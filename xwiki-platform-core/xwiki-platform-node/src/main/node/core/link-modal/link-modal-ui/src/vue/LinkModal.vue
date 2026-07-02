@@ -22,21 +22,22 @@ import AttachmentConfig from "./linkTypes/AttachmentConfig.vue";
 import EmailConfig from "./linkTypes/EmailConfig.vue";
 import PageConfig from "./linkTypes/PageConfig.vue";
 import UrlConfig from "./linkTypes/UrlConfig.vue";
+import { createLinkEditionContext } from "../linkSuggest.js";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
 import { provide } from "vue";
 import { useI18n } from "vue-i18n";
 import type { LinkData } from "../data/linkType";
-import type { LinkEditionContext } from "../linkSuggest";
+import type { Container } from "inversify";
 
 const props = defineProps<{
   current: LinkData;
-  linkEditionCtx: LinkEditionContext;
+  depsContainer: Container;
 }>();
 
 const { t } = useI18n({ messages: translations });
 
-provide("linkEditionCtx", props.linkEditionCtx);
+provide("linkEditionCtx", createLinkEditionContext(props.depsContainer));
 
 const linkData = typedRef(props.current);
 

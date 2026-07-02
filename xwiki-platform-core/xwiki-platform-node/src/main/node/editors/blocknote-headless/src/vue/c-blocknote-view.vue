@@ -45,6 +45,10 @@ import type {
 } from "@xwiki/platform-editors-blocknote-react";
 import type { LinkData } from "@xwiki/platform-link-modal-ui";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 import type { UniAst } from "@xwiki/platform-uniast-api";
 
 type Props = {
@@ -99,6 +103,14 @@ defineExpose({
   // Get the editor's content
   getContent: (): UniAst | Error => extractEditorContent(),
 });
+
+const remoteURLParser = depsContainer
+  .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+  .get()!;
+
+const remoteURLSerializer = depsContainer
+  .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+  .get()!;
 
 /**
  * Extract the editor's content and convert it to UniAst
@@ -161,7 +173,7 @@ const submitEditedLink = ({
       ? config.url
       : type === "email"
         ? `mailto:${config.address}`
-        : linkEditionCtx.remoteURLSerializer.serialize(config.ref!)!;
+        : remoteURLSerializer.serialize(config.ref!)!;
 
   editingLink.value?.onSubmit({
     title: displayText,
@@ -189,6 +201,16 @@ const linkModalContainer = useTemplateRef<HTMLElement>("link-modal-container");
 const mountedBlockNote = ref<{ unmount: () => void }>();
 
 const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
+
+function handleLinkEditorOutsideClick(e: MouseEvent) {
+  if (!editingLink.value || !linkModalContainer.value) {
+    return;
+  }
+
+  if (!e.composedPath().includes(linkModalContainer.value)) {
+    editingLink.value = null;
+  }
+}
 
 onMounted(() => {
   if (content instanceof Error) {
@@ -231,12 +253,9 @@ onUnmounted(() => {
     <LinkModal
       :current="{
         displayText: editingLink.current.title,
-        target: parseLinkTarget(
-          editingLink.current.url,
-          linkEditionCtx.remoteURLParser,
-        ),
+        target: parseLinkTarget(editingLink.current.url, remoteURLParser),
       }"
-      :link-edition-ctx="linkEditionCtx"
+      :deps-container="depsContainer"
       @submit="submitEditedLink"
       @cancel="editingLink = null"
     />

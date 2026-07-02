@@ -67,19 +67,20 @@ public class CaptchaServiceManager implements Initializable
      */
     public CaptchaService getCaptchaService(String engine) throws CaptchaException
     {
-        CaptchaService result = null;
-
-        CaptchaEngine captchaEngine = null;
+        CaptchaEngine captchaEngine;
 
         try {
-            Class<CaptchaEngine> engineClass = (Class<CaptchaEngine>) Class.forName(engine);
-            captchaEngine = engineClass.getConstructor(null).newInstance(null);
+            Class<?> engineClass = Class.forName(engine);
+            if (!CaptchaEngine.class.isAssignableFrom(engineClass)) {
+                throw new CaptchaException(String.format("Invalid engine [%s]: not a CaptchaEngine", engine));
+            }
+            captchaEngine = (CaptchaEngine) engineClass.getDeclaredConstructor().newInstance();
+        } catch (CaptchaException e) {
+            throw e;
         } catch (Exception e) {
             throw new CaptchaException(String.format("Invalid engine [%s]", engine), e);
         }
 
-        result = new GenericManageableCaptchaService(captchaStore, captchaEngine, 180, 100000, 75000);
-
-        return result;
+        return new GenericManageableCaptchaService(captchaStore, captchaEngine, 180, 100000, 75000);
     }
 }

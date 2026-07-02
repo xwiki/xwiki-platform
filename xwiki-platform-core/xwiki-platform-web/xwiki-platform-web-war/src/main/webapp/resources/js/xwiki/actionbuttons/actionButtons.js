@@ -538,12 +538,12 @@ var XWiki = (function(XWiki) {
           "  <li>$services.localization.render('csrf.error.causes.stalesession')</li>" +
           "  <li>$services.localization.render('csrf.error.causes.forgedrequest')</li>" +
           "</ul>");
+        var buttonsDiv =  new Element('div', {'class': 'csrf-warning-buttons'});
         if (answerJson.allowResubmit === 'true') {
           content.insert("<div class=\"resubmit-question\">" +
             "  $services.localization.render('csrf.error.resubmit.question')" +
             "</div>");
 
-          var buttonsDiv =  new Element('div', {'class': 'csrf-warning-buttons'});
           var buttonCreate = new Element('button', {'class': 'resubmit-primary btn btn-primary', 'id': 'cancel-save-csrf'});
           buttonCreate.insert("$services.localization.render('csrf.error.resubmit.question.no')");
           buttonsDiv.insert(buttonCreate);

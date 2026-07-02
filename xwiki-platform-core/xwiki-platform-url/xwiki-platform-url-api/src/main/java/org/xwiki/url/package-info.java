@@ -38,3 +38,4 @@
  * @since 5.3M1
  */
 package org.xwiki.url;
+

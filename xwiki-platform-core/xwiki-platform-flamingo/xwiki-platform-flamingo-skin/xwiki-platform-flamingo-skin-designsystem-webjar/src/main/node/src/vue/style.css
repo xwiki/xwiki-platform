@@ -1,0 +1,91 @@
+:root {
+    --cr-sizes-max-page-width: calc(var(--max-screen-size) * 1px); /*This value controls the width of the main content. It should be 100% for spanning text along the whole width or an arbitraty value*/
+    --cr-sizes-main-sidebar-width: var(--panel-column-left-width);; /*The default width of the main sidebar*/
+    --cr-sizes-main-sidebar-min-width: 0; /*The minimum width of the main sidebar*/
+    --cr-base-font-size: var(--font-size-base);
+    --cr-base-text-color: var(--text-color);
+    --cr-base-link-color: var(--link-color);
+    --cr-base-visited-link-color: var(--link-color);
+    --cr-mute-text-color: var(--text-muted);
+
+    /*
+     * Typography
+     */
+
+    /* Fonts */
+    --cr-font-mono: var(--font-family-monospace);
+    --cr-font-sans: var(--font-family-sans-serif);
+    --cr-font-serif: var(--font-family-serif);
+
+    /* Font sizes */
+    --cr-font-size-2x-small: calc(var(--cr-base-font-size) * 0.625);
+    --cr-font-size-x-small: calc(var(--cr-base-font-size) * 0.75);
+    --cr-font-size-small: calc(var(--cr-base-font-size) * 0.875);
+    --cr-font-size-medium: var(--cr-base-font-size);
+    --cr-font-size-large: calc(var(--cr-base-font-size) * 1.25);
+    --cr-font-size-x-large: calc(var(--cr-base-font-size) * 1.5);
+    --cr-font-size-2x-large: calc(var(--cr-base-font-size) * 2.25);
+    --cr-font-size-3x-large: calc(var(--cr-base-font-size) * 3);
+    --cr-font-size-4x-large: calc(var(--cr-base-font-size) * 4.5);
+
+    /* Font weights */
+    --cr-font-weight-light: cal(var(--font-weight-regular) -100); /* deriving it because we currently don't define it*/
+    --cr-font-weight-normal: var(--font-weight-regular);
+    --cr-font-weight-semibold: var(--font-weight-semibold);
+    --cr-font-weight-bold: var(--font-weight-bold);
+
+    /* Letter spacings - arbitrary values because bootstrap and flamingo does not define them. */
+    --cr-letter-spacing-denser: -0.05em;
+    --cr-letter-spacing-dense: -0.025em;
+    --cr-letter-spacing-normal: 0;
+    --cr-letter-spacing-loose: 0.05em;
+    --cr-letter-spacing-looser: 0.1em;
+
+    /* Line heights - arbitrary values because bootstrap and flamingo does not define them. */
+    --cr-line-height-denser: 1;
+    --cr-line-height-dense: 1.25;
+    --cr-line-height-normal: 1.42857143;
+    --cr-line-height-loose: 1.6;
+    --cr-line-height-looser: 2;
+
+    /* Neutral */
+    --cr-color-neutral-50: color-mix(in srgb, white 97.5%, var(--text-color));
+    --cr-color-neutral-100: color-mix(in srgb, white 95.9%, var(--text-color));
+    --cr-color-neutral-200: color-mix(in srgb, white 90%, var(--text-color));
+    --cr-color-neutral-300: color-mix(in srgb, white 83.9%, var(--text-color));
+    --cr-color-neutral-400: color-mix(in srgb, white 64.9%, var(--text-color));
+    --cr-color-neutral-500: color-mix(in srgb, white 46.1%, var(--text-color));
+    --cr-color-neutral-600: color-mix(in srgb, white 33.9%, var(--text-color));
+    --cr-color-neutral-700: color-mix(in srgb, white 26.1%, var(--text-color));
+    --cr-color-neutral-800: color-mix(in srgb, white 15.9%, var(--text-color));
+    --cr-color-neutral-900: color-mix(in srgb, white 10%, var(--text-color));
+    --cr-color-neutral-950: color-mix(in srgb, white 8%, var(--text-color));
+
+    /*
+     * Border radii
+     */
+
+    --cr-border-radius-small: 0.1875rem; /* 3px */
+    --cr-border-radius-medium: 0.25rem; /* 4px */
+    --cr-border-radius-large: 0.5rem; /* 8px */
+    --cr-border-radius-x-large: 1rem; /* 16px */
+
+    --cr-border-radius-circle: 50%;
+    --cr-border-radius-pill: 9999px;
+
+    /*
+     * Spacings
+     */
+    --cr-spacing-3x-small: calc(var(--button-spacing) * 0.25);
+    --cr-spacing-2x-small: calc(var(--button-spacing) * 0.5);
+    --cr-spacing-x-small: calc(var(--button-spacing) * 0.75);
+    --cr-spacing-small: var(--button-spacing);
+    --cr-spacing-medium: calc(var(--button-spacing) * 1.5);
+    --cr-spacing-large: calc(var(--button-spacing) * 2);
+    --cr-spacing-x-large: calc(var(--button-spacing) * 3);
+    --cr-spacing-2x-large: calc(var(--button-spacing) * 4);
+    --cr-spacing-3x-large: calc(var(--button-spacing) * 6);
+    --cr-spacing-4x-large: calc(var(--button-spacing) * 8);
+    --cr-input-border-color: var(--cr-color-neutral-400);
+    --cr-input-border-width: 1px;
+}

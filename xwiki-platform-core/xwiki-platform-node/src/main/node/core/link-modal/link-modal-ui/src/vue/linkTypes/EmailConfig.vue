@@ -18,12 +18,41 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import "./style.css";
+import { translations } from "../../translations";
+import LinkConfig from "../LinkConfig.vue";
+import { useI18n } from "vue-i18n";
+import type { LinkData, LinkEmailConfig } from "../../data/linkType";
+
+defineProps<{ linkData: LinkData }>();
+
+const model = defineModel<LinkEmailConfig>({
+  required: true,
+});
+
+const { t } = useI18n({ messages: translations });
 </script>
 
-<!-- eslint-disable-next-line vue/valid-template-root-->
 <template>
-  <!-- Every required element is loaded from the context. -->
-</template>
+  <LinkConfig :link-data>
+    <template #config>
+      <x-text-field
+        :label="t('link-modal.target-types.email.address')"
+        type="email"
+        v-model="model.address"
+        required
+      />
+    </template>
 
-<style scoped></style>
+    <template #options>
+      <x-text-field
+        :label="t('link-modal.target-types.email.subject')"
+        v-model="model.messageSubject"
+      />
+
+      <x-text-field
+        :label="t('link-modal.target-types.email.body')"
+        v-model="model.messageBody"
+      />
+    </template>
+  </LinkConfig>
+</template>

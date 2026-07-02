@@ -54,6 +54,7 @@ export type BlockNoteViewWrapperProps = {
     collaboration?: Collaboration;
     onChange?: (editor: EditorType) => void;
     depsContainer: Container;
+    linkEditionHandler: LinkEditionHandler;
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
     };
@@ -142,6 +143,22 @@ export type InlineMacroInvocation = {
     } | {
         type: "none";
     };
+};
+
+// @beta
+export type LinkEditionHandler = (props: LinkEditionHandlerProps) => void;
+
+// @beta
+export type LinkEditionHandlerProps = {
+    current: {
+        title: string;
+        url: string;
+    };
+    onSubmit: (link: {
+        title: string;
+        url: string;
+    }) => void;
+    mode: "createNew" | "editExisting";
 };
 
 // @beta

@@ -17,28 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Container, inject, injectable } from "inversify";
 
-// FIXME: We have to inject a partial Cristal Application for BlockNote to work at the moment.
-@injectable("Singleton")
-export class MinimalApp {
-  public static bind(container: Container): void {
-    container.bind("CristalApp").to(MinimalApp).inSingletonScope();
-  }
+import { generateConfigVue } from "@xwiki/platform-tool-viteconfig";
+import { UserConfig } from "vite";
 
-  private readonly wikiConfig = {
-    getType: () => "XWiki",
-    realtimeHint: "xwiki",
-    baseURL: XWiki.contextPath,
-  };
+const config: UserConfig = generateConfigVue(import.meta.url);
 
-  constructor(@inject("Container") private readonly container: Container) {}
-
-  getContainer() {
-    return this.container;
-  }
-
-  getWikiConfig() {
-    return this.wikiConfig;
-  }
-}
+export default config;

@@ -17,32 +17,30 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script lang="ts" setup>
-import { computed } from "vue";
-import type { BtnProps } from "@xwiki/platform-dsapi";
+<script setup lang="ts">
+import { translations } from "../../translations";
+import LinkConfig from "../LinkConfig.vue";
+import { useI18n } from "vue-i18n";
+import type { LinkData, LinkUrlConfig } from "../../data/linkType";
 
-const { variant, size } = defineProps<BtnProps>();
-const bVariant = computed(() => {
-  if (!variant) {
-    return "btn-default";
-  }
-  switch (variant) {
-    case "text":
-      return "btn-link";
-    case "neutral":
-      return "btn-default";
-    default:
-      return "btn-" + variant;
-  }
+defineProps<{ linkData: LinkData }>();
+
+const model = defineModel<LinkUrlConfig>({
+  required: true,
 });
-const bSize = computed(() => {
-  if (size === "small") {
-    return "btn-sm";
-  } else {
-    return "";
-  }
-});
+
+const { t } = useI18n({ messages: translations });
 </script>
+
 <template>
-  <button :class="['btn', bVariant, bSize]"><slot /></button>
+  <LinkConfig :link-data>
+    <template #config>
+      <x-text-field
+        :label="t('link-modal.target-types.url.url')"
+        type="url"
+        v-model="model.url"
+        required
+      />
+    </template>
+  </LinkConfig>
 </template>

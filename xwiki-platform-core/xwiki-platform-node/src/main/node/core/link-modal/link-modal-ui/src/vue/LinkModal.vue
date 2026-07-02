@@ -1,0 +1,104 @@
+<!--
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<script setup lang="ts">
+import AttachmentConfig from "./linkTypes/AttachmentConfig.vue";
+import EmailConfig from "./linkTypes/EmailConfig.vue";
+import PageConfig from "./linkTypes/PageConfig.vue";
+import UrlConfig from "./linkTypes/UrlConfig.vue";
+import { createLinkEditionContext } from "../linkSuggest.js";
+import { translations } from "../translations";
+import { typedRef } from "../utils";
+import { provide } from "vue";
+import { useI18n } from "vue-i18n";
+import type { LinkData } from "../data/linkType";
+import type { Container } from "inversify";
+
+const props = defineProps<{
+  current: LinkData;
+  depsContainer: Container;
+}>();
+
+const { t } = useI18n({ messages: translations });
+
+provide("linkEditionCtx", createLinkEditionContext(props.depsContainer));
+
+const linkData = typedRef(props.current);
+
+defineEmits<{ submit: [LinkData]; cancel: [] }>();
+</script>
+
+<template>
+  <div :class="$style.container">
+    <url-config
+      v-if="linkData.target.type === 'url'"
+      v-model="linkData.target.config"
+      :link-data="linkData"
+    />
+
+    <page-config
+      v-if="linkData.target.type === 'page'"
+      v-model="linkData.target.config"
+      :link-data="linkData"
+    />
+
+    <attachment-config
+      v-if="linkData.target.type === 'attachment'"
+      v-model="linkData.target.config"
+      :link-data="linkData"
+    />
+
+    <email-config
+      v-if="linkData.target.type === 'email'"
+      v-model="linkData.target.config"
+      :link-data="linkData"
+    />
+
+    <div :class="$style.actions">
+      <x-btn variant="success" @click="$emit('submit', linkData)">
+        {{ t("link-modal.buttons.submit") }}
+      </x-btn>
+
+      <x-btn variant="neutral" @click="$emit('cancel')">
+        {{ t("link-modal.buttons.cancel") }}
+      </x-btn>
+    </div>
+  </div>
+</template>
+
+<style module>
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cr-spacing-large);
+  position: absolute;
+  border: var(--cr-input-border-width) solid var(--cr-input-border-color);
+  border-radius: var(--cr-border-radius-large);
+  background: var(--cr-color-neutral-50);
+  padding: var(--cr-spacing-medium);
+  z-index: 99;
+}
+
+.actions {
+  padding: var(--cr-spacing-large);
+  display: flex;
+  justify-content: end;
+  gap: var(--cr-spacing-medium);
+}
+</style>

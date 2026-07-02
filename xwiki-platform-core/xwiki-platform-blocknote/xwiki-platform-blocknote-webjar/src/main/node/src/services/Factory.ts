@@ -18,6 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { Logic } from "./Logic";
+import { resolverPromise } from "@xwiki/platform-component-manager-default";
+import type { DesignSystemLoader } from "@xwiki/platform-api";
 
 /**
  * Factory class to create and manage BlockNote instances.
@@ -40,9 +42,14 @@ export class Factory {
    * @returns a promise that resolves to the BlockNote instance associated with the given host element
    */
   async create(element: HTMLElement) {
+    const resolver = await resolverPromise;
+    const designSystemLoader = await resolver.getAsync<DesignSystemLoader>(
+      Symbol.for("DesignSystemLoader"),
+      "flamingo",
+    );
     let logic = this.instancesByHost.get(element);
     if (!logic) {
-      logic = new Logic(element);
+      logic = new Logic(element, { designSystemLoader });
       this.instancesByHost.set(element, logic);
       if (logic.name) {
         this.instancesByName.set(logic.name, logic);

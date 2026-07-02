@@ -17,32 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { LinkType } from "@xwiki/platform-link-suggest-api";
-import { Container, injectable } from "inversify";
-import type {
-  Link,
-  LinkSuggestService,
-} from "@xwiki/platform-link-suggest-api";
 
-@injectable("Singleton")
-export class XWikiLinkSuggestService implements LinkSuggestService {
-  public static bind(container: Container): void {
-    container
-      .bind("LinkSuggestService")
-      .to(XWikiLinkSuggestService)
-      .inSingletonScope()
-      .whenNamed("XWiki");
-  }
+import en from "../langs/translation-en.json";
 
-  public async getLinks(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    query: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    linkType?: LinkType,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    mimetype?: string,
-  ): Promise<Link[]> {
-    // TODO
-    return Promise.resolve([]);
-  }
-}
+// TODO: handle translations in a way that can be handled by the server itself: https://jira.xwiki.org/browse/XWIKI-24392
+export const translations: Record<string, Record<string, string>> = {
+  en,
+};

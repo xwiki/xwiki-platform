@@ -17,28 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Container, inject, injectable } from "inversify";
 
-// FIXME: We have to inject a partial Cristal Application for BlockNote to work at the moment.
-@injectable("Singleton")
-export class MinimalApp {
-  public static bind(container: Container): void {
-    container.bind("CristalApp").to(MinimalApp).inSingletonScope();
-  }
+import { default as _LinkModal } from "./vue/LinkModal.vue";
 
-  private readonly wikiConfig = {
-    getType: () => "XWiki",
-    realtimeHint: "xwiki",
-    baseURL: XWiki.contextPath,
-  };
+/**
+ * Link modal UI component
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+export const LinkModal = _LinkModal;
 
-  constructor(@inject("Container") private readonly container: Container) {}
+export type {
+  LinkAttachmentConfig,
+  LinkData,
+  LinkEmailConfig,
+  LinkPageConfig,
+  LinkTarget,
+  LinkUrlConfig,
+} from "./data/linkType";
 
-  getContainer() {
-    return this.container;
-  }
-
-  getWikiConfig() {
-    return this.wikiConfig;
-  }
-}
+export { parseLinkTarget } from "./convert";

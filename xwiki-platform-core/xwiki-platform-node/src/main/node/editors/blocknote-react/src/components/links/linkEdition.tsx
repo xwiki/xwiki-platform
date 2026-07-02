@@ -17,28 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Container, inject, injectable } from "inversify";
 
-// FIXME: We have to inject a partial Cristal Application for BlockNote to work at the moment.
-@injectable("Singleton")
-export class MinimalApp {
-  public static bind(container: Container): void {
-    container.bind("CristalApp").to(MinimalApp).inSingletonScope();
-  }
+/**
+ * Function called to open the link editor
+ *
+ * @since 18.4.0RC-1
+ * @beta
+ */
+type LinkEditionHandler = (props: LinkEditionHandlerProps) => void;
 
-  private readonly wikiConfig = {
-    getType: () => "XWiki",
-    realtimeHint: "xwiki",
-    baseURL: XWiki.contextPath,
-  };
+/**
+ * Properties for the link editor handler
+ *
+ * @since 18.4.0RC-1
+ * @beta
+ */
+type LinkEditionHandlerProps = {
+  current: { title: string; url: string };
+  onSubmit: (link: { title: string; url: string }) => void;
+  mode: "createNew" | "editExisting";
+};
 
-  constructor(@inject("Container") private readonly container: Container) {}
-
-  getContainer() {
-    return this.container;
-  }
-
-  getWikiConfig() {
-    return this.wikiConfig;
-  }
-}
+export type { LinkEditionHandler, LinkEditionHandlerProps };

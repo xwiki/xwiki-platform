@@ -387,15 +387,6 @@ defineExpose({
 
 <style>
 .xwiki-blocknote {
-  --cr-base-font-size: unset;
-  --cr-base-text-color: unset;
-  --cr-font-sans: unset;
-  --cr-font-size-x-large: 24px; /* --font-size-h2 */
-  --cr-font-size-large: 20px; /* --font-size-h3 */
-  --cr-font-size-medium: 17px; /* --font-size-h4 */
-  --cr-font-weight-normal: var(--font-weight-regular);
-  --cr-line-height-normal: unset;
-
   .bn-container {
     --bn-font-family: unset;
     --mantine-font-size-md: inherit;

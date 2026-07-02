@@ -17,26 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { registerAsyncComponent } from "@xwiki/platform-api";
-import { injectable } from "inversify";
-import type { DesignSystemLoader } from "@xwiki/platform-api";
-import type { Container } from "inversify";
-import type { App } from "vue";
+import { ref } from "vue";
+import type { Ref } from "vue";
 
-@injectable("Singleton")
-export class XWikiDesignSystemLoader implements DesignSystemLoader {
-  public static bind(container: Container): void {
-    container
-      .bind<DesignSystemLoader>("DesignSystemLoader")
-      .to(XWikiDesignSystemLoader)
-      .inSingletonScope();
-  }
-
-  loadDesignSystem(app: App): void {
-    registerAsyncComponent(
-      app,
-      "XBtn",
-      () => import("../../components/ds/x-btn.vue"),
-    );
-  }
+/**
+ * Create a correctly-typed Vue 3 references
+ *
+ * Required because of fundamental incompatibility between ES6's private fields and Vue's reactivity
+ *
+ * Functionally equivalent to ref()
+ *
+ * @see https://stackoverflow.com/a/68731963
+ *
+ * @param value - The value to wrap in a Vue reference
+ *
+ * @returns A Vue reference
+ */
+export function typedRef<T>(value: T): Ref<T> {
+  return ref(value) as Ref<T>;
 }

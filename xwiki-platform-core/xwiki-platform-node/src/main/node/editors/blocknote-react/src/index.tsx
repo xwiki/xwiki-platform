@@ -90,3 +90,8 @@ export type {
   MacroBlockInvocation,
   MacroInsertionEditorPrefillData,
 } from "./blocknote/utils";
+
+export type {
+  LinkEditionHandler,
+  LinkEditionHandlerProps,
+} from "./components/links/linkEdition";

@@ -79,7 +79,7 @@ export default {
      */
     applyEdit() {
       const documentName = this.logic.getEntryId(this.entry);
-      if (!documentName) {
+      if (!documentName && !this.entry._new) {
         new XWiki.widgets.Notification(
           this.$t(
             "livedata.displayer.xObjectProperty.missingDocumentName.errorMessage",
@@ -169,6 +169,7 @@ export default {
               $(this.$refs.xObjectPropertyEdit)
                 .find(":input")
                 .filter(":visible")
+                .first()
                 .focus();
             }
           });

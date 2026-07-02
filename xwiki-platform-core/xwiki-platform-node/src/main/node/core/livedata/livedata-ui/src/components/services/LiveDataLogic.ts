@@ -65,6 +65,8 @@ export class LiveDataLogic implements Logic {
   private readonly editBusInstance: EditBusService;
   private readonly isTranslationsLoaded: Promise<boolean>;
 
+  private editMode: Ref<boolean> = ref(false);
+
   constructor(
     private readonly liveDataSource: LiveDataSource,
     data: string,
@@ -215,6 +217,9 @@ export class LiveDataLogic implements Logic {
    */
   getEntryId(values: Values): string | undefined {
     const idProperty = this.data.meta.entryDescriptor.idProperty || "id";
+    if (values._new) {
+      return undefined;
+    }
     if (values[idProperty] === undefined) {
       console.warn("Entry has no id (at property [" + idProperty + "]", values);
       return;
@@ -424,6 +429,10 @@ export class LiveDataLogic implements Logic {
       this.fetchEntries()
         // eslint-disable-next-line promise/always-return
         .then((data) => {
+          // We need to keep drafts to insert them back in the entries.
+          const drafts = this.data.data.entries.filter((entry) => entry._new);
+          data.entries.push(...drafts);
+
           this.data.data = data;
           // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated
           // first.
@@ -563,10 +572,19 @@ export class LiveDataLogic implements Logic {
    * @param  values - the entry's values to update
    */
   setValues({ entryId, values }: { entryId: string; values: unknown }) {
-    const source = this.data.query.source;
-    return this.liveDataSource
-      .updateEntry(source, entryId, values)
-      .then(() => this.updateEntries());
+    const newEntry = this.data.data.entries.find((entry) => entry._new);
+    // We don't automatically save on new row changes.
+    if (!entryId && newEntry) {
+      return new Promise<void>((resolve) => {
+        Object.assign(newEntry, values);
+        resolve();
+      });
+    } else {
+      const source = this.data.query.source;
+      return this.liveDataSource
+        .updateEntry(source, entryId, values)
+        .then(() => this.updateEntries());
+    }
   }
 
   /**
@@ -574,11 +592,33 @@ export class LiveDataLogic implements Logic {
    */
   canAddEntry() {
     // Check if the add entry action is available.
-    return this.data.meta.actions.find((action) => action.id === "addEntry");
+    return (
+      this.editMode.value &&
+      !this.data.data.entries.some((entry) => entry._new) &&
+      this.data.meta.actions.find((action) => action.id === "addEntry")
+    );
   }
 
   addEntry() {
-    throw new Error("not implemented");
+    const newEntry: Record<string, string> = { _new: "true" };
+    for (const actionKey of this.getEntryActionKeys()) {
+      newEntry[actionKey] = "true";
+    }
+    this.data.data.entries.push(newEntry);
+  }
+
+  /**
+   * Find the actual property names for the actions available on columns.
+   */
+  private getEntryActionKeys(): Set<string> {
+    return new Set(
+      ["view", "edit"]
+        .map(
+          (id) =>
+            this.data.meta.actions.find((a) => a.id === id)?.allowProperty,
+        )
+        .filter((p): p is string => !!p),
+    );
   }
 
   /**
@@ -724,7 +764,7 @@ export class LiveDataLogic implements Logic {
    */
   isPropertyVisible(propertyId: string) {
     const propertyDescriptor = this.getPropertyDescriptor(propertyId);
-    return propertyDescriptor?.visible ?? false;
+    return (propertyDescriptor?.visible ?? false) || this.editMode.value;
   }
 
   /**
@@ -1494,5 +1534,58 @@ export class LiveDataLogic implements Logic {
     // Make sure that the translations are loaded from the server before translating.
     await this.translationsLoaded();
     return this.t(key, args);
+  }
+
+  enableEditMode() {
+    this.editMode.value = true;
+  }
+
+  disableEditMode() {
+    this.editMode.value = false;
+  }
+
+  isEditMode(): boolean {
+    return this.editMode.value;
+  }
+
+  hasEditMode(): boolean {
+    return this.data.query.source.hasEditMode == "true";
+  }
+
+  async saveNewEntry() {
+    const newEntryIndex = this.data.data.entries.findIndex((e) => e._new);
+    if (newEntryIndex >= 0) {
+      const entryActionKeys = this.getEntryActionKeys();
+      try {
+        // Submit only data properties, filtering out internal flags and action keys.
+        await this.liveDataSource.addEntry(
+          this.data.query.source,
+          Object.fromEntries(
+            Object.entries(this.data.data.entries[newEntryIndex]).filter(
+              ([k]) => !k.startsWith("_") && !entryActionKeys.has(k),
+            ),
+          ),
+        );
+        // We remove the draft once it's successfully saved.
+        this.data.data.entries.splice(newEntryIndex, 1);
+        await this.updateEntries();
+      } catch (e) {
+        console.error("Failed to create entry", e);
+        this.translate("livedata.error.addEntryFailed")
+          .then(
+            // @ts-expect-error XWiki.widgets is expected to be globally accessible
+            (value) => new XWiki.widgets.Notification(value, "error"),
+          )
+          .catch(() => {});
+        throw e;
+      }
+    }
+  }
+
+  cancelNewEntry() {
+    const newIndex = this.data.data.entries.findIndex((e) => e._new);
+    if (newIndex >= 0) {
+      this.data.data.entries.splice(newIndex, 1);
+    }
   }
 }

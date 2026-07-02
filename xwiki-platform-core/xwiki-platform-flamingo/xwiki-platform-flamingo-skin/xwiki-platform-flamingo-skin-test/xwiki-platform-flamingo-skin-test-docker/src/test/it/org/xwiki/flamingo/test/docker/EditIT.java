@@ -337,6 +337,7 @@ public class EditIT
 
             // check that the warning is still displayed after a cancel
             assertTrue(editWiki.isCSRFWarningDisplayed());
+            assertTrue(editWiki.hasForceSaveCSRFButton());
             editWiki.clickForceSaveCSRFButton();
             editWiki.waitForNotificationSuccessMessage("Saved");
 

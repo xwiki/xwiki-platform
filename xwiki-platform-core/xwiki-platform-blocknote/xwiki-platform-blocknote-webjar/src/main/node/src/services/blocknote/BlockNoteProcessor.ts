@@ -24,7 +24,7 @@ import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
  * In other words, it acts as a pre-processor and post-processor for the BlockNote content.
  *
  * @beta
- * @since 18.5.0RC1
+ * @since 18.6.0RC1
  */
 interface BlockNoteProcessor {
   /**

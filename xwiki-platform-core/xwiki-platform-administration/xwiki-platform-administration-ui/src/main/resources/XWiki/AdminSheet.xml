@@ -238,8 +238,9 @@
  *#
 #macro(admin_displayCategory $sections $translationPrefix)
 (% class="admin-category" %)
-  #set ($sortedSections = [])
-  #sortCollectionOfMapsByField($sections, 'order', 9999, 'asc', $sortedSections)
+#set ($sortedSections = [])
+## XWIKI-24518 Without the ((())) the following line was outputing a <p> filled with &nbsp;
+(((#sortCollectionOfMapsByField($sections, 'order', 9999, 'asc', $sortedSections))))
 (% class="admin-categories-container" %)
 (((
   #foreach ($section in $sortedSections)

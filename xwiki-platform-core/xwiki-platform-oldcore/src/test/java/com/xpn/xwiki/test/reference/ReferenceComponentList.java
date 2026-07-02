@@ -51,8 +51,10 @@ import org.xwiki.model.internal.reference.ExplicitStringDocumentReferenceResolve
 import org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitStringPageAttachmentReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitStringPageReferenceResolver;
+import org.xwiki.model.internal.reference.FSPathStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.WithParametersStringEntityReferenceResolver;
@@ -62,6 +64,7 @@ import org.xwiki.model.internal.reference.WithTypeAndParametersStringEntityRefer
 import org.xwiki.model.internal.reference.WithTypeStringEntityReferenceSerializer;
 import org.xwiki.test.annotation.ComponentList;
 
+import com.xpn.xwiki.internal.model.DefaultLegacySpaceResolver;
 import com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer;
 import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
 import com.xpn.xwiki.internal.model.reference.CurrentAttachmentReferenceResolver;
@@ -172,6 +175,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     WithParametersSymbolScheme.class,
     WithTypeAndParametersStringEntityReferenceSerializer.class,
     WithTypeStringEntityReferenceSerializer.class,
+    FSPathStringEntityReferenceSerializer.class,
+    PathStringEntityReferenceSerializer.class,
+    DefaultLegacySpaceResolver.class,
 
     DefaultModelConfiguration.class,
     EntityReferenceFactory.class

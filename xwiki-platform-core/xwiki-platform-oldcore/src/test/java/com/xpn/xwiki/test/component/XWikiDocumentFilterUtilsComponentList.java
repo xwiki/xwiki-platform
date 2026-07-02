@@ -37,6 +37,7 @@ import org.xwiki.filter.xar.internal.input.XARInputFilterStream;
 import org.xwiki.filter.xar.internal.input.XARInputFilterStreamFactory;
 import org.xwiki.filter.xar.internal.output.XAROutputFilterStream;
 import org.xwiki.filter.xar.internal.output.XAROutputFilterStreamFactory;
+import org.xwiki.filter.xar.internal.output.XARWikiWriter;
 import org.xwiki.properties.internal.DefaultBeanManager;
 import org.xwiki.properties.internal.DefaultConverterManager;
 import org.xwiki.properties.internal.converter.ConvertUtilsConverter;
@@ -145,6 +146,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     XARInputFilterStream.class,
     XAROutputFilterStreamFactory.class,
     XAROutputFilterStream.class,
+    XARWikiWriter.class,
     XarObjectPropertySerializerManager.class,
     ListXarObjectPropertySerializer.class,
     DateXarObjectPropertySerializer.class,

@@ -731,7 +731,7 @@ public class XarPackage
             try {
                 writer.close();
             } catch (XMLStreamException e) {
-                LOGGER.warn("Failed to close XML writer: {}", ExceptionUtils.getRootCauseMessage(e));
+                LOGGER.warn("Failed to close XML writer: [{}]", ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

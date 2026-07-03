@@ -125,8 +125,8 @@ public class DefaultIOService implements IOService
                 documentFullName = this.serializer.serialize(docRef);
             }
             // now get the document with that name
-            XWikiContext xcontext = getXWikiContext();
-            XWikiDocument document = xcontext.getWiki().getDocument(documentFullName, xcontext);
+            XWikiContext deprecatedContext = getXWikiContext();
+            XWikiDocument document = deprecatedContext.getWiki().getDocument(documentFullName, deprecatedContext);
             // Avoid modifying the cached document
             document = document.clone();
             // create a new object in this document to hold the annotation
@@ -135,13 +135,13 @@ public class DefaultIOService implements IOService
             EntityReference annotationClassReference = this.configuration.getAnnotationClassReference();
             annotationClassReference =
                 annotationClassReference.removeParent(annotationClassReference.extractReference(EntityType.WIKI));
-            BaseObject object = document.newXObject(annotationClassReference, xcontext);
-            updateObject(object, annotation, xcontext);
+            BaseObject object = document.newXObject(annotationClassReference, deprecatedContext);
+            updateObject(object, annotation, deprecatedContext);
             // and set additional data: author to annotation author, date to now and the annotation target
-            object.set(Annotation.DATE_FIELD, new Date(), xcontext);
+            object.set(Annotation.DATE_FIELD, new Date(), deprecatedContext);
             // TODO: maybe we shouldn't trust what we receive from the caller but set the author from the context.
             // Or the other way around, set the author of the document from the annotations author.
-            object.set(Annotation.AUTHOR_FIELD, annotation.getAuthor(), xcontext);
+            object.set(Annotation.AUTHOR_FIELD, annotation.getAuthor(), deprecatedContext);
             // store the target of this annotation, serialized with a local serializer, to be exportable and importable
             // in a different wiki
             // TODO: figure out if this is the best idea in terms of target serialization
@@ -157,17 +157,17 @@ public class DefaultIOService implements IOService
                 // This makes it easier to have a valid annotation reference in case of page move/copy.
                 if (!Objects.equals(targetReference, object.getDocumentReference())) {
                     object.set(Annotation.TARGET_FIELD, this.localSerializer.serialize(targetReference),
-                        xcontext);
+                        deprecatedContext);
                 }
             } else {
-                object.set(Annotation.TARGET_FIELD, target, xcontext);
+                object.set(Annotation.TARGET_FIELD, target, deprecatedContext);
             }
             // set the author of the document to the current user
-            document.setAuthor(xcontext.getUser());
+            document.setAuthor(deprecatedContext.getUser());
             // Note: We make sure to only provide a few characters of contextual information in order to control the
             // size of the comment (we display the first 30 characters).
-            xcontext.getWiki().saveDocument(document, "Added annotation on \""
-                + StringUtils.abbreviate(annotation.getSelection(), 30) + "\"", true, xcontext);
+            deprecatedContext.getWiki().saveDocument(document, "Added annotation on \""
+                + StringUtils.abbreviate(annotation.getSelection(), 30) + "\"", true, deprecatedContext);
         } catch (XWikiException e) {
             throw new IOServiceException("An exception message has occurred while saving the annotation", e);
         }
@@ -200,8 +200,8 @@ public class DefaultIOService implements IOService
                 docName = this.serializer.serialize(targetReference.extractReference(EntityType.DOCUMENT));
             }
             // Get the document
-            XWikiContext xcontext = getXWikiContext();
-            XWikiDocument document = xcontext.getWiki().getDocument(docName, xcontext);
+            XWikiContext deprecatedContext = getXWikiContext();
+            XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
             // And the annotation class objects in it
             List<BaseObject> objects = document.getXObjects(this.configuration.getAnnotationClassReference());
             // and build a list of Annotation objects
@@ -247,8 +247,8 @@ public class DefaultIOService implements IOService
                 docName = this.serializer.serialize(targetReference.extractReference(EntityType.DOCUMENT));
             }
             // get the document
-            XWikiContext xcontext = getXWikiContext();
-            XWikiDocument document = xcontext.getWiki().getDocument(docName, xcontext);
+            XWikiContext deprecatedContext = getXWikiContext();
+            XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
             // and the annotation class objects in it
             // parse the annotation id as object index
             BaseObject object =
@@ -266,20 +266,6 @@ public class DefaultIOService implements IOService
             throw new IOServiceException("An exception has occurred while loading the annotation with id "
                 + annotationID, e);
         }
-    }
-
-    /**
-     * @param targetField the target stored on the annotation object
-     * @param localTargetId the serialized reference of the requested target
-     * @param isDocumentType {@code true} if the requested target is a document (i.e. its content)
-     * @return {@code true} if the object holds an annotation for the requested target. This is the case either when the
-     *     stored target matches the requested one, or when the stored target is blank and the requested target is the
-     *     document: a blank target is the representation of an annotation on the document content, which stays valid
-     *     when the document is moved (unlike a target storing the document reference explicitly)
-     */
-    private boolean matchesTarget(String targetField, String localTargetId, boolean isDocumentType)
-    {
-        return Objects.equals(localTargetId, targetField) || (StringUtils.isBlank(targetField) && isDocumentType);
     }
 
     /**
@@ -309,8 +295,8 @@ public class DefaultIOService implements IOService
                 docName = this.serializer.serialize(targetReference.extractReference(EntityType.DOCUMENT));
             }
             // get the document
-            XWikiContext xcontext = getXWikiContext();
-            XWikiDocument document = xcontext.getWiki().getDocument(docName, xcontext);
+            XWikiContext deprecatedContext = getXWikiContext();
+            XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
             if (document.isNew()) {
                 // if the document doesn't exist already skip it
                 return;
@@ -329,9 +315,9 @@ public class DefaultIOService implements IOService
                     isDocumentType))
             {
                 document.removeObject(annotationObject);
-                document.setAuthor(xcontext.getUser());
-                xcontext.getWiki().saveDocument(document, "Deleted annotation " + annotationID,
-                    true, xcontext);
+                document.setAuthor(deprecatedContext.getUser());
+                deprecatedContext.getWiki().saveDocument(document, "Deleted annotation " + annotationID,
+                    true, deprecatedContext);
             }
         } catch (NumberFormatException e) {
             throw new IOServiceException("An exception has occurred while parsing the annotation id", e);
@@ -363,8 +349,8 @@ public class DefaultIOService implements IOService
                 docName = this.serializer.serialize(targetReference.extractReference(EntityType.DOCUMENT));
             }
             // get the document pointed to by the target
-            XWikiContext xcontext = getXWikiContext();
-            XWikiDocument document = xcontext.getWiki().getDocument(docName, xcontext);
+            XWikiContext deprecatedContext = getXWikiContext();
+            XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
             // Avoid modifying the cached document
             document = document.clone();
             List<String> updateNotifs = new ArrayList<>();
@@ -381,13 +367,13 @@ public class DefaultIOService implements IOService
                 if (object == null) {
                     continue;
                 }
-                updated = updateObject(object, annotation, xcontext) || updated;
+                updated = updateObject(object, annotation, deprecatedContext) || updated;
                 updateNotifs.add(annotation.getId());
             }
             if (updated) {
                 // set the author of the document to the current user
-                document.setAuthor(xcontext.getUser());
-                xcontext.getWiki().saveDocument(document, "Updated annotations", true, xcontext);
+                document.setAuthor(deprecatedContext.getUser());
+                deprecatedContext.getWiki().saveDocument(document, "Updated annotations", true, deprecatedContext);
             }
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while updating the annotation", e);
@@ -440,10 +426,10 @@ public class DefaultIOService implements IOService
      *
      * @param object the object to update
      * @param annotation the annotation to marshal in the object
-     * @param xcontext the XWikiContext execute object operations
+     * @param deprecatedContext the XWikiContext execute object operations
      * @return {@code true} if any modification was done on this object, {@code false} otherwise
      */
-    protected boolean updateObject(BaseObject object, Annotation annotation, XWikiContext xcontext)
+    protected boolean updateObject(BaseObject object, Annotation annotation, XWikiContext deprecatedContext)
         throws XWikiException
     {
         boolean updated = false;
@@ -453,7 +439,7 @@ public class DefaultIOService implements IOService
         // state is an enum
         updated =
             setIfNotNull(object, Annotation.STATE_FIELD, annotation.getState() == null ? null : annotation.getState()
-                .toString(), xcontext)
+                .toString(), deprecatedContext)
                 || updated;
         // don't reset the state, the date (which will be set now, upon save), and ignore anything that could overwrite
         // the target. Don't set the author either, will be set by caller, if needed
@@ -463,7 +449,7 @@ public class DefaultIOService implements IOService
         // all fields in the annotation, try to put them in object (I wonder what happens if I can't...)
         for (String propName : annotation.getFieldNames()) {
             if (!skippedFields.contains(propName)) {
-                updated = setIfNotNull(object, propName, annotation.get(propName), xcontext) || updated;
+                updated = setIfNotNull(object, propName, annotation.get(propName), deprecatedContext) || updated;
             }
         }
 
@@ -477,14 +463,14 @@ public class DefaultIOService implements IOService
      * @param object the object to set the value of the field
      * @param fieldName the name of the field to set
      * @param newValue the new value to set to the field. It will be ignored if it's {@code null}
-     * @param xcontext the XWikiContext
+     * @param deprecatedContext the XWikiContext
      * @return {@code true} if the field was set to newValue, {@code false} otherwise
      */
-    protected boolean setIfNotNull(BaseObject object, String fieldName, Object newValue, XWikiContext xcontext)
+    protected boolean setIfNotNull(BaseObject object, String fieldName, Object newValue, XWikiContext deprecatedContext)
         throws XWikiException
     {
         if (newValue != null) {
-            object.set(fieldName, newValue, xcontext);
+            object.set(fieldName, newValue, deprecatedContext);
             return true;
         }
         return false;
@@ -496,5 +482,19 @@ public class DefaultIOService implements IOService
     private XWikiContext getXWikiContext()
     {
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+    }
+
+    /**
+     * @param targetField the target stored on the annotation object
+     * @param localTargetId the serialized reference of the requested target
+     * @param isDocumentType {@code true} if the requested target is a document (i.e. its content)
+     * @return {@code true} if the object holds an annotation for the requested target. This is the case either when the
+     *     stored target matches the requested one, or when the stored target is blank and the requested target is the
+     *     document: a blank target is the representation of an annotation on the document content, which stays valid
+     *     when the document is moved (unlike a target storing the document reference explicitly)
+     */
+    private boolean matchesTarget(String targetField, String localTargetId, boolean isDocumentType)
+    {
+        return Objects.equals(localTargetId, targetField) || (StringUtils.isBlank(targetField) && isDocumentType);
     }
 }

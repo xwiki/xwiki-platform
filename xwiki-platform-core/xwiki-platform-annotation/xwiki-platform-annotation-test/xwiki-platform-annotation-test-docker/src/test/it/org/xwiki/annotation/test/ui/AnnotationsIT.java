@@ -220,8 +220,7 @@ class AnnotationsIT
         annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_4);
     }
 
-    // TODO: This test must currently be last (it switches the wiki to multilingual, which leaves the UI in a
-    // non-English language for the following tests). We can get back to a more natural order once XWIKI-9759 is fixed
+    // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
     @Test
     @Order(5)
     void addAnnotationTranslation(TestUtils setup, TestReference testReference,
@@ -260,5 +259,4 @@ class AnnotationsIT
             "Failed to read resource [iscroll/"
         );
     }
-
 }

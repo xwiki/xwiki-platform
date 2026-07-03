@@ -73,8 +73,11 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DefaultIOServiceTest
 {
+
     private static final DocumentReference ANNOTATION_CLASS_REFERENCE =
         new DocumentReference("xwiki", "XWiki", "AnnotationClass");
+
+    public static final String PAGE_STRING_REFERENCE = "xwiki:Space.Page";
 
     @InjectMockComponents
     private DefaultIOService ioService;
@@ -177,8 +180,8 @@ class DefaultIOServiceTest
 
         when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
         when(this.localSerializer.serialize(documentReference)).thenReturn(target);
-        when(this.serializer.serialize(documentReference)).thenReturn("xwiki:Space.Page");
-        when(this.xwiki.getDocument("xwiki:Space.Page", this.context)).thenReturn(document);
+        when(this.serializer.serialize(documentReference)).thenReturn(PAGE_STRING_REFERENCE);
+        when(this.xwiki.getDocument(PAGE_STRING_REFERENCE, this.context)).thenReturn(document);
         BaseObject baseObject0 = mock(BaseObject.class);
         when(baseObject0.getStringValue(Annotation.TARGET_FIELD)).thenReturn("");
         BaseObject baseObject1 = mock(BaseObject.class);
@@ -212,8 +215,8 @@ class DefaultIOServiceTest
 
         when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(targetReference);
         when(this.localSerializer.serialize(targetReference)).thenReturn(target);
-        when(this.serializer.serialize(documentReference)).thenReturn("xwiki:Space.Page");
-        when(this.xwiki.getDocument("xwiki:Space.Page", this.context)).thenReturn(document);
+        when(this.serializer.serialize(documentReference)).thenReturn(PAGE_STRING_REFERENCE);
+        when(this.xwiki.getDocument(PAGE_STRING_REFERENCE, this.context)).thenReturn(document);
 
         // A document-content annotation (blank target): it must NOT be returned for an object property target,
         // otherwise content annotations would leak into every object property (regression guarded by this test).
@@ -242,8 +245,8 @@ class DefaultIOServiceTest
 
         when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
         when(this.localSerializer.serialize(documentReference)).thenReturn(target);
-        when(this.serializer.serialize(documentReference)).thenReturn("xwiki:Space.Page");
-        when(this.xwiki.getDocument("xwiki:Space.Page", this.context)).thenReturn(document);
+        when(this.serializer.serialize(documentReference)).thenReturn(PAGE_STRING_REFERENCE);
+        when(this.xwiki.getDocument(PAGE_STRING_REFERENCE, this.context)).thenReturn(document);
         BaseObject baseObject = mock(BaseObject.class);
         when(document.getXObject(ANNOTATION_CLASS_REFERENCE, 1)).thenReturn(baseObject);
         when(baseObject.getStringValue(Annotation.TARGET_FIELD)).thenReturn("OtherSpace");
@@ -262,8 +265,8 @@ class DefaultIOServiceTest
 
         when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
         when(this.localSerializer.serialize(documentReference)).thenReturn(target);
-        when(this.serializer.serialize(documentReference)).thenReturn("xwiki:Space.Page");
-        when(this.xwiki.getDocument("xwiki:Space.Page", this.context)).thenReturn(document);
+        when(this.serializer.serialize(documentReference)).thenReturn(PAGE_STRING_REFERENCE);
+        when(this.xwiki.getDocument(PAGE_STRING_REFERENCE, this.context)).thenReturn(document);
         BaseObject baseObject = mock(BaseObject.class);
         when(document.getXObject(ANNOTATION_CLASS_REFERENCE, 1)).thenReturn(baseObject);
         when(baseObject.getStringValue(Annotation.TARGET_FIELD)).thenReturn(xObjectTarget);
@@ -281,8 +284,7 @@ class DefaultIOServiceTest
     void removeAnnotationWithBlankTargetOnDocument() throws Exception
     {
         // An annotation on the document content is stored with a blank target; removing it through the document
-        // target must still delete the object (regression: blank targets were not matched on removal, so the
-        // annotation could no longer be deleted).
+        // target must still delete the object.
         String target = "Space.Page";
         DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
 
@@ -292,8 +294,8 @@ class DefaultIOServiceTest
 
         when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
         when(this.localSerializer.serialize(documentReference)).thenReturn(target);
-        when(this.serializer.serialize(documentReference)).thenReturn("xwiki:Space.Page");
-        when(this.xwiki.getDocument("xwiki:Space.Page", this.context)).thenReturn(document);
+        when(this.serializer.serialize(documentReference)).thenReturn(PAGE_STRING_REFERENCE);
+        when(this.xwiki.getDocument(PAGE_STRING_REFERENCE, this.context)).thenReturn(document);
         when(document.clone()).thenReturn(clonedDocument);
         when(clonedDocument.getXObject(ANNOTATION_CLASS_REFERENCE, 1)).thenReturn(annotationObject);
         when(annotationObject.getStringValue(Annotation.TARGET_FIELD)).thenReturn("");

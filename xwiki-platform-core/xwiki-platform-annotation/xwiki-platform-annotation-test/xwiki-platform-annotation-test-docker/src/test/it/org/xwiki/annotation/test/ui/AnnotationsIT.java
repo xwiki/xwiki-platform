@@ -185,9 +185,45 @@ class AnnotationsIT
         assertTrue(annotatableViewPage.getAnnotationTextById(0).isDisplayed());
     }
 
-    // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
+    /**
+     * Ensure that annotations are still displayed after the annotated page has been moved (renamed). This is a
+     * regression test for the case where annotation targets used to point to the old document reference.
+     */
     @Test
     @Order(4)
+    void annotationsSurvivePageMove(TestUtils setup, TestReference testReference)
+    {
+        AnnotatableViewPage annotatableViewPage =
+            new AnnotatableViewPage(setup.createPage(testReference, CONTENT, null));
+
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_2, ANNOTATION_TEXT_2);
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_3, ANNOTATION_TEXT_3);
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_4, ANNOTATION_TEXT_4);
+
+        // Move the page to check that the annotations are still displayed afterward.
+        RenamePage renamePage = annotatableViewPage.getWrappedViewPage().rename();
+        renamePage.getDocumentPicker().setName("NewName");
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+        renameStatusPage.gotoNewPage();
+
+        // It seems that there are some issues refreshing content while this tab is not open. This might be a bug in the
+        // Annotations Application
+        annotatableViewPage.showAnnotationsPane();
+        annotatableViewPage.clickShowAnnotations();
+        assertEquals(4, annotatableViewPage.getAnnotationCount());
+
+        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_1);
+        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_2);
+        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_3);
+        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_4);
+    }
+
+    // TODO: This test must currently be last (it switches the wiki to multilingual, which leaves the UI in a
+    // non-English language for the following tests). We can get back to a more natural order once XWIKI-9759 is fixed
+    @Test
+    @Order(5)
     void addAnnotationTranslation(TestUtils setup, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
@@ -225,38 +261,4 @@ class AnnotationsIT
         );
     }
 
-    /**
-     * Ensure that annotations are still displayed after the annotated page has been moved (renamed). This is a
-     * regression test for the case where annotation targets used to point to the old document reference.
-     */
-    @Test
-    @Order(5)
-    void annotationsSurvivePageMove(TestUtils setup, TestReference testReference)
-    {
-        AnnotatableViewPage annotatableViewPage =
-            new AnnotatableViewPage(setup.createPage(testReference, CONTENT, null));
-
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_2, ANNOTATION_TEXT_2);
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_3, ANNOTATION_TEXT_3);
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_4, ANNOTATION_TEXT_4);
-
-        // Move the page to check that the annotations are still displayed afterward.
-        RenamePage renamePage = annotatableViewPage.getWrappedViewPage().rename();
-        renamePage.getDocumentPicker().setName("NewName");
-        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton();
-        assertEquals("Done.", renameStatusPage.getInfoMessage());
-        renameStatusPage.gotoNewPage();
-
-        // It seems that there are some issues refreshing content while this tab is not open. This might be a bug in the
-        // Annotations Application
-        annotatableViewPage.showAnnotationsPane();
-        annotatableViewPage.clickShowAnnotations();
-        assertEquals(4, annotatableViewPage.getAnnotationCount());
-
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_1);
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_2);
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_3);
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_4);
-    }
 }

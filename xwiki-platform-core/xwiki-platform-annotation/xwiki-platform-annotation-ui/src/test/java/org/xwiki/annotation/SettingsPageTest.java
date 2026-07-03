@@ -86,7 +86,7 @@ class SettingsPageTest extends PageTest
         this.annotationScriptService = mock(AnnotationScriptService.class);
         this.componentManager.registerComponent(ScriptService.class, "annotations", this.annotationScriptService);
 
-        this.stubRequest.put("target", "Space.Target");
+        this.request.put("target", "Space.Target");
     }
 
     @Test

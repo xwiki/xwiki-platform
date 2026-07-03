@@ -268,13 +268,12 @@ public class AnnotatableViewPage extends BaseElement
 
     public void simulateCTRL_M()
     {
+        // The annotation shortcut is registered as "Meta+M". The Keypress library resolves the "meta" key to the
+        // actual Command key only when the browser runs on macOS; on any other platform it resolves to the Control
+        // key. Since the browser always runs in a Linux Docker container, the shortcut is effectively "Ctrl+M" there,
+        // regardless of the operating system running these tests. We therefore always send Ctrl+M.
         WebElement body = getDriver().findElement(By.id("body"));
-        String os = System.getProperty("os.name");
-        if ("Mac OS X".equals(os)) {
-            body.sendKeys(Keys.chord(Keys.COMMAND, "m"));
-        } else {
-            body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
-        }
+        body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
     }
 
     /**

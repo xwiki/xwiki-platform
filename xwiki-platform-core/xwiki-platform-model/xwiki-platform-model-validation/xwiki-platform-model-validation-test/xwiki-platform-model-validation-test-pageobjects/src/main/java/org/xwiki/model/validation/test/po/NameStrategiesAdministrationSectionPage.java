@@ -29,6 +29,8 @@ import org.xwiki.test.ui.po.Select;
  * saved, and where a name can be entered to test the currently selected strategy.
  *
  * @version $Id$
+ * @since 17.10.10
+ * @since 18.4.3
  * @since 18.5.0RC1
  */
 public class NameStrategiesAdministrationSectionPage extends AdministrationSectionPage

@@ -81,6 +81,9 @@ public class NumberClass extends PropertyClass
 
     private static final long serialVersionUID = 1L;
 
+    // The "number" HTML input type set in displayEdit() coincidentally matches this value; they are unrelated and
+    // shouldn't be merged into a single constant.
+    @SuppressWarnings("checkstyle:MultipleStringLiterals")
     private static final String XCLASSNAME = "number";
     private static final String SIZE = "size";
     private static final String NUMBER_TYPE = "numberType";

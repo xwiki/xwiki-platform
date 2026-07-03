@@ -80,4 +80,9 @@ public class AllIT
     class NestedWithoutScriptRightIT extends WithoutScriptRightIT
     {
     }
+
+    @Nested
+    class NestedNumberClassFieldIT extends NumberClassFieldIT
+    {
+    }
 }

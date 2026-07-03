@@ -215,9 +215,7 @@ public class DefaultIOService implements IOService
                     String targetField = object.getStringValue(Annotation.TARGET_FIELD);
                     // The legacy behavior is to have a non-empty target, which can lead to issues when the document
                     // is moved. Now, we consider an object with an empty target as related to the containing document.
-                    if (Objects.equals(localTargetId, targetField)
-                        || (StringUtils.isBlank(targetField) && isDocumentType))
-                    {
+                    if (matchesTarget(targetField, localTargetId, isDocumentType)) {
                         result.add(loadAnnotationFromObject(object, localTargetId));
                     }
                 }
@@ -257,9 +255,7 @@ public class DefaultIOService implements IOService
                 document.getXObject(this.configuration.getAnnotationClassReference(),
                     Integer.valueOf(annotationID));
             String targetField = object == null ? null : object.getStringValue(Annotation.TARGET_FIELD);
-            if (object == null || !(Objects.equals(localTargetId, targetField)
-                || (StringUtils.isBlank(targetField) && isDocumentType)))
-            {
+            if (object == null || !matchesTarget(targetField, localTargetId, isDocumentType)) {
                 return null;
             }
             // use the object number as annotation id
@@ -270,6 +266,20 @@ public class DefaultIOService implements IOService
             throw new IOServiceException("An exception has occurred while loading the annotation with id "
                 + annotationID, e);
         }
+    }
+
+    /**
+     * @param targetField the target stored on the annotation object
+     * @param localTargetId the serialized reference of the requested target
+     * @param isDocumentType {@code true} if the requested target is a document (i.e. its content)
+     * @return {@code true} if the object holds an annotation for the requested target. This is the case either when the
+     *     stored target matches the requested one, or when the stored target is blank and the requested target is the
+     *     document: a blank target is the representation of an annotation on the document content, which stays valid
+     *     when the document is moved (unlike a target storing the document reference explicitly)
+     */
+    private boolean matchesTarget(String targetField, String localTargetId, boolean isDocumentType)
+    {
+        return Objects.equals(localTargetId, targetField) || (StringUtils.isBlank(targetField) && isDocumentType);
     }
 
     /**

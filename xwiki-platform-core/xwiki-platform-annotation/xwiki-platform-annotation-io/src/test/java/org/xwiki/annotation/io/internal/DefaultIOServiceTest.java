@@ -53,6 +53,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -63,9 +64,9 @@ import static org.mockito.Mockito.when;
  * Test of {@link DefaultIOService}.
  *
  * @version $Id$
- * @since 15.5.5
- * @since 15.10.1
- * @since 16.0RC1
+ * @since 17.10.11
+ * @since 18.4.3
+ * @since 18.6.0RC1
  */
 @ComponentTest
 class DefaultIOServiceTest
@@ -139,12 +140,15 @@ class DefaultIOServiceTest
         when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
         when(this.serializer.serialize(documentReference)).thenReturn(serializedReference);
         when(this.xwiki.getDocument(serializedReference, this.context)).thenReturn(document);
+        // The service clones the document to avoid modifying the cached instance.
+        when(document.clone()).thenReturn(document);
         when(document.newXObject(
             ANNOTATION_CLASS_REFERENCE.removeParent(ANNOTATION_CLASS_REFERENCE.extractReference(EntityType.WIKI)),
             this.context))
             .thenReturn(baseObject);
 
         when(baseObject.getDocumentReference()).thenReturn(documentReference);
+        when(this.context.getUser()).thenReturn("xwiki:XWiki.Author");
 
         Annotation annotation = new Annotation("selection", "", "");
         this.ioService.addAnnotation(target, annotation);
@@ -153,8 +157,8 @@ class DefaultIOServiceTest
         verify(baseObject).set(eq(Annotation.DATE_FIELD), any(Date.class), eq(this.context));
         verify(baseObject).set(Annotation.AUTHOR_FIELD, annotation.getAuthor(), this.context);
         verify(baseObject, never()).set(eq(Annotation.TARGET_FIELD), any(), any());
-        verify(document).setAuthor(any());
-        verify(this.xwiki).saveDocument(document, "Added annotation on \"selection\"", this.context);
+        verify(document).setAuthor(anyString());
+        verify(this.xwiki).saveDocument(document, "Added annotation on \"selection\"", true, this.context);
     }
 
     @Test

@@ -57,10 +57,9 @@ import static org.xwiki.model.EntityType.DOCUMENT;
  * Test of {@link AnnotationInternalTargetFixTaskConsumer}.
  *
  * @version $Id$
- * @since 14.10.20
- * @since 15.5.5
- * @since 15.10.1
- * @since 16.0RC1
+ * @since 17.10.11
+ * @since 18.4.3
+ * @since 18.6.0RC1
  */
 @ComponentTest
 class AnnotationInternalTargetFixTaskConsumerTest

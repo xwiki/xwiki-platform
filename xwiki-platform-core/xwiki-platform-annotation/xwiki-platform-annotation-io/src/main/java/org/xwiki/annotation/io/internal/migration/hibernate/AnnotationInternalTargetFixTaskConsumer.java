@@ -48,9 +48,9 @@ import com.xpn.xwiki.objects.BaseObject;
  *
  * @version $Id$
  * @see <a href="https://jira.xwiki.org/browse/XWIKI-20699">XWIKI-20699</a>
- * @since 15.5.5
- * @since 15.10.1
- * @since 16.0RC1
+ * @since 17.10.11
+ * @since 18.4.3
+ * @since 18.6.0RC1
  */
 @Component
 @Singleton

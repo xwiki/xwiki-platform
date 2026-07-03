@@ -72,6 +72,11 @@ public class AllIT
     }
 
     @Nested
+    class NestedUserAndGroupClassFieldSubWikiIT extends UserAndGroupClassFieldSubWikiIT
+    {
+    }
+
+    @Nested
     class NestedClassEditorIT extends ClassEditorIT
     {
     }

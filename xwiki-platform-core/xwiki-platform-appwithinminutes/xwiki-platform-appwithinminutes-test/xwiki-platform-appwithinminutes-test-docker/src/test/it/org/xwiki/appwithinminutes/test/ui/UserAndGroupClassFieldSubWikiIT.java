@@ -50,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * entry is displayed properly in view mode.
  *
  * @version $Id$
+ * @since 17.10.10
+ * @since 18.4.3
  * @since 18.6.0RC1
  */
 @UITest(properties = {

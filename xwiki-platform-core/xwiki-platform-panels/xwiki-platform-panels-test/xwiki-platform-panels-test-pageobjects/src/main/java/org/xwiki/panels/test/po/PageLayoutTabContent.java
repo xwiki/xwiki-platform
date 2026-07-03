@@ -127,6 +127,8 @@ public class PageLayoutTabContent extends BaseElement
 
     /**
      * @return the comma-separated list of panels configured for the left column
+     * @since 17.10.10
+     * @since 18.4.3
      * @since 18.6.0RC1
      */
     public String getLeftPanels()
@@ -137,6 +139,8 @@ public class PageLayoutTabContent extends BaseElement
     /**
      * @param leftPanels the comma-separated list of panels to set for the left column
      * @return this object
+     * @since 17.10.10
+     * @since 18.4.3
      * @since 18.6.0RC1
      */
     public PageLayoutTabContent setLeftPanels(String leftPanels)

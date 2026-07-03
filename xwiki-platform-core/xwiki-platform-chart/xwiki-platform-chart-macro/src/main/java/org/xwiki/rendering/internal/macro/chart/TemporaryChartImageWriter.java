@@ -20,7 +20,6 @@
 package org.xwiki.rendering.internal.macro.chart;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 
@@ -28,7 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
@@ -94,15 +93,10 @@ public class TemporaryChartImageWriter implements ChartImageWriter
     {
         File imageFile = getStorageLocation(imageId);
 
-        FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(imageFile);
-            fos.write(imageData);
-            fos.close();
+            FileUtils.writeByteArrayToFile(imageFile, imageData);
         } catch (IOException e) {
             throw new MacroExecutionException("Failed to write the generated chart image", e);
-        } finally {
-            IOUtils.closeQuietly(fos);
         }
     }
 

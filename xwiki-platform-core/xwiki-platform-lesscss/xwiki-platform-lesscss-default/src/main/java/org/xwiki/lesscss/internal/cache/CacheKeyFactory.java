@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
@@ -33,7 +34,6 @@ import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.internal.skin.SkinReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 

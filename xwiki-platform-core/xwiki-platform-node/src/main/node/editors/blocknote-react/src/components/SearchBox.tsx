@@ -17,12 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { DepsContainerContext } from "../contexts";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
 import { t } from "i18next";
 import { debounce } from "lodash-es";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { RiLink } from "react-icons/ri";
-import type { LinkEditionContext, LinkSuggestion } from "../misc/linkSuggest";
+import type { LinkSuggestion } from "../misc/linkSuggest";
+import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
 import type { KeyboardEvent, ReactElement } from "react";
 
 export type SearchBoxProps = {
@@ -35,13 +38,6 @@ export type SearchBoxProps = {
    * The search box's placeholder (when empty)
    */
   placeholder: string;
-
-  /**
-   * Link edition context, required for validate raw entity references on submit
-   *
-   * @since 18.0.0RC1
-   */
-  linkEditionCtx: LinkEditionContext | null;
 
   /**
    * Perform a search
@@ -81,15 +77,29 @@ export type SearchBoxProps = {
  *
  * @see SearchBoxProps
  */
+// eslint-disable-next-line max-statements
 export const SearchBox: React.FC<SearchBoxProps> = ({
   initialValue,
   placeholder,
-  linkEditionCtx,
   getSuggestions,
   renderSuggestion,
   onSelect,
   onSubmit,
 }) => {
+  const depsContainer = useContext(DepsContainerContext);
+
+  if (!depsContainer) {
+    throw new Error("Missing dependencies container in React context");
+  }
+
+  const modelReferenceParser = depsContainer
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!;
+
+  const remoteURLSerializer = depsContainer
+    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+    .get()!;
+
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
@@ -139,12 +149,12 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         return;
       }
 
-      if (!linkEditionCtx) {
+      if (!modelReferenceParser || !remoteURLSerializer) {
         e.preventDefault();
         return;
       }
 
-      const reference = await linkEditionCtx.modelReferenceParser
+      const reference = await modelReferenceParser
         .parseAsync(value)
         .catch(() => null);
 
@@ -153,7 +163,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         return;
       }
 
-      const url = linkEditionCtx.remoteURLSerializer.serialize(reference);
+      const url = remoteURLSerializer.serialize(reference);
 
       if (url === undefined) {
         e.preventDefault();
@@ -162,7 +172,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
       onSubmit(url);
     },
-    [onSubmit, linkEditionCtx],
+    [onSubmit, modelReferenceParser, remoteURLSerializer],
   );
 
   // Automatically perform a search when the query changes

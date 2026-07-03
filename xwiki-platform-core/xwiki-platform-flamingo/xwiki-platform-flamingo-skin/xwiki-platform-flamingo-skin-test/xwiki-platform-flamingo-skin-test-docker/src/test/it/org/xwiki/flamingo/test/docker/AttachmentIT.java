@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.By;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
@@ -452,13 +453,15 @@ class AttachmentIT
 
     @Test
     @Order(9)
-    void checkEscapingInAttachmentName(TestUtils setup, TestReference testReference) throws IOException
+    void checkEscapingInAttachmentName(TestUtils setup, TestReference testReference, @TempDir Path temporaryDirectory)
+        throws IOException
     {
         setup.loginAsSuperAdmin();
 
         // We shouldn't store files with special characters in the repository, since some filesystems don't support it.
-        // Instead, we create the file during the test.
-        Path unescapedFile = Files.createTempFile("<strong>", null);
+        // Instead, we create the file during the test. We create it under a @TempDir directory so that it doesn't leak
+        // outside the build "target" directory.
+        Path unescapedFile = Files.createTempFile(temporaryDirectory, "<strong>", null);
         String unescapedFileName = unescapedFile.getFileName().toString();
 
         setup.createPage(testReference, "Empty content");

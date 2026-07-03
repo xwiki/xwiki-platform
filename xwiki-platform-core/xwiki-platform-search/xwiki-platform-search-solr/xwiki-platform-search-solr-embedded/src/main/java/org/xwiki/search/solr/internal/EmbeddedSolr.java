@@ -49,7 +49,6 @@ import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.lucene.util.Version;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.CoreContainer.CoreLoadFailure;
@@ -65,6 +64,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
+import org.xwiki.search.solr.XWikiSolrCore;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.search.SearchCoreInitializer;
 
@@ -113,6 +113,12 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     private Path solrHomePath;
 
     private Path solrSearchCorePath;
+
+    @Override
+    public boolean canCreateCore()
+    {
+        return true;
+    }
 
     @Override
     public void initialize() throws InitializationException
@@ -184,16 +190,25 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     }
 
     @Override
-    protected SolrClient getInternalSolrClient(String coreName) throws SolrException
+    protected XWikiSolrCore getCore(String xwikiCoreName, int solrMajorVersion) throws SolrException
     {
-        SolrCore core = this.container.getCore(coreName);
+        // Resolve the real Solr core name
+        String solrCoreName = toSolrCoreName(xwikiCoreName, solrMajorVersion);
 
-        return core != null ? new EmbeddedClient(core) : null;
+        SolrCore core = this.container.getCore(solrCoreName);
+
+        return core != null
+            ? new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, new EmbeddedClient(core), solrMajorVersion) : null;
     }
 
     @Override
-    protected SolrClient createSolrClient(String solrCoreName, boolean isCache) throws SolrException
+    protected XWikiSolrCore createCore(String xwikiCoreName, boolean isCache) throws SolrException
     {
+        int solrMajorVersion = getSolrMajorVersion();
+
+        // Resolve the real Solr core name
+        String solrCoreName = toSolrCoreName(xwikiCoreName, solrMajorVersion);
+
         // Prepare the filesystem
         // TODO: get rid of that when we find out how to have Solr fully create the core as it should...
         Path corePath;
@@ -217,7 +232,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         SolrCore core = this.container.create(solrCoreName, parameters);
 
         // Return a usable SolrClient instance
-        return new EmbeddedClient(core);
+        return new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, new EmbeddedClient(core), solrMajorVersion);
     }
 
     private Path prepareCore(String solrCoreName) throws IOException
@@ -246,7 +261,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     }
 
     @Override
-    protected int getSolrMajorVersion()
+    public int getSolrMajorVersion()
     {
         return Version.LATEST.major;
     }

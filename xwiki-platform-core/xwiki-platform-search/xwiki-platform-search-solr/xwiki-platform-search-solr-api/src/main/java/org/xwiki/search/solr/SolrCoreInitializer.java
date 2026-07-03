@@ -47,7 +47,7 @@ public interface SolrCoreInitializer
     @Deprecated(since = "16.1.0RC1")
     default void initialize(SolrClient client) throws SolrException
     {
-        initialize(new DefaultXWikiSolrCore(getCoreName(), getCoreName(), client));
+        initialize(new DefaultXWikiSolrCore(getCoreName(), getCoreName(), client, -1));
     }
 
     /**

@@ -370,7 +370,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 // with something else. Bas64 does not use _, and it is allowed in cookies, so
                 // we're using that instead of =. In decryptText the reverse operation is perfomed.
                 // See XWIKI-2211
-                return encryptedEncodedText.replaceAll("=", "_");
+                return encryptedEncodedText.replace("=", "_");
             }
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error("ERROR! >> SecretKey not generated...");
@@ -576,7 +576,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             // so here we must re-introduce the = sign needed by Base64.
             // See XWIKI-2211
             byte[] decodedEncryptedText =
-                Base64.decodeBase64(encryptedText.replaceAll("_", "=").getBytes("ISO-8859-1"));
+                Base64.decodeBase64(encryptedText.replace("_", "=").getBytes("ISO-8859-1"));
             Cipher c1 = Cipher.getInstance(this.cipherParameters);
             c1.init(Cipher.DECRYPT_MODE, this.secretKey);
             byte[] decryptedText = c1.doFinal(decodedEncryptedText);

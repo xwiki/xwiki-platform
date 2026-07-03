@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { DepsContainerContext } from "../../contexts";
 import { SearchBox } from "../SearchBox";
 import {
   Box,
@@ -36,32 +37,66 @@ import {
   DocumentReference,
   EntityType,
 } from "@xwiki/platform-model-api";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { RiAttachmentLine } from "react-icons/ri";
+import type { LinkSuggestion } from "../../misc/linkSuggest";
+import type { AttachmentsService } from "@xwiki/platform-attachments-api";
+import type { DocumentService } from "@xwiki/platform-document-api";
+import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
-  LinkEditionContext,
-  LinkSuggestion,
-} from "../../misc/linkSuggest";
+  ModelReferenceHandlerProvider,
+  ModelReferenceParserProvider,
+} from "@xwiki/platform-model-reference-api";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 
 export type ImageSelectorProps = {
-  linkEditionCtx: LinkEditionContext;
   currentSelection?: string;
   onSelected: (url: string) => void;
 };
 
+// eslint-disable-next-line max-statements
 export const ImageSelector: React.FC<ImageSelectorProps> = ({
-  linkEditionCtx,
   currentSelection,
   onSelected,
 }) => {
+  const depsContainer = useContext(DepsContainerContext)!;
+
+  const remoteURLParser = depsContainer
+    .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+    .get()!;
+
+  const modelReferenceHandler = depsContainer
+    .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
+    .get()!;
+
+  const modelReferenceParser = depsContainer
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!;
+
+  const remoteURLSerializer = depsContainer
+    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+    .get()!;
+
+  const documentService = depsContainer.get<DocumentService>("DocumentService");
+
+  const attachmentsService =
+    depsContainer.get<AttachmentsService>("AttachmentsService")!;
+
+  const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
+    "LinkSuggestServiceProvider",
+  ).get!();
+
   const [initialQuery, selectedEntityPath] = useMemo(() => {
     if (!currentSelection) {
       return ["", null];
     }
 
     const entityRef = tryFallible(() =>
-      linkEditionCtx.remoteURLParser.parse(currentSelection),
+      remoteURLParser.parse(currentSelection),
     );
 
     if (!entityRef || entityRef instanceof Error) {
@@ -75,12 +110,7 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
 
     const segments = documentReference.space?.names.slice(0) ?? [];
 
-    return [
-      "",
-      segments.concat([
-        linkEditionCtx.modelReferenceHandler.getTitle(entityRef)!,
-      ]),
-    ];
+    return ["", segments.concat([modelReferenceHandler.getTitle(entityRef)!])];
   }, [currentSelection]);
 
   const { t } = useTranslation();
@@ -94,10 +124,9 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
   const fileSelected = useCallback(
     async (file: File) => {
       const currentPageName =
-        linkEditionCtx.documentService.getCurrentDocumentReferenceString()
-          .value ?? "";
+        documentService.getCurrentDocumentReferenceString().value ?? "";
 
-      const uploadedFilesUrls = await linkEditionCtx.attachmentsService.upload(
+      const uploadedFilesUrls = await attachmentsService.upload(
         currentPageName,
         [file],
       );
@@ -106,12 +135,11 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
       if (uploadedFilesUrls && uploadedFilesUrls[0]) {
         url = uploadedFilesUrls[0];
       } else {
-        const parser = linkEditionCtx.modelReferenceParser?.parse(
-          currentPageName,
-          { relative: false },
-        );
+        const parser = modelReferenceParser?.parse(currentPageName, {
+          relative: false,
+        });
 
-        url = linkEditionCtx.remoteURLSerializer?.serialize(
+        url = remoteURLSerializer?.serialize(
           new AttachmentReference(file.name, parser as DocumentReference),
         );
       }
@@ -125,18 +153,18 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
 
   const searchAttachments = useCallback(
     async (query: string) => {
-      if (!linkEditionCtx.linkSuggestService) {
+      if (!linkSuggestService) {
         return false;
       }
 
-      const results = await linkEditionCtx.linkSuggestService.getLinks(
+      const results = await linkSuggestService.getLinks(
         query,
         LinkType.ATTACHMENT,
         "image/*",
       );
 
       return results.map((link): LinkSuggestion => {
-        const attachmentReference = linkEditionCtx.modelReferenceParser?.parse(
+        const attachmentReference = modelReferenceParser?.parse(
           link.reference,
           { relative: false },
         ) as AttachmentReference;
@@ -157,7 +185,7 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
         };
       });
     },
-    [linkEditionCtx],
+    [modelReferenceParser, linkSuggestService],
   );
 
   // Start a first empty search on the first load, to not let the results empty.
@@ -184,7 +212,6 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
       <SearchBox
         placeholder={t("blocknote.imageSelector.placeholder")}
         initialValue={initialQuery}
-        linkEditionCtx={linkEditionCtx}
         getSuggestions={searchAttachments}
         renderSuggestion={(suggestion) => (
           <Flex gap="sm">

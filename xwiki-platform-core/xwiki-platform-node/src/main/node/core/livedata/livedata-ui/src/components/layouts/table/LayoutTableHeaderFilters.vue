@@ -82,9 +82,13 @@ export default {
 
 <style>
 .layout-table .column-filters th {
-  padding: 2px;
+  padding: var(--table-cell-padding);
+  /* Ensure vertical visual alignment with the column name. */
+  padding-top: 0;
+  padding-bottom: var(--padding-large-vertical);
   font-weight: normal;
   vertical-align: middle;
+  border: 0;
 }
 
 .layout-table .column-filters th.entry-selector {

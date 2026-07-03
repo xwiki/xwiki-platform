@@ -22,6 +22,7 @@ package org.xwiki.search.test.ui;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -120,6 +121,7 @@ class SolrIndexerIT
     private static final String WEB_HOME = "WebHome";
 
     @Test
+    @Order(1)
     void sortOrder(TestReference testReference, TestUtils testUtils)
         throws Exception
     {

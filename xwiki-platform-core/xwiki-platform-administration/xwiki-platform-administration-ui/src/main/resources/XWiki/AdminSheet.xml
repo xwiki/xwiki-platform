@@ -242,12 +242,9 @@
 ## XWIKI-24518 Without the ((())) the following line was outputing a paragraph filled with empty spaces
 (((#sortCollectionOfMapsByField($sections, 'order', 9999, 'asc', $sortedSections))))
 (% class="admin-categories-container" %)
-(((
-  #foreach ($section in $sortedSections)
-    (% class="admin-category-card" %)
-    (((
+#foreach ($section in $sortedSections)
       ## Icon Container
-      (% class="admin-category-icon" %)
+      * (% class="admin-category-icon" %)
       (((
         [[image:${section.iconReference}]]
       )))
@@ -267,9 +264,7 @@
           )))
         #end
       )))
-    )))
   #end
-)))
 #end
 
 #**
@@ -295,16 +290,12 @@
  *#
 #macro(admin_displayCategories $adminMenu $translationPrefix)
 (% class="admin-categories-container" %)
-(((
-  #foreach ($category in $adminMenu)
-    (% class="admin-category-card" %)
-    (((
-      ## Icon Container
-      (% class="admin-category-icon" %)
+#foreach ($category in $adminMenu)
+    * (% class="admin-category-icon" %)
       (((
         [[image:${category.iconReference}]]
       )))
-      ## NEW: Container for Title and Description
+      ## Container for Title and Description
       (% class="admin-category-text-container" %)
       (((
         ## Name/Link Container
@@ -320,9 +311,7 @@
           )))
         #end
       )))
-    )))
   #end
-)))
 #end
 
 #macro (verticalNavigation $menu $options)
@@ -1066,17 +1055,20 @@ require(['jquery'], function($) {
 .admin-categories-container p {
   margin: 0;
 }
-.admin-categories-container{
-  float: left;
-  display: flex;
-  gap: 8px;
-  flex-flow: column;
+.admin-categories-container {
+    float: left;
+    display: flex;
+    gap: 8px;
+    flex-flow: column;
+    padding:0
 }
-.admin-category-card {
-  display: flex;
-  gap: 0 8px;
-  border-radius: 7px;
-  padding: 4px;
+
+.admin-categories-container li {
+    display: flex;
+    gap: 0 8px;
+    border-radius: 7px;
+    padding: 4px;
+    list-style: none;
 }
 
 .admin-category-text-container {

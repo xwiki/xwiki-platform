@@ -77,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
 import { MACRO_UI_PLACEHOLDER } from "../services/macros/placeholderUi";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
@@ -194,6 +195,8 @@ const value = ref(initialValue);
 const dirty = ref(false);
 const isLoading = ref(true);
 
+let blockNoteDocument: BlockNoteDocument | undefined;
+
 // This is passed to the BlockNote editor component.
 const editorContent = ref();
 
@@ -258,7 +261,8 @@ let collaborationManager: CollaborationManager | undefined = undefined;
 const collaborationKey: Ref<string | undefined> = ref();
 
 onBeforeMount(async () => {
-  editorContent.value = blockNoteProcessor.load(initialValue);
+  blockNoteDocument = blockNoteProcessor.load(initialValue);
+  editorContent.value = blockNoteDocument.content;
 
   editorProps.value.label =
     (await resolver.resolve(["platform.blocknote.editor.label"])).translations[
@@ -368,7 +372,8 @@ function updateValue(editorContent?: BlockType[]): string {
     throw new Error("Could not get the editor content.");
   }
 
-  const newValue = blockNoteProcessor.save(editorContent);
+  blockNoteDocument!.content = editorContent;
+  const newValue = blockNoteProcessor.save(blockNoteDocument!);
 
   value.value = newValue;
   dirty.value = false;

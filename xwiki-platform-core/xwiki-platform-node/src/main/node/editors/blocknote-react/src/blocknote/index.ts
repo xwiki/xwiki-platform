@@ -22,7 +22,12 @@ import { DefinitionListItemBlock } from "./definitionList";
 import { XWikiGroupBlock } from "./group";
 import { XWikiMacroBlock } from "./macroBlock";
 import { XWikiRawBlock } from "./raw";
-import { SubscriptStyle, SuperscriptStyle, VerbatimStyle } from "./styles";
+import {
+  SubscriptStyle,
+  SuperscriptStyle,
+  VerbatimStyle,
+  XWikiParametersStyle,
+} from "./styles";
 import { MACRO_NAME_PREFIX } from "./utils";
 import translations from "../translations";
 import {
@@ -103,6 +108,7 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
       subscript: SubscriptStyle,
       superscript: SuperscriptStyle,
       xwikiVerbatim: VerbatimStyle,
+      xwikiParameters: XWikiParametersStyle,
     },
   });
 

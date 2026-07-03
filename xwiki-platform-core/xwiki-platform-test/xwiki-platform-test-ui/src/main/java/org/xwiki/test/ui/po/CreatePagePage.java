@@ -96,6 +96,7 @@ public class CreatePagePage extends BaseElement
      * @param template the value of the template option
      * @return the icon name displayed for the specified template option, extracted from the {@code <img>} element's
      *         {@code src} attribute
+     * @since 17.10.10
      * @since 18.3RC1
      */
     public String getTemplateIcon(String template)
@@ -106,6 +107,7 @@ public class CreatePagePage extends BaseElement
     /**
      * @param template the value of the template option
      * @return the description text displayed for the specified template option
+     * @since 17.10.10
      * @since 18.3.0RC1
      */
     public String getTemplateDescription(String template)

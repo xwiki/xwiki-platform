@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { BlockNoteDocument } from "./BlockNoteProcessor";
 import { Container, inject, injectable } from "inversify";
 import type { BlockNoteIterator, NodeType } from "./BlockNoteIterator";
 import type { BlockNoteProcessor } from "./BlockNoteProcessor";
@@ -41,18 +42,37 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     @inject("BlockNoteIterator") private readonly iterator: BlockNoteIterator,
   ) {}
 
-  public load(blockNoteJSON: string): BlockType[] {
+  public load(blockNoteJSON: string): BlockNoteDocument {
     const blockNoteContent = blockNoteJSON ? JSON.parse(blockNoteJSON) : [];
+    const blockNoteDocument = new BlockNoteDocument(blockNoteContent);
     this.iterator.iterate(blockNoteContent, {
-      visit: (node) => this.loadNode(node),
+      visit: (node) => this.loadNode(node, blockNoteDocument),
     });
-    return blockNoteContent;
+    return blockNoteDocument;
   }
 
-  private loadNode(node: NodeType): boolean {
-    if (typeof node === "object" && node.type === "xwikiMacroBlock") {
-      this.loadMacro(node as BlockType);
-      return true;
+  private loadNode(
+    node: NodeType,
+    blockNoteDocument: BlockNoteDocument,
+  ): boolean {
+    if (typeof node === "object") {
+      if (node.type === "xwikiMacroBlock") {
+        this.loadMacro(node as BlockType);
+        return true;
+      } else if (
+        "props" in node &&
+        node.props !== null &&
+        typeof node.props === "object"
+      ) {
+        this.storeBlockXWikiParameters(node, blockNoteDocument);
+      } else if (
+        node.type === "text" &&
+        "styles" in node &&
+        node.styles !== null &&
+        typeof node.styles === "object"
+      ) {
+        this.serializeXWikiParameters(node.styles as Record<string, unknown>);
+      }
     }
     return false;
   }
@@ -71,18 +91,79 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     }
   }
 
-  public save(blockNoteContent: BlockType[]): string {
-    const blockNoteContentCopy = structuredClone(blockNoteContent);
+  /**
+   * Extracts `xwikiParameters` from a block's props, assigns the block a stable UUID (so BlockNote preserves it),
+   * and stores the parameters in the metadata for re-injection during save.
+   *
+   * Modifying propSchema of standard BlockNote blocks to carry `xwikiParameters` is not possible: the render and
+   * toExternalHTML closures inside each block's implementation capture the original propSchema at construction time,
+   * so they would receive `xwikiParameters` in block.props but not find it in their captured propSchema, causing a
+   * TypeError in wrapInBlockStructure. The ID-injection side-channel avoids that entirely.
+   *
+   * @param block - the raw block node (mutable)
+   * @param blockNoteDocument - the BlockNote document to store the parameters in
+   */
+  private storeBlockXWikiParameters(
+    block: Record<string, unknown>,
+    blockNoteDocument: BlockNoteDocument,
+  ): void {
+    const props = block.props as Record<string, unknown>;
+    if (
+      props.xwikiParameters !== null &&
+      typeof props.xwikiParameters === "object"
+    ) {
+      block.id = block.id ?? crypto.randomUUID();
+      blockNoteDocument.getMetadata(block.id as string, true)!.parameters =
+        props.xwikiParameters;
+      delete props.xwikiParameters;
+    }
+  }
+
+  /**
+   * Converts the `xwikiParameters` value in a text style object from an object to a JSON string so that BlockNote
+   * can store it as a primitive style value.
+   *
+   * @param obj - the text styles object to update in place
+   */
+  private serializeXWikiParameters(obj: Record<string, unknown>): void {
+    if (
+      obj.xwikiParameters !== null &&
+      typeof obj.xwikiParameters === "object"
+    ) {
+      obj.xwikiParameters = JSON.stringify(obj.xwikiParameters);
+    }
+  }
+
+  public save(blockNoteDocument: BlockNoteDocument): string {
+    const blockNoteContentCopy = structuredClone(blockNoteDocument.content);
     this.iterator.iterate(blockNoteContentCopy, {
-      visit: (node) => this.saveNode(node),
+      visit: (node) => this.saveNode(node, blockNoteDocument),
     });
     return JSON.stringify(blockNoteContentCopy);
   }
 
-  private saveNode(node: NodeType): boolean {
-    if (typeof node === "object" && node.type === "xwikiMacroBlock") {
-      this.saveMacro(node as BlockType);
-      return true;
+  private saveNode(
+    node: NodeType,
+    blockNoteDocument: BlockNoteDocument,
+  ): boolean {
+    if (typeof node === "object") {
+      if (node.type === "xwikiMacroBlock") {
+        this.saveMacro(node as BlockType);
+        return true;
+      } else if (
+        "props" in node &&
+        node.props !== null &&
+        typeof node.props === "object"
+      ) {
+        this.restoreBlockXWikiParameters(node, blockNoteDocument);
+      } else if (
+        node.type === "text" &&
+        "styles" in node &&
+        node.styles !== null &&
+        typeof node.styles === "object"
+      ) {
+        this.restoreXWikiParameters(node.styles as Record<string, unknown>);
+      }
     }
     return false;
   }
@@ -99,6 +180,42 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     }
     if (typeof props.output === "string") {
       props.output = JSON.parse(props.output);
+    }
+  }
+
+  /**
+   * Re-injects the `xwikiParameters` object that was extracted during load, identified by the block's stable ID.
+   *
+   * @param block - the raw block node
+   * @param blockNoteDocument - the BlockNote document to retrieve the parameters from
+   */
+  private restoreBlockXWikiParameters(
+    block: Record<string, unknown>,
+    blockNoteDocument: BlockNoteDocument,
+  ): void {
+    if (typeof block.id === "string") {
+      const metadata = blockNoteDocument.getMetadata(block.id);
+      if (metadata?.parameters) {
+        const props = block.props as Record<string, unknown>;
+        props.xwikiParameters = metadata.parameters;
+      }
+    }
+  }
+
+  /**
+   * Reverses the serialization done by {@link serializeXWikiParameters}: converts the `xwikiParameters` JSON string
+   * back to an object, or removes the key entirely when it is empty (so the Java backend does not receive an empty
+   * entry).
+   *
+   * @param obj - the text styles object to update in place
+   */
+  private restoreXWikiParameters(obj: Record<string, unknown>): void {
+    if (typeof obj.xwikiParameters === "string") {
+      if (obj.xwikiParameters === "") {
+        delete obj.xwikiParameters;
+      } else {
+        obj.xwikiParameters = JSON.parse(obj.xwikiParameters);
+      }
     }
   }
 }

@@ -78,4 +78,28 @@ const VerbatimStyle = createStyleSpec(
   },
 );
 
-export { SubscriptStyle, SuperscriptStyle, VerbatimStyle };
+/**
+ * BlockNote style spec that preserves XWiki inline parameters (e.g., `(% data-foo="bar" %)`). These parameters are not
+ * visible or editable by the user; the style value holds a JSON-serialized string of the parameter map and renders as a
+ * transparent `<span>`.
+ *
+ * @since 18.6.0RC1
+ * @beta
+ */
+const XWikiParametersStyle = createStyleSpec(
+  { type: "xwikiParameters", propSchema: "string" },
+  {
+    render: () => {
+      const span = document.createElement("span");
+      return { dom: span, contentDOM: span };
+    },
+    parse: () => undefined,
+  },
+);
+
+export {
+  SubscriptStyle,
+  SuperscriptStyle,
+  VerbatimStyle,
+  XWikiParametersStyle,
+};

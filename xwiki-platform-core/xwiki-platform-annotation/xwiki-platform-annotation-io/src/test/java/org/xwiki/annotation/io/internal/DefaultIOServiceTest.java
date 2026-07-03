@@ -38,6 +38,8 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -191,6 +193,39 @@ class DefaultIOServiceTest
         when(baseObject1.getPropertyNames()).thenReturn(new String[] {});
 
         assertEquals(2, this.ioService.getAnnotations(target).size());
+    }
+
+    @Test
+    void getAnnotationsForObjectPropertyDoesNotReturnDocumentContentAnnotations() throws Exception
+    {
+        // The target points to an object property, not to the document itself.
+        String target = "Space.Page^XWiki.MyClass[0].myProperty";
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+        ObjectPropertyReference targetReference =
+            new ObjectPropertyReference("myProperty", new ObjectReference("XWiki.MyClass[0]", documentReference));
+
+        XWikiDocument document = mock(XWikiDocument.class);
+
+        when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(targetReference);
+        when(this.localSerializer.serialize(targetReference)).thenReturn(target);
+        when(this.serializer.serialize(documentReference)).thenReturn("xwiki:Space.Page");
+        when(this.xwiki.getDocument("xwiki:Space.Page", this.context)).thenReturn(document);
+
+        // A document-content annotation (blank target): it must NOT be returned for an object property target,
+        // otherwise content annotations would leak into every object property (regression guarded by this test).
+        BaseObject documentContentAnnotation = mock(BaseObject.class);
+        when(documentContentAnnotation.getStringValue(Annotation.TARGET_FIELD)).thenReturn("");
+        // An annotation actually targeting the requested object property: it must be returned.
+        BaseObject objectPropertyAnnotation = mock(BaseObject.class);
+        when(objectPropertyAnnotation.getStringValue(Annotation.TARGET_FIELD)).thenReturn(target);
+        when(objectPropertyAnnotation.getStringValue(Annotation.STATE_FIELD)).thenReturn("SAFE");
+        when(objectPropertyAnnotation.getPropertyNames()).thenReturn(new String[] {});
+        when(document.getXObjects(ANNOTATION_CLASS_REFERENCE)).thenReturn(List.of(
+            documentContentAnnotation,
+            objectPropertyAnnotation
+        ));
+
+        assertEquals(1, this.ioService.getAnnotations(target).size());
     }
 
     @Test

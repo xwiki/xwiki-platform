@@ -303,9 +303,8 @@ public class DefaultIOService implements IOService
             // get the target identifier and the document name from the parsed reference
             String localTargetId = target;
             String docName = target;
-            if (targetReference.getType() == EntityType.DOCUMENT
-                || targetReference.getType() == EntityType.OBJECT_PROPERTY)
-            {
+            boolean isDocumentType = targetReference.getType() == EntityType.DOCUMENT;
+            if (isDocumentType || targetReference.getType() == EntityType.OBJECT_PROPERTY) {
                 localTargetId = this.localSerializer.serialize(targetReference);
                 docName = this.serializer.serialize(targetReference.extractReference(EntityType.DOCUMENT));
             }
@@ -326,7 +325,8 @@ public class DefaultIOService implements IOService
 
             // if object exists and its target matches the requested target, delete it
             if (annotationObject != null
-                && localTargetId.equals(annotationObject.getStringValue(Annotation.TARGET_FIELD)))
+                && matchesTarget(annotationObject.getStringValue(Annotation.TARGET_FIELD), localTargetId,
+                    isDocumentType))
             {
                 document.removeObject(annotationObject);
                 document.setAuthor(xcontext.getUser());

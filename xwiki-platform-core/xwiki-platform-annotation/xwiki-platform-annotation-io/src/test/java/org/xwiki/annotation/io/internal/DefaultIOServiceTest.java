@@ -276,4 +276,32 @@ class DefaultIOServiceTest
         Annotation annotation = this.ioService.getAnnotation(target, "1");
         assertEquals("Space.Page", annotation.get("target"));
     }
+
+    @Test
+    void removeAnnotationWithBlankTargetOnDocument() throws Exception
+    {
+        // An annotation on the document content is stored with a blank target; removing it through the document
+        // target must still delete the object (regression: blank targets were not matched on removal, so the
+        // annotation could no longer be deleted).
+        String target = "Space.Page";
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        XWikiDocument clonedDocument = mock(XWikiDocument.class);
+        BaseObject annotationObject = mock(BaseObject.class);
+
+        when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
+        when(this.localSerializer.serialize(documentReference)).thenReturn(target);
+        when(this.serializer.serialize(documentReference)).thenReturn("xwiki:Space.Page");
+        when(this.xwiki.getDocument("xwiki:Space.Page", this.context)).thenReturn(document);
+        when(document.clone()).thenReturn(clonedDocument);
+        when(clonedDocument.getXObject(ANNOTATION_CLASS_REFERENCE, 1)).thenReturn(annotationObject);
+        when(annotationObject.getStringValue(Annotation.TARGET_FIELD)).thenReturn("");
+        when(this.context.getUser()).thenReturn("xwiki:XWiki.Author");
+
+        this.ioService.removeAnnotation(target, "1");
+
+        verify(clonedDocument).removeObject(annotationObject);
+        verify(this.xwiki).saveDocument(clonedDocument, "Deleted annotation 1", true, this.context);
+    }
 }

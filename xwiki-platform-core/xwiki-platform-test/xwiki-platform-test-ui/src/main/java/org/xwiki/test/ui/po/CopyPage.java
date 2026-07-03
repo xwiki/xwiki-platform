@@ -137,6 +137,7 @@ public class CopyPage extends ViewPage
     /**
      * @return {@code true} if the checkbox for preserving children during copy is checked.
      * @since 17.4.0RC1
+     * @since 17.10.10
      */
     public boolean isDeepCopy()
     {
@@ -148,6 +149,7 @@ public class CopyPage extends ViewPage
      *
      * @param deep {@code true} to preserve children, {@code false} otherwise
      * @since 17.4.0RC1
+     * @since 17.10.10
      */
     public void setDeepCopy(boolean deep)
     {

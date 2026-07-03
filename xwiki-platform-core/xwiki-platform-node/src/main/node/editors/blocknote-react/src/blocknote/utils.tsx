@@ -249,7 +249,7 @@ type ContextForMacros = {
 };
 
 /**
- * Informations to fill the insertion modal UI with
+ * Information to fill the insertion modal UI with
  *
  * @since 18.5.0RC1
  * @beta

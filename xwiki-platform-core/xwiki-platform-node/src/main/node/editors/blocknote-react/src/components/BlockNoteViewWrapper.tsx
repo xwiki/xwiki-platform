@@ -28,6 +28,7 @@ import {
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
+import { DepsContainerContext } from "../contexts";
 import { blocksToYXmlFragment } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -39,6 +40,7 @@ import {
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
+import { filterMap } from "@xwiki/platform-fn-utils";
 import { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
 import { useEffect } from "react";
 import type {
@@ -54,12 +56,16 @@ import type {
   BlockNoteConcreteMacro,
   ContextForMacros,
 } from "../blocknote/utils";
-import type { LinkEditionContext } from "../misc/linkSuggest";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { Container } from "inversify";
 
 /**
  * Default options for the BlockNote editor
@@ -156,9 +162,12 @@ type BlockNoteViewWrapperProps = {
   onChange?: (editor: EditorType) => void;
 
   /**
-   * Link edition utilities
+   * Container for dependency injection
+   *
+   * @since 18.5.0RC1
+   * @beta
    */
-  linkEditionCtx: LinkEditionContext;
+  depsContainer: Container;
 
   /**
    * Overrides for default behavior
@@ -203,7 +212,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   collaboration,
   onChange,
   lang,
-  linkEditionCtx,
+  depsContainer,
   overrides,
   label,
   syntax,
@@ -213,8 +222,13 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
   if (macros) {
     const macroAstToReactJsxConverter = new MacrosAstToReactJsxConverter(
-      linkEditionCtx.remoteURLParser,
-      linkEditionCtx.remoteURLSerializer,
+      depsContainer
+        .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+        .get()!,
+
+      depsContainer
+        .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+        .get()!,
     );
 
     for (const macro of macros.list) {
@@ -238,7 +252,8 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
       return undefined;
     }
 
-    const collaborator = collaboration.collaborator;
+    const { collaborator } = collaboration;
+
     return {
       provider: collaboration.provider,
       fragment: collaboration.doc.getXmlFragment(name),
@@ -297,56 +312,55 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
   // Renders the editor instance using a React component.
   return (
-    <BlockNoteView
-      editor={editor}
-      theme={theme}
-      // Override some builtin components
-      formattingToolbar={false}
-      linkToolbar={false}
-      filePanel={false}
-      slashMenu={false}
-      onChange={(editor) => onChange?.(editor)}
-    >
-      <SuggestionMenuController
-        triggerCharacter={"/"}
-        getItems={async (query) =>
-          querySuggestionsMenuItems(editor, query, builtMacros, syntax, lang)
-        }
-      />
+    <DepsContainerContext.Provider value={depsContainer}>
+      <BlockNoteView
+        editor={editor}
+        theme={theme}
+        // Override some builtin components
+        formattingToolbar={false}
+        linkToolbar={false}
+        filePanel={false}
+        slashMenu={false}
+        onChange={(editor) => onChange?.(editor)}
+      >
+        <SuggestionMenuController
+          triggerCharacter={"/"}
+          getItems={async (query) =>
+            querySuggestionsMenuItems(editor, query, builtMacros, syntax, lang)
+          }
+        />
 
-      {/* TODO: suggestions menu for inline macros */}
+        {/* TODO: suggestions menu for inline macros */}
 
-      <FormattingToolbarController
-        formattingToolbar={(props) => (
-          <CustomFormattingToolbar
-            formattingToolbarProps={props}
-            linkEditionCtx={linkEditionCtx}
-            imageEditionOverrideFn={overrides?.imageEdition}
-          />
-        )}
-      />
-
-      <LinkToolbarController
-        linkToolbar={(props) => (
-          <FormattingToolbar>
-            <CustomLinkToolbar
-              linkToolbarProps={props}
-              linkEditionCtx={linkEditionCtx}
+        <FormattingToolbarController
+          formattingToolbar={(props) => (
+            <CustomFormattingToolbar
+              formattingToolbarProps={props}
+              imageEditionOverrideFn={overrides?.imageEdition}
+              additionalBlockTypes={filterMap(
+                builtMacros,
+                (built) => built.dropdownTransformItem,
+              )}
+              macros={macros}
             />
-          </FormattingToolbar>
-        )}
-      />
+          )}
+        />
 
-      <FilePanelController
-        filePanel={({ blockId }) => (
-          <FilePanel
-            blockId={blockId}
-            editor={editor}
-            linkEditionCtx={linkEditionCtx}
-          />
-        )}
-      />
-    </BlockNoteView>
+        <LinkToolbarController
+          linkToolbar={(props) => (
+            <FormattingToolbar>
+              <CustomLinkToolbar linkToolbarProps={props} />
+            </FormattingToolbar>
+          )}
+        />
+
+        <FilePanelController
+          filePanel={({ blockId }) => (
+            <FilePanel blockId={blockId} editor={editor} />
+          )}
+        />
+      </BlockNoteView>
+    </DepsContainerContext.Provider>
   );
 };
 

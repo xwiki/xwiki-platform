@@ -561,7 +561,7 @@ public class HibernateStore implements Disposable, Initializable
      */
     public String toDynamicMappingTableName(String className)
     {
-        return "xwikicustom_" + className.replaceAll("\\.", "_");
+        return "xwikicustom_" + className.replace(".", "_");
     }
 
     /**

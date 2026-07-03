@@ -239,30 +239,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 }
 
                 try {
-                    switch (queueEntry.operation) {
-                        case READY_MARKER:
-                            queueEntry.readyIndicator.switchToIndexQueue();
-                            DefaultSolrIndexer.this.indexQueue.put(new IndexQueueEntry(queueEntry.readyIndicator));
-                            break;
-                        case INDEX:
-                            Iterable<EntityReference> references = retrieveReferences(queueEntry);
-
-                            for (EntityReference reference : references) {
-                                indexQueue.put(new IndexQueueEntry(
-                                    DefaultSolrIndexer.this.entityReferenceFactory.getReference(reference),
-                                    queueEntry.operation));
-                            }
-                            break;
-                        default:
-                            if (queueEntry.recurse) {
-                                indexQueue.put(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
-                                    queueEntry.operation));
-                            } else if (queueEntry.reference != null) {
-                                indexQueue.put(new IndexQueueEntry(
-                                    DefaultSolrIndexer.this.entityReferenceFactory.getReference(queueEntry.reference),
-                                    queueEntry.operation));
-                            }
-                    }
+                    dispatchQueueEntry(queueEntry);
                 } catch (Throwable e) {
                     logger.warn("Failed to apply operation [{}] on root reference [{}]", queueEntry.operation,
                         queueEntry.reference, e);
@@ -276,6 +253,35 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
             }
 
             logger.debug("Stop SOLR resolver thread");
+        }
+
+        private void dispatchQueueEntry(ResolveQueueEntry queueEntry)
+            throws SolrIndexerException, InterruptedException
+        {
+            switch (queueEntry.operation) {
+                case READY_MARKER:
+                    queueEntry.readyIndicator.switchToIndexQueue();
+                    DefaultSolrIndexer.this.indexQueue.put(new IndexQueueEntry(queueEntry.readyIndicator));
+                    break;
+                case INDEX:
+                    Iterable<EntityReference> references = retrieveReferences(queueEntry);
+
+                    for (EntityReference reference : references) {
+                        indexQueue.put(new IndexQueueEntry(
+                            DefaultSolrIndexer.this.entityReferenceFactory.getReference(reference),
+                            queueEntry.operation));
+                    }
+                    break;
+                default:
+                    if (queueEntry.recurse) {
+                        indexQueue.put(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
+                            queueEntry.operation));
+                    } else if (queueEntry.reference != null) {
+                        indexQueue.put(new IndexQueueEntry(
+                            DefaultSolrIndexer.this.entityReferenceFactory.getReference(queueEntry.reference),
+                            queueEntry.operation));
+                    }
+            }
         }
 
         private Iterable<EntityReference> retrieveReferences(ResolveQueueEntry queueEntry) throws SolrIndexerException

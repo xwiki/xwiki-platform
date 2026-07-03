@@ -20,6 +20,8 @@
 
 import { CustomImageToolbar } from "./images/CustomImageToolbar";
 import { CustomCreateLinkButton } from "./links/CustomCreateLinkButton";
+import { CustomInsertMacroButton } from "./links/CustomInsertMacroButton";
+import { CustomMacroEditButton } from "./links/CustomMacroEditButton";
 import { useEditor } from "../hooks";
 import {
   AddCommentButton,
@@ -37,31 +39,45 @@ import {
   TableCellMergeButton,
   TextAlignButton,
   UnnestBlockButton,
+  blockTypeSelectItems,
   useComponentsContext,
+  useDictionary,
 } from "@blocknote/react";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
-import type { LinkEditionContext } from "../misc/linkSuggest";
+import type { ContextForMacros } from "../blocknote/utils";
 import type {
   BlockTypeSelectItem,
   FormattingToolbarProps,
 } from "@blocknote/react";
+import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { JSX } from "react";
 
 type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
-  linkEditionCtx: LinkEditionContext;
+  additionalBlockTypes: BlockTypeSelectItem[];
+  macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
 };
 
 export const CustomFormattingToolbar: React.FC<
   CustomFormattingToolbarProps
-> = ({ formattingToolbarProps, linkEditionCtx, imageEditionOverrideFn }) => {
+> = ({
+  formattingToolbarProps,
+  additionalBlockTypes,
+  imageEditionOverrideFn,
+  macros,
+}) => {
   const Components = useComponentsContext()!;
+  const dict = useDictionary();
 
   const editor = useEditor();
 
   // TODO: check if there is a need to update the selection in realtime?
   const currentBlock = editor.getTextCursorPosition().block;
+
+  const combinedBlockTypeSelectItems = (
+    formattingToolbarProps.blockTypeSelectItems ?? blockTypeSelectItems(dict)
+  ).concat(additionalBlockTypes);
 
   return (
     <Components.FormattingToolbar.Root
@@ -71,15 +87,11 @@ export const CustomFormattingToolbar: React.FC<
       {currentBlock.type === "image" ? (
         <CustomImageToolbar
           currentBlock={currentBlock}
-          linkEditionCtx={linkEditionCtx}
           imageEditionOverrideFn={imageEditionOverrideFn}
         />
       ) : (
         // For others, simply show the "normal", default toolbar
-        getDefaultFormattingToolbarItems(
-          formattingToolbarProps.blockTypeSelectItems,
-          linkEditionCtx,
-        )
+        getDefaultFormattingToolbarItems(combinedBlockTypeSelectItems, macros)
       )}
     </Components.FormattingToolbar.Root>
   );
@@ -87,7 +99,7 @@ export const CustomFormattingToolbar: React.FC<
 
 const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
-  linkEditionCtx: LinkEditionContext,
+  macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false,
 ): JSX.Element[] =>
   // NOTE: This should return **exactly** the same items as BlockNote's default toolbar
   // So, when BlockNote updates theirs, we should update ours
@@ -121,12 +133,28 @@ const getDefaultFormattingToolbarItems = (
     <UnnestBlockButton key={"unnestBlockButton"} />,
     // This button has the exact same appearance as the default creation link button
     // But brings a custom popover to support XWiki references
-    <CustomCreateLinkButton
-      key={"createLinkButton"}
-      linkEditionCtx={linkEditionCtx}
-    />,
+    <CustomCreateLinkButton key={"createLinkButton"} />,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
-  ];
+  ].concat(
+    macros
+      ? [
+          <CustomMacroEditButton
+            key={"macroEditButton"}
+            macrosList={macros.list}
+            ctxForMacros={macros.ctx}
+          />,
+          // Hide the insert action when no insertion editor is available.
+          ...(macros.ctx.openInsertionEditor
+            ? [
+                <CustomInsertMacroButton
+                  key={"insertMacroButton"}
+                  openEditor={macros.ctx.openInsertionEditor}
+                />,
+              ]
+            : []),
+        ]
+      : [],
+  );
 
 export type { CustomFormattingToolbarProps };

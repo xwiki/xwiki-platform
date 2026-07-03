@@ -3200,7 +3200,7 @@ public class Document extends Api
                 i = fname.lastIndexOf("/");
             }
             filename = fname.substring(i + 1);
-            filename = filename.replaceAll("\\+", " ");
+            filename = filename.replace("+", " ");
 
             if ((data != null) && (data.length > 0)) {
                 XWikiAttachment attachment = this.getDoc().addAttachment(filename, data, getXWikiContext());

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -71,6 +72,10 @@ class DefaultLiveDataSourceManagerTest
     private ComponentManagerManager componentManagerManager;
 
     @Mock
+    @Named("root")
+    private ComponentManager rootComponentManager;
+
+    @Mock
     @Named("wiki")
     private ComponentManager wikiComponentManager;
 
@@ -89,6 +94,7 @@ class DefaultLiveDataSourceManagerTest
     void before()
     {
         when(this.contextComponentManagerProvider.get()).thenReturn(this.contextComponentManager);
+        when(this.componentManagerManager.getComponentManager(null, false)).thenReturn(this.rootComponentManager);
         when(this.alice.getRoleHint()).thenReturn("alice");
         when(this.bob.getRoleHint()).thenReturn("bob");
     }
@@ -105,7 +111,13 @@ class DefaultLiveDataSourceManagerTest
     @Test
     void getAvailableSourcesFromUnknownNamespace()
     {
-        assertFalse(this.sourceManager.getAvailableSources("unknown").isPresent());
+        // The component manager of the requested namespace doesn't exist yet (e.g. a freshly created wiki), so the
+        // source manager falls back to the root component manager to find globally-registered sources.
+        when(this.rootComponentManager.<LiveDataSource>getComponentDescriptorList((Type) LiveDataSource.class))
+            .thenReturn(Arrays.asList(this.alice, this.bob));
+
+        assertEquals(Set.of("alice", "bob"),
+            this.sourceManager.getAvailableSources("unknown").get());
     }
 
     @Test

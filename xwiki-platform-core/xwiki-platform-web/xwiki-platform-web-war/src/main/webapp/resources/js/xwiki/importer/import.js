@@ -78,17 +78,19 @@ var XWiki = (function(XWiki){
       hookRichImporterUI();
       /** Attach the HTML5 uploader, if available */
       var form = $('AddAttachment');
-      if (form && typeof(XWiki.FileUploader) != 'undefined') {
-        var input = form.down("input[type='file']");
-        var html5Uploader = new XWiki.FileUploader(input, {
-          'progressAutohide' : true,
-          'responseContainer' : $('packagelistcontainer'),
-          'responseURL' : window.docgeturl + '?xpage=packagelist&forceTestRights=1',
-          'maxFilesize' : parseInt(input.readAttribute('data-max-file-size'))
-        });
-        form.observe("xwiki:html5upload:done", hookRichImporterUI);
-        html5Uploader.hideFormButtons();
-      }
+      require(['xwiki-upload'], function(FileUploader) {
+        if (form && typeof (FileUploader) != 'undefined') {
+          var input = form.down("input[type='file']");
+          var html5Uploader = new FileUploader(input, {
+            'progressAutohide': true,
+            'responseContainer': $('packagelistcontainer'),
+            'responseURL': window.docgeturl + '?xpage=packagelist&forceTestRights=1',
+            'maxFilesize': parseInt(input.readAttribute('data-max-file-size'))
+          });
+          form.observe("xwiki:html5upload:done", hookRichImporterUI);
+          html5Uploader.hideFormButtons();
+        }
+      });
     });
 
     /**

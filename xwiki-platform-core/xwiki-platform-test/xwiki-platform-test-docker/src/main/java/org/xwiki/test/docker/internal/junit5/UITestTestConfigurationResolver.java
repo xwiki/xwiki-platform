@@ -90,6 +90,8 @@ public class UITestTestConfigurationResolver
 
     private static final String OFFICE_PROPERTY = "xwiki.test.ui.office";
 
+    private static final String STANDARDFLAVOR_PROPERTY = "xwiki.test.ui.standardFlavor";
+
     private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
 
     private static final String SAVEPERMANENTDIRECTORY_PROPERTY = "xwiki.test.ui.savePermanentDirectoryData";
@@ -127,6 +129,7 @@ public class UITestTestConfigurationResolver
         configuration.setSSHPorts(resolveSSHPorts(uiTestAnnotation.sshPorts()));
         configuration.setProfiles(resolveCommaSeparatedValues(uiTestAnnotation.profiles(), PROFILES_PROPERTY));
         configuration.setOffice(resolveOffice(uiTestAnnotation.office()));
+        configuration.setStandardFlavor(resolveStandardFlavor(uiTestAnnotation.standardFlavor()));
         configuration.setForbiddenServletEngines(resolveForbiddenServletEngines(uiTestAnnotation.forbiddenEngines()));
         configuration.setDatabaseCommands(resolveDatabaseCommands(uiTestAnnotation.databaseCommands()));
         configuration.setSaveDatabaseData(resolveSaveDatabaseData(uiTestAnnotation.saveDatabaseData()));
@@ -269,6 +272,11 @@ public class UITestTestConfigurationResolver
     private boolean resolveWCAGStopOnError(boolean wcagStopOnError)
     {
         return resolve(wcagStopOnError, WCAG_STOP_ON_ERROR_PROPERTY);
+    }
+
+    private boolean resolveStandardFlavor(boolean standardFlavor)
+    {
+        return resolve(standardFlavor, STANDARDFLAVOR_PROPERTY);
     }
 
     private boolean resolveOffice(boolean office)

@@ -317,13 +317,14 @@ class NotificationsIT
         notificationsRSS.loadEntries(setup);
         assertEquals(2, notificationsRSS.getEntries().size());
 
-        // FIXME: This needs to be enabled back once XWIKI-21059 is fixed.
-        //assertEquals("A comment has been added to the page \"Linux as a title\"",
-        //        notificationsRSS.getEntries().get(0).getTitle());
-        //assertTrue(notificationsRSS.getEntries().get(0).getDescription().getValue().contains(
-        //        "<strong>Pages: [addComment]</strong>"));
-        //assertEquals("The page \"Linux as a title\" has been modified",
-        //        notificationsRSS.getEntries().get(1).getTitle());
+        assertEquals("A comment has been added to the page \"Linux as a title\"",
+                notificationsRSS.getEntries().get(0).getTitle());
+        String descriptionValue = notificationsRSS.getEntries().get(0).getDescription().getValue();
+        assertTrue(descriptionValue.contains("<strong>Pages</strong>"), "Value was: " + descriptionValue);
+        assertTrue(descriptionValue.contains("Linux as a title"), "Value was: " + descriptionValue);
+        assertTrue(descriptionValue.contains("edited by " + FIRST_USER_NAME), "Value was: " + descriptionValue);
+        assertEquals("The page \"Linux as a title\" has been modified",
+                notificationsRSS.getEntries().get(1).getTitle());
 
         tray.clearAllNotifications();
     }
@@ -508,8 +509,9 @@ class NotificationsIT
 
         setup.forceGuestUser();
         setup.gotoPage(subWikiDashboard);
+        // Events are processed asynchronously, so wait until the macro displays the two expected notifications.
         NotificationsContainerElement notificationsContainerElement =
-            NotificationsContainerElement.getElementForMacroInPage();
+            NotificationsContainerElement.waitUntilNotificationCount(2);
 
         for (int i = 0; i < notificationsContainerElement.getNotificationsListCount(); i++) {
             assertFalse(notificationsContainerElement.isNotificationEventRelatedToOtherWiki(i),
@@ -521,10 +523,10 @@ class NotificationsIT
         assertEquals("Test Notif Subwiki", notificationsContainerElement.getNotificationPage(1));
 
         setup.gotoPage(mainWikiDashboard);
-        notificationsContainerElement =
-            NotificationsContainerElement.getElementForMacroInPage();
+        // This test should have produced 6 events, but more were produced with previous tests. Wait until at least
+        // the 6 events of this test are displayed.
+        notificationsContainerElement = NotificationsContainerElement.waitUntilNotificationCount(6);
 
-        // this test should have produced 6 events, but more were produced with previous tests.
         assertTrue(notificationsContainerElement.getNotificationsListCount() >= 6);
         assertEquals("Sub Wiki Dashboard (wiki1)", notificationsContainerElement.getNotificationPage(0));
         assertEquals("Main Wiki Dashboard", notificationsContainerElement.getNotificationPage(1));

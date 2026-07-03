@@ -335,6 +335,10 @@ export default {
   z-index: 1;
 }
 
+.layout-table .draggable-item:last-child .resize-handle {
+  right: 0; /* Prevents an always showing horizontal scrollbar below the table */
+}
+
 .layout-table .draggable-item .resize-handle:focus-within,
 .layout-table .draggable-item .resize-handle:hover {
   /* Show the resize handle and increase its width when the column is focused or hovered. */

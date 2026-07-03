@@ -237,6 +237,12 @@ class CreatePageAndSpaceIT
         assertTrue(documentPicker.isNameLiveValidationSuccess());
         assertTrue(documentPicker.isParentLiveValidationSuccess());
 
+        // A name ending with a dot is escaped in the serialized reference (e.g. a space named "Foo."
+        // is serialized as "Foo\."), so an escaped dot must be considered a valid parent.
+        documentPicker.setParent("Foo\\.");
+        assertTrue(documentPicker.isNameLiveValidationSuccess());
+        assertTrue(documentPicker.isParentLiveValidationSuccess());
+
         documentPicker.setParent(".Foo.Bar");
         assertTrue(documentPicker.isNameLiveValidationSuccess());
         assertFalse(documentPicker.isParentLiveValidationSuccess());

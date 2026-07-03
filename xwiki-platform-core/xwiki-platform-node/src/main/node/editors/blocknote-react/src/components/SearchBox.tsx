@@ -17,13 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { DepsContainerContext } from "../contexts";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
 import { t } from "i18next";
 import { debounce } from "lodash-es";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { RiLink } from "react-icons/ri";
-import type { LinkEditionContext, LinkSuggestion } from "../misc/linkSuggest";
-import type { KeyboardEvent, ReactElement } from "react";
+import type { LinkSuggestion } from "../misc/linkSuggest";
+import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
+import type { ReactElement } from "react";
 
 export type SearchBoxProps = {
   /**
@@ -35,13 +38,6 @@ export type SearchBoxProps = {
    * The search box's placeholder (when empty)
    */
   placeholder: string;
-
-  /**
-   * Link edition context, required for validate raw entity references on submit
-   *
-   * @since 18.0.0RC1
-   */
-  linkEditionCtx: LinkEditionContext | null;
 
   /**
    * Perform a search
@@ -81,15 +77,29 @@ export type SearchBoxProps = {
  *
  * @see SearchBoxProps
  */
+// eslint-disable-next-line max-statements
 export const SearchBox: React.FC<SearchBoxProps> = ({
   initialValue,
   placeholder,
-  linkEditionCtx,
   getSuggestions,
   renderSuggestion,
   onSelect,
   onSubmit,
 }) => {
+  const depsContainer = useContext(DepsContainerContext);
+
+  if (!depsContainer) {
+    throw new Error("Missing dependencies container in React context");
+  }
+
+  const modelReferenceParser = depsContainer
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!;
+
+  const remoteURLSerializer = depsContainer
+    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+    .get()!;
+
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
@@ -133,36 +143,33 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
   const submitRawValue = useCallback(
     // eslint-disable-next-line max-statements
-    async (e: KeyboardEvent<HTMLInputElement>, value: string) => {
+    async (value: string) => {
       if (isUrl(value)) {
         onSubmit(value);
         return;
       }
 
-      if (!linkEditionCtx) {
-        e.preventDefault();
+      if (!modelReferenceParser || !remoteURLSerializer) {
         return;
       }
 
-      const reference = await linkEditionCtx.modelReferenceParser
+      const reference = await modelReferenceParser
         .parseAsync(value)
         .catch(() => null);
 
       if (!reference) {
-        e.preventDefault();
         return;
       }
 
-      const url = linkEditionCtx.remoteURLSerializer.serialize(reference);
+      const url = remoteURLSerializer.serialize(reference);
 
       if (url === undefined) {
-        e.preventDefault();
         throw new Error("Failed to serialize entity reference: " + value);
       }
 
       onSubmit(url);
     },
-    [onSubmit, linkEditionCtx],
+    [onSubmit, modelReferenceParser, remoteURLSerializer],
   );
 
   // Automatically perform a search when the query changes
@@ -199,6 +206,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         <InputBase
           leftSection={<RiLink />}
           rightSection=" "
+          data-test="searchBoxInput"
           placeholder={placeholder}
           value={query}
           onChange={(event) => {
@@ -211,9 +219,15 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
           onBlur={() => {
             combobox.closeDropdown();
           }}
-          onKeyDown={(e) =>
-            e.key === "Enter" && submitRawValue(e, e.currentTarget.value)
-          }
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              // Prevent the default editing action of the Enter key: the submit handlers can move
+              // the focus back to the editor synchronously, in which case the browser would apply
+              // the default action to the editor's restored selection, deleting its content.
+              e.preventDefault();
+              submitRawValue(e.currentTarget.value);
+            }
+          }}
         />
       </Combobox.Target>
 

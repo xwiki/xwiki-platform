@@ -116,7 +116,7 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
 
             // Try to get a template associated with the composite event
             Template template = this.templateManager.getTemplate(String.format("notification/rss/%s.vm",
-                    eventNotification.getType().replaceAll("\\/", ".")));
+                    eventNotification.getType().replace("/", ".")));
 
             // If no template is found, fallback on the default one
             if (template == null) {

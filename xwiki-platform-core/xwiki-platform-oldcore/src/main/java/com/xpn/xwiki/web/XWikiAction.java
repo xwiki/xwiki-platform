@@ -1112,6 +1112,7 @@ public abstract class XWikiAction implements LegacyAction
                     if (jsonAnswer) {
                         Map<String, String> jsonObject = new LinkedHashMap<>();
                         jsonObject.put("errorType", "CSRF");
+                        jsonObject.put("allowResubmit", String.valueOf(csrf.isResubmitAllowedForCurrentRequest()));
                         jsonObject.put("resubmissionURI", csrf.getRequestURI());
                         jsonObject.put("newToken", csrf.getToken());
                         this.answerJSON(context, HttpServletResponse.SC_FORBIDDEN, jsonObject);

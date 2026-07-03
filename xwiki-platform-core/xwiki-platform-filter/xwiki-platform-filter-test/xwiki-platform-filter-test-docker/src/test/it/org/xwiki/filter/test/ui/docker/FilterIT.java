@@ -192,7 +192,7 @@ class FilterIT
 
         // the document is missing xclass information so it triggers a migration.
         assertEquals("2.1", page.getVersion());
-        assertEquals("Migrated property [prop1] from class [space.nestedspace.document]", page.getComment());
+        assertEquals("Migrated class [space.nestedspace.document]", page.getComment());
 
         assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), page.getModified().getTime());
         assertEquals(toDate("2000-01-01 00:00:00.0 UTC"), page.getCreated().getTime());

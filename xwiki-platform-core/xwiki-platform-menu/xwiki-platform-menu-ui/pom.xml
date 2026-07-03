@@ -122,6 +122,13 @@
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
+    <!-- Used by the MenuTemplate page when creating a new menu -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

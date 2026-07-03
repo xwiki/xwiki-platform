@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,6 +72,8 @@ import org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest;
  */
 public class SavedRequestRestorerFilter implements Filter
 {
+    private static final String SEC_FETCH_SITE_HEADER = "Sec-Fetch-Site";
+
     /**
      * Regular expression used for extracting the SRID from the query string. See
      * {@link #getSavedRequest(HttpServletRequest)}.
@@ -185,6 +188,31 @@ public class SavedRequestRestorerFilter implements Filter
         public Enumeration<String> getParameterNames()
         {
             return Collections.enumeration(getParameterMap().keySet());
+        }
+
+        /**
+         * We retrieve the method of the original request only if the current request is GET, and if it complies with
+         * the Sec-Fetch-Site header: either the header is missing, or its value is different from cross-site, to
+         * prevent having cross origin POST requests.
+         * @return the method of the current request, or the method of the saved request if it exists and complies to
+         * the conditions explained above.
+         * @see HttpServletRequest#getMethod()
+         */
+        @Override
+        public String getMethod()
+        {
+            String result = super.getMethod();
+            if (Strings.CI.equals(result, "GET") && this.savedRequest != null) {
+                Map<String, List<String>> headers = this.savedRequest.getHeaders();
+                // We are permissive if the Sec-Fetch-Site header is missing: it cannot really be exploited outside of
+                // a browser. Also, it ensures we can test that in Selenium.
+                if (!headers.containsKey(SEC_FETCH_SITE_HEADER)
+                    || (headers.containsKey(SEC_FETCH_SITE_HEADER)
+                        && !Strings.CI.equals("cross-site", headers.get(SEC_FETCH_SITE_HEADER).getFirst()))) {
+                    result = this.savedRequest.getMethod();
+                }
+            }
+            return result;
         }
     }
 

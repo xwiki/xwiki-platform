@@ -104,7 +104,7 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
                 try {
                     inputSource.close();
                 } catch (IOException e) {
-                    this.logger.warn("Failed to close the source: {}", ExceptionUtils.getRootCauseMessage(e));
+                    this.logger.warn("Failed to close the source: [{}]", ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         } else {

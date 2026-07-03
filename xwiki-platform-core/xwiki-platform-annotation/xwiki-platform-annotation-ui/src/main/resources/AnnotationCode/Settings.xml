@@ -57,7 +57,7 @@
         #end
         #foreach ($option in $options.keySet())
           #set($optionValue = $options.get($option))
-          &lt;label class="option #if($optionValue.checked) selected #end"&gt;&lt;input type="checkbox" value="${option}" #if($optionValue.checked) checked="checked" #end/&gt;$optionValue.prettyName&lt;/label&gt;
+          &lt;label class="option #if($optionValue.checked) selected #end"&gt;&lt;input type="checkbox" value="$escapetool.xml($option)" #if($optionValue.checked) checked="checked" #end/&gt;$optionValue.prettyName&lt;/label&gt;
         #end
       &lt;/div&gt;
     &lt;/div&gt;

@@ -80,5 +80,26 @@
       <artifactId>fast-diff</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- Test dependencies. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Settings.xml is written in xwiki/2.0 syntax, required to render it in the page test. -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xwiki20</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Provides the global macros.vm velocity library (e.g. #setVariable) used by Settings.xml. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web-templates</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

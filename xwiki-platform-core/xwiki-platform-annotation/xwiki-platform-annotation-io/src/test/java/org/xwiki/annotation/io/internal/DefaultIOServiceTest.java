@@ -137,14 +137,16 @@ class DefaultIOServiceTest
         String serializedReference = "xwiki:XWiki.Test";
 
         XWikiDocument document = mock(XWikiDocument.class);
+        // The service clones the cached document and operates on (and saves) the clone, so that the cached
+        // instance is never modified.
+        XWikiDocument clonedDocument = mock(XWikiDocument.class);
         BaseObject baseObject = mock(BaseObject.class);
 
         when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
         when(this.serializer.serialize(documentReference)).thenReturn(serializedReference);
         when(this.xwiki.getDocument(serializedReference, this.context)).thenReturn(document);
-        // The service clones the document to avoid modifying the cached instance.
-        when(document.clone()).thenReturn(document);
-        when(document.newXObject(
+        when(document.clone()).thenReturn(clonedDocument);
+        when(clonedDocument.newXObject(
             ANNOTATION_CLASS_REFERENCE.removeParent(ANNOTATION_CLASS_REFERENCE.extractReference(EntityType.WIKI)),
             this.context))
             .thenReturn(baseObject);
@@ -159,8 +161,10 @@ class DefaultIOServiceTest
         verify(baseObject).set(eq(Annotation.DATE_FIELD), any(Date.class), eq(this.context));
         verify(baseObject).set(Annotation.AUTHOR_FIELD, annotation.getAuthor(), this.context);
         verify(baseObject, never()).set(eq(Annotation.TARGET_FIELD), any(), any());
-        verify(document).setAuthor(anyString());
-        verify(this.xwiki).saveDocument(document, "Added annotation on \"selection\"", true, this.context);
+        // The clone (not the cached document) is the one updated and saved.
+        verify(document, never()).setAuthor(anyString());
+        verify(clonedDocument).setAuthor("xwiki:XWiki.Author");
+        verify(this.xwiki).saveDocument(clonedDocument, "Added annotation on \"selection\"", true, this.context);
     }
 
     @Test

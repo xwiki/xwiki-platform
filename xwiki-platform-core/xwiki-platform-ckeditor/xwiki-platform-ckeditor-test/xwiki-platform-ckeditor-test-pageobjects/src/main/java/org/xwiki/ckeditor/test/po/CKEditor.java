@@ -23,6 +23,7 @@ import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BaseElement;
@@ -52,6 +53,14 @@ public class CKEditor extends BaseElement
     }
 
     /**
+     * @return the name of this editor instance (usually matches the name of the form field the editor is attached to)
+     */
+    public String getName()
+    {
+        return this.name;
+    }
+
+    /**
      * Waits for CKEditor to load.
      *
      * @return this editor instance
@@ -59,20 +68,19 @@ public class CKEditor extends BaseElement
     public CKEditor waitToLoad()
     {
         StringBuilder script = new StringBuilder();
-        script.append("var name = arguments[0];\n");
-        script.append("var callback = arguments[1];\n");
-        script.append("require(['deferred!ckeditor'], function(ckeditorPromise) {\n");
-        script.append("  ckeditorPromise.done(function(ckeditor) {\n");
+        script.append("const name = arguments[0];\n");
+        script.append("const callback = arguments[1];\n");
+        script.append("require(['deferred!ckeditor'], ckeditorPromise => {\n");
+        script.append("  ckeditorPromise.done(ckeditor => {\n");
         script.append("    // In case the editor instance is not ready yet.\n");
-        script.append("    var handler = ckeditor.on('instanceReady', function(event) {\n");
+        script.append("    const handler = ckeditor.on('instanceReady', event => {\n");
         script.append("      if (name === event.editor.name) {\n");
         script.append("        handler.removeListener();\n");
         script.append("        callback();\n");
         script.append("      }\n");
         script.append("    });\n");
         script.append("    // In case the editor instance is ready.\n");
-        script.append("    var instance = ckeditor.instances[name];\n");
-        script.append("    instance && instance.status === 'ready' && callback();\n");
+        script.append("    ckeditor.instances[name]?.status === 'ready' && callback();\n");
         script.append("  });\n");
         script.append("});\n");
 
@@ -94,12 +102,30 @@ public class CKEditor extends BaseElement
     }
 
     /**
+     * @return the page object used to interact with the CKEditor balloon tool bar
+     * @since 15.10.6
+     * @since 16.0.0RC1
+     */
+    public CKEditorBalloonToolBar getBalloonToolBar()
+    {
+        return new CKEditorBalloonToolBar(this);
+    }
+
+    /**
      * @return the rich text area
      */
     public RichTextAreaElement getRichTextArea()
     {
-        // The in-line frame element is renewed while editing so we can't cache it.
-        return new RichTextAreaElement(getIframe());
+        return getRichTextArea(true);
+    }
+
+    /**
+     * @param wait whether to wait or not for the content to be editable
+     * @return the rich text area
+     */
+    public RichTextAreaElement getRichTextArea(boolean wait)
+    {
+        return new RichTextAreaElement(this, wait);
     }
 
     /**
@@ -107,33 +133,41 @@ public class CKEditor extends BaseElement
      */
     public WebElement getSourceTextArea()
     {
-        return getDriver().findElementWithoutWaiting(getContainer(), By.className("cke_source"));
+        WebElement sourceTextArea =
+            (WebElement) getDriver().executeScript("return CKEDITOR.instances[arguments[0]].editable().$;", this.name);
+        getDriver().waitUntilCondition(ExpectedConditions.domPropertyToBe(sourceTextArea, "readOnly", "false"));
+        return sourceTextArea;
     }
 
-    protected WebElement getContainer()
+    protected WebElement getContentContainer()
     {
-        return (WebElement) getDriver().executeScript("return CKEDITOR.instances[arguments[0]].container.$;",
-            this.name);
-    }
-
-    protected WebElement getIframe()
-    {
-        return getDriver().findElementWithoutWaiting(getContainer(), By.className("cke_wysiwyg_frame"));
+        WebElement contentContainer = (WebElement) getDriver()
+            .executeScript("return CKEDITOR.instances[arguments[0]].ui.contentsElement.$;", this.name);
+        if (!"textbox".equals(contentContainer.getDomAttribute("role"))) {
+            contentContainer = getDriver().findElementWithoutWaiting(contentContainer, By.tagName("iframe"));
+        }
+        return contentContainer;
     }
 
     /**
-     * Execute the runnable on the context of the CKEditor iframe.
+     * Execute the runnable on the context of the CKEditor editable content.
      *
-     * @param runnable the action to run on the context of the CKEditor iframe
-     * @since 14.8RC1
+     * @param runnable the action to run on the context of the CKEditor editable content
+     * @since 16.2.0RC1
      */
-    public void executeOnIframe(Runnable runnable)
+    public void executeOnEditedContent(Runnable runnable)
     {
+        WebElement contentContainer = getContentContainer();
+        boolean isFrame = "iframe".equals(contentContainer.getTagName());
         try {
-            getDriver().switchTo().frame(getIframe());
+            if (isFrame) {
+                getDriver().switchTo().frame(contentContainer);
+            }
             runnable.run();
         } finally {
-            getDriver().switchTo().parentFrame();
+            if (isFrame) {
+                getDriver().switchTo().parentFrame();
+            }
         }
     }
 }

@@ -1,0 +1,22 @@
+{
+  "private": true,
+  "name": "xwiki-platform-component-webjar",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test:unit": "exit 0 ## no test need for this package"
+  },
+  "dependencies": {
+    "@xwiki/platform-component-annotation-default": "workspace:*",
+    "@xwiki/platform-component-manager-api": "workspace:*",
+    "@xwiki/platform-component-manager-default": "workspace:*"
+  },
+  "devDependencies": {
+    "@xwiki/platform-tool-eslintconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
+    "eslint": "catalog:",
+    "vite": "catalog:"
+  }
+}

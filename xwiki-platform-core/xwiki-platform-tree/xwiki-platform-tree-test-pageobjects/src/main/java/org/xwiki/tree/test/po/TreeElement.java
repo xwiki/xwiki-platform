@@ -22,14 +22,11 @@ package org.xwiki.tree.test.po;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -113,19 +110,16 @@ public class TreeElement extends BaseElement
      */
     public TreeElement waitForIt()
     {
-        // Wait for the loading animation container. This element is generated from JavaScript when the tree is
-        // being initialized, so its presence guarantees that the tree initialization has started.
-        getDriver().waitUntilElementIsVisible(this.element, By.cssSelector(".jstree-container-ul"));
         // Wait for the root node to be loaded.
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
+        getDriver().waitUntilCondition(driver ->
+            // Wait for the loading animation container. This element is generated from JavaScript when the tree is
+            // being initialized, so its presence guarantees that the tree initialization has started.
+            getDriver().hasElement(this.element, By.cssSelector(".jstree-container-ul"))
                 // The tree element is marked as busy while the tree nodes are being loaded.
-                return !Boolean.valueOf(element.getAttribute("aria-busy"));
-            }
-        });
+                && !Boolean.parseBoolean(this.element.getAttribute("aria-busy"))
+                // Check if there is any descendant of the element that is marked as busy.
+                && this.element.findElements(By.cssSelector("[aria-busy = 'true']")).isEmpty()
+        );
         return this;
     }
 
@@ -204,6 +198,6 @@ public class TreeElement extends BaseElement
             .findElementsWithoutWaiting(this.element,
                 By.cssSelector(".jstree-container-ul > .jstree-node:not(.jstree-hidden)"))
             .stream().map(nodeElement -> By.id(nodeElement.getAttribute("id")))
-            .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).collect(Collectors.toList());
+            .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).toList();
     }
 }

@@ -75,7 +75,6 @@ import static org.mockito.Mockito.when;
 @WikiManagerScriptServiceComponentList
 @ComponentList({
     ErrorMessageMacro.class,
-    TranslationMacro.class,
     TestNoScriptMacro.class,
     ModelScriptService.class
 })

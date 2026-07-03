@@ -93,7 +93,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
             // Get the component role interface
             Type roleType = component.getRoleType();
             Class< ? > roleTypeClass = ReflectionUtils.getTypeClass(roleType);
-            ComponentDescriptor componentDescriptor = createComponentDescriptor(roleType, component.getRoleHint());
+            ComponentDescriptor componentDescriptor = createComponentDescriptor(roleType, component);
 
             // Set the proper information so the component manager use the proper keys to find components to register
             this.wikiComponentManagerContext.setCurrentUserReference(component.getAuthorReference());
@@ -217,14 +217,18 @@ public class DefaultWikiComponentManager implements WikiComponentManager
      * Helper method to create a component descriptor from role and hint.
      * 
      * @param roleType the component role type of the descriptor to create
-     * @param roleHint the hint of the implementation for the descriptor to create
+     * @param component the component for which to create a descriptor
      * @return the constructed {@link ComponentDescriptor}
      */
-    private ComponentDescriptor createComponentDescriptor(Type roleType, String roleHint)
+    private ComponentDescriptor createComponentDescriptor(Type roleType, WikiComponent component)
     {
         DefaultComponentDescriptor cd = new DefaultComponentDescriptor();
         cd.setRoleType(roleType);
-        cd.setRoleHint(roleHint);
+        cd.setRoleHint(component.getRoleHint());
+        cd.setImplementation(component.getClass());
+        cd.setRoleHintPriority(component.getRoleHintPriority());
+        cd.setRoleTypePriority(component.getRoleTypePriority());
+
         return cd;
     }
 

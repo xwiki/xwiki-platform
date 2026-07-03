@@ -56,12 +56,14 @@ public abstract class XWikiForm
      * @param request The servlet request we are processing
      * @since 13.0
      */
+    @Deprecated(since = "17.0.0RC1")
     public void reset(XWikiRequest request)
     {
         this.request = request;
         readRequest();
     }
 
+    @Deprecated(since = "17.0.0RC1")
     public XWikiRequest getRequest()
     {
         return this.request;

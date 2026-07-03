@@ -44,7 +44,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.stability.Unstable;
 
 /**
  * A {@link NamingCriterion} based on the opening heading (if present) of the document.
@@ -107,7 +106,6 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
      * @since 14.10.2
      * @since 15.0RC1
      */
-    @Unstable
     public HeadingNameNamingCriterion()
     {
     }
@@ -142,7 +140,7 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
                 {
                     public List<Block> filter(Block block)
                     {
-                        List<Block> blocks = new ArrayList<Block>();
+                        List<Block> blocks = new ArrayList<>();
                         if (block instanceof WordBlock || block instanceof SpaceBlock
                             || block instanceof SpecialSymbolBlock) {
                             blocks.add(block);
@@ -182,10 +180,14 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
 
     private DocumentReference maybeTruncate(DocumentReference documentReference)
     {
+        // Fallback max size in case of issue when accessing the document reference
+        var maxSize = this.docBridge.getLocalReferenceMaxLength();
+        var suffixSize = 3;
+
         // Reserve 3 characters for the suffix needed to avoid name clashes in case the document reference was used
-        // previously or it exists already.
-        // TODO: The max length should be taken from the store API instead of being hard-coded.
-        int maxLength = (this.documentReferences.contains(documentReference) || exists(documentReference)) ? 765 : 768;
+        // previously, or it exists already.
+        int maxLength = this.documentReferences.contains(documentReference) || exists(documentReference) ?
+            maxSize - suffixSize : maxSize;
 
         // We can only truncate the document name, so we can't do much if the base space reference is already too large.
         // The document name can contain special characters that are escaped when serialized, requiring more length, so

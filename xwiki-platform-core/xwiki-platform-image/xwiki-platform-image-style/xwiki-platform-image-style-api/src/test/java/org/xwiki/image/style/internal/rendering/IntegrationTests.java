@@ -19,7 +19,7 @@
  */
 package org.xwiki.image.style.internal.rendering;
 
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.test.annotation.AllComponents;
 
 /**
@@ -31,6 +31,6 @@ import org.xwiki.test.annotation.AllComponents;
  * @since 14.10.8
  */
 @AllComponents
-public class IntegrationTests implements RenderingTests
+public class IntegrationTests extends RenderingTest
 {
 }

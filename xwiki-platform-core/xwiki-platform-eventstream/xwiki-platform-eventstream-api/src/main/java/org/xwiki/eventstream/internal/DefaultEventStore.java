@@ -394,7 +394,7 @@ public class DefaultEventStore implements EventStore, Initializable
         }
 
         final String id =
-            String.format("%d-%d-%s", hash, event.getDate().getTime(), RandomStringUtils.randomAlphanumeric(8));
+            String.format("%d-%d-%s", hash, event.getDate().getTime(), RandomStringUtils.secure().nextAlphanumeric(8));
         if (context != null && context.getProperty(GROUP_ID_CONTEXT_KEY) == null) {
             context.setProperty(GROUP_ID_CONTEXT_KEY, id);
         }

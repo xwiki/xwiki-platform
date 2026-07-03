@@ -52,4 +52,4 @@ admin.indexinguser.explanation.mainwikionly=Це налаштування мож
 XWiki.SolrSearchAdminIndexingUser_indexer.description=Користувач індексації
 XWiki.SolrSearchAdminIndexingUser_indexer.hint=Обліковий запис користувача XWiki, що використовується для індексації сторінок у фоновому режимі.
 </content>
-  </xwikidoc>
+</xwikidoc>

@@ -19,7 +19,6 @@
  */
 package org.xwiki.attachment.test.ui.docker;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -33,8 +32,12 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Move attachments test")
     class NestedMoveAttachmentIT extends MoveAttachmentIT
+    {
+    }
+
+    @Nested
+    class NestedAttachmentCommentIT extends AttachmentCommentIT
     {
     }
 }

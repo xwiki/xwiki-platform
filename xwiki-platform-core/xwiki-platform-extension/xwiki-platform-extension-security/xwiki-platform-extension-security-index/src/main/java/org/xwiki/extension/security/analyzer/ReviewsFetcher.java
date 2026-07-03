@@ -19,12 +19,9 @@
  */
 package org.xwiki.extension.security.analyzer;
 
-import java.util.Optional;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.index.security.review.ReviewsMap;
 import org.xwiki.extension.security.internal.ExtensionSecurityException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Fetches the security vulnerabilities reviews.
@@ -32,13 +29,13 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.6RC1
  */
-@Unstable
 @Role
 public interface ReviewsFetcher
 {
     /**
-     * @return {@link Optional#empty()} in case of issue during the fetching, the fetched {@link ReviewsMap} otherwise
-     * @throws ExtensionSecurityException in case of issue when fetching the remove false-positive source
+     * @return the fetched {@link ReviewsMap}
+     * @throws ExtensionSecurityException in case of issue when fetching the remote false-positive source
+     * @since 15.10.2
      */
-    Optional<ReviewsMap> fetch() throws ExtensionSecurityException;
+    ReviewsMap fetch() throws ExtensionSecurityException;
 }

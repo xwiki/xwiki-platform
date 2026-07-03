@@ -31,6 +31,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -50,7 +51,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xpn.xwiki.XWikiException;
 
 /**
@@ -75,6 +75,10 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
 
     private static final String UNDEFINED_CLASS_ERROR_MESSAGE =
         "Can't update object properties if the object type (class name) is undefined.";
+
+    private static final String REQUIRES_HTML_CONVERSION = "RequiresHTMLConversion";
+
+    private static final String CLASS_SUFFIX = "_class";
 
     @Inject
     private LiveTableLiveDataResultsRenderer resultsRenderer;
@@ -104,7 +108,7 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
             // instead of serializing a map.
             ObjectMapper objectMapper =
                 JsonMapper.builder().enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER).build();
-            ObjectNode liveTableResults = getLiveTableResultsJSON(query, objectMapper);
+            JsonNode liveTableResults = getLiveTableResultsJSON(query, objectMapper);
             LiveData liveData = new LiveData();
             liveData.setCount(liveTableResults.path("totalrows").asLong());
             JsonNode rows = liveTableResults.path("rows");
@@ -117,7 +121,7 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
         }
     }
 
-    private ObjectNode getLiveTableResultsJSON(LiveDataQuery query, ObjectMapper objectMapper) throws Exception
+    private JsonNode getLiveTableResultsJSON(LiveDataQuery query, ObjectMapper objectMapper) throws Exception
     {
         // Merge the parameters of this live data source with the parameters from the given query.
         Source originalSource = query.getSource();
@@ -139,7 +143,8 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
                 liveTableResultsJSON =
                     this.resultsRenderer.getLiveTableResultsFromPage("XWiki.LiveTableResults", query);
             }
-            return (ObjectNode) objectMapper.readTree(liveTableResultsJSON);
+
+            return objectMapper.readTree(liveTableResultsJSON);
         } finally {
             // Restore the original query source.
             query.setSource(originalSource);
@@ -170,6 +175,11 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     {
         String className = (String) this.getParameters().get(CLASS_NAME_PARAMETER);
 
+        String customClassName = (String) this.getParameters().get(property + CLASS_SUFFIX);
+        if (customClassName != null) {
+            className = customClassName;
+        }
+
         // We can't update an object property if the object type is undefined.
         if (className == null && !StringUtils.defaultIfEmpty(property, "").startsWith(DOC_PREFIX)) {
             throw new LiveDataException(UNDEFINED_CLASS_ERROR_MESSAGE);
@@ -193,13 +203,17 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
     public Optional<Object> save(Map<String, Object> entry) throws LiveDataException
     {
         String className = (String) this.getParameters().get(CLASS_NAME_PARAMETER);
+        DocumentReference classReference;
+        if (className != null) {
+            classReference = this.currentDocumentReferenceResolver.resolve(className);
+        } else {
+            classReference = null;
+        }
 
-        // We can't save the entry if one of its properties maps to an object property and the object type is unknown.
-        boolean hasXObjectPropertiesToUpdate = entry.keySet()
-            .stream()
-            .anyMatch(it -> !StringUtils.defaultIfEmpty(it, "").startsWith(DOC_PREFIX));
-        if (className == null && hasXObjectPropertiesToUpdate) {
-            throw new LiveDataException(UNDEFINED_CLASS_ERROR_MESSAGE);
+        Map<String, DocumentReference> propertyClassReferences = resolvePropertyClassReferences();
+
+        if (className == null) {
+            checkAllXObjectPropertiesHaveXClass(entry, propertyClassReferences);
         }
 
         String entryId = this.liveDataConfigurationProvider.get().getMeta().getEntryDescriptor().getIdProperty();
@@ -211,20 +225,53 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
 
         DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(fullName);
 
-        DocumentReference classReference;
-        if (className != null) {
-            classReference = this.currentDocumentReferenceResolver.resolve(className);
-        } else {
-            classReference = null;
-        }
-
         try {
-            this.modelBridge.updateAll(entry, documentReference, classReference);
+            this.modelBridge.updateAll(entry, documentReference, classReference, propertyClassReferences);
         } catch (AccessDeniedException | XWikiException e) {
             throw new LiveDataException(e);
         }
 
         return Optional.of(fullName);
     }
-   
+
+    private void checkAllXObjectPropertiesHaveXClass(Map<String, Object> entry,
+        Map<String, DocumentReference> propertyClassReferences) throws LiveDataException
+    {
+        Set<String> htmlConvertedProperties = entry.containsKey(REQUIRES_HTML_CONVERSION)
+            ? this.modelBridge.getPropertiesRequiringHTMLConversion((String) entry.get(REQUIRES_HTML_CONVERSION),
+            null, propertyClassReferences, 0)
+            : Set.of();
+
+        if (entry.keySet().stream()
+                .filter(name -> !isDocumentProperty(name) && !REQUIRES_HTML_CONVERSION.equals(name))
+                .map(name -> {
+                    // If the property has a suffix related to HTML conversion, we remove it if the base property is
+                    // known to require HTML conversion.
+                    if (name.endsWith("_syntax") || name.endsWith("_cache")) {
+                        String baseName = StringUtils.substringBeforeLast(name, "_");
+                        if (htmlConvertedProperties.contains(baseName)) {
+                            return baseName;
+                        }
+                    }
+                    return name;
+                })
+                .anyMatch(name -> !propertyClassReferences.containsKey(name))) {
+            throw new LiveDataException(UNDEFINED_CLASS_ERROR_MESSAGE);
+        }
+    }
+
+    private Map<String, DocumentReference> resolvePropertyClassReferences()
+    {
+        return this.getParameters().entrySet().stream()
+                .filter(e -> e.getKey().endsWith(CLASS_SUFFIX) && e.getValue() instanceof String)
+                .collect(Collectors.toMap(
+                    e -> Strings.CS.removeEnd(e.getKey(), CLASS_SUFFIX),
+                    e -> this.currentDocumentReferenceResolver.resolve((String) e.getValue())
+                ));
+    }
+
+    private boolean isDocumentProperty(String property)
+    {
+        return StringUtils.defaultIfEmpty(property, "").startsWith(DOC_PREFIX);
+    }
 }

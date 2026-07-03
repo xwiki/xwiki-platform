@@ -64,8 +64,8 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_chromeRemoteDebuggingPort")
     private WebElement chromeRemoteDebuggingPortInput;
 
-    @FindBy(xpath = "//input[@type='submit'][@name='action_saveandcontinue']")
-    private WebElement saveButton;
+    @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_pageReadyTimeout")
+    private WebElement pageReadyTimeoutInput;
 
     @FindBy(linkText = "Reset")
     private WebElement resetButton;
@@ -86,7 +86,7 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
      */
     public PDFExportAdministrationSectionPage()
     {
-        super(SECTION_ID);
+        super(SECTION_ID, true);
     }
 
     /**
@@ -220,21 +220,23 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
         return isValid(this.chromeRemoteDebuggingPortInput);
     }
 
-    @Override
-    public void clickSave()
+    /**
+     * @return the page ready timeout
+     */
+    public String getPageReadyTimeout()
     {
-        clickSave(true);
+        return this.pageReadyTimeoutInput.getAttribute("value");
     }
 
-    @Override
-    public void clickSave(boolean wait)
+    /**
+     * Sets the page ready timeout.
+     * 
+     * @param value the new page ready timeout value
+     */
+    public void setPageReadyTimeout(String value)
     {
-        this.saveButton.click();
-
-        if (wait) {
-            // Wait until the page is really saved.
-            waitForNotificationSuccessMessage("Saved");
-        }
+        this.pageReadyTimeoutInput.clear();
+        this.pageReadyTimeoutInput.sendKeys(value);
     }
 
     /**

@@ -1,0 +1,1092 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="Main.MessageSenderMacro" locale="">
+  <web>Main</web>
+  <name>MessageSenderMacro</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Message Sender Macro</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{messageSender/}}</content>
+  <object>
+    <name>Main.MessageSenderMacro</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>45267be4-0f7b-407f-99c8-f5ce7665cbb8</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+XWiki.MessageStream = Class.create({
+  initialize : function(container) {
+    container = container || $(document.body);
+    this.prepareForms(container);
+    this.enhanceSelect(container);
+  },
+  prepareTargetInput : function(event, element) {
+    var targetType = element.options[element.selectedIndex].value;
+    element.className = targetType;
+    var messageStream = element.up('.messagestream');
+    var targetInputContainer = messageStream.down('.message-target-' + targetType);
+    if (!targetInputContainer) {
+      targetInputContainer = messageStream.down('.message-target-default');
+    }
+    messageStream.select('.message-target').forEach(function(messageTargetContainer) {
+      var fields = messageTargetContainer.select('input, select, textarea');
+      if (messageTargetContainer === targetInputContainer) {
+        messageTargetContainer.removeClassName('hidden');
+        fields.forEach(function(field) {
+          field.enable();
+          field.hasClassName('tomselected') &amp;&amp; field.selectize.enable();
+        });
+      } else {
+        messageTargetContainer.addClassName('hidden');
+        fields.forEach(function(field) {
+          field.disable();
+          field.hasClassName('tomselected') &amp;&amp; field.selectize.disable();
+        });
+      }
+    });
+  },
+  enhanceSelect: function (container) {
+    container.select('.messagestream select[name="visibilityLevel"]').each(function(element) {
+      element.observe('change', this.prepareTargetInput.bindAsEventListener(this, element));
+      this.prepareTargetInput(null, element);
+    }.bind(this));
+  },
+  prepareForms: function(container) {
+    container.select('.messagestream form').each(function(msForm) {
+      msForm.action = msForm.action.replace(/xredirect=.*$/, 'xpage=plain')
+      msForm.observe('submit', function(event) {
+        event.stop();
+        if (msForm._disabled == true || msForm.down('textarea').value.strip() == '') {
+          return;
+        }
+        new Ajax.Request(
+          msForm.action, {
+            parameters: msForm.serialize(true),
+            onCreate: function() {
+              msForm._disabled = true;
+              msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.inProgress')", 'inprogress');
+            },
+            onSuccess: function() {
+              if (msForm) {
+                msForm.messagestream_message.value = '';
+              }
+              if (msForm &amp;&amp; msForm._notification) {
+                msForm._notification.hide();
+              }
+              msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.success')", 'done');
+
+              document.fire('xwiki:activity:newActivity', msForm);
+            },
+            onFailure: function(response) {
+              var failureReason = response.statusText || 'Server not responding';
+              if (msForm) {
+                msForm._disabled = false
+                if (msForm._notification) {
+                  msForm._notification.hide();
+                }
+                msForm._notification = new XWiki.widgets.Notification("$services.localization.render('xe.activity.messages.submit.failed'): " + failureReason, 'error');
+              }
+            },
+            on0 : function(response) {  /*FAILURE*/
+              response.request.options.onFailure(response);
+            },
+            onComplete: function() {
+              msForm._disabled = false;
+            }.bind(this)
+          }
+        );
+      }.bindAsEventListener(this));
+    }.bind(this));
+  }
+});
+
+var init = function (event) {
+  var elements = (event &amp;&amp; event.memo.elements) || [$(document.body)];
+  elements.forEach(function(container) {
+    new XWiki.MessageStream(container);
+  });
+  return true;
+};
+
+// Initialize the message sender macro when the page is loaded.
+(XWiki.domIsLoaded &amp;&amp; init())
+|| document.observe('xwiki:dom:loaded', init);
+
+// Initialize the message sender macro when it is added after the page is loaded.
+document.observe('xwiki:dom:updated', init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));</code>
+    </property>
+    <property>
+      <name>User status update</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>Main.MessageSenderMacro</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>d2eaf281-0560-40ea-bfed-99a94ee1b305</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.messagestream-tools {
+  display: flex;
+  position: relative;
+  margin: .5em 0 1em;
+}
+.messagestream select {
+  width: auto;
+}
+.messagestream .message-target {
+  flex-grow: 1;
+  margin-left: .3em;
+}
+
+.messagestream .message-content {
+  padding: .5em 0 .5em 75px;
+}
+
+.messagestream .activitySnapshot {
+  height: 30px;
+  margin: 5px 0 0 -50px;
+  position: absolute;
+}
+
+.messagestream .activitySnapshot img {
+  border-radius: 10px 10px 0 10px;
+  box-shadow: -1px 1px 1px rgba(128,128,128,0.6);
+}
+
+/* User's avatar */
+.messagestream .activitySnapshot .avatar {
+  border-radius: 7px;
+  box-shadow: 0 0 2px 1px rgba(128,128,128,0.6);
+}
+
+.messagestream .activitySnapshot .activityActionAvatar {
+  background: $theme.pageContentBackgroundColor;
+  border-color: $theme.pageContentBackgroundColor;
+  border-style: solid;
+  border-width: 4px 1px 1px 3px;
+  box-sizing: content-box;
+  bottom: -5px;
+  height: 16px;
+  position: absolute;
+  right: -10px;
+  width: 16px;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Message stream form styling</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>Main.MessageSenderMacro</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>080fc355-840c-4a9d-820f-1fb16690f451</guid>
+    <class>
+      <name>XWiki.WikiMacroClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>13</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>14</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>12</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <code>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>code</name>
+        <number>10</number>
+        <prettyName>Macro code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentDescription>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>contentDescription</name>
+        <number>9</number>
+        <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </contentDescription>
+      <contentJavaType>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentJavaType</name>
+        <number>8</number>
+        <picker>1</picker>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentJavaType>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>7</number>
+        <prettyName>Macro content availability</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Optional|Mandatory|No content</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <defaultCategories>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
+        <number>4</number>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
+      <description>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Macro description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <id>
+        <disabled>0</disabled>
+        <name>id</name>
+        <number>1</number>
+        <prettyName>Macro id</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </id>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Macro name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
+      <supportsInlineMode>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>supportsInlineMode</name>
+        <number>5</number>
+        <prettyName>Supports inline mode</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </supportsInlineMode>
+      <visibility>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>visibility</name>
+        <number>6</number>
+        <prettyName>Macro visibility</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Current User|Current Wiki|Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </visibility>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <code>{{velocity output='false'}}
+#* Duplicate code (from Main.Activity) START *#
+##
+## User status configuration
+## -------------------------------------------------------------
+#set ($config = 'XWiki.MessageStreamConfig')
+#set ($configClass = $xwiki.getDocument($config).getxWikiClass())
+#set ($isMessageStreamActive = $services.messageStream.isActive())
+
+#set ($activityActionsMap = {
+  'publicMessage':    'icons/silk/user_comment.png',
+  'personalMessage':  'icons/silk/user_comment.png',
+  'directMessage':    'icons/silk/user_go.png',
+  'groupMessage':     'icons/silk/group_go.png'
+})
+##
+#**
+  * Display user avatar and action message
+  *#
+#macro(activitySnapshot $eventUser $eventType)
+  &lt;span class='activitySnapshot'&gt;
+    #if ($eventUser != 'XWiki.XWikiGuest')
+      &lt;a href="$xwiki.getURL($eventUser)"&gt;#smallUserAvatar("$!eventUser")&lt;/a&gt;
+    #else
+      #smallUserAvatar("$!eventUser")
+    #end
+    &lt;img class='activityActionAvatar' src="$xwiki.getSkinFile($activityActionsMap.get($eventType), true)" alt="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" title="$services.localization.render("xe.activity.action.${eventType}", [$relatedEventsNo])" /&gt;
+  &lt;/span&gt;
+#end
+##
+#* Duplicate code END *#
+##
+## Skin Extensions
+##--------------------------------------------------------------
+#set ($discard = $xwiki.ssx.use('Main.MessageSenderMacro'))
+#set ($discard = $xwiki.jsx.use('Main.MessageSenderMacro'))
+{{/velocity}}
+
+{{velocity}}
+#if ($isMessageStreamActive)
+  #set ($xredirect = $doc.getURL($xcontext.action, $!{request.queryString}))
+  #set ($errorMessageKeyPrefix = "messageSender.post.error.")
+  #set ($errorMessage = $request.session.getAttribute("${errorMessageKeyPrefix}${xredirect}"))
+  #if ("$!errorMessage" != '')
+    ## Clean the error and display the message.
+    #set ($discard = $request.session.removeAttribute("${errorMessageKeyPrefix}${xredirect}"))
+    {{error}}$errorMessage{{/error}}
+
+  ##
+  ## Handle postMessage action here so that the macro can be self contained.
+  ##
+  #elseif ("$!{request.xaction}" != '')
+    #if ("$!{request.xaction}" == 'postMessage')
+      #if(!$services.csrf.isTokenValid(${request.form_token}))
+        #set($redirectURL = $services.csrf.getResubmissionURL())
+        $response.sendRedirect($redirectURL)
+      #else
+        #set ($message = "$!{request.messagestream_message.trim()}")
+        #if ($message == '')
+          ## Do nothing with empty messages
+          #if ("$!{request.xredirect}" != '')
+            $response.sendRedirect(${request.xredirect})
+          #end
+        #else
+          #set ($success = false)
+          #if (!$isGuest)
+            #set ($messageType = "$!{request.visibilityLevel}")
+            #if ($messageType == 'everyone')
+              #set ($success = $services.messageStream.postPublicMessage($message))
+            #elseif ($messageType == 'followers')
+              #set ($success = $services.messageStream.postPersonalMessage($message))
+            #elseif ($messageType == 'group')
+              #set ($success = $services.messageStream.postMessageToGroup($message, $services.model.resolveDocument("$!{request.targetName}")))
+            #elseif ($messageType == 'user')
+              #set ($success = $services.messageStream.postDirectMessageToUser($message, $services.model.resolveDocument("$!{request.targetName}")))
+            #end
+          #end
+          #if (!$success)
+            #if ($request.xpage == 'plain')
+              #if ($isGuest)
+                $response.setStatus(401)## Unauthorized
+              #else
+                $response.setStatus(403)## Forbidden
+              #end
+              $services.localization.render('xe.activity.messages.submit.failed')
+            #elseif ("$!{request.xredirect}" != '')
+              ## Pass the error message in the xredirect so that we display it in the calling page and not in the macro page.
+              $request.session.setAttribute("${errorMessageKeyPrefix}${request.xredirect}", $services.localization.render('xe.activity.messages.submit.failed'))
+              $response.sendRedirect($request.xredirect)
+            #else
+              {{error}}$services.localization.render('xe.activity.messages.submit.failed'){{/error}}
+
+            #end
+          #elseif ("$!{request.xredirect}" != '')
+            $response.sendRedirect(${request.xredirect})
+          #elseif ($request.xpage == 'plain')
+            ## Just print something for confirmation.
+            $services.localization.render('xe.activity.messages.submit.success')
+          #end
+        #end
+      #end
+    #end
+  #end
+  ##
+  ## Display the UI. Don't display it for AJAX calls and guests.
+  ##
+  #if ($request.xpage != 'plain' &amp;&amp; !$isGuest)
+    ## When this macro is displayed in edit/inline mode, we disable the inputs and no longer display the form (because it would clash with the main form of inline edit).
+    #set ($inEditMode = ($xcontext.action == 'inline' || $xcontext.action == 'edit'))
+    #set ($actionQueryString = "xredirect=$escapetool.url($xredirect)")
+    {{html}}
+    ## Wrap the form in a div so that the layout is preserved in inline mode (where the form is stripped by the rendering).
+    &lt;div class='messagestream xform'&gt;
+    #if (!$inEditMode)
+    &lt;form action="${xwiki.getURL('Main.MessageSenderMacro', 'view', $!{actionQueryString})}" method='post'&gt;
+    #end
+      &lt;div class='message-content'&gt;
+        #if(!$inEditMode)
+          ## CSRF prevention
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          &lt;input type='hidden' name='xaction' value='postMessage' /&gt;
+        #end
+        #activitySnapshot($xcontext.user, 'personalMessage')
+        &lt;div class='messagestream-data'&gt;
+          &lt;textarea name='messagestream_message' rows='3' cols='40'#if($inEditMode) disabled='disabled'#end&gt;&lt;/textarea&gt;
+        &lt;/div&gt;
+        &lt;div class='messagestream-tools'&gt;
+          #set ($possibleTargets = $xcontext.macro.params.get('visibilityOptions').split('\s*,\s*'))
+          #if (!$possibleTargets)
+            #set ($possibleTargets = $configClass.get('visibilityLevel').getListValues())
+          #end
+          ##
+          #set ($targetName = $xcontext.macro.params.get('visibilityParameter'))
+          ##
+          #set ($defaultTarget = $xcontext.macro.params.get('visibility'))
+          #if (!$defaultTarget)
+            #if ($doc.getObject('XWiki.XWikiGroups'))
+              #set ($defaultTarget = 'group')
+              #set ($targetName = $doc.fullName)
+            #elseif ($doc.getObject('XWiki.XWikiUsers'))
+              #if ($doc.documentReference == $xcontext.userReference)
+                #set ($defaultTarget = 'followers')
+              #else
+                #set ($defaultTarget = 'user')
+                #set ($targetName = $doc.fullName)
+              #end
+            #else
+              #set ($defaultTarget = 'everyone')
+            #end
+          #end
+          &lt;label&gt;$services.localization.render('xe.activity.messages.visibility')
+            &lt;select name='visibilityLevel'#if($inEditMode) disabled='disabled'#end&gt;
+            #foreach ($target in $possibleTargets)
+              &lt;option value="${target}"#if ($defaultTarget == $target) selected='selected'#end&gt;$services.localization.render("XWiki.MessageStreamConfig_visibilityLevel_${target}")&lt;/option&gt;
+            #end
+            &lt;/select&gt;
+          &lt;/label&gt;
+          #set ($suggestPickerParams = {
+            'name': 'targetName',
+            'title': $services.localization.render('xe.activity.messages.visibility.targetName.tip')
+          })
+          #foreach ($target in ['user', 'group'])
+            #if ($possibleTargets.contains($target))
+              #set ($notDefaultTarget = $target != $defaultTarget)
+              &lt;div class="message-target message-target-$target#if ($notDefaultTarget) hidden#end"&gt;
+                #set ($discard = $suggestPickerParams.put('class', 'targetName'))
+                #set ($suggestPickerParams.disabled = $inEditMode || $notDefaultTarget)
+                #set ($suggestPickerParams.value = $targetName)
+                #if ($notDefaultTarget)
+                  #set ($suggestPickerParams.value = '')
+                #end
+                #if ($target == 'user')
+                  #userPicker(false, $suggestPickerParams)
+                #else
+                  #groupPicker(false, $suggestPickerParams)
+                #end
+              &lt;/div&gt;
+            #end
+          #end
+          &lt;div class="message-target message-target-default"&gt;
+            &lt;input type="hidden" name="targetName" value="$!escapetool.xml($targetName)" class="targetName" /&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class='messagestream-buttons'&gt;
+          &lt;span class='butonwrapper'&gt;&lt;input type='submit' value="$services.localization.render('xe.activity.messages.submit')" class='button'#if($inEditMode) disabled='disabled'#end/&gt;&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    #if (!$inEditMode)
+    &lt;/form&gt;
+    #end
+    &lt;/div&gt;
+    {{/html}}
+  #end
+#end
+{{/velocity}}</code>
+    </property>
+    <property>
+      <contentDescription/>
+    </property>
+    <property>
+      <contentJavaType/>
+    </property>
+    <property>
+      <contentType>No content</contentType>
+    </property>
+    <property>
+      <defaultCategories>
+        <value>Social</value>
+      </defaultCategories>
+    </property>
+    <property>
+      <description>A control that allows users to enter messages that are handled by the MessageStream module.</description>
+    </property>
+    <property>
+      <id>messageSender</id>
+    </property>
+    <property>
+      <name>Message Sender</name>
+    </property>
+    <property>
+      <priority/>
+    </property>
+    <property>
+      <supportsInlineMode>0</supportsInlineMode>
+    </property>
+    <property>
+      <visibility>Current Wiki</visibility>
+    </property>
+  </object>
+  <object>
+    <name>Main.MessageSenderMacro</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>615acf22-2c34-4197-9255-d3539674457a</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Default selected visibility when the macro is displayed.
+
+If not specified, it is determined automatically based on the page where the macro is used.
+
+Valid values are: 'everyone', 'followers', 'group' or 'user'. </description>
+    </property>
+    <property>
+      <mandatory/>
+    </property>
+    <property>
+      <name>visibility</name>
+    </property>
+    <property>
+      <type/>
+    </property>
+  </object>
+  <object>
+    <name>Main.MessageSenderMacro</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>feced613-3e36-40e2-a0db-71d91b3c5bb9</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Some visibility levels (like 'user' and 'group') accept a parameter. In the case of the 2 mentioned levels, the value can be a serialized reference of a user or a group document.</description>
+    </property>
+    <property>
+      <mandatory/>
+    </property>
+    <property>
+      <name>visibilityParameter</name>
+    </property>
+    <property>
+      <type/>
+    </property>
+  </object>
+  <object>
+    <name>Main.MessageSenderMacro</name>
+    <number>2</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>72674ec2-6bd1-4735-a395-15a5ccac6aac</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Comma separated list of visibility options that the macro should allow the user to choose from.
+
+This list should be a sublist of the default ones: 'everyone', 'followers', 'group', 'user'.</description>
+    </property>
+    <property>
+      <mandatory/>
+    </property>
+    <property>
+      <name>visibilityOptions</name>
+    </property>
+    <property>
+      <type/>
+    </property>
+  </object>
+</xwikidoc>

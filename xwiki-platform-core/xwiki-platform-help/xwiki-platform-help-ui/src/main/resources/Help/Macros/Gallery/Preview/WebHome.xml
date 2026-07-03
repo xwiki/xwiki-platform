@@ -44,11 +44,11 @@
 (% class="col-md-12" style="text-align: center; margin: auto;"%)
 (((
 {{gallery}}
-image:Help.Macros.Example-Gallery.WebHome@Koi1.jpg
-image:Help.Macros.Example-Gallery.WebHome@Koi2.jpg
-image:Help.Macros.Example-Gallery.WebHome@Koi3.jpg
-image:Help.Macros.Example-Gallery.WebHome@Koi4.jpg
-image:Help.Macros.Example-Gallery.WebHome@Koi5.jpg
+image:Help.Macros.Gallery.WebHome@Koi1.jpg
+image:Help.Macros.Gallery.WebHome@Koi2.jpg
+image:Help.Macros.Gallery.WebHome@Koi3.jpg
+image:Help.Macros.Gallery.WebHome@Koi4.jpg
+image:Help.Macros.Gallery.WebHome@Koi5.jpg
 {{/gallery}}
 )))
 &lt;/div&gt;

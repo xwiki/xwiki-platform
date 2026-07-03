@@ -20,16 +20,14 @@
 define('xwiki-realtime-textCursor', function() {
   'use strict';
 
-  var module = {exports: {}};
-
-  var transformCursor = function(cursor, op) {
+  function transformCursor(cursor, op) {
     if (!op) {
       return cursor;
     }
 
-    var pos = op.offset;
-    var remove = op.toRemove;
-    var insert = op.toInsert.length;
+    const pos = op.offset;
+    const remove = op.toRemove;
+    const insert = op.toInsert.length;
     if (typeof cursor === 'undefined') {
       return;
     }
@@ -40,17 +38,17 @@ define('xwiki-realtime-textCursor', function() {
       cursor += insert;
     }
     return cursor;
-  };
+  }
 
-  module.exports.transformCursor = function(cursor, ops) {
-    if (!Array.isArray(ops)) {
-      ops = [ops];
+  return {
+    transformCursor: (cursor, ops) => {
+      if (!Array.isArray(ops)) {
+        ops = [ops];
+      }
+      for (let i = ops.length - 1; i >= 0; i--) {
+        cursor = transformCursor(cursor, ops[i]);
+      }
+      return cursor;
     }
-    for (var i = ops.length - 1; i >= 0; i--) {
-      cursor = transformCursor(cursor, ops[i]);
-    }
-    return cursor;
   };
-
-  return module.exports;
 });

@@ -22,7 +22,7 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
@@ -89,9 +89,11 @@ public class ExportAction extends XWikiAction
             XWikiRequest request = context.getRequest();
             String format = request.get("format");
 
-            if ((format == null) || (format.equals("xar"))) {
+            if (!validateExportRequest(request)) {
+                return "docdoesnotexist";
+            } else if (format == null || "xar".equals(format)) {
                 defaultPage = exportXAR(context);
-            } else if (format.equals("html")) {
+            } else if ("html".equals(format)) {
                 defaultPage = exportHTML(context);
             } else {
                 defaultPage = export(format, context);
@@ -105,13 +107,44 @@ public class ExportAction extends XWikiAction
     }
 
     /**
+     * Checks if the given request is intended to perform an export. We need this check because large exports require
+     * many resources and we want to allocate those resources only when there is a clear intent.
+     *
+     * @param request the export request to validate
+     * @return {@code true} if the request is a valid (e.g. the user intended to perform an export), {@code false} otherwise
+     */
+    private boolean validateExportRequest(XWikiRequest request)
+    {
+        // We used to consider all requests to the /export/ action as export requests but this was causing problems with
+        // the PDF export where resources loaded by the print preview page using relative URLs ended up targeting the
+        // export action and thus triggering a backup XAR export. See XWIKI-23768: Missing RequireJS module can slow
+        // down or even block the PDF export
+        //
+        // Ideally we should ask for a CSRF token, but this would break backwards compatibility. We can't rely on the
+        // Accept HTTP header either becuse it includes */* most of the time, even when the request originates from a
+        // script or image HTML tag. The best option seems to be to rely on the Sec-Fetch-Dest header which is set by
+        // modern browsers to indicate the context in which the request is made.
+        // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Dest
+        //
+        // As such, we validate the export request if:
+        String secFetchDest = request.getHeader("Sec-Fetch-Dest");
+        return
+            // either the Sec-Fetch-Dest header is missing, which is a sign that the request was made by a non-browser
+            // user agent (e.g. curl, wget),
+            secFetchDest == null
+            // or the Sec-Fetch-Dest header is set to "document", which is a sign that the export request is the result
+            // of a user navigating to an export URL (e.g. by clicking on a link or submitting a form).
+            || "document".equals(secFetchDest);
+    }
+
+    /**
      * Create ZIP archive containing wiki pages rendered in HTML, attached files and used skins.
      *
      * @param context the XWiki context.
      * @return always return null.
      * @throws XWikiException error when exporting HTML ZIP package.
      * @throws IOException error when exporting HTML ZIP package.
-     * @since XWiki Platform 1.3M1
+     * @since 1.3M1
      */
     private String exportHTML(XWikiContext context) throws XWikiException, IOException
     {
@@ -119,7 +152,7 @@ public class ExportAction extends XWikiAction
         // Fallback on the current document if there's no selection specified on the request.
         Collection<DocumentReference> pageList =
             documentSelectionResolver.isSelectionSpecified() ? documentSelectionResolver.getSelectedDocuments()
-                : Collections.singleton(context.getDoc().getDocumentReference());
+                : List.of(context.getDoc().getDocumentReference());
 
         // HTML export can be done by simple users so we need to check view right.
         ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
@@ -157,7 +190,7 @@ public class ExportAction extends XWikiAction
         handleRevision(context);
 
         // We currently use the PDF export infrastructure but we have to redesign the export code.
-        XWikiURLFactory urlFactory = new OfficeExporterURLFactory();
+        XWikiURLFactory urlFactory = new OfficeExporterURLFactory(true);
         PdfExport exporter = new OfficeExporter();
         // Check if the office exporter supports the specified format.
         ExportType exportType = ((OfficeExporter) exporter).getExportType(format);
@@ -183,7 +216,7 @@ public class ExportAction extends XWikiAction
         // a directory hierarchy but a file name
         EntityReferenceSerializer<String> serializer =
             Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "path");
-        String filename = serializer.serialize(doc.getDocumentReference()).replaceAll("/", "_");
+        String filename = serializer.serialize(doc.getDocumentReference()).replace("/", "_");
         // Make sure we don't go over 255 chars since several filesystems don't support filename longer than that!
         filename = StringUtils.abbreviateMiddle(filename, "__", 255);
         context.getResponse().addHeader("Content-disposition",
@@ -269,52 +302,55 @@ public class ExportAction extends XWikiAction
             InputFilterStreamFactory inputFilterStreamFactory =
                 Utils.getComponent(InputFilterStreamFactory.class, FilterStreamType.XWIKI_INSTANCE.serialize());
 
-            InputFilterStream inputFilterStream = inputFilterStreamFactory.createInputFilterStream(inputProperties);
+            try (InputFilterStream inputFilterStream
+                 = inputFilterStreamFactory.createInputFilterStream(inputProperties))
+            {
+                // Create output wiki stream
+                XAROutputProperties xarProperties = new XAROutputProperties();
 
-            // Create output wiki stream
-            XAROutputProperties xarProperties = new XAROutputProperties();
+                // We don't want to log the details
+                xarProperties.setVerbose(false);
+                if (optimized) {
+                    xarProperties.setOptimized(optimized);
+                }
 
-            // We don't want to log the details
-            xarProperties.setVerbose(false);
-            if (optimized) {
-                xarProperties.setOptimized(optimized);
+                XWikiResponse response = context.getResponse();
+
+                xarProperties.setTarget(new DefaultOutputStreamOutputTarget(response.getOutputStream()));
+                xarProperties.setPackageName(name);
+                if (description != null) {
+                    xarProperties.setPackageDescription(description);
+                }
+                if (licence != null) {
+                    xarProperties.setPackageLicense(licence);
+                }
+                if (author != null) {
+                    xarProperties.setPackageAuthor(author);
+                }
+                if (version != null) {
+                    xarProperties.setPackageVersion(version);
+                }
+                xarProperties.setPackageBackupPack(backup);
+                xarProperties.setPreserveVersion(backup || history);
+
+                BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory = Utils
+                    .getComponent((Type) OutputFilterStreamFactory.class,
+                        FilterStreamType.XWIKI_XAR_CURRENT.serialize());
+
+                try (OutputFilterStream outputFilterStream
+                         = xarFilterStreamFactory.createOutputFilterStream(xarProperties))
+                {
+                    // Export
+                    response.setContentType("application/zip");
+                    response.addHeader("Content-disposition",
+                        "attachment; filename=" + Util.encodeURI(name, context) + ".xar");
+
+                    inputFilterStream.read(outputFilterStream.getFilter());
+                }
+
+                // Flush
+                response.getOutputStream().flush();
             }
-
-            XWikiResponse response = context.getResponse();
-
-            xarProperties.setTarget(new DefaultOutputStreamOutputTarget(response.getOutputStream()));
-            xarProperties.setPackageName(name);
-            if (description != null) {
-                xarProperties.setPackageDescription(description);
-            }
-            if (licence != null) {
-                xarProperties.setPackageLicense(licence);
-            }
-            if (author != null) {
-                xarProperties.setPackageAuthor(author);
-            }
-            if (version != null) {
-                xarProperties.setPackageVersion(version);
-            }
-            xarProperties.setPackageBackupPack(backup);
-            xarProperties.setPreserveVersion(backup || history);
-
-            BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory = Utils
-                .getComponent((Type) OutputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_CURRENT.serialize());
-
-            OutputFilterStream outputFilterStream = xarFilterStreamFactory.createOutputFilterStream(xarProperties);
-
-            // Export
-            response.setContentType("application/zip");
-            response.addHeader("Content-disposition", "attachment; filename=" + Util.encodeURI(name, context) + ".xar");
-
-            inputFilterStream.read(outputFilterStream.getFilter());
-
-            inputFilterStream.close();
-            outputFilterStream.close();
-
-            // Flush
-            response.getOutputStream().flush();
 
             // Indicate that we are done with the response so no need to add anything
             context.setFinished(true);

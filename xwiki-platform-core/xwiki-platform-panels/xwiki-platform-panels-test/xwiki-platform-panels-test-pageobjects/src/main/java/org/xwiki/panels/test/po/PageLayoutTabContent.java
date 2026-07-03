@@ -56,6 +56,9 @@ public class PageLayoutTabContent extends BaseElement
     @FindBy(css = "#XWiki\\.XWikiPreferences_0_rightPanels")
     private WebElement rightPanelsInput;
 
+    @FindBy(css = "#XWiki\\.XWikiPreferences_0_leftPanels")
+    private WebElement leftPanelsInput;
+
     @FindBy(id = "rightPanels")
     private WebElement rightPanels;
 
@@ -122,6 +125,27 @@ public class PageLayoutTabContent extends BaseElement
         return this;
     }
 
+    /**
+     * @return the comma-separated list of panels configured for the left column
+     * @since 18.6.0RC1
+     */
+    public String getLeftPanels()
+    {
+        return this.leftPanelsInput.getText();
+    }
+
+    /**
+     * @param leftPanels the comma-separated list of panels to set for the left column
+     * @return this object
+     * @since 18.6.0RC1
+     */
+    public PageLayoutTabContent setLeftPanels(String leftPanels)
+    {
+        this.leftPanelsInput.clear();
+        this.leftPanelsInput.sendKeys(leftPanels);
+        return this;
+    }
+
     public PageLayoutTabContent openPanelListSection()
     {
         this.panelListSection.click();
@@ -130,7 +154,7 @@ public class PageLayoutTabContent extends BaseElement
 
     public void dragPanelToColumn(String panelName, Column column)
     {
-        String cssSelector = String.format(".panel.%s h1", panelName);
+        String cssSelector = String.format(".panel.%s h2", panelName);
         WebElement element = getDriver().findElementWithoutWaiting(By.cssSelector(cssSelector));
         if (column == Column.RIGHT) {
             getDriver().dragAndDrop(element, rightPanels);
@@ -141,7 +165,7 @@ public class PageLayoutTabContent extends BaseElement
 
     public void removePanelFromColumn(String panelName, Column column)
     {
-        String cssSelector = String.format("#%%s .panel.%s h1", panelName);
+        String cssSelector = String.format("#%%s .panel.%s h2", panelName);
 
         if (column == Column.RIGHT) {
             cssSelector = String.format(cssSelector, "rightPanels");

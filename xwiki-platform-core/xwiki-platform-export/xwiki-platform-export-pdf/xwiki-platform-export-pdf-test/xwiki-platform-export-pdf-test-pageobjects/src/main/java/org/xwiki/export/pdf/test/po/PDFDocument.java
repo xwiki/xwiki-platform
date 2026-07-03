@@ -20,6 +20,7 @@
 package org.xwiki.export.pdf.test.po;
 
 import java.awt.geom.Rectangle2D;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -32,6 +33,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -44,6 +46,8 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDe
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDNamedDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 
@@ -56,6 +60,11 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
  */
 public class PDFDocument implements AutoCloseable
 {
+    /**
+     * Holds recently created PDF documents. This list is normally reset before / after each test execution.
+     */
+    public static final List<byte[]> BLOBS = new ArrayList<>();
+
     private final PDDocument document;
 
     private final PDFImageExtractor imageExtractor;
@@ -89,8 +98,16 @@ public class PDFDocument implements AutoCloseable
             String authHeaderValue = "Basic " + new String(encodedAuth);
             connection.setRequestProperty("Authorization", authHeaderValue);
         }
-        this.document = PDDocument.load(IOUtils.toByteArray(connection));
+        this.document = Loader.loadPDF(IOUtils.toByteArray(connection));
         this.imageExtractor = new PDFImageExtractor();
+        save();
+    }
+
+    private void save() throws IOException
+    {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        this.document.save(outputStream);
+        BLOBS.add(outputStream.toByteArray());
     }
 
     @Override
@@ -151,31 +168,26 @@ public class PDFDocument implements AutoCloseable
      */
     public Map<String, String> getLinksFromPage(int pageNumber) throws IOException
     {
-        Map<String, String> links = new LinkedHashMap<>();
-        for (Map.Entry<String, PDAnnotationLink> entry : getLinksFromPage(this.document.getPage(pageNumber))
-            .entrySet()) {
-            PDAction action = entry.getValue().getAction();
-            PDDestination destination = entry.getValue().getDestination();
-            if (action instanceof PDActionGoTo) {
-                PDActionGoTo anchor = (PDActionGoTo) entry.getValue().getAction();
-                links.put(entry.getKey(), getDestinationText(anchor.getDestination()));
-            } else if (action instanceof PDActionURI) {
-                PDActionURI uri = (PDActionURI) entry.getValue().getAction();
-                links.put(entry.getKey(), uri.getURI());
-            } else if (destination != null) {
-                links.put(entry.getKey(), getDestinationText(destination));
-            }
-        }
-        return links;
+        return getLinksFromPage(pageNumber, true);
+    }
+
+    /**
+     * @param pageNumber the page number
+     * @param merge whether to merge consecutive link annotations with the same target
+     * @return a mapping between link labels and link targets
+     * @throws IOException if we fail to extract the links from the specified page
+     */
+    public Map<String, String> getLinksFromPage(int pageNumber, boolean merge) throws IOException
+    {
+        return getLinksFromPage(this.document.getPage(pageNumber), merge);
     }
 
     /**
      * Code adapted from
      * https://github.com/apache/pdfbox/blob/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/PrintURLs.java
      */
-    private Map<String, PDAnnotationLink> getLinksFromPage(PDPage page) throws IOException
+    private Map<String, String> getLinksFromPage(PDPage page, boolean merge) throws IOException
     {
-        Map<String, PDAnnotationLink> links = new LinkedHashMap<>();
         PDFTextStripperByArea stripper = new PDFTextStripperByArea();
         List<PDAnnotation> annotations = page.getAnnotations();
         // First setup the text extraction regions.
@@ -202,16 +214,56 @@ public class PDFDocument implements AutoCloseable
 
         stripper.extractRegions(page);
 
+        Map<String, String> links = new LinkedHashMap<>();
+        // Starting with Chrome 124 we sometimes get multiple link annotations for the same source HTML link. Basically,
+        // the link label is split into multiple parts, each part being annotated as a link to the same target. We
+        // overcome this strange behavior by merging consecutive link annotations with the same target.
+        StringBuilder linkLabel = new StringBuilder();
+        String previousLinkTarget = null;
         for (int j = 0; j < annotations.size(); j++) {
             PDAnnotation annotation = annotations.get(j);
             if (annotation instanceof PDAnnotationLink) {
                 PDAnnotationLink link = (PDAnnotationLink) annotation;
-                String label = stripper.getTextForRegion(String.valueOf(j)).trim();
-                links.put(label, link);
+                String linkTarget = getLinkTarget(link);
+                if (!merge || (previousLinkTarget != null && !previousLinkTarget.equals(linkTarget))) {
+                    // Commit the current link group and start a new link group.
+                    links.put(linkLabel.toString(), previousLinkTarget);
+                    linkLabel.setLength(0);
+                }
+
+                linkLabel.append(stripper.getTextForRegion(String.valueOf(j)).trim());
+                previousLinkTarget = linkTarget;
+            } else if (previousLinkTarget != null) {
+                // Commit the current link group and start a new link group.
+                links.put(linkLabel.toString(), previousLinkTarget);
+                linkLabel.setLength(0);
+                previousLinkTarget = null;
             }
         }
 
+        if (previousLinkTarget != null) {
+            // Commit the last link group.
+            links.put(linkLabel.toString(), previousLinkTarget);
+        }
+
         return links;
+    }
+
+    private String getLinkTarget(PDAnnotationLink link) throws IOException
+    {
+        PDAction action = link.getAction();
+        PDDestination destination = link.getDestination();
+        if (action instanceof PDActionGoTo) {
+            PDActionGoTo anchor = (PDActionGoTo) action;
+            return getDestinationText(anchor.getDestination());
+        } else if (action instanceof PDActionURI) {
+            PDActionURI uri = (PDActionURI) action;
+            return uri.getURI();
+        } else if (destination != null) {
+            return getDestinationText(destination);
+        } else {
+            return null;
+        }
     }
 
     private String getDestinationText(PDDestination destination) throws IOException
@@ -266,6 +318,36 @@ public class PDFDocument implements AutoCloseable
     public List<PDFImage> getImagesFromPage(int pageNumber) throws IOException
     {
         return getImagesFromPage(this.document.getPage(pageNumber));
+    }
+
+    /**
+     * Each node from the outline is printed on a new lines, with indentation representing the outline hierarchy.
+     *
+     * @return the outline from this PDF document as text
+     * @since 18.0.0RC1
+     * @since 17.10.1
+     */
+    public String getOutlineText()
+    {
+        PDDocumentOutline root = this.document.getDocumentCatalog().getDocumentOutline();
+        PDOutlineItem item = root.getFirstChild();
+        StringBuilder output = new StringBuilder();
+        while (item != null) {
+            printOutlineItem(item, output, 0);
+            item = item.getNextSibling();
+        }
+        return output.toString();
+    }
+
+    private void printOutlineItem(PDOutlineItem item, StringBuilder output, int level)
+    {
+        output.append(StringUtils.repeat("  ", level));
+        output.append(item.getTitle()).append("\n");
+        PDOutlineItem child = item.getFirstChild();
+        while (child != null) {
+            printOutlineItem(child, output, level + 1);
+            child = child.getNextSibling();
+        }
     }
 
     private List<PDFImage> getImagesFromPage(PDPage page) throws IOException

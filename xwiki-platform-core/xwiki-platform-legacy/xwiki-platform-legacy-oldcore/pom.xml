@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-oldcore</artifactId>
   <name>XWiki Platform - Legacy - Old Core</name>
@@ -35,7 +35,7 @@
     <!-- The features provided by this module so that it's found when resolving extension that pretty much never depend on this one -->
     <xwiki.extension.features>
       org.xwiki.platform:xwiki-platform-oldcore,
-      com.xpn.xwiki.platform:xwiki-core
+      ${xwiki.platform.oldcore.extension.features}
     </xwiki.extension.features>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
@@ -70,6 +70,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- Legacy oldcore needs some legacy classes from legacy model -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-model-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Legacy oldcore needs some legacy classes from legacy rendering -->
     <dependency>
@@ -77,6 +83,7 @@
       <artifactId>xwiki-rendering-legacy-api</artifactId>
       <version>${rendering.version}</version>
     </dependency>
+
 
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->
@@ -108,13 +115,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Needed by the legacy XWikiTest test -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-logging-logback</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -137,7 +137,7 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Exclude AspectJ's builddef.lst file form the generated JAR since it's not useful there. -->
+      <!-- Exclude AspectJ's builddef.lst file from the generated JAR since it's not useful there. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>

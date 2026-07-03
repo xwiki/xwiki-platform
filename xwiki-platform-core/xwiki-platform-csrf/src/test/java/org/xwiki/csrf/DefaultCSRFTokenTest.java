@@ -20,7 +20,9 @@
 package org.xwiki.csrf;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +37,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.csrf.internal.DefaultCSRFToken;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.LogLevel;
@@ -44,10 +47,13 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -64,7 +70,7 @@ import static org.mockito.Mockito.when;
  * @since 2.5M2
  */
 @ComponentTest
-public class DefaultCSRFTokenTest
+class DefaultCSRFTokenTest
 {
     /** URL of the current document. */
     private static final String mockDocumentUrl = "http://host/xwiki/bin/save/Main/Test";
@@ -82,10 +88,12 @@ public class DefaultCSRFTokenTest
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
+    private final HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+
     /**
      * This class is here because it doesn't require a SecureRandom generator
      * seed on each startup. Seeding a SecureRandom generator can take a very long time,
-     * especially many time over which depleats the random pool on the server.
+     * especially many times over which depletes the random pool on the server.
      */
     public static class InsecureCSRFToken extends DefaultCSRFToken
     {
@@ -105,7 +113,7 @@ public class DefaultCSRFTokenTest
     }
 
     @BeforeEach
-    public void configure(MockitoComponentManager componentManager) throws Exception
+    void configure(MockitoComponentManager componentManager) throws Exception
     {
         // set up mocked dependencies
         final CopyStringMatcher returnValue = new CopyStringMatcher(resubmitUrl + "?", "");
@@ -120,7 +128,6 @@ public class DefaultCSRFTokenTest
 
         // request
         final HttpSession mockSession = mock(HttpSession.class);
-        final HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         final ServletRequest servletRequest = new ServletRequest(httpRequest);
 
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(mockDocumentUrl));
@@ -135,9 +142,8 @@ public class DefaultCSRFTokenTest
 
     /**
      * Add a mocking role to have a logged user.
-     * @throws Exception if problems occur
      */
-    private void userIsLogged() throws Exception
+    private void userIsLogged()
     {
         // document access bridge
         when(mockDocumentAccessBridge.getCurrentUserReference())
@@ -148,7 +154,7 @@ public class DefaultCSRFTokenTest
      * Test that the secret token is a non-empty string.
      */
     @Test
-    public void testToken() throws Exception
+    void getTokenIsNotEmptyWithLoggedUser()
     {
         userIsLogged();
 
@@ -162,7 +168,7 @@ public class DefaultCSRFTokenTest
      * Test that the secret token is a non-empty string, even for guest user.
      */
     @Test
-    public void testTokenForGuestUser() throws Exception
+    void getTokenIsNotEmptyWithGuestUser()
     {
         String token = this.csrf.getToken();
         assertNotNull(token, "CSRF token is null");
@@ -174,7 +180,7 @@ public class DefaultCSRFTokenTest
      * Test that the same secret token is returned on subsequent calls.
      */
     @Test
-    public void testTokenTwice() throws Exception
+    void getTokenSameWhenCalledTwice()
     {
         userIsLogged();
 
@@ -189,7 +195,7 @@ public class DefaultCSRFTokenTest
      * Test that the produced valid secret token is indeed valid.
      */
     @Test
-    public void testTokenValidity() throws Exception
+    void getTokenIsValid()
     {
         userIsLogged();
 
@@ -201,31 +207,31 @@ public class DefaultCSRFTokenTest
      * Test that null is not valid.
      */
     @Test
-    public void testNullNotValid() throws Exception
+    void isTokenValidWhenNull()
     {
         userIsLogged();
         assertFalse(this.csrf.isTokenValid(null), "Null passed validity check");
-        assertTrue(logCapture.getMessage(0).startsWith("CSRFToken: Secret token verification failed, token: "
-            + "\"null\", stored token:"));
+        assertThat(logCapture.getMessage(0), matchesPattern("Secret CSRF token verification failed \\(token: \\[null], "
+            + "stored token: \\[.*]\\)"));
     }
 
     /**
      * Test that empty string is not valid.
      */
     @Test
-    public void testEmptyNotValid() throws Exception
+    void isTokenValidWhenEmpty()
     {
         userIsLogged();
         assertFalse(this.csrf.isTokenValid(""), "Empty string passed validity check");
-        assertTrue(logCapture.getMessage(0).startsWith("CSRFToken: Secret token verification failed, token: "
-            + "\"\", stored token:"));
+        assertThat(logCapture.getMessage(0), matchesPattern("Secret CSRF token verification failed \\(token: \\[], "
+            + "stored token: \\[.*]\\)"));
     }
 
     /**
      * Test that the prefix of the valid token is not valid.
      */
     @Test
-    public void testPrefixNotValid() throws Exception
+    void prefixNotValid()
     {
         userIsLogged();
 
@@ -234,35 +240,77 @@ public class DefaultCSRFTokenTest
             token = token.substring(0, token.length() - 2);
         }
         assertFalse(this.csrf.isTokenValid(token), "Null passed validity check");
-        assertTrue(logCapture.getMessage(0).startsWith("CSRFToken: Secret token verification failed, token: "));
+        assertTrue(logCapture.getMessage(0).startsWith("Secret CSRF token verification failed"));
     }
 
     /**
      * Test that the resubmission URL is correct.
      */
     @Test
-    public void testResubmissionURL() throws Exception
+    void resubmissionURLWhenPost() throws Exception
     {
         userIsLogged();
 
+        when(this.httpRequest.getMethod()).thenReturn("POST");
         String url = this.csrf.getResubmissionURL();
         // srid is random, extract it from the url
         Matcher matcher = Pattern.compile(".*srid%3D([a-zA-Z0-9]+).*").matcher(url);
         String srid = matcher.matches() ? matcher.group(1) : "asdf";
-        String resubmit = URLEncoder.encode(mockDocumentUrl + "?srid=" + srid, "utf-8");
-        String back = URLEncoder.encode(mockDocumentUrl, "utf-8");
-        String expected = resubmitUrl + "?resubmit=" + resubmit + "&xback=" + back + "&xpage=resubmit";
+        String resubmit = URLEncoder.encode(mockDocumentUrl + "?srid=" + srid, StandardCharsets.UTF_8);
+        String back = URLEncoder.encode(mockDocumentUrl, StandardCharsets.UTF_8);
+        String expected = resubmitUrl + "?xpage=resubmit&xback=" + back + "&resubmit=" + resubmit + "&sridKey=" + srid;
         assertEquals(expected, url, "Invalid resubmission URL");
+    }
+
+    /**
+     * Test that the resubmission URL is correct.
+     */
+    @Test
+    void resubmissionURLWhenGet() throws Exception
+    {
+        userIsLogged();
+
+        when(this.httpRequest.getMethod()).thenReturn("GET");
+        String url = this.csrf.getResubmissionURL();
+        // srid is random, extract it from the url
+        Matcher matcher = Pattern.compile(".*srid%3D([a-zA-Z0-9]+).*").matcher(url);
+        String srid = matcher.matches() ? matcher.group(1) : "asdf";
+        String expected = resubmitUrl + "?xpage=resubmit";
+        assertEquals(expected, url, "Invalid resubmission URL");
+    }
+
+    @Test
+    void isResubmitAllowedForCurrentRequest()
+    {
+        userIsLogged();
+        when(this.httpRequest.getMethod()).thenReturn("GET");
+        assertFalse(this.csrf.isResubmitAllowedForCurrentRequest());
+        when(this.httpRequest.getMethod()).thenReturn("POST");
+        assertTrue(this.csrf.isResubmitAllowedForCurrentRequest());
+    }
+
+    @Test
+    void isResubmitAllowedForRequestId()
+    {
+        assertFalse(this.csrf.isResubmitAllowedForRequestId(""));
+        HttpSession httpSession = mock(HttpSession.class);
+        when(this.httpRequest.getSession()).thenReturn(httpSession);
+        assertFalse(this.csrf.isResubmitAllowedForRequestId("test"));
+        when(httpSession.getAttribute(SavedRequestManager.getSavedRequestKey())).thenReturn(Map.of());
+        assertFalse(this.csrf.isResubmitAllowedForRequestId("test"));
+        when(httpSession.getAttribute(SavedRequestManager.getSavedRequestKey()))
+            .thenReturn(Map.of("test", mock(SavedRequestManager.SavedRequest.class)));
+        assertTrue(this.csrf.isResubmitAllowedForRequestId("test"));
     }
 
     /**
      * Test that the request URI is correct.
      */
     @Test
-    public void testRequestURI() throws Exception
+    void requestURIWhenPost()
     {
         userIsLogged();
-
+        when(this.httpRequest.getMethod()).thenReturn("POST");
         String requestURI = this.csrf.getRequestURI();
         // srid is random, extract it from the url
         Matcher matcher = Pattern.compile(".*srid=([a-zA-Z0-9]+)$").matcher(requestURI);
@@ -271,12 +319,19 @@ public class DefaultCSRFTokenTest
         assertEquals(resubmit, requestURI, "Invalid request URI URL");
     }
 
+    @Test
+    void requestURIWhenGet()
+    {
+        userIsLogged();
+        assertNull(this.csrf.getRequestURI());
+    }
+
     /**
      * Tests if the token contains any special characters that have a potential to break the layout when used in places
      * where XWiki-syntax is allowed.
      */
     @Test
-    public void testXWikiSyntaxCompatibility() throws Exception
+    void xWikiSyntaxCompatibility()
     {
         userIsLogged();
 

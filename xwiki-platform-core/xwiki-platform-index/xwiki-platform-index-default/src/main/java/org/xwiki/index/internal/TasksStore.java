@@ -48,6 +48,13 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 @Singleton
 public class TasksStore extends XWikiHibernateBaseStore
 {
+    private static final String QUERY_TASK_DELETION =
+        "delete from XWikiDocumentIndexingTask t where t.docId = :docId and t.type = :type ";
+
+    private static final String DOC_ID = "docId";
+
+    private static final String TYPE = "type";
+
     @Inject
     private ExecutionContextManager contextManager;
 
@@ -103,18 +110,17 @@ public class TasksStore extends XWikiHibernateBaseStore
     {
         initWikiContext(xWikiContext -> {
             executeWrite(xWikiContext, session -> {
-                String query = "delete from XWikiDocumentIndexingTask t where t.docId = :docId ";
+                String query = QUERY_TASK_DELETION;
                 if (StringUtils.isEmpty(version)) {
                     // The is null part is required for Oracle.
                     query += "and (t.version = :version or t.version is null)";
                 } else {
-                    query += "and t.version = :version ";
+                    query += "and t.version = :version";
                 }
-                query = query + "and t.type = :type";
                 session.createQuery(query)
-                    .setParameter("docId", docId)
+                    .setParameter(DOC_ID, docId)
                     .setParameter("version", version)
-                    .setParameter("type", type)
+                    .setParameter(TYPE, type)
                     .executeUpdate();
                 return null;
             });
@@ -133,10 +139,9 @@ public class TasksStore extends XWikiHibernateBaseStore
     {
         initWikiContext(xWikiContext -> {
             executeWrite(xWikiContext, session -> {
-                session.createQuery("delete from XWikiDocumentIndexingTask t where t.docId = :docId "
-                        + "and t.type = :type")
-                    .setParameter("docId", task.getDocId())
-                    .setParameter("type", task.getType())
+                session.createQuery(QUERY_TASK_DELETION)
+                    .setParameter(DOC_ID, task.getDocId())
+                    .setParameter(TYPE, task.getType())
                     .executeUpdate();
                 innerAddTask(task, session);
                 return null;
@@ -157,7 +162,7 @@ public class TasksStore extends XWikiHibernateBaseStore
     {
         return initWikiContext(context -> executeRead(context, session -> (XWikiDocument)
             session.createQuery("select doc from XWikiDocument doc where doc.id = :docId")
-                .setParameter("docId", docId)
+                .setParameter(DOC_ID, docId)
                 .getSingleResult()
         ), wikiId);
     }

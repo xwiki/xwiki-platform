@@ -50,7 +50,7 @@ Ecco un elenco di pagine liberamente modificabili con cui esercitarsi:
 
 Di seguito una dimostrazione della [[Sintassi di XWiki&gt;&gt;XWiki.XWikiSyntax]] che è possibile usare nelle pagine wiki (titoli, immagini, tabelle).
 
-= Titolo 1 =
+== Titolo ==
 XWiki dispone di sei livelli di titoli. È possibile usarli per strutturare le pagine.
 
 == Titolo 2 ==
@@ -63,7 +63,7 @@ XWiki dispone di sei livelli di titoli. È possibile usarli per strutturare le p
 
 ====== Titolo 6 ======
 
-= Stili =
+== Stili ==
 In XWiki sono supportati i seguenti stili di base:
 
 * **Testo in Grassetto**
@@ -73,45 +73,45 @@ In XWiki sono supportati i seguenti stili di base:
 * Testo ,,pedice,,
 * Testo ^^apice^^
 
-= Elenchi = 
+== Elenchi ==
 È possibile creare vari tipi di elenchi nelle pagine del wiki:
 
-== Elenco puntato ==
+=== Elenco puntato ===
 * Livello 1
 ** Livello 2
 *** Livello 3
 ** Livello 2
 * Livello 1
 
-== Elenco numerato ==
+=== Elenco numerato ===
 1. Voce
 11. Voce livello 2
 111. Voce livello 3
 1. Voce
 
-== Elenco misto ==
+=== Elenco misto ===
 1. Voce 1
 11. Voce 2
 11*. Voce 3
 11*. Voce 4
 1. Voce 5
 
-= Tabelle =
+== Tabelle ==
 
 Si possono creare delle semplici tabelle direttamente nelle pagine del wiki:
 
-== Tabella con riga d'intestazione ==
+=== Tabella con riga d'intestazione ===
 |= intestazione |= intestazione |= intestazione 
 | cella | cella | cella
 | cella | cella | cella
 
-== Tabella con riga e colonna d'intestazione ==
+=== Tabella con riga e colonna d'intestazione ===
 |= intestazione |= intestazione |= intestazione 
 |= intestazione | cella | cella
 |= intestazione | cella | cella
 
 
-= Link o Collegamenti =
+== Link o Collegamenti ==
 XWIki permette di inserire dei link ad altre pagine del wiki o collegamenti a pagine nel web:
 
 * [[WebHome]] -&gt; è un link alla homepage dello spazio corrente
@@ -120,20 +120,20 @@ XWIki permette di inserire dei link ad altre pagine del wiki o collegamenti a pa
 * [[http://www.xwiki.org]] -&gt; ci si può collegare a pagine del wiki o a siti web esterni
 * [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; le etichette sui collegamenti funzionano anche per i collegamenti esterni
 
-= Immagini =
+== Immagini ==
 Nelle pagine del wiki si possono inserire delle immagini:
 
 [[image:XWikiLogo.png]]
 
-= Macro =
+== Macro ==
 Le Macro permettono di dare un aspetto migliore al contenuto delle pagine e aggiungere ulteriori caratteristiche. Ecco due esempi di come usare le macro nelle pagine wiki:
 
-== Macro Avviso (Warning macro)==
+=== Macro Avviso (Warning macro)===
 Questa Macro consente di attirare l'attenzione del lettore su una specifica informazione:
 
 {{warning}}Ciao Mondo!{{/warning}}
 
-== Indice della pagina (Toc) ==
+=== Indice della pagina (Toc) ===
 Questa Macro genera automaticamente l'indice della pagina in base ai livelli dei titoli:
 
 {{toc/}}</content>

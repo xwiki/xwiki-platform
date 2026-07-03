@@ -80,7 +80,8 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
     private static final String FILENAME = HINT + "DataMigration-users.txt";
 
     private static final String XWQL_QUERY = "select distinct doc.fullName from Document doc, "
-        + "doc.object(XWiki.XWikiUsers) objUser where objUser.password not like 'hash:%' and objUser.password <> '' "
+        + "doc.object(XWiki.XWikiUsers) objUser where objUser.password not like 'hash:%' and "
+        + "length(objUser.password) > 0 "
         + "order by doc.fullName";
 
     private static final String PASSWORD_FIELD = "password";
@@ -279,11 +280,16 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
         if (userObj != null) {
             String password = userObj.getStringValue(PASSWORD_FIELD);
             if (!password.startsWith("hash:")) {
-                if (isMain && resetPassword) {
-                    userObj.set(PASSWORD_FIELD, "", context);
-                } else {
-                    // The set method should automatically compute the hash
-                    userObj.set(PASSWORD_FIELD, password, context);
+                try {
+                    if (isMain && resetPassword) {
+                        userObj.set(PASSWORD_FIELD, "", context);
+                    } else {
+                        // The set method should automatically compute the hash
+                        userObj.set(PASSWORD_FIELD, password, context);
+                    }
+                } catch (XWikiException e) {
+                    // Note: this should never happen since it's a standard string field.
+                    this.logger.error("Error while reseting password field for user [{}]", userDoc, e);
                 }
                 result = true;
             } else if (isMain) {

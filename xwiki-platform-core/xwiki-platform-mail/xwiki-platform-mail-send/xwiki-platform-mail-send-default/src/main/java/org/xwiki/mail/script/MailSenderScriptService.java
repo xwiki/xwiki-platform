@@ -214,7 +214,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
     }
 
     /**
-     * Send the list of mails synchronously, using a Memory {@link }MailListener} to store the results.
+     * Send the list of mails synchronously, using a Memory {@link MailListener} to store the results.
      *
      * @param messages the list of messages to send
      * @return the result and status of the send batch
@@ -236,8 +236,10 @@ public class MailSenderScriptService extends AbstractMailScriptService
     {
         ScriptMailResult scriptMailResult = sendAsynchronously(messages, hint);
 
-        // Wait for all messages from this batch to have been sent before returning
-        scriptMailResult.getStatusResult().waitTillProcessed(Long.MAX_VALUE);
+        if (scriptMailResult != null) {
+            // Wait for all messages from this batch to have been sent before returning
+            scriptMailResult.getStatusResult().waitTillProcessed(Long.MAX_VALUE);
+        }
 
         return scriptMailResult;
     }

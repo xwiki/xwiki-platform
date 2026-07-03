@@ -28,7 +28,7 @@ import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
 import org.xwiki.job.internal.script.safe.SafeCancelableJobStatus;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;

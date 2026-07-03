@@ -93,7 +93,7 @@ public class WikiMacroParameterMacro extends AbstractMacro<WikiMacroParameterMac
     {
         Map<String, String> placeholderParameters = new LinkedHashMap<>();
         placeholderParameters.put("data-wikimacro-id", ID);
-        placeholderParameters.put("name", parameters.getName());
+        placeholderParameters.put("data-wikimacro-parameter-name", parameters.getName());
 
         if (context.isInline()) {
             return Collections
@@ -101,5 +101,11 @@ public class WikiMacroParameterMacro extends AbstractMacro<WikiMacroParameterMac
         } else {
             return Collections.singletonList(new GroupBlock(placeholderParameters));
         }
+    }
+
+    @Override
+    public boolean isExecutionIsolated(WikiMacroParameterMacroParameters parameters, String content)
+    {
+        return true;
     }
 }

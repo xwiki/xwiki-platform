@@ -19,10 +19,13 @@
  */
 package org.xwiki.notifications.notifiers.internal.email;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.notifiers.email.EmailTemplateRenderer;
 import org.xwiki.notifications.notifiers.email.NotificationEmailRenderer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.syntax.Syntax;
@@ -57,13 +60,13 @@ public abstract class AbstractNotificationEmailRenderer implements NotificationE
             throws NotificationException
     {
         // Generate the full template name
-        String templateName = String.format(templatePath, event.getType().replaceAll("\\/", "."));
+        String templateName = String.format(templatePath, event.getType().replace("/", "."));
         // Get the template
         Template template = templateManager.getTemplate(templateName);
         if (template == null) {
             template = templateManager.getTemplate(String.format(templatePath, "default"));
         }
-        return emailTemplateRenderer.executeTemplate(event, userId, template, syntax);
+        return emailTemplateRenderer.executeTemplate(event, userId, template, syntax, Map.of());
     }
 
     protected String renderHTML(Block block)

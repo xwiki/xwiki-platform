@@ -566,7 +566,7 @@
 #set ($obj = $doc.getObject($xwikiUsersClassName))
 ##
 #if (!$obj)
-= $services.localization.render('xe.admin.users.sheet') =
+== $services.localization.render('xe.admin.users.sheet') ==
 
 {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}
 
@@ -602,15 +602,15 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
         #set ($enableClass = "hidden")
         #set ($disableClass = "")
       #end
-      &lt;a href="#" id="enable" class="btn btn-success $enableClass"&gt;$services.icon.renderHTML('unlock') $services.localization.render('platform.core.profile.category.profile.enableAccount')&lt;/a&gt;
-      &lt;a href="#" id="disable" class="btn btn-warning $disableClass"&gt;$services.icon.renderHTML('lock') $services.localization.render('platform.core.profile.category.profile.disableAccount')&lt;/a&gt;
+      &lt;button id="enable" class="btn btn-success $enableClass"&gt;$services.icon.renderHTML('unlock') $services.localization.render('platform.core.profile.category.profile.enableAccount')&lt;/button&gt;
+      &lt;button id="disable" class="btn btn-warning $disableClass"&gt;$services.icon.renderHTML('lock') $services.localization.render('platform.core.profile.category.profile.disableAccount')&lt;/button&gt;
     #end
     &lt;div class='userInfo'&gt;
     #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
       &lt;div class='editProfileCategory'&gt;
         &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))"
-           href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')" class="btn btn-xs"&gt;
-          &lt;span class="action-icon"&gt;$services.icon.renderHTML('pencil')&lt;/span&gt;
+           href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')" class="btn btn-xs btn-default"&gt;
+          $services.icon.renderHTML('pencil')
           &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))&lt;/span&gt;
         &lt;/a&gt;
       &lt;/div&gt;
@@ -658,22 +658,13 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
   &lt;/div&gt;
   #if (!$inEditMode)
     &lt;div class='half column'&gt;
-      #set ($isMessageStreamActive = $services.messageStream.isActive())
-      #if ($isMessageStreamActive &amp;&amp; !$isGuest)
-      &lt;div class='userMessage profile-section'&gt;
-        &lt;h1&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.sendMessage'))&lt;/h1&gt;
-
-          {{messageSender /}}
-
-      &lt;/div&gt;
-      #end
       &lt;div class='userRecentChanges'&gt;
       #if ($xcontext.user == $doc.fullName)
         &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.activity'))&lt;/h2&gt;
       #else
         &lt;h2&gt;
           $escapetool.xml($services.localization.render('platform.core.profile.section.activityof',
-            [$xwiki.getUserName($doc.fullName, false)]))
+            [$xwiki.getPlainUserName($doc.documentReference)]))
         &lt;/h2&gt;
         #if ($hasWatch)
         $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##

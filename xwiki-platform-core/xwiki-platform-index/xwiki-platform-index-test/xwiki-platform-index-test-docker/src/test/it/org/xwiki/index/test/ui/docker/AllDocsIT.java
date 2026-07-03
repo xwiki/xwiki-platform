@@ -22,10 +22,12 @@ package org.xwiki.index.test.ui.docker;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.xwiki.index.test.po.AllDocsLivetable;
+import org.xwiki.index.test.po.AllDocsLiveData;
 import org.xwiki.index.test.po.AllDocsPage;
+import org.xwiki.index.tree.test.po.DocumentTreeElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -38,6 +40,7 @@ import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.EditRightsPane;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
+import org.xwiki.tree.test.po.TreeNodeElement;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -52,7 +55,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class AllDocsIT
 {
+    private static final String LOCATION_COLUMN_LABEL = "Location";
+
+    private static final String TYPE_COLUMN_LABEL = "Type";
+
+    private static final String NAME_COLUMN_LABEL = "Name";
+
+    private static final String SIZE_COLUMN_LABEL = "Size";
+
+    private static final String DATE_COLUMN_LABEL = "Date";
+
+    private static final String AUTHOR_COLUMN_LABEL = "Author";
+
     @Test
+    @Order(1)
     void verifyAllDocs(TestUtils setup, TestInfo testInfo, TestReference testReference)
     {
         // Fixture
@@ -62,7 +78,7 @@ class AllDocsIT
 
         // tests
         validateActionsAndGuest(setup);
-        validateFilterDoc(setup, testReference);
+        validateFilterDoc(testReference);
         validateCopyLink(setup, testInfo, testReference);
         validateRenameLink(setup, testInfo, testReference);
         validateDeleteLink(setup, testReference);
@@ -71,10 +87,9 @@ class AllDocsIT
 
     /**
      * Test attachment listing, filtering and sorting.
-     * <p>
-     * This test is against XWiki Enterprise XE-701 https://jira.xwiki.org/browse/XE-701 (fixed in 2.5M1).
      */
     @Test
+    @Order(2)
     void attachmentsTabFilteringAndSorting(TestUtils setup, TestReference testReference) throws Exception
     {
         // Create 2 pages with attachments so that this test filter returns only one.
@@ -89,48 +104,154 @@ class AllDocsIT
         TableLayoutElement liveData = docsPage.clickAttachmentsTab().getTableLayout();
 
         // Here we test if all the Columns are displayed.
-        assertTrue(liveData.hasColumn("Type"), "No Type column found");
-        assertTrue(liveData.hasColumn("Name"), "No Name column found");
-        assertTrue(liveData.hasColumn("Location"), "No Location column found");
-        assertTrue(liveData.hasColumn("Size"), "No Size column found");
-        assertTrue(liveData.hasColumn("Date"), "No Date column found");
-        assertTrue(liveData.hasColumn("Author"), "No Author column found");
+        assertTrue(liveData.hasColumn(TYPE_COLUMN_LABEL), "No Type column found");
+        assertTrue(liveData.hasColumn(NAME_COLUMN_LABEL), "No Name column found");
+        assertTrue(liveData.hasColumn(LOCATION_COLUMN_LABEL), "No Location column found");
+        assertTrue(liveData.hasColumn(SIZE_COLUMN_LABEL), "No Size column found");
+        assertTrue(liveData.hasColumn(DATE_COLUMN_LABEL), "No Date column found");
+        assertTrue(liveData.hasColumn(AUTHOR_COLUMN_LABEL), "No Author column found");
 
         String defaultLocationFilter = className + ".";
 
-        liveData.filterColumn("Location", defaultLocationFilter);
+        liveData.filterColumn(LOCATION_COLUMN_LABEL, defaultLocationFilter);
 
         assertEquals(2, liveData.countRows());
 
         // Filter by attachment file name.
-        liveData.filterColumn("Name", "t1");
+        liveData.filterColumn(NAME_COLUMN_LABEL, "t1");
         assertEquals(1, liveData.countRows());
-        assertEquals("attachment1.txt", liveData.getCell("Name", 1).getText());
+        assertEquals("attachment1.txt", liveData.getCell(NAME_COLUMN_LABEL, 1).getText());
 
         // Clear the filter.
-        liveData.filterColumn("Name", "");
+        liveData.filterColumn(NAME_COLUMN_LABEL, "");
 
         // Filter by attachment location.
-        liveData.filterColumn("Location", defaultLocationFilter + "Oth");
+        liveData.filterColumn(LOCATION_COLUMN_LABEL, defaultLocationFilter + "Oth");
         assertEquals(1, liveData.countRows());
-        assertEquals(className + "OtherPage", liveData.getCell("Location", 1).getText());
+        assertEquals(className + "OtherPage", liveData.getCell(LOCATION_COLUMN_LABEL, 1).getText());
 
         // Reset the filter.
-        liveData.filterColumn("Location", defaultLocationFilter);
+        liveData.filterColumn(LOCATION_COLUMN_LABEL, defaultLocationFilter);
 
         // Sort by attachment file name. The live table should be already sorted by file name ascending. This will
         // reverse the order.
-        assertEquals("attachment2.txt", liveData.getCell("Name", 2).getText());
-        liveData.sortBy("Name");
+        assertEquals("attachment2.txt", liveData.getCell(NAME_COLUMN_LABEL, 2).getText());
+        liveData.sortBy(NAME_COLUMN_LABEL);
         assertEquals(2, liveData.countRows());
-        assertEquals("attachment2.txt", liveData.getCell("Name", 1).getText());
+        assertEquals("attachment2.txt", liveData.getCell(NAME_COLUMN_LABEL, 1).getText());
 
         // Sort by attachment location.
-        liveData.sortBy("Location");
-        assertEquals(className + "Page", liveData.getCell("Location", 2).getText());
-        liveData.sortBy("Location");
+        liveData.sortBy(LOCATION_COLUMN_LABEL);
+        assertEquals(className + "Page", liveData.getCell(LOCATION_COLUMN_LABEL, 2).getText());
+        liveData.sortBy(LOCATION_COLUMN_LABEL);
         assertEquals(2, liveData.countRows());
-        assertEquals(className + "Page", liveData.getCell("Location", 1).getText());
+        assertEquals(className + "Page", liveData.getCell(LOCATION_COLUMN_LABEL, 1).getText());
+    }
+
+    /**
+     * Verify that the "Deleted documents" and "Deleted attachments" tabs are only visible to logged in users with the
+     * right to see them (i.e. not to guests).
+     */
+    @Test
+    @Order(3)
+    void recycleBinTab(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+        setup.deletePage(testReference, true);
+
+        // Create a document with an attachment and then delete it so that there are both a deleted document and a
+        // deleted attachment.
+        setup.createPageWithAttachment(testReference, "", "Document", "file.txt",
+            new ByteArrayInputStream("File content".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
+        setup.deletePage(testReference, true);
+
+        setup.gotoPage(AllDocsPage.getURL());
+        AllDocsPage page = new AllDocsPage();
+        assertTrue(page.hasDeletedDocsTab(), "Deleted documents tab is not visible to Admin");
+        assertTrue(page.hasDeletedAttachmentsTab(), "Deleted attachments tab is not visible to Admin");
+
+        // Logs out to be guest to verify that Deleted attachments/documents are not visible to guests.
+        setup.forceGuestUser();
+
+        assertFalse(page.hasDeletedDocsTab(), "Deleted documents shouldn't be visible to guests");
+        assertFalse(page.hasDeletedAttachmentsTab(), "Deleted attachments shouldn't be visible to guests");
+    }
+
+    /**
+     * Validate the tree view.
+     */
+    @Test
+    @Order(4)
+    void treeViewTab(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String spaceName = testReference.getLastSpaceReference().getName();
+
+        setup.loginAsSuperAdmin();
+        // Clean up any leftover from a previous run.
+        setup.deletePage(new DocumentReference("xwiki", spaceName, "WebHome"), true);
+
+        // Create a tree structure.
+        setup.createPage(spaceName, "WebHome", null, null);
+        setup.createPageWithAttachment(Arrays.asList(spaceName, "A", "B"), "C", null, "Child Page", null, null,
+            "file.txt", new ByteArrayInputStream("File content".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
+
+        DocumentTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
+
+        // The AllDocs tree lists and paginates (15 per page) all the top-level spaces of the wiki, and the functional
+        // test suite shares a single XWiki instance, so this test's top-level space is not guaranteed to be on the
+        // first page. We use openTo on the top space node only: it resolves the node path on the server, loads the
+        // right page and opens that node (which lazily loads its direct child "A"). The deeper levels are then expanded
+        // manually below so that we still verify the tree loads children lazily, level by level.
+        tree.openToDocument(spaceName, "WebHome");
+
+        TreeNodeElement root = tree.getDocumentNode(spaceName, "WebHome");
+        assertEquals(spaceName, root.getLabel());
+
+        // "A" is already loaded because openTo opened the top space node above (revealing it past the pagination
+        // requires opening it). Its descendants are still loaded lazily, which we verify in the following steps.
+        TreeNodeElement alice = tree.getDocumentNode(spaceName, "A", "WebHome");
+        assertEquals("A", alice.getLabel());
+
+        assertFalse(tree.hasDocument(spaceName, "A", "B", "WebHome"));
+        alice.open().waitForIt();
+        TreeNodeElement bob = tree.getDocumentNode(spaceName, "A", "B", "WebHome");
+        assertEquals("B", bob.getLabel());
+
+        assertFalse(tree.hasDocument(spaceName, "A", "B", "C"));
+        bob.open().waitForIt();
+        TreeNodeElement child = tree.getDocumentNode(spaceName, "A", "B", "C");
+        assertEquals("Child Page", child.getLabel());
+
+        assertFalse(tree.hasAttachment(spaceName, "A", "B", "C", "file.txt"));
+        // Open the Attachments node.
+        child.open().waitForIt().getChildren().get(0).open().waitForIt();
+        TreeNodeElement file = tree.getAttachmentNode(spaceName, "A", "B", "C", "file.txt");
+        assertEquals("file.txt", file.getLabel());
+    }
+
+    /**
+     * @see "XWIKI-5187: XWiki Explorer doesn't support very well spaces and pages with special characters in their
+     * names"
+     */
+    @Test
+    @Order(5)
+    void treeViewTabWithSpecialCharactersInEntityNames(TestUtils setup, TestReference testReference)
+    {
+        String spaceName = testReference.getLastSpaceReference().getName() + ".0";
+
+        setup.loginAsSuperAdmin();
+        // Clean up any leftover from a previous run.
+        setup.deletePage(new DocumentReference("xwiki", spaceName, "WebHome"), true);
+
+        // Create a tree structure.
+        setup.createPage(Arrays.asList(spaceName, "Level.1", "Level{[(2)]}", "Level@3"), "End", null, null);
+
+        DocumentTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
+        tree.openToDocument(spaceName, "Level.1", "Level{[(2)]}", "Level@3", "End");
+
+        assertTrue(tree.hasDocument(spaceName, "Level.1", "WebHome"));
+        assertTrue(tree.hasDocument(spaceName, "Level.1", "Level{[(2)]}", "WebHome"));
+        assertTrue(tree.hasDocument(spaceName, "Level.1", "Level{[(2)]}", "Level@3", "WebHome"));
     }
 
     /**
@@ -141,15 +262,15 @@ class AllDocsIT
         // Create a test user
         setup.createUserAndLogin("Foobar", "password");
         AllDocsPage page = AllDocsPage.gotoPage();
-        AllDocsLivetable livetable = page.clickIndexTab();
-        assertTrue(livetable.hasColumn("Actions"), "No Actions column found");
+        AllDocsLiveData livetable = page.clickIndexTab();
+        assertTrue(livetable.getTableLayout().hasColumn("Actions"), "No Actions column found");
 
         // Logs out to be guest to verify that the Action columns is no longer displayed
         setup.forceGuestUser();
 
         page = AllDocsPage.gotoPage();
         livetable = page.clickIndexTab();
-        assertFalse(livetable.hasColumn("Actions"), "Actions column shouldn't be visible for guests");
+        assertFalse(livetable.getTableLayout().hasColumn("Actions"), "Actions column shouldn't be visible for guests");
 
         setup.loginAsSuperAdmin();
     }
@@ -157,19 +278,20 @@ class AllDocsIT
     /**
      * Verify filtering works by filtering on the document name
      */
-    private void validateFilterDoc(TestUtils setup, TestReference testReference)
+    private void validateFilterDoc(TestReference testReference)
     {
         String testName = testReference.getLastSpaceReference().getName();
         AllDocsPage page = AllDocsPage.gotoPage();
-        AllDocsLivetable livetable = page.clickIndexTab();
-        livetable.filterColumn(2, testName);
+        AllDocsLiveData livetable = page.clickIndexTab();
+        livetable.filterColumn(LOCATION_COLUMN_LABEL, testName);
         // We get one result for the page we've created
-        assertEquals(1, livetable.getRowCount());
-        assertTrue(livetable.hasRow("Title", testName));
+        TableLayoutElement tableLayout = livetable.getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow("Title", testName);
 
         // We get no result for a page created by user barbaz
-        livetable.filterColumn(4, "barbaz");
-        assertEquals(0, livetable.getRowCount());
+        livetable.filterColumn("Last Author", "barbaz");
+        assertEquals(0, tableLayout.countRows());
     }
 
     /**
@@ -185,11 +307,12 @@ class AllDocsIT
         setup.deletePage(copyPageReference);
 
         AllDocsPage page = AllDocsPage.gotoPage();
-        AllDocsLivetable livetable = page.clickIndexTab();
-        livetable.filterColumn(2, testName);
+        AllDocsLiveData livetable = page.clickIndexTab();
+        livetable.filterColumn(LOCATION_COLUMN_LABEL, testName);
         // We get one result for the page we've created
-        assertEquals(1, livetable.getRowCount());
-        assertTrue(livetable.hasRow("Title", testName));
+        TableLayoutElement tableLayout = livetable.getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow("Title", testName);
 
         // click on the copy action link.
         livetable.clickAction(1, "copy");
@@ -202,10 +325,11 @@ class AllDocsIT
 
         page = AllDocsPage.gotoPage();
         livetable = page.clickIndexTab();
-        livetable.filterColumn(2, testName);
-        assertEquals(2, livetable.getRowCount());
-        livetable.filterColumn(2, copyPageName);
-        assertEquals(1, livetable.getRowCount());
+        livetable.filterColumn(LOCATION_COLUMN_LABEL, testName);
+        tableLayout = livetable.getTableLayout();
+        assertEquals(2, tableLayout.countRows());
+        livetable.filterColumn(LOCATION_COLUMN_LABEL, copyPageName);
+        assertEquals(1, tableLayout.countRows());
 
         setup.deletePage(copyPageReference);
     }
@@ -219,11 +343,12 @@ class AllDocsIT
             Arrays.asList(testSpace, renamedPageName), "WebHome");
 
         AllDocsPage page = AllDocsPage.gotoPage();
-        AllDocsLivetable livetable = page.clickIndexTab();
-        livetable.filterColumn(2, testName);
+        AllDocsLiveData livetable = page.clickIndexTab();
+        livetable.filterColumn(LOCATION_COLUMN_LABEL, testName);
         // We get one result for the page we've created
-        assertEquals(1, livetable.getRowCount());
-        assertTrue(livetable.hasRow("Title", testName));
+        TableLayoutElement tableLayout = livetable.getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow("Title", testName);
 
         // click on the copy action link.
         livetable.clickAction(1, "rename");
@@ -236,9 +361,10 @@ class AllDocsIT
 
         page = AllDocsPage.gotoPage();
         livetable = page.clickIndexTab();
-        livetable.filterColumn(2, testName);
-        assertEquals(1, livetable.getRowCount());
-        assertEquals(testSpace + renamedPageName, livetable.getCell(1, 2).getText());
+        livetable.filterColumn(LOCATION_COLUMN_LABEL, testName);
+        tableLayout = livetable.getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        assertEquals(testSpace + renamedPageName, tableLayout.getCell(LOCATION_COLUMN_LABEL, 1).getText());
 
         setup.deletePage(renamedPageReference);
         setup.createPage(testReference, "", testReference.getLastSpaceReference().getName());
@@ -249,11 +375,12 @@ class AllDocsIT
         String testName = testReference.getLastSpaceReference().getName();
 
         AllDocsPage page = AllDocsPage.gotoPage();
-        AllDocsLivetable livetable = page.clickIndexTab();
-        livetable.filterColumn(2, testName);
+        AllDocsLiveData livetable = page.clickIndexTab();
+        livetable.filterColumn(LOCATION_COLUMN_LABEL, testName);
         // We get one result for the page we've created
-        assertEquals(1, livetable.getRowCount());
-        assertTrue(livetable.hasRow("Title", testName));
+        TableLayoutElement tableLayout = livetable.getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow("Title", testName);
 
         // click on the copy action link.
         livetable.clickAction(1, "delete");
@@ -262,8 +389,8 @@ class AllDocsIT
         deletingPage.waitUntilFinished();
         page = AllDocsPage.gotoPage();
         livetable = page.clickIndexTab();
-        livetable.filterColumn(2, testName);
-        assertEquals(0, livetable.getRowCount());
+        livetable.filterColumn(LOCATION_COLUMN_LABEL, testName);
+        assertEquals(0, livetable.getTableLayout().countRows());
         setup.createPage(testReference, "", testReference.getLastSpaceReference().getName());
     }
 
@@ -272,11 +399,12 @@ class AllDocsIT
         String testName = testReference.getLastSpaceReference().getName();
 
         AllDocsPage page = AllDocsPage.gotoPage();
-        AllDocsLivetable livetable = page.clickIndexTab();
-        livetable.filterColumn(2, testName);
+        AllDocsLiveData livetable = page.clickIndexTab();
+        livetable.filterColumn(LOCATION_COLUMN_LABEL, testName);
         // We get one result for the page we've created
-        assertEquals(1, livetable.getRowCount());
-        assertTrue(livetable.hasRow("Title", testName));
+        TableLayoutElement tableLayout = livetable.getTableLayout();
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow("Title", testName);
 
         // click on the copy action link.
         livetable.clickAction(1, "rights");

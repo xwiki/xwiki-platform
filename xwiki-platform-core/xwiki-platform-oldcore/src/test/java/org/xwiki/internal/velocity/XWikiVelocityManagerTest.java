@@ -26,10 +26,11 @@ import org.mockito.Mock;
 import org.xwiki.internal.script.XWikiScriptContextInitializer;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.logging.internal.DefaultLoggerConfiguration;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.script.internal.DefaultScriptContextManager;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
@@ -123,8 +124,9 @@ public class XWikiVelocityManagerTest
         when(this.skinMacrosTemplateContent.getDocumentReference()).thenReturn(TEMPLATE_DOCUMENT);
         when(this.skinMacrosTemplateContent.getContent()).thenReturn("");
 
-        AuthorizationManager authorizationManager = this.oldcore.getMockAuthorizationManager();
-        when(authorizationManager.hasAccess(Right.SCRIPT, SCRIPT_USER, TEMPLATE_DOCUMENT)).thenReturn(true);
+        DocumentAuthorizationManager authorizationManager = this.oldcore.getMockDocumentAuthorizationManager();
+        when(authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, SCRIPT_USER, TEMPLATE_DOCUMENT))
+            .thenReturn(true);
     }
 
     // Tests

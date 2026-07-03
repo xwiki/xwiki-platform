@@ -69,7 +69,8 @@ public class PrintPreviewURLBuilder
     {
         // Extend the base query string with the parameters required by the print preview.
         String baseQueryString = Objects.toString(request.getBaseURL().getQuery(), "");
-        String queryString = getPrintPreviewQueryString(baseQueryString, request.getId());
+        String queryString = getPrintPreviewQueryString(baseQueryString, request.getId(),
+            Objects.toString(request.getContext().get("locale"), null));
 
         // Use the same hash (fragment identifier) as the base URL. It's important to preserve the hash
         // because it can influence the output: e.g. the live table saves and reads its state from the hash.
@@ -84,13 +85,14 @@ public class PrintPreviewURLBuilder
         return new URL(this.documentAccessBridge.getDocumentURL(documentReference, "export", queryString, hash, true));
     }
 
-    private String getPrintPreviewQueryString(String originalQueryString, List<String> pdfExportJobId)
+    private String getPrintPreviewQueryString(String originalQueryString, List<String> pdfExportJobId, String locale)
     {
         List<NameValuePair> printPreviewParams = Arrays.asList(new BasicNameValuePair("format", "html-print"),
             new BasicNameValuePair("xpage", "get"), new BasicNameValuePair("outputSyntax", "plain"),
             // Asynchronous rendering is disabled by default on the export action so we need to force it.
             new BasicNameValuePair("async", "true"), new BasicNameValuePair("sheet", "XWiki.PDFExport.Sheet"),
-            new BasicNameValuePair("jobId", StringUtils.join(pdfExportJobId, '/')));
+            new BasicNameValuePair("jobId", StringUtils.join(pdfExportJobId, '/')),
+            new BasicNameValuePair("language", locale));
         return URLEncodedUtils.format(printPreviewParams, StandardCharsets.UTF_8) + '&' + originalQueryString;
     }
 }

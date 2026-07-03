@@ -19,7 +19,8 @@
  */
 package com.xpn.xwiki.plugin;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.Objects;
+
 import org.xwiki.localization.ContextualLocalizationManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -177,7 +178,7 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface
 
     protected String localizePlainOrKey(String key, Object... parameters)
     {
-        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+        return Objects.toString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     /**

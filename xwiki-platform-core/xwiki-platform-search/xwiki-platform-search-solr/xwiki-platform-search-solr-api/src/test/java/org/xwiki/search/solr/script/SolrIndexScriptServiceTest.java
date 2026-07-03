@@ -19,15 +19,14 @@
  */
 package org.xwiki.search.solr.script;
 
-import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Provider;
 
 import org.apache.solr.common.SolrDocument;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.slf4j.Logger;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -35,21 +34,25 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.FieldUtils;
-import org.xwiki.search.solr.internal.reference.SolrEntityReferenceResolver;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -59,14 +62,31 @@ import static org.mockito.Mockito.when;
 
 /**
  * Tests for the {@link org.xwiki.search.solr.script.SolrIndexScriptService}.
- * 
+ *
  * @version $Id$
  */
-public class SolrIndexScriptServiceTest
+@ComponentTest
+class SolrIndexScriptServiceTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<SolrIndexScriptService> mocker =
-        new MockitoComponentMockingRule<SolrIndexScriptService>(SolrIndexScriptService.class);
+    @InjectMockComponents
+    private SolrIndexScriptService service;
+
+    @MockComponent
+    private Provider<XWikiContext> xcontextProvider;
+
+    @MockComponent
+    private AuthorizationManager mockAuthorization;
+
+    @MockComponent
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
+    @MockComponent
+    private EntityReferenceResolver<SolrDocument> solrEntityReferenceResolver;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
+
+    private DocumentReference userReference;
 
     private XWikiContext mockContext;
 
@@ -74,48 +94,31 @@ public class SolrIndexScriptServiceTest
 
     private XWikiDocument mockCurrentDocument;
 
-    private DocumentReference userReference;
-
-    private DocumentReference contentAuthorReference;
-
-    private SolrIndexScriptService service;
-
-    private Logger logger;
-
-    private AuthorizationManager mockAuthorization;
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
         this.userReference = new DocumentReference("wiki", "space", "user");
 
         // Context
         this.mockContext = mock(XWikiContext.class);
-        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(this.mockContext);
+        when(this.xcontextProvider.get()).thenReturn(this.mockContext);
 
         // XWiki
         this.mockXWiki = mock(XWiki.class);
-        when(mockContext.getWiki()).thenReturn(this.mockXWiki);
+        when(this.mockContext.getWiki()).thenReturn(this.mockXWiki);
 
         this.mockCurrentDocument = mock(XWikiDocument.class);
-        when(mockContext.getDoc()).thenReturn(this.mockCurrentDocument);
+        when(this.mockContext.getDoc()).thenReturn(this.mockCurrentDocument);
 
-        when(mockContext.getWikiId()).thenReturn("currentWiki");
-        when(mockContext.getUserReference()).thenReturn(userReference);
-
-        // RightService
-        this.mockAuthorization = this.mocker.getInstance(AuthorizationManager.class);
-
-        this.service = mocker.getComponentUnderTest();
+        when(this.mockContext.getWikiId()).thenReturn("currentWiki");
+        when(this.mockContext.getUserReference()).thenReturn(this.userReference);
 
         // Rights check success. By default we are allowed (no error is thrown)
-        this.logger = mocker.getMockedLogger();
-        verify(this.logger, never()).error(any(), any(AccessDeniedException.class));
+        assertEquals(0, this.logCapture.size());
     }
 
     @Test
-    public void indexSingleReferenceChecksRights() throws Exception
+    void indexSingleReferenceChecksRights() throws Exception
     {
         EntityReference wikiReference = new WikiReference("someWiki");
 
@@ -126,11 +129,11 @@ public class SolrIndexScriptServiceTest
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
-    public void indexMultipleReferencesChecksRights() throws Exception
+    void indexMultipleReferencesChecksRights() throws Exception
     {
         EntityReference wikiReference = new WikiReference("someWiki");
 
@@ -138,17 +141,17 @@ public class SolrIndexScriptServiceTest
 
         // Note: Faking it. just using one reference but still calling the multiple references method (which is what we
         // wanted anyway)
-        this.service.index(Arrays.asList(wikiReference));
+        this.service.index(List.of(wikiReference));
 
         // Assert and verify
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
-    public void deleteSingleReferenceChecksRights() throws Exception
+    void deleteSingleReferenceChecksRights() throws Exception
     {
         EntityReference wikiReference = new WikiReference("someWiki");
 
@@ -159,11 +162,11 @@ public class SolrIndexScriptServiceTest
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
-    public void deleteMultipleReferencesChecksRights() throws Exception
+    void deleteMultipleReferencesChecksRights() throws Exception
     {
         EntityReference wikiReference = new WikiReference("someWiki");
 
@@ -171,17 +174,17 @@ public class SolrIndexScriptServiceTest
 
         // Note: Faking it. just using one reference but still calling the multiple references method (which is what we
         // wanted anyway)
-        this.service.delete(Arrays.asList(wikiReference));
+        this.service.delete(List.of(wikiReference));
 
         // Assert and verify
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
-    public void operationsChecksRightsWithOtherReferences() throws Exception
+    void operationsChecksRightsWithOtherReferences() throws Exception
     {
         EntityReference documentReference = new DocumentReference("someWiki", "space", "document");
 
@@ -193,17 +196,16 @@ public class SolrIndexScriptServiceTest
         // Actual rights check
         EntityReference wikiReference = documentReference.extractReference(EntityType.WIKI);
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
-    public void hasWikiAdminButNoProgrammingCausesRightsCheckFailure() throws Exception
+    void hasWikiAdminButNoProgrammingCausesRightsCheckFailure() throws Exception
     {
         EntityReference wikiReference = new WikiReference("someWiki");
 
         // Mock
-        doThrow(AccessDeniedException.class).when(this.mockAuthorization).checkAccess(Right.PROGRAM,
-            this.contentAuthorReference, null);
+        doThrow(AccessDeniedException.class).when(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
 
         // Call
         this.service.index(wikiReference);
@@ -212,16 +214,17 @@ public class SolrIndexScriptServiceTest
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
 
-        // Rights check failure
-        verify(this.logger).error(isNull(), any(AccessDeniedException.class));
+        // Rights check failure (AccessDeniedException has no message, so getMessage() returns null)
+        assertEquals(1, this.logCapture.size());
+        assertNull(this.logCapture.getMessage(0));
         verify(this.mockContext).put(eq(SolrIndexScriptService.CONTEXT_LASTEXCEPTION),
             any(AccessDeniedException.class));
     }
 
     @Test
-    public void hasProgrammingButNoWikiAdminCausesRightsCheckFailure() throws Exception
+    void hasProgrammingButNoWikiAdminCausesRightsCheckFailure() throws Exception
     {
         EntityReference wikiReference = new WikiReference("someWiki");
 
@@ -237,17 +240,18 @@ public class SolrIndexScriptServiceTest
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
         // hasProgrammingRights does not really get to be called, since hasWikiAdminRights already failed at this point
-        verify(this.mockAuthorization, times(0)).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager, never()).checkAccess(Right.PROGRAM);
 
         // Rights check failure.
-        verify(this.logger).error(isNull(), any(AccessDeniedException.class));
-        verify(this.mockContext).remove(eq(SolrIndexScriptService.CONTEXT_LASTEXCEPTION));
+        assertEquals(1, this.logCapture.size());
+        assertNull(this.logCapture.getMessage(0));
+        verify(this.mockContext).remove(SolrIndexScriptService.CONTEXT_LASTEXCEPTION);
         verify(this.mockContext).put(eq(SolrIndexScriptService.CONTEXT_LASTEXCEPTION),
             any(AccessDeniedException.class));
     }
 
     @Test
-    public void openrationsOnMultipleReferencesOnTheSameWikiChecksRightsOnlyOnceForThatWiki() throws Exception
+    void openrationsOnMultipleReferencesOnTheSameWikiChecksRightsOnlyOnceForThatWiki() throws Exception
     {
         // References from the same wiki
         WikiReference wikiReference = new WikiReference("wiki");
@@ -256,17 +260,17 @@ public class SolrIndexScriptServiceTest
         DocumentReference documentReference2 = new DocumentReference("wiki", "space", "name2");
 
         // Call
-        this.service.index(Arrays.asList(wikiReference, spaceReference, documentReference, documentReference2));
+        this.service.index(List.of(wikiReference, spaceReference, documentReference, documentReference2));
 
         // Assert and verify
 
         // Actual rights check
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference);
-        verify(this.mockAuthorization).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager).checkAccess(Right.PROGRAM);
     }
 
     @Test
-    public void openrationsOnMultipleReferencesOnDifferentWikisChecksRightsOnEachWiki() throws Exception
+    void openrationsOnMultipleReferencesOnDifferentWikisChecksRightsOnEachWiki() throws Exception
     {
         // References from 3 different wikis
         WikiReference wikiReference1 = new WikiReference("wiki");
@@ -278,7 +282,7 @@ public class SolrIndexScriptServiceTest
 
         // Call
         this.service.index(
-            Arrays.asList(wikiReference1, spaceReference, wikiReference2, documentReference, documentReference2));
+            List.of(wikiReference1, spaceReference, wikiReference2, documentReference, documentReference2));
 
         // Assert and verify
 
@@ -286,11 +290,11 @@ public class SolrIndexScriptServiceTest
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference1);
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference2);
         verify(this.mockAuthorization).checkAccess(Right.ADMIN, this.userReference, wikiReference3);
-        verify(this.mockAuthorization, times(3)).checkAccess(Right.PROGRAM, this.contentAuthorReference, null);
+        verify(this.contextualAuthorizationManager, times(3)).checkAccess(Right.PROGRAM);
     }
 
     @Test
-    public void resolveWithImplicitType() throws Exception
+    void resolveWithImplicitType()
     {
         SolrDocument document = new SolrDocument();
         Object[] parameters = new Object[] {};
@@ -300,10 +304,9 @@ public class SolrIndexScriptServiceTest
         document.setField(FieldUtils.TYPE, "foo");
         assertNull(this.service.resolve(document, parameters));
 
-        EntityReferenceResolver<SolrDocument> solrEntityReferenceResolver =
-            this.mocker.getInstance(SolrEntityReferenceResolver.TYPE);
         EntityReference spaceReference = new EntityReference("bar", EntityType.SPACE);
-        when(solrEntityReferenceResolver.resolve(document, EntityType.SPACE, parameters)).thenReturn(spaceReference);
+        when(this.solrEntityReferenceResolver.resolve(document, EntityType.SPACE, parameters))
+            .thenReturn(spaceReference);
 
         document.setField(FieldUtils.TYPE, "SPACE");
         assertSame(spaceReference, this.service.resolve(document, parameters));

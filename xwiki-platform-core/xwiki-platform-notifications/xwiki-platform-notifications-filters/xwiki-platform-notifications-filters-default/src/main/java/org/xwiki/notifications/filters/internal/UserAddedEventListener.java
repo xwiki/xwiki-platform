@@ -113,7 +113,6 @@ public class UserAddedEventListener extends AbstractEventListener
         for (NotificationFilterPreference filterPreference : filterPreferences) {
             DefaultNotificationFilterPreference preference =
                 new DefaultNotificationFilterPreference(filterPreference, false);
-            preference.setProviderHint(UserProfileNotificationFilterPreferenceProvider.HINT);
             userFilterPreferences.add(preference);
         }
         this.notificationFilterPreferenceManager.saveFilterPreferences(userDocReference, userFilterPreferences);

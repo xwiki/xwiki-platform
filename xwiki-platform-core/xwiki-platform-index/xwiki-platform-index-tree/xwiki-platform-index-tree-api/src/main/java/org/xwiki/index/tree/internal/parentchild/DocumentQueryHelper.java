@@ -31,6 +31,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -75,8 +76,8 @@ public class DocumentQueryHelper
         throws QueryException
     {
         String fromClause = "";
-        List<String> finalConstraints = new ArrayList<String>();
-        Map<String, Object> finalParameters = new HashMap<String, Object>();
+        List<String> finalConstraints = new ArrayList<>();
+        Map<String, Object> finalParameters = new HashMap<>();
         String xclass = (String) config.get("filterByClass");
         if (!StringUtils.isEmpty(xclass)) {
             fromClause = ", BaseObject as obj";
@@ -84,7 +85,7 @@ public class DocumentQueryHelper
             finalConstraints.add("obj.className = :class");
             finalConstraints.add("doc.fullName <> :template");
             finalParameters.put("class", xclass);
-            finalParameters.put("template", StringUtils.removeEnd(xclass, "Class") + "Template");
+            finalParameters.put("template", Strings.CS.removeEnd(xclass, "Class") + "Template");
         }
         finalConstraints.addAll(constraints);
         finalParameters.putAll(parameters);
@@ -116,7 +117,7 @@ public class DocumentQueryHelper
     {
         query.setOffset(offset);
         query.setLimit(limit);
-        List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
+        List<DocumentReference> documentReferences = new ArrayList<>();
         for (Object result : query.execute()) {
             documentReferences.add(this.explicitDocumentReferenceResolver.resolve((String) result, parentReference));
         }

@@ -26,6 +26,7 @@ import java.util.Iterator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
 
@@ -36,6 +37,7 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -52,12 +54,15 @@ class XWikiDocumentArchiveTest
 {
     private XWikiContext context;
 
+    private MemoryConfigurationSource xwikicfg;
+
     @BeforeEach
-    void setUp(MockitoOldcore mockitoOldcore) throws Exception
+    void setUp(MockitoOldcore mockitoOldcore)
     {
         this.context = mockitoOldcore.getXWikiContext();
+        this.xwikicfg = mockitoOldcore.registerMockXWikiCfg();
     }
-    
+
     /**
      * JRCS uses the user.name system property to set the author of a change. Verify that it
      * works if the user name has a space in its name. This used to fail and this test is here to
@@ -68,91 +73,92 @@ class XWikiDocumentArchiveTest
     @Test
     void updateArchiveWhenSpaceInUsername() throws Exception
     {
-        String originalArchive = "head\t1.1;\n" +
-            "access;\n" +
-            "symbols;\n" +
-            "locks; strict;\n" +
-            "comment\t@# @;\n" +
-            "\n" +
-            "\n" +
-            "1.1\n" +
-            "date\t2007.02.14.14.01.57;\tauthor vmassol;\tstate Exp;\n" +
-            "branches;\n" +
-            "next\t;\n" +
-            "\n" +
-            "\n" +
-            "desc\n" +
-            "@@\n" +
-            "\n" +
-            "\n" +
-            "1.1\n" +
-            "log\n" +
-            "@KnowledgeBase.WebHome\n" +
-            "@\n" +
-            "text\n" +
-            "@<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
-            "\n" +
-            "<xwikidoc>\n" +
-            "<web>KnowledgeBase</web>\n" +
-            "<name>WebHome</name>\n" +
-            "<language></language>\n" +
-            "<defaultLanguage>en</defaultLanguage>\n" +
-            "<translation>0</translation>\n" +
-            "<parent>Main.Notes</parent>\n" +
-            "<creator>XWiki.Admin</creator>\n" +
-            "<author>XWiki.Admin</author>\n" +
-            "<customClass></customClass>\n" +
-            "<contentAuthor>XWiki.Admin</contentAuthor>\n" +
-            "<creationDate>1165874272000</creationDate>\n" +
-            "<date>1166177448000</date>\n" +
-            "<contentUpdateDate>1171458116000</contentUpdateDate>\n" +
-            "<version>1.1</version>\n" +
-            "<title></title>\n" +
-            "<template></template>\n" +
-            "<defaultTemplate></defaultTemplate>\n" +
-            "<validationScript></validationScript>\n" +
-            "<object>\n" +
-            "<class>\n" +
-            "<name>XWiki.TagClass</name>\n" +
-            "<customClass></customClass>\n" +
-            "<customMapping></customMapping>\n" +
-            "<defaultViewSheet></defaultViewSheet>\n" +
-            "<defaultEditSheet></defaultEditSheet>\n" +
-            "<defaultWeb></defaultWeb>\n" +
-            "<nameField></nameField>\n" +
-            "<validationScript></validationScript>\n" +
-            "<tags>\n" +
-            "<name>tags</name>\n" +
-            "<prettyName>Tags</prettyName>\n" +
-            "<unmodifiable>0</unmodifiable>\n" +
-            "<relationalStorage>1</relationalStorage>\n" +
-            "<displayType>checkbox</displayType>\n" +
-            "<multiSelect>1</multiSelect>\n" +
-            "<size>30</size>\n" +
-            "<separator> </separator>\n" +
-            "<separators> ,|</separators>\n" +
-            "<values></values>\n" +
-            "<number>1</number>\n" +
-            "<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>\n" +
-            "</tags>\n" +
-            "</class>\n" +
-            "<name>KnowledgeBase.WebHome</name>\n" +
-            "<number>0</number>\n" +
-            "<className>XWiki.TagClass</className>\n" +
-            "<property>\n" +
-            "<tags/>\n" +
-            "</property>\n" +
-            "</object>\n" +
-            "<content>1 Wiki Knowledge Base\n" +
-            "\n" +
-            "This is the Wiki Knowledge Base, where you can start writing about your favorite subjects.\n" +
-            "\n" +
-            "To create new pages, click edit button and write links using brackets around words.\n" +
-            "\n" +
-            "* [Example Link 1]\n" +
-            "* [Example Link 2]</content>\n" +
-            "</xwikidoc>\n" +
-            "@";
+        String originalArchive = """
+            head\t1.1;
+            access;
+            symbols;
+            locks; strict;
+            comment\t@# @;
+            
+            
+            1.1
+            date\t2007.02.14.14.01.57;\tauthor vmassol;\tstate Exp;
+            branches;
+            next\t;
+            
+            
+            desc
+            @@
+            
+            
+            1.1
+            log
+            @KnowledgeBase.WebHome
+            @
+            text
+            @<?xml version="1.0" encoding="ISO-8859-1"?>
+            
+            <xwikidoc>
+            <web>KnowledgeBase</web>
+            <name>WebHome</name>
+            <language></language>
+            <defaultLanguage>en</defaultLanguage>
+            <translation>0</translation>
+            <parent>Main.Notes</parent>
+            <creator>XWiki.Admin</creator>
+            <author>XWiki.Admin</author>
+            <customClass></customClass>
+            <contentAuthor>XWiki.Admin</contentAuthor>
+            <creationDate>1165874272000</creationDate>
+            <date>1166177448000</date>
+            <contentUpdateDate>1171458116000</contentUpdateDate>
+            <version>1.1</version>
+            <title></title>
+            <template></template>
+            <defaultTemplate></defaultTemplate>
+            <validationScript></validationScript>
+            <object>
+            <class>
+            <name>XWiki.TagClass</name>
+            <customClass></customClass>
+            <customMapping></customMapping>
+            <defaultViewSheet></defaultViewSheet>
+            <defaultEditSheet></defaultEditSheet>
+            <defaultWeb></defaultWeb>
+            <nameField></nameField>
+            <validationScript></validationScript>
+            <tags>
+            <name>tags</name>
+            <prettyName>Tags</prettyName>
+            <unmodifiable>0</unmodifiable>
+            <relationalStorage>1</relationalStorage>
+            <displayType>checkbox</displayType>
+            <multiSelect>1</multiSelect>
+            <size>30</size>
+            <separator> </separator>
+            <separators> ,|</separators>
+            <values></values>
+            <number>1</number>
+            <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+            </tags>
+            </class>
+            <name>KnowledgeBase.WebHome</name>
+            <number>0</number>
+            <className>XWiki.TagClass</className>
+            <property>
+            <tags/>
+            </property>
+            </object>
+            <content>1 Wiki Knowledge Base
+            
+            This is the Wiki Knowledge Base, where you can start writing about your favorite subjects.
+            
+            To create new pages, click edit button and write links using brackets around words.
+            
+            * [Example Link 1]
+            * [Example Link 2]</content>
+            </xwikidoc>
+            @""";
         
         XWikiDocumentArchive archive = new XWikiDocumentArchive(123456789L);
         archive.setArchive(originalArchive);
@@ -164,10 +170,10 @@ class XWikiDocumentArchiveTest
         doc.setContent(doc.getContent() + "\nsomething added");
         archive.updateArchive(doc, XWikiRightService.GUEST_USER_FULLNAME, new Date(), "some comment", null, context);
 
-        // Try to construct again the archive from the last modification. This will happen when
-        // XWiki loads a document from the database for example. We verify here that a username
-        // with a space works.
-        new XWikiDocumentArchive(123456789L).setArchive(archive.getArchive(context));
+        // Try to construct again the archive from the last modification. This will happen when XWiki loads a document
+        // from the database, for example. We verify here that a username with a space works and not cause an exception
+        // to be raised.
+        assertDoesNotThrow(() -> new XWikiDocumentArchive(123456789L).setArchive(archive.getArchive(context)));
     }
 
     @Test
@@ -290,8 +296,59 @@ class XWikiDocumentArchiveTest
     }
 
     @Test
-    void getNextFullVersions() throws XWikiException
+    void getNextFullVersions(MockitoOldcore mockitoOldcore) throws XWikiException
     {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
+        XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
+        doc.setDocumentArchive(archive);
+        String author = "XWiki.some author";
+
+        // We have a full version every 5 nodes, so we're injecting 15 versions
+        addRevisionToHistory(archive, doc, "content 1.1", author, "initial 1.1");
+
+        doc.setContent("content 2.1\nqwe @ ");
+        archive.updateArchive(doc, author, new Date(), "2.1", new Version(2,1), context);
+
+        doc.setContent("content 2.2\nqweq@ ");
+        archive.updateArchive(doc, author, new Date(), "2.2", new Version(2,2), context);
+
+        doc.setContent("content 2.3\nqweqe @@");
+        archive.updateArchive(doc, author, new Date(), "2.3", new Version(2,3), context);
+
+        doc.setContent("content 2.4\nqweqe @@");
+        archive.updateArchive(doc, author, new Date(), "2.4", new Version(2,4), context);
+
+        // 5 nodes so far,
+        // let's add 5
+
+        for (int i = 1; i <= 5; i++) {
+            String version = String.format("3.%s", i);
+            doc.setContent(version + "\nqweqe @@");
+            archive.updateArchive(doc, author, new Date(), version, new Version(version), context);
+        }
+
+        // let's add 7
+        for (int i = 1; i <= 7; i++) {
+            String version = String.format("4.%s", i);
+            doc.setContent(version + "\nqweqe @@");
+            archive.updateArchive(doc, author, new Date(), version, new Version(version), context);
+        }
+        assertEquals(new Version(4,7), archive.getLatestVersion());
+
+        assertEquals(new Version("2.3"), archive.getNextFullVersion(new Version("2.3")));
+        assertEquals(new Version("1.1"), archive.getNextFullVersion(new Version("1.1")));
+        assertEquals(new Version("2.1"), archive.getNextFullVersion(new Version("2.1")));
+        assertEquals(new Version("3.1"), archive.getNextFullVersion(new Version("3.1")));
+        assertEquals(new Version("4.6"), archive.getNextFullVersion(new Version("4.6")));
+        assertEquals(new Version("4.4"), archive.getNextFullVersion(new Version("4.4")));
+    }
+
+    @Test
+    void getNextFullVersionsWhenFullEvery5Versions(MockitoOldcore mockitoOldcore) throws XWikiException
+    {
+        // Change the configuration to create a full patch only every 5 versions
+        this.xwikicfg.setProperty("xwiki.store.rcs.nodesPerFull", 5);
+
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
         doc.setDocumentArchive(archive);
@@ -369,6 +426,51 @@ class XWikiDocumentArchiveTest
     @Test
     void verifyDiffAndFullRevisionAlgorithm() throws Exception
     {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
+        XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
+        doc.setDocumentArchive(archive);
+        String author = "XWiki.some author";
+
+        addRevisionToHistory(archive, doc, "content 1.1", author, "1.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 2.1", author, "2.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(2, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 3.1", author, "3.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(2, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(3, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 4.1", author, "4.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(2, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(3, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(4, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 5.1", author, "5.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(2, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(3, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(4, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(5, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 6.1", author, "6.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(2, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(3, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(4, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(5, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(6, 1)).isDiff());
+    }
+
+    @Test
+    void verifyDiffAndFullRevisionAlgorithmWhenFullEvery5Versions() throws Exception
+    {
+        // Change the configuration to create a full patch only every 5 versions
+        this.xwikicfg.setProperty("xwiki.store.rcs.nodesPerFull", 5);
+
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
         doc.setDocumentArchive(archive);

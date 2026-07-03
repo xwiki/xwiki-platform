@@ -27,9 +27,12 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MailStoreException;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -40,6 +43,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -64,26 +68,84 @@ class DatabaseMailStatusStoreTest
     private Provider<XWikiContext> xcontextProvider;
 
     @Test
-    void computeSelectQueryString()
+    void computeSelectQueryString() throws Exception
     {
         Map<String, Object> filterMap = new LinkedHashMap<>();
-        filterMap.put("status", "failed");
+        filterMap.put("state", "failed");
         filterMap.put("wiki", "mywiki");
 
         assertEquals(
-            "from org.xwiki.mail.MailStatus where mail_status like :status and mail_wiki like :wiki order by date desc",
+            "from org.xwiki.mail.MailStatus as mailStatus where mailStatus.state like :state and "
+                + "mailStatus.wiki like :wiki order by mailStatus.date desc",
             this.store.computeSelectQueryString(filterMap, "date", false));
     }
 
     @Test
-    void computeCountQueryString()
+    void computeCountQueryString() throws Exception
     {
         Map<String, Object> filterMap = new LinkedHashMap<>();
-        filterMap.put("status", "failed");
+        filterMap.put("state", "failed");
         filterMap.put("wiki", "mywiki");
 
-        assertEquals("select count(*) from org.xwiki.mail.MailStatus where mail_status like :status and "
-            + "mail_wiki like :wiki", this.store.computeCountQueryString(filterMap));
+        assertEquals("select count(*) from org.xwiki.mail.MailStatus as mailStatus where mailStatus.state like "
+            + ":state and mailStatus.wiki like :wiki", this.store.computeCountQueryString(filterMap));
+    }
+
+    @Test
+    void computeSelectQueryStringAcceptsStatusAlias() throws Exception
+    {
+        assertEquals(String.format("from %s as mailStatus where mailStatus.state like :state",
+            MailStatus.class.getName()),
+            this.store.computeSelectQueryString(Collections.singletonMap("status", "failed"), null, true));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"messageId", "batchId", "date", "recipients", "type", "state",
+        "errorSummary", "errorDescription", "wiki"})
+    void computeSelectQueryStringAllowsMailStatusSortFields(String sortableField) throws Exception
+    {
+        assertEquals(String.format("from %s as mailStatus order by mailStatus.%s", MailStatus.class.getName(),
+            sortableField),
+            this.store.computeSelectQueryString(Collections.emptyMap(), sortableField, true));
+    }
+
+    @Test
+    void computeSelectQueryStringAllowsMailStatusFilterFields() throws Exception
+    {
+        Map<String, Object> filterMap = new LinkedHashMap<>();
+        filterMap.put("messageId", "messageId");
+        filterMap.put("batchId", "batchId");
+        filterMap.put("date", "date");
+        filterMap.put("recipients", "recipients");
+        filterMap.put("type", "type");
+        filterMap.put("state", "state");
+        filterMap.put("errorSummary", "errorSummary");
+        filterMap.put("errorDescription", "errorDescription");
+        filterMap.put("wiki", "wiki");
+
+        assertEquals("from org.xwiki.mail.MailStatus as mailStatus where mailStatus.messageId like :messageId "
+            + "and mailStatus.batchId like :batchId and mailStatus.date like :date and mailStatus.recipients "
+            + "like :recipients and mailStatus.type like :type and mailStatus.state like :state and "
+            + "mailStatus.errorSummary like :errorSummary and mailStatus.errorDescription like :errorDescription "
+            + "and mailStatus.wiki like :wiki",
+            this.store.computeSelectQueryString(filterMap, null, true));
+    }
+
+    @Test
+    void computeSelectQueryStringIgnoresUnsupportedSortField() throws Exception
+    {
+        assertEquals(String.format("from %s as mailStatus", MailStatus.class.getName()),
+            this.store.computeSelectQueryString(Collections.emptyMap(), "date desc, (select 1)", true));
+    }
+
+    @Test
+    void computeSelectQueryStringRejectsUnsupportedFilterField()
+    {
+        Map<String, Object> filterMap = Map.of("state or 1=1", "failed");
+        MailStoreException exception = assertThrows(MailStoreException.class, () ->
+            this.store.computeSelectQueryString(filterMap, "date", true));
+
+        assertEquals("Unsupported mail status filter field [state or 1=1]", exception.getMessage());
     }
 
     @Test
@@ -111,8 +173,9 @@ class DatabaseMailStatusStoreTest
 
         // The test is here, we verify that debug logs are correct
         assertEquals(2, this.logCapture.size());
-        assertEquals("Find mail statuses for query [from org.xwiki.mail.MailStatus where mail_status like :status "
-            + "and mail_wiki like :wiki] and parameters [[status] = [failed], [wiki] = [mywiki]]",
+        assertEquals("Find mail statuses for query [from org.xwiki.mail.MailStatus as mailStatus where "
+            + "mailStatus.state like :state and mailStatus.wiki like :wiki] and parameters [[state] = [failed], "
+            + "[wiki] = [mywiki]]",
             this.logCapture.getMessage(0));
         assertEquals("Loaded mail status [messageId = [messageid], batchId = [batchid], state = [prepare_success], "
             + "date = [<null>], recipients = [recipients]]", this.logCapture.getMessage(1));

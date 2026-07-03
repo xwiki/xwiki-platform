@@ -54,6 +54,8 @@ import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserProperties;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -121,7 +123,7 @@ class XWikiTest
     private XWiki xwiki;
 
     @AfterComponent
-    public void afterComponent() throws Exception
+    void afterComponent() throws Exception
     {
         MockitoComponentManager componentManager = this.oldcore.getMocker();
 
@@ -141,7 +143,7 @@ class XWikiTest
     }
 
     @BeforeEach
-    protected void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.document = new XWikiDocument(new DocumentReference("Wiki", "MilkyWay", "Fidis"));
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequestStub());
@@ -153,7 +155,7 @@ class XWikiTest
         this.xwiki = this.oldcore.getSpyXWiki();
 
         // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
-        // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
+        // the Velocity init would fail (since, by default, the macros.vm templates wouldn't be found as we're
         // not providing it in our unit test resources).
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.render.velocity.macrolist", "");
 
@@ -180,7 +182,7 @@ class XWikiTest
         this.xwiki.setUserDefaultGroup("XWiki.user1", this.oldcore.getXWikiContext());
 
         // then
-        verify(this.xwiki, times(0)).addUserToGroup(anyString(), anyString(), any(XWikiContext.class));
+        verify(this.xwiki, never()).addUserToGroup(anyString(), anyString(), any(XWikiContext.class));
     }
 
     @Test
@@ -197,7 +199,7 @@ class XWikiTest
         this.xwiki.setUserDefaultGroup("XWiki.user1", this.oldcore.getXWikiContext());
 
         // then
-        verify(this.xwiki, times(1)).addUserToGroup("XWiki.user1", "XWiki.XWikiAllGroup",
+        verify(this.xwiki).addUserToGroup("XWiki.user1", "XWiki.XWikiAllGroup",
             this.oldcore.getXWikiContext());
     }
 
@@ -1091,13 +1093,14 @@ class XWikiTest
             new DocumentReference(targetReference, Locale.GERMAN), xWikiContext);
 
         // Test links
-        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference);
+        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference,
+            Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
-            targetReference, false);
+            targetReference, false, Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,
-            targetReference, false);
+            targetReference, false, Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc3.getXDOM(), reference3, sourceReference,
-            targetReference, false);
+            targetReference, false, Map.of(sourceReference, targetReference));
 
         assertTrue(this.xwiki
             .getDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME), this.oldcore.getXWikiContext()).isNew());
@@ -1107,5 +1110,21 @@ class XWikiTest
             this.xwiki.getDocument(reference4, this.oldcore.getXWikiContext()).getParent());
         assertEquals(new DocumentReference("newwikiname", "newspace", "newpage"),
             this.xwiki.getDocument(reference5, this.oldcore.getXWikiContext()).getParentReference());
+    }
+
+    @Test
+    void formatDate()
+    {
+        Date date = new Date(1718887539000L);
+        String expectedResult = "2024/06/20 12:45";
+        this.oldcore.getMockWikiConfigurationSource().setProperty("default_language", "fr_CA");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.timezone", "BRT");
+        when(this.oldcore.getMockAllUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE))
+            .thenReturn(mock(UserProperties.class));
+        assertEquals(expectedResult, this.xwiki.formatDate(date, null, this.oldcore.getXWikiContext()));
+
+        String format = "EEEE dd MMMM YYYY HH:mm:ss";
+        assertEquals("jeudi 20 juin 2024 12:45:39",
+            this.xwiki.formatDate(date, format, this.oldcore.getXWikiContext()));
     }
 }

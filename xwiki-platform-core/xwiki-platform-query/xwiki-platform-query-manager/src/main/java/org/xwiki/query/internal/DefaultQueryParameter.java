@@ -22,6 +22,8 @@ package org.xwiki.query.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryParameter;
 
@@ -95,5 +97,28 @@ public class DefaultQueryParameter implements QueryParameter
     public Query query()
     {
         return this.query;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DefaultQueryParameter that = (DefaultQueryParameter) o;
+
+        return new EqualsBuilder().append(parts, that.parts).append(query, that.query)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 95).append(parts).append(query).toHashCode();
     }
 }

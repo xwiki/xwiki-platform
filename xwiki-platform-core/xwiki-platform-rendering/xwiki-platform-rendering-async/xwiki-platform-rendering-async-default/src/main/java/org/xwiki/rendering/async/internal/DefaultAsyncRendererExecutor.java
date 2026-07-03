@@ -36,6 +36,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.CacheControl;
@@ -66,6 +67,8 @@ import com.xpn.xwiki.internal.context.XWikiContextContextStore;
 @Singleton
 public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 {
+    private static final int CLIENT_ID_RANDOM_LENGTH = 8;
+
     @Inject
     @Named(AsyncRendererJobStatus.JOBTYPE)
     private Provider<Job> jobProvider;
@@ -102,7 +105,8 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
     private String newClientId()
     {
-        return String.valueOf(this.clientIdCount.incrementAndGet());
+        return String.format("%s%s", RandomStringUtils.secure().nextAlphanumeric(CLIENT_ID_RANDOM_LENGTH),
+            this.clientIdCount.incrementAndGet());
     }
 
     @Override
@@ -397,11 +401,9 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             boolean encode = false;
 
             switch (c) {
-                // '/' and '\' has been known to cause issues with various default server setup (Tomcat for example)
-                case '/':
-                case '\\':
+                // '/' and '\' have been known to cause issues with various default server setup (Tomcat for example)
+                case '/', '\\':
                     encode = true;
-
                     break;
 
                 default:

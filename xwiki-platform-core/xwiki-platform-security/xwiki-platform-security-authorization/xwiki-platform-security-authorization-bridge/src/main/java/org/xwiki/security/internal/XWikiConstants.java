@@ -29,6 +29,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
  * @version $Id$
  * @since 4.0M2
  */
+// Old interface not describing a type, hard to remove for backward-compatibility reasons.
+@SuppressWarnings("checkstyle:InterfaceIsType")
 public interface XWikiConstants
 {
     /** Name of the space where user document and global preferences is stored. */

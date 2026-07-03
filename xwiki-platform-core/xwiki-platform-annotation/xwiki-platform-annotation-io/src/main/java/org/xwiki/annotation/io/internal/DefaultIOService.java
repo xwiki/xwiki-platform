@@ -127,6 +127,8 @@ public class DefaultIOService implements IOService
             // now get the document with that name
             XWikiContext xcontext = getXWikiContext();
             XWikiDocument document = xcontext.getWiki().getDocument(documentFullName, xcontext);
+            // Avoid modifying the cached document
+            document = document.clone();
             // create a new object in this document to hold the annotation
             // Make sure to use a relative reference when creating the XObject, since we can`t use absolute references
             // for an object's class. This avoids ugly log warning messages.
@@ -165,7 +167,7 @@ public class DefaultIOService implements IOService
             // Note: We make sure to only provide a few characters of contextual information in order to control the
             // size of the comment (we display the first 30 characters).
             xcontext.getWiki().saveDocument(document, "Added annotation on \""
-                + StringUtils.abbreviate(annotation.getSelection(), 30) + "\"", xcontext);
+                + StringUtils.abbreviate(annotation.getSelection(), 30) + "\"", true, xcontext);
         } catch (XWikiException e) {
             throw new IOServiceException("An exception message has occurred while saving the annotation", e);
         }
@@ -304,6 +306,9 @@ public class DefaultIOService implements IOService
                 // if the document doesn't exist already skip it
                 return;
             }
+            // Avoid modifying the cached document
+            document = document.clone();
+
             // and the document object on it
             BaseObject annotationObject =
                 document.getXObject(this.configuration.getAnnotationClassReference(),
@@ -316,7 +321,7 @@ public class DefaultIOService implements IOService
                 document.removeObject(annotationObject);
                 document.setAuthor(deprecatedContext.getUser());
                 deprecatedContext.getWiki().saveDocument(document, "Deleted annotation " + annotationID,
-                    deprecatedContext);
+                    true, deprecatedContext);
             }
         } catch (NumberFormatException e) {
             throw new IOServiceException("An exception has occurred while parsing the annotation id", e);
@@ -350,6 +355,8 @@ public class DefaultIOService implements IOService
             // get the document pointed to by the target
             XWikiContext deprecatedContext = getXWikiContext();
             XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
+            // Avoid modifying the cached document
+            document = document.clone();
             List<String> updateNotifs = new ArrayList<>();
             boolean updated = false;
             for (Annotation annotation : annotations) {
@@ -370,7 +377,7 @@ public class DefaultIOService implements IOService
             if (updated) {
                 // set the author of the document to the current user
                 document.setAuthor(deprecatedContext.getUser());
-                deprecatedContext.getWiki().saveDocument(document, "Updated annotations", deprecatedContext);
+                deprecatedContext.getWiki().saveDocument(document, "Updated annotations", true, deprecatedContext);
             }
         } catch (XWikiException e) {
             throw new IOServiceException("An exception has occurred while updating the annotation", e);
@@ -427,6 +434,7 @@ public class DefaultIOService implements IOService
      * @return {@code true} if any modification was done on this object, {@code false} otherwise
      */
     protected boolean updateObject(BaseObject object, Annotation annotation, XWikiContext deprecatedContext)
+        throws XWikiException
     {
         boolean updated = false;
         // TODO: there's an issue here to solve with (custom) types which need to be serialized before saved. Some do,
@@ -463,6 +471,7 @@ public class DefaultIOService implements IOService
      * @return {@code true} if the field was set to newValue, {@code false} otherwise
      */
     protected boolean setIfNotNull(BaseObject object, String fieldName, Object newValue, XWikiContext deprecatedContext)
+        throws XWikiException
     {
         if (newValue != null) {
             object.set(fieldName, newValue, deprecatedContext);

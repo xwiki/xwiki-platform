@@ -17,6 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+// Mock modules defined in the XWiki WAR (so not in a WebJar that could be listed as dependency).
+XWiki = window.XWiki || {
+  contextPath: '/xwiki',
+  currentWiki: 'xwiki',
+  Document: function() {
+    this.getURL = () => '';
+  }
+};
+
+define('xwiki-meta', {});
+
+define('xwiki-page-ready', {
+  delayPageReady: () => {},
+  getPendingDelays: () => new Map(),
+  afterPageReady: callback => callback()
+});
+
+define('xwiki-events-bridge', {});
+
 define(['jquery', 'ckeditor'], function($, CKEDITOR) {
   return {
     createEditor: function(done, config) {

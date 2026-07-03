@@ -45,6 +45,7 @@ panels._actions=Действия
 ### Missing: panels.emptyvalue=
 panels.children.title=Дочерние страницы
 panels.siblings.title=Родственные страницы
+panels.customize=Вы можете настроить боковую колонку (колонки) с помощью {0}
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

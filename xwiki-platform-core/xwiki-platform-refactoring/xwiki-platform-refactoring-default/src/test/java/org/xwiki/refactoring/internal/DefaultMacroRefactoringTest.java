@@ -152,11 +152,12 @@ class DefaultMacroRefactoringTest
         });
         assertEquals(Optional.empty(),
             this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference,
-                this.sourceReference, this.targetReference, true));
+                this.sourceReference, this.targetReference, true, Map.of()));
         assertEquals(Optional.empty(),
             this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference,
-                this.sourceReference, this.targetReference, false));
-        verify(this.referenceRenamer, never()).renameReferences(any(), any(), any(DocumentReference.class), any(), anyBoolean());
+                this.sourceReference, this.targetReference, false, Map.of()));
+        verify(this.referenceRenamer, never()).renameReferences(any(), any(), any(DocumentReference.class), any(),
+            anyBoolean(), any());
     }
 
     @Test
@@ -186,10 +187,10 @@ class DefaultMacroRefactoringTest
             return xdom;
         });
         when(this.referenceRenamer.renameReferences(xdom, this.currentDocumentReference, this.sourceReference,
-            this.targetReference, true)).thenReturn(false);
+            this.targetReference, true, Map.of())).thenReturn(false);
         assertEquals(Optional.empty(),
             this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference, this.sourceReference,
-                this.targetReference, true));
+                this.targetReference, true, Map.of()));
         verify(this.blockRenderer, never()).render(any(Block.class), any());
     }
 
@@ -211,7 +212,7 @@ class DefaultMacroRefactoringTest
             return xdom;
         });
         when(this.referenceRenamer.renameReferences(xdom, this.currentDocumentReference, this.sourceReference,
-            this.targetReference, true)).thenReturn(true);
+            this.targetReference, true, Map.of())).thenReturn(true);
         String expectedContent = "the expected content";
         doAnswer(invocationOnMock -> {
             WikiPrinter printer = invocationOnMock.getArgument(1);
@@ -232,7 +233,7 @@ class DefaultMacroRefactoringTest
         MacroBlock expectedBlock = new MacroBlock(this.macroId, parameters, expectedContent, false);
         assertEquals(Optional.of(expectedBlock),
             this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference, this.sourceReference,
-                this.targetReference, true));
+                this.targetReference, true, Map.of()));
     }
 
     @Test

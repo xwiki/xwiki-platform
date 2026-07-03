@@ -49,7 +49,6 @@ import com.xpn.xwiki.XWikiContext;
  */
 public abstract class AbstractTestWiki
 {
-
     /** The subdirectory in the classpath were the test wiki definitions will be found. */
     private final static String TEST_WIKI_DEFINITIONS_DIRECTORY = "testwikis";
 
@@ -63,12 +62,12 @@ public abstract class AbstractTestWiki
      * The object (wiki, space or document) that have access control objects that is currently being parsed and built is
      * at the top of this stack.
      */
-    private final Stack<HasAcl> currentRightsHolder = new Stack<HasAcl>();
+    private final Stack<HasAcl> currentRightsHolder = new Stack<>();
 
     /**
      * The object (wiki or group) that have users that is currently being parsed and built is at the top of this stack.
      */
-    private final Stack<HasUsers> currentUsersHolder = new Stack<HasUsers>();
+    private final Stack<HasUsers> currentUsersHolder = new Stack<>();
 
     /**
      * Add a wiki definition.
@@ -260,12 +259,14 @@ public abstract class AbstractTestWiki
                            String name = attributes.getValue("name");
                            String creator = attributes.getValue("creator");
                            String alt = attributes.getValue("alt");
+                           boolean enforceRequiredRights =
+                               Boolean.parseBoolean(attributes.getValue("enforceRequiredRights"));
 
                            if (creator == null) {
                                creator = "XWiki.Admin";
                            }
 
-                           HasAcl document = currentSpace.addDocument(name, creator, alt);
+                           HasAcl document = currentSpace.addDocument(name, creator, enforceRequiredRights, alt);
                            currentRightsHolder.push(document);
                        }
 
@@ -309,7 +310,20 @@ public abstract class AbstractTestWiki
                        public void addRight(HasAcl rightsHolder, String name, String type) {
                            rightsHolder.addDenyGroup(name, type);
                        }
-                   });
+                   })
+                .declare("requiredRight", new AbstractElementBuilder()
+                {
+                    @Override
+                    public void startElement(Attributes attributes)
+                    {
+                        HasAcl rightsHolder = AbstractTestWiki.this.currentRightsHolder.peek();
+                        if (rightsHolder instanceof HasRequiredRights hasRequiredRights) {
+                            String type = attributes.getValue("type");
+                            String scope = attributes.getValue("scope");
+                            hasRequiredRights.addRequiredRight(type, scope != null ? scope : "document");
+                        }
+                    }
+                });
 
         }
 

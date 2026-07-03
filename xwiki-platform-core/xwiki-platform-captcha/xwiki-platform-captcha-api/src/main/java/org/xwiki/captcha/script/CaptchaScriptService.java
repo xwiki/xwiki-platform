@@ -32,7 +32,7 @@ import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
 
 /**

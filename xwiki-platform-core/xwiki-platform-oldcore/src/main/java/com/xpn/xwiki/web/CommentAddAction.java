@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.captcha.Captcha;
@@ -115,7 +116,7 @@ public class CommentAddAction extends XWikiAction
                 String author = ((BaseProperty) object.get(AUTHOR_PROPERTY_NAME)).getValue() + "";
                 author = StringUtils.remove(author, ':');
                 while (author.startsWith(USER_SPACE_PREFIX)) {
-                    author = StringUtils.removeStart(author, USER_SPACE_PREFIX);
+                    author = Strings.CS.removeStart(author, USER_SPACE_PREFIX);
                 }
                 // We need to make sure the author will fit in a String property, this is mostly a protection against
                 // spammers who try to put large texts in this field
@@ -190,6 +191,7 @@ public class CommentAddAction extends XWikiAction
         }
     }
 
+    @Deprecated(since = "17.0.0RC1")
     protected void handleTemporaryUploadedFiles(XWikiDocument document, XWikiRequest request) throws XWikiException
     {
         String[] uploadedFiles = request.getParameterValues("uploadedFiles");

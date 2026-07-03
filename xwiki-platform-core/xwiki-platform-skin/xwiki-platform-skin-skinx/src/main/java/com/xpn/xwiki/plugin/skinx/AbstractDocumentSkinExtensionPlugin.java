@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +45,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
@@ -87,7 +88,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
      */
     private final List<Event> events = new ArrayList<>(3);
 
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
     private DocumentReferenceResolver<String> stringDocumentReferenceResolver;
     private EntityReferenceResolver<String> currentEntityReferenceResolver;
 
@@ -219,8 +220,8 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                     try {
                         XWikiDocument doc = context.getWiki().getDocument(extension, context);
                         // Only add the extension as being "always used" if the page holding it has been saved with
-                        // programming rights.
-                        if (getAuthorizationManager().hasAccess(Right.PROGRAM,
+                        // wiki admin rights.
+                        if (getAuthorizationManager().hasAccess(Right.ADMIN, EntityType.WIKI,
                             doc.getAuthorReference(), doc.getDocumentReference())) {
                             extensions.add(extension);
                         }
@@ -244,7 +245,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         XWikiDocument doc = context.getDoc();
         boolean result = false;
         if (doc != null && this.hasCurrentPageExtensionObjects(doc)) {
-            if (getAuthorizationManager().hasAccess(Right.SCRIPT, doc.getAuthorReference(),
+            if (getAuthorizationManager().hasAccess(Right.SCRIPT, EntityType.DOCUMENT, doc.getAuthorReference(),
                 doc.getDocumentReference())) {
                 result = true;
             } else {
@@ -268,7 +269,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                 if (obj == null) {
                     continue;
                 }
-                if (StringUtils.equals(obj.getStringValue(USE_FIELDNAME), "currentPage")) {
+                if (Strings.CS.equals(obj.getStringValue(USE_FIELDNAME), "currentPage")) {
                     return true;
                 }
             }
@@ -296,10 +297,10 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         return this.stringDocumentReferenceResolver;
     }
 
-    private AuthorizationManager getAuthorizationManager()
+    private DocumentAuthorizationManager getAuthorizationManager()
     {
         if (this.authorizationManager == null) {
-            this.authorizationManager = Utils.getComponent(AuthorizationManager.class);
+            this.authorizationManager = Utils.getComponent(DocumentAuthorizationManager.class);
         }
         return this.authorizationManager;
     }
@@ -312,7 +313,8 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         try {
             XWikiDocument document = context.getWiki().getDocument(documentReference, context);
             DocumentReference authorReference = document.getAuthorReference();
-            return getAuthorizationManager().hasAccess(Right.SCRIPT, authorReference, documentReference);
+            return getAuthorizationManager().hasAccess(Right.SCRIPT, EntityType.DOCUMENT, authorReference,
+                documentReference);
         } catch (XWikiException e) {
             LOGGER.error("Error while loading [{}] for checking script right: [{}]", documentReference,
                 ExceptionUtils.getRootCauseMessage(e));
@@ -385,13 +387,13 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         if (document.getObject(getExtensionClassName()) != null) {
             // new or already existing object
             if (document.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
-                if (getAuthorizationManager().hasAccess(Right.PROGRAM,
+                if (getAuthorizationManager().hasAccess(Right.ADMIN, EntityType.WIKI,
                     document.getAuthorReference(), document.getDocumentReference())) {
                     getAlwaysUsedExtensions().add(document.getDocumentReference());
 
                     return;
                 } else {
-                    // in case the extension lost its programming rights upon this save.
+                    // in case the extension lost wiki admin right upon this save.
                     remove = true;
                 }
             } else {

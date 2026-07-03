@@ -41,14 +41,14 @@
 == HTML ==
 
 {{comment}}будь ласка, не перекладайте підзаголовки{{/comment}}
-=== HTML 1.0 ===
+=== 1.0 HTML ===
 
 {{info}}У XWiki Syntax 1.0 можна вводити HTML-розмітку безпосередньо в текст.{{/info}}
 
 |=Синтаксис XWiki 1.0|=Результат
 |&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;|{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}}
 
-=== HTML 2.0 ===
+=== 2.0 HTML ===
 
 {{info}}У синтаксисі XWiki {{velocity}}$crtSyntaxVer{{/velocity}} HTML або XHTML потрібно вводити за допомогою [[HTML макроса&gt;&gt;https://extensions.xwiki.org/xwiki/bin/ view/Extension/HTML%20Macro]].{{/info}}
 

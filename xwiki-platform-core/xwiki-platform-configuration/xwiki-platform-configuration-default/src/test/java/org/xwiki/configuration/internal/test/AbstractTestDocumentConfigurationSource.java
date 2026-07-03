@@ -28,16 +28,12 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -45,9 +41,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -56,6 +52,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@ReferenceComponentList
 public abstract class AbstractTestDocumentConfigurationSource
 {
     @InjectMockitoOldcore
@@ -80,8 +77,8 @@ public abstract class AbstractTestDocumentConfigurationSource
     @BeforeComponent
     public void beforeComponent() throws Exception
     {
-        this.mockCache = mock(Cache.class);
-        when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(this.mockCache);
+        this.mockCache = mock();
+        when(this.cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(this.mockCache);
     }
 
     public void before() throws Exception
@@ -91,13 +88,7 @@ public abstract class AbstractTestDocumentConfigurationSource
         when(this.mockConverter.convert(any(Type.class), any(Object.class))).then(
             invocation -> invocation.getArguments()[1]);
 
-        WikiDescriptorManager wikiManager = this.componentManager.getInstance(WikiDescriptorManager.class);
-        when(wikiManager.getCurrentWikiId()).thenReturn(CURRENT_WIKI);
-
-        DocumentReferenceResolver<EntityReference> mockCurrentEntityResolver =
-            this.componentManager.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
-        when(mockCurrentEntityResolver.resolve(eq(getClassReference()), any(DocumentReference.class))).thenReturn(
-            new DocumentReference(getClassReference(), new WikiReference(CURRENT_WIKI)));
+        this.oldcore.getXWikiContext().setWikiId(CURRENT_WIKI);
     }
 
     protected void setupBaseObject(DocumentReference documentReference, Consumer<BaseObject> consumer)
@@ -109,7 +100,6 @@ public abstract class AbstractTestDocumentConfigurationSource
         BaseObject baseObject = document.getXObject(classReference);
         if (baseObject == null) {
             baseObject = new BaseObject();
-            baseObject.setDocumentReference(documentReference);
             baseObject.setXClassReference(classReference);
             document.addXObject(baseObject);
         }
@@ -129,14 +119,14 @@ public abstract class AbstractTestDocumentConfigurationSource
     protected void setStringProperty(DocumentReference documentReference, String propertyName, String propertyValue)
         throws XWikiException
     {
-        setupBaseObject(documentReference, (baseObject) -> {
+        setupBaseObject(documentReference, baseObject -> {
             baseObject.setStringValue(propertyName, propertyValue);
         });
     }
 
     protected void resetCache()
     {
-        this.mockCache = mock(Cache.class);
+        this.mockCache = mock();
     }
 
     protected void setCache(String property, Object value)

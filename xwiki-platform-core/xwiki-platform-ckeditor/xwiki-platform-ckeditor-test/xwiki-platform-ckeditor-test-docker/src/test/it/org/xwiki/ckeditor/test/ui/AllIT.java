@@ -19,7 +19,6 @@
  */
 package org.xwiki.ckeditor.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -33,45 +32,47 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Save")
     class NestedSaveIT extends SaveIT
     {
     }
 
     @Nested
-    @DisplayName("Image Plugin")
-    class NestedImagePluginIT extends ImagePluginIT
+    class NestedImageIT extends ImageIT
     {
     }
 
     @Nested
-    @DisplayName("TextArea Editor")
     class NestedTextAreaIT extends TextAreaIT
     {
     }
 
     @Nested
-    @DisplayName("Link Plugin")
-    class NestedLinkPluginIT extends LinkPluginIT
+    class NestedLinkIT extends LinkIT
     {
     }
-    
+
     @Nested
-    @DisplayName("Quick Actions")
     class NestedQuickActionsIT extends QuickActionsIT
     {
     }
 
     @Nested
-    @DisplayName("Undo / Redo")
     class NestedUndoRedoIT extends UndoRedoIT
     {
     }
-    
+
     @Nested
-    @DisplayName("Localization")
     class NestedLocalizationIT extends LocalizationIT
     {
     }
-    
+
+    @Nested
+    class NestedFilterIT extends FilterIT
+    {
+    }
+
+    @Nested
+    class NestedTableIT extends TableIT
+    {
+    }
 }

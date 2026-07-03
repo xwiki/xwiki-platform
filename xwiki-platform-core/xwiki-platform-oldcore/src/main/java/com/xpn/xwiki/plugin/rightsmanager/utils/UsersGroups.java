@@ -34,12 +34,12 @@ public class UsersGroups
     /**
      * The collection of users.
      */
-    public Collection<String> users = new HashSet<String>();
+    public Collection<String> users = new HashSet<>();
 
     /**
      * The collection of groups.
      */
-    public Collection<String> groups = new HashSet<String>();
+    public Collection<String> groups = new HashSet<>();
 
     @Override
     public String toString()

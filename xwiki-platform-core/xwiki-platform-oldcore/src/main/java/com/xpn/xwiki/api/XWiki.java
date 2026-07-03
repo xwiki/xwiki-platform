@@ -44,6 +44,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.hql.internal.HQLStatementValidator;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationException;
@@ -58,6 +59,7 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiInitializerJob;
 import com.xpn.xwiki.internal.XWikiInitializerJobStatus;
+import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
@@ -104,6 +106,8 @@ public class XWiki extends Api
     private DocumentRevisionProvider documentRevisionProvider;
 
     private ContextualAuthorizationManager contextualAuthorizationManager;
+
+    private HQLStatementValidator hqlValidator;
 
     /**
      * XWiki API Constructor
@@ -165,6 +169,15 @@ public class XWiki extends Api
         }
 
         return this.documentRevisionProvider;
+    }
+
+    private HQLStatementValidator getHQLStatementValidator()
+    {
+        if (this.hqlValidator == null) {
+            this.hqlValidator = Utils.getComponent(HQLStatementValidator.class);
+        }
+
+        return this.hqlValidator;
     }
 
     /**
@@ -257,7 +270,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked before sending back the document.
+     * Loads a Document from the database. Rights are checked before sending back the document.
      * <p>
      * This is a helper for document reference but you can use {@link #getEntityDocument(String, EntityType)} for any
      * other kind of reference.
@@ -285,7 +298,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked before sending back the document.
+     * Loads a Document from the database. Rights are checked before sending back the document.
      *
      * @param reference the reference of the document to be loaded
      * @param type the type of the reference
@@ -296,12 +309,7 @@ public class XWiki extends Api
      */
     public Document getEntityDocument(String reference, EntityType type) throws XWikiException
     {
-        XWikiDocument doc = this.xwiki.getDocument(reference, type, getXWikiContext());
-        if (!getContextualAuthorizationManager().hasAccess(Right.VIEW, doc.getDocumentReference())) {
-            return null;
-        }
-
-        return doc.newDocument(getXWikiContext());
+        return getDocument(this.xwiki.getDocumentReference(reference, type, getXWikiContext()));
     }
 
     /**
@@ -316,11 +324,11 @@ public class XWiki extends Api
     public Document getDocument(DocumentReference reference) throws XWikiException
     {
         try {
-            XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(),
-                doc.getPrefixedFullName(), getXWikiContext()) == false) {
+            if (!getContextualAuthorizationManager().hasAccess(Right.VIEW, reference)) {
                 return null;
             }
+
+            XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
 
             return doc.newDocument(getXWikiContext());
         } catch (Exception ex) {
@@ -349,7 +357,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document containing
+     * Loads a Document from the database. Rights are checked on the author (contentAuthor) of the document containing
      * the currently executing script before sending back the loaded document.
      *
      * @param fullName the full name of the XWiki document to be loaded
@@ -375,7 +383,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document containing
+     * Loads a Document from the database. Rights are checked on the author (contentAuthor) of the document containing
      * the currently executing script before sending back the loaded document.
      *
      * @param reference the reference of the XWiki document to be loaded
@@ -485,7 +493,7 @@ public class XWiki extends Api
             if (attachments == null || attachments.isEmpty()) {
                 attachments = Collections.emptyList();
             }
-            List<DeletedAttachment> result = new ArrayList<DeletedAttachment>(attachments.size());
+            List<DeletedAttachment> result = new ArrayList<>(attachments.size());
             for (com.xpn.xwiki.doc.DeletedAttachment attachment : attachments) {
                 result.add(new DeletedAttachment(attachment, this.context));
             }
@@ -516,7 +524,7 @@ public class XWiki extends Api
             if (attachments == null) {
                 attachments = Collections.emptyList();
             }
-            List<DeletedAttachment> result = new ArrayList<DeletedAttachment>(attachments.size());
+            List<DeletedAttachment> result = new ArrayList<>(attachments.size());
             for (com.xpn.xwiki.doc.DeletedAttachment attachment : attachments) {
                 result.add(new DeletedAttachment(attachment, this.context));
             }
@@ -606,7 +614,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked before sending back the document.
+     * Loads a Document from the database. Rights are checked before sending back the document.
      *
      * @param space Space to use in case no space is defined in the provided <code>fullname</code>
      * @param fullname the full name or relative name of the document to load
@@ -710,6 +718,23 @@ public class XWiki extends Api
         return this.xwiki.getMetaclass();
     }
 
+    private void checkSearchQueryAllowed(String whereSQL) throws XWikiException
+    {
+        if (!hasProgrammingRights()) {
+            try {
+                if (!getHQLStatementValidator()
+                    .isSafe(HqlQueryUtils.createLegacySQLQuery("select distinct doc.fullName", whereSQL))) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        "The query [" + whereSQL + "] requires programming right");
+                }
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    "Failed to validate the query [" + whereSQL + "], requiring programming right", e);
+            }
+        }
+    }
+
     /**
      * API allowing to search for document names matching a query. Examples:
      * <ul>
@@ -742,6 +767,8 @@ public class XWiki extends Api
     @Deprecated
     public List<String> searchDocuments(String wheresql) throws XWikiException
     {
+        checkSearchQueryAllowed(wheresql);
+
         return this.xwiki.getStore().searchDocumentsNames(wheresql, getXWikiContext());
     }
 
@@ -760,6 +787,8 @@ public class XWiki extends Api
     @Deprecated
     public List<String> searchDocuments(String wheresql, int nb, int start) throws XWikiException
     {
+        checkSearchQueryAllowed(wheresql);
+
         return this.xwiki.getStore().searchDocumentsNames(wheresql, nb, start, getXWikiContext());
     }
 
@@ -796,6 +825,8 @@ public class XWiki extends Api
      */
     public List<Document> searchDocuments(String wheresql, boolean distinctbylocale) throws XWikiException
     {
+        checkSearchQueryAllowed(wheresql);
+
         return convert(this.xwiki.getStore().searchDocuments(wheresql, distinctbylocale, getXWikiContext()));
     }
 
@@ -812,6 +843,8 @@ public class XWiki extends Api
     public List<Document> searchDocuments(String wheresql, boolean distinctbylocale, int nb, int start)
         throws XWikiException
     {
+        checkSearchQueryAllowed(wheresql);
+
         return convert(this.xwiki.getStore().searchDocuments(wheresql, distinctbylocale, nb, start, getXWikiContext()));
     }
 
@@ -845,6 +878,8 @@ public class XWiki extends Api
     public List<String> searchDocuments(String parameterizedWhereClause, int maxResults, int startOffset,
         List<?> parameterValues) throws XWikiException
     {
+        checkSearchQueryAllowed(parameterizedWhereClause);
+
         return this.xwiki.getStore().searchDocumentsNames(parameterizedWhereClause, maxResults, startOffset,
             parameterValues, getXWikiContext());
     }
@@ -858,6 +893,8 @@ public class XWiki extends Api
     @Deprecated
     public List<String> searchDocuments(String parameterizedWhereClause, List<?> parameterValues) throws XWikiException
     {
+        checkSearchQueryAllowed(parameterizedWhereClause);
+
         return this.xwiki.getStore().searchDocumentsNames(parameterizedWhereClause, parameterValues, getXWikiContext());
     }
 
@@ -885,6 +922,8 @@ public class XWiki extends Api
         try {
             this.context.setWikiId(wikiName);
 
+            checkSearchQueryAllowed(parameterizedWhereClause);
+
             return searchDocuments(parameterizedWhereClause, maxResults, startOffset, parameterValues);
         } finally {
             this.context.setWikiId(database);
@@ -895,7 +934,7 @@ public class XWiki extends Api
      * Search spaces by passing HQL where clause values as parameters. See
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
      *
-     * @param parametrizedSqlClause the HQL where clause. For example
+     * @param parameterizedSqlClause the HQL where clause. For example
      *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
@@ -903,10 +942,12 @@ public class XWiki extends Api
      * @return a list of spaces names.
      * @throws XWikiException in case of error while performing the query
      */
-    public List<String> searchSpacesNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
+    public List<String> searchSpacesNames(String parameterizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
-        return this.xwiki.getStore().search("select distinct doc.space from XWikiDocument doc " + parametrizedSqlClause,
+        checkSearchQueryAllowed(parameterizedSqlClause);
+
+        return this.xwiki.getStore().search("select distinct doc.space from XWikiDocument doc " + parameterizedSqlClause,
             nb, start, parameterValues, this.context);
     }
 
@@ -915,7 +956,7 @@ public class XWiki extends Api
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses. You can specify
      * properties of attach (the attachment) or doc (the document it is attached to)
      *
-     * @param parametrizedSqlClause The HQL where clause. For example
+     * @param parameterizedSqlClause The HQL where clause. For example
      *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb The number of rows to return. If 0 then all rows are returned
      * @param start The number of rows to skip at the beginning.
@@ -924,17 +965,19 @@ public class XWiki extends Api
      * @throws XWikiException in case of error while performing the query
      * @since 5.0M2
      */
-    public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
+    public List<Attachment> searchAttachments(String parameterizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
+        checkSearchQueryAllowed(parameterizedSqlClause);
+
         return convertAttachments(
-            this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues, this.context));
+            this.xwiki.searchAttachments(parameterizedSqlClause, true, nb, start, parameterValues, this.context));
     }
 
     /**
      * Count attachments returned by a given parameterized query
      *
-     * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL see:
+     * @param parameterizedSqlClause Everything which would follow the "WHERE" in HQL see:
      *            {@link #searchDocuments(String, int, int, List)}
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
      * @return int number of attachments found.
@@ -942,9 +985,11 @@ public class XWiki extends Api
      * @see #searchAttachments(String, int, int, List)
      * @since 5.0M2
      */
-    public int countAttachments(String parametrizedSqlClause, List<?> parameterValues) throws XWikiException
+    public int countAttachments(String parameterizedSqlClause, List<?> parameterValues) throws XWikiException
     {
-        return this.xwiki.countAttachments(parametrizedSqlClause, parameterValues, this.context);
+        checkSearchQueryAllowed(parameterizedSqlClause);
+
+        return this.xwiki.countAttachments(parameterizedSqlClause, parameterValues, this.context);
     }
 
     /**
@@ -955,7 +1000,7 @@ public class XWiki extends Api
      */
     public List<Document> wrapDocs(List<?> docs)
     {
-        List<Document> result = new ArrayList<Document>();
+        List<Document> result = new ArrayList<>();
         if (docs != null) {
             for (java.lang.Object obj : docs) {
                 try {
@@ -1387,7 +1432,7 @@ public class XWiki extends Api
      */
     public List<String> getWikiNames()
     {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         try {
             result = this.xwiki.getVirtualWikisDatabaseNames(getXWikiContext());
@@ -1597,7 +1642,10 @@ public class XWiki extends Api
      * @return {@code true} if the rename succeeded. {@code false} if there was any issue.
      * @throws XWikiException if the document cannot be renamed properly.
      * @since 12.5RC1
+     * @deprecated use the Refactoring Script Service instead as it's more complete and more recent, and it is the
+     *             recommended api to use
      */
+    @Deprecated(since = "17.5RC1")
     public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
         List<DocumentReference> childDocumentReferences) throws XWikiException
@@ -1928,7 +1976,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in view mode The URL is generated differently depending on the
+     * API to retrieve the URL of a Wiki Document in view mode The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
@@ -1979,7 +2027,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in view mode The URL is generated differently depending on the
+     * API to retrieve the URL of a Wiki Document in view mode The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
@@ -1995,7 +2043,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in any mode. The URL is generated differently depending on the
+     * API to retrieve the URL of a Wiki Document in any mode. The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment). It
      * is important to always use the URL functions to generate URL and never hardcode URLs.
@@ -2050,7 +2098,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in any mode, optionally adding an anchor. The URL is generated
+     * API to retrieve the URL of a Wiki Document in any mode, optionally adding an anchor. The URL is generated
      * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The anchor will be modified to be added in the way the environment
      * needs it. It is important to not add the anchor parameter manually after a URL. Some environments will not accept
@@ -2776,41 +2824,6 @@ public class XWiki extends Api
     public String getUniquePageName(String space, String name) throws XWikiException
     {
         return this.xwiki.getUniquePageName(space, name, getXWikiContext());
-    }
-
-    /**
-     * Inserts a tooltip using toolTip.js
-     *
-     * @param html HTML viewed
-     * @param message HTML Tooltip message
-     * @param params Parameters in Javascropt added to the tooltip config
-     * @return HTML with working tooltip
-     */
-    public String addTooltip(String html, String message, String params)
-    {
-        return this.xwiki.addTooltip(html, message, params, getXWikiContext());
-    }
-
-    /**
-     * Inserts a tooltip using toolTip.js
-     *
-     * @param html HTML viewed
-     * @param message HTML Tooltip message
-     * @return HTML with working tooltip
-     */
-    public String addTooltip(String html, String message)
-    {
-        return this.xwiki.addTooltip(html, message, getXWikiContext());
-    }
-
-    /**
-     * Inserts the tooltip Javascript
-     *
-     * @return
-     */
-    public String addTooltipJS()
-    {
-        return this.xwiki.addTooltipJS(getXWikiContext());
     }
 
     /*

@@ -23,11 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Enumeration;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -35,12 +34,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
-import org.restlet.Request;
-import org.restlet.data.Form;
-import org.restlet.ext.servlet.ServletUtils;
-import org.restlet.representation.InputRepresentation;
-import org.restlet.representation.Representation;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rest.JAXRSUtils;
 import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
@@ -60,6 +55,9 @@ public class FormUrlEncodedObjectReader implements MessageBodyReader<Object>, XW
 
     private static final String PROPERTY_PREFIX = "property#";
 
+    @Inject
+    private JAXRSUtils jaxrs;
+
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType)
     {
@@ -71,42 +69,19 @@ public class FormUrlEncodedObjectReader implements MessageBodyReader<Object>, XW
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
         throws IOException, WebApplicationException
     {
+        MultivaluedMap<String, String> form = this.jaxrs.readForm(mediaType, annotations, entityStream);
+
         ObjectFactory objectFactory = new ObjectFactory();
         Object object = objectFactory.createObject();
 
-        Representation representation =
-            new InputRepresentation(entityStream, org.restlet.data.MediaType.APPLICATION_WWW_FORM);
-        Form form = new Form(representation);
+        object.setClassName(form.getFirst(CLASSNAME_FIELD_NAME));
 
-        /*
-         * If the form is empty then it might have happened that some filter has invalidated the entity stream. Try to
-         * read data using getParameter()
-         */
-        if (form.getNames().isEmpty()) {
-            HttpServletRequest httpServletRequest = ServletUtils.getRequest(Request.getCurrent());
-
-            object.setClassName(httpServletRequest.getParameter(CLASSNAME_FIELD_NAME));
-
-            Enumeration<String> enumeration = httpServletRequest.getParameterNames();
-            while (enumeration.hasMoreElements()) {
-                String name = enumeration.nextElement();
-                if (name.startsWith(PROPERTY_PREFIX)) {
-                    Property property = objectFactory.createProperty();
-                    property.setName(name.replace(PROPERTY_PREFIX, ""));
-                    property.setValue(httpServletRequest.getParameter(name));
-                    object.getProperties().add(property);
-                }
-            }
-        } else {
-            object.setClassName(form.getFirstValue(CLASSNAME_FIELD_NAME));
-
-            for (String name : form.getNames()) {
-                if (name.startsWith(PROPERTY_PREFIX)) {
-                    Property property = objectFactory.createProperty();
-                    property.setName(name.replace(PROPERTY_PREFIX, ""));
-                    property.setValue(form.getFirstValue(name));
-                    object.getProperties().add(property);
-                }
+        for (String name : form.keySet()) {
+            if (name.startsWith(PROPERTY_PREFIX)) {
+                Property property = objectFactory.createProperty();
+                property.setName(name.replace(PROPERTY_PREFIX, ""));
+                property.setValue(form.getFirst(name));
+                object.getProperties().add(property);
             }
         }
 

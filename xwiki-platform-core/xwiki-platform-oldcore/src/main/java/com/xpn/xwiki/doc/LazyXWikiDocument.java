@@ -287,6 +287,12 @@ public class LazyXWikiDocument extends XWikiDocument
     }
 
     @Override
+    public boolean isEnforceRequiredRights()
+    {
+        return getDocument().isEnforceRequiredRights();
+    }
+
+    @Override
     public XWikiDocumentArchive getDocumentArchive()
     {
         return getDocument().getDocumentArchive();
@@ -326,6 +332,12 @@ public class LazyXWikiDocument extends XWikiDocument
     public XDOM getXDOM()
     {
         return getDocument().getXDOM();
+    }
+
+    @Override
+    public XDOM getPreparedXDOM()
+    {
+        return getDocument().getPreparedXDOM();
     }
 
     @Override

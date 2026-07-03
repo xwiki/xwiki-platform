@@ -376,6 +376,11 @@ require(['jquery'], function($) {
     return this;
   };
 
+  $(document).on('xwiki:dom:updated', (event, data) => {
+    const containers = data?.elements || [document.documentElement];
+    $(containers).find('.xwiki-select').xwikiSelectWidget();
+  });
+
   /**
    * Initializer called when the DOM is ready
    */

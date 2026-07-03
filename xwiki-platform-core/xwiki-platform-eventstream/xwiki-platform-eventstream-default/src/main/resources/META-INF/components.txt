@@ -7,3 +7,4 @@ org.xwiki.eventstream.internal.UntypedRecordableEventDescriptorComponentBuilder
 org.xwiki.eventstream.internal.observation.EventStatusEventConverter
 org.xwiki.eventstream.internal.observation.EventStreamEventConverter
 org.xwiki.eventstream.internal.observation.MailEntityEventConverter
+org.xwiki.eventstream.internal.EventClassRequiredRightAnalyzer

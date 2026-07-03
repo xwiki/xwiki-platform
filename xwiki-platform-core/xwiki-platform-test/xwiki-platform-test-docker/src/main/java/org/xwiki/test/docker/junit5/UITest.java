@@ -27,9 +27,11 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.xwiki.test.docker.internal.junit5.MultiUserTestUtilsParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestLocalReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.TestReferenceParameterResolver;
 import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
+import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -53,6 +55,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ExtendWith(XWikiDockerExtension.class)
 @ExtendWith(TestReferenceParameterResolver.class)
 @ExtendWith(TestLocalReferenceParameterResolver.class)
+@ExtendWith(MultiUserTestUtilsParameterResolver.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public @interface UITest
@@ -114,6 +117,12 @@ public @interface UITest
     String jdbcDriverVersion() default "";
 
     /**
+     * @return the docker image tag to use for the browser (if not specified, uses the "latest" tag)
+     * @since 16.3.0RC1
+     */
+    String browserTag() default "";
+
+    /**
      * @return true if VNC container is started and recording is done and saved on test exit
      * @since 10.10RC1
      */
@@ -123,6 +132,12 @@ public @interface UITest
      * @return true if WCAG tests should be executed, false otherwise
      */
     boolean wcag() default false;
+
+    /**
+     * @return {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     * @since 16.1.0
+     */
+    boolean wcagStopOnError() default true;
 
     /**
      * @return the list of configuration properties to use when generating the XWiki configuration files such as
@@ -182,6 +197,18 @@ public @interface UITest
     boolean office() default false;
 
     /**
+     * @return true to make the test instance equivalent to an XWiki installed from the standard flavor
+     *         distribution. When true, two things happen: (1) the generated WAR contains the full set of core
+     *         extensions of the standard XWiki distribution WAR (i.e. the {@code WEB-INF/lib} JARs resolved from
+     *         {@code xwiki-platform-distribution-war-dependencies}) instead of the minimal set (resolved from
+     *         {@code xwiki-platform-minimaldependencies}); and (2) the standard flavor
+     *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically, so the test does
+     *         not need to declare it as a dependency. False by default.
+     * @since 18.6.0RC1
+     */
+    boolean standardFlavor() default false;
+
+    /**
      * @return the list of Servlet Engines on which this test must not be executed. If the Servlet Engine is selected
      *         then the test will be skipped
      * @since 10.11RC1
@@ -209,4 +236,50 @@ public @interface UITest
      * @since 14.5
      */
     boolean savePermanentDirectoryData() default false;
+
+    /**
+     * @return the list of network aliases to use for the servlet engine Docker container; this is useful when you need
+     *         to access the same XWiki instance using different domains, e.g. because you need to login with different
+     *         XWiki users in the same browser instance (but different tabs).
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    String[] servletEngineNetworkAliases() default {};
+
+    /**
+     * Configure the blob store backend to use for the tests. By default the filesystem blob store is used unless
+     * clustering is enabled, in which case it's S3 by default.
+     * 
+     * @return the blob store backend to use, see {@link BlobStore}
+     * @since 17.10.0RC1
+     */
+    BlobStore blobStore() default BlobStore.DEFAULT;
+
+    /**
+     * @return the docker image tag to use for the blob store (if not specified, uses the "latest" tag)
+     * @since 17.10.0RC1
+     */
+    String blobStoreTag() default "";
+
+    /**
+     * Configure whether a remote Solr instance should be used for the tests, instead of an embedded one. It's disabled
+     * by default, unless clustering in enabled, in which case it's always enabled.
+     * 
+     * @return true if a remote Solr instance should be used for the tests, instead of an embedded one
+     * @since 18.3.0RC1
+     */
+    SolrMode solrMode() default SolrMode.DEFAULT;
+
+    /**
+     * @return the docker image tag to use for Solr (if not specified, uses the "latest" tag)
+     * @since 18.3.0RC1
+     */
+    String remoteSolrTag() default "";
+
+    /**
+     * @return the number of instances to run during tests.
+     * @since 18.3.0RC1
+     */
+    XWikiInstances xwikiInstances() default @XWikiInstances;
 }

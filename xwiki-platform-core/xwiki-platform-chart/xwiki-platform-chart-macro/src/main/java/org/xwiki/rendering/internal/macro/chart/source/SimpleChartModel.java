@@ -42,7 +42,7 @@ public class SimpleChartModel implements ChartModel
     /**
      * The axes.
      */
-    private final List<Axis> axes = new ArrayList<Axis>();
+    private final List<Axis> axes = new ArrayList<>();
 
     /**
      * Public constructor.

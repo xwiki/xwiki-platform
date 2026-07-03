@@ -19,6 +19,17 @@
  */
 package org.xwiki.store.filesystem.internal;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+
+import org.apache.commons.io.IOUtils;
+import org.xwiki.store.blob.Blob;
+import org.xwiki.store.blob.BlobPath;
+import org.xwiki.store.blob.BlobStoreException;
+
 /**
  * Internal class for providing static utilities used by multiple classes in this package.
  *
@@ -62,5 +73,70 @@ public final class StoreFileUtils
         }
 
         return storedFileNameBuilder.toString();
+    }
+
+    /**
+     * A helper that returns either the blob if it exists or the linked blob if there is a link instead.
+     * 
+     * @param targetBlob the target blob
+     * @param followLinks true if links should be followed
+     * @return the resolved blob
+     * @throws BlobStoreException when failing to resolve the link
+     * @throws IOException when failing to read the link blob
+     * @since 16.4.0RC1
+     */
+    public static Blob resolve(Blob targetBlob, boolean followLinks) throws BlobStoreException, IOException
+    {
+        // Return the target blob by default
+        Blob blob = targetBlob;
+
+        while (!blob.exists()) {
+            // If the blob does not exist, check if there is a link instead
+            Blob linkBlob = getLinkBlob(blob);
+
+            if (linkBlob.exists()) {
+                if (followLinks) {
+                    // Move the target blob to the link's target blob
+                    String linkContent;
+                    try (InputStream stream = linkBlob.getStream()) {
+                        linkContent = IOUtils.toString(stream, StandardCharsets.UTF_8).trim();
+                    }
+                    blob = linkBlob.getStore().getBlob(linkBlob.getPath().resolveSibling(linkContent));
+                } else {
+                    // Stop at the link blob if we don't follow it
+                    blob = linkBlob;
+                }
+            } else {
+                // Stop the loop since no blob or link could be found
+                break;
+            }
+        }
+
+        return blob;
+    }
+
+    /**
+     * @param originalfile the location for which to create a link
+     * @return the File representing the link for the passed location
+     * @since 17.10.0RC1
+     */
+    public static Blob getLinkBlob(Blob originalfile) throws BlobStoreException
+    {
+        BlobPath originalPath = originalfile.getPath();
+        // The file name cannot be null here as the storage file cannot be the root.
+        String fileName = Objects.requireNonNull(originalPath.getFileName()).toString();
+        BlobPath linkPath = originalPath.resolveSibling(fileName + ".lnk");
+        return originalfile.getStore().getBlob(linkPath);
+    }
+
+    /**
+     * @param folder the folder where the link is located
+     * @param targetFile the target file
+     * @return the content of the link file
+     * @since 16.4.0RC1
+     */
+    public static String getLinkContent(File folder, File targetFile)
+    {
+        return folder.toPath().relativize(targetFile.toPath()).toString();
     }
 }

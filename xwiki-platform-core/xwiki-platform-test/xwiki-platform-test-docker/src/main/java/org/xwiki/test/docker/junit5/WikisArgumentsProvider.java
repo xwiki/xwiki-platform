@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -91,7 +90,7 @@ class WikisArgumentsProvider implements ArgumentsProvider, AnnotationConsumer<Wi
         // Install required extensions
         if (!this.extensions.isEmpty()) {
             List<String> namespaces = this.wikis.stream().filter(w -> !w.getName().equals(MAINWIKI))
-                .map(w -> "wiki:" + w.getName()).collect(Collectors.toList());
+                .map(w -> "wiki:" + w.getName()).toList();
 
             ExtensionInstaller extensionInstaller = DockerTestUtils.getExtensionInstaller(context);
             extensionInstaller.installExtensions(this.extensions, TestUtils.SUPER_ADMIN_CREDENTIALS,

@@ -21,6 +21,7 @@ package org.xwiki.url.script;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,6 +31,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
+import org.xwiki.url.FrontendURLCheckPolicy;
+import org.xwiki.url.URLConfiguration;
 import org.xwiki.url.URLSecurityManager;
 
 /**
@@ -42,11 +45,13 @@ import org.xwiki.url.URLSecurityManager;
 @Component
 @Named("security.url")
 @Singleton
-@Unstable
 public class URLSecurityScriptService implements ScriptService
 {
     @Inject
     private URLSecurityManager urlSecurityManager;
+
+    @Inject
+    private URLConfiguration urlConfiguration;
 
     @Inject
     private Logger logger;
@@ -72,5 +77,43 @@ public class URLSecurityScriptService implements ScriptService
             this.logger.debug("Security exception stack trace: ", e);
             return null;
         }
+    }
+
+    /**
+     * @return the list of trusted domains.
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    @Unstable
+    public List<String> getTrustedDomains()
+    {
+        return this.urlConfiguration.getTrustedDomains();
+    }
+
+    /**
+     * Define the policy to use for URL checks performed in the UI, whether the user should be asked for confirmation
+     * when going to an untrusted domain.
+     * @return the configured policy
+     * @since 17.9.0
+     * @since 17.4.7
+     * @since 16.10.14
+     */
+    @Unstable
+    public FrontendURLCheckPolicy getFrontendUrlCheckPolicy()
+    {
+        return this.urlConfiguration.getFrontendUrlCheckPolicy();
+    }
+
+    /**
+     * @return the list of URLs that are allowed to avoid asking confirmation to users when accessing them.
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    @Unstable
+    public List<String> getAllowedFrontendUrls()
+    {
+        return this.urlConfiguration.getAllowedFrontendUrls();
     }
 }

@@ -44,6 +44,7 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequest;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -51,7 +52,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -134,6 +134,12 @@ class ImagePluginTest
     }
 
     @Test
+    void downloadAttachmentWhenNull()
+    {
+        assertNull(this.plugin.downloadAttachment(null, new XWikiContext()));
+    }
+
+    @Test
     void cacheOfScaledAttachment() throws Exception
     {
         Date date = new Date(0);
@@ -177,8 +183,8 @@ class ImagePluginTest
         // Load again, this time from cache.
         assertSame(scaled, this.plugin.downloadAttachment(attachment, xcontext));
 
-        verify(this.imageProcessor, times(1)).writeImage(renderedImage, "image/png", .5F, attachmentOutputStream);
-        verify(imageCache, times(1)).set(cacheKey, attachment);
+        verify(this.imageProcessor).writeImage(renderedImage, "image/png", .5F, attachmentOutputStream);
+        verify(imageCache).set(cacheKey, attachment);
     }
 
     @ParameterizedTest

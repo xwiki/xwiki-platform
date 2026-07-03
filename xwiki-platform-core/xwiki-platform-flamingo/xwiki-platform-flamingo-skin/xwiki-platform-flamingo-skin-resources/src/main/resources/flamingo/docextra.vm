@@ -31,8 +31,6 @@
 #if (!$docextras)
   #set ($docextras = [])
   #if ($showcomments)
-    $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
-    $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #set ($discard = $docextras.add(['Comments', 'comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'commentsinline.vm', $services.localization.render('core.shortcuts.view.comments')]))
   #end
   #if ($showannotations)
@@ -60,21 +58,18 @@
     #set ($discard = $docextras.add(['History', 'history', $services.localization.render('docextra.history'), -1, 'historyinline.vm', $services.localization.render('core.shortcuts.view.history')]))
   #end
   #if ($showinformation)
-    $xwiki.jsfx.use('js/xwiki/viewers/information.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
-    $xwiki.ssfx.use('js/xwiki/viewers/information.css', true)
-    $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': true, 'language': $xcontext.locale})
     #set ($discard = $docextras.add(['Information', 'information', $services.localization.render('docextra.information'), -1, 'informationinline.vm', $services.localization.render('core.shortcuts.view.information')]))
   #end
-#end
 
-#set ($docExtraExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.template.docextra', {'sortByParameter' : 'order'}))
-#foreach($docExtraExtension in $docExtraExtensions)
-  #set ($params = $docExtraExtension.parameters)
-  #set ($template = "loaddocextrauix.vm&uix=$docExtraExtension.id")
-  ## Params are evaluated as string
-  #if ($params.show && $params.show == 'true')
-    #set ($newDocExtra = [$docExtraExtension.id, $params.name, $params.title, $params.itemnumber, $template, $params.shortcut])
-    #set ($discard = $docextras.add($newDocExtra))
+  #set ($docExtraExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.template.docextra', {'sortByParameter' : 'order'}))
+  #foreach($docExtraExtension in $docExtraExtensions)
+    #set ($params = $docExtraExtension.parameters)
+    #set ($template = "loaddocextrauix.vm&uix=$docExtraExtension.id")
+    ## Params are evaluated as string
+    #if ($params.show && $params.show == 'true')
+      #set ($newDocExtra = [$docExtraExtension.id, $params.name, $params.title, $params.itemnumber, $template, $params.shortcut])
+      #set ($discard = $docextras.add($newDocExtra))
+    #end
   #end
 #end
 

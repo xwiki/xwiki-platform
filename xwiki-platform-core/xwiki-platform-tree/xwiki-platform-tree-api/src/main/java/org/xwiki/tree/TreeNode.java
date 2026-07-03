@@ -82,4 +82,13 @@ public interface TreeNode
      * @return the map of tree node properties
      */
     Map<String, Object> getProperties();
+
+    /**
+     * @since 16.4.0RC1
+     * @return the tree node type (usually the hint of the tree node implementation)
+     */
+    default String getType()
+    {
+        return null;
+    }
 }

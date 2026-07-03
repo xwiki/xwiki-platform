@@ -73,7 +73,7 @@ public class X509CertificateSubjectQuery extends AbstractX509SubjectQuery
      */
     public Collection<CertifiedPublicKey> getCertificates(PrincipalIndentifier subject)
     {
-        Collection<CertifiedPublicKey> result = new ArrayList<CertifiedPublicKey>();
+        Collection<CertifiedPublicKey> result = new ArrayList<>();
         try {
             for (String cert : this.<String>execute(subject)) {
                 try {

@@ -26,7 +26,7 @@ define('xwiki-realtime-document', [
 
   const channelListAPI = {
     getByPath: function(path) {
-      return this.filter(channel => JSON.stringify(channel.path) === JSON.stringify(path))[0];
+      return this.find(channel => JSON.stringify(channel.path) === JSON.stringify(path));
     },
     getByPathPrefix: function(pathPrefix) {
       return this.filter(channel => channel.path.length >= pathPrefix.length &&
@@ -34,17 +34,17 @@ define('xwiki-realtime-document', [
     }
   };
 
-  const document = {
-    // Initialize the document fields based on the meta information available on page load.
-    documentReference: meta.documentReference,
-    language: meta.locale,
-    version: meta.version,
-    isNew: meta.isNew,
+  class XWikiDocument {
+    constructor() {
+      // Initialize with document fields coming from the real-time configuration.
+      $.extend(this, realtimeConfig.document);
+      this.update();
+    }
 
-    reload: function() {
+    reload() {
       return $.getJSON(meta.restURL, {
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
-        timestamp: new Date().getTime()
+        timestamp: Date.now()
       }).then(updatedDocument => {
         // Reload succeeded.
         // We were able to load the document so it's not new.
@@ -53,8 +53,8 @@ define('xwiki-realtime-document', [
           // We need the real locale.
           language: updatedDocument.language || updatedDocument.translations['default']
         });
-      }, jqXHR => {
-        if (jqXHR.status === 404) {
+      }, error => {
+        if (error.status === 404) {
           // The document doesn't exist anymore. Maybe it was deleted?
           return $.extend(this, {
             version: '1.1',
@@ -67,9 +67,18 @@ define('xwiki-realtime-document', [
           return this;
         }
       }).then(this.update.bind(this));
-    },
+    }
 
-    update: function(data) {
+    update(data) {
+      data = data || {
+        documentReference: meta.documentReference,
+        // We need the real locale.
+        language: meta.locale || realtimeConfig.document.language,
+        version: meta.version,
+        // The timestamp of the last modification is needed to be able to properly merge on save.
+        modified: meta.modified || realtimeConfig.document.modified,
+        isNew: meta.isNew
+      };
       $.extend(this, data);
       if (this.documentReference === meta.documentReference && this.version !== meta.version) {
         // Update the meta and the hidden fields used by the edit form in order to ensure proper merge on save.
@@ -78,10 +87,10 @@ define('xwiki-realtime-document', [
         $('#isNew').val(this.isNew);
       }
       return this;
-    },
+    }
 
-    save: function(data) {
-      return $.post(window.docsaveurl, $.param($.extend({
+    save(data) {
+      return $.post(globalThis.docsaveurl, $.param($.extend({
         /* jshint camelcase:false */
         form_token: meta.form_token,
         xredirect: '',
@@ -95,25 +104,44 @@ define('xwiki-realtime-document', [
         minorEdit: 1,
         ajax: true
       }, data), true)).then(this.reload.bind(this));
-    },
+    }
 
-    getChannels: function(params) {
+    getChannels(params) {
       const url = new XWiki.Document(this.documentReference).getRestURL('channels');
       params = $.extend({
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
-        timestamp: new Date().getTime()
+        timestamp: Date.now()
       }, params);
       return $.getJSON(url, $.param(params, true)).then(function(data) {
-        if (!Array.isArray(data)) {
-          console.error('Failed to retrieve the list of document channels.');
-          return Promise.reject(data);
-        } else {
+        if (Array.isArray(data)) {
           return $.extend(data, channelListAPI);
+        } else {
+          throw new TypeError('Invalid response from the server when requesting the list of document channels.',
+            {cause: data});
         }
+      }, function(error) {
+        throw new Error('Failed to retrieve the list of document channels.', {cause: error});
       });
     }
-  };
 
-  // Extend with document fields coming from the real-time configuration.
-  return $.extend(document, realtimeConfig.document);
+    getURL(...args) {
+      return new XWiki.Document(this.documentReference).getURL(...args);
+    }
+
+    getRevision(version) {
+      return $.getJSON(meta.restURL + '/history/' + encodeURIComponent(version), $.param({
+        prettyNames: true
+      }, true));
+    }
+  }
+
+  // Initialize the document fields based on the meta information available on page load.
+  const xwikiDocument = new XWikiDocument();
+
+  // Update the document fields before and after the document is edited inplace (without reloading the web page).
+  $(document).on('xwiki:actions:edit xwiki:actions:view', function(event, data) {
+    xwikiDocument.update();
+  });
+
+  return xwikiDocument;
 });

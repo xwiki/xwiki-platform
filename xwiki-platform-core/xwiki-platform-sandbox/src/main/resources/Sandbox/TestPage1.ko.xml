@@ -1,0 +1,44 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Sandbox.TestPage1" locale="ko">
+  <web>Sandbox</web>
+  <name>TestPage1</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Sandbox.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>샌드박스 테스트 페이지 1</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>**"편집"**을 클릭하고 이 페이지의 내용을 수정한 다음 **"저장 및 보기"**를 클릭하여 페이지에서 내용이 어떻게 보이는지 확인하세요!
+
+= 다음은 페이지의 모양을 보여주는 더미 텍스트입니다. =
+
+환자를 잘 보살피는 것이 중요하고, 환자를 따라가게 되지만, 동시에 큰 고통과 괴로움을 겪게 되는 결과로 발생하게 됩니다. 가장 작은 세부 사항까지 말하자면, 어떤 종류의 일이든 그로부터 어떤 이익을 얻지 않는 한 누구도 실행해서는 안 됩니다. 번식이 없기를 바라면서 고통에서 머리카락이되기를 바라는 쾌락에 질책의 고통에 화를 내지 마십시오. 음욕에 눈멀어지지 아니하면 나오지 아니하나니 본분을 버리고 마음을 누그러뜨리는 자들은 죄가 있으니 곧 수고니라.</content>
+</xwikidoc>

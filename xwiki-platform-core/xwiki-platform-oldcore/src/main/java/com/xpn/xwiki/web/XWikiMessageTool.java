@@ -95,21 +95,21 @@ public class XWikiMessageTool
      * Cache properties loaded from the document bundles for maximum efficiency. The map is of type (Long, Properties)
      * where Long is the XWiki document ids.
      */
-    private Map<Long, Properties> propsCache = new HashMap<Long, Properties>();
+    private Map<Long, Properties> propsCache = new HashMap<>();
 
     /**
      * Cache for saving the last modified dates of document bundles that have been loaded. This is used so that we can
      * reload them if they've been modified since last time they were cached. The map is of type (Long, Date) where Long
      * is the XWiki document ids.
      */
-    private Map<Long, Date> previousDates = new HashMap<Long, Date>();
+    private Map<Long, Date> previousDates = new HashMap<>();
 
     /**
      * List of document bundles that have been modified since the last time they were cached. The Set contains Long
      * objects which are the XWiki document ids. TODO: This instance variable should be removed as it's used internally
      * and its state shouldn't encompass several calls to get().
      */
-    private Set<Long> docsToRefresh = new HashSet<Long>();
+    private Set<Long> docsToRefresh = new HashSet<>();
 
     /**
      * The localization manager.
@@ -233,7 +233,7 @@ public class XWikiMessageTool
         }
 
         if (docNames == null) {
-            docNamesList = new ArrayList<String>();
+            docNamesList = new ArrayList<>();
         } else {
             docNamesList = Arrays.asList(docNames.split(","));
         }
@@ -254,7 +254,7 @@ public class XWikiMessageTool
         }
 
         String defaultLanguage = context.getWiki().getDefaultLanguage(context);
-        List<XWikiDocument> result = new ArrayList<XWikiDocument>();
+        List<XWikiDocument> result = new ArrayList<>();
         for (String docName : getDocumentBundleNames()) {
             for (XWikiDocument docBundle : getDocumentBundles(docName.trim(), defaultLanguage)) {
                 if (docBundle != null) {
@@ -324,7 +324,7 @@ public class XWikiMessageTool
      */
     public List<XWikiDocument> getDocumentBundles(String documentName, String defaultLanguage)
     {
-        List<XWikiDocument> list = new ArrayList<XWikiDocument>();
+        List<XWikiDocument> list = new ArrayList<>();
 
         if (documentName.length() != 0) {
             try {

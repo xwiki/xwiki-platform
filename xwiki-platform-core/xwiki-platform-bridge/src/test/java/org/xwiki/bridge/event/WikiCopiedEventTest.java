@@ -29,10 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class WikiCopiedEventTest
+class WikiCopiedEventTest
 {
     @Test
-    public void match()
+    void match()
     {
         assertTrue(new WikiCopiedEvent().matches(new WikiCopiedEvent()));
         assertTrue(new WikiCopiedEvent().matches(new WikiCopiedEvent("source", "target")));

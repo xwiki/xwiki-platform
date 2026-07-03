@@ -65,7 +65,7 @@
       #end
     </div>
     <div class="notification-description">
-      #displayCompositeEventDescription($compositeEvent)
+      #displayCompositeEventDescription($compositeEvent false)
       <div><small class="text-muted">$escapetool.xml($services.date.displayTimeAgo($compositeEvent.dates.get(0)))</small></div>
     </div>
   #end
@@ -101,7 +101,7 @@
       #end
     </div>
     <div class="col-xs-9 notification-content">
-      <button class="notification-event-read-button btn btn-xs hidden"
+      <button class="notification-event-read-button btn btn-default btn-xs hidden"
               aria-label="$escapetool.xml($services.localization.render('notifications.macro.markEventAsRead'))"
               title="$escapetool.xml($services.localization.render('notifications.macro.markEventAsRead'))"
               disabled="disabled">
@@ -109,7 +109,7 @@
       </button>
       $content
       #if ($stringtool.isNotBlank($details))
-        <button class="btn btn-xs toggle-notification-event-details" type="submit"
+        <button class="btn btn-default btn-xs toggle-notification-event-details" type="submit"
                 aria-label="$escapetool.xml($services.localization.render('notifications.macro.showEventDetails'))"
                 title="$escapetool.xml($services.localization.render('notifications.macro.showEventDetails'))">
           <span class="fa fa-ellipsis-h"></span>
@@ -165,21 +165,26 @@
 #**
  * Display a line with a user (its name and a small avatar)
  * @param $user the reference of the user to display
+ * @param $onlyAvatar (boolean), when true, do not display the userName.
  *#
 #macro(displayNotificationEventUser $user $onlyAvatar)
-  #set ($userDoc = $xwiki.getDocument($user))
-  #getUserAvatarURL($userDoc.documentReference, $avatarURL, 40)
-  #set ($userName = $xwiki.getUserName($user))
-  #set ($plainUserName = $xwiki.getPlainUserName($user))
-  <span class="notification-event-user" data-xwiki-lightbox="false">
-    <img src="$avatarURL.url" alt="$escapetool.xml($plainUserName)"/>#if(!$onlyAvatar)${userName}#end
-  </span>##
+  #if($onlyAvatar)
+    #set ($userDoc = $xwiki.getDocument($user))
+    #getUserAvatarURL($userDoc.documentReference, $avatarURL, 40)
+    #set ($plainUserName = $xwiki.getPlainUserName($user))
+    <span class="notification-event-user" data-xwiki-lightbox="false">
+      <img src="$avatarURL.url" alt="$escapetool.xml($plainUserName)"/>
+    </span>##
+  #else
+    #displayUser($user {'useInlineHTML': true})
+  #end
 #end
 #**
  * Display a line with the name of all users.
  * The result is not HTML-escaped when the $link parameter is false.
  * @param $users the users to display
  * @param $link (since 9.5) either or not an HTML link to the user must be generated (default: true)
+ * @param $onlyAvatars (boolean) do not display the user name, even when there's only one user to display.
  *#
 #macro(displayNotificationEventUsers $users $link $onlyAvatars)##
 ## The indent is bad to not introduce space charaters in the results
@@ -241,7 +246,7 @@ $xwiki.getPlainUserName($user)##
   #displayNotificationEventSkeleton($icon, 'comment', $content, '')
 #end
 
-#macro(displayCompositeEventDescription $compositeEvent)
+#macro(displayCompositeEventDescription $compositeEvent $forEmail)
   #set ($baseTranslationPrefix = "${compositeEvent.type}")
   #set ($fallbackTranslationPrefix = "notifications.events.${compositeEvent.type}")
   #set ($fallbackTranslationSuffix = "description")
@@ -254,7 +259,11 @@ $xwiki.getPlainUserName($user)##
       "${baseTranslationPrefix}.${fallbackTranslationSuffix}",
       "${fallbackTranslationPrefix}.${fallbackTranslationSuffix}"
     ])
-    #set ($translationParameters = ["#displayNotificationEventUsers($compositeEvent.users, true, false)"])
+    #if ($forEmail)
+      #set ($translationParameters = ["#displayEmailNotificationEventUsers($compositeEvent.users, true, false)"])
+    #else
+      #set ($translationParameters = ["#displayNotificationEventUsers($compositeEvent.users, true, false)"])
+    #end
     $services.localization.render($translationKeys,$translationParameters)
   #else
   <div>
@@ -269,7 +278,11 @@ $xwiki.getPlainUserName($user)##
     $services.localization.render($translationKeys,$translationParameters)
   </div>
   <div>
-    #displayNotificationEventUsers($compositeEvent.users, true, true)
+    #if ($forEmail)
+      #displayEmailNotificationEventUsers($compositeEvent.users, true, true)
+    #else
+      #displayNotificationEventUsers($compositeEvent.users, true, true)
+    #end
   </div>
   #end
 #end

@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -65,7 +65,8 @@ public class CustomUserUpdatedDocumentEventListener extends AbstractEventListene
         UserUpdatingDocumentEvent userEvent = (UserUpdatingDocumentEvent) event;
         XWikiDocument sourceDoc = (XWikiDocument) source;
         DocumentReference expectedReference = new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
-        if (StringUtils.equals(userEvent.getUserReference().getName(), "DeleteVersionTestUserCancelEvent")
+        if (userEvent.getUserReference() != null
+            && Strings.CS.equals(userEvent.getUserReference().getName(), "DeleteVersionTestUserCancelEvent")
             && sourceDoc.getDocumentReference().equals(expectedReference)) {
             logger.info("Cancelling user event on purpose");
             userEvent.cancel();

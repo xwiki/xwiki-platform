@@ -22,6 +22,8 @@ package org.xwiki.attachment.validation.internal.step;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.ws.rs.core.Response;
+
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -34,7 +36,6 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static javax.servlet.http.HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -75,7 +76,7 @@ class MimetypeAttachmentValidationStepTest
             () -> this.validationStep.validate(wrapper));
 
         assertEquals("Invalid mimetype [text/plain]", exception.getMessage());
-        assertEquals(SC_UNSUPPORTED_MEDIA_TYPE, exception.getHttpStatus());
+        assertEquals(Response.Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode(), exception.getHttpStatus());
         assertEquals("attachment.validation.mimetype.rejected", exception.getTranslationKey());
         assertEquals(List.of(List.of(), List.of(blockerMimetype)), exception.getTranslationParameters());
         assertNull(exception.getContextMessage());
@@ -97,7 +98,7 @@ class MimetypeAttachmentValidationStepTest
             () -> this.validationStep.validate(wrapper));
 
         assertEquals("Invalid mimetype [text/plain]", exception.getMessage());
-        assertEquals(SC_UNSUPPORTED_MEDIA_TYPE, exception.getHttpStatus());
+        assertEquals(Response.Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode(), exception.getHttpStatus());
         assertEquals("attachment.validation.mimetype.rejected", exception.getTranslationKey());
         assertEquals(List.of(List.of(blockerMimetype), List.of()), exception.getTranslationParameters());
         assertNull(exception.getContextMessage());

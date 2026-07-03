@@ -35,7 +35,7 @@ import org.xwiki.job.Request;
  * @version $Id$
  * @since 9.5RC1
  */
-@Component(hints = { "jar", "webjar" })
+@Component(hints = { "jar", "webjar", "webjar-node" })
 @Singleton
 public class MavenBuildJarExtensionHandler extends AbstractExtensionHandler
 {

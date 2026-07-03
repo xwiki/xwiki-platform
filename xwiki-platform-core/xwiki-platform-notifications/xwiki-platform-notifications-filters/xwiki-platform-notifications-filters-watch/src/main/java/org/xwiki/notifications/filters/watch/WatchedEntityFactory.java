@@ -21,6 +21,7 @@ package org.xwiki.notifications.filters.watch;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.notifications.NotificationException;
 
 /**
  * Helper to create watched entity references.
@@ -36,12 +37,12 @@ public interface WatchedEntityFactory
      * @param location the reference of the location to watch
      * @return the watched location reference
      */
-    WatchedLocationReference createWatchedLocationReference(EntityReference location);
+    WatchedLocationReference createWatchedLocationReference(EntityReference location) throws NotificationException;
 
     /**
      * Create a watched user reference.
      * @param userId the ID of the user to watch
      * @return the watched user reference
      */
-    WatchedUserReference createWatchedUserReference(String userId);
+    WatchedUserReference createWatchedUserReference(String userId) throws NotificationException;
 }

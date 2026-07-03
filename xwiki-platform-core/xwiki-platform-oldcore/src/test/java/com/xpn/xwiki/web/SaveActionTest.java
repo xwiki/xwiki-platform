@@ -19,14 +19,28 @@
  */
 package com.xpn.xwiki.web;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
@@ -47,6 +61,7 @@ import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -60,17 +75,6 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link SaveAction}.
@@ -110,8 +114,7 @@ class SaveActionTest
     private DocumentRevisionProvider documentRevisionProvider;
 
     @MockComponent
-    @Named("document")
-    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
 
     private XWikiContext context;
 
@@ -130,7 +133,11 @@ class SaveActionTest
 
     private XWiki xWiki;
 
-    private UserReference fooUserReference;
+    @Mock(name = "currentUser")
+    private UserReference currentUserReference;
+
+    @Mock(name = "effectiveAuthor")
+    private UserReference effectiveAuthor;
 
     private DocumentAuthors mockAuthors;
 
@@ -143,6 +150,7 @@ class SaveActionTest
         this.context.setWiki(this.xWiki);
 
         this.mockRequest = mock(XWikiRequest.class);
+        when(this.mockRequest.getEffectiveAuthor()).thenReturn(Optional.of(this.effectiveAuthor));
         this.context.setRequest(this.mockRequest);
 
         this.mockResponse = mock(XWikiResponse.class);
@@ -159,8 +167,7 @@ class SaveActionTest
         when(this.entityNameValidationConfiguration.useValidation()).thenReturn(false);
 
         this.context.setUserReference(USER_REFERENCE);
-        this.fooUserReference = mock(UserReference.class);
-        when(this.userReferenceResolver.resolve(USER_REFERENCE)).thenReturn(this.fooUserReference);
+        when(this.currentUserResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(this.currentUserReference);
 
         this.mockAuthors = mock(DocumentAuthors.class);
         when(this.mockClonedDocument.getAuthors()).thenReturn(mockAuthors);
@@ -189,11 +196,12 @@ class SaveActionTest
         when(mockClonedDocument.getComment()).thenReturn("My Changes");
         when(mockClonedDocument.getLock(this.context)).thenReturn(mock(XWikiLock.class));
         when(mockForm.getTemplate()).thenReturn("");
-        assertFalse(saveAction.save(this.context));
-        assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
 
-        verify(this.mockAuthors).setOriginalMetadataAuthor(this.fooUserReference);
-        verify(this.mockAuthors).setEffectiveMetadataAuthor(this.fooUserReference);
+        assertFalse(saveAction.save(this.context));
+        assertEquals(Map.of("newVersion", "1.2"), saveAction.getJSONAnswer(context));
+
+        verify(mockAuthors).setOriginalMetadataAuthor(this.currentUserReference);
+        verify(mockAuthors).setEffectiveMetadataAuthor(this.effectiveAuthor);
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
@@ -213,7 +221,7 @@ class SaveActionTest
         when(mockRequest.getParameter("previousVersion")).thenReturn("1.1");
         when(mockRequest.getParameter("isNew")).thenReturn("true");
         assertFalse(saveAction.save(this.context));
-        assertEquals(new Version("1.1"), this.context.get("SaveAction.savedObjectVersion"));
+        assertEquals(Map.of("newVersion", "1.1"), saveAction.getJSONAnswer(context));
         verify(this.xWiki).checkSavingDocument(eq(USER_REFERENCE), any(XWikiDocument.class), eq(""), eq(false),
             eq(this.context));
         verify(this.xWiki).saveDocument(any(XWikiDocument.class), eq(""), eq(false), eq(this.context));
@@ -237,7 +245,7 @@ class SaveActionTest
         when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("1.4"));
         when(mockClonedDocument.getComment()).thenReturn("My Changes");
         assertFalse(saveAction.save(this.context));
-        assertEquals(new Version("1.4"), this.context.get("SaveAction.savedObjectVersion"));
+        assertEquals(Map.of("newVersion", "1.4"), saveAction.getJSONAnswer(context));
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
     }
@@ -268,10 +276,10 @@ class SaveActionTest
         when(mockDocument.getObjectDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());
 
         assertFalse(saveAction.save(this.context));
-        assertEquals(new Version("1.2"), this.context.get("SaveAction.savedObjectVersion"));
+        assertEquals(Map.of("newVersion", "1.2"), saveAction.getJSONAnswer(context));
 
-        verify(this.mockAuthors).setOriginalMetadataAuthor(this.fooUserReference);
-        verify(this.mockAuthors).setEffectiveMetadataAuthor(this.fooUserReference);
+        verify(mockAuthors).setOriginalMetadataAuthor(this.currentUserReference);
+        verify(mockAuthors).setEffectiveMetadataAuthor(this.effectiveAuthor);
         verify(mockClonedDocument).setMetaDataDirty(true);
         verify(this.xWiki).checkSavingDocument(USER_REFERENCE, mockClonedDocument, "My Changes", false, this.context);
         verify(this.xWiki).saveDocument(mockClonedDocument, "My Changes", false, this.context);
@@ -281,6 +289,7 @@ class SaveActionTest
     @Test
     void saveFromTemplate() throws Exception
     {
+        when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("3.2"));
         when(this.mockForm.getTemplate()).thenReturn("TemplateSpace.TemplateDocument");
         DocumentReference templateReference =
             new DocumentReference(context.getWikiId(), "TemplateSpace", "TemplateDocument");
@@ -322,6 +331,7 @@ class SaveActionTest
         String comment = "Some comment";
         when(sectionDoc.getComment()).thenReturn(comment);
         when(sectionDoc.isMinorEdit()).thenReturn(true);
+        when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("4.1"));
 
         assertFalse(this.saveAction.save(this.context));
 

@@ -44,5 +44,9 @@ index.spacesMacro.spaceAdministration.title=Ver a administración do espazo
 index.spacesMacro.createSpace.link=Crear un novo espazo
 index.spacesMacro.createSpace.defaultSpaceName=Nome do espazo
 index.spacesMacro.createSpace.submit=Crear
-### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+### Missing: index.deletedDocuments.deleteAll=Delete all
+index.administration.remainingTasks.heading=Tarefas restantes de análisis de documentos
+index.administration.remainingTasks.emptyQueue=Non quedan tarefas
+admin.documentanalysis=Análisis de documentos
+</content>
 </xwikidoc>

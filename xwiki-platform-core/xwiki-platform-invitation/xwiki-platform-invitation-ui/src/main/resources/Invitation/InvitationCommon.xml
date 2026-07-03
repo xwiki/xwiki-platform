@@ -119,18 +119,20 @@
     ## Tell the user that some of the email addresses are invalid.
     #if($invalidAddresses &amp;&amp; $invalidAddresses.size() &gt; 0)
       &lt;p class="invalid-address-message"&gt;
-       &lt;span class="errormessage"&gt;
+      {{/html}}
+       {{error}}
         #if($recips.size() == 1)
           ## The email address given is invalid and will not be sent to.
-          $escapetool.xml($services.localization.render('xe.invitation.displayMessage.theAddressIsInvalid'))
+          $services.rendering.escape($services.localization.render('xe.invitation.displayMessage.theAddressIsInvalid'), 'xwiki/2.1')
         #else
           #if($invalid.size() &gt; 1)
-            $escapetool.xml($services.localization.render('xe.invitation.displayMessage.someAddressesAreInvalid', [$invalidAddresses.size()]))
+            $services.rendering.escape($services.localization.render('xe.invitation.displayMessage.someAddressesAreInvalid', [$invalidAddresses.size()]), 'xwiki/2.1')
           #else
-            $escapetool.xml($services.localization.render('xe.invitation.displayMessage.anAddressesIsInvalid'))
+            $services.rendering.escape($services.localization.render('xe.invitation.displayMessage.anAddressesIsInvalid'), 'xwiki/2.1')
           #end
         #end
-       &lt;/span&gt;
+       {{/error}}
+       {{html wiki=false clean=false}}
       &lt;/p&gt;
     #end
      ## Subject:
@@ -778,7 +780,7 @@
       <messageBodyTemplate>{{velocity}}
 #set($discard = "#template('colorThemeInit.vm')")
 #if("$!theme" == "")
- #set($theme = {"linkColor":"#4791BC"})
+ #set($theme = {"linkColor":"#4791BC", "notificationErrorColor":"#ca302c"}})
 #end
 #set($userName = $xwiki.getUserName($xcontext.getUser(), false))
 #set($wikiName = $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"))
@@ -786,7 +788,8 @@
 #set($linkStyle = "color:$theme.get('linkColor');text-decoration:none;")
 #set($bigText = "font-size:130%;")
 #set($joinLink = "float:left;")
-#set($declineLink = "color:#f88;float:right;text-decoration:none;")
+#set($dangerColor = $theme.notificationErrorColor)
+#set($declineLink = "color:$dangerColor;float:right;text-decoration:none;")
 
 $services.localization.render('xe.invitation.emailContent.userHasInvitedYouToJoinWiki', [$userName, $wikiName])
 

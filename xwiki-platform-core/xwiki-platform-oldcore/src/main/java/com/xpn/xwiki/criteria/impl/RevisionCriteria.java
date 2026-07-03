@@ -160,4 +160,20 @@ public class RevisionCriteria
     {
         this.includeMinorVersions = includeMinorVersions;
     }
+
+    /**
+     * Checks that the criteria are all-inclusive.
+     *
+     * @return false if some revisions might be filtered out by these criteria, true otherwise.
+     * @since 15.10.8
+     * @since 16.2.0RC1
+     */
+    public boolean isAllInclusive()
+    {
+        return this.includeMinorVersions
+            && this.getAuthor().isEmpty()
+            && this.getRange().getSize() == 0
+            && this.getPeriod().getStart() == Long.MIN_VALUE
+            && this.getPeriod().getEnd() == Long.MAX_VALUE;
+    }
 }

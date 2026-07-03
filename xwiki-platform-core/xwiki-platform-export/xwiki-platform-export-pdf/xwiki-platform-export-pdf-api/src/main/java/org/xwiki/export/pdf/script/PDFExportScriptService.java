@@ -37,7 +37,7 @@ import org.xwiki.export.pdf.job.PDFExportJobRequestFactory;
 import org.xwiki.export.script.ExportScriptService;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;

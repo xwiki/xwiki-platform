@@ -45,8 +45,8 @@ public abstract class AbstractFilterContentAlterer extends AbstractContentAltere
     public AlteredContent alter(CharSequence sequence)
     {
         StringBuffer buffer = new StringBuffer();
-        Map<Integer, Integer> initialToAltered = new HashMap<Integer, Integer>();
-        Map<Integer, Integer> alteredToInitial = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> initialToAltered = new HashMap<>();
+        Map<Integer, Integer> alteredToInitial = new HashMap<>();
 
         // index altered
         int j = 0;

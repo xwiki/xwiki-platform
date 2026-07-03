@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
@@ -36,6 +37,21 @@ import org.xwiki.test.ui.XWikiWebDriver;
  */
 public class BaseElement
 {
+    /**
+     * The name of the "value" attribute which is used by input elements to store their value.
+     */
+    public static final String ATTRIBUTE_VALUE = "value";
+
+    /**
+     * The name of the "id" attribute.
+     */
+    public static final String ATTRIBUTE_ID = "id";
+
+    /**
+     * The name of the "class" attribute which is used by elements to store their CSS classes.
+     */
+    public static final String ATTRIBUTE_CLASS = "class";
+
     private static PersistentTestContext context;
 
     /** Used so that AllTests can set the persistent test context. */
@@ -134,6 +150,25 @@ public class BaseElement
      */
     public void waitUntilPageIsReady()
     {
-        getDriver().waitUntilElementHasAttributeValue(By.tagName("html"), "data-xwiki-page-ready", "true");
+        By htmlTagLocator = By.tagName("html");
+        try {
+            getDriver().waitUntilElementHasAttributeValue(htmlTagLocator, "data-xwiki-page-ready", "true");
+        } catch (TimeoutException e) {
+            // Gather debug information by getting the reasons why the page didn't become ready, e.g., which requests
+            // it is waiting for.
+            // As require could be async, there is no easy way to return the value directly.
+            // So set it in an attribute and get it later.
+            getDriver().executeJavascript("require(['xwiki-page-ready'], function(pageReady) {"
+                + "  document.documentElement.dataset.debugPendingDelays"
+                + " = JSON.stringify(Object.fromEntries(pageReady.getPendingDelays().entries()));"
+                + "});");
+            // Wait for the attribute to be set and retrieve it.
+            String attributeName = "data-debug-pending-delays";
+            getDriver().waitUntilElementHasNonEmptyAttributeValue(htmlTagLocator, attributeName);
+            // Get the value of the attribute.
+            String pendingDelays = getDriver().findElement(htmlTagLocator).getAttribute(attributeName);
+            throw new TimeoutException(
+                "Page did not become ready within the timeout. Pending delays: " + pendingDelays + ".", e);
+        }
     }
 }

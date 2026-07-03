@@ -62,11 +62,25 @@ public class XarDocumentModel
     public static final String VERSION_15 = "1.5";
 
     /**
+     * Introduce the concept of required right enforcement.
+     *
+     * @since 16.10.0RC1
+     */
+    public static final String VERSION_16 = "1.6";
+
+    /**
+     * Introduce the concept of type in object property.
+     *
+     * @since 18.2.0RC1
+     */
+    public static final String VERSION_17 = "1.7";
+
+    /**
      * The current version.
      * 
      * @since 9.0RC1
      */
-    public static final String VERSION_CURRENT = VERSION_15;
+    public static final String VERSION_CURRENT = VERSION_17;
 
     public static final String ELEMENT_DOCUMENT = "xwikidoc";
 
@@ -162,6 +176,11 @@ public class XarDocumentModel
      * @since 14.0RC1
      */
     public static final String ELEMENT_REVISION_ORIGINALMEDATAAUTHOR = "originalMetadataAuthor";
+
+    /**
+     * @since 16.10.0RC1
+     */
+    public static final String ELEMENT_ENFORCE_REQUIRED_RIGHTS = "enforceRequiredRights";
 
     public static final String ELEMENT_REVISION_COMMENT = "comment";
 

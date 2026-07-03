@@ -45,6 +45,11 @@ public class GenericStringResourceTypeResolver implements ResourceTypeResolver<S
     public ResourceType resolve(String type, Map<String, Object> parameters)
         throws CreateResourceTypeException
     {
+        if (type == null) {
+            throw new CreateResourceTypeException(String.format("Invalid scheme URL type. The URL is "
+                + "missing a path segment and should be of the format [/<type>/something/...]"));
+        }
+
         return new ResourceType(type);
     }
 }

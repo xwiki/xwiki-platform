@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
@@ -58,7 +58,7 @@ public class DeleteUserEventListener extends AbstractEventListener
      */
     @Named("cached")
     @Inject
-    private Provider<ModelBridge> modelBridgeProvider;
+    private Provider<FilterPreferencesModelBridge> modelBridgeProvider;
 
     @Inject
     private Logger logger;

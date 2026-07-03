@@ -19,12 +19,12 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @since 9.7RC1
  */
 @ComponentTest
-public class DefaultNotificationFilterManagerTest
+class DefaultNotificationFilterManagerTest
 {
     @InjectMockComponents
     private DefaultNotificationFilterManager filterManager;
@@ -67,24 +67,23 @@ public class DefaultNotificationFilterManagerTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @MockComponent
-    private DocumentReference testUser;
-
-    @MockComponent
     @Named("cached")
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
     @MockComponent
     private ModelContext modelContext;
 
+    private DocumentReference testUser;
+
     @BeforeEach
     void setUp() throws Exception
     {
-        testUser = new DocumentReference("wiki", "test", "user");
+        this.testUser = new DocumentReference("wiki", "test", "user");
 
         // Set a default comportment for the wikiDescriptorManager
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("wiki");
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("currentWikiId");
-        when(wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("wiki", "currentWikiId"));
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("wiki");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("currentWikiId");
+        when(this.wikiDescriptorManager.getAllIds()).thenReturn(List.of("wiki", "currentWikiId"));
     }
 
     @Test
@@ -93,12 +92,12 @@ public class DefaultNotificationFilterManagerTest
         NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
         NotificationFilter fakeFilter2 = mock(NotificationFilter.class);
 
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("somethingElseThanwiki");
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("somethingElseThanwiki");
 
-        when(componentManager.getInstanceList(NotificationFilter.class))
-                .thenReturn(Arrays.asList(fakeFilter1, fakeFilter2));
+        when(this.componentManager.getInstanceList(NotificationFilter.class))
+            .thenReturn(List.of(fakeFilter1, fakeFilter2));
 
-        Collection<NotificationFilter> filters = this.filterManager.getAllFilters(testUser, false);
+        Collection<NotificationFilter> filters = this.filterManager.getAllFilters(this.testUser, false);
 
         assertEquals(2, filters.size());
         assertTrue(filters.contains(fakeFilter1));
@@ -110,10 +109,10 @@ public class DefaultNotificationFilterManagerTest
     {
         NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
 
-        when(componentManager.getInstanceMap(NotificationFilter.class))
-                .thenReturn(Collections.singletonMap("1", fakeFilter1));
+        when(this.componentManager.getInstanceMap(NotificationFilter.class))
+            .thenReturn(Map.of("1", fakeFilter1));
 
-        Collection<NotificationFilter> filters = this.filterManager.getAllFilters(testUser, false);
+        Collection<NotificationFilter> filters = this.filterManager.getAllFilters(this.testUser, false);
 
         assertEquals(1, filters.size());
         assertTrue(filters.contains(fakeFilter1));
@@ -126,12 +125,12 @@ public class DefaultNotificationFilterManagerTest
         NotificationFilter fakeFilter2 = mock(NotificationFilter.class);
 
         WikiReference currentWiki = new WikiReference("current");
-        when(wikiDescriptorManager.getCurrentWikiReference()).thenReturn(currentWiki);
+        when(this.wikiDescriptorManager.getCurrentWikiReference()).thenReturn(currentWiki);
 
         WikiReference argumentWiki = new WikiReference("foo");
 
-        when(componentManager.getInstanceList(NotificationFilter.class))
-            .thenReturn(Arrays.asList(fakeFilter1, fakeFilter2));
+        when(this.componentManager.getInstanceList(NotificationFilter.class))
+            .thenReturn(List.of(fakeFilter1, fakeFilter2));
 
         Collection<NotificationFilter> filters = this.filterManager.getAllFilters(argumentWiki);
 
@@ -147,15 +146,15 @@ public class DefaultNotificationFilterManagerTest
     {
         SystemUserNotificationFilter disabledFilter = mock(SystemUserNotificationFilter.class);
 
-        when(componentManager.getInstanceMap(NotificationFilter.class))
-                .thenReturn(Collections.singletonMap("1", disabledFilter));
+        when(this.componentManager.getInstanceMap(NotificationFilter.class))
+            .thenReturn(Map.of("1", disabledFilter));
 
         when(disabledFilter.getName()).thenReturn(SystemUserNotificationFilter.FILTER_NAME);
         Map<String, Boolean> filterActivations = new HashMap<>();
         filterActivations.put(SystemUserNotificationFilter.FILTER_NAME, false);
 
         Collection<NotificationFilter> filters = this.filterManager.getEnabledFilters(
-                this.filterManager.getAllFilters(testUser, true), filterActivations).collect(Collectors.toList());
+            this.filterManager.getAllFilters(this.testUser, true), filterActivations).collect(Collectors.toList());
 
         assertEquals(0, filters.size());
     }
@@ -170,7 +169,7 @@ public class DefaultNotificationFilterManagerTest
         when(fakeFilter1.matchesPreference(preference)).thenReturn(true);
 
         Collection<NotificationFilter> filters = this.filterManager.getFiltersRelatedToNotificationPreference(
-                Arrays.asList(fakeFilter1), preference).collect(Collectors.toList());
+            List.of(fakeFilter1), preference).collect(Collectors.toList());
 
         assertEquals(1, filters.size());
         assertTrue(filters.contains(fakeFilter1));
@@ -186,7 +185,7 @@ public class DefaultNotificationFilterManagerTest
         when(fakeFilter1.matchesPreference(preference)).thenReturn(false);
 
         Collection<NotificationFilter> filters = this.filterManager
-            .getFiltersRelatedToNotificationPreference(Arrays.asList(fakeFilter1), preference)
+            .getFiltersRelatedToNotificationPreference(List.of(fakeFilter1), preference)
             .collect(Collectors.toList());
 
         assertEquals(0, filters.size());
@@ -211,16 +210,17 @@ public class DefaultNotificationFilterManagerTest
         when(filter6.getName()).thenReturn("filter6");
         when(filter7.getName()).thenReturn("filter7");
 
-        Map<String, Boolean> filterActivations = new HashMap<>();
-        filterActivations.put("filter1", true);
-        filterActivations.put("filter2", false);
-        filterActivations.put("filter3", true);
-        filterActivations.put("filter4", false);
-        filterActivations.put("filter5", true);
-        filterActivations.put("filter6", false);
+        Map<String, ToggleableNotificationFilterActivation> filterActivations = new HashMap<>();
+        filterActivations.put("filter1", new ToggleableNotificationFilterActivation("filter1", true, null, -1));
+        filterActivations.put("filter2", new ToggleableNotificationFilterActivation("filter2", false, null, -1));
+        filterActivations.put("filter3", new ToggleableNotificationFilterActivation("filter3", true, null, -1));
+        filterActivations.put("filter4", new ToggleableNotificationFilterActivation("filter4", false, null, -1));
+        filterActivations.put("filter5", new ToggleableNotificationFilterActivation("filter5", true, null, -1));
+        filterActivations.put("filter6", new ToggleableNotificationFilterActivation("filter6", false, null, -1));
         // We don't put filter7 so it should default as being considered activated
 
-        when(this.modelBridge.getToggeableFilterActivations(testUser)).thenReturn(filterActivations);
+        when(this.filterPreferencesModelBridge.getToggleableFilterActivations(this.testUser))
+            .thenReturn(filterActivations);
         when(filter1.getFilteringPhases())
             .thenReturn(NotificationFilter.SUPPORT_ONLY_PRE_FILTERING_PHASE);
         when(filter2.getFilteringPhases())
@@ -237,52 +237,51 @@ public class DefaultNotificationFilterManagerTest
             .thenReturn(NotificationFilter.SUPPORT_BOTH_FILTERING_PHASE);
 
         // Using subwiki so we manipulate a set instead of a map
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("somethingElseThanwiki");
-        when(componentManager.getInstanceList(NotificationFilter.class))
-            .thenReturn(Arrays.asList(filter1, filter2, filter3, filter4, filter5, filter6, filter7));
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("somethingElseThanwiki");
+        when(this.componentManager.getInstanceList(NotificationFilter.class))
+            .thenReturn(List.of(filter1, filter2, filter3, filter4, filter5, filter6, filter7));
 
         // we request prefiltering filters that are enabled:
         // we should not return filter2/4/6 since they are not enabled,
         // nor filter3 because it's only for post-filtering
-        Collection<NotificationFilter> allFilters = this.filterManager.getAllFilters(testUser, true,
+        Collection<NotificationFilter> allFilters = this.filterManager.getAllFilters(this.testUser, true,
             NotificationFilter.FilteringPhase.PRE_FILTERING);
         assertEquals(3, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter1, filter5, filter7)), allFilters);
+        assertEquals(new HashSet<>(List.of(filter1, filter5, filter7)), allFilters);
 
         // we request postfiltering filters that are enabled:
         // we should not return filter2/4/6 since they are not enabled,
         // nor filter1 because it's only for pre-filtering, nor filter5 because it's for both pre and post filtering
-        allFilters = this.filterManager.getAllFilters(testUser, true, NotificationFilter.FilteringPhase.POST_FILTERING);
+        allFilters = this.filterManager.getAllFilters(this.testUser, true,
+            NotificationFilter.FilteringPhase.POST_FILTERING);
         assertEquals(1, allFilters.size());
-        assertEquals(Collections.singleton(filter3), allFilters);
+        assertEquals(Set.of(filter3), allFilters);
 
         // we request all filters that are enabled:
         // we should not return filter2/4/6 since they are not enabled.
-        allFilters = this.filterManager.getAllFilters(testUser, true, null);
+        allFilters = this.filterManager.getAllFilters(this.testUser, true, null);
         assertEquals(4, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter1, filter3, filter5, filter7)), allFilters);
+        assertEquals(new HashSet<>(List.of(filter1, filter3, filter5, filter7)), allFilters);
 
         // we request prefiltering filters whatever if they are enabled or not
         // we should not return filter3 and 4 because they are only for post-filtering
-        allFilters = this.filterManager.getAllFilters(testUser, false,
+        allFilters = this.filterManager.getAllFilters(this.testUser, false,
             NotificationFilter.FilteringPhase.PRE_FILTERING);
         assertEquals(5, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter5, filter6, filter7)), allFilters);
+        assertEquals(new HashSet<>(List.of(filter1, filter2, filter5, filter6, filter7)), allFilters);
 
         // we request postfiltering filters whatever if they are enabled or not
         // we should not return filter1/2 because they are only for pre-filtering,
         // nor filter5/6/7 because they are for both pre and post filtering
-        allFilters = this.filterManager.getAllFilters(testUser, false,
+        allFilters = this.filterManager.getAllFilters(this.testUser, false,
             NotificationFilter.FilteringPhase.POST_FILTERING);
         assertEquals(2, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter3, filter4)), allFilters);
+        assertEquals(new HashSet<>(List.of(filter3, filter4)), allFilters);
 
         // we request all filters  whatever if they are enabled or not:
         // we return all filters
-        allFilters = this.filterManager.getAllFilters(testUser, false, null);
+        allFilters = this.filterManager.getAllFilters(this.testUser, false, null);
         assertEquals(7, allFilters.size());
-        assertEquals(new HashSet<>(Arrays.asList(filter1, filter2, filter3, filter4, filter5, filter6, filter7)),
-            allFilters);
+        assertEquals(new HashSet<>(List.of(filter1, filter2, filter3, filter4, filter5, filter6, filter7)), allFilters);
     }
-
 }

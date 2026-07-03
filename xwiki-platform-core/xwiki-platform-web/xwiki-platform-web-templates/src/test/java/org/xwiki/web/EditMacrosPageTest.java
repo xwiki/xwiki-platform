@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.inject.Named;
 import javax.script.ScriptContext;
 import javax.servlet.http.HttpSession;
 
@@ -30,13 +31,18 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.xwiki.csrf.script.CSRFTokenScriptService;
+import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.validation.edit.EditConfirmationChecker;
 import org.xwiki.model.validation.edit.EditConfirmationCheckerResult;
 import org.xwiki.model.validation.edit.EditConfirmationScriptService;
 import org.xwiki.model.validation.edit.internal.DefaultEditConfirmationCheckersManager;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
+import org.xwiki.model.validation.internal.SlugEntityNameValidationConfiguration;
 import org.xwiki.model.validation.script.ModelValidationScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.block.GroupBlock;
@@ -45,6 +51,7 @@ import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfig
 import org.xwiki.rendering.internal.configuration.RenderingConfigClassDocumentConfigurationSource;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.internal.macro.TemplateMacro;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -56,6 +63,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -81,6 +89,17 @@ class EditMacrosPageTest extends PageTest
     @MockComponent
     private ReplaceCharacterEntityNameValidationConfiguration replaceCharacterEntityNameValidationConfiguration;
 
+    @MockComponent
+    private SlugEntityNameValidationConfiguration slugEntityNameValidationConfiguration;
+
+    @MockComponent(classToMock = IconManagerScriptService.class)
+    @Named("icon")
+    private ScriptService iconManagerScriptService;
+
+    @MockComponent(classToMock = CSRFTokenScriptService.class)
+    @Named("csrf")
+    private ScriptService csrfScriptService;
+
     @Mock
     private HttpSession httpSession;
 
@@ -88,6 +107,8 @@ class EditMacrosPageTest extends PageTest
     void setUp()
     {
         this.request.setSession(this.httpSession);
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
+            .then(invocationOnMock -> { return invocationOnMock.getArgument(0) + "Icon";});
     }
 
     @Test
@@ -126,7 +147,8 @@ class EditMacrosPageTest extends PageTest
         Map<String, String> editConfirmation = (Map<String, String>) scriptContext.getAttribute("editConfirmation");
         assertEquals("warning", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
-        assertEquals("platform.core.editConfirmation.warnings", message.selectFirst(".warningmessage").text());
+        assertEquals("warningIcon warning " 
+            + "platform.core.editConfirmation.warnings", message.selectFirst(".warningmessage").text());
         assertEquals("Warning", message.selectFirst("#warning1").text());
         assertEquals("cancel", editConfirmation.get("reject"));
         assertEquals("forcelock", editConfirmation.get("confirm"));
@@ -160,14 +182,15 @@ class EditMacrosPageTest extends PageTest
         assertEquals("error", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
         // This test is not to test the structure, but to verify the order in which the text are displayed.
-        assertEquals("platform.core.editConfirmation.errors Error 1 Error 2 platform.core.editConfirmation"
+        assertEquals("exclamationIcon error " 
+            + "platform.core.editConfirmation.errors Error 1 Error 2 platform.core.editConfirmation"
             + ".additionalWarnings Warning 1 Warning 2", message.text());
         assertEquals("cancel", editConfirmation.get("reject"));
         assertNull(editConfirmation.get("confirm"));
     }
 
     @Test
-    void oneWarningEditForced() throws Exception
+    void oneWarningEditForcedInSession() throws Exception
     {
         XWikiDocument document = this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Page"), this.context);
         document.setContent("{{template name=\"edit_macros.vm\" output='false'/}}\n"
@@ -189,6 +212,37 @@ class EditMacrosPageTest extends PageTest
         ScriptContext scriptContext =
             this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class).getScriptContext();
         assertNull(scriptContext.getAttribute("editConfirmation"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void oneWarningEditForcedInRequest(boolean validToken) throws Exception
+    {
+        XWikiDocument document = this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Page"), this.context);
+        document.setContent("{{template name=\"edit_macros.vm\" output='false'/}}\n"
+            + "{{velocity}}#getEditConfirmation(){{/velocity}}"
+        );
+        document.setSyntax(Syntax.XWIKI_2_1);
+        this.context.setDoc(document);
+        this.componentManager.registerComponent(EditConfirmationChecker.class, "warningChecker1",
+            (EditConfirmationChecker) () -> Optional.of(
+                new EditConfirmationCheckerResult(new WordBlock("Warning 1"), false, true)));
+
+        String forceToken = "forceToken";
+        this.request.put("force_token", forceToken);
+        when(((CSRFTokenScriptService) this.csrfScriptService).isTokenValid(forceToken)).thenReturn(validToken);
+
+        this.request.put("force", "true");
+        document.getRenderedContent(this.context);
+
+        ScriptContext scriptContext =
+            this.oldcore.getMocker().<ScriptContextManager>getInstance(ScriptContextManager.class).getScriptContext();
+        if (validToken) {
+            assertNull(scriptContext.getAttribute("editConfirmation"));
+        } else {
+            Map<?, ?> editConfirmation = (Map<?, ?>) scriptContext.getAttribute("editConfirmation");
+            assertEquals("warning", editConfirmation.get("title"));
+        }
     }
 
     @Test
@@ -216,7 +270,7 @@ class EditMacrosPageTest extends PageTest
         Map<String, String> editConfirmation = (Map<String, String>) scriptContext.getAttribute("editConfirmation");
         assertEquals("error", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
-        assertEquals("platform.core.editConfirmation.errors", message.selectFirst(".errormessage").text());
+        assertEquals("exclamationIcon error platform.core.editConfirmation.errors", message.selectFirst(".errormessage").text());
         assertEquals("Error", message.selectFirst("#error1").text());
         assertEquals("cancel", editConfirmation.get("reject"));
         assertNull(editConfirmation.get("confirm"));

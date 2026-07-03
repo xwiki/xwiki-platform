@@ -24,6 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.text.XWikiToStringBuilder;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -35,13 +39,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LiveDataPropertyDescriptor
+public class LiveDataPropertyDescriptor implements InitializableLiveDataElement
 {
+    private static final String NAME_CONSTANT = "name";
+
     /**
      * Holds the filter configuration.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class FilterDescriptor extends BaseDescriptor
+    public static class FilterDescriptor extends BaseDescriptor implements InitializableLiveDataElement
     {
         private String defaultOperator;
 
@@ -117,14 +123,48 @@ public class LiveDataPropertyDescriptor
             this.defaultOperator = defaultOperator;
         }
 
-        /**
-         * Prevent {@code null} values where it's possible.
-         */
+        @Override
         public void initialize()
         {
             if (this.operators == null) {
                 this.operators = new ArrayList<>();
             }
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            FilterDescriptor that = (FilterDescriptor) o;
+
+            return new EqualsBuilder().appendSuper(super.equals(o))
+                .append(defaultOperator, that.defaultOperator).append(operators, that.operators).isEquals();
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return new HashCodeBuilder(23, 87)
+                .appendSuper(super.hashCode())
+                .append(defaultOperator).append(operators)
+                .toHashCode();
+        }
+
+        @Override
+        public String toString()
+        {
+            return new XWikiToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("defaultOperator", defaultOperator)
+                .append("operators", operators)
+                .toString();
         }
     }
 
@@ -171,6 +211,38 @@ public class LiveDataPropertyDescriptor
         public void setName(String name)
         {
             this.name = name;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            OperatorDescriptor that = (OperatorDescriptor) o;
+
+            return new EqualsBuilder().appendSuper(super.equals(o)).append(name, that.name)
+                .isEquals();
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return new HashCodeBuilder(17, 69).appendSuper(super.hashCode()).append(name).toHashCode();
+        }
+
+        @Override
+        public String toString()
+        {
+            return new XWikiToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append(NAME_CONSTANT, name)
+                .toString();
         }
     }
 
@@ -487,9 +559,7 @@ public class LiveDataPropertyDescriptor
         this.editable = editable;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    @Override
     public void initialize()
     {
         if (this.visible == null) {
@@ -504,5 +574,53 @@ public class LiveDataPropertyDescriptor
         if (this.filter == null) {
             this.filter = new FilterDescriptor();
         }
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        LiveDataPropertyDescriptor that = (LiveDataPropertyDescriptor) o;
+
+        return new EqualsBuilder().append(id, that.id).append(name, that.name)
+            .append(description, that.description).append(icon, that.icon).append(type, that.type)
+            .append(sortable, that.sortable).append(visible, that.visible).append(filterable, that.filterable)
+            .append(editable, that.editable).append(displayer, that.displayer).append(filter, that.filter)
+            .append(styleName, that.styleName).isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(27, 37).append(id).append(name).append(description).append(icon).append(type)
+            .append(sortable).append(visible).append(filterable).append(editable).append(displayer).append(filter)
+            .append(styleName).toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .appendSuper(super.toString())
+            .append("id", id)
+            .append(NAME_CONSTANT, name)
+            .append("description", description)
+            .append("icon", icon)
+            .append("type", type)
+            .append("sortable", sortable)
+            .append("visible", visible)
+            .append("filterable", filterable)
+            .append("editable", editable)
+            .append("displayer", displayer)
+            .append("filter", filter)
+            .append("styleName", styleName)
+            .toString();
     }
 }

@@ -50,7 +50,7 @@ Hier finden Sie eine Reihe von Seiten, mit denen Sie herumspielen können:
 
 Hier finden Sie Beispiele für die [[XWiki Syntaxelemente&gt;&gt;XWiki.XWikiSyntax]], die Sie in Wiki-Seiten verwenden können (Überschriften, Bilder, Tabellen).
 
-= Überschriften =
+== Überschriften ==
 
 XWiki bietet 6 Ebenen für Überschriften. Sie können sie zum Strukturieren Ihrer Seiten verwenden.
 
@@ -64,7 +64,7 @@ XWiki bietet 6 Ebenen für Überschriften. Sie können sie zum Strukturieren Ihr
 
 ====== Überschriftsebene 6 ======
 
-= Textformatierung =
+== Textformatierung ==
 
 XWiki unterstützt folgende grundlegende Textformatierungen:
 
@@ -75,11 +75,11 @@ XWiki unterstützt folgende grundlegende Textformatierungen:
 * ,,Tiefer gestellter,, Text
 * ^^Höher gestellter^^ Text
 
-= Listen =
+== Listen ==
 
 Sie können verschiedene Arten von Listen in Ihren Texten einfügen :
 
-== Aufzählung ==
+=== Aufzählung ===
 
 * Ebene 1
 ** Ebene 2
@@ -87,7 +87,7 @@ Sie können verschiedene Arten von Listen in Ihren Texten einfügen :
 ** Ebene 2
 * Ebene 1
 
-== Nummerierung ==
+=== Nummerierung ===
 
 1. Erster Eintrag
 11. Untereintag
@@ -95,7 +95,7 @@ Sie können verschiedene Arten von Listen in Ihren Texten einfügen :
 11. Noch ein Unterentrag
 11. Zweiter Eintrag
 
-== Gemischte Listen ==
+=== Gemischte Listen ===
 
 1. Punkt 1
 11. Unterpunkt 2
@@ -103,23 +103,23 @@ Sie können verschiedene Arten von Listen in Ihren Texten einfügen :
 11*. Unterpunkt 4
 1. Punkt 5
 
-= Tabellen =
+== Tabellen ==
 
 Sie können einfache Tabellen in Ihren Wiki-Seiten erzeugen:
 
-== Tabelle mit einer Kopfzeile oben ==
+=== Tabelle mit einer Kopfzeile oben ===
 
 |= Kopf |= Kopf |= Kopf
 | Zelle | Zelle | Zelle
 | Zelle | Zelle | Zelle
 
-== Tabelle mit Kopfzeilen oben und links ==
+=== Tabelle mit Kopfzeilen oben und links ===
 
 |= Kopf |= Kopf |= Kopf
 |= Kopf | Zelle | Zelle
 |= Kopf | Zelle | Zelle
 
-= Links =
+== Links ==
 
 XWiki erlaubt Links zu anderen Wiki-Seiten und zum Web:
 
@@ -129,23 +129,23 @@ XWiki erlaubt Links zu anderen Wiki-Seiten und zum Web:
 * [[http://www.xwiki.org]] -&gt; Sie können zu Seiten im Web verlinken
 * [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; Beschriftungen sind auch bei externen Links möglich
 
-= Bilder =
+== Bilder ==
 
 Sie können Bilder in Ihre Wiki-Seiten integrieren:
 
 [[image:XWikiLogo.png]]
 
-= Makros =
+== Makros ==
 
 Makros bieten die Möglichkeit, das Aussehen von Wiki-Seiten zu verbessern und stellen zusätzliche Funktionalitäten in der Seite zur Verfügung. Hier sind zwei Beispiele, wie Makros die Inhalte verbessern können:
 
-== Makro: Warnmeldung ==
+=== Makro: Warnmeldung ===
 
 Dieses Makro bietet die Möglichkeit, die Aufmerksamkeit der Leser auf einen bestimmten Text zu lenken:
 
 {{warning}}Dies ist ein wichtiger Hinweis!{{/warning}}
 
-== Inhaltsverzeichnis ==
+=== Inhaltsverzeichnis ===
 
 Dieses Makro erzeugt ein Inhaltsverzeichnis basierend auf den Überschriften in der Seite:
 

@@ -56,12 +56,21 @@ import org.xwiki.filter.type.FilterStreamType;
 public class InstanceInputFilterStreamFactory extends
     AbstractBeanInputFilterStreamFactory<InstanceInputProperties, InstanceFilter>
 {
+    /**
+     * The role hint of this input stream factory.
+     */
     public static final String ROLEHINT = "xwiki+instance";
+
+    private static final String FAILED_TO_GET_GENERATORS =
+        "Failed to get registered instance of InstanceInputEventGenerator components";
 
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
+    /**
+     * Default constructor.
+     */
     public InstanceInputFilterStreamFactory()
     {
         super(FilterStreamType.XWIKI_INSTANCE);
@@ -79,8 +88,7 @@ public class InstanceInputFilterStreamFactory extends
         try {
             eventGenerators = this.componentManagerProvider.get().getInstanceList(InstanceInputEventGenerator.class);
         } catch (ComponentLookupException e) {
-            throw new InitializationException(
-                "Failed to get registered instance of InstanceInputEventGenerator components", e);
+            throw new InitializationException(FAILED_TO_GET_GENERATORS, e);
         }
 
         FilterStreamDescriptor[] descriptors = new FilterStreamDescriptor[eventGenerators.size() + 1];
@@ -101,10 +109,10 @@ public class InstanceInputFilterStreamFactory extends
         try {
             eventGenerators = this.componentManagerProvider.get().getInstanceList(InstanceInputEventGenerator.class);
         } catch (ComponentLookupException e) {
-            throw new FilterException("Failed to get registered instance of InstanceInputEventGenerator components", e);
+            throw new FilterException(FAILED_TO_GET_GENERATORS, e);
         }
 
-        Set<Class< ? >> filters = new HashSet<Class< ? >>();
+        Set<Class< ? >> filters = new HashSet<>();
         filters.addAll(super.getFilterInterfaces());
         for (InstanceInputEventGenerator generator : eventGenerators) {
             filters.addAll(generator.getFilterInterfaces());

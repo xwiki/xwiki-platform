@@ -177,16 +177,21 @@ public abstract class AbstractCaptcha implements Captcha
             // Try to read actual values from the configuration document, overriding the default values.
             XWikiDocument configurationDoc = xwiki.getDocument(getConfigurationDocumentReference(), context);
             BaseObject configurationObj = configurationDoc.getXObject(getConfigurationClassReference());
-            for (Object prop : configurationObj.getProperties()) {
-                BaseProperty<?> property = (BaseProperty<?>) prop;
-                Object value = property.getValue();
-                if (value != null && !(value instanceof String && StringUtils.isEmpty((String) value))) {
-                    // Count only non-null values and non-empty strings.
-                    parameters.put(property.getName(), value);
+            if (configurationObj != null) {
+                for (Object prop : configurationObj.getProperties()) {
+                    BaseProperty<?> property = (BaseProperty<?>) prop;
+                    Object value = property.getValue();
+                    if (value != null && !(value instanceof String stringValue && StringUtils.isEmpty(stringValue))) {
+                        // Count only non-null values and non-empty strings.
+                        parameters.put(property.getName(), value);
+                    }
                 }
+            } else {
+                getLogger().warn("Failed to read the configuration document [{}]. Using default values",
+                    getConfigurationDocumentReference());
             }
         } catch (Exception e) {
-            getLogger().warn("Failed to read the configuration document [{}]. Using default values",
+            getLogger().error("Error while reading the configuration document [{}]. Using default values",
                 getConfigurationDocumentReference(), e);
         }
 

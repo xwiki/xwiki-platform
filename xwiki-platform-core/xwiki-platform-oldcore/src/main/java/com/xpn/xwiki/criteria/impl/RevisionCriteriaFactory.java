@@ -107,4 +107,18 @@ public class RevisionCriteriaFactory
     {
         return new RevisionCriteria(author, period, RangeFactory.createAllRange(), includeMinorVersions);
     }
+
+    /**
+     * Creates a revision criteria matching every revision, filtering only minor versions.
+     *
+     * @param includeMinorVersions include minor versions in the set
+     * @return a new revision criteria
+     * @since 15.10.8
+     * @since 16.2.0RC1
+     */
+    public RevisionCriteria createRevisionCriteria(boolean includeMinorVersions)
+    {
+        return new RevisionCriteria("", PeriodFactory.createMaximumPeriod(), RangeFactory.createAllRange(),
+            includeMinorVersions);
+    }
 }

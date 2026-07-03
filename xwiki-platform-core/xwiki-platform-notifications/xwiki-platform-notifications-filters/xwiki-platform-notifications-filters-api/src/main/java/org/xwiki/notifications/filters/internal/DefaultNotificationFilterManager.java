@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -74,7 +75,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
 
     @Inject
     @Named("cached")
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
     @Override
     public Collection<NotificationFilter> getAllFilters(boolean allWikis) throws NotificationException
@@ -211,7 +212,10 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user)
             throws NotificationException
     {
-        return modelBridge.getToggeableFilterActivations(user);
+        return filterPreferencesModelBridge.getToggleableFilterActivations(user)
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().isEnabled()));
     }
 
     @Override
@@ -233,10 +237,8 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     public Block displayFilter(NotificationFilter filter, NotificationFilterPreference preference)
             throws NotificationException
     {
-        /**
-         * Try to find a {@link NotificationFilterDisplayer} that corresponds to the given filter.
-         * If no renderer is found, fallback on the default one.
-         */
+        // Try to find a {@link NotificationFilterDisplayer} that corresponds to the given filter.
+        // If no renderer is found, fallback on the default one.
         try {
             List<NotificationFilterDisplayer> renderers =
                     componentManager.getInstanceList(NotificationFilterDisplayer.class);

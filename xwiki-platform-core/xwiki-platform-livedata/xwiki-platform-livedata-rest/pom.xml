@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-livedata-rest</artifactId>
@@ -33,9 +33,6 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data REST Services</xwiki.extension.name>
-    <checkstyle.suppressions.location>
-      ${basedir}/src/checkstyle/checkstyle-suppressions.xml
-    </checkstyle.suppressions.location>
     <xwiki.jacoco.instructionRatio>0.38</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
@@ -55,15 +52,34 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-rest-server</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <!-- Xerces is causing problems with the jaxb plugin -->
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
+      <artifactId>javax.ws.rs-api</artifactId>
     </dependency>
+
+    <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

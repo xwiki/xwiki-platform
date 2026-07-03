@@ -65,6 +65,9 @@ import com.xpn.xwiki.job.JobRequestContext;
 @Singleton
 public class FilterScriptService extends AbstractFilterScriptService
 {
+    /**
+     * The role hint of this script service.
+     */
     public static final String ROLEHINT = "filter";
 
     @Inject
@@ -89,12 +92,23 @@ public class FilterScriptService extends AbstractFilterScriptService
 
     private Job lastJob;
 
+    /**
+     * @param id the identifier of the sub script service to return
+     * @return the sub script service registered under the passed identifier
+     */
     public ScriptService get(String id)
     {
         return this.scriptServiceManager.get(ROLEHINT + '.' + id);
     }
 
     /**
+     * Start converting from one stream type to another asynchronously.
+     *
+     * @param inputType the type of the input stream to read the data from
+     * @param inputProperties the properties controlling the input stream
+     * @param outputType the type of the output stream to write the data to
+     * @param outputProperties the properties controlling the output stream
+     * @return the job performing the conversion
      * @since 6.2M1
      */
     public Job startConvert(FilterStreamType inputType, Map<String, Object> inputProperties,
@@ -104,6 +118,14 @@ public class FilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * Start converting from one stream type to another asynchronously.
+     *
+     * @param inputType the type of the input stream to read the data from
+     * @param inputProperties the properties controlling the input stream
+     * @param outputType the type of the output stream to write the data to
+     * @param folded {@code true} if the events should be folded
+     * @param outputProperties the properties controlling the output stream
+     * @return the job performing the conversion
      * @since 8.2RC1
      */
     public Job startConvert(FilterStreamType inputType, Map<String, Object> inputProperties,
@@ -113,6 +135,13 @@ public class FilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * Convert from one stream type to another synchronously.
+     *
+     * @param inputType the type of the input stream to read the data from
+     * @param inputProperties the properties controlling the input stream
+     * @param outputType the type of the output stream to write the data to
+     * @param outputProperties the properties controlling the output stream
+     * @return the job that performed the conversion
      * @since 6.2M1
      */
     public Job convert(FilterStreamType inputType, Map<String, Object> inputProperties, FilterStreamType outputType,
@@ -122,6 +151,14 @@ public class FilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * Convert from one stream type to another synchronously.
+     *
+     * @param inputType the type of the input stream to read the data from
+     * @param inputProperties the properties controlling the input stream
+     * @param outputType the type of the output stream to write the data to
+     * @param folded {@code true} if the events should be folded
+     * @param outputProperties the properties controlling the output stream
+     * @return the job that performed the conversion
      * @since 8.2RC1
      */
     public Job convert(FilterStreamType inputType, Map<String, Object> inputProperties, FilterStreamType outputType,
@@ -162,6 +199,7 @@ public class FilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * @return the last job started through this script service
      * @since 6.2M1
      */
     public Job getCurrentJob()
@@ -180,7 +218,7 @@ public class FilterScriptService extends AbstractFilterScriptService
             List<ComponentDescriptor<FilterStreamFactory>> descriptors =
                 this.componentManagerProvider.get().<FilterStreamFactory>getComponentDescriptorList(factoryType);
 
-            List<FilterStreamType> types = new ArrayList<FilterStreamType>(descriptors.size());
+            List<FilterStreamType> types = new ArrayList<>(descriptors.size());
             for (ComponentDescriptor<FilterStreamFactory> descriptor : descriptors) {
                 types.add(FilterStreamType.unserialize(descriptor.getRoleHint()));
             }
@@ -196,6 +234,7 @@ public class FilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * @return the types of all the available input streams
      * @since 6.2M1
      */
     public Collection<FilterStreamType> getAvailableInputStreams()
@@ -204,6 +243,7 @@ public class FilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * @return the types of all the available output streams
      * @since 6.2M1
      */
     public Collection<FilterStreamType> getAvailableOutputStreams()
@@ -214,13 +254,13 @@ public class FilterScriptService extends AbstractFilterScriptService
     /**
      * @since 6.2M1
      */
-    private FilterStreamDescriptor getFilterStreamDescriptor(Type factoryType, FilterStreamType inputType)
+    private FilterStreamDescriptor getFilterStreamDescriptor(Type factoryType, FilterStreamType type)
     {
         resetError();
 
         try {
             return this.componentManagerProvider.get()
-                .<FilterStreamFactory>getInstance(factoryType, inputType.serialize()).getDescriptor();
+                .<FilterStreamFactory>getInstance(factoryType, type.serialize()).getDescriptor();
         } catch (Exception e) {
             setError(e);
         }
@@ -229,6 +269,8 @@ public class FilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * @param inputType the type of the input stream to describe
+     * @return the descriptor of the input stream of the passed type
      * @since 6.2M1
      */
     public FilterStreamDescriptor getInputFilterStreamDescriptor(FilterStreamType inputType)
@@ -237,11 +279,13 @@ public class FilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * @param outputType the type of the output stream to describe
+     * @return the descriptor of the output stream of the passed type
      * @since 6.2M1
      */
-    public FilterStreamDescriptor getOutputFilterStreamDescriptor(FilterStreamType inputType)
+    public FilterStreamDescriptor getOutputFilterStreamDescriptor(FilterStreamType outputType)
     {
-        return getFilterStreamDescriptor(OutputFilterStreamFactory.class, inputType);
+        return getFilterStreamDescriptor(OutputFilterStreamFactory.class, outputType);
     }
 
     /**
@@ -263,6 +307,8 @@ public class FilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * @param inputType the type of the input stream factory to return
+     * @return the input stream factory of the passed type
      * @since 6.2M1
      */
     public InputFilterStreamFactory getInputFilterStreamFactory(FilterStreamType inputType)
@@ -271,6 +317,8 @@ public class FilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * @param outputType the type of the output stream factory to return
+     * @return the output stream factory of the passed type
      * @since 6.2M1
      */
     public OutputFilterStreamFactory getOutputFilterStreamFactory(FilterStreamType outputType)
@@ -279,6 +327,9 @@ public class FilterScriptService extends AbstractFilterScriptService
     }
 
     /**
+     * @param stream the stream to wrap into an output target
+     * @param autoclose {@code true} if the stream should be closed automatically once the conversion is done
+     * @return the output target wrapping the passed stream
      * @since 6.2M1
      */
     public OutputStreamOutputTarget createOutputStreamOutputTarget(OutputStream stream, boolean autoclose)

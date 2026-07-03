@@ -75,8 +75,8 @@ public class DefaultDistributionJob extends AbstractDistributionJob<Distribution
         // Clean leftovers
         addCleanStep(steps);
 
-        // Upgrade other wikis
-        if (isMainWiki) {
+        // Upgrade other wikis, unless subwiki upgrade is configured to be non interactive
+        if (isMainWiki && this.distributionConfiguration.isInteractiveDistributionWizardEnabledForWiki()) {
             ExtensionId wikiUI = this.distributionManager.getWikiUIExtensionId();
             if (wikiUI != null && StringUtils.isNotBlank(wikiUI.getId())) {
                 // ... but only if the wiki extension ID is defined

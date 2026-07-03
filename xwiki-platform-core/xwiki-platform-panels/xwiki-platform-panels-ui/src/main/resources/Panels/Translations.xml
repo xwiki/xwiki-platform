@@ -45,6 +45,7 @@ panels._actions=Actions
 panels.emptyvalue=
 panels.children.title=Child Pages
 panels.siblings.title=Sibling Pages
+panels.customize=You can customize the side column(s) using the {0}
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

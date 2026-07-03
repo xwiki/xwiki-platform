@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class XWikiContextTest
+class XWikiContextTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -49,13 +49,13 @@ public class XWikiContextTest
     private XWikiContext xcontext;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         this.xcontext = this.oldcore.getXWikiContext();
     }
 
     @Test
-    public void testgetUser()
+    void getUser()
     {
         this.xcontext.setMainXWiki("wiki");
         this.xcontext.setWikiId("wiki");
@@ -75,7 +75,7 @@ public class XWikiContextTest
     }
 
     @Test
-    public void testSetUser()
+    void setUser()
     {
         this.xcontext.setMainXWiki("wiki");
         this.xcontext.setWikiId("wiki");
@@ -91,7 +91,7 @@ public class XWikiContextTest
     }
 
     @Test
-    public void testAnonymousUser()
+    void anonymousUser()
     {
         this.xcontext.setMainXWiki("wiki");
         this.xcontext.setWikiId("wiki");

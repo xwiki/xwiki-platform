@@ -33,6 +33,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.CursorMarkParams;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.link.LinkException;
 import org.xwiki.link.LinkStore;
@@ -49,6 +50,8 @@ import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.internal.SolrClientInstance;
 import org.xwiki.search.solr.internal.SolrSearchCoreUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.api.SolrIndexer;
+import org.xwiki.store.ReadyIndicator;
 
 /**
  * @version $Id$
@@ -57,6 +60,8 @@ import org.xwiki.search.solr.internal.api.FieldUtils;
 @Singleton
 public class DefaultLinkStore implements LinkStore
 {
+    private static final int ROWS = 1000;
+
     @Inject
     private Solr solr;
 
@@ -68,6 +73,9 @@ public class DefaultLinkStore implements LinkStore
 
     @Inject
     private SolrLinkSerializer linkSerializer;
+
+    @Inject
+    private SolrIndexer solrIndexer;
 
     @Inject
     private EntityReferenceResolver<EntityReference> referenceConverter;
@@ -149,8 +157,6 @@ public class DefaultLinkStore implements LinkStore
             filter.append(FieldUtils.LINKS_EXTENDED);
             filter.append(':');
             filter.append(this.utils.toCompleteFilterQueryString(this.linkSerializer.serialize(pageBasedReference)));
-        }
-        if (filter.length() > 0) {
             filter.append(" OR ");
         }
         filter.append(FieldUtils.LINKS_EXTENDED);
@@ -159,30 +165,43 @@ public class DefaultLinkStore implements LinkStore
 
         SolrQuery solrQuery = new SolrQuery(filter.toString());
 
-        solrQuery.setRows(Integer.MAX_VALUE - 1);
+        solrQuery.setRows(ROWS);
+        // Set sorting based on the ID for cursor-based pagination to work.
+        solrQuery.addSort(FieldUtils.ID, SolrQuery.ORDER.asc);
+        solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
 
         // Load only the field we need
         solrQuery.setFields(FieldUtils.REFERENCE);
 
         QueryResponse response;
-        try {
-            response = getClient().query(solrQuery);
-        } catch (Exception e) {
-            throw new LinkException("Failed to search Solr for the backlinks of an entity", e);
-        }
-
-        SolrDocumentList solrDocuments = response.getResults();
-
-        Set<EntityReference> references = new HashSet<>(solrDocuments.size());
-        for (SolrDocument solrDocument : solrDocuments) {
-            String referenceStr = (String) solrDocument.getFieldValue(FieldUtils.REFERENCE);
-
-            if (referenceStr != null) {
-                references.add(this.referenceResolver.resolve(referenceStr, null));
+        Set<EntityReference> references = new HashSet<>();
+        do {
+            try {
+                response = getClient().query(solrQuery);
+            } catch (Exception e) {
+                throw new LinkException("Failed to search Solr for the backlinks of an entity", e);
             }
-        }
+
+            SolrDocumentList solrDocuments = response.getResults();
+
+            for (SolrDocument solrDocument : solrDocuments) {
+                String referenceStr = (String) solrDocument.getFieldValue(FieldUtils.REFERENCE);
+
+                if (referenceStr != null) {
+                    references.add(this.referenceResolver.resolve(referenceStr, null));
+                }
+            }
+
+            solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, response.getNextCursorMark());
+        } while (response.getResults().size() == ROWS);
 
         return references;
+    }
+
+    @Override
+    public ReadyIndicator waitReady()
+    {
+        return this.solrIndexer.waitReady();
     }
 
     EntityReference toDocumentBasedReference(EntityReference entityReference)

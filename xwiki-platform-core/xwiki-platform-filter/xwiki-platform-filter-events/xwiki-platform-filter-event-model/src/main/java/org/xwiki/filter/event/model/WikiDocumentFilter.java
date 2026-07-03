@@ -197,6 +197,13 @@ public interface WikiDocumentFilter
      */
     String PARAMETER_REVISION_MINOR = "revision_minor";
 
+    // required rights
+    /**
+     * @type {@link Boolean}
+     * @since 16.10.0RC1
+     */
+    String PARAMETER_ENFORCE_REQUIRED_RIGHTS = "enforce_required_rights";
+
     // Events
 
     /**

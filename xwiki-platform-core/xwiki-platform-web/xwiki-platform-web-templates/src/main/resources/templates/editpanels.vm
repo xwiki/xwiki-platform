@@ -35,8 +35,14 @@
   #set ($editorPanels = $editorPanelsHistory)
 #end
 #if ($!editorPanels != '')
+  ## Similar to the toggle defined in rightpanels.vm
+  <button id="rightPanelsToggle" class="btn btn-default" 
+  title="$escapetool.xml($services.localization.render('panels.column.right.toggle.hint'))" type="button">
+    $services.icon.renderHTML('caret-right')
+    <span class="sr-only">$services.localization.render('panels.column.right.toggle.hint')</span>
+  </button>
   #set ($editorPanels = $editorPanels.split(','))
-  <div id="editPanels" class="panels editor">
+  <div id="rightPanels" class="panels editor">
 
   ## Convert the list of panels to panel (UIExtension) IDs
   #set ($panelIDList = [])
@@ -57,7 +63,9 @@
       $services.rendering.render($panelUIExtension.execute(), "xhtml/1.0")
     #end
   #end
-
+  ## Similar to the resize handle defined in rightpanels.vm
+  <span role="button" tabindex="0" class="ui-resizable-handle ui-resizable-w"
+       title="$escapetool.xml($services.localization.render('panels.column.right.resizeHandle.hint'))"></span>
   </div>
 #end
 #end

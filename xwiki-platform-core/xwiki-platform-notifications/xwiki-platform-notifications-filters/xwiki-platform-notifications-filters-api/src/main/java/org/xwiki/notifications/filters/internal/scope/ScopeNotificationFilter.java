@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
@@ -65,46 +66,60 @@ public class ScopeNotificationFilter implements NotificationFilter
     @Inject
     private ScopeNotificationFilterExpressionGenerator expressionGenerator;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public FilterPolicy filterEvent(Event event, DocumentReference user,
             Collection<NotificationFilterPreference> filterPreferences,
             NotificationFormat format)
     {
         final EntityReference eventEntity = getEventEntity(event);
-        if (eventEntity == null) {
-            // We don't handle events that are not related to a particular location
-            return FilterPolicy.NO_EFFECT;
+        FilterPolicy result = FilterPolicy.NO_EFFECT;
+        if (eventEntity != null) {
+            // We don't check the inclusive filters if the target is specified since it means the notification already
+            // targets an user. We still check the exclusive one in case the user would want to avoid spam.
+            boolean checkInclusiveFilters = event.getTarget() == null || event.getTarget().isEmpty();
+
+            // Note: the filtering on the date is not handled on the HQL-side because the request used to be too long
+            // and used to generate stack overflows. So we won't make it worse by adding a date condition on each
+            // different scope preference.
+            WatchedLocationState state = stateComputer.isLocationWatched(filterPreferences, eventEntity,
+                event.getType(), format, false, checkInclusiveFilters, false);
+
+            result = getFilterPolicy(event, user, state, checkInclusiveFilters);
         }
+        return result;
+    }
 
-        // We don't check the inclusive filters if the target is specified since it means the notification already
-        // targets an user. We still check the exclusive one in case the user would want to avoid spam.
-        boolean checkInclusiveFilters = event.getTarget() == null || event.getTarget().isEmpty();
+    private FilterPolicy getFilterPolicy(Event event, DocumentReference user, WatchedLocationState state,
+        boolean checkInclusiveFilters)
+    {
+        FilterPolicy result = FilterPolicy.NO_EFFECT;
+        switch (state.getState()) {
+            case BLOCKED, BLOCKED_BY_ANCESTOR, BLOCKED_WITH_CHILDREN -> {
+                if (state.getStartingDate() != null && state.getStartingDate().before(event.getDate())) {
+                    result = FilterPolicy.FILTER;
+                }
+            }
 
+            case WATCHED, WATCHED_BY_ANCESTOR, WATCHED_WITH_CHILDREN -> {
+                if (state.getStartingDate() != null && state.getStartingDate().after(event.getDate())) {
+                    result = FilterPolicy.FILTER;
+                }
+            }
 
-        // Note: the filtering on the date is not handled on the HQL-side because the request used to be too long and
-        // used to generate stack overflows. So we won't make it worse by adding a date condition on each different
-        // scope preference.
-        WatchedLocationState state
-                = stateComputer.isLocationWatched(filterPreferences, eventEntity, event.getType(), format, false,
-                checkInclusiveFilters, false);
+            case CUSTOM ->
+                this.logger.error("Filtering of event should never return custom. Event: [{}]. User: [{}] ",
+                    event, user);
 
-        // We dismiss the event if:
-        //    1. the location is not watched without any starting date (default behaviour in case of no filter, but
-        //    only if it's not a target event)
-        //    2. the location is not watched because of a filter that has been added before the event date
-        //    3. the location is now watched because of a filter, but the event has been sent before the filter exists
-        if (state.getStartingDate() == null) {
-            return (!state.isWatched() && checkInclusiveFilters) ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
-        } else {
-            if (state.isWatched() && state.getStartingDate().after(event.getDate())) {
-                return FilterPolicy.FILTER;
-            } else if (!state.isWatched() && state.getStartingDate().before(event.getDate())) {
-                return FilterPolicy.FILTER;
+            default -> {
+                if (checkInclusiveFilters) {
+                    result = FilterPolicy.FILTER;
+                }
             }
         }
-
-        // Otherwise, we have nothing to say
-        return FilterPolicy.NO_EFFECT;
+        return result;
     }
 
     @Override

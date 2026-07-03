@@ -33,7 +33,7 @@ import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.script.JobScriptService;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 

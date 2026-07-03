@@ -19,25 +19,19 @@
  */
 package org.xwiki.index.tree.internal.nestedpages;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.index.tree.internal.AbstractEntityTreeNode;
-import org.xwiki.localization.LocalizationContext;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryFilter;
+import org.xwiki.tree.CompositeTreeNodeGroup;
+import org.xwiki.tree.TreeNode;
 
 /**
  * The wiki tree node.
@@ -47,95 +41,51 @@ import org.xwiki.query.QueryFilter;
  * @since 7.4.5
  */
 @Component
-@Named("wiki")
+@Named(WikiTreeNode.HINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class WikiTreeNode extends AbstractEntityTreeNode
+public class WikiTreeNode extends AbstractEntityTreeNode implements Initializable
 {
-    @Inject
-    private LocalizationContext localizationContext;
+    /**
+     * The component hint and also the tree node type.
+     */
+    public static final String HINT = "wiki";
 
     @Inject
-    @Named("topLevelPage/nestedPages")
-    private QueryFilter topLevelPageFilter;
+    protected CompositeTreeNodeGroup childNodes;
 
     @Inject
-    @Named("hiddenPage/nestedPages")
-    private QueryFilter hiddenPageFilter;
+    @Named("pinnedChildPages")
+    private TreeNode pinnedChildPages;
 
     @Inject
-    @Named("excludedSpace/nestedPages")
-    private QueryFilter excludedSpaceFilter;
+    @Named("childDocuments")
+    private TreeNode childDocuments;
 
-    @Inject
-    @Named("documentReferenceResolver/nestedPages")
-    private QueryFilter documentReferenceResolverFilter;
-
-    @Override
-    public List<String> getChildren(String nodeId, int offset, int limit)
+    /**
+     * Default constructor.
+     */
+    public WikiTreeNode()
     {
-        EntityReference wikiReference = resolve(nodeId);
-        if (wikiReference != null && wikiReference.getType() == EntityType.WIKI) {
-            try {
-                return serialize(getChildren(new WikiReference(wikiReference), offset, limit));
-            } catch (QueryException e) {
-                this.logger.warn("Failed to retrieve the children of [{}]. Root cause [{}].", nodeId,
-                    ExceptionUtils.getRootCauseMessage(e));
-            }
-        }
-        return Collections.emptyList();
+        super(HINT);
     }
 
-    protected List<? extends EntityReference> getChildren(WikiReference wikiReference, int offset, int limit)
-        throws QueryException
+    @Override
+    public void initialize() throws InitializationException
     {
-        String orderBy = getOrderBy();
-        Query query;
-        if ("title".equals(orderBy)) {
-            query = this.queryManager.getNamedQuery("nonTerminalPagesOrderedByTitle");
-            query.bindValue("locale", this.localizationContext.getCurrentLocale().toString());
-        } else {
-            // Query only the spaces table.
-            query = this.queryManager.createQuery(
-                "select reference, 0 as terminal from XWikiSpace page order by lower(name), name", Query.HQL);
-        }
-
-        query.setWiki(wikiReference.getName());
-        query.setOffset(offset);
-        query.setLimit(limit);
-
-        Set<String> excludedSpaces = getExcludedSpaces(wikiReference);
-        if (!excludedSpaces.isEmpty()) {
-            query.bindValue("excludedSpaces", excludedSpaces);
-            query.addFilter(this.excludedSpaceFilter);
-        }
-
-        query.addFilter(this.topLevelPageFilter);
-
-        if (!areHiddenEntitiesShown()) {
-            query.addFilter(this.hiddenPageFilter);
-        }
-
-        return query.addFilter(this.documentReferenceResolverFilter).execute();
+        this.childNodes.addTreeNode(this.pinnedChildPages, nodeId -> true);
+        this.childNodes.addTreeNode(this.childDocuments, nodeId -> true);
     }
 
     @Override
     public int getChildCount(String nodeId)
     {
-        EntityReference wikiReference = resolve(nodeId);
-        if (wikiReference != null && wikiReference.getType() == EntityType.WIKI) {
-            try {
-                return getChildCount(new WikiReference(wikiReference));
-            } catch (QueryException e) {
-                this.logger.warn("Failed to count the children of [{}]. Root cause [{}].", nodeId,
-                    ExceptionUtils.getRootCauseMessage(e));
-            }
-        }
-        return 0;
+        return withSameProperties(this.childNodes).getChildCount(nodeId);
     }
 
-    protected int getChildCount(WikiReference wikiReference) throws QueryException
+    @Override
+    public List<String> getChildren(String nodeId, int offset, int limit)
     {
-        return getChildSpacesCount(wikiReference);
+        return withSameProperties(this.childNodes).getChildren(nodeId, offset, limit);
     }
 
     @Override

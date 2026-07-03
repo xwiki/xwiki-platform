@@ -22,7 +22,7 @@ package org.xwiki.model.internal.document;
 import java.util.Objects;
 
 import org.xwiki.model.document.DocumentAuthors;
-import org.xwiki.script.internal.safe.AbstractSafeObject;
+import org.xwiki.script.safe.AbstractSafeObject;
 import org.xwiki.script.wrap.AbstractWrappingObject;
 import org.xwiki.user.UserReference;
 

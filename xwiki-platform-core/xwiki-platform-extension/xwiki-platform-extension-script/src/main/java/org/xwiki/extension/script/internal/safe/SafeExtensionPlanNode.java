@@ -26,8 +26,8 @@ import java.util.Collections;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanNode;
 import org.xwiki.extension.version.VersionConstraint;
-import org.xwiki.script.internal.safe.AbstractSafeObject;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.AbstractSafeObject;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to an extension plan node.
@@ -65,7 +65,7 @@ public class SafeExtensionPlanNode extends AbstractSafeObject<ExtensionPlanNode>
             if (nodes.isEmpty()) {
                 this.wrappedChildren = Collections.emptyList();
             } else {
-                this.wrappedChildren = new ArrayList<ExtensionPlanNode>(nodes.size());
+                this.wrappedChildren = new ArrayList<>(nodes.size());
                 for (ExtensionPlanNode node : nodes) {
                     this.wrappedChildren.add(new SafeExtensionPlanNode(node, this.safeProvider));
                 }

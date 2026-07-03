@@ -20,7 +20,6 @@
 package org.xwiki.whatsnew;
 
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a {@link NewsSourceItem} content.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.1RC1
  */
-@Unstable
 public interface NewsContent
 {
     /**

@@ -22,11 +22,8 @@ package org.xwiki.flamingo.test.docker;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.repository.test.SolrTestUtils;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -40,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BacklinksIT
 {
     @Test
-    void backlinks(TestUtils setup, TestReference reference, TestConfiguration testConfiguration) throws Exception
+    void backlinks(TestUtils setup, TestReference reference) throws Exception
     {
         setup.loginAsSuperAdmin();
         DocumentReference targetDocumentReference =
@@ -74,17 +71,10 @@ class BacklinksIT
             null);
 
         // Wait for the solr indexing to be completed before checking the backlinks of the target.
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         vp = setup.gotoPage(targetDocumentReference);
 
         assertEquals(setup.serializeReference(sourceDocumentReference1.getLocalDocumentReference()), vp.getContent());
-    }
-
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
     }
 }

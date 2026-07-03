@@ -69,13 +69,13 @@ public abstract class AbstractExtendedURLResourceTypeResolver implements Resourc
         // Find the Resource Type, which is the first segment in the ExtendedURL.
         //
         // Note that we need to remove the type from the ExtendedURL instance since it's passed to the specific
-        // resolvers and they shouldn't be aware of where it was located since they need to be able to resolve the
+        // resolvers, and they shouldn't be aware of where it was located since they need to be able to resolve the
         // rest of the URL independently of the URL scheme, in case they wish to have a single URL syntax for all URL
         // schemes.
         //
         // Examples:
-        // - scheme 1: /<type>/something
-        // - scheme 2: /something?type=<type>
+        // - scheme 1: /<type>/something/...
+        // - scheme 2: /something/...?type=<type>
         //
         // The specific resolver for type <type> needs to be passed an ExtendedURL independent of the type, in this
         // case, "/something" for both examples.
@@ -85,8 +85,8 @@ public abstract class AbstractExtendedURLResourceTypeResolver implements Resourc
         // Resource.
         List<String> segments = extendedURL.getSegments();
 
-        resourceType = this.defaultStringResourceTypeResolver.resolve(segments.get(0), Collections
-            .<String, Object>emptyMap());
+        String nextSegment = segments.size() > 0 ? segments.get(0) : null;
+        resourceType = this.defaultStringResourceTypeResolver.resolve(nextSegment, Collections.emptyMap());
 
         // First, find out if an ExtendedURL Resource Resolver exists, only for this URL scheme.
         // Second, if not found, try to locate a URL Resolver registered for all URL schemes
@@ -101,7 +101,7 @@ public abstract class AbstractExtendedURLResourceTypeResolver implements Resourc
         } else {
             // No specific Resource Type Resolver has been found. In order to support short URLs (ie. without the
             // "bin" or "wiki" part specified), we assume the URL is pointing to an Entity Resource Reference.
-            // Since the "wiki" type was not selected, we're assuming that the we'll use the "bin" entity resolver.
+            // Since the "wiki" type was not selected, we're assuming that we'll use the "bin" entity resolver.
             resourceType = EntityResourceReference.TYPE;
         }
 

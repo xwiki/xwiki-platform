@@ -20,15 +20,14 @@
 package org.xwiki.notifications.filters.watch.internal;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
-import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
-import org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.notifications.filters.watch.WatchedLocationReference;
 import org.xwiki.notifications.filters.watch.WatchedUserReference;
@@ -44,30 +43,27 @@ import org.xwiki.notifications.filters.watch.WatchedUserReference;
 public class DefaultWatchedEntityFactory implements WatchedEntityFactory
 {
     @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    @Inject
-    private EntityReferenceResolver<String> resolver;
-
-    @Inject
-    private ScopeNotificationFilterLocationStateComputer stateComputer;
-
-    @Inject
-    private EventUserFilterPreferencesGetter eventUserFilterPreferencesGetter;
-
-    @Inject
-    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+    @Named("context")
+    private ComponentManager componentManager;
 
     @Override
-    public WatchedLocationReference createWatchedLocationReference(EntityReference location)
+    public WatchedLocationReference createWatchedLocationReference(EntityReference location) throws
+        NotificationException
     {
-        return new WatchedLocationReference(location, serializer.serialize(location), resolver, stateComputer,
-                notificationFilterPreferenceManager);
+        try {
+            return new WatchedLocationReference(location, componentManager);
+        } catch (ComponentLookupException e) {
+            throw new NotificationException("Error when instantiating a new WatchedLocationReference", e);
+        }
     }
 
     @Override
-    public WatchedUserReference createWatchedUserReference(String userId)
+    public WatchedUserReference createWatchedUserReference(String userId) throws NotificationException
     {
-        return new WatchedUserReference(userId, eventUserFilterPreferencesGetter, notificationFilterPreferenceManager);
+        try {
+            return new WatchedUserReference(userId, componentManager);
+        } catch (ComponentLookupException e) {
+            throw new NotificationException("Error when instantiating a new WatchedUserReference", e);
+        }
     }
 }

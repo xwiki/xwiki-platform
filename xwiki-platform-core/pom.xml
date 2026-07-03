@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -33,6 +33,19 @@
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
+    <!-- Define here extension features that will be used within some modules and their legacy versions -->
+    <!-- Extension features of xwiki-platform-oldcore -->
+    <xwiki.platform.oldcore.extension.features>
+      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+      com.xpn.xwiki.platform:xwiki-core,
+
+      <!-- The old org.xwiki.platform:xwiki-platform-filter-instance-oldcore has been merged with oldcore -->
+      org.xwiki.platform:xwiki-platform-filter-instance-oldcore,
+
+      <!-- A contrib extension to use with versions of oldcore which does not support authservice API -->
+      org.xwiki.contrib:authservice-backport-api,
+      org.xwiki.contrib:authservice-backport-default
+    </xwiki.platform.oldcore.extension.features>
   </properties>
   <build>
     <pluginManagement>
@@ -124,13 +137,53 @@
             </revapi.differences>
 
                  Single justification example:
+
+            <revapi.differences>
+              <differences>
+                <item>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.diff.xml.XMLDiff::xxx()</old>
+                  <justification>Unstable API added by mistake.</justification>
+                  <criticality>highlight</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
             -->
-            
-            
+            <revapi.differences>
+              <justification>
+                The serial version UID changed because new fields needed to be added, but it shouldn't be a real
+                breakage as the SavedRequest should never be persisted.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.serialVersionUIDChanged</code>
+                  <old>field org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest.serialVersionUID</old>
+                  <new>field org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest.serialVersionUID</new>
+                  <oldSerialVersionUID>8779129900717599986</oldSerialVersionUID>
+                  <newSerialVersionUID>4295744004102683007</newSerialVersionUID>
+                </item>
+              </differences>
+            </revapi.differences>
             
             
           </analysisConfiguration>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-tool-importmap-plugin</artifactId>
+        <version>18.6.0-SNAPSHOT</version>
+        <executions>
+          <!-- Make sure declared importmap are valid. -->
+          <execution>
+            <id>enforce-valid-javascript-importmap</id>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -143,6 +196,8 @@
     <module>xwiki-platform-application</module>
     <module>xwiki-platform-appwithinminutes</module>
     <module>xwiki-platform-attachment</module>
+    <module>xwiki-platform-blocknote</module>
+    <module>xwiki-platform-bootstrap</module>
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
@@ -172,6 +227,7 @@
     <module>xwiki-platform-index</module>
     <module>xwiki-platform-instance</module>
     <module>xwiki-platform-invitation</module>
+    <module>xwiki-platform-javascript</module>
     <module>xwiki-platform-job</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-lesscss</module>
@@ -186,10 +242,10 @@
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-mentions</module>
     <module>xwiki-platform-menu</module>
-    <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-netflux</module>
+    <module>xwiki-platform-node</module>
     <module>xwiki-platform-notifications</module>
     <module>xwiki-platform-observation</module>
     <module>xwiki-platform-office</module>
@@ -233,6 +289,7 @@
     <module>xwiki-platform-xar</module>
     <module>xwiki-platform-xclass</module>
     <module>xwiki-platform-xml</module>
+    <module>xwiki-platform-yjs</module>
     <module>xwiki-platform-zipexplorer</module>
   </modules>
   <profiles>
@@ -246,6 +303,47 @@
     <profile>
       <id>docker</id>
       <build>
+        <plugins>
+          <!-- Dynamically generate a properties file containing all xwiki.test.ui.* system properties in it.
+               See the explanation on the failsafe maven plugin definition below -->
+          <plugin>
+            <groupId>org.codehaus.gmavenplus</groupId>
+            <artifactId>gmavenplus-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>set-system-properties-file</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <scripts>
+                <script><![CDATA[
+                  def sysProps = System.getProperties().findAll({it.key.startsWith 'xwiki.test.ui.'})
+                  sysProps.storeToXML(new FileOutputStream(new File("${project.build.directory}/env-tests.xml")), null);
+             ]]></script>
+              </scripts>
+            </configuration>
+            <dependencies>
+              <!-- Avoid the following warning:
+                     [WARNING] Unable to initialize 'ant' with a new AntBuilder object. Is Groovy a dependency?
+                     If you are using Groovy >= 2.3.0-rc-1, remember to include groovy-ant as a dependency.
+               -->
+              <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${groovy.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-ant</artifactId>
+                <version>${groovy.version}</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
         <pluginManagement>
           <plugins>
             <plugin>
@@ -262,6 +360,12 @@
                   -->
                   <oracle.jdbc.timezoneAsRegion>false</oracle.jdbc.timezoneAsRegion>
                 </systemPropertyVariables>
+                <!-- Tell Failsafe to use the properties file generated by the gmavenplus maven plugin which will
+                     contain all the xwiki.test.ui.* system properties passed from the command line. This is needed
+                     for the Gradle Cache to recognize different inputs for two builds with different system properties.
+                     See https://tinyurl.com/2xkdzcpn
+                -->
+                <systemPropertiesFile>${project.build.directory}/env-tests.xml</systemPropertiesFile>
               </configuration>
             </plugin>
           </plugins>

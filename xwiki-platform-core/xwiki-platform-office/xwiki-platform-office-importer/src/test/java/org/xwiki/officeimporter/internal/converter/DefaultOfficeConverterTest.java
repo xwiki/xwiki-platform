@@ -21,7 +21,6 @@ package org.xwiki.officeimporter.internal.converter;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -33,7 +32,6 @@ import org.jodconverter.core.DocumentConverter;
 import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
 import org.jodconverter.core.job.ConversionJobWithOptionalSourceFormatUnspecified;
 import org.jodconverter.core.job.ConversionJobWithOptionalTargetFormatUnspecified;
-import org.jodconverter.core.office.OfficeException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,11 +70,11 @@ class DefaultOfficeConverterTest
     void setup()
     {
         this.localConverter = mock(DocumentConverter.class);
-        this.defaultOfficeConverter = new DefaultOfficeConverter(localConverter, tmpDir);
+        this.defaultOfficeConverter = new DefaultOfficeConverter(this.localConverter, this.tmpDir);
     }
 
     @Test
-    void convertDocument() throws IOException, OfficeException, OfficeConverterException
+    void convertDocument() throws Exception
     {
         OfficeConverterException officeConverterException = assertThrows(OfficeConverterException.class,
             () -> this.defaultOfficeConverter.convertDocument(Collections.emptyMap(), "myFile", "myOutputFile"));
@@ -129,16 +127,18 @@ class DefaultOfficeConverterTest
     }
 
     @Test
-    void isConversionSupported() throws Exception
+    void isConversionSupported()
     {
         when(this.localConverter.getFormatRegistry()).thenReturn(DefaultDocumentFormatRegistry.getInstance());
         for (String mediaType : Arrays.asList("application/vnd.oasis.opendocument.text", "application/msword",
             "application/vnd.oasis.opendocument.presentation", "application/vnd.ms-powerpoint",
-            "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.ms-excel")) {
-            assertTrue(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"));
+            "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.ms-excel", "text/html")) {
+            assertTrue(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"),
+                String.format("%s conversion to text/html not supported", mediaType));
         }
         for (String mediaType : Arrays.asList("foo/bar", "application/pdf")) {
-            assertFalse(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"));
+            assertFalse(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"),
+                String.format("%s conversion to text/html supported while it shouldn't", mediaType));
         }
     }
 

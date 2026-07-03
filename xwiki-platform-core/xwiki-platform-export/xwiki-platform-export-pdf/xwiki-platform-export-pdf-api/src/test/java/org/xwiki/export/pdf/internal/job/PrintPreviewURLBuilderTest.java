@@ -19,10 +19,9 @@
  */
 package org.xwiki.export.pdf.internal.job;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-
 import java.net.URL;
+import java.util.Collections;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -31,6 +30,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link PrintPreviewURLBuilder}.
@@ -55,12 +57,13 @@ class PrintPreviewURLBuilderTest
     {
         this.request.setId("export", "pdf", "123");
         this.request.setBaseURL(new URL("http://localhost:8080/xwiki/bin/view/Some/Page?ke%7Cy=va%7Clue#fo%7Co"));
+        this.request.setContext(Collections.singletonMap("locale", Locale.FRENCH));
 
         when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(currentDocumentReference);
         URL printPreviewURL = new URL("http://localhost:8080/print/preview/url");
         when(this.documentAccessBridge.getDocumentURL(currentDocumentReference, "export",
             "format=html-print&xpage=get&outputSyntax=plain&async=true"
-                + "&sheet=XWiki.PDFExport.Sheet&jobId=export%2Fpdf%2F123&ke%7Cy=va%7Clue",
+                + "&sheet=XWiki.PDFExport.Sheet&jobId=export%2Fpdf%2F123&language=fr&ke%7Cy=va%7Clue",
             "fo|o", true)).thenReturn(printPreviewURL.toString());
 
         assertEquals(printPreviewURL, this.builder.getPrintPreviewURL(this.request));

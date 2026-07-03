@@ -38,7 +38,7 @@ public class RegistrationModal extends AbstractRegistrationPage
     public static RegistrationModal gotoPage()
     {
         UsersAdministrationSectionPage sectionPage = UsersAdministrationSectionPage.gotoPage();
-        sectionPage.getUsersLiveTable().waitUntilReady();
+        sectionPage.getUsersLiveData().getTableLayout().waitUntilReady();
         return sectionPage.clickAddNewUser();
     }
 
@@ -46,6 +46,15 @@ public class RegistrationModal extends AbstractRegistrationPage
     public void clickRegister()
     {
         this.createButton.click();
+    }
+
+    /**
+     * Wait for the registration form to show no error message.
+     */
+    public void waitForLiveValidationSuccess()
+    {
+        getDriver()
+            .waitUntilCondition(input -> input.findElements(By.cssSelector("#createUserModal .LV_invalid")).isEmpty());
     }
 
     @Override

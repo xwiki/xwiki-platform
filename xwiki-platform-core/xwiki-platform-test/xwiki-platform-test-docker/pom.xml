@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-docker</artifactId>
   <name>XWiki Platform - Test - Docker UI Test Framework</name>
@@ -58,6 +58,11 @@
       <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-test-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- PR Test checker -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -66,67 +71,46 @@
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
-      <artifactId>selenium</artifactId>
-      <version>${testcontainers.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.annotation</groupId>
-          <artifactId>javax.annotation-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- Replace the versions triggered by testcontainers by a more accurate one -->
-    <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>mysql</artifactId>
+      <artifactId>testcontainers-selenium</artifactId>
       <version>${testcontainers.version}</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
-      <artifactId>mariadb</artifactId>
+      <artifactId>testcontainers-mysql</artifactId>
       <version>${testcontainers.version}</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
-      <artifactId>postgresql</artifactId>
+      <artifactId>testcontainers-mariadb</artifactId>
       <version>${testcontainers.version}</version>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
-      <artifactId>oracle-xe</artifactId>
+      <artifactId>testcontainers-postgresql</artifactId>
+      <version>${testcontainers.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-oracle-xe</artifactId>
+      <version>${testcontainers.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-minio</artifactId>
       <version>${testcontainers.version}</version>
     </dependency>
     <!-- Needed by TestContainers, to verify that the DBs are started -->
     <dependency>
       <groupId>${mysql.groupId}</groupId>
       <artifactId>${mysql.artifactId}</artifactId>
-      <version>${mysql.version}</version>
     </dependency>
     <dependency>
       <groupId>${mariadb.groupId}</groupId>
       <artifactId>${mariadb.artifactId}</artifactId>
-      <version>${mariadb.version}</version>
     </dependency>
     <dependency>
       <groupId>${oracle.groupId}</groupId>
       <artifactId>${oracle.artifactId}</artifactId>
-      <version>${oracle.version}</version>
     </dependency>
     <!-- Dependencies for WARBuilder -->
     <dependency>
@@ -159,12 +143,13 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-jersey</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>compile</scope>
     </dependency>
     <!-- Dependency to generate XED files by reusing existing code -->
@@ -185,21 +170,17 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
       <version>${project.version}</version>
-      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
-           stop the chain -->
-      <scope>provided</scope>
+      <scope>runtime</scope>
     </dependency>
+    <!-- Dependencies that are not needed for this module but that we need for functional tests modules so that
+         they get all the required dependencies in the local maven repository where the tests execute -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
-      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
-           stop the chain -->
-      <scope>provided</scope>
+      <scope>runtime</scope>
     </dependency>
-    <!-- Dependencies that are not needed for this module but that we need for functional tests modules so that
-         they get all the required dependencies in the local maven repository where the tests execute -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-minimaldependencies</artifactId>

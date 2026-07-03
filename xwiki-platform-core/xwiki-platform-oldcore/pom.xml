@@ -25,28 +25,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Old Core</description>
   <properties>
-    <xwiki.extension.features>
-      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-      com.xpn.xwiki.platform:xwiki-core,
-
-      <!-- The old org.xwiki.platform:xwiki-platform-filter-instance-oldcore has been merged with oldcore -->
-      org.xwiki.platform:xwiki-platform-filter-instance-oldcore,
-
-      <!-- A contrib extension to use with versions of oldcore which does not support authservice API -->
-      org.xwiki.contrib:authservice-backport-api,
-      org.xwiki.contrib:authservice-backport-default
-    </xwiki.extension.features>
+    <xwiki.extension.features>${xwiki.platform.oldcore.extension.features}</xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.38</xwiki.jacoco.instructionRatio>
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
+    <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 
@@ -103,8 +92,9 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-http</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -140,12 +130,16 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+    </dependency>
 
     <!-- Used by parse groovy from page -->
     <!-- Note: We only depend on the miniumum required to compile oldcore since the distributions will depend on
          xwiki-commons-groovy which has dependencies on all the various groovy jars and thus they'll be bundled -->
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy</artifactId>
     </dependency>
 
@@ -154,26 +148,29 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
     </dependency>
+    <!-- Hibernate 5 seems to require (but don't declare) javax validation-->
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+    </dependency>
     <!-- Replace the one from Hibernate -->
     <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
     </dependency>
-    <!-- Use jakarta.transaction:jakarta.transaction-api instead to not have duplicate JARs in generated WARs -->
+    <!-- Replace the one from DBCP -->
     <dependency>
-      <groupId>jakarta.transaction</groupId>
-      <artifactId>jakarta.transaction-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-c3p0</artifactId>
-      <version>${hibernate.version}</version>
-      <scope>runtime</scope>
+      <groupId>javax.transaction</groupId>
+      <artifactId>javax.transaction-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
     </dependency>
     <dependency>
       <groupId>org.liquibase</groupId>
@@ -205,6 +202,16 @@
       <artifactId>ecs</artifactId>
       <version>1.4.2</version>
     </dependency>
+    <!--
+		Used to workaround a regression in Java that breaks FOP.
+		See https://issues.apache.org/jira/browse/FOP-3275 and https://bugs.openjdk.org/browse/JDK-8368356.
+    -->
+    <dependency>
+      <groupId>net.sf.saxon</groupId>
+      <artifactId>Saxon-HE</artifactId>
+      <version>13.0</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- HTML Export/PDF Export -->
     <dependency>
@@ -226,6 +233,12 @@
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-svgrasterizer</artifactId>
+    </dependency>
+
+    <!-- Guava, currently only used in SimpleDocumentCache -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
 
     <!-- Misc -->
@@ -284,7 +297,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-configuration-api</artifactId>
+      <artifactId>xwiki-commons-configuration-default</artifactId>
       <version>${commons.version}</version>
     </dependency>
 
@@ -448,6 +461,11 @@
       <artifactId>xwiki-platform-edit-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed by FileUploadPlugin -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+    </dependency>
 
     <!-- Used by HibernateDataMigrationManager to temporarily disable logback logging in hibernate -->
     <dependency>
@@ -469,35 +487,6 @@
     </dependency>
 
     <!-- Test dependencies -->
-
-    <!-- Used to mock XWiki class -->
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- To be removed as soon as we get rid of AbstractXWikiComponentTestCase -->
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock</artifactId>
-      <version>1.2.0</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- To be removed as soon as we get rid of AbstractXWikiComponentTestCase -->
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock-cglib</artifactId>
-      <version>1.2.0</version>
-      <scope>test</scope>
-      <exclusions>
-        <!-- We use cglib:cglig instead -->
-        <exclusion>
-          <groupId>cglib</groupId>
-          <artifactId>cglib-nodep</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -584,6 +573,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- The Login and Register links are injected as UI extensions. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Test dependencies -->
 
     <!-- XWiki syntax parsers -->
@@ -636,13 +632,14 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
-
-    <!-- To be remove if we stop declaring hibernate validator as oldcore runtime dependency -->
     <dependency>
-      <groupId>org.mortbay.jasper</groupId>
-      <artifactId>apache-el</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-xml</artifactId>
+      <version>${commons.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-index-api</artifactId>
@@ -692,7 +689,6 @@
                 **/api/CriteriaService.java,
                 **/api/Document.java,
                 **/api/DocumentSection.java,
-                **/api/Object.java,
                 **/api/XWiki.java,
                 **/content/parsers/RenamePageReplaceLinkHandler.java,
                 **/criteria/api/XWikiCriteriaService.java,
@@ -762,7 +758,6 @@
                 **/monitor/api/MonitorTimerSummary.java,
                 **/objects/BaseCollection.java,
                 **/objects/BaseElement.java,
-                **/objects/BaseObject.java,
                 **/objects/BaseProperty.java,
                 **/objects/BaseStringProperty.java,
                 **/objects/classes/BaseClass.java,
@@ -773,31 +768,16 @@
                 **/objects/classes/LevelsClass.java,
                 **/objects/classes/ListClass.java,
                 **/objects/classes/ListItem.java,
-                **/objects/classes/NumberClass.java,
-                **/objects/classes/PasswordClass.java,
-                **/objects/classes/PropertyClassInterface.java,
-                **/objects/classes/PropertyClass.java,
                 **/objects/classes/StaticListClass.java,
                 **/objects/classes/StringClass.java,
-                **/objects/classes/TextAreaClass.java,
-                **/objects/DBStringListProperty.java,
-                **/objects/DoubleProperty.java,
                 **/objects/ElementComparator.java,
                 **/objects/ElementInterface.java,
-                **/objects/FloatProperty.java,
-                **/objects/IntegerProperty.java,
-                **/objects/LargeStringProperty.java,
                 **/objects/ListProperty.java,
-                **/objects/LongProperty.java,
                 **/objects/NumberProperty.java,
-                **/objects/ObjectDiff.java,
                 **/objects/ObjectInterface.java,
                 **/objects/PropertyInterface.java,
-                **/objects/StringListProperty.java,
                 **/pdf/impl/PdfExportImpl.java,
                 **/pdf/impl/PdfURLFactory.java,
-                **/plugin/mail/MailPluginApi.java,
-                **/plugin/mail/MailPlugin.java,
                 **/plugin/packaging/DocumentFilter.java,
                 **/plugin/packaging/DocumentInfoAPI.java,
                 **/plugin/packaging/DocumentInfo.java,
@@ -878,7 +858,6 @@
                 **/web/ExportAction.java,
                 **/web/ExportURLFactory.java,
                 **/web/HomePageRedirectServlet.java,
-                **/web/ImportAction.java,
                 **/web/includeservletasstring/BufferedResponse.java,
                 **/web/includeservletasstring/BufferOutputStream.java,
                 **/web/includeservletasstring/IncludeServletAsString.java,

@@ -98,13 +98,15 @@ class ClassResourceImplTest
     @Mock
     private XWiki xWiki;
 
-    private List<String> availableClasses = Arrays.asList("Foo.Class1", "XWiki.User", "XWiki.Protected", "Bar.Other");
-    private List<DocumentReference> documentReferences = Arrays.asList(
+    private final List<String> availableClasses = Arrays.asList("Foo.Class1", "XWiki.User", "XWiki.Protected", "Bar.Other");
+
+    private final List<DocumentReference> documentReferences = Arrays.asList(
         new DocumentReference("xwiki", "Foo", "Class1"),
         new DocumentReference("xwiki", "XWiki", "User"),
         new DocumentReference("xwiki", "XWiki", "Protected"),
         new DocumentReference("xwiki", "Bar", "Other")
     );
+
     private List<Class> restClasses;
 
     XWikiContext xcontext;
@@ -114,35 +116,35 @@ class ClassResourceImplTest
     {
         this.xcontext = mock(XWikiContext.class);
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
-        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
-        Utils.setComponentManager(componentManager);
+        this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
+        Utils.setComponentManager(this.componentManager);
     }
 
     @BeforeEach
     void configure() throws Exception
     {
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        when(xcontext.getWiki()).thenReturn(xWiki);
-        when(xWiki.getClassList(xcontext)).thenReturn(availableClasses);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        when(this.xcontext.getWiki()).thenReturn(this.xWiki);
+        when(this.xWiki.getClassList(this.xcontext)).thenReturn(this.availableClasses);
         UriInfo uriInfo = mock(UriInfo.class);
         when(uriInfo.getBaseUri()).thenReturn(new URI("/xwiki/rest"));
-        ReflectionUtils.setFieldValue(resource, "uriInfo", uriInfo);
-        when(authorization.hasAccess(eq(Right.VIEW), any())).thenReturn(true);
+        ReflectionUtils.setFieldValue(this.resource, "uriInfo", uriInfo);
+        when(this.authorization.hasAccess(eq(Right.VIEW), any())).thenReturn(true);
 
         this.restClasses = new ArrayList<>();
-        for (int i = 0; i < availableClasses.size(); i++) {
-            when(resolver.resolve(eq(availableClasses.get(i)), any())).thenReturn(documentReferences.get(i));
+        for (int i = 0; i < this.availableClasses.size(); i++) {
+            when(this.resolver.resolve(eq(this.availableClasses.get(i)), any())).thenReturn(this.documentReferences.get(i));
             XWikiDocument doc = mock(XWikiDocument.class);
             BaseClass baseClass = mock(BaseClass.class);
             Class zeclass = mock(Class.class);
             // the cast here is mandatory, else Mockito register a mock for the call to
             // getDocument(DocumentReference, XWikiContext)
-            when(xWiki.getDocument((EntityReference)documentReferences.get(i), xcontext)).thenReturn(doc);
+            when(this.xWiki.getDocument((EntityReference) this.documentReferences.get(i), this.xcontext)).thenReturn(doc);
             when(doc.getXClass()).thenReturn(baseClass);
-            when(modelFactory.toRestClass(any(), eq(new com.xpn.xwiki.api.Class(baseClass, xcontext))))
+            when(this.modelFactory.toRestClass(any(), eq(new com.xpn.xwiki.api.Class(baseClass, this.xcontext))))
                 .thenReturn(zeclass);
-            when(zeclass.getId()).thenReturn(availableClasses.get(i));
-            restClasses.add(zeclass);
+            when(zeclass.getId()).thenReturn(this.availableClasses.get(i));
+            this.restClasses.add(zeclass);
         }
     }
 
@@ -150,13 +152,13 @@ class ClassResourceImplTest
     void authorizedClassesOnly() throws XWikiRestException, AccessDeniedException
     {
         DocumentReference protectedReference = new DocumentReference("xwiki", "XWiki", "Protected");
-        doThrow(new AccessDeniedException(xcontext.getUserReference(), protectedReference)).when(
-            authorization).checkAccess(eq(Right.VIEW), eq(protectedReference));
+        doThrow(new AccessDeniedException(this.xcontext.getUserReference(), protectedReference))
+            .when(this.authorization).checkAccess(Right.VIEW, protectedReference);
 
         String protectedClass = "XWiki.Protected";
-        for (String availableClass : availableClasses) {
+        for (String availableClass : this.availableClasses) {
             try {
-                Class aClass = resource.getClass("xwiki", availableClass);
+                Class aClass = this.resource.getClass("xwiki", availableClass);
                 if (availableClass.equals(protectedClass)) {
                     fail();
                 } else {

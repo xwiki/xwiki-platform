@@ -27,6 +27,7 @@ import org.xwiki.model.validation.EntityNameValidation;
 import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
+import org.xwiki.model.validation.internal.SlugEntityNameValidationConfiguration;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -71,6 +72,9 @@ class ModelValidationScriptServiceTest
 
     @MockComponent
     private ReplaceCharacterEntityNameValidationConfiguration replaceCharacterEntityNameValidationConfiguration;
+
+    @MockComponent
+    private SlugEntityNameValidationConfiguration slugEntityNameValidationConfiguration;
 
     @MockComponent
     private EntityNameValidation nameStrategy;
@@ -122,26 +126,37 @@ class ModelValidationScriptServiceTest
     }
 
     @Test
+    void getSlugNameStrategyConfiguration()
+    {
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(false);
+        assertNull(this.scriptService.getSlugEntityNameValidationConfiguration());
+
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
+        assertSame(this.slugEntityNameValidationConfiguration,
+            this.scriptService.getSlugEntityNameValidationConfiguration());
+    }
+
+    @Test
     void transformName()
     {
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(this.nameStrategy);
         when(this.configuration.useTransformation()).thenReturn(true);
         assertEquals(TRANSFORMED_NAME, this.scriptService.transformName(TEST_NAME));
-        verify(this.nameStrategy, times(1)).transform(TEST_NAME);
+        verify(this.nameStrategy).transform(TEST_NAME);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(null);
         assertEquals(TEST_NAME, this.scriptService.transformName(TEST_NAME));
-        verify(this.nameStrategy, times(1)).transform(TEST_NAME);
+        verify(this.nameStrategy).transform(TEST_NAME);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(this.nameStrategy);
         when(this.configuration.useTransformation()).thenReturn(false);
         assertEquals(TEST_NAME, this.scriptService.transformName(TEST_NAME));
-        verify(this.nameStrategy, times(1)).transform(TEST_NAME);
+        verify(this.nameStrategy).transform(TEST_NAME);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(null);
         when(this.configuration.useTransformation()).thenReturn(false);
         assertEquals(TEST_NAME, this.scriptService.transformName(TEST_NAME));
-        verify(this.nameStrategy, times(1)).transform(TEST_NAME);
+        verify(this.nameStrategy).transform(TEST_NAME);
     }
 
     @Test
@@ -150,21 +165,21 @@ class ModelValidationScriptServiceTest
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(this.nameStrategy);
         when(this.configuration.useTransformation()).thenReturn(true);
         assertSame(this.entityReferenceTarget, this.scriptService.transformEntityReference(this.entityReferenceSource));
-        verify(this.nameStrategy, times(1)).transform(this.entityReferenceSource);
+        verify(this.nameStrategy).transform(this.entityReferenceSource);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(null);
         assertSame(this.entityReferenceSource, this.scriptService.transformEntityReference(this.entityReferenceSource));
-        verify(this.nameStrategy, times(1)).transform(this.entityReferenceSource);
+        verify(this.nameStrategy).transform(this.entityReferenceSource);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(this.nameStrategy);
         when(this.configuration.useTransformation()).thenReturn(false);
         assertSame(this.entityReferenceSource, this.scriptService.transformEntityReference(this.entityReferenceSource));
-        verify(this.nameStrategy, times(1)).transform(this.entityReferenceSource);
+        verify(this.nameStrategy).transform(this.entityReferenceSource);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(null);
         when(this.configuration.useTransformation()).thenReturn(false);
         assertSame(this.entityReferenceSource, this.scriptService.transformEntityReference(this.entityReferenceSource));
-        verify(this.nameStrategy, times(1)).transform(this.entityReferenceSource);
+        verify(this.nameStrategy).transform(this.entityReferenceSource);
     }
 
     @Test
@@ -173,19 +188,19 @@ class ModelValidationScriptServiceTest
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(this.nameStrategy);
         when(this.configuration.useTransformation()).thenReturn(false);
         assertEquals(TRANSFORMED_NAME, this.scriptService.transformName(TEST_NAME, HINT));
-        verify(this.nameStrategy, times(1)).transform(TEST_NAME);
+        verify(this.nameStrategy).transform(TEST_NAME);
         verify(this.nameStrategyManager, never()).getEntityReferenceNameStrategy();
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(null);
         when(this.configuration.useTransformation()).thenReturn(false);
         assertEquals(TEST_NAME, this.scriptService.transformName(TEST_NAME, HINT));
-        verify(this.nameStrategy, times(1)).transform(TEST_NAME);
+        verify(this.nameStrategy).transform(TEST_NAME);
         verify(this.nameStrategyManager, never()).getEntityReferenceNameStrategy();
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(null);
         when(this.configuration.useTransformation()).thenReturn(true);
         assertEquals(TEST_NAME, this.scriptService.transformName(TEST_NAME, HINT));
-        verify(this.nameStrategy, times(1)).transform(TEST_NAME);
+        verify(this.nameStrategy).transform(TEST_NAME);
         verify(this.nameStrategyManager, never()).getEntityReferenceNameStrategy();
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(this.nameStrategy);
@@ -202,21 +217,21 @@ class ModelValidationScriptServiceTest
         when(this.configuration.useTransformation()).thenReturn(false);
         assertSame(
             this.entityReferenceTarget, this.scriptService.transformEntityReference(this.entityReferenceSource, HINT));
-        verify(this.nameStrategy, times(1)).transform(this.entityReferenceSource);
+        verify(this.nameStrategy).transform(this.entityReferenceSource);
         verify(this.nameStrategyManager, never()).getEntityReferenceNameStrategy();
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(null);
         when(this.configuration.useTransformation()).thenReturn(false);
         assertSame(
             this.entityReferenceSource, this.scriptService.transformEntityReference(this.entityReferenceSource, HINT));
-        verify(this.nameStrategy, times(1)).transform(this.entityReferenceSource);
+        verify(this.nameStrategy).transform(this.entityReferenceSource);
         verify(this.nameStrategyManager, never()).getEntityReferenceNameStrategy();
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(null);
         when(this.configuration.useTransformation()).thenReturn(true);
         assertSame(
             this.entityReferenceSource, this.scriptService.transformEntityReference(this.entityReferenceSource, HINT));
-        verify(this.nameStrategy, times(1)).transform(this.entityReferenceSource);
+        verify(this.nameStrategy).transform(this.entityReferenceSource);
         verify(this.nameStrategyManager, never()).getEntityReferenceNameStrategy();
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(this.nameStrategy);
@@ -233,21 +248,21 @@ class ModelValidationScriptServiceTest
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(this.nameStrategy);
         when(this.configuration.useValidation()).thenReturn(true);
         assertFalse(this.scriptService.isValid(TEST_NAME));
-        verify(this.nameStrategy, times(1)).isValid(TEST_NAME);
+        verify(this.nameStrategy).isValid(TEST_NAME);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(null);
         assertTrue(this.scriptService.isValid(TEST_NAME));
-        verify(this.nameStrategy, times(1)).isValid(TEST_NAME);
+        verify(this.nameStrategy).isValid(TEST_NAME);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(this.nameStrategy);
         when(this.configuration.useValidation()).thenReturn(false);
         assertTrue(this.scriptService.isValid(TEST_NAME));
-        verify(this.nameStrategy, times(1)).isValid(TEST_NAME);
+        verify(this.nameStrategy).isValid(TEST_NAME);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(null);
         when(this.configuration.useValidation()).thenReturn(false);
         assertTrue(this.scriptService.isValid(TEST_NAME));
-        verify(this.nameStrategy, times(1)).isValid(TEST_NAME);
+        verify(this.nameStrategy).isValid(TEST_NAME);
     }
 
     @Test
@@ -256,21 +271,21 @@ class ModelValidationScriptServiceTest
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(this.nameStrategy);
         when(this.configuration.useValidation()).thenReturn(true);
         assertFalse(this.scriptService.isValid(this.entityReferenceSource));
-        verify(this.nameStrategy, times(1)).isValid(this.entityReferenceSource);
+        verify(this.nameStrategy).isValid(this.entityReferenceSource);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(null);
         assertTrue(this.scriptService.isValid(this.entityReferenceSource));
-        verify(this.nameStrategy, times(1)).isValid(this.entityReferenceSource);
+        verify(this.nameStrategy).isValid(this.entityReferenceSource);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(this.nameStrategy);
         when(this.configuration.useValidation()).thenReturn(false);
         assertTrue(this.scriptService.isValid(this.entityReferenceSource));
-        verify(this.nameStrategy, times(1)).isValid(this.entityReferenceSource);
+        verify(this.nameStrategy).isValid(this.entityReferenceSource);
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy()).thenReturn(null);
         when(this.configuration.useValidation()).thenReturn(false);
         assertTrue(this.scriptService.isValid(this.entityReferenceSource));
-        verify(this.nameStrategy, times(1)).isValid(this.entityReferenceSource);
+        verify(this.nameStrategy).isValid(this.entityReferenceSource);
     }
 
     @Test
@@ -279,13 +294,13 @@ class ModelValidationScriptServiceTest
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(this.nameStrategy);
         when(this.configuration.useValidation()).thenReturn(false);
         assertFalse(this.scriptService.isValid(TEST_NAME, HINT));
-        verify(this.nameStrategy, times(1)).isValid(TEST_NAME);
+        verify(this.nameStrategy).isValid(TEST_NAME);
         verify(this.nameStrategyManager, never()).getEntityReferenceNameStrategy();
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(null);
         when(this.configuration.useValidation()).thenReturn(false);
         assertTrue(this.scriptService.isValid(TEST_NAME, HINT));
-        verify(this.nameStrategy, times(1)).isValid(TEST_NAME);
+        verify(this.nameStrategy).isValid(TEST_NAME);
         verify(this.nameStrategyManager, never()).getEntityReferenceNameStrategy();
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(this.nameStrategy);
@@ -307,13 +322,13 @@ class ModelValidationScriptServiceTest
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(this.nameStrategy);
         when(this.configuration.useValidation()).thenReturn(false);
         assertFalse(this.scriptService.isValid(this.entityReferenceSource, HINT));
-        verify(this.nameStrategy, times(1)).isValid(this.entityReferenceSource);
+        verify(this.nameStrategy).isValid(this.entityReferenceSource);
         verify(this.nameStrategyManager, never()).getEntityReferenceNameStrategy();
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(null);
         when(this.configuration.useValidation()).thenReturn(false);
         assertTrue(this.scriptService.isValid(this.entityReferenceSource, HINT));
-        verify(this.nameStrategy, times(1)).isValid(this.entityReferenceSource);
+        verify(this.nameStrategy).isValid(this.entityReferenceSource);
         verify(this.nameStrategyManager, never()).getEntityReferenceNameStrategy();
 
         when(this.nameStrategyManager.getEntityReferenceNameStrategy(HINT)).thenReturn(this.nameStrategy);

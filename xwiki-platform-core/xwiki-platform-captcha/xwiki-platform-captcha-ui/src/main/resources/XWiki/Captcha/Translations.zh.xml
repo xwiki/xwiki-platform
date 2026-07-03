@@ -39,5 +39,8 @@
   <content>admin.captcha=验证码
 captcha.admin.defaultCaptchaName.label=默认的验证方式
 captcha.admin.defaultCaptchaName.hint=设置默认的验证码生成器。您可以使用扩展管理器来搜寻并安装使用其他的验证码生成器。
+captcha.admin.configure.title=配置
+captcha.admin.sample.title=验证码样本
+captcha.admin.sample.description=例如，配置的 CAPTCHA 在表单中显示时的外观。
 </content>
 </xwikidoc>

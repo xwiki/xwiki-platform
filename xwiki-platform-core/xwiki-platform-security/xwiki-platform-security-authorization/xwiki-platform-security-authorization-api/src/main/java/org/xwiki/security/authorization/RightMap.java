@@ -53,10 +53,10 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     private transient List<Object> rights;
 
     /** Cached key set. */
-    private transient Set<Right> keySet;
+    private transient Set<Right> cachedKeySet;
 
     /** Cached value collection. */
-    private transient Collection<V> values;
+    private transient Collection<V> cachedValues;
 
     /** Cached entry set. */
     private transient Set<Entry<Right, V>> entrySet;
@@ -260,10 +260,10 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     @Override
     public Set<Right> keySet()
     {
-        if (keySet == null) {
-            keySet = new RightSet();
+        if (cachedKeySet == null) {
+            cachedKeySet = new RightSet();
         }
-        return keySet;
+        return cachedKeySet;
     }
 
     /**
@@ -307,10 +307,10 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     @Override
     public Collection<V> values()
     {
-        if (values == null) {
-            values = new Values();
+        if (cachedValues == null) {
+            cachedValues = new Values();
         }
-        return values;
+        return cachedValues;
     }
 
     /**
@@ -630,7 +630,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
         // Read in the key type and any hidden stuff
         s.defaultReadObject();
 
-        rights = new ArrayList<Object>(Right.size());
+        rights = new ArrayList<>(Right.size());
 
         // Read the keys and values, and put the mappings in the HashMap
         for (int i = 0; i < s.readInt(); i++) {

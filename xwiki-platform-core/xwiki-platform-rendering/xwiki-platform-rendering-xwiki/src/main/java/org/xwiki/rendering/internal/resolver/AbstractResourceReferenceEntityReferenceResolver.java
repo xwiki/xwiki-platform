@@ -186,7 +186,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
                 new SpaceReference(reference.getName(), (SpaceReference) reference.getParent());
             finalReference = new DocumentReference(defaultDocumentName, spaceReference);
 
-            if (trySpaceSibling
+            if (sourceReference != null && trySpaceSibling
                 && trySpaceSiblingFallback(sourceReference, finalReference, baseReference, defaultDocumentName)) {
                 // Try as a space sibling.
                 DocumentReference siblingReference =

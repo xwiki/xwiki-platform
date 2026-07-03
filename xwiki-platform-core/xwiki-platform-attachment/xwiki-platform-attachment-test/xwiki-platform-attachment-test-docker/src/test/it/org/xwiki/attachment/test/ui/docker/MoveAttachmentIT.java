@@ -48,10 +48,7 @@ import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentIniti
  * @version $Id$
  * @since 14.0RC1
  */
-@UITest(properties = {
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
-})
+@UITest
 class MoveAttachmentIT
 {
     private static final String SOURCE_FILENAME = "moveme.txt";

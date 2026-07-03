@@ -26,7 +26,7 @@ import org.xwiki.extension.xar.job.diff.DiffXarJobStatus;
 import org.xwiki.extension.xar.job.diff.DocumentUnifiedDiff;
 import org.xwiki.job.internal.script.safe.SafeJobStatus;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 

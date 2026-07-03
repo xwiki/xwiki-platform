@@ -33,6 +33,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
@@ -58,7 +60,7 @@ import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.rendering.wiki.WikiModelException;
 
 import com.steadystate.css.parser.CSSOMParser;
-import com.steadystate.css.parser.SACParserCSS21;
+import com.steadystate.css.parser.SACParserCSS3;
 
 /**
  * Implementation using the Document Access Bridge ({@link DocumentAccessBridge}).
@@ -68,6 +70,7 @@ import com.steadystate.css.parser.SACParserCSS21;
  */
 @Component
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class XWikiWikiModel implements WikiModel
 {
     /**
@@ -134,7 +137,7 @@ public class XWikiWikiModel implements WikiModel
      *
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-5625">XWIKI-5625: PDF styling doesn't work anymore</a>
      */
-    private final CSSOMParser cssParser = new CSSOMParser(new SACParserCSS21());
+    private final CSSOMParser cssParser = new CSSOMParser(new SACParserCSS3());
 
     /**
      * {@inheritDoc}
@@ -312,7 +315,8 @@ public class XWikiWikiModel implements WikiModel
                 value = sd.getPropertyValue(dimension);
             } catch (Exception e) {
                 // Ignore the style parameter but log a warning to let the user know.
-                this.logger.warn("Failed to parse CSS style [{}]", style);
+                this.logger.warn("Failed to parse CSS style [{}]. Root cause is: [{}]", style,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
         if (StringUtils.isBlank(value)) {
@@ -330,10 +334,10 @@ public class XWikiWikiModel implements WikiModel
      */
     private Map<String, Object> getImageURLParameters(Map<String, String> imageParameters)
     {
-        String width = StringUtils.removeEnd(getImageDimension(WIDTH, imageParameters), PIXELS);
-        String height = StringUtils.removeEnd(getImageDimension(HEIGHT, imageParameters), PIXELS);
+        String width = Strings.CS.removeEnd(getImageDimension(WIDTH, imageParameters), PIXELS);
+        String height = Strings.CS.removeEnd(getImageDimension(HEIGHT, imageParameters), PIXELS);
         boolean useHeight = StringUtils.isNotEmpty(height) && StringUtils.isNumeric(height);
-        Map<String, Object> queryString = new LinkedHashMap<String, Object>();
+        Map<String, Object> queryString = new LinkedHashMap<>();
         if (StringUtils.isEmpty(width) || !StringUtils.isNumeric(width)) {
             // Width is unspecified or is not measured in pixels.
             if (useHeight) {
@@ -367,7 +371,7 @@ public class XWikiWikiModel implements WikiModel
 
     private String extendQueryString(String queryString, Map<String, Object> parameters)
     {
-        List<NameValuePair> pairs = new ArrayList<NameValuePair>(URLEncodedUtils.parse(queryString, UTF8, '&'));
+        List<NameValuePair> pairs = new ArrayList<>(URLEncodedUtils.parse(queryString, UTF8, '&'));
         // Exclude the parameters that are already on the query string.
         for (NameValuePair pair : pairs) {
             parameters.remove(pair.getName());

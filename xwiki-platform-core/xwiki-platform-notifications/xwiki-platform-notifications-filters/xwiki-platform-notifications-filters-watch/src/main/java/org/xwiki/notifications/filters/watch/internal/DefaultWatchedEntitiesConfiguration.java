@@ -56,9 +56,6 @@ public class DefaultWatchedEntitiesConfiguration implements WatchedEntitiesConfi
     private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(CODE_SPACE,
             "AutomaticWatchModeClass");
 
-    private static final LocalDocumentReference WATCHLIST_REFERENCE = new LocalDocumentReference(XWIKI_SPACE,
-            "WatchListClass");
-
     private static final LocalDocumentReference CONFIGURATION_REFERENCE = new LocalDocumentReference(CODE_SPACE,
             "NotificationAdministration");
 
@@ -91,12 +88,6 @@ public class DefaultWatchedEntitiesConfiguration implements WatchedEntitiesConfi
         Object value = documentAccessBridge.getProperty(user, getAbsoluteClassReference(user),
                 AUTOMATIC_WATCH_MODE);
         if (value != null && StringUtils.isNotBlank((String) value)) {
-            return AutomaticWatchMode.valueOf((String) value);
-        }
-
-        // Fallback to the value of the Watchlist
-        value = documentAccessBridge.getProperty(user, getAbsoluteWatchlistClassReference(user), "automaticwatch");
-        if (value != null && StringUtils.isNotBlank((String) value) && !"default".equals(value)) {
             return AutomaticWatchMode.valueOf((String) value);
         }
 
@@ -165,11 +156,6 @@ public class DefaultWatchedEntitiesConfiguration implements WatchedEntitiesConfi
     private DocumentReference getAbsoluteClassReference(WikiReference wikiReference)
     {
         return new DocumentReference(CLASS_REFERENCE, wikiReference);
-    }
-
-    private DocumentReference getAbsoluteWatchlistClassReference(DocumentReference user)
-    {
-        return new DocumentReference(WATCHLIST_REFERENCE, user.getWikiReference());
     }
 
     private DocumentReference getAbsoluteConfigurationReference(WikiReference wikiReference)

@@ -20,6 +20,8 @@
 
 package org.xwiki.security.authorization.testwikis;
 
+import java.util.Collection;
+
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -44,4 +46,22 @@ public interface TestDocument extends SecureTestEntity
      * @return the alternate description for this test document.
      */
     String getDescription();
+
+    /**
+     * @return if required rights shall be enforced
+     * @since 16.10.0RC1
+     */
+    boolean isEnforceRequiredRights();
+
+    /**
+     * @param requiredRight the required right to add
+     * @since 16.10.0RC1
+     */
+    void addRequiredRight(TestRequiredRight requiredRight);
+
+    /**
+     * @return the required rights
+     * @since 16.10.0RC1
+     */
+    Collection<TestRequiredRight> getRequiredRights();
 }

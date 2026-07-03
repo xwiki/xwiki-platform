@@ -23,7 +23,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.like.test.po.LikeButton;
+import org.xwiki.like.test.po.LikersPage;
 import org.xwiki.like.test.po.UserProfileLikedPagesPage;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -40,7 +42,9 @@ import static org.xwiki.like.test.po.UserProfileLikedPagesPage.TITLE_COLUMN_NAME
 @UITest(
     properties = {
         // Required for filters preferences
-        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+        // The RightsManagerPlugin is needed to change rights in the UI
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
@@ -138,7 +142,7 @@ class LikeIT
         tableLayout.assertRow(LIKES_COLUMN_NAME, "2");
         tableLayout.assertRow(LIKES_COLUMN_NAME, "1");
 
-        // Go to the profile of user 1 and verify that the like pages are displayed and valid.
+        // Go to the profile of user 1 and verify that the liked pages are displayed and valid.
         UserProfileLikedPagesPage user1ProfileLikedPagesPage = new UserProfileLikedPagesPage(USER1);
         user1ProfileLikedPagesPage.gotoPage();
         tableLayout = user1ProfileLikedPagesPage.getLiveData().getTableLayout();
@@ -146,6 +150,14 @@ class LikeIT
         tableLayout.assertCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
             testUtils.getURL(testReference.getLastSpaceReference()));
         tableLayout.assertRow(LIKES_COLUMN_NAME, "2");
+
+        // Go to the likers of the page and verify the Live Data is accurate.
+        LikersPage likersPage = LikersPage.goToLikers(testReference);
+        LiveDataElement likersLiveData = likersPage.getLiveData();
+        TableLayoutElement likersTableLayout = likersLiveData.getTableLayout();
+        assertEquals(2, likersTableLayout.countRows());
+        likersTableLayout.assertRow("User", "LikeUser1");
+        likersTableLayout.assertRow("User", "LikeUser2");
 
         testUtils.login(USER1, USER1);
         testUtils.gotoPage(testReference);
@@ -160,5 +172,54 @@ class LikeIT
         likeButton = new LikeButton();
         assertTrue(likeButton.isDisplayed());
         assertEquals(1, likeButton.getLikeNumber());
+    }
+
+    @Test
+    @Order(3)
+    void likeRight(TestReference testReference, TestUtils testUtils) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        // Create a page for the test.
+        testUtils.rest().savePage(testReference, "some content", "Title");
+        // Make sure that user 1 has the right to like while user 2 doesn't have it.
+        testUtils.setRights(testReference, null, "XWiki." + USER1, "like", true);
+
+        // Verify that user 1 can like the page.
+        testUtils.login(USER1, USER1);
+        testUtils.gotoPage(testReference);
+        LikeButton likeButton = new LikeButton();
+        assertTrue(likeButton.isDisplayed());
+        assertTrue(likeButton.canBeClicked());
+        assertEquals(0, likeButton.getLikeNumber());
+        likeButton.clickToLike();
+        assertEquals(1, likeButton.getLikeNumber());
+
+        // Verify that user 2 can't like the page.
+        testUtils.login(USER2, USER2);
+        testUtils.gotoPage(testReference);
+        likeButton = new LikeButton();
+        assertTrue(likeButton.isDisplayed());
+        assertFalse(likeButton.canBeClicked());
+        assertEquals(1, likeButton.getLikeNumber());
+    }
+
+    /**
+     * Check that the like feature can be disabled.
+     */
+    @Test
+    @Order(4)
+    void disableLike(TestUtils testUtils, TestReference testReference)
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.createPage(testReference, "some content");
+        updateLikeConfiguration(testUtils, "enabled", false);
+        testUtils.gotoPage(testReference);
+        LikeButton likeButton = new LikeButton();
+        // Even as an admin, the like button is not displayed
+        assertFalse(likeButton.isDisplayed());
+        updateLikeConfiguration(testUtils, "enabled", true);
+        testUtils.gotoPage(testReference);
+        likeButton = new LikeButton();
+        assertTrue(likeButton.isDisplayed());
     }
 }

@@ -1,0 +1,34 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.# Verify that icons using HTML are correctly displayed in inline and standalone contexts
+.#-----------------------------------------------------
+{{displayIcon name="home" iconSet="html" /}}
+
+Inline: {{displayIcon name="home" iconSet="html" /}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [displayIcon] [name=home|iconSet=html]
+beginMetaData [[syntax]=[XWiki 2.1]]
+beginParagraph
+beginMacroMarkerInline [html] [clean=false] [<span class="fa fa-htmlHome" aria-hidden="true"></span>]
+onRawText [<span class="fa fa-htmlHome" aria-hidden="true"></span>] [html/5.0]
+endMacroMarkerInline [html] [clean=false] [<span class="fa fa-htmlHome" aria-hidden="true"></span>]
+endParagraph
+endMetaData [[syntax]=[XWiki 2.1]]
+endMacroMarkerStandalone [displayIcon] [name=home|iconSet=html]
+beginParagraph
+onWord [Inline]
+onSpecialSymbol [:]
+onSpace
+beginMacroMarkerInline [displayIcon] [name=home|iconSet=html]
+beginMetaData [[syntax]=[XWiki 2.1]]
+beginMacroMarkerInline [html] [clean=false] [<span class="fa fa-htmlHome" aria-hidden="true"></span>]
+onRawText [<span class="fa fa-htmlHome" aria-hidden="true"></span>] [html/5.0]
+endMacroMarkerInline [html] [clean=false] [<span class="fa fa-htmlHome" aria-hidden="true"></span>]
+endMetaData [[syntax]=[XWiki 2.1]]
+endMacroMarkerInline [displayIcon] [name=home|iconSet=html]
+endParagraph
+endDocument

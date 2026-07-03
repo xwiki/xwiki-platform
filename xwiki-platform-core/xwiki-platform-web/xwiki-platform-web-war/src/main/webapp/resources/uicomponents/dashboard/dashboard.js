@@ -48,9 +48,14 @@
 #foreach ($key in $l10nKeys)
   #set ($discard = $l10n.put($key, $services.localization.render($key)))
 #end
+#set ($iconNames = ['pencil', 'cross', 'add'])
+#set ($icons = {})
+#foreach ($iconName in $iconNames)
+  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
+#end
 #[[*/
 // Start JavaScript-only code.
-(function(paths, l10n) {
+(function(paths, l10n, icons) {
   "use strict";
 
 require.config({paths});
@@ -76,6 +81,17 @@ XWiki.Dashboard = Class.create( {
     this.containers = element.select(".gadget-container");
     this.createDragAndDrops();
     this.addGadgetsHandlers();
+    // Create the section to contain add buttons
+    var sectionAddButtons = new Element('section', {
+      'class': 'containeradd'
+    });
+    // check if the warning is there, if it is, put the button under it
+    var warning = this.element.down('.differentsource');
+    if (warning) {
+      warning.insert({'after' : sectionAddButtons});
+    } else {
+      this.element.insert({'top' : sectionAddButtons});
+    }
     this.addNewGadgetHandler();
     this.addNewContainerHandler();
 
@@ -98,6 +114,7 @@ XWiki.Dashboard = Class.create( {
     this.sourceSpace = this.element.down('.metadata .sourcespace').innerHTML;
     this.sourceWiki = this.element.down('.metadata .sourcewiki').innerHTML;
     this.sourceURL = this.element.down('.metadata .sourceurl').readAttribute('href');
+    this.sourceSyntax = this.element.querySelector('.metadata')?.dataset.sourceSyntax || 'xwiki/2.0';
   },
 
   /**
@@ -259,12 +276,14 @@ XWiki.Dashboard = Class.create( {
       'title': l10n['dashboard.gadget.actions.delete.tooltip']
     });
     removeIcon.observe('click', this.onRemoveGadget.bindAsEventListener(this));
+    removeIcon.update(icons.cross);
 
     var editIcon = new Element('span', {
       'class': 'edit action',
       'title': l10n['dashboard.gadget.actions.edit.tooltip']
     });
     editIcon.observe('click', this.onEditGadgetClick.bindAsEventListener(this));
+    editIcon.update(icons.pencil);
 
     var actionsContainer = new Element('div', {'class' : 'gadget-actions'})
     actionsContainer.insert(editIcon);
@@ -278,20 +297,12 @@ XWiki.Dashboard = Class.create( {
   addNewGadgetHandler : function() {
     // create the button
     var addButton = new Element('div', {
-      'class': 'addgadget',
+      'class': 'btn btn-success addgadget',
       'title': l10n['dashboard.actions.add.tooltip']
     });
-    addButton.update(l10n['dashboard.actions.add.button']);
+    addButton.update(icons.add + l10n['dashboard.actions.add.button']);
     addButton.observe('click', this.onAddGadgetClick.bindAsEventListener(this));
-    // check if the warning is there, if it is, put the button under it
-    var warning = this.element.down('.differentsource');
-    if (warning) {
-      warning.insert({'after' : addButton});
-    } else {
-      this.element.insert({'top' : addButton});
-    }
-    // and put a clearfloats after the add
-    addButton.insert({'after' : new Element('div', {'class' : 'clearfloats'})});
+    this.element.down('.containeradd').insert(addButton);
   },
 
   /**
@@ -308,8 +319,8 @@ XWiki.Dashboard = Class.create( {
       return;
     }
     button.addClassName('loading');
-    require(['gadgetWizard'], function(gadgetWizard) {
-      gadgetWizard(gadget).then(callback).finally(() => {
+    require(['gadgetWizard'], (gadgetWizard) => {
+      gadgetWizard(gadget, this.sourceSyntax).then(callback).finally(() => {
         button.removeClassName('loading');
       });
     });
@@ -338,7 +349,7 @@ XWiki.Dashboard = Class.create( {
     // content
     addParameters.set(this.gadgetsClass + '_content', contentField);
     addParameters.set('RequiresHTMLConversion', this.gadgetsClass + '_content');
-    addParameters.set(this.gadgetsClass + '_content_syntax', "xwiki/2.0");
+    addParameters.set(this.gadgetsClass + '_content_syntax', this.sourceSyntax);
     // position
     addParameters.set(this.gadgetsClass + '_position', lastColumn + ', ' + lastIndex);
     // steal the form token of the edit form around the dashboard and send it with the form
@@ -448,7 +459,7 @@ XWiki.Dashboard = Class.create( {
     // content
     editParameters.set(this.gadgetsClass + '_' + gadgetId + '_content', contentField);
     editParameters.set('RequiresHTMLConversion', this.gadgetsClass + '_' + gadgetId + '_content');
-    editParameters.set(this.gadgetsClass + '_' + gadgetId + '_content_syntax', "xwiki/2.0");
+    editParameters.set(this.gadgetsClass + '_' + gadgetId + '_content_syntax', this.sourceSyntax);
     editParameters.set('ajax', '1');
     // steal form token parameter to be able to submit a valid form on the server
     var formToken = this.getFormToken();
@@ -530,13 +541,12 @@ XWiki.Dashboard = Class.create( {
   addNewContainerHandler : function() {
     // create the button
     var addButton = new Element('div', {
-      'class': 'addcontainer',
+      'class': 'btn btn-success addcontainer',
       'title': l10n['dashboard.actions.columns.add.tooltip']
     });
-    addButton.update(l10n['dashboard.actions.columns.add.button']);
+    addButton.update(icons.add + l10n['dashboard.actions.columns.add.button']);
     addButton.observe('click', this.onAddColumn.bindAsEventListener(this));
-    var addGadgetButton = this.element.down('.addgadget');
-    addGadgetButton.insert({'before' : addButton});
+    this.element.down('.containeradd').insert(addButton);
   },
 
   /**
@@ -737,4 +747,4 @@ function init() {
 || document.observe("xwiki:dom:loaded", init);
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $l10n]));
+}).apply(']]#', $jsontool.serialize([$paths, $l10n, $icons]));

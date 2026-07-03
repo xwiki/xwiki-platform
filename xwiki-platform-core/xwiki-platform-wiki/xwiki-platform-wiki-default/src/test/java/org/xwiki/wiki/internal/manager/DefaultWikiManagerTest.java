@@ -21,17 +21,17 @@ package org.xwiki.wiki.internal.manager;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.slf4j.Logger;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiCreateFailedEvent;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.configuration.WikiConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -42,9 +42,12 @@ import org.xwiki.wiki.provisioning.WikiCopier;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -57,19 +60,32 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.0M1
  */
-public class DefaultWikiManagerTest
+@ComponentTest
+class DefaultWikiManagerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultWikiManager> mocker =
-            new MockitoComponentMockingRule(DefaultWikiManager.class);
+    @InjectMockComponents
+    private DefaultWikiManager wikiManager;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
     private ObservationManager observationManager;
 
-    private Logger logger;
+    @MockComponent
+    private WikiCopier wikiCopier;
+
+    @MockComponent
+    private WikiDeleter wikiDeleter;
+
+    @MockComponent
+    private WikiCreator wikiCreator;
+
+    @MockComponent
+    private WikiConfiguration wikiConfiguration;
 
     private XWikiContext xcontext;
 
@@ -77,117 +93,95 @@ public class DefaultWikiManagerTest
 
     private XWikiStoreInterface store;
 
-    private WikiCreator wikiCreator;
-
-    private WikiCopier wikiCopier;
-
-    private WikiDeleter wikiDeleter;
-
-    private WikiConfiguration wikiConfiguration;
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        // Injection
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        observationManager = mocker.getInstance(ObservationManager.class);
-        wikiCopier = mocker.getInstance(WikiCopier.class);
-        wikiDeleter = mocker.getInstance(WikiDeleter.class);
-        wikiCreator = mocker.getInstance(WikiCreator.class);
-        this.wikiConfiguration = mocker.getInstance(WikiConfiguration.class);
-
         // Frequent uses
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(com.xpn.xwiki.XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
-        store = mock(XWikiStoreInterface.class);
-        when(xwiki.getStore()).thenReturn(store);
+        this.xcontext = mock(XWikiContext.class);
+        when(xcontextProvider.get()).thenReturn(this.xcontext);
+        this.xwiki = mock(com.xpn.xwiki.XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+        this.store = mock(XWikiStoreInterface.class);
+        when(this.xwiki.getStore()).thenReturn(this.store);
     }
 
     @Test
-    public void idAvailable() throws Exception
+    void idAvailable() throws Exception
     {
         when(this.wikiConfiguration.shouldCreateDatabase()).thenReturn(true);
 
         // Forbidden list
-        when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden,wikiid3,toto");
-        when(store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
+        when(this.xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden,wikiid3,toto");
+        when(this.store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
 
         // When the wiki already exists
-        when(wikiDescriptorManager.exists("wikiid1")).thenReturn(true);
-        assertFalse(this.mocker.getComponentUnderTest().idAvailable("wikiid1"));
+        when(this.wikiDescriptorManager.exists("wikiid1")).thenReturn(true);
+        assertFalse(this.wikiManager.idAvailable("wikiid1"));
 
         // When the wiki does not already exists
-        when(wikiDescriptorManager.exists("wikiid2")).thenReturn(false);
-        assertTrue(this.mocker.getComponentUnderTest().idAvailable("wikiid2"));
+        when(this.wikiDescriptorManager.exists("wikiid2")).thenReturn(false);
+        assertTrue(this.wikiManager.idAvailable("wikiid2"));
 
         // When the wiki does not already exists but the id is forbidden
-        when(wikiDescriptorManager.exists("wikiid3")).thenReturn(false);
-        assertFalse(this.mocker.getComponentUnderTest().idAvailable("wikiid3"));
+        when(this.wikiDescriptorManager.exists("wikiid3")).thenReturn(false);
+        assertFalse(this.wikiManager.idAvailable("wikiid3"));
     }
 
     @Test
-    public void createWhenWikiExists() throws Exception
+    void createWhenWikiExists() throws Exception
     {
         // When the wiki already exists
-        when(wikiDescriptorManager.exists("wikiid1")).thenReturn(true);
+        when(this.wikiDescriptorManager.exists("wikiid1")).thenReturn(true);
 
-        boolean exceptionCaught = false;
-        try {
-            this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1", true);
-        } catch (WikiManagerException e) {
-            exceptionCaught = true;
-        }
-        assertTrue(exceptionCaught);
+        Throwable exception = assertThrows(WikiManagerException.class, () -> {
+            this.wikiManager.create("wikiid1", "wikialias1", true);
+        });
+        assertEquals("The wiki id [wikiid1] is already used or is a reserved id, and thus is not available.",
+            exception.getMessage());
     }
 
     @Test
-    public void createWhenWikiIdIsForbidden() throws Exception
+    void createWhenWikiIdIsForbidden() throws Exception
     {
         // The wiki does not already exist
-        when(wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
+        when(this.wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
 
         // Forbidden list
-        when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden,wikiid1");
+        when(this.xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden,wikiid1");
 
-        boolean exceptionCaught = false;
-        try {
-            this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1", true);
-        } catch (WikiManagerException e) {
-            exceptionCaught = true;
-        }
-        assertTrue(exceptionCaught);
+        Throwable exception = assertThrows(WikiManagerException.class, () -> {
+            this.wikiManager.create("wikiid1", "wikialias1", true);
+        });
+        assertEquals("The wiki id [wikiid1] is already used or is a reserved id, and thus is not available.",
+            exception.getMessage());
     }
 
     @Test
-    public void createWhenWikiIdIsValid() throws Exception
+    void createWhenWikiIdIsValid() throws Exception
     {
         when(this.wikiConfiguration.shouldCreateDatabase()).thenReturn(true);
 
         // The wiki does not already exist
-        when(wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
+        when(this.wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
 
         // The wiki id is valid
-        when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden");
+        when(this.xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden");
 
         // The wiki name is available
-        when(store.isWikiNameAvailable(eq("wikiid1"), any(XWikiContext.class))).thenReturn(true);
+        when(this.store.isWikiNameAvailable(eq("wikiid1"), any(XWikiContext.class))).thenReturn(true);
 
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1", "owner");
-        when(wikiCreator.create("wikiid1", "wikialias1", "owner")).thenReturn(descriptor);
+        when(this.wikiCreator.create("wikiid1", "wikialias1", "owner")).thenReturn(descriptor);
 
         // Create
-        WikiDescriptor newWikiDescriptor =
-            this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1", "owner", true);
+        WikiDescriptor newWikiDescriptor = this.wikiManager.create("wikiid1", "wikialias1", "owner", true);
 
         // Verify a descriptor has been returned
         assertNotNull(newWikiDescriptor);
 
         // Verify that the wiki descriptor is an instance of DefaultWikiDescriptor
-        assertTrue(newWikiDescriptor instanceof DefaultWikiDescriptor);
+        assertInstanceOf(DefaultWikiDescriptor.class, newWikiDescriptor);
 
         // Verify that the wiki has been created
         verify(wikiCreator).create("wikiid1", "wikialias1", "owner");
@@ -198,92 +192,85 @@ public class DefaultWikiManagerTest
     }
 
     @Test
-    public void createWhenWikiIdIsValidButFail() throws Exception
+    void createWhenWikiIdIsValidButFail() throws Exception
     {
         when(this.wikiConfiguration.shouldCreateDatabase()).thenReturn(true);
 
         // The wiki does not already exist
-        when(wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
+        when(this.wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
 
         // The wiki id is valid
-        when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden");
+        when(this.xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden");
 
         // The wiki name is available
-        when(store.isWikiNameAvailable(eq("wikiid1"), any(XWikiContext.class))).thenReturn(true);
+        when(this.store.isWikiNameAvailable(eq("wikiid1"), any(XWikiContext.class))).thenReturn(true);
 
-        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1", "owner");
-        when(wikiCreator.create("wikiid1", "wikialias1", "owner")).thenThrow(new WikiManagerException("..."));
+        when(this.wikiCreator.create("wikiid1", "wikialias1", "owner")).thenThrow(new WikiManagerException("error"));
 
         // Create
-        boolean exceptionCaught = false;
-        try {
-            this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1", "owner", true);
-        } catch (WikiManagerException e) {
-            exceptionCaught = true;
-        }
-
-        // verify the exception
-        assertTrue(exceptionCaught);
+        Throwable exception = assertThrows(WikiManagerException.class, () -> {
+            this.wikiManager.create("wikiid1", "wikialias1", "owner", true);
+        });
+        assertEquals("error", exception.getMessage());
 
         // Verify the events has been sent
-        verify(observationManager).notify(new WikiCreatingEvent("wikiid1"), "wikiid1", xcontext);
-        verify(observationManager).notify(new WikiCreateFailedEvent("wikiid1"), "wikiid1", xcontext);
+        verify(this.observationManager).notify(new WikiCreatingEvent("wikiid1"), "wikiid1", xcontext);
+        verify(this.observationManager).notify(new WikiCreateFailedEvent("wikiid1"), "wikiid1", xcontext);
     }
 
     @Test
-    public void deleteWiki() throws Exception
+    void deleteWiki() throws Exception
     {
-        this.mocker.getComponentUnderTest().delete("wikiid");
-        verify(wikiDeleter).delete("wikiid");
-        verify(observationManager).notify(eq(new WikiDeletedEvent("wikiid")), eq("wikiid"));
+        this.wikiManager.delete("wikiid");
+        verify(this.wikiDeleter).delete("wikiid");
+        verify(this.observationManager).notify(eq(new WikiDeletedEvent("wikiid")), eq("wikiid"));
     }
 
     @Test
-    public void copyWhenWikiAlreadyExists() throws Exception
+    void copyWhenWikiAlreadyExists() throws Exception
     {
-        when(store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
+        when(this.store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
         // The wiki already exists
-        when(wikiDescriptorManager.exists("existingid")).thenReturn(true);
-        boolean exceptionCaught = false;
-        try {
-            this.mocker.getComponentUnderTest().copy("wikiid", "existingid", "newwikialias", true, true, true);
-        } catch (WikiManagerException e) {
-            exceptionCaught = true;
-        }
-        assertTrue(exceptionCaught);
+        when(this.wikiDescriptorManager.exists("existingid")).thenReturn(true);
+
+        Throwable exception = assertThrows(WikiManagerException.class, () -> {
+            this.wikiManager.copy("wikiid", "existingid", "newwikialias", true, true, true);
+        });
+        assertEquals("Failed to create the new wiki [existingid] when copying [wikiid].", exception.getMessage());
+        assertEquals("The wiki id [existingid] is already used or is a reserved id, and thus is not available.",
+            exception.getCause().getMessage());
     }
 
     @Test
-    public void copyWhenWikiAvailable() throws Exception
+    void copyWhenWikiAvailable() throws Exception
     {
         when(this.wikiConfiguration.shouldCreateDatabase()).thenReturn(true);
 
         // The wiki does not already exist
-        when(wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
+        when(this.wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
 
         // The new id is valid
-        when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden");
+        when(this.xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden");
 
         // The wiki name is available
-        when(store.isWikiNameAvailable(eq("wikiid1"), any(XWikiContext.class))).thenReturn(true);
+        when(this.store.isWikiNameAvailable(eq("wikiid1"), any(XWikiContext.class))).thenReturn(true);
 
         // Other mocks
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1");
-        when(wikiCreator.create("wikiid1", "wikialias1", null)).thenReturn(descriptor);
+        when(this.wikiCreator.create("wikiid1", "wikialias1", null)).thenReturn(descriptor);
 
         // Copy
-        WikiDescriptor newWikiDescriptor = this.mocker.getComponentUnderTest().copy("wikiid", "wikiid1",
-                "wikialias1", true, true, true);
+        WikiDescriptor newWikiDescriptor = this.wikiManager.copy("wikiid", "wikiid1", "wikialias1", true, true, true);
         assertNotNull(newWikiDescriptor);
 
         // Verify that the wiki has been created
-        verify(wikiCreator).create("wikiid1", "wikialias1", null);
+        verify(this.wikiCreator).create("wikiid1", "wikialias1", null);
         // Verify that the wiki has been copied
-        verify(wikiCopier).copyDocuments(eq("wikiid"), eq("wikiid1"), eq(true));
+        verify(this.wikiCopier).copyDocuments("wikiid", "wikiid1", true);
         // Verify that deleted documents has been copied too
-        verify(wikiCopier).copyDeletedDocuments(eq("wikiid"), eq("wikiid1"));
+        verify(this.wikiCopier).copyDeletedDocuments("wikiid", "wikiid1");
         // Verify that events has been sent
-        verify(observationManager).notify(new WikiCopiedEvent("wikiid", "wikiid1"), "wikiid", xcontext);
+        verify(this.observationManager).notify(new WikiCopiedEvent("wikiid", "wikiid1"), "wikiid", this.xcontext);
     }
 }
 

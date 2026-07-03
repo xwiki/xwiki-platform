@@ -23,159 +23,206 @@ define('xwiki-realtime-loader', [
   'xwiki-realtime-config',
   'xwiki-realtime-document',
   'xwiki-l10n!xwiki-realtime-messages',
-  'xwiki-realtime-errorBox',
   'xwiki-events-bridge'
 ], function(
   /* jshint maxparams:false */
-  $, xm, realtimeConfig, doc, Messages, ErrorBox
+  $, xm, realtimeConfig, doc, Messages
 ) {
   'use strict';
 
   if (!realtimeConfig.webSocketURL) {
-    console.log('The WebSocket URL is missing. Aborting attempt to configure a realtime session.');
+    console.error('The WebSocket URL is missing. Aborting attempt to configure a realtime session.');
     return;
   }
 
   let module = {
-    messages: Messages,
-    isForced: window.location.href.indexOf('force=1') >= 0,
-    // Real-time enabled by default.
-    isRt: window.location.href.indexOf('realtime=false') < 0
-  },
-
-  // FIXME: The real-time JavaScript code is not loaded anymore on the "lock" page so this code is not really used. We
-  // need to decide if we want to re-add the real-time JavaScript code on the lock page and how.
-  getDocLock = module.getDocLock = function() {
-    const lockedBy = document.querySelectorAll('p.xwikimessage .wikilink a');
-    const force = document.querySelectorAll('a[href*="force=1"][href*="/edit/"]');
-    return (lockedBy.length && force.length) ? force[0] : null;
-  },
-
-  getRTEditorURL = module.getEditorURL = function(href, info) {
-    href = href.replace(/\?(.*)$/, function (all, args) {
-      return '?' + args.split('&').filter(
-        arg => ['editor', 'section', 'force', 'realtime'].indexOf(arg.split('=', 1)[0]) < 0
-      ).join('&');
-    });
-    if (href.indexOf('?') < 0) {
-      href += '?';
-    }
-    href = href + info.href;
-    return href;
+    isForced: globalThis.location.href.includes('force=1'),
   },
 
   allRt = {
     state: false
-  },
-
-  getConfig = module.getConfig = function() {
-    const userReference = xm.userReference ? XWiki.Model.serialize(xm.userReference) : 'xwiki:XWiki.XWikiGuest';
-    return {
-      WebsocketURL: realtimeConfig.webSocketURL,
-      htmlConverterUrl: new XWiki.Document('ConvertHTML', 'RTFrontend').getURL('get', $.param({
-        'xpage': 'plain',
-        'outputSyntax': 'plain',
-        'form_token': document.documentElement.dataset.xwikiFormToken
-      })),
-      // userId === <userReference>-encoded(<userName>)%2d<randomNumber>
-      userName: userReference + '-' + encodeURIComponent(realtimeConfig.user.name + '-').replace(/-/g, '%2d') +
-        String(Math.random()).substring(2),
-      userAvatarURL: realtimeConfig.user.avatarURL,
-      isAdvancedUser: realtimeConfig.user.advanced,
-      network: allRt.network,
-      abort: module.onRealtimeAbort.bind(module),
-      onKeysChanged: module.onKeysChanged.bind(module),
-      displayDisableModal: module.displayDisableModal.bind(module),
-    };
-  },
-
-  // Returns a promise that resolves with the list of editor channels available for the content field of the current
-  // document in the current language.
-  checkSocket = function() {
-    const path = doc.language + '/content/';
-    return doc.getChannels({path}).then(function(channels) {
-      return channels.filter(channel => channel?.path?.length > 2 && channel?.userCount > 0)
-        .map(channel => channel.path.slice(2).join('/'));
-    });
-  },
-
-  lock = getDocLock();
-
-  module.checkSessions = function(info) {
-    if (lock) {
-      // Found an edit lock link.
-      checkSocket().then(types => {
-        // Determine if it's a realtime session.
-        if (types.length) {
-          console.log('Found an active realtime session.');
-          displayModal(null, types, null, info);
-        } else {
-          console.log("Couldn't find an active realtime session.");
-          module.whenReady(function(rt) {
-            if (rt) {
-              displayModal(null, null, null, info);
-            }
-          });
-        }
-      });
-    } else {
-      // Do nothing.
-    }
   };
 
-  let displayModal = module.displayModal = function(createType, existingTypes, callback, info) {
-    if (XWiki.widgets.RealtimeCreateModal) {
-      return;
+  class RealtimeContext {
+    constructor(info) {
+      this.info = info;
+      this.network = allRt.network;
+
+      // Realtime enabled by default.
+      this.realtimeEnabled = !globalThis.location.href.includes('realtime=false');
+      this.webSocketURL = realtimeConfig.webSocketURL;
+
+      const userReference = xm.userReference ? XWiki.Model.serialize(xm.userReference) : 'xwiki:XWiki.XWikiGuest';
+      this.user = {
+        // sessionId === <userReference>-encoded(<userName>)%2d<randomNumber>
+        sessionId: userReference + '-' + encodeURIComponent(realtimeConfig.user.name + '-').replaceAll('-', '%2d') +
+          String(Math.random()).substring(2),
+        name: realtimeConfig.user.name,
+        reference: userReference,
+        avatar: realtimeConfig.user.avatarURL
+      };
+
+      RealtimeContext.instances = RealtimeContext.instances || {};
+      RealtimeContext.instances[info.field] = this;
     }
-    existingTypes = existingTypes || [];
-    XWiki.widgets.RealtimeCreateModal = Class.create(XWiki.widgets.ModalPopup, {
-      initialize: function($super) {
-        $super(
-          this.createContent(),
-          {
-            'show': {method: this.showDialog, keys: []},
-            'close': {method: this.closeDialog, keys: ['Esc']}
-          },
-          {
-            displayCloseButton: true,
-            verticalPosition: 'center',
-            // FIXME: Use color theme or remove this line.
-            backgroundColor: '#FFF',
-            removeOnClose: true
+
+    async updateChannels() {
+      const channels = await doc.getChannels({
+        path: [
+          `translations/${doc.language}/saver`,
+          `translations/${doc.language}/userData`,
+          `translations/${doc.language}/fields/${this.info.field}/editors/${this.info.type}`,
+          // Check also if the field is edited in real-time with other editors at the same time.
+          `translations/${doc.language}/fields/${this.info.field}/editors/`,
+        ],
+        create: true
+      });
+      this.channels = this._parseChannels(channels);
+      return this.channels;
+    }
+
+    _parseChannels(channels) {
+      let keys = {};
+      const saverChannel = channels.getByPath(['translations', doc.language, 'saver']);
+      const userDataChannel = channels.getByPath(['translations', doc.language, 'userData']);
+      const editorChannel = channels.getByPath(['translations', doc.language, 'fields', this.info.field, 'editors',
+        this.info.type]);
+      if (!saverChannel || !userDataChannel || !editorChannel) {
+        console.error('Missing document channels.');
+      } else {
+        keys = $.extend(keys, {
+          [this.info.type]: editorChannel.key,
+          [this.info.type + '_users']: editorChannel.userCount,
+          saver: saverChannel.key,
+          userData: userDataChannel.key,
+          active: {}
+        });
+        // Collect the other active real-time editing session (for the specified document field) that are using a
+        // different editor (e.g. the WYSIWYG editor).
+        channels.getByPathPrefix([
+          'translations', doc.language, 'fields', this.info.field, 'editors'
+        ]).forEach(channel => {
+          if (channel.userCount > 0 && JSON.stringify(channel.path) !== JSON.stringify(editorChannel.path)) {
+            keys.active[channel.path.slice(5).join('/')] = channel;
           }
-        );
-        this.showDialog();
-        this.setClass('realtime-create-session');
-        // FIXME: Use a better (namespaced) event name.
-        $(document).trigger('insertButton');
-      },
-
-      /**
-       * Gets the content of the modal dialog using AJAX.
-       */
-      createContent : function() {
-        let message = Messages.requestASession;
-        if (existingTypes.length > 1) {
-          message = Messages['redirectDialog.pluralPrompt'];
-        } else if (existingTypes.length === 1) {
-          message = Messages.sessionInProgress;
-        }
-
-        const content = createModalContent(message, Messages.get('redirectDialog.create', info.name));
-        const classesButtons = existingTypes.map(type => 'realtime-button-' + type).join(' ');
-        const buttonsDiv = content.find('.realtime-buttons').addClass(classesButtons).data('modal', this);
-        buttonsDiv.find('button').on('click', function() {
-          callback();
-          buttonsDiv.data('modal').closeDialog();
-        }).toggle(!!createType);
-
-        return content[0];
+        });
       }
-    });
-    return new XWiki.widgets.RealtimeCreateModal();
-  },
+      return keys;
+    }
 
-  displayCustomModal = function(content) {
+    /**
+     * Notify the other users that we're editing in realtime or not.
+     * 
+     * @param {boolean} realtimeEnabled whether the user is editing in realtime or not
+     */
+    setRealtimeEnabled(realtimeEnabled) {
+      this.realtimeEnabled = realtimeEnabled;
+      // Notify the others only if we're still editing (only if this context is still associated with the edited field).
+      if (RealtimeContext.instances[this.info.field] === this) {
+        allRt.wChan?.bcast(JSON.stringify({
+          cmd: 'join',
+          field: this.info.field,
+          realtime: realtimeEnabled
+        }));
+        RealtimeContext.detectConcurrentEditing();
+      }
+    }
+
+    destroy() {
+      if (RealtimeContext.instances[this.info.field] === this) {
+        delete RealtimeContext.instances[this.info.field];
+        // Notify the others that we stopped editing this field.
+        allRt.wChan?.bcast(JSON.stringify({
+          cmd: 'leave',
+          field: this.info.field
+        }));
+        RealtimeContext.detectConcurrentEditing();
+      }
+    }
+
+    setConcurrentEditing(concurrentEditing) {
+      const show = !this.concurrentEditing;
+      this.concurrentEditing = concurrentEditing;
+      $('.realtime-warning').popover('destroy').remove();
+      if (concurrentEditing) {
+        this._createConcurrentEditingWarning(show);
+      }
+    }
+
+    _createConcurrentEditingWarning(show) {
+      const template = document.querySelector('template#realtime-warning');
+      const popoverToggle = template.content.querySelector('.realtime-warning-' +
+        (this.realtimeEnabled ? 'connected' : 'disconnected')).cloneNode(true);
+      let toolbar = document.querySelector(
+        this.realtimeEnabled ? '.realtime-edit-toolbar-left' : '.buttons:not(.realtime-edit-toolbar)'
+      );
+      toolbar.append(popoverToggle);
+      $(popoverToggle).popover();
+      if (show) {
+        this._showConcurrentEditingWarning(popoverToggle);
+      }
+    }
+
+    _showConcurrentEditingWarning(popoverToggle) {
+      // The warning message is shown when leaving collaboration or when switching to Source mode, in which case there
+      // is a toolbar switch, so it's best to wait a bit for the toolbar layout to settle otherwise the position of the
+      // popover won't match the position of the toggle button. Moreover, we want to prevent quickly showing and hiding
+      // the popover in cases where the user is disconnected for a short while.
+      setTimeout(() => {
+        $(popoverToggle).popover('show');
+      }, 1000);
+      // Auto-hide the warning message after 10 seconds.
+      const autoHideTimeout = setTimeout(() => {
+        $(popoverToggle).popover('hide');
+      }, 10000);
+      $(popoverToggle).one('hide.bs.popover', () => {
+        clearTimeout(autoHideTimeout);
+      });
+    }
+
+    /**
+     * Hides the concurrent editing warning messages and asks the other users is they are editing offline (i.e. outside
+     * the realtime collaboration session), in which case the warning message is displayed again (see
+     * onIsSomeoneOfflineMessage).
+     */
+    static detectConcurrentEditing() {
+      if (Object.values(RealtimeContext.instances).some(instance => instance.concurrentEditing)) {
+        RealtimeContext.clearConcurrentEditing();
+        // Check if someone is editing offline any of the document fields we're editing.
+        const editedFields = RealtimeContext.getEditedFields();
+        if (editedFields.length) {
+          allRt.wChan?.bcast(JSON.stringify({
+            cmd: 'isSomeoneOffline',
+            fields: editedFields
+          }));
+        }
+      }
+    }
+
+    static clearConcurrentEditing() {
+      Object.values(RealtimeContext.instances).forEach(instance => instance.setConcurrentEditing(false));
+    }
+
+    static getEditedFields() {
+      return Object.keys(RealtimeContext.instances);
+    }
+
+    static getOfflineEditedFields(fields) {
+      fields = fields || RealtimeContext.getEditedFields();
+      return fields.filter(field => RealtimeContext.isOfflineEditedField(field));
+    }
+
+    static isOfflineEditedField(field) {
+      return RealtimeContext.instances[field] && !RealtimeContext.instances[field].realtimeEnabled;
+    }
+
+    static getRealtimeEditedFields(fields) {
+      fields = fields || RealtimeContext.getEditedFields();
+      return fields.filter(field => RealtimeContext.instances[field]?.realtimeEnabled);
+    }
+  }
+
+  let displayCustomModal = function(content) {
     XWiki.widgets.RealtimeRequestModal = Class.create(XWiki.widgets.ModalPopup, {
       initialize : function($super) {
         $super(
@@ -261,28 +308,12 @@ define('xwiki-realtime-loader', [
     )[0];
   },
 
-  getReloadContent = function() {
-    const content = createModalContent(Messages['reloadDialog.prompt'], Messages['reloadDialog.exit']);
-    const buttonReload = $('<button class="btn btn-default"></button>').text(Messages['reloadDialog.reload']);
-    buttonReload.on('click', window.location.reload.bind(window.location, true)).insertAfter(content.find('button'));
-    return content[0];
-  },
-
   getSaveErrorContent = function() {
     return createModalContent(Messages['requestDialog.saveError'], Messages['rejectDialog.ok'])[0];
   };
 
   module.displayRequestErrorModal = function() {
     displayCustomModal(getSaveErrorContent());
-  };
-
-  module.displayDisableModal = function(callback) {
-    const content = createModalContent(Messages['disableDialog.prompt'], Messages['disableDialog.ok']);
-
-    const buttonOK = content.find('button').on('click', callback.bind(null, true));
-    $('<button class="btn btn-default"></button>').text(Messages['disableDialog.exit']).insertBefore(buttonOK)
-      .on('click', callback.bind(null, false));
-    displayCustomModal(content[0]);
   };
 
   const availableRt = {};
@@ -308,7 +339,7 @@ define('xwiki-realtime-loader', [
       $(document).one('xwiki:document:saved.createRt', function() {
         $(document).off('xwiki:document:saveFailed.createRt');
         comment.val(previousComment);
-        window.location.href = module.getEditorURL(window.location.href, info);
+        globalThis.location.href = module.getEditorURL(globalThis.location.href, info);
       });
       $(document).one('xwiki:document:saveFailed.createRt', function() {
         $(document).off('xwiki:document:saved.createRt');
@@ -318,201 +349,23 @@ define('xwiki-realtime-loader', [
     }
   },
 
-  isEditorCompatible = function() {
-    let matchedType;
-    Object.keys(availableRt).some(function(type) {
-      if ((availableRt[type].info.compatible || []).indexOf(XWiki.editor) !== -1) {
-        matchedType = type;
-        return true;
-      }
-    });
-    return matchedType;
-  },
-
-  unload = false;
-  window.addEventListener('beforeunload', function() {
-    unload = true;
-    setTimeout(function() {
-      unload = false;
-    }, 5000);
-  });
-
-  let fullScreen = !!($('body').attr('data-maximized') || $('html').attr('style')),
-
-  // Trigger a resize event to resize the editable area in fullscreen mode.
-  resize = function() {
-    setTimeout(function() {
-      window.dispatchEvent(new Event('resize'));
+  getCompatibleEditor = function(type) {
+    return Object.keys(availableRt).find((availableType) => {
+      return (availableRt[availableType].info.compatible || []).includes(type);
     });
   },
 
-  // Place the warning box at the correct position when in fullscreen mode.
-  getBoxPosition = function() {
-    return fullScreen ? $('.buttons') : $('#hierarchy');
-  },
-
-  moveBox = function() {
-    $('.xwiki-realtime-box').insertAfter(getBoxPosition()).show();
-    $('.xwiki-realtime-box').css('margin-bottom', fullScreen ? '0' : '');
-    resize();
-  };
-
-  // Detect fullscreen mode in CKeditor.
-  // FIXME: Modify the CKEditor to fire the fullscreen events.
-  new MutationObserver(function(mutations) {
-    mutations.forEach(function (mutation) {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'data-maximized') {
-        fullScreen = $('body').attr('data-maximized') === 'true';
-        moveBox();
-      }
-    });
-  }).observe($('body')[0], {
-    attributes: true
-  });
-
-  // Detect fullscreen mode in wiki editor.
-  $(document).on('xwiki:fullscreen:exited', function() {
-    fullScreen = false;
-    moveBox();
-  }).on('xwiki:fullscreen:entered', function() {
-    fullScreen = true;
-    moveBox();
-  });
-
-  // Scroll to the warning box when a message is displayed or updated.
-  let scrollToBox = function($box) {
-    moveBox();
-    $box[0].scrollIntoView();
-  },
-
-  warningVisible = false,
-  displayWarning = function() {
-    const $after = getBoxPosition();
-    if (unload || warningVisible || !$after.length) {
-      return;
-    }
-    warningVisible = true;
-    const $warning = $('<div></div>', {
-      'class': 'xwiki-realtime-warning xwiki-realtime-box box warningmessage'
-    }).insertAfter($after);
-    scrollToBox($warning);
-    $('<strong></strong>').text(Messages.conflictsWarning).appendTo($warning);
-    $('<br/>').appendTo($warning);
-    $('<span></span>').text(Messages.wsErrorConflicts).appendTo($warning);
-    const editor = isEditorCompatible();
-    if (!module.isRt && editor) {
-      $('<br/>').appendTo($warning);
-      // The parameter is the edit link but we can't inject it directly because we need to escape the HTML.
-      let suggestion = Messages.get('conflictsWarningSuggestion', '__0__');
-      // The translation message shouldn't contain HTML.
-      suggestion = $('<div></div>').text(suggestion).html();
-      // The link label shouldn't contain HTML.
-      const link = $('<a></a>', {
-        href: getRTEditorURL(window.location.href, availableRt[editor].info)
-      }).text(Messages.conflictsWarningInfoLink).prop('outerHTML');
-      // Inject the link and append the suggestion.
-      $warning.append(suggestion.replace('__0__', link));
-    } else if (module.isRt) {
-      $('<br/>').appendTo($warning);
-      $('<span></span>').text(Messages.conflictsWarningInfoRt).appendTo($warning);
-    }
-  },
-
-  displayWsWarning = function(isError) {
-    const $after = getBoxPosition();
-    if (unload || warningVisible || !$after.length) {
-      return;
-    }
-    warningVisible = true;
-    const type = isError ? 'errormessage' : 'warningmessage';
-    const $warning = $('<div></div>', {
-      'class': 'xwiki-realtime-warning xwiki-realtime-box box ' + type
-    }).insertAfter($after);
-    scrollToBox($warning);
-    $('<strong></strong>').text(Messages.wsError).appendTo($warning);
-    $('<br/>').appendTo($warning);
-    $('<span></span>').text(Messages.wsErrorInfo).appendTo($warning);
-    if (module.isForced) {
-      $('<br/>').appendTo($warning);
-      $('<span></span>').text(Messages.wsErrorConflicts).appendTo($warning);
-    }
-  },
-
-  hideWarning = function() {
-    warningVisible = false;
-    $('.xwiki-realtime-warning').remove();
-    resize();
-  },
-
-  connectingVisible = false,
-  displayConnecting = function() {
-    const $after = getBoxPosition();
-    if (unload || connectingVisible || !$after.length) {
-      return;
-    }
-    connectingVisible = true;
-    const $warning = $('<div></div>', {
-      'class': 'xwiki-realtime-connecting xwiki-realtime-box box infomessage'
-    }).insertAfter($after);
-    scrollToBox($warning);
-    $('<strong></strong>').text(Messages.connectingBox).appendTo($warning);
-  },
-
-  hideConnecting = function() {
-    warningVisible = false;
-    $('.xwiki-realtime-connecting').remove();
-    resize();
-  },
-
-  wsErrorVisible = false,
-  displayWsError = function() {
-    const $after = getBoxPosition();
-    if (unload || wsErrorVisible || !$after.length) {
-      return;
-    }
-    wsErrorVisible = true;
-    const $warning = $('<div></div>', {
-      'class': 'xwiki-realtime-disconnected xwiki-realtime-box box errormessage'
-    }).insertAfter($after);
-    scrollToBox($warning);
-    $('<strong></strong>').text(Messages.connectionLost).appendTo($warning);
-    $('<br/>').appendTo($warning);
-    $('<span></span>').text(Messages.connectionLostInfo).appendTo($warning);
-  },
-
-  hideWsError = function() {
-    wsErrorVisible = false;
-    $('.xwiki-realtime-disconnected').remove();
-    resize();
-  },
-
-  tryParse = function(msg) {
+  tryParse = function(message) {
     try {
-      return JSON.parse(msg);
-    } catch (e) {
-      console.error('Cannot parse the message');
+      return JSON.parse(message);
+    } catch (error) {
+      console.error('Cannot parse the message.', {message, error});
     }
   },
 
-  editForm = $('#edit').length ? $('#edit') : $('#inline'),
-  shouldRedirect = false,
-  previewButton = $('#mainEditArea').find('input[name="action_preview"]'),
-  save = function(cont, preview) {
-    if (preview) {
-      previewButton.data('checked', true);
-      previewButton.click();
-    } else {
-      shouldRedirect = !cont;
-      $(document).trigger('xwiki:actions:save', {
-        form: editForm[0],
-        continue: 1
-      });
-    }
-  },
-
-  // Join a channel with all users on this page (realtime, offline AND lock page)
-  // 1. This channel allows users on "lock" page to contact the editing user and request a collaborative session, using
-  //    the `request` and `answer` commands
+  // Join a channel with all users on this page:
+  // 1. This channel allows users to contact the editing user and request a collaborative session, using the `request`
+  //    and `answer` commands
   // 2. It is also used to know if someone else is editing the document concurrently (at least 2 users with 1 editing
   //    offline). In this case, a warning message can be displayed.
   //
@@ -525,13 +378,8 @@ define('xwiki-realtime-loader', [
     }
     const channel = allRt.wChan;
     const network = allRt.network;
-    // Handle leave events.
-    channel.on('leave', function() {
-      hideWarning();
-      channel.bcast(JSON.stringify({
-        cmd: 'isSomeoneOffline'
-      }));
-    });
+    // Whenever someone leaves the edit mode, check if the concurrent editing warning message is still needed.
+    channel.on('leave', RealtimeContext.detectConcurrentEditing);
     // Handle incoming messages.
     channel.on('message', function(msg, sender) {
       const data = tryParse(msg);
@@ -541,19 +389,22 @@ define('xwiki-realtime-loader', [
         // Receiving an answer to a realtime session request.
         case 'answer': return onAnswerMessage(data);
         // Someone is joining the channel while we're editing, check if they are using realtime and if we are.
-        case 'join': return onJoinMessage(data, sender, channel, network);
+        case 'join': return onJoinMessage(data, sender, network);
+        // Someone has stopped editing a document field. Check if the warning message is still needed.
+        case 'leave': return RealtimeContext.detectConcurrentEditing();
         // Someone wants to know if we're editing offline to know if the warning message should be displayed.
-        case 'isSomeoneOffline': return onIsSomeoneOfflineMessage(sender, network);
+        case 'isSomeoneOffline': return onIsSomeoneOfflineMessage(data, sender, network);
       }
     });
   },
 
   onRequestMessage = function(data, channel) {
-    if (lock || !data.type) {
+    if (!data.field || !data.type) {
       return;
     }
     const response = {
       cmd: 'answer',
+      field: data.field,
       type: data.type
     };
     // Make sure realtime is available for the requested editor.
@@ -561,16 +412,12 @@ define('xwiki-realtime-loader', [
       response.state = -1;
       channel.bcast(JSON.stringify(response));
     // Check if we're not already in realtime.
-    } else if (module.isRt) {
+    } else if (RealtimeContext.instances[data.field]?.realtimeEnabled) {
       response.state = 2;
       channel.bcast(JSON.stringify(response));
     // Check if our current editor is realtime compatible, i.e. Object editor can't switch to WYSIWYG.
-    } else if (!isEditorCompatible()) {
-      response.state = 0;
-      response.reason = 'invalid';
-      channel.bcast(JSON.stringify(response));
-    // We're editing offline: display the modal.
-    } else {
+    } else if (getCompatibleEditor(data.type)) {
+      // We're editing offline: display the modal.
       const content = getRequestContent(availableRt[data.type].info, function(state) {
         if (state) {
           // Accepted: save and create the realtime session.
@@ -583,6 +430,10 @@ define('xwiki-realtime-loader', [
         $('.xdialog-modal-container').css('z-index', '99999');
       });
       displayCustomModal(content);
+    } else {
+      response.state = 0;
+      response.reason = 'invalid';
+      channel.bcast(JSON.stringify(response));
     }
   },
 
@@ -593,7 +444,7 @@ define('xwiki-realtime-loader', [
     const state = data.state;
     allRt.request(state);
     if (state === -1) {
-      ErrorBox.show('unavailable');
+      console.debug('We lost the connection to the editing session.');
     } else if (state === 0) {
       // Rejected
       $('.realtime-buttons').data('modal')?.closeDialog();
@@ -601,195 +452,143 @@ define('xwiki-realtime-loader', [
     }
   },
 
-  onJoinMessage = function(data, sender, channel, network) {
-    if (lock) {
+  onJoinMessage = function(data, sender, network) {
+    const realtimeContext = RealtimeContext.instances[data.field];
+    if (!realtimeContext) {
       return;
-    } else if (!data.realtime || !module.isRt) {
-      displayWarning();
+    // Someone has started editing the same document field as us.
+    } else if (!data.realtime || !realtimeContext.realtimeEnabled) {
+      // One of us is editing offline (outside the realtime session).
+      realtimeContext.setConcurrentEditing(true);
       network.sendto(sender, JSON.stringify({
-        cmd: 'displayWarning'
+        cmd: 'displayWarning',
+        fields: [data.field]
       }));
-    } else if (warningVisible) {
-      hideWarning();
-      channel.bcast(JSON.stringify({
-        cmd: 'isSomeoneOffline'
+    } else {
+      // We're both editing in realtime. Maybe we need to hide the concurrent editing warning message.
+      RealtimeContext.detectConcurrentEditing();
+    }
+  },
+
+  onIsSomeoneOfflineMessage = function(data, sender, network) {
+    const offlineFields = RealtimeContext.getOfflineEditedFields(data.fields);
+    if (offlineFields.length) {
+      network.sendto(sender, JSON.stringify({
+        cmd: 'displayWarning',
+        fields: offlineFields
       }));
     }
   },
 
-  onIsSomeoneOfflineMessage = function(sender, network) {
-    if (!lock && !module.isRt) {
-      network.sendto(sender, JSON.stringify({
-        cmd: 'displayWarning'
-      }));
-    }
-  },
-
-  joinAllUsers = function() {
-    const config = getConfig();
-    const getChannels = doc.getChannels.bind(doc, {
-      path: doc.language + '/events/all',
+  getAllUsersChannel = async function() {
+    const channels = await doc.getChannels({
+      path: `translations/${doc.language}/loader`,
       create: true
     });
-    getChannels().then(channels => {
-      const channelKey = channels[0].key;
-      if (channelKey) {
-        require(['netflux-client', 'xwiki-realtime-errorBox'], function(Netflux, ErrorBox) {
-          const onError = function (error) {
-            allRt.error = true;
-            displayWsWarning();
-            console.error(error);
-          };
-          // Connect to the websocket server.
-          Netflux.connect(config.WebsocketURL).then(onNetfluxConnect.bind(null, config, getChannels, channelKey,
-            onError), onError);
-        });
-      }
-    });
+    if (channels.length) {
+      return channels[0];
+    } else {
+      // We can't create / access the All Users channel.
+      throw new Error(Messages.forbidden);
+    }
   },
 
-  onNetfluxConnect = function(config, getChannels, channelKey, onError, network) {
-    allRt.network = network;
-    const onOpen = function(channel) {
-      allRt.userList = channel.members;
-      allRt.wChan = channel;
-      addMessageHandler();
-      // If we're in edit mode (not locked), tell the other users.
-      if (!lock) {
-        channel.bcast(JSON.stringify({
-          cmd: 'join',
-          realtime: module.isRt
-        }));
-      }
-    };
-    // Join the "all" channel.
-    network.join(channelKey).then(onOpen, onError);
+  joinAllUsers = async function() {
+    if (!allRt.network) {
+      allRt.network = await connectToNetfluxWebSocket();
+    }
+
+    const channelInfo = await getAllUsersChannel();
+    if (channelInfo.key !== allRt.channelInfo?.key) {
+      // Either we haven't joined the All Users channel yet, or the key has changed. The later can happen when the
+      // current document language is changed (e.g. because the user has switched from editing the original document
+      // translation to editing another translation, without reloading the web page, from inplace editing). In this
+      // case we have to leave the current channel before joining the new one.
+      allRt.wChan?.leave('Switching to a different All Users channel');
+      await onOpen(channelInfo);
+    }
+  },
+
+  createNetwork = async function() {
+    const Netflux = await new Promise((resolve, reject) => {
+      require(['netflux-client'], resolve, reject);
+    });
+    // We pass a custom WebSocket factory to Netflux in order to avoid repeated connection attempts if the first one
+    // fails, which is often a sign that the HTTP proxy in front on XWiki is blocking the WebSocket requests or is badly
+    // forwarding them. We want to reconnect only if the first connection attempt succeeds (e.g. if we lose the
+    // connection while editing in realtime). The problem is that the Netflux client never stops trying to connect and
+    // we want to fallback to editing alone if the WebSocket connection is not available from the start.
+    let failed = false;
+    const network = await Netflux.connect(realtimeConfig.webSocketURL, (url) => {
+      const webSocket = new WebSocket(url);
+      const maybeDisconnect = () => {
+        if (!allRt.wChan) {
+          // The WebSocket connection was closed before we could join the All Users channel, which is a sign that the
+          // server-side is lacking proper support for WebSockets.
+          failed = true;
+          // HACK: Make Netflux client think we have connected successfully and received the identity in order to
+          // resolve the network promise. There's no other way to force settling the promise unfortunately.
+          webSocket._onident();
+        }
+      };
+      webSocket.addEventListener('error', maybeDisconnect);
+      webSocket.addEventListener('close', maybeDisconnect);
+      return webSocket;
+    });
+    if (failed) {
+      network.disconnect();
+      throw new Error("Failed to connect to the Netflux WebSocket. Make sure the servlet container has WebSocket " +
+        "support enabled and, if you're using an HTTP proxy, that it properly forwards WebSocket requests.");
+    }
+    return network;
+  },
+
+  connectToNetfluxWebSocket = async function() {
+    const network = await createNetwork();
     // Add direct messages handler.
-    network.on('message', function(msg, sender) {
+    network.on('message', msg => {
       const data = tryParse(msg);
       if (data?.cmd === 'displayWarning') {
-        displayWarning();
+        // Some fields are being edited concurrently. Warn about merge conflicts, but only for the fields that we're
+        // still editing.
+        data.fields.forEach(field => RealtimeContext.instances[field]?.setConcurrentEditing(true));
       }
     });
     // On reconnect, join the "all" channel again.
-    network.on('reconnect', function() {
-      hideWarning();
-      hideWsError();
-      getChannels().then(channels => network.join(channels[0].key)).then(onOpen, onError);
-    });
-    network.on('disconnect', function() {
-      if (module.isRt) {
-        displayWsError();
-      } else {
-        displayWsWarning();
+    network.on('reconnect', async () => {
+      try {
+        // Hide the concurrent editing warnings.
+        RealtimeContext.clearConcurrentEditing();
+        await module.toBeReady();
+      } catch (error) {
+        console.error(error);
       }
     });
+    let expectedDisconnect = false;
+    window.addEventListener('beforeunload', () => {
+      expectedDisconnect = true;
+    });
+    network.on('disconnect', () => {
+      if (!expectedDisconnect && Object.keys(RealtimeContext.instances).length) {
+        console.debug('We lost the connection to the editing session.');
+      }
+    });
+    return network;
   },
 
-  fixActionButtonsInOfflineMode = function() {
-    if (!editForm.length || module.isRt) {
-      // Either not editing or online.
-      return;
-    }
-
-    $(document).on('xwiki:document:saved', function() {
-      doc.reload();
-      if (!shouldRedirect) {
-        return;
-      }
-      // CKEditor tries to block the user from leaving the page with unsaved content. Our save mechanism doesn't
-      // update the flag about unsaved content, so we have to do it manually.
-      // FIXME: Trigger some event instead of using directly the CKEditor API.
-      if (window.CKEDITOR) {
-        try {
-          CKEDITOR.instances.content.resetDirty();
-        } catch (error) {
-          // Ignore.
-        }
-      }
-      window.location.href = window.XWiki.currentDocument.getURL('view');
-    });
-
-    // Replace the save actions to check the version first.
-    $('#mainEditArea').find('input[name="action_save"], input[name="action_saveandcontinue"]').each(function() {
-      // TODO: Update this if we rewrite actionButtons.js to use jQuery instead of Prototype.js
-      const clickListeners = Event.cache[this._prototypeUID || this.uniqueID]?.click?.map(entry => entry.handler);
-      $(this).data('prototype.js/clickListeners', clickListeners);
-      this.stopObserving('click');
-    }).off('click.realtime-loader').on('click.realtime-loader', function(event) {
-      event.preventDefault();
-      event.stopPropagation();
-      save(/* continue: */ $(this).attr('name') !== 'action_save');
-    });
-
-    previewButton.on('click', function(event) {
-      if (previewButton.data('checked')) {
-        previewButton.data('checked', false);
-      } else {
-        event.preventDefault();
-        event.stopPropagation();
-        save(false, true);
-      }
-    });
-  },
-
-  beforeLaunchRealtime = function(keys) {
-    return new Promise((resolve, reject) => {
-      if (module.isRt) {
-        module.whenReady(function(wsAvailable) {
-          module.isRt = wsAvailable;
-          resolve(keys);
-        });
-      } else {
-        resolve(keys);
-      }
-    });
-  },
-
-  parseKeyData = function(editorId, channels) {
-    let keys = {};
-    const eventsChannel = channels.getByPath([doc.language, 'events', '1.0']);
-    const userDataChannel = channels.getByPath([doc.language, 'events', 'userdata']);
-    const editorChannel = channels.getByPath([doc.language, 'content', editorId]);
-    if (!eventsChannel || !userDataChannel || !editorChannel) {
-      console.error('Missing document channels.');
-    } else {
-      keys = $.extend(keys, {
-        [editorId]: editorChannel.key,
-        [editorId + '_users']: editorChannel.userCount,
-        events: eventsChannel.key,
-        userdata: userDataChannel.key,
-        active: {}
-      });
-      // Collect the other active real-time editing session (for the document content field) that are using a different
-      // editor (e.g. the WYSIWYG editor).
-      channels.getByPathPrefix([doc.language, 'content']).forEach(channel => {
-        if (channel.userCount > 0 && JSON.stringify(channel.path) !== JSON.stringify(editorChannel.path)) {
-          keys.active[channel.path.slice(2).join('/')] = channel;
-        }
-      });
-    }
-    return keys;
+  onOpen = async channelInfo => {
+    const channel = await allRt.network.join(channelInfo.key);
+    allRt.userList = channel.members;
+    allRt.wChan = channel;
+    allRt.channelInfo = channelInfo;
+    addMessageHandler();
   };
 
   $.extend(module, {
-    updateKeys: function(editorId) {
-      return doc.getChannels({
-        path: [
-          doc.language + '/events/1.0',
-          doc.language + '/events/userdata',
-          doc.language + '/content/' + editorId,
-          // Check also if the content is edited in real-time with other editors at the same time.
-          doc.language + '/content/',
-        ],
-        create: true
-      }).then(parseKeyData.bind(module, editorId));
-    },
-
-    requestRt: function(type, callback) {
+    requestRt: function({field, type, callback}) {
       if (!allRt.wChan) {
-        setTimeout(function () {
-          module.requestRt(type, callback);
+        setTimeout(() => {
+          this.requestRt({field, type, callback});
         }, 500);
       } else if (allRt.userList.length === 1) {
         // No other user.
@@ -798,76 +597,63 @@ define('xwiki-realtime-loader', [
         allRt.request = callback;
         allRt.wChan.bcast(JSON.stringify({
           cmd: 'request',
-          type: 'wysiwyg'
+          field,
+          type
         }));
       }
     },
 
-    onRealtimeAbort: function() {
-      module.isRt = false;
-      allRt.wChan?.bcast(JSON.stringify({
-        cmd: 'join',
-        realtime: module.isRt
-      }));
+    getEditorURL: function(href, info) {
+      const currentURL = new URL(href);
+      const baseURL = new URL("?", currentURL).toString();
+      const params = new URLSearchParams(currentURL.search);
+      ['editor', 'section', 'force', 'realtime'].forEach(param => params.delete(param));
+      const hash = info.href.includes('#') ? '' : currentURL.hash;
+      return baseURL + params.toString() + info.href + hash;
     },
 
-    whenReady: function(callback) {
-      displayConnecting();
-      // We want realtime enabled so we have to wait for the network to be ready.
-      if (allRt.network) {
-        hideConnecting();
-        callback(true);
-      } else if (allRt.error) {
-        // Can't connect to network: hide the warning about "not being warned when some wants RT" and display error
-        // about not being able to enable WebSocket.
-        hideConnecting();
-        hideWarning();
-        displayWsWarning(true);
-        callback(false);
-      } else {
-        setTimeout(module.whenReady.bind(module, callback), 100);
+    bootstrap: async function(info) {
+      this.setAvailableRt(info);
+      // We currently support editing in realtime only the content field (using either the Wiki editor, the standalone
+      // WYSIWYG editor or the Inplace editor).
+      if (info.field === 'content' && globalThis.XWiki.editor === info.type) {
+        // The current editor is supported. Check if we can join a realtime session.
+        const realtimeContext = new RealtimeContext(info);
+        const keys = await realtimeContext.updateChannels();
+        if (!keys[info.type] || !keys.saver || !keys.userData) {
+          // We can't create / access the document Netflux channels required for realtime editing.
+          throw new Error(Messages.forbidden);
+        } else if (Object.keys(keys.active).length && !keys[info.type + '_users']) {
+          // There is an active real-time editing session for the document content but it uses a different editor. We
+          // don't want to activate another editing session for the current editor because the auto-save from each
+          // session will create a lot of merge conflicts.
+          throw new Error(`The current editor [${info.type}] is not compatible with the existing realtime ` +
+            `editing session that uses the ${Object.keys(keys.active)} editor.`);
+        }
+        return await this.beforeLaunchRealtime(realtimeContext);
       }
     },
 
-    onKeysChanged: function() {
-      // The channel keys have changed while we were offline. We may not have the latest version of the document. The
-      // safest solution is to reload.
-      // FIXME: This module shouldn't know about CKEditor.
-      sessionStorage.refreshCk = 'true';
-      displayCustomModal(getReloadContent());
+    beforeLaunchRealtime: async function(realtimeContext) {
+      if (realtimeContext.realtimeEnabled) {
+        try {
+          await this.toBeReady();
+        } finally {
+          realtimeContext.realtimeEnabled = !!allRt.wChan;
+          realtimeContext.network = allRt.network;
+        }
+      }
+
+      return realtimeContext;
     },
 
-    bootstrap: function(info) {
-      return new Promise((resolve, reject) => {
-        this.setAvailableRt(info);
-        if (lock) {
-          // Found a lock link. Check active sessions.
-          this.checkSessions(info);
-          reject(new Error('Lock detected'));
-        } else if (window.XWiki.editor === info.type) {
-          // No lock and we are using the right editor. Start realtime.
-          this.updateKeys(info.type).then(keys => {
-            if (!keys[info.type] || !keys.events || !keys.userdata) {
-              ErrorBox.show('unavailable');
-              const error = new Error('You are not allowed to create a new realtime session for that document.');
-              console.error(error);
-              reject(error);
-            } else if (!Object.keys(keys.active).length || keys[info.type + '_users'] > 0) {
-              resolve(keys);
-            } else {
-              // Let the user choose between joining the existing real-time session (with a different editor) or create
-              // a new real-time session with the current editor.
-              console.log('Join the existing realtime session or create a new one.');
-              this.displayModal(info.type, Object.keys(keys.active), resolve.bind(null, keys), info);
-            }
-          });
-        }
-      }).then(beforeLaunchRealtime);
-    }
-  });
+    toBeReady: function() {
+      this.ready = this.ready.then(joinAllUsers);
+      return this.ready;
+    },
 
-  $(fixActionButtonsInOfflineMode);
-  joinAllUsers();
+    ready: joinAllUsers()
+  });
 
   return module;
 });

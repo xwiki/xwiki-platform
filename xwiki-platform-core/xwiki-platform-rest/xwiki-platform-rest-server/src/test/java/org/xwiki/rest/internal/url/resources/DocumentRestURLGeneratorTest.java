@@ -20,6 +20,7 @@
 package org.xwiki.rest.internal.url.resources;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Provider;
@@ -61,29 +62,31 @@ class DocumentRestURLGeneratorTest
     void setup(ComponentManager componentManager) throws Exception
     {
         Provider<XWikiContext> xwikiContextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
-        xwikiContext = xwikiContextProvider.get();
-        xwiki = mock(XWiki.class);
-        urlFactory = mock(XWikiURLFactory.class);
+        this.xwikiContext = xwikiContextProvider.get();
+        this.xwiki = mock(XWiki.class);
+        this.urlFactory = mock(XWikiURLFactory.class);
 
-        when(xwikiContext.getWiki()).thenReturn(xwiki);
-        when(xwikiContext.getURLFactory()).thenReturn(urlFactory);
-        when(xwiki.getWebAppPath(xwikiContext)).thenReturn("/");
-        when(urlFactory.getServerURL(xwikiContext)).thenReturn(new URL("http://localhost"));
+        when(this.xwikiContext.getWiki()).thenReturn(this.xwiki);
+        when(this.xwikiContext.getURLFactory()).thenReturn(this.urlFactory);
+        when(this.xwiki.getWebAppPath(this.xwikiContext)).thenReturn("/");
+        when(this.urlFactory.getServerURL(this.xwikiContext)).thenReturn(new URL("http://localhost"));
     }
 
     @Test
     void getURLWithoutLocale() throws Exception
     {
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         assertEquals("http://localhost/rest/wikis/wiki/spaces/space/pages/page",
-            this.generator.getURL(documentReference).toString());
+            this.generator.getURL(new DocumentReference("wiki", "space", "page")).toString());
+
+        assertEquals("http://localhost/rest/wikis/wiki/spaces/space1/spaces/space2/pages/page",
+            this.generator.getURL(new DocumentReference("wiki", List.of("space1", "space2"), "page")).toString());
     }
 
     @Test
     void getURLWitTrailingServerURLSlash() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        when(urlFactory.getServerURL(xwikiContext)).thenReturn(new URL("http://localhost2/"));
+        when(this.urlFactory.getServerURL(this.xwikiContext)).thenReturn(new URL("http://localhost2/"));
         assertEquals("http://localhost2/rest/wikis/wiki/spaces/space/pages/page",
             this.generator.getURL(documentReference).toString());
     }
@@ -101,6 +104,14 @@ class DocumentRestURLGeneratorTest
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "pa/ge");
         assertEquals("http://localhost/rest/wikis/wiki/spaces/space/pages/pa%2Fge",
+            this.generator.getURL(documentReference).toString());
+    }
+
+    @Test
+    void getURLWithSeveralSpaces() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", List.of("space1", "space2"), "page");
+        assertEquals("http://localhost/rest/wikis/wiki/spaces/space1/spaces/space2/pages/page",
             this.generator.getURL(documentReference).toString());
     }
 }

@@ -104,8 +104,15 @@ public class NotificationParameters
      * {@link org.xwiki.notifications.GroupingEventManager}.
      * @since 15.5RC1
      */
-    @Unstable
     public String groupingEventTarget = "alert";
+
+    /**
+     * Don't get notifications filtered before that date.
+     *
+     * @since 17.10.1
+     */
+    @Unstable
+    public Date fromPrefilteringDate;
 
     @Override
     public boolean equals(Object o)
@@ -133,6 +140,7 @@ public class NotificationParameters
             .append(filterPreferences, that.filterPreferences)
             .append(filters, that.filters)
             .append(groupingEventTarget, that.groupingEventTarget)
+            .append(fromPrefilteringDate, that.fromPrefilteringDate)
             .isEquals();
     }
 
@@ -152,6 +160,7 @@ public class NotificationParameters
             .append(filterPreferences)
             .append(filters)
             .append(groupingEventTarget)
+            .append(fromPrefilteringDate)
             .toHashCode();
     }
 
@@ -171,6 +180,7 @@ public class NotificationParameters
             .append("filterPreferences", filterPreferences)
             .append("filters", filters)
             .append("notificationGroupingStrategyHint", groupingEventTarget)
+            .append("fromPrefilteringDate", fromPrefilteringDate)
             .toString();
     }
 }

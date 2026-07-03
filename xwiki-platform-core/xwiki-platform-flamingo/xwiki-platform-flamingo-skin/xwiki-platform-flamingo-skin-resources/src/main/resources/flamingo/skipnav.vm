@@ -1,0 +1,34 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Provide a way to skip directly to the main content of page
+## See: https://www.w3.org/TR/WCAG20-TECHS/G1.html
+<div class="skip-nav">
+  #if ("$!xcontext.action" == 'view' || "$!xcontext.action" == 'preview')
+    ## Point at #xwikicontent to skip over the navigation tools including the breadrumb
+    #set ($targetNav = '#xwikicontent')
+  #elseif (("$!xcontext.action" == 'inline' || "$!xcontext.action" == 'edit') && !$editConfirmation)
+    ## In edit mode, point at the title field
+    #set ($targetNav = '#editMeta')
+  #else
+    ## Point at '#mainContentArea' which is present in all pages that include "startpage.vm"
+    #set ($targetNav = '#mainContentArea')
+  #end
+  <a class="btn btn-default" href="$targetNav">$services.localization.render('skin.skipnav.links.content.title')</a>
+</div>

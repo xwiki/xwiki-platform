@@ -27,6 +27,7 @@ import org.xwiki.model.validation.internal.DefaultEntityNameValidationManager;
 import org.xwiki.model.validation.internal.EntityNameValidationConfigurationSource;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidation;
 import org.xwiki.model.validation.internal.ReplaceCharacterEntityNameValidationConfiguration;
+import org.xwiki.model.validation.internal.SlugEntityNameValidationConfiguration;
 import org.xwiki.model.validation.script.ModelValidationScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -34,7 +35,6 @@ import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.velocity.tools.EscapeTool;
-import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -52,7 +52,6 @@ import static org.mockito.Mockito.when;
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
 @ComponentList({
-    ControlCharactersFilter.class,
     ModelScriptService.class,
     // ModelValidationScriptService and its dependencies.
     ModelValidationScriptService.class,
@@ -70,6 +69,9 @@ class CreatePanelTest extends PageTest
     // We mock the name validation configuration to define the replacement map without depending on the documents.
     @MockComponent
     private ReplaceCharacterEntityNameValidationConfiguration nameValidationConfiguration;
+
+    @MockComponent
+    private SlugEntityNameValidationConfiguration slugEntityNameValidationConfiguration;
 
     @Test
     void createPanel() throws Exception

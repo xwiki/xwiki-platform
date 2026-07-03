@@ -35,7 +35,7 @@ require(['jquery', config.treeWebjar], function ($) {
   // TODO: Should be moved to a common place (see XWIKI-19320).
   function getPageWhiteIcon() {
     if (pageWhiteIcon === undefined) {
-      const iconURL = `${XWiki.contextPath}/rest/wikis/${XWiki.currentWiki}/iconThemes/icons?name=page_white`;
+      const iconURL = `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/iconThemes/icons?name=page_white`;
       var response = window.fetch(iconURL, {
         headers: {
           'Accept': 'application/json'

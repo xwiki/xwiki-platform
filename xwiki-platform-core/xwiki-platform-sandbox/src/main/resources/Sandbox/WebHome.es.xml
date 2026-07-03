@@ -52,7 +52,7 @@ A continuación, unas cuantas páginas de prueba con las que puedes jugar:
 
 Sigue una demostración de la [[Sintaxis XWiki&gt;&gt;XWiki.XWikiSyntax]] que puedes usar en páginas wiki (encabezados, imágenes, tablas).
 
-= Encabezados =
+== Encabezados ==
 
 XWiki ofrece 6 niveles de encabezado. Los puedes usar para estructurar tus páginas.
 
@@ -66,7 +66,7 @@ XWiki ofrece 6 niveles de encabezado. Los puedes usar para estructurar tus pági
 
 ====== Nivel 6 de encabezado 6 ======
 
-= Estilos =
+== Estilos ==
 
 XWiki soporta los estilos básicos:
 
@@ -77,11 +77,11 @@ XWiki soporta los estilos básicos:
 * Texto con ,,subíndice,,
 * Texto con ^^superíndice^^
 
-= Listas =
+== Listas ==
 
 Puedes crear varios tipos de listas en tus páginas wiki:
 
-== Listas no ordenadas ==
+=== Listas no ordenadas ===
 
 * Nivel 1
 ** Nivel 2
@@ -89,14 +89,14 @@ Puedes crear varios tipos de listas en tus páginas wiki:
 ** Nivel 2
 * Nivel 1
 
-== Listas numeradas ==
+=== Listas numeradas ===
 
 1. Ítem
 11. Subítem
 111. Subítem
 1. Ítem
 
-== Listas mixtas ==
+=== Listas mixtas ===
 
 1. Ítem 1
 11. Ítem 2
@@ -104,23 +104,23 @@ Puedes crear varios tipos de listas en tus páginas wiki:
 11*. Ítem 4
 1. Ítem 5
 
-= Tablas =
+== Tablas ==
 
 Puedes crear tablas directamente en tus páginas wiki:
 
-== Tabla con cabecera en la fila superior ==
+=== Tabla con cabecera en la fila superior ===
 
 |= cabecera de tabla |= cabecera de tabla |= cabecera de tabla
 | celda | celda | celda
 | celda | celda | celda
 
-== Table con cabeceras en la fila superior y la columna izquierda ==
+=== Table con cabeceras en la fila superior y la columna izquierda ===
 
 |= cabecera de tabla |= cabecera de tabla |= cabecera de tabla
 |= cabecera de tabla | celda | celda
 |= cabecera de tabla | celda | celda
 
-= Enlaces =
+== Enlaces ==
 
 XWiki te permite crear enlaces a otras páginas de tu wiki o de la web:
 
@@ -134,17 +134,17 @@ También puedes crear enlaces a adjuntos:
 
 attach:XWikiLogo.png
 
-= Imágenes =
+== Imágenes ==
 
 Puedes insertar imágenes en tus páginas wiki:
 
 [[image:XWikiLogo.png]]
 
-= Macros =
+== Macros ==
 
 Las macros te permiten mejorar la presentación del contenido wiki y añadir funcionalidades adicionales a tu wiki. A continuación, dos ejemplos de como utilizar las macros en páginas wiki:
 
-== Macro de Advertencia ==
+=== Macro de Advertencia ===
 
 Esta macro te permite atraer la atención de los usuarios a una parte específica de la información:
 
@@ -152,7 +152,7 @@ Esta macro te permite atraer la atención de los usuarios a una parte específic
 Hola Mundo
 {{/warning}}
 
-== Tabla de contenidos ==
+=== Tabla de contenidos ===
 
 Este macro genera de forma automática la tabla de contenidos de tu página wiki basándose en los encabezados:
 

@@ -28,6 +28,7 @@
     "propertyTypes" : [ ],
     "filters" : [ {
       "id" : "text",
+      "defaultOperator" : "contains",
       "operators" : [ {
         "id" : "contains",
         "name" : "contains"
@@ -40,6 +41,7 @@
       } ]
     }, {
       "id" : "number",
+      "defaultOperator" : "equals",
       "operators" : [ {
         "id" : "equals",
         "name" : "="
@@ -52,12 +54,14 @@
       } ]
     }, {
       "id" : "boolean",
+      "defaultOperator" : "equals",
       "operators" : [ {
         "id" : "equals",
         "name" : "Equals"
       } ]
     }, {
       "id" : "date",
+      "defaultOperator" : "between",
       "operators" : [ {
         "id" : "between",
         "name" : "between"
@@ -74,6 +78,7 @@
       "dateFormat" : "yyyy/MM/dd HH:mm"
     }, {
       "id" : "list",
+      "defaultOperator" : "contains",
       "operators" : [ {
         "id" : "equals",
         "name" : "Equals"
@@ -122,7 +127,9 @@
     }, {
       "id" : "delete",
       "name" : "delete",
-      "icon" : { }
+      "icon" : {
+        "cssClass" : "text-danger"
+      }
     }, {
       "id" : "copy",
       "name" : "copy",

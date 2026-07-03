@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tour</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tour-ui</artifactId>
   <packaging>xar</packaging>
@@ -62,6 +62,17 @@
       <artifactId>bootstrap-tour</artifactId>
       <version>0.12.0</version>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.webjars</groupId>
+          <artifactId>bootstrap</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- bootstrap tour uses deprecated jquery 3 API -->
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>jquery-migrate</artifactId>
     </dependency>
     <!-- The app has been created by Application Within Minutes -->
     <dependency>

@@ -68,7 +68,7 @@ public class DefaultGadgetRenderer implements GadgetRenderer
         // a gadget or not.
         if (!this.emptyXDOMChecker.check(gadget.getContent())) {
             // prepare the title of the gadget, in a heading 2
-            HeaderBlock titleBlock = new HeaderBlock(gadget.getTitle(), HeaderLevel.LEVEL1);
+            HeaderBlock titleBlock = new HeaderBlock(gadget.getTitle(), HeaderLevel.LEVEL2);
             titleBlock.setParameter(CLASS, "gadget-title");
 
             // And then the content wrapped in a group block with class, to style it

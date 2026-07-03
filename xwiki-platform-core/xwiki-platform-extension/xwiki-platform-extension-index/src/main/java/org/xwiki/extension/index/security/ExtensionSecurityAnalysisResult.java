@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 import static java.util.Comparator.comparingDouble;
@@ -34,7 +33,6 @@ import static java.util.Comparator.comparingDouble;
  * @version $Id$
  * @since 15.5RC1
  */
-@Unstable
 public class ExtensionSecurityAnalysisResult
 {
     private List<SecurityVulnerabilityDescriptor> securityVulnerabilities;

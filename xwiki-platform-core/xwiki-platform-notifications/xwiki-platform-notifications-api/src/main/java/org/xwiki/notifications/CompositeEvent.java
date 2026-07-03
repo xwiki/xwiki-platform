@@ -22,17 +22,17 @@ package org.xwiki.notifications;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.eventstream.DocumentEventType;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
-import org.xwiki.text.StringUtils;
 
 /**
  * A group of similar events that compose a "composite" event.
@@ -104,7 +104,6 @@ public class CompositeEvent
      * @param event the event to add
      * @since 15.5RC1
      */
-    @Unstable
     public void add(Event event)
     {
         events.add(event);
@@ -141,8 +140,8 @@ public class CompositeEvent
             // We are most interested in "advanced" event that we are in "core" events such as "create" or "update",
             // which often are the technical consequences of the real event (ex: a comment has been added).
             // FIXME: this sounds really like a hack: we should probably instead allow to set the type.
-            if (StringUtils.isNotBlank(event.getType()) && !"create".equals(event.getType())
-                && !"update".equals(event.getType())) {
+            if (StringUtils.isNotBlank(event.getType()) && !DocumentEventType.CREATE.equals(event.getType())
+                && !DocumentEventType.UPDATE.equals(event.getType())) {
                 type = event.getType();
             }
         }
@@ -172,7 +171,9 @@ public class CompositeEvent
      */
     public Set<DocumentReference> getUsers()
     {
-        Set<DocumentReference> users = new HashSet();
+        // Use a linked hash set to follow the order in which events were added:
+        // this avoids problems when testing
+        Set<DocumentReference> users = new LinkedHashSet<>();
         for (Event event : events) {
             users.add(event.getUser());
         }

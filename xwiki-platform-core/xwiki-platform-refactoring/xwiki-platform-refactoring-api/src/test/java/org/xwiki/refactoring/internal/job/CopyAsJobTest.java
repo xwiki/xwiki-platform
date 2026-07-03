@@ -19,16 +19,15 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.job.CopyRequest;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -40,19 +39,21 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class CopyAsJobTest extends AbstractEntityJobTest
+@ComponentTest
+class CopyAsJobTest extends AbstractEntityJobTest
 {
-    @Rule
-    public MockitoComponentMockingRule<Job> mocker = new MockitoComponentMockingRule<Job>(CopyAsJob.class);
+    @InjectMockComponents
+    private CopyAsJob copyAsJob;
+
 
     @Override
-    protected MockitoComponentMockingRule<Job> getMocker()
+    protected Job getJob()
     {
-        return this.mocker;
+        return this.copyAsJob;
     }
 
     @Test
-    public void copyAsDocument() throws Throwable
+    void copyAsDocument() throws Throwable
     {
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);
@@ -61,16 +62,17 @@ public class CopyAsJobTest extends AbstractEntityJobTest
         when(this.modelBridge.copy(sourceReference, copyReference)).thenReturn(true);
 
         CopyRequest request = new CopyRequest();
-        request.setEntityReferences(Arrays.asList(sourceReference));
+        request.setEntityReferences(List.of(sourceReference));
         request.setDestination(copyReference);
         request.setCheckRights(false);
         request.setCheckAuthorRights(false);
         request.setInteractive(false);
-        Map<String, String> parameters = Collections.singletonMap("foo", "bar");
+        Map<String, String> parameters = Map.of("foo", "bar");
         request.setEntityParameters(sourceReference, parameters);
         run(request);
 
         verify(this.modelBridge).copy(sourceReference, copyReference);
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
     }
+
 }

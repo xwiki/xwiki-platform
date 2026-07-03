@@ -36,6 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>scheduler.applicationsPanelEntryLabel=Планировщик
+  <content>scheduler.disabled=В данном экземпляре планировщик отключен. Ни одна задача не будет выполняться.
+scheduler.applicationsPanelEntryLabel=Планировщик
 </content>
 </xwikidoc>

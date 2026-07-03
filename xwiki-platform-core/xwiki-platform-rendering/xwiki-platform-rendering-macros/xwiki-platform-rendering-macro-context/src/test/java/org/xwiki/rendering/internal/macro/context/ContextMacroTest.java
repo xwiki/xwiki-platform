@@ -250,7 +250,7 @@ class ContextMacroTest
             DocumentModelBridge dmb = mock(DocumentModelBridge.class);
             when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
             targetXDOM = new XDOM(Arrays.asList(new WordBlock("word")), metadata);
-            when(dmb.getXDOM()).thenReturn(targetXDOM);
+            when(dmb.getPreparedXDOM()).thenReturn(targetXDOM);
 
             parameters.setDocument("target");
             parameters.setTransformationContext(mode);

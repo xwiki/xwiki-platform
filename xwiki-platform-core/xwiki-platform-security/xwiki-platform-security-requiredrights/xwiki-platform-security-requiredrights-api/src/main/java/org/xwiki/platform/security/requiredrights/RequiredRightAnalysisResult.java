@@ -26,7 +26,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -36,7 +35,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 15.9RC1
  */
-@Unstable
 public class RequiredRightAnalysisResult
 {
     private final EntityReference entityReference;

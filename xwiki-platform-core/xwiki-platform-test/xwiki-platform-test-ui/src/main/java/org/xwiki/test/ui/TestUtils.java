@@ -27,10 +27,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -65,7 +69,10 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.hc.core5.net.URIBuilder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Keys;
@@ -87,6 +94,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
@@ -98,6 +106,7 @@ import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
+import org.xwiki.rest.resources.pages.PagesResource;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -187,6 +196,8 @@ public class TestUtils
      */
     public static final int[] STATUS_ACCEPTED = new int[] { Status.ACCEPTED.getStatusCode() };
 
+    private static final String MAIN_WIKI_NAME = "xwiki";
+
     private static PersistentTestContext context;
 
     private static ComponentManager componentManager;
@@ -208,8 +219,6 @@ public class TestUtils
      * Used to convert REST request XML result into its Java representation.
      */
     private static Unmarshaller unmarshaller;
-
-    private static String urlPrefix = XWikiExecutor.URL;
 
     /**
      * Cached secret token. TODO cache for each user.
@@ -360,7 +369,7 @@ public class TestUtils
             this.httpClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
             this.httpClient.getParams().setAuthenticationPreemptive(true);
         } else {
-            this.httpClient.getState().clearCredentials();
+            this.httpClient.getState().clear();
             this.httpClient.getParams().setAuthenticationPreemptive(false);
         }
 
@@ -407,11 +416,13 @@ public class TestUtils
      */
     public void loginAndGotoPage(String username, String password, String pageURL, boolean checkLoginSuccess)
     {
+        // ensure to be on a wiki page before performing check on the username.
+        getDriver().get(getURL("XWiki", "Register", "register", "_=" + new Date().getTime()));
         if (!username.equals(getLoggedInUserName())) {
             // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
             // going to the home page for example.
             // Also recache the CSRF token
-            String destUrl = getURL("XWiki", "Register", "register");
+            String destUrl = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
             getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
 
             if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
@@ -598,8 +609,10 @@ public class TestUtils
         userPage.setObjects(new org.xwiki.rest.model.jaxb.Objects());
         org.xwiki.rest.model.jaxb.Object userObject = RestTestUtils.object("XWiki.XWikiUsers");
 
-        // Set password
+        // Set password and mark the user active (a real Admin user is active), so that queries filtering
+        // on active users (e.g. the user suggestion query) return this user.
         userObject.getProperties().add(RestTestUtils.property("password", password));
+        userObject.getProperties().add(RestTestUtils.property("active", "1"));
         userPage.getObjects().getObjectSummaries().add(userObject);
 
         // Save the user page
@@ -700,6 +713,19 @@ public class TestUtils
             fail("Failed to add rights object of class [" + rightClassName + "] with groups [" + normalizedGroups
                 + "], users [" + normalizedUsers + "], rights [" + rights + "] and enabled [" + enabled + "]", e);
         }
+    }
+
+    /**
+     * Attempt to navigate to the specified page without waiting for the page to load. This is useful for instance when
+     * leaving the current page triggers a confirmation alert that you want to accept or dismiss.
+     * 
+     * @param reference the reference of the page to go to
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void gotoPageWithoutWaiting(EntityReference reference)
+    {
+        getDriver().executeScript("window.location.href = arguments[0]", getURL(reference));
     }
 
     public ViewPage gotoPage(String space, String page)
@@ -1074,6 +1100,16 @@ public class TestUtils
     }
 
     /**
+     * @since 16.8.0RC1
+     * @since 16.4.5
+     * @since 15.10.14
+     */
+    public String serializeLocalReference(EntityReference reference)
+    {
+        return localReferenceSerializer.serialize(reference);
+    }
+
+    /**
      * Accesses the URL to delete the specified space.
      *
      * @param space the name of the space to delete
@@ -1167,7 +1203,89 @@ public class TestUtils
      */
     public String getURL(EntityReference reference)
     {
-        return getURL(reference, "view", "");
+        return getBaseURL() + getPath(reference);
+    }
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public String getPath(EntityReference reference)
+    {
+        return getPath(reference, "view", "");
+    }
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public String getPath(EntityReference reference, String action, String queryString)
+    {
+        return getPath(reference, action, queryString, null);
+    }
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public String getPath(EntityReference reference, String action, String queryString, String fragment)
+    {
+        Serializable locale = reference.getParameters().get("locale");
+        if (locale != null) {
+            queryString += "&language=" + locale;
+        }
+        EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
+        String wikiName = (wikiReference != null) ? wikiReference.getName() : null;
+
+        return getPath(wikiName, action, extractListFromReference(reference).toArray(new String[] {}), queryString,
+            fragment);
+    }
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public String getPath(String wikiName, String action, String[] path, String queryString, String fragment)
+    {
+        StringBuilder builder = new StringBuilder(getBaseBinPath(wikiName));
+
+        if (!StringUtils.isEmpty(action)) {
+            builder.append(action).append('/');
+        }
+        List<String> escapedPath = new ArrayList<>();
+        for (String element : path) {
+            escapedPath.add(escapeURL(element));
+        }
+        builder.append(StringUtils.join(escapedPath, '/'));
+
+        boolean needToAddSecretToken = !Arrays.asList("view", "register", "download", "export").contains(action);
+        if (needToAddSecretToken || !StringUtils.isEmpty(queryString)) {
+            builder.append('?');
+        }
+        if (needToAddSecretToken) {
+            addQueryStringEntry(builder, "form_token", getSecretToken());
+            builder.append('&');
+        }
+        if (!StringUtils.isEmpty(queryString)) {
+            builder.append(queryString);
+        }
+
+        if (!StringUtils.isEmpty(fragment)) {
+            builder.append('#').append(fragment);
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * @since 18.3.0RC1
+     */
+    public String getBaseBinPath(String wiki)
+    {
+        String wikiName = MAIN_WIKI_NAME;
+        if (!StringUtils.isEmpty(wiki)) {
+            wikiName = wiki;
+        } else if (!StringUtils.isEmpty(this.currentWiki)) {
+            wikiName = this.currentWiki;
+        }
+
+        return (MAIN_WIKI_NAME.equals(wikiName) ? "bin/" : "wiki/" + wikiName + '/');
     }
 
     /**
@@ -1175,7 +1293,7 @@ public class TestUtils
      */
     public String getURL(EntityReference reference, String action, String queryString)
     {
-        return getURL(reference, action, queryString, null);
+        return getBaseURL() + getPath(reference, action, queryString);
     }
 
     /**
@@ -1183,11 +1301,7 @@ public class TestUtils
      */
     public String getURL(EntityReference reference, String action, String queryString, String fragment)
     {
-        Serializable locale = reference.getParameters().get("locale");
-        if (locale != null) {
-            queryString += "&language=" + locale;
-        }
-        return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString, fragment);
+        return getBaseURL() + getPath(reference, action, queryString, fragment);
     }
 
     /**
@@ -1206,12 +1320,37 @@ public class TestUtils
      */
     public String executeWiki(String wikiContent, Syntax wikiSyntax) throws Exception
     {
+        return executeWiki(wikiContent, wikiSyntax, null);
+    }
+
+    /**
+     * @since 16.4.0RC1
+     * @since 15.10.11
+     * @since 14.10.22
+     */
+    public String executeWikiPlain(String wikiContent, Syntax wikiSyntax) throws Exception
+    {
+        Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("outputSyntax", "plain");
+
+        return executeWiki(wikiContent, wikiSyntax, queryParameters);
+    }
+
+    /**
+     * @since 16.4.0RC1
+     * @since 15.10.11
+     * @since 14.10.22
+     */
+    public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters)
+        throws Exception
+    {
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
-        rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null);
+        rest().savePageAs(SUPER_ADMIN_CREDENTIALS, reference, wikiContent, wikiSyntax.toIdString(), null, null, false);
 
-        return executeAndGetBodyAsString(reference, null);
+        // Execute the content and return the result
+        return executeAndGetBodyAsString(reference, queryParameters);
     }
 
     /**
@@ -1262,31 +1401,12 @@ public class TestUtils
      */
     public String getBaseURL()
     {
-        String baseURL;
-
-        // If the URL has the port specified then consider it's a full URL and use it, otherwise add the port and the
-        // webapp context
-        if (TestUtils.urlPrefix.matches("http://.*:[0-9]+/.*")) {
-            baseURL = TestUtils.urlPrefix;
-        } else {
-            baseURL = TestUtils.urlPrefix + ":"
-                + (getCurrentExecutor() != null ? getCurrentExecutor().getPort() : XWikiExecutor.DEFAULT_PORT)
-                + XWikiExecutor.DEFAULT_CONTEXT;
+        XWikiExecutor executor = getCurrentExecutor();
+        if (executor != null) {
+            return executor.getBrowserBaseURL();
         }
 
-        if (!baseURL.endsWith("/")) {
-            baseURL = baseURL + "/";
-        }
-
-        return baseURL;
-    }
-
-    /**
-     * @since 10.6RC1
-     */
-    public static void setURLPrefix(String urlPrefix)
-    {
-        TestUtils.urlPrefix = urlPrefix;
+        return XWikiExecutor.URL + ':' + XWikiExecutor.DEFAULT_PORT + XWikiExecutor.DEFAULT_CONTEXT + '/';
     }
 
     /**
@@ -1302,7 +1422,7 @@ public class TestUtils
      */
     public String getBaseBinURL(String wiki)
     {
-        return getBaseURL() + ((StringUtils.isEmpty(wiki) || wiki.equals("xwiki")) ? "bin/" : "wiki/" + wiki + '/');
+        return getBaseURL() + getBaseBinPath(wiki);
     }
 
     /**
@@ -1310,7 +1430,7 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString)
     {
-        return getURL(action, path, queryString, null);
+        return getURL(null, action, path, queryString, null);
     }
 
     /**
@@ -1318,34 +1438,17 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString, String fragment)
     {
-        StringBuilder builder = new StringBuilder(getBaseBinURL());
+        return getURL(null, action, path, queryString, fragment);
+    }
 
-        if (!StringUtils.isEmpty(action)) {
-            builder.append(action).append('/');
-        }
-        List<String> escapedPath = new ArrayList<>();
-        for (String element : path) {
-            escapedPath.add(escapeURL(element));
-        }
-        builder.append(StringUtils.join(escapedPath, '/'));
-
-        boolean needToAddSecretToken = !Arrays.asList("view", "register", "download", "export").contains(action);
-        if (needToAddSecretToken || !StringUtils.isEmpty(queryString)) {
-            builder.append('?');
-        }
-        if (needToAddSecretToken) {
-            addQueryStringEntry(builder, "form_token", getSecretToken());
-            builder.append('&');
-        }
-        if (!StringUtils.isEmpty(queryString)) {
-            builder.append(queryString);
-        }
-
-        if (!StringUtils.isEmpty(fragment)) {
-            builder.append('#').append(fragment);
-        }
-
-        return builder.toString();
+    /**
+     * @since 16.10.0RC1
+     * @since 15.10.14
+     * @since 16.4.6
+     */
+    public String getURL(String wikiName, String action, String[] path, String queryString, String fragment)
+    {
+        return getBaseURL() + getPath(wikiName, action, path, queryString, fragment);
     }
 
     /**
@@ -1421,8 +1524,8 @@ public class TestUtils
     private void recacheSecretTokenWhenOnRegisterPage()
     {
         try {
-            WebElement tokenInput = getDriver().findElement(By.xpath("//input[@name='form_token']"));
-            this.secretToken = tokenInput.getAttribute("value");
+            WebElement htmlElement = getDriver().findElement(By.tagName("html"));
+            this.secretToken = htmlElement.getDomAttribute("data-xwiki-form-token");
         } catch (NoSuchElementException exception) {
             // Something is really wrong if this happens.
             System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");
@@ -1444,6 +1547,20 @@ public class TestUtils
             return "";
         }
         return this.secretToken;
+    }
+
+    /**
+     * Sets the secret token used for CSRF protection. Use this method to restore a token that was previously saved. If
+     * you want to cache the current token you should use {@link #recacheSecretToken()} instead.
+     *
+     * @param secretToken the new secret token to use
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public void setSecretToken(String secretToken)
+    {
+        this.secretToken = secretToken;
     }
 
     /**
@@ -1475,6 +1592,55 @@ public class TestUtils
         {
             return this.secretToken;
         }
+    }
+
+    /**
+     * @return the current edit mode, or null / empty string if we're not currently in edit mode
+     */
+    public String getEditMode()
+    {
+        return (String) getDriver().executeScript("return window.XWiki?.editor");
+    }
+
+    /**
+     * If we are in edit mode, leave using the cancel shortcut key (ALT + C).
+     *
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void maybeLeaveEditMode()
+    {
+        String editMode = getEditMode();
+        List<String> adminModes = List.of("globaladmin", "spaceadmin");
+        if (StringUtils.isNotEmpty(editMode) && !adminModes.contains(editMode)) {
+            leaveEditMode();
+        }
+    }
+
+    /**
+     * Leave the edit mode using the cancel shortcut key (ALT + C).
+     *
+     * @since 16.10.6
+     * @since 17.3.0RC1
+     */
+    public void leaveEditMode()
+    {
+        // Use the cancel shortcut key to leave the edit mode, but since the shortcut keys are handled with JavaScript
+        // we need to wait for view mode ourselves. We can't use the page reload marker because the in-place editor
+        // doesn't reload the page on cancel. We can only rely on the fact that the URL will change (even for the
+        // in-place editor where the '#edit' URL fragment is removed).
+        String editURL = getDriver().getCurrentUrl();
+        WebElement cancelButton =
+            getDriver().findElementWithoutWaitingWithoutScrolling(By.cssSelector("input[name='action_cancel']"));
+        // The cancel button can be temporarily disabled, e.g. while the content is being (auto)saved.
+        getDriver().waitUntilElementIsEnabled(cancelButton);
+        // We use the shortcut key instead of clicking because the cancel button might not be visible (e.g. when doing
+        // realtime collaboration).
+        getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, "c"));
+        getDriver().waitUntilCondition(driver -> {
+            String viewURL = driver.getCurrentUrl();
+            return !Objects.equals(viewURL, editURL);
+        });
     }
 
     public boolean isInWYSIWYGEditMode()
@@ -1565,6 +1731,7 @@ public class TestUtils
     public void forceGuestUser()
     {
         setSession(null);
+        setDefaultCredentials(null);
     }
 
     public void addObject(String space, String page, String className, Object... properties)
@@ -1935,8 +2102,8 @@ public class TestUtils
 
         // import file
         executeGet(
-            getBaseBinURL() + "import/XWiki/Import?historyStrategy=add&importAsBackup=true&ajax&action=import&name="
-                + escapeURL(file.getName()),
+            getURL("XWiki", "Import", "import",
+                "historyStrategy=add&importAsBackup=true&ajax&action=import&name=" + escapeURL(file.getName())),
             Status.OK.getStatusCode());
     }
 
@@ -2201,12 +2368,12 @@ public class TestUtils
 
     public InputStream getInputStream(String path, Map<String, ?> queryParams) throws Exception
     {
-        return getInputStream(getBaseURL(), path, queryParams);
+        return getInputStream(getCurrentExecutor().getHttpClientBaseURL(), path, queryParams);
     }
 
     public String getString(String path, Map<String, ?> queryParams) throws Exception
     {
-        return getString(getBaseURL(), path, queryParams);
+        return getString(getCurrentExecutor().getHttpClientBaseURL(), path, queryParams);
     }
 
     /**
@@ -2228,12 +2395,13 @@ public class TestUtils
     public InputStream getInputStream(String prefix, String path, Map<String, ?> queryParams, Object... elements)
         throws Exception
     {
-        String cleanPrefix = prefix.endsWith("/") ? prefix.substring(0, prefix.length() - 1) : prefix;
+        String cleanPrefix = Strings.CS.removeEnd(prefix, "/");
         if (path.startsWith(cleanPrefix)) {
+            // Ignore the prefix if it's already path of the path
             cleanPrefix = "";
         }
 
-        UriBuilder builder = UriBuilder.fromUri(cleanPrefix).path(path.startsWith("/") ? path.substring(1) : path);
+        UriBuilder builder = UriBuilder.fromUri(cleanPrefix).path(Strings.CS.removeStart(path, "/"));
 
         if (queryParams != null) {
             for (Map.Entry<String, ?> entry : queryParams.entrySet()) {
@@ -2363,8 +2531,6 @@ public class TestUtils
 
         public static final Map<EntityType, ResourceAPI> RESOURCES_MAP = new IdentityHashMap<>();
 
-        public static String urlPrefix;
-
         public static class ResourceAPI
         {
             public Class<?> api;
@@ -2394,10 +2560,12 @@ public class TestUtils
                 throw new RuntimeException(e);
             }
 
+            RESOURCES_MAP.put(EntityType.SPACE, new ResourceAPI(PagesResource.class, null));
             RESOURCES_MAP.put(EntityType.DOCUMENT, new ResourceAPI(PageResource.class, PageTranslationResource.class));
             RESOURCES_MAP.put(EntityType.OBJECT, new ResourceAPI(ObjectResource.class, null));
             RESOURCES_MAP.put(EntityType.OBJECT_PROPERTY, new ResourceAPI(ObjectPropertyResource.class, null));
             RESOURCES_MAP.put(EntityType.CLASS_PROPERTY, new ResourceAPI(ClassPropertyResource.class, null));
+            RESOURCES_MAP.put(EntityType.ATTACHMENT, new ResourceAPI(AttachmentResource.class, null));
         }
 
         /**
@@ -2461,107 +2629,64 @@ public class TestUtils
 
         public String getBaseURL()
         {
-            String prefix;
-            if (RestTestUtils.urlPrefix != null) {
-                prefix = RestTestUtils.urlPrefix;
-            } else {
-                prefix = this.testUtils.getBaseURL();
-            }
-            if (!prefix.endsWith("/")) {
-                prefix = prefix + "/";
-            }
-            return prefix + "rest";
-        }
-
-        /**
-         * Used when running in a docker container for example and thus when we need a REST URL pointing to a host
-         * different than the TestUTils baseURL which is used inside the Selenium docker container and is thus
-         * different from a REST URL used outside of any container and that needs to call XWiki running inside a
-         * container... ;)
-         *
-         * @since 10.9
-         */
-        public void setURLPrefix(String newURLPrefix)
-        {
-            RestTestUtils.urlPrefix = newURLPrefix;
-        }
-
-        private String toSpaceElement(Iterable<?> spaces)
-        {
-            StringBuilder builder = new StringBuilder();
-
-            for (Object space : spaces) {
-                if (builder.length() > 0) {
-                    builder.append("/spaces/");
-                }
-
-                if (space instanceof EntityReference) {
-                    builder.append(((EntityReference) space).getName());
-                } else {
-                    builder.append(space.toString());
-                }
-            }
-
-            return builder.toString();
-        }
-
-        private String toSpaceElement(String spaceReference)
-        {
-            return toSpaceElement(
-                relativeReferenceResolver.resolve(spaceReference, EntityType.SPACE).getReversedReferenceChain());
+            return this.testUtils.getCurrentExecutor().getHttpClientBaseURL() + "rest";
         }
 
         protected Object[] toElements(Page page)
         {
-            List<Object> elements = new ArrayList<>();
-
-            // Add wiki
-            if (page.getWiki() != null) {
-                elements.add(page.getWiki());
-            } else {
-                elements.add(this.testUtils.getCurrentWiki());
-            }
-
-            // Add spaces
-            elements.add(toSpaceElement(page.getSpace()));
-
-            // Add name
-            elements.add(page.getName());
-
-            // Add translation
+            // Get locale
+            Locale locale;
             if (StringUtils.isNotEmpty(page.getLanguage())) {
-                elements.add(page.getLanguage());
+                locale = LocaleUtils.toLocale(page.getLanguage());
+            } else {
+                locale = null;
             }
 
-            return elements.toArray();
+            // Wiki
+            WikiReference wikiReference;
+            if (page.getWiki() != null) {
+                wikiReference = new WikiReference(page.getWiki());
+            } else {
+                wikiReference = new WikiReference(this.testUtils.getCurrentWiki());
+            }
+
+            // Spaces
+            SpaceReference spaceReference = new SpaceReference(relativeReferenceResolver
+                .resolve(page.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
+
+            // Document
+            DocumentReference documentReference = new DocumentReference(page.getName(), spaceReference, locale);
+
+            return toElements(documentReference);
         }
 
         public Object[] toElements(org.xwiki.rest.model.jaxb.Object obj, boolean onlyDocument)
         {
-            List<Object> elements = new ArrayList<>();
-
-            // Add wiki
+            // Wiki
+            WikiReference wikiReference;
             if (obj.getWiki() != null) {
-                elements.add(obj.getWiki());
+                wikiReference = new WikiReference(obj.getWiki());
             } else {
-                elements.add(this.testUtils.getCurrentWiki());
+                wikiReference = new WikiReference(this.testUtils.getCurrentWiki());
             }
 
-            // Add spaces
-            elements.add(toSpaceElement(obj.getSpace()));
+            // Spaces
+            SpaceReference spaceReference = new SpaceReference(relativeReferenceResolver
+                .resolve(obj.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
 
-            // Add name
-            elements.add(obj.getPageName());
+            // Document
+            DocumentReference documentReference = new DocumentReference(obj.getPageName(), spaceReference);
 
-            if (!onlyDocument) {
-                // Add class
-                elements.add(obj.getClassName());
-
-                // Add number
-                elements.add(obj.getNumber());
+            // Object
+            EntityReference finalReference;
+            if (onlyDocument) {
+                finalReference = documentReference;
+            } else {
+                String objectName = obj.getClassName() + '[' + obj.getNumber() + ']';
+                finalReference = new ObjectReference(objectName, documentReference);
             }
 
-            return elements.toArray();
+            return toElements(finalReference);
         }
 
         public Object[] toElements(EntityReference reference)
@@ -2737,7 +2862,7 @@ public class TestUtils
          */
         public void savePage(EntityReference reference) throws Exception
         {
-            savePage(reference, null, null, null, null);
+            savePage(reference, null, null, null, null, false);
         }
 
         /**
@@ -2745,14 +2870,14 @@ public class TestUtils
          */
         public void savePage(EntityReference reference, String content, String title) throws Exception
         {
-            savePage(reference, content, null, title, null);
+            savePage(reference, content, null, title, null, false);
         }
 
         /**
          * @since 7.3M1
          */
         public void savePage(EntityReference reference, String content, String syntaxId, String title,
-            String parentFullPageName) throws Exception
+            String parentFullPageName, boolean isHidden) throws Exception
         {
             Page page = page(reference);
 
@@ -2768,8 +2893,56 @@ public class TestUtils
             if (parentFullPageName != null) {
                 page.setParent(parentFullPageName);
             }
+            page.setHidden(isHidden);
 
             save(page, true);
+        }
+
+        /**
+         * Save the page using the provided credentials and restore the previous credentials afterward.
+         *
+         * @param credentials the credentials to use to save the page
+         * @param reference the reference of the page to save
+         * @param content the content of the page to save
+         * @param syntaxId the syntax id of the page to save
+         * @param title the title of the page to save
+         * @param parentFullPageName the full page name of the parent page to set to the page to save
+         * @param isHidden whether the page to save should be hidden or not
+         *
+         * @since 18.2.0RC1
+         * @since 17.10.4
+         */
+        public void savePageAs(UsernamePasswordCredentials credentials, EntityReference reference, String content,
+            String syntaxId, String title, String parentFullPageName, boolean isHidden) throws Exception
+        {
+            // Remember the current credentials
+            UsernamePasswordCredentials currentCredentials = this.testUtils.getDefaultCredentials();
+
+            try {
+                this.testUtils.setDefaultCredentials(credentials);
+
+                savePage(reference, content, syntaxId, title, parentFullPageName, isHidden);
+            } finally {
+                // Restore initial credentials
+                this.testUtils.setDefaultCredentials(currentCredentials);
+            }
+        }
+
+        /**
+         * Save the page using the provided credentials and restore the previous credentials afterward.
+         *
+         * @param credentials the credentials to use to save the page
+         * @param reference the reference of the page to save
+         * @param content the content of the page to save
+         * @param title the title of the page to save
+         * @throws Exception if an error occurs while saving the page
+         * @since 18.2.0RC1
+         * @since 17.10.4
+         */
+        public void savePageAs(UsernamePasswordCredentials credentials, EntityReference reference, String content,
+            String title) throws Exception
+        {
+            savePageAs(credentials, reference, content, null, title, null, false);
         }
 
         /**
@@ -2790,30 +2963,35 @@ public class TestUtils
         }
 
         /**
-         * @since 15.2RC1
-         * @since 15.1
-         * @since 14.10.6
+         * Add a new object to an existing or new page.
+         *
+         * @param documentReference the document where to add the object
+         * @param className the class name of the object to add
+         * @param properties the properties of the object to add (name1, value1, name2, value2, ...)
+         * @since 17.10.1
+         * @since 18.0.0RC1
          */
-        private void addObject(EntityReference documentReference, String rightClassName, Object... properties)
+        public void addObject(EntityReference documentReference, String className, Object... properties)
             throws Exception
         {
             // Make sure the page exist (object add fail otherwise)
             // TODO: improve object add API to allow adding an object in a page that does not yet exist
             if (!exists(documentReference)) {
-                savePage(documentReference);
+                boolean isHidden = "WebPreferences".equals(documentReference.getName());
+                savePage(documentReference, null, null, null, null, isHidden);
             }
 
             // Create the object
-            org.xwiki.rest.model.jaxb.Object rightsObject = object(documentReference, rightClassName);
+            org.xwiki.rest.model.jaxb.Object jaxbObject = object(documentReference, className);
             for (int i = 0; i < properties.length; i += 2) {
                 String name = (String) properties[i + 0];
                 Object value = properties[i + 1];
 
-                rightsObject.withProperties(RestTestUtils.property(name, value));
+                jaxbObject.withProperties(RestTestUtils.property(name, value));
             }
 
             // Add the object
-            add(rightsObject);
+            add(jaxbObject);
         }
 
         /**
@@ -2908,15 +3086,34 @@ public class TestUtils
         }
 
         /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(EntityReference reference, Map<String, Object[]> queryParams) throws Exception
+        {
+            return get(reference, queryParams, true);
+        }
+
+        /**
          * Return object model of the passed reference or null if none could be found.
          * 
          * @since 8.0M1
          */
         public <T> T get(EntityReference reference, boolean failIfNotFound) throws Exception
         {
+            return get(reference, Map.of(), failIfNotFound);
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(EntityReference reference, Map<String, Object[]> queryParams, boolean failIfNotFound)
+            throws Exception
+        {
             Class<?> resource = getResourceAPI(reference);
 
-            return get(resource, reference, failIfNotFound);
+            return get(resource, queryParams, reference, failIfNotFound);
         }
 
         /**
@@ -2944,13 +3141,32 @@ public class TestUtils
         }
 
         /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference) throws Exception
+        {
+            return get(resourceURI, queryParams, reference, true);
+        }
+
+        /**
          * Return object model of the passed reference with the passed resource URI or null if none could be found.
          * 
          * @since 8.0M1
          */
         public <T> T get(Object resourceURI, EntityReference reference, boolean failIfNotFound) throws Exception
         {
-            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, reference), false,
+            return get(resourceURI, Map.of(), reference, failIfNotFound);
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference,
+            boolean failIfNotFound) throws Exception
+        {
+            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, queryParams, reference), false,
                 failIfNotFound ? STATUS_OK : STATUS_OK_NOT_FOUND);
 
             if (getMethod.getStatusCode() == Status.NOT_FOUND.getStatusCode()) {
@@ -2973,6 +3189,19 @@ public class TestUtils
         public <T> T get(Object resourceURI, boolean failIfNotFound) throws Exception
         {
             return get(resourceURI, null, failIfNotFound);
+        }
+
+        /**
+         * @param attachmentReference the reference of the attachment
+         * @return the attachment content as byte array
+         * @throws Exception when failing to get the attachment content
+         * @since 17.3.0RC1
+         */
+        public byte[] getAttachmentAsByteArray(EntityReference attachmentReference) throws Exception
+        {
+            try (InputStream stream = get(attachmentReference)) {
+                return IOUtils.toByteArray(stream);
+            }
         }
 
         public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
@@ -3030,6 +3259,16 @@ public class TestUtils
         public GetMethod executeGet(Object resourceURI, EntityReference reference) throws Exception
         {
             return executeGet(resourceURI, toElements(reference));
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public GetMethod executeGet(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference)
+            throws Exception
+        {
+            return executeGet(resourceURI, queryParams, toElements(reference));
         }
 
         public GetMethod executeGet(Object resourceUri, Object... elements) throws Exception
@@ -3252,5 +3491,35 @@ public class TestUtils
         switchTab(secondTabHandle);
         getDriver().close();
         switchTab(currentTab);
+    }
+
+    /**
+     * @param path the resource path
+     * @return the corresponding {@link File}
+     * @throws URISyntaxException
+     * @since 17.3.0RC1
+     */
+    public File getResourceFile(String path) throws URISyntaxException
+    {
+        URL resource = getClass().getResource(path);
+        return Paths.get(resource.toURI()).toFile();
+    }
+
+    public String toBrowserUri(String uri) throws URISyntaxException
+    {
+        URIBuilder builder = new URIBuilder(uri);
+        builder.setHost(getCurrentExecutor().getBrowserHost());
+        builder.setPort(getCurrentExecutor().getBrowserPort());
+
+        return builder.build().toString();        
+    }
+
+    public String toHttpClientUri(String uri) throws URISyntaxException
+    {
+        URIBuilder builder = new URIBuilder(uri);
+        builder.setHost(getCurrentExecutor().getHttpClientHost());
+        builder.setPort(getCurrentExecutor().getHttpClientPort());
+
+        return builder.build().toString();
     }
 }

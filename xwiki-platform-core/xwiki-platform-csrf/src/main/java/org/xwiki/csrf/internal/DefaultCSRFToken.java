@@ -23,14 +23,19 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -69,8 +74,10 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /** Resubmission template name. */
     private static final String RESUBMIT_TEMPLATE = "resubmit";
 
+    private static final String SEC_FETCH_SITE_HEADER = "Sec-Fetch-Site";
+
     /** Token storage (one token per user). */
-    private final ConcurrentMap<DocumentReference, String> tokens = new ConcurrentHashMap<DocumentReference, String>();
+    private final ConcurrentMap<DocumentReference, String> tokens = new ConcurrentHashMap<>();
 
     /** Token for guest user. */
     private String guestToken;
@@ -78,7 +85,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /** Random number generator. */
     private SecureRandom random;
 
-    /** Used to find out the current user name and the current document. */
+    /** Used to find out the current username and the current document. */
     @Inject
     private DocumentAccessBridge docBridge;
 
@@ -110,11 +117,11 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         } catch (NoSuchAlgorithmException e) {
             // use the default implementation then
             this.random = new SecureRandom();
-            this.logger.warn("CSRFToken: Using default implementation of SecureRandom");
+            this.logger.warn("Using default implementation of SecureRandom for CSRF token");
         }
         byte[] seed = this.random.generateSeed(TOKEN_LENGTH);
         this.random.setSeed(seed);
-        this.logger.debug("CSRFToken: Anti-CSRF secret token component has been initialized");
+        this.logger.debug("Anti-CSRF secret token component has been initialized");
     }
 
     /**
@@ -161,15 +168,18 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     }
 
     @Override
+    // The token is generated and not user-controlled
+    @SuppressWarnings("javasecurity:S5145")
     public boolean isTokenValid(String token)
     {
         if (!this.configuration.isEnabled()) {
             return true;
         }
         String storedToken = getToken();
-        if (token == null || token.equals("") || !storedToken.equals(token)) {
-            this.logger.warn("CSRFToken: Secret token verification failed, token: \"" + token
-                + "\", stored token: \"" + storedToken + "\"");
+        if (token == null || token.isEmpty() || !storedToken.equals(token)) {
+            this.logger.warn("Secret CSRF token verification failed (token: [{}], stored token: [{}])", token,
+                storedToken);
+
             return false;
         }
         return true;
@@ -178,26 +188,78 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     @Override
     public String getResubmissionURL()
     {
-        String query = "resubmit=" + urlEncode(getRequestURI());
-
         // back URL is the URL of the document that was about to be modified, so in most
         // cases we can redirect back to the correct document (if the user clicks "no")
         String backUrl = getDocumentURL(this.docBridge.getCurrentDocumentReference(), null);
-        query += "&xback=" + urlEncode(backUrl);
+        String query = "xpage=" + RESUBMIT_TEMPLATE;
+
+        if (this.isResubmitAllowedForCurrentRequest()) {
+            Pair<String, String> requestURIInfo = buildRequestURI();
+            query += "&xback=" + urlEncode(backUrl);
+            query += "&resubmit=" + urlEncode(requestURIInfo.getValue());
+            // note we don't use srid so that it doesn't trigger the SavedRequestRestorerFilter
+            query += "&sridKey=" + requestURIInfo.getKey();
+        }
 
         // redirect to the resubmission template
-        query += "&xpage=" + RESUBMIT_TEMPLATE;
         return backUrl + "?" + query;
+    }
+
+    @Override
+    public boolean isResubmitAllowedForCurrentRequest()
+    {
+        boolean result = false;
+        HttpServletRequest httpServletRequest = getHttpServletRequest();
+        if (httpServletRequest != null) {
+            result = Strings.CI.equals("POST", httpServletRequest.getMethod())
+                && !Strings.CI.equals("cross-site", httpServletRequest.getHeader(SEC_FETCH_SITE_HEADER));
+        }
+        return result;
+    }
+
+    @Override
+    public boolean isResubmitAllowedForRequestId(String srid)
+    {
+        boolean result = false;
+        HttpServletRequest httpServletRequest = getHttpServletRequest();
+        if (!StringUtils.isBlank(srid) && httpServletRequest != null) {
+            Map<String, SavedRequestManager.SavedRequest> savedRequests =
+                (Map<String, SavedRequestManager.SavedRequest>) httpServletRequest.getSession()
+                    .getAttribute(SavedRequestManager.getSavedRequestKey());
+            if (savedRequests != null) {
+                return savedRequests.containsKey(srid);
+            }
+        }
+        return result;
+    }
+
+    private HttpServletRequest getHttpServletRequest()
+    {
+        Request request = this.container.getRequest();
+        if (request instanceof ServletRequest servletRequest)
+        {
+            return servletRequest.getRequest();
+        }
+        return null;
+    }
+
+    private Pair<String, String> buildRequestURI()
+    {
+        String resubmitUrl = getRequest().getRequestURI();
+        // request URL is the one that performs the modification
+        String srid = SavedRequestManager.saveRequest(getRequest());
+        resubmitUrl += '?' + SavedRequestManager.getSavedRequestIdentifier() + "=" + srid;
+        return Pair.of(srid, resubmitUrl);
     }
 
     @Override
     public String getRequestURI()
     {
-        // request URL is the one that performs the modification
-        String srid = SavedRequestManager.saveRequest(getRequest());
-        String resubmitUrl = getRequest().getRequestURI();
-        resubmitUrl += '?' + SavedRequestManager.getSavedRequestIdentifier() + "=" + srid;
-        return resubmitUrl;
+        if (isResubmitAllowedForCurrentRequest()) {
+            return buildRequestURI().getValue();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -238,9 +300,10 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     private HttpServletRequest getRequest()
     {
         Request request = this.container.getRequest();
-        if (request instanceof ServletRequest) {
-            return ((ServletRequest) request).getHttpServletRequest();
+        if (request instanceof ServletRequest servletRequest) {
+            return servletRequest.getRequest();
         }
+
         throw new RuntimeException("Not supported request type");
     }
 

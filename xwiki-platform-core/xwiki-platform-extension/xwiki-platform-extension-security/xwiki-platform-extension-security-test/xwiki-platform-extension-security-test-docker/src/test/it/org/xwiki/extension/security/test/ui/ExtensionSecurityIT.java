@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension.security.test.ui;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -37,8 +36,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.xwiki.extension.security.test.po.ExtensionVulnerabilitiesAdminPage.goToExtensionVulnerabilitiesAdmin;
@@ -87,35 +84,26 @@ class ExtensionSecurityIT
         tableLayout.assertRow("Latest Fix Version", "140.10.2");
     }
 
-    private String createSecurityVulnerabilitiesSource(TestUtils setup, TestReference testReference) throws IOException
+    private String createSecurityVulnerabilitiesSource(TestUtils setup, TestReference testReference) throws Exception
     {
-        return createPageFromFile(setup,
-            new DocumentReference(testReference.getWikiReference().getName(), List.of("XWiki", "Extension", "Security"),
-                "TestSource"), "vulnerabilities_source.vm");
+        return createPageFromFile(setup, new DocumentReference(testReference.getWikiReference().getName(),
+            List.of("XWiki", "Extension", "Security"), "TestSource"), "vulnerabilities_source.vm");
     }
 
-    private String createSecurityReviewsSource(TestUtils setup, TestReference testReference) throws IOException
+    private String createSecurityReviewsSource(TestUtils setup, TestReference testReference) throws Exception
     {
-        return createPageFromFile(setup,
-            new DocumentReference(testReference.getWikiReference().getName(), List.of("XWiki", "Extension", "Security"),
-                "TestReviews"), "reviews_source.vm");
+        return createPageFromFile(setup, new DocumentReference(testReference.getWikiReference().getName(),
+            List.of("XWiki", "Extension", "Security"), "TestReviews"), "reviews_source.vm");
     }
 
     private String createPageFromFile(TestUtils setup, DocumentReference testDocumentReference, String name)
-        throws IOException
+        throws Exception
     {
-        ViewPage viewPage = setup.createPage(testDocumentReference, "");
-        WikiEditPage wikiEditPage = viewPage.editWiki();
-        // Can't create the content using setup.createPage as the content is too large.
-        wikiEditPage.setContent("{{velocity wiki='false'}}\n"
-            + IOUtils.toString(getClass().getClassLoader().getResourceAsStream(name),
-            Charset.defaultCharset())
-            + "{{/velocity}}");
-        wikiEditPage.clickSaveAndView(false);
-        // We don't use gotoPage here as it relies on some markers to ensure the page is properly loaded, which is not
-        // properly working when navigating from a JSON answer.
-        // Here we just want to navigate away from the JSON.
-        setup.getDriver().get(setup.getURL("Main", "WebHome"));
+        setup.rest().savePage(testDocumentReference,
+            "{{velocity wiki='false'}}\n"
+                + IOUtils.toString(getClass().getClassLoader().getResourceAsStream(name), Charset.defaultCharset())
+                + "{{/velocity}}",
+            null);
         return getLocalRestURL(setup, testDocumentReference);
     }
 

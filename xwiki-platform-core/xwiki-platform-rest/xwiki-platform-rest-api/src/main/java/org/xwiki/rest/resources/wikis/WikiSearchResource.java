@@ -30,14 +30,19 @@ import javax.ws.rs.QueryParam;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.SearchResults;
 
+//FIXME: Write Javadoc describing the REST API parameters
+@SuppressWarnings("checkstyle:MissingJavadocType")
 @Path("/wikis/{wikiName}/search")
 public interface WikiSearchResource
 {
+    // Needs a lot of parameters to bind path and query parameters
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:MissingJavadocMethod"})
     @GET SearchResults search(
             @PathParam("wikiName") String wikiName,
             @QueryParam("q") String keywords,
             @QueryParam("scope") List<String> searchScopeStrings,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("start") @DefaultValue("0") Integer start,
             @QueryParam("orderField") @DefaultValue("") String orderField,
             @QueryParam("order") @DefaultValue("asc") String order,

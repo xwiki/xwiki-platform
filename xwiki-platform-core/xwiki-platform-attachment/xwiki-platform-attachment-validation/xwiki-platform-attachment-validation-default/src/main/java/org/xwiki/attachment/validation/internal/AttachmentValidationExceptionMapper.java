@@ -21,6 +21,7 @@ package org.xwiki.attachment.validation.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -29,8 +30,6 @@ import org.json.JSONObject;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestComponent;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
  * Exception mapper for {@link AttachmentValidationException}.
@@ -55,7 +54,7 @@ public class AttachmentValidationExceptionMapper implements ExceptionMapper<Atta
         return Response
             .serverError()
             .entity(entity.toString())
-            .type(APPLICATION_JSON)
+            .type(MediaType.APPLICATION_JSON_TYPE)
             .status(exception.getHttpStatus())
             .build();
     }

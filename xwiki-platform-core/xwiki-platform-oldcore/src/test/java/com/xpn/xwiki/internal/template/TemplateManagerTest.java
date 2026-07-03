@@ -34,6 +34,7 @@ import org.mockito.stubbing.Answer;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.RenderingException;
@@ -41,6 +42,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.template.Template;
 import org.xwiki.test.annotation.AfterComponent;
@@ -78,7 +80,7 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class TemplateManagerTest
 {
-    private AuthorizationManager authorizationMock;
+    private DocumentAuthorizationManager authorizationMock;
 
     private Environment environmentMock;
 
@@ -102,9 +104,10 @@ class TemplateManagerTest
         this.componentManager.registerMockComponent(TransformationManager.class);
         this.componentManager.registerMockComponent(ObservationManager.class);
         this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        this.componentManager.registerMockComponent(AuthorizationManager.class);
         this.componentManager.registerMockComponent(WikiDescriptorManager.class);
 
-        this.authorizationMock = this.componentManager.registerMockComponent(AuthorizationManager.class);
+        this.authorizationMock = this.componentManager.registerMockComponent(DocumentAuthorizationManager.class);
         this.environmentMock = this.componentManager.registerMockComponent(Environment.class);
         this.velocityManagerMock = this.componentManager.registerMockComponent(VelocityManager.class);
 
@@ -118,15 +121,13 @@ class TemplateManagerTest
         this.velocityEngineMock = mock();
         when(this.velocityManagerMock.getVelocityEngine()).thenReturn(this.velocityEngineMock);
         when(this.velocityManagerMock.getVelocityContext()).thenReturn(new VelocityContext());
-
-        when(this.environmentMock.getResource("/templates/")).thenReturn(new URL("file://templates/"));
     }
 
     private void setTemplateContent(String content) throws UnsupportedEncodingException, MalformedURLException
     {
         when(this.environmentMock.getResourceAsStream("/templates/template"))
             .thenReturn(new ByteArrayInputStream(content.getBytes("UTF8")));
-        when(this.environmentMock.getResource("/templates/template")).thenReturn(new URL("file://templates/template"));
+        when(this.environmentMock.getResource("/templates/", "template")).thenReturn(new URL("file://templates/template"));
     }
 
     private void mockVelocity(String source, String result) throws XWikiVelocityException
@@ -172,7 +173,8 @@ class TemplateManagerTest
     {
         DocumentReference author = new DocumentReference("wiki", "space", "user");
 
-        doThrow(AccessDeniedException.class).when(this.authorizationMock).checkAccess(Right.SCRIPT, author, null);
+        doThrow(AccessDeniedException.class).when(this.authorizationMock).checkAccess(Right.SCRIPT,
+            EntityType.DOCUMENT, author, null);
 
         Template template = this.templateManager.createStringTemplate("", author);
 
@@ -182,13 +184,9 @@ class TemplateManagerTest
     @Test
     void templateCheatingProtection() throws Exception
     {
-        when(this.environmentMock.getResource("/templates/../secure[]")).thenReturn(new URL("file://secure[]"));
-        when(this.environmentMock.getResourceAsStream("/templates/../template[]"))
-            .thenReturn(new ByteArrayInputStream("source".getBytes("UTF8")));
-
         mockVelocity("source", "KO");
 
-        assertEquals("", this.templateManager.render("../secure[]"));
+        assertThrows(IllegalArgumentException.class, () -> this.templateManager.render("../secure[]"));
     }
 
     @Test

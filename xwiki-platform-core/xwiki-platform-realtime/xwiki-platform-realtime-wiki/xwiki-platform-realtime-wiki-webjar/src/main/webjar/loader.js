@@ -19,55 +19,40 @@
  */
 define('xwiki-realtime-wikiEditor-loader', [
   'jquery',
-  'xwiki-realtime-loader'
-], function($, Loader) {
+  'xwiki-realtime-loader',
+  'xwiki-l10n!xwiki-realtime-messages'
+], function($, Loader, Messages) {
   'use strict';
 
-  var editorId = 'wiki', info = {
+  const editorId = 'wiki', info = {
     type: editorId,
-    href: '&editor=wiki&force=1',
+    // FIXME: Don't hard-code the field name. We should be able to edit any document field (e.g. TextArea xobject
+    // properties), not just the document content.
+    field: 'content',
+    href: '&editor=wiki',
     name: 'Wiki',
     compatible: ['wiki', 'wysiwyg']
   };
 
-  Loader.bootstrap(info).then(keys => {
-    require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
-      if (RealtimeWikiEditor && RealtimeWikiEditor.main) {
-        keys._update = Loader.updateKeys.bind(Loader, editorId);
-        var config = Loader.getConfig();
-        config.rtURL = Loader.getEditorURL(window.location.href, info);
-        RealtimeWikiEditor.main(config, keys);
-      } else {
-        console.error("Couldn't find RealtimeWikiEditor.main, aborting.");
-      }
-    });
-  });
-
-  var getWikiLock = function() {
-    var force = document.querySelectorAll('a[href*="editor=wiki"][href*="force=1"][href*="/edit/"]');
-    return !!force.length;
-  };
-
-  var displayButtonModal = function() {
-    // TODO: This JavaScript code is not loaded anymore on the edit lock page so we need to decide what to do with it
-    // (either drop it or find a clean way to load it on the edit lock page).
-    var lock = Loader.getDocLock();
-    var wikiLock = getWikiLock();
-    var button = $();
-    if ($('.realtime-button-' + info.type).length) {
-      button = $('<button class="btn btn-success"></button>').text(
-        Loader.messages.get('redirectDialog.join', info.name));
-      $('.realtime-button-' + info.type).prepend(button).prepend('<br/>');
-    } else if (lock && wikiLock) {
-      button = $('<button class="btn btn-primary"></button>').text(
-        Loader.messages.get('redirectDialog.create', info.name));
-      $('.realtime-buttons').append('<br/>').append(button);
+  Loader.bootstrap(info).then(realtimeContext => {
+    // "Fail" silently if realtime collaboration is not supported in this context.
+    if (realtimeContext) {
+      return new Promise((resolve, reject) => {
+        require(['xwiki-realtime-wikiEditor'], function (RealtimeWikiEditor) {
+          try {
+            realtimeContext.rtURL = Loader.getEditorURL(globalThis.location.href, info);
+            // TODO: The editor initialization is asynchronous so the resolved value should be a Promise in order to
+            // notify the user in case of errors.
+            resolve(new RealtimeWikiEditor(realtimeContext));
+          } catch (error) {
+            reject(error);
+          }
+        }, reject);
+      });
     }
-    button.on('click', function() {
-      window.location.href = Loader.getEditorURL(window.location.href, info);
-    });
-  };
-
-  displayButtonModal();
-  $(document).on('insertButton', displayButtonModal);
+  }).catch(error => {
+    new XWiki.widgets.Notification(Messages['join.error'], 'error');
+    // Provide more details in the console for debugging.
+    console.error(Messages['join.error'], error);
+  });
 });

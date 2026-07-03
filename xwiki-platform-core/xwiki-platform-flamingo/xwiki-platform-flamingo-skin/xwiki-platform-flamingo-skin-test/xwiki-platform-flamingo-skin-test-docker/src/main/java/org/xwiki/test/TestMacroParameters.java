@@ -19,7 +19,7 @@
  */
 package org.xwiki.test;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 /**
  * Java bean defining the parameters of {@link TestMacro}.

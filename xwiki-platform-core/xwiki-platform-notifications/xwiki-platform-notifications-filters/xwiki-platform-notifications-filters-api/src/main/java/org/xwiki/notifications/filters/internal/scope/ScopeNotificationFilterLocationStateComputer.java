@@ -22,12 +22,16 @@ package org.xwiki.notifications.filters.internal.scope;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 
@@ -44,33 +48,53 @@ public class ScopeNotificationFilterLocationStateComputer
     @Inject
     private ScopeNotificationFilterPreferencesGetter preferencesGetter;
 
-    private enum WatchedState
-    {
-        WATCHED,
-        NOT_WATCHED,
-        UNKNOWN
-    }
-
     /**
-     * @param filterPreferences the collection of all preferences to take into account
-     * @param location a location
-     * @return {@code true} if the location is watched by the user, for any kind of event types or format.
+     * Compute the watch state for the given location, based on the given preferences, for all formats and all event
+     * types.
+     *
+     * @param filterPreferences the list of filter preferences to consider for computing the watch state
+     * @param location the location for which to compute the watch state
+     * @return the watch state for all formats and all event types
      */
-    public boolean isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
-        EntityReference location)
+    // TODO: This should be probably cached info.
+    public WatchedLocationState isLocationWatchedWithAllTypesAndFormats(Collection<NotificationFilterPreference>
+        filterPreferences, EntityReference location)
     {
-        return isLocationWatched(filterPreferences, location, null, null, false, true, false).isWatched();
-    }
+        ScopeNotificationFilterPreferencesHierarchy preferencesAllFormatsAndAllEventsTypes = preferencesGetter
+            .getScopeFilterPreferences(filterPreferences, null, null, true, true);
+        ScopeNotificationFilterPreferencesHierarchy preferencesAnyFormatAnyEventTypes = preferencesGetter
+            .getScopeFilterPreferences(filterPreferences, null, null, false, false);
 
-    /**
-     * @param filterPreferences the collection of all preferences to take into account
-     * @param location a location
-     * @return {@code true} if the location is watched by the user, for all formats and for all events only.
-     */
-    public boolean isLocationWatchedWithAllEventTypes(Collection<NotificationFilterPreference> filterPreferences,
-        EntityReference location)
-    {
-        return isLocationWatched(filterPreferences, location, null, null, true, true, true).isWatched();
+        WatchedLocationState result = new WatchedLocationState();
+
+        if (!filterPreferences.isEmpty()) {
+            Optional<WatchedLocationState> optionalWatchedLocationState =
+                handleExclusiveFilters(location, preferencesAllFormatsAndAllEventsTypes, true);
+
+            if (optionalWatchedLocationState.isPresent()) {
+                result = optionalWatchedLocationState.get();
+            } else {
+                optionalWatchedLocationState =
+                    handleExclusiveFilters(location, preferencesAnyFormatAnyEventTypes, false);
+                if (optionalWatchedLocationState.isPresent()) {
+                    result = optionalWatchedLocationState.get();
+                }
+            }
+
+            optionalWatchedLocationState =
+                handleInclusiveFilters(location, preferencesAllFormatsAndAllEventsTypes, true);
+            if (result.getState() == WatchedLocationState.WatchedState.NOT_SET
+                && optionalWatchedLocationState.isPresent()) {
+                result = optionalWatchedLocationState.get();
+            } else if (result.getState() == WatchedLocationState.WatchedState.NOT_SET) {
+                optionalWatchedLocationState =
+                    handleInclusiveFilters(location, preferencesAnyFormatAnyEventTypes, false);
+                if (optionalWatchedLocationState.isPresent()) {
+                    result = optionalWatchedLocationState.get();
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -91,93 +115,178 @@ public class ScopeNotificationFilterLocationStateComputer
      * @param onlyGivenFormat if {@code true} the filter preference should match exactly the format requested even if
      *      *                 it's {@code null}.
      * @param location the location to check
-     * @param checkInclusiveFilters if {@code true} both inclusive and exclusive filters are considered.
+     * @param handleInclusiveFilters if {@code true} both inclusive and exclusive filters are considered.
      *                              if {@code false} only exclusive filters are considered.
      * @return if the location is watched by the user, for the given event type and format
      */
-    public WatchedLocationState isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
-        EntityReference location, String eventType, NotificationFormat format, boolean onlyGivenType,
-        boolean checkInclusiveFilters, boolean onlyGivenFormat)
+    public WatchedLocationState isLocationWatched(Collection<NotificationFilterPreference>
+        filterPreferences, EntityReference location, String eventType, NotificationFormat format,
+        boolean onlyGivenType, boolean handleInclusiveFilters, boolean onlyGivenFormat)
     {
-        // TODO: write a unit test with a complex set of preferences
-
         ScopeNotificationFilterPreferencesHierarchy preferences = preferencesGetter
-                .getScopeFilterPreferences(filterPreferences, eventType, format, onlyGivenType, onlyGivenFormat);
+            .getScopeFilterPreferences(filterPreferences, eventType, format, onlyGivenType, onlyGivenFormat);
 
-        if (preferences.isEmpty()) {
-            // If there is no filter preference, then nothing is watched.
-            return new WatchedLocationState(false);
-        }
+        WatchedLocationState result = new WatchedLocationState();
 
-        WatchedLocationState state = handleExclusiveFilters(location, preferences);
-        if (state != null) {
-            return state;
-        }
+        if (!filterPreferences.isEmpty()) {
+            Optional<WatchedLocationState> optionalWatchedLocationState =
+                handleExclusiveFilters(location, preferences, true);
 
-        Iterator<ScopeNotificationFilterPreference> it = preferences.getInclusiveFiltersThatHasNoParents();
-        if (!checkInclusiveFilters || !it.hasNext()) {
-            // No inclusive filters == we get nothing, so it's not watched.
-            return new WatchedLocationState(false);
-        }
-
-        boolean match = false;
-        Date startingDate = null;
-        while (it.hasNext()) {
-            ScopeNotificationFilterPreference pref = it.next();
-
-            // If the inclusive filter match the event location...
-            if (match(pref, location)) {
-                // Then it means we watch this location
-                match = true;
-                if (startingDate == null
-                        || (pref.getStartingDate() != null && startingDate.after(pref.getStartingDate()))) {
-                    startingDate = pref.getStartingDate();
+            if (optionalWatchedLocationState.isPresent()) {
+                result = optionalWatchedLocationState.get();
+            } else if (handleInclusiveFilters) {
+                optionalWatchedLocationState =
+                    handleInclusiveFilters(location, preferences, true);
+                if (optionalWatchedLocationState.isPresent()) {
+                    result = optionalWatchedLocationState.get();
                 }
             }
         }
-
-        // If we are here, we have filter preferences but no one is matching the current event location,
-        // so we don't watch this location
-        return new WatchedLocationState(match, startingDate);
+        return result;
     }
 
-    private WatchedLocationState handleExclusiveFilters(EntityReference location,
-        ScopeNotificationFilterPreferencesHierarchy preferences)
+    private Optional<WatchedLocationState> handleInclusiveFilters(EntityReference location,
+        ScopeNotificationFilterPreferencesHierarchy preferencesHierarchy,
+        boolean allEventsAllFormats)
     {
-        WatchedState state = WatchedState.UNKNOWN;
-        int deepestLevel = 0;
+        Optional<WatchedLocationState> result = Optional.empty();
+        boolean match = false;
         Date startingDate = null;
+        // note that the hierarchy is not a real hierarchy: it depends on whether the filter are inclusive or
+        // exclusive so two inclusive filters are never parent of each other.
+        Iterator<ScopeNotificationFilterPreference> inclusiveFiltersIterator =
+            preferencesHierarchy.getInclusiveFiltersThatHasNoParents();
+
+        boolean exactMatch = false;
+        boolean spaceMatch = false;
+        while (inclusiveFiltersIterator.hasNext()) {
+            ScopeNotificationFilterPreference pref = inclusiveFiltersIterator.next();
+
+            boolean isExactMatch = isExactMatch(pref, location);
+            boolean isParentMatch = isParentMatch(pref, location);
+            boolean isSpaceMatch = isSpaceMatch(pref, location);
+            // If the inclusive filter match the event location...
+            if (isExactMatch || isParentMatch) {
+                // Then it means we watch this location
+                match = true;
+                exactMatch = isExactMatch;
+                // If we found an exact space match then we want to keep it true
+                spaceMatch |= isSpaceMatch;
+                startingDate = pref.getStartingDate();
+                // if it's an exact match there's no point on checking other filters
+                if (exactMatch) {
+                    break;
+                }
+            }
+        }
+        if (match) {
+            WatchedLocationState.WatchedState watchedState =
+                getWatchedState(allEventsAllFormats, exactMatch, spaceMatch, true);
+            result = Optional.of(new WatchedLocationState(watchedState, startingDate));
+        }
+        return result;
+    }
+
+    private static WatchedLocationState.WatchedState getWatchedState(boolean allEventsAllFormats, boolean exactMatch,
+        boolean spaceMatch, boolean isInclusive)
+    {
+        WatchedLocationState.WatchedState watchedState;
+        if (!allEventsAllFormats) {
+            watchedState = WatchedLocationState.WatchedState.CUSTOM;
+        } else if (exactMatch) {
+            watchedState = (isInclusive) ? WatchedLocationState.WatchedState.WATCHED
+                : WatchedLocationState.WatchedState.BLOCKED;
+        } else if (spaceMatch) {
+            watchedState = (isInclusive) ? WatchedLocationState.WatchedState.WATCHED_WITH_CHILDREN
+                : WatchedLocationState.WatchedState.BLOCKED_WITH_CHILDREN;
+        } else {
+            watchedState = (isInclusive) ? WatchedLocationState.WatchedState.WATCHED_BY_ANCESTOR
+                : WatchedLocationState.WatchedState.BLOCKED_BY_ANCESTOR;
+        }
+        return watchedState;
+    }
+
+    private Optional<WatchedLocationState> handleExclusiveFilters(EntityReference location,
+        ScopeNotificationFilterPreferencesHierarchy preferences, boolean allTypesAndEvents)
+    {
+        ExclusiveMatch match = new ExclusiveMatch();
 
         Iterator<ScopeNotificationFilterPreference> it = preferences.getExclusiveFiltersThatHasNoParents();
         while (it.hasNext()) {
-            ScopeNotificationFilterPreference pref = it.next();
-
-            int deepLevel = pref.getScopeReference().size();
-
-            // If the exclusive filter match the event location...
-            if (match(pref, location) && deepLevel > deepestLevel) {
-                state = WatchedState.NOT_WATCHED;
-                startingDate = pref.getStartingDate();
-                deepestLevel = deepLevel;
-
-                // then we watch the location if there is at least an inclusive filter child matching it
-                for (ScopeNotificationFilterPreference child : pref.getChildren()) {
-                    int childDeepLevel = child.getScopeReference().size();
-                    if (match(child, location) && childDeepLevel > deepestLevel) {
-                        state = WatchedState.WATCHED;
-                        deepestLevel = childDeepLevel;
-                        startingDate = child.getStartingDate();
-                    }
-                }
-            }
+            handleExclusiveFilter(it.next(), location, allTypesAndEvents, match);
         }
 
-        return state == WatchedState.UNKNOWN ? null
-            : new WatchedLocationState(state == WatchedState.WATCHED, startingDate);
+        if (match.state != null) {
+            return Optional.of(new WatchedLocationState(match.state, match.startingDate));
+        } else {
+            return Optional.empty();
+        }
     }
 
-    private boolean match(ScopeNotificationFilterPreference pref, EntityReference location)
+    private void handleExclusiveFilter(ScopeNotificationFilterPreference pref, EntityReference location,
+        boolean allTypesAndEvents, ExclusiveMatch match)
     {
-        return location.equals(pref.getScopeReference()) || location.hasParent(pref.getScopeReference());
+        int deepLevel = pref.getScopeReference().size();
+        boolean isExactMatch = isExactMatch(pref, location);
+        boolean isParentMatch = isParentMatch(pref, location);
+        boolean isSpaceMatch = isSpaceMatch(pref, location);
+
+        // If the exclusive filter match the event location...
+        if ((isExactMatch || isParentMatch) && deepLevel > match.deepestLevel) {
+            match.state = getWatchedState(allTypesAndEvents, isExactMatch, isSpaceMatch, false);
+            match.startingDate = pref.getStartingDate();
+            match.deepestLevel = deepLevel;
+
+            // then we watch the location if there is at least an inclusive filter child matching it
+            for (ScopeNotificationFilterPreference child : pref.getChildren()) {
+                handleExclusiveChild(child, location, allTypesAndEvents, match);
+            }
+        }
+    }
+
+    private void handleExclusiveChild(ScopeNotificationFilterPreference child, EntityReference location,
+        boolean allTypesAndEvents, ExclusiveMatch match)
+    {
+        int childDeepLevel = child.getScopeReference().size();
+        boolean isChildExactMatch = isExactMatch(child, location);
+        boolean isChildParentMatch = isParentMatch(child, location);
+        boolean isChildSpaceMatch = isSpaceMatch(child, location);
+        if ((isChildExactMatch || isChildParentMatch) && childDeepLevel > match.deepestLevel) {
+            match.state = getWatchedState(allTypesAndEvents, isChildExactMatch, isChildSpaceMatch, true);
+            match.deepestLevel = childDeepLevel;
+            match.startingDate = child.getStartingDate();
+        }
+    }
+
+    /**
+     * Holds the current best match found while iterating over the exclusive filters and their children.
+     */
+    private static final class ExclusiveMatch
+    {
+        private WatchedLocationState.WatchedState state;
+
+        private int deepestLevel;
+
+        private Date startingDate;
+    }
+
+    private boolean isSpaceMatch(ScopeNotificationFilterPreference pref, EntityReference location)
+    {
+        boolean result = false;
+        EntityReference scopeReference = pref.getScopeReference();
+        if (scopeReference.getType() == EntityType.SPACE) {
+            result = new DocumentReference("WebHome", new SpaceReference(scopeReference)).equals(location);
+        }
+        return result;
+    }
+
+    private boolean isExactMatch(ScopeNotificationFilterPreference pref, EntityReference location)
+    {
+        return location.equals(pref.getScopeReference());
+    }
+
+    private boolean isParentMatch(ScopeNotificationFilterPreference pref, EntityReference location)
+    {
+        return location.hasParent(pref.getScopeReference());
     }
 }

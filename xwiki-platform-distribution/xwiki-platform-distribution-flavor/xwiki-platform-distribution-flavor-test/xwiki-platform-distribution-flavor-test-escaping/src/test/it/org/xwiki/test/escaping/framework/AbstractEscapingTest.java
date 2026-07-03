@@ -198,7 +198,7 @@ public abstract class AbstractEscapingTest implements FileTest
     protected boolean patternMatches(String fileName)
     {
         String pattern = System.getProperty("pattern", "");
-        if (pattern == null || pattern.equals("")) {
+        if (pattern == null || "".equals(pattern)) {
             return true;
         }
         return Pattern.matches(".*" + pattern + ".*", fileName);
@@ -274,7 +274,7 @@ public abstract class AbstractEscapingTest implements FileTest
                     // ignore 404 (the page is still rendered)
                     break;
                 case HttpStatus.SC_INTERNAL_SERVER_ERROR:
-                    // ignore 500 (internal server error), which is used by the standard exception.vm error display
+                    // ignore 500 (internal server error)
                     break;
                 default:
                     throw new RuntimeException("HTTP GET request returned status " + statusCode + " ("
@@ -440,7 +440,7 @@ public abstract class AbstractEscapingTest implements FileTest
         String delimiter = "?";
         if (parameters != null) {
             for (String parameter : parameters.keySet()) {
-                if (parameter != null && !parameter.equals("")) {
+                if (parameter != null && !"".equals(parameter)) {
                     String value = parameters.get(parameter);
                     url += delimiter + escapeUrl(parameter) + "=" + escapeUrl(value);
                 }
@@ -453,7 +453,7 @@ public abstract class AbstractEscapingTest implements FileTest
             url += delimiter + LANGUAGE + "=en";
         }
         // some tests need to create or delete pages, we add secret token to avoid CSRF protection failures
-        if ((action == null || !action.equals("edit"))
+        if ((action == null || !"edit".equals(action))
             && (parameters == null || !parameters.containsKey(SECRET_TOKEN))) {
             url += delimiter + SECRET_TOKEN + "=" + getSecretToken();
         }

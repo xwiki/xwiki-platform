@@ -34,6 +34,9 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
     }
   };
 
+  // We want to still activate the links with a click even after they are selected from the finder.
+  $.jstree.defaults.core.allow_reselect = true;
+
   var createSuggestInput = function(options) {
     var input = document.createElement('input');
     input.type = 'text';
@@ -93,6 +96,27 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
       parent.init.call(this, element, options);
 
       $(createSuggestInput(options)).insertBefore(element).on('xwiki:suggest:selected', findNode.bind(this));
+    };
+
+    this.destroy = function (keep_html) {
+      const result = parent.destroy.apply(this, arguments);
+      this._getFinderSuggestInput()?.detach();
+      if (!keep_html) {
+        this._getFinderInput().remove();
+      }
+      return result;
+    };
+
+    this.clearFinderSuggestions = function() {
+      this._getFinderSuggestInput()?.clearSuggestions();
+    };
+
+    this._getFinderInput = function() {
+      return this.element.prevAll('.xtree-finder').first();
+    };
+
+    this._getFinderSuggestInput = function() {
+      return this._getFinderInput()[0]?.__x_suggest;
     };
   };
 });

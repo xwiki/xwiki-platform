@@ -20,24 +20,28 @@
 package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
-import java.util.Arrays;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BrowserWebDriverContainer;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.VncRecordingContainer;
 import org.testcontainers.utility.DockerLoggerFactory;
 import org.testcontainers.utility.TestcontainersConfiguration;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.extension.test.junit5.ExtensionTestUtils;
+import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.maven.ArtifactResolver;
@@ -91,16 +95,28 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreensh
  * @version $Id$
  * @since 10.6RC1
  */
-public class XWikiDockerExtension extends AbstractExtension
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
+public class XWikiDockerExtension extends AbstractExecutionConditionExtension
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDockerExtension.class);
 
     private static final String SUPERADMIN = "superadmin";
 
-    private boolean isVncStarted;
+    private static final String SUPERADMIN_PASSWORD = "pass";
 
-    private ExtensionContextTestConfigurationResolver testConfigurationMerger =
-        new ExtensionContextTestConfigurationResolver();
+    /**
+     * When set to true, keeps the XWiki instance and the started Docker containers (DB, Servlet Engine, optional Blob
+     * Store) running after the tests complete so that the instance can be inspected manually. The process will wait
+     * until a file named "stop.txt" is created in the current directory.
+     */
+    private static final String KEEP_RUNNING_PROPERTY = "xwiki.test.ui.keepRunning";
+
+    private static final String STOP_FILENAME = "stop.txt";
+
+    private static final List<Class<?>> SUPPORTED_PARAMETER_TYPES = List.of(XWikiWebDriver.class, TestUtils.class,
+        TestConfiguration.class, ComponentManager.class, ExtensionTestUtils.class);
+
+    private boolean isVncStarted;
 
     @Override
     public void beforeAll(ExtensionContext extensionContext)
@@ -127,23 +143,7 @@ public class XWikiDockerExtension extends AbstractExtension
         // Programmatically enable logging for TestContainers code when verbose is on so that we can get the maximum
         // of debugging information.
         if (testConfiguration.isVerbose()) {
-            setLogbackLoggerLevel("org.testcontainers", Level.TRACE);
-            setLogbackLoggerLevel("org.rnorth", Level.TRACE);
-            setLogbackLoggerLevel("org.xwiki.test.docker.internal.junit5.browser", Level.TRACE);
-            setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
-            // Don't display the stack trace that TC displays when it cannot find a config file override
-            // ("Testcontainers config override was found on file:/root/.testcontainers.properties but the file was not
-            // found), since this is not a problem and it's optional.
-            // See https://github.com/testcontainers/testcontainers-java/issues/2253
-            setLogbackLoggerLevel("org.testcontainers.utility.TestcontainersConfiguration", Level.WARN);
-        }
-        if (testConfiguration.isDebug()) {
-            // Debug: get logs when starting the sshd container
-            setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
-                TestcontainersConfiguration.getInstance().getSSHdImage()).getName(), Level.TRACE);
-            // Debug: get logs when starting the vnc container
-            setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
-                TestcontainersConfiguration.getInstance().getVncRecordedContainerImage()).getName(), Level.TRACE);
+            enableVerboseLogs();
         }
 
         // Expose ports for SSH port forwarding so that containers can communicate with the host using the
@@ -153,50 +153,73 @@ public class XWikiDockerExtension extends AbstractExtension
         // Initialize resolvers.
         RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration.isOffline());
         ArtifactResolver artifactResolver = new ArtifactResolver(testConfiguration.isOffline(),
-            testConfiguration.isDebug(), repositoryResolver);
+            testConfiguration.isVerbose(), repositoryResolver);
         MavenResolver mavenResolver =
             new MavenResolver(testConfiguration.getProfiles(), artifactResolver, repositoryResolver);
 
-        // If the Servlet Engine is external then consider XWiki is already configured, provisioned and running.
-        if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
-            // Start the Database.
-            // Note: We start the database before the XWiki WAR is created because we need the IP of the docker
-            // container for the database when configuring the JDBC URL, in the case when the servlet container is
-            // running outside of docker and thus outside of the shared docker network...
-            LOGGER.info("(*) Starting database [{}]...", testConfiguration.getDatabase());
-            startDatabase(testConfiguration);
+        for (int index = 0; index < testConfiguration.getXWikiInstances().value(); ++index) {
+            // If the Servlet Engine is external then consider XWiki is already configured, provisioned and running.
+            if (testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
+                beforeAllExternal(index, extensionContext);
+            } else {
+                // Start the Database.
+                // Note: We start the database before the XWiki WAR is created because we need the IP of the docker
+                // container for the database when configuring the JDBC URL, in the case when the servlet container is
+                // running outside of docker and thus outside of the shared docker network...
+                LOGGER.info("(*) Starting database [{}]...", testConfiguration.getDatabase());
+                startDatabase(testConfiguration);
 
-            // Build the XWiki WAR
-            LOGGER.info("(*) Building custom XWiki WAR...");
-            File targetWARDirectory = getServletContainerExecutor(testConfiguration, artifactResolver, mavenResolver,
-                repositoryResolver, extensionContext).getWARDirectory();
-            WARBuilder builder = new WARBuilder(testConfiguration, targetWARDirectory, artifactResolver, mavenResolver,
-                repositoryResolver);
-            builder.build();
+                // Start the Blob Store container (if needed)
+                if (testConfiguration.getBlobStore() != null) {
+                    LOGGER.info("(*) Starting blob store [{}]...", testConfiguration.getBlobStore());
+                    startBlobStore(testConfiguration);
+                }
 
-            // Start the Servlet Engine
-            LOGGER.info("(*) Starting Servlet container [{}]...", testConfiguration.getServletEngine());
-            startServletEngine(targetWARDirectory, testConfiguration, artifactResolver, mavenResolver,
-                repositoryResolver, extensionContext);
+                // Build the XWiki WAR
+                LOGGER.info("(*) Building custom XWiki WAR...");
+                ServletContainerExecutor containerExecutor = getServletContainerExecutor(index, testConfiguration,
+                    artifactResolver, mavenResolver, repositoryResolver, extensionContext);
+                File targetWARDirectory = containerExecutor.getWARDirectory();
+                WARBuilder builder = new WARBuilder(testConfiguration, targetWARDirectory, artifactResolver,
+                    mavenResolver, repositoryResolver);
+                builder.build();
 
-            // Provision XWiki by installing all required extensions.
-            LOGGER.info("(*) Provision extensions for test...");
-            provisionExtensions(artifactResolver, mavenResolver, extensionContext);
-        } else {
-            // Set the IP/port for the container since startServletEngine() wasn't called and it's set there normally.
-            testConfiguration.getServletEngine().setIP("localhost");
-            testConfiguration.getServletEngine().setPort(8080);
-            setXWikiURL(testConfiguration, extensionContext);
+                // Start the Servlet Engine
+                LOGGER.info("(*) Starting Servlet container [{}]...", testConfiguration.getServletEngine());
+                XWikiExecutor executor = containerExecutor.start(targetWARDirectory);
 
-            LOGGER.info("XWiki is already started, using running instance at [{}] to execute the tests...",
-                loadXWikiURL(extensionContext));
+                // Store the XWikiExecutor in the context
+                DockerTestUtils.addXWikiExecutor(extensionContext, executor);
 
-            // Note: Provisioning is not done in this case, you're supposed to have an XWiki instance that contains
-            // what's needed for the tests.
+                // Switch the context executor to the new one (so that extensions are provisioned on the right instance)
+                DockerTestUtils.setCurrentXWikiExecutor(index, extensionContext);
+
+                LOGGER.info("(*) Provision extensions for test...");
+                provisionExtensions(artifactResolver, mavenResolver, extensionContext);
+            }
         }
+
+        // Switch back to the first executor as current executor
+        DockerTestUtils.setCurrentXWikiExecutor(0, extensionContext);
 
         // Start the Browser (this creates and initializes the PersistentTestContext, XWikiWebDriver objects)
         startBrowser(testConfiguration, extensionContext);
+    }
+
+    private void beforeAllExternal(int index, ExtensionContext extensionContext)
+    {
+        // Create the XWikiExecutor
+        XWikiExecutor executor = new XWikiExecutor(index, GenericContainer.INTERNAL_HOST_HOSTNAME, 8080,
+            GenericContainer.INTERNAL_HOST_HOSTNAME, 8080, "localhost", 8080);
+
+        LOGGER.info("XWiki is already started, using running instance at [{}] to execute the tests...",
+            executor.getHttpClientBaseURL());
+
+        // Store the XWikiExecutor in the context
+        DockerTestUtils.addXWikiExecutor(extensionContext, executor);
+
+        // Note: Provisioning is not done in this case, you're supposed to have an XWiki instance that contains
+        // what's needed for the tests.
     }
 
     @Override
@@ -207,6 +230,29 @@ public class XWikiDockerExtension extends AbstractExtension
         } catch (Exception e) {
             raiseException(e);
         }
+    }
+
+    private void enableVerboseLogs()
+    {
+        // Enable TC logs to get more info
+        setLogbackLoggerLevel("org.testcontainers", Level.TRACE);
+        setLogbackLoggerLevel("org.rnorth", Level.TRACE);
+        setLogbackLoggerLevel("org.xwiki.test.docker.internal.junit5.browser", Level.TRACE);
+        setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
+        // Don't display the stack trace that TC displays when it cannot find a config file override
+        // ("Testcontainers config override was found on file:/root/.testcontainers.properties but the file was not
+        // found), since this is not a problem and it's optional.
+        // See https://github.com/testcontainers/testcontainers-java/issues/2253
+        setLogbackLoggerLevel("org.testcontainers.utility.TestcontainersConfiguration", Level.WARN);
+        // Also enable some debug logs from our test framework
+        setLogbackLoggerLevel("org.xwiki.test.docker", Level.DEBUG);
+        setLogbackLoggerLevel("org.xwiki.test.extension", Level.DEBUG);
+        // Get logs when starting the sshd container
+        setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
+            TestcontainersConfiguration.getInstance().getSSHdImage()).getName(), Level.TRACE);
+        // Get logs when starting the vnc container
+        setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
+            TestcontainersConfiguration.getInstance().getVncRecordedContainerImage()).getName(), Level.TRACE);
     }
 
     private TestConfiguration computeTestConfiguration(ExtensionContext extensionContext)
@@ -278,7 +324,11 @@ public class XWikiDockerExtension extends AbstractExtension
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        saveScreenshotAndVideo(extensionContext);
+        try {
+            saveScreenshotAndVideo(extensionContext);
+        } catch (Exception e) {
+            LOGGER.error("Failed to save the video", e);
+        }
 
         // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
         displayAgentName();
@@ -290,8 +340,13 @@ public class XWikiDockerExtension extends AbstractExtension
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
     {
         Class<?> type = parameterContext.getParameter().getType();
-        return XWikiWebDriver.class.isAssignableFrom(type) || TestUtils.class.isAssignableFrom(type)
-            || TestConfiguration.class.isAssignableFrom(type);
+        for (Class<?> supportedType : SUPPORTED_PARAMETER_TYPES) {
+            if (supportedType.isAssignableFrom(type)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -302,6 +357,10 @@ public class XWikiDockerExtension extends AbstractExtension
             return loadXWikiWebDriver(extensionContext);
         } else if (TestConfiguration.class.isAssignableFrom(type)) {
             return loadTestConfiguration(extensionContext);
+        } else if (ComponentManager.class.isAssignableFrom(type)) {
+            return loadComponentManager(extensionContext);
+        } else if (ExtensionTestUtils.class.isAssignableFrom(type)) {
+            return loadExtensionTestUtils(extensionContext);
         } else {
             return loadPersistentTestContext(extensionContext).getUtil();
         }
@@ -321,59 +380,49 @@ public class XWikiDockerExtension extends AbstractExtension
         if (testContext != null) {
             // End the wcag validation process.
             testContext.getUtil().getWCAGUtils().endWCAGValidation();
-
-            // Shutdown the test context
-            shutdownPersistentTestContext(testContext);
         }
 
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
 
+        // Check if we should keep XWiki running for manual inspection.
+        if (Boolean.getBoolean(KEEP_RUNNING_PROPERTY)
+            && !testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
+            XWikiExecutor executor = DockerTestUtils.getCurrentXWikiExecutor(extensionContext);
+            String url = executor.getHttpClientBaseURL();
+
+            LOGGER.info("XWiki is kept running for manual inspection ({}={}).", KEEP_RUNNING_PROPERTY, true);
+            LOGGER.info("Access XWiki at: {}", url);
+            LOGGER.info("You can log in as [{}] with password [{}]", SUPERADMIN, SUPERADMIN_PASSWORD);
+
+            // Wait for the user to create the file "stop.txt" in the current directory.
+            Path target = Paths.get("").toAbsolutePath().normalize().resolve(STOP_FILENAME);
+            LOGGER.info("Create a file [{}] to stop XWiki.", target);
+
+            // Wait for the user to create the file.
+            StopFileWatcher.waitForFileAndDeleteIfEmpty(target);
+        }
+
+        if (testContext != null) {
+            // Shutdown the test context
+            shutdownPersistentTestContext(testContext);
+        }
+
         // Only stop DB and Servlet Engine if we have started them
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
+            // Stop the Blob Store
+            if (testConfiguration.getBlobStore() != null) {
+                LOGGER.info("(*) Stopping blob store [{}]...", testConfiguration.getBlobStore());
+                stopBlobStore(testConfiguration);
+            }
+
             // Stop the DB
             LOGGER.info("(*) Stopping database [{}]...", testConfiguration.getDatabase());
             stopDatabase(testConfiguration);
 
             // Stop the Servlet Engine
-            LOGGER.info("(*) Stopping Servlet container [{}]...", testConfiguration.getServletEngine());
-            stopServletEngine(extensionContext);
+            LOGGER.info("(*) Stopping Servlet container(s) [{}]...", testConfiguration.getServletEngine());
+            stopServletEngines(extensionContext);
         }
-    }
-
-    @Override
-    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext)
-    {
-        // This method is the first one called in the test lifecycle. It's called for the top level test class but
-        // also for nested test classes. So if the test class has parent tests and one of them has the @UITest
-        // annotation then it means all containers have already been started and the servlet engine is supported.
-        if (!hasParentTestContainingUITestAnnotation(extensionContext)) {
-            // Create & save the test configuration so that we can access it in afterAll()
-            TestConfiguration testConfiguration = this.testConfigurationMerger.resolve(extensionContext);
-            saveTestConfiguration(extensionContext, testConfiguration);
-            // Skip the test if the Servlet Engine selected is in the forbidden list
-            if (isServletEngineForbidden(testConfiguration)) {
-                return ConditionEvaluationResult.disabled(String.format("Servlet Engine [%s] is forbidden, skipping",
-                    testConfiguration.getServletEngine()));
-            } else {
-                return ConditionEvaluationResult.enabled(String.format("Servlet Engine [%s] is supported, continuing",
-                    testConfiguration.getServletEngine()));
-            }
-        } else {
-            return ConditionEvaluationResult.enabled("Servlet Engine is supported by parent Test class, continuing");
-        }
-    }
-
-    private boolean hasParentTestContainingUITestAnnotation(ExtensionContext extensionContext)
-    {
-        boolean hasUITest = false;
-        ExtensionContext current = extensionContext;
-        // Note: the top level context is the JUnitJupiterExtensionContext one and it doesn't contain any test and
-        // thus calling getRequiredTestClass() throws an exception on it, which is why we skip it.
-        while (current.getParent().get().getParent().isPresent() && !hasUITest) {
-            current = current.getParent().get();
-            hasUITest = current.getRequiredTestClass().isAnnotationPresent(UITest.class);
-        }
-        return hasUITest;
     }
 
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
@@ -393,23 +442,15 @@ public class XWikiDockerExtension extends AbstractExtension
         // Initialize the test context
         LOGGER.info("(*) Initialize Test Context...");
         PersistentTestContext testContext =
-            new PersistentTestContext(Arrays.asList(new XWikiExecutor(0)), xwikiWebDriver);
+            new PersistentTestContext(DockerTestUtils.getXWikiExecutors(extensionContext), xwikiWebDriver);
         AbstractTest.initializeSystem(testContext);
         savePersistentTestContext(extensionContext, testContext);
 
-        // Set the URLs to access XWiki:
-        // - the one used inside the Selenium container
-        testContext.getUtil().setURLPrefix(computeXWikiURLPrefix(
-            testConfiguration.getServletEngine().getInternalIP(),
-            testConfiguration.getServletEngine().getInternalPort()));
-
         // Setup the wcag validation context.
-        testContext.getUtil().getWCAGUtils().setupWCAGValidation(testConfiguration.isWCAG(),
-            extensionContext.getTestClass().get().getName());
-
-
-        // - the one used by RestTestUtils, i.e. outside of any container
-        testContext.getUtil().rest().setURLPrefix(loadXWikiURL(extensionContext));
+        testContext.getUtil().getWCAGUtils().setupWCAGValidation(
+            testConfiguration.isWCAG(),
+            extensionContext.getTestClass().get().getName(),
+            testConfiguration.shouldWCAGStopOnError());
 
         // Display logs after the container has been started so that we can see problems happening in the containers
         followOutput(webDriverContainer, getClass());
@@ -434,46 +475,42 @@ public class XWikiDockerExtension extends AbstractExtension
         executor.stop(testConfiguration);
     }
 
-    private ServletContainerExecutor getServletContainerExecutor(TestConfiguration testConfiguration,
+    private void startBlobStore(TestConfiguration testConfiguration) throws Exception
+    {
+        BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
+        executor.start(testConfiguration);
+    }
+
+    private void stopBlobStore(TestConfiguration testConfiguration)
+    {
+        BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
+        executor.stop(testConfiguration);
+    }
+
+    private ServletContainerExecutor getServletContainerExecutor(int index, TestConfiguration testConfiguration,
         ArtifactResolver artifactResolver, MavenResolver mavenResolver, RepositoryResolver repositoryResolver,
         ExtensionContext extensionContext)
     {
-        ServletContainerExecutor executor = loadServletContainerExecutor(extensionContext);
+        ServletContainerExecutor executor = loadServletContainerExecutor(index, extensionContext);
         if (executor == null) {
-            executor = new ServletContainerExecutor(testConfiguration, artifactResolver, mavenResolver,
+            executor = new ServletContainerExecutor(index, testConfiguration, artifactResolver, mavenResolver,
                 repositoryResolver);
-            saveServletContainerExecutor(extensionContext, executor);
+            addServletContainerExecutor(extensionContext, executor);
         }
         return executor;
     }
 
-    private void startServletEngine(File sourceWARDirectory, TestConfiguration testConfiguration,
-        ArtifactResolver artifactResolver, MavenResolver mavenResolver, RepositoryResolver repositoryResolver,
-        ExtensionContext extensionContext) throws Exception
+    private void stopServletEngines(ExtensionContext extensionContext)
     {
-        ServletContainerExecutor executor = getServletContainerExecutor(testConfiguration, artifactResolver,
-            mavenResolver, repositoryResolver, extensionContext);
-        executor.start(sourceWARDirectory);
-        setXWikiURL(testConfiguration, extensionContext);
-    }
-
-    private void setXWikiURL(TestConfiguration testConfiguration, ExtensionContext extensionContext)
-    {
-        // URL to access XWiki from the host.
-        String xwikiURL = computeXWikiURLPrefix(testConfiguration.getServletEngine().getIP(),
-            testConfiguration.getServletEngine().getPort());
-        saveXWikiURL(extensionContext, xwikiURL);
-
-        if (testConfiguration.isVerbose()) {
-            LOGGER.info("XWiki ping URL = {}", xwikiURL);
-        }
-    }
-
-    private void stopServletEngine(ExtensionContext extensionContext) throws Exception
-    {
-        ServletContainerExecutor executor = loadServletContainerExecutor(extensionContext);
-        if (executor != null) {
-            executor.stop();
+        List<ServletContainerExecutor> executors = loadServletContainerExecutors(extensionContext);
+        if (executors != null) {
+            for (ServletContainerExecutor executor : executors) {
+                try {
+                    executor.stop();
+                } catch (Exception e) {
+                    LOGGER.error("Failed to stop servlet container executor [{}]", executor, e);
+                }
+            }
         }
     }
 
@@ -485,17 +522,7 @@ public class XWikiDockerExtension extends AbstractExtension
         DockerTestUtils.setExtensionInstaller(context, extensionInstaller);
 
         // Install extensions in the running XWiki
-        extensionInstaller.installExtensions(SUPERADMIN, "pass", SUPERADMIN);
-    }
-
-    private String computeXWikiURLPrefix(String ip, int port)
-    {
-        return String.format("http://%s:%s/xwiki", ip, port);
-    }
-
-    private boolean isServletEngineForbidden(TestConfiguration testConfiguration)
-    {
-        return testConfiguration.getForbiddenServletEngines().contains(testConfiguration.getServletEngine());
+        extensionInstaller.installExtensions(SUPERADMIN, SUPERADMIN_PASSWORD, SUPERADMIN);
     }
 
     private void saveScreenshotAndVideo(ExtensionContext extensionContext)

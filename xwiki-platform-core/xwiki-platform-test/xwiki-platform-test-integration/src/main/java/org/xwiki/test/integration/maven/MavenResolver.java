@@ -91,6 +91,16 @@ public class MavenResolver
     /**
      * @return the version of the XWiki platform artifacts to download/resolve
      * @throws Exception if an error occurred during reading and parsing of the POM
+     * @since 16.2.0RC1
+     */
+    public String getCommonsVersion() throws Exception
+    {
+        return getPropertyFromCurrentPOM("commons.version");
+    }
+
+    /**
+     * @return the version of the XWiki platform artifacts to download/resolve
+     * @throws Exception if an error occurred during reading and parsing of the POM
      */
     public String getPlatformVersion() throws Exception
     {
@@ -242,7 +252,7 @@ public class MavenResolver
         // module artifacts as XWiki Extensions).
         Model model = getModelFromCurrentPOM();
         for (Dependency dependency : model.getDependencies()) {
-            if (dependency.getArtifactId().equals("clover") && dependency.getGroupId().equals("org.openclover")) {
+            if ("clover".equals(dependency.getArtifactId()) && "org.openclover".equals(dependency.getGroupId())) {
                 artifacts.add(convertToArtifact(dependency));
             }
         }

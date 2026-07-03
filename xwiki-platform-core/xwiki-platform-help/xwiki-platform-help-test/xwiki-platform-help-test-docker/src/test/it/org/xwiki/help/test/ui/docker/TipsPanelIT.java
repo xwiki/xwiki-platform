@@ -19,6 +19,8 @@
  */
 package org.xwiki.help.test.ui.docker;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -46,8 +48,15 @@ import static org.xwiki.test.ui.TestUtils.RestTestUtils.property;
 @UITest(properties = {
     // "$xcontext.context" (used in the test) requires PR
     "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:.*PanelIT"
-        + ".verifyTipsContentIsExecutedWithTheRightAuthor.WebHome"
-})
+        + ".verifyTipsContentIsExecutedWithTheRightAuthor.WebHome",
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+},
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    }
+)
 class TipsPanelIT
 {
     private final static String TIPS_UIXP = "org.xwiki.platform.help.tipsPanel";
@@ -81,7 +90,7 @@ class TipsPanelIT
         testUtils.rest().save(tipPage);
 
         // Execute the tip panel and verify the result is restricted (the velocity macro is forbidden)
-        testUtils.gotoPage(new DocumentReference("xwiki", "Help", "TipsPanel", "WebHome"));
+        testUtils.gotoPage(new DocumentReference("xwiki", List.of("Help", "TipsPanel"), "WebHome"));
         PanelViewPage panelPage = new PanelViewPage();
         assertEquals("execution is restricted: true", panelPage.getPanelContent().getText());
 
@@ -110,12 +119,13 @@ class TipsPanelIT
         tipObject.getProperties().add(property("name", testUtils.serializeReference(testReference)));
         tipObject.getProperties().add(property("extensionPointId", "org.xwiki.platform.help.tipsPanel"));
         tipObject.getProperties().add(property("content",
-            "execution is restricted: {{isrestricted/}}, executed by {{velocity}}$xcontext.context.authorReference{{/velocity}}"));
+            "execution is restricted: {{isrestricted/}}, "
+                + "executed by {{velocity}}$xcontext.context.authorReference{{/velocity}}"));
         tipPage.getObjects().getObjectSummaries().add(tipObject);
         testUtils.rest().save(tipPage);
 
         // Execute the tip panel and verify the result is the expected one
-        testUtils.gotoPage(new DocumentReference("xwiki", "Help", "TipsPanel", "WebHome"));
+        testUtils.gotoPage(new DocumentReference("xwiki", List.of("Help", "TipsPanel"), "WebHome"));
         PanelViewPage panelPage = new PanelViewPage();
         assertEquals(
             "execution is restricted: false, executed by xwiki:XWiki." + TestUtils.ADMIN_CREDENTIALS.getUserName(),

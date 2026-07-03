@@ -23,11 +23,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for AttachmentMetadataSerializer
@@ -35,7 +36,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * @version $Id$
  * @since 3.0M2
  */
-public class AttachmentMetadataSerializerTest
+class AttachmentMetadataSerializerTest
 {
     private static final String TEST_CONTENT =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -50,33 +51,29 @@ public class AttachmentMetadataSerializerTest
 
     private AttachmentMetadataSerializer serializer;
 
-    @Before
-    public void setUp()
+    @BeforeEach
+    void setUp()
     {
         this.serializer = new AttachmentMetadataSerializer();
     }
 
     @Test
-    public void testParse() throws Exception
+    void parse() throws Exception
     {
         final ByteArrayInputStream bais = new ByteArrayInputStream(TEST_CONTENT.getBytes("US-ASCII"));
         final XWikiAttachment attach = this.serializer.parse(bais);
         bais.close();
 
-        Assert.assertEquals("Attachment1 had wrong name", "file1", attach.getFilename());
-        Assert.assertEquals("Attachment1 had wrong author", "me", attach.getAuthor());
-        Assert.assertEquals("Attachment1 had wrong version", "1.1", attach.getVersion());
-        Assert.assertEquals("Attachment1 had wrong comment",
-            attach.getComment(),
-            "something whitty");
+        assertEquals("file1", attach.getFilename(), "Attachment1 had wrong name");
+        assertEquals("me", attach.getAuthor(), "Attachment1 had wrong author");
+        assertEquals("1.1", attach.getVersion(), "Attachment1 had wrong version");
+        assertEquals("something whitty", attach.getComment(), "Attachment1 had wrong comment");
         // We drop milliseconds for consistency with the database so last 3 digits are 0.
-        Assert.assertEquals("Attachment1 had wrong date.",
-            attach.getDate().getTime() + "",
-            "1293045632000");
+        assertEquals("1293045632000", attach.getDate().getTime() + "", "Attachment1 had wrong date.");
     }
 
     @Test
-    public void testParseSerialize() throws Exception
+    void parseSerialize() throws Exception
     {
         final ByteArrayInputStream bais = new ByteArrayInputStream(TEST_CONTENT.getBytes("US-ASCII"));
         final XWikiAttachment attach = this.serializer.parse(bais);
@@ -86,6 +83,6 @@ public class AttachmentMetadataSerializerTest
         IOUtils.copy(this.serializer.serialize(attach), baos);
         final String test = new String(baos.toByteArray(), "US-ASCII");
         final String control = TEST_CONTENT.replaceAll("[0-9][0-9][0-9]</date>", "000</date>");
-        Assert.assertEquals("Parsing and serializing yields a different output.", control, test);
+        assertEquals(control, test, "Parsing and serializing yields a different output.");
     }
 }

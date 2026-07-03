@@ -19,9 +19,10 @@
  */
 (function() {
   'use strict';
+  const $ = jQuery;
 
   function disableResizer(widget) {
-    require(['imageStyleClient'], function (imageStyleClient) {
+    require(['xwiki-wysiwyg-image-style-client'], function (imageStyleClient) {
       widget.resizer.removeClass('hidden');
       var styleId = widget.data.imageStyle;
       if (styleId) {
@@ -33,6 +34,19 @@
           }, function () {
             console.debug("Failed to resolve image style [" + styleId + "]");
           });
+      } else {
+        // In case of empty imageStyle, check if this is because the default style is forced.
+        // In this case, allow resizing according to the default style configuration.
+        imageStyleClient.loadImageStylesDefault().then((defaultStyle) => {
+          if (defaultStyle.forceDefaultStyle === "true") {
+            imageStyleClient.loadImageStyles().then((values) => {
+              var forcedStyle = values.imageStyles.filter((style) => style.identifier === defaultStyle.defaultStyle)[0];
+              if (forcedStyle.adjustableSize === false) {
+                widget.resizer.addClass('hidden');
+              }
+            });
+          }
+        });
       }
     });
   }
@@ -51,48 +65,97 @@
       return imageOrLink;
     }
 
+    function updateImage(data) {
+      if (widget?.element) {
+        widget.setData(data);
 
-    require(['imageWizard'], function(imageWizard) {
-      imageWizard({
-        editor: editor,
-        imageData: Object.assign({}, widget.data),
-        isInsert: isInsert,
-        setImageData: setImageData
-      }).done(function(data) {
-        if (widget && widget.element) {
-          widget.setData(data);
+        disableResizer(widget);
 
-          disableResizer(widget);
-
-          // With the old image dialog, image were wrapped in a p to be centered. We need to unwrap them to make them
-          // compliant with the new image dialog.
-          if (widget.element.getName() === 'p') {
-            widget.element = unwrapFromCentering(widget.element);
-            widget.element.setAttribute('data-widget', widget.name);
-          }
-
-        } else {
-          // Wrap the image in a span to have somewhere to place the resize element.
-          var element = CKEDITOR.dom.element.createFromHtml('<span>' + widget.template.output() + '</span>',
-            editor.document);
-          var wrapper = editor.widgets.wrapElement(element, widget.name);
-          var temp = new CKEDITOR.dom.documentFragment(wrapper.getDocument());
-
-          // Append wrapper to a temporary document. This will unify the environment in which #data listeners work when
-          // creating and editing widget.
-          temp.append(wrapper);
-
-          // Initialize an empty image widget, then update it with the data from the image dialog.
-          var widgetInstance = editor.widgets.initOn(element, widget, {});
-          widgetInstance.setData(data);
-          editor.widgets.finalizeCreation(temp);
+        // With the old image dialog, image were wrapped in a p to be centered. We need to unwrap them to make them
+        // compliant with the new image dialog.
+        if (widget.element.getName() === 'p') {
+          widget.element = unwrapFromCentering(widget.element);
+          widget.element.setAttribute('data-widget', widget.name);
         }
+
+      } else {
+        // Wrap the image in a span to have somewhere to place the resize element.
+        var element = CKEDITOR.dom.element.createFromHtml('<span>' + widget.template.output() + '</span>',
+          editor.document);
+        var wrapper = editor.widgets.wrapElement(element, widget.name);
+        var temp = new CKEDITOR.dom.documentFragment(wrapper.getDocument());
+
+        // Append wrapper to a temporary document. This will unify the environment in which #data listeners work when
+        // creating and editing widget.
+        temp.append(wrapper);
+
+        // Initialize an empty image widget, then update it with the data from the image dialog.
+        var widgetInstance = editor.widgets.initOn(element, widget, {});
+        widgetInstance.setData(data);
+        editor.widgets.finalizeCreation(temp);
+      }
+    }
+
+    // Skip the wizard if setImageData is set.
+    if (setImageData) {
+      updateImage(setImageData);
+    } else {
+      require(['xwiki-wysiwyg-image-wizard'], function(imageWizard) {
+        imageWizard({
+          captionAllowed: editor.filter.checkFeature(editor.widgets.registered.image.features.caption),
+          currentDocument: editor.config.sourceDocument.documentReference,
+          getImageResourceURL: (resourceReference, params) => getImageResourceURL(editor, resourceReference, params),
+          imageData: Object.assign({}, widget.data),
+          isHTML5: editor.config.htmlSyntax === 'annotatedhtml/5.0',
+          isInsert,
+          upload: (...args) => createLoader(editor, ...args),
+        }).done(updateImage);
       });
+    }
+  }
+
+  /**
+   * Initialize a loader for the provided file. Three optional callbacks can be provided in the options
+   * object:
+   * - onSuccess is called when the upload is successful, the entity reference is passed as argument.
+   * - onError is called when the upload fails
+   * - onAbort is called when the upload is aborted
+   * @param uploadedFile the uploaded file to create the loader for
+   * @param options an option object with callback actions
+   */
+  function createLoader(editor, uploadedFile, options = {}) {
+    const loader = editor.uploadRepository.create(uploadedFile);
+    loader.on('uploaded', function (event) {
+      const resourceReference = event.sender.responseData.message.resourceReference;
+      const entityReference = CKEDITOR.plugins.xwikiResource.convertResourceReferenceToEntityReference(
+        resourceReference);
+      options.onSuccess?.(entityReference);
     });
+
+    loader.on('error', function (error) {
+      console.log('Failed to upload a file', error);
+      options.onError?.();
+    });
+    loader.on('abort', function (error) {
+      console.log('Failed to upload a file', error);
+      options.onAbort?.();
+    });
+
+    loader.loadAndUpload(editor.config.filebrowserUploadUrl);
+  }
+
+  function getImageResourceURL(editor, resourceReference, params = {}) {
+    let resourceURL = CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor);
+    // Only set the params for resource reference types that can support it. Sending the custom params to external URLs
+    // does not make sense as they are not able to interpret them.
+    if (resourceReference.type !== 'url') {
+      resourceURL = resourceURL + '&' + new URLSearchParams(params);
+    }
+    return resourceURL;
   }
 
   CKEDITOR.plugins.add('xwiki-image', {
-    requires: 'xwiki-image-old,xwiki-dialog',
+    requires: 'xwiki-image-old,xwiki-dialog,xwiki-resource',
     beforeInit: function(editor) {
       editor.on('widgetDefinition', function(event) {
         var widgetDefinition = event.data;
@@ -131,7 +194,7 @@
           '</div>' +
           '</li>',
         feed: function (opts, callback) {
-          require(['attachmentService'], function (attachmentService) {
+          require(['xwiki-wysiwyg-attachment-service'], function (attachmentService) {
 
 
             const attachmentToItem = function (attachment) {
@@ -266,110 +329,48 @@
             return "img::" + item.query;
           }
 
-          require(['jquery', 'resource'], function ($, resource) {
-            if (item.id === "_uploadImage") {
-
-              // Reuse attachment suggest code to show the file picker.
-              // Provides xwiki-attachments-store and xwiki-file-picker
-              const requiredSkinExtensions = `<script src=` +
-                `'${XWiki.contextPath}/${XWiki.servletpath}` +
-                `skin/resources/uicomponents/suggest/suggestAttachments.js'` +
-                `defer='defer'></script>`;
-              $(CKEDITOR.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
-
-              require(['attachmentService',
-                  'xwiki-attachments-store',
-                  'xwiki-file-picker'
-                ],
-                function (attachmentService, attachmentsStore, filePicker) {
-
-                  const convertFilesToAttachments = function (files, documentReference) {
-                    const attachments = [];
-                    for (var i = 0; i < files.length; i++) {
-                      const file = files.item(i);
-                      const attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
-                        documentReference);
-                      attachments.push(attachmentsStore.create(attachmentReference, file));
-                    }
-                    return attachments;
-                  };
-
-                  // Open the file picker
-                  filePicker.pickLocalFiles({
-                    accept: "image/*",
-                    multiple: false
-                  }).then(function (files) {
-                    const attachments = convertFilesToAttachments(
+          if (item.id === "_uploadImage") {
+            require(['xwiki-wysiwyg-attachment-service', 'xwiki-file-picker'], (attachmentService, filePicker) => {
+              // Open the file picker.
+              filePicker.pickLocalFiles({
+                accept: "image/*",
+                multiple: false
+              }).then(files => {
+                if (files.length) {
+                  // Simulate a paste event, as if the selected image files were pasted in the editor.
+                  editor.fire('paste', {
+                    method: 'paste',
+                    dataValue: '',
+                    dataTransfer: new CKEDITOR.plugins.clipboard.dataTransfer({
                       files,
-                      editor.config.sourceDocument.documentReference
-                    );
-
-                    // Cancel the insertion when no image is picked
-                    if (attachments.length === 0) {
-                      return;
-                    }
-
-                    const attachment = attachments[0];
-
-                    const notification = new XWiki.widgets.Notification(
-                      editor.localization.get('xwiki-image.slash.uploadProgress', attachment.name),
-                      'inprogress');
-
-                    // Upload the selected image
-                    const attachmentReference = XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT);
-                    attachmentsStore.upload(attachmentReference, attachment.file).then(() => {
-                      notification.replace(
-                        new XWiki.widgets.Notification(
-                          editor.localization.get('xwiki-image.slash.uploadSuccess', attachment.name),
-                          'done')
-                      );
-                      // Clear the cache so the new image can appear on next usage of the image quick action
-                      attachmentService.clearCache();
-
-                      const resourceReference = {...resource.convertEntityReferenceToResourceReference(
-                        XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT),
-                        editor.config.sourceDocument.documentReference),
-                        // Image references are always attachments.
-                        typed: false
-                      };
-
-                      // Insert the newly uploaded image
-                      imageWidget.insert({
-                        setImageData: {
-                          resourceReference,
-                          src: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor)
-                        }
-                      });
-                    }).catch(() => {
-                      notification.replace(
-                        new XWiki.widgets.Notification(
-                          editor.localization.get('xwiki-image.slash.uploadError', attachment.name),
-                          'error')
-                      );
-                      return Promise.reject();
-                    });
+                      types: ['Files'],
+                    })
                   });
-                });
-              return;
-            }
-
-            const resourceReference = {...resource.convertEntityReferenceToResourceReference(
+                  editor.once('fileUploadResponse', () => {
+                    // Clear the cache so the new image can appear on next usage of the image quick action.
+                    attachmentService.clearCache();
+                  });
+                }
+              });
+            });
+          } else {
+            const resourceReference = {...CKEDITOR.plugins.xwikiResource.convertEntityReferenceToResourceReference(
               XWiki.Model.resolve(item.reference, XWiki.EntityType.ATTACHMENT),
               editor.config.sourceDocument.documentReference),
               // Image references are always attachments.
               typed: false
             };
 
-            // Insert the selected image
-            imageWidget.insert({
+            // Insert the selected image after the quick action returns without inserting anything.
+            setTimeout(() => imageWidget.insert({
               setImageData: {
                 resourceReference,
                 src: CKEDITOR.plugins.xwikiResource.getResourceURL(resourceReference, editor)
               }
-            });
-          });
+            }), 0);
+          }
 
-          return "";
+          return '';
         }
       });
 
@@ -433,22 +434,39 @@
         widget.on('data', function () {
           widget.resizer[widget.data.alignment === 'end' ? 'addClass' : 'removeClass']('cke_image_resizer_left');
         });
-        
-        if(!widget.wrapper.getChild(0).hasClass('cke_widget_element')) {
-          // Re-wrap the element in a widget element.
-          // This happens when removing the caption of an image. 
-          var widgetElement = editor.document.createElement('span');
-          widgetElement.addClass('cke_widget_element');
+
+        // The image has been wrapped in the image resize wrapper. If the image was the widget element then we need to
+        // create another widget element to hold the image resize wrapper (which includes the image).
+        if (!widget.wrapper.getFirst(node => node.type === CKEDITOR.NODE_ELEMENT)?.hasClass('cke_widget_element')) {
+          const oldWidgetElement = widget.element;
+          const widgetElementAttrs = [
+            'data-cke-widget-data',
+            'data-cke-widget-upcasted', 
+            'data-cke-widget-keep-attr',
+            'data-widget',
+          ];
+
+          // Create a new widget element (copying some attributes from the old widget element).
+          const newWidgetElement = editor.document.createElement('span');
+          newWidgetElement.addClass('cke_widget_element');
+          newWidgetElement.setAttributes(widgetElementAttrs.reduce((attrs, name) => {
+            attrs[name] = oldWidgetElement.getAttribute(name);
+            return attrs;
+          }, {}));
           if (resizeWrapper) {
-            widgetElement.append(resizeWrapper);
+            newWidgetElement.append(resizeWrapper);
           }
-          widget.wrapper.append(widgetElement, true);
-          widget.element = widgetElement;
-          widget.element.setAttribute('data-widget', widget.name);
-        } else {
-          if (resizeWrapper) {
-            widget.element.append(resizeWrapper, true);
-          }
+
+          // Replace the widget element.
+          widget.wrapper.append(newWidgetElement, true);
+          widget.element = newWidgetElement;
+
+          // Cleanup the old widget element.
+          oldWidgetElement.removeClass('cke_widget_element');
+          oldWidgetElement.removeAttributes(widgetElementAttrs);
+        } else if (resizeWrapper) {
+          // Simply append the image resize wrapper to the widget element.
+          widget.element.append(resizeWrapper, true);
         }
       }
 
@@ -621,49 +639,25 @@
         originalData.call(this);
       };
 
-      var originalUpcast = imageWidget.upcast;
-      // @param {CKEDITOR.htmlParser.element} element
-      // @param {Object} data
-      imageWidget.upcast = function (element, data) {
-        var el = originalUpcast.apply(this, arguments);
-        if (el && element.name === 'img') {
-          // Wrap the image with a span. This span will be used to place the resize span during the init of the image
-          // widget.
-          var span = new CKEDITOR.htmlParser.element( 'span' );
-          el.wrapWith(span);
-          el = span;
-        }
-        return el;
-      };
-
-      var originalDowncast = imageWidget.downcast;
-      imageWidget.downcast = function (element) {
+      const originalDowncast = imageWidget.downcast;
+      imageWidget.downcast = function (...args) {
         const alignment = this.data.alignment;
-        var el = originalDowncast.apply(this, arguments);
-        downcastLegacyCenter(el, alignment);
-        var isNotCaptioned = this.parts.caption === null;
-        if (isNotCaptioned) {
-          let img;
-          if(el.name === 'img') {
-            img = el;
-          } else {
-            img = el.findOne('img', true);
+        const element = originalDowncast.apply(this, args);
+        downcastLegacyCenter(element, alignment);
+        if (!this.parts.caption) {
+          // Image widget without caption.
+          // Remove the wrapping span used for the resize handle.
+          const img = element.name === 'img' ? element : element.findOne('img', true);
+          let imageResizeWrapper = img;
+          while (imageResizeWrapper && imageResizeWrapper.name !== 'span' && imageResizeWrapper !== element) {
+            imageResizeWrapper = imageResizeWrapper.parent;
           }
-          // Cleanup and remove the wrapping span used for the resize caret.
-          delete img.attributes['data-widget'];
-          if(el.children[0]) {
-            var firstChild = el.children[0];
-            if (firstChild.children[0]) {
-              firstChild.replaceWith(firstChild.children[0]);
-            }
+          if (imageResizeWrapper?.name === 'span' && imageResizeWrapper !== element) {
+            imageResizeWrapper.replaceWith(imageResizeWrapper.children[0]);
           }
         }
 
-        // Safety data-widget removal as I noticed an additional data-widget being persisted. I did not identify the
-        // exact reproduction steps though. 
-        delete el.attributes['data-widget'];
-
-        return el;
+        return element;
       };
     }
   });

@@ -23,9 +23,9 @@ import java.util.Iterator;
 
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.repository.result.IterableResult;
-import org.xwiki.script.internal.safe.AbstractSafeObject;
-import org.xwiki.script.internal.safe.SafeIterator;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.AbstractSafeObject;
+import org.xwiki.script.safe.SafeIterator;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to a iterable result.
@@ -49,7 +49,7 @@ public class SafeIterableResult<E extends Extension> extends AbstractSafeObject<
     @Override
     public Iterator<E> iterator()
     {
-        return new SafeIterator<E, Iterator<E>>(getWrapped().iterator(), this.safeProvider, null);
+        return new SafeIterator<>(getWrapped().iterator(), this.safeProvider, null);
     }
 
     @Override

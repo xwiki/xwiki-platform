@@ -27,7 +27,7 @@ import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanTree;
 import org.xwiki.job.internal.script.safe.SafeJobStatus;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to an extension plan.
@@ -71,7 +71,7 @@ public class SafeExtensionPlan<J extends ExtensionPlan> extends SafeJobStatus<J>
             if (actions.isEmpty()) {
                 this.wrappedActions = Collections.emptyList();
             } else {
-                this.wrappedActions = new ArrayList<ExtensionPlanAction>(actions.size());
+                this.wrappedActions = new ArrayList<>(actions.size());
                 for (ExtensionPlanAction action : actions) {
                     this.wrappedActions.add(new SafeExtensionPlanAction(action, this.safeProvider));
                 }

@@ -20,7 +20,7 @@
 package org.xwiki.localization;
 
 /**
- * Raised when trying to manipulate a bundle that does not exists.
+ * Raised when trying to manipulate a bundle that does not exist.
  * 
  * @version $Id$
  * @since 4.3M2

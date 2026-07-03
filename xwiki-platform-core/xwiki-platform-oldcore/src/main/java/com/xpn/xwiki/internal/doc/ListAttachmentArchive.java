@@ -24,12 +24,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
-import org.suigeneris.jrcs.rcs.impl.Node;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -56,11 +54,6 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     private static final String NOT_IMPLEMENTED_MESSAGE = "This function is not available in this implementation.";
 
     /**
-     * The attachment which this is an archive of.
-     */
-    private XWikiAttachment attachment;
-
-    /**
      * A list of all the revisions of the attachment in this archive ordered by version number ascending.
      */
     private final List<XWikiAttachment> revisions = new ArrayList<>();
@@ -72,7 +65,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
      */
     public ListAttachmentArchive(final XWikiAttachment attachment)
     {
-        this.attachment = attachment;
+        setAttachment(attachment);
     }
 
     /**
@@ -105,7 +98,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         }
 
         // Set the attachment for this archive to the latest version.
-        this.attachment = this.revisions.get(revisions.size() - 1);
+        setAttachment(this.revisions.get(revisions.size() - 1));
     }
 
     /**
@@ -119,8 +112,8 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     @Override
     public Object clone()
     {
-        final ListAttachmentArchive out = new ListAttachmentArchive(cloneAttachment(this.attachment));
-        out.attachment.setAttachment_archive(out);
+        final ListAttachmentArchive out = new ListAttachmentArchive(cloneAttachment(getAttachment()));
+        out.getAttachment().setAttachment_archive(out);
         for (XWikiAttachment revision : this.revisions) {
             final XWikiAttachment revClone = cloneAttachment(revision);
             revClone.setAttachment_archive(out);
@@ -172,7 +165,6 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
      */
     private Archive toRCS(final XWikiContext context) throws Exception
     {
-        final Version[] versions = this.getVersions();
         XWikiAttachmentRCSArchive rcsArch = null;
 
         // We need to loop backward since the revision are ordered in desc order.
@@ -187,39 +179,6 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
             }
         }
         return rcsArch;
-    }
-
-    /**
-     * @param rcsArchive the RCS archive to import.
-     * @throws Exception if getting a revision from the RCS archive or deserializing an attachment from XML fails
-     */
-    private void fromRCS(final Archive rcsArchive) throws Exception
-    {
-        if (rcsArchive == null) {
-            return;
-        }
-
-        final Node[] nodes = rcsArchive.changeLog();
-        for (int i = nodes.length - 1; i > -1; i--) {
-            final Object[] lines = rcsArchive.getRevision(nodes[i].getVersion());
-            final StringBuilder content = new StringBuilder();
-            for (int j = 0; j < lines.length; j++) {
-                String line = lines[j].toString();
-                content.append(line);
-                if (j != lines.length - 1) {
-                    content.append("\n");
-                }
-            }
-            final XWikiAttachment rev = new XWikiAttachment();
-            rev.fromXML(content.toString());
-            rev.setDoc(getAttachment().getDoc());
-            rev.setAttachment_archive(this);
-
-            // this should not be necessary, keeping to maintain behavior.
-            rev.setVersion(nodes[i].getVersion().toString());
-
-            revisions.add(rev);
-        }
     }
 
     /**
@@ -287,36 +246,15 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     }
 
     @Override
-    public void updateArchive(final XWikiContext context)
+    public void addCurrentAttachment(XWikiContext context)
     {
-        this.update();
-    }
+        XWikiAttachment currentAttachment = getAttachment();
 
-    /**
-     * Update the archive, increment the attachment version, set the date on the attachment and add the attachment to
-     * the list.
-     */
-    private void update()
-    {
-        final XWikiAttachment attach = this.getAttachment();
-        attach.incrementVersion();
-        attach.setDate(new Date());
         // Clone the attachment but don't clone this archive.
-        final XWikiAttachment clone = cloneAttachment(attach);
+        XWikiAttachment clone = cloneAttachment(currentAttachment);
         clone.setAttachment_archive(this);
-        this.revisions.add(clone);
-    }
 
-    @Override
-    public XWikiAttachment getAttachment()
-    {
-        return this.attachment;
-    }
-
-    @Override
-    public void setAttachment(final XWikiAttachment attachment)
-    {
-        this.attachment = attachment;
+        this.revisions.add(clone);        
     }
 
     @Override

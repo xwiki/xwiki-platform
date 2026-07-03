@@ -124,6 +124,62 @@ class OsvResponseAnalyzerTest
             extensionSecurityAnalysisResult.getSecurityVulnerabilities().get(0).getFixVersion());
     }
 
+    @Test
+    void analyzeCommonsFileuploadOsvResponse()
+    {
+        OsvResponse osvResponse = readJson("commons-fileupload-commons-fileupload-1.5.json");
+        ExtensionSecurityAnalysisResult extensionSecurityAnalysisResult =
+            this.analyzer.analyzeOsvResponse("commons-fileupload:commons-fileupload", "1.5", osvResponse);
+        assertEquals(1, extensionSecurityAnalysisResult.getSecurityVulnerabilities().size());
+        assertEquals(8.7, extensionSecurityAnalysisResult.getMaxCVSS());
+    }
+
+    @Test
+    void analyzeOsvResponseCVSSV2()
+    {
+        OsvResponse osvResponse = readJson("osvResponseCVSSV2.json");
+
+        ExtensionSecurityAnalysisResult expected = new ExtensionSecurityAnalysisResult();
+        SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor = new SecurityVulnerabilityDescriptor();
+        securityVulnerabilityDescriptor.setId("CVE-1");
+        securityVulnerabilityDescriptor.setAliases(Set.of("A1", "VULN_ID"));
+        securityVulnerabilityDescriptor.setURL("https://main.ref/");
+        securityVulnerabilityDescriptor.setScore(7.5);
+        securityVulnerabilityDescriptor.setFixVersion(new DefaultVersion("15.7"));
+        expected.setResults(List.of(securityVulnerabilityDescriptor));
+
+        assertEquals(expected,
+            this.analyzer.analyzeOsvResponse("org.test:my-ext", "7.5", osvResponse));
+    }
+
+    @Test
+    void analyzeOsvResponseMultipleSeverities()
+    {
+        OsvResponse osvResponse = readJson("osvResponseMultipleSeverities.json");
+
+        ExtensionSecurityAnalysisResult expected = new ExtensionSecurityAnalysisResult();
+        SecurityVulnerabilityDescriptor securityVulnerabilityDescriptor = new SecurityVulnerabilityDescriptor();
+        securityVulnerabilityDescriptor.setId("CVE-1");
+        securityVulnerabilityDescriptor.setAliases(Set.of("A1", "VULN_ID"));
+        securityVulnerabilityDescriptor.setURL("https://main.ref/");
+        securityVulnerabilityDescriptor.setScore(8.7);
+        securityVulnerabilityDescriptor.setFixVersion(new DefaultVersion("15.7"));
+        expected.setResults(List.of(securityVulnerabilityDescriptor));
+
+        assertEquals(expected,
+            this.analyzer.analyzeOsvResponse("org.test:my-ext", "7.5", osvResponse));
+    }
+
+    @Test
+    void analyzeCommonsHttpclientOsvResponse()
+    {
+        OsvResponse osvResponse = readJson("commons-httpclient-commons-httpclient-3.1.json");
+        ExtensionSecurityAnalysisResult extensionSecurityAnalysisResult =
+            this.analyzer.analyzeOsvResponse("commons-httpclient:commons-httpclient", "3.1", osvResponse);
+        assertEquals(1, extensionSecurityAnalysisResult.getSecurityVulnerabilities().size());
+        assertEquals(0, extensionSecurityAnalysisResult.getMaxCVSS());
+    }
+
     private OsvResponse readJson(String name)
     {
         InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream(name);

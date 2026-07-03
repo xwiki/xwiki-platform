@@ -19,14 +19,30 @@
 
     // Styles for the tree navigation.
     &.dropdown {
+      /* We make sure the links get their own specific color. */
+      & > a {
+        color: @breadcrumb-link-color;
+        &:hover, &:focus {
+          color: @breadcrumb-active-color;
+        }
+      }
+      
       > .dropdown-toggle {
         color: @breadcrumb-color;
         cursor: pointer;
         /* Match the separator padding */
+        margin: 2px;
         margin-left: 5px;
+        /* Remove default styles for buttons */
+        background: transparent;
+        border-color: transparent;
+        padding: 0;
+        line-height: .5rem;
 
-        :hover {
+        &:hover, &:focus {
           color: @breadcrumb-active-color;
+          /* We want to revert the default from bootstrap where the outline is removed... */
+          outline: revert;
         }
       }
 
@@ -38,7 +54,7 @@
 
         a {
           /* Reset the link color inside the tree. */
-          color: @link-color;
+          color: @dropdown-link-color;
         }
       }
     }

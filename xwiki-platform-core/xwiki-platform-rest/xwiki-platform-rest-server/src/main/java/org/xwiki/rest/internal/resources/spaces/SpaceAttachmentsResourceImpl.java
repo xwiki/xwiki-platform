@@ -39,6 +39,8 @@ import org.xwiki.rest.resources.spaces.SpaceAttachmentsResource;
 public class SpaceAttachmentsResourceImpl extends BaseAttachmentsResource implements SpaceAttachmentsResource
 {
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Attachments getAttachments(String wiki, String spaces, String name, String page, String author,
         String fileTypes, Integer offset, Integer limit, Boolean withPrettyNames) throws XWikiRestException
     {
@@ -48,7 +50,7 @@ public class SpaceAttachmentsResourceImpl extends BaseAttachmentsResource implem
         filters.put("author", author);
         filters.put("fileTypes", fileTypes);
 
-        return super.getAttachments(new SpaceReference(wiki, parseSpaceSegments(spaces)), filters, offset, limit,
-            withPrettyNames);
+        return super.getAttachments(new SpaceReference(wiki, parseSpaceSegments(spaces)), filters, offset,
+            validateAndGetLimit(limit), withPrettyNames);
     }
 }

@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,10 +33,11 @@ import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.ComponentList;
@@ -93,7 +95,7 @@ class PdfExportImplTest
     private VelocityEngine velocityEngine;
 
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @MockComponent
     private HTMLCleaner htmlCleaner;
@@ -152,7 +154,11 @@ class PdfExportImplTest
         this.cssProperties = "span { color:red; }";
 
         // Set up HTML cleaner.
-        Document htmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // Prevent network requests to w3.org to fetch the DTD.
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        Document htmlDocument = factory.newDocumentBuilder()
             .parse(new ByteArrayInputStream(this.htmlContent.getBytes()));
         HTMLCleanerConfiguration cleanerConfiguration = new DefaultHTMLCleanerConfiguration();
         when(this.htmlCleaner.getDefaultConfiguration()).thenReturn(cleanerConfiguration);
@@ -231,10 +237,12 @@ class PdfExportImplTest
     @Test
     void applyPDFTemplateWithoutScriptRights() throws Exception
     {
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, DOCUMENT_REFERENCE)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE,
+            DOCUMENT_REFERENCE)).thenReturn(false);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         this.pdfExport.exportHtml(this.htmlContent, baos, PdfExport.ExportType.PDF, this.context);
-        verify(this.authorizationManager).hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, DOCUMENT_REFERENCE);
+        verify(this.authorizationManager)
+            .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE, DOCUMENT_REFERENCE);
         verifyNoInteractions(this.authorExecutor);
         verifyNoInteractions(this.velocityEngine);
     }
@@ -245,14 +253,16 @@ class PdfExportImplTest
     @Test
     void applyPDFTemplateWithAuthorExecutor() throws Exception
     {
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, DOCUMENT_REFERENCE)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE,
+            DOCUMENT_REFERENCE)).thenReturn(true);
 
         // Do not call the callable to check that the call to the Velocity engine is inside the author executor.
         doReturn("").when(this.authorExecutor).call(any(), any(), any());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         this.pdfExport.exportHtml(this.htmlContent, baos, PdfExport.ExportType.PDF, this.context);
-        verify(this.authorizationManager).hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, DOCUMENT_REFERENCE);
+        verify(this.authorizationManager)
+            .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE, DOCUMENT_REFERENCE);
         verify(this.authorExecutor).call(any(), eq(AUTHOR_REFERENCE), eq(DOCUMENT_REFERENCE));
         verifyNoInteractions(this.velocityEngine);
     }

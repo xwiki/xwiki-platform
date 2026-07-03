@@ -60,10 +60,10 @@
 ## If the Rights Manager Plugin is not enabled, then return an empty JSON result.
 #if ("$!usersService" != '')
   ## The live table offset starts from 1 so we need to subtract 1.
-  #if ($request.wiki == 'local')
+  #if ($request.wiki == 'local' || $request.scope == 'local')
     #set ($users = $usersService.getAllMatchedLocalUsers($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
     #set ($countUsers = $usersService.countAllMatchedLocalUsers($filterMap))
-  #elseif ($request.wiki == 'global')
+  #elseif ($request.wiki == 'global' || $request.scope == 'global')
     #set ($users = $usersService.getAllMatchedGlobalUsers($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
     #set ($countUsers = $usersService.countAllMatchedGlobalUsers($filterMap))
   #else
@@ -128,16 +128,18 @@
       'doc_hasdelete': $hasDelete,
       'doc_delete_url': $user.getURL('delete'),
       'doc_hasdisable': $hasDisable,
-      'doc_disable_url': $user.getURL('save', $escapetool.url({
-        "${userClassName}_0_active": 0,
-        'comment': $services.localization.render('core.users.disable.saveComment'),
-        'form_token': $services.csrf.token
+      'doc_disable_url': $xwiki.getURL('XWiki.XWikiUserProfileSheet', 'get', $escapetool.url({
+        'outputSyntax': 'plain',
+        'action': 'disable',
+        'userId': $user.documentReference,
+        'csrf': $services.csrf.token
       })),
       'doc_hasenable': $hasEnable,
-      'doc_enable_url': $user.getURL('save', $escapetool.url({
-        "${userClassName}_0_active": 1,
-        'comment': $services.localization.render('core.users.enable.saveComment'),
-        'form_token': $services.csrf.token
+      'doc_enable_url': $xwiki.getURL('XWiki.XWikiUserProfileSheet', 'get', $escapetool.url({
+        'outputSyntax': 'plain',
+        'action': 'enable',
+        'userId': $user.documentReference,
+        'csrf': $services.csrf.token
       })),
       'name': "#displayUserAliasWithAvatar($user.documentReference $disabled)",
       'first_name': $userObject.getValue('first_name'),

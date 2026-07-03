@@ -126,7 +126,7 @@
 #foreach ($docname in $backlinks)
   #if ($docname != $previousDoc)
     #set ($backlinkDoc = $xwiki.getDocument($docname).getTranslatedDocument())
-    #if ($backlinkDoc &amp;&amp; !$blacklistedSpaces.contains($backlinkDoc.space))
+    #if ($backlinkDoc &amp;&amp; ($services.user.properties.displayHiddenDocuments() || !$backlinkDoc.isHidden()))
       #set ($discard = $backlinkDocs.add($backlinkDoc))
     #end
   #end

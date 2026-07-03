@@ -36,9 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: platform.panels.applications.helper=Here, you can select which applications are displayed in the Applications Bar (on the left, by default). Any new application will be displayed there. If you want to remove some of them, you just need to drag and drop the icon from the first box to the other. You can also re-order the applications as you want. Don't forget to save your changes!
-### Missing: platform.panels.applications.displayedapps=Applications in the bar
-### Missing: platform.panels.applications.blacklistedapps=Applications not in the bar
+  <content>platform.panels.applications.helper=Aqui você pode selecionar quais aplicativos serão exibidos na Barra de Aplicativos (à esquerda, por padrão). Qualquer novo aplicativo será exibido lá. Se quiser remover alguns deles, basta arrastar e soltar o ícone da primeira caixa para a outra. Você também pode reordenar os aplicativos conforme desejar. Não se esqueça de salvar suas alterações!
+platform.panels.applications.displayedapps=Aplicações na barra
+platform.panels.applications.blacklistedapps=Aplicativos que não estão na barra
 platform.panels.applications.save=Salvar
 platform.panels.applications.revert=Reverter
 platform.panels.applications.ajax.success=A configuração foi salva.
@@ -47,7 +47,6 @@ platform.panels.applications.ajax.noright=Você não tem permissão para editar 
 platform.panels.applications.ajax.error=Falha ao salvar suas alterações.
 admin.panels.applications=Painel de Aplicações
 admin.panels.applications.description=Gerenciar quais aplicativos são exibidos no Painel de Aplicativos.
-
 admin.panels.navigation=Painel de Navegação
 admin.panels.navigation.description=Gerenciar quais páginas são exibidas no Painel de Navegação.
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Excluir páginas de extensão de nível superior
@@ -64,5 +63,6 @@ platform.panels.navigation.configuration.excludedPages.empty=Nenhum
 platform.panels.navigation.configuration.topLevelExtensionPages=Páginas de extensão de nível superior
 platform.panels.navigation.configuration.topLevelApplicationPages=Páginas de aplicativos de nível superior
 platform.panels.navigation.configuration.otherPages=Outras Páginas
-platform.panels.navigation.configuration.saveComment=Atualizada a configuração do Painel de Navegação da Administração</content>
+platform.panels.navigation.configuration.saveComment=Atualizada a configuração do Painel de Navegação da Administração
+</content>
 </xwikidoc>

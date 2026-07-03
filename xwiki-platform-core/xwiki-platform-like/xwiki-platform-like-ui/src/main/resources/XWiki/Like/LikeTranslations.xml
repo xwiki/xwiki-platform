@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Like.LikeTranslations" locale="">
+<xwikidoc version="1.5" reference="XWiki.Like.LikeTranslations" locale="">
   <web>XWiki.Like</web>
   <name>LikeTranslations</name>
   <language/>
@@ -47,12 +47,16 @@ like.newlike.error=Error when trying to like the page.
 like.unlike.success=The page has been unliked.
 like.unlike.error=Error when trying to unlike the page.
 like.userprofile.menu=Liked Pages
-like.button.title=Number of likes on this page: {0}
-like.button.title.like=Click to like the current page. Number of likes on this page: {0}.
-like.button.title.unlike=Click to unlike the current page. Number of likes on this page: {0}.
+like.toggle.hint.like=Like this page.
+like.toggle.hint.unlike=Unlike this page. You currently like this page.
+like.toggle.hint.like.noright=You cannot interact with likes on this page.
+like.likers.link.zero={0} Likes
+like.likers.link.one={0} Like
+like.likers.link.many={0} Likes
+like.likers.link.title=Number of likes on this page: {0}. Click to see who liked this page.
 like.likers.empty=No one likes this page yet.
 like.likers.number={0} person(s) like this page:
-like.likers.title=People liking {0}
+like.likers.title=Persons liking {0}
 like.livetable.column.title=Title
 like.livetable.column.location=Location
 like.livetable.column.likes=Likes
@@ -63,6 +67,23 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache capacity
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Number of Like information kept in cache. Note that you have to restart XWiki for this option change to be taken into account.
 XWiki.Like.LikeConfigurationClass_enabled=Enable Like feature
 XWiki.Like.LikeConfigurationClass_enabled.hint=If unchecked this will disable the Like feature and hide information related to Likes.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 18.0.0RC1
+#######################################
+like.button.title=Number of likes on this page: {0}
+like.button.title.like=Click to like the current page. Number of likes on this page: {0}.
+like.button.title.unlike=Click to unlike the current page. Number of likes on this page: {0}.
+
+#@deprecatedend
   </content>
   <object>
     <name>XWiki.Like.LikeTranslations</name>

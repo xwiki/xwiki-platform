@@ -24,6 +24,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.administration.test.po.TemplatesAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -31,6 +32,7 @@ import org.xwiki.test.ui.po.EditablePropertyPane;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 import org.xwiki.xclass.test.po.DataTypesPage;
 
@@ -92,6 +94,9 @@ class ClassSheetIT
         // Add a property.
         ClassEditPage classEditor = classSheetPage.clickDefineClassLink();
         classEditor.addProperty("color", "String").setPrettyName("Your favorite color");
+        // Test that adding a property with an existing name returns a notification error.
+        classEditor.addPropertyWithoutWaiting("color", "String");
+        classEditor.waitForNotificationErrorMessage("Property color already exists");
         classEditor.clickSaveAndView();
 
         // Add a new property.
@@ -114,19 +119,41 @@ class ClassSheetIT
         classSheetPage = classSheetPage.clickCreateSheetButton().clickBindSheetLink();
         ViewPage sheetPage = classSheetPage.clickSheetLink();
         assertEquals(className + " Sheet", sheetPage.getDocumentTitle());
-        sheetPage.clickBreadcrumbLink(classTitle);
+        // Go back to the class page directly (the breadcrumb is exercised by other tests).
+        setup.gotoPage(spaceName, classDocName);
+        classSheetPage = new ClassSheetPage();
 
         // Create the template.
         classSheetPage = classSheetPage.clickCreateTemplateButton().clickAddObjectToTemplateLink();
         ViewPage templatePage = classSheetPage.clickTemplateLink();
         assertEquals(className + " Template", templatePage.getDocumentTitle());
+        // Check that the object is present in the template.
+        ObjectEditPage objectEditPage = templatePage.editObjects();
+        assertTrue(objectEditPage.hasObject(spaceName + "." + classDocName));
+        objectEditPage.clickCancel();
         // The default edit button should take us to the In-line edit mode.
         templatePage.edit();
         InlinePage editPage = new InlinePage();
         editPage.setValue("color", "red");
         editPage.setValue("age", "13");
         editPage.clickSaveAndContinue();
-        editPage.clickBreadcrumbLink(classTitle);
+        setup.gotoPage(spaceName, classDocName);
+        classSheetPage = new ClassSheetPage();
+
+        // Create the template provider from the class UI.
+        classSheetPage = classSheetPage.clickCreateTemplateProviderButton();
+        ViewPage templateProviderPage = classSheetPage.clickTemplateProviderLink();
+        assertEquals(className + " Template Provider", templateProviderPage.getDocumentTitle());
+
+        // The created template provider must be listed in the "Available Template Providers" list of the Page
+        // Templates administration section.
+        TemplatesAdministrationSectionPage templatesAdminPage = TemplatesAdministrationSectionPage.gotoPage();
+        assertTrue(templatesAdminPage.getExistingTemplatesLinks().stream()
+            .anyMatch(link -> (className + " Template Provider").equals(link.getText())));
+
+        // Go back to the class page to create a document based on the class template.
+        setup.gotoPage(spaceName, classDocName);
+        classSheetPage = new ClassSheetPage();
 
         // Create a document based on the class template.
         assertEquals(spaceName, classSheetPage.getNewPagePicker().getParentInput().getAttribute("value"));
@@ -154,8 +181,9 @@ class ClassSheetIT
         assertEquals("Tester", descriptionProperty.getDisplayValue());
 
         assertEquals(pageName, viewPage.getDocumentTitle());
-        assertEquals("YOUR FAVORITE COLOR\npink\nYOUR CURRENT AGE\n27\nDESCRIPTION\nTester", viewPage.getContent());
-        viewPage.clickBreadcrumbLink(classTitle);
+        assertEquals("Your favorite color\npink\nYour current age\n27\nDescription\nTester", viewPage.getContent());
+        setup.gotoPage(spaceName, classDocName);
+        classSheetPage = new ClassSheetPage();
 
         // Assert the created document is listed.
         assertTrue(classSheetPage.hasDocument(pageName));

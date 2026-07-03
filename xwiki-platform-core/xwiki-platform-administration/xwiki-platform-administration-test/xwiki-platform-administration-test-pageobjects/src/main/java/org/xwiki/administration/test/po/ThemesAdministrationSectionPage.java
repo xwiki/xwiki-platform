@@ -22,6 +22,7 @@ package org.xwiki.administration.test.po;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
@@ -49,6 +50,12 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
 
     @FindBy(xpath = "//a[contains(text(), 'Manage color themes')]")
     private WebElement manageColorThemesButton;
+
+    /**
+     * The select input to set the icon theme.
+     */
+    @FindBy(id = "XWiki.XWikiPreferences_0_iconTheme")
+    private WebElement iconThemeSelect;
 
     @FindBy(xpath = "//select[@id='XWiki.XWikiPreferences_0_skin']")
     private WebElement skinInput;
@@ -113,7 +120,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
         getColorThemeOptionElement(colorThemeName).click();
 
         // Waiting to be sure the change is effective
-        getDriver().waitUntilCondition(driver -> StringUtils.equals(getCurrentColorTheme(), colorThemeName));
+        getDriver().waitUntilCondition(driver -> Strings.CS.equals(getCurrentColorTheme(), colorThemeName));
     }
 
     private WebElement getColorThemeOptionElement(String colorThemeName)
@@ -199,5 +206,70 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     public void clickOnCustomizeSkin()
     {
         this.customizeSkinButton.click();
+    }
+
+    private List<WebElement> getIconThemeOptions()
+    {
+        return this.iconThemeSelect.findElements(By.tagName("option"));
+    }
+
+    private WebElement getIconThemeOptionElement(String iconThemeName)
+    {
+        for (WebElement option : getIconThemeOptions()) {
+            if (iconThemeName.equals(option.getText())) {
+                return option;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return the list of available icon themes
+     * @since 18.6.0RC1
+     */
+    public List<String> getIconThemes()
+    {
+        List<String> results = new ArrayList<>();
+        for (WebElement option : getIconThemeOptions()) {
+            results.add(option.getText());
+        }
+        return results;
+    }
+
+    /**
+     * Select the specified icon theme.
+     *
+     * @param iconThemeName the name of the icon theme to select (e.g. {@code Silk} or {@code Font Awesome})
+     * @since 18.6.0RC1
+     */
+    public void setIconTheme(String iconThemeName)
+    {
+        // Make sure the icon theme that we want to set is available from the list first.
+        try {
+            getDriver().waitUntilCondition(driver -> getIconThemeOptionElement(iconThemeName) != null);
+        } catch (TimeoutException e) {
+            throw new TimeoutException(String.format("Icon theme [%s] wasn't found among [%s]", iconThemeName,
+                StringUtils.join(getIconThemes(), ',')), e);
+        }
+
+        // Click on it to set the theme.
+        getIconThemeOptionElement(iconThemeName).click();
+
+        // Wait to be sure the change is effective.
+        getDriver().waitUntilCondition(driver -> Strings.CS.equals(getCurrentIconTheme(), iconThemeName));
+    }
+
+    /**
+     * @return the currently selected icon theme
+     * @since 18.6.0RC1
+     */
+    public String getCurrentIconTheme()
+    {
+        for (WebElement option : getIconThemeOptions()) {
+            if (option.isSelected()) {
+                return option.getText();
+            }
+        }
+        return null;
     }
 }

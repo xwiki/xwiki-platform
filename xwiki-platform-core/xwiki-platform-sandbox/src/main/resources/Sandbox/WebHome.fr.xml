@@ -46,7 +46,7 @@ Il existe trois pages de test :
 * [[Page de Test 2&gt;&gt;Sandbox.TestPage2]]
 * [[Page de Test 3&gt;&gt;Sandbox.TestPage3]]
 
-= Titres =
+== Titres ==
 
 XWiki vous offre 6 niveaux pour les titres que vous pouvez utiliser afin d'organiser le contenu de vos pages. 
 
@@ -60,7 +60,7 @@ XWiki vous offre 6 niveaux pour les titres que vous pouvez utiliser afin d'organ
 
 ====== Titre 6 ======
 
-= Styles =
+== Styles ==
 
 XWiki supporte les styles de base suivants :
 
@@ -71,11 +71,11 @@ XWiki supporte les styles de base suivants :
 * Texte en ,,indice,,
 * Texte en ^^exposant^^
 
-= Liste =
+== Liste ==
 
 Vous pouvez créer divers types de listes dans vos pages wiki:
 
-== Liste à puces ==
+=== Liste à puces ===
 
 * Niveau 1
 ** Niveau 2
@@ -83,31 +83,39 @@ Vous pouvez créer divers types de listes dans vos pages wiki:
 ** Niveau 2
 * Niveau 1
 
-== Liste numérotée ==
+=== Liste numérotée ===
 
 1. Élément
 11. Sous-élément
 111. Élément
 1. Sous-élément
 
-= Tableaux =
+=== Liste mixte ===
+
+1. Élément 1
+11. Élément 2
+11*. Élément 3
+11*. Élément 4
+1. Élément 5
+
+== Tableaux ==
 
 Vous pouvez créer des tableaux directement dans vos pages wiki :
 
-== Tableau avec en-tête en première ligne ==
+=== Tableau avec en-tête en première ligne ===
 
 |= en-tête |= en-tête |= en-tête 
 | cellule | cellule | cellule
 | cellule | cellule | cellule
 
-== Tableau dont l'en-tête est sur la première ligne et la première colonne ==
+=== Tableau dont l'en-tête est sur la première ligne et la première colonne ===
 
 |= en-tête |= en-tête |= en-tête
 |= en-tête | cellule | cellule
 |= en-tête | cellule | cellule
 
 
-= Liens =
+== Liens ==
 
 XWiki vous permet de créer des liens vers d'autres documents wiki ou vers des pages Web :
 
@@ -117,23 +125,23 @@ XWiki vous permet de créer des liens vers d'autres documents wiki ou vers des p
 * [[http://www.xwiki.org]] -&gt; vous pouvez également indiquer des pages wiki ou des sites Web externes
 * [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; les titres des liens fonctionnent également pour les liens externes.
 
-= Images =
+== Images ==
 
 Vous pouvez ajouter des images dans vos pages wiki:
 
 [[image:XWikiLogo.png]]
 
-= Macros = 
+== Macros ==
 
 Les macros vous permettent de personnaliser l'aspect du contenu du wiki ainsi que d'y ajouter des fonctionnalités. Ci-dessous vous avez 2 exemples d'usage des macros dans les pages wiki :
 
-== La macro d'avertissement ==
+=== La macro d'avertissement ===
 
 Cette macro vous permet d'attirer l'attention des utilisateurs :
 
 {{warning}}Salut à tous!{{/warning}}
 
-== Table de matières ==
+=== Table de matières ===
 
 Cette macro génère automatiquement une table des matières à partir des niveaux de titres présents dans le contenu de votre page wiki :
 

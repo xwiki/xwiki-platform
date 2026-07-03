@@ -29,6 +29,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -61,6 +62,9 @@ public class DefaultLiveDataSourceManager implements LiveDataSourceManager
     @Inject
     private ComponentManagerManager componentManagerManager;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public Optional<LiveDataSource> get(Source sourceConfig, String namespace)
     {
@@ -73,7 +77,7 @@ public class DefaultLiveDataSourceManager implements LiveDataSourceManager
                 }
                 return Optional.of(liveDataSource);
             } catch (ComponentLookupException e) {
-                // Shouldn't happen normally, unless the component was just unregistered by another thread.
+                this.logger.error("Error when initializing LiveDataSource with hint [{}]", sourceConfig.getId(), e);
             }
         }
 
@@ -94,7 +98,21 @@ public class DefaultLiveDataSourceManager implements LiveDataSourceManager
 
     private ComponentManager getComponentManager(String namespace)
     {
-        return "".equals(namespace) ? this.contextComponentManagerProvider.get()
-            : this.componentManagerManager.getComponentManager(namespace, false);
+        if ("".equals(namespace)) {
+            return this.contextComponentManagerProvider.get();
+        }
+
+        ComponentManager componentManager = this.componentManagerManager.getComponentManager(namespace, false);
+
+        // The component manager of a namespace is created lazily (e.g. when a wiki component is registered for it), so
+        // it might not exist yet for a freshly created wiki, in particular in an integration test. In that case, fall
+        // back to the root component manager instead of giving up: globally-registered sources (such as "liveTable")
+        // are always visible from the root. Without this fallback, requesting a source on a wiki whose component
+        // manager hasn't been initialized yet would wrongly report the source as missing.
+        if (componentManager == null) {
+            componentManager = this.componentManagerManager.getComponentManager(null, false);
+        }
+
+        return componentManager;
     }
 }

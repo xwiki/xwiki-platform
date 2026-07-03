@@ -62,7 +62,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
      * beginAnnotation was signaled but not endAnnotation). Used for correctly nesting the annotations markers with
      * other XHTML elements. <br>
      */
-    private List<Annotation> renderedAnnotations = new LinkedList<Annotation>();
+    private List<Annotation> renderedAnnotations = new LinkedList<>();
 
     /**
      * Builds an XHTML markers annotations printer which uses the underlying wiki printer.
@@ -121,7 +121,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
      */
     private void printAnnotationStartMarker(Annotation annotation)
     {
-        Map<String, String> attributes = new LinkedHashMap<String, String>();
+        Map<String, String> attributes = new LinkedHashMap<>();
 
         attributes.put("class", "annotation ID" + annotation.getId());
         printXMLStartElement(ANNOTATION_MARKER, attributes);

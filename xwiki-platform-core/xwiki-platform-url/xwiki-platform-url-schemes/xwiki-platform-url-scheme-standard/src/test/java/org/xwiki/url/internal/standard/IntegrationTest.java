@@ -19,13 +19,12 @@
  */
 package org.xwiki.url.internal.standard;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
@@ -35,6 +34,7 @@ import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.resource.CreateResourceTypeException;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
@@ -46,7 +46,9 @@ import org.xwiki.resource.resources.ResourcesResourceReference;
 import org.xwiki.resource.skins.SkinsResourceReference;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLConfiguration;
 import org.xwiki.url.internal.DefaultResourceReferenceResolver;
@@ -58,7 +60,8 @@ import org.xwiki.url.internal.standard.resources.ResourcesResourceReferenceResol
 import org.xwiki.url.internal.standard.skins.SkinsResourceReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
@@ -67,6 +70,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.1M1
  */
+@ComponentTest
 @ComponentList({
     DefaultResourceTypeResolver.class,
     DefaultResourceReferenceResolver.class,
@@ -83,17 +87,17 @@ import static org.mockito.Mockito.when;
     ResourcesResourceReferenceResolver.class,
     SkinsResourceReferenceResolver.class
 })
-public class IntegrationTest
+class IntegrationTest
 {
-    @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     private ResourceTypeResolver<ExtendedURL> resourceTypeResolver;
 
     private ResourceReferenceResolver<ExtendedURL> resourceReferenceResolver;
 
     @BeforeComponent
-    public void setUpComponents() throws Exception
+    void setUpComponents() throws Exception
     {
         // Isolate from xwiki configuration file
         URLConfiguration urlConfiguration = this.componentManager.registerMockComponent(URLConfiguration.class);
@@ -128,8 +132,8 @@ public class IntegrationTest
         this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
     }
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
         this.resourceTypeResolver = this.componentManager.getInstance(
             new DefaultParameterizedType(null, ResourceTypeResolver.class, ExtendedURL.class));
@@ -138,7 +142,7 @@ public class IntegrationTest
     }
 
     @Test
-    public void extractResourceReference() throws Exception
+    void extractResourceReference() throws Exception
     {
         // Entity Resource References
         assertURL("http://localhost:8080/xwiki/bin/view/space/page", EntityResourceReference.TYPE,
@@ -153,18 +157,28 @@ public class IntegrationTest
         // Skins Resource References
         assertURL("http://localhost:8080/xwiki/skins/flamingo/logo.png", SkinsResourceReference.TYPE,
             new SkinsResourceReference());
+    }
 
+    @Test
+    void resolveResoureReferenceWhenInvalid() throws Exception
+    {
+        ExtendedURL extendedURL = new ExtendedURL(new URI("http://localhost:8080/xwiki").toURL(), "xwiki");
+
+        Throwable exception = assertThrows(CreateResourceTypeException.class,
+            () -> this.resourceTypeResolver.resolve(extendedURL, Collections.emptyMap()));
+        assertEquals("Invalid standard scheme URL type. The URL is missing a path segment and should be of the "
+            + "format [/<type>/something/...]", exception.getMessage());
     }
 
     private void assertURL(String url, ResourceType expectedType, ResourceReference expectedReference) throws Exception
     {
-        ExtendedURL extendedURL = new ExtendedURL(new URL(url), "xwiki");
+        ExtendedURL extendedURL = new ExtendedURL(new URI(url).toURL(), "xwiki");
         ResourceType resourceType =
-            this.resourceTypeResolver.resolve(extendedURL, Collections.<String, Object>emptyMap());
+            this.resourceTypeResolver.resolve(extendedURL, Collections.emptyMap());
         assertEquals(expectedType.getId(), resourceType.getId());
 
         ResourceReference reference = this.resourceReferenceResolver.resolve(
-            extendedURL, resourceType, Collections.<String, Object>emptyMap());
+            extendedURL, resourceType, Collections.emptyMap());
         assertEquals(expectedReference, reference);
     }
 }

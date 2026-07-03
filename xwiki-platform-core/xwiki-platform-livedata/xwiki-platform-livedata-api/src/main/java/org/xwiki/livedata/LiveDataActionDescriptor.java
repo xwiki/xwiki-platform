@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @since 13.0
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LiveDataActionDescriptor extends BaseDescriptor
+public class LiveDataActionDescriptor extends BaseDescriptor implements InitializableLiveDataElement
 {
     /**
      * The action pretty name.
@@ -60,6 +60,11 @@ public class LiveDataActionDescriptor extends BaseDescriptor
      * Specifies the live data property that holds the URL that can be used to perform this action on a given entry.
      */
     private String urlProperty;
+
+    /**
+     * Holds the properties required to execute the action asynchronously.
+     */
+    private LiveDataAsyncActionDescriptor async;
 
     /**
      * Default constructor.
@@ -180,13 +185,29 @@ public class LiveDataActionDescriptor extends BaseDescriptor
         this.urlProperty = urlProperty;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    @Override
     public void initialize()
     {
         if (this.icon == null) {
             this.icon = new HashMap<>();
         }
+    }
+
+    /**
+     * @return the properties to execute this action asynchronously
+     * @since 16.2.0RC1
+     */
+    public LiveDataAsyncActionDescriptor getAsync()
+    {
+        return this.async;
+    }
+
+    /**
+     * @param async the properties to execute this action asynchronously
+     * @since 16.2.0RC1
+     */
+    public void setAsync(LiveDataAsyncActionDescriptor async)
+    {
+        this.async = async;
     }
 }

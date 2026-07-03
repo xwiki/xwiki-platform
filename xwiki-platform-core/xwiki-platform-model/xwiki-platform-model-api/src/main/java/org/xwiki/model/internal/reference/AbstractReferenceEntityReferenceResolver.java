@@ -90,15 +90,16 @@ public abstract class AbstractReferenceEntityReferenceResolver extends AbstractE
         EntityReference reference = normalizedReference;
         while (reference != null) {
             List<EntityType> types = reference.getType().getAllowedParents();
-            if (reference.getParent() != null && !types.isEmpty() && !types.contains(reference.getParent().getType())) {
+            if (reference.getParent() != null
+                && isParentTypeAndAllowedTypeNotMatching(types, reference.getParentType())) {
                 // The parent reference isn't the allowed parent: insert an allowed reference
                 EntityReference newReference =
                     resolveDefaultReference(types.get(0), parameters).appendParent(reference.getParent());
                 normalizedReference = normalizedReference.replaceParent(reference.getParent(), newReference);
                 reference = newReference;
-            } else if (reference.getParent() == null && !types.isEmpty()) {
+            } else if (reference.getParent() == null && reference.getParentType() != null) {
                 // The top reference isn't the allowed top level reference, add a parent reference
-                EntityReference newReference = resolveDefaultReference(types.get(0), parameters);
+                EntityReference newReference = resolveDefaultReference(reference.getParentType(), parameters);
                 normalizedReference = normalizedReference.appendParent(newReference);
                 reference = newReference;
             } else if (reference.getParent() != null && types.isEmpty()) {
@@ -111,5 +112,10 @@ public abstract class AbstractReferenceEntityReferenceResolver extends AbstractE
         }
 
         return normalizedReference;
+    }
+
+    private boolean isParentTypeAndAllowedTypeNotMatching(List<EntityType> allowedTypes, EntityType parentType)
+    {
+        return !allowedTypes.isEmpty() && parentType != null && !allowedTypes.contains(parentType);
     }
 }

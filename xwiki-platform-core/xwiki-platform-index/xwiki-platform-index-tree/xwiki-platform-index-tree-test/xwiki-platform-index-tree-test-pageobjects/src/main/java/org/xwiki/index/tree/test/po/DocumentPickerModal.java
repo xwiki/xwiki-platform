@@ -35,7 +35,7 @@ import org.xwiki.test.ui.po.DocumentPicker;
  */
 public class DocumentPickerModal extends BaseElement
 {
-    private WebElement container;
+    protected WebElement container;
 
     private DocumentTreeElement tree;
 

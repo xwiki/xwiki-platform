@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
  * @since 6.2M1
  */
 @ComponentTest
-public class DefaultIconManagerTest
+class DefaultIconManagerTest
 {
     @InjectMockComponents
     private DefaultIconManager iconManager;
@@ -58,7 +58,7 @@ public class DefaultIconManagerTest
     private IconRenderer iconRenderer;
 
     @Test
-    public void render() throws Exception
+    void render() throws Exception
     {
         IconSet iconSet = new IconSet("silk");
         iconSet.addIcon("test", new Icon("hello"));
@@ -72,7 +72,7 @@ public class DefaultIconManagerTest
     }
 
     @Test
-    public void renderWithFallBack() throws Exception
+    void renderWithFallBack() throws Exception
     {
         IconSet iconSet = new IconSet("silk");
         when(iconSetManager.getCurrentIconSet()).thenReturn(iconSet);
@@ -87,7 +87,7 @@ public class DefaultIconManagerTest
     }
 
     @Test
-    public void renderHTML() throws Exception
+    void renderHTML() throws Exception
     {
         IconSet iconSet = new IconSet("silk");
         iconSet.addIcon("test", new Icon("hello"));
@@ -101,7 +101,7 @@ public class DefaultIconManagerTest
     }
 
     @Test
-    public void renderHTMLWithFallBack() throws Exception
+    void renderHTMLWithFallBack() throws Exception
     {
         IconSet iconSet = new IconSet("silk");
         when(iconSetManager.getCurrentIconSet()).thenReturn(iconSet);
@@ -116,7 +116,7 @@ public class DefaultIconManagerTest
     }
 
     @Test
-    public void renderWithIconSetName() throws Exception
+    void renderWithIconSetName() throws Exception
     {
         // Mocks
         IconSet iconSet1 = new IconSet("iconSet1");
@@ -160,7 +160,7 @@ public class DefaultIconManagerTest
     }
 
     @Test
-    public void getIconNames() throws Exception
+    void getIconNames() throws Exception
     {
         IconSet iconSet = new IconSet("iconSet1");
         iconSet.addIcon("icon1", new Icon("icon1 value"));
@@ -184,7 +184,7 @@ public class DefaultIconManagerTest
     }
 
     @Test
-    public void getMetaData() throws Exception
+    void getMetaData() throws Exception
     {
         IconSet iconSet = new IconSet("iconSet");
         iconSet.setType(IconType.FONT);
@@ -211,7 +211,7 @@ public class DefaultIconManagerTest
     }
 
     @Test
-    public void getMetaDataWithFallback() throws Exception
+    void getMetaDataWithFallback() throws Exception
     {
         IconSet iconSet = new IconSet("iconSet");
 
@@ -237,7 +237,7 @@ public class DefaultIconManagerTest
     }
 
     @Test
-    public void getMetaDataWithoutFallback() throws Exception
+    void getMetaDataWithoutFallback() throws Exception
     {
         // Test
         Map<String, Object> metadata = iconManager.getMetaData("test", "iconSet", false);

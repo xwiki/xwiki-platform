@@ -20,18 +20,24 @@
 package org.xwiki.flamingo.test.docker;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.By;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -57,7 +63,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(properties = {
     // Add the FileUploadPlugin which is needed by the test to upload attachment files
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Test\\.Execute\\..*"
 })
 class AttachmentIT
 {
@@ -74,6 +81,9 @@ class AttachmentIT
     @BeforeAll
     public void setup(TestUtils setup)
     {
+        setup.loginAsSuperAdmin();
+        // Make sure the timezone configuration the default value until XWIKI-21924 is fixed.
+        setup.setPropertyInXWikiPreferences("timezone", "String", "");
         setup.createUser("User2", "pass", "");
         setup.createUserAndLogin("User1", "pass");
     }
@@ -98,7 +108,7 @@ class AttachmentIT
         setup.rest().savePage(testReference, "", "");
         Page page = setup.rest().get(testReference);
         // We make the page hidden as we identified some issues specific to hidden pages (see XWIKI-20093).
-        // If it happens that some issues are specific to non-hidden pages, the test will need to be improved to 
+        // If it happens that some issues are specific to non-hidden pages, the test will need to be improved to
         // cover both cases (which will make the execution time of the test suite larger).
         page.setHidden(true);
         setup.rest().save(page);
@@ -129,17 +139,13 @@ class AttachmentIT
         assertEquals("This is a small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
 
-        // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
-        viewPage.waitForDocExtraPaneActive("attachments");
+        viewPage.waitForDocExtraPaneActive("Attachments");
         attachmentsPane.waitForAttachmentsLiveData();
 
         attachmentsPane.getAttachmentLink(SECOND_ATTACHMENT).click();
         assertEquals("This is another small attachment.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
-        // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
-        viewPage.waitForDocExtraPaneActive("attachments");
+        viewPage.waitForDocExtraPaneActive("Attachments");
 
         // Upload another version of the first attachment
         attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, "v2/" + FIRST_ATTACHMENT).getAbsolutePath());
@@ -153,9 +159,7 @@ class AttachmentIT
         attachmentsPane.getAttachmentLink(FIRST_ATTACHMENT).click();
         assertEquals("This is a small attachment v2.", setup.getDriver().findElement(By.tagName("html")).getText());
         setup.getDriver().navigate().back();
-        // TODO: remove when https://jira.xwiki.org/browse/XWIKI-15513 is fixed
-        setup.getDriver().navigate().refresh();
-        viewPage.waitForDocExtraPaneActive("attachments");
+        viewPage.waitForDocExtraPaneActive("Attachments");
         attachmentsPane.waitForAttachmentsLiveData();
 
         attachmentsPane.deleteAttachmentByFileByName(FIRST_ATTACHMENT);
@@ -280,7 +284,7 @@ class AttachmentIT
         setup.gotoPage(testReference);
 
         DeletePageOutcomePage deletePageOutcomePage = new DeletePageOutcomePage();
-        ViewPage viewPage = deletePageOutcomePage.clickRestore();
+        deletePageOutcomePage.clickRestore();
 
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("toto.txt"));
@@ -288,9 +292,9 @@ class AttachmentIT
         attachmentsPane.getAttachmentLink("toto.txt").click();
         assertEquals("v2.1", setup.getDriver().findElement(By.tagName("html")).getText());
 
-        viewPage = setup.gotoPage(testReference);
+        ViewPage viewPage = setup.gotoPage(testReference);
         HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
-        viewPage = historyPane.rollbackToVersion("2.1");
+        historyPane.rollbackToVersion("2.1");
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("toto.txt"));
         assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment("toto.txt"));
@@ -302,10 +306,10 @@ class AttachmentIT
     @Order(5)
     void filterAttachmentsLiveData(TestUtils setup, TestReference testReference) throws Exception
     {
-        ViewPage viewPage = setup.createPage(testReference, "", "");
+        setup.createPage(testReference, "", "");
 
         // Upload attachments with 2 different users.
-        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        new AttachmentsViewPage().openAttachmentsDocExtraPane();
         setup.attachFile(testReference, FIRST_ATTACHMENT,
             getClass().getResourceAsStream("/AttachmentIT/" + FIRST_ATTACHMENT), false);
         setup.attachFile(testReference, SECOND_ATTACHMENT,
@@ -313,7 +317,7 @@ class AttachmentIT
 
         setup.login("User2", "pass");
         setup.gotoPage(testReference);
-        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         setup.attachFile(testReference, SMALL_SIZE_ATTACHMENT,
             getClass().getResourceAsStream("/AttachmentIT/" + SMALL_SIZE_ATTACHMENT), false);
 
@@ -447,16 +451,61 @@ class AttachmentIT
                 basePage.getXWikiMessageContent());
     }
 
+    @Test
+    @Order(9)
+    void checkEscapingInAttachmentName(TestUtils setup, TestReference testReference, @TempDir Path temporaryDirectory)
+        throws IOException
+    {
+        setup.loginAsSuperAdmin();
+
+        // We shouldn't store files with special characters in the repository, since some filesystems don't support it.
+        // Instead, we create the file during the test. We create it under a @TempDir directory so that it doesn't leak
+        // outside the build "target" directory.
+        Path unescapedFile = Files.createTempFile(temporaryDirectory, "<strong>", null);
+        String unescapedFileName = unescapedFile.getFileName().toString();
+
+        setup.createPage(testReference, "Empty content");
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+
+        attachmentsPane.setFileToUpload(unescapedFile.toString(), true);
+        attachmentsPane.waitForUploadToFinish(unescapedFileName);
+        attachmentsPane.clickHideProgress();
+
+        assertTrue(attachmentsPane.attachmentExistsByFileName(unescapedFileName));
+        attachmentsPane.deleteAttachmentByFileByName(unescapedFileName);
+    }
+
     private String getAttachmentsMacroContent(DocumentReference docRef)
     {
-        StringBuilder sb = new StringBuilder();
+        return "{{velocity}}\n"
+            + "#template('attachment_macros.vm')\n"
+            + "#set($attachmentsDoc = $xwiki.getDocument(\"" + docRef + "\"))\n"
+            + "#showAttachmentsLiveData($attachmentsDoc 'testAttachments')\n"
+            + "{{/velocity}}";
+    }
 
-        sb.append("{{velocity}}\n");
-        sb.append("#template('attachment_macros.vm')\n");
-        sb.append("#set($attachmentsDoc = $xwiki.getDocument(\"" + docRef + "\"))\n");
-        sb.append("#showAttachmentsLiveData($attachmentsDoc 'testAttachments')\n");
-        sb.append("{{/velocity}}");
+    @Test
+    @Order(10)
+    void attachmentContentLocation(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        setup.createPage(testReference, "", "");
 
-        return sb.toString();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, FIRST_ATTACHMENT).getAbsolutePath());
+        attachmentsPane.waitForUploadToFinish(FIRST_ATTACHMENT);
+        assertTrue(attachmentsPane.attachmentExistsByFileName(FIRST_ATTACHMENT));
+
+        // Make sure the content of the attachment is actually referencing the last version in the history storage
+        assertEquals("fv1.1.txt",
+            StringUtils.substringAfterLast(setup.executeWikiPlain(
+                """
+                    {{groovy}}
+                      println(xwiki.getDocument('%s').document.getAttachment('%s')
+                        .getAttachmentContent(xcontext.context).storageBlob.getPath())
+                    {{/groovy}}
+                    """
+                    .formatted(setup.serializeReference(testReference), FIRST_ATTACHMENT),
+                Syntax.XWIKI_2_1), '/'));
     }
 }

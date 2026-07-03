@@ -40,8 +40,8 @@ public abstract class AbstractMandatoryClassInitializer extends AbstractMandator
         new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiClasses");
 
     /**
-     * @param reference the reference of the document to update. Can be either local or absolute depending if the
-     *            document is associated to a specific wiki or not
+     * @param reference the reference of the document to update. Can be either local or absolute, depending on whether
+     *                  the document is associated to a specific wiki or not
      */
     public AbstractMandatoryClassInitializer(EntityReference reference)
     {
@@ -49,8 +49,8 @@ public abstract class AbstractMandatoryClassInitializer extends AbstractMandator
     }
 
     /**
-     * @param reference the reference of the document to update. Can be either local or absolute depending if the
-     *            document is associated to a specific wiki or not
+     * @param reference the reference of the document to update. Can be either local or absolute, depending on whether
+     *                  the document is associated to a specific wiki or not
      * @param title the title of the document
      */
     public AbstractMandatoryClassInitializer(EntityReference reference, String title)
@@ -113,7 +113,7 @@ public abstract class AbstractMandatoryClassInitializer extends AbstractMandator
     }
 
     /**
-     * Update document sheet. By default set the class sheet.
+     * Update document sheet. By default, set the class sheet.
      * 
      * @param document the document to update
      * @return true if the document has been modified, false otherwise

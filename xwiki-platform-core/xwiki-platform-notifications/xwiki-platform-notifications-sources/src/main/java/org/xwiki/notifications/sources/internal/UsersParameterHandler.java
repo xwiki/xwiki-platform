@@ -39,6 +39,8 @@ import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.sources.NotificationParameters;
 
+import com.xpn.xwiki.api.Util;
+
 /**
  * Handle the "users" parameters of the REST API.
  *
@@ -77,10 +79,7 @@ public class UsersParameterHandler
             String[] userArray = users.split(FIELD_SEPARATOR);
             List<String> userList = new ArrayList<>();
             for (int i = 0; i < userArray.length; ++i) {
-                String user = userArray[i].trim();
-                if (!user.contains(".")) {
-                    user = "XWiki." + user;
-                }
+                String user = Util.getStandardUsername(userArray[i].trim(), true);
                 DocumentReference userReference = currentDocumentReferenceResolver.resolve(user);
                 if (documentAccessBridge.exists(userReference)) {
                     userList.add(entityReferenceSerializer.serialize(userReference));

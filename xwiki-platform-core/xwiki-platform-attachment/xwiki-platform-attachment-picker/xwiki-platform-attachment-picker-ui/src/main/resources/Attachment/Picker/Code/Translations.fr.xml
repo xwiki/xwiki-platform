@@ -36,7 +36,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>attachment.picker.ckeditor.pluginsImageSelector.title=Galerie
+  <content>attachment.picker.wysiwyg.imageSelector.title=Galerie
 attachment.picker.searchField.placeholder=Recherche...
+attachment.picker.searchField.scope.currentPage=Page Courante
+attachment.picker.searchField.scope.allPages=Toutes les Pages
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+attachment.picker.ckeditor.pluginsImageSelector.title=Galerie
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
 </xwikidoc>

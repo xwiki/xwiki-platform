@@ -55,6 +55,7 @@ public interface XWikiBridge
     /**
      * Right now the security module logic only works with DOCUMENT based reference so PAGE reference need to be
      * converted.
+     * This also removes parameters from the reference as they aren't supported by the security module.
      * 
      * @param reference the reference
      * @return the compatible reference

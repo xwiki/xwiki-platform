@@ -21,10 +21,10 @@ package com.xpn.xwiki;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * The root servlet for XWiki. The purpose of this servlet is to respond to WebDAV requests correctly and to redirect
@@ -36,6 +36,9 @@ public class XWikiRootServlet extends HttpServlet
 {
     /** Class version identifier. Needed for serialization. */
     private static final long serialVersionUID = -4907199005755391420L;
+
+    /** Name of the WebDAV header and value of the {@code MS-Author-Via} header. */
+    private static final String DAV = "DAV";
 
     /**
      * The address to redirect to (the name of the XWiki webapp). Configured using the <code>redirectTo</code>
@@ -64,9 +67,9 @@ public class XWikiRootServlet extends HttpServlet
         IOException
     {
         response.setStatus(HttpServletResponse.SC_OK);
-        response.setHeader("MS-Author-Via", "DAV");
+        response.setHeader("MS-Author-Via", DAV);
         response.setHeader("Content-Language", "en");
-        response.setHeader("DAV", "1,2");
+        response.setHeader(DAV, "1,2");
         response.setHeader("Allow", "OPTIONS, GET, HEAD, PROPFIND, LOCK, UNLOCK");
         response.setHeader("Content-Length", "0");
         response.flushBuffer();

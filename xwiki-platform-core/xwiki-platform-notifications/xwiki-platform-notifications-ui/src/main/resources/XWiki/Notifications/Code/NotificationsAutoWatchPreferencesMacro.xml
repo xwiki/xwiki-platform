@@ -375,8 +375,8 @@
       <code>{{velocity}}
 #if (!$services.notification.watch.isEnabled())
   {{warning}}
-    {{localization key="notifications.settings.watch.disabled" /}}
-  {{warning}}
+    {{translation key="notifications.settings.watch.disabled" /}}
+  {{/warning}}
 #elseif (!$xcontext.userReference)
   {{info}}
     {{translation key="notifications.settings.watch.forGuest" /}}

@@ -26,6 +26,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -33,6 +36,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -43,6 +47,7 @@ import org.xwiki.livedata.LiveDataPropertyDescriptor.DisplayerDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.WithParameters;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -69,6 +74,10 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class LiveTableLiveDataPropertyStore extends WithParameters implements LiveDataPropertyDescriptorStore
 {
+    private static final String EQUALS_OPERATOR = "equals";
+
+    private static final String CLASS_SUFFIX = "_class";
+
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
@@ -87,17 +96,34 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
+    @Inject
+    private ContextualLocalizationManager localizationManager;
+
     @Override
     public Collection<LiveDataPropertyDescriptor> get() throws LiveDataException
     {
-        List<LiveDataPropertyDescriptor> properties = new ArrayList<>();
-        properties.addAll(getDocumentProperties());
-        try {
-            properties.addAll(getClassProperties());
-        } catch (Exception e) {
-            throw new LiveDataException("Failed to retrieve class properties.", e);
+        List<LiveDataPropertyDescriptor> properties = new ArrayList<>(getDocumentProperties());
+        properties.addAll(getClassProperties());
+        for (var parameter : getParameters().entrySet()) {
+            String key = parameter.getKey();
+            // Load property descriptors for properties of extra classes that are specified in the form
+            // <property>_class=My.Class.
+            if (key.endsWith(CLASS_SUFFIX) && parameter.getValue() instanceof String className) {
+                String propertyName = Strings.CS.removeEnd(key, CLASS_SUFFIX);
+                getPropertyDescriptor(className, propertyName).ifPresent(properties::add);
+            }
         }
         return properties;
+    }
+
+    private Optional<LiveDataPropertyDescriptor> getPropertyDescriptor(String className, String propertyName)
+        throws LiveDataException
+    {
+        return getAccessibleDocument(className).stream()
+            .map(classDoc -> (PropertyClass) classDoc.getXClass().get(propertyName))
+            .filter(Objects::nonNull)
+            .map(this::getLiveDataPropertyDescriptor)
+            .findFirst();
     }
 
     private Collection<LiveDataPropertyDescriptor> getDocumentProperties()
@@ -106,27 +132,54 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
         return this.defaultConfigProvider.get().getMeta().getPropertyDescriptors();
     }
 
-    private List<LiveDataPropertyDescriptor> getClassProperties() throws Exception
+    private List<LiveDataPropertyDescriptor> getClassProperties() throws LiveDataException
     {
         Object className = getParameters().get("className");
-        if (className instanceof String) {
-            DocumentReference classReference = this.currentDocumentReferenceResolver.resolve((String) className);
+        if (className instanceof String classReference) {
             return getClassProperties(classReference);
         } else {
             return Collections.emptyList();
         }
     }
 
-    private List<LiveDataPropertyDescriptor> getClassProperties(DocumentReference classReference) throws Exception
+    private List<LiveDataPropertyDescriptor> getClassProperties(String classReference) throws LiveDataException
     {
-        if (this.authorization.hasAccess(Right.VIEW, classReference)) {
-            XWikiContext xcontext = this.xcontextProvider.get();
-            XWikiDocument classDoc = xcontext.getWiki().getDocument(classReference, xcontext);
-            return classDoc.getXClass().getEnabledProperties().stream().map(this::getLiveDataPropertyDescriptor)
-                .collect(Collectors.toList());
-        } else {
-            return Collections.emptyList();
+        return getAccessibleDocument(classReference)
+            .map(document ->
+                document.getXClass()
+                    .getEnabledProperties()
+                    .stream()
+                    .map(this::getLiveDataPropertyDescriptor)
+                    .toList())
+            .orElse(List.of());
+    }
+
+    private Optional<XWikiDocument> getAccessibleDocument(String documentReference) throws LiveDataException
+    {
+        try {
+            DocumentReference reference = this.currentDocumentReferenceResolver.resolve(documentReference);
+            if (this.authorization.hasAccess(Right.VIEW, reference)) {
+                XWikiContext xcontext = this.xcontextProvider.get();
+                return Optional.of(xcontext.getWiki().getDocument(reference, xcontext));
+            } else {
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            throw new LiveDataException(
+                "Failed to retrieve document [%s] to retrieve properties for Live Data.".formatted(documentReference),
+                e
+            );
         }
+    }
+
+    // TODO: we should have a helper in the localization component for this kind of fallback
+    private String getRightTranslationWithFallback(String right)
+    {
+        String result = this.localizationManager.getTranslationPlain("rightsmanager." + right);
+        if (StringUtils.isEmpty(result)) {
+            result = right;
+        }
+        return result;
     }
 
     private LiveDataPropertyDescriptor getLiveDataPropertyDescriptor(PropertyClass xproperty)
@@ -144,19 +197,28 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
         // The returned property value is the displayer output.
         descriptor.setDisplayer(new DisplayerDescriptor("xObjectProperty"));
         if (xproperty instanceof ListClass) {
-            descriptor.setFilter(new FilterDescriptor("list"));
-            descriptor.getFilter().addOperator("empty", null);
+            FilterDescriptor filterList = new FilterDescriptor("list");
             if (xproperty instanceof LevelsClass) {
-                descriptor.getFilter().setParameter("options", ((LevelsClass) xproperty).getList(xcontext));
+                // We need to provide a list of maps of value / labels so that selectize can interpret them.
+                filterList.setParameter("options", ((LevelsClass) xproperty).getList(xcontext)
+                    .stream()
+                    .map(item -> Map.of(
+                        "value", item,
+                        "label", getRightTranslationWithFallback(item)
+                    ))
+                    .collect(Collectors.toList()));
             } else {
-                descriptor.getFilter().setParameter("searchURL", getSearchURL(xproperty));
+                filterList.setParameter("searchURL", getSearchURL(xproperty));
             }
             if (xproperty.newProperty() instanceof StringListProperty) {
                 // The default live table results page currently supports only exact matching for list properties with
                 // multiple selection and no relational storage (selected values are stored concatenated on a single
                 // database column).
-                descriptor.getFilter().addOperator("equals", null);
+                filterList.addOperator("empty", null);
+                filterList.addOperator(EQUALS_OPERATOR, null);
+                filterList.setDefaultOperator(EQUALS_OPERATOR);
             }
+            descriptor.setFilter(filterList);
         } else if (xproperty instanceof DateClass) {
             String dateFormat = ((DateClass) xproperty).getDateFormat();
             if (!StringUtils.isEmpty(dateFormat)) {

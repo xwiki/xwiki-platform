@@ -21,6 +21,7 @@ package org.xwiki.skin.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -35,7 +36,21 @@ public class SkinTemplateElement extends BaseElement
 
     public SkinTemplateElement(WebElement rootElement)
     {
+        this(rootElement, false);
+    }
+
+    /**
+     * @param rootElement the container of the properties
+     * @param waitOnSlide {@code true} if the element uses a slide to be displayed
+     * @since 17.7.0RC1
+     */
+    public SkinTemplateElement(WebElement rootElement, boolean waitOnSlide)
+    {
         this.rootElement = rootElement;
+        if (waitOnSlide) {
+            getDriver().waitUntilCondition(
+                ExpectedConditions.attributeContains(this.rootElement, "class", "property-slided"));
+        }
     }
 
     public void setContent(String content)

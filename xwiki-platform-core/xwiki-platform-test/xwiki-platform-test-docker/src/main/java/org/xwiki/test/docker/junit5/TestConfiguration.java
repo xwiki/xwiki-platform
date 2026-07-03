@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.test.docker.internal.junit5.configuration.PropertiesMerger;
+import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -58,11 +59,15 @@ public class TestConfiguration
 
     private String databaseTag;
 
+    private String browserTag;
+
     private String jdbcDriverVersion;
 
     private boolean vnc;
 
     private boolean wcag;
+
+    private boolean wcagStopOnError;
 
     private Properties properties;
 
@@ -78,6 +83,8 @@ public class TestConfiguration
 
     private boolean office;
 
+    private boolean standardFlavor;
+
     private List<ServletEngine> forbiddenServletEngines;
 
     private Properties databaseCommands;
@@ -88,10 +95,24 @@ public class TestConfiguration
 
     private boolean savePermanentDirectoryData;
 
+    private List<String> servletEngineNetworkAliases;
+
+    private BlobStore blobStore;
+
+    private String blobStoreTag;
+
+    private SolrMode solrMode;
+
+    private String remoteSolrTag;
+
+    private XWikiInstances xwikiInstances;
+
     /**
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
      */
+    // This is a flat sequence of one merge call per configuration option; splitting it would only hurt readability.
+    @SuppressWarnings("ExecutableStatementCount")
     public void merge(TestConfiguration testConfiguration) throws DockerTestException
     {
         mergeBrowser(testConfiguration.getBrowser());
@@ -103,8 +124,10 @@ public class TestConfiguration
         mergeDatabaseTag(testConfiguration.getDatabaseTag());
         mergeServletEngineTag(testConfiguration.getServletEngineTag());
         mergeJDBCDriverVersion(testConfiguration.getJDBCDriverVersion());
+        mergeBrowserTag(testConfiguration.getBrowserTag());
         mergeVNC(testConfiguration.vnc());
         mergeWCAG(testConfiguration.isWCAG());
+        mergeWCAGStopOnError(testConfiguration.shouldWCAGStopOnError());
         mergeProperties(testConfiguration.getProperties());
         mergeExtraJARs(testConfiguration.getExtraJARs());
         mergeResolveExtraJARs(testConfiguration.isResolveExtraJARs());
@@ -112,10 +135,17 @@ public class TestConfiguration
         mergeSSHPorts(testConfiguration.getSSHPorts());
         mergeProfiles(testConfiguration.getProfiles());
         mergeOffice(testConfiguration.isOffice());
+        mergeStandardFlavor(testConfiguration.isStandardFlavor());
         mergeForbiddenServletEngines(testConfiguration.getForbiddenServletEngines());
         mergeDatabaseCommands(testConfiguration.getDatabaseCommands());
         mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
         mergeSavePermanentDirectoryData(testConfiguration.isPermanentDirectoryDataSaved());
+        mergeServletEngineNetworkAliases(testConfiguration.getServletEngineNetworkAliases());
+        mergeBlobStore(testConfiguration.blobStore);
+        mergeBlobStoreTag(testConfiguration.getBlobStoreTag());
+        mergeSolrMode(testConfiguration.solrMode);
+        mergeRemoteSolrTag(testConfiguration.getRemoteSolrTag());
+        mergeXWikiInstances(testConfiguration.getXWikiInstances());
     }
 
     private void mergeBrowser(Browser browser) throws DockerTestException
@@ -191,8 +221,6 @@ public class TestConfiguration
                 throw new DockerTestException(
                     String.format("Cannot merge database tag [%s] since it was already specified as [%s]",
                         databaseTag, getDatabaseTag()));
-            } else {
-                this.databaseTag = getDatabaseTag();
             }
         } else {
             this.databaseTag = databaseTag;
@@ -206,11 +234,22 @@ public class TestConfiguration
                 throw new DockerTestException(
                     String.format("Cannot merge Servlet engine tag [%s] since it was already specified as [%s]",
                         servletEngineTag, getServletEngineTag()));
-            } else {
-                this.servletEngineTag = getServletEngineTag();
             }
         } else {
             this.servletEngineTag = servletEngineTag;
+        }
+    }
+
+    private void mergeBrowserTag(String browserTag) throws DockerTestException
+    {
+        if (getBrowserTag() != null) {
+            if (browserTag != null && !getBrowserTag().equals(browserTag)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge Browser tag [%s] since it was already specified as [%s]",
+                        browserTag, getBrowserTag()));
+            }
+        } else {
+            this.browserTag = browserTag;
         }
     }
 
@@ -221,8 +260,6 @@ public class TestConfiguration
                 throw new DockerTestException(
                     String.format("Cannot merge JDBC driver version [%s] since it was already specified as [%s]",
                         jdbcDriverVersion, getJDBCDriverVersion()));
-            } else {
-                this.jdbcDriverVersion = getJDBCDriverVersion();
             }
         } else {
             this.jdbcDriverVersion = jdbcDriverVersion;
@@ -244,10 +281,22 @@ public class TestConfiguration
         this.wcag = isWCAG() || wcag;
     }
 
+    private void mergeWCAGStopOnError(boolean wcagStopOnError)
+    {
+        this.wcagStopOnError = shouldWCAGStopOnError() || wcagStopOnError;
+    }
+
     private void mergeOffice(boolean office)
     {
         if (!isOffice() && office) {
             this.office = true;
+        }
+    }
+
+    private void mergeStandardFlavor(boolean standardFlavor)
+    {
+        if (!isStandardFlavor() && standardFlavor) {
+            this.standardFlavor = true;
         }
     }
 
@@ -324,6 +373,74 @@ public class TestConfiguration
     {
         if (!isPermanentDirectoryDataSaved() && savePermanentDirectoryData) {
             this.savePermanentDirectoryData = true;
+        }
+    }
+
+    private void mergeServletEngineNetworkAliases(List<String> aliases)
+    {
+        List<String> mergedAliases = getServletEngineNetworkAliases();
+        if (aliases != null) {
+            mergedAliases.addAll(aliases);
+        }
+        this.servletEngineNetworkAliases = mergedAliases;
+    }
+
+    private void mergeBlobStore(BlobStore blobStore) throws DockerTestException
+    {
+        if (this.blobStore != null && this.blobStore != BlobStore.DEFAULT) {
+            if (blobStore != null && blobStore != BlobStore.DEFAULT && this.blobStore != blobStore) {
+                throw new DockerTestException(String.format(
+                    "Cannot merge blob store [%s] since it was already specified as [%s]", blobStore, getBlobStore()));
+            }
+        } else {
+            this.blobStore = blobStore;
+        }
+    }
+
+    private void mergeBlobStoreTag(String blobStoreTag) throws DockerTestException
+    {
+        if (getBlobStoreTag() != null) {
+            if (blobStoreTag != null && !getBlobStoreTag().equals(blobStoreTag)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge blob store tag [%s] since it was already specified as [%s]",
+                        blobStoreTag, getBlobStoreTag()));
+            }
+        } else {
+            this.blobStoreTag = blobStoreTag;
+        }
+    }
+
+    private void mergeSolrMode(SolrMode solrMode) throws DockerTestException
+    {
+        if (this.solrMode != null && this.solrMode != SolrMode.DEFAULT) {
+            if (solrMode != null && solrMode != SolrMode.DEFAULT && this.solrMode != solrMode) {
+                throw new DockerTestException(String.format(
+                    "Cannot merge solr mode [%s] since it was already specified as [%s]", solrMode, getBlobStore()));
+            }
+        } else {
+            this.solrMode = solrMode;
+        }
+    }
+
+    private void mergeRemoteSolrTag(String remoteSolrTag) throws DockerTestException
+    {
+        if (getRemoteSolrTag() != null) {
+            if (remoteSolrTag != null && !getRemoteSolrTag().equals(remoteSolrTag)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge remote solr tag [%s] since it was already specified as [%s]",
+                        remoteSolrTag, getRemoteSolrTag()));
+            }
+        } else {
+            this.remoteSolrTag = remoteSolrTag;
+        }
+    }
+
+    private void mergeXWikiInstances(XWikiInstances xwikiInstances)
+    {
+        // Select the configuration with the biggest number of instances.
+        if (getXWikiInstances() == null
+            || (xwikiInstances != null && xwikiInstances.value() > getXWikiInstances().value())) {
+            setXWikiInstances(xwikiInstances);
         }
     }
 
@@ -461,6 +578,23 @@ public class TestConfiguration
     }
 
     /**
+     * @return the docker image tag to use for the browser container (if not specified, uses the "latest" tag)
+     * @since 16.3.0RC1
+     */
+    public String getBrowserTag()
+    {
+        return browserTag;
+    }
+
+    /**
+     * @param browserTag see {@link #getBrowserTag()}
+     */
+    public void setBrowserTag(String browserTag)
+    {
+        this.browserTag = browserTag;
+    }
+
+    /**
      * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
      * depending on the database)
      * @since 10.10RC1
@@ -511,6 +645,24 @@ public class TestConfiguration
     public void setWCAG(boolean wcag)
     {
         this.wcag = wcag;
+    }
+
+    /**
+     * @return {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     * @since 16.1.0
+     */
+    public boolean shouldWCAGStopOnError()
+    {
+        return this.wcagStopOnError;
+    }
+
+    /**
+     * @param wcagStopOnError {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     * @since 16.1.0
+     */
+    public void setWCAGStopOnError(boolean wcagStopOnError)
+    {
+        this.wcagStopOnError = wcagStopOnError;
     }
 
     /**
@@ -644,32 +796,43 @@ public class TestConfiguration
      */
     public String getName()
     {
-        return String.format("%s-%s-%s-%s-%s-%s",
+        // Note: the standardFlavor mode is part of the name so that the minimal-WAR and standard-flavor variants get
+        // distinct output directories (and thus distinct build.marker files). Otherwise switching modes for the same
+        // db/servlet/browser combination would reuse a stale WAR.
+        return String.format("%s-%s-%s-%s-%s-%s%s",
             getDatabase().name().toLowerCase(),
             StringUtils.isEmpty(getDatabaseTag()) ? DEFAULT : getDatabaseTag(),
             StringUtils.isEmpty(getJDBCDriverVersion()) ? DEFAULT : getDatabaseTag(),
             getServletEngine().name().toLowerCase(),
             StringUtils.isEmpty(getServletEngineTag()) ? DEFAULT : getServletEngineTag(),
-            getBrowser().name().toLowerCase());
+            getBrowser().name().toLowerCase(),
+            isStandardFlavor() ? "-standardflavor" : "");
     }
 
     /**
-     * @return the output directory where to output files required for running the tests. If the {@code maven.build.dir}
-     * system property is not defined then construct an output directory name based on the defined configuration so that
-     * we can run different configurations one after another without them overriding each other. The {@code
-     * maven.build.dir} system property is there to allow controlling where the Maven output directory is located when
-     * running from Maven.
+     * @return the output directory where to output files required for running the tests. It's a sub-directory of the
+     *         Maven build directory, which name is based on the defined configuration so that we can run different
+     *         configurations one after another without them overriding each other.
      */
     public String getOutputDirectory()
     {
-        String outputDirectory;
+        return getMavenBuildDirectory() + "/" + getName();
+    }
+
+    /**
+     * @return the output directory where Maven produce files. Assume ./target if the system property
+     *         {@code maven.build.dir} is not set.
+     * @since 18.3.0RC1
+     */
+    public String getMavenBuildDirectory()
+    {
         String mavenBuildDir = System.getProperty("maven.build.dir");
+
         if (mavenBuildDir == null) {
-            outputDirectory = String.format("./target/%s", getName());
+            return "./target";
         } else {
-            outputDirectory = mavenBuildDir;
+            return mavenBuildDir;
         }
-        return outputDirectory;
     }
 
     /**
@@ -687,6 +850,46 @@ public class TestConfiguration
     public void setOffice(boolean office)
     {
         this.office = office;
+    }
+
+    /**
+     * @return true to make the test instance equivalent to an XWiki installed from the standard flavor
+     *         distribution: the WAR's {@code WEB-INF/lib} is built from the standard distribution WAR
+     *         dependencies (instead of the minimal set) and the standard flavor
+     *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically. See
+     *         {@link org.xwiki.test.docker.junit5.UITest#standardFlavor()}.
+     * @since 18.6.0RC1
+     */
+    public boolean isStandardFlavor()
+    {
+        return this.standardFlavor;
+    }
+
+    /**
+     * @param standardFlavor see {@link #isStandardFlavor()}
+     * @since 18.6.0RC1
+     */
+    public void setStandardFlavor(boolean standardFlavor)
+    {
+        this.standardFlavor = standardFlavor;
+    }
+
+    /**
+     * @return the artifactId (in the {@code org.xwiki.platform} groupId) of the {@code pom} artifact whose
+     *         dependencies define the JARs to put in the WAR's {@code WEB-INF/lib}: the full standard distribution
+     *         dependencies when {@link #isStandardFlavor()} is true (the {@code legacy} variant when the
+     *         {@code legacy} profile is active), or the minimal set otherwise. Used by both the WAR builder and the
+     *         extension installer so that they agree on what is bundled versus provisioned.
+     * @since 18.6.0RC1
+     */
+    public String getWARDependenciesRootArtifactId()
+    {
+        if (!isStandardFlavor()) {
+            return "xwiki-platform-minimaldependencies";
+        }
+        return getProfiles().contains("legacy")
+            ? "xwiki-platform-distribution-war-legacydependencies"
+            : "xwiki-platform-distribution-war-dependencies";
     }
 
     /**
@@ -742,5 +945,134 @@ public class TestConfiguration
     public void setSavePermanentDirectoryData(boolean savePermanentDirectoryData)
     {
         this.savePermanentDirectoryData = savePermanentDirectoryData;
+    }
+
+    /**
+     * @return the list of network aliases to use for the servlet engine Docker container
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public List<String> getServletEngineNetworkAliases()
+    {
+        return this.servletEngineNetworkAliases;
+    }
+
+    /**
+     * @param servletEngineNetworkAliases see {@link #getServletEngineNetworkAliases()}
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public void setServletEngineNetworkAliases(List<String> servletEngineNetworkAliases)
+    {
+        this.servletEngineNetworkAliases = servletEngineNetworkAliases;
+    }
+
+    /**
+     * @return the blob store to use
+     * @since 17.10.0RC1
+     */
+    public BlobStore getBlobStore()
+    {
+        if (this.blobStore == BlobStore.DEFAULT) {
+            return isCluster() ? BlobStore.S3 : BlobStore.FILESYSTEM;
+        }
+
+        return this.blobStore;
+    }
+
+    /**
+     * @param blobStore see {@link #getBlobStore()}
+     * @since 17.10.0RC1
+     */
+    public void setBlobStore(BlobStore blobStore)
+    {
+        this.blobStore = blobStore;
+    }
+
+    /**
+     * @return the docker image tag to use for the blob store container (if not specified, uses the "latest" tag)
+     * @since 17.10.0RC1
+     */
+    public String getBlobStoreTag()
+    {
+        return this.blobStoreTag;
+    }
+
+    /**
+     * @param blobStoreTag see {@link #getBlobStoreTag()}
+     * @since 17.10.0RC1
+     */
+    public void setBlobStoreTag(String blobStoreTag)
+    {
+        this.blobStoreTag = blobStoreTag;
+    }
+
+    /**
+     * @return the mode to use
+     * @since 18.3.0RC1
+     */
+    public SolrMode getSolrMode()
+    {
+        if (this.solrMode == SolrMode.DEFAULT) {
+            return isCluster() ? SolrMode.REMOTE : SolrMode.EMBEDDED;
+        }
+
+        return this.solrMode;
+    }
+
+    /**
+     * @param solrMode the Solr mode to use
+     * @since 18.3.0RC1
+     */
+    public void setSolrMode(SolrMode solrMode)
+    {
+        this.solrMode = solrMode;
+    }
+
+    /**
+     * @return the docker image tag to use for the remote solr container (if not specified, uses the "latest" tag)
+     * @since 18.3.0RC1
+     */
+    public String getRemoteSolrTag()
+    {
+        return this.remoteSolrTag;
+    }
+
+    /**
+     * @param remoteSolrTag see {@link #getRemoteSolrTag()}
+     * @since 18.3.0RC1
+     */
+    public void setRemoteSolrTag(String remoteSolrTag)
+    {
+        this.remoteSolrTag = remoteSolrTag;
+    }
+
+    /**
+     * @return the XWiki instances configuration
+     * @since 18.3.0RC1
+     */
+    public XWikiInstances getXWikiInstances()
+    {
+        return this.xwikiInstances;
+    }
+
+    /**
+     * @param xwikiInstances see {@link #getXWikiInstances()}
+     * @since 18.3.0RC1
+     */
+    public void setXWikiInstances(XWikiInstances xwikiInstances)
+    {
+        this.xwikiInstances = xwikiInstances;
+    }
+
+    /**
+     * @return true if the test configuration is for a cluster setup (i.e. more than 1 XWiki instance), false otherwise
+     * @since 18.3.0RC1
+     */
+    public boolean isCluster()
+    {
+        return getXWikiInstances().value() > 1;
     }
 }

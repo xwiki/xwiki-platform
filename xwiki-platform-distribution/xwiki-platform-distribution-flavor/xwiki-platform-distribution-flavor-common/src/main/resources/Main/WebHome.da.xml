@@ -35,13 +35,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>= Velkommen til din wiki =
+  <content>== Velkommen til din wiki ==
 
 XWiki er det bedste værktøj til at organisere din viden og erfaring. En //wiki// er en ordnet samling af //sider//. Du kan opretter flere Wikier, med hver sit sæt af sider..
 
 XWiki kan være en vidensbase (support, dokumentation, salg, o.s.v.), et fælles arbejdsrum eller enda et helt intranet.
 
-= The basics =
+== The basics ==
 
 For at få det bedst ud af din wiki så log ind og:
 
@@ -54,23 +54,23 @@ Brug {{displayIcon name="home"/}} "brødkrumme-linien" ovenover titlen til at //
 På siden [[Sandbox&gt;&gt;Sandbox.WebHome]] kan du se eksempler på mere indhold og det et godt sted at eksperimentere med wikiens mange funktioner. 
 
  {{box}}
-Lær mere om XWiki med en engelske [[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].
+Lær mere om XWiki med en engelske [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].
 {{/box}}
 
 (%class="row"%)
 (((
 (%class="col-xs-12 col-sm-6"%)
 (((
-= Udvid din wiki =
+== Udvid din wiki ==
 
 Wikien kan udbygges med masser af funktionalitet, som du måske står og mangler. Derfor - kig  på [[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] hvor der kan søges og installeres udvidelser.
 
-For at finde mere om de 900+ udvidelser, som andre XWiki-brugere har delt, gå til [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]].
+For at finde mere om de 900+ udvidelser, som andre XWiki-brugere har delt, gå til [[Extensions Repository&gt;&gt;https://extensions.xwiki.org]].
 )))
 
 (%class="col-xs-12 col-sm-6"%)
 (((
-= Opret et nyt værktøj =
+== Opret et nyt værktøj ==
 
 Foruden disse mange udvidelser, har du mulighed for selv at definere //struktur// på dine data efter //dit// behov, ved at oprette dine egne værktøj med [[Minut-Apps&gt;&gt;AppWithinMinutes]] (AWM). 
 

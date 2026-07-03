@@ -35,7 +35,7 @@ public class Ping
 
     private Collection<ExtensionPing> extensions;
 
-    private JavaPing java;
+    private JavaPing javaPing;
 
     private DatabasePing database;
 
@@ -112,15 +112,15 @@ public class Ping
      */
     public JavaPing getJava()
     {
-        return this.java;
+        return this.javaPing;
     }
 
     /**
-     * @param java see {@link #getJava()}
+     * @param javaPing see {@link #getJava()}
      */
-    public void setJava(JavaPing java)
+    public void setJava(JavaPing javaPing)
     {
-        this.java = java;
+        this.javaPing = javaPing;
     }
 
     /**

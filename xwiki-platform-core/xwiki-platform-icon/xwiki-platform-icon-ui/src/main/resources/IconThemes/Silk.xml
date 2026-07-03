@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.5" reference="IconThemes.Silk" locale="">
   <web>IconThemes</web>
   <name>Silk</name>
   <language/>
@@ -38,8 +38,8 @@
   <hidden>true</hidden>
   <content>## General settings
 xwiki.iconset.type = image
-xwiki.iconset.render.wiki = [[image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")||data-xwiki-lightbox="false"]]
-xwiki.iconset.render.html = &lt;img src="$xwiki.getSkinFile("icons/silk/${icon}.png")" alt="Icon" data-xwiki-lightbox="false" /&gt;
+xwiki.iconset.render.wiki = [[image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")||alt="" data-xwiki-lightbox="false"]]
+xwiki.iconset.render.html = &lt;img src="$xwiki.getSkinFile("icons/silk/${icon}.png")" alt="" data-xwiki-lightbox="false" /&gt;
 xwiki.iconset.icon.url = $xwiki.getSkinFile("icons/silk/${icon}.png")
 
 ## XWiki Icon Set (see: http://design.xwiki.org/xwiki/bin/view/Proposal/XWiki+Icon+Set).
@@ -128,6 +128,7 @@ folder = folder
 user = user
 group = group
 heart = heart
+heart_empty = heart_empty
 question = help
 image = image
 key = key
@@ -198,6 +199,14 @@ plus-square = bullet_toggle_plus
 filter = find
 fast-backward = control_rewind
 arrow_in = arrow_in
+reposition = reposition
+
+## Since 17.10.0RC1
+sort-ascending = arrow_up
+sort-descending = arrow_down
+
+## Since 18.0.0RC1
+note = note
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = accept

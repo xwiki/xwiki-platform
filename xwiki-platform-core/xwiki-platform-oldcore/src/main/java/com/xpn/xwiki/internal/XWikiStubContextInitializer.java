@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.container.servlet.ServletResponse;
+import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
@@ -69,10 +70,11 @@ public class XWikiStubContextInitializer implements ExecutionContextInitializer
                 stubContext.declareInExecutionContext(context);
 
                 // Set the stub request and the response
-                if (this.container.getRequest() == null) {
+                if (this.container.getRequest() == null && stubContext.getRequest() != null) {
                     this.container.setRequest(new ServletRequest(stubContext.getRequest()));
+                    this.container.setSession(new ServletSession(stubContext.getRequest()));
                 }
-                if (this.container.getResponse() == null) {
+                if (this.container.getResponse() == null && stubContext.getResponse() != null) {
                     this.container.setResponse(new ServletResponse(stubContext.getResponse()));
                 }
             }

@@ -25,12 +25,15 @@ import java.net.URL;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Provider;
@@ -38,6 +41,7 @@ import javax.script.ScriptContext;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.hibernate.cfg.Configuration;
 import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
@@ -59,6 +63,8 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
+import org.xwiki.internal.document.DocumentRequiredRightsReader;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -77,11 +83,15 @@ import org.xwiki.script.internal.CloneableSimpleScriptContext;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.test.XWikiTempDirUtil;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
+import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.URLConfiguration;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
@@ -172,9 +182,13 @@ public class MockitoOldcore
 
     private ContextualAuthorizationManager mockContextualAuthorizationManager;
 
+    private DocumentAuthorizationManager mockDocumentAuthorizationManager;
+
     private QueryManager queryManager;
 
     private WikiDescriptorManager wikiDescriptorManager;
+
+    private Set<String> wikis = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     protected Map<DocumentReference, XWikiDocument> documents = new ConcurrentHashMap<>();
 
@@ -205,6 +219,8 @@ public class MockitoOldcore
     private boolean mockXWiki = true;
 
     private UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
+
+    private UserPropertiesResolver allUserPropertiesResolver;
 
     /**
      * @version $Id$
@@ -326,19 +342,42 @@ public class MockitoOldcore
         getXWikiContext().put(ComponentManager.class.getName(), getMocker());
 
         if (testClass.getAnnotation(AllComponents.class) != null) {
-            // If @AllComponents is enabled force mocking AuthorizationManager and ContextualAuthorizationManager if not
-            // already mocked
+            // If @AllComponents is enabled force mocking AuthorizationManager, ContextualAuthorizationManager, and
+            // DocumentAuthorizationManager if not already mocked
             this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class, false);
             this.mockContextualAuthorizationManager =
                 getMocker().registerMockComponent(ContextualAuthorizationManager.class, false);
+            this.mockDocumentAuthorizationManager =
+                getMocker().registerMockComponent(DocumentAuthorizationManager.class, false);
         } else {
-            // Make sure an AuthorizationManager and a ContextualAuthorizationManager is available
+            // Make sure an AuthorizationManager, a ContextualAuthorizationManager, and a
+            // DocumentAuthorizationManager are available
             if (!getMocker().hasComponent(AuthorizationManager.class)) {
                 this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class);
+            } else {
+                AuthorizationManager registered = getMocker().getInstance(AuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockAuthorizationManager = registered;
+                }
             }
             if (!getMocker().hasComponent(ContextualAuthorizationManager.class)) {
                 this.mockContextualAuthorizationManager =
                     getMocker().registerMockComponent(ContextualAuthorizationManager.class);
+            } else {
+                ContextualAuthorizationManager registered =
+                    getMocker().getInstance(ContextualAuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockContextualAuthorizationManager = registered;
+                }
+            }
+            if (!getMocker().hasComponent(DocumentAuthorizationManager.class)) {
+                this.mockDocumentAuthorizationManager =
+                    getMocker().registerMockComponent(DocumentAuthorizationManager.class);
+            } else {
+                DocumentAuthorizationManager registered = getMocker().getInstance(DocumentAuthorizationManager.class);
+                if (MockUtil.isMock(registered)) {
+                    this.mockDocumentAuthorizationManager = registered;
+                }
             }
         }
 
@@ -377,6 +416,12 @@ public class MockitoOldcore
             when(cacheControl.isCacheReadAllowed((ChronoLocalDateTime) any())).thenReturn(true);
         }
 
+        // Make sure a LoggerConfiguration is available by default
+        if (!getMocker().hasComponent(LoggerConfiguration.class)) {
+            LoggerConfiguration loggerConfiguration = getMocker().registerMockComponent(LoggerConfiguration.class);
+            when(loggerConfiguration.isDeprecatedLogEnabled()).thenReturn(true);
+        }
+
         // Expose a XWikiStubContextProvider if none is exist
         if (!getMocker().hasComponent(XWikiStubContextProvider.class)) {
             XWikiStubContextProvider conetxtProvider =
@@ -397,7 +442,9 @@ public class MockitoOldcore
                 when(servletContextMock.getAttribute("javax.servlet.context.tempdir"))
                     .thenReturn(new File(System.getProperty("java.io.tmpdir")));
 
-                initEnvironmentDirectories();
+                Environment testEnvironment = new TestEnvironment();
+                this.temporaryDirectory = testEnvironment.getTemporaryDirectory();
+                this.permanentDirectory = testEnvironment.getPermanentDirectory();
 
                 servletEnvironment.setTemporaryDirectory(this.temporaryDirectory);
                 servletEnvironment.setPermanentDirectory(this.permanentDirectory);
@@ -509,11 +556,11 @@ public class MockitoOldcore
                 // Also note that setting a non null request forces us to set a non null URL as otherwise it would lead
                 // to another NPE...
                 XWikiRequest originalRequest = getXWikiContext().getRequest();
-                if (getXWikiContext().getRequest() == null) {
+                if (originalRequest == null) {
                     getXWikiContext().setRequest(new XWikiServletRequestStub());
                 }
                 URL originalURL = getXWikiContext().getURL();
-                if (getXWikiContext().getURL() == null) {
+                if (originalURL == null) {
                     getXWikiContext().setURL(new URL("http://localhost:8080"));
                 }
                 stubContextProvider.initialize(getXWikiContext());
@@ -643,6 +690,12 @@ public class MockitoOldcore
                     document = new XWikiDocument(reference, reference.getLocale());
                     document.setSyntax(Syntax.PLAIN_1_0);
                     document.setOriginalDocument(document.clone());
+                } else {
+                    if (document.isMetaDataDirty()) {
+                        // Clone the document to make sure the test store behave as a real store (i.e. cannot be corrupted
+                        // by modifying the XWikiDocument instance and always return a new instance)
+                        document = document.clone();
+                    }
                 }
 
                 return document;
@@ -695,39 +748,17 @@ public class MockitoOldcore
                     reference = reference.setWikiReference(xcontext.getWikiReference());
                 }
 
-                if (document.isContentDirty() || document.isMetaDataDirty()) {
-                    document.setDate(new Date());
-                    if (document.isContentDirty()) {
-                        document.setContentUpdateDate(new Date());
-                        document.setContentAuthorReference(document.getAuthorReference());
-                    }
-                    document.incrementVersion();
-
-                    document.setContentDirty(false);
-                    document.setMetaDataDirty(false);
-
-                    if (supportRevisionStore) {
-                        // Save the document in the document archive.
-                        getMockVersioningStore().updateXWikiDocArchive(document, true, xcontext);
-                    }
-                }
-                document.setNew(false);
-                document.setStore(getMockStore());
-
-                // Make sure the document is not restricted.
-                document.setRestricted(false);
-
-                XWikiDocument savedDocument = document.clone();
-
-                documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
-
-
-                // Set the document as it's original document
-                savedDocument.setOriginalDocument(savedDocument.clone());
+                saveDocument(reference, document, xcontext);
 
                 return null;
             }
         }).when(getMockStore()).saveXWikiDoc(anyXWikiDocument(), anyXWikiContext());
+        doAnswer(invocation -> {
+            XWikiDocument document = invocation.getArgument(0);
+            XWikiContext xcontext = invocation.getArgument(1);
+            getMockStore().saveXWikiDoc(document, xcontext);
+            return null;
+        }).when(getMockStore()).saveXWikiDoc(anyXWikiDocument(), anyXWikiContext(), anyBoolean());
         when(getMockStore().getLimitSize(any(), any(), any())).thenReturn(255);
 
         // XWikiVersioningStoreInterface
@@ -842,7 +873,7 @@ public class MockitoOldcore
                     XWikiDocument doc = invocation.getArgument(0);
                     String revision = invocation.getArgument(1);
 
-                    if (StringUtils.equals(revision, doc.getVersion())) {
+                    if (Strings.CS.equals(revision, doc.getVersion())) {
                         return doc;
                     }
 
@@ -881,27 +912,6 @@ public class MockitoOldcore
                     document.setComment(StringUtils.defaultString(comment));
                     document.setMinorEdit(minorEdit);
 
-                    if (document.isContentDirty() || document.isMetaDataDirty()) {
-                        Date ndate = new Date();
-                        document.setDate(ndate);
-                        if (document.isContentDirty()) {
-                            document.setContentUpdateDate(ndate);
-                            DocumentAuthors authors = document.getAuthors();
-                            authors.setContentAuthor(authors.getEffectiveMetadataAuthor());
-                        }
-                        document.incrementVersion();
-
-                        document.setContentDirty(false);
-                        document.setMetaDataDirty(false);
-
-                        // Save the document in the document archive.
-                        if (supportRevisionStore) {
-                            getMockVersioningStore().updateXWikiDocArchive(document, true, xcontext);
-                        }
-                    }
-                    document.setNew(false);
-                    document.setStore(getMockStore());
-
                     XWikiDocument previousDocument = documents.get(document.getDocumentReferenceWithLocale());
 
                     if (previousDocument != null && previousDocument != document) {
@@ -920,27 +930,27 @@ public class MockitoOldcore
                         document.setOriginalDocument(originalDocument);
                     }
 
-                    // Make sure the document is not restricted.
-                    document.setRestricted(false);
+                    saveDocument(document.getDocumentReferenceWithLocale(), document, xcontext);
 
-                    XWikiDocument savedDocument = document.clone();
+                    XWikiDocument newOriginal = document.getOriginalDocument();
 
-                    documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
+                    try {
+                        document.setOriginalDocument(originalDocument);
 
-                    if (isNew) {
                         if (notifyDocumentCreatedEvent) {
-                            getObservationManager().notify(new DocumentCreatedEvent(document.getDocumentReference()),
-                                document, getXWikiContext());
+                            if (isNew) {
+                                getObservationManager().notify(
+                                    new DocumentCreatedEvent(document.getDocumentReference()), document,
+                                    getXWikiContext());
+                            } else {
+                                getObservationManager().notify(
+                                    new DocumentUpdatedEvent(document.getDocumentReference()), document,
+                                    getXWikiContext());
+                            }
                         }
-                    } else {
-                        if (notifyDocumentUpdatedEvent) {
-                            getObservationManager().notify(new DocumentUpdatedEvent(document.getDocumentReference()),
-                                document, getXWikiContext());
-                        }
+                    } finally {
+                        document.setOriginalDocument(newOriginal);
                     }
-
-                    // Set the document as it's original document
-                    savedDocument.setOriginalDocument(savedDocument.clone());
 
                     return null;
                 }
@@ -1117,6 +1127,29 @@ public class MockitoOldcore
             });
         }
 
+        // Add a DocumentRequiredRightsManager if we have a DocumentRequiredRightsReader as the former isn't easily
+        // available in a mocked setup while the latter can be loaded without problems.
+        if (!this.componentManager.hasComponent(DocumentRequiredRightsManager.class)
+            && this.componentManager.hasComponent(DocumentRequiredRightsReader.class)) {
+            DocumentRequiredRightsManager requiredRightsManager =
+                this.componentManager.registerMockComponent(DocumentRequiredRightsManager.class);
+            DocumentRequiredRightsReader documentRequiredRightsReader =
+                this.componentManager.getInstance(DocumentRequiredRightsReader.class);
+
+            when(requiredRightsManager.getRequiredRights(any())).then(invocationOnMock ->
+            {
+                DocumentReference reference = invocationOnMock.getArgument(0);
+                if (reference != null) {
+                    XWikiDocument document = getSpyXWiki().getDocument(reference.withoutLocale(), getXWikiContext());
+                    if (!document.isNew()) {
+                        return Optional.of(documentRequiredRightsReader.readRequiredRights(document));
+                    }
+                }
+
+                return Optional.empty();
+            });
+        }
+
         // Query Manager
         // If there's already a Query Manager registered, use it instead.
         // This allows, for example, using @ComponentList to use the real Query Manager, in integration tests.
@@ -1154,6 +1187,29 @@ public class MockitoOldcore
                     return getXWikiContext().getWikiId();
                 }
             });
+            when(this.wikiDescriptorManager.getAllIds()).then(new Answer<Collection<String>>()
+            {
+                @Override
+                public Collection<String> answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return wikis;
+                }
+            });
+        }
+
+        // A default implementation of UserReferenceResolver<CurrentUserReference> is expected by
+        // EffectiveAuthorSetterListener which otherwise fails to be registered as a component when @AllComponents
+        // annotation is used in tests that depend on oldcore. We register a mock implementation in case there's none
+        // registered already.
+        DefaultParameterizedType currentUserReferenceResolverType =
+            new DefaultParameterizedType(null, UserReferenceResolver.class, CurrentUserReference.class);
+        if (!this.componentManager.hasComponent(currentUserReferenceResolverType)) {
+            UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver =
+                getMocker().registerMockComponent(currentUserReferenceResolverType);
+            // Ensure that getting the current user reference can be serialized to a DocumentReference that
+            // corresponds to the user in the context.
+            when(currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE))
+                .thenAnswer(invocationOnMock -> new TestDocumentUserReference(getXWikiContext().getUserReference()));
         }
 
         DefaultParameterizedType userReferenceDocumentReferenceResolverType =
@@ -1172,6 +1228,12 @@ public class MockitoOldcore
                     getMocker().getInstance(userReferenceDocumentReferenceSerializer, "document");
             }
 
+            if (!this.componentManager.hasComponent(UserPropertiesResolver.class, "all")) {
+                this.allUserPropertiesResolver = getMocker().registerMockComponent(UserPropertiesResolver.class, "all");
+            } else {
+                this.allUserPropertiesResolver = getMocker().getInstance(UserPropertiesResolver.class, "all");
+            }
+
             // we ensure that when trying to resolve a DocumentReference to UserReference, then the returned mock
             // will return the original DocumentReference when resolved back to DocumentReference.
             when(userReferenceResolver.resolve(any()))
@@ -1179,6 +1241,76 @@ public class MockitoOldcore
             when(this.documentReferenceUserReferenceSerializer.serialize(any(TestDocumentUserReference.class)))
                 .then(invocationOnMock -> invocationOnMock.<TestDocumentUserReference>getArgument(0).documentReference);
         }
+    }
+
+    private void saveDocument(DocumentReference reference, XWikiDocument document, XWikiContext xcontext)
+        throws XWikiException
+    {
+        boolean supportRevisionStore = this.componentManager.hasComponent(XWikiDocumentFilterUtils.class);
+
+        if (document.isContentDirty() || document.isMetaDataDirty()) {
+            document.setDate(new Date());
+            if (document.isContentDirty()) {
+                document.setContentUpdateDate(new Date());
+                DocumentAuthors authors = document.getAuthors();
+                authors.setContentAuthor(authors.getEffectiveMetadataAuthor());
+            }
+            document.incrementVersion();
+
+            document.setContentDirty(false);
+            document.setMetaDataDirty(false);
+
+            if (supportRevisionStore) {
+                // Save the document in the document archive.
+                getMockVersioningStore().updateXWikiDocArchive(document, true, xcontext);
+            }
+        } else {
+            if (supportRevisionStore) {
+                if (document.getDocumentArchive() != null) {
+                    getMockVersioningStore().saveXWikiDocArchive(document.getDocumentArchive(), false, xcontext);
+
+                    if (!containsVersion(document, document.getRCSVersion(), xcontext)) {
+                        getMockVersioningStore().updateXWikiDocArchive(document, false, xcontext);
+                    }
+                } else {
+                    try {
+                        document.getDocumentArchive(xcontext);
+
+                        if (!containsVersion(document, document.getRCSVersion(), xcontext)) {
+                            getMockVersioningStore().updateXWikiDocArchive(document, false, xcontext);
+                        }
+                    } catch (XWikiException e) {
+                        // this is a non critical error
+                    }
+                }
+            }
+        }
+        document.setNew(false);
+        document.setStore(getMockStore());
+
+        // Make sure the document is not restricted.
+        document.setRestricted(false);
+
+        XWikiDocument savedDocument = document;
+
+        this.documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
+
+        this.wikis.add(document.getDocumentReference().getWikiReference().getName());
+
+        // Set the document as it's original document
+        savedDocument.setOriginalDocument(savedDocument.clone());
+    }
+
+    private boolean containsVersion(XWikiDocument doc, Version targetversion, XWikiContext context)
+        throws XWikiException
+    {
+        for (Version version : doc.getRevisions(context)) {
+            if (version.equals(targetversion)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected DocumentReference resolveDocument(String documentName) throws ComponentLookupException
@@ -1261,6 +1393,11 @@ public class MockitoOldcore
     public ContextualAuthorizationManager getMockContextualAuthorizationManager()
     {
         return this.mockContextualAuthorizationManager;
+    }
+
+    public DocumentAuthorizationManager getMockDocumentAuthorizationManager()
+    {
+        return this.mockDocumentAuthorizationManager;
     }
 
     public XWikiStoreInterface getMockStore()
@@ -1384,24 +1521,25 @@ public class MockitoOldcore
         return this.wikiConfigurationSource;
     }
 
-    private void initEnvironmentDirectories()
-    {
-        File testDirectory = XWikiTempDirUtil.createTemporaryDirectory();
-
-        this.temporaryDirectory = new File(testDirectory, "temporary");
-        this.permanentDirectory = new File(testDirectory, "permanent-dir");
-    }
-
     /**
      * @since 7.2M2
      */
     public void registerMockEnvironment() throws Exception
     {
-        this.environment = getMocker().registerMockComponent(Environment.class);
+        this.environment = new TestEnvironment();
+        getMocker().registerComponent(Environment.class, this.environment);
 
-        initEnvironmentDirectories();
+        this.temporaryDirectory = this.environment.getTemporaryDirectory();
+        this.permanentDirectory = this.environment.getPermanentDirectory();
+    }
 
-        when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
-        when(this.environment.getPermanentDirectory()).thenReturn(this.permanentDirectory);
+    public UserPropertiesResolver getMockAllUserPropertiesResolver()
+    {
+        return this.allUserPropertiesResolver;
+    }
+
+    public void addWiki(String wikiId)
+    {
+        this.wikis.add(wikiId);
     }
 }

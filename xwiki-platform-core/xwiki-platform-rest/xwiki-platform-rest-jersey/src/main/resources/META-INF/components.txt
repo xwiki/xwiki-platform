@@ -1,0 +1,3 @@
+org.xwiki.rest.jersey.internal.JerseyReloadListener
+org.xwiki.rest.jersey.internal.JerseyServletContainer
+org.xwiki.rest.jersey.internal.XWikiInjectionManager

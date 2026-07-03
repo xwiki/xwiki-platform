@@ -23,6 +23,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.job.IndexerJob;
 import org.xwiki.search.solr.internal.job.IndexerRequest;
+import org.xwiki.store.ReadyIndicator;
 
 /**
  * Component that accepts XWiki {@link EntityReference}s to be indexed or deleted from the index if they exist. The
@@ -68,4 +69,10 @@ public interface SolrIndexer
      * @throws SolrIndexerException when failing to create the job
      */
     IndexerJob startIndex(IndexerRequest request) throws SolrIndexerException;
+
+    /**
+     * @return a ready indicator that indicates if all requests that have been submitted before it have been completed
+     * @since 16.9.0RC1
+     */
+    ReadyIndicator waitReady();
 }

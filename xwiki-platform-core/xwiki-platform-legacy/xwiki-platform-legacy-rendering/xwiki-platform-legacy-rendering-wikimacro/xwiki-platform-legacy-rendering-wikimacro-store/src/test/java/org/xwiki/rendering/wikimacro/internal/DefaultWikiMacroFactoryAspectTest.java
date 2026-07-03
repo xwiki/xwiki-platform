@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
+import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.annotation.ComponentList;
@@ -80,6 +81,9 @@ class DefaultWikiMacroFactoryAspectTest
 
     @MockComponent
     private ContentParser contentParser;
+
+    @MockComponent
+    private MacroContentParser macroContentParser;
 
     @MockComponent
     @Named("macro")

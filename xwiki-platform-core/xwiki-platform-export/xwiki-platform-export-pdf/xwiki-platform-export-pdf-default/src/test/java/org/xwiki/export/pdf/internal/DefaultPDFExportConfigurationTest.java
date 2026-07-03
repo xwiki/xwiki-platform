@@ -35,6 +35,8 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -122,5 +124,29 @@ class DefaultPDFExportConfigurationTest
         when(this.configDocument.containsKey("xwikiURI")).thenReturn(true);
         when(this.configDocument.getProperty("xwikiURI", "xwiki-old")).thenReturn("https://xwiki-new:9293");
         assertEquals(new URI("https://xwiki-new:9293"), this.config.getXWikiURI());
+    }
+
+    @Test
+    void isXWikiURISpecified()
+    {
+        assertFalse(this.config.isXWikiURISpecified());
+
+        when(this.configDocument.containsKey("xwikiURI")).thenReturn(true);
+        assertTrue(this.config.isXWikiURISpecified());
+
+        when(this.configDocument.containsKey("xwikiURI")).thenReturn(false);
+        when(this.xwikiProperties.containsKey("export.pdf.xwikiURI")).thenReturn(true);
+        assertTrue(this.config.isXWikiURISpecified());
+
+        when(this.xwikiProperties.containsKey("export.pdf.xwikiURI")).thenReturn(false);
+        when(this.configDocument.containsKey("xwikiHost")).thenReturn(true);
+        assertTrue(this.config.isXWikiURISpecified());
+
+        when(this.configDocument.containsKey("xwikiHost")).thenReturn(false);
+        when(this.xwikiProperties.containsKey("export.pdf.xwikiHost")).thenReturn(true);
+        assertTrue(this.config.isXWikiURISpecified());
+
+        when(this.xwikiProperties.containsKey("export.pdf.xwikiHost")).thenReturn(false);
+        assertFalse(this.config.isXWikiURISpecified());
     }
 }

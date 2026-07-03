@@ -45,7 +45,7 @@ public class SpaceRestURLGenerator extends AbstractEntityRestURLGenerator<SpaceR
         // So it is consistent.
         try {
             return Utils.createURI(getBaseURI(), SpaceResource.class, reference.getWikiReference().getName(),
-                getSpaceList(reference)).toURL();
+                getRestSpaceList(reference)).toURL();
         } catch (MalformedURLException e) {
             throw new XWikiRestException(String.format("Failed to generate a REST URL for the space [%s].", reference),
                 e);

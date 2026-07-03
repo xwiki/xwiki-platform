@@ -19,7 +19,11 @@
  */
 package org.xwiki.observation.remote;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide apis to manage the event network interface.
@@ -31,14 +35,14 @@ import org.xwiki.component.annotation.Role;
 public interface RemoteObservationManager
 {
     /**
-     * Send a event in the different network channels.
+     * Send an event to all cluster members.
      * <p>
      * This method is not supposed to be used directly for a new event unless the user specifically want to bypass or
      * emulate {@link org.xwiki.observation.ObservationManager}.
      *
-     * @param event the event
+     * @param localEvent the event to send
      */
-    void notify(LocalEventData event);
+    void notify(LocalEventData localEvent);
 
     /**
      * Inject a remote event in the local {@link org.xwiki.observation.ObservationManager}.
@@ -46,9 +50,9 @@ public interface RemoteObservationManager
      * This method is not supposed to be used directly for a new event unless the user specifically want to bypass or
      * emulate network.
      *
-     * @param event the event
+     * @param remoteEvent the event
      */
-    void notify(RemoteEventData event);
+    void notify(RemoteEventData remoteEvent);
 
     /**
      * Stop a running channel.
@@ -65,4 +69,14 @@ public interface RemoteObservationManager
      * @throws RemoteEventException error when trying to start a channel
      */
     void startChannel(String channelId) throws RemoteEventException;
+
+    /**
+     * @return the channels used to communicate with other XWiki instances
+     * @since 17.9.0RC1
+     */
+    @Unstable
+    default Collection<NetworkChannel> getChannels()
+    {
+        return List.of();
+    }
 }

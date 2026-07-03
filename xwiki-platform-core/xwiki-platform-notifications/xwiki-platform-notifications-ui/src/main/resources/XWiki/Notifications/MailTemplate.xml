@@ -124,15 +124,15 @@
     <property>
       <html>#template('notification/email/macros.vm')
 ## Main Div
-&lt;div style="font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; background-color:#F5F5F5; padding:15px; margin:0 auto; color: #1d1f24; "&gt;
+&lt;div style="font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; background-color:$theme.panelBackgroundColor; padding:15px; margin:0 auto; color: $theme.panelTextColor;"&gt;
   ## Main centered table
-  &lt;table style="max-width: 570px; margin:0 auto" cellspacing="0" cellpadding="0" width="100%" align="center"&gt;&lt;tr&gt;&lt;td&gt;
+  &lt;table style="width: 100%; max-width: 570px; margin:0 auto" cellspacing="0" cellpadding="0"&gt;&lt;tr&gt;&lt;td&gt;
     ## Logo table
-    &lt;table width="100%" border="0"&gt;&lt;tr height="55px"&gt;
+    &lt;table style="width: 100%; border: 0"&gt;&lt;tr style="height: 55px"&gt;
       ## Logo
       &lt;td align="left"&gt;&lt;a href="$xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference)"&gt;&lt;img src="cid:logo" alt="XWiki" style="max-width: 50%; max-height: 50px;"/&gt;&lt;/a&gt;&lt;/td&gt;
       ## Notification settings
-      &lt;td align="right"&gt;&lt;a href="$xwiki.getURL($emailUser, 'view', 'category=notifications')" style="color: #0088CC; text-decoration: none; font-size: 14px;"&gt;&lt;img src="cid:NECog.png" alt="" height="12" style="height: 12px"/&gt; $escapetool.xml($services.localization.render('notifications.settings.title'))&lt;/a&gt;&lt;/td&gt;
+      &lt;td align="right"&gt;&lt;a href="$xwiki.getURL($emailUser, 'view', 'category=notifications')" style="color: ${linkColor}; text-decoration: none; font-size: 14px;"&gt;&lt;img src="cid:NECog.png" alt="" height="12" style="height: 12px"/&gt; $escapetool.xml($services.localization.render('notifications.settings.title'))&lt;/a&gt;&lt;/td&gt;
     ## End of the logo table
     &lt;/tr&gt;&lt;/table&gt;
 

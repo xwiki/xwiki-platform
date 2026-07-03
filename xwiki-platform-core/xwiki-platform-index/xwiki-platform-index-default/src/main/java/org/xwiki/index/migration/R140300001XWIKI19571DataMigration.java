@@ -100,7 +100,7 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
                 PersistentClass persistentClass =
                     this.hibernateStore.getConfigurationMetadata()
                         .getEntityBinding(XWikiDocumentIndexingTask.class.getName());
-                String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
+                String tableName = this.hibernateStore.getAdapter().getTableName(persistentClass);
                 String changeSet = "";
                 if (exists(databaseMetaData, tableName)) {
                     saveTasks(session, persistentClass, tableName);
@@ -138,10 +138,10 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
      */
     private boolean exists(DatabaseMetaData databaseMetaData, String tableName) throws SQLException
     {
-        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
+        String databaseName = this.hibernateStore.getAdapter().getDatabaseFromWikiName();
 
         ResultSet resultSet;
-        if (this.hibernateStore.isCatalog()) {
+        if (this.hibernateStore.getAdapter().isCatalog()) {
             resultSet = databaseMetaData.getTables(databaseName, null, tableName, null);
         } else {
             resultSet = databaseMetaData.getTables(null, databaseName, tableName, null);

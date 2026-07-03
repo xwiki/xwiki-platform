@@ -21,7 +21,6 @@ package org.xwiki.notifications.preferences.email;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.notifications.preferences.NotificationEmailInterval;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -83,7 +82,6 @@ public interface NotificationEmailUserPreferenceManager
      * @return the hint of the strategy to use
      * @since 15.6RC1
      */
-    @Unstable
     default String getEmailGroupingStrategy(UserReference userReference, NotificationEmailInterval interval)
     {
         return "default";

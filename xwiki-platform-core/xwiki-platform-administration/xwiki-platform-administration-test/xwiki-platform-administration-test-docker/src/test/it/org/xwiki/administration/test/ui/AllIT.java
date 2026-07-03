@@ -19,7 +19,6 @@
  */
 package org.xwiki.administration.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -33,50 +32,57 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Overall Administration UI")
     class NestedAdministrationIT extends AdministrationIT
     {
     }
 
     @Nested
-    @DisplayName("Reset Password")
-    class NestedResetPasswordIT extends ResetPasswordIT
-    {
-    }
-
-    @Nested
-    @DisplayName("ConfigurableClass")
     class NestedConfigurableClassIT extends ConfigurableClassIT
     {
     }
 
     @Nested
-    @DisplayName("Users and Groups Rights Management")
     class NestedUsersGroupsRightsManagementIT extends UsersGroupsRightsManagementIT
     {
     }
 
     @Nested
-    @DisplayName("Forgot Username")
-    class NestedForgotUsernameIT extends ForgotUsernameIT
-    {
-    }
-
-    @Nested
-    @DisplayName("XAR Import")
     class NestedXARImportIT extends XARImportIT
     {
     }
 
     @Nested
-    @DisplayName("Page Templates")
     class NestedPageTemplatesIT extends PageTemplatesIT
     {
     }
     
     @Nested
-    @DisplayName("User registration")
     class NestedRegisterIT extends RegisterIT
+    {
+    }
+
+    @Nested
+    class NestedPresentationIT extends PresentationIT
+    {
+    }
+
+    @Nested
+    class NestedDateTimeIT extends DateTimeIT
+    {
+    }
+
+    @Nested
+    class NestedUserEditIT extends UserEditIT
+    {
+    }
+
+    @Nested
+    class NestedEditingIT extends EditingIT
+    {
+    }
+
+    @Nested
+    class NestedIconThemeIT extends IconThemeIT
     {
     }
 }

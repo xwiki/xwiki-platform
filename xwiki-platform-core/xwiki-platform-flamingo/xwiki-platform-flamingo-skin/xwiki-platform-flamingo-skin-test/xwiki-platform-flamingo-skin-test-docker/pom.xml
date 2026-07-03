@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-test-docker</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Test - Functional Docker Tests</name>
@@ -140,6 +140,13 @@
       <artifactId>xwiki-platform-diff-xml</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed for NameStrategiesReplaceCharacterIT -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-validation-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->
@@ -169,6 +176,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed for NameStrategiesReplaceCharacterIT: the Name Strategies administration section page object. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model-validation-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Needed or PDFExportIT -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -178,7 +192,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-test-utils</artifactId>
+      <artifactId>xwiki-platform-search-test-utils</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

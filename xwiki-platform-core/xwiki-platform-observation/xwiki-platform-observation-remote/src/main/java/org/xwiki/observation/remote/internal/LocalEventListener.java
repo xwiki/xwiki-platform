@@ -109,13 +109,11 @@ public class LocalEventListener implements EventListener
                 om.removeListener(getName());
                 this.remoteObservationManager = this.componentManager.getInstance(RemoteObservationManager.class);
                 om.addListener(this);
-
-                this.remoteObservationManager.notify(new LocalEventData(event, source, data));
             } catch (ComponentLookupException e) {
                 this.logger.error("Failed to initialize the Remote Observation Manager", e);
             }
-        } else {
-            this.remoteObservationManager.notify(new LocalEventData(event, source, data));
         }
+
+        this.remoteObservationManager.notify(new LocalEventData(event, source, data));
     }
 }

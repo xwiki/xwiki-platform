@@ -19,10 +19,10 @@
  */
 package org.xwiki.notifications.sources.internal;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,7 +60,7 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
  */
 @ComponentList({ExpressionNodeToHQLConverter.class, DefaultStringEntityReferenceSerializer.class,
     DefaultSymbolScheme.class, QueryExpressionGenerator.class})
-public class QueryGeneratorTest extends AbstractQueryGeneratorTest
+class QueryGeneratorTest extends AbstractQueryGeneratorTest
 {
     @InjectMockComponents
     private QueryGenerator queryGenerator;
@@ -75,7 +75,7 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
     private String pref1StartDateParamName;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         super.beforeEach();
 
@@ -87,15 +87,15 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryExpression() throws Exception
+    void generateQueryExpression() throws Exception
     {
         // Test
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
-        parameters.fromDate = startDate;
-        parameters.preferences = Arrays.asList(pref1);
-        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        parameters.fromDate = this.startDate;
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
         ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
@@ -117,20 +117,20 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWhenHiddenDocsAreEnabled() throws Exception
+    void generateQueryWhenHiddenDocsAreEnabled() throws Exception
     {
         // Mock
         UserProperties userProperties = mock(UserProperties.class);
         when(userProperties.displayHiddenDocuments()).thenReturn(true);
-        when(userPropertiesResolver.resolve(any(UserReference.class))).thenReturn(userProperties);
+        when(this.userPropertiesResolver.resolve(any(UserReference.class))).thenReturn(userProperties);
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
-        parameters.fromDate = startDate;
-        parameters.preferences = Arrays.asList(pref1);
-        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        parameters.fromDate = this.startDate;
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
         ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
@@ -152,15 +152,15 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithNotOnlyUnread() throws Exception
+    void generateQueryWithNotOnlyUnread() throws Exception
     {
         // Test
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
-        parameters.fromDate = startDate;
-        parameters.preferences = Arrays.asList(pref1);
-        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        parameters.fromDate = this.startDate;
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
         ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
@@ -177,7 +177,7 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithUntilDate() throws Exception
+    void generateQueryWithUntilDate() throws Exception
     {
         Date untilDate = new Date(1000000000000L);
         String untilDateParamName = String.format("date_%s", DigestUtils.sha256Hex(untilDate.toString()));
@@ -186,10 +186,10 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
-        parameters.fromDate = startDate;
+        parameters.fromDate = this.startDate;
         parameters.endDate = untilDate;
-        parameters.preferences = Arrays.asList(pref1);
-        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
         ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
@@ -211,7 +211,7 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithUntilDateAndBlackList() throws Exception
+    void generateQueryWithUntilDateAndBlackList() throws Exception
     {
         Date untilDate = new Date(1000000000000L);
 
@@ -220,9 +220,9 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.endDate = untilDate;
-        parameters.blackList = Arrays.asList("event1", "event2");
-        parameters.preferences = Arrays.asList(pref1);
-        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        parameters.blackList = List.of("event1", "event2");
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
         ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
@@ -232,16 +232,16 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithLocalUser() throws Exception
+    void generateQueryWithLocalUser() throws Exception
     {
         // Test
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
-        parameters.fromDate = startDate;
-        parameters.preferences = Arrays.asList(pref1);
-        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        parameters.fromDate = this.startDate;
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
         ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Verify
@@ -251,7 +251,7 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithFilters() throws Exception
+    void generateQueryWithFilters() throws Exception
     {
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
@@ -267,7 +267,7 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
 
         when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
         when(notificationFilter2.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
-        when(notificationFilterManager.getFiltersRelatedToNotificationPreference(anyCollection(),
+        when(this.notificationFilterManager.getFiltersRelatedToNotificationPreference(anyCollection(),
             any(NotificationPreference.class)))
                 .thenAnswer(invocationOnMock -> ((Collection) invocationOnMock.getArgument(0)).stream());
 
@@ -275,11 +275,11 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
-        parameters.fromDate = startDate;
-        parameters.blackList = Arrays.asList("event1", "event2");
-        parameters.filters = Arrays.asList(notificationFilter1, notificationFilter2);
-        parameters.preferences = Arrays.asList(pref1);
-        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        parameters.fromDate = this.startDate;
+        parameters.blackList = List.of("event1", "event2");
+        parameters.filters = List.of(notificationFilter1, notificationFilter2);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
         ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " + "AND (((TYPE = \"create\" AND DATE >= \""
@@ -289,7 +289,7 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithNoRelevantFilters() throws Exception
+    void generateQueryWithNoRelevantFilters() throws Exception
     {
 
         // Mocks
@@ -304,11 +304,11 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
-        parameters.fromDate = startDate;
-        parameters.blackList = Arrays.asList("event1", "event2");
+        parameters.fromDate = this.startDate;
+        parameters.blackList = List.of("event1", "event2");
         parameters.filters = Collections.singleton(notificationFilter1);
-        parameters.preferences = Arrays.asList(pref1);
-        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
         ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         assertEquals("(((DATE >= \"" + this.startDate.toString() + "\" " + "AND (TYPE = \"create\" AND DATE >= \""
@@ -317,7 +317,7 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
     }
 
     @Test
-    public void generateQueryWithEventTypesThatHasNoDescriptor() throws Exception
+    void generateQueryWithEventTypesThatHasNoDescriptor() throws Exception
     {
         // Mocks
         NotificationFilter notificationFilter1 = mock(NotificationFilter.class);
@@ -327,21 +327,21 @@ public class QueryGeneratorTest extends AbstractQueryGeneratorTest
                 .thenReturn(value(EventProperty.PAGE).eq(value("someValue1")).and(value("1").eq(value("1"))));
 
         when(notificationFilter1.matchesPreference(any(NotificationPreference.class))).thenReturn(true);
-        when(notificationFilterManager.getFiltersRelatedToNotificationPreference(anyCollection(),
+        when(this.notificationFilterManager.getFiltersRelatedToNotificationPreference(anyCollection(),
             any(NotificationPreference.class)))
                 .thenAnswer(invocationOnMock -> ((Collection) invocationOnMock.getArgument(0)).stream());
 
         // No matching descriptor
-        when(recordableEventDescriptorHelper.hasDescriptor("create", USER_REFERENCE)).thenReturn(false);
+        when(this.recordableEventDescriptorHelper.hasDescriptor("create", USER_REFERENCE)).thenReturn(false);
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
-        parameters.fromDate = startDate;
-        parameters.filters = Arrays.asList(notificationFilter1);
-        parameters.preferences = Arrays.asList(pref1);
-        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+        parameters.fromDate = this.startDate;
+        parameters.filters = List.of(notificationFilter1);
+        parameters.preferences = List.of(this.pref1);
+        parameters.filterPreferences = List.of(this.fakeFilterPreference);
         ExpressionNode node = this.queryGenerator.generateQueryExpression(parameters);
 
         // Expectation: no filters on "create" event type because it has no descriptor

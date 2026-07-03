@@ -26,7 +26,7 @@ import org.xwiki.extension.rating.ExtensionRating;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.rating.Ratable;
 import org.xwiki.extension.version.Version;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to a ratable extension repository.

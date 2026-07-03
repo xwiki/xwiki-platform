@@ -19,8 +19,6 @@
  */
 package org.xwiki.extension.security.internal.livedata;
 
-import javax.inject.Inject;
-
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.Test;

@@ -19,8 +19,12 @@
  */
 package org.xwiki.lesscss.internal.resources;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
@@ -28,43 +32,45 @@ import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
 import org.xwiki.template.TemplateManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Test class for {@link LESSSkinFileResourceReference}.
  *
- * @since 7.0RC1
  * @version $Id$
+ * @since 7.0RC1
  */
-public class LESSSkinFileResourceReferenceTest
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class LESSSkinFileResourceReferenceTest
 {
     private TemplateManager templateManager;
 
     private SkinManager skinManager;
 
     private Skin skin;
-    
-    @Before
-    public void setUp() throws Exception
+
+    @BeforeEach
+    void setUp()
     {
-        templateManager = mock(TemplateManager.class);
-        skinManager = mock(SkinManager.class);
-        skin = mock(Skin.class);
-        when(skinManager.getSkin("skin")).thenReturn(skin);
+        this.templateManager = mock(TemplateManager.class);
+        this.skinManager = mock(SkinManager.class);
+        this.skin = mock(Skin.class);
+        when(this.skinManager.getSkin("skin")).thenReturn(this.skin);
     }
 
     @Test
-    public void getContent() throws Exception
+    void getContent() throws Exception
     {
         LESSSkinFileResourceReference lessSkinFileResourceReference
-                = new LESSSkinFileResourceReference("style.less", templateManager, skinManager);
-        
+            = new LESSSkinFileResourceReference("style.less", this.templateManager, this.skinManager);
+
         // Mocks
         Template template = mock(Template.class);
-        when(templateManager.getTemplate("less/style.less", skin)).thenReturn(template);
+        when(this.templateManager.getTemplate("less/style.less", this.skin)).thenReturn(template);
         TemplateContent templateContent = mock(TemplateContent.class);
         when(template.getContent()).thenReturn(templateContent);
         when(templateContent.getContent()).thenReturn("// My LESS file");
@@ -74,11 +80,11 @@ public class LESSSkinFileResourceReferenceTest
     }
 
     @Test
-    public void getContentWhenFileDoesNotExist() throws Exception
+    void getContentWhenFileDoesNotExist()
     {
         LESSSkinFileResourceReference lessSkinFileResourceReference
-                = new LESSSkinFileResourceReference("not-existing-file.less", templateManager, skinManager);
-        
+            = new LESSSkinFileResourceReference("not-existing-file.less", this.templateManager, this.skinManager);
+
         // Test
         LESSCompilerException caughtException = null;
         try {
@@ -89,25 +95,25 @@ public class LESSSkinFileResourceReferenceTest
 
         // Verify
         assertNotNull(caughtException);
-        assertEquals("The template [not-existing-file.less] does not exists.", caughtException.getMessage());
+        assertEquals("The template [not-existing-file.less] does not exist.", caughtException.getMessage());
     }
 
     @Test
-    public void getContentWhenException() throws Exception
+    void getContentWhenException() throws Exception
     {
         LESSSkinFileResourceReference lessSkinFileResourceReference
-                = new LESSSkinFileResourceReference("file.less", templateManager, skinManager);
-        
+            = new LESSSkinFileResourceReference("file.less", this.templateManager, this.skinManager);
+
         // Mocks
         Template template = mock(Template.class);
-        when(templateManager.getTemplate("less/file.less", skin)).thenReturn(template);
+        when(this.templateManager.getTemplate("less/file.less", this.skin)).thenReturn(template);
         Exception exception = new Exception("exception");
         when(template.getContent()).thenThrow(exception);
 
         // Test
         LESSCompilerException caughtException = null;
         try {
-           lessSkinFileResourceReference.getContent("skin");
+            lessSkinFileResourceReference.getContent("skin");
         } catch (LESSCompilerException e) {
             caughtException = e;
         }
@@ -119,11 +125,11 @@ public class LESSSkinFileResourceReferenceTest
     }
 
     @Test
-    public void serialize() throws Exception
+    void serialize()
     {
         LESSSkinFileResourceReference lessSkinFileResourceReference
-                = new LESSSkinFileResourceReference("file.less", templateManager, skinManager);
-        
+            = new LESSSkinFileResourceReference("file.less", this.templateManager, this.skinManager);
+
         // Test
         assertEquals("LessSkinFile[file.less]", lessSkinFileResourceReference.serialize());
     }

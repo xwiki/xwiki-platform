@@ -19,11 +19,6 @@
  */
 package org.xwiki.index.tree.internal.parentchild;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -31,11 +26,11 @@ import javax.inject.Provider;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.index.tree.internal.AbstractDocumentTreeNode;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
+import org.xwiki.tree.TreeNode;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -50,50 +45,20 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("document/parentChild")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DocumentTreeNode extends org.xwiki.index.tree.internal.nestedpages.DocumentTreeNode
+public class DocumentTreeNode extends AbstractDocumentTreeNode
 {
-    @Inject
-    @Named("compact")
-    private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
-
-    @Inject
-    private DocumentQueryHelper documentQueryHelper;
-
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
-    @Override
-    protected List<DocumentReference> getChildDocuments(DocumentReference documentReference, int offset, int limit)
-        throws QueryException
-    {
-        return this.documentQueryHelper.resolve(getChildrenQuery(new DocumentReference(documentReference)), offset,
-            limit, documentReference);
-    }
-
-    private Query getChildrenQuery(DocumentReference parentReference) throws QueryException
-    {
-        List<String> constraints = new ArrayList<String>();
-        constraints.add("doc.translation = 0");
-        constraints
-            .add("(doc.parent in (:absoluteRef, :localRef) or (doc.space = :space and doc.parent = :relativeRef))");
-
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("space", this.localEntityReferenceSerializer.serialize(parentReference.getParent()));
-        parameters.put("absoluteRef", this.defaultEntityReferenceSerializer.serialize(parentReference));
-        parameters.put("localRef", this.localEntityReferenceSerializer.serialize(parentReference));
-        parameters.put("relativeRef",
-            this.compactEntityReferenceSerializer.serialize(parentReference, parentReference.getParent()));
-        Query query = this.documentQueryHelper.getQuery(constraints, parameters, getProperties());
-        query.setWiki(parentReference.getWikiReference().getName());
-        return query;
-    }
+    @Inject
+    @Named("childDocuments/parentChild")
+    private TreeNode childDocuments;
 
     @Override
-    protected int getChildDocumentsCount(DocumentReference documentReference) throws QueryException
+    public void initialize() throws InitializationException
     {
-        Query query = getChildrenQuery(documentReference);
-        query.addFilter(this.countQueryFilter);
-        return ((Long) query.execute().get(0)).intValue();
+        super.initialize();
+        this.childNodes.addTreeNode(this.childDocuments, nodeId -> true);
     }
 
     @Override

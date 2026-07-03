@@ -192,6 +192,7 @@ class DefaultDocumentRendererTest
     void renderCurrentDocument() throws Exception
     {
         when(this.xcontext.getDoc()).thenReturn(this.document);
+        when(this.document.getTranslatedDocument(this.xcontext)).thenReturn(this.document);
 
         DocumentRendererParameters rendererParameters = new DocumentRendererParameters();
         this.documentRenderer.render(this.documentReference, rendererParameters);

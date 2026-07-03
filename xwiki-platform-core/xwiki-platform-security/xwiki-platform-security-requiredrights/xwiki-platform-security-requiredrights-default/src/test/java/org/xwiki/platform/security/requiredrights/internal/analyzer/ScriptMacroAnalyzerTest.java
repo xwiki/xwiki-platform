@@ -33,7 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
-import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
+import org.xwiki.platform.security.requiredrights.display.BlockSupplierProvider;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -60,6 +60,7 @@ import com.xpn.xwiki.web.Utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -179,7 +180,11 @@ class ScriptMacroAnalyzerTest
         RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
         assertEquals(requiredRight, requiredRightResult.getRight());
         assertFalse(requiredRightResult.isManualReviewNeeded());
-        assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
+        if (isPrivileged) {
+            assertNull(requiredRightResult.getEntityType());
+        } else {
+            assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
+        }
     }
 
     private void registerMockMacro(String macroName, Macro<?> macro) throws MacroLookupException

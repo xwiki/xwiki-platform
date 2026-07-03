@@ -19,15 +19,14 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
@@ -35,7 +34,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -53,11 +52,10 @@ import com.xpn.xwiki.objects.BaseObject;
 public class WikiNotificationFilterDisplayerComponentBuilder implements WikiBaseObjectComponentBuilder
 {
     @Inject
-    private ComponentManager componentManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @Inject
-    private AuthorizationManager authorizationManager;
-
+    private Provider<WikiNotificationFilterDisplayer> wikiNotificationFilterDisplayerProvider;
 
     @Override
     public List<WikiComponent> buildComponents(BaseObject baseObject) throws WikiComponentException
@@ -68,9 +66,11 @@ public class WikiNotificationFilterDisplayerComponentBuilder implements WikiBase
             this.checkRights(parentDocument.getDocumentReference(), parentDocument.getAuthorReference());
 
             // Instantiate the component
-            return Arrays.asList(
-                    new WikiNotificationFilterDisplayer(parentDocument.getAuthorReference(),
-                            this.componentManager, baseObject));
+            WikiNotificationFilterDisplayer wikiNotificationFilterDisplayer =
+                this.wikiNotificationFilterDisplayerProvider.get();
+            wikiNotificationFilterDisplayer.initialize(parentDocument.getAuthorReference(), baseObject);
+
+            return List.of(wikiNotificationFilterDisplayer);
         } catch (Exception e) {
             throw new WikiComponentException(String.format(
                     "Unable to build the WikiNotificationFilterDisplayer wiki component "
@@ -96,7 +96,7 @@ public class WikiNotificationFilterDisplayerComponentBuilder implements WikiBase
     private void checkRights(DocumentReference documentReference, DocumentReference authorReference)
             throws NotificationException
     {
-        if (!this.authorizationManager.hasAccess(Right.ADMIN, authorReference, documentReference.getWikiReference())) {
+        if (!this.authorizationManager.hasAccess(Right.ADMIN, EntityType.WIKI, authorReference, documentReference)) {
             throw new NotificationException(
                     "Registering custom Notification Filter Displayers requires wiki administration rights.");
         }

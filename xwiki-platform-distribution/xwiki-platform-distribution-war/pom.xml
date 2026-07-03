@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war</artifactId>
   <name>XWiki Platform - Distribution - War</name>
@@ -158,13 +158,10 @@
                     <exclude>junit:*</exclude>
                     <exclude>org.junit.*:*</exclude>
                     <exclude>org.mockito:*</exclude>
-                    <exclude>javax.servlet:servlet-api:*:*:compile</exclude>
-                    <exclude>jakarta.mail:jakarta.mail-api</exclude>
+                    <exclude>jakarta.servlet:jakarta.servlet-api:*:*:compile</exclude>
                   </excludes>
                   <includes>
-                    <!-- Allow only JUnit and JMock with scope test because -->
-                    <include>org.jmock:*:*:*:test</include>
-                    <include>jmock:*:*:*:test</include>
+                    <!-- Allow only JUnit with scope test -->
                     <include>junit:*:*:*:test</include>
                     <include>org.junit.*:*:*:*:test</include>
                     <include>org.mockito:*:*:*:test</include>

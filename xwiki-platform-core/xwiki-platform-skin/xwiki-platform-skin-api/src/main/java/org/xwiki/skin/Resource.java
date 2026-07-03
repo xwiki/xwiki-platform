@@ -22,7 +22,6 @@ package org.xwiki.skin;
 import java.time.Instant;
 
 import org.xwiki.filter.input.InputSource;
-import org.xwiki.stability.Unstable;
 
 /**
  * @param <I> the type of the {@link InputSource}
@@ -65,7 +64,6 @@ public interface Resource<I extends InputSource>
      * @throws Exception when failing to get the instant of the resource
      * @since 15.8RC1
      */
-    @Unstable
     default Instant getInstant() throws Exception
     {
         return null;

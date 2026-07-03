@@ -33,6 +33,7 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -57,6 +58,9 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
+    @Inject
+    private Environment environment;
+
     private File getTemporaryZipFile(DocumentReference docReference, String attachmentName)
         throws XWikiException, IOException
     {
@@ -79,7 +83,7 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
 
         // We need to copy the attachment to a temporary file because we want ti use ZipFile
         // instead of ZipArchiveInputStream (see: http://commons.apache.org/proper/commons-compress/zip.html)
-        File tempFile = File.createTempFile(attachmentName, ".tmp");
+        File tempFile = File.createTempFile(attachmentName, ".tmp", this.environment.getTemporaryDirectory());
         // We copy the content of the attachment
         FileUtils.copyInputStreamToFile(xar.getContentInputStream(xcontext), tempFile);
 
@@ -99,28 +103,28 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
             if (tempZipFile == null) {
                 return;
             }
-            ZipFile zipFile = new ZipFile(tempZipFile);
-            // We look for each document to restore if there is a corresponding zipEntry.
-            Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
-            while (itDocumentsToRestore.hasNext()) {
-                DocumentReference docRef = itDocumentsToRestore.next();
+            try (ZipFile zipFile = new ZipFile(tempZipFile)) {
+                // We look for each document to restore if there is a corresponding zipEntry.
+                Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
+                while (itDocumentsToRestore.hasNext()) {
+                    DocumentReference docRef = itDocumentsToRestore.next();
 
-                // Compute what should be the filename of the document to restore
-                String fileNameToRestore = String.format("%s/%s.xml", docRef.getLastSpaceReference().getName(),
-                        docRef.getName());
+                    // Compute what should be the filename of the document to restore
+                    String fileNameToRestore = String.format("%s/%s.xml",
+                        docRef.getLastSpaceReference().getName(), docRef.getName());
 
-                // Get the corresponding zip Entry
-                ZipArchiveEntry zipEntry = zipFile.getEntry(fileNameToRestore);
-                if (zipEntry != null) {
-                    // Restore the document
-                    XWikiDocument docToRestore = xwiki.getDocument(docRef, xcontext);
-                    docToRestore.fromXML(zipFile.getInputStream(zipEntry));
-                    xwiki.saveDocument(docToRestore, xcontext);
-                    // We have restored this document
-                    itDocumentsToRestore.remove();
+                    // Get the corresponding zip Entry
+                    ZipArchiveEntry zipEntry = zipFile.getEntry(fileNameToRestore);
+                    if (zipEntry != null) {
+                        // Restore the document
+                        XWikiDocument docToRestore = xwiki.getDocument(docRef, xcontext);
+                        docToRestore.fromXML(zipFile.getInputStream(zipEntry));
+                        xwiki.saveDocument(docToRestore, xcontext);
+                        // We have restored this document
+                        itDocumentsToRestore.remove();
+                    }
                 }
             }
-            zipFile.close();
         } catch (IOException e) {
             logger.error("Error during the decompression of [{}].", attachmentName, e);
         } finally {

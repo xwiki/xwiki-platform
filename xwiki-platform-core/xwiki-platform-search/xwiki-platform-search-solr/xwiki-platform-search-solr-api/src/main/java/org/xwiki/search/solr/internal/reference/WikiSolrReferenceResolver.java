@@ -37,8 +37,6 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
-import com.google.common.collect.Iterables;
-
 /**
  * Resolve wiki references.
  * 
@@ -70,7 +68,7 @@ public class WikiSolrReferenceResolver extends AbstractSolrReferenceResolver
     @Override
     public List<EntityReference> getReferences(EntityReference wikiReference) throws SolrIndexerException
     {
-        List<EntityReference> result = new ArrayList<EntityReference>();
+        List<EntityReference> result = new ArrayList<>();
 
         // Ignore the wiki reference because it is not indexable.
 
@@ -89,7 +87,7 @@ public class WikiSolrReferenceResolver extends AbstractSolrReferenceResolver
                 this.explicitEntityReferenceResolver.resolve(localSpaceRef, EntityType.SPACE, wikiReference);
 
             try {
-                Iterables.addAll(result, this.spaceResolverProvider.get().getReferences(spaceReference));
+                this.spaceResolverProvider.get().getReferences(spaceReference).forEach(result::add);
             } catch (Exception e) {
                 this.logger.error("Failed to resolve references for space [" + spaceReference + "]", e);
             }

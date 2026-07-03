@@ -1,1 +1,2 @@
 org.xwiki.query.solr.internal.SolrQueryExecutor
+org.xwiki.query.solr.internal.SolrSearchExclusionsQueryFilter

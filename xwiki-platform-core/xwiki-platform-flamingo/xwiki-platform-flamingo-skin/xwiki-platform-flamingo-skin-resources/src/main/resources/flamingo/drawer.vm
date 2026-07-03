@@ -41,11 +41,6 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
         #elseif($xcontext.user == 'XWiki.XWikiGuest' && $xcontext.inactiveUserReference)
           <a href="$xwiki.getURL($xcontext.inactiveUserReference, 'view')" class="brand-user" id="tmUser">$!xwiki.getUserName($xcontext.inactiveUserReference, false)</a>
           $logoutLink
-        #else
-          <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)&loginLink=1")" id="tmLogin" rel="nofollow">$services.icon.renderHTML('log-in') $escapetool.xml($services.localization.render('login'))</a>
-          #if ($xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
-            <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister" rel="nofollow">$services.icon.renderHTML('log-in') $escapetool.xml($services.localization.render('register'))</a>
-          #end
         #end
         ##
         ## UIX

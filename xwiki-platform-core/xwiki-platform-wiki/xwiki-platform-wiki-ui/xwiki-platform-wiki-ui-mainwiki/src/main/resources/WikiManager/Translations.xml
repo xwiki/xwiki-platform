@@ -165,7 +165,6 @@ rendering.macro.workspaces.name=Workspaces (Legacy)
 rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.
 
 ## Browse
-platform.wiki.browse=Browse Wikis
 platform.wiki.browse.emptyvalue=N/A
 platform.wiki.browse.wikiprettyname=Name
 platform.wiki.browse.description=Description
@@ -244,7 +243,7 @@ admin.wikis.rights=Creation Right
 ## XWikiServer Sheet
 platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
 platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
-platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
+platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exist.
 platform.wiki.sheet.title.settings=Wiki properties
 platform.wiki.sheet.title.createnewalias=Create new alias
 platform.wiki.sheet.title.viewaliases=View aliases
@@ -301,6 +300,11 @@ platform.wiki.create.wizard.step.provisioning.finalize=Finalize
 #######################################
 platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
 platform.wiki.delete.confirmation.no=No, take me back!
+
+#######################################
+## until 18.0.0RC1
+#######################################
+platform.wiki.browse=Browse Wikis
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>

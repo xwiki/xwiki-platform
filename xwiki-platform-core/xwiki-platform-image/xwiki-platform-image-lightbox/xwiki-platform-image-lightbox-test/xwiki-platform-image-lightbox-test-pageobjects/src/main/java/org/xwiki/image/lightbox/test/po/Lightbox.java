@@ -87,6 +87,9 @@ public class Lightbox extends BaseElement
     public String getCaption()
     {
         By captionSelector = By.cssSelector("#blueimp-gallery .caption");
+        // Wait until the element is visible before continuing. Otherwise, the non-initialized element with an
+        // empty value can be used, with an empty text, leading to flaky tests.
+        getDriver().waitUntilElementIsVisible(captionSelector);
         return getDriver().findElement(captionSelector).getText();
     }
 

@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Named;
@@ -44,22 +43,37 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 public class ToggleableFilterPreferenceDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
-     * The path to the class parent document.
+     * Reference of the xclass.
+     * @since 16.3.0RC1
      */
-    private static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
+    public static final LocalDocumentReference XCLASS =
+        new LocalDocumentReference(List.of("XWiki", "Notifications", "Code"), "ToggleableFilterPreferenceClass");
+
+    /**
+     * Name of field holding the filter name.
+     * @since 16.3.0RC1
+     */
+    public static final String FIELD_FILTER_NAME = "filterName";
+
+    /**
+     * Name of the field holding the activation value.
+     * @since 16.3.0RC1
+     */
+    public static final String FIELD_IS_ENABLED = "isEnabled";
+
 
     /**
      * Default constructor.
      */
     public ToggleableFilterPreferenceDocumentInitializer()
     {
-        super(new LocalDocumentReference(PARENT_PATH, "ToggleableFilterPreferenceClass"));
+        super(XCLASS);
     }
 
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField("filterName", "Filter name", 64);
-        xclass.addBooleanField("isEnabled", "Is enabled ?", "checkbox", "", true);
+        xclass.addTextField(FIELD_FILTER_NAME, "Filter name", 64);
+        xclass.addBooleanField(FIELD_IS_ENABLED, "Is enabled ?", "checkbox", "", true);
     }
 }

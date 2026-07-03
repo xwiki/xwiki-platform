@@ -77,13 +77,13 @@ public interface Query
     String getWiki();
 
     /**
-     * Bind named parameter var with value val in query statement.
+     * Bind named parameter variable with value val in query statement.
      *
-     * @param var variable in query statement (:var).
+     * @param variable variable in query statement (:variable).
      * @param val value of the variable.
      * @return this query
      */
-    Query bindValue(String var, Object val);
+    Query bindValue(String variable, Object val);
 
     /**
      * Bind a positional parameter present in the statement (?index in XWQL) with a value. It is recommended to use
@@ -122,19 +122,19 @@ public interface Query
     }
 
     /**
-     * Bind named parameter var with a value that will be constructed using calls to
+     * Bind named parameter variable with a value that will be constructed using calls to
      * {@link QueryParameter#literal(String)}, {@link QueryParameter#anychar()} and {@link QueryParameter#anyChars()}.
      * In order to perserve the fluent API, it's also possible to call {@link QueryParameter#query()} to get back the
      * {@link Query}.
      *
-     * @param var the variable in the query statement ({@code :var}).
+     * @param variable the variable in the query statement ({@code :variable}).
      * @return an empty {@link QueryParameter} that needs to be populated by calling
      *         {@link QueryParameter#literal(String)}, {@link QueryParameter#anychar()} and
      *         {@link QueryParameter#anyChars()}
      * @since 8.4.5
      * @since 9.3RC1
      */
-    default QueryParameter bindValue(String var)
+    default QueryParameter bindValue(String variable)
     {
         throw new RuntimeException("Not implemented");
     }

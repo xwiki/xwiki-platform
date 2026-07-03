@@ -1,0 +1,202 @@
+/**
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+import FilterList from "./FilterList.vue";
+import { mount } from "@vue/test-utils";
+import flushPromises from "flush-promises";
+import $ from "jquery";
+import _ from "lodash-es";
+import { describe, expect, it, vi } from "vitest";
+import { reactive } from "vue";
+
+vi.mock("../../services/require.js", () => {
+  return {
+    loadById() {
+      return {
+        require(ids, callback) {
+          callback();
+        },
+      };
+    },
+  };
+});
+
+/**
+ * Initialize a FilterList component using default values vue test-utils `mount` parameters.
+ * The default parameters can be overridden using the `mountConfiguration` parameter.
+ *
+ * The default configuration is:
+ * ```
+ * {
+ *   provide: {
+ *     logic: {
+ *       getQueryFilterGroup() {
+ *         return {};
+ *       },
+ *       onEventWhere() {
+ *       },
+ *       getFilterDescriptor() {
+ *         return {options: ''};
+ *       }
+ *     }
+ *   }
+ * }
+ * ```
+ *
+ * @param mountConfiguration - mount parameters merged over the default configuration
+ * @returns an initialized FilterList Vue component
+ */
+function initWrapper(mountConfiguration = {}) {
+  // Define an empty xwikiSelectize to prevent the component mount to fail.
+  $.fn.xwikiSelectize = () => {};
+
+  return mount(
+    FilterList,
+    _.merge(
+      {
+        attachTo: document.body,
+        global: {
+          provide: {
+            jQuery: $,
+            logic: {
+              getQueryFilterGroup() {
+                return {};
+              },
+              onEventWhere() {},
+              getFilterDescriptor() {
+                return {
+                  options: "",
+                  operators: [],
+                };
+              },
+              translationsLoaded() {
+                return Promise.resolve(true);
+              },
+            },
+          },
+          mocks: {
+            $t: (key) => key,
+          },
+        },
+      },
+      mountConfiguration,
+    ),
+  );
+}
+
+describe("FilterList.vue", () => {
+  it("Render the filter list when visible", async () => {
+    const wrapper = initWrapper();
+    // The loader is displayed until the translations are loaded.
+    expect(wrapper.find("div").classes()).toStrictEqual(["xwiki-loader"]);
+    await flushPromises();
+    expect(wrapper.find("span").html()).toBe(
+      '<span><input class="filter-list livedata-filter" aria-label="livedata.filter.list.label"></span>',
+    );
+  });
+
+  it("Displays the empty option when the operator is switched to empty externally", async () => {
+    // Reactive filter group so that mutating the operator (as the advanced filtering panel does) triggers the
+    // component reactivity.
+    const filterGroup = reactive({
+      constraints: [{ value: "U1", operator: "contains" }],
+    });
+    const wrapper = initWrapper({
+      props: { index: 0, propertyId: "user1" },
+      global: {
+        provide: {
+          logic: {
+            getQueryFilterGroup() {
+              return filterGroup;
+            },
+          },
+        },
+      },
+    });
+    await flushPromises();
+    // The column filter initially displays the selected value.
+    expect(wrapper.vm.$refs.input.value).toBe("U1");
+
+    // Simulate selecting the "empty" operator in the advanced filtering panel.
+    filterGroup.constraints[0].operator = "empty";
+    await wrapper.vm.$nextTick();
+
+    // Verify the value is the empty operator (the comma is the convention used to display the empty
+    // option).
+    expect(wrapper.vm.$refs.input.value).toBe(",");
+  });
+
+  it("Applies the default operator when switching from the empty filter to a value", async () => {
+    const filter = vi.fn();
+    const wrapper = initWrapper({
+      props: { index: 0, propertyId: "user1" },
+      global: {
+        provide: {
+          logic: {
+            getFilterDefaultOperator() {
+              return "equals";
+            },
+            filter,
+          },
+        },
+      },
+    });
+    await flushPromises();
+    // Simulate a selectize widget with one selected (non-empty) value.
+    wrapper.vm.$refs.input.selectize = { items: ["U1"] };
+    // Simulate the user selecting a non-empty value while the empty operator is active.
+    wrapper.vm.selectizeSettings.onChange("U1");
+
+    // Make sure the filter is called with the right value.
+    expect(filter).toHaveBeenCalledWith(
+      "user1",
+      0,
+      { value: "U1" },
+      {
+        filterOperator: "equals",
+        skipFetch: false,
+      },
+    );
+  });
+
+  it("Render the filter list when Empty filter and advanced", async () => {
+    const wrapper = initWrapper({
+      props: { index: 0, isAdvanced: true },
+      global: {
+        provide: {
+          logic: {
+            getQueryFilterGroup() {
+              return {
+                constraints: [{ value: undefined, operator: "empty" }],
+              };
+            },
+          },
+        },
+      },
+    });
+    // The loader is displayed until the translations are loaded.
+    expect(wrapper.find("div").classes()).toStrictEqual(["xwiki-loader"]);
+    await flushPromises();
+    const span = wrapper.find("span");
+    expect(span.isVisible()).toBe(false);
+    expect(span.find("input").html()).toBe(
+      '<input class="filter-list livedata-filter" aria-label="livedata.filter.list.label">',
+    );
+  });
+});

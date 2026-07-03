@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.eventstream.Event;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -34,7 +33,6 @@ import org.xwiki.user.UserReference;
  * @since 15.5RC1
  */
 @Role
-@Unstable
 public interface GroupingEventManager
 {
     /**

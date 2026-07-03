@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.xar.job.diff.DiffXarJobStatus;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 /**

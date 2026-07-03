@@ -28,7 +28,6 @@
 
   CKEDITOR.plugins.add('xwiki-save', {
     requires: 'notification,xwiki-cache,xwiki-localization',
-    editors: [],
 
     init: function(editor) {
       // Make sure we restore the previous editing mode when the page is loaded from cache (back/forward/reload).
@@ -38,14 +37,6 @@
         contentTypeField.prop('disabled', true);
         editor.config.startupMode = 'source';
       }
-
-      this.editors.push(editor);
-      editor.on('destroy', (function(event) {
-        var index = this.editors.indexOf(editor);
-        if (index >= 0) {
-          this.editors.splice(index, 1);
-        }
-      }).bind(this));
 
       // Keyboard shortcuts for the edit form.
       this.addEditFormShortcutKey(editor, 'cancel', CKEDITOR.ALT + 67 /*C*/);
@@ -74,7 +65,7 @@
           // 'xwiki:document:saved' to be sure the document was saved.
           if (!data || !data['continue']) {
             submitInProgress = event.type === 'xwiki:actions:preview' || event.type === 'xwiki:actions:save';
-            this.editors.forEach(function(editor) {
+            this.getEditors().forEach(function(editor) {
               // The editor (its focus manager to be precise) is blurred (loses focus) with a delay (200ms by default).
               // When the editor loses focus its content (HTML) can suffer changes (e.g. some placeholder text is added
               // or removed, the 'cke_widget_focused' and 'cke_widget_editable_focused' CSS classes are removed, etc.).
@@ -109,10 +100,17 @@
       }).bind(this));
     },
 
+    /**
+     * @return the CKEditor instances that use this plugin and are still attached to the DOM
+     */
+    getEditors: function() {
+      return Object.values(CKEDITOR.instances).filter(editor => editor.plugins['xwiki-save'] && !editor.isDetached());
+    },
+
     updateFormFields: function(fullData) {
       var success = true;
       fullData = fullData === true;
-      this.editors.forEach(function(editor) {
+      this.getEditors().forEach(function(editor) {
         if (editor.elementMode === CKEDITOR.ELEMENT_MODE_REPLACE && !this.updateContent(editor, fullData)) {
           success = false;
         }
@@ -160,8 +158,9 @@
     },
 
     checkDirty: function() {
-      for (var i = 0; i < this.editors.length; i++) {
-        var editor = this.editors[i];
+      const editors = this.getEditors();
+      for (var i = 0; i < editors.length; i++) {
+        var editor = editors[i];
         var config = editor.config['xwiki-save'] || {};
         if (config.leaveConfirmation && editor.checkDirty()) {
           return editor;
@@ -188,5 +187,32 @@
       });
       editor.setKeystroke(shortcut, commandName);
     }
+  });
+
+  // The editor (its focus manager to be precise) is blurred (loses focus) with a delay (200ms by default). This is done
+  // using a timer. Our save listener (see above) needs to determine if a blur is scheduled and for this it checks this
+  // timer. Unfortunately the timer is nullified (deleted) only when the scheduled blur handler is executed, but not
+  // when it's canceled (i.e. when clearTimeout is called). This means that our save listener above may blur the editor
+  // even if there's no scheduled blur, just because the last blur was canceled. To overcome this we override the focus
+  // manager's methods to nullify the timer when it's canceled.
+  function nullifyBlurTimerOnClearTimeout(originalMethod) {
+    return function(...args) {
+      const originalClearTimeout = clearTimeout;
+      const focusManager = this;
+      try {
+        clearTimeout = function(...args) {
+          if (focusManager._.timer === args[0]) {
+            delete focusManager._.timer;
+          }
+          return originalClearTimeout.apply(this, args);
+        };
+        return originalMethod.apply(this, args);
+      } finally {
+        clearTimeout = originalClearTimeout;
+      }
+    };
+  }
+  ['focus', 'blur'].forEach(function(method) {
+    CKEDITOR.focusManager.prototype[method] = nullifyBlurTimerOnClearTimeout(CKEDITOR.focusManager.prototype[method]);
   });
 })();

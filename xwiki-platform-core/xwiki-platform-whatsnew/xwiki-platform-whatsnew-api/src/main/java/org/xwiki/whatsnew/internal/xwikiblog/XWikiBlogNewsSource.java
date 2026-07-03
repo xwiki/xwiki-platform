@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.joda.time.DateTime;
@@ -169,7 +168,7 @@ public class XWikiBlogNewsSource implements NewsSource
             } else {
                 itemStream = rssReader.read(this.rssStream);
             }
-            articles = itemStream.collect(Collectors.toList());
+            articles = itemStream.toList();
         } catch (IOException e) {
             String message = String.format("Failed to read RSS for [%s]", computedRSSURL);
             throw new NewsException(message, e);

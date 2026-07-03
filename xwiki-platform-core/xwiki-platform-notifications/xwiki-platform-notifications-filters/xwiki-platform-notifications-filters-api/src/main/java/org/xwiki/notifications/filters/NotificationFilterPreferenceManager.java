@@ -94,8 +94,7 @@ public interface NotificationFilterPreferenceManager
             NotificationFilterType filterType, NotificationFormat format);
 
     /**
-     * Save the given set of {@link NotificationFilterPreference} against their respective
-     * {@link NotificationFilterPreferenceProvider}.
+     * Save the given set of {@link NotificationFilterPreference}.
      *
      * @param user the user to use
      * @param notificationFilterPreferences a set of {@link NotificationFilterPreference} to save
@@ -104,7 +103,8 @@ public interface NotificationFilterPreferenceManager
      * @since 10.8.3
      * @since 9.11.9
      */
-    void saveFilterPreferences(DocumentReference user, Set<NotificationFilterPreference> notificationFilterPreferences);
+    void saveFilterPreferences(DocumentReference user, Set<NotificationFilterPreference> notificationFilterPreferences)
+        throws NotificationException;
 
     /**
      * Delete a filter preference.
@@ -117,6 +117,21 @@ public interface NotificationFilterPreferenceManager
      * @since 9.11.9
      */
     void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
+
+    /**
+     * Delete a set of filter preferences.
+     * @param user the user to use
+     * @param filterPreferenceIds ids of the filter preferences
+     * @throws NotificationException if an error happens
+     *
+     * @since 15.10.2
+     * @since 16.0.0RC1
+     */
+    default void deleteFilterPreferences(DocumentReference user, Set<String> filterPreferenceIds)
+        throws NotificationException
+    {
+        // Do nothing
+    }
 
     /**
      * Delete a filter preference.

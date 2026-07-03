@@ -199,8 +199,6 @@ public interface SolrUtils
      */
     void set(String fieldName, Collection<?> fieldValue, SolrInputDocument document);
 
-
-
     /**
      * Store in the document the value associated with the passed field name.
      * <p>
@@ -291,7 +289,6 @@ public interface SolrUtils
         return toFilterQueryString(fieldValue, valueType);
     }
 
-
     /**
      * Extract from the document the value associated with the passed field name.
      * 
@@ -328,6 +325,21 @@ public interface SolrUtils
     default <T> Collection<T> getCollection(String fieldName, SolrDocument document, Type targetType)
     {
         return getCollection(fieldName, document);
+    }
+
+    /**
+     * Extract from the document the values associated with the passed field name.
+     * 
+     * @param <T> the of the value to return
+     * @param fieldName the name of the field in the document
+     * @param document the Solr document
+     * @param targetType the type of the value to return
+     * @return the value associated with the passed field name in the document
+     * @since 16.8.0RC1
+     */
+    default <T> List<T> getList(String fieldName, SolrDocument document, Type targetType)
+    {
+        return getList(fieldName, document);
     }
 
     /**

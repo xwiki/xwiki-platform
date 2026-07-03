@@ -40,17 +40,18 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.tree.AbstractTreeNode;
+import org.xwiki.tree.EntityTreeNode;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserPropertiesResolver;
 
 /**
  * Base class for tree nodes that represent entities.
- * 
+ *
  * @version $Id$
  * @since 8.3M2
  * @since 7.4.5
  */
-public abstract class AbstractEntityTreeNode extends AbstractTreeNode
+public abstract class AbstractEntityTreeNode extends AbstractTreeNode implements EntityTreeNode
 {
     /**
      * There is a single farm node and this is its id.
@@ -76,6 +77,11 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
     @Inject
     @Named("entityTreeNodeId")
     private Converter<EntityReference> entityTreeNodeIdConverter;
+
+    protected AbstractEntityTreeNode(String type)
+    {
+        super(type);
+    }
 
     protected EntityReference resolve(String nodeId)
     {
@@ -108,8 +114,8 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
 
     protected int getChildSpacesCount(EntityReference parentReference) throws QueryException
     {
-        List<String> constraints = new ArrayList<String>();
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        List<String> constraints = new ArrayList<>();
+        Map<String, Object> parameters = new HashMap<>();
 
         EntityReference parentSpaceReference = parentReference.extractReference(EntityType.SPACE);
         if (parentSpaceReference != null) {
@@ -151,14 +157,14 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
 
     protected Set<EntityReference> getExcludedEntities(String parentNodeId)
     {
-        return getExclusions(parentNodeId).stream().map(nodeId -> this.resolve(nodeId)).filter(Objects::nonNull)
+        return getExclusions(parentNodeId).stream().map(this::resolve).filter(Objects::nonNull)
             .collect(Collectors.toSet());
     }
 
     protected Set<String> getExcludedWikis()
     {
         return getExcludedEntities(FARM_NODE_ID).stream().filter(AbstractEntityTreeNode::isWiki)
-            .map(entityReference -> entityReference.getName()).collect(Collectors.toSet());
+            .map(EntityReference::getName).collect(Collectors.toSet());
     }
 
     protected Set<String> getExcludedSpaces(EntityReference parentReference)
@@ -173,8 +179,7 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
 
     protected Set<String> getExcludedDocuments(EntityReference parentReference)
     {
-        return getExcludedEntities(serialize(parentReference)).stream()
-            .filter(entityReference -> this.isTerminalDocument(entityReference))
+        return getExcludedEntities(serialize(parentReference)).stream().filter(this::isTerminalDocument)
             .filter(entityReference -> entityReference.hasParent(parentReference))
             .map(entityReference -> this.localEntityReferenceSerializer.serialize(entityReference))
             .collect(Collectors.toSet());

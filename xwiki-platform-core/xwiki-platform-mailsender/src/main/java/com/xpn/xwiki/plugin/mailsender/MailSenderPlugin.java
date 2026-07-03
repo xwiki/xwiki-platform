@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -59,6 +60,7 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.environment.Environment;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.velocity.VelocityManager;
@@ -124,6 +126,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /** The name of the header that specifies the sender of the mail. */
     private static final String FROM = "From";
+
+    private final Environment environment = Utils.getComponent((Type) Environment.class);
 
     /**
      * Default plugin constructor.
@@ -271,10 +275,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     {
         String name = attachment.getFilename();
         byte[] stream = attachment.getContent();
-        File temp = new TemporaryFile(File.createTempFile("tmpfile", ".tmp"));
-        FileOutputStream fos = new FileOutputStream(temp);
-        fos.write(stream);
-        fos.close();
+        File temp = new TemporaryFile(File.createTempFile("tmpfile", ".tmp", this.environment.getTemporaryDirectory()));
+        try (FileOutputStream fos = new FileOutputStream(temp)) {
+            fos.write(stream);
+        }
         DataSource source = new FileDataSource(temp);
         MimeBodyPart part = new MimeBodyPart();
         String mimeType = MimeTypesUtil.getMimeTypeFromFilename(name);
@@ -299,7 +303,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     {
         Multipart multipart;
         List<Attachment> rawAttachments =
-            mail.getAttachments() != null ? mail.getAttachments() : new ArrayList<Attachment>();
+            mail.getAttachments() != null ? mail.getAttachments() : new ArrayList<>();
 
         if (mail.getHtmlPart() == null && mail.getAttachments() != null) {
             multipart = new MimeMultipart("mixed");
@@ -315,8 +319,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             }
         } else {
             multipart = new MimeMultipart("mixed");
-            List<Attachment> attachments = new ArrayList<Attachment>();
-            List<Attachment> embeddedImages = new ArrayList<Attachment>();
+            List<Attachment> attachments = new ArrayList<>();
+            List<Attachment> embeddedImages = new ArrayList<>();
 
             // Create the text part of the email
             BodyPart textPart;
@@ -335,7 +339,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             Pattern cidPattern =
                 Pattern.compile("src=('|\")cid:([^'\"]*)('|\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
             Matcher matcher = cidPattern.matcher(mail.getHtmlPart());
-            List<String> foundEmbeddedImages = new ArrayList<String>();
+            List<String> foundEmbeddedImages = new ArrayList<>();
             while (matcher.find()) {
                 foundEmbeddedImages.add(matcher.group(2));
             }
@@ -416,9 +420,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                     value += line;
                     line = input.readLine();
                 }
-                if (header.equals(SUBJECT)) {
+                if (SUBJECT.equals(header)) {
                     toMail.setSubject(value);
-                } else if (header.equals(FROM)) {
+                } else if (FROM.equals(header)) {
                     toMail.setFrom(value);
                 } else {
                     toMail.setHeader(header, value);
@@ -600,7 +604,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     public boolean sendMail(Mail mailItem, MailConfiguration mailConfiguration, XWikiContext context)
         throws MessagingException, UnsupportedEncodingException
     {
-        ArrayList<Mail> mailList = new ArrayList<Mail>();
+        ArrayList<Mail> mailList = new ArrayList<>();
         mailList.add(mailItem);
         return sendMails(mailList, mailConfiguration, context);
     }

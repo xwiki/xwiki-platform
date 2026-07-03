@@ -19,8 +19,6 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -99,7 +97,7 @@ class ObjectPropertySolrMetadataExtractorTest
     private final XWikiDocument translatedDocument = mock(XWikiDocument.class, Locale.FRENCH.toString());
 
     private final DocumentReference documentReference =
-        new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"), "WebHome");
+        new DocumentReference("wiki", List.of("Path", "To", "Page"), "WebHome");
 
     private final DocumentReference frenchDocumentReference =
         new DocumentReference(this.documentReference, Locale.FRENCH);
@@ -142,7 +140,8 @@ class ObjectPropertySolrMetadataExtractorTest
 
     @ParameterizedTest
     @MethodSource("getDocumentWithPropertyParameters")
-    void getDocumentWithProperty(PropertyClass propertyClass, Object value, boolean obfuscate, boolean visible)
+    void getDocumentWithProperty(PropertyClass propertyClass, Object value, boolean obfuscate, boolean visible,
+        boolean isSensitive)
         throws Exception
     {
         when(this.mailConfiguration.shouldObfuscate()).thenReturn(obfuscate);
@@ -155,9 +154,10 @@ class ObjectPropertySolrMetadataExtractorTest
         when(property.getName()).thenReturn(propertyName);
         when(property.getValue()).thenReturn(value);
         when(property.getObject()).thenReturn(object);
+        when(property.isSensitive(this.xcontext)).thenReturn(isSensitive);
 
         // Mock the class reference
-        DocumentReference classReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Class");
+        DocumentReference classReference = new DocumentReference("wiki", List.of("Path", "To"), "Class");
 
         BaseClass xclass = mock(BaseClass.class);
         when(object.getXClass(this.xcontext)).thenReturn(xclass);
@@ -167,6 +167,9 @@ class ObjectPropertySolrMetadataExtractorTest
         when(object.getRelativeXClassReference())
             .thenReturn(classReference.removeParent(classReference.getWikiReference()));
         when(xclass.get(propertyName)).thenReturn(propertyClass);
+        if (obfuscate) {
+            when(property.isSensitive(xcontext)).thenReturn(true);
+        }
 
         BaseObjectReference objectReference = new BaseObjectReference(classReference, 0, this.documentReference);
         ObjectPropertyReference propertyReference = new ObjectPropertyReference(propertyName, objectReference);
@@ -194,7 +197,7 @@ class ObjectPropertySolrMetadataExtractorTest
             if (value instanceof List) {
                 values = (List<?>) value;
             } else {
-                values = Collections.singletonList(value);
+                values = List.of(value);
             }
             assertEquals(values, solrDocument.getFieldValues(fieldName));
             assertEquals(values, solrDocument.getFieldValues(localizedFieldName));
@@ -207,11 +210,11 @@ class ObjectPropertySolrMetadataExtractorTest
     static Stream<Arguments> getDocumentWithPropertyParameters()
     {
         return Stream.of(
-            arguments(mock(StringClass.class), "value", false, true),
-            arguments(mock(EmailClass.class), "email@example.com", false, true),
-            arguments(mock(EmailClass.class), "hidden@example.com", true, false),
-            arguments(mock(PasswordClass.class), "passw0rd", false, false),
-            arguments(mock(StaticListClass.class), List.of("red", "green"), false, true)
+            arguments(mock(StringClass.class), "value", false, true, false),
+            arguments(mock(EmailClass.class), "email@example.com", false, true, false),
+            arguments(mock(EmailClass.class), "hidden@example.com", true, false, false),
+            arguments(mock(PasswordClass.class), "passw0rd", false, false, true),
+            arguments(mock(StaticListClass.class), List.of("red", "green"), false, true, false)
         );
     }
 

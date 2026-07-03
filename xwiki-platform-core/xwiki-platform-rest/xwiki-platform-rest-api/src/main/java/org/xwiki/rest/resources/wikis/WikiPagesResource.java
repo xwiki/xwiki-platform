@@ -34,6 +34,8 @@ import org.xwiki.rest.model.jaxb.Pages;
 @Path("/wikis/{wikiName}/pages")
 public interface WikiPagesResource
 {
+    // FIXME: Write Javadoc describing the REST API parameters
+    @SuppressWarnings("checkstyle:MissingJavadocMethod")
     @GET Pages getPages(
             @PathParam("wikiName") String wikiName,
             @QueryParam("start") @DefaultValue("0") Integer start,

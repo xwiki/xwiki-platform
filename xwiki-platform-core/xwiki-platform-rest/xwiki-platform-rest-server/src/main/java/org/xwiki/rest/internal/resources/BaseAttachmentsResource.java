@@ -34,13 +34,16 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
+import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -56,6 +59,9 @@ import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -67,6 +73,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class BaseAttachmentsResource extends XWikiResource
 {
     /**
@@ -113,6 +120,9 @@ public class BaseAttachmentsResource extends XWikiResource
     }
 
     @Inject
+    protected ContextualAuthorizationManager authorization;
+
+    @Inject
     private ModelFactory modelFactory;
 
     @Inject
@@ -126,6 +136,13 @@ public class BaseAttachmentsResource extends XWikiResource
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
+    @Inject
+    private XWikiAttachmentSecurityManager attachmentSecurityManager;
 
     /**
      * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
@@ -152,15 +169,19 @@ public class BaseAttachmentsResource extends XWikiResource
 
             List<Object> queryResults = getAttachmentsQuery(scope, filters).setLimit(limit).setOffset(offset).execute();
             attachments.withAttachments(queryResults.stream().map(this::processAttachmentsQueryResult)
+                // Apply passed filters
                 .filter(getFileTypeFilter(filters.getOrDefault(FILTER_FILE_TYPES, "")))
+                // Filter out attachments the current user is not allowed to see
+                .filter(a -> authorization.hasAccess(Right.VIEW, a.getReference()))
+                // Convert XWikiAttachment to REST Attachment
                 .map(xwikiAttachment -> toRestAttachment(xwikiAttachment, withPrettyNames))
-                .collect(Collectors.toList()));
+                .toList());
         } catch (QueryException e) {
             throw new XWikiRestException(e);
         } finally {
             xcontext.setWikiId(database);
         }
-
+        
         return attachments;
     }
 
@@ -347,8 +368,8 @@ public class BaseAttachmentsResource extends XWikiResource
     {
         Attachments attachments = this.objectFactory.createAttachments();
 
-        RangeIterable<com.xpn.xwiki.api.Attachment> attachmentsRange =
-            new RangeIterable<com.xpn.xwiki.api.Attachment>(doc.getAttachmentList(), start, number);
+        RangeIterable<com.xpn.xwiki.api.Attachment> attachmentsRange = new RangeIterable<>(doc.getAttachmentList(),
+            start, number);
         for (com.xpn.xwiki.api.Attachment xwikiAttachment : attachmentsRange) {
             attachments.getAttachments().add(
                 this.modelFactory.toRestAttachment(this.uriInfo.getBaseUri(), xwikiAttachment, withPrettyNames, false));
@@ -411,7 +432,11 @@ public class BaseAttachmentsResource extends XWikiResource
                 String.format("Failed to instantiate a [%s] component.", AttachmentValidator.class.getName()), e);
         }
 
-        // Set the document author.
+        // Set the document creator / author.
+        if (document.isNew()) {
+            document.getAuthors()
+                .setCreator(this.documentReferenceUserReferenceResolver.resolve(xcontext.getUserReference()));
+        }
         document.setAuthorReference(xcontext.getUserReference());
 
         // Calculate and store the attachment media type.
@@ -423,5 +448,34 @@ public class BaseAttachmentsResource extends XWikiResource
         xwiki.saveDocument(document, xcontext);
 
         return attachment;
+    }
+
+    /**
+     * Compute a proper Response for the REST API based on the given attachment to return.
+     * @param xwikiAttachment the attachment to return
+     * @return a {@link Response} with proper metadata to return the attachment
+     * @throws XWikiRestException in case of problem when loading the content of the attachment
+     * @since 18.4.0
+     * @since 17.10.9
+     */
+    public Response answerWithAttachment(com.xpn.xwiki.api.Attachment xwikiAttachment) throws XWikiRestException
+    {
+        if (xwikiAttachment == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+
+        boolean shouldBeDownloaded = attachmentSecurityManager.shouldBeDownloaded(xwikiAttachment);
+        try {
+            return Response
+                .ok()
+                .type(xwikiAttachment.getMimeType())
+                .entity(xwikiAttachment.getContent())
+                .header("Content-Disposition",
+                    attachmentSecurityManager.getContentDispositionHeader(
+                        xwikiAttachment.getFilename(), shouldBeDownloaded))
+                .build();
+        } catch (XWikiException e) {
+            throw new XWikiRestException(e);
+        }
     }
 }

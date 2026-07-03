@@ -35,13 +35,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
-import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceConfiguration;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -75,6 +75,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Component
 @Singleton
 @Named("R140401000XWIKI15460")
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
@@ -95,9 +96,6 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
-    private NotificationFilterPreferenceConfiguration filterPreferenceConfiguration;
-
-    @Inject
     private QueryManager queryManager;
 
     @Inject
@@ -106,6 +104,9 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
 
     @Inject
     private UserManager userManager;
+
+    @Inject
+    private ConfigurationSource configurationSource;
 
     @Override
     public XWikiDBVersion getVersion()
@@ -139,11 +140,16 @@ public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigr
         // Stop the execution early if the configuration uses the main store and we are not upgrading the main wiki.
         // This check cannot be done in #shouldExecute because possibly missing columns are not yet added to the 
         // database.
-        if (this.filterPreferenceConfiguration.useMainStore() && !isMainWiki) {
+        if (useMainStore() && !isMainWiki) {
             return;
         }
 
         internalHibernateMigrate(isMainWiki);
+    }
+
+    private boolean useMainStore()
+    {
+        return this.configurationSource.getProperty("eventstream.usemainstore", true);
     }
 
     private void internalHibernateMigrate(boolean isMainWiki) throws DataMigrationException

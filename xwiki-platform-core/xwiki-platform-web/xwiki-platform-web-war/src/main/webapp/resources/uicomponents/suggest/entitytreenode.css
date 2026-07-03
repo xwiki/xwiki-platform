@@ -1,0 +1,7 @@
+/* Align the dropdown (drawn by bootstrap) with the suggest input (drawn by selectize) */
+.type-selector-with-suggest {
+  margin-top: -5px !important;
+}
+.entity-type-label {
+  padding-right: 0.5em;
+}

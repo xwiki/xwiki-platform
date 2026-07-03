@@ -35,4 +35,13 @@ public class ExtensionSecurityException extends Exception
     {
         super(message, cause);
     }
+
+    /**
+     * @param message the exception message
+     * @since 15.10.2
+     */
+    public ExtensionSecurityException(String message)
+    {
+        super(message);
+    }
 }

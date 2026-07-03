@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -114,7 +113,7 @@ public class DistributionPingDataProvider extends AbstractPingDataProvider
                 // ExtensionId class, and we want to make it easy to query later on.
                 extensionPing.setFeatures(features.stream()
                     .map(ExtensionId::toString)
-                    .collect(Collectors.toList()));
+                    .toList());
             }
             distributionPing.setExtension(extensionPing);
         }

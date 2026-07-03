@@ -36,7 +36,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -72,6 +72,7 @@ import com.xpn.xwiki.api.Attachment;
  * @since 9.6RC1
  * @version $Id$
  */
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessage>, Iterable<MimeMessage>
 {
     private static final String EVENTS = "events";
@@ -411,11 +412,14 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         XWikiContext xcontext = this.xcontextProvider.get();
 
         WikiReference currentWiki = xcontext.getWikiReference();
+        DocumentReference currentContextUser = xcontext.getUserReference();
 
         ExtendedMimeMessage message = null;
         try {
             // Switch to user's wiki to make sure the mail is generated from target user point of view
             xcontext.setWikiReference(this.currentUser.getWikiReference());
+            // Ensure to use the user we target in email to properly create notifications.
+            xcontext.setUserReference(this.currentUser);
 
             DocumentReference templateDocumentReference =
                 this.documentReferenceResolver.resolve(this.templateReference, this.currentUser);
@@ -423,6 +427,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
             updateFactoryParameters(templateDocumentReference);
             message = ExtendedMimeMessage.wrap(this.factory.createMessage(templateDocumentReference,
                 this.factoryParameters));
+            message.setHeader("Auto-Submitted", "auto-generated");
+            message.setHeader("X-Auto-Response-Suppress", "All");
 
             List<EntityEvent> events = new ArrayList<>();
             this.currentEvents.forEach(
@@ -434,6 +440,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         } finally {
             // Restore wiki
             xcontext.setWikiReference(currentWiki);
+            // Restore context user
+            xcontext.setUserReference(currentContextUser);
         }
 
         // Look for the next email to send

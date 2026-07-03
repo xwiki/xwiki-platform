@@ -256,7 +256,7 @@
 
     // Add a launch tour link to the actions column.
     if (row.find('.actionLaunch').length == 0) {
-      $('&lt;a class="action actionLaunch"&gt;$services.icon.renderHTML("play") $escapetool.javascript($escapetool.xml($services.localization.render("tour.livetable._actions.launch")))&lt;/a&gt;')
+      $('&lt;a class="action actionLaunch"&gt;$escapetool.javascript($services.icon.renderHTML("play")) $escapetool.javascript($escapetool.xml($services.localization.render("tour.livetable._actions.launch")))&lt;/a&gt;')
         .attr('href', targetPageDocument.getURL('view', 'startTour=true'))
         .css('padding-left', '1px').appendTo(row.find('.actions'));
     }

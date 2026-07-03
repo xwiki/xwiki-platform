@@ -19,15 +19,12 @@
  */
 package org.xwiki.whatsnew;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception raised when an error occurs in the What's New extension.
  *
  * @version $Id$
  * @since 15.1RC1
  */
-@Unstable
 public class NewsException extends Exception
 {
     /**

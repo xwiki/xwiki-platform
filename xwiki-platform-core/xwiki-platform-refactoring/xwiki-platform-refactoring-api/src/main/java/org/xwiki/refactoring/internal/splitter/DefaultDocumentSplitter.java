@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -62,6 +63,8 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  */
 @Component
 @Singleton
+// Fan out of 22 on a max of 20
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultDocumentSplitter implements DocumentSplitter
 {
     /**
@@ -82,7 +85,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
     public List<WikiDocument> split(WikiDocument rootDoc, SplittingCriterion splittingCriterion,
         NamingCriterion namingCriterion)
     {
-        List<WikiDocument> result = new ArrayList<WikiDocument>();
+        List<WikiDocument> result = new ArrayList<>();
         // Add the rootDoc into the result
         result.add(rootDoc);
         // Recursively split the root document.
@@ -202,7 +205,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
             String fragment = null;
             if (isDocument(resoureceType) && StringUtils.isEmpty(reference.getReference())) {
                 fragment = reference.getParameter(ANCHOR_PARAMETER);
-            } else if (StringUtils.startsWith(reference.getReference(), "#")
+            } else if (Strings.CS.startsWith(reference.getReference(), "#")
                 && (ResourceType.PATH.equals(resoureceType) || ResourceType.URL.equals(resoureceType))) {
                 fragment = reference.getReference().substring(1);
             }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -87,7 +89,8 @@ public class DeletePageConfirmationPage extends ConfirmationPage
     {
         WebElement element = getDriver().findElement(By.id("newBacklinkTarget"));
         SuggestInputElement suggestInputElement = new SuggestInputElement(element);
-        suggestInputElement.clearSelectedSuggestions().sendKeys(target).selectTypedText();
+        suggestInputElement.click().waitForSuggestions().clearSelectedSuggestions().sendKeys(target)
+            .waitForSuggestions().selectTypedText();
     }
 
     /**
@@ -145,5 +148,21 @@ public class DeletePageConfirmationPage extends ConfirmationPage
     {
         clickYes();
         return new DeletingPage();
+    }
+
+    /**
+     * Open the Affect Children Panel.
+     *
+     * @since 16.0.0RC1
+     */
+    public void openAffectChildrenPanel()
+    {
+        WebElement panelCollapseButton =
+            getDriver().findElementWithoutWaiting(By.cssSelector(".panel-collapse-carret"));
+        panelCollapseButton.click();
+        getDriver().waitUntilCondition(input -> {
+            String[] classes = panelCollapseButton.getAttribute("class").split("\\s+");
+            return !List.of(classes).contains("collapsed");
+        });
     }
 }

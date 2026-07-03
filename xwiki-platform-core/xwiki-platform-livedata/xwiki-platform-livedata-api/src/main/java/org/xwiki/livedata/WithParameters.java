@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.text.XWikiToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -82,5 +83,13 @@ public class WithParameters
         }
 
         return false;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("parameters", parameters)
+            .toString();
     }
 }

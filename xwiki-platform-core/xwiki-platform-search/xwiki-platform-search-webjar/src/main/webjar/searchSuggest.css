@@ -1,0 +1,30 @@
+#template('colorThemeInit.vm')
+
+div.suggestItems.searchSuggest {
+  border-top: 1px solid var(--xwiki-border-color);
+  border-radius: var(--border-radius-base);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.175);
+  overflow: hidden;
+}
+
+.xlist .xitem .xitemcontainer {
+  padding: 0;
+}
+
+.xlist .xitem .xitemcontainer:hover {
+  background-color: transparent;
+}
+
+ul.xlist li.showAllResults {
+  padding:0;
+}
+
+ul.xlist li.showAllResults.loading {
+  background-position: calc(100% - 6px) center;
+}
+
+ul.xlist li.showAllResults button.xitemcontainer {
+  padding: 4px 8px;
+  font-size: 1em;
+  color: var(--link-color);
+}

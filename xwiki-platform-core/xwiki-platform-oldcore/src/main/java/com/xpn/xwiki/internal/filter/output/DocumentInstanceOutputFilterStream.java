@@ -46,7 +46,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
-import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 
 /**
  * @version $Id$
@@ -252,16 +251,6 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
                 xcontext.getWiki().saveDocument(document, inputDocument.getComment(), inputDocument.isMinorEdit(),
                     xcontext);
-
-                if (!hasJRCSHistory) {
-                    // Not a JRCS based history document
-                    // Explicitly update the history because the store won't do it automatically (because
-                    // metadata/content dirty is false)
-                    XWikiVersioningStoreInterface versioningStore = document.getVersioningStore(xcontext);
-                    if (versioningStore != null) {
-                        versioningStore.updateXWikiDocArchive(document, true, xcontext);
-                    }
-                }
             } else {
                 // Forget the input history to let the store do its standard job
                 document.setDocumentArchive((XWikiDocumentArchive) null);
@@ -292,8 +281,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     {
         // Document author
         UserReference authorUserReference = this.documentReferenceUserReferenceResolver.resolve(authorReference);
-        document.getAuthors().setEffectiveMetadataAuthor(authorUserReference);
-        document.getAuthors().setOriginalMetadataAuthor(authorUserReference);
+        document.setAuthor(authorUserReference);
 
         // Attachments author
         for (XWikiAttachment attachment : document.getAttachmentList()) {
@@ -310,8 +298,8 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             documentAuthors.copyAuthors(inputDocumentAuthors);
         } else {
             documentAuthors.setEffectiveMetadataAuthor(inputDocumentAuthors.getEffectiveMetadataAuthor());
-            documentAuthors.setContentAuthor(inputDocumentAuthors.getContentAuthor());
             documentAuthors.setOriginalMetadataAuthor(inputDocumentAuthors.getOriginalMetadataAuthor());
+            documentAuthors.setContentAuthor(inputDocumentAuthors.getContentAuthor());
         }
 
         // Attachments author

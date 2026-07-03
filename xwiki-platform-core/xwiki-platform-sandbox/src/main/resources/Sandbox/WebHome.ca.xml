@@ -50,7 +50,7 @@ Aguí hi han un grapat de pàgines de proves amb les quals podeu jugar-hi:
 
 A continuació hi ha una demostració de la [[sintaxi d'XWiki&gt;&gt;XWiki.XWikiSyntax]] que podeu utilitzar en pàgines de la wiki (encapçalaments, imatges, taules).
 
-= Encapçalaments =
+== Encapçalaments ==
 
 XWiki ofereix 6 nivells d'encapçalaments. Els podeu utilitzar per a estructurar les vostres pàgines.
 
@@ -64,7 +64,7 @@ XWiki ofereix 6 nivells d'encapçalaments. Els podeu utilitzar per a estructurar
 
 ====== Encapçalament de nivell 6 ======
 
-= Estils =
+== Estils ==
 
 Estils bàsics que estan suportats en la XWiki:
 
@@ -75,11 +75,11 @@ Estils bàsics que estan suportats en la XWiki:
 * Text en ,,sub-índex,,
 * Text en ^^super-índex^^
 
-= Llistes =
+== Llistes ==
 
 Podeu crear diversos tipus de llistes en les vostres pàgines wiki:
 
-== Llista desordenada ==
+=== Llista desordenada ===
 
 * Nivell 1
 ** Nivell 2
@@ -87,14 +87,14 @@ Podeu crear diversos tipus de llistes en les vostres pàgines wiki:
 ** Nivell 2
 * Nivell 1
 
-== Llista ordenada ==
+=== Llista ordenada ===
 
 1. Ítem
 11. Subítem
 111. Ítem
 1. Subítem
 
-== Llista mesclada ==
+=== Llista mesclada ===
 
 1. Ítem 1
 11. Ítem 2
@@ -102,23 +102,23 @@ Podeu crear diversos tipus de llistes en les vostres pàgines wiki:
 11*. Ítem 4
 1. Ítem 5
 
-= Taules =
+== Taules ==
 
 Podeu crear taules a l'interior de les pàgines de la wiki:
 
-== Taula amb 1 fila de capçaleres ==
+=== Taula amb 1 fila de capçaleres ===
 
 |= capçalera de la taula |= capçalera de la taula |= capçalera de la taula
 | cel·la | cel·la | cel·la
 | cel·la | cel·la | cel·la
 
-== Taula amb 2 files de capçaleres ==
+=== Taula amb 2 files de capçaleres ===
 
 |= capçalera de la taula |= capçalera de la taula |= capçalera de la taula
 |= capçalera de la taula | cel·la | cel·la
 |= capçalera de la taula | cel·la | cel·la
 
-= Enllaços =
+== Enllaços ==
 
 XWiki us permet crear enllaços a altres pàgines de la wiki i d'altres webs:
 
@@ -128,23 +128,23 @@ XWiki us permet crear enllaços a altres pàgines de la wiki i d'altres webs:
 * [[http://www.xwiki.org]] -&gt; podeu enllaçar a pàgines de la wiki, o bé a llocs web externs
 * [[Lloc web XWiki.org&gt;&gt;http://www.xwiki.org]] -&gt; Les etiquetes d'enllaç també funcionen amb enllaços externs
 
-= Imatges =
+== Imatges ==
 
 també podeu inserir imatges en les vostres pàgines de la wiki:
 
 [[image:XWikiLogo.png]]
 
-= Macros =
+== Macros ==
 
 Les macros us permeten que es vegi millor el contingut de la wiki, i afegir característiques addicionals a la vostra wiki. Aquí hi han 2 exemples de com es poden utilitzar les macros en pàgines de la wiki:
 
-== Macro d'advertència ==
+=== Macro d'advertència ===
 
 Aquesta macro us permet cridar l'atenció als usuaris amb trossos d'informació:
 
 {{warning}}Hola Mon!{{/warning}}
 
-== Taula de continguts ==
+=== Taula de continguts ===
 
 Aquesta macro genera automàticament la taula de continguts basada amb encapçalaments de la vostra pàgina wiki:
 

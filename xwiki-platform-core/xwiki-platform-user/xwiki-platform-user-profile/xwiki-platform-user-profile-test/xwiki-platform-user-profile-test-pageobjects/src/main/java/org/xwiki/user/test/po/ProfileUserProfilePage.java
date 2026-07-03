@@ -68,8 +68,11 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
     @FindBy(xpath = "//div[@id='avatar']//img")
     private WebElement userAvatarImage;
 
-    @FindBy(css = ".activity-follow a")
-    private WebElement followUnfollowButton;
+    @FindBy(css = ".activity-follow .notificationWatchUserFollowing")
+    private WebElement followingContainer;
+
+    @FindBy(css = ".activity-follow .notificationWatchUserNotFollowing")
+    private WebElement notFollowingContainer;
 
     @FindBy(id = "disable")
     private WebElement disableButton;
@@ -146,6 +149,20 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
         return this.userBlogFeed.getText();
     }
 
+    /**
+     * Gets the displayed value of a custom profile field (i.e. one added to extend the user profile), located by the
+     * pretty name shown as its label.
+     *
+     * @param prettyName the pretty name (label) of the custom field as displayed in the profile
+     * @return the displayed value of the custom field
+     * @since 18.5.0RC1
+     */
+    public String getUserCustomProperty(String prettyName)
+    {
+        return getDriver().findElementWithoutWaiting(
+            By.xpath("//dd[preceding-sibling::dt[1]/label[. = '" + prettyName + "']]")).getText();
+    }
+
     public ChangeAvatarPage changeAvatarImage()
     {
         this.changeAvatar.click();
@@ -161,19 +178,15 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
 
     public boolean isFollowed()
     {
-        String[] classNames = followUnfollowButton.getAttribute("class").split(" ");
-        for (String className : classNames) {
-            if ("unfollow".equals(className)) {
-                return true;
-            }
-        }
-
-        return false;
+        return followingContainer.isDisplayed();
     }
 
     public ProfileUserProfilePage toggleFollowButton()
     {
-        this.followUnfollowButton.click();
+        WebElement container = (isFollowed()) ? followingContainer : notFollowingContainer;
+        getDriver().findElementWithoutWaiting(container, By.tagName("button")).click();
+        container.findElement(By.className("dropdown-menu")).findElement(By.tagName("a")).click();
+        waitForNotificationSuccessMessage("Done");
         return new ProfileUserProfilePage(this.getUsername());
     }
 

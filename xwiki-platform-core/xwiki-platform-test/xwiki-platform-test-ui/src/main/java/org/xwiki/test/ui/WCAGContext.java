@@ -70,8 +70,7 @@ public class WCAGContext
 
             // WCAG 2.0 Level A & AA Rules
             entry("area-alt", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("aria-allowed-attr", false),
+            entry("aria-allowed-attr", true),
             entry("aria-command-name", true),
             entry("aria-hidden-body", true),
             entry("aria-hidden-focus", true),
@@ -96,12 +95,9 @@ public class WCAGContext
             entry("definition-list", true),
             entry("dlitem", true),
             entry("document-title", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("duplicate-id-active", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("duplicate-id-aria", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("duplicate-id", false),
+            entry("duplicate-id-active", true),
+            entry("duplicate-id-aria", true),
+            entry("duplicate-id", true),
             entry("form-field-multiple-labels", true),
             entry("frame-focusable-content", true),
             entry("frame-title-unique", true),
@@ -109,14 +105,12 @@ public class WCAGContext
             entry("html-has-lang", true),
             entry("html-lang-valid", true),
             entry("html-xml-lang-mismatch", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("image-alt", false),
+            entry("image-alt", true),
             entry("input-button-name", true),
             entry("input-image-alt", true),
             // Set to true once the build doesn't fail this rule anymore
             entry("label", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("link-in-text-block", false),
+            entry("link-in-text-block", true),
             entry("link-name", true),
             entry("list", true),
             entry("listitem", true),
@@ -129,8 +123,7 @@ public class WCAGContext
             entry("role-img-alt", true),
             // Set to true once the build doesn't fail this rule anymore
             entry("scrollable-region-focusable", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("select-name", false),
+            entry("select-name", true),
             entry("server-side-image-map", true),
             entry("svg-img-alt", true),
             entry("td-headers-attr", true),
@@ -150,6 +143,7 @@ public class WCAGContext
      * Tags to take into account during axe-core validation.
      * All rules with at least one of those tags will be validated.
      */
+    // Note: this list needs to be in sync with the vitest configuration in @xwiki/platform-test-accessibility
     private static final List<String> VALIDATE_TAGS = Arrays.asList("wcag2a", "wcag2aa", "wcag21a", "wcag21aa");
 
     /**
@@ -197,7 +191,7 @@ public class WCAGContext
                 // If the ruleid is not defined in FAILS_ON_RULE,
                 // the default behavior will be to add it to the fails.
                 // In order to resolve these test-suite fails quickly, set them as "false" in FAILS_ON_RULE.
-                .collect(Collectors.toList());
+                .toList();
             this.failCount = numberOfChecks(failingViolations);
             if (this.failCount != 0) {
                 this.failReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
@@ -207,7 +201,7 @@ public class WCAGContext
             List<Rule> warningViolations = axeResults.getViolations()
                 .stream()
                 .filter(rule -> FAILS_ON_RULE.containsKey(rule.getId()) && !FAILS_ON_RULE.get(rule.getId()))
-                .collect(Collectors.toList());
+                .toList();
             this.warnCount = numberOfChecks(warningViolations);
             if (this.warnCount != 0) {
                 this.warnReport = AbstractXWikiCustomAxeReporter.getReadableAxeResults(testMethodName, pageClassName,
@@ -258,6 +252,8 @@ public class WCAGContext
     private String testClassName;
 
     private String testMethodName;
+
+    private boolean stopOnError = true;
 
     /**
      * Sets the current test class name. This name is the string representation of the TestUI class in which the
@@ -436,6 +432,9 @@ public class WCAGContext
     }
 
     /**
+     * This setter allows among other things to disable the WCAG validation for a single page test.
+     * This should only be done with careful consideration. 
+     * Keep track of such usages in our `WCAG Testing` documentation.
      * @param wcag validation enabled setup parameter to use in the test suite.
      */
     public void setWCAGEnabled(boolean wcag)
@@ -449,6 +448,22 @@ public class WCAGContext
     public boolean isWCAGEnabled()
     {
         return this.wcagEnabled;
+    }
+
+    /**
+     * @param stopOnError {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     */
+    public void setWCAGStopOnError(boolean stopOnError)
+    {
+        this.stopOnError = stopOnError;
+    }
+
+    /**
+     * @return {@code false} if WCAG validation should ignore errors, {@code true} otherwise.
+     */
+    public boolean shouldWCAGStopOnError()
+    {
+        return this.stopOnError;
     }
 
     /**

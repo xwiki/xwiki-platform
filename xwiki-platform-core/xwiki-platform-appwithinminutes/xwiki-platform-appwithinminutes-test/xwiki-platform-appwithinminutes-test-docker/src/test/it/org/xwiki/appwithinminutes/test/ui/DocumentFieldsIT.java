@@ -59,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:AppWithinMinutes\\.(ClassEditSheet|DynamicMessageTool|LiveTableEditSheet)"})
 class DocumentFieldsIT
 {
-    private String appName = RandomStringUtils.randomAlphabetic(6);
+    private String appName = RandomStringUtils.secure().nextAlphabetic(6);
 
     @BeforeAll
     static void beforeAll(TestUtils setup)

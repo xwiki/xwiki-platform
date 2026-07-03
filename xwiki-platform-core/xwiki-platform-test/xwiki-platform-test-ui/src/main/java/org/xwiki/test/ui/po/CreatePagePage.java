@@ -36,7 +36,7 @@ import org.xwiki.test.ui.po.editor.EditPage;
  * @version $Id$
  * @since 3.2M3
  */
-public class CreatePagePage extends ViewPage
+public class CreatePagePage extends BaseElement
 {
     private static final By errorMessageLocator = By.className("errormessage");
 
@@ -53,7 +53,7 @@ public class CreatePagePage extends ViewPage
     @FindBy(id = "terminal")
     private WebElement isTerminalCheckbox;
 
-    @FindBy(css = "form#create input[type='submit']")
+    @FindBy(css = "form#create input[type='submit'],form#create button[type='submit']")
     private WebElement createButton;
 
     public static CreatePagePage gotoPage()
@@ -90,6 +90,27 @@ public class CreatePagePage extends ViewPage
     public void setTemplate(String template)
     {
         this.pageTypePicker.selectTemplateByValue(template);
+    }
+
+    /**
+     * @param template the value of the template option
+     * @return the icon name displayed for the specified template option, extracted from the {@code <img>} element's
+     *         {@code src} attribute
+     * @since 18.3.0RC1
+     */
+    public String getTemplateIcon(String template)
+    {
+        return this.pageTypePicker.getTemplateIcon(template);
+    }
+
+    /**
+     * @param template the value of the template option
+     * @return the description text displayed for the specified template option
+     * @since 18.3.0RC1
+     */
+    public String getTemplateDescription(String template)
+    {
+        return this.pageTypePicker.getTemplateDescription(template);
     }
 
     public void setType(String type)
@@ -179,7 +200,7 @@ public class CreatePagePage extends ViewPage
      * @param spaceReference document's space reference (parent nested document), ignored if {@code null}
      * @param pageName document's name (space name or page name, depending if terminal or not), ignored if {@code null}
      * @param isTerminalPage true if the new document is terminal, false for non-terminal
-     * @since public since 7.4M2
+     * @since 7.4M2
      */
     public void fillForm(String title, String spaceReference, String pageName, boolean isTerminalPage)
     {

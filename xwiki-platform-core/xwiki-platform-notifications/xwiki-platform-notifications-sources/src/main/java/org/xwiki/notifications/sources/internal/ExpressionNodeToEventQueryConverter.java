@@ -87,6 +87,7 @@ public class ExpressionNodeToEventQueryConverter
         PROPERTY_MAPPING.put(EventProperty.TITLE, Event.FIELD_TITLE);
         PROPERTY_MAPPING.put(EventProperty.BODY, Event.FIELD_BODY);
         PROPERTY_MAPPING.put(EventProperty.DOCUMENT_VERSION, Event.FIELD_DOCUMENTVERSION);
+        PROPERTY_MAPPING.put(EventProperty.PREFILTERING_DATE, Event.FIELD_PREFILTERING_DATE);
     }
 
     @Inject

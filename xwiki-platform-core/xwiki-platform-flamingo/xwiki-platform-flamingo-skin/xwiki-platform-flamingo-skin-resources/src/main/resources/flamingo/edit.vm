@@ -48,6 +48,14 @@
           ## Allow the user to force the edit.
           #set ($newQueryString = "$!request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')"
             + '&amp;force=1')
+          #set ($forceTokenParameter = "force_token=$!{services.csrf.getToken()}")
+          #if (!$newQueryString.contains($forceTokenParameter))
+            ## Prepend the token to ensure it is the first value for the force_token parameter as we use the first
+            ## value if there are several and there could be an invalid token in the query string already.
+            ## We don't set the form_token parameter as this would also authorize other parameter that might already
+            ## be in the URL that are interpreted by the edit action and that could be used for attacks.
+            #set ($newQueryString = $forceTokenParameter + '&amp;' + $newQueryString)
+          #end
           #set ($forceEditURL = $tdoc.getURL($xcontext.action, ${newQueryString}))
           <a href="$forceEditURL" class="btn btn-warning">$escapetool.xml($editConfirmation.confirm)</a>
           $response.setStatus(423)
@@ -90,6 +98,7 @@
   #template("xwikivars.vm")
   #template("layoutvars.vm")
   #template("htmlheader.vm")
+  #template("skipnav.vm")
   #if($displayMainMenu)
     <div id="menuview">
       #template("menus_view.vm")
@@ -126,7 +135,6 @@
   ##################
   <div id="xwikieditor">
   <div id="xwikieditorinner">
-  <div class="leftsidecolumns main">
   <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
   <div id="mainEditArea">
@@ -151,6 +159,9 @@
       </div>
     #end
     #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
+      <h1 class="sr-only">
+        $services.localization.render('core.editors.content.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
+      </h1>
       <div id="editMeta" class="col-xs-12#if ($displayContentMenu) col-md-7#end">
         #template('editmeta.vm')
       </div>
@@ -170,7 +181,8 @@
   ## This javascript must be placed here since it uses velocity variables set in the template above.
   <script>
     //<![CDATA[
-    if ($('tmEditWysiwyg')) {
+    let form = document.forms[$jsontool.serialize($formname)];
+    if (form && $('tmEditWysiwyg')) {
       var switchEditor = function(editor, event) {
         // We switch the editor by submitting the edit form to the new editor (in order to preserve the unsaved changes
         // made to the edited content). We don't submit the edit form using one of the existing action buttons (e.g.
@@ -181,7 +193,6 @@
         // fields for syntax conversion before the form is submitted. In order to overcome this we trigger an event to
         // let the form fields know that their values are about to be submitted. It makes sense to use the preview action
         // events because we don't want to save the content, we want to preview it in a different editor.
-        var form = document.forms.${formname};
         form.fire('xwiki:actions:beforePreview');
         // This is needed in order to silence the leave confirmation (we're not going to loose unsaved changes).
         form.fire('xwiki:actions:preview');
@@ -210,8 +221,6 @@
   </div> ## mainEditArea
   </div> ## alleditcontent
   </div> ## editcolumn
-  <div class="clearfix"></div>
-  </div> ## leftsidecolumns
   #template("editpanels.vm")
   <div class="clearfix"></div>
   </div> ## xwikieditorinner

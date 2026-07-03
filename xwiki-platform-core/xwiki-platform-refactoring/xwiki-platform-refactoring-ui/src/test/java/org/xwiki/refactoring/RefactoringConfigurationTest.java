@@ -22,12 +22,10 @@ package org.xwiki.refactoring;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
-import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.internal.store.StoreConfiguration;
 
@@ -45,9 +43,6 @@ import static org.mockito.Mockito.when;
  */
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
-@ComponentList({
-    ControlCharactersFilter.class
-})
 class RefactoringConfigurationTest extends PageTest
 {
     private static final DocumentReference REFACTORING_CONFIGURATION_REFERENCE =

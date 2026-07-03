@@ -35,16 +35,14 @@ import org.junit.jupiter.api.TestInfo;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
 import org.xwiki.flamingo.skin.test.po.RestoreStatusPage;
 import org.xwiki.flamingo.skin.test.po.UndeletePage;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.rest.model.jaxb.Page;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.ConfirmationPage;
@@ -57,6 +55,7 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -87,7 +86,7 @@ class DeletePageIT
 
     private static final String PAGE_TITLE = "Page title that will be deleted";
 
-    private static final String DELETE_SUCCESSFUL = "Done.";
+    private static final String ACTION_SUCCESSFUL = "Done.";
 
     @BeforeEach
     void setUp(TestUtils setup, TestReference testReference)
@@ -119,7 +118,7 @@ class DeletePageIT
         deletingPage.waitUntilFinished();
         // Note: it's better to wait instead of using isSuccess() since there could be some timeframe between
         // the hiding of the progress UI and the display of the success message.
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
 
         List<DeletedPageEntry> deletedPagesEntries = deleteOutcome.getDeletedPagesEntries();
@@ -273,9 +272,23 @@ class DeletePageIT
         confirmationPage = parentPage.deletePage();
         assertTrue(confirmationPage.hasAffectChildrenOption());
         confirmationPage.setAffectChildren(false);
+        confirmationPage.openAffectChildrenPanel();
+        TableLayoutElement affectChildrenLiveData = new LiveDataElement("deleteSpaceIndex").getTableLayout();
+        assertEquals(nbChildren, affectChildrenLiveData.countRows());
+        for (int i = 1; i <= nbChildren; i++) {
+            SpaceReference childSpaceReference = childrenReferences[i - 1].getLastSpaceReference();
+            affectChildrenLiveData.assertCellWithLink("Title", String.format("Child %d", i),
+                setup.getURL(childSpaceReference));
+            affectChildrenLiveData.assertCellWithLink("Location", String.format("Child_%d", i),
+                setup.getURL(childSpaceReference));
+            affectChildrenLiveData.assertRow("Date", hasItem(affectChildrenLiveData.getDatePatternMatcher()));
+            affectChildrenLiveData.assertCellWithLink("Last Author", "superadmin",
+                setup.getURL(new DocumentReference("xwiki", "XWiki", "superadmin")));
+        }
+
         DeletingPage deletingPage = confirmationPage.confirmDeletePage();
         deletingPage.waitUntilFinished();
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         // Check the page have been effectively removed
         ViewPage page = setup.gotoPage(parentReference);
         assertFalse(page.exists());
@@ -333,12 +346,12 @@ class DeletePageIT
         }
         // Assert that we have at least some actions. Testing individual items is not so easy because the action URLs
         // are not what the LD page object expects.
-        liveDataTable.assertRow(UndeletePage.LIVE_DATA_ACTIONS, "RestoreDelete");
+        liveDataTable.assertRow(UndeletePage.LIVE_DATA_ACTIONS, "Restore\nDelete");
 
         // Trigger the actual restore.
         RestoreStatusPage restoreStatusPage = undeletePage.clickRestore();
         restoreStatusPage.waitUntilFinished();
-        assertEquals("Done.", restoreStatusPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, restoreStatusPage.getInfoMessage());
         page = restoreStatusPage.gotoRestoredPage();
 
         // Check the page have been effectively restored.
@@ -491,7 +504,7 @@ class DeletePageIT
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilFinished();
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         List<DeletedPageEntry> deletedPagesEntries = deleteOutcome.getDeletedPagesEntries();
         assertEquals(1, deletedPagesEntries.size());
@@ -513,7 +526,7 @@ class DeletePageIT
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilFinished();
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
         ViewPage viewPage1 = new ViewPage();
@@ -730,8 +743,7 @@ class DeletePageIT
      */
     @Test
     @Order(13)
-    void deleteWithUpdateLinksAndAutoRedirect(TestUtils testUtils, TestReference reference,
-        TestConfiguration testConfiguration) throws Exception
+    void deleteWithUpdateLinksAndAutoRedirect(TestUtils testUtils, TestReference reference) throws Exception
     {
         DocumentReference backlinkDocumentReference = new DocumentReference("xwiki", "Backlink", "WebHome");
         DocumentReference newTargetReference = new DocumentReference("xwiki", "NewTarget", "WebHome");
@@ -743,7 +755,7 @@ class DeletePageIT
         testUtils.createPage(newTargetReference, "", "New target");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
 
         // Delete page and provide a new target, with updateLinks and autoRedirect enabled.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -754,12 +766,12 @@ class DeletePageIT
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilFinished();
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
 
         // Verify that a redirect was added and the link was updated.
         viewPage = testUtils.gotoPage(reference);
         assertEquals("New target", this.viewPage.getDocumentTitle());
-        assertEquals("[[Link>>doc:NewTarget.WebHome]]",
+        assertEquals("[[Link>>doc:xwiki:NewTarget.WebHome]]",
             testUtils.rest().<Page>get(backlinkDocumentReference).getContent());
     }
 
@@ -771,7 +783,7 @@ class DeletePageIT
      */
     @Test
     @Order(14)
-    void deleteWithoutNewTarget(TestUtils testUtils, TestReference reference, TestConfiguration testConfiguration)
+    void deleteWithoutNewTarget(TestUtils testUtils, TestReference reference)
         throws Exception
     {
         DocumentReference backlinkDocReference = new DocumentReference("xwiki", "Backlink", "WebHome");
@@ -782,7 +794,7 @@ class DeletePageIT
         testUtils.createPage(backlinkDocReference, backlinkDocContent, "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
 
         // Delete page without specifying a new target.
         ViewPage viewPage = testUtils.gotoPage(reference);
@@ -792,7 +804,7 @@ class DeletePageIT
         deletingPage.waitUntilFinished();
 
         // Verify that there is no redirect and the links were not altered.
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         DeletePageOutcomePage deleteOutcome = deletingPage.getDeletePageOutcomePage();
         assertEquals(LOGGED_USERNAME, deleteOutcome.getPageDeleter());
         assertEquals(DOCUMENT_NOT_FOUND, deleteOutcome.getMessage());
@@ -808,11 +820,10 @@ class DeletePageIT
      */
     @Test
     @Order(15)
-    void deleteWithAffectChildrenAndNewTarget(TestUtils testUtils, TestReference parentReference,
-        TestConfiguration testConfiguration) throws Exception
+    void deleteWithAffectChildrenAndNewTarget(TestUtils testUtils, TestReference parentReference) throws Exception
     {
         DocumentReference childReference = new DocumentReference("Child", parentReference.getLastSpaceReference());
-        String childFullName = testUtils.serializeReference(childReference).split(":")[1];
+        String childFullName = testUtils.serializeLocalReference(childReference);
         DocumentReference backlinkDocReference = new DocumentReference("xwiki", "Backlink", "WebHome");
         DocumentReference newTargetReference = new DocumentReference("xwiki", "NewTarget", "WebHome");
 
@@ -822,10 +833,10 @@ class DeletePageIT
         // Create backlinks to the parent and the child page.
         String format = "[[Parent>>doc:%s]] [[Child>>doc:%s]]";
         testUtils.createPage(backlinkDocReference,
-            String.format(format, testUtils.serializeReference(parentReference), childFullName), "Backlink document");
+            String.format(format, testUtils.serializeLocalReference(parentReference), childFullName), "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
-        new SolrTestUtils(testUtils, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
 
         // Delete parent page with affectChildren and newTarget (updateLinks and autoRedirect enabled).
         ViewPage parentPage = testUtils.gotoPage(parentReference);
@@ -839,20 +850,13 @@ class DeletePageIT
         deletingPage.waitUntilFinished();
 
         // Verify that there is no redirect on the child page and backlink was not altered.
-        assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
+        assertEquals(ACTION_SUCCESSFUL, deletingPage.getInfoMessage());
         String newContent =
-            String.format(format, testUtils.serializeReference(newTargetReference).split(":")[1], childFullName);
+            String.format(format, testUtils.serializeLocalReference(newTargetReference), childFullName);
         assertEquals(newContent, testUtils.rest().<Page>get(backlinkDocReference).getContent());
         parentPage = testUtils.gotoPage(parentReference);
         assertEquals("New target", parentPage.getDocumentTitle());
         ViewPage childPage = testUtils.gotoPage(childReference);
         assertEquals("Child", childPage.getDocumentTitle());
-    }
-
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
     }
 }

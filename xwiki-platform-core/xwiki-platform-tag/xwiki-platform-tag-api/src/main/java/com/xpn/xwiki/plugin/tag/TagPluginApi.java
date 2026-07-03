@@ -211,6 +211,9 @@ public class TagPluginApi extends PluginApi<TagPlugin>
         try {
             XWikiDocument document = this.context.getWiki().getDocument(documentName, this.context);
             if (this.context.getWiki().checkAccess(TAG_ACCESS_RIGHT, document, this.context)) {
+                // Avoid modifying the cached document
+                document = document.clone();
+
                 result = this.getProtectedPlugin().addTagToDocument(tag, document, this.context);
             } else {
                 result = TagOperationResult.NOT_ALLOWED;
@@ -237,6 +240,9 @@ public class TagPluginApi extends PluginApi<TagPlugin>
         try {
             XWikiDocument document = this.context.getWiki().getDocument(documentName, this.context);
             if (this.context.getWiki().checkAccess(TAG_ACCESS_RIGHT, document, this.context)) {
+                // Avoid modifying the cached document
+                document = document.clone();
+
                 result = this.getProtectedPlugin().addTagsToDocument(tags, document, this.context);
             } else {
                 result = TagOperationResult.NOT_ALLOWED;

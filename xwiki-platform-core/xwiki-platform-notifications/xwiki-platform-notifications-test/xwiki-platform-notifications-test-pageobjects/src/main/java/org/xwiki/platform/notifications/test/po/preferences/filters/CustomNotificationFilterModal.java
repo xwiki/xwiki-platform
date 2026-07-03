@@ -26,8 +26,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.index.tree.test.po.DocumentTreeElement;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.test.ui.po.BaseModal;
-import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
  * Represents the Add filter modal.
@@ -205,21 +206,33 @@ public class CustomNotificationFilterModal extends BaseModal
     }
 
     /**
-     * Click on the submit button to add the new filter and wait until the modal is closed and the livetable of
-     * custom filter preferences has been refreshed. Be careful to call {@link #isSubmitEnabled()} before to ensure
-     * the submit button can be clicked.
+     * Click on the Submit button to add the new filter and wait until the modal is closed, and the Live Data of custom
+     * filter preferences has been refreshed. Be careful to call {@link #isSubmitEnabled()} before to ensure the Submit
+     * button can be clicked.
+     *
+     * @see #clickSubmit(int) if the form leads to the creation of more than one notification filter
      */
     public void clickSubmit()
     {
-        LiveTableElement liveTableElement =
-            new LiveTableElement("notificationCustomFilterPreferencesLiveTable");
-        int rowCount = liveTableElement.getRowCount();
-        getSubmitButton().click();
-        this.waitForClosed();
+        clickSubmit(1);
+    }
 
-        // This first wait might not be enough since the LT was already ready: so it might returns immediately
-        // while we actually want to wait that the number of rows increased. Hence the two waits.
-        liveTableElement.waitUntilReady();
-        liveTableElement.waitUntilRowCountGreaterThan(rowCount + 1);
+    /**
+     * Click on the Submit button to add new filters and wait until the modal is closed, and the Live Data of custom
+     * filter preferences to be refreshed. Be careful to call {@link #isSubmitEnabled()} before to ensure the Submit
+     * button can be clicked.
+     *
+     * @param offset the expected number of additional notification filters created
+     */
+    public void clickSubmit(int offset)
+    {
+        LiveDataElement liveDataElement =
+            new LiveDataElement("notificationCustomFilterPreferencesLiveData");
+        TableLayoutElement tableLayout = liveDataElement.getTableLayout();
+        int rowCount = tableLayout.countRows();
+        getSubmitButton().click();
+        waitForClosed();
+
+        tableLayout.waitUntilRowCountEqualsTo(rowCount + offset);
     }
 }

@@ -54,6 +54,11 @@ public class IndexerRequest extends AbstractRequest
     private boolean removeMissing = true;
 
     /**
+     * @see #isCleanInvalid()
+     */
+    private boolean cleanInvalid;
+
+    /**
      * The default constructor.
      */
     public IndexerRequest()
@@ -116,6 +121,24 @@ public class IndexerRequest extends AbstractRequest
     public void setRemoveMissing(boolean removeMissing)
     {
         this.removeMissing = removeMissing;
+    }
+
+    /**
+     * @return if true the invalid Solr document entries are removed, if false nothing is checked
+     * @since 17.8.0RC1
+     */
+    public boolean isCleanInvalid()
+    {
+        return this.cleanInvalid;
+    }
+
+    /**
+     * @param cleanInvalid if true the invalid Solr document entries are removed, if false nothing is checked
+     * @since 17.8.0RC1
+     */
+    public void setCleanInvalid(boolean cleanInvalid)
+    {
+        this.cleanInvalid = cleanInvalid;
     }
 
     @Override

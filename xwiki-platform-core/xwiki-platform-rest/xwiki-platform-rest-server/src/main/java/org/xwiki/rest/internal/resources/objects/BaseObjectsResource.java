@@ -22,7 +22,6 @@ package org.xwiki.rest.internal.resources.objects;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -70,7 +69,7 @@ public class BaseObjectsResource extends XWikiResource
 
     private static List<BaseObject> getBaseObjectList(XWikiDocument xwikiDocument)
     {
-        return xwikiDocument.getXObjects().values().stream().flatMap(List::stream).collect(Collectors.toList());
+        return xwikiDocument.getXObjects().values().stream().flatMap(List::stream).toList();
     }
 
     protected List<BaseObject> getBaseObjects(Document doc, String className) throws XWikiException

@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -84,7 +86,7 @@ public class Attachment extends Api
     {
         long longSize = getLongSize();
 
-        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
+        return longSize > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
     }
 
     /**
@@ -110,6 +112,18 @@ public class Attachment extends Api
     public String getAuthor()
     {
         return this.attachment.getAuthor();
+    }
+
+    /**
+     * @return the reference of the author of the attachment.
+     * @see XWikiAttachment#getAuthorReference()
+     * @since 17.10.9
+     * @since 18.4.0RC1
+     */
+    @Unstable
+    public DocumentReference getAuthorReference()
+    {
+        return this.attachment.getAuthorReference();
     }
 
     /**
@@ -157,9 +171,10 @@ public class Attachment extends Api
     {
         try {
             // the input stream can be null if the attachment has been deleted for example.
-            InputStream contentInputStream = this.attachment.getContentInputStream(getXWikiContext());
-            if (contentInputStream != null) {
-                return IOUtils.toByteArray(contentInputStream);
+            try (InputStream contentInputStream = this.attachment.getContentInputStream(getXWikiContext())) {
+                if (contentInputStream != null) {
+                    return IOUtils.toByteArray(contentInputStream);
+                }
             }
         } catch (IOException ex) {
             // This really shouldn't happen.

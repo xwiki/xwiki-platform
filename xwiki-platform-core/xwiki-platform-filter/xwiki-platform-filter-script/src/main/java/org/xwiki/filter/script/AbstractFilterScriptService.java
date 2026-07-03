@@ -22,7 +22,7 @@ package org.xwiki.filter.script;
 import javax.inject.Inject;
 
 import org.xwiki.context.Execution;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
 
 /**

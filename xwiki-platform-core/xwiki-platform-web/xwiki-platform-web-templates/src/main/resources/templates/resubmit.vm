@@ -26,21 +26,38 @@ $response.setStatus(401)##
 ##
 $response.addHeader( "X-FRAME-OPTIONS", "DENY" )
 #template("startpage.vm")
-<div class="main layoutsubsection">
-## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
-<main id="mainContentArea">
-#xwikimessageboxstart($services.localization.render('warning') $services.localization.render('csrf.confirmation'))
-#getSanitizedURLAttributeValue('form','action', $request.getParameter('resubmit'), '', $resubmit)
-#getSanitizedURLAttributeValue('a','href', $request.getParameter('xback'), $doc.getURL(), $xback)
-<form action="$resubmit" method="post">
-  <div class="hidden">
-    ## Valid CSRF token
-    <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+#set ($discard = $xwiki.ssfx.use('css/resubmit.css', {'forceSkinAction': true}))
+<div id="mainContentArea">
+<div class="resubmit-box">
+  <div class="resubmit-title">$services.localization.render('csrf.error.title')</div>
+  <div class="resubmit-content">
+    <p class="main-explanation">$services.localization.render('csrf.error.message')</p>
+    <p class="resubmit-causes-introduction">$services.localization.render('csrf.error.causes.introduction')</p>
+    <ul class="resubmit-causes">
+      <li>$services.localization.render('csrf.error.causes.stalesession')</li>
+      <li>$services.localization.render('csrf.error.causes.forgedrequest')</li>
+    </ul>
   </div>
-  <div class="buttonwrapper"><input type="submit" class="button" value="$services.localization.render('yes')"/></div>
-  <div class="buttonwrapper"><a class="secondary button" href="$xback">$services.localization.render('no')</a></div>
-</form>
-#xwikimessageboxend()
+  #if ($services.csrf.isResubmitAllowedForRequestId($request.getParameter('sridKey')))
+    #getSanitizedURLAttributeValue('form','action', $request.getParameter('resubmit'), '', $resubmit)
+    #getSanitizedURLAttributeValue('a','href', $request.getParameter('xback'), $doc.getURL(), $xback)
+    <form action="$resubmit" method="post" class="resubmit-form">
+      ## Valid CSRF token
+      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+      <div class="resubmit-question">$services.localization.render('csrf.error.resubmit.question')</div>
+      <div>
+        <a class="resubmit-primary btn btn-primary resubmit-no" href="$xback">
+          $services.localization.render('csrf.error.resubmit.question.no')
+        </a>
+      </div>
+      <div>
+        <button class="btn btn-default resubmit-secondary resubmit-yes">
+          $services.localization.render('csrf.error.resubmit.question.yes')
+        </button>
+      </div>
+    </form>
+  #end
+</div>
 <div class="clearfloats"></div>
 </main>## mainContentArea
 </div>## main

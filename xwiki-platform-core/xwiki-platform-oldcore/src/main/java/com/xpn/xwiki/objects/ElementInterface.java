@@ -21,7 +21,6 @@ package com.xpn.xwiki.objects;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.XWikiContext;
@@ -91,7 +90,6 @@ public interface ElementInterface
      * @since 14.10.7
      * @since 15.2RC1
      */
-    @Unstable
     MergeManagerResult<ElementInterface, Object> merge(ElementInterface previousElement, ElementInterface newElement,
         MergeConfiguration configuration, XWikiContext context);
 

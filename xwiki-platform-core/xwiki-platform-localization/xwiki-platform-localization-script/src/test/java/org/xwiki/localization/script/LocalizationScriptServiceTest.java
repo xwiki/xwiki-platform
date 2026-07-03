@@ -122,7 +122,7 @@ class LocalizationScriptServiceTest
         assertFalse(locales.isEmpty());
         assertTrue(locales.contains(new Locale("fr")));
         assertTrue(locales.contains(new Locale("it")));
-        assertTrue(locales.contains(new Locale("mr_IN")));
+        assertTrue(locales.contains(new Locale("mr","IN")));
         assertFalse(locales.contains(new Locale("whatever")));
     }
 }

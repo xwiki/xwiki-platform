@@ -34,9 +34,7 @@
 #set ($minorVersions = (!$xwiki.hasMinorEdit()) || ("$!request.showminor" == 'true'))
 ## Revision criteria. The following requests for all versions, filtered by the minorVersions option.
 #set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
-#set ($versions = $tdoc.getRevisions($criteria))
-#set ($discard = $collectiontool.reverseModifiable($versions))
-#set ($totalVersions = $versions.size())
+#set ($totalVersions = $tdoc.getRevisionsCount($criteria))
 #if ($totalVersions == 0)
   #warning ($services.localization.render('core.viewers.history.empty'))
 #else
@@ -52,10 +50,15 @@
   #set ($versions = $tdoc.getRevisions($criteria))
   #set ($discard = $collectiontool.reverseModifiable($versions))
   #if ("$tdoc.realLocale" != '')
-    #set ($lang = "&amp;language=${tdoc.realLocale}")
+    #set ($langParams = {'language' : "$tdoc.realLocale"})
   #else
-    #set ($lang = '')
+    #set ($langParams = {})
   #end
+  ## Get the real current version of the document. This is needed because when viewing a specific revision
+  ## (e.g., via ?rev=1.1), $tdoc.getRCSVersion() returns that revision's version instead of the latest
+  ## version. $xwiki.getDocument() by default loads the latest version from the document cache, ignoring
+  ## the rev request parameter.
+  #set ($currentDocVersion = $xwiki.getDocument($tdoc.getDocumentReferenceWithLocale()).getRCSVersion())
 ##
 #set ($documentExtensions = $services.extension.xar.getInstalledExtensions($doc.getDocumentReferenceWithLocale()))
 #set ($displayCompare = $totalVersions > 1 || ($totalVersions == 1 && $documentExtensions.size() > 0))
@@ -76,21 +79,19 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
       <input type="hidden" name="language" value="$!xcontext.locale" />
       <table class="table table-striped table-hover responsive-table">
         <caption class="sr-only">$services.localization.render('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($mathtool.sub($versions.size(), 1)), $versions.get(0)])</caption>
-## Print the table header
         <thead>
           <tr>
           #if ($displayCompare)
             <th scope="col">$services.localization.render('core.viewers.history.from')</th>
             <th scope="col">$services.localization.render('core.viewers.history.to')</th>
           #end
-            <th scope="col">$services.localization.render('core.viewers.history.version')</th>
-            <th scope="col">$services.localization.render('core.viewers.history.author')</th>
-            <th scope="col">$services.localization.render('core.viewers.history.date')</th>
-  ## Might be disabled in certain wikis.
-          #if($xwiki.hasEditComment())
+          <th scope="col">$services.localization.render('core.viewers.history.version')</th>
+          <th scope="col">$services.localization.render('core.viewers.history.author')</th>
+          <th scope="col">$services.localization.render('core.viewers.history.date')</th>
+          #if ($xwiki.hasEditComment())
             <th scope="col">$services.localization.render('core.viewers.history.comment')</th>
           #end
-  ## Editors see the Revert button. Admins see the Revert and Delete buttons.
+          ## Editors see the Revert button. Admins see the Revert and Delete buttons.
           #if ($hasEdit)
             <th scope="col" #if($hasAdmin)colspan="2"#end>
               $services.localization.render('core.viewers.history.actions')
@@ -116,10 +117,20 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
             <input type="radio" name="rev2" id="rev2_$version" value="$version"/>
           </td>
         #end
-        #set ($_versionURL = $tdoc.getURL('view', $escapetool.url({'rev' : $version})))
-        <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))" colspan="4">$services.localization.render('core.viewers.history.extension.label', ["<a href='$_versionURL'>", '</a>', "<strong>", $escapetool.xml($documentExtension.name), $escapetool.xml($documentExtension.id.version), '</strong>'])</td>
+        ## If there's no summary, then there's one less column to span for the message in the version column.
+        #if ($xwiki.hasEditComment())
+          #set ($versionColspan = 4)
+        #else
+          #set ($versionColspan = 3)
+        #end
+        #set ($_versionParams = {'rev' : $version})
+        #set ($discard = $_versionParams.putAll($langParams))
+        #set ($_versionURL = $tdoc.getURL('view', $escapetool.url($_versionParams)))
+        <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))" colspan="${versionColspan}">$services.localization.render('core.viewers.history.extension.label', ["<a href='$_versionURL'>", '</a>', "<strong>", $escapetool.xml($documentExtension.name), $escapetool.xml($documentExtension.id.version), '</strong>'])</td>
         #if ($hasEdit || $hasAdmin)
-          #set ($_rollbackURL = $tdoc.getURL('rollback', "form_token=$!{services.csrf.getToken()}&amp;rev=${escapetool.url($version)}$lang"))
+          #set ($_rollbackParams = {'form_token' : $services.csrf.getToken(), 'rev' : $version})
+          #set ($discard = $_rollbackParams.putAll($langParams))
+          #set ($_rollbackURL = $tdoc.getURL('rollback', $escapetool.url($_rollbackParams)))
           <td class="xwikibuttonlink" data-title="$escapetool.xml($services.localization.render('core.viewers.history.rollback'))"><a href="$_rollbackURL" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.rollback')</a></td>
         #end
         #if ($hasAdmin)
@@ -130,7 +141,11 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
   #end
   #foreach ($version in $versions)
     #set ($revinfo = $tdoc.getRevisionInfo($version))
-    #if ($tdoc.getRCSVersion() == $version)
+    #set ($_revParams = {'rev' : $version})
+    #set ($discard = $_revParams.putAll($langParams))
+    #set ($_actionParams = {'form_token' : $services.csrf.getToken(), 'rev' : $version})
+    #set ($discard = $_actionParams.putAll($langParams))
+    #if ($currentDocVersion == $version)
       <tr class="currentversion odd">
     #else
        <tr class="#if($foreach.count % 2 == 0) even #else odd #end">
@@ -145,21 +160,21 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
         <input type="radio" name="rev2" id="rev2_$version" value="$version" #if ($foreach.count==1) checked="checked" #end/>
       </td>
     #end
-    <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))"><a href="$tdoc.getURL('view',"rev=$version")">$version</a></td>
+    <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))"><a href="$tdoc.getURL('view', $escapetool.url($_revParams))">$version</a></td>
     <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.author'))">$xwiki.getUserName($revinfo.author)</td>
     <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.date'))">$xwiki.formatDate($revinfo.date)</td>
     #if ($xwiki.hasEditComment())
       <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.comment'))">$!{escapetool.xml($revinfo.comment)}</td>
     #end
     #if ($hasEdit || $hasAdmin)
-      #if ($tdoc.getRCSVersion()==$version)
+      #if ($currentDocVersion == $version)
         <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.rollback'))"><span class="currentversionlabel">$services.localization.render('core.viewers.history.currentVersion')</span></td>
       #else
-        <td class="xwikibuttonlink" data-title="$escapetool.xml($services.localization.render('core.viewers.history.rollback'))"><a href="$tdoc.getURL('rollback', "form_token=$!{services.csrf.getToken()}&amp;rev=$version$lang")" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.rollback')</a></td>
+        <td class="xwikibuttonlink" data-title="$escapetool.xml($services.localization.render('core.viewers.history.rollback'))"><a href="$tdoc.getURL('rollback', $escapetool.url($_actionParams))" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.rollback')</a></td>
       #end
     #end
     #if ($hasAdmin)
-      <td class="xwikibuttonlink" data-title="$escapetool.xml($services.localization.render('core.viewers.history.deleteSingle'))"><a href="$tdoc.getURL('deleteversions',"form_token=$!{services.csrf.getToken()}&amp;rev=$version$lang")" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmDeleteSingle', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.deleteSingle')</a></td>
+      <td class="xwikibuttonlink" data-title="$escapetool.xml($services.localization.render('core.viewers.history.deleteSingle'))"><a href="$tdoc.getURL('deleteversions', $escapetool.url($_actionParams))" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmDeleteSingle', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.deleteSingle')</a></td>
     #end
     </tr>
   #end ## foreach

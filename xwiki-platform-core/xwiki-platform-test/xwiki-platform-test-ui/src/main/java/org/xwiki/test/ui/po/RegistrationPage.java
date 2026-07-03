@@ -61,11 +61,11 @@ public class RegistrationPage extends AbstractRegistrationPage
      */
     public Optional<String> getRegistrationSuccessMessage()
     {
-        List<WebElement> infos = getDriver().findElements(By.className("infomessage"));
-        for (WebElement info : infos) {
-            if (info.getText().contains("Registration successful.")) {
-                return Optional.of(info.getText());
-            }
+        List<WebElement> infos = getDriver().findElements(
+            By.xpath("//*[(contains(@class, 'infomessage') or contains(@class, 'registration-success-headline')) and " +
+                "(contains(., 'Registration successful.') or contains(., 'Welcome '))]"));
+        if (!infos.isEmpty()) {
+            return Optional.of(infos.getFirst().getText().replaceAll("\n", " "));
         }
 
         return Optional.empty();

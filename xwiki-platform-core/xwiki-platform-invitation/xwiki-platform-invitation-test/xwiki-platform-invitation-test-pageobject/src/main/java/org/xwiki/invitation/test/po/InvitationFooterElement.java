@@ -70,7 +70,7 @@ public class InvitationFooterElement extends BaseElement
         }
         String message = getDriver().findElementsWithoutWaiting(this.footer,
             By.id("my-pending-invitations")).get(0).getText().trim();
-        return Integer.parseInt(message.substring(0, message.indexOf(" pending")));
+        return Integer.parseInt(message.substring(message.indexOf("\n") + 1, message.indexOf(" pending")));
     }
 
     public int spamReports()
@@ -80,6 +80,6 @@ public class InvitationFooterElement extends BaseElement
         }
         String message = getDriver().findElementsWithoutWaiting(this.footer,
             By.id("spam-reports")).get(0).getText().trim();
-        return Integer.parseInt(message.substring(0, message.indexOf(" reported as spam")));
+        return Integer.parseInt(message.substring(message.indexOf("\n") + 1, message.indexOf(" reported as spam")));
     }
 }

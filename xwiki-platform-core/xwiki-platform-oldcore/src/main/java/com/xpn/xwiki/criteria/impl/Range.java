@@ -101,7 +101,7 @@ public class Range
      */
     public List<String> subList(List<String> list)
     {
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
         results.addAll(list);
 
         if (getAbsoluteSize() > 0) {

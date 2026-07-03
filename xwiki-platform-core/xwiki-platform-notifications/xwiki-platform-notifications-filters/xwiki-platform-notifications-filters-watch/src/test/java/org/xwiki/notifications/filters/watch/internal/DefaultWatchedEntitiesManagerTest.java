@@ -30,8 +30,13 @@ import org.xwiki.notifications.filters.watch.WatchedEntityReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 import java.util.Set;
+
+import javax.inject.Named;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -43,20 +48,31 @@ import static org.mockito.Mockito.*;
  * @since 9.9RC1
  */
 @ComponentTest
-public class DefaultWatchedEntitiesManagerTest
+class DefaultWatchedEntitiesManagerTest
 {
     @InjectMockComponents
     private DefaultWatchedEntitiesManager watchedEntitiesManager;
     
     @MockComponent
     private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
     
     @Test
     void testWithSeveralFilterPreferences() throws Exception
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
-        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        DocumentReference userDocRef = new DocumentReference("xwiki", "XWiki", "User");
+        UserReference userRef = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(userDocRef)).thenReturn(userRef);
+        when(this.userReferenceSerializer.serialize(userRef)).thenReturn(userDocRef);
 
         // Filters
         DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
@@ -84,18 +100,21 @@ public class DefaultWatchedEntitiesManagerTest
         pref4.setEnabled(false);
         pref4.setId("pref4");
 
-        when(notificationFilterPreferenceManager.getFilterPreferences(user))
+        when(notificationFilterPreferenceManager.getFilterPreferences(userDocRef))
             .thenReturn(Sets.newSet(pref1, pref2, pref3, pref4));
 
-        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(false, true);
+        when(watchedEntityReference.getWatchedStatus(userRef))
+            .thenReturn(
+                WatchedEntityReference.WatchedStatus.NOT_SET,
+                WatchedEntityReference.WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS);
 
         // Test
-        watchedEntitiesManager.watchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.watchEntity(watchedEntityReference, userDocRef);
 
         // Checks
-        verify(notificationFilterPreferenceManager, never()).setFilterPreferenceEnabled(user, "pref2", false);
-        verify(notificationFilterPreferenceManager).setFilterPreferenceEnabled(user, "pref3", false);
-        verify(notificationFilterPreferenceManager).setFilterPreferenceEnabled(user, "pref4", true);
+        verify(notificationFilterPreferenceManager, never()).setFilterPreferenceEnabled(userDocRef, "pref2", false);
+        verify(notificationFilterPreferenceManager).setFilterPreferenceEnabled(userDocRef, "pref3", false);
+        verify(notificationFilterPreferenceManager).setFilterPreferenceEnabled(userDocRef, "pref4", true);
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
     }
 
@@ -104,7 +123,10 @@ public class DefaultWatchedEntitiesManagerTest
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
-        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        DocumentReference userDocRef = new DocumentReference("xwiki", "XWiki", "User");
+        UserReference userRef = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(userDocRef)).thenReturn(userRef);
+        when(this.userReferenceSerializer.serialize(userRef)).thenReturn(userDocRef);
 
         // Filters
         DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
@@ -114,15 +136,18 @@ public class DefaultWatchedEntitiesManagerTest
         pref1.setEnabled(true);
         pref1.setId("pref1");
 
-        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
+        when(notificationFilterPreferenceManager.getFilterPreferences(userDocRef)).thenReturn(Sets.newSet(pref1));
 
-        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(false, true);
+        when(watchedEntityReference.getWatchedStatus(userRef))
+            .thenReturn(
+                WatchedEntityReference.WatchedStatus.NOT_SET,
+                WatchedEntityReference.WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS);
 
         // Test
-        watchedEntitiesManager.watchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.watchEntity(watchedEntityReference, userDocRef);
 
         // Checks
-        verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref1");
+        verify(notificationFilterPreferenceManager).deleteFilterPreference(userDocRef, "pref1");
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
     }
 
@@ -131,7 +156,10 @@ public class DefaultWatchedEntitiesManagerTest
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
-        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        DocumentReference userDocRef = new DocumentReference("xwiki", "XWiki", "User");
+        UserReference userRef = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(userDocRef)).thenReturn(userRef);
+        when(this.userReferenceSerializer.serialize(userRef)).thenReturn(userDocRef);
 
         // Filters
         DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
@@ -147,15 +175,19 @@ public class DefaultWatchedEntitiesManagerTest
         pref2.setEnabled(true);
         pref2.setId("pref2");
 
-        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2));
+        when(notificationFilterPreferenceManager.getFilterPreferences(userDocRef))
+            .thenReturn(Sets.newSet(pref1, pref2));
 
-        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(false, true);
+        when(watchedEntityReference.getWatchedStatus(userRef))
+            .thenReturn(
+                WatchedEntityReference.WatchedStatus.NOT_SET,
+                WatchedEntityReference.WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS);
 
         // Test
-        watchedEntitiesManager.watchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.watchEntity(watchedEntityReference, userDocRef);
 
         // Checks
-        verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref2");
+        verify(notificationFilterPreferenceManager).deleteFilterPreference(userDocRef, "pref2");
         verify(watchedEntityReference, never()).createInclusiveFilterPreference();
     }
 
@@ -164,15 +196,19 @@ public class DefaultWatchedEntitiesManagerTest
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
-        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        DocumentReference userDocRef = new DocumentReference("xwiki", "XWiki", "User");
+        UserReference userRef = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(userDocRef)).thenReturn(userRef);
+        when(this.userReferenceSerializer.serialize(userRef)).thenReturn(userDocRef);
 
         // Filters
         DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
-        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
+        when(notificationFilterPreferenceManager.getFilterPreferences(userDocRef)).thenReturn(Sets.newSet(pref1));
 
-        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(false);
+        when(watchedEntityReference.getWatchedStatus(userRef))
+            .thenReturn(WatchedEntityReference.WatchedStatus.NOT_SET);
 
         DefaultNotificationFilterPreference createdPref = mock(DefaultNotificationFilterPreference.class);
         when(watchedEntityReference.createInclusiveFilterPreference()).thenReturn(createdPref);
@@ -185,13 +221,13 @@ public class DefaultWatchedEntitiesManagerTest
             DefaultNotificationFilterPreference prefToSave = (DefaultNotificationFilterPreference) set.toArray()[0];
             assertEquals("aabbccdd", prefToSave.getId());
             return null;
-        }).when(notificationFilterPreferenceManager).saveFilterPreferences(eq(user), anySet());
+        }).when(notificationFilterPreferenceManager).saveFilterPreferences(eq(userDocRef), anySet());
 
         // Test
-        watchedEntitiesManager.watchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.watchEntity(watchedEntityReference, userDocRef);
 
         // Checks
-        verify(notificationFilterPreferenceManager).saveFilterPreferences(eq(user), anySet());
+        verify(notificationFilterPreferenceManager).saveFilterPreferences(eq(userDocRef), anySet());
     }
 
     @Test
@@ -199,7 +235,10 @@ public class DefaultWatchedEntitiesManagerTest
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
-        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        DocumentReference userDocRef = new DocumentReference("xwiki", "XWiki", "User");
+        UserReference userRef = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(userDocRef)).thenReturn(userRef);
+        when(this.userReferenceSerializer.serialize(userRef)).thenReturn(userDocRef);
 
         // Filters
         DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
@@ -209,15 +248,18 @@ public class DefaultWatchedEntitiesManagerTest
         pref1.setEnabled(true);
         pref1.setId("pref1");
 
-        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
+        when(notificationFilterPreferenceManager.getFilterPreferences(userDocRef)).thenReturn(Sets.newSet(pref1));
 
-        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(true, false);
+        when(watchedEntityReference.getWatchedStatus(userRef))
+            .thenReturn(
+                WatchedEntityReference.WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
+                WatchedEntityReference.WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS);
 
         // Test
-        watchedEntitiesManager.unwatchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.unwatchEntity(watchedEntityReference, userDocRef);
 
         // Checks
-        verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref1");
+        verify(notificationFilterPreferenceManager).deleteFilterPreference(userDocRef, "pref1");
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
     }
 
@@ -226,7 +268,10 @@ public class DefaultWatchedEntitiesManagerTest
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
-        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        DocumentReference userDocRef = new DocumentReference("xwiki", "XWiki", "User");
+        UserReference userRef = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(userDocRef)).thenReturn(userRef);
+        when(this.userReferenceSerializer.serialize(userRef)).thenReturn(userDocRef);
 
         // Filters
         DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
@@ -236,15 +281,18 @@ public class DefaultWatchedEntitiesManagerTest
         pref1.setEnabled(false);
         pref1.setId("pref1");
 
-        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
+        when(notificationFilterPreferenceManager.getFilterPreferences(userDocRef)).thenReturn(Sets.newSet(pref1));
 
-        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(true, false);
+        when(watchedEntityReference.getWatchedStatus(userRef))
+            .thenReturn(
+                WatchedEntityReference.WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
+                WatchedEntityReference.WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS);
 
         // Test
-        watchedEntitiesManager.unwatchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.unwatchEntity(watchedEntityReference, userDocRef);
 
         // Checks
-        verify(notificationFilterPreferenceManager).setFilterPreferenceEnabled(user, "pref1", true);
+        verify(notificationFilterPreferenceManager).setFilterPreferenceEnabled(userDocRef, "pref1", true);
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
     }
 
@@ -253,7 +301,10 @@ public class DefaultWatchedEntitiesManagerTest
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
-        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        DocumentReference userDocRef = new DocumentReference("xwiki", "XWiki", "User");
+        UserReference userRef = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(userDocRef)).thenReturn(userRef);
+        when(this.userReferenceSerializer.serialize(userRef)).thenReturn(userDocRef);
 
         // Filters
         DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
@@ -270,15 +321,18 @@ public class DefaultWatchedEntitiesManagerTest
         pref2.setEnabled(true);
         pref2.setId("pref2");
 
-        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1, pref2));
+        when(notificationFilterPreferenceManager.getFilterPreferences(userDocRef)).thenReturn(Sets.newSet(pref1, pref2));
 
-        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(true, false);
+        when(watchedEntityReference.getWatchedStatus(userRef))
+            .thenReturn(
+                WatchedEntityReference.WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS,
+                WatchedEntityReference.WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS);
 
         // Test
-        watchedEntitiesManager.unwatchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.unwatchEntity(watchedEntityReference, userDocRef);
 
         // Checks
-        verify(notificationFilterPreferenceManager).deleteFilterPreference(user, "pref1");
+        verify(notificationFilterPreferenceManager).deleteFilterPreference(userDocRef, "pref1");
         verify(watchedEntityReference, never()).createExclusiveFilterPreference();
     }
 
@@ -287,15 +341,20 @@ public class DefaultWatchedEntitiesManagerTest
     {
         // Mocks
         WatchedEntityReference watchedEntityReference = mock(WatchedEntityReference.class);
-        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        DocumentReference userDocRef = new DocumentReference("xwiki", "XWiki", "User");
+        UserReference userRef = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(userDocRef)).thenReturn(userRef);
+        when(this.userReferenceSerializer.serialize(userRef)).thenReturn(userDocRef);
 
         // Filters
         DefaultNotificationFilterPreference pref1 = new DefaultNotificationFilterPreference();
         pref1.setNotificationFormats(Sets.newSet(NotificationFormat.ALERT, NotificationFormat.EMAIL));
 
-        when(notificationFilterPreferenceManager.getFilterPreferences(user)).thenReturn(Sets.newSet(pref1));
+        when(notificationFilterPreferenceManager.getFilterPreferences(userDocRef)).thenReturn(Sets.newSet(pref1));
 
-        when(watchedEntityReference.isWatchedWithAllEventTypes(user)).thenReturn(true);
+        when(watchedEntityReference.getWatchedStatus(userRef))
+            .thenReturn(
+                WatchedEntityReference.WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS);
 
         DefaultNotificationFilterPreference createdPref = mock(DefaultNotificationFilterPreference.class);
         when(watchedEntityReference.createExclusiveFilterPreference()).thenReturn(createdPref);
@@ -306,12 +365,12 @@ public class DefaultWatchedEntitiesManagerTest
             DefaultNotificationFilterPreference prefToSave = (DefaultNotificationFilterPreference) set.toArray()[0];
             assertEquals("aabbccdd", prefToSave.getId());
             return null;
-        }).when(notificationFilterPreferenceManager).saveFilterPreferences(eq(user), anySet());
+        }).when(notificationFilterPreferenceManager).saveFilterPreferences(eq(userDocRef), anySet());
 
         // Test
-        watchedEntitiesManager.unwatchEntity(watchedEntityReference, user);
+        watchedEntitiesManager.unwatchEntity(watchedEntityReference, userDocRef);
 
         // Checks
-        verify(notificationFilterPreferenceManager).saveFilterPreferences(eq(user), anySet());
+        verify(notificationFilterPreferenceManager).saveFilterPreferences(eq(userDocRef), anySet());
     }
 }

@@ -28,6 +28,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -187,7 +188,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
         String wikiId = null;
         String pageName = document.getDocumentReference().getName();
         if (pageName.startsWith(VALID_PAGE_PREFIX)) {
-            wikiId = StringUtils.removeStart(pageName, VALID_PAGE_PREFIX).toLowerCase();
+            wikiId = Strings.CS.removeStart(pageName, VALID_PAGE_PREFIX).toLowerCase();
         }
         return wikiId;
     }
@@ -202,6 +203,9 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
         try {
             // Create the descriptor document
             descriptorDoc = wikiDescriptorDocumentHelper.getDocumentFromWikiId(descriptor.getId());
+
+            // Avoid modifying the cached document
+            descriptorDoc = descriptorDoc.clone();
 
             // Create the server class object
             BaseObject obj = descriptorDoc.getXObject(DefaultWikiDescriptor.SERVER_CLASS, true, context);

@@ -42,8 +42,10 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecutor;
 import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
@@ -90,17 +92,17 @@ public class ConfigurationFilesGenerator
 
     /**
      * @param configurationFileTargetDirectory the location where to generate the config files
-     * @param version the XWiki version for which to generate config files (used to get the config resources for the
-     * right version)
+     * @param platformVersion the XWiki version for which to generate config files (used to get the config resources for
+     *            the right version)
      * @param resolver the artifact resolver to use (can contain resolved artifacts in cache)
      * @throws Exception if an error occurs during config generation
      */
-    public void generate(File configurationFileTargetDirectory, String version, ArtifactResolver resolver)
+    public void generate(File configurationFileTargetDirectory, String platformVersion, ArtifactResolver resolver)
         throws Exception
     {
         VelocityContext context = createVelocityContext();
         Artifact artifact = new DefaultArtifact("org.xwiki.platform", "xwiki-platform-tool-configuration-resources",
-            JAR, version);
+            JAR, platformVersion);
         File configurationJARFile = resolver.resolveArtifact(artifact).getArtifact().getFile();
 
         configurationFileTargetDirectory.mkdirs();
@@ -128,9 +130,9 @@ public class ConfigurationFilesGenerator
         }
 
         // Copy a logback config file for testing. This allows putting overrides in it that are needed only for the
-        // tests. Only do this in the CI for now (or if debug is true) since this is currently used for debugging
+        // tests. Only do this in the CI for now (or if verbose is true) since this is currently used for debugging
         // problems.
-        if (DockerTestUtils.isInAContainer() || this.testConfiguration.isDebug()) {
+        if (DockerTestUtils.isInAContainer() || this.testConfiguration.isVerbose()) {
             copyLogbackConfigFile(configurationFileTargetDirectory);
         }
     }
@@ -174,8 +176,10 @@ public class ConfigurationFilesGenerator
         props.setProperty("xwikiCfgPlugins",
             "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\\"
+                + "        com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\\"
+                + "        com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
         props.setProperty("xwikiCfgVirtualUsepath", "1");
         props.setProperty("xwikiCfgEditCommentMandatory", "0");
@@ -202,12 +206,12 @@ public class ConfigurationFilesGenerator
         repositories.add(String.format("maven-local:maven:file://%s", localRepo));
 
         if (!this.repositoryResolver.getSession().isOffline()) {
-            repositories.add("maven-xwiki:maven:https://nexus.xwiki.org/nexus/content/groups/public");
+            repositories.add("maven-xwiki:maven:https://nexus-snapshots.xwiki.org/repository/public-proxy");
             // Allow snapshot extensions to be resolved too when not offline
             // Note that the xwiki-commons-extension-repository-maven-snapshots artifact is added in
             // WARBuilder when resolving distribution artifacts.
             repositories.add(
-                "maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots");
+                "maven-xwiki-snapshot:maven:https://nexus-snapshots.xwiki.org/repository/snapshots");
         }
 
         props.setProperty("xwikiExtensionRepositories", StringUtils.join(repositories, ','));
@@ -223,6 +227,36 @@ public class ConfigurationFilesGenerator
         // main and subwikis will be empty by default). If you need to test the DW, set these properties to true.
         props.setProperty("xwikiPropertiesAutomaticStartOnMainWiki", Boolean.FALSE.toString());
         props.setProperty("xwikiPropertiesAutomaticStartOnWiki", Boolean.FALSE.toString());
+
+        // Configure blob store properties
+        props.putAll(getBlobStoreConfigurationProperties());
+
+        return props;
+    }
+
+    private Properties getBlobStoreConfigurationProperties()
+    {
+        Properties props = new Properties();
+
+        BlobStore blobStore = this.testConfiguration.getBlobStore();
+        if (blobStore == BlobStore.S3) {
+            // Configure S3 blob store using additional properties
+            String additionalProperties =
+                """
+                    store.blobStoreType=%s
+                    store.s3.bucketName=%s
+                    store.s3.accessKey=%s
+                    store.s3.secretKey=%s
+                    store.s3.endpoint=%s
+                    store.s3.pathStyleAccess=true""".formatted(
+                    blobStore.getType(),
+                    BlobStoreContainerExecutor.getBucketName(),
+                    BlobStoreContainerExecutor.getAccessKey(),
+                    BlobStoreContainerExecutor.getSecretKey(),
+                    blobStore.getEndpoint());
+
+            props.setProperty("xwikiPropertiesAdditionalProperties", additionalProperties);
+        }
 
         return props;
     }
@@ -294,6 +328,18 @@ public class ConfigurationFilesGenerator
             throw new RuntimeException(
                 String.format("Failed to generate Hibernate config. Database [%s] not supported yet!",
                     this.testConfiguration.getDatabase()));
+        }
+
+        // In standardFlavor mode the WAR bundles the full standard distribution JARs and installs the standard
+        // flavor, so register the same extra Hibernate mappings the standard distribution registers (see
+        // xwiki.db.common.extraMappings / xwiki.db.default.extraMappings in xwiki-platform-distribution/pom.xml).
+        // Without this the standard UI (e.g. the notifications watch menu) queries entities such as
+        // DefaultNotificationFilterPreference that would otherwise be unmapped. In minimal mode these JARs are
+        // absent from WEB-INF/lib, so the mappings must NOT be registered.
+        if (this.testConfiguration.isStandardFlavor()) {
+            props.setProperty("xwikiDbHbmCommonExtraMappings",
+                "instance.hbm.xml,notification-filter-preferences.hbm.xml");
+            props.setProperty("xwikiDbHbmDefaultExtraMappings", "mailsender.hbm.xml");
         }
 
         return props;

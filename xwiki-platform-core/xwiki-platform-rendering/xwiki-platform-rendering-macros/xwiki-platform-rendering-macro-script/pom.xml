@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>16.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-script</artifactId>
   <name>XWiki Platform - Rendering - Macro - Script</name>
@@ -34,8 +34,6 @@
     <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Script Macro</xwiki.extension.name>
-    <!-- Too many dependencies required -->
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>
@@ -100,6 +98,12 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-standard</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -113,7 +117,7 @@
             </goals>
             <configuration>
               <includes>
-                <include>**/ScriptMockSetup*.class</include>
+                <include>**/JUnit5ScriptMockSetup*.class</include>
               </includes>
             </configuration>
           </execution>

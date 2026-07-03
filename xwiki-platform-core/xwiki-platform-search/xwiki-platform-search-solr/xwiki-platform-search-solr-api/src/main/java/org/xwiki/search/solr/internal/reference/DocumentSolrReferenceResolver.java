@@ -39,7 +39,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
-import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -146,7 +145,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
             AttachmentReference attachmentReference = attachment.getReference();
 
             try {
-                Iterables.addAll(result, this.attachmentResolverProvider.get().getReferences(attachmentReference));
+                this.attachmentResolverProvider.get().getReferences(attachmentReference).forEach(result::add);
             } catch (Exception e) {
                 this.logger.error("Failed to resolve references for attachment [" + attachmentReference + "]", e);
             }
@@ -166,7 +165,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
                     BaseObjectReference objectReference = object.getReference();
 
                     try {
-                        Iterables.addAll(result, this.objectResolverProvider.get().getReferences(objectReference));
+                        this.objectResolverProvider.get().getReferences(objectReference).forEach(result::add);
                     } catch (Exception e) {
                         this.logger.error("Failed to resolve references for object [" + objectReference + "]", e);
                     }
@@ -197,21 +196,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
      */
     protected Locale getLocale(DocumentReference documentReference) throws SolrIndexerException
     {
-        Locale locale = null;
-
-        try {
-            if (documentReference.getLocale() != null && !documentReference.getLocale().equals(Locale.ROOT)) {
-                locale = documentReference.getLocale();
-            } else {
-                XWikiContext xcontext = this.xcontextProvider.get();
-                locale = xcontext.getWiki().getDocument(documentReference, xcontext).getRealLocale();
-            }
-        } catch (Exception e) {
-            throw new SolrIndexerException(String.format("Exception while fetching the locale of the document '%s'",
-                documentReference), e);
-        }
-
-        return locale;
+        return documentReference.getLocale() != null ? documentReference.getLocale() : Locale.ROOT;
     }
 
     @Override

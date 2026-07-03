@@ -88,7 +88,7 @@ public class XWikiSelectWidget extends BaseElement
     public List<String> getCategoryNames()
     {
         return getCategoriesStream().map(category -> StringUtils.substringBefore(category.getText(), '(').trim())
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private Stream<WebElement> getCategoriesStream()

@@ -163,7 +163,7 @@ class IntervalUsersManagerInvalidatorTest
         setActive(this.userDocument.getOriginalDocument(), true);
 
         this.invalidator.onEvent(event, this.userDocument, null);
-        verify(this.users, times(1)).invalidateUser(USER_REFERENCE);
+        verify(this.users).invalidateUser(USER_REFERENCE);
 
         // The user is but was not active
         setActive(this.userDocument, false);

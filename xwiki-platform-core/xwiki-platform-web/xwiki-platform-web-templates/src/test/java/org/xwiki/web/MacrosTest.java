@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,12 +40,14 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.url.script.URLSecurityScriptService;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.internal.XWikiDateTool;
 import org.xwiki.xml.html.script.HTMLScriptService;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -60,6 +64,9 @@ import static org.mockito.Mockito.when;
 @ComponentList({XWikiDateTool.class, ModelScriptService.class})
 class MacrosTest extends PageTest
 {
+    private static final Pattern TRANSLATION_MACRO_OUTPUT_REGEX =
+        Pattern.compile("\\{\\{translation key=\"key\" scriptParameters=\"(txparams_key_.....)\"/}}");
+
     private VelocityManager velocityManager;
 
     @BeforeEach
@@ -67,7 +74,41 @@ class MacrosTest extends PageTest
     {
         this.velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
     }
+    
+    @Test
+    void setVariableGlobal() throws Exception
+    {
+        StringWriter writer = new StringWriter();
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
+			+ "#macro(helloMacro $return)\n"
+			+ "  #set($return = $NULL)\n"
+			+ "  #setVariable(\"$return\" \"my new value\")\n"
+			+ "#end\n"
+			+ "#helloMacro($myVarToSet)"));
+        
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        assertEquals("my new value", velocityContext.get("myVarToSet"));
+    } 
 
+    @Test
+    void setVariableInMacroContext() throws Exception
+    {
+        StringWriter writer = new StringWriter();
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
+			+ "#macro(childMacro $return)\n"
+			+ "  #set($return = $NULL)\n"
+			+ "  #setVariable(\"$return\" \"value from child macro\")\n"
+			+ "#end\n"  		
+			+ "#macro(parentMacro $return)\n"
+			+ "  #childMacro($macro.childMacroResult)\n"
+			+ "  #setVariable(\"$return\" \"${macro.childMacroResult}/parentValue\")\n"
+			+ "#end\n"
+			+ "#parentMacro($myVarToSet)"));
+        
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        assertEquals("value from child macro/parentValue", velocityContext.get("myVarToSet"));
+    } 
+    
     @Test
     void addLivetableLocationFilter() throws Exception
     {
@@ -253,36 +294,36 @@ class MacrosTest extends PageTest
         StringWriter out = new StringWriter();
         this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
         assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.XWikiGuest\">"
-            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
-            + "alt=\"XWikiGuest\" />"
-            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">XWikiGuest</a>"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" alt=\"\" />"
+            + "XWikiGuest</a>"
             + "</div>", out.toString().trim());
 
         script = "#displayUser($NULL)";
         out = new StringWriter();
         this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
         assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.XWikiGuest\">"
-            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
-            + "alt=\"XWikiGuest\" />"
-            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">XWikiGuest</a>"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" alt=\"\" />"
+            + "XWikiGuest</a>"
             + "</div>", out.toString().trim());
 
         script = "#displayUser(\"\")";
         out = new StringWriter();
         this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
         assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.XWikiGuest\">"
-            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
-            + "alt=\"XWikiGuest\" />"
-            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">XWikiGuest</a>"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" alt=\"\" />"
+            + "XWikiGuest</a>"
             + "</div>", out.toString().trim());
 
         script = "#displayUser(\"XWiki.Foo\")";
         out = new StringWriter();
         this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
         assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.Foo\">"
-            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
-            + "alt=\"Foo\" />"
-            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/Foo\">Foo</a>"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/Foo\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" alt=\"\" />"
+            + "Foo</a>"
             + "</div>", out.toString().trim());
 
         DocumentReference userFoo = new DocumentReference("xwiki", "XWiki", "Foo");
@@ -292,9 +333,9 @@ class MacrosTest extends PageTest
         out = new StringWriter();
         this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
         assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.Foo\">"
-            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
-            + "alt=\"Foo\" />"
-            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/Foo\">Foo</a>"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/Foo\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" alt=\"\" />"
+            + "Foo</a>"
             + "</div>", out.toString().trim());
     }
 
@@ -369,5 +410,27 @@ class MacrosTest extends PageTest
         out = new StringWriter();
         this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
         assertEquals("", velocityContext.get("sanitizedResult"));
+    }
+
+    @Test
+    void wikiTranslation() throws XWikiVelocityException
+    {
+        StringWriter writer = new StringWriter();
+        this.velocityManager.evaluate(writer, "translations", new StringReader("""
+            #wikiTranslation('key' ['string1'])
+            #wikiTranslation('key' ['string2', 42])"""));
+
+        Matcher matcher = TRANSLATION_MACRO_OUTPUT_REGEX.matcher(writer.toString());
+        assertTrue(matcher.find());
+        String parameters1 = matcher.group(1);
+
+        assertTrue(matcher.find());
+        String parameters2 = matcher.group(1);
+
+        assertNotEquals(parameters1, parameters2);
+
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        assertEquals(List.of("string1"), velocityContext.get(parameters1));
+        assertEquals(List.of("string2", 42), velocityContext.get(parameters2));
     }
 }

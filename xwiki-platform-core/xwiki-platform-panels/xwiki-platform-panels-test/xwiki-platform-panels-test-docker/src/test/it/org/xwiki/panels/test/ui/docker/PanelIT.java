@@ -288,6 +288,51 @@ class PanelIT
         assertAlmostEqualSize(200, panelPage.getPanelWidth(PageWithPanels.Column.RIGHT));
     }
 
+    @Test
+    @Order(6)
+    void displayLeftPanelColumn(TestUtils testUtils, TestReference testReference)
+    {
+        // Automates the "Display Left Panel Column" manual test: create two panels, configure them on the
+        // left column as a comma-separated list via the Panels administration UI, and verify both are
+        // displayed in the left column. This proves the Panel Admin UI works for the left column and that
+        // a comma-separated list of more than one panel is supported.
+        String baseName = testReference.getLastSpaceReference().getName();
+        String title1 = baseName + "1";
+        String title2 = baseName + "2";
+
+        for (String title : new String[] { title1, title2 }) {
+            testUtils.deletePage("Panels", title);
+            PanelEditPage panelEditPage = PanelsHomePage.gotoPage().createPanel(title);
+            panelEditPage.setContent(String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, title, "Panel content."));
+            panelEditPage.clickSaveAndContinue();
+        }
+
+        setLeftPanelsInAdministration(
+            StringUtils.join(new Object[] { "Panels." + title1, "Panels." + title2 }, ','));
+
+        testUtils.gotoPage(testReference);
+        PageWithPanels page = new PageWithPanels();
+        assertTrue(page.hasLeftPanels());
+        assertTrue(page.hasLeftPanel(title1));
+        assertTrue(page.hasLeftPanel(title2));
+
+        // Clean up the pages created by this test because they interfere with the navigation panel
+        // administration test (which asserts the exact list of top level pages).
+        testUtils.deletePage("Panels", title1);
+        testUtils.deletePage("Panels", title2);
+        testUtils.deletePage(testReference);
+    }
+
+    private void setLeftPanelsInAdministration(String panels)
+    {
+        AdministrationPage.gotoPage().clickSection("Look & Feel", "Panels");
+        PanelsAdministrationPage panelsAdminPage = new PanelsAdministrationPage();
+        PageLayoutTabContent pageLayout = panelsAdminPage.selectPageLayout();
+        pageLayout.selectLeftColumnLayout();
+        pageLayout.setLeftPanels(panels);
+        panelsAdminPage.clickSave();
+    }
+
     private void setRightPanelInAdministration(String panelName)
     {
         AdministrationPage.gotoPage().clickSection("Look & Feel", "Panels");

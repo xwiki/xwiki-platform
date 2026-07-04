@@ -48,6 +48,12 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
 
     private static final By TEST_TRANSFORMED_NAME = By.id("testNameStrategyTransformedName");
 
+    private static final By USE_TRANSFORMATION_SELECT =
+        By.id("XWiki.EntityNameValidation.ConfigurationClass_0_useTransformation");
+
+    private static final By USE_VALIDATION_SELECT =
+        By.id("XWiki.EntityNameValidation.ConfigurationClass_0_useValidation");
+
     /**
      * Open the Name Strategies administration section.
      *
@@ -83,6 +89,28 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     public String getSelectedStrategy()
     {
         return new Select(getDriver().findElement(STRATEGY_SELECT)).getFirstSelectedOption().getAttribute("value");
+    }
+
+    /**
+     * Enable or disable the automatic transformation of names that don't respect the selected strategy. This only
+     * changes the selected value in the form; call {@link #save()} to persist it.
+     *
+     * @param enabled {@code true} to enable the automatic transformation, {@code false} to disable it
+     */
+    public void setTransformNameAutomatically(boolean enabled)
+    {
+        new Select(getDriver().findElement(USE_TRANSFORMATION_SELECT)).selectByValue(enabled ? "1" : "0");
+    }
+
+    /**
+     * Enable or disable the validation of names before saving. This only changes the selected value in the form; call
+     * {@link #save()} to persist it.
+     *
+     * @param enabled {@code true} to enable the validation, {@code false} to disable it
+     */
+    public void setValidateNames(boolean enabled)
+    {
+        new Select(getDriver().findElement(USE_VALIDATION_SELECT)).selectByValue(enabled ? "1" : "0");
     }
 
     /**

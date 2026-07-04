@@ -35,6 +35,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 import com.xpn.xwiki.objects.meta.PasswordMetaClass;
 
@@ -82,6 +83,26 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
      */
     private static final String TIMEZONE_FIELD = "timezone";
 
+    /**
+     * Custom display template for the {@code core.defaultDocumentSyntax} property showing a syntax selector.
+     */
+    private static final String DEFAULT_DOCUMENT_SYNTAX_CUSTOM_DISPLAY = """
+        {{velocity}}
+        {{html wiki="false" clean="false"}}
+        #if ("$!value" == '')
+          #set ($value = $xwiki.getDefaultDocumentSyntax())
+        #end
+        <select name="${object.getxWikiClass().name}_${object.number}_${name}"\
+         id="${object.getxWikiClass().name}_${object.number}_${name}">
+        #set ($configuredSyntaxes = $collectiontool.sort($services.rendering.getConfiguredSyntaxes()))
+        #foreach($syntax in $configuredSyntaxes)
+          <option value="$syntax.toIdString()"#if($syntax.toIdString().equalsIgnoreCase($value))\
+         selected="selected"#end>$syntax.toString()</option>
+        #end
+        </select>
+        {{/html}}
+        {{/velocity}}""";
+
     private static final LocalDocumentReference SHEET_REFERENCE =
         new LocalDocumentReference(XWiki.SYSTEM_SPACE, "AdminSheet");
 
@@ -108,6 +129,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("parent", "Parent Space", 30);
         xclass.addBooleanField("multilingual", "Multi-Lingual", "yesno");
         xclass.addTextField("default_language", "Default Language", 5);
+        xclass.addTextField("plugins", "Plugins", 40);
         xclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
         xclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
 
@@ -120,6 +142,8 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
                 + "or theme.className='FlamingoThemesCode.ThemeClass') "
                 + "and doc.fullName<>'ColorThemes.ColorThemeTemplate' "
                 + "and doc.fullName<>'FlamingoThemesCode.ThemeTemplate'");
+        ((PropertyClass) xclass.get("colorTheme")).setCustomDisplay(
+            "{{include reference=\"XWiki.ColorThemePropertyDisplayer\" /}}");
         xclass.addDBListField("iconTheme", "Icon theme",
             "select doc.fullName, propName.value from XWikiDocument as doc, BaseObject as theme, "
                 + "StringProperty propName "
@@ -131,6 +155,9 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
 
         xclass.addStaticListField("editor", "Default Editor", "Text|Wysiwyg");
+        ((ListClass) xclass.get("editor")).setPicker(true);
+        xclass.addStaticListField("underline", "Underline links", "OnlyInlineLinks|Yes|No");
+        ((ListClass) xclass.get("underline")).setPicker(true);
 
         xclass.addTextField("webcopyright", "Copyright", 30);
         xclass.addTextField("title", "Title", 30);
@@ -153,11 +180,17 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addBooleanField("obfuscateEmailAddresses", "Obfuscate Email Addresses", "yesno");
 
         xclass.addStaticListField("registration_anonymous", "Anonymous", "Image|Text");
+        ((ListClass) xclass.get("registration_anonymous")).setPicker(true);
         xclass.addStaticListField("registration_registered", "Registered", "Image|Text");
+        ((ListClass) xclass.get("registration_registered")).setPicker(true);
         xclass.addStaticListField("edit_anonymous", "Anonymous", "Image|Text");
+        ((ListClass) xclass.get("edit_anonymous")).setPicker(true);
         xclass.addStaticListField("edit_registered", "Registered", "Image|Text");
+        ((ListClass) xclass.get("edit_registered")).setPicker(true);
         xclass.addStaticListField("comment_anonymous", "Anonymous", "Image|Text");
+        ((ListClass) xclass.get("comment_anonymous")).setPicker(true);
         xclass.addStaticListField("comment_registered", "Registered", "Image|Text");
+        ((ListClass) xclass.get("comment_registered")).setPicker(true);
 
         xclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
@@ -167,6 +200,8 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
 
         // Document editing
         xclass.addTextField("core.defaultDocumentSyntax", "Default document syntax", 60);
+        ((PropertyClass) xclass.get("core.defaultDocumentSyntax"))
+            .setCustomDisplay(DEFAULT_DOCUMENT_SYNTAX_CUSTOM_DISPLAY);
         xclass.addBooleanField("xwiki.title.mandatory", "Make document title field mandatory", "yesno");
 
         // for tags

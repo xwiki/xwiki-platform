@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.administration.test.po.AdministrationSectionPage;
@@ -40,6 +41,15 @@ public class SearchAdministrationPage extends AdministrationSectionPage
 
     @FindBy(id = "XWiki.SearchConfigClass_0_exclusions")
     private WebElement searchExclusionsField;
+
+    @FindBy(id = "solrAdminAction")
+    private WebElement indexingActionField;
+
+    @FindBy(id = "solrAdminWiki")
+    private WebElement indexingWikiField;
+
+    @FindBy(className = "solrQueueSize")
+    private WebElement queueSizeField;
 
     /**
      * Open the search administration section.
@@ -74,5 +84,48 @@ public class SearchAdministrationPage extends AdministrationSectionPage
     public SuggestInputElement getSearchExclusionsField()
     {
         return new SuggestInputElement(this.searchExclusionsField);
+    }
+
+    /**
+     * @return the dropdown list used to select the indexing action to perform (add to the index, delete from the
+     *         index or reindex)
+     */
+    public Select getIndexingActionField()
+    {
+        return new Select(this.indexingActionField);
+    }
+
+    /**
+     * @return the dropdown list used to select the wiki on which to perform the indexing action (or the entire farm
+     *         when the empty value is selected)
+     */
+    public Select getIndexingWikiField()
+    {
+        return new Select(this.indexingWikiField);
+    }
+
+    /**
+     * Submit the indexing action form, i.e. click the "Apply" button. This triggers a full-page reload.
+     */
+    public void submitIndexingAction()
+    {
+        getDriver().findElement(
+            By.xpath("//select[@id = 'solrAdminAction']/ancestor::form//input[@type = 'submit']")).click();
+    }
+
+    /**
+     * @return the current size of the Solr indexing queue, as displayed in the administration section
+     */
+    public int getQueueSize()
+    {
+        return Integer.parseInt(this.queueSizeField.getText().trim());
+    }
+
+    /**
+     * @return the text of the success message displayed after submitting an indexing action
+     */
+    public String getActionResultMessage()
+    {
+        return getDriver().findElement(By.cssSelector("div.box.successmessage")).getText();
     }
 }

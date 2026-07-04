@@ -887,7 +887,6 @@ public class BasePage extends BaseElement
     /**
      * @return {@code true} if an icon rendered by the Font Awesome (font-based) icon theme is displayed in the page
      *         content; Font Awesome renders icons as {@code <span class="fa ...">} elements
-     * @since 18.6.0RC1
      */
     public boolean isFontAwesomeIconDisplayedInContent()
     {
@@ -897,7 +896,6 @@ public class BasePage extends BaseElement
     /**
      * @return {@code true} if an icon rendered by the Silk (image-based) icon theme is displayed in the page content;
      *         Silk renders icons as {@code <img src=".../icons/silk/...">} elements
-     * @since 18.6.0RC1
      */
     public boolean isSilkIconDisplayedInContent()
     {

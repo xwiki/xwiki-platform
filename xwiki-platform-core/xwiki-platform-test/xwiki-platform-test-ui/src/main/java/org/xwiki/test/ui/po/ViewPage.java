@@ -432,9 +432,6 @@ public class ViewPage extends BasePage
 
     /**
      * @return the content of the copyright section in the page footer
-     * @since 17.10.10
-     * @since 18.4.3
-     * @since 18.6.0RC1
      */
     public String getFooterCopyright()
     {
@@ -443,9 +440,6 @@ public class ViewPage extends BasePage
 
     /**
      * @return the content of the version section in the page footer
-     * @since 17.10.10
-     * @since 18.4.3
-     * @since 18.6.0RC1
      */
     public String getFooterVersion()
     {

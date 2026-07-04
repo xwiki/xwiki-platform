@@ -204,6 +204,8 @@ public @interface UITest
      *         {@code xwiki-platform-minimaldependencies}); and (2) the standard flavor
      *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically, so the test does
      *         not need to declare it as a dependency. False by default.
+     * @since 17.10.10
+     * @since 18.4.3
      * @since 18.6.0RC1
      */
     boolean standardFlavor() default false;

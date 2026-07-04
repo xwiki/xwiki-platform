@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.xwiki.administration.test.po.TemplateProviderInlinePage;
+import org.xwiki.administration.test.po.TemplateProviderViewPage;
 import org.xwiki.administration.test.po.TemplatesAdministrationSectionPage;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
@@ -533,6 +534,105 @@ class PageTemplatesIT
         assertThat(scriptingCreatePage.getErrorMessage(),
             containsString("You don't have the required rights to create pages from the template ["
                 + templateProviderFullName + "]."));
+    }
+
+    /**
+     * Tests creating a template provider with icon, description, and visibility restrictions, verifying that the
+     * template is available only in the restricted location.
+     */
+    @Test
+    @Order(8)
+    void createTemplateProviderWithIconAndRestrictions(TestUtils setup, TestReference testReference) throws Exception
+    {
+        cleanUp(setup, testReference);
+
+        SpaceReference testSpaceReference = testReference.getLastSpaceReference();
+        EntityReference testLocalParent = testReference.getLocalDocumentReference().getParent();
+
+        SpaceReference visibilitySpaceReference = new SpaceReference("VisibilitySpace", testSpaceReference);
+        SpaceReference creationSpaceReference = new SpaceReference("CreationSpace", testSpaceReference);
+        SpaceReference otherSpaceReference = new SpaceReference("OtherSpace", testSpaceReference);
+
+        setup.rest().savePage(new DocumentReference("WebHome", visibilitySpaceReference), "", "Visibility Space");
+        setup.rest().savePage(new DocumentReference("WebHome", creationSpaceReference), "", "Creation Space");
+        setup.rest().savePage(new DocumentReference("WebHome", otherSpaceReference), "", "Other Space");
+
+        String templateContent = "Restricted template content";
+        LocalDocumentReference templateReference =
+            new LocalDocumentReference(TEMPLATE_NAME, testLocalParent);
+        setup.rest().savePage(templateReference, templateContent, "Restricted Template");
+
+        String providerName = "RestrictedProvider";
+        LocalDocumentReference templateProviderReference =
+            new LocalDocumentReference(providerName, testLocalParent);
+        String templateProviderFullName = setup.serializeReference(templateProviderReference);
+        String testSpace = setup.serializeReference(templateProviderReference.getParent());
+        String visibilitySpace = testSpace + ".VisibilitySpace";
+        String creationSpace = testSpace + ".CreationSpace";
+
+        TemplatesAdministrationSectionPage sectionPage = TemplatesAdministrationSectionPage.gotoPage();
+        TemplateProviderInlinePage templateProviderInline =
+            sectionPage.createTemplateProvider(templateProviderReference);
+        templateProviderInline.setTemplateName("Restricted Template");
+        templateProviderInline.setIcon("page");
+        templateProviderInline.setDescription("A template with visibility restrictions");
+        templateProviderInline.setTemplate(setup.serializeReference(templateReference));
+
+        List<String> visibilityRestrictions = new ArrayList<>();
+        visibilityRestrictions.add(visibilitySpace);
+        templateProviderInline.setVisibilityRestrictions(visibilityRestrictions);
+
+        List<String> creationRestrictions = new ArrayList<>();
+        creationRestrictions.add(creationSpace);
+        templateProviderInline.setCreationRestrictions(creationRestrictions);
+
+        templateProviderInline.clickSaveAndView();
+        TemplateProviderViewPage templateProviderViewPage = new TemplateProviderViewPage();
+        assertEquals("page", templateProviderViewPage.getIcon());
+        assertEquals("A template with visibility restrictions", templateProviderViewPage.getDescription());
+
+        // The template is visible only in the visibility-restricted space
+        ViewPage visibilitySpaceView =
+            setup.gotoPage(new DocumentReference("WebHome", visibilitySpaceReference));
+        CreatePagePage createPageInVisibilitySpace = visibilitySpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        assertTrue(createPageInVisibilitySpace.getAvailableTemplates().contains(templateProviderFullName));
+        assertEquals("page", createPageInVisibilitySpace.getTemplateIcon(templateProviderFullName));
+        assertEquals("A template with visibility restrictions",
+            createPageInVisibilitySpace.getTemplateDescription(templateProviderFullName));
+
+        // The template is not visible outside the visibility-restricted space
+        ViewPage otherSpaceView =
+            setup.gotoPage(new DocumentReference("WebHome", otherSpaceReference));
+        CreatePagePage createPageInOtherSpace = otherSpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        assertFalse(createPageInOtherSpace.getAvailableTemplates().contains(templateProviderFullName));
+
+        // The template can be used to create a page only in the creation-restricted space
+        visibilitySpaceView =
+            setup.gotoPage(new DocumentReference("WebHome", visibilitySpaceReference));
+        createPageInVisibilitySpace = visibilitySpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        createPageInVisibilitySpace.setTemplate(templateProviderFullName);
+        createPageInVisibilitySpace.getDocumentPicker().toggleLocationAdvancedEdit();
+        EditPage editPage = createPageInVisibilitySpace
+            .createPageFromTemplate("RestrictedPage", creationSpace, null, templateProviderFullName);
+        ViewPage createdPage = editPage.clickSaveAndView();
+        assertEquals(templateContent, createdPage.getContent());
+
+        // The template cannot be used to create a page outside the creation-restricted space
+        visibilitySpaceView =
+            setup.gotoPage(new DocumentReference("WebHome", visibilitySpaceReference));
+        createPageInVisibilitySpace = visibilitySpaceView.createPage();
+        assertTrue(setup.isInCreateMode());
+        createPageInVisibilitySpace.setTemplate(templateProviderFullName);
+        createPageInVisibilitySpace.getDocumentPicker().toggleLocationAdvancedEdit();
+        createPageInVisibilitySpace.getDocumentPicker().setParent(visibilitySpace);
+        createPageInVisibilitySpace.getDocumentPicker().setName("ShouldNotWork");
+        String currentURL = setup.getDriver().getCurrentUrl();
+        createPageInVisibilitySpace.clickCreate(false);
+        assertEquals(currentURL, setup.getDriver().getCurrentUrl());
+        createPageInVisibilitySpace.waitForFieldErrorMessage();
     }
 
     /**

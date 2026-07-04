@@ -819,6 +819,8 @@ public class TestConfiguration
      *         dependencies (instead of the minimal set) and the standard flavor
      *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically. See
      *         {@link org.xwiki.test.docker.junit5.UITest#standardFlavor()}.
+     * @since 17.10.10
+     * @since 18.4.3
      * @since 18.6.0RC1
      */
     public boolean isStandardFlavor()
@@ -828,6 +830,8 @@ public class TestConfiguration
 
     /**
      * @param standardFlavor see {@link #isStandardFlavor()}
+     * @since 17.10.10
+     * @since 18.4.3
      * @since 18.6.0RC1
      */
     public void setStandardFlavor(boolean standardFlavor)
@@ -841,6 +845,8 @@ public class TestConfiguration
      *         dependencies when {@link #isStandardFlavor()} is true (the {@code legacy} variant when the
      *         {@code legacy} profile is active), or the minimal set otherwise. Used by both the WAR builder and the
      *         extension installer so that they agree on what is bundled versus provisioned.
+     * @since 17.10.10
+     * @since 18.4.3
      * @since 18.6.0RC1
      */
     public String getWARDependenciesRootArtifactId()

@@ -89,9 +89,6 @@ public class SearchAdministrationPage extends AdministrationSectionPage
     /**
      * @return the dropdown list used to select the indexing action to perform (add to the index, delete from the
      *         index or reindex)
-     * @since 17.10.10
-     * @since 18.4.3
-     * @since 18.5.0RC1
      */
     public Select getIndexingActionField()
     {
@@ -101,9 +98,6 @@ public class SearchAdministrationPage extends AdministrationSectionPage
     /**
      * @return the dropdown list used to select the wiki on which to perform the indexing action (or the entire farm
      *         when the empty value is selected)
-     * @since 17.10.10
-     * @since 18.4.3
-     * @since 18.5.0RC1
      */
     public Select getIndexingWikiField()
     {
@@ -112,10 +106,6 @@ public class SearchAdministrationPage extends AdministrationSectionPage
 
     /**
      * Submit the indexing action form, i.e. click the "Apply" button. This triggers a full-page reload.
-     *
-     * @since 17.10.10
-     * @since 18.4.3
-     * @since 18.5.0RC1
      */
     public void submitIndexingAction()
     {
@@ -125,9 +115,6 @@ public class SearchAdministrationPage extends AdministrationSectionPage
 
     /**
      * @return the current size of the Solr indexing queue, as displayed in the administration section
-     * @since 17.10.10
-     * @since 18.4.3
-     * @since 18.5.0RC1
      */
     public int getQueueSize()
     {
@@ -136,9 +123,6 @@ public class SearchAdministrationPage extends AdministrationSectionPage
 
     /**
      * @return the text of the success message displayed after submitting an indexing action
-     * @since 17.10.10
-     * @since 18.4.3
-     * @since 18.5.0RC1
      */
     public String getActionResultMessage()
     {

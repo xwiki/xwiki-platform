@@ -429,4 +429,20 @@ public class ViewPage extends BasePage
         reviewButton.click();
         return new RequiredRightsModal();
     }
+
+    /**
+     * @return the content of the copyright section in the page footer
+     */
+    public String getFooterCopyright()
+    {
+        return getDriver().findElement(By.id("xwikilicence")).getText();
+    }
+
+    /**
+     * @return the content of the version section in the page footer
+     */
+    public String getFooterVersion()
+    {
+        return getDriver().findElement(By.id("xwikiplatformversion")).getText();
+    }
 }

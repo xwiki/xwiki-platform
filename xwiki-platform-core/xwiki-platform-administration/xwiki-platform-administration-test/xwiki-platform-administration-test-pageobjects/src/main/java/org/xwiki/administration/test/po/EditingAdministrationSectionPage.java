@@ -44,6 +44,13 @@ public class EditingAdministrationSectionPage extends AdministrationSectionPage
     private WebElement defaultEditorSelect;
 
     /**
+     * The dropdown used to control whether the document title field is mandatory when editing a page (the
+     * {@code xwiki.title.mandatory} preference). The value "1" means Yes (mandatory) and "0" means No.
+     */
+    @FindBy(name = "XWiki.XWikiPreferences_0_xwiki.title.mandatory")
+    private WebElement mandatoryTitleSelect;
+
+    /**
      * Open the Editing administration section.
      *
      * @return the Editing administration section
@@ -86,5 +93,24 @@ public class EditingAdministrationSectionPage extends AdministrationSectionPage
     public String getDefaultEditor()
     {
         return getDefaultEditorSelect().getFirstSelectedOption().getAttribute("value");
+    }
+
+    /**
+     * Set whether the document title field is mandatory when editing a page and save the changes.
+     *
+     * @param mandatory {@code true} to make the document title mandatory, {@code false} otherwise
+     */
+    public void setMandatoryTitle(boolean mandatory)
+    {
+        new Select(this.mandatoryTitleSelect).selectByValue(mandatory ? "1" : "0");
+        clickSave();
+    }
+
+    /**
+     * @return {@code true} if the document title field is configured as mandatory when editing a page
+     */
+    public boolean isMandatoryTitle()
+    {
+        return "1".equals(new Select(this.mandatoryTitleSelect).getFirstSelectedOption().getAttribute("value"));
     }
 }

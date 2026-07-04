@@ -87,8 +87,6 @@ public class PageTypePicker extends XWikiSelectWidget
      * @param template the value of the template option
      * @return the icon name displayed for the specified template option, extracted from the {@code <img>} element's
      *         {@code src} attribute, or an empty string if no icon is displayed
-     * @since 17.10.10
-     * @since 18.3RC1
      */
     public String getTemplateIcon(String template)
     {
@@ -106,8 +104,6 @@ public class PageTypePicker extends XWikiSelectWidget
     /**
      * @param template the value of the template option
      * @return the description text displayed for the specified template option, or an empty string if none
-     * @since 17.10.10
-     * @since 18.3.0RC1
      */
     public String getTemplateDescription(String template)
     {

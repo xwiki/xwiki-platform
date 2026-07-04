@@ -89,12 +89,6 @@ public class TemplateProviderInlinePage extends InlinePage
         this.templateNameInput.sendKeys(value);
     }
 
-    /**
-     * Set the icon of the template provider.
-     *
-     * @param icon the icon to set
-     * @since 17.10.10
-     */
     public void setIcon(String icon)
     {
         this.iconInput.clear();
@@ -102,12 +96,6 @@ public class TemplateProviderInlinePage extends InlinePage
         this.iconInput.sendKeys(Keys.ESCAPE);
     }
 
-    /**
-     * Set the description of the template provider.
-     *
-     * @param description the description to set
-     * @since 17.10.10
-     */
     public void setDescription(String description)
     {
         this.descriptionInput.clear();

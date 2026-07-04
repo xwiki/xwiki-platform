@@ -128,6 +128,12 @@ import com.xpn.xwiki.util.Util;
 @Singleton
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface, Initializable
 {
+    private static final String CREATE_SCHEMA = "CREATE SCHEMA ";
+    private static final String CASCADE_SUFFIX = " CASCADE";
+    private static final String DROP_SCHEMA = "DROP SCHEMA ";
+    private static final String DOC_ID = "docId";
+    private static final String SELECT_DISTINCT_DOC_FULLNAME = "select distinct doc.fullName";
+
     @Inject
     private Logger logger;
 
@@ -333,9 +339,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         escapedSchema, escapedSchema));
                 } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.DB2 == databaseProduct
                     || DatabaseProduct.H2 == databaseProduct) {
-                    statement.execute("CREATE SCHEMA " + escapedSchema);
+                    statement.execute(CREATE_SCHEMA + escapedSchema);
                 } else if (DatabaseProduct.HSQLDB == databaseProduct) {
-                    statement.execute("CREATE SCHEMA " + escapedSchema + " AUTHORIZATION DBA");
+                    statement.execute(CREATE_SCHEMA + escapedSchema + " AUTHORIZATION DBA");
                 } else if (DatabaseProduct.MYSQL == databaseProduct) {
                     StringBuilder statementBuilder = new StringBuilder("create database " + escapedSchema);
                     String[] charsetAndCollation = getCharsetAndCollation(wikiName, session, context);
@@ -346,7 +352,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     statement.execute(statementBuilder.toString());
                 } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
                     if (isInSchemaMode()) {
-                        statement.execute("CREATE SCHEMA " + escapedSchema);
+                        statement.execute(CREATE_SCHEMA + escapedSchema);
                     } else {
                         this.logger.error("Creation of a new database is currently only supported in the schema mode, "
                             + "see https://jira.xwiki.org/browse/XWIKI-8753");
@@ -469,17 +475,17 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         String escapedSchemaName) throws SQLException
     {
         if (DatabaseProduct.ORACLE == databaseProduct) {
-            statement.execute("DROP USER " + escapedSchemaName + " CASCADE");
+            statement.execute("DROP USER " + escapedSchemaName + CASCADE_SUFFIX);
         } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.MYSQL == databaseProduct
             || DatabaseProduct.H2 == databaseProduct) {
-            statement.execute("DROP SCHEMA " + escapedSchemaName);
+            statement.execute(DROP_SCHEMA + escapedSchemaName);
         } else if (DatabaseProduct.HSQLDB == databaseProduct) {
-            statement.execute("DROP SCHEMA " + escapedSchemaName + " CASCADE");
+            statement.execute(DROP_SCHEMA + escapedSchemaName + CASCADE_SUFFIX);
         } else if (DatabaseProduct.DB2 == databaseProduct) {
-            statement.execute("DROP SCHEMA " + escapedSchemaName + " RESTRICT");
+            statement.execute(DROP_SCHEMA + escapedSchemaName + " RESTRICT");
         } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
             if (isInSchemaMode()) {
-                statement.execute("DROP SCHEMA " + escapedSchemaName + " CASCADE");
+                statement.execute(DROP_SCHEMA + escapedSchemaName + CASCADE_SUFFIX);
             } else {
                 this.logger.warn("Subwiki deletion not yet supported in Database mode for PostgreSQL");
             }
@@ -2049,7 +2055,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                 Query<Long> query = session
                     .createQuery("select lock.docId from XWikiLock as lock where lock.docId = :docId", Long.class);
-                query.setParameter("docId", docId);
+                query.setParameter(DOC_ID, docId);
                 if (query.uniqueResult() != null) {
                     lock = new XWikiLock();
                     session.load(lock, Long.valueOf(docId));
@@ -2070,7 +2076,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             try {
                 Query<Long> query = session
                     .createQuery("select lock.docId from XWikiLock as lock where lock.docId = :docId", Long.class);
-                query.setParameter("docId", lock.getDocId());
+                query.setParameter(DOC_ID, lock.getDocId());
                 if (query.uniqueResult() == null) {
                     session.save(lock);
                 } else {
@@ -2185,7 +2191,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             try {
                 Query<XWikiLink> query =
                     session.createQuery(" from XWikiLink as link where link.id.docId = :docId", XWikiLink.class);
-                query.setParameter("docId", docId);
+                query.setParameter(DOC_ID, docId);
 
                 return query.list();
             } catch (Exception e) {
@@ -2406,7 +2412,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         executeWrite(inputxcontext, session -> {
             try {
                 Query<?> query = session.createQuery("delete from XWikiLink as link where link.id.docId = :docId");
-                query.setParameter("docId", docId);
+                query.setParameter(DOC_ID, docId);
                 query.executeUpdate();
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -2501,7 +2507,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {
-        String sql = createSQLQuery("select distinct doc.fullName", parametrizedSqlClause);
+        String sql = createSQLQuery(SELECT_DISTINCT_DOC_FULLNAME, parametrizedSqlClause);
         return searchDocumentReferencesInternal(sql, nb, start, parameterValues, context);
     }
 
@@ -2509,7 +2515,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
-        String sql = createSQLQuery("select distinct doc.fullName", parametrizedSqlClause);
+        String sql = createSQLQuery(SELECT_DISTINCT_DOC_FULLNAME, parametrizedSqlClause);
         return searchDocumentsNamesInternal(sql, nb, start, parameterValues, context);
     }
 
@@ -2543,7 +2549,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
-        String sql = createSQLQuery("select distinct doc.fullName", wheresql);
+        String sql = createSQLQuery(SELECT_DISTINCT_DOC_FULLNAME, wheresql);
         return searchDocumentReferencesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
     }
 
@@ -2551,7 +2557,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
-        String sql = createSQLQuery("select distinct doc.fullName", wheresql);
+        String sql = createSQLQuery(SELECT_DISTINCT_DOC_FULLNAME, wheresql);
         return searchDocumentsNamesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
     }
 
@@ -2814,7 +2820,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (distinctbylanguage) {
                 sql = createSQLQuery("select distinct doc.fullName, doc.language", wheresql);
             } else {
-                sql = createSQLQuery("select distinct doc.fullName", wheresql);
+                sql = createSQLQuery(SELECT_DISTINCT_DOC_FULLNAME, wheresql);
             }
 
             // Start monitoring timer
@@ -3338,7 +3344,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             try {
                 Query<Long> query =
                     session.createQuery("select count(*) from XWikiLink as link where link.id.docId = :docId")
-                        .setParameter("docId", docId);
+                        .setParameter(DOC_ID, docId);
                 return query.getSingleResult();
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,

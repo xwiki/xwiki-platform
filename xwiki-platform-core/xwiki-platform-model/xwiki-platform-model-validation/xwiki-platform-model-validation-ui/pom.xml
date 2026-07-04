@@ -35,4 +35,13 @@
     <!-- Category to display by the Extension Manager -->
     <xwiki.extension.category>application</xwiki.extension.category>
   </properties>
+  <dependencies>
+    <dependency>
+      <!-- The Administration page renders its content with the {{display}} macro. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-display-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

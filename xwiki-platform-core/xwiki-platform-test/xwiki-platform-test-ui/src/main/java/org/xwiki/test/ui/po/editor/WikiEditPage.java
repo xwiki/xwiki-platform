@@ -189,9 +189,6 @@ public class WikiEditPage extends PreviewableEditPage
 
     /**
      * @return {@code true} if the edit comment (version summary) field is present in the form
-     * @since 17.10.10
-     * @since 18.3.0RC1
-     * @since 18.4.3
      */
     public boolean hasEditComment()
     {

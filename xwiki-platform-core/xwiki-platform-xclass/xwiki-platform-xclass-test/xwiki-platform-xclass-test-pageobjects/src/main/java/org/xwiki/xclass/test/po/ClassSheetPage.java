@@ -222,9 +222,6 @@ public class ClassSheetPage extends ViewPage
      * contains an instance of the class.
      *
      * @return the current page, after it is reloaded
-     * @since 17.10.10
-     * @since 18.4.3
-     * @since 18.6.0RC1
      */
     public ClassSheetPage clickCreateTemplateProviderButton()
     {
@@ -238,9 +235,6 @@ public class ClassSheetPage extends ViewPage
      * created.
      *
      * @return the page that represents the class template provider
-     * @since 17.10.10
-     * @since 18.4.3
-     * @since 18.6.0RC1
      */
     public ViewPage clickTemplateProviderLink()
     {

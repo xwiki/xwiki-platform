@@ -29,6 +29,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.xwiki.extension.ExtensionId;
@@ -55,6 +56,8 @@ public class ExtensionInstaller
     private static final String XAR = "xar";
 
     private static final String JAR = "jar";
+
+    private static final String PLATFORM_GROUPID = "org.xwiki.platform";
 
     private static final String DEPENDENCIES_SYSTEM_PROPERTY = System.getProperty("xwiki.test.ui.dependencies");
 
@@ -129,14 +132,26 @@ public class ExtensionInstaller
         List<Artifact> extraArtifacts = this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs(),
             this.testConfiguration.isResolveExtraJARs());
         this.mavenResolver.addCloverJAR(extraArtifacts);
+        // Use the same dependencies root as the one used to build the WAR (see WARBuilder). This is required so that
+        // the set of extensions considered as already part of the distribution (i.e. bundled in WEB-INF/lib and thus
+        // not to be re-provisioned) matches what the WAR actually contains. In standardFlavor mode this avoids
+        // re-installing as extensions the core extensions that are already bundled in the WAR.
         Collection<ArtifactResult> distributionArtifactResults =
-            this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
+            this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts,
+                this.testConfiguration.getWARDependenciesRootArtifactId());
         List<ExtensionId> distributionExtensionIds = new ArrayList<>();
         for (ArtifactResult artifactResult : distributionArtifactResults) {
             Artifact artifact = artifactResult.getArtifact();
             ExtensionId extensionId = convertToExtensionId(artifact);
             distributionExtensionIds.add(extensionId);
-            if (artifact.getExtension().equalsIgnoreCase(XAR)) {
+            // Auto-provision the distribution's mandatory XAR extensions (they're not bundled in WEB-INF/lib), but
+            // ONLY in minimal mode. In standardFlavor mode the distribution dependencies pull in
+            // xwiki-platform-distribution-ui-base only to bundle its JARs in WEB-INF/lib, and that drags in its whole
+            // transitive XAR closure (the entire standard UI). We must not auto-provision those here: they are
+            // installed through the flavor (see Step 3), exactly as a real XWiki instance installs the flavor via its
+            // Distribution Wizard. XWiki's Extension Manager then resolves the flavor tree server-side and skips the
+            // JAR core extensions already bundled in WEB-INF/lib.
+            if (!this.testConfiguration.isStandardFlavor() && artifact.getExtension().equalsIgnoreCase(XAR)) {
                 extensions.add(extensionId);
             }
         }
@@ -148,6 +163,17 @@ public class ExtensionInstaller
         // dependencies in your POM (can be useful when you want to test your extension on a vesion of XWiki for which
         // it wasn't developed for).
         extensions.addAll(getProjectExtensionIds(distributionExtensionIds));
+
+        // Step 3: In standardFlavor mode, install the standard flavor automatically (as on a fresh standard
+        // distribution), so the test module doesn't need to declare it as a dependency. The flavor is restricted to
+        // the main wiki (wiki:xwiki) by the flavor extension itself. Installing it makes XWiki's Extension Manager
+        // resolve and install the whole standard UI server-side while skipping the JAR core extensions already
+        // bundled in WEB-INF/lib (see Step 1).
+        if (this.testConfiguration.isStandardFlavor()) {
+            Artifact flavorArtifact = new DefaultArtifact(PLATFORM_GROUPID,
+                "xwiki-platform-distribution-flavor-mainwiki", XAR, platformVersion);
+            extensions.add(convertToExtensionId(flavorArtifact));
+        }
 
         installExtensions(extensions, credentials, installUserReference, namespaces, true);
     }

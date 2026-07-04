@@ -193,8 +193,31 @@ public class ArtifactResolver
     public Collection<ArtifactResult> getDistributionDependencies(String commonsVersion, String platformVersion,
         List<Artifact> extraArtifacts) throws Exception
     {
+        return getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts,
+            "xwiki-platform-minimaldependencies");
+    }
+
+    /**
+     * @param commonsVersion the version to use for xwiki-commons artifacts
+     * @param platformVersion the version to use for xwiki-platform artifacts
+     * @param extraArtifacts the list of extra artifacts that should be added to {@code WEB-INF/lib}. Can be empty
+     * @param rootDistributionArtifactId the artifactId (in the {@code org.xwiki.platform} groupId) of the {@code pom}
+     *        artifact whose dependencies define the set of JARs to put in {@code WEB-INF/lib}. Use
+     *        {@code xwiki-platform-minimaldependencies} for the minimal WAR or
+     *        {@code xwiki-platform-distribution-war-dependencies} (or the {@code -legacydependencies} variant) to
+     *        generate a WAR with the same core extensions as the standard XWiki distribution WAR
+     * @return the collection of resolved artifact results for the XWiki distribution/flavor to be used for
+     *         functional tests
+     * @throws Exception if an error occurred during resolving
+     * @since 17.10.10
+     * @since 18.4.3
+     * @since 18.6.0RC1
+     */
+    public Collection<ArtifactResult> getDistributionDependencies(String commonsVersion, String platformVersion,
+        List<Artifact> extraArtifacts, String rootDistributionArtifactId) throws Exception
+    {
         Artifact rootDistributionArtifact = new DefaultArtifact(PLATFORM_GROUPID,
-            "xwiki-platform-minimaldependencies", "pom", platformVersion);
+            rootDistributionArtifactId, "pom", platformVersion);
 
         List<Artifact> dependentArtifacts = new ArrayList<>();
 

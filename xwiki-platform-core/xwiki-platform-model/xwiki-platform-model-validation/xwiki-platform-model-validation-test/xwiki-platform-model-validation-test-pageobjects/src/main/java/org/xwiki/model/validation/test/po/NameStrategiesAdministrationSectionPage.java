@@ -77,6 +77,15 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     }
 
     /**
+     * @return the hint of the currently selected entity name validation strategy (e.g.
+     *         {@code "ReplaceCharacterEntityNameValidation"} or {@code "SlugEntityNameValidation"})
+     */
+    public String getSelectedStrategy()
+    {
+        return new Select(getDriver().findElement(STRATEGY_SELECT)).getFirstSelectedOption().getAttribute("value");
+    }
+
+    /**
      * Save the configuration. This persists the selected strategy and its configuration (which is necessary, for the
      * Slug strategy, so that its configuration properties are initialized before the strategy is tested).
      */

@@ -187,6 +187,14 @@ public class WikiEditPage extends PreviewableEditPage
         return this.commentInput.isDisplayed();
     }
 
+    /**
+     * @return {@code true} if the edit comment (version summary) field is present in the form
+     */
+    public boolean hasEditComment()
+    {
+        return getDriver().hasElement(By.name("comment"));
+    }
+
     public boolean loginModalDisplayed() {
         if (!this.modal.isDisplayed()) {
             return false;

@@ -62,7 +62,9 @@ class AdministrationIT
         assertTrue(wikiAdministrationPage.getBreadcrumbContent().endsWith("/Global Administration"));
 
         // TODO: Move these tests in their own modules, i.e. the modules that brought the Administration UI extension.
-        Arrays.asList("Users", "Groups", "Rights", "Registration", "Themes", "Presentation", "Templates",
+        // Note: the global "Rights" section presence is verified by UsersGroupsRightsManagementIT (via
+        // AdministrationPage.clickGlobalRightsSection()), so it's not re-checked here.
+        Arrays.asList("Users", "Groups", "Registration", "Themes", "Presentation", "Templates",
             "Localization", "Import", "Export", "Editing", "emailSend", "emailStatus", "emailGeneral")
             .stream().forEach(sectionId -> assertTrue(wikiAdministrationPage.hasSection(sectionId),
                 String.format("Menu section [%s] is missing.", sectionId)));
@@ -83,7 +85,8 @@ class AdministrationIT
         assertTrue(pageAdministrationPage.hasSection("Themes"));
         assertTrue(pageAdministrationPage.hasSection("Presentation"));
         assertTrue(pageAdministrationPage.hasSection("PageAndChildrenRights"));
-        assertTrue(pageAdministrationPage.hasSection("PageRights"));
+        // Note: the "PageRights" section presence is verified by
+        // UsersGroupsRightsManagementIT.rightsShowUsersAndGroups, so it's not re-checked here.
 
         // All these sections should not be present (they provide wiki-wide configuration).
         Arrays.asList("Users", "Groups", "Rights", "Registration", "Templates", "Localization", "Import", "Export",

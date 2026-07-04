@@ -158,9 +158,6 @@ public class ProfileEditPage extends EditPage
      *
      * @param propertyName the name of the property on the {@code XWiki.XWikiUsers} class
      * @param value the value to set
-     * @since 17.10.10
-     * @since 18.4.3
-     * @since 18.5.0RC1
      */
     public void setUserCustomProperty(String propertyName, String value)
     {

@@ -182,7 +182,14 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement clearSelectedSuggestions()
     {
-        getSelectedSuggestions().forEach(SuggestionElement::delete);
+        // Deleting a suggestion re-renders the widget and invalidates the element references of the remaining
+        // selected suggestions, so iterating over a pre-fetched list triggers a StaleElementReferenceException.
+        // Instead, always delete the first selected suggestion and re-fetch the list after each deletion.
+        List<SuggestionElement> selectedSuggestions = getSelectedSuggestions();
+        while (!selectedSuggestions.isEmpty()) {
+            selectedSuggestions.get(0).delete();
+            selectedSuggestions = getSelectedSuggestions();
+        }
         return this;
     }
 

@@ -29,7 +29,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.hibernate.engine.spi.NamedQueryDefinition;
+import org.hibernate.boot.query.NamedHqlQueryDefinition;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
@@ -146,6 +146,6 @@ public class DBListClassRequiredRightAnalyzer implements RequiredRightAnalyzer<D
     private Optional<String> getNamedQuery(Query query)
     {
         return Optional.ofNullable(this.hibernate.getConfiguration().getNamedQueries().get(query.getStatement()))
-            .map(NamedQueryDefinition::getQuery);
+            .map(NamedHqlQueryDefinition::getHqlString);
     }
 }

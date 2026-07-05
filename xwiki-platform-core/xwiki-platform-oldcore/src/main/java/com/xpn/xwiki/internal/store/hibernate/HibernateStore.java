@@ -1123,7 +1123,7 @@ public class HibernateStore implements Disposable, Initializable
      */
     public String getConfiguredColumnName(Property property)
     {
-        Column column = (Column) property.getColumnIterator().next();
+        Column column = property.getColumns().get(0);
 
         return getConfiguredColumnName(column);
     }
@@ -1231,8 +1231,8 @@ public class HibernateStore implements Disposable, Initializable
 
         if (result == -1) {
             PersistentClass persistentClass = getConfigurationMetadata().getEntityBinding(entityType.getName());
-            Column column2 = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
-            result = column2.getLength();
+            Column column2 = persistentClass.getProperty(propertyName).getColumns().get(0);
+            result = column2.getLength().intValue();
             this.logger.warn(
                 "Error while getting the size limit for entity [{}] and propertyName [{}]. "
                     + "The length value set by hibernate [{}] will be used.",

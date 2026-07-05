@@ -395,7 +395,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                         // Ignore errors in the log during the creation of the sequence since we know it can fail and we
                         // don't want to show false positives to the user.
                         this.loggerManager.pushLogListener(null);
-                        session.createSQLQuery(sequenceSQL).executeUpdate();
+                        session.createNativeQuery(sequenceSQL).executeUpdate();
                     } catch (HibernateException e) {
                         // Sequence failed to be created, we assume it already exists and that's why an exception was
                         // raised!
@@ -435,7 +435,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
             for (String element : createSQL) {
                 sql = element;
                 LOGGER.debug("Update Schema sql: [{}]", sql);
-                session.createSQLQuery(sql).executeUpdate();
+                session.createNativeQuery(sql).executeUpdate();
             }
             session.getTransaction().commit();
         } catch (Exception e) {

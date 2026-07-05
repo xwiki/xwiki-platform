@@ -284,12 +284,12 @@ class XWikiHibernateStoreTest
         when(this.hibernateStore.getDialect()).thenReturn(dialect);
         when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
         NativeQuery sqlQuery = mock(NativeQuery.class);
-        when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(session.createNativeQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
         this.store.createHibernateSequenceIfRequired(new String[] {}, "schema", session);
 
-        verify(session).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(session).createNativeQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery).executeUpdate();
     }
 
@@ -304,13 +304,13 @@ class XWikiHibernateStoreTest
         when(this.hibernateStore.getDialect()).thenReturn(dialect);
         when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
         NativeQuery sqlQuery = mock(NativeQuery.class);
-        when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(session.createNativeQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
         this.store.createHibernateSequenceIfRequired(
             new String[] {"whatever", "create sequence schema.hibernate_sequence"}, "schema", session);
 
-        verify(session, never()).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(session, never()).createNativeQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery, never()).executeUpdate();
     }
 

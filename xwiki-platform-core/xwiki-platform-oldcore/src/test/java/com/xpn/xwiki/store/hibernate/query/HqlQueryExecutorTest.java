@@ -30,8 +30,8 @@ import javax.inject.Named;
 
 import org.hibernate.Session;
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.query.NamedNativeQueryDefinition;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.spi.NamedSQLQueryDefinition;
 import org.hibernate.query.NativeQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -314,7 +314,6 @@ class HqlQueryExecutorTest
         Session session = mock(Session.class);
         NativeQuery sqlQuery = mock(NativeQuery.class);
         when(session.getNamedQuery(query.getStatement())).thenReturn(sqlQuery);
-        when(sqlQuery.getQueryString()).thenReturn("foo");
 
         // Add a Query Filter to verify it's called and can change the statement
         QueryFilter filter = mock(QueryFilter.class);
@@ -323,18 +322,18 @@ class HqlQueryExecutorTest
         when(filter.filterQuery(any(Query.class))).then(returnsFirstArg());
 
         NativeQuery finalQuery = mock(NativeQuery.class);
-        when(session.createSQLQuery("bar")).thenReturn(finalQuery);
+        when(session.createNativeQuery("bar", "someResultSet")).thenReturn(finalQuery);
 
-        NamedSQLQueryDefinition definition = mock(NamedSQLQueryDefinition.class);
-        when(definition.getResultSetRef()).thenReturn("someResultSet");
-        when(definition.getName()).thenReturn(query.getStatement());
+        // On Hibernate 6 the base statement comes from the original mapped SQL (which keeps its named parameters)
+        // rather than from NativeQuery#getQueryString() (which would have the named parameters rewritten to ?).
+        NamedNativeQueryDefinition definition = mock(NamedNativeQueryDefinition.class);
+        when(definition.getSqlQueryString()).thenReturn("foo");
+        when(definition.getResultSetMappingName()).thenReturn("someResultSet");
 
-        when(this.hibernateStore.getConfigurationMetadata().getNamedNativeQueryDefinition(query.getStatement()))
+        when(this.hibernateStore.getConfigurationMetadata().getNamedNativeQueryMapping(query.getStatement()))
             .thenReturn(definition);
 
         assertSame(finalQuery, this.executor.createHibernateQuery(session, query));
-
-        verify(finalQuery).setResultSetMapping(definition.getResultSetRef());
     }
 
     @Test

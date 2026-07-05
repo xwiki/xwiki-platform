@@ -35,8 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.spi.NamedQueryDefinition;
-import org.hibernate.engine.spi.NamedSQLQueryDefinition;
+import org.hibernate.boot.query.NamedNativeQueryDefinition;
 import org.hibernate.query.NativeQuery;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -126,19 +125,21 @@ public class HqlQueryExecutor extends AbstractQueryExecutor implements Initializ
                 if (this.safeNamedQueries == null) {
                     Set<String> safeQueries = new HashSet<>();
 
-                    // Gather the list of allowed named queries
-                    Collection<NamedQueryDefinition> namedQueries =
-                        this.hibernate.getConfigurationMetadata().getNamedQueryDefinitions();
-                    for (NamedQueryDefinition definition : namedQueries) {
+                    // Gather the list of allowed named queries.
+                    // Note: Hibernate 6 replaced Metadata#getNamedQueryDefinitions() (which returned a Collection of
+                    // org.hibernate.engine.spi.NamedQueryDefinition) with a visitor over
+                    // org.hibernate.boot.query.NamedHqlQueryDefinition.
+                    this.hibernate.getConfigurationMetadata().visitNamedHqlQueryDefinitions(definition -> {
                         try {
-                            if (this.queryValidator.isSafe(definition.getQuery())) {
-                                safeQueries.add(definition.getName());
+                            if (this.queryValidator.isSafe(definition.getHqlString())) {
+                                safeQueries.add(definition.getRegistrationName());
                             }
                         } catch (QueryException e) {
                             this.logger.warn("Failed to validate named query [{}] with statement [{}]: {}",
-                                definition.getName(), definition.getQuery(), ExceptionUtils.getRootCauseMessage(e));
+                                definition.getRegistrationName(), definition.getHqlString(),
+                                ExceptionUtils.getRootCauseMessage(e));
                         }
-                    }
+                    });
 
                     this.safeNamedQueries = safeQueries;
                 }
@@ -359,7 +360,13 @@ public class HqlQueryExecutor extends AbstractQueryExecutor implements Initializ
             // the execution.
             boolean isNative = hQuery instanceof NativeQuery;
             String language = isNative ? "sql" : Query.HQL;
-            final String statement = hQuery.getQueryString();
+            // On Hibernate 6, a named native query's NativeQuery#getQueryString() has its named parameters rewritten to
+            // positional ones, which later clashes with filters that add named parameters ("Cannot mix parameter
+            // styles"). Source the base statement from the original mapped SQL, which keeps its named parameters.
+            NamedNativeQueryDefinition nativeDefinition = isNative
+                ? this.hibernate.getConfigurationMetadata().getNamedNativeQueryMapping(query.getStatement()) : null;
+            final String statement =
+                nativeDefinition != null ? nativeDefinition.getSqlQueryString() : hQuery.getQueryString();
 
             // Run filters
             filteredQuery = filterQuery(new WrappingQuery(filteredQuery)
@@ -372,12 +379,15 @@ public class HqlQueryExecutor extends AbstractQueryExecutor implements Initializ
             }, language);
 
             if (isNative) {
-                hQuery = session.createSQLQuery(filteredQuery.getStatement());
                 // Copy the information about the return column types, if possible.
-                NamedSQLQueryDefinition definition =
-                    this.hibernate.getConfigurationMetadata().getNamedNativeQueryDefinition(query.getStatement());
-                if (!StringUtils.isEmpty(definition.getResultSetRef())) {
-                    ((NativeQuery<T>) hQuery).setResultSetMapping(definition.getResultSetRef());
+                // Note: Hibernate 6 removed NativeQuery#setResultSetMapping(String); the result set mapping can only
+                // be provided when the native query is created, so we pass it to createNativeQuery directly.
+                String resultSetMappingName =
+                    nativeDefinition == null ? null : nativeDefinition.getResultSetMappingName();
+                if (!StringUtils.isEmpty(resultSetMappingName)) {
+                    hQuery = session.createNativeQuery(filteredQuery.getStatement(), resultSetMappingName);
+                } else {
+                    hQuery = session.createNativeQuery(filteredQuery.getStatement());
                 }
             } else {
                 hQuery = session.createQuery(filteredQuery.getStatement());

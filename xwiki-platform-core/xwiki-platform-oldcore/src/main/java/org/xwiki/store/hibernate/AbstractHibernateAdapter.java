@@ -21,6 +21,7 @@ package org.xwiki.store.hibernate;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -31,11 +32,22 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Table;
-import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.schema.TargetType;
+import org.hibernate.tool.schema.internal.ExceptionHandlerCollectingImpl;
+import org.hibernate.tool.schema.spi.CommandAcceptanceException;
+import org.hibernate.tool.schema.spi.ContributableMatcher;
+import org.hibernate.tool.schema.spi.ExecutionOptions;
+import org.hibernate.tool.schema.spi.SchemaManagementTool;
+import org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator;
+import org.hibernate.tool.schema.spi.SchemaMigrator;
+import org.hibernate.tool.schema.spi.ScriptTargetOutput;
+import org.hibernate.tool.schema.spi.TargetDescriptor;
 import org.slf4j.Logger;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -218,9 +230,39 @@ public abstract class AbstractHibernateAdapter implements HibernateAdapter
 
     private void updateDatabaseStandard(Metadata metadata) throws HibernateStoreException
     {
-        SchemaUpdate updater = new SchemaUpdate();
-        updater.execute(EnumSet.of(TargetType.DATABASE), metadata);
-        List<Exception> exceptions = updater.getExceptions();
+        // Note: Hibernate 6 removed org.hibernate.tool.hbm2ddl.SchemaUpdate. The faithful equivalent is to run the
+        // SchemaMigrator obtained from the SchemaManagementTool service, which is exactly what SchemaUpdate did
+        // internally. Errors are collected through an ExceptionHandlerCollectingImpl to preserve the previous
+        // "log all errors then fail" behavior.
+        StandardServiceRegistry serviceRegistry =
+            ((MetadataImplementor) metadata).getMetadataBuildingOptions().getServiceRegistry();
+        SchemaManagementTool schemaManagementTool = serviceRegistry.getService(SchemaManagementTool.class);
+        Map<String, Object> configuration = serviceRegistry.getService(ConfigurationService.class).getSettings();
+
+        ExceptionHandlerCollectingImpl exceptionHandler = new ExceptionHandlerCollectingImpl();
+        ExecutionOptions executionOptions =
+            SchemaManagementToolCoordinator.buildExecutionOptions(configuration, exceptionHandler);
+
+        TargetDescriptor targetDescriptor = new TargetDescriptor()
+        {
+            @Override
+            public EnumSet<TargetType> getTargetTypes()
+            {
+                return EnumSet.of(TargetType.DATABASE);
+            }
+
+            @Override
+            public ScriptTargetOutput getScriptTargetOutput()
+            {
+                // Not used when the target is the database only.
+                return null;
+            }
+        };
+
+        SchemaMigrator schemaMigrator = schemaManagementTool.getSchemaMigrator(configuration);
+        schemaMigrator.doMigration(metadata, executionOptions, ContributableMatcher.ALL, targetDescriptor);
+
+        List<CommandAcceptanceException> exceptions = exceptionHandler.getExceptions();
 
         if (!exceptions.isEmpty()) {
             // Print the errors

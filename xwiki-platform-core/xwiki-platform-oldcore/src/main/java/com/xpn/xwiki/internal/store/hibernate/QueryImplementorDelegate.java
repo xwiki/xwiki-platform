@@ -19,46 +19,11 @@
  */
 package com.xpn.xwiki.internal.store.hibernate;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import javax.persistence.FlushModeType;
-import javax.persistence.LockModeType;
-import javax.persistence.Parameter;
-import javax.persistence.TemporalType;
-
-import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
-import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
-import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
-import org.hibernate.engine.spi.RowSelection;
-import org.hibernate.graph.GraphSemantic;
-import org.hibernate.graph.RootGraph;
-import org.hibernate.query.ParameterMetadata;
-import org.hibernate.query.Query;
-import org.hibernate.query.QueryParameter;
 import org.hibernate.query.spi.QueryImplementor;
-import org.hibernate.query.spi.QueryProducerImplementor;
-import org.hibernate.transform.ResultTransformer;
-import org.hibernate.type.Type;
 
 /**
- * Wrap a QueryImplementor.
- * 
+ * Wrap a {@link QueryImplementor}.
+ *
  * @param <R> query result type
  * @version $Id$
  * @since 11.5RC1
@@ -76,115 +41,309 @@ public class QueryImplementorDelegate<R> implements QueryImplementor<R>
     }
 
     @Override
-    public Optional<R> uniqueResultOptional()
+    public org.hibernate.query.spi.QueryImplementor<R> setProperties(java.lang.Object arg0)
     {
-        return this.delegate.uniqueResultOptional();
+        return this.delegate.setProperties(arg0);
     }
 
     @Override
-    public Stream<R> stream()
+    public org.hibernate.query.spi.QueryImplementor<R> setProperties(java.util.Map arg0)
     {
-        return this.delegate.stream();
+        return this.delegate.setProperties(arg0);
     }
 
     @Override
-    public Query<R> applyGraph(RootGraph graph, GraphSemantic semantic)
+    public org.hibernate.engine.spi.SharedSessionContractImplementor getSession()
     {
-        return this.delegate.applyGraph(graph, semantic);
+        return this.delegate.getSession();
     }
 
     @Override
-    public Query<R> setParameter(Parameter<Instant> param, Instant value, TemporalType temporalType)
+    public void setOptionalId(java.io.Serializable arg0)
     {
-        return this.delegate.setParameter(param, value, temporalType);
+        this.delegate.setOptionalId(arg0);
     }
 
     @Override
-    public Query<R> setParameter(Parameter<LocalDateTime> param, LocalDateTime value, TemporalType temporalType)
+    public void setOptionalEntityName(java.lang.String arg0)
     {
-        return this.delegate.setParameter(param, value, temporalType);
+        this.delegate.setOptionalEntityName(arg0);
     }
 
     @Override
-    public Query<R> setParameter(Parameter<ZonedDateTime> param, ZonedDateTime value, TemporalType temporalType)
+    public void setOptionalObject(java.lang.Object arg0)
     {
-        return this.delegate.setParameter(param, value, temporalType);
+        this.delegate.setOptionalObject(arg0);
     }
 
     @Override
-    public Query<R> setParameter(Parameter<OffsetDateTime> param, OffsetDateTime value, TemporalType temporalType)
+    public org.hibernate.query.spi.QueryParameterBindings getParameterBindings()
     {
-        return this.delegate.setParameter(param, value, temporalType);
+        return this.delegate.getParameterBindings();
     }
 
     @Override
-    public Query<R> setParameter(String name, Instant value, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(name, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(String name, LocalDateTime value, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(name, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(String name, ZonedDateTime value, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(name, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(String name, OffsetDateTime value, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(name, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, Instant value, TemporalType temporalType)
-    {
-        // Convert from legacy Hibernate positional parameter to JPA positional parameter
-        return this.delegate.setParameter(position, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, LocalDateTime value, TemporalType temporalType)
-    {
-        // Convert from legacy Hibernate positional parameter to JPA positional parameter
-        return this.delegate.setParameter(position, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, ZonedDateTime value, TemporalType temporalType)
-    {
-        // Convert from legacy Hibernate positional parameter to JPA positional parameter
-        return this.delegate.setParameter(position, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, OffsetDateTime value, TemporalType temporalType)
-    {
-        // Convert from legacy Hibernate positional parameter to JPA positional parameter
-        return this.delegate.setParameter(position, value, temporalType);
-    }
-
-    @Override
-    public ScrollableResults scroll()
+    public org.hibernate.query.spi.ScrollableResultsImplementor<R> scroll()
     {
         return this.delegate.scroll();
     }
 
     @Override
-    public ScrollableResults scroll(ScrollMode scrollMode)
+    public org.hibernate.query.spi.ScrollableResultsImplementor<R> scroll(org.hibernate.ScrollMode arg0)
     {
-        return this.delegate.scroll(scrollMode);
+        return this.delegate.scroll(arg0);
     }
 
     @Override
-    public List<R> list()
+    public <T> org.hibernate.query.spi.QueryImplementor<T> setTupleTransformer(org.hibernate.query.TupleTransformer<T> arg0)
+    {
+        return this.delegate.setTupleTransformer(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setResultListTransformer(org.hibernate.query.ResultListTransformer<R> arg0)
+    {
+        return this.delegate.setResultListTransformer(arg0);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameter(org.hibernate.query.QueryParameter<P> arg0, P arg1, java.lang.Class<P> arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameter(org.hibernate.query.QueryParameter<P> arg0, P arg1, org.hibernate.query.BindableType<P> arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <T> org.hibernate.query.spi.QueryImplementor<R> setParameter(org.hibernate.query.QueryParameter<T> arg0, T arg1)
+    {
+        return this.delegate.setParameter(arg0, arg1);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameter(jakarta.persistence.Parameter<java.util.Calendar> arg0, java.util.Calendar arg1, jakarta.persistence.TemporalType arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <T> org.hibernate.query.spi.QueryImplementor<R> setParameter(jakarta.persistence.Parameter<T> arg0, T arg1)
+    {
+        return this.delegate.setParameter(arg0, arg1);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameter(jakarta.persistence.Parameter<java.util.Date> arg0, java.util.Date arg1, jakarta.persistence.TemporalType arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameter(int arg0, P arg1, org.hibernate.query.BindableType<P> arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameter(int arg0, P arg1, java.lang.Class<P> arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameter(int arg0, java.lang.Object arg1)
+    {
+        return this.delegate.setParameter(arg0, arg1);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameter(java.lang.String arg0, java.util.Date arg1, jakarta.persistence.TemporalType arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameter(int arg0, java.util.Calendar arg1, jakarta.persistence.TemporalType arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameter(int arg0, java.util.Date arg1, jakarta.persistence.TemporalType arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameter(int arg0, java.time.Instant arg1, jakarta.persistence.TemporalType arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameter(java.lang.String arg0, java.util.Calendar arg1, jakarta.persistence.TemporalType arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameter(java.lang.String arg0, java.time.Instant arg1, jakarta.persistence.TemporalType arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameter(java.lang.String arg0, P arg1, org.hibernate.query.BindableType<P> arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameter(java.lang.String arg0, P arg1, java.lang.Class<P> arg2)
+    {
+        return this.delegate.setParameter(arg0, arg1, arg2);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameter(java.lang.String arg0, java.lang.Object arg1)
+    {
+        return this.delegate.setParameter(arg0, arg1);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(java.lang.String arg0, P[] arg1, java.lang.Class<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameterList(java.lang.String arg0, java.lang.Object[] arg1)
+    {
+        return this.delegate.setParameterList(arg0, arg1);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(java.lang.String arg0, java.util.Collection<? extends P> arg1, org.hibernate.query.BindableType<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(java.lang.String arg0, P[] arg1, org.hibernate.query.BindableType<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameterList(int arg0, java.util.Collection arg1)
+    {
+        return this.delegate.setParameterList(arg0, arg1);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(org.hibernate.query.QueryParameter<P> arg0, P[] arg1, org.hibernate.query.BindableType<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameterList(java.lang.String arg0, java.util.Collection arg1)
+    {
+        return this.delegate.setParameterList(arg0, arg1);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(java.lang.String arg0, java.util.Collection<? extends P> arg1, java.lang.Class<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(org.hibernate.query.QueryParameter<P> arg0, java.util.Collection<? extends P> arg1)
+    {
+        return this.delegate.setParameterList(arg0, arg1);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(org.hibernate.query.QueryParameter<P> arg0, java.util.Collection<? extends P> arg1, java.lang.Class<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(org.hibernate.query.QueryParameter<P> arg0, java.util.Collection<? extends P> arg1, org.hibernate.query.BindableType<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(org.hibernate.query.QueryParameter<P> arg0, P[] arg1)
+    {
+        return this.delegate.setParameterList(arg0, arg1);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(org.hibernate.query.QueryParameter<P> arg0, P[] arg1, java.lang.Class<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(int arg0, java.util.Collection<? extends P> arg1, java.lang.Class<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(int arg0, java.util.Collection<? extends P> arg1, org.hibernate.query.BindableType<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryImplementor<R> setParameterList(int arg0, java.lang.Object[] arg1)
+    {
+        return this.delegate.setParameterList(arg0, arg1);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(int arg0, P[] arg1, java.lang.Class<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public <P> org.hibernate.query.spi.QueryImplementor<R> setParameterList(int arg0, P[] arg1, org.hibernate.query.BindableType<P> arg2)
+    {
+        return this.delegate.setParameterList(arg0, arg1, arg2);
+    }
+
+    @Override
+    public java.util.List<R> list()
     {
         return this.delegate.list();
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setReadOnly(boolean arg0)
+    {
+        return this.delegate.setReadOnly(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setComment(java.lang.String arg0)
+    {
+        return this.delegate.setComment(arg0);
+    }
+
+    @Override
+    public java.lang.String getComment()
+    {
+        return this.delegate.getComment();
     }
 
     @Override
@@ -194,312 +353,183 @@ public class QueryImplementorDelegate<R> implements QueryImplementor<R>
     }
 
     @Override
-    public FlushMode getHibernateFlushMode()
+    public R getSingleResult()
     {
-        return this.delegate.getHibernateFlushMode();
+        return this.delegate.getSingleResult();
     }
 
     @Override
-    public CacheMode getCacheMode()
+    public java.util.Optional<R> uniqueResultOptional()
     {
-        return this.delegate.getCacheMode();
-    }
-
-    @Override
-    public String getCacheRegion()
-    {
-        return this.delegate.getCacheRegion();
-    }
-
-    @Override
-    public Integer getFetchSize()
-    {
-        return this.delegate.getFetchSize();
-    }
-
-    @Override
-    public LockOptions getLockOptions()
-    {
-        return this.delegate.getLockOptions();
-    }
-
-    @Override
-    public String getComment()
-    {
-        return this.delegate.getComment();
-    }
-
-    @Override
-    public String getQueryString()
-    {
-        return this.delegate.getQueryString();
-    }
-
-    @Override
-    public ParameterMetadata getParameterMetadata()
-    {
-        return this.delegate.getParameterMetadata();
-    }
-
-    @Override
-    public Query<R> setMaxResults(int maxResult)
-    {
-        return this.delegate.setMaxResults(maxResult);
-    }
-
-    @Override
-    public Query<R> setFirstResult(int startPosition)
-    {
-        return this.delegate.setFirstResult(startPosition);
-    }
-
-    @Override
-    public Query<R> setHint(String hintName, Object value)
-    {
-        return this.delegate.setHint(hintName, value);
-    }
-
-    @Override
-    public <T> Query<R> setParameter(Parameter<T> param, T value)
-    {
-        return this.delegate.setParameter(param, value);
-    }
-
-    @Override
-    public Query<R> setParameter(Parameter<Calendar> param, Calendar value, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(param, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(Parameter<Date> param, Date value, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(param, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(String name, Object value)
-    {
-        return this.delegate.setParameter(name, value);
-    }
-
-    @Override
-    public Query<R> setParameter(String name, Object value, Type type)
-    {
-        return this.delegate.setParameter(name, value, type);
-    }
-
-    @Override
-    public Query<R> setParameter(String name, Calendar value, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(name, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(String name, Date value, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(name, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, Object value)
-    {
-        return this.delegate.setParameter(position, value);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, Calendar value, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(position, value, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, Date value, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(position, value, temporalType);
-    }
-
-    @Override
-    public <T> Query<R> setParameter(QueryParameter<T> parameter, T val)
-    {
-        return this.delegate.setParameter(parameter, val);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, Object val, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(position, val, temporalType);
-    }
-
-    @Override
-    public <T> Query<R> setParameter(QueryParameter<T> parameter, T val, Type type)
-    {
-        return this.delegate.setParameter(parameter, val, type);
-    }
-
-    @Override
-    public Query<R> setParameter(int position, Object val, Type type)
-    {
-        return this.delegate.setParameter(position, val, type);
-    }
-
-    @Override
-    public <T> Query<R> setParameter(QueryParameter<T> parameter, T val, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(parameter, val, temporalType);
-    }
-
-    @Override
-    public Query<R> setParameter(String name, Object val, TemporalType temporalType)
-    {
-        return this.delegate.setParameter(name, val, temporalType);
-    }
-
-    @Override
-    public Query<R> setFlushMode(FlushModeType flushMode)
-    {
-        return this.delegate.setFlushMode(flushMode);
-    }
-
-    @Override
-    public Query<R> setLockMode(LockModeType lockMode)
-    {
-        return this.delegate.setLockMode(lockMode);
-    }
-
-    @Override
-    public Query<R> setReadOnly(boolean readOnly)
-    {
-        return this.delegate.setReadOnly(readOnly);
-    }
-
-    @Override
-    public Query<R> setHibernateFlushMode(FlushMode flushMode)
-    {
-        return this.delegate.setHibernateFlushMode(flushMode);
-    }
-
-    @Override
-    public Query<R> setCacheMode(CacheMode cacheMode)
-    {
-        return this.delegate.setCacheMode(cacheMode);
-    }
-
-    @Override
-    public Query<R> setCacheable(boolean cacheable)
-    {
-        return this.delegate.setCacheable(cacheable);
-    }
-
-    @Override
-    public Query<R> setCacheRegion(String cacheRegion)
-    {
-        return this.delegate.setCacheRegion(cacheRegion);
-    }
-
-    @Override
-    public Query<R> setTimeout(int timeout)
-    {
-        return this.delegate.setTimeout(timeout);
-    }
-
-    @Override
-    public Query<R> setFetchSize(int fetchSize)
-    {
-        return this.delegate.setFetchSize(fetchSize);
-    }
-
-    @Override
-    public Query<R> setLockOptions(LockOptions lockOptions)
-    {
-        return this.delegate.setLockOptions(lockOptions);
-    }
-
-    @Override
-    public Query<R> setLockMode(String alias, LockMode lockMode)
-    {
-        return this.delegate.setLockMode(alias, lockMode);
-    }
-
-    @Override
-    public Query<R> setComment(String comment)
-    {
-        return this.delegate.setComment(comment);
-    }
-
-    @Override
-    public Query<R> addQueryHint(String hint)
-    {
-        return this.delegate.addQueryHint(hint);
-    }
-
-    @Override
-    public <T> Query<R> setParameterList(QueryParameter<T> parameter, Collection<T> values)
-    {
-        return this.delegate.setParameterList(parameter, values);
-    }
-
-    @Override
-    public Query<R> setParameterList(String name, Collection values)
-    {
-        return this.delegate.setParameterList(name, values);
-    }
-
-    @Override
-    public Query<R> setParameterList(String name, Collection values, Type type)
-    {
-        return this.delegate.setParameterList(name, values, type);
-    }
-
-    @Override
-    public Query<R> setParameterList(String name, Object[] values, Type type)
-    {
-        return this.delegate.setParameterList(name, values, type);
-    }
-
-    @Override
-    public Query<R> setParameterList(String name, Object[] values)
-    {
-        return this.delegate.setParameterList(name, values);
-    }
-
-    @Override
-    public Query<R> setProperties(Object bean)
-    {
-        return this.delegate.setProperties(bean);
-    }
-
-    @Override
-    public Query<R> setProperties(Map bean)
-    {
-        return this.delegate.setProperties(bean);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setEntity(int position, Object val)
-    {
-        return this.delegate.setEntity(position, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setEntity(String name, Object val)
-    {
-        return this.delegate.setEntity(name, val);
-    }
-
-    @Override
-    @Deprecated
-    public Query<R> setResultTransformer(ResultTransformer transformer)
-    {
-        return this.delegate.setResultTransformer(transformer);
+        return this.delegate.uniqueResultOptional();
     }
 
     @Override
     public int executeUpdate()
     {
         return this.delegate.executeUpdate();
+    }
+
+    @Override
+    public java.lang.String getQueryString()
+    {
+        return this.delegate.getQueryString();
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> applyGraph(org.hibernate.graph.RootGraph arg0, org.hibernate.graph.GraphSemantic arg1)
+    {
+        return this.delegate.applyGraph(arg0, arg1);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> addQueryHint(java.lang.String arg0)
+    {
+        return this.delegate.addQueryHint(arg0);
+    }
+
+    @Override
+    public org.hibernate.LockOptions getLockOptions()
+    {
+        return this.delegate.getLockOptions();
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setLockOptions(org.hibernate.LockOptions arg0)
+    {
+        return this.delegate.setLockOptions(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setLockMode(jakarta.persistence.LockModeType arg0)
+    {
+        return this.delegate.setLockMode(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setLockMode(java.lang.String arg0, org.hibernate.LockMode arg1)
+    {
+        return this.delegate.setLockMode(arg0, arg1);
+    }
+
+    @Override
+    public org.hibernate.query.spi.QueryOptions getQueryOptions()
+    {
+        return this.delegate.getQueryOptions();
+    }
+
+    @Override
+    public org.hibernate.query.ParameterMetadata getParameterMetadata()
+    {
+        return this.delegate.getParameterMetadata();
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setHibernateFlushMode(org.hibernate.FlushMode arg0)
+    {
+        return this.delegate.setHibernateFlushMode(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setCacheable(boolean arg0)
+    {
+        return this.delegate.setCacheable(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setCacheRegion(java.lang.String arg0)
+    {
+        return this.delegate.setCacheRegion(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setCacheMode(org.hibernate.CacheMode arg0)
+    {
+        return this.delegate.setCacheMode(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setCacheStoreMode(jakarta.persistence.CacheStoreMode arg0)
+    {
+        return this.delegate.setCacheStoreMode(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setCacheRetrieveMode(jakarta.persistence.CacheRetrieveMode arg0)
+    {
+        return this.delegate.setCacheRetrieveMode(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setTimeout(int arg0)
+    {
+        return this.delegate.setTimeout(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setFetchSize(int arg0)
+    {
+        return this.delegate.setFetchSize(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setMaxResults(int arg0)
+    {
+        return this.delegate.setMaxResults(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setFirstResult(int arg0)
+    {
+        return this.delegate.setFirstResult(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setHint(java.lang.String arg0, java.lang.Object arg1)
+    {
+        return this.delegate.setHint(arg0, arg1);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setEntityGraph(jakarta.persistence.EntityGraph<R> arg0, org.hibernate.graph.GraphSemantic arg1)
+    {
+        return this.delegate.setEntityGraph(arg0, arg1);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> enableFetchProfile(java.lang.String arg0)
+    {
+        return this.delegate.enableFetchProfile(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> disableFetchProfile(java.lang.String arg0)
+    {
+        return this.delegate.disableFetchProfile(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setFlushMode(jakarta.persistence.FlushModeType arg0)
+    {
+        return this.delegate.setFlushMode(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setOrder(org.hibernate.query.Order<? super R> arg0)
+    {
+        return this.delegate.setOrder(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.Query<R> setOrder(java.util.List<org.hibernate.query.Order<? super R>> arg0)
+    {
+        return this.delegate.setOrder(arg0);
+    }
+
+    @Override
+    public boolean isReadOnly()
+    {
+        return this.delegate.isReadOnly();
     }
 
     @Override
@@ -515,203 +545,183 @@ public class QueryImplementorDelegate<R> implements QueryImplementor<R>
     }
 
     @Override
-    public Map<String, Object> getHints()
+    public R getSingleResultOrNull()
     {
-        return this.delegate.getHints();
+        return this.delegate.getSingleResultOrNull();
     }
 
     @Override
-    public Set<Parameter<?>> getParameters()
+    public long getResultCount()
     {
-        return this.delegate.getParameters();
+        return this.delegate.getResultCount();
     }
 
     @Override
-    public Parameter<?> getParameter(String name)
+    public org.hibernate.query.KeyedResultList<R> getKeyedResultList(org.hibernate.query.KeyedPage<R> arg0)
     {
-        return this.delegate.getParameter(name);
+        return this.delegate.getKeyedResultList(arg0);
     }
 
     @Override
-    public <T> Parameter<T> getParameter(String name, Class<T> type)
+    public java.lang.Integer getFetchSize()
     {
-        return this.delegate.getParameter(name, type);
+        return this.delegate.getFetchSize();
     }
 
     @Override
-    public Parameter<?> getParameter(int position)
+    public org.hibernate.CacheMode getCacheMode()
     {
-        return this.delegate.getParameter(position);
+        return this.delegate.getCacheMode();
     }
 
     @Override
-    public <T> Parameter<T> getParameter(int position, Class<T> type)
+    public jakarta.persistence.CacheStoreMode getCacheStoreMode()
     {
-        return this.delegate.getParameter(position, type);
+        return this.delegate.getCacheStoreMode();
     }
 
     @Override
-    public boolean isBound(Parameter<?> param)
+    public jakarta.persistence.CacheRetrieveMode getCacheRetrieveMode()
     {
-        return this.delegate.isBound(param);
+        return this.delegate.getCacheRetrieveMode();
     }
 
     @Override
-    public <T> T getParameterValue(Parameter<T> param)
-    {
-        return this.delegate.getParameterValue(param);
-    }
-
-    @Override
-    public Object getParameterValue(String name)
-    {
-        return this.delegate.getParameterValue(name);
-    }
-
-    @Override
-    public Object getParameterValue(int position)
-    {
-        return this.delegate.getParameterValue(position);
-    }
-
-    @Override
-    @Deprecated
-    public FlushModeType getFlushMode()
-    {
-        return this.delegate.getFlushMode();
-    }
-
-    @Override
-    public LockModeType getLockMode()
-    {
-        return this.delegate.getLockMode();
-    }
-
-    @Override
-    public <T> T unwrap(Class<T> cls)
-    {
-        return this.delegate.unwrap(cls);
-    }
-
-    @Override
-    @Deprecated
-    public RowSelection getQueryOptions()
-    {
-        return this.delegate.getQueryOptions();
-    }
-
-    @Override
-    @Deprecated
     public boolean isCacheable()
     {
         return this.delegate.isCacheable();
     }
 
     @Override
-    @Deprecated
-    public Integer getTimeout()
+    public boolean isQueryPlanCacheable()
+    {
+        return this.delegate.isQueryPlanCacheable();
+    }
+
+    @Override
+    public org.hibernate.query.SelectionQuery<R> setQueryPlanCacheable(boolean arg0)
+    {
+        return this.delegate.setQueryPlanCacheable(arg0);
+    }
+
+    @Override
+    public java.lang.String getCacheRegion()
+    {
+        return this.delegate.getCacheRegion();
+    }
+
+    @Override
+    public jakarta.persistence.LockModeType getLockMode()
+    {
+        return this.delegate.getLockMode();
+    }
+
+    @Override
+    public org.hibernate.LockMode getHibernateLockMode()
+    {
+        return this.delegate.getHibernateLockMode();
+    }
+
+    @Override
+    public org.hibernate.query.SelectionQuery<R> setHibernateLockMode(org.hibernate.LockMode arg0)
+    {
+        return this.delegate.setHibernateLockMode(arg0);
+    }
+
+    @Override
+    public org.hibernate.query.SelectionQuery<R> setAliasSpecificLockMode(java.lang.String arg0, org.hibernate.LockMode arg1)
+    {
+        return this.delegate.setAliasSpecificLockMode(arg0, arg1);
+    }
+
+    @Override
+    public org.hibernate.query.SelectionQuery<R> setFollowOnLocking(boolean arg0)
+    {
+        return this.delegate.setFollowOnLocking(arg0);
+    }
+
+    @Override
+    public jakarta.persistence.FlushModeType getFlushMode()
+    {
+        return this.delegate.getFlushMode();
+    }
+
+    @Override
+    public org.hibernate.FlushMode getHibernateFlushMode()
+    {
+        return this.delegate.getHibernateFlushMode();
+    }
+
+    @Override
+    public java.lang.Integer getTimeout()
     {
         return this.delegate.getTimeout();
     }
 
     @Override
-    @Deprecated
-    public boolean isReadOnly()
+    public java.util.Set<jakarta.persistence.Parameter<?>> getParameters()
     {
-        return this.delegate.isReadOnly();
+        return this.delegate.getParameters();
     }
 
     @Override
-    @Deprecated
-    public Type[] getReturnTypes()
+    public <T> T unwrap(java.lang.Class<T> arg0)
     {
-        return this.delegate.getReturnTypes();
+        return this.delegate.unwrap(arg0);
     }
 
     @Override
-    @Deprecated
-    public Iterator<R> iterate()
+    public java.util.Map<java.lang.String, java.lang.Object> getHints()
     {
-        return this.delegate.iterate();
+        return this.delegate.getHints();
     }
 
     @Override
-    @Deprecated
-    public String[] getNamedParameters()
+    public jakarta.persistence.Parameter<?> getParameter(int arg0)
     {
-        return this.delegate.getNamedParameters();
+        return this.delegate.getParameter(arg0);
     }
 
     @Override
-    @Deprecated
-    public org.hibernate.Query<R> setParameterList(int position, Collection values)
+    public jakarta.persistence.Parameter<?> getParameter(java.lang.String arg0)
     {
-        return this.delegate.setParameterList(position, values);
+        return this.delegate.getParameter(arg0);
     }
 
     @Override
-    @Deprecated
-    public org.hibernate.Query<R> setParameterList(int position, Collection values, Type type)
+    public <T> jakarta.persistence.Parameter<T> getParameter(java.lang.String arg0, java.lang.Class<T> arg1)
     {
-        return this.delegate.setParameterList(position, values, type);
+        return this.delegate.getParameter(arg0, arg1);
     }
 
     @Override
-    @Deprecated
-    public org.hibernate.Query<R> setParameterList(int position, Object[] values, Type type)
+    public <T> jakarta.persistence.Parameter<T> getParameter(int arg0, java.lang.Class<T> arg1)
     {
-        return this.delegate.setParameterList(position, values, type);
+        return this.delegate.getParameter(arg0, arg1);
     }
 
     @Override
-    @Deprecated
-    public org.hibernate.Query<R> setParameterList(int position, Object[] values)
+    public boolean isBound(jakarta.persistence.Parameter<?> arg0)
     {
-        return this.delegate.setParameterList(position, values);
+        return this.delegate.isBound(arg0);
     }
 
     @Override
-    @Deprecated
-    public Type determineProperBooleanType(int position, Object value, Type defaultType)
+    public java.lang.Object getParameterValue(java.lang.String arg0)
     {
-        return this.delegate.determineProperBooleanType(position, value, defaultType);
+        return this.delegate.getParameterValue(arg0);
     }
 
     @Override
-    @Deprecated
-    public Type determineProperBooleanType(String name, Object value, Type defaultType)
+    public java.lang.Object getParameterValue(int arg0)
     {
-        return this.delegate.determineProperBooleanType(name, value, defaultType);
+        return this.delegate.getParameterValue(arg0);
     }
 
     @Override
-    @Deprecated
-    public String[] getReturnAliases()
+    public <T> T getParameterValue(jakarta.persistence.Parameter<T> arg0)
     {
-        return this.delegate.getReturnAliases();
+        return this.delegate.getParameterValue(arg0);
     }
 
-    @Override
-    public QueryProducerImplementor getProducer()
-    {
-        return this.delegate.getProducer();
-    }
-
-    @Override
-    public void setOptionalId(Serializable id)
-    {
-        this.delegate.setOptionalId(id);
-    }
-
-    @Override
-    public void setOptionalEntityName(String entityName)
-    {
-        this.delegate.setOptionalEntityName(entityName);
-    }
-
-    @Override
-    public void setOptionalObject(Object optionalObject)
-    {
-        this.delegate.setOptionalObject(optionalObject);
-    }
 }

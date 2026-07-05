@@ -19,13 +19,10 @@
  */
 package com.xpn.xwiki.internal.store.hibernate.legacy;
 
-import java.util.Collections;
 import java.util.regex.Pattern;
 
-import org.hibernate.QueryException;
 import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.hql.spi.QueryTranslator;
 import org.hibernate.query.spi.QueryImplementor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +46,6 @@ import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 public class LegacySessionImplementor extends SessionDelegatorBaseImpl
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
-
-    private static final String LEGACY_ORDINAL_PARAMS_PREFIX =
-        QueryTranslator.ERROR_LEGACY_ORDINAL_PARAMS_NO_LONGER_SUPPORTED.substring(0, 115);
 
     private static final Pattern LEGACY_MATCHER = Pattern.compile("\\?($|[^\\d])");
 
@@ -93,23 +87,15 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
 
     private String checkStatement(String statement)
     {
-        // Check if the statement might (it's not using the real hql parser to limit the number of fully parser
-        // statements) contain legacy HQL ordinal parameters
+        // Check if the statement might (it's not using the real hql parser to limit the number of fully parsed
+        // statements) contain legacy HQL ordinal parameters.
+        // Note: Hibernate 6 removed org.hibernate.hql.spi.QueryTranslator (and its
+        // ERROR_LEGACY_ORDINAL_PARAMS_NO_LONGER_SUPPORTED marker) as well as the SessionFactory query plan cache API
+        // that were previously used to confirm that the statement actually failed because of legacy ordinal
+        // parameters before converting it. As a faithful equivalent we now rely solely on the heuristic matcher to
+        // decide whether to convert the legacy ordinal parameters.
         if (containsLegacyOrdinalStatement(statement)) {
-            // Check if the statement is valid and if not translate it
-            // FIXME: find a more efficient way (we currently parse and validate the statement twice, plus the if which
-            // is parsing the statement String...). The problem is that when createQuery fail it's too late and the
-            // session is dead (marked as rollback only) and it's not possible to avoid it without reimplementing a lot
-            // of stuff.
-            try {
-                getFactory().getQueryPlanCache().getHQLQueryPlan(statement, false, Collections.emptyMap());
-            } catch (QueryException e) {
-                if (e.getMessage() != null && e.getMessage().contains(LEGACY_ORDINAL_PARAMS_PREFIX)) {
-                    return replaceLegacyQueryParameters(statement);
-                }
-
-                throw e;
-            }
+            return replaceLegacyQueryParameters(statement);
         }
 
         return null;

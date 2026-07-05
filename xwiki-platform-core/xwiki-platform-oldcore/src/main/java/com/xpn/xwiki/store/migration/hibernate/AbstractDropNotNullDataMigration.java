@@ -21,7 +21,6 @@
 package com.xpn.xwiki.store.migration.hibernate;
 
 import org.hibernate.boot.Metadata;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 
@@ -55,11 +54,10 @@ public abstract class AbstractDropNotNullDataMigration extends AbstractHibernate
     public String getLiquibaseChangeLog() throws DataMigrationException
     {
         XWikiHibernateBaseStore store = getStore();
-        Dialect dialect = store.getDialect();
         Metadata metadata = store.getMetadata();
         PersistentClass pClass = metadata.getEntityBinding(this.table.getName());
-        Column column = ((Column) pClass.getProperty(this.property).getColumnIterator().next());
-        String columnType = column.getSqlType(dialect, metadata);
+        Column column = ((Column) pClass.getProperty(this.property).getColumns().get(0));
+        String columnType = column.getSqlType(metadata);
 
         StringBuilder builder = new StringBuilder();
 

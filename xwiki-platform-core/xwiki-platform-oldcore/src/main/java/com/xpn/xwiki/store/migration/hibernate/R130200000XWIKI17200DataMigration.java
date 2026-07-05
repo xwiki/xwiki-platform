@@ -33,6 +33,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -216,12 +217,15 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
             if (resultSet.next()) {
                 String currentColumnType = resultSet.getString("TYPE_NAME");
 
-                Column column = (Column) property.getColumnIterator().next();
+                Column column = (Column) property.getColumns().get(0);
+                // Note: Hibernate 6 removed Dialect#getTypeName(int); the DDL type name for a SQL type code is now
+                // resolved through the DdlTypeRegistry.
                 String expectedColumnType =
-                    this.hibernateStore.getDialect().getTypeName(column.getSqlTypeCode(configurationMetadata));
+                    ((MetadataImplementor) configurationMetadata).getTypeConfiguration().getDdlTypeRegistry()
+                        .getTypeName(column.getSqlTypeCode(configurationMetadata), this.hibernateStore.getDialect());
 
                 if (!currentColumnType.equalsIgnoreCase(expectedColumnType)) {
-                    int expectedLenght = column.getLength();
+                    int expectedLenght = column.getLength().intValue();
 
                     int currentColumnSize = resultSet.getInt("COLUMN_SIZE");
 
@@ -250,7 +254,7 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
     {
         Dialect dialect = this.hibernateStore.getDialect();
 
-        StringBuilder builder = new StringBuilder(column.getSqlType(dialect, configurationMetadata));
+        StringBuilder builder = new StringBuilder(column.getSqlType(configurationMetadata));
 
         if (column.isNullable()) {
             builder.append(dialect.getNullColumnString());

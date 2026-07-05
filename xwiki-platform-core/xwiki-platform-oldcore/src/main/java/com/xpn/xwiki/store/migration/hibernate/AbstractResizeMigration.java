@@ -166,7 +166,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
         Map<String, String> rowFormats, StringBuilder builder, Session session)
         throws SQLException, HibernateStoreException
     {
-        int expectedLenght = column.getLength();
+        int expectedLenght = column.getLength().intValue();
 
         if (expectedLenght >= MAXSIZE_MIN && expectedLenght <= MAXSIZE_MAX) {
             Integer databaseSize = getDatabaseSize(column, databaseMetaData);
@@ -214,11 +214,11 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
         if (value instanceof Collection collection) {
             Table collectionTable = collection.getCollectionTable();
 
-            for (Iterator<Column> it = collectionTable.getColumnIterator(); it.hasNext();) {
+            for (Iterator<Column> it = collectionTable.getColumns().iterator(); it.hasNext();) {
                 updateColumn(it.next(), databaseMetaData, dynamicTables, rowFormats, builder, session);
             }
         } else if (value != null) {
-            for (Iterator<Selectable> it = value.getColumnIterator(); it.hasNext();) {
+            for (Iterator<Selectable> it = value.getSelectables().iterator(); it.hasNext();) {
                 Selectable selectable = it.next();
                 if (selectable instanceof Column column) {
                     updateColumn(column, databaseMetaData, dynamicTables, rowFormats, builder, session);
@@ -334,7 +334,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
     {
         for (PersistentClass entity : existingTables) {
             // Find properties to update
-            for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
+            for (Iterator<Property> it = entity.getProperties().iterator(); it.hasNext();) {
                 updateProperty(it.next(), databaseMetaData, dynamicTables, rowFormats, builder, session);
             }
 
@@ -426,7 +426,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
                 builder);
             appendXmlAttribute("columnName", this.hibernateStore.getConfiguredColumnName(column), builder);
             appendXmlAttribute("newDataType",
-                column.getSqlType(this.hibernateStore.getDialect(), this.hibernateStore.getConfigurationMetadata()),
+                column.getSqlType(this.hibernateStore.getConfigurationMetadata()),
                 builder);
             builder.append("/>");
         }
@@ -436,7 +436,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
     {
         Dialect dialect = this.hibernateStore.getDialect();
 
-        StringBuilder builder = new StringBuilder(column.getSqlType(dialect, configurationMetadata));
+        StringBuilder builder = new StringBuilder(column.getSqlType(configurationMetadata));
 
         if (column.isNullable()) {
             builder.append(dialect.getNullColumnString());

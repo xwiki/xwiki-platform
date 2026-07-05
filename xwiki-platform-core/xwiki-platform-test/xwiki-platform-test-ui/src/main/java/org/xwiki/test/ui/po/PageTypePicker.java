@@ -96,7 +96,7 @@ public class PageTypePicker extends XWikiSelectWidget
         if (iconImages.isEmpty()) {
             return "";
         }
-        String src = iconImages.getFirst().getAttribute("src");
+        String src = iconImages.get(0).getAttribute("src");
         String fileName = src.substring(src.lastIndexOf('/') + 1);
         return fileName.contains(".") ? fileName.substring(0, fileName.indexOf('.')) : fileName;
     }
@@ -112,6 +112,6 @@ public class PageTypePicker extends XWikiSelectWidget
         if (hints.isEmpty()) {
             return "";
         }
-        return hints.getFirst().getText();
+        return hints.get(0).getText();
     }
 }

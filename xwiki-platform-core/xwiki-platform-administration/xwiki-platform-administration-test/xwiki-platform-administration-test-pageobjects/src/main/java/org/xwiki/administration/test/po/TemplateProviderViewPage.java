@@ -45,7 +45,7 @@ public class TemplateProviderViewPage extends ViewPage
         if (iconImages.isEmpty()) {
             return "";
         }
-        String src = iconImages.getFirst().getAttribute("src");
+        String src = iconImages.get(0).getAttribute("src");
         String fileName = src.substring(src.lastIndexOf('/') + 1);
         return fileName.contains(".") ? fileName.substring(0, fileName.indexOf('.')) : fileName;
     }
@@ -60,6 +60,6 @@ public class TemplateProviderViewPage extends ViewPage
         if (descriptionElements.isEmpty()) {
             return "";
         }
-        return descriptionElements.getFirst().getText().trim();
+        return descriptionElements.get(0).getText().trim();
     }
 }

@@ -826,7 +826,7 @@ class RenamePageIT
 
     @Order(12)
     @Test
-    void convertTerminalPageToNestedPage(TestUtils setup) throws Exception
+    void convertTerminalPageToNestedPage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         DocumentReference sourceParent = new DocumentReference("xwiki", Arrays.asList("a", "b", "c"), "WebHome");
         DocumentReference sourceTerminal = new DocumentReference("xwiki", Arrays.asList("a", "b", "c"), "4");
@@ -845,7 +845,7 @@ class RenamePageIT
         setup.createPage(sourceParent, "", "");
         setup.createPage(sourceTerminal, "Content of terminal page", "4");
 
-        new SolrTestUtils(setup).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         ViewPage vp = setup.gotoPage(sourceTerminal);
         RenamePage renamePage = vp.rename();

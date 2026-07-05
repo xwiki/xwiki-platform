@@ -303,6 +303,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    // The schema/user name is escaped as a quoted SQL identifier (dialect quoting with internal-quote doubling)
+    // by HibernateAdapter#escapeDatabaseName. DDL statements such as CREATE SCHEMA/USER cannot use bind parameters
+    // for identifiers, so identifier quoting is the correct protection against SQL injection here.
+    @SuppressWarnings("java:S2077")
     public void createWiki(String wikiName, XWikiContext inputxcontext) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, false);
@@ -471,6 +475,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @param escapedSchemaName the subwiki schema name being deleted
      * @throws SQLException in case of an error while deleting the sub wiki
      */
+    // The schema/user name is already escaped as a quoted SQL identifier (dialect quoting with internal-quote
+    // doubling) by HibernateAdapter#escapeDatabaseName before being passed here. DDL statements such as DROP
+    // SCHEMA/USER cannot use bind parameters for identifiers, so identifier quoting is the correct protection
+    // against SQL injection here.
+    @SuppressWarnings("java:S2077")
     protected void executeDeleteWikiStatement(Statement statement, DatabaseProduct databaseProduct,
         String escapedSchemaName) throws SQLException
     {

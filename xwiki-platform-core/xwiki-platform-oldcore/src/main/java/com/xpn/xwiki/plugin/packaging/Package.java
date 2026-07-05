@@ -99,6 +99,22 @@ public class Package
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Package.class);
 
+    private static final String INFOS = "infos";
+
+    private static final String DESCRIPTION = "description";
+
+    private static final String LICENCE = "licence";
+
+    private static final String AUTHOR = "author";
+
+    private static final String VERSION = "version";
+
+    private static final String FILES = "files";
+
+    private static final String LANGUAGE = "language";
+
+    private static final String DEFAULT_ACTION = "defaultAction";
+
     private String name = "My package";
 
     private String description = "";
@@ -572,7 +588,7 @@ public class Package
     private boolean documentExistInPackageFile(String docName, String language, Document xml)
     {
         Element docFiles = xml.getRootElement();
-        Element infosFiles = docFiles.element("files");
+        Element infosFiles = docFiles.element(FILES);
 
         @SuppressWarnings("unchecked")
         List<Element> fileList = infosFiles.elements("file");
@@ -582,7 +598,7 @@ public class Package
             if (tmpDocName.compareTo(docName) != 0) {
                 continue;
             }
-            String tmpLanguage = el.attributeValue("language");
+            String tmpLanguage = el.attributeValue(LANGUAGE);
             if (tmpLanguage == null) {
                 tmpLanguage = "";
             }
@@ -597,13 +613,13 @@ public class Package
     private void updateFileInfos(Document xml)
     {
         Element docFiles = xml.getRootElement();
-        Element infosFiles = docFiles.element("files");
+        Element infosFiles = docFiles.element(FILES);
 
         @SuppressWarnings("unchecked")
         List<Element> fileList = infosFiles.elements("file");
         for (Element el : fileList) {
-            String defaultAction = el.attributeValue("defaultAction");
-            String language = el.attributeValue("language");
+            String defaultAction = el.attributeValue(DEFAULT_ACTION);
+            String language = el.attributeValue(LANGUAGE);
             if (language == null) {
                 language = "";
             }
@@ -1082,26 +1098,26 @@ public class Package
         Element docel = new DOMElement("package");
         wr.writeOpen(docel);
 
-        Element elInfos = new DOMElement("infos");
+        Element elInfos = new DOMElement(INFOS);
         wr.write(elInfos);
 
         Element el = new DOMElement("name");
         el.addText(this.name);
         wr.write(el);
 
-        el = new DOMElement("description");
+        el = new DOMElement(DESCRIPTION);
         el.addText(this.description);
         wr.write(el);
 
-        el = new DOMElement("licence");
+        el = new DOMElement(LICENCE);
         el.addText(this.licence);
         wr.write(el);
 
-        el = new DOMElement("author");
+        el = new DOMElement(AUTHOR);
         el.addText(this.authorName);
         wr.write(el);
 
-        el = new DOMElement("version");
+        el = new DOMElement(VERSION);
         el.addText(this.version);
         wr.write(el);
 
@@ -1113,13 +1129,13 @@ public class Package
         el.addText(new Boolean(this.preserveVersion).toString());
         wr.write(el);
 
-        Element elfiles = new DOMElement("files");
+        Element elfiles = new DOMElement(FILES);
         wr.writeOpen(elfiles);
 
         for (DocumentInfo docInfo : this.files) {
             Element elfile = new DOMElement("file");
-            elfile.addAttribute("defaultAction", String.valueOf(docInfo.getAction()));
-            elfile.addAttribute("language", String.valueOf(docInfo.getLanguage()));
+            elfile.addAttribute(DEFAULT_ACTION, String.valueOf(docInfo.getAction()));
+            elfile.addAttribute(LANGUAGE, String.valueOf(docInfo.getLanguage()));
             elfile.addText(docInfo.getFullName());
             wr.write(elfile);
         }
@@ -1321,14 +1337,14 @@ public class Package
 
         Element docEl = domdoc.getRootElement();
 
-        Element infosEl = docEl.element("infos");
+        Element infosEl = docEl.element(INFOS);
 
         this.name = getElementText(infosEl, "name");
-        this.description = getElementText(infosEl, "description");
-        this.licence = getElementText(infosEl, "licence");
-        this.authorName = getElementText(infosEl, "author");
+        this.description = getElementText(infosEl, DESCRIPTION);
+        this.licence = getElementText(infosEl, LICENCE);
+        this.authorName = getElementText(infosEl, AUTHOR);
         this.extensionId = getElementText(infosEl, "extensionId", null);
-        this.version = getElementText(infosEl, "version");
+        this.version = getElementText(infosEl, VERSION);
         this.backupPack = new Boolean(getElementText(infosEl, "backupPack")).booleanValue();
         this.preserveVersion = new Boolean(getElementText(infosEl, "preserveVersion")).booleanValue();
 
@@ -1465,18 +1481,18 @@ public class Package
 
         Map<String, Object> infos = new HashMap<>();
         infos.put("name", this.name);
-        infos.put("description", this.description);
-        infos.put("licence", this.licence);
-        infos.put("author", this.authorName);
-        infos.put("version", this.version);
+        infos.put(DESCRIPTION, this.description);
+        infos.put(LICENCE, this.licence);
+        infos.put(AUTHOR, this.authorName);
+        infos.put(VERSION, this.version);
         infos.put("backup", this.isBackupPack());
 
         Map<String, Map<String, List<Map<String, String>>>> files = new HashMap<>();
 
         for (DocumentInfo docInfo : this.files) {
             Map<String, String> fileInfos = new HashMap<>();
-            fileInfos.put("defaultAction", String.valueOf(docInfo.getAction()));
-            fileInfos.put("language", String.valueOf(docInfo.getLanguage()));
+            fileInfos.put(DEFAULT_ACTION, String.valueOf(docInfo.getAction()));
+            fileInfos.put(LANGUAGE, String.valueOf(docInfo.getLanguage()));
             fileInfos.put("fullName", docInfo.getFullName());
 
             // If the space does not exist in the map of spaces, we create it.
@@ -1495,8 +1511,8 @@ public class Package
             files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()).add(fileInfos);
         }
 
-        json.put("infos", infos);
-        json.put("files", files);
+        json.put(INFOS, infos);
+        json.put(FILES, files);
 
         return json;
     }

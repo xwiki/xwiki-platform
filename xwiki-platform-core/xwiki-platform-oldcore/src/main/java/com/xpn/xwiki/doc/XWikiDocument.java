@@ -230,6 +230,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private static final String[] HTML_MACRO_REPLACE_STRINGS = new String[] { "&#123;&#123;html", "&#123;&#123;/html" };
 
+    private static final String CURRENT = "current";
+
+    private static final String PRE_START = "{pre}";
+
+    private static final String PRE_END = "{/pre}";
+
+    private static final String HIDDEN = "hidden";
+
+    private static final String XWIKIGUEST_REFERENCE_WARNING =
+        "A reference to XWikiGuest user has been set instead of null. This is probably a mistake.";
+
+    private static final String SEE_STACK_TRACE = "See stack trace";
+
     /**
      * An attachment waiting to be deleted at next document save.
      *
@@ -351,7 +364,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private static DocumentReferenceResolver<String> getCurrentDocumentReferenceResolver()
     {
-        return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT);
     }
 
     /**
@@ -383,7 +396,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private static DocumentReferenceResolver<EntityReference> getCurrentReferenceDocumentReferenceResolver()
     {
-        return Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+        return Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, CURRENT);
     }
 
     /**
@@ -417,7 +430,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private static ObjectReferenceResolver<EntityReference> getCurrentReferenceObjectReferenceResolver()
     {
-        return Utils.getComponent(ObjectReferenceResolver.TYPE_REFERENCE, "current");
+        return Utils.getComponent(ObjectReferenceResolver.TYPE_REFERENCE, CURRENT);
     }
 
     /**
@@ -2169,8 +2182,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             this.authors.setEffectiveMetadataAuthor(GuestUserReference.INSTANCE);
         } else {
             if (authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                    new Exception("See stack trace"));
+                LOGGER.warn(XWIKIGUEST_REFERENCE_WARNING,
+                    new Exception(SEE_STACK_TRACE));
             }
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(authorReference);
             this.authors.setEffectiveMetadataAuthor(user);
@@ -2228,8 +2241,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             this.authors.setContentAuthor(GuestUserReference.INSTANCE);
         } else {
             if (contentAuthorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                    new Exception("See stack trace"));
+                LOGGER.warn(XWIKIGUEST_REFERENCE_WARNING,
+                    new Exception(SEE_STACK_TRACE));
             }
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(contentAuthorReference);
             this.authors.setContentAuthor(user);
@@ -2284,8 +2297,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             this.authors.setCreator(GuestUserReference.INSTANCE);
         } else {
             if (creatorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                    new Exception("See stack trace"));
+                LOGGER.warn(XWIKIGUEST_REFERENCE_WARNING,
+                    new Exception(SEE_STACK_TRACE));
             }
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(creatorReference);
             this.authors.setCreator(user);
@@ -3976,25 +3989,25 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 if (is10Syntax(wrappingSyntaxId)) {
                     // Don't use pre when not in the rendernig engine since for template we don't evaluate wiki syntax.
                     if (isInRenderingEngine) {
-                        result.append("{pre}");
+                        result.append(PRE_START);
                     }
                 }
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
                 if (is10Syntax(wrappingSyntaxId)) {
                     if (isInRenderingEngine) {
-                        result.append("{/pre}");
+                        result.append(PRE_END);
                     }
                 }
-            } else if ("hidden".equals(type)) {
+            } else if (HIDDEN.equals(type)) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
                 if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
-                    result.append("{pre}");
+                    result.append(PRE_START);
                 }
                 pclass.displayHidden(result, fieldname, prefix, obj, context);
                 if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
-                    result.append("{/pre}");
+                    result.append(PRE_END);
                 }
             } else if ("search".equals(type)) {
                 // Backward compatibility
@@ -4014,12 +4027,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     // the
                     // escaping. For example for a textarea check the TextAreaClass class.
                     if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
-                        result.append("{pre}");
+                        result.append(PRE_START);
                     }
                     prefix = LOCAL_REFERENCE_SERIALIZER.serialize(obj.getXClass(context).getDocumentReference()) + "_";
                     searchMethod.invoke(pclass, result, fieldname, prefix, context.get("query"), context);
                     if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
-                        result.append("{/pre}");
+                        result.append(PRE_END);
                     }
                 } else {
                     pclass.displayView(result, fieldname, prefix, obj, context);
@@ -6111,7 +6124,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 .createQuery("select distinct doc.fullName from XWikiDocument doc where "
                     + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
                     Query.XWQL);
-            query.addFilter(Utils.getComponent(QueryFilter.class, "hidden"));
+            query.addFilter(Utils.getComponent(QueryFilter.class, HIDDEN));
             query.bindValue("prefixedFullName",
                 getDefaultEntityReferenceSerializer().serialize(getDocumentReference()));
             query.bindValue("fullName", LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference()));
@@ -7235,7 +7248,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         if (fromDoc.isHidden() != toDoc.isHidden()) {
-            list.add(new MetaDataDiff("hidden", fromDoc.isHidden(), toDoc.isHidden()));
+            list.add(new MetaDataDiff(HIDDEN, fromDoc.isHidden(), toDoc.isHidden()));
         }
 
         if (fromDoc.isEnforceRequiredRights() != toDoc.isEnforceRequiredRights()) {

@@ -67,6 +67,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     private static final String AUTHENTICATION_REALM_NAME = "xwiki.authentication.realmname";
     private static final String MESSAGE_CONTEXT_KEY = "message";
+    private static final String USER_AUTHENTIFIED_MESSAGE = "User [{}] is authentified";
 
     private static final EntityReference USERCLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
         new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
@@ -218,7 +219,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             final String userName = getContextUserName(wrappedRequest.getUserPrincipal(), context);
             if (LOGGER.isInfoEnabled()) {
                 if (userName != null) {
-                    LOGGER.info("User [{}] is authentified", userName);
+                    LOGGER.info(USER_AUTHENTIFIED_MESSAGE, userName);
                 }
             }
 
@@ -267,7 +268,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             Principal principal = wrappedRequest.getUserPrincipal();
             if (LOGGER.isInfoEnabled()) {
                 if (principal != null) {
-                    LOGGER.info("User [{}] is authentified", principal.getName());
+                    LOGGER.info(USER_AUTHENTIFIED_MESSAGE, principal.getName());
                 }
             }
 

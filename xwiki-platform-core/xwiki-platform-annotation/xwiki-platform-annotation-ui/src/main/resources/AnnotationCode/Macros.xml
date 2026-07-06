@@ -271,10 +271,10 @@
       #if ($mode != 'edit')
         ## Comment reply button only for default annotations.
         #if ("$!annotationClassDocName" == 'XWiki.XWikiComments')
-          #set($xredirect = $!escapetool.xml($request.get('xredirect')))
-          #if("$!xredirect" == '')
-            #set($xredirect = "$xwiki.getURL($docRef, 'view', $!{request.queryString})")
-          #end
+          ## Sanitize the xredirect parameter. Fall back to the annotated document view URL when the provided
+          ## redirect is missing or unsafe.
+          #set($replyFallbackURL = "$xwiki.getURL($docRef, 'view', $!{request.queryString})")
+          #getSanitizedURLAttributeValue('a', 'href', "$!request.get('xredirect')", $replyFallbackURL, $xredirect)
           ## add "comment reply" button
           &lt;a class='btn btn-default btn-xs reply' href="${xredirect}#xwikicomment_${ann.id}"
             title="$services.localization.render('core.viewers.comments.reply')"&gt;

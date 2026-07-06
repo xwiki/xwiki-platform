@@ -65,13 +65,12 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAuthServiceImpl.class);
 
-    private static final String XWIKI_SPACE = "XWiki";
     private static final String AUTHENTICATION_REALM_NAME = "xwiki.authentication.realmname";
-    private static final String USER_LOG_PREFIX = "User ";
     private static final String MESSAGE_CONTEXT_KEY = "message";
+    private static final String USER_AUTHENTIFIED_MESSAGE = "User [{}] is authentified";
 
     private static final EntityReference USERCLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
-        new EntityReference(XWIKI_SPACE, EntityType.SPACE));
+        new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     /**
      * Used to convert a string into a proper Document Name.
@@ -121,7 +120,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 if (xwiki.Param(AUTHENTICATION_REALM_NAME) != null) {
                     sconfig.setRealmName(xwiki.Param(AUTHENTICATION_REALM_NAME));
                 } else {
-                    sconfig.setRealmName(XWIKI_SPACE);
+                    sconfig.setRealmName(XWiki.SYSTEM_SPACE);
                 }
                 authenticator.init(null, sconfig);
             } else {
@@ -133,7 +132,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 if (xwiki.Param(AUTHENTICATION_REALM_NAME) != null) {
                     sconfig.setRealmName(xwiki.Param(AUTHENTICATION_REALM_NAME));
                 } else {
-                    sconfig.setRealmName(XWIKI_SPACE);
+                    sconfig.setRealmName(XWiki.SYSTEM_SPACE);
                 }
 
                 if (xwiki.Param("xwiki.authentication.defaultpage") != null) {
@@ -148,21 +147,21 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                     sconfig.setLoginPage(xwiki.Param("xwiki.authentication.loginpage"));
                 } else {
                     sconfig.setLoginPage(stripContextPathFromURL(
-                        context.getURLFactory().createURL(XWIKI_SPACE, "XWikiLogin", "login", context), context));
+                        context.getURLFactory().createURL(XWiki.SYSTEM_SPACE, "XWikiLogin", "login", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.logoutpage") != null) {
                     sconfig.setLogoutPage(xwiki.Param("xwiki.authentication.logoutpage"));
                 } else {
                     sconfig.setLogoutPage(stripContextPathFromURL(
-                        context.getURLFactory().createURL(XWIKI_SPACE, "XWikiLogout", "logout", context), context));
+                        context.getURLFactory().createURL(XWiki.SYSTEM_SPACE, "XWikiLogout", "logout", context), context));
                 }
 
                 if (xwiki.Param("xwiki.authentication.errorpage") != null) {
                     sconfig.setErrorPage(xwiki.Param("xwiki.authentication.errorpage"));
                 } else {
                     sconfig.setErrorPage(stripContextPathFromURL(
-                        context.getURLFactory().createURL(XWIKI_SPACE, "XWikiLogin", "loginerror", context), context));
+                        context.getURLFactory().createURL(XWiki.SYSTEM_SPACE, "XWikiLogin", "loginerror", context), context));
                 }
 
                 sconfig.setPersistentLoginManager(this.persistentLoginManagerProvider.get());
@@ -211,7 +210,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             // Process logout (this only works with Forms)
             if (auth.processLogout(wrappedRequest, response, new URLPatternMatcher())) {
                 if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info(USER_LOG_PREFIX + context.getUser() + " has been logged-out");
+                    LOGGER.info("User [{}] has been logged-out", context.getUser());
                 }
                 wrappedRequest.setUserPrincipal(null);
                 return null;
@@ -220,7 +219,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             final String userName = getContextUserName(wrappedRequest.getUserPrincipal(), context);
             if (LOGGER.isInfoEnabled()) {
                 if (userName != null) {
-                    LOGGER.info(USER_LOG_PREFIX + userName + " is authentified");
+                    LOGGER.info(USER_AUTHENTIFIED_MESSAGE, userName);
                 }
             }
 
@@ -269,7 +268,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             Principal principal = wrappedRequest.getUserPrincipal();
             if (LOGGER.isInfoEnabled()) {
                 if (principal != null) {
-                    LOGGER.info(USER_LOG_PREFIX + principal.getName() + " is authentified");
+                    LOGGER.info(USER_AUTHENTIFIED_MESSAGE, principal.getName());
                 }
             }
 
@@ -421,7 +420,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         String user;
 
         // First let's look in the cache
-        if (context.getWiki().exists(new DocumentReference(context.getWikiId(), XWIKI_SPACE, username), context)) {
+        if (context.getWiki().exists(new DocumentReference(context.getWikiId(), XWiki.SYSTEM_SPACE, username), context)) {
             user = "XWiki." + username;
         } else {
             // Note: The result of this search depends on the Database. If the database is
@@ -429,7 +428,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             // username in any case. For case-sensitive databases (like HSQLDB) they'll need to
             // enter it exactly as they've created it.
             String sql = "select distinct doc.fullName from XWikiDocument as doc";
-            Object[][] whereParameters = new Object[][] { { "doc.space", XWIKI_SPACE }, { "doc.name", username } };
+            Object[][] whereParameters = new Object[][] { { "doc.space", XWiki.SYSTEM_SPACE }, { "doc.name", username } };
 
             List<String> list = context.getWiki().search(sql, whereParameters, context);
             if (list.size() == 0) {
@@ -506,7 +505,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         if (createuser != null) {
             String wikiname = context.getWiki().clearName(user, true, true, context);
             XWikiDocument userdoc =
-                context.getWiki().getDocument(new DocumentReference(context.getWikiId(), XWIKI_SPACE, wikiname), context);
+                context.getWiki().getDocument(new DocumentReference(context.getWikiId(), XWiki.SYSTEM_SPACE, wikiname), context);
             if (userdoc.isNew()) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("User page does not exist for user " + user);

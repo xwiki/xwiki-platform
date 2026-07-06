@@ -145,7 +145,7 @@
 
     <!-- Storage -->
     <dependency>
-      <groupId>org.hibernate</groupId>
+      <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-core</artifactId>
     </dependency>
     <!-- Hibernate 5 seems to require (but don't declare) javax validation-->
@@ -157,6 +157,17 @@
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
+    </dependency>
+    <!-- Hibernate 6 parses the hbm.xml mapping files through a Jakarta JAXB runtime. Only the jakarta.xml.bind-api is
+         available transitively (via Hibernate), with no runtime provider, so the JAXBContext cannot be built. Provide
+         the Glassfish Jakarta implementation for the tests that boot Hibernate's mapping binder. -->
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <!-- Force the Jakarta (4.x) implementation: the version managed for the javax.xml.bind consumers is 2.x, which
+           cannot build the jakarta.xml.bind JAXBContext that Hibernate 6 needs to parse hbm.xml. -->
+      <version>4.0.5</version>
+      <scope>test</scope>
     </dependency>
     <!-- Replace the one from DBCP -->
     <dependency>

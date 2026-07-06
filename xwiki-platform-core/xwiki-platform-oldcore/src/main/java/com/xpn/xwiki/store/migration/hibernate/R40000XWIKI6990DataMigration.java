@@ -298,7 +298,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             sb.append("UPDATE ").append(name).append(" SET ").append(field).append('=').append(':').append(NEWID)
                 .append(" WHERE ").append(field).append('=').append(':').append(OLDID);
             long now = System.nanoTime();
-            this.session.createSQLQuery(sb.toString()).setParameter(NEWID, this.currentNewId).setParameter(OLDID, this.currentOldId)
+            this.session.createNativeQuery(sb.toString()).setParameter(NEWID, this.currentNewId).setParameter(OLDID, this.currentOldId)
                 .executeUpdate();
             return System.nanoTime() - now;
         }
@@ -513,7 +513,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         if (pClass != null) {
             @SuppressWarnings("unchecked")
-            Iterator<Property> it = pClass.getPropertyIterator();
+            Iterator<Property> it = pClass.getProperties().iterator();
             while (it.hasNext()) {
                 Property property = it.next();
                 if (property.getType().isCollectionType()) {
@@ -558,7 +558,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      */
     private String getKeyColumnName(org.hibernate.mapping.Collection coll)
     {
-        return ((Column) coll.getKey().getColumnIterator().next()).getName();
+        return ((Column) coll.getKey().getColumns().get(0)).getName();
     }
 
     /**
@@ -582,9 +582,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     private String getColumnName(PersistentClass pClass, String propertyName)
     {
         if (propertyName != null) {
-            return ((Column) pClass.getProperty(propertyName).getColumnIterator().next()).getName();
+            return ((Column) pClass.getProperty(propertyName).getColumns().get(0)).getName();
         }
-        return ((Column) pClass.getKey().getColumnIterator().next()).getName();
+        return ((Column) pClass.getKey().getColumns().get(0)).getName();
     }
 
     @Override
@@ -923,7 +923,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 pkName = getStore().failSafeExecuteRead(getXWikiContext(), session -> {
                     // Retrieve the constraint name from the database
                     return (String) session
-                        .createSQLQuery("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS"
+                        .createNativeQuery("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS"
                             + " WHERE TABLE_NAME = :tableName AND CONSTRAINT_TYPE = 'PRIMARY KEY'")
                         .setParameter("tableName", tableName).uniqueResult();
                 });
@@ -955,7 +955,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         sb.append("    <addPrimaryKey tableName=\"").append(table.getName()).append("\"  columnNames=\"");
 
-        Iterator<Column> columns = pk.getColumnIterator();
+        Iterator<Column> columns = pk.getColumns().iterator();
         while (columns.hasNext()) {
             Column column = columns.next();
             sb.append(column.getName());
@@ -994,7 +994,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         sb.append("    <createIndex tableName=\"").append(index.getTable().getName()).append("\"  indexName=\"")
             .append(index.getName()).append("\">\n");
 
-        Iterator<Column> columns = index.getColumnIterator();
+        Iterator<Column> columns = index.getColumns().iterator();
         while (columns.hasNext()) {
             Column column = columns.next();
             sb.append("      <column name=\"").append(column.getName()).append("\"/>\n");
@@ -1047,7 +1047,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             }
 
             // We drop all index related to the table, this is overkill, but does not hurt
-            for (Iterator<Index> it = table.getIndexIterator(); it.hasNext();) {
+            for (Iterator<Index> it = table.getIndexes().values().iterator(); it.hasNext();) {
                 Index index = it.next();
                 appendDropIndex(sb, index);
             }
@@ -1061,7 +1061,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 appendAddPrimaryKey(sb, table);
             }
 
-            for (Iterator<Index> it = table.getIndexIterator(); it.hasNext();) {
+            for (Iterator<Index> it = table.getIndexes().values().iterator(); it.hasNext();) {
                 Index index = it.next();
                 appendAddIndex(sb, index);
             }
@@ -1128,7 +1128,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             }
 
             @SuppressWarnings("unchecked")
-            Iterator<Property> it = pClass.getPropertyIterator();
+            Iterator<Property> it = pClass.getProperties().iterator();
             while (it.hasNext()) {
                 Property property = it.next();
                 if (property.getType().isCollectionType()) {
@@ -1208,7 +1208,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
                 // Reuse the data from the old foreign key
                 // Columns in the current table
-                Iterator<Column> columns = fk.getColumnIterator();
+                Iterator<Column> columns = fk.getColumns().iterator();
                 while (columns.hasNext()) {
                     Column column = columns.next();
                     sb.append(column.getName());
@@ -1220,7 +1220,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     .append("\" referencedColumnNames=\"");
 
                 // Columns in the referenced table
-                columns = fk.getReferencedTable().getPrimaryKey().getColumnIterator();
+                columns = fk.getReferencedTable().getPrimaryKey().getColumns().iterator();
                 while (columns.hasNext()) {
                     Column column = columns.next();
                     sb.append(column.getName());
@@ -1263,7 +1263,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         this.isMySQL = true;
 
         String createTable = store.failSafeExecuteRead(getXWikiContext(), session -> {
-            NativeQuery<Object[]> query = session.createSQLQuery("SHOW TABLE STATUS like 'xwikidoc'");
+            NativeQuery<Object[]> query = session.createNativeQuery("SHOW TABLE STATUS like 'xwikidoc'");
             return (String) query.uniqueResult()[1];
         });
 

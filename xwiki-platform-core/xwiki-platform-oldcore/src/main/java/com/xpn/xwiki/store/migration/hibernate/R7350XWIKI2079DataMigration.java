@@ -68,14 +68,14 @@ public class R7350XWIKI2079DataMigration extends AbstractHibernateDataMigration
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 try {
-                    session.createSQLQuery("ALTER TABLE xwikidoc DROP COLUMN XWD_ARCHIVE").executeUpdate();
+                    session.createNativeQuery("ALTER TABLE xwikidoc DROP COLUMN XWD_ARCHIVE").executeUpdate();
                 } catch (HibernateException ex) {
                     // Maybe the column doesn't exist. Anyway, in case we're using a DBMS which
                     // doesn't support DROP COLUMN (such as Derby < 10.3.1.4), we can try to alter
                     // the column to allow NULL values.
                     // TODO Can we check the exception and see what is happening?
                     try {
-                        session.createSQLQuery("ALTER TABLE xwikidoc ALTER COLUMN XWD_ARCHIVE " + "SET DEFAULT ' '")
+                        session.createNativeQuery("ALTER TABLE xwikidoc ALTER COLUMN XWD_ARCHIVE " + "SET DEFAULT ' '")
                                 .executeUpdate();
                     } catch (HibernateException ex2) {
                         // Maybe the column doesn't exist, after all.

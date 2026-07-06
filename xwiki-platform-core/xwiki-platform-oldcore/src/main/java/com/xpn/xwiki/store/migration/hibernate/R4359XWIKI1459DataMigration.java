@@ -27,9 +27,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -106,7 +106,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                         // XWD_ARCHIVE column had a not null constraint and since this column has disappeared in 1.2
                         // and after, the hibernate update script will not have modified the nullability of it...
                         // (see https://jira.xwiki.org/browse/XWIKI-2074).
-                        rs = session.createSQLQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc"
+                        rs = session.createNativeQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc"
                             + " where (XWD_ARCHIVE is not null and XWD_ARCHIVE <> ' ') order by XWD_VERSION").list();
                     } catch (HibernateException e) {
                         // most likely there is no XWD_ARCHIVE column, so migration is not needed
@@ -119,8 +119,8 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                     Transaction originalTransaction = versioningStore.getTransaction(context);
                     versioningStore.setSession(null, context);
                     versioningStore.setTransaction(null, context);
-                    SQLQuery deleteStatement =
-                            session.createSQLQuery("update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
+                    NativeQuery<?> deleteStatement =
+                            session.createNativeQuery("update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
 
                     for (Object[] result : rs) {
                         if (R4359XWIKI1459DataMigration.this.logger.isInfoEnabled()) {
@@ -150,7 +150,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                                     "Empty revision found for document [{}]. Ignoring non-fatal error.",
                                     result[2].toString());
                         }
-                        deleteStatement.setLong(1, docId);
+                        deleteStatement.setParameter(1, docId);
                         deleteStatement.executeUpdate();
                     }
                     versioningStore.setSession(session, context);

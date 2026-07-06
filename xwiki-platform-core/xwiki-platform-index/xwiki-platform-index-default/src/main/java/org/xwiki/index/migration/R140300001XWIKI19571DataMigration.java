@@ -170,7 +170,7 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
         // updated later in the migration.
         String sql = String.format("select %s, %s, %s, %s, %s from %s", docIdColumnName, versionColumnName,
             typeColumnName, instanceIdColumnName, timestampColumnName, tableName);
-        List<Object[]> resultList = session.createSQLQuery(sql).getResultList();
+        List<Object[]> resultList = session.createNativeQuery(sql).getResultList();
         for (Object[] resultSet : resultList) {
             XWikiDocumentIndexingTask task = new XWikiDocumentIndexingTask();
             task.setDocId(((Number) resultSet[0]).longValue());

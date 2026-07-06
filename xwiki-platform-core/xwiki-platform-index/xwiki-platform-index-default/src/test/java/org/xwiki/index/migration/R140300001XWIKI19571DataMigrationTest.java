@@ -37,7 +37,7 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.query.spi.NativeQueryImplementor;
+import org.hibernate.query.sql.spi.NativeQueryImplementor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -154,7 +154,7 @@ class R140300001XWIKI19571DataMigrationTest
         ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.next()).thenReturn(true);
         when(this.databaseMetaData.getTables("dbname", null, "XWIKIDOCUMENTINDEXINGQUEUE", null)).thenReturn(resultSet);
-        when(this.session.createSQLQuery(
+        when(this.session.createNativeQuery(
             "select DOC_ID, VERSION, TYPE, INSTANCE_ID, TIMESTAMP from XWIKIDOCUMENTINDEXINGQUEUE"))
             .thenReturn(this.nativeQueryImplementor);
 
@@ -192,7 +192,7 @@ class R140300001XWIKI19571DataMigrationTest
         ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.next()).thenReturn(true);
         when(this.databaseMetaData.getTables(null, "dbname", "XWIKIDOCUMENTINDEXINGQUEUE", null)).thenReturn(resultSet);
-        when(this.session.createSQLQuery(
+        when(this.session.createNativeQuery(
             "select DOC_ID, VERSION, TYPE, INSTANCE_ID, TIMESTAMP from XWIKIDOCUMENTINDEXINGQUEUE"))
             .thenReturn(this.nativeQueryImplementor);
         Timestamp now = new Timestamp(new Date().getTime());

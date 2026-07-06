@@ -3128,7 +3128,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             return true;
         }
 
-        Iterator<Property> it = mapping.getPropertyIterator();
+        Iterator<Property> it = mapping.getProperties().iterator();
         while (it.hasNext()) {
             Property hibprop = it.next();
             String propname = hibprop.getName();
@@ -3164,7 +3164,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             return null;
         }
 
-        Iterator<Property> it = mapping.getPropertyIterator();
+        Iterator<Property> it = mapping.getProperties().iterator();
         while (it.hasNext()) {
             Property hibprop = it.next();
             String propname = hibprop.getName();

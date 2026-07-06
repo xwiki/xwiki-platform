@@ -72,6 +72,8 @@ public class UploadAction extends XWikiAction
     /** The prefix of the corresponding filename input field name. */
     private static final String FILENAME_FIELD_NAME = "filename";
 
+    private static final String MESSAGE = "message";
+
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -83,9 +85,9 @@ public class UploadAction extends XWikiAction
             if (exception instanceof AttachmentValidationException) {
                 AttachmentValidationException exp = (AttachmentValidationException) exception;
                 response.setStatus(exp.getHttpStatus());
-                getCurrentScriptContext().setAttribute("message", exp.getTranslationKey(), ENGINE_SCOPE);
+                getCurrentScriptContext().setAttribute(MESSAGE, exp.getTranslationKey(), ENGINE_SCOPE);
                 getCurrentScriptContext().setAttribute("parameters", exp.getTranslationParameters(), ENGINE_SCOPE);
-                context.put("message", exp.getContextMessage());
+                context.put(MESSAGE, exp.getContextMessage());
 
                 return true;
             }
@@ -113,7 +115,7 @@ public class UploadAction extends XWikiAction
         // The document is saved for each attachment in the group.
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
         if (fileupload == null) {
-            getCurrentScriptContext().setAttribute("message", "core.action.upload.failure.noFiles",
+            getCurrentScriptContext().setAttribute(MESSAGE, "core.action.upload.failure.noFiles",
                 ENGINE_SCOPE);
 
             return true;
@@ -156,7 +158,7 @@ public class UploadAction extends XWikiAction
         }
         // Forward to the attachment page
         if (failedFiles.size() > 0 || !wrongFileNames.isEmpty()) {
-            getCurrentScriptContext().setAttribute("message", "core.action.upload.failure", ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute(MESSAGE, "core.action.upload.failure", ENGINE_SCOPE);
             getCurrentScriptContext().setAttribute("failedFiles", failedFiles, ENGINE_SCOPE);
             getCurrentScriptContext().setAttribute("wrongFileNames", wrongFileNames, ENGINE_SCOPE);
 
@@ -240,7 +242,7 @@ public class UploadAction extends XWikiAction
             // check Exception is ERROR_XWIKI_APP_JAVA_HEAP_SPACE when saving Attachment
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                context.put("message", "javaheapspace");
+                context.put(MESSAGE, "javaheapspace");
                 return true;
             }
             throw e;
@@ -303,7 +305,7 @@ public class UploadAction extends XWikiAction
         if (ajax) {
             try {
                 context.getResponse().getOutputStream()
-                    .println("error: " + localizePlainOrKey((String) context.get("message")));
+                    .println("error: " + localizePlainOrKey((String) context.get(MESSAGE)));
             } catch (IOException ex) {
                 LOGGER.error("Unhandled exception writing output:", ex);
             }

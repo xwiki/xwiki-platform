@@ -320,8 +320,6 @@ public class XWiki implements EventListener
 
     private static final String DEFAULT_LANGUAGE = "default_language";
 
-    private static final String XWIKIUSERS_CLASS = "XWiki.XWikiUsers";
-
     private static final String INTERFACE_LANGUAGE = "interfacelanguage";
 
     private static final String XWIKINAME = "xwikiname";
@@ -3388,7 +3386,8 @@ public class XWiki implements EventListener
             String user = context.getUser();
             XWikiDocument userdoc = getDocument(user, context);
             if (userdoc != null) {
-                userPreferenceLanguage = userdoc.getStringValue(XWIKIUSERS_CLASS, DEFAULT_LANGUAGE);
+                userPreferenceLanguage =
+                    userdoc.getStringValue(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING, DEFAULT_LANGUAGE);
             }
         } catch (XWikiException e) {
         }
@@ -3490,7 +3489,8 @@ public class XWiki implements EventListener
             XWikiDocument userdoc = null;
             userdoc = getDocument(user, context);
             if (userdoc != null) {
-                userPreferenceLanguage = userdoc.getStringValue(XWIKIUSERS_CLASS, "default_interface_language");
+                userPreferenceLanguage = userdoc.getStringValue(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING,
+                    "default_interface_language");
             }
         } catch (XWikiException e) {
         }
@@ -3898,13 +3898,14 @@ public class XWiki implements EventListener
             userDocument = userDocument.clone();
 
             // Get the stored validation key
-            BaseObject userObject = userDocument.getObject(XWIKIUSERS_CLASS, 0);
+            BaseObject userObject = userDocument.getObject(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING, 0);
             String storedKey = userObject.getStringValue(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
 
             // Get the validation key from the URL
             String validationKey = request.getParameter(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
             PropertyInterface validationKeyClass =
-                getClass(XWIKIUSERS_CLASS, context).get(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
+                getClass(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING, context)
+                    .get(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
             if (validationKeyClass instanceof PasswordClass) {
                 validationKey = ((PasswordClass) validationKeyClass).getEquivalentPassword(storedKey, validationKey);
             }
@@ -3980,7 +3981,7 @@ public class XWiki implements EventListener
             }
 
             if ((parent == null) || (parent.isEmpty())) {
-                parent = XWIKIUSERS_CLASS;
+                parent = XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING;
             }
 
             // Mark the user as active or waiting email validation.
@@ -4040,8 +4041,8 @@ public class XWiki implements EventListener
     public boolean createEmptyUser(String xwikiname, String userRights, XWikiContext context) throws XWikiException
     {
         Map<String, String> map = new HashMap<>();
-        map.put("active", "1");
-        map.put("first_name", xwikiname);
+        map.put(XWikiUser.ACTIVE_PROPERTY, "1");
+        map.put(XWikiUsersDocumentInitializer.FIRST_NAME_FIELD, xwikiname);
 
         if (createUser(xwikiname, map, userRights, context) == 1) {
             return true;
@@ -6371,7 +6372,7 @@ public class XWiki implements EventListener
                 return escapeXML ? XMLUtils.escape(userReference.getName()) : userReference.getName();
             }
 
-            BaseObject userobj = userdoc.getObject(XWIKIUSERS_CLASS);
+            BaseObject userobj = userdoc.getObject(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING);
             if (userobj == null) {
                 return escapeXML ? XMLUtils.escape(userdoc.getDocumentReference().getName())
                     : userdoc.getDocumentReference().getName();
@@ -6380,12 +6381,12 @@ public class XWiki implements EventListener
             String text;
 
             if (format == null) {
-                text = userobj.getStringValue("first_name");
-                String lastName = userobj.getStringValue("last_name");
+                text = userobj.getStringValue(XWikiUsersDocumentInitializer.FIRST_NAME_FIELD);
+                String lastName = userobj.getStringValue(XWikiUsersDocumentInitializer.LAST_NAME_FIELD);
                 if (!text.isEmpty() && !lastName.isEmpty()) {
                     text += ' ';
                 }
-                text += userobj.getStringValue("last_name");
+                text += userobj.getStringValue(XWikiUsersDocumentInitializer.LAST_NAME_FIELD);
                 if (StringUtils.isBlank(text)) {
                     text = userdoc.getDocumentReference().getName();
                 }

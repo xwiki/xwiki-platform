@@ -77,6 +77,14 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     private static final String COMMENT_SYNTAX_KEY = "comment_syntax";
 
     /**
+     * The name of the transient metadata field holding the comma-separated list of temporary uploaded file names that
+     * must be attached to the annotated document when the annotation is persisted (e.g. images inserted in the
+     * annotation comment). It matches the {@code uploadedFiles} request parameter and is never stored as an annotation
+     * object property.
+     */
+    protected static final String UPLOADED_FILES_FIELD = "uploadedFiles";
+
+    /**
      * The name of the request parameter value represents the parameter that requires
      * conversion from HTML to wiki syntax.
      * This parameter and its implementation is directly inspired from
@@ -421,7 +429,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         // never persisted. When allowed, the names stay in the metadata, reach the Annotation object, and the IO
         // service persists the attachments on the same document instance that holds the annotation, in a single save.
         if (!canUploadAttachment) {
-            metadataMap.remove(Annotation.UPLOADED_FILES_FIELD);
+            metadataMap.remove(UPLOADED_FILES_FIELD);
         }
         return canUploadAttachment;
     }

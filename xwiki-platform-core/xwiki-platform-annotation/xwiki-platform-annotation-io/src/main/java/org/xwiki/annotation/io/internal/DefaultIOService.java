@@ -65,6 +65,13 @@ import com.xpn.xwiki.objects.BaseProperty;
 public class DefaultIOService implements IOService
 {
     /**
+     * The name of the transient annotation metadata field holding the comma-separated list of temporary uploaded file
+     * names to attach to the annotated document on save (e.g. images inserted in the annotation comment). It is never
+     * stored as an annotation object property.
+     */
+    private static final String UPLOADED_FILES_FIELD = "uploadedFiles";
+
+    /**
      * The execution used to get the deprecated XWikiContext.
      */
     @Inject
@@ -440,7 +447,7 @@ public class DefaultIOService implements IOService
         // the target. Don't set the author either, will be set by caller, if needed
         Collection<String> skippedFields =
             Arrays.asList(Annotation.STATE_FIELD, Annotation.DATE_FIELD, Annotation.AUTHOR_FIELD,
-                Annotation.TARGET_FIELD, Annotation.UPLOADED_FILES_FIELD);
+                Annotation.TARGET_FIELD, UPLOADED_FILES_FIELD);
         // all fields in the annotation, try to put them in object (I wonder what happens if I can't...)
         for (String propName : annotation.getFieldNames()) {
             if (!skippedFields.contains(propName)) {
@@ -476,12 +483,12 @@ public class DefaultIOService implements IOService
      * persisted when the document is saved.
      *
      * @param document the document instance that is about to be saved
-     * @param annotation the annotation possibly carrying uploaded file names in {@link Annotation#UPLOADED_FILES_FIELD}
+     * @param annotation the annotation possibly carrying uploaded file names in the uploaded-files metadata field
      * @return {@code true} if at least one temporary attachment was added to the document, {@code false} otherwise
      */
     private boolean attachTemporaryUploadedFiles(XWikiDocument document, Annotation annotation)
     {
-        Object uploadedFiles = annotation.get(Annotation.UPLOADED_FILES_FIELD);
+        Object uploadedFiles = annotation.get(UPLOADED_FILES_FIELD);
         if (uploadedFiles != null) {
             String[] fileNames = StringUtils.split(String.valueOf(uploadedFiles), ",");
             if (fileNames != null && fileNames.length > 0) {

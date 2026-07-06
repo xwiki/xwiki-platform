@@ -114,7 +114,7 @@ class DefaultIOServiceTest
     {
         Annotation annotation = new Annotation("selection", "left", "right");
         annotation.setAuthor("xwiki:XWiki.Admin");
-        annotation.set(Annotation.UPLOADED_FILES_FIELD, "image1.png,image2.png");
+        annotation.set("uploadedFiles", "image1.png,image2.png");
 
         this.ioService.addAnnotation(TARGET, annotation);
 
@@ -123,7 +123,7 @@ class DefaultIOServiceTest
             .attachTemporaryAttachmentsInDocument(this.clonedDocument, Arrays.asList("image1.png", "image2.png"));
         verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(true), eq(this.xcontext));
         // The uploaded files list must not be written as a (bogus) annotation object property.
-        verify(this.annotationObject, never()).set(eq(Annotation.UPLOADED_FILES_FIELD), any(), any());
+        verify(this.annotationObject, never()).set(eq("uploadedFiles"), any(), any());
     }
 
     @Test
@@ -145,7 +145,7 @@ class DefaultIOServiceTest
         // An update whose only change is an uploaded image: updateObject would report no change, but the attachment
         // must still be persisted, forcing a save.
         Annotation annotation = new Annotation("0");
-        annotation.set(Annotation.UPLOADED_FILES_FIELD, "image.png");
+        annotation.set("uploadedFiles", "image.png");
 
         this.ioService.updateAnnotations(TARGET, List.of(annotation));
 

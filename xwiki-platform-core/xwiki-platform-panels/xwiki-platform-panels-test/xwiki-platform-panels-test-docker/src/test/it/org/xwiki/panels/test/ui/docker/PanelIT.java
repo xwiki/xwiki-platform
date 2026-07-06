@@ -290,7 +290,7 @@ class PanelIT
 
     @Test
     @Order(6)
-    void displayLeftPanelColumn(TestUtils testUtils, TestReference testReference)
+    void displayLeftPanelColumn(TestUtils testUtils, TestReference testReference) throws Exception
     {
         // Automates the "Display Left Panel Column" manual test: create two panels, configure them on the
         // left column as a comma-separated list via the Panels administration UI, and verify both are
@@ -321,6 +321,13 @@ class PanelIT
         testUtils.deletePage("Panels", title1);
         testUtils.deletePage("Panels", title2);
         testUtils.deletePage(testReference);
+
+        // Restore the default page layout (right column shown, left column hidden and empty) since this test
+        // switched the wiki to a left-column-only layout. The AllIT instance is shared across all panels tests so
+        // leaving the right column hidden would break other tests relying on it (e.g. the navigation panel test).
+        testUtils.setWikiPreference("showRightPanels", "1");
+        testUtils.setWikiPreference("showLeftPanels", "0");
+        testUtils.setWikiPreference("leftPanels", "");
     }
 
     private void setLeftPanelsInAdministration(String panels)

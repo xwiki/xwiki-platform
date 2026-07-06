@@ -207,4 +207,39 @@ public class DefaultNotificationRSSRendererTest
         assertEquals("Guest", resultEntry.getAuthors().get(0).getName());
         assertEquals("id1", resultEntry.getUri());
     }
+
+    @Test
+    void renderNotificationUsesEventMatchingCompositeType() throws Exception
+    {
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(Mockito.mock(ScriptContext.class));
+        when(this.templateManager.getTemplate(ArgumentMatchers.any())).thenReturn(Mockito.mock(Template.class));
+
+        // Technical update event triggered by the comment save: it shares the comment date and can end up first in
+        // the composite.
+        Event updateEvent = mock(Event.class);
+        when(updateEvent.getType()).thenReturn("update");
+        when(updateEvent.getTitle()).thenReturn("UpdateEventTitle");
+        when(updateEvent.getDocumentTitle()).thenReturn("EventDocumentTitle");
+
+        // The actual comment event, whose type matches the composite type.
+        Event commentEvent = mock(Event.class);
+        when(commentEvent.getType()).thenReturn("addComment");
+        when(commentEvent.getTitle()).thenReturn("EventTitle");
+        when(commentEvent.getDocumentTitle()).thenReturn("EventDocumentTitle");
+        when(this.contextualLocalizationManager.getTranslation("EventTitle")).thenReturn(mock(Translation.class));
+
+        CompositeEvent compositeEvent = mock(CompositeEvent.class);
+        // The update event is first (as it would be after a date tie), the comment event second.
+        when(compositeEvent.getEvents()).thenReturn(Arrays.asList(updateEvent, commentEvent));
+        when(compositeEvent.getType()).thenReturn("addComment");
+        when(compositeEvent.getUsers()).thenReturn(Set.of(testEventAuthor1));
+        when(compositeEvent.getEventIds()).thenReturn(Arrays.asList("id1"));
+        when(compositeEvent.getDates()).thenReturn(Arrays.asList(mock(Date.class)));
+
+        SyndEntry resultEntry = this.defaultNotificationRSSRenderer.renderNotification(compositeEvent);
+
+        // The title must come from the comment event (matching the composite type), not from the technical update
+        // event which happens to be first in the composite.
+        assertEquals("TranslatedEventTitle", resultEntry.getTitle());
+    }
 }

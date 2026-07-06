@@ -62,7 +62,17 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
     /**
      * The name of the field containing the user email.
      */
-    private static final String EMAIL_FIELD = "email";
+    public static final String EMAIL_FIELD = "email";
+
+    /**
+     * The name of the field containing the user password.
+     */
+    public static final String PASSWORD_FIELD = "password";
+
+    /**
+     * The name of the field containing the account validation key.
+     */
+    public static final String VALIDKEY_FIELD = "validkey";
 
     /**
      * The name of the field containing the time zone.
@@ -90,8 +100,8 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addTextField("first_name", "First Name", 30);
         xclass.addTextField("last_name", "Last Name", 30);
         xclass.addEmailField(EMAIL_FIELD, "e-Mail", 30);
-        xclass.addPasswordField("password", "Password", 10);
-        xclass.addPasswordField("validkey", "Validation Key", 10);
+        xclass.addPasswordField(PASSWORD_FIELD, "Password", 10);
+        xclass.addPasswordField(VALIDKEY_FIELD, "Validation Key", 10);
         xclass.addBooleanField("active", "Active", "active");
         xclass.addTextField("company", "Company", 30);
         xclass.addTextField("blog", "Blog", 60);

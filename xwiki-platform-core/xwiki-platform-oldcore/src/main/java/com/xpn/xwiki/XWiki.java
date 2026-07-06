@@ -221,6 +221,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
@@ -314,6 +315,30 @@ public class XWiki implements EventListener
 
     /** Represents no value (ie the default value will be used) in xproperties */
     private static final String NO_VALUE = "---";
+
+    private static final String LANGUAGE = "language";
+
+    private static final String DEFAULT_LANGUAGE = "default_language";
+
+    private static final String XWIKIUSERS_CLASS = "XWiki.XWikiUsers";
+
+    private static final String INTERFACE_LANGUAGE = "interfacelanguage";
+
+    private static final String XWIKINAME = "xwikiname";
+
+    private static final String INCLUDED_DOCS = "included_docs";
+
+    private static final String HTTPS = "https";
+
+    private static final String DOWNLOAD = "download";
+
+    private static final String TOPIC = "topic";
+
+    private static final String HIDDEN = "hidden";
+
+    private static final String CURRENT = "current";
+
+    private static final String PARENT_CLASSLOADER = "parentclassloader";
 
     /**
      * List of top level space names that can be used in the fake context document created when accessing a resource
@@ -690,7 +715,7 @@ public class XWiki implements EventListener
     private DocumentReferenceResolver<PageReference> getCurrentPageDocumentResolver()
     {
         if (this.currentPageDocumentResolver == null) {
-            this.currentPageDocumentResolver = Utils.getComponent(DocumentReferenceResolver.TYPE_PAGEREFERENCE, "current");
+            this.currentPageDocumentResolver = Utils.getComponent(DocumentReferenceResolver.TYPE_PAGEREFERENCE, CURRENT);
         }
 
         return this.currentPageDocumentResolver;
@@ -709,7 +734,7 @@ public class XWiki implements EventListener
     {
         if (this.currentAttachmentReferenceResolver == null) {
             this.currentAttachmentReferenceResolver =
-                Utils.getComponent(AttachmentReferenceResolver.TYPE_REFERENCE, "current");
+                Utils.getComponent(AttachmentReferenceResolver.TYPE_REFERENCE, CURRENT);
         }
 
         return this.currentAttachmentReferenceResolver;
@@ -738,7 +763,7 @@ public class XWiki implements EventListener
     {
         if (this.currentReferenceDocumentReferenceResolver == null) {
             this.currentReferenceDocumentReferenceResolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, CURRENT);
         }
 
         return this.currentReferenceDocumentReferenceResolver;
@@ -3145,11 +3170,11 @@ public class XWiki implements EventListener
         // from the XWiki preferences settings. Otherwise set a cookie to remember the language
         // in use.
         try {
-            String language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
+            String language = Util.normalizeLanguage(context.getRequest().getParameter(LANGUAGE));
             if (language != null) {
                 if ("default".equals(language)) {
                     // forgetting language cookie
-                    Cookie cookie = new Cookie("language", "");
+                    Cookie cookie = new Cookie(LANGUAGE, "");
                     cookie.setMaxAge(0);
                     cookie.setPath("/");
                     context.getResponse().addCookie(cookie);
@@ -3159,7 +3184,7 @@ public class XWiki implements EventListener
                     locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
                     if (LocaleUtils.isAvailableLocale(locale)) {
                         // setting language cookie
-                        Cookie cookie = new Cookie("language", context.getLocale().toString());
+                        Cookie cookie = new Cookie(LANGUAGE, context.getLocale().toString());
                         cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
                         cookie.setPath("/");
                         context.getResponse().addCookie(cookie);
@@ -3173,7 +3198,7 @@ public class XWiki implements EventListener
         // As no language parameter was passed in the request, try to get the language to use from a cookie.
         try {
             // First we get the language from the cookie
-            String language = Util.normalizeLanguage(getUserPreferenceFromCookie("language", context));
+            String language = Util.normalizeLanguage(getUserPreferenceFromCookie(LANGUAGE, context));
             if (StringUtils.isNotEmpty(language)) {
                 locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
                 if (LocaleUtils.isAvailableLocale(locale)) {
@@ -3268,7 +3293,7 @@ public class XWiki implements EventListener
     public Locale getDefaultLocale(XWikiContext xcontext)
     {
         // Find out what is the default language from the XWiki preferences settings.
-        String defaultLanguage = xcontext.getWiki().getXWikiPreference("default_language", "", xcontext);
+        String defaultLanguage = xcontext.getWiki().getXWikiPreference(DEFAULT_LANGUAGE, "", xcontext);
 
         Locale defaultLocale;
 
@@ -3347,14 +3372,14 @@ public class XWiki implements EventListener
         boolean setCookie = false;
 
         if (!context.getWiki().isMultiLingual(context)) {
-            language = context.getWiki().getXWikiPreference("default_language", "", context);
+            language = context.getWiki().getXWikiPreference(DEFAULT_LANGUAGE, "", context);
             context.setLanguage(language);
             return language;
         }
 
         // Get request language
         try {
-            requestLanguage = Util.normalizeLanguage(context.getRequest().getParameter("language"));
+            requestLanguage = Util.normalizeLanguage(context.getRequest().getParameter(LANGUAGE));
         } catch (Exception ex) {
         }
 
@@ -3363,7 +3388,7 @@ public class XWiki implements EventListener
             String user = context.getUser();
             XWikiDocument userdoc = getDocument(user, context);
             if (userdoc != null) {
-                userPreferenceLanguage = userdoc.getStringValue("XWiki.XWikiUsers", "default_language");
+                userPreferenceLanguage = userdoc.getStringValue(XWIKIUSERS_CLASS, DEFAULT_LANGUAGE);
             }
         } catch (XWikiException e) {
         }
@@ -3382,7 +3407,7 @@ public class XWiki implements EventListener
 
         // Get language from cookie
         try {
-            cookieLanguage = Util.normalizeLanguage(getUserPreferenceFromCookie("language", context));
+            cookieLanguage = Util.normalizeLanguage(getUserPreferenceFromCookie(LANGUAGE, context));
         } catch (Exception e) {
         }
 
@@ -3394,7 +3419,7 @@ public class XWiki implements EventListener
             } else {
                 language = requestLanguage;
                 context.setLanguage(language);
-                Cookie cookie = new Cookie("language", language);
+                Cookie cookie = new Cookie(LANGUAGE, language);
                 cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
                 cookie.setPath("/");
                 context.getResponse().addCookie(cookie);
@@ -3415,7 +3440,7 @@ public class XWiki implements EventListener
         }
         context.setLanguage(language);
         if (setCookie) {
-            Cookie cookie = new Cookie("language", language);
+            Cookie cookie = new Cookie(LANGUAGE, language);
             cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
             cookie.setPath("/");
             context.getResponse().addCookie(cookie);
@@ -3445,14 +3470,14 @@ public class XWiki implements EventListener
         boolean setCookie = false;
 
         if (!context.getWiki().isMultiLingual(context)) {
-            language = Util.normalizeLanguage(context.getWiki().getXWikiPreference("default_language", "", context));
+            language = Util.normalizeLanguage(context.getWiki().getXWikiPreference(DEFAULT_LANGUAGE, "", context));
             context.setInterfaceLocale(LocaleUtils.toLocale(language));
             return language;
         }
 
         // Get request language
         try {
-            requestLanguage = Util.normalizeLanguage(context.getRequest().getParameter("interfacelanguage"));
+            requestLanguage = Util.normalizeLanguage(context.getRequest().getParameter(INTERFACE_LANGUAGE));
         } catch (Exception ex) {
         }
 
@@ -3465,7 +3490,7 @@ public class XWiki implements EventListener
             XWikiDocument userdoc = null;
             userdoc = getDocument(user, context);
             if (userdoc != null) {
-                userPreferenceLanguage = userdoc.getStringValue("XWiki.XWikiUsers", "default_interface_language");
+                userPreferenceLanguage = userdoc.getStringValue(XWIKIUSERS_CLASS, "default_interface_language");
             }
         } catch (XWikiException e) {
         }
@@ -3484,7 +3509,7 @@ public class XWiki implements EventListener
 
         // Get language from cookie
         try {
-            cookieLanguage = Util.normalizeLanguage(getUserPreferenceFromCookie("interfacelanguage", context));
+            cookieLanguage = Util.normalizeLanguage(getUserPreferenceFromCookie(INTERFACE_LANGUAGE, context));
         } catch (Exception e) {
         }
 
@@ -3496,7 +3521,7 @@ public class XWiki implements EventListener
             } else {
                 language = requestLanguage;
                 context.setLanguage(language);
-                Cookie cookie = new Cookie("interfacelanguage", language);
+                Cookie cookie = new Cookie(INTERFACE_LANGUAGE, language);
                 cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
                 cookie.setPath("/");
                 context.getResponse().addCookie(cookie);
@@ -3521,7 +3546,7 @@ public class XWiki implements EventListener
         }
         context.setLanguage(language);
         if (setCookie) {
-            Cookie cookie = new Cookie("interfacelanguage", language);
+            Cookie cookie = new Cookie(INTERFACE_LANGUAGE, language);
             cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
             cookie.setPath("/");
             context.getResponse().addCookie(cookie);
@@ -3865,7 +3890,7 @@ public class XWiki implements EventListener
         try {
             XWikiRequest request = context.getRequest();
             // Get the user document
-            String username = convertUsername(request.getParameter("xwikiname"), context);
+            String username = convertUsername(request.getParameter(XWIKINAME), context);
             username = com.xpn.xwiki.api.Util.getStandardUsername(username, false);
             XWikiDocument userDocument = getDocument(username, context);
 
@@ -3873,12 +3898,13 @@ public class XWiki implements EventListener
             userDocument = userDocument.clone();
 
             // Get the stored validation key
-            BaseObject userObject = userDocument.getObject("XWiki.XWikiUsers", 0);
-            String storedKey = userObject.getStringValue("validkey");
+            BaseObject userObject = userDocument.getObject(XWIKIUSERS_CLASS, 0);
+            String storedKey = userObject.getStringValue(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
 
             // Get the validation key from the URL
-            String validationKey = request.getParameter("validkey");
-            PropertyInterface validationKeyClass = getClass("XWiki.XWikiUsers", context).get("validkey");
+            String validationKey = request.getParameter(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
+            PropertyInterface validationKeyClass =
+                getClass(XWIKIUSERS_CLASS, context).get(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
             if (validationKeyClass instanceof PasswordClass) {
                 validationKey = ((PasswordClass) validationKeyClass).getEquivalentPassword(storedKey, validationKey);
             }
@@ -3887,7 +3913,7 @@ public class XWiki implements EventListener
             if ((!"".equals(storedKey) && (storedKey.equals(validationKey)))) {
                 // Ensure to remove the validation key value, so it cannot be used afterwards to enable back
                 // a disabled user.
-                userObject.setStringValue("validkey", "");
+                userObject.setStringValue(XWikiUsersDocumentInitializer.VALIDKEY_FIELD, "");
                 saveDocument(userDocument, context);
 
                 XWikiUser xWikiUser = new XWikiUser(userDocument.getDocumentReference());
@@ -3895,9 +3921,10 @@ public class XWiki implements EventListener
                 xWikiUser.setEmailChecked(true, context);
 
                 if (withConfirmEmail) {
-                    String email = userObject.getStringValue("email");
-                    String password = userObject.getStringValue("password");
-                    sendValidationEmail(username, password, email, request.getParameter("validkey"),
+                    String email = userObject.getStringValue(XWikiUsersDocumentInitializer.EMAIL_FIELD);
+                    String password = userObject.getStringValue(XWikiUsersDocumentInitializer.PASSWORD_FIELD);
+                    sendValidationEmail(username, password, email,
+                        request.getParameter(XWikiUsersDocumentInitializer.VALIDKEY_FIELD),
                         "confirmation_email_content", context);
                 }
 
@@ -3923,10 +3950,10 @@ public class XWiki implements EventListener
             Syntax syntax = getDefaultDocumentSyntaxInternal();
 
             // Read the values from the request.
-            String xwikiname = request.getParameter("xwikiname");
+            String xwikiname = request.getParameter(XWIKINAME);
             String password2 = request.getParameter("register2_password");
-            String password = (map.get("password"))[0];
-            String email = (map.get("email"))[0];
+            String password = (map.get(XWikiUsersDocumentInitializer.PASSWORD_FIELD))[0];
+            String email = (map.get(XWikiUsersDocumentInitializer.EMAIL_FIELD))[0];
             String parent = request.getParameter("parent");
             String validkey = null;
 
@@ -3953,7 +3980,7 @@ public class XWiki implements EventListener
             }
 
             if ((parent == null) || (parent.isEmpty())) {
-                parent = "XWiki.XWikiUsers";
+                parent = XWIKIUSERS_CLASS;
             }
 
             // Mark the user as active or waiting email validation.
@@ -3962,7 +3989,7 @@ public class XWiki implements EventListener
                 map.put(XWikiUser.EMAIL_CHECKED_PROPERTY, new String[] { "0" });
 
                 validkey = generateValidationKey(16);
-                map.put("validkey", new String[] { validkey });
+                map.put(XWikiUsersDocumentInitializer.VALIDKEY_FIELD, new String[] { validkey });
 
             } else {
                 // Mark user active
@@ -4032,7 +4059,8 @@ public class XWiki implements EventListener
     public void sendValidationEmail(String xwikiname, String password, String email, String validkey,
         String contentfield, XWikiContext context) throws XWikiException
     {
-        sendValidationEmail(xwikiname, password, email, "validkey", validkey, contentfield, context);
+        sendValidationEmail(xwikiname, password, email, XWikiUsersDocumentInitializer.VALIDKEY_FIELD, validkey,
+            contentfield, context);
     }
 
     public void sendValidationEmail(String xwikiname, String password, String email, String addfieldname,
@@ -4063,10 +4091,10 @@ public class XWiki implements EventListener
         try {
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
             vcontext.put(addfieldname, addfieldvalue);
-            vcontext.put("email", email);
-            vcontext.put("password", password);
+            vcontext.put(XWikiUsersDocumentInitializer.EMAIL_FIELD, email);
+            vcontext.put(XWikiUsersDocumentInitializer.PASSWORD_FIELD, password);
             vcontext.put("sender", sender);
-            vcontext.put("xwikiname", xwikiname);
+            vcontext.put(XWIKINAME, xwikiname);
             content = parseContent(content, context);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
@@ -4449,10 +4477,10 @@ public class XWiki implements EventListener
                 LOGGER.debug("Including Topic {}", topic);
                 try {
                     @SuppressWarnings("unchecked")
-                    Set<String> includedDocs = (Set<String>) context.get("included_docs");
+                    Set<String> includedDocs = (Set<String>) context.get(INCLUDED_DOCS);
                     if (includedDocs == null) {
                         includedDocs = new HashSet<>();
-                        context.put("included_docs", includedDocs);
+                        context.put(INCLUDED_DOCS, includedDocs);
                     }
 
                     if (includedDocs.contains(prefixedTopic) || currentDocName.equals(prefixedTopic)) {
@@ -4505,7 +4533,7 @@ public class XWiki implements EventListener
             }
             try {
                 @SuppressWarnings("unchecked")
-                Set<String> includedDocs = (Set<String>) context.get("included_docs");
+                Set<String> includedDocs = (Set<String>) context.get(INCLUDED_DOCS);
                 if (includedDocs != null) {
                     includedDocs.remove(prefixedTopic);
                 }
@@ -5345,7 +5373,7 @@ public class XWiki implements EventListener
                             }
                         }
 
-                        return new URL(protocol != null ? protocol : (port == 443 ? "https" : "http"), server, port,
+                        return new URL(protocol != null ? protocol : (port == 443 ? HTTPS : "http"), server, port,
                             "");
                     }
                 }
@@ -5368,7 +5396,7 @@ public class XWiki implements EventListener
         // Try wiki descriptor
         Boolean secure = wikiDescriptor.isSecure();
         if (secure != null) {
-            return wikiDescriptor.isSecure() == Boolean.TRUE ? "https" : "http";
+            return wikiDescriptor.isSecure() == Boolean.TRUE ? HTTPS : "http";
         }
 
         // Try configuration
@@ -5382,7 +5410,7 @@ public class XWiki implements EventListener
             secure = getWikiDescriptorManager().getMainWikiDescriptor().isSecure();
 
             if (secure != null) {
-                return secure ? "https" : "http";
+                return secure ? HTTPS : "http";
             }
         } catch (WikiManagerException e) {
             LOGGER.error("Failed to get main wiki descriptor", e);
@@ -5504,7 +5532,7 @@ public class XWiki implements EventListener
     {
         String action = "view";
         if (reference.getType() == EntityType.ATTACHMENT) {
-            action = "download";
+            action = DOWNLOAD;
         }
         return getURL(reference, action, context);
     }
@@ -5635,7 +5663,7 @@ public class XWiki implements EventListener
      */
     public String getAttachmentURL(AttachmentReference attachmentReference, String queryString, XWikiContext context)
     {
-        return getAttachmentURL(attachmentReference, "download", queryString, context);
+        return getAttachmentURL(attachmentReference, DOWNLOAD, queryString, context);
     }
 
     /**
@@ -5730,8 +5758,8 @@ public class XWiki implements EventListener
     {
         DocumentReference reference;
         if (context.getMode() == XWikiContext.MODE_PORTLET) {
-            if (request.getParameter("topic") != null) {
-                reference = getCurrentMixedDocumentReferenceResolver().resolve(request.getParameter("topic"));
+            if (request.getParameter(TOPIC) != null) {
+                reference = getCurrentMixedDocumentReferenceResolver().resolve(request.getParameter(TOPIC));
             } else {
                 // Point to this wiki's home page
                 reference = getDefaultDocumentReference().setWikiReference(new WikiReference(context.getWikiId()));
@@ -5744,8 +5772,8 @@ public class XWiki implements EventListener
             ResourceReference resourceReference = getResourceReferenceManager().getResourceReference();
             if (resourceReference instanceof EntityResourceReference entityResource) {
                 String action = entityResource.getAction().getActionName();
-                if ((request.getParameter("topic") != null) && ("edit".equals(action) || "inline".equals(action))) {
-                    reference = getCurrentMixedDocumentReferenceResolver().resolve(request.getParameter("topic"));
+                if ((request.getParameter(TOPIC) != null) && ("edit".equals(action) || "inline".equals(action))) {
+                    reference = getCurrentMixedDocumentReferenceResolver().resolve(request.getParameter(TOPIC));
                 } else {
                     reference = new DocumentReference(
                         entityResource.getEntityReference().extractReference(EntityType.DOCUMENT));
@@ -5864,7 +5892,7 @@ public class XWiki implements EventListener
             // If the parameter language exists and is empty, it means we want to force loading the regular document
             // not a translation. This should be handled later by doing a better separation between locale used in the UI
             // and for loading the documents.
-            if ("".equals(context.getRequest().getParameter("language"))) {
+            if ("".equals(context.getRequest().getParameter(LANGUAGE))) {
                 tdoc = doc;
             } else {
                 tdoc = doc.getTranslatedDocument(context);
@@ -6343,7 +6371,7 @@ public class XWiki implements EventListener
                 return escapeXML ? XMLUtils.escape(userReference.getName()) : userReference.getName();
             }
 
-            BaseObject userobj = userdoc.getObject("XWiki.XWikiUsers");
+            BaseObject userobj = userdoc.getObject(XWIKIUSERS_CLASS);
             if (userobj == null) {
                 return escapeXML ? XMLUtils.escape(userdoc.getDocumentReference().getName())
                     : userdoc.getDocumentReference().getName();
@@ -6507,7 +6535,7 @@ public class XWiki implements EventListener
                 String language = getLanguagePreference(context);
                 formatSymbols = new DateFormatSymbols(LocaleUtils.toLocale(language));
             } catch (Exception e2) {
-                String language = getXWikiPreference("default_language", context);
+                String language = getXWikiPreference(DEFAULT_LANGUAGE, context);
                 if ((language != null) && (!language.isEmpty())) {
                     formatSymbols = new DateFormatSymbols(LocaleUtils.toLocale(language));
                 }
@@ -6770,7 +6798,7 @@ public class XWiki implements EventListener
     {
         try {
             return getStore().getQueryManager().getNamedQuery("getSpaces")
-                .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
+                .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, HIDDEN)).execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
@@ -6790,7 +6818,7 @@ public class XWiki implements EventListener
     {
         try {
             return getStore().getQueryManager().getNamedQuery("getSpaceDocsName")
-                .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"))
+                .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, HIDDEN))
                 .bindValue("space", spaceReference).execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
@@ -6862,7 +6890,7 @@ public class XWiki implements EventListener
             // refreshes all Links of each doc of the wiki
             @SuppressWarnings("deprecation")
             List<String> docs = getStore().getQueryManager().getNamedQuery("getAllDocuments")
-                .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
+                .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, HIDDEN)).execute();
             for (int i = 0; i < docs.size(); i++) {
                 XWikiDocument myDoc = this.getDocument(docs.get(i), context);
                 myDoc.getStore().saveLinks(myDoc, context, true);
@@ -7090,16 +7118,16 @@ public class XWiki implements EventListener
     public Object parseGroovyFromString(String script, String jarWikiPage, XWikiContext xcontext) throws XWikiException
     {
         XWikiPageClassLoader pcl = new XWikiPageClassLoader(jarWikiPage, xcontext);
-        Object prevParentClassLoader = xcontext.get("parentclassloader");
+        Object prevParentClassLoader = xcontext.get(PARENT_CLASSLOADER);
         try {
-            xcontext.put("parentclassloader", pcl);
+            xcontext.put(PARENT_CLASSLOADER, pcl);
 
             return parseGroovyFromString(script, xcontext);
         } finally {
             if (prevParentClassLoader == null) {
-                xcontext.remove("parentclassloader");
+                xcontext.remove(PARENT_CLASSLOADER);
             } else {
-                xcontext.put("parentclassloader", prevParentClassLoader);
+                xcontext.put(PARENT_CLASSLOADER, prevParentClassLoader);
             }
         }
     }
@@ -7383,7 +7411,7 @@ public class XWiki implements EventListener
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(fullName, context);
 
-        return doc.getExternalAttachmentURL(filename, "download", context);
+        return doc.getExternalAttachmentURL(filename, DOWNLOAD, context);
     }
 
     public int getMaxRecursiveSpaceChecks(XWikiContext context)

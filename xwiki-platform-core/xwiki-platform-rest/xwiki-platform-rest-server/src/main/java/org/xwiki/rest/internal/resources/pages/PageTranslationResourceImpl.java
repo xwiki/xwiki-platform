@@ -74,7 +74,7 @@ public class PageTranslationResourceImpl extends ModifiablePageResource implemen
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, true, false);
 
-            deletePage(documentInfo);
+            deletePage(documentInfo, false);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

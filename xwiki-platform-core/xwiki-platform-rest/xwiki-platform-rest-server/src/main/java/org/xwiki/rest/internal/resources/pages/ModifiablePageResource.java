@@ -23,10 +23,13 @@ import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.Page;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
@@ -68,10 +71,28 @@ public class ModifiablePageResource extends XWikiResource
         }
     }
 
-    void deletePage(DocumentInfo documentInfo) throws XWikiException
+    /**
+     * Deletes the specified page.
+     *
+     * @param documentInfo identifies the page to be deleted
+     * @param skipRecycleBin when {@code true}, the page is deleted permanently instead of being sent to the recycle
+     *  bin; the caller is responsible for having checked that skipping the recycle bin is allowed (wiki configuration)
+     *  and that the current user has the required right
+     * @throws XWikiException if deleting the page fails
+     */
+    void deletePage(DocumentInfo documentInfo, boolean skipRecycleBin) throws XWikiException
     {
         Document doc = documentInfo.getDocument();
 
-        doc.delete();
+        if (skipRecycleBin) {
+            // Permanently delete the page, bypassing the recycle bin. The DELETE right has already been checked by
+            // the caller.
+            DocumentReference documentReference = doc.getDocumentReference();
+            XWikiContext xcontext = getXWikiContext();
+            XWiki xwiki = xcontext.getWiki();
+            xwiki.deleteDocument(xwiki.getDocument(documentReference, xcontext), false, xcontext);
+        } else {
+            doc.delete();
+        }
     }
 }

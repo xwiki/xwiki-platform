@@ -28,6 +28,8 @@ import java.util.Vector;
 
 import javax.inject.Provider;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import jakarta.inject.Named;
@@ -40,6 +42,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.ModelFactory;
@@ -64,7 +67,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -86,6 +92,9 @@ class PageResourceImplTest
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @MockComponent
+    private RefactoringConfiguration refactoringConfiguration;
+
+    @MockComponent
     @Named("context")
     private ComponentManager contextComponentManager;
 
@@ -96,6 +105,10 @@ class PageResourceImplTest
     private XWiki xwiki;
 
     private XWikiContext context;
+
+    private XWikiDocument testPageXWikiDocument;
+
+    private Document testPageDocument;
 
     @BeforeEach
     void setUp(MockitoComponentManager componentManager)
@@ -121,7 +134,7 @@ class PageResourceImplTest
     }
 
     @Test
-    void testCheckRights() throws XWikiRestException, XWikiException
+    void checkRights() throws XWikiRestException, XWikiException
     {
         String wikiName = "testWiki";
         String spaceName = "TestSpace";
@@ -154,7 +167,7 @@ class PageResourceImplTest
     }
 
     @Test
-    void testSupportedSyntaxes() throws XWikiRestException, XWikiException
+    void supportedSyntaxes() throws XWikiRestException, XWikiException
     {
         String wikiName = "testWiki";
         String spaceName = "TestSpace";
@@ -177,6 +190,63 @@ class PageResourceImplTest
             false, List.of(), List.of("markdown/1.2"));
         assertEquals("XWiki content.", pageWithRendering.getContent());
         assertEquals("Rendered content.", pageWithRendering.getRenderedContent());
+    }
+
+    @Test
+    void deletePageSendsToRecycleBinByDefault() throws XWikiRestException, XWikiException
+    {
+        DocumentReference reference = initTestPage("testWiki", "TestSpace", "TestPage");
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, reference)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(true);
+
+        this.pageResource.deletePage("testWiki", "TestSpace", "TestPage", false);
+
+        verify(this.testPageDocument).delete();
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+    }
+
+    @Test
+    void deletePageSkipsRecycleBinWhenActivated() throws XWikiRestException, XWikiException
+    {
+        DocumentReference reference = initTestPage("testWiki", "TestSpace", "TestPage");
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, reference)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(true);
+        when(this.refactoringConfiguration.isRecycleBinSkippingActivated()).thenReturn(true);
+
+        this.pageResource.deletePage("testWiki", "TestSpace", "TestPage", true);
+
+        verify(this.xwiki).deleteDocument(this.testPageXWikiDocument, false, this.context);
+        verify(this.testPageDocument, never()).delete();
+    }
+
+    @Test
+    void deletePageSkipRecycleBinFallsBackWhenNotActivated() throws XWikiRestException, XWikiException
+    {
+        DocumentReference reference = initTestPage("testWiki", "TestSpace", "TestPage");
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, reference)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(true);
+        when(this.refactoringConfiguration.isRecycleBinSkippingActivated()).thenReturn(false);
+
+        this.pageResource.deletePage("testWiki", "TestSpace", "TestPage", true);
+
+        verify(this.testPageDocument).delete();
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+    }
+
+    @Test
+    void deletePageWithoutDeleteRight() throws XWikiException
+    {
+        DocumentReference reference = initTestPage("testWiki", "TestSpace", "TestPage");
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, reference)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(false);
+
+        // The DELETE right is required regardless of the skipRecycleBin value.
+        WebApplicationException exception = assertThrows(WebApplicationException.class,
+            () -> this.pageResource.deletePage("testWiki", "TestSpace", "TestPage", false));
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), exception.getResponse().getStatus());
+
+        verify(this.testPageDocument, never()).delete();
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
     }
 
     private DocumentReference initTestPage(String wikiName, String spaceName, String pageName) throws XWikiException
@@ -203,6 +273,9 @@ class PageResourceImplTest
         when(testPageDoc.getAuthors()).thenReturn(mock(DocumentAuthors.class));
         when(testPageDoc.getContent()).thenReturn("XWiki content.");
         when(testPageDoc.displayDocument()).thenReturn("Rendered content.");
+
+        this.testPageXWikiDocument = testPageMock;
+        this.testPageDocument = testPageDoc;
 
         return testPageRef;
     }

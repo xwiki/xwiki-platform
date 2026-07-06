@@ -32,7 +32,7 @@
   <name>XWiki Platform - REST - Server</name>
   <description>Service for accessing XWiki through a RESTful API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.33</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.36</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -111,6 +111,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Needed to check whether the recycle bin can be skipped when deleting a page. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Needed for the nested page hierarchy. -->

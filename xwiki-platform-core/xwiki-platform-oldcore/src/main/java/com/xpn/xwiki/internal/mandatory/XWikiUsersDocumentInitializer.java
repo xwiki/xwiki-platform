@@ -60,6 +60,16 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         XWiki.SYSTEM_SPACE + '.' + XWIKI_USERS_DOCUMENT_REFERENCE.getName();
 
     /**
+     * The name of the field containing the user first name.
+     */
+    public static final String FIRST_NAME_FIELD = "first_name";
+
+    /**
+     * The name of the field containing the user last name.
+     */
+    public static final String LAST_NAME_FIELD = "last_name";
+
+    /**
      * The name of the field containing the user email.
      */
     public static final String EMAIL_FIELD = "email";
@@ -97,8 +107,8 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addTextField("first_name", "First Name", 30);
-        xclass.addTextField("last_name", "Last Name", 30);
+        xclass.addTextField(FIRST_NAME_FIELD, "First Name", 30);
+        xclass.addTextField(LAST_NAME_FIELD, "Last Name", 30);
         xclass.addEmailField(EMAIL_FIELD, "e-Mail", 30);
         xclass.addPasswordField(PASSWORD_FIELD, "Password", 10);
         xclass.addPasswordField(VALIDKEY_FIELD, "Validation Key", 10);

@@ -4040,8 +4040,8 @@ public class XWiki implements EventListener
     public boolean createEmptyUser(String xwikiname, String userRights, XWikiContext context) throws XWikiException
     {
         Map<String, String> map = new HashMap<>();
-        map.put("active", "1");
-        map.put("first_name", xwikiname);
+        map.put(XWikiUser.ACTIVE_PROPERTY, "1");
+        map.put(XWikiUsersDocumentInitializer.FIRST_NAME_FIELD, xwikiname);
 
         if (createUser(xwikiname, map, userRights, context) == 1) {
             return true;
@@ -6380,12 +6380,12 @@ public class XWiki implements EventListener
             String text;
 
             if (format == null) {
-                text = userobj.getStringValue("first_name");
-                String lastName = userobj.getStringValue("last_name");
+                text = userobj.getStringValue(XWikiUsersDocumentInitializer.FIRST_NAME_FIELD);
+                String lastName = userobj.getStringValue(XWikiUsersDocumentInitializer.LAST_NAME_FIELD);
                 if (!text.isEmpty() && !lastName.isEmpty()) {
                     text += ' ';
                 }
-                text += userobj.getStringValue("last_name");
+                text += userobj.getStringValue(XWikiUsersDocumentInitializer.LAST_NAME_FIELD);
                 if (StringUtils.isBlank(text)) {
                     text = userdoc.getDocumentReference().getName();
                 }

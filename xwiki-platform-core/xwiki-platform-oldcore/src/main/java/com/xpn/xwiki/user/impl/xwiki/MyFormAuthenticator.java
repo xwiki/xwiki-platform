@@ -43,8 +43,6 @@ import com.xpn.xwiki.web.Utils;
 
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
 {
-    private static final String USER_PREFIX = "User ";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MyFormAuthenticator.class);
 
     private UserAuthenticatedEventNotifier userAuthenticatedEventNotifier;
@@ -160,7 +158,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
                 if (principal != null) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug(USER_PREFIX + principal.getName() + " has been authentified from cookie");
+                        LOGGER.debug("User [{}] has been authentified from cookie", principal.getName());
                     }
 
                     // make sure the Principal contains wiki name information
@@ -213,7 +211,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         if (principal != null && authenticationFailureManager.validateForm(username, request)) {
             // login successful
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info(USER_PREFIX + principal.getName() + " has been logged-in");
+                LOGGER.info("User [{}] has been logged-in", principal.getName());
             }
 
             authenticationFailureManager.resetAuthenticationFailureCounter(username);
@@ -254,7 +252,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             // login failed
             // set response status and forward to error page
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info(USER_PREFIX + username + " login has failed");
+                LOGGER.info("User [{}] login has failed", username);
             }
 
             authenticationFailureManager.recordAuthenticationFailure(username, request);

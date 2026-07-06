@@ -221,6 +221,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
@@ -324,12 +325,6 @@ public class XWiki implements EventListener
     private static final String INTERFACE_LANGUAGE = "interfacelanguage";
 
     private static final String XWIKINAME = "xwikiname";
-
-    private static final String VALIDKEY = "validkey";
-
-    private static final String EMAIL = "email";
-
-    private static final String PASSWORD = "password";
 
     private static final String INCLUDED_DOCS = "included_docs";
 
@@ -3904,11 +3899,12 @@ public class XWiki implements EventListener
 
             // Get the stored validation key
             BaseObject userObject = userDocument.getObject(XWIKIUSERS_CLASS, 0);
-            String storedKey = userObject.getStringValue(VALIDKEY);
+            String storedKey = userObject.getStringValue(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
 
             // Get the validation key from the URL
-            String validationKey = request.getParameter(VALIDKEY);
-            PropertyInterface validationKeyClass = getClass(XWIKIUSERS_CLASS, context).get(VALIDKEY);
+            String validationKey = request.getParameter(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
+            PropertyInterface validationKeyClass =
+                getClass(XWIKIUSERS_CLASS, context).get(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
             if (validationKeyClass instanceof PasswordClass) {
                 validationKey = ((PasswordClass) validationKeyClass).getEquivalentPassword(storedKey, validationKey);
             }
@@ -3917,7 +3913,7 @@ public class XWiki implements EventListener
             if ((!"".equals(storedKey) && (storedKey.equals(validationKey)))) {
                 // Ensure to remove the validation key value, so it cannot be used afterwards to enable back
                 // a disabled user.
-                userObject.setStringValue(VALIDKEY, "");
+                userObject.setStringValue(XWikiUsersDocumentInitializer.VALIDKEY_FIELD, "");
                 saveDocument(userDocument, context);
 
                 XWikiUser xWikiUser = new XWikiUser(userDocument.getDocumentReference());
@@ -3925,9 +3921,10 @@ public class XWiki implements EventListener
                 xWikiUser.setEmailChecked(true, context);
 
                 if (withConfirmEmail) {
-                    String email = userObject.getStringValue(EMAIL);
-                    String password = userObject.getStringValue(PASSWORD);
-                    sendValidationEmail(username, password, email, request.getParameter(VALIDKEY),
+                    String email = userObject.getStringValue(XWikiUsersDocumentInitializer.EMAIL_FIELD);
+                    String password = userObject.getStringValue(XWikiUsersDocumentInitializer.PASSWORD_FIELD);
+                    sendValidationEmail(username, password, email,
+                        request.getParameter(XWikiUsersDocumentInitializer.VALIDKEY_FIELD),
                         "confirmation_email_content", context);
                 }
 
@@ -3955,8 +3952,8 @@ public class XWiki implements EventListener
             // Read the values from the request.
             String xwikiname = request.getParameter(XWIKINAME);
             String password2 = request.getParameter("register2_password");
-            String password = (map.get(PASSWORD))[0];
-            String email = (map.get(EMAIL))[0];
+            String password = (map.get(XWikiUsersDocumentInitializer.PASSWORD_FIELD))[0];
+            String email = (map.get(XWikiUsersDocumentInitializer.EMAIL_FIELD))[0];
             String parent = request.getParameter("parent");
             String validkey = null;
 
@@ -3992,7 +3989,7 @@ public class XWiki implements EventListener
                 map.put(XWikiUser.EMAIL_CHECKED_PROPERTY, new String[] { "0" });
 
                 validkey = generateValidationKey(16);
-                map.put(VALIDKEY, new String[] { validkey });
+                map.put(XWikiUsersDocumentInitializer.VALIDKEY_FIELD, new String[] { validkey });
 
             } else {
                 // Mark user active
@@ -4062,7 +4059,8 @@ public class XWiki implements EventListener
     public void sendValidationEmail(String xwikiname, String password, String email, String validkey,
         String contentfield, XWikiContext context) throws XWikiException
     {
-        sendValidationEmail(xwikiname, password, email, VALIDKEY, validkey, contentfield, context);
+        sendValidationEmail(xwikiname, password, email, XWikiUsersDocumentInitializer.VALIDKEY_FIELD, validkey,
+            contentfield, context);
     }
 
     public void sendValidationEmail(String xwikiname, String password, String email, String addfieldname,
@@ -4093,8 +4091,8 @@ public class XWiki implements EventListener
         try {
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
             vcontext.put(addfieldname, addfieldvalue);
-            vcontext.put(EMAIL, email);
-            vcontext.put(PASSWORD, password);
+            vcontext.put(XWikiUsersDocumentInitializer.EMAIL_FIELD, email);
+            vcontext.put(XWikiUsersDocumentInitializer.PASSWORD_FIELD, password);
             vcontext.put("sender", sender);
             vcontext.put(XWIKINAME, xwikiname);
             content = parseContent(content, context);

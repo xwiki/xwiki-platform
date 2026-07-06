@@ -61,26 +61,36 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
 
     /**
      * The name of the field containing the user first name.
+     *
+     * @since 18.6.0RC1
      */
     public static final String FIRST_NAME_FIELD = "first_name";
 
     /**
      * The name of the field containing the user last name.
+     *
+     * @since 18.6.0RC1
      */
     public static final String LAST_NAME_FIELD = "last_name";
 
     /**
      * The name of the field containing the user email.
+     *
+     * @since 18.6.0RC1
      */
     public static final String EMAIL_FIELD = "email";
 
     /**
      * The name of the field containing the user password.
+     *
+     * @since 18.6.0RC1
      */
     public static final String PASSWORD_FIELD = "password";
 
     /**
      * The name of the field containing the account validation key.
+     *
+     * @since 18.6.0RC1
      */
     public static final String VALIDKEY_FIELD = "validkey";
 

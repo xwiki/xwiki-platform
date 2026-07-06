@@ -166,8 +166,25 @@
                 </item>
               </differences>
             </revapi.differences>
-            
-            
+            <revapi.differences>
+              <justification>
+                Adding @Produces("application/rss+xml") only forces the media type of the RSS response so that browsers
+                and feed readers recognize it as a feed instead of rendering it as HTML. It doesn't change the Java
+                signature nor the REST contract (the endpoint already only ever returned RSS).
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method java.lang.String org.xwiki.notifications.rest.NotificationsResource::getNotificationsRSS(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                  <new>method java.lang.String org.xwiki.notifications.rest.NotificationsResource::getNotificationsRSS(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                  <annotation>@javax.ws.rs.Produces({"application/rss+xml"})</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
+
+
           </analysisConfiguration>
         </configuration>
       </plugin>

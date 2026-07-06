@@ -21,6 +21,7 @@ package org.xwiki.platform.notifications.test.po;
 
 import java.util.List;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -43,6 +44,8 @@ import com.rometools.rome.io.impl.Base64;
 public class NotificationsRSS
 {
     private SyndFeed feed;
+
+    private String contentType;
 
     private String url;
     private String user;
@@ -85,6 +88,11 @@ public class NotificationsRSS
                     response.getStatusLine().getStatusCode()));
             }
 
+            // Capture the Content-Type before consuming the entity so that tests can verify the feed is served with a
+            // feed media type (and not, e.g., text/html which browsers would render as HTML).
+            Header responseContentType = response.getEntity().getContentType();
+            this.contentType = (responseContentType == null) ? null : responseContentType.getValue();
+
             SyndFeedInput input = new SyndFeedInput();
             feed = input.build(new XmlReader(response.getEntity().getContent()));
         } catch (Exception e) {
@@ -102,5 +110,14 @@ public class NotificationsRSS
     public List<SyndEntry> getEntries()
     {
         return feed.getEntries();
+    }
+
+    /**
+     * @return the value of the {@code Content-Type} HTTP response header returned when the feed was loaded
+     * @since 17.10.10
+     */
+    public String getContentType()
+    {
+        return this.contentType;
     }
 }

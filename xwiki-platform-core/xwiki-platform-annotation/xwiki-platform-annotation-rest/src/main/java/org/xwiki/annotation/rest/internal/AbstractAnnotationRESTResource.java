@@ -23,7 +23,6 @@ package org.xwiki.annotation.rest.internal;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -33,7 +32,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationService;
 import org.xwiki.annotation.AnnotationServiceException;
@@ -414,18 +412,18 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         return metadataMap;
     }
 
-    protected void handleTemporaryUploadedFiles(DocumentReference documentReference, Map<String, Object> metadataMap)
+    protected boolean handleTemporaryUploadedFiles(DocumentReference documentReference, Map<String, Object> metadataMap)
         throws XWikiException
     {
         String documentName = this.referenceSerializer.serialize(documentReference);
         boolean canUploadAttachment = this.annotationRightService.canUploadAttachment(documentName, getXWikiUser());
-        if (canUploadAttachment && metadataMap.containsKey("uploadedFiles")) {
-            XWikiContext context = this.xcontextProvider.get();
-            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
-            String[] uploadedFiles = StringUtils.split(String.valueOf(metadataMap.get("uploadedFiles")), ",");
-            this.temporaryAttachmentSessionsManager
-                .attachTemporaryAttachmentsInDocument(document, Arrays.asList(uploadedFiles));
+        // When the user is not allowed to upload attachments, drop the temporary uploaded file names so that they are
+        // never persisted. When allowed, the names stay in the metadata, reach the Annotation object, and the IO
+        // service persists the attachments on the same document instance that holds the annotation, in a single save.
+        if (!canUploadAttachment) {
+            metadataMap.remove(Annotation.UPLOADED_FILES_FIELD);
         }
+        return canUploadAttachment;
     }
 
     protected void cleanTemporaryUploadedFiles(DocumentReference documentReference)

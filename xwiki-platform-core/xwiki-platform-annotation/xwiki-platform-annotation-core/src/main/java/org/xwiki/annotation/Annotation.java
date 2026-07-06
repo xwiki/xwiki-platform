@@ -99,6 +99,16 @@ public class Annotation
     public static final String PLAIN_TEXT_END_OFFSET_FIELD = "plainTextEndOffset";
 
     /**
+     * The name of the field holding the comma-separated list of temporary uploaded file names that must be attached
+     * to the annotated document when the annotation is persisted (e.g. images inserted in the annotation comment).
+     *
+     * @since 17.10.10
+     * @since 18.4.3
+     * @since 18.6.0RC1
+     */
+    public static final String UPLOADED_FILES_FIELD = "uploadedFiles";
+
+    /**
      * The unique identifier of this annotation, which should be unique among all the annotations on the same target.
      */
     protected final String id;

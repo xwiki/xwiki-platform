@@ -136,7 +136,11 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             }
             Map<String, Object> annotationMetaData = getMap(updateRequest.getAnnotation());
 
-            this.handleTemporaryUploadedFiles(documentReference, annotationMetaData);
+            // The annotation fields were already copied above from the request; if the user is not allowed to upload
+            // attachments, make sure the uploaded file names don't survive on the annotation either.
+            if (!this.handleTemporaryUploadedFiles(documentReference, annotationMetaData)) {
+                newAnnotation.set(Annotation.UPLOADED_FILES_FIELD, null);
+            }
             // skip these fields as we don't want to overwrite them with whatever is in this map. Setters should be used
             // for these values or constructor
             Collection<String> skippedFields =

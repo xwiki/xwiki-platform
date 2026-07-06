@@ -22,6 +22,7 @@ package org.xwiki.web;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -410,6 +411,18 @@ class MacrosTest extends PageTest
         out = new StringWriter();
         this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
         assertEquals("", velocityContext.get("sanitizedResult"));
+
+        // Sixth check: parseToSafeURI() throws URISyntaxException (e.g. for an opaque-looking URI such as
+        // "javascript:alert(1)//") instead of returning null; this must be treated the same as an unsafe URL rather
+        // than aborting the whole macro.
+        fallbackUrl = "xwiki/bin/view/Sandbox";
+        velocityContext.put("myFallback", fallbackUrl);
+        when(urlSecurityScriptService.parseToSafeURI(url)).thenThrow(new URISyntaxException(url, "not a valid URI"));
+        when(urlSecurityScriptService.parseToSafeURI(fallbackUrl)).thenReturn(fallBackUri);
+        when(htmlScriptService.isAttributeSafe(htmlElement, attributeName, fallBackUri.toString())).thenReturn(true);
+        out = new StringWriter();
+        this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
+        assertEquals(fallbackUrl, velocityContext.get("sanitizedResult"));
     }
 
     @Test

@@ -65,6 +65,8 @@ import com.xpn.xwiki.web.ViewAction;
  */
 public class XWikiStatsReader
 {
+    private static final String START = "start";
+
     /**
      * Logging tool.
      */
@@ -229,7 +231,7 @@ public class XWikiStatsReader
                 + " by sum(pageViews) {1}", nameFilter, sortOrder);
 
             params.put("action", action);
-            params.put("start", period.getStartCode());
+            params.put(START, period.getStartCode());
             params.put("end", period.getEndCode());
 
             Query query = this.queryManager.createQuery(statement, Query.HQL);
@@ -303,7 +305,7 @@ public class XWikiStatsReader
                 + " order by sum(pageViews) {1}", nameFilter, sortOrder);
 
             params.put("referer", getHqlValidDomain(domain));
-            params.put("start", period.getStartCode());
+            params.put(START, period.getStartCode());
             params.put("end", period.getEndCode());
 
             Query query = this.queryManager.createQuery(statement, Query.HQL);
@@ -352,7 +354,7 @@ public class XWikiStatsReader
                 + " group by referer order by sum(pageViews) {1}", nameFilter, sortOrder);
 
             params.put("referer", getHqlValidDomain(domain));
-            params.put("start", period.getStartCode());
+            params.put(START, period.getStartCode());
             params.put("end", period.getEndCode());
 
             Query query = this.queryManager.createQuery(statement, Query.HQL);

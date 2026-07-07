@@ -116,6 +116,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     /** Mark internal mapping. */
     private static final String INTERNAL = "internal";
 
+    private static final String TIME_ELAPSED_COLLECTION_MESSAGE = "Time elapsed for {} collection: {} ms";
+
+    private static final String TIME_ELAPSED_CLASS_MESSAGE = "Time elapsed for {} class: {} ms";
+
     /** Stub statistic class used to compute new ids from existing objects. */
     private static final class StatsIdComputer extends XWikiStats
     {
@@ -761,15 +765,15 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             if (this.logger.isDebugEnabled()) {
                 int timer = 0;
                 for (String[] coll : docsColl) {
-                    this.logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++] / 1000000);
+                    this.logger.debug(TIME_ELAPSED_COLLECTION_MESSAGE, coll[0], times[timer++] / 1000000);
                 }
                 for (Class<?> doclinkClass : DOCLINK_CLASSES) {
-                    this.logger.debug("Time elapsed for {} class: {} ms", doclinkClass.getName(),
+                    this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, doclinkClass.getName(),
                         times[timer++] / 1000000);
                 }
-                this.logger.debug("Time elapsed for {} class: {} ms", XWikiRCSNodeInfo.class.getName(),
+                this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, XWikiRCSNodeInfo.class.getName(),
                     times[timer++] / 1000000);
-                this.logger.debug("Time elapsed for {} class: {} ms", XWikiDocument.class.getName(),
+                this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, XWikiDocument.class.getName(),
                     times[timer++] / 1000000);
             }
 
@@ -839,7 +843,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             if (this.logger.isDebugEnabled()) {
                 int timer = 0;
                 for (String[] coll : objsColl) {
-                    this.logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++] / 1000000);
+                    this.logger.debug(TIME_ELAPSED_COLLECTION_MESSAGE, coll[0], times[timer++] / 1000000);
                 }
                 for (String customMappedClass : customClassToProcess) {
                     this.logger.debug("Time elapsed for {} custom table: {} ms", customMappedClass,
@@ -849,7 +853,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     this.logger.debug("Time elapsed for {} property table: {} ms", propertyClass,
                         times[timer++] / 1000000);
                 }
-                this.logger.debug("Time elapsed for {} class: {} ms", BaseObject.class.getName(),
+                this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, BaseObject.class.getName(),
                     times[timer++] / 1000000);
             }
 
@@ -887,9 +891,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 if (this.logger.isDebugEnabled()) {
                     int timer = 0;
                     for (String[] coll : statsColl) {
-                        this.logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++] / 1000000);
+                        this.logger.debug(TIME_ELAPSED_COLLECTION_MESSAGE, coll[0], times[timer++] / 1000000);
                     }
-                    this.logger.debug("Time elapsed for {} class: {} ms", statsClass.getName(),
+                    this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, statsClass.getName(),
                         times[timer++] / 1000000);
                 }
 

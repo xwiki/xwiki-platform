@@ -198,7 +198,6 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
 
     /**
      * @param value the value to set for the "Copyright" option
-     * @since 18.6.0RC1
      */
     public void setCopyright(String value)
     {
@@ -208,7 +207,6 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
 
     /**
      * @param value the value to set for the "Version" option
-     * @since 18.6.0RC1
      */
     public void setVersion(String value)
     {

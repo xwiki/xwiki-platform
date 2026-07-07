@@ -28,6 +28,8 @@ import org.xwiki.test.ui.po.Select;
  * default edit mode used when editing a page) can be configured.
  *
  * @version $Id$
+ * @since 17.10.10
+ * @since 18.4.3
  * @since 18.5.0RC1
  */
 public class EditingAdministrationSectionPage extends AdministrationSectionPage

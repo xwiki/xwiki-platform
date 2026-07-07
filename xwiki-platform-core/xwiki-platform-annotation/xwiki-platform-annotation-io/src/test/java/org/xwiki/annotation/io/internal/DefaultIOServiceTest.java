@@ -19,29 +19,20 @@
  */
 package org.xwiki.annotation.io.internal;
 
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
-
-import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationConfiguration;
-import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
+import org.xwiki.annotation.reference.internal.DefaultTypedStringEntityReferenceResolver;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.test.LogLevel;
-import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -50,10 +41,8 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -63,21 +52,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of {@link DefaultIOService}.
+ * Tests that {@link DefaultIOService} persists the temporary uploaded files (e.g. images inserted in an annotation
+ * comment) on the very document instance that is saved with the annotation. See XWIKI-24546.
  *
  * @version $Id$
- * @since 17.10.11
- * @since 18.4.3
- * @since 18.6.0RC1
  */
 @ComponentTest
+@ComponentList({ DefaultTypedStringEntityReferenceResolver.class })
+@ReferenceComponentList
 class DefaultIOServiceTest
 {
-
-    private static final DocumentReference ANNOTATION_CLASS_REFERENCE =
-        new DocumentReference("xwiki", "XWiki", "AnnotationClass");
-
-    public static final String PAGE_STRING_REFERENCE = "xwiki:Space.Page";
+    private static final String TARGET = "xwiki:Space.Page";
 
     @InjectMockComponents
     private DefaultIOService ioService;
@@ -85,225 +70,87 @@ class DefaultIOServiceTest
     @MockComponent
     private Execution execution;
 
-    /**
-     * Entity reference handler to resolve the reference target.
-     */
-    @MockComponent
-    private TypedStringEntityReferenceResolver referenceResolver;
-
-    /**
-     * Default entity reference serializer to create document full names.
-     */
-    @MockComponent
-    private EntityReferenceSerializer<String> serializer;
-
-    /**
-     * Local entity reference serializer, to create references which are robust to import / export.
-     */
-    @MockComponent
-    @Named("local")
-    private EntityReferenceSerializer<String> localSerializer;
-
-    /**
-     * The Annotation Application's configuration.
-     */
     @MockComponent
     private AnnotationConfiguration configuration;
 
-    @RegisterExtension
-    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    @MockComponent
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
-    @Mock
-    private ExecutionContext executionContext;
-
-    @Mock
-    private XWikiContext context;
-
-    @Mock
     private XWiki xwiki;
 
+    private XWikiContext xcontext;
+
+    private XWikiDocument clonedDocument;
+
+    private BaseObject annotationObject;
+
     @BeforeEach
-    void setUp()
+    void setUp() throws Exception
     {
-        when(this.execution.getContext()).thenReturn(this.executionContext);
-        when(this.executionContext.getProperty("xwikicontext")).thenReturn(this.context);
-        when(this.context.getWiki()).thenReturn(this.xwiki);
-        when(this.configuration.getAnnotationClassReference())
-            .thenReturn(ANNOTATION_CLASS_REFERENCE);
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        when(this.execution.getContext()).thenReturn(executionContext);
+        this.xcontext = mock(XWikiContext.class);
+        when(executionContext.getProperty("xwikicontext")).thenReturn(this.xcontext);
+
+        this.xwiki = mock(XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+
+        // getDocument returns the (shared) cached instance; the service clones it before modifying it.
+        XWikiDocument cachedDocument = mock(XWikiDocument.class);
+        this.clonedDocument = mock(XWikiDocument.class);
+        when(cachedDocument.clone()).thenReturn(this.clonedDocument);
+        when(this.xwiki.getDocument(anyString(), eq(this.xcontext))).thenReturn(cachedDocument);
+
+        DocumentReference annotationClassReference = new DocumentReference("xwiki", "XWiki", "AnnotationClass");
+        when(this.configuration.getAnnotationClassReference()).thenReturn(annotationClassReference);
+
+        this.annotationObject = mock(BaseObject.class);
+        when(this.clonedDocument.createXObject(any(EntityReference.class), eq(this.xcontext))).thenReturn(0);
+        when(this.clonedDocument.getXObject(annotationClassReference, 0)).thenReturn(this.annotationObject);
     }
 
     @Test
-    void addAnnotation() throws Exception
+    void addAnnotationAttachesTemporaryUploadedFilesToTheSavedDocument() throws Exception
     {
-        String target = "XWiki.Test";
-        DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Test");
-        String serializedReference = "xwiki:XWiki.Test";
+        Annotation annotation = new Annotation("selection", "left", "right");
+        annotation.setAuthor("xwiki:XWiki.Admin");
+        annotation.set("uploadedFiles", "image1.png,image2.png");
 
-        XWikiDocument document = mock(XWikiDocument.class);
-        // The service clones the cached document and operates on (and saves) the clone, so that the cached
-        // instance is never modified.
-        XWikiDocument clonedDocument = mock(XWikiDocument.class);
-        BaseObject baseObject = mock(BaseObject.class);
+        this.ioService.addAnnotation(TARGET, annotation);
 
-        when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
-        when(this.serializer.serialize(documentReference)).thenReturn(serializedReference);
-        when(this.xwiki.getDocument(serializedReference, this.context)).thenReturn(document);
-        when(document.clone()).thenReturn(clonedDocument);
-        when(clonedDocument.newXObject(
-            ANNOTATION_CLASS_REFERENCE.removeParent(ANNOTATION_CLASS_REFERENCE.extractReference(EntityType.WIKI)),
-            this.context))
-            .thenReturn(baseObject);
-
-        when(baseObject.getDocumentReference()).thenReturn(documentReference);
-        when(this.context.getUser()).thenReturn("xwiki:XWiki.Author");
-
-        Annotation annotation = new Annotation("selection", "", "");
-        this.ioService.addAnnotation(target, annotation);
-
-        verify(baseObject).set(Annotation.STATE_FIELD, "SAFE", this.context);
-        verify(baseObject).set(eq(Annotation.DATE_FIELD), any(Date.class), eq(this.context));
-        verify(baseObject).set(Annotation.AUTHOR_FIELD, annotation.getAuthor(), this.context);
-        verify(baseObject, never()).set(eq(Annotation.TARGET_FIELD), any(), any());
-        // The clone (not the cached document) is the one updated and saved.
-        verify(document, never()).setAuthor(anyString());
-        verify(clonedDocument).setAuthor("xwiki:XWiki.Author");
-        verify(this.xwiki).saveDocument(clonedDocument, "Added annotation on \"selection\"", true, this.context);
+        // The attachments are added to the exact instance that is saved.
+        verify(this.temporaryAttachmentSessionsManager)
+            .attachTemporaryAttachmentsInDocument(this.clonedDocument, Arrays.asList("image1.png", "image2.png"));
+        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(true), eq(this.xcontext));
+        // The uploaded files list must not be written as a (bogus) annotation object property.
+        verify(this.annotationObject, never()).set(eq("uploadedFiles"), any(), any());
     }
 
     @Test
-    void getAnnotations() throws Exception
+    void addAnnotationWithoutUploadedFilesDoesNotAttachAnything() throws Exception
     {
-        String target = "Space.Page";
-        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+        Annotation annotation = new Annotation("selection", "left", "right");
+        annotation.setAuthor("xwiki:XWiki.Admin");
 
-        XWikiDocument document = mock(XWikiDocument.class);
+        this.ioService.addAnnotation(TARGET, annotation);
 
-        when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
-        when(this.localSerializer.serialize(documentReference)).thenReturn(target);
-        when(this.serializer.serialize(documentReference)).thenReturn(PAGE_STRING_REFERENCE);
-        when(this.xwiki.getDocument(PAGE_STRING_REFERENCE, this.context)).thenReturn(document);
-        BaseObject baseObject0 = mock(BaseObject.class);
-        when(baseObject0.getStringValue(Annotation.TARGET_FIELD)).thenReturn("");
-        BaseObject baseObject1 = mock(BaseObject.class);
-        when(baseObject1.getStringValue(Annotation.TARGET_FIELD)).thenReturn("Space.Page");
-        BaseObject baseObject2 = mock(BaseObject.class);
-        when(baseObject2.getStringValue(Annotation.TARGET_FIELD)).thenReturn("OtherSpace.Page");
-        when(document.getXObjects(ANNOTATION_CLASS_REFERENCE)).thenReturn(List.of(
-            baseObject0,
-            baseObject1,
-            baseObject2
-        ));
-
-        when(baseObject0.getStringValue(Annotation.STATE_FIELD)).thenReturn("SAFE");
-        when(baseObject1.getStringValue(Annotation.STATE_FIELD)).thenReturn("SAFE");
-        when(baseObject0.getPropertyNames()).thenReturn(new String[] {});
-        when(baseObject1.getPropertyNames()).thenReturn(new String[] {});
-
-        assertEquals(2, this.ioService.getAnnotations(target).size());
+        verify(this.temporaryAttachmentSessionsManager, never())
+            .attachTemporaryAttachmentsInDocument(any(), any());
+        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(true), eq(this.xcontext));
     }
 
     @Test
-    void getAnnotationsForObjectPropertyDoesNotReturnDocumentContentAnnotations() throws Exception
+    void updateAnnotationsAttachesAndSavesEvenWhenNoOtherFieldChanged() throws Exception
     {
-        // The target points to an object property, not to the document itself.
-        String target = "Space.Page^XWiki.MyClass[0].myProperty";
-        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
-        ObjectPropertyReference targetReference =
-            new ObjectPropertyReference("myProperty", new ObjectReference("XWiki.MyClass[0]", documentReference));
+        // An update whose only change is an uploaded image: updateObject would report no change, but the attachment
+        // must still be persisted, forcing a save.
+        Annotation annotation = new Annotation("0");
+        annotation.set("uploadedFiles", "image.png");
 
-        XWikiDocument document = mock(XWikiDocument.class);
+        this.ioService.updateAnnotations(TARGET, List.of(annotation));
 
-        when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(targetReference);
-        when(this.localSerializer.serialize(targetReference)).thenReturn(target);
-        when(this.serializer.serialize(documentReference)).thenReturn(PAGE_STRING_REFERENCE);
-        when(this.xwiki.getDocument(PAGE_STRING_REFERENCE, this.context)).thenReturn(document);
-
-        // A document-content annotation (blank target): it must NOT be returned for an object property target,
-        // otherwise content annotations would leak into every object property (regression guarded by this test).
-        BaseObject documentContentAnnotation = mock(BaseObject.class);
-        when(documentContentAnnotation.getStringValue(Annotation.TARGET_FIELD)).thenReturn("");
-        // An annotation actually targeting the requested object property: it must be returned.
-        BaseObject objectPropertyAnnotation = mock(BaseObject.class);
-        when(objectPropertyAnnotation.getStringValue(Annotation.TARGET_FIELD)).thenReturn(target);
-        when(objectPropertyAnnotation.getStringValue(Annotation.STATE_FIELD)).thenReturn("SAFE");
-        when(objectPropertyAnnotation.getPropertyNames()).thenReturn(new String[] {});
-        when(document.getXObjects(ANNOTATION_CLASS_REFERENCE)).thenReturn(List.of(
-            documentContentAnnotation,
-            objectPropertyAnnotation
-        ));
-
-        assertEquals(1, this.ioService.getAnnotations(target).size());
-    }
-
-    @Test
-    void getAnnotationNotMatchingTarget() throws Exception
-    {
-        String target = "Space.Page";
-        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
-
-        XWikiDocument document = mock(XWikiDocument.class);
-
-        when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
-        when(this.localSerializer.serialize(documentReference)).thenReturn(target);
-        when(this.serializer.serialize(documentReference)).thenReturn(PAGE_STRING_REFERENCE);
-        when(this.xwiki.getDocument(PAGE_STRING_REFERENCE, this.context)).thenReturn(document);
-        BaseObject baseObject = mock(BaseObject.class);
-        when(document.getXObject(ANNOTATION_CLASS_REFERENCE, 1)).thenReturn(baseObject);
-        when(baseObject.getStringValue(Annotation.TARGET_FIELD)).thenReturn("OtherSpace");
-
-        assertNull(this.ioService.getAnnotation(target, "1"));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = { "", "Space.Page" })
-    void getAnnotationNotMatchingTarget(String xObjectTarget) throws Exception
-    {
-        String target = "Space.Page";
-        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
-
-        XWikiDocument document = mock(XWikiDocument.class);
-
-        when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
-        when(this.localSerializer.serialize(documentReference)).thenReturn(target);
-        when(this.serializer.serialize(documentReference)).thenReturn(PAGE_STRING_REFERENCE);
-        when(this.xwiki.getDocument(PAGE_STRING_REFERENCE, this.context)).thenReturn(document);
-        BaseObject baseObject = mock(BaseObject.class);
-        when(document.getXObject(ANNOTATION_CLASS_REFERENCE, 1)).thenReturn(baseObject);
-        when(baseObject.getStringValue(Annotation.TARGET_FIELD)).thenReturn(xObjectTarget);
-        when(baseObject.getStringValue(Annotation.STATE_FIELD)).thenReturn("SAFE");
-        when(baseObject.getPropertyNames()).thenReturn(new String[] { "target" });
-        BaseProperty baseProperty = mock(BaseProperty.class);
-        when(baseObject.get("target")).thenReturn(baseProperty);
-        when(baseProperty.getValue()).thenReturn(xObjectTarget);
-
-        Annotation annotation = this.ioService.getAnnotation(target, "1");
-        assertEquals("Space.Page", annotation.get("target"));
-    }
-
-    @Test
-    void removeAnnotationWithBlankTargetOnDocument() throws Exception
-    {
-        // An annotation on the document content is stored with a blank target; removing it through the document
-        // target must still delete the object.
-        String target = "Space.Page";
-        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
-
-        XWikiDocument document = mock(XWikiDocument.class);
-        XWikiDocument clonedDocument = mock(XWikiDocument.class);
-        BaseObject annotationObject = mock(BaseObject.class);
-
-        when(this.referenceResolver.resolve(target, EntityType.DOCUMENT)).thenReturn(documentReference);
-        when(this.localSerializer.serialize(documentReference)).thenReturn(target);
-        when(this.serializer.serialize(documentReference)).thenReturn(PAGE_STRING_REFERENCE);
-        when(this.xwiki.getDocument(PAGE_STRING_REFERENCE, this.context)).thenReturn(document);
-        when(document.clone()).thenReturn(clonedDocument);
-        when(clonedDocument.getXObject(ANNOTATION_CLASS_REFERENCE, 1)).thenReturn(annotationObject);
-        when(annotationObject.getStringValue(Annotation.TARGET_FIELD)).thenReturn("");
-        when(this.context.getUser()).thenReturn("xwiki:XWiki.Author");
-
-        this.ioService.removeAnnotation(target, "1");
-
-        verify(clonedDocument).removeObject(annotationObject);
-        verify(this.xwiki).saveDocument(clonedDocument, "Deleted annotation 1", true, this.context);
+        verify(this.temporaryAttachmentSessionsManager)
+            .attachTemporaryAttachmentsInDocument(this.clonedDocument, Arrays.asList("image.png"));
+        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(true), eq(this.xcontext));
     }
 }

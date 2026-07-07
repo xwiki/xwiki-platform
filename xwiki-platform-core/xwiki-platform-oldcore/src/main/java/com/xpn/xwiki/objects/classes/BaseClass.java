@@ -69,6 +69,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
+    private static final String INTERNAL = "internal";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseClass.class);
 
     private static final long serialVersionUID = 1L;
@@ -1224,7 +1226,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public String getCustomMapping()
     {
         if ("XWiki.XWikiPreferences".equals(getName())) {
-            return "internal";
+            return INTERNAL;
         }
 
         if (this.customMapping == null) {
@@ -1245,12 +1247,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         String cMapping = getCustomMapping();
 
-        return (cMapping != null) && (!"".equals(cMapping)) && (!"internal".equals(cMapping));
+        return (cMapping != null) && (!"".equals(cMapping)) && (!INTERNAL.equals(cMapping));
     }
 
     public boolean hasInternalCustomMapping()
     {
-        return "internal".equals(this.customMapping);
+        return INTERNAL.equals(this.customMapping);
     }
 
     public boolean isCustomMappingValid(XWikiContext context) throws XWikiException

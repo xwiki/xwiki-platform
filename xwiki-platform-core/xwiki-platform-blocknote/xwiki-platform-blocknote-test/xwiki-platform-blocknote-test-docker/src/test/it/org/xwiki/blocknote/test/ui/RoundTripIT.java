@@ -153,13 +153,10 @@ class RoundTripIT extends AbstractBlockNoteIT
     @Order(6)
     void blockquote(TestUtils setup, TestReference testReference)
     {
-        // Minimal test for now because we have the following issues:
-        // XWIKI-24011: Fail to edit a quote with multiple child blocks
-        // XWIKI-24012: Failed to save nested quote
         roundTrip(setup, testReference, """
+            (% data-foo="bar" %)
             >line1
             >lineOne
-            (% data-foo="bar" %)
             >>line2
             >>lineTwo
             >>>line3
@@ -174,6 +171,7 @@ class RoundTripIT extends AbstractBlockNoteIT
     {
         roundTrip(setup, testReference, """
             * one
+            (% data-version="3.2" %)
             ** two
             *** three
             * done""");
@@ -184,7 +182,7 @@ class RoundTripIT extends AbstractBlockNoteIT
     void orderedList(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
-            (% start="5" %)
+            (% data-foo="bar" start="5" %)
             1. one
             11. two
             111. three
@@ -196,6 +194,7 @@ class RoundTripIT extends AbstractBlockNoteIT
     void definitionList(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
+            (% data-type="user" %)
             ; name
             : John
             ; age
@@ -207,9 +206,10 @@ class RoundTripIT extends AbstractBlockNoteIT
     void table(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
-            |=|=One|=Two
+            (% data-sortable="true" %)
+            |=(% data-foo="bar" %)|=One|=Two
             |=Three|1.3|2.3
-            |=Four|1.4|2.4""");
+            |=Four|1.4|(% data-type="number" %)2.4""");
     }
 
     @Test
@@ -254,6 +254,11 @@ class RoundTripIT extends AbstractBlockNoteIT
         roundTrip(setup, testReference, """
             (((
             group
+
+            (% id="test" %)
+            (((
+            nested
+            )))
             )))""");
     }
 

@@ -121,7 +121,7 @@ class DefaultIOServiceTest
         // The attachments are added to the exact instance that is saved.
         verify(this.temporaryAttachmentSessionsManager)
             .attachTemporaryAttachmentsInDocument(this.clonedDocument, Arrays.asList("image1.png", "image2.png"));
-        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(true), eq(this.xcontext));
+        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(this.xcontext));
         // The uploaded files list must not be written as a (bogus) annotation object property.
         verify(this.annotationObject, never()).set(eq("uploadedFiles"), any(), any());
     }
@@ -136,7 +136,7 @@ class DefaultIOServiceTest
 
         verify(this.temporaryAttachmentSessionsManager, never())
             .attachTemporaryAttachmentsInDocument(any(), any());
-        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(true), eq(this.xcontext));
+        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(this.xcontext));
     }
 
     @Test
@@ -151,6 +151,6 @@ class DefaultIOServiceTest
 
         verify(this.temporaryAttachmentSessionsManager)
             .attachTemporaryAttachmentsInDocument(this.clonedDocument, Arrays.asList("image.png"));
-        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(true), eq(this.xcontext));
+        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(this.xcontext));
     }
 }

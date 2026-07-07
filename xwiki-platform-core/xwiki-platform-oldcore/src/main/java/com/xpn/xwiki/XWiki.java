@@ -322,6 +322,8 @@ public class XWiki implements EventListener
 
     private static final String INTERFACE_LANGUAGE = "interfacelanguage";
 
+    private static final int LANGUAGE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 10;
+
     private static final String XWIKINAME = "xwikiname";
 
     private static final String INCLUDED_DOCS = "included_docs";
@@ -3172,20 +3174,14 @@ public class XWiki implements EventListener
             if (language != null) {
                 if ("default".equals(language)) {
                     // forgetting language cookie
-                    Cookie cookie = new Cookie(LANGUAGE, "");
-                    cookie.setMaxAge(0);
-                    cookie.setPath("/");
-                    context.getResponse().addCookie(cookie);
+                    addLanguageCookie(LANGUAGE, "", 0, context);
                     context.setLocale(defaultLocale);
                     return defaultLocale;
                 } else {
                     locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
                     if (LocaleUtils.isAvailableLocale(locale)) {
                         // setting language cookie
-                        Cookie cookie = new Cookie(LANGUAGE, context.getLocale().toString());
-                        cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-                        cookie.setPath("/");
-                        context.getResponse().addCookie(cookie);
+                        addLanguageCookie(LANGUAGE, context.getLocale().toString(), LANGUAGE_COOKIE_MAX_AGE, context);
                         return locale;
                     }
                 }
@@ -3230,6 +3226,18 @@ public class XWiki implements EventListener
         // Finally, use the default language from the global preferences.
         context.setLocale(defaultLocale);
         return defaultLocale;
+    }
+
+    // The language/interface-language cookie stores only a validated, non-sensitive locale identifier
+    // (see Util.normalizeLanguage), so it doesn't require the HttpOnly/Secure flags that XWiki applies
+    // to sensitive cookies such as authentication cookies (see MyPersistentLoginManager).
+    @SuppressWarnings({"java:S3330", "java:S2092"})
+    private void addLanguageCookie(String cookieName, String value, int maxAge, XWikiContext context)
+    {
+        Cookie cookie = new Cookie(cookieName, value);
+        cookie.setMaxAge(maxAge);
+        cookie.setPath("/");
+        context.getResponse().addCookie(cookie);
     }
 
     /**
@@ -3418,10 +3426,7 @@ public class XWiki implements EventListener
             } else {
                 language = requestLanguage;
                 context.setLanguage(language);
-                Cookie cookie = new Cookie(LANGUAGE, language);
-                cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-                cookie.setPath("/");
-                context.getResponse().addCookie(cookie);
+                addLanguageCookie(LANGUAGE, language, LANGUAGE_COOKIE_MAX_AGE, context);
                 return language;
             }
         }
@@ -3439,10 +3444,7 @@ public class XWiki implements EventListener
         }
         context.setLanguage(language);
         if (setCookie) {
-            Cookie cookie = new Cookie(LANGUAGE, language);
-            cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-            cookie.setPath("/");
-            context.getResponse().addCookie(cookie);
+            addLanguageCookie(LANGUAGE, language, LANGUAGE_COOKIE_MAX_AGE, context);
         }
         return language;
     }
@@ -3521,10 +3523,7 @@ public class XWiki implements EventListener
             } else {
                 language = requestLanguage;
                 context.setLanguage(language);
-                Cookie cookie = new Cookie(INTERFACE_LANGUAGE, language);
-                cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-                cookie.setPath("/");
-                context.getResponse().addCookie(cookie);
+                addLanguageCookie(INTERFACE_LANGUAGE, language, LANGUAGE_COOKIE_MAX_AGE, context);
                 return language;
             }
         }
@@ -3546,10 +3545,7 @@ public class XWiki implements EventListener
         }
         context.setLanguage(language);
         if (setCookie) {
-            Cookie cookie = new Cookie(INTERFACE_LANGUAGE, language);
-            cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-            cookie.setPath("/");
-            context.getResponse().addCookie(cookie);
+            addLanguageCookie(INTERFACE_LANGUAGE, language, LANGUAGE_COOKIE_MAX_AGE, context);
         }
         return language;
     }

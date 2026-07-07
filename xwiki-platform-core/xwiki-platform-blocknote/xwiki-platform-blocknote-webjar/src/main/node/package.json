@@ -34,6 +34,7 @@
     "@xwiki/platform-uniast-api": "workspace:*",
     "@xwiki/platform-xwiki-syntax-config": "workspace:*",
     "inversify": "catalog:",
+    "lib0": "catalog:",
     "pinia": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

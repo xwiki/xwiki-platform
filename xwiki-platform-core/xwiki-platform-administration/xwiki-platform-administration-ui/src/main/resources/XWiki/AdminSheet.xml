@@ -1058,16 +1058,16 @@ require(['jquery'], function($) {
 .admin-categories-container {
     float: left;
     display: flex;
-    gap: 8px;
+    gap: var(--spacing-medium);
     flex-flow: column;
     padding:0
 }
 
 .admin-categories-container li {
     display: flex;
-    gap: 0 8px;
-    border-radius: 7px;
-    padding: 4px;
+    gap: 0 var(--spacing-medium);
+    border-radius: var(--border-radius-base);
+    padding: var(--spacing-base);
     list-style: none;
 }
 
@@ -1083,12 +1083,12 @@ require(['jquery'], function($) {
   display:flex;
   justify-content: center;
   align-items: center;
-  border-radius: 7px;
+  border-radius: var(--border-radius-base);
   border: 1px solid var(--xwiki-border-color);
 }
 
 .admin-category-name {
-  font-size: 1.44em;
+  font-size: var(--font-size-h3);
   font-weight: var(--font-weight-semibold);
 }
 

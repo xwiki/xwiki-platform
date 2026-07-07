@@ -24,6 +24,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
@@ -104,6 +105,10 @@ public interface NotificationsResource
      */
     @GET
     @Path("/rss")
+    // Force the RSS media type on the response: the method returns a raw String, so without this the JAX-RS runtime
+    // negotiates the content type from the browser's Accept header (typically text/html), which makes browsers and
+    // feed readers render the feed as HTML instead of recognizing it as an RSS feed.
+    @Produces("application/rss+xml")
     String getNotificationsRSS(
             @QueryParam("useUserPreferences") String useUserPreferences,
             @QueryParam("userId") String userId,

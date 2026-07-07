@@ -19,6 +19,8 @@
  */
 package org.xwiki.platform.notifications.test.ui;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +54,8 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import com.rometools.rome.feed.synd.SyndEntry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -325,14 +329,33 @@ class NotificationsIT
             String.format("%s:%s", servletEngine.getIP(), servletEngine.getPort()));
         assertEquals(2, notificationsRSS.getEntries().size());
 
-        assertEquals("A comment has been added to the page \"Linux as a title\"",
-                notificationsRSS.getEntries().get(0).getTitle());
-        String descriptionValue = notificationsRSS.getEntries().get(0).getDescription().getValue();
+        // Both RSS feeds must be served with a feed media type so that browsers and feed readers recognize them as
+        // feeds instead of rendering the XML as HTML (see XWIKI-24543). The menu feed is served by the
+        // NotificationRSSService wiki page (application/xml) while the macro feed is served by the /notifications/rss
+        // REST endpoint (application/rss+xml).
+        assertTrue(notificationsRSS.getContentType().startsWith("application/xml"),
+            "Menu RSS feed Content-Type was: " + notificationsRSS.getContentType());
+
+        String macroRSSURL = String.format(
+            "%srest/notifications/rss?userId=%s&useUserPreferences=false&count=10&displayOwnEvents=true",
+            setup.getBaseURL(), URLEncoder.encode("xwiki:XWiki." + SECOND_USER_NAME, StandardCharsets.UTF_8));
+        NotificationsRSS macroRSS = new NotificationsRSS(macroRSSURL, SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        macroRSS.loadEntries(
+            String.format("%s:%s", servletEngine.getInternalIP(), servletEngine.getInternalPort()),
+            String.format("%s:%s", servletEngine.getIP(), servletEngine.getPort()));
+        assertTrue(macroRSS.getContentType().startsWith("application/rss+xml"),
+            "Macro (REST) RSS feed Content-Type was: " + macroRSS.getContentType());
+
+        // The comment event and the page-update composite event can share the same timestamp (posting a
+        // comment also updates the page), so the RSS feed may return them in either order (see XWIKI-21059).
+        // Match the entries by title rather than by position.
+        SyndEntry commentEntry = getEntryByTitle(notificationsRSS,
+            "A comment has been added to the page \"Linux as a title\"");
+        getEntryByTitle(notificationsRSS, "The page \"Linux as a title\" has been modified");
+        String descriptionValue = commentEntry.getDescription().getValue();
         assertTrue(descriptionValue.contains("<strong>Pages</strong>"), "Value was: " + descriptionValue);
         assertTrue(descriptionValue.contains("Linux as a title"), "Value was: " + descriptionValue);
         assertTrue(descriptionValue.contains("edited by " + FIRST_USER_NAME), "Value was: " + descriptionValue);
-        assertEquals("The page \"Linux as a title\" has been modified",
-                notificationsRSS.getEntries().get(1).getTitle());
 
         tray.clearAllNotifications();
     }
@@ -542,5 +565,14 @@ class NotificationsIT
 
         assertTrue(notificationsContainerElement.getNotificationPage(4).startsWith("Profile of "));
         assertTrue(notificationsContainerElement.getNotificationPage(5).startsWith("Profile of "));
+    }
+
+    private SyndEntry getEntryByTitle(NotificationsRSS rss, String title)
+    {
+        return rss.getEntries().stream()
+            .filter(entry -> title.equals(entry.getTitle()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError(String.format("No RSS entry with title [%s]. Titles: %s",
+                title, rss.getEntries().stream().map(SyndEntry::getTitle).toList())));
     }
 }

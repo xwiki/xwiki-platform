@@ -43,6 +43,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -63,6 +64,13 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Singleton
 public class DefaultIOService implements IOService
 {
+    /**
+     * The name of the transient annotation metadata field holding the comma-separated list of temporary uploaded file
+     * names to attach to the annotated document on save (e.g. images inserted in the annotation comment). It is never
+     * stored as an annotation object property.
+     */
+    private static final String UPLOADED_FILES_FIELD = "uploadedFiles";
+
     /**
      * The execution used to get the deprecated XWikiContext.
      */
@@ -101,6 +109,13 @@ public class DefaultIOService implements IOService
     private AnnotationConfiguration configuration;
 
     /**
+     * Used to persist the temporary uploaded files (e.g. images inserted in the annotation comment) on the document
+     * that holds the annotation.
+     */
+    @Inject
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    /**
      * {@inheritDoc}
      * <p>
      * This implementation saves the added annotation in the document where the target of the annotation is.
@@ -126,6 +141,9 @@ public class DefaultIOService implements IOService
             XWikiDocument document = deprecatedContext.getWiki().getDocument(documentFullName, deprecatedContext);
             // Avoid modifying the cached document
             document = document.clone();
+            // Attach the temporary uploaded files (e.g. images inserted in the annotation comment) to the same
+            // document instance that is going to be saved, so they are persisted together with the annotation.
+            attachTemporaryUploadedFiles(document, annotation);
             // create a new object in this document to hold the annotation
             // Make sure to use a relative reference when creating the XObject, since we can`t use absolute references
             // for an object's class. This avoids ugly log warning messages.
@@ -355,6 +373,9 @@ public class DefaultIOService implements IOService
                     continue;
                 }
                 updated = updateObject(object, annotation, deprecatedContext) || updated;
+                // Attach the temporary uploaded files to the same document instance that is going to be saved, so
+                // they are persisted even when the uploaded image is the only change made to the annotation.
+                updated = attachTemporaryUploadedFiles(document, annotation) || updated;
                 updateNotifs.add(annotation.getId());
             }
             if (updated) {
@@ -426,7 +447,7 @@ public class DefaultIOService implements IOService
         // the target. Don't set the author either, will be set by caller, if needed
         Collection<String> skippedFields =
             Arrays.asList(Annotation.STATE_FIELD, Annotation.DATE_FIELD, Annotation.AUTHOR_FIELD,
-                Annotation.TARGET_FIELD);
+                Annotation.TARGET_FIELD, UPLOADED_FILES_FIELD);
         // all fields in the annotation, try to put them in object (I wonder what happens if I can't...)
         for (String propName : annotation.getFieldNames()) {
             if (!skippedFields.contains(propName)) {
@@ -453,6 +474,28 @@ public class DefaultIOService implements IOService
         if (newValue != null) {
             object.set(fieldName, newValue, deprecatedContext);
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * Attaches the temporary uploaded files referenced by the annotation to the given document instance, so they get
+     * persisted when the document is saved.
+     *
+     * @param document the document instance that is about to be saved
+     * @param annotation the annotation possibly carrying uploaded file names in the uploaded-files metadata field
+     * @return {@code true} if at least one temporary attachment was added to the document, {@code false} otherwise
+     */
+    private boolean attachTemporaryUploadedFiles(XWikiDocument document, Annotation annotation)
+    {
+        Object uploadedFiles = annotation.get(UPLOADED_FILES_FIELD);
+        if (uploadedFiles != null) {
+            String[] fileNames = StringUtils.split(String.valueOf(uploadedFiles), ",");
+            if (fileNames != null && fileNames.length > 0) {
+                this.temporaryAttachmentSessionsManager
+                    .attachTemporaryAttachmentsInDocument(document, Arrays.asList(fileNames));
+                return true;
+            }
         }
         return false;
     }

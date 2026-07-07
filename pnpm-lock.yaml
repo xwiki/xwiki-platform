@@ -368,6 +368,9 @@ importers:
       inversify:
         specifier: 'catalog:'
         version: 8.1.1(reflect-metadata@0.2.2)
+      lib0:
+        specifier: 'catalog:'
+        version: 0.2.117
       pinia:
         specifier: 'catalog:'
         version: 3.0.4(typescript@5.9.3)(vue@3.5.38(typescript@5.9.3))

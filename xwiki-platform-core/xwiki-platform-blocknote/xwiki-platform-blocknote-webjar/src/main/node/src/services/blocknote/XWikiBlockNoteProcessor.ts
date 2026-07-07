@@ -19,6 +19,7 @@
  */
 import { BlockNoteDocument } from "./BlockNoteProcessor";
 import { Container, inject, injectable } from "inversify";
+import { uuidv4 } from "lib0/random";
 import type { BlockNoteIterator, NodeType } from "./BlockNoteIterator";
 import type { BlockNoteProcessor } from "./BlockNoteProcessor";
 import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
@@ -30,6 +31,26 @@ import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
  */
 @injectable("Singleton")
 export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
+  private static readonly DEFAULTS = {
+    // Generic styles
+    backgroundColor: "default",
+    textColor: "default",
+
+    // FIXME: Left text alignment is the default but at the same time the user might have explicitly set it in order to
+    // overwrite the inherited alignment. It's not easy to distinguish between the two cases. Given that we discourage
+    // the users from using non-semantic text styles in general (they should focus on the content and leave the style to
+    // the theme and skin), I think it's acceptable to lose the explicit left alignment for now, instead of polluting
+    // the saved source syntax with a lot of unnecessary styles.
+    textAlignment: "left",
+
+    // Table cells
+    colspan: 1,
+    rowspan: 1,
+
+    // Code block
+    language: "text",
+  };
+
   public static bind(container: Container): void {
     container
       .bind("BlockNoteProcessor")
@@ -112,7 +133,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
       props.xwikiParameters !== null &&
       typeof props.xwikiParameters === "object"
     ) {
-      block.id = block.id ?? crypto.randomUUID();
+      block.id = block.id ?? uuidv4();
       blockNoteDocument.getMetadata(block.id as string, true)!.parameters =
         props.xwikiParameters;
       delete props.xwikiParameters;
@@ -155,6 +176,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
         node.props !== null &&
         typeof node.props === "object"
       ) {
+        this.removeDefaults(node.props);
         this.restoreBlockXWikiParameters(node, blockNoteDocument);
       } else if (
         node.type === "text" &&
@@ -162,10 +184,21 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
         node.styles !== null &&
         typeof node.styles === "object"
       ) {
+        this.removeDefaults(node.styles);
         this.restoreXWikiParameters(node.styles as Record<string, unknown>);
       }
     }
     return false;
+  }
+
+  private removeDefaults(options: Record<string, unknown>): void {
+    for (const [key, defaultValue] of Object.entries(
+      XWikiBlockNoteProcessor.DEFAULTS,
+    )) {
+      if (options[key] === defaultValue) {
+        delete options[key];
+      }
+    }
   }
 
   /**

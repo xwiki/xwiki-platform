@@ -138,7 +138,11 @@ export const CustomFormattingToolbar: React.FC<
         />
       ) : (
         // For others, simply show the "normal", default toolbar
-        getDefaultFormattingToolbarItems(combinedBlockTypeSelectItems, macros, t)
+        getDefaultFormattingToolbarItems(
+          combinedBlockTypeSelectItems,
+          macros,
+          t,
+        )
       )}
     </Components.FormattingToolbar.Root>
   );

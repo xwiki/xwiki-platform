@@ -31,6 +31,7 @@
     "@xwiki/platform-xwiki-syntax-config": "workspace:*",
     "@xwiki/platform-minimal-syntax-config": "workspace:*",
     "inversify": "catalog:",
+    "lib0": "catalog:",
     "pinia": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

@@ -425,7 +425,7 @@ class MacrosTest extends PageTest
 
         String htmlElement = "form";
         String attributeName = "action";
-        String url = "http://xwiki.org/?query=foo&bar=%20space%4F#éâ";
+        String url = "1http://foo";
         String fallbackUrl = "xwiki/bin/view/Sandbox";
         String script = "#getSanitizedURLAttributeValue($myHtmlElement,$myAttributeName,$myUrl,$myFallback,"
             + "$sanitizedResult)";
@@ -438,9 +438,8 @@ class MacrosTest extends PageTest
 
         URI fallBackUri = new URI(fallbackUrl);
 
-        // parseToSafeURI() throws URISyntaxException (e.g. for an opaque-looking URI such as
-        // "javascript:alert(1)//") instead of returning null; this must be treated the same as an unsafe URL rather
-        // than aborting the whole macro.
+        // parseToSafeURI() throws URISyntaxException (e.g. for an opaque-looking URI such as "1http://foo") instead of
+        // returning null; this must be treated the same as an unsafe URL rather than aborting the whole macro.
         when(urlSecurityScriptService.parseToSafeURI(url)).thenThrow(new URISyntaxException(url, "not a valid URI"));
         when(urlSecurityScriptService.parseToSafeURI(fallbackUrl)).thenReturn(fallBackUri);
         when(htmlScriptService.isAttributeSafe(htmlElement, attributeName, fallBackUri.toString())).thenReturn(true);

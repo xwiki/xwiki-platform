@@ -20,13 +20,19 @@
 package org.xwiki.rest.internal.resources.pages;
 
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
@@ -37,6 +43,9 @@ public class ModifiablePageResource extends XWikiResource
 {
     @Inject
     protected ModelFactory factory;
+
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     /**
      * Creates or updates the specified page.
@@ -68,10 +77,34 @@ public class ModifiablePageResource extends XWikiResource
         }
     }
 
-    void deletePage(DocumentInfo documentInfo) throws XWikiException
+    /**
+     * Deletes the specified page.
+     *
+     * @param documentInfo identifies the page to be deleted
+     * @param skipRecycleBin when {@code true}, the page is deleted permanently instead of being sent to the recycle
+     *  bin; the caller is responsible for having checked that skipping the recycle bin is allowed (wiki configuration)
+     * @throws XWikiException if deleting the page fails
+     * @throws WebApplicationException with an {@link Status#UNAUTHORIZED} status if the current user doesn't have the
+     *  right to delete the page
+     */
+    void deletePage(DocumentInfo documentInfo, boolean skipRecycleBin) throws XWikiException
     {
         Document doc = documentInfo.getDocument();
+        DocumentReference documentReference = doc.getDocumentReference();
 
-        doc.delete();
+        // Deleting a page requires the DELETE right, whether or not the recycle bin is skipped. Check it up-front so
+        // that a proper HTTP 401 is returned instead of a generic server error.
+        if (!this.contextualAuthorizationManager.hasAccess(Right.DELETE, documentReference)) {
+            throw new WebApplicationException(Status.UNAUTHORIZED);
+        }
+
+        if (skipRecycleBin) {
+            // Permanently delete the page, bypassing the recycle bin.
+            XWikiContext xcontext = getXWikiContext();
+            XWiki xwiki = xcontext.getWiki();
+            xwiki.deleteDocument(xwiki.getDocument(documentReference, xcontext), false, xcontext);
+        } else {
+            doc.delete();
+        }
     }
 }

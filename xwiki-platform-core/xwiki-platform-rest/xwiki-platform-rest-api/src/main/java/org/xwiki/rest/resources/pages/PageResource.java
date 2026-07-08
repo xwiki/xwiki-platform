@@ -82,11 +82,21 @@ public interface PageResource
             Page page
     ) throws XWikiRestException;
 
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Delete a page.
+     *
+     * @param wikiName the wiki storing the page
+     * @param spaceNames the space where the page is located in
+     * @param pageName the name of the page
+     * @param skipRecycleBin (since 18.6.0RC1) when {@code true}, the page is deleted permanently instead of being sent
+     *  to the recycle bin. This is only honored for advanced users and when the wiki configuration allows skipping the
+     *  recycle bin; otherwise the page is sent to the recycle bin as usual. Defaults to {@code false}
+     * @throws XWikiRestException if the user is not authorized or if the deletion fails
+     */
     @DELETE void deletePage(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceNames,
-            @PathParam("pageName") String pageName
+            @PathParam("pageName") String pageName,
+            @QueryParam("skipRecycleBin") @DefaultValue("false") Boolean skipRecycleBin
     ) throws XWikiRestException;
 }

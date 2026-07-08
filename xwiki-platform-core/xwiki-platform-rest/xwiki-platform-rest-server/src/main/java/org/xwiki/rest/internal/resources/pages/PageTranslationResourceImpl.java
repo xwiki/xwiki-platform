@@ -19,10 +19,12 @@
  */
 package org.xwiki.rest.internal.resources.pages;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
@@ -37,6 +39,9 @@ import com.xpn.xwiki.api.Document;
 @Named("org.xwiki.rest.internal.resources.pages.PageTranslationResourceImpl")
 public class PageTranslationResourceImpl extends ModifiablePageResource implements PageTranslationResource
 {
+    @Inject
+    private RefactoringConfiguration refactoringConfiguration;
+
     @Override
     public Page getPageTranslation(String wikiName, String spaceName, String pageName, String language,
         Boolean withPrettyNames) throws XWikiRestException
@@ -68,13 +73,19 @@ public class PageTranslationResourceImpl extends ModifiablePageResource implemen
     }
 
     @Override
-    public void deletePageTranslation(String wikiName, String spaceName, String pageName, String language)
+    public void deletePageTranslation(String wikiName, String spaceName, String pageName, String language,
+        Boolean skipRecycleBin)
         throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, language, null, true, false);
 
-            deletePage(documentInfo);
+            // Skipping the recycle bin permanently deletes the page, so it's only honored when the wiki configuration
+            // enables it.
+            boolean skipRecycleBinEffective = Boolean.TRUE.equals(skipRecycleBin)
+                && this.refactoringConfiguration.isRecycleBinSkippingActivated();
+
+            deletePage(documentInfo, skipRecycleBinEffective);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

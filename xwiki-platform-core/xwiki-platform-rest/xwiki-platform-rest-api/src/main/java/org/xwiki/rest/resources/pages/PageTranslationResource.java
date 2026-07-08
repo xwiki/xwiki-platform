@@ -59,12 +59,23 @@ public interface PageTranslationResource
             Page page
     ) throws XWikiRestException;
 
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Delete a page translation.
+     *
+     * @param wikiName the wiki storing the page
+     * @param spaceName the space where the page is located in
+     * @param pageName the name of the page
+     * @param language the language of the translation to delete
+     * @param skipRecycleBin (since 18.6.0RC1) when {@code true}, the page is deleted permanently instead of being sent
+     *  to the recycle bin. This is only honored for advanced users and when the wiki configuration allows skipping the
+     *  recycle bin; otherwise the page is sent to the recycle bin as usual. Defaults to {@code false}
+     * @throws XWikiRestException if the user is not authorized or if the deletion fails
+     */
     @DELETE void deletePageTranslation(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
-            @PathParam("language") String language
+            @PathParam("language") String language,
+            @QueryParam("skipRecycleBin") @DefaultValue("false") Boolean skipRecycleBin
     ) throws XWikiRestException;
 }

@@ -195,6 +195,11 @@
                   <old>method void org.xwiki.rest.resources.pages.PageResource::deletePage(java.lang.String, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException</old>
                   <new>method void org.xwiki.rest.resources.pages.PageResource::deletePage(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
                 </item>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void org.xwiki.rest.resources.pages.PageTranslationResource::deletePageTranslation(java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method void org.xwiki.rest.resources.pages.PageTranslationResource::deletePageTranslation(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
               </differences>
             </revapi.differences>
           </analysisConfiguration>

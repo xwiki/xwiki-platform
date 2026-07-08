@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -50,6 +51,7 @@ import com.xpn.xwiki.web.Utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -78,6 +80,9 @@ class PageTranslationResourceImplTest
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @MockComponent
+    private RefactoringConfiguration refactoringConfiguration;
+
+    @MockComponent
     @Named("context")
     private ComponentManager contextComponentManager;
 
@@ -85,6 +90,8 @@ class PageTranslationResourceImplTest
     private XWiki xwiki;
 
     private XWikiContext context;
+
+    private XWikiDocument translationXWikiDocument;
 
     private Document translationDocument;
 
@@ -113,37 +120,63 @@ class PageTranslationResourceImplTest
         when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(false);
 
         WebApplicationException exception = assertThrows(WebApplicationException.class,
-            () -> this.pageTranslationResource.deletePageTranslation(WIKI, SPACE, PAGE, LANGUAGE));
+            () -> this.pageTranslationResource.deletePageTranslation(WIKI, SPACE, PAGE, LANGUAGE, false));
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), exception.getResponse().getStatus());
 
         verify(this.translationDocument, never()).delete();
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
     }
 
     @Test
-    void deletePageTranslationWithDeleteRight() throws XWikiRestException, XWikiException
+    void deletePageTranslationSendsToRecycleBinByDefault() throws XWikiRestException, XWikiException
     {
         DocumentReference reference = initTranslation();
         when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(true);
 
-        this.pageTranslationResource.deletePageTranslation(WIKI, SPACE, PAGE, LANGUAGE);
+        this.pageTranslationResource.deletePageTranslation(WIKI, SPACE, PAGE, LANGUAGE, false);
 
         verify(this.translationDocument).delete();
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+    }
+
+    @Test
+    void deletePageTranslationSkipsRecycleBinWhenActivated() throws XWikiRestException, XWikiException
+    {
+        DocumentReference reference = initTranslation();
+        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(true);
+        when(this.refactoringConfiguration.isRecycleBinSkippingActivated()).thenReturn(true);
+
+        this.pageTranslationResource.deletePageTranslation(WIKI, SPACE, PAGE, LANGUAGE, true);
+
+        verify(this.xwiki).deleteDocument(this.translationXWikiDocument, false, this.context);
+        verify(this.translationDocument, never()).delete();
+    }
+
+    @Test
+    void deletePageTranslationSkipRecycleBinFallsBackWhenNotActivated() throws XWikiRestException, XWikiException
+    {
+        DocumentReference reference = initTranslation();
+        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(true);
+        when(this.refactoringConfiguration.isRecycleBinSkippingActivated()).thenReturn(false);
+
+        this.pageTranslationResource.deletePageTranslation(WIKI, SPACE, PAGE, LANGUAGE, true);
+
+        verify(this.translationDocument).delete();
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
     }
 
     private DocumentReference initTranslation() throws XWikiException
     {
         DocumentReference reference = new DocumentReference(WIKI, SPACE, PAGE, Locale.FRENCH);
-        XWikiDocument translationXWikiDocument = mock(XWikiDocument.class);
-        Document translationDoc = mock(Document.class);
+        this.translationXWikiDocument = mock(XWikiDocument.class);
+        this.translationDocument = mock(Document.class);
 
-        when(this.xwiki.getDocument(reference, this.context)).thenReturn(translationXWikiDocument);
-        when(translationXWikiDocument.newDocument(this.context)).thenReturn(translationDoc);
-        when(translationDoc.getDocumentReference()).thenReturn(reference);
+        when(this.xwiki.getDocument(reference, this.context)).thenReturn(this.translationXWikiDocument);
+        when(this.translationXWikiDocument.newDocument(this.context)).thenReturn(this.translationDocument);
+        when(this.translationDocument.getDocumentReference()).thenReturn(reference);
 
         // The translation must be resolved (VIEW right + existing document) before the DELETE right is checked.
         when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, reference)).thenReturn(true);
-
-        this.translationDocument = translationDoc;
 
         return reference;
     }

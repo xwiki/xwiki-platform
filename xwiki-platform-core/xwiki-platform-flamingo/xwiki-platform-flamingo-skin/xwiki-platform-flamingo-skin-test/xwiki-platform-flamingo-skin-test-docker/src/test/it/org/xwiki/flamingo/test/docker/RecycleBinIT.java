@@ -21,7 +21,6 @@ package org.xwiki.flamingo.test.docker;
 
 import java.io.File;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -53,7 +52,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 13.10.4
  * @since 14.2RC1
  */
-@UITest
+@UITest(properties = {
+    // Allow skipping the recycle bin so that the test can permanently delete its pages during cleanup and thus stay
+    // idempotent across repeated runs.
+    "xwikiPropertiesAdditionalProperties=refactoring.isRecycleBinSkippingActivated=true"
+})
 class RecycleBinIT
 {
     /**
@@ -65,18 +68,12 @@ class RecycleBinIT
     {
         setup.loginAsSuperAdmin();
 
-        // Use a UUID-prefixed page name so that each execution operates on a fresh page (idempotent across
-        // repetitions). Revert once https://jira.xwiki.org/browse/XWIKI-23447 is implemented and TestUtils is
-        // modified to delete pages permanently (i.e. not put them in the trash).
-        SpaceReference testSpace = testReference.getLastSpaceReference();
-        DocumentReference pageReference = new DocumentReference(testReference.getName(),
-            new SpaceReference(UUID.randomUUID() + "-" + testSpace.getName(), testSpace.getParent()));
-
-        // Clean up.
-        setup.rest().deletePage(pageReference.getLastSpaceReference().getName(), pageReference.getName());
+        // Clean up, permanently deleting the page (skipping the recycle bin) so that each execution starts from a
+        // clean state and the test stays idempotent across repetitions.
+        setup.rest().delete(testReference, true);
 
         // Create a new page.
-        ViewPage page = setup.createPage(pageReference, "Once upon a time..", "A story");
+        ViewPage page = setup.createPage(testReference, "Once upon a time..", "A story");
 
         // Add an attachment.
         new AttachmentsViewPage().openAttachmentsDocExtraPane().setFileToUpload(

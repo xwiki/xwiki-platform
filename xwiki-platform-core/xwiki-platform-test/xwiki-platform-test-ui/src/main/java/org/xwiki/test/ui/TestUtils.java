@@ -3013,9 +3013,25 @@ public class TestUtils
 
         public void delete(EntityReference reference) throws Exception
         {
+            delete(reference, false);
+        }
+
+        /**
+         * @param reference the reference of the entity to delete
+         * @param skipRecycleBin when {@code true}, request permanent deletion (bypassing the recycle bin). This is only
+         *            honored when the wiki allows skipping the recycle bin (see the
+         *            {@code refactoring.isRecycleBinSkippingActivated} configuration); otherwise the entity is sent to
+         *            the recycle bin as usual. It is also ignored for entities that don't delete pages
+         * @since 18.6.0RC1
+         */
+        public void delete(EntityReference reference, boolean skipRecycleBin) throws Exception
+        {
             Class<?> resource = getResourceAPI(reference);
 
-            TestUtils.assertStatusCodes(executeDelete(resource, toElements(reference)), true,
+            Map<String, Object[]> queryParams =
+                skipRecycleBin ? Map.of("skipRecycleBin", new Object[] { Boolean.TRUE }) : Map.of();
+
+            TestUtils.assertStatusCodes(executeDelete(resource, queryParams, toElements(reference)), true,
                 STATUS_NO_CONTENT_NOT_FOUND);
         }
 
@@ -3032,6 +3048,20 @@ public class TestUtils
         public void deletePage(String space, String page) throws Exception
         {
             delete(new LocalDocumentReference(space, page));
+        }
+
+        /**
+         * @param space the space of the page to delete
+         * @param page the name of the page to delete
+         * @param skipRecycleBin when {@code true}, request permanent deletion (bypassing the recycle bin). This is only
+         *            honored when the wiki allows skipping the recycle bin (see the
+         *            {@code refactoring.isRecycleBinSkippingActivated} configuration); otherwise the page is sent to
+         *            the recycle bin as usual
+         * @since 18.6.0RC1
+         */
+        public void deletePage(String space, String page, boolean skipRecycleBin) throws Exception
+        {
+            delete(new LocalDocumentReference(space, page), skipRecycleBin);
         }
 
         /**

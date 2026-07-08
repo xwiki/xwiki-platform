@@ -20,6 +20,7 @@
 
 // This file is required as it is the base import for Playwright
 
+import { registerDsComponentsMock } from "./dsComponentsMock";
 import { beforeMount } from "@playwright/experimental-ct-vue/hooks";
 import { createI18n } from "vue-i18n";
 
@@ -28,4 +29,9 @@ import { createI18n } from "vue-i18n";
 // local messages.
 beforeMount(async ({ app }) => {
   app.use(createI18n({ legacy: false, locale: "en", messages: {} }));
+
+  // The link modal renders design system components (e.g. <x-text-field>) that are only provided
+  // at runtime by the application embedding the editor. Register stand-ins so tests can interact
+  // with them.
+  registerDsComponentsMock(app);
 });

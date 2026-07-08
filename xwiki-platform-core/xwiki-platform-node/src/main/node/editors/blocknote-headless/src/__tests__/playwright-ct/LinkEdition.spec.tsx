@@ -46,10 +46,12 @@ test("Editing the title of a link keeps the rest of the line intact", async ({
   await editLinkButtonEl.waitFor({ state: "attached" });
   await editLinkButtonEl.click();
 
-  const titleInputEl = page.locator('input[data-test="linkTitle"]');
+  const titleInputEl = page.locator('[data-test="linkDisplayText"]');
   await titleInputEl.waitFor({ state: "attached" });
   await titleInputEl.fill("2nd");
-  await titleInputEl.press("Enter");
+
+  const submitButtonEl = page.locator('[data-test="linkSubmit"]');
+  await submitButtonEl.click();
 
   // The link title must be updated...
   await expect(linkEl).toHaveText("2nd");

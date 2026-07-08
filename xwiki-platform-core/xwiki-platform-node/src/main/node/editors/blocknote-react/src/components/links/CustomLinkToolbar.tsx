@@ -46,6 +46,7 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
     <>
       <Components.FormattingToolbar.Button
         className="bn-button"
+        data-test="editLink"
         label={t("blocknote.linkToolbar.buttons.edit")}
         icon={<RiPencilLine />}
         onClick={() =>
@@ -56,7 +57,7 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
             },
             mode: "editExisting",
             onSubmit({ url, title }) {
-              editLink(url, title);
+              editLink(url, title, linkToolbarProps.range.from);
             },
           })
         }

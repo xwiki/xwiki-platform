@@ -71,11 +71,15 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
     />
 
     <div :class="$style.actions">
-      <x-btn variant="success" @click="$emit('submit', linkData)">
+      <x-btn
+        data-test="linkSubmit"
+        variant="success"
+        @click="$emit('submit', linkData)"
+      >
         {{ t("link-modal.buttons.submit") }}
       </x-btn>
 
-      <x-btn variant="neutral" @click="$emit('cancel')">
+      <x-btn data-test="linkCancel" variant="neutral" @click="$emit('cancel')">
         {{ t("link-modal.buttons.cancel") }}
       </x-btn>
     </div>

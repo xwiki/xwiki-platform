@@ -66,12 +66,14 @@ watch(linkTargetTypeSelect, (label) => {
 
 <template>
   <x-text-field
+    data-test="linkDisplayText"
     :label="t('link-modal.config.display-text')"
     v-model="linkData.displayText"
     required
   />
 
   <x-select
+    data-test="linkTargetType"
     :label="t('link-modal.config.target-type')"
     v-model="linkTargetTypeSelect"
     :items="targetTypes.map((t) => t.label)"

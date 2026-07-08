@@ -54,10 +54,17 @@ test("Creating a link on a word in the middle of a line keeps the text intact", 
   await linkButtonEl.waitFor({ state: "attached" });
   await linkButtonEl.click();
 
-  const urlInputEl = page.locator(".bn-form-popover input");
+  // The link modal defaults to the "Page" target type, switch it to "URL".
+  const targetTypeSelectEl = page.locator('[data-test="linkTargetType"]');
+  await targetTypeSelectEl.waitFor({ state: "attached" });
+  await targetTypeSelectEl.selectOption("URL");
+
+  const urlInputEl = page.locator('[data-test="linkUrl"]');
   await urlInputEl.waitFor({ state: "attached" });
   await urlInputEl.fill("https://xwiki.org");
-  await urlInputEl.press("Enter");
+
+  const submitButtonEl = page.locator('[data-test="linkSubmit"]');
+  await submitButtonEl.click();
 
   // The link must be inserted around the selected word...
   const linkEl = editorEl.locator('a[href="https://xwiki.org"]');

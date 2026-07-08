@@ -883,4 +883,22 @@ public class BasePage extends BaseElement
     {
         return getDriver().hasElementWithoutWaiting(By.className("xwikirenderingerror"));
     }
+
+    /**
+     * @return {@code true} if an icon rendered by the Font Awesome (font-based) icon theme is displayed in the page
+     *         content; Font Awesome renders icons as {@code <span class="fa ...">} elements
+     */
+    public boolean isFontAwesomeIconDisplayedInContent()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector("#xwikicontent span.fa"));
+    }
+
+    /**
+     * @return {@code true} if an icon rendered by the Silk (image-based) icon theme is displayed in the page content;
+     *         Silk renders icons as {@code <img src=".../icons/silk/...">} elements
+     */
+    public boolean isSilkIconDisplayedInContent()
+    {
+        return getDriver().hasElementWithoutWaiting(By.cssSelector("#xwikicontent img[src*='/icons/silk/']"));
+    }
 }

@@ -96,4 +96,28 @@ public class BlockNoteToolBar extends BaseElement
         clickButton("changeimage");
         return new ImageDialogEditModal();
     }
+
+    /**
+     * Clicks the button to create a link from the current selection. This opens the link popover.
+     *
+     * @return the link popover
+     * @since 18.6.0RC1
+     */
+    public BlockNoteLinkPopover createLink()
+    {
+        clickButton("createLink");
+        return new BlockNoteLinkPopover();
+    }
+
+    /**
+     * Clicks the button to edit the selected link. This opens the link popover.
+     *
+     * @return the link popover
+     * @since 18.6.0RC1
+     */
+    public BlockNoteLinkPopover editLink()
+    {
+        clickButton("editLink");
+        return new BlockNoteLinkPopover();
+    }
 }

@@ -398,12 +398,18 @@ require(['jquery'], function($) {
         insertAfterWhatNode: isSimpleUser ? breadcrumbContainer[0] : spaceReferenceInput[0]
       });
       spaceValidator.displayMessageWhenEmpty = true;
+      // A space/page name may legitimately contain dots, which are escaped with a backslash in the
+      // serialized reference (e.g. "Foo\." is the reference of a space named "Foo."). Neutralize the
+      // escaped sequences before checking, so that an escaped dot is not mistaken for a separator and
+      // flagged as a partial reference (leading / trailing / double dot). The double backslashes are
+      // collapsed first so that "\\." (escaped backslash followed by a separator) is handled correctly.
       let dotRegex = /(^\.)|(\.$)|(\.\.+)/
       spaceValidator.add(Validate.Custom, {
         failureMessage: l10n['core.validation.spacevalidation.message.invalidreference'],
         against: function(value) {
           if (typeof value === 'string') {
-            return value.strip().search(dotRegex) === -1;
+            let separatorsOnly = value.strip().replace(/\\\\/g, 'x').replace(/\\./g, 'x');
+            return separatorsOnly.search(dotRegex) === -1;
           } else {
             return true;
           }

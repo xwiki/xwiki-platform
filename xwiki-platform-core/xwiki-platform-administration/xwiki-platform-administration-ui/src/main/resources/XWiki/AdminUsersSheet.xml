@@ -133,7 +133,7 @@
 
 #macro (createUserModal)
   &lt;div class="modal" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserModal-label"
-      data-backdrop="static" data-keyboard="false"&gt;
+      data-backdrop="static"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -149,7 +149,7 @@
           &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
             $escapetool.xml($services.localization.render('cancel'))
           &lt;/button&gt;
-          &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;
+          &lt;button type="submit" class="btn btn-primary" form="register" disabled="disabled"&gt;
             $escapetool.xml($services.localization.render('create'))
           &lt;/button&gt;
         &lt;/div&gt;
@@ -160,7 +160,7 @@
 
 #macro (editUserModal)
   &lt;div class="modal" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModal-label"
-      data-backdrop="static" data-keyboard="false" data-live-data="#userstable" data-live-data-action="edit"&gt;
+      data-backdrop="static" data-live-data="#userstable" data-live-data-action="edit"&gt;
     &lt;div class="modal-dialog modal-lg" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -467,12 +467,13 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
       createUserForm.find(':input').filter(':visible').first().focus();
       createUserButton.prop('disabled', !createUserForm.length);
     });
-  }).on('click', '.btn-primary', function(event) {
+  }).on('submit', 'form#register', function(event) {
+    event.preventDefault();
     var createUserForm = createUserModal.find('form#register');
     if (!validateCreateUserForm(createUserForm)) {
       return;
     }
-    var createUserButton = $(this).prop('disabled', true);
+    var createUserButton = createUserModal.find('.btn-primary').prop('disabled', true);
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('xe.admin.users.create.inProgress')),
       'inprogress'

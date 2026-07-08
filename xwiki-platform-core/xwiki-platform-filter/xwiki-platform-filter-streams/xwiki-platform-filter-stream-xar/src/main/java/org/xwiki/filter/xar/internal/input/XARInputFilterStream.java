@@ -26,6 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -61,6 +63,9 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
 
     @Inject
     private Provider<DocumentLocaleReader> documentLocaleReaderProvider;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public void close() throws IOException
@@ -99,7 +104,7 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
                 try {
                     inputSource.close();
                 } catch (IOException e) {
-                    throw new FilterException("Failed to close the source", e);
+                    this.logger.warn("Failed to close the source: [{}]", ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         } else {

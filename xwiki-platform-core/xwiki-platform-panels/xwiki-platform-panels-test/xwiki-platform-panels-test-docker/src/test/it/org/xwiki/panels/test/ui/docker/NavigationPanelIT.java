@@ -52,7 +52,11 @@ class NavigationPanelIT
     {
         setup.loginAsSuperAdmin();
 
-        // Activate the Navigation Panel in the right column
+        // Activate the Navigation Panel in the right column. We also force the right column to be displayed since
+        // this test needs it and another test running before it in the same XWiki instance could have switched the
+        // wiki to a layout that hides the right column (the shared AllIT instance means the page layout preference
+        // is global state).
+        setup.setWikiPreference("showRightPanels", "1");
         setup.setWikiPreference("rightPanels", "Panels.Navigation");
     }
 
@@ -83,6 +87,10 @@ class NavigationPanelIT
         setup.gotoPage(page);
         assertFalse(new NavigationPanel().getNavigationTree().hasDocument(appName, "WebHome"),
             "The application home page is not excluded from the Navigation Panel");
+
+        // Clean up the application created by this test because its top level page interferes with the navigation
+        // panel administration test (which asserts the exact list of top level pages).
+        AppWithinMinutesHomePage.gotoPage().deleteApplication(appName);
     }
 
     private ApplicationHomePage createEmptyApp(String appName)

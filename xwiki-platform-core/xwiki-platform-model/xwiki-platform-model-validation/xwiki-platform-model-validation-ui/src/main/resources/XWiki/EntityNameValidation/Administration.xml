@@ -50,7 +50,7 @@
 
 #macro (createReplacementCharacterModal)
   &lt;div class="modal" id="createReplacementCharacterModal" tabindex="-1" role="dialog" aria-labelledby="createReplacementCharacterModal-label"
-      data-backdrop="static" data-keyboard="false"&gt;
+      data-backdrop="static"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -96,7 +96,7 @@
 
 #macro (removeReplacementCharacterModal)
   &lt;div class="modal" id="removeReplacementCharacterModal" tabindex="-1" role="dialog" aria-labelledby="removeReplacementCharacterModal-label"
-      data-backdrop="static" data-keyboard="false"&gt;
+      data-backdrop="static"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;

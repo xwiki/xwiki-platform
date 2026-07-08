@@ -197,6 +197,9 @@ mkdir -p $XWIKI_DATA_DIR/logs 2>/dev/null
 JETTY_BASE=$PRGDIR
 # Also make sure the log directory exists since Jetty won't create it.
 mkdir -p $JETTY_BASE/logs 2>/dev/null
+# Make sure the "work" directory exists so that Jetty reuses a persistent, stable temp directory for the webapps
+# instead of creating a new random tmp/jetty-*-any-<random> folder on each startup.
+mkdir -p $JETTY_BASE/work 2>/dev/null
 
 # Make sure the environments folder exist
 mkdir -p environments

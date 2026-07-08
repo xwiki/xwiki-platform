@@ -94,13 +94,18 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
       {!creationMode && (
         <Input
           leftSection={<RiText />}
+          data-test="linkTitle"
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
-          onKeyDown={(e) =>
-            current &&
-            e.key === "Enter" &&
-            submit({ title: e.currentTarget.value })
-          }
+          onKeyDown={(e) => {
+            if (current && e.key === "Enter") {
+              // Prevent the default editing action of the Enter key: the submit handler moves the
+              // focus back to the editor synchronously, in which case the browser would apply the
+              // default action to the editor's restored selection, deleting its content.
+              e.preventDefault();
+              submit({ title: e.currentTarget.value });
+            }
+          }}
         />
       )}
 

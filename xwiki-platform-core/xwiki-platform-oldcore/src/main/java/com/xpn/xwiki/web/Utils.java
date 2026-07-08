@@ -66,6 +66,10 @@ public class Utils
     private static final String PLACEHOLDERS_ENABLED_CONTEXT_KEY = Utils.class.getCanonicalName()
         + "_placeholders_enabled";
 
+    private static final String CACHE_CONTROL_HEADER = "Cache-Control";
+
+    private static final String NO_CACHE = "no-cache";
+
     /**
      * The component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}. It is useful
      * for any non component code that need to initialize/access components.
@@ -137,15 +141,15 @@ public class Utils
                 }
                 // Set a nocache to make sure the page is reloaded after an edit
                 if (cacheSetting == 1) {
-                    response.setHeader("Pragma", "no-cache");
-                    response.setHeader("Cache-Control", "no-cache");
+                    response.setHeader("Pragma", NO_CACHE);
+                    response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
                 } else if (cacheSetting == 2) {
-                    response.setHeader("Pragma", "no-cache");
-                    response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
+                    response.setHeader("Pragma", NO_CACHE);
+                    response.setHeader(CACHE_CONTROL_HEADER, "max-age=0, no-cache, no-store");
                 } else if (cacheSetting == 3) {
-                    response.setHeader("Cache-Control", "private");
+                    response.setHeader(CACHE_CONTROL_HEADER, "private");
                 } else if (cacheSetting == 4) {
-                    response.setHeader("Cache-Control", "public");
+                    response.setHeader(CACHE_CONTROL_HEADER, "public");
                 }
 
                 // Set an expires in one month
@@ -161,7 +165,7 @@ public class Utils
         if (("download".equals(action)) || ("skin".equals(action))) {
             // Set a nocache to make sure these files are not cached by proxies
             if (cacheSetting == 1 || cacheSetting == 2) {
-                response.setHeader("Cache-Control", "no-cache");
+                response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
             }
         }
 

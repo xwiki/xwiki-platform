@@ -32,6 +32,8 @@ import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 
 public class MonitorPlugin extends XWikiDefaultPlugin
 {
+    private static final String FAILED_WITH_EXCEPTION_MESSAGE = " failed with exception ";
+
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(MonitorPlugin.class);
 
     private boolean bActive;
@@ -219,7 +221,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
             }
         } catch (Throwable e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("MONITOR: startRequest for timer " + timername + " failed with exception " + e);
+                LOGGER.debug("MONITOR: startRequest for timer " + timername + FAILED_WITH_EXCEPTION_MESSAGE + e);
                 e.printStackTrace();
             }
         }
@@ -239,7 +241,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
             }
         } catch (Throwable e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("MONITOR: setTimerDesc for timer " + timername + " failed with exception " + e);
+                LOGGER.debug("MONITOR: setTimerDesc for timer " + timername + FAILED_WITH_EXCEPTION_MESSAGE + e);
                 e.printStackTrace();
             }
         }
@@ -259,7 +261,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
             }
         } catch (Throwable e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("MONITOR: endRequest for timer " + timername + " failed with exception " + e);
+                LOGGER.debug("MONITOR: endRequest for timer " + timername + FAILED_WITH_EXCEPTION_MESSAGE + e);
                 e.printStackTrace();
             }
         }

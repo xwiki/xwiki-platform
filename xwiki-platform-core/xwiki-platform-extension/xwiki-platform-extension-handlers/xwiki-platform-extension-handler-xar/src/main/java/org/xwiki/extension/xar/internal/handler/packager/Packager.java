@@ -152,11 +152,8 @@ public class Packager
     private void importXARToWiki(String comment, File xarFile, WikiReference wikiReference,
         PackageConfiguration configuration) throws IOException, XarException, XWikiException
     {
-        FileInputStream fis = new FileInputStream(xarFile);
-        try {
+        try (FileInputStream fis = new FileInputStream(xarFile)) {
             importXARToWiki(comment, fis, wikiReference, configuration);
-        } finally {
-            fis.close();
         }
     }
 

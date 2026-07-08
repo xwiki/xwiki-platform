@@ -114,6 +114,8 @@ public class Document extends Api
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Document.class);
 
+    private static final String DELETE = "delete";
+
     /**
      * The XWikiDocument object wrapped by this API.
      */
@@ -3106,7 +3108,7 @@ public class Document extends Api
 
     public void delete() throws XWikiException
     {
-        if (hasAccessLevel("delete")) {
+        if (hasAccessLevel(DELETE)) {
             deleteDocument();
         } else {
             java.lang.Object[] args = { this.getFullName() };
@@ -3302,7 +3304,7 @@ public class Document extends Api
     public void rename(DocumentReference newReference) throws XWikiException
     {
         XWiki xWiki = this.context.getWiki();
-        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+        if (hasAccessLevel(DELETE) && xWiki.checkAccess("edit",
             xWiki.getDocument(newReference, this.context), this.context)) {
             List<DocumentReference> backLinkedReferences = getDocument().getBackLinkedReferences(this.context);
             List<DocumentReference> childrenReferences = getDocument().getChildrenReferences(this.context);
@@ -3396,7 +3398,7 @@ public class Document extends Api
         List<DocumentReference> childDocumentNames) throws XWikiException
     {
         XWiki xWiki = this.context.getWiki();
-        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+        if (hasAccessLevel(DELETE) && xWiki.checkAccess("edit",
             xWiki.getDocument(newReference, this.context), this.context)) {
 
             // Every page given in childDocumentNames has it's parent changed whether it needs it or not.

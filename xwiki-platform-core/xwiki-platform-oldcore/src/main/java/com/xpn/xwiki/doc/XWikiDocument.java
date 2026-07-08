@@ -224,6 +224,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
 
+    private static final String DOCUMENT = "document";
+
+    private static final String REFERENCE = "reference";
+
+    private static final String INLINE = "inline";
+
     private static final String TM_FAILEDDOCUMENTPARSE = "core.document.error.failedParse";
 
     private static final String[] HTML_MACRO_SEARCH_STRINGS = new String[] { "{{html", "{{/html" };
@@ -1007,12 +1013,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private UserReferenceSerializer<DocumentReference> getUserReferenceDocumentReferenceSerializer()
     {
-        return Utils.getComponent(UserReferenceSerializer.TYPE_DOCUMENT_REFERENCE, "document");
+        return Utils.getComponent(UserReferenceSerializer.TYPE_DOCUMENT_REFERENCE, DOCUMENT);
     }
 
     private UserReferenceResolver<DocumentReference> getUserReferenceDocumentReferenceResolver()
     {
-        return Utils.getComponent(UserReferenceResolver.TYPE_DOCUMENT_REFERENCE, "document");
+        return Utils.getComponent(UserReferenceResolver.TYPE_DOCUMENT_REFERENCE, DOCUMENT);
     }
 
     private UserReferenceSerializer<String> getUserReferenceStringSerializer()
@@ -2128,7 +2134,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // The user API is missing the concept of relative user references ATM so we're forced to check where the users
         // are stored in order to make sure user references stored in the database are relative.
         // See also XWIKI-19442: APIs to generate various String references from a UserReference
-        if ("document".equals(getUserConfiguration().getStoreHint())) {
+        if (DOCUMENT.equals(getUserConfiguration().getStoreHint())) {
             // Users are stored as documents. We want the user references that are stored in the database to be relative
             // as much as possible (because it makes the content portable). For this we omit the wiki reference when the
             // user (profile document) reference is from the same wiki as this document.
@@ -2147,7 +2153,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // The user API is missing the concept of relative user references ATM so if we want to resolve (partial) user
         // references that were stored in the database relative to this document then we need to check where the users
         // are stored. See also XWIKI-19442: APIs to generate various String references from a UserReference
-        if ("document".equals(getUserConfiguration().getStoreHint())) {
+        if (DOCUMENT.equals(getUserConfiguration().getStoreHint())) {
             return getUserReferenceStringResolver().resolve(userString, getDocumentReference().getWikiReference());
         } else {
             return getUserReferenceStringResolver().resolve(userString);
@@ -6305,9 +6311,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 // play nice with people migrating from 1.0 to 2.0 syntax
 
                 if ("include".equalsIgnoreCase(macroBlock.getId()) || "display".equalsIgnoreCase(macroBlock.getId())) {
-                    String documentName = macroBlock.getParameters().get("reference");
+                    String documentName = macroBlock.getParameters().get(REFERENCE);
                     if (StringUtils.isEmpty(documentName)) {
-                        documentName = macroBlock.getParameters().get("document");
+                        documentName = macroBlock.getParameters().get(DOCUMENT);
                         if (StringUtils.isEmpty(documentName)) {
                             continue;
                         }
@@ -7224,7 +7230,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         if (ObjectUtils.notEqual(fromDoc.getDocumentReference(), toDoc.getDocumentReference())) {
-            list.add(new MetaDataDiff("reference", fromDoc.getDocumentReference(), toDoc.getDocumentReference()));
+            list.add(new MetaDataDiff(REFERENCE, fromDoc.getDocumentReference(), toDoc.getDocumentReference()));
         }
 
         if (!fromDoc.getSpace().equals(toDoc.getSpace())) {
@@ -7679,7 +7685,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
         if (is10Syntax()) {
             if (getContent().indexOf("includeForm(") != -1) {
-                return "inline";
+                return INLINE;
             }
         } else {
             // Algorithm: look in all include macros and for all document included check if one of them
@@ -7694,9 +7700,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 // For backward-compatibility we also check for a "document" parameter since this is the parameter name
                 // that was used prior to XWiki 3.4M1 when the "reference" one was introduced and thus when the
                 // "document" one was deprecated.
-                String includedDocumentReference = macroBlock.getParameter("reference");
+                String includedDocumentReference = macroBlock.getParameter(REFERENCE);
                 if (includedDocumentReference == null) {
-                    includedDocumentReference = macroBlock.getParameter("document");
+                    includedDocumentReference = macroBlock.getParameter(DOCUMENT);
                 }
                 if (includedDocumentReference != null) {
                     // Resolve the document name into a valid Reference
@@ -7716,7 +7722,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                             if (StringUtils.isBlank(defaultEditMode)) {
                                 // TODO: maybe here the real value should be returned if the object is edit mode class,
                                 // and inline only if the object is sheetclass
-                                return "inline";
+                                return INLINE;
                             } else {
                                 return defaultEditMode;
                             }
@@ -7733,8 +7739,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         String editMode = getDefaultEditMode(context);
 
-        if ("inline".equals(editMode)) {
-            return getEditURL("inline", "", context);
+        if (INLINE.equals(editMode)) {
+            return getEditURL(INLINE, "", context);
         } else {
             com.xpn.xwiki.XWiki xwiki = context.getWiki();
             String editor = xwiki.getEditorPreference(context);

@@ -287,7 +287,7 @@ public class XWiki implements EventListener
      * 
      * @since 13.2RC1
      */
-    public static final EntityReference SYSTEM_SPACE_REFERENCE = new EntityReference("XWiki", EntityType.SPACE);
+    public static final EntityReference SYSTEM_SPACE_REFERENCE = new EntityReference(SYSTEM_SPACE, EntityType.SPACE);
 
     /** Name of the default space homepage. */
     public static final String DEFAULT_SPACE_HOMEPAGE = "WebHome";
@@ -315,6 +315,10 @@ public class XWiki implements EventListener
 
     /** Represents no value (ie the default value will be used) in xproperties */
     private static final String NO_VALUE = "---";
+
+    private static final String DEFAULT = "default";
+
+    private static final String BACKLINKS = "backlinks";
 
     private static final String LANGUAGE = "language";
 
@@ -3172,7 +3176,7 @@ public class XWiki implements EventListener
         try {
             String language = Util.normalizeLanguage(context.getRequest().getParameter(LANGUAGE));
             if (language != null) {
-                if ("default".equals(language)) {
+                if (DEFAULT.equals(language)) {
                     // forgetting language cookie
                     addLanguageCookie(LANGUAGE, "", 0, context);
                     context.setLocale(defaultLocale);
@@ -3421,7 +3425,7 @@ public class XWiki implements EventListener
         // Determine which language to use
         // First we get the language from the request
         if (StringUtils.isNotEmpty(requestLanguage)) {
-            if ("default".equals(requestLanguage)) {
+            if (DEFAULT.equals(requestLanguage)) {
                 setCookie = true;
             } else {
                 language = requestLanguage;
@@ -3518,7 +3522,7 @@ public class XWiki implements EventListener
         // Determine which language to use
         // First we get the language from the request
         if ((requestLanguage != null) && (!requestLanguage.isEmpty())) {
-            if ("default".equals(requestLanguage)) {
+            if (DEFAULT.equals(requestLanguage)) {
                 setCookie = true;
             } else {
                 language = requestLanguage;
@@ -5323,7 +5327,7 @@ public class XWiki implements EventListener
 
     public String getEncoding()
     {
-        return getConfiguration().getProperty("xwiki.encoding", "UTF-8");
+        return getConfiguration().getProperty("xwiki.encoding", DEFAULT_ENCODING);
     }
 
     public URL getServerURL(String wikiId, XWikiContext xcontext) throws MalformedURLException
@@ -6900,7 +6904,7 @@ public class XWiki implements EventListener
     public boolean hasBacklinks(XWikiContext context)
     {
         if (this.hasBacklinks == null) {
-            this.hasBacklinks = "1".equals(getXWikiPreference("backlinks", "xwiki.backlinks", "0", context));
+            this.hasBacklinks = "1".equals(getXWikiPreference(BACKLINKS, "xwiki.backlinks", "0", context));
         }
         return this.hasBacklinks;
     }
@@ -7852,8 +7856,8 @@ public class XWiki implements EventListener
             if (event instanceof XObjectPropertyEvent xObjectPropertyEvent) {
                 EntityReference reference = xObjectPropertyEvent.getReference();
                 String modifiedProperty = reference.getName();
-                if ("backlinks".equals(modifiedProperty)) {
-                    this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
+                if (BACKLINKS.equals(modifiedProperty)) {
+                    this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent()).getIntValue(BACKLINKS,
                         getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
                 }
             }

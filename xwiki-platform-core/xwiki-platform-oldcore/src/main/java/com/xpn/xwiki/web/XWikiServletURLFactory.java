@@ -63,6 +63,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletURLFactory.class);
 
+    private static final String HTML_AMPERSAND = "&amp;";
+
+    private static final String UTF8 = "UTF-8";
+
     private EntityReferenceResolver<String> relativeEntityReferenceResolver;
 
     private EntityReferenceResolver<String> currentEntityReferenceResolver;
@@ -326,7 +330,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
         }
 
         if (!StringUtils.isEmpty(anchor)) {
@@ -450,7 +454,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         String encodedName;
         try {
-            encodedName = URLEncoder.encode(name, "UTF-8");
+            encodedName = URLEncoder.encode(name, UTF8);
         } catch (Exception e) {
             // Should not happen (UTF-8 is always available)
             throw new RuntimeException("Missing charset [UTF-8]", e);
@@ -524,9 +528,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         throws UnsupportedEncodingException
     {
         if (paramValue instanceof String) {
-            stringBuilder.append(URLEncoder.encode(key, "UTF-8"));
+            stringBuilder.append(URLEncoder.encode(key, UTF8));
             stringBuilder.append('=');
-            stringBuilder.append(URLEncoder.encode((String) paramValue, "UTF-8"));
+            stringBuilder.append(URLEncoder.encode((String) paramValue, UTF8));
         } else if (paramValue.getClass().isArray()) {
             Class ofArray = paramValue.getClass().getComponentType();
             if (ofArray.isPrimitive()) {
@@ -761,7 +765,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
         }
 
         try {
@@ -864,7 +868,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     String querystring = url.getQuery();
                     if (!StringUtils.isEmpty(querystring)) {
                         relativeURLBuilder.append("?")
-                            .append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+                            .append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
                     }
 
                     String anchor = url.getRef();

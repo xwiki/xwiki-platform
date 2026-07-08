@@ -206,7 +206,8 @@ class SolrSearchIT
      */
     @Test
     @Order(5)
-    void verifyIndexingActionsFromAdministration(TestUtils setup, TestReference testReference) throws Exception
+    void verifyIndexingActionsFromAdministration(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
 
@@ -216,7 +217,7 @@ class SolrSearchIT
             new SpaceReference("DeleteReindex", testReference.getLastSpaceReference()));
         setup.rest().savePage(pageReference, matchedWord, pageTitle);
 
-        SolrTestUtils solrUtils = new SolrTestUtils(setup);
+        SolrTestUtils solrUtils = new SolrTestUtils(setup, testConfiguration.getServletEngine());
         solrUtils.waitEmptyQueue();
 
         // The page is initially indexed and thus found by the search.

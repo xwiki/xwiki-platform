@@ -22,6 +22,7 @@ package org.xwiki.rendering.script;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -31,8 +32,15 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
@@ -55,9 +63,14 @@ import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.transformation.XWikiTransformationContext;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Provides Rendering-specific Scripting APIs.
@@ -101,6 +114,16 @@ public class RenderingScriptService implements ScriptService
 
     @Inject
     private TransformationManager transformationManager;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    private AuthorExecutor authorExecutor;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     /**
      * Used to check programming rights.
@@ -183,18 +206,130 @@ public class RenderingScriptService implements ScriptService
     }
 
     /**
-     * Performs transformations on the passed block using the passed transformation context.
+     * Performs transformations on the passed block using the passed transformation context using the curent user as
+     * context author. Requires programming rights.
      * 
      * @param block the block on which to perform the transformations
      * @param transformationContext the context in which to perform the transformations
      * @since 18.1.0RC1
      */
     @Unstable
-    public void transform(Block block, XWikiTransformationContext transformationContext) throws TransformationException
+    public void transform(Block block, XWikiTransformationContext transformationContext)
+        throws TransformationException, AccessDeniedException
     {
-        if (this.authorization.hasAccess(Right.PROGRAM)) {
-            this.transformationManager.performTransformations(block, transformationContext);
+        this.authorization.checkAccess(Right.PROGRAM);
+
+        try {
+            this.authorExecutor.call(() -> {
+                this.transformationManager.performTransformations(block, transformationContext);
+                return null;
+            }, this.documentAccessBridge.getCurrentUserReference(),
+                maybeExtractDocumentReference(transformationContext.getContentEntityReference()));
+        } catch (Exception e) {
+            if (e instanceof TransformationException transformationException) {
+                throw transformationException;
+            } else {
+                throw new TransformationException("Failed to perform transformations", e);
+            }
         }
+    }
+
+    /**
+     * Converts a text from a source syntax to a target syntax, executing transformations with the passed
+     * transformation context. The source and target syntaxes are taken from the transformation context. The context
+     * author is either the current user, or, if the content corresponds to the content of the passed document or object
+     * property, the author of that content. Requires programming rights.
+     *
+     * @param source the text to convert
+     * @param transformationContext the context in which to perform the transformations; it also provides the source
+     *     syntax (see {@link XWikiTransformationContext#getSyntax()}) the source text is written in and the target
+     *     syntax (see {@link XWikiTransformationContext#getTargetSyntax()}) to convert the source text into
+     * @return the converted text
+     * @throws TransformationException if an error occurs during the conversion
+     * @throws AccessDeniedException if the context author does not have programming rights
+     * @since 18.6.0
+     * @since 18.4.3
+     */
+    @Unstable
+    public String convert(String source, XWikiTransformationContext transformationContext)
+        throws TransformationException, AccessDeniedException, ComponentLookupException
+    {
+        this.authorization.checkAccess(Right.PROGRAM);
+
+        Objects.requireNonNull(source, "The source text to convert must be specified");
+        Objects.requireNonNull(transformationContext, "The transformation context must be specified");
+        Syntax sourceSyntax = Objects.requireNonNull(transformationContext.getSyntax(),
+            "The source syntax must be specified in the transformation context");
+        Syntax targetSyntax = Objects.requireNonNull(transformationContext.getTargetSyntax(),
+            "The target syntax must be specified in the transformation context");
+
+        String result;
+        try {
+            Parser parser =
+                this.componentManagerProvider.get().getInstance(Parser.class, sourceSyntax.toIdString());
+            BlockRenderer renderer =
+                this.componentManagerProvider.get().getInstance(BlockRenderer.class, targetSyntax.toIdString());
+            WikiPrinter printer = new DefaultWikiPrinter();
+            XDOM xdom = parser.parse(new StringReader(source));
+            // Make the parsed content available to the transformations (some macros inspect the full XDOM).
+            transformationContext.setXDOM(xdom);
+
+            UserReference author = CurrentUserReference.INSTANCE;
+            EntityReference contentEntityReference = transformationContext.getContentEntityReference();
+            switch (contentEntityReference) {
+                case ObjectPropertyReference objectPropertyReference -> {
+                    Object originalContent = this.documentAccessBridge.getProperty(objectPropertyReference);
+                    if (source.equals(originalContent)) {
+                        author =
+                            this.documentAccessBridge.getDocumentInstance(objectPropertyReference)
+                                .getAuthors().getEffectiveMetadataAuthor();
+                    }
+                }
+                case DocumentReference documentReference -> {
+                    DocumentModelBridge document = this.documentAccessBridge.getDocumentInstance(documentReference);
+                    if (source.equals(document.getContent())) {
+                        author = document.getAuthors().getContentAuthor();
+                    }
+                }
+                case null -> {
+                    // Ignore, the author will be the current user.
+                }
+                default ->
+                    throw new TransformationException("Unsupported content entity reference type ["
+                        + contentEntityReference.getType() + "]");
+            }
+
+            DocumentReference authorDocumentReference = this.userReferenceSerializer.serialize(author);
+
+            this.authorExecutor.call(() -> {
+                this.transformationManager.performTransformations(xdom, transformationContext);
+                return null;
+            }, authorDocumentReference, maybeExtractDocumentReference(contentEntityReference));
+            renderer.render(xdom, printer);
+            result = printer.toString();
+        } catch (Exception e) {
+            if (e instanceof TransformationException transformationException) {
+                throw transformationException;
+            } else if (e instanceof ComponentLookupException componentLookupException) {
+                throw componentLookupException;
+            }
+
+            throw new TransformationException("Failed to convert from [" + sourceSyntax + "] to [" + targetSyntax
+                + "]", e);
+        }
+        return result;
+    }
+
+    private DocumentReference maybeExtractDocumentReference(EntityReference entityReference)
+    {
+        if (entityReference != null) {
+            EntityReference documentEntityReference = entityReference.extractReference(EntityType.DOCUMENT);
+            if (documentEntityReference != null) {
+                return new DocumentReference(documentEntityReference);
+            }
+        }
+
+        return null;
     }
 
     /**

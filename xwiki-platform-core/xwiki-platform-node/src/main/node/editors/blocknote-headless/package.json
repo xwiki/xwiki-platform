@@ -73,6 +73,7 @@
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
+    "@xwiki/platform-syntaxes-config": "workspace:*",
     "cross-env": "catalog:",
     "eslint": "catalog:",
     "inversify": "catalog:",

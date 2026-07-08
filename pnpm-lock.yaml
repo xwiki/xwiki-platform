@@ -3054,6 +3054,9 @@ importers:
       '@xwiki/platform-link-modal-ui':
         specifier: workspace:*
         version: link:../../core/link-modal/link-modal-ui
+      '@xwiki/platform-syntaxes-config':
+        specifier: workspace:*
+        version: link:../../core/syntaxes/syntaxes-config
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../tools/tool-apiextractorconfig

@@ -245,6 +245,25 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>
+                XWikiTransformationContext is still unstable, generalized the content document reference to an entity
+                reference so that the content of object properties can be transformed, too.
+              </justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method org.xwiki.model.reference.DocumentReference org.xwiki.rendering.transformation.XWikiTransformationContext::getContentDocumentReference()</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.rendering.transformation.XWikiTransformationContext::setContentDocumentReference(org.xwiki.model.reference.DocumentReference)</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

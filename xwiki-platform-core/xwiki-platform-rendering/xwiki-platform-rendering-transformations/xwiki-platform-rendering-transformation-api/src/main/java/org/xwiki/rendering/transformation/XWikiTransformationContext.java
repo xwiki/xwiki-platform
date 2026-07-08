@@ -19,7 +19,8 @@
  */
 package org.xwiki.rendering.transformation;
 
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -31,25 +32,42 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class XWikiTransformationContext extends TransformationContext
 {
-    private DocumentReference contentDocumentReference;
+    private EntityReference contentEntityReference;
 
     /**
-     * @return the reference of the document whose content is being transformed; some transformations require specific
-     *         access rights, which are evaluated for the current user against this document
+     * @return the reference of the document or object property whose content is being transformed; some
+     * transformations require specific access rights, which are evaluated for the user specified in this context
+     * against the entity whose content is being transformed
+     * @since 18.6.0
+     * @since 18.4.3
      */
-    public DocumentReference getContentDocumentReference()
+    public EntityReference getContentEntityReference()
     {
-        return this.contentDocumentReference;
+        return this.contentEntityReference;
     }
 
     /**
-     * Set the reference of the document whose content is being transformed. Some transformations require specific
-     * access rights, which are evaluated for the current user against this document.
+     * Set the reference of the document or object property whose content is being transformed. Some transformations
+     * require specific access rights, which are evaluated for the specified user against the entity whose content is
+     * being transformed. The reference must be absolute (i.e. rooted at a wiki) so that it unambiguously identifies the
+     * entity.
      *
-     * @param contentDocumentReference the content document reference
+     * @param contentEntityReference the absolute reference of the document or object property whose content is being
+     *     transformed, or {@code null} if there is no such entity
+     * @throws IllegalArgumentException if the passed reference is not {@code null} and not absolute (i.e. not rooted at
+     *     a wiki reference)
+     * @since 18.6.0
+     * @since 18.4.3
      */
-    public void setContentDocumentReference(DocumentReference contentDocumentReference)
+    public void setContentEntityReference(EntityReference contentEntityReference)
     {
-        this.contentDocumentReference = contentDocumentReference;
+        if (contentEntityReference != null
+            && contentEntityReference.getRoot().getType() != EntityType.WIKI) {
+            throw new IllegalArgumentException(String.format(
+                "The content entity reference [%s] must be absolute (i.e. rooted at a wiki reference).",
+                contentEntityReference));
+        }
+
+        this.contentEntityReference = contentEntityReference;
     }
 }

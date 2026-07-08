@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.reference.EntityReference;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -36,16 +37,9 @@ public interface XWikiRightService
     String SUPERADMIN_USER = "superadmin";
 
     /**
-     * The prefix (space part) used to build the full names of the built-in users and groups.
-     *
-     * @since 18.6.0RC1
-     */
-    String XWIKI_SPACE_PREFIX = "XWiki.";
-
-    /**
      * The Superadmin full name.
      */
-    String SUPERADMIN_USER_FULLNAME = XWIKI_SPACE_PREFIX + SUPERADMIN_USER;
+    String SUPERADMIN_USER_FULLNAME = XWiki.SYSTEM_SPACE + "." + SUPERADMIN_USER;
 
     /**
      * The Guest username.
@@ -55,7 +49,7 @@ public interface XWikiRightService
     /**
      * The Guest full name.
      */
-    String GUEST_USER_FULLNAME = XWIKI_SPACE_PREFIX + GUEST_USER;
+    String GUEST_USER_FULLNAME = XWiki.SYSTEM_SPACE + "." + GUEST_USER;
 
     /**
      * The AllGroup username.
@@ -65,7 +59,7 @@ public interface XWikiRightService
     /**
      * The AllGroup full name.
      */
-    String ALLGROUP_GROUP_FULLNAME = XWIKI_SPACE_PREFIX + ALLGROUP_GROUP;
+    String ALLGROUP_GROUP_FULLNAME = XWiki.SYSTEM_SPACE + "." + ALLGROUP_GROUP;
 
     /**
      * @param userReference the user reference

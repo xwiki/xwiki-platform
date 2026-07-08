@@ -18,35 +18,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import BlockNoteHeadlessForTest from "./BlockNoteHeadlessForTest.vue";
-import type {
-  MountOptions,
-  MountResult,
-} from "@playwright/experimental-ct-vue";
+import type { Block, UniAst } from "@xwiki/platform-uniast-api";
 
-type BlockNoteHeadlessProps = InstanceType<
-  typeof BlockNoteHeadlessForTest
->["$props"];
-
-export function mountBlockNoteHeadless(
-  mount: <HooksConfig, Component = unknown>(
-    component: Component,
-    options?: MountOptions<HooksConfig, Component>,
-  ) => Promise<MountResult<Component>>,
-  props: Omit<BlockNoteHeadlessProps, "editorProps"> & {
-    editorProps: Omit<BlockNoteHeadlessProps["editorProps"], "label" | "lang">;
-  },
-): Promise<MountResult<typeof BlockNoteHeadlessForTest>> {
-  const cpProps: BlockNoteHeadlessProps = {
-    ...props,
-    editorProps: {
-      ...props.editorProps,
-      label: "Editor",
-      lang: "en",
-    },
+export function buildParagraphs(blocks: string[]): UniAst {
+  return {
+    blocks: blocks.map(
+      (blockText): Block => ({
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            content: blockText,
+            styles: {},
+          },
+        ],
+        styles: {},
+      }),
+    ),
   };
-
-  return mount(BlockNoteHeadlessForTest, {
-    props: cpProps,
-  });
 }

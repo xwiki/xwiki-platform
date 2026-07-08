@@ -19,15 +19,13 @@
  */
 import { mountBlockNoteHeadless } from "./BlockNote.story.jsx";
 import { FULL_SYNTAX } from "./syntax.mock.js";
+import { buildParagraphs } from "./utils.js";
 import { expect, test } from "@playwright/experimental-ct-vue";
-import type { Block } from "@xwiki/platform-uniast-api";
 
 test("BlockNote Headless mounts properly", async ({ mount }) => {
   const component = await mountBlockNoteHeadless(mount, {
     editorContent: { blocks: [] },
     editorProps: {
-      label: "Editor",
-      lang: "en",
       syntax: FULL_SYNTAX,
     },
     macros: false,
@@ -39,10 +37,8 @@ test("BlockNote Headless mounts properly", async ({ mount }) => {
 
 test("BlockNote Headless shows with initial content", async ({ mount }) => {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: { blocks: buildParagraphs(["Hello,", "world!"]) },
+    editorContent: buildParagraphs(["Hello,", "world!"]),
     editorProps: {
-      label: "Editor",
-      lang: "en",
       syntax: FULL_SYNTAX,
     },
     macros: false,
@@ -51,19 +47,3 @@ test("BlockNote Headless shows with initial content", async ({ mount }) => {
   await expect(component).toBeVisible();
   await expect(component).toHaveText("Hello,world!");
 });
-
-function buildParagraphs(blocks: string[]): Block[] {
-  return blocks.map(
-    (blockText): Block => ({
-      type: "paragraph",
-      content: [
-        {
-          type: "text",
-          content: blockText,
-          styles: {},
-        },
-      ],
-      styles: {},
-    }),
-  );
-}

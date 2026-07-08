@@ -17,23 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { BlockNoteForTest } from "./BlockNote.story";
+import { mountBlockNoteHeadless } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
-import { expect, test } from "@playwright/experimental-ct-react";
-import type { BlockType } from "../../blocknote";
+import { buildParagraphs } from "./utils";
+import { expect, test } from "@playwright/experimental-ct-vue";
 
 // eslint-disable-next-line max-statements
 test("Creating a link on a word in the middle of a line keeps the text intact", async ({
   mount,
   page,
 }) => {
-  const component = await mount(
-    <BlockNoteForTest
-      content={buildParagraph("First second third fourth")}
-      macros={false}
-      syntax={FULL_SYNTAX}
-    />,
-  );
+  const component = await mountBlockNoteHeadless(mount, {
+    editorContent: buildParagraphs(["First second third fourth"]),
+    editorProps: {
+      syntax: FULL_SYNTAX,
+    },
+    macros: false,
+  });
 
   const editorEl = component.locator(".bn-editor");
   const paragraph = editorEl.locator("p.bn-inline-content");
@@ -66,25 +66,3 @@ test("Creating a link on a word in the middle of a line keeps the text intact", 
   // ...and the rest of the line must be intact.
   await expect(editorEl).toHaveText("First second third fourth");
 });
-
-function buildParagraph(text: string): BlockType[] {
-  return [
-    {
-      id: Math.random().toString(),
-      type: "paragraph",
-      props: {
-        backgroundColor: "default",
-        textAlignment: "left",
-        textColor: "default",
-      },
-      content: [
-        {
-          type: "text",
-          text,
-          styles: {},
-        },
-      ],
-      children: [],
-    },
-  ];
-}

@@ -29,7 +29,7 @@ import type {
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { UniAst } from "@xwiki/platform-uniast-api";
 
-type Props = {
+defineProps<{
   editorProps: Omit<
     BlockNoteViewWrapperProps,
     | "depsContainer"
@@ -49,11 +49,9 @@ type Props = {
   editorContent: UniAst | Error;
 
   collaboration?: Collaboration;
-};
+}>();
 
-defineProps<Props>();
-
-const emit = defineEmits<{
+defineEmits<{
   "instant-change": [];
   "debounced-change": [content: UniAst];
 }>();
@@ -76,7 +74,7 @@ defineExpose({
     ref="inner"
     v-bind="$props"
     :deps-container="depsContainer"
-    @instant-change="emit('instant-change')"
-    @debounced-change="(content) => emit('debounced-change', content)"
+    @instant-change="$emit('instant-change')"
+    @debounced-change="(content) => $emit('debounced-change', content)"
   />
 </template>

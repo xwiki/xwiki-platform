@@ -82,6 +82,7 @@ catalog:
   "@mantine/hooks": 8.3.14
   "@microsoft/api-extractor": 7.58.9
   "@playwright/experimental-ct-react": 1.61.0-alpha-2026-06-08
+  "@playwright/experimental-ct-vue": 1.61.0-alpha-2026-06-08
   "@playwright/test": 1.61.0-alpha-2026-06-08
   "@tsconfig/node24": 24.0.4
   "@types/jquery": 4.0.0
@@ -96,6 +97,7 @@ catalog:
   "@vitejs/plugin-react": 5.2.0
   "@vitejs/plugin-vue": 6.0.7
   "@vitest/eslint-plugin": 1.6.17
+  "@vue/compiler-dom": 3.5.38
   "@vue/eslint-config-prettier": 10.2.0
   "@vue/eslint-config-typescript": 14.7.0
   "@vue/test-utils": 2.4.10

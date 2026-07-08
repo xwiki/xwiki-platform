@@ -18,14 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import localConfig from "./vite.config";
-import { vitestVue as defaultConfig } from "@xwiki/platform-dev-config";
-import { UserConfig } from "vite";
-import { mergeConfig } from "vitest/config";
+// This file is required as it is the base import for Playwright
 
-export default mergeConfig(defaultConfig, {
-  ...localConfig,
-  test: {
-    include: ["src/__tests__/vitest/**.ts", "src/__tests__/vitest/**.tsx"],
-  },
-} satisfies UserConfig);
+import { beforeMount } from "@playwright/experimental-ct-vue/hooks";
+import { createI18n } from "vue-i18n";
+
+// Components under test call useI18n(), which requires the vue-i18n plugin to
+// be installed on the app, even when each component then provides its own
+// local messages.
+beforeMount(async ({ app }) => {
+  app.use(createI18n({ legacy: false, locale: "en", messages: {} }));
+});

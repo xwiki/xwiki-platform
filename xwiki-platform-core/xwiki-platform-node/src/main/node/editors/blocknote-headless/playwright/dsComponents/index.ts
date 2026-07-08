@@ -18,20 +18,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-// This file is required as it is the base import for Playwright
+// The design system's components (e.g. <x-text-field>) are provided at runtime by whichever
+// application embeds the editor (they are only typed, not implemented, in `@xwiki/platform-dsapi`).
+// These implementations are built against that same typed contract so Playwright component tests
+// can interact with real form elements without pulling in a full design system package.
 
-import { registerDsComponents } from "./dsComponents";
-import { beforeMount } from "@playwright/experimental-ct-vue/hooks";
-import { createI18n } from "vue-i18n";
+import XBtn from "./XBtn.vue";
+import XCheckbox from "./XCheckbox.vue";
+import XSelect from "./XSelect.vue";
+import XTextField from "./XTextField.vue";
+import type { App } from "vue";
 
-// Components under test call useI18n(), which requires the vue-i18n plugin to
-// be installed on the app, even when each component then provides its own
-// local messages.
-beforeMount(async ({ app }) => {
-  app.use(createI18n({ legacy: false, locale: "en", messages: {} }));
-
-  // The link modal renders design system components (e.g. <x-text-field>) that are only provided
-  // at runtime by the application embedding the editor. Register implementations of the
-  // `@xwiki/platform-dsapi` contract so tests can interact with real form elements.
-  registerDsComponents(app);
-});
+export function registerDsComponents(app: App): void {
+  app.component("XTextField", XTextField);
+  app.component("XSelect", XSelect);
+  app.component("XBtn", XBtn);
+  app.component("XCheckbox", XCheckbox);
+}

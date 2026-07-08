@@ -98,26 +98,26 @@ public class BlockNoteToolBar extends BaseElement
     }
 
     /**
-     * Clicks the button to create a link from the current selection. This opens the link popover.
+     * Clicks the button to create a link from the current selection. This opens the link modal.
      *
-     * @return the link popover
+     * @return the link modal
      * @since 18.6.0RC1
      */
-    public BlockNoteLinkPopover createLink()
+    public BlockNoteLinkModal createLink()
     {
         clickButton("createLink");
-        return new BlockNoteLinkPopover();
+        return new BlockNoteLinkModal();
     }
 
     /**
-     * Clicks the button to edit the selected link. This opens the link popover.
+     * Clicks the button to edit the selected link. This opens the link modal.
      *
-     * @return the link popover
+     * @return the link modal
      * @since 18.6.0RC1
      */
-    public BlockNoteLinkPopover editLink()
+    public BlockNoteLinkModal editLink()
     {
         clickButton("editLink");
-        return new BlockNoteLinkPopover();
+        return new BlockNoteLinkModal();
     }
 }

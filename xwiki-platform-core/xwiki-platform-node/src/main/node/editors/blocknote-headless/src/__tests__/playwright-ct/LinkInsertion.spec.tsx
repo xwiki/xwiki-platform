@@ -19,7 +19,7 @@
  */
 import { mountBlockNoteHeadless } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
-import { buildParagraphs } from "./utils";
+import { buildParagraphs, pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-vue";
 
 // eslint-disable-next-line max-statements
@@ -39,14 +39,15 @@ test("Creating a link on a word in the middle of a line keeps the text intact", 
   const paragraph = editorEl.locator("p.bn-inline-content");
   await paragraph.waitFor({ state: "attached" });
 
-  // Select the word "second" (offsets 6 to 12) with the keyboard.
+  // Select the word "second" (offsets 6 to 12) with the keyboard. Each key press is awaited until it is painted
+  // (see pressKeySettled) so that sending them in quick succession doesn't outrun the editor's selection update.
   await paragraph.click();
-  await page.keyboard.press("Home");
+  await pressKeySettled(page, "Home");
   for (let i = 0; i < 6; i++) {
-    await page.keyboard.press("ArrowRight");
+    await pressKeySettled(page, "ArrowRight");
   }
   for (let i = 0; i < 6; i++) {
-    await page.keyboard.press("Shift+ArrowRight");
+    await pressKeySettled(page, "Shift+ArrowRight");
   }
 
   // The formatting toolbar is rendered via FloatingPortal into document.body.

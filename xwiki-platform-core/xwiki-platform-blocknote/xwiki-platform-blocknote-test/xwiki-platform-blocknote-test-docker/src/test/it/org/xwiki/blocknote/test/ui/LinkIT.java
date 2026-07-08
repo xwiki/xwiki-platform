@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
+import org.xwiki.blocknote.test.po.BlockNoteLinkModal;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -120,6 +121,73 @@ class LinkIT extends AbstractBlockNoteIT
         assertEquals("""
             (% style="color:default;background-color:default;text-align:left" %)
             First [[2nd>>https://xwiki.org]] third fourth""", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(3)
+    void cancelLinkCreation(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "First second third fourth");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Select the word "second" using the keyboard.
+        textArea.click();
+        selectWord(textArea, 6, 6);
+
+        // Open the link modal, fill it in, but cancel it instead of submitting.
+        BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.selectTargetType("URL");
+        linkModal.setUrl("https://xwiki.org");
+        linkModal.cancel();
+
+        // The content must be left untouched.
+        textArea.waitUntilTextIs("First second third fourth");
+
+        // Save and check the source: since nothing was actually changed in the editor, the page content is left
+        // untouched (i.e. it is not even round-tripped through the editor, hence the lack of style annotation that a
+        // real edit would introduce).
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("First second third fourth", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(4)
+    void cancelLinkEdition(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "First [[second>>https://xwiki.org]] third fourth");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal,
+        // change the title, but cancel the modal instead of submitting.
+        textArea.click();
+        textArea.sendKeys(Keys.HOME);
+        textArea.sendKeys(Keys.ARROW_RIGHT.toString().repeat(8));
+        BlockNoteLinkModal linkModal = editor.getToolBar().editLink();
+        linkModal.setDisplayText("2nd");
+        linkModal.cancel();
+
+        // The link title must be left untouched.
+        textArea.waitUntilTextIs("First second third fourth");
+
+        // Save and check the source: since nothing was actually changed in the editor, the page content is left
+        // untouched (i.e. it is not even round-tripped through the editor, hence the lack of style annotation that a
+        // real edit would introduce).
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("First [[second>>https://xwiki.org]] third fourth", wikiEditor.getContent());
     }
 
     /**

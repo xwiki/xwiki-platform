@@ -20,7 +20,35 @@
 
 import type { Block, UniAst } from "@xwiki/platform-uniast-api";
 
-export function buildParagraphs(blocks: string[]): UniAst {
+interface PageWithKeyboard {
+  keyboard: { press(key: string): Promise<void> };
+  evaluate<T>(pageFunction: () => T | Promise<T>): Promise<T>;
+}
+
+/**
+ * Presses a key and waits for the resulting DOM change to be painted before returning. Sending keys back-to-back
+ * with `page.keyboard.press` can outrun the rich text editor's selection/state update (e.g. ProseMirror applies a
+ * transaction asynchronously with respect to the native key event), which can make some key presses effectively
+ * lost. Waiting for two animation frames (the first to let the browser schedule the pending update, the second to
+ * confirm it has been painted) ensures each key press is fully applied before the next one is sent.
+ *
+ * @param page - the page to send the key to
+ * @param key - the key (or key combination) to press, using Playwright's key syntax
+ */
+async function pressKeySettled(
+  page: PageWithKeyboard,
+  key: string,
+): Promise<void> {
+  await page.keyboard.press(key);
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      }),
+  );
+}
+
+function buildParagraphs(blocks: string[]): UniAst {
   return {
     blocks: blocks.map(
       (blockText): Block => ({
@@ -37,3 +65,5 @@ export function buildParagraphs(blocks: string[]): UniAst {
     ),
   };
 }
+
+export { buildParagraphs, pressKeySettled };

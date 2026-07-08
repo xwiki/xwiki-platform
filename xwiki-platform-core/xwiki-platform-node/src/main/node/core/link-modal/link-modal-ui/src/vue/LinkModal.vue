@@ -71,15 +71,21 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
     />
 
     <div :class="$style.actions">
+      <!-- NOTE: 'v-bind' is used here as it is more flexible
+                 'data-*' attributes would not be allowed due to not being present in `BtnProps` -->
       <x-btn
-        data-test="linkSubmit"
+        v-bind="{ 'data-test': 'linkSubmit' }"
         variant="success"
         @click="$emit('submit', linkData)"
       >
         {{ t("link-modal.buttons.submit") }}
       </x-btn>
 
-      <x-btn data-test="linkCancel" variant="neutral" @click="$emit('cancel')">
+      <x-btn
+        v-bind="{ 'data-test': 'linkCancel' }"
+        variant="neutral"
+        @click="$emit('cancel')"
+      >
         {{ t("link-modal.buttons.cancel") }}
       </x-btn>
     </div>

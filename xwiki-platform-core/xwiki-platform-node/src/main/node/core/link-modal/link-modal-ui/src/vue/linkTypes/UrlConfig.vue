@@ -36,7 +36,7 @@ const { t } = useI18n({ messages: translations });
   <LinkConfig :link-data>
     <template #config>
       <x-text-field
-        data-test="linkUrl"
+        v-bind="{ 'data-test': 'linkUrl' }"
         :label="t('link-modal.target-types.url.url')"
         type="url"
         v-model="model.url"

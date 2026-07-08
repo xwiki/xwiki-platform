@@ -65,15 +65,17 @@ watch(linkTargetTypeSelect, (label) => {
 </script>
 
 <template>
+  <!-- NOTE: 'v-bind' is used here as it is more flexible
+             'data-*' attributes would not be allowed due to not being present in `BtnProps` -->
   <x-text-field
-    data-test="linkDisplayText"
+    v-bind="{ 'data-test': 'linkDisplayText' }"
     :label="t('link-modal.config.display-text')"
     v-model="linkData.displayText"
     required
   />
 
   <x-select
-    data-test="linkTargetType"
+    v-bind="{ 'data-test': 'linkTargetType' }"
     :label="t('link-modal.config.target-type')"
     v-model="linkTargetTypeSelect"
     :items="targetTypes.map((t) => t.label)"

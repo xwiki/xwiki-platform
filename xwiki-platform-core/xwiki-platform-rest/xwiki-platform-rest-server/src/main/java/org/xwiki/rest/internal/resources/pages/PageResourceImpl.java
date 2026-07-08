@@ -23,9 +23,7 @@ import java.net.URI;
 import java.util.List;
 
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -33,7 +31,6 @@ import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.resources.pages.PageResource;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
@@ -54,9 +51,6 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
 
     @Inject
     private RefactoringConfiguration refactoringConfiguration;
-
-    @Inject
-    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Override
     // Needs a lot of parameters to bind path and query parameters
@@ -112,13 +106,6 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);
-
-            // Deleting a page requires the DELETE right, whether or not the recycle bin is skipped. Check it up-front
-            // so that a proper HTTP 401 is returned instead of a generic server error.
-            if (!this.contextualAuthorizationManager.hasAccess(Right.DELETE,
-                documentInfo.getDocument().getDocumentReference())) {
-                throw new WebApplicationException(Status.UNAUTHORIZED);
-            }
 
             // Skipping the recycle bin permanently deletes the page, so it's only honored when the wiki configuration
             // enables it.

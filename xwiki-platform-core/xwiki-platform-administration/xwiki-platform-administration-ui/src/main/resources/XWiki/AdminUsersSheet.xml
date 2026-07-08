@@ -149,7 +149,9 @@
           &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
             $escapetool.xml($services.localization.render('cancel'))
           &lt;/button&gt;
-          &lt;button type="submit" class="btn btn-primary" form="register" disabled="disabled"&gt;
+          ## The registration form is not present on page load so we can't bind the submit button without triggerig an
+          ## HTML validation error. That's why we set the form attribute from JavaScript instead.
+          &lt;button type="submit" class="btn btn-primary" disabled="disabled"&gt;
             $escapetool.xml($services.localization.render('create'))
           &lt;/button&gt;
         &lt;/div&gt;
@@ -447,7 +449,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
   //
   // User Creation
   //
-  var createUserModal = $('#createUserModal');
+  const createUserModal = $('#createUserModal');
+  // We set the form attribute from JavaScript in order to avoid HTML validation errors because the form is not present
+  // on page load (we load it the first time the modal is shown, see below).
+  const createUserButton = createUserModal.find('.btn-primary').attr('form', 'register');
 
   var validateCreateUserForm = function(form) {
     return form.length &amp;&amp; (!window.LiveValidation ||
@@ -455,7 +460,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
   };
 
   createUserModal.on('show.bs.modal', function() {
-    var createUserButton = createUserModal.find('.btn-primary').prop('disabled', true);
+    createUserButton.prop('disabled', true);
     var createUserURL = XWiki.currentDocument.getURL('view', 'xpage=registerinline');
     var createUserModalBody = createUserModal.find('.modal-body').empty().addClass('loading');
     $.get(createUserURL, function(html) {
@@ -473,7 +478,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
     if (!validateCreateUserForm(createUserForm)) {
       return;
     }
-    var createUserButton = createUserModal.find('.btn-primary').prop('disabled', true);
+    createUserButton.prop('disabled', true);
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('xe.admin.users.create.inProgress')),
       'inprogress'

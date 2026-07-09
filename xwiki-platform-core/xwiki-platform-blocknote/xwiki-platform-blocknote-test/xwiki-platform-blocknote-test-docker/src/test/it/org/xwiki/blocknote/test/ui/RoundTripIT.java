@@ -172,7 +172,11 @@ class RoundTripIT extends AbstractBlockNoteIT
         roundTrip(setup, testReference, """
             * one
             (% data-version="3.2" %)
-            ** two
+            ** two(((
+            = Heading =
+
+            Paragraph
+            )))
             *** three
             * done""");
     }
@@ -183,7 +187,11 @@ class RoundTripIT extends AbstractBlockNoteIT
     {
         roundTrip(setup, testReference, """
             (% data-foo="bar" start="5" %)
-            1. one
+            1. one(((
+            = Heading =
+
+            Paragraph
+            )))
             11. two
             111. three
             1. done""");
@@ -209,7 +217,18 @@ class RoundTripIT extends AbstractBlockNoteIT
             (% data-sortable="true" %)
             |=(% data-foo="bar" %)|=One|=Two
             |=Three|1.3|2.3
-            |=Four|1.4|(% data-type="number" %)2.4""");
+            |=Four|1.4|(% data-type="number" %)2.4""",
+            // The content is modified on save:
+            // * table cell parameters are lost (because the editor doesn't treat table cell as blocks, so there's no
+            // clean way to attach metadata)
+            //
+            // Note also that table cells currently accept only inline content. We'll have to update the test when this
+            // is fixed.
+            """
+                (% data-sortable="true" %)
+                |=|=One|=Two
+                |=Three|1.3|2.3
+                |=Four|1.4|2.4""");
     }
 
     @Test

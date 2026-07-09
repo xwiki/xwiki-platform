@@ -265,8 +265,30 @@ export default {
     onDisplayerFocus() {
       // In edit mode, focusing an editable cell should make it editable.
       if (this.logic.isEditMode()) {
-        // We add a bit of delay to wait for the edit bus to unlock edition.
-        setTimeout(() => this.setEdit(), 200);
+        const editBus = this.logic.getEditBus();
+
+        // If another cell is currently being saved, that save will then
+        // refresh the table and re-render this cell. Opening the editor now
+        // would just lock the edit bus before the editor gets destroyed.
+        if (editBus.hasPendingSave()) {
+          editBus.requestEdit(
+            this.logic.getEntryId(this.entry),
+            this.propertyId,
+          );
+        } else {
+          this.setEdit();
+        }
+      }
+    },
+    // Resume an edit that was requested on this cell.
+    resumeRequestedEdit() {
+      if (
+        this.logic.isEditMode() &&
+        this.logic
+          .getEditBus()
+          .enablePendingEdit(this.logic.getEntryId(this.entry), this.propertyId)
+      ) {
+        this.setEdit();
       }
     },
     // Monitors focus switching outside of the current cell.
@@ -276,8 +298,22 @@ export default {
       if (!this.isView) {
         const editBlock = this.$refs["editBlock"];
 
-        if (evt.relatedTarget && editBlock.contains(evt.relatedTarget)) {
+        // Focus moved to another element of this cell: keep editing.
+        if (evt.relatedTarget && this.$el.contains(evt.relatedTarget)) {
           return;
+        }
+
+        // In some cases, a focusout without a related target can be caused by
+        // a focus bounce. So we wait for the focus to settle and we skip the
+        // event if it actually landed back inside this cell.
+        if (!evt.relatedTarget) {
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          if (
+            editBlock !== this.$refs["editBlock"] ||
+            this.$el.contains(document.activeElement)
+          ) {
+            return;
+          }
         }
 
         await this.applyEdit();
@@ -310,6 +346,9 @@ export default {
     this.logic.getEditBus().onAnyEvent(() => {
       this.duringEditing = !this.logic.getEditBus().isEditable();
     });
+    // This cell might have been re-created by a refresh following a save,
+    // so we try to resume any edit that could have been requested on it.
+    this.resumeRequestedEdit();
   },
   watch: {
     // The disable prop behaves weirdly, so we handle that manually instead.
@@ -319,6 +358,11 @@ export default {
       } else {
         this.$refs.tippy.tippy.enable();
       }
+    },
+    // This cell might have been re-used as-is by a refresh following a save,
+    // so we try to resume any edit that could have been requested on it.
+    entry() {
+      this.resumeRequestedEdit();
     },
   },
 };

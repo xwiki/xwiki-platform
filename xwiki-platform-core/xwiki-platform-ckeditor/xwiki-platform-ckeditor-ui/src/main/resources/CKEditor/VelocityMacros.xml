@@ -189,6 +189,16 @@
     'content': $parameters.content,
     'restricted': $parameters.attributes.data-restricted
   })
+  ## The source document reference is kept with its locale in $source because it's needed server-side to render
+  ## the edited content in the right translation. The value written to the data-sourceDocumentReference HTML
+  ## attribute must however be a properly serialized reference string: the client resolves it to build the file
+  ## upload URL and to store temporary attachments, which are keyed on a locale-free reference. A raw reference
+  ## object would be serialized with its implicit toString() into an invalid "wiki:Space.Page()" value (empty
+  ## locale parameters rendered as "()"), which resolves to the wrong document and breaks image uploads.
+  #if ($parameters.attributes.containsKey('data-sourceDocumentReference'))
+    #set ($discard = $parameters.attributes.put('data-sourceDocumentReference',
+      $services.model.serialize($sourceDocumentReference)))
+  #end
   ##
   ## Disable the file upload and drag &amp; drop when the current user doesn't have edit right on the source document, if
   ## the source is restricted. This is the case for instance when an user with comment right adds a comment to a page

@@ -142,7 +142,7 @@ public final class FileUploadUtils
 
             try {
                 List<FileItem> list = fileupload.parseRequest(reqContext);
-                if (list.size() > 0) {
+                if (!list.isEmpty()) {
                     LOGGER.info("Loaded " + list.size() + " uploaded files");
                 }
 

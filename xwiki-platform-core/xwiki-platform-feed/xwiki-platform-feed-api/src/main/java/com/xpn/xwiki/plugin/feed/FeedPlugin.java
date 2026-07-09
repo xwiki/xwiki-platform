@@ -706,7 +706,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         @SuppressWarnings("unchecked")
         List<SyndContent> contentList = entry.getContents();
-        if (contentList != null && contentList.size() > 0) {
+        if (contentList != null && !contentList.isEmpty()) {
             for (SyndContent content : contentList) {
                 if (contents.length() != 0) {
                     contents.append("\n");

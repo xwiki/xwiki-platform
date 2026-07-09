@@ -639,7 +639,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         // accessible to users, it's just not visible for simple users; it doesn't change permissions.
         List<String> docsToProcess = getDocumentsWithTag(tag, true, context);
 
-        if (docsToProcess.size() == 0) {
+        if (docsToProcess.isEmpty()) {
             return TagOperationResult.NO_EFFECT;
         }
         for (String docName : docsToProcess) {

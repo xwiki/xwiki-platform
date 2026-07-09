@@ -112,7 +112,7 @@ public class AnnotationsPane extends BaseElement
      */
     public boolean checkIfShowAnnotationsCheckboxExists()
     {
-        if (getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).size() > 0) {
+        if (!getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).isEmpty()) {
             return true;
         } else {
             return false;

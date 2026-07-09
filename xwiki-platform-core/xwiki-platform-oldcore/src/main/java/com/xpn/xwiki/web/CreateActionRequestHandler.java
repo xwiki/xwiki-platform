@@ -452,7 +452,7 @@ public class CreateActionRequestHandler
 
                     List<String> creationRestrictions =
                         getTemplateProviderRestrictions(templateObject, TP_CREATION_RESTRICTIONS_PROPERTY);
-                    if (creationRestrictions.size() > 0 && isTemplateProviderAllowedInSpace(templateObject,
+                    if (!creationRestrictions.isEmpty() && isTemplateProviderAllowedInSpace(templateObject,
                         spaceReference, TP_CREATION_RESTRICTIONS_PROPERTY)) {
                         // Consider providers that have creations restrictions matching the current space as
                         // "recommended" and handle them separately.
@@ -517,7 +517,7 @@ public class CreateActionRequestHandler
     {
         // Check the allowed spaces list.
         List<String> restrictions = getTemplateProviderRestrictions(templateObject, restrictionsProperty);
-        if (restrictions.size() > 0) {
+        if (!restrictions.isEmpty()) {
             EntityReferenceSerializer<String> localSerializer = getLocalEntityReferenceSerializer();
             String spaceStringReference = localSerializer.serialize(spaceReference);
 
@@ -567,7 +567,7 @@ public class CreateActionRequestHandler
     private List<String> getTemplateProviderRestrictions(BaseObject templateObject, String restrictionsProperty)
     {
         List<String> creationRestrictions = templateObject.getListValue(restrictionsProperty);
-        if (creationRestrictions.size() == 0) {
+        if (creationRestrictions.isEmpty()) {
             // Backwards compatibility for template providers created before 8.3M2, where the "spaces" property handled
             // both visibility and creation.
             creationRestrictions = templateObject.getListValue(SPACES_PROPERTY);

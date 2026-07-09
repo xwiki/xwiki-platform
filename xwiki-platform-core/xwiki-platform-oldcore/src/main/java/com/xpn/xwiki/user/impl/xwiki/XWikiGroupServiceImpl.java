@@ -658,7 +658,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         List<?> list = context.getWiki().getStore().search(sql, 0, 0, parameterValues, context);
 
-        if (list == null || list.size() == 0) {
+        if (list == null || list.isEmpty()) {
             return 0;
         }
 

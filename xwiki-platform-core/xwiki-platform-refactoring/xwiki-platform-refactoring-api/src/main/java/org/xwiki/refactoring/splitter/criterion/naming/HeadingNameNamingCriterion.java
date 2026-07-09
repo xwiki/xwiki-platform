@@ -132,7 +132,7 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
 
     private Optional<String> getFirstHeadingName(XDOM xdom)
     {
-        if (xdom.getChildren().size() > 0) {
+        if (!xdom.getChildren().isEmpty()) {
             Block firstChild = xdom.getChildren().get(0);
             if (firstChild instanceof HeaderBlock) {
                 // Clone the header block and remove any unwanted stuff.

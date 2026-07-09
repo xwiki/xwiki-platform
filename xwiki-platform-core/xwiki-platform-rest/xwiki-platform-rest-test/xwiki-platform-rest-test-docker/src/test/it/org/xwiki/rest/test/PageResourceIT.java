@@ -122,7 +122,7 @@ class PageResourceIT extends AbstractHttpIT
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Wikis wikis = (Wikis) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(wikis.getWikis().size() > 0);
+        assertTrue(!wikis.getWikis().isEmpty());
         Wiki wiki = wikis.getWikis().get(0);
 
         // Get a link to an index of spaces (http://localhost:8080/xwiki/rest/wikis/xwiki/spaces)
@@ -131,7 +131,7 @@ class PageResourceIT extends AbstractHttpIT
         getMethod = executeGet(spacesLink.getHref());
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
         Spaces spaces = (Spaces) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(spaces.getSpaces().size() > 0);
+        assertTrue(!spaces.getSpaces().isEmpty());
 
         Space space = null;
         for (final Space s : spaces.getSpaces()) {
@@ -148,7 +148,7 @@ class PageResourceIT extends AbstractHttpIT
         getMethod = executeGet(pagesInSpace.getHref());
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
         Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(pages.getPageSummaries().size() > 0);
+        assertTrue(!pages.getPageSummaries().isEmpty());
 
         Link pageLink = null;
         for (final PageSummary ps : pages.getPageSummaries()) {
@@ -445,7 +445,7 @@ class PageResourceIT extends AbstractHttpIT
         // constructor to be safe.
         String expectedLanguage = LocaleUtils.toLocale(languageId).getLanguage();
         assertEquals(expectedLanguage, modifiedPage.getLanguage());
-        assertTrue(modifiedPage.getTranslations().getTranslations().size() > 0);
+        assertTrue(!modifiedPage.getTranslations().getTranslations().isEmpty());
 
         for (Translation translation : modifiedPage.getTranslations().getTranslations()) {
             getMethod = executeGet(getFirstLinkByRelation(translation, Relations.PAGE).getHref());
@@ -573,7 +573,7 @@ class PageResourceIT extends AbstractHttpIT
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(pages.getPageSummaries().size() > 0);
+        assertTrue(!pages.getPageSummaries().isEmpty());
 
         for (PageSummary pageSummary : pages.getPageSummaries()) {
             checkLinks(pageSummary);

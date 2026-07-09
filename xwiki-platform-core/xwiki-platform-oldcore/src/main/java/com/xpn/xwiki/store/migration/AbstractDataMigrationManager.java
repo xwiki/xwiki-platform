@@ -919,7 +919,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             updateMigrationStatus(getLatestVersion());
             if (this.logger.isInfoEnabled()) {
                 this.logger.info("Database [{}] upgraded to latest version [{}] without needing{} data migration",
-                    getXWikiContext().getWikiId(), getDBVersion(), (this.migrations.size() > 0) ? " further" : "");
+                    getXWikiContext().getWikiId(), getDBVersion(), !this.migrations.isEmpty() ? " further" : "");
             }
         }
     }

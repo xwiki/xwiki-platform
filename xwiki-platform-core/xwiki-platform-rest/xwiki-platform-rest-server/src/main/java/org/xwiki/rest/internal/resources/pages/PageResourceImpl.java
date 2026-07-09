@@ -27,7 +27,6 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.resources.pages.PageResource;
@@ -48,9 +47,6 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
 {
     @Inject
     private ContextualLocalizationManager contextualLocalizationManager;
-
-    @Inject
-    private RefactoringConfiguration refactoringConfiguration;
 
     @Override
     // Needs a lot of parameters to bind path and query parameters
@@ -107,12 +103,7 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);
 
-            // Skipping the recycle bin permanently deletes the page, so it's only honored when the wiki configuration
-            // enables it.
-            boolean skipRecycleBinEffective = Boolean.TRUE.equals(skipRecycleBin)
-                && this.refactoringConfiguration.isRecycleBinSkippingActivated();
-
-            deletePage(documentInfo, skipRecycleBinEffective);
+            deletePage(documentInfo, skipRecycleBin);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

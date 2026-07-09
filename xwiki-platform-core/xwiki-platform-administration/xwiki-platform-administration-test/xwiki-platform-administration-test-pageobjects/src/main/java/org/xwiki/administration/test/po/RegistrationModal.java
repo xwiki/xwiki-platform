@@ -70,6 +70,6 @@ public class RegistrationModal extends AbstractRegistrationPage
         By serverSideErrorMessage =
             By.xpath(String.format("//div[contains(@class,'xnotification-error') and contains(., '%s')]", message));
         return super.validationFailureMessagesInclude(message)
-            || getDriver().findElementsWithoutWaiting(serverSideErrorMessage).size() > 0;
+            || !getDriver().findElementsWithoutWaiting(serverSideErrorMessage).isEmpty();
     }
 }

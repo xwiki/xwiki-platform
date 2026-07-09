@@ -89,7 +89,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
         try {
             annotations = ioService.getAnnotations(target);
 
-            if (annotations.size() == 0) {
+            if (annotations.isEmpty()) {
                 // no annotations, nothing to do
                 return;
             }
@@ -107,7 +107,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
                 getDiffService().getDifferences(renderedPreviousContent, renderedCurrentContent);
             // if any differences: note that there can be updates on the content that have no influence on the plain
             // text space normalized version
-            if (differences.size() > 0) {
+            if (!differences.isEmpty()) {
                 // compute the spaceless version of the renderedPreviousContent to be able to map the annotation on it
                 // (so that matching is done in the same way as for rendering), and then go back to the normalized
                 // version
@@ -329,7 +329,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
     {
         // find out if there is another encounter of the selection text & context than the one at cStart
         List<Integer> occurrences = getOccurrences(content, annotation.getSelectionInContext(), cStart);
-        if (occurrences.size() == 0) {
+        if (occurrences.isEmpty()) {
             // it appears only once, it's done
             return;
         }

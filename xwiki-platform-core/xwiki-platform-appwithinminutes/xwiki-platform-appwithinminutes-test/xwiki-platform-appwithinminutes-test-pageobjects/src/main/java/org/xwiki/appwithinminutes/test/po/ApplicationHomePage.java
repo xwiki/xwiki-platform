@@ -107,7 +107,7 @@ public class ApplicationHomePage extends ViewPage
      */
     public boolean hasEntriesLiveTable()
     {
-        return getDriver().findElements(By.className("xwiki-livetable")).size() > 0;
+        return !getDriver().findElements(By.className("xwiki-livetable")).isEmpty();
     }
 
     public ConfirmationPage clickDeleteAllEntries()

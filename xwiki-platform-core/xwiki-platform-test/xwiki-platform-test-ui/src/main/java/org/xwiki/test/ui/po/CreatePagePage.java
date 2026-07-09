@@ -279,7 +279,7 @@ public class CreatePagePage extends BaseElement
     public boolean isTerminalOptionDisplayed()
     {
         List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.id("terminal"));
-        return elements.size() > 0 && elements.get(0).isDisplayed();
+        return !elements.isEmpty() && elements.get(0).isDisplayed();
     }
 
     /**

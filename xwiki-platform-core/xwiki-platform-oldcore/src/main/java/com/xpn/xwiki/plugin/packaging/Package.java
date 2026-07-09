@@ -369,7 +369,7 @@ public class Package
             docinfo.setAction(defaultAction);
             this.files.add(docinfo);
             BaseClass bclass = doc.getXClass();
-            if (bclass.getFieldList().size() > 0) {
+            if (!bclass.getFieldList().isEmpty()) {
                 this.classFiles.add(docinfo);
             }
             if (bclass.getCustomMapping() != null) {
@@ -441,7 +441,7 @@ public class Package
 
     public String export(OutputStream os, XWikiContext context) throws IOException, XWikiException
     {
-        if (this.files.size() == 0) {
+        if (this.files.isEmpty()) {
             return "No Selected file";
         }
 
@@ -650,7 +650,7 @@ public class Package
 
         int result = DocumentInfo.INSTALL_IMPOSSIBLE;
         try {
-            if (this.files.size() == 0) {
+            if (this.files.isEmpty()) {
                 return result;
             }
 
@@ -958,7 +958,7 @@ public class Package
     private boolean documentContainsHistory(DocumentInfo doc)
     {
         if ((doc.getDoc().getDocumentArchive() == null) || (doc.getDoc().getDocumentArchive().getNodes() == null)
-            || (doc.getDoc().getDocumentArchive().getNodes().size() == 0)) {
+            || doc.getDoc().getDocumentArchive().getNodes().isEmpty()) {
             return false;
         }
         return true;

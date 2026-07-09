@@ -188,7 +188,7 @@ public class DBListClass extends ListClass
     {
         List<ListItem> list = getDBList(context);
         Map<String, ListItem> result = new LinkedHashMap<>();
-        if ((list == null) || (list.size() == 0)) {
+        if ((list == null) || (list.isEmpty())) {
             return result;
         }
 
@@ -332,7 +332,7 @@ public class DBListClass extends ListClass
                 // Let's create the complete query
                 select.append(" from ");
                 select.append(StringUtils.join(fromStatements.iterator(), ", "));
-                if (whereStatements.size() > 0) {
+                if (!whereStatements.isEmpty()) {
                     select.append(" where ");
                     select.append(StringUtils.join(whereStatements.iterator(), " and "));
                 }

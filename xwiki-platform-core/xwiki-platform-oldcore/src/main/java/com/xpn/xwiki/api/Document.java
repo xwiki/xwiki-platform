@@ -1324,7 +1324,7 @@ public class Document extends Api
         }
         try {
             Vector<BaseObject> allObjects = this.getDoc().getObjects(classname);
-            if (allObjects == null || allObjects.size() == 0) {
+            if (allObjects == null || allObjects.isEmpty()) {
                 return result;
             } else {
                 for (BaseObject obj : allObjects) {
@@ -2188,7 +2188,7 @@ public class Document extends Api
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         List<DocumentStats> stats = statisticsService.getDocumentStatistics(action, scope, period, range, this.context);
-        if (stats.size() > 0) {
+        if (!stats.isEmpty()) {
             return stats.get(0);
         }
         return new DocumentStats();
@@ -2207,7 +2207,7 @@ public class Document extends Api
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         List<DocumentStats> stats = statisticsService.getDocumentStatistics(action, scope, period, range, this.context);
-        if (stats.size() > 0) {
+        if (!stats.isEmpty()) {
             return stats.get(0);
         }
         return new DocumentStats();

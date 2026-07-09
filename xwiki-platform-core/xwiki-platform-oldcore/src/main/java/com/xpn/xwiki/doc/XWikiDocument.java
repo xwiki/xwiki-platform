@@ -4119,7 +4119,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         BaseClass bclass = firstobject.getXClass(context);
-        if (bclass.getPropertyList().size() == 0) {
+        if (bclass.getPropertyList().isEmpty()) {
             return "";
         }
 
@@ -4206,7 +4206,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         BaseClass bclass = firstobject.getXClass(context);
-        if (bclass.getPropertyList().size() == 0) {
+        if (bclass.getPropertyList().isEmpty()) {
             return "";
         }
 

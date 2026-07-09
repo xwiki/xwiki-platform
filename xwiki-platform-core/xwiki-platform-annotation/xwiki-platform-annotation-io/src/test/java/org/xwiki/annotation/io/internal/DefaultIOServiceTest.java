@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.annotation.reference.internal.DefaultTypedStringEntityReferenceResolver;
@@ -46,14 +47,18 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests that {@link DefaultIOService} persists the temporary uploaded files (e.g. images inserted in an annotation
- * comment) on the very document instance that is saved with the annotation. See XWIKI-24546.
+ * Tests that {@link DefaultIOService} attaches the temporary uploaded files (e.g. images inserted in an annotation
+ * comment) to the exact document instance that is saved with the annotation, and does so before that document is
+ * saved (otherwise the attachment would not be persisted). This is a wiring test: the
+ * {@link TemporaryAttachmentSessionsManager} collaborator is mocked, so it verifies the delegation and its ordering
+ * but not the end-to-end attachment persistence, which is exercised by the functional tests.
  *
  * @version $Id$
  */
@@ -118,10 +123,12 @@ class DefaultIOServiceTest
 
         this.ioService.addAnnotation(TARGET, annotation);
 
-        // The attachments are added to the exact instance that is saved.
-        verify(this.temporaryAttachmentSessionsManager)
+        // The attachments must be added to the exact instance that is saved, and before it is saved (otherwise they
+        // would not be persisted).
+        InOrder inOrder = inOrder(this.temporaryAttachmentSessionsManager, this.xwiki);
+        inOrder.verify(this.temporaryAttachmentSessionsManager)
             .attachTemporaryAttachmentsInDocument(this.clonedDocument, Arrays.asList("image1.png", "image2.png"));
-        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(true), eq(this.xcontext));
+        inOrder.verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(this.xcontext));
         // The uploaded files list must not be written as a (bogus) annotation object property.
         verify(this.annotationObject, never()).set(eq("uploadedFiles"), any(), any());
     }
@@ -136,7 +143,7 @@ class DefaultIOServiceTest
 
         verify(this.temporaryAttachmentSessionsManager, never())
             .attachTemporaryAttachmentsInDocument(any(), any());
-        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(true), eq(this.xcontext));
+        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(this.xcontext));
     }
 
     @Test
@@ -149,8 +156,9 @@ class DefaultIOServiceTest
 
         this.ioService.updateAnnotations(TARGET, List.of(annotation));
 
-        verify(this.temporaryAttachmentSessionsManager)
+        InOrder inOrder = inOrder(this.temporaryAttachmentSessionsManager, this.xwiki);
+        inOrder.verify(this.temporaryAttachmentSessionsManager)
             .attachTemporaryAttachmentsInDocument(this.clonedDocument, Arrays.asList("image.png"));
-        verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(true), eq(this.xcontext));
+        inOrder.verify(this.xwiki).saveDocument(eq(this.clonedDocument), anyString(), eq(this.xcontext));
     }
 }

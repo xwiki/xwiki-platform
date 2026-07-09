@@ -227,6 +227,10 @@ export default {
   font-weight: var(--font-weight-semibold);
 }
 
+.layout-cards .attachmentMimeType {
+  text-align: inherit;
+}
+
 .layout-cards .value {
   flex-grow: 1;
   align-self: stretch;

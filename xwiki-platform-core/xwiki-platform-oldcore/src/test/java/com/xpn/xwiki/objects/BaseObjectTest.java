@@ -190,7 +190,7 @@ class BaseObjectTest
             .merge(previousObject, nextObject, mergeConfiguration, this.oldcore.getXWikiContext(), mergeResult);
 
         List<LogEvent> errors = mergeResult.getLog().getLogsFrom(LogLevel.ERROR);
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             fail("Found error or warning during the merge (" + errors.get(0) + ")");
         }
 

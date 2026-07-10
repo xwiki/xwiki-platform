@@ -992,7 +992,7 @@ public class HibernateStore implements Disposable, Initializable
     {
         return this.<List<String>, String>executeNative(String
             .format("select SEQUENCE_NAME from all_sequences where SEQUENCE_OWNER = '%s'", schemaName.toUpperCase()),
-            query -> query.getResultList());
+            NativeQuery::getResultList);
     }
 
     /**

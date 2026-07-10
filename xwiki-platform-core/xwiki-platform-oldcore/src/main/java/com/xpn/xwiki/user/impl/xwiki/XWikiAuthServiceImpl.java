@@ -431,7 +431,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             Object[][] whereParameters = new Object[][] { { "doc.space", XWiki.SYSTEM_SPACE }, { "doc.name", username } };
 
             List<String> list = context.getWiki().search(sql, whereParameters, context);
-            if (list.size() == 0) {
+            if (list.isEmpty()) {
                 user = null;
             } else {
                 user = list.get(0);

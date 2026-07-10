@@ -39,6 +39,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -61,10 +62,10 @@ import com.xpn.xwiki.web.Utils;
 public class XWikiRightServiceImpl implements XWikiRightService
 {
     public static final EntityReference RIGHTCLASS_REFERENCE = new EntityReference("XWikiRights", EntityType.DOCUMENT,
-        new EntityReference("XWiki", EntityType.SPACE));
+        new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     public static final EntityReference GLOBALRIGHTCLASS_REFERENCE = new EntityReference("XWikiGlobalRights",
-        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+        EntityType.DOCUMENT, new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     private static final String ADMIN = "admin";
     private static final String COMMENT = "comment";
@@ -83,12 +84,12 @@ public class XWikiRightServiceImpl implements XWikiRightService
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRightServiceImpl.class);
 
     private static final EntityReference XWIKIPREFERENCES_REFERENCE = new EntityReference("XWikiPreferences",
-        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+        EntityType.DOCUMENT, new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     private static final List<String> ALLLEVELS = Arrays.asList(ADMIN, "view", "edit", COMMENT, DELETE,
         UNDELETE, REGISTER, PROGRAMMING);
 
-    private static final EntityReference DEFAULTUSERSPACE = new EntityReference("XWiki", EntityType.SPACE);
+    private static final EntityReference DEFAULTUSERSPACE = new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE);
 
     private static Map<String, String> actionMap;
 
@@ -571,7 +572,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
 
         allow = isSuperAdminOrProgramming(userOrGroupName, entityReference, accessLevel, user, context);
-        if ((allow == true) || (PROGRAMMING.equals(accessLevel))) {
+        if (allow || (PROGRAMMING.equals(accessLevel))) {
             return allow;
         }
 
@@ -581,8 +582,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
             DocumentReference docReference = currentdoc.getDocumentReference();
 
             if ("edit".equals(accessLevel)
-                && (WEB_PREFERENCES.equals(docReference.getName()) || ("XWiki".equals(docReference.getLastSpaceReference().getName())
-                    && "XWikiPreferences".equals(docReference.getName())))) {
+                && (WEB_PREFERENCES.equals(docReference.getName())
+                    || (XWiki.SYSTEM_SPACE.equals(docReference.getLastSpaceReference().getName())
+                        && "XWikiPreferences".equals(docReference.getName())))) {
                 // Since edit rights on these documents would be sufficient for a user to elevate himself to
                 // admin or even programmer, we will instead check for admin access on these documents.
                 // See https://jira.xwiki.org/browse/XWIKI-6987 and https://jira.xwiki.org/browse/XWIKI-2184.

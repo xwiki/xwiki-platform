@@ -130,7 +130,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
                 }
             }
         } else {
-            result = (tableBlocks.size() > 0) ? tableBlocks.get(0) : null;
+            result = !tableBlocks.isEmpty() ? tableBlocks.get(0) : null;
         }
 
         if (null == result) {

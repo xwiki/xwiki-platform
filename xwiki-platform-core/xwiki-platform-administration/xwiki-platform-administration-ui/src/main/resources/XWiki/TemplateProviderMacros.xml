@@ -71,7 +71,10 @@
     #if ($isEditing)
       ## This is used as a template on the client side when a new path is added.
       &lt;li class="path hidden"&gt;
-        &lt;a href="#path-delete" class="path-delete"&gt;$services.icon.renderHTML('delete')&lt;/a&gt;
+        #set ($label = $escapetool.xml($services.localization.render("administration.templateProvider.${property}.remove")))
+        &lt;button type="button" class="btn btn-xs btn-link path-delete" title="$label"
+          &gt;&lt;span class="sr-only"&gt;$label&lt;/span
+          &gt;$services.icon.renderHTML('delete')&lt;/button&gt;
         &lt;input type="hidden" name="XWiki.TemplateProviderClass_0_$property" disabled="disabled" /&gt;
         &lt;ol class="breadcrumb"&gt;
           &lt;li class="loading"&gt;&lt;/li&gt;
@@ -79,7 +82,10 @@
       &lt;/li&gt;
       &lt;li class="path-add"&gt;
         &lt;input type="hidden" name="XWiki.TemplateProviderClass_0_$property" value="" /&gt;
-        &lt;a href="#path-add"&gt;$services.icon.renderHTML('add')&lt;/a&gt;
+        #set ($label = $escapetool.xml($services.localization.render("administration.templateProvider.${property}.add")))
+        &lt;button type="button" class="btn btn-xs btn-link path-add" title="$label"
+          &gt;&lt;span class="sr-only"&gt;$label&lt;/span
+          &gt;$services.icon.renderHTML('add')&lt;/button&gt;
       &lt;/li&gt;
     #end
   &lt;/ul&gt;
@@ -404,8 +410,7 @@
 }
 
 .templateProviderSheet .paths .path-delete {
-  cursor: pointer;
-  margin-top: 8px;
+  margin-top: 6px;
   position: absolute;
   right: 30px;
 }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.captcha;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Exception in the CAPTCHA module's operations.
  *
@@ -38,5 +40,18 @@ public class CaptchaException extends Exception
     public CaptchaException(String message, Throwable cause)
     {
         super(message, cause);
+    }
+
+    /**
+     * Default constructor when it's the root cause.
+     * @param message detail message.
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    @Unstable
+    public CaptchaException(String message)
+    {
+        super(message);
     }
 }

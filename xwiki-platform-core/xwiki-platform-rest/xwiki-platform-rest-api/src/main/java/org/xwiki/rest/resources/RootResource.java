@@ -30,7 +30,12 @@ import org.xwiki.rest.model.jaxb.Xwiki;
 @Path("/")
 public interface RootResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Returns the entry point of the REST API, exposing the XWiki version and links to the available top-level
+     * resources.
+     *
+     * @return the root descriptor of the XWiki instance, carrying the running XWiki version string (for example
+     *  {@code 15.10.1}) and the links to the top-level resources (such as the list of wikis)
+     */
     @GET Xwiki getRoot();
 }

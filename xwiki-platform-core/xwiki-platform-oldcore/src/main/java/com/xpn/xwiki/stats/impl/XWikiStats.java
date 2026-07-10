@@ -214,7 +214,7 @@ public class XWikiStats extends BaseCollection
 
         // Add Class
         if (bclass != null) {
-            if (bclass.getFieldList().size() > 0) {
+            if (!bclass.getFieldList().isEmpty()) {
                 oel.add(bclass.toXML());
             }
         }

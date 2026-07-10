@@ -112,7 +112,7 @@ public class XWikiNotificationManager
             Vector<XWikiNotificationRule> vnamedrules = namedrules.get(name);
             if (vnamedrules != null) {
                 vnamedrules.remove(rule);
-                if (vnamedrules.size() == 0)
+                if (vnamedrules.isEmpty())
                     namedrules.remove(name);
             }
         }

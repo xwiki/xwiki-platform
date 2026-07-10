@@ -68,7 +68,7 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <!-- Used to verify that annotations don't break in-place editing. -->
+    <!-- Used to verify that annotations don't break in-place editing and to test image upload while annotating. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-annotation-ui</artifactId>
@@ -127,6 +127,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-ckeditor-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

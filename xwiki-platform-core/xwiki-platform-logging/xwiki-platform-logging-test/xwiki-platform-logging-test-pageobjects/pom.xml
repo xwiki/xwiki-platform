@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-logging-test</artifactId>
-    <version>17.10.10-SNAPSHOT</version>
+    <version>17.10.10</version>
   </parent>
   <artifactId>xwiki-platform-logging-test-pageobjects</artifactId>
   <name>XWiki Platform - Logging - Tests - Page Objects</name>

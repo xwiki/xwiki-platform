@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.annotation.test.po.AnnotatableViewPage;
 import org.xwiki.annotation.test.po.AnnotationsWindow;
 import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,7 +36,6 @@ import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.EditablePropertyPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
-import org.xwiki.wysiwyg.test.po.image.ImageDialogSelectModal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

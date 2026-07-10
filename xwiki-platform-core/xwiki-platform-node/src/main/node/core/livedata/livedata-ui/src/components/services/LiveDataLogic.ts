@@ -1549,7 +1549,7 @@ export class LiveDataLogic implements Logic {
   }
 
   hasEditMode(): boolean {
-    return this.data.query.source.hasEditMode == "true";
+    return this.data.query.source.hasEditMode === "true";
   }
 
   async saveNewEntry() {

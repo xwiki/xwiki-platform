@@ -572,7 +572,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
 
         allow = isSuperAdminOrProgramming(userOrGroupName, entityReference, accessLevel, user, context);
-        if ((allow == true) || (PROGRAMMING.equals(accessLevel))) {
+        if (allow || (PROGRAMMING.equals(accessLevel))) {
             return allow;
         }
 

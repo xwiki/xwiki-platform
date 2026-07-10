@@ -112,6 +112,7 @@ export default {
 
   mounted() {
     // Autofocus the first editable cell of a new row.
+    // This makes new row creation smoother by making it directly editable.
     if (this.entry?._new) {
       const tryFocus = (attempt = 0) => {
         const cell = this.$el.querySelector(".editable")?.closest("[tabindex]");

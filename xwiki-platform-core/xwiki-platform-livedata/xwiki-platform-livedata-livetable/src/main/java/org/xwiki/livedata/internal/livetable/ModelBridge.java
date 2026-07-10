@@ -42,11 +42,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 import com.xpn.xwiki.XWikiContext;
@@ -89,10 +87,6 @@ public class ModelBridge
 
     @Inject
     private UserReferenceResolver<CurrentUserReference> userReferenceResolver;
-
-    @Inject
-    @Named("document")
-    private UserReferenceSerializer<DocumentReference> documentUserReferenceSerializer;
 
     /**
      * Update a property of an xobject located in the specified document. If the property starts with {@code doc.} the
@@ -292,7 +286,7 @@ public class ModelBridge
             UserReference userReference = this.userReferenceResolver.resolve(CurrentUserReference.INSTANCE);
             document.setAuthor(userReference);
             String comment = "LiveData update.";
-            DocumentReference documentUserReference = this.documentUserReferenceSerializer.serialize(userReference);
+            DocumentReference documentUserReference = xcontext.getUserReference();
             xcontext.getWiki().checkSavingDocument(documentUserReference, document, comment, true, xcontext);
             xcontext.getWiki().saveDocument(document, comment, true, xcontext);
         }
@@ -383,7 +377,6 @@ public class ModelBridge
      * @throws XWikiException if there was a problem during lookup
      * @since 18.6.0RC1
      */
-    @Unstable
     public boolean exists(DocumentReference documentReference) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();

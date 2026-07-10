@@ -107,7 +107,10 @@ public class ApplicationHomePage extends ViewPage
      */
     public boolean hasEntriesLiveTable()
     {
-        return !getDriver().findElements(By.className("xwiki-livetable")).isEmpty();
+        // The livetable container element is rendered server-side (only its rows are loaded asynchronously), so once
+        // this view page is ready the element's presence is stable and won't appear later. We can thus check for it
+        // without waiting, which avoids blocking for the full timeout when it's legitimately absent.
+        return getDriver().hasElementWithoutWaiting(By.className("xwiki-livetable"));
     }
 
     public ConfirmationPage clickDeleteAllEntries()

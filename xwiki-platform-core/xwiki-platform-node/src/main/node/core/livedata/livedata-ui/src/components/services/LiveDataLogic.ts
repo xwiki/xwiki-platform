@@ -1552,6 +1552,7 @@ export class LiveDataLogic implements Logic {
     return this.data.query.source.hasEditMode === "true";
   }
 
+  // eslint-disable-next-line max-statements
   async saveNewEntry() {
     const newEntryIndex = this.data.data.entries.findIndex((e) => e._new);
     if (newEntryIndex >= 0) {
@@ -1575,7 +1576,9 @@ export class LiveDataLogic implements Logic {
           const message = await this.translate("livedata.error.addEntryFailed");
           // @ts-expect-error XWiki.widgets is expected to be globally accessible
           new XWiki.widgets.Notification(message, "error");
-      } catch { /* ignore translation failure */ }
+        } catch {
+          /* ignore translation failure */
+        }
         throw e;
       }
     }

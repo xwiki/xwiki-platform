@@ -106,6 +106,14 @@ const suggestions = shallowRef<
 const loading = ref(false);
 
 const performSearch = debounce(async (search: string) => {
+  // Skip the search when the query is empty (e.g., right after focusing an empty field): searching for
+  // everything is wasteful (it fetches unrelated content from the whole wiki) and useless (the caller always
+  // filters the result down by target type, so this never surfaces anything relevant anyway).
+  if (search.trim().length === 0) {
+    closeSuggestions();
+    return;
+  }
+
   loading.value = true;
 
   const results = await getSuggestions(search);
@@ -220,7 +228,7 @@ watch(suggestions, (suggestions) => {
 </script>
 
 <template>
-  <div>
+  <div class="search-box">
     <x-text-field
       :label
       :placeholder
@@ -296,6 +304,10 @@ watch(suggestions, (suggestions) => {
 </template>
 
 <style>
+.search-box {
+  position: relative;
+}
+
 .status-message {
   font-weight: normal;
   font-style: italic;

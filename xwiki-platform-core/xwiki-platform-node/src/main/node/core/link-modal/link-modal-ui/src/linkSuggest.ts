@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { EntityType } from "@xwiki/platform-model-api";
 import type { AttachmentsService } from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
@@ -25,7 +26,6 @@ import type {
   Link,
   LinkSuggestService,
   LinkSuggestServiceProvider,
-  LinkType,
 } from "@xwiki/platform-link-suggest-api";
 import type {
   AttachmentReference,
@@ -67,7 +67,10 @@ type LinkSuggestion = {
  * @since 18.5.0RC1
  * @beta
  */
-type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
+type LinkSuggestor = (params: {
+  query: string;
+  type?: LinkType;
+}) => Promise<LinkSuggestion[]>;
 
 /**
  * (Internal) Link edition context
@@ -154,14 +157,14 @@ function createLinkSuggestor({
 
   // Return an array of suggestions from a query
 
-  return async ({ query }) => {
+  return async ({ query, type }) => {
     // TODO: add upload attachment action
     // TODO: add create new page action
     // TODO: add links suggestions
     let links: Link[];
 
     try {
-      links = await linkSuggestService.getLinks(query);
+      links = await linkSuggestService.getLinks(query, type);
     } catch (e) {
       console.group("Failed to fetch remote links");
       console.error(e);
@@ -178,6 +181,10 @@ function createLinkSuggestor({
         // need to think me precisely of the architecture we want for this.
         const entityReference = modelReferenceParser?.parse(link.reference, {
           relative: false,
+          type:
+            link.type === LinkType.ATTACHMENT
+              ? EntityType.ATTACHMENT
+              : undefined,
         });
 
         const documentReference =
@@ -193,7 +200,7 @@ function createLinkSuggestor({
         }
 
         return {
-          title: documentReference.name,
+          title: link.label,
           segments,
           reference: link.reference,
           url: link.url,

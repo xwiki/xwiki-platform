@@ -21,6 +21,7 @@ package org.xwiki.blocknote.test.ui;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.ui.TestUtils;
 
@@ -67,5 +68,18 @@ abstract class AbstractBlockNoteIT
     protected void loginAsAlice(TestUtils setup)
     {
         setup.createUserAndLogin("Alice", "pass", "editor", "Wysiwyg");
+    }
+
+    /**
+     * Waits for the Solr indexing queue to be empty, since the link quick action and the link modal's page and
+     * attachment suggestions are based on Solr indexation.
+     *
+     * @param setup the test utils used to communicate with the running XWiki instance
+     * @throws Exception if the Solr status can't be retrieved
+     * @since 18.6.0RC1
+     */
+    protected void waitForSolrIndexing(TestUtils setup) throws Exception
+    {
+        new SolrTestUtils(setup).waitEmptyQueue();
     }
 }

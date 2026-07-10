@@ -19,6 +19,9 @@
  */
 package org.xwiki.blocknote.test.ui;
 
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
@@ -26,6 +29,9 @@ import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteLinkModal;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -42,7 +48,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @UITest(
     properties = {
         // The Image Wizard needs this to be able to upload images.
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+
+        // The page and attachment link suggestions execute a Solr query from XWiki.SuggestSolrService /
+        // XWiki.SuggestSolrMacros, which requires programming right. These pages are authored by a user that has
+        // programming right in a normal wiki, but the test wiki blocks programming right by default, so we need to
+        // explicitly exclude them.
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.SuggestSolr(Service|Macros)"
     },
     extraJARs = {
         // The WebSocket end-point implementation based on XWiki components needs to be installed as core extension.
@@ -60,6 +72,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 )
 class LinkIT extends AbstractBlockNoteIT
 {
+    @BeforeAll
+    void beforeAllLinkIT(TestUtils setup) throws Exception
+    {
+        // Wait for the Solr indexing to complete since the page and attachment link suggestions are based on it.
+        waitForSolrIndexing(setup);
+    }
+
     @Test
     @Order(1)
     void createLinkOnWordInTheMiddleOfALine(TestUtils setup, TestReference testReference)
@@ -188,6 +207,200 @@ class LinkIT extends AbstractBlockNoteIT
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("First [[second>>https://xwiki.org]] third fourth", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(5)
+    void createPageLink(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Create the page to link to and wait for it to be indexed, since the page link suggestions are based on
+        // Solr indexation.
+        DocumentReference targetPage = new DocumentReference("PageLinkTarget", testReference.getLastSpaceReference());
+        setup.deletePage(targetPage);
+        setup.createPage(targetPage, "", "Page Link Target");
+        waitForSolrIndexing(setup);
+
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "First second third fourth");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Select the word "second" using the keyboard.
+        textArea.click();
+        selectWord(textArea, 6, 6);
+
+        // Create a link targeting a page from the selection. Search by title since suggestions are matched (and
+        // rendered) using the page title, not its reference.
+        editor.getToolBar().createLink().setPageTargetAndSubmit("Page Link Target", "Page Link Target");
+
+        // The link must be inserted on the selected word without touching the rest of the line.
+        textArea.waitUntilTextIs("First second third fourth");
+
+        // Save and check the source.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            (%% style="color:default;background-color:default;text-align:left" %%)
+            First [[second>>doc:%s]] third fourth"""
+            .formatted(serialize(targetPage)), wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(6)
+    void createAttachmentLink(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Create the page holding the attachment to link to and wait for it to be indexed, since the attachment
+        // link suggestions are based on Solr indexation.
+        DocumentReference targetPage =
+            new DocumentReference("AttachmentLinkTarget", testReference.getLastSpaceReference());
+        setup.deletePage(targetPage);
+        setup.createPage(targetPage, "", "Attachment Link Target");
+        String attachmentName = "image.gif";
+        setup.attachFile(targetPage, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
+        waitForSolrIndexing(setup);
+
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "First second third fourth");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Select the word "second" using the keyboard.
+        textArea.click();
+        selectWord(textArea, 6, 6);
+
+        // Create a link targeting an attachment from the selection. Search by filename (as a real user would), but
+        // disambiguate the suggestion to select using the target page name, since other tests running in the same
+        // wiki may also attach a file with the same name.
+        editor.getToolBar().createLink().setAttachmentTargetAndSubmit(attachmentName, targetPage.getName());
+
+        // The link must be inserted on the selected word without touching the rest of the line.
+        textArea.waitUntilTextIs("First second third fourth");
+
+        // Save and check the source.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            (%% style="color:default;background-color:default;text-align:left" %%)
+            First [[second>>attach:%s@%s]] third fourth"""
+            .formatted(serialize(targetPage), attachmentName), wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(7)
+    void createEmailLink(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "First second third fourth");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Select the word "second" using the keyboard.
+        textArea.click();
+        selectWord(textArea, 6, 6);
+
+        // Create a link targeting an e-mail address from the selection.
+        editor.getToolBar().createLink().setEmailTargetAndSubmit("second@xwiki.org");
+
+        // The link must be inserted on the selected word without touching the rest of the line.
+        textArea.waitUntilTextIs("First second third fourth");
+
+        // Save and check the source.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            (% style="color:default;background-color:default;text-align:left" %)
+            First [[second>>mailto:second@xwiki.org]] third fourth""", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(8)
+    void cancelPageLinkCreation(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "First second third fourth");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Select the word "second" using the keyboard.
+        textArea.click();
+        selectWord(textArea, 6, 6);
+
+        // Open the link modal, switch to the Page target type, but cancel it instead of submitting.
+        BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
+        linkModal.selectTargetType("Page");
+        linkModal.cancel();
+
+        // The content must be left untouched.
+        textArea.waitUntilTextIs("First second third fourth");
+
+        // Save and check the source: since nothing was actually changed in the editor, the page content is left
+        // untouched (i.e. it is not even round-tripped through the editor, hence the lack of style annotation that a
+        // real edit would introduce).
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("First second third fourth", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(9)
+    void switchTargetTypeWhenEditingLink(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "First [[second>>https://xwiki.org]] third fourth");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
+        // and switch the target type from URL to E-mail.
+        textArea.click();
+        textArea.sendKeys(Keys.HOME);
+        textArea.sendKeys(Keys.ARROW_RIGHT.toString().repeat(8));
+        editor.getToolBar().editLink().setEmailTargetAndSubmit("second@xwiki.org");
+
+        // The link text must be left untouched.
+        textArea.waitUntilTextIs("First second third fourth");
+
+        // Save and check the source.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            (% style="color:default;background-color:default;text-align:left" %)
+            First [[second>>mailto:second@xwiki.org]] third fourth""", wikiEditor.getContent());
+    }
+
+    /**
+     * Serializes the given reference the way {@code XWiki.Model.serialize()} would (i.e., including the wiki name).
+     *
+     * @param reference the reference to serialize
+     * @return the serialized reference
+     */
+    private String serialize(DocumentReference reference)
+    {
+        String spacePath = reference.getLastSpaceReference().getReversedReferenceChain().stream()
+            .filter(ref -> ref.getType() == EntityType.SPACE)
+            .map(EntityReference::getName)
+            .collect(Collectors.joining("."));
+        return reference.getWikiReference().getName() + ':' + spacePath + '.' + reference.getName();
     }
 
     /**

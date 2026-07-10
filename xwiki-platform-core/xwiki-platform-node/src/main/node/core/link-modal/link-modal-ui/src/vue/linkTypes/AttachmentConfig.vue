@@ -50,26 +50,31 @@ const getSuggestions: SearchLinkSuggestor<
     return false;
   }
 
-  return filterMap(await linkSuggestor({ query }), (result) => {
-    if (result.type !== LinkType.ATTACHMENT) {
-      return null;
-    }
+  return filterMap(
+    await linkSuggestor({ query, type: LinkType.ATTACHMENT }),
+    (result) => {
+      if (result.type !== LinkType.ATTACHMENT) {
+        return null;
+      }
 
-    const ref = tryFallible(() =>
-      linkEditionCtx.modelReferenceParser.parse(result.reference),
-    );
+      const ref = tryFallible(() =>
+        linkEditionCtx.modelReferenceParser.parse(result.reference, {
+          type: EntityType.ATTACHMENT,
+        }),
+      );
 
-    if (ref?.type !== EntityType.ATTACHMENT) {
-      return null;
-    }
+      if (ref?.type !== EntityType.ATTACHMENT) {
+        return null;
+      }
 
-    return {
-      key: result.url,
-      value: ref,
-      renderingData: result,
-      equivalentQuery: result.reference,
-    };
-  });
+      return {
+        key: result.url,
+        value: ref,
+        renderingData: result,
+        equivalentQuery: result.reference,
+      };
+    },
+  );
 };
 
 function submit(ref: AttachmentReference) {
@@ -78,7 +83,9 @@ function submit(ref: AttachmentReference) {
 
 function trySelectRaw(query: string): boolean {
   const ref = tryFallible(() =>
-    linkEditionCtx.modelReferenceParser.parse(query),
+    linkEditionCtx.modelReferenceParser.parse(query, {
+      type: EntityType.ATTACHMENT,
+    }),
   );
 
   if (ref?.type !== EntityType.ATTACHMENT) {
@@ -101,7 +108,7 @@ watch(query, async (query) => {
   }
 
   loadingSuggestions.value = true;
-  suggestions.value = await linkSuggestor({ query });
+  suggestions.value = await linkSuggestor({ query, type: LinkType.ATTACHMENT });
   loadingSuggestions.value = false;
 });
 </script>
@@ -110,6 +117,7 @@ watch(query, async (query) => {
   <link-config :link-data>
     <template #config>
       <search-box
+        v-bind="{ 'data-test': 'linkAttachmentReference' }"
         :label="t('link-modal.target-types.attachment.reference')"
         :initial-value="
           model.ref !== null
@@ -143,6 +151,7 @@ watch(query, async (query) => {
 
     <template #options>
       <x-text-field
+        v-bind="{ 'data-test': 'linkAttachmentQueryString' }"
         :label="t('link-modal.target-types.attachment.query-string')"
         v-model="model.queryString"
       />

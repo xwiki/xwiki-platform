@@ -36,6 +36,7 @@ const { t } = useI18n({ messages: translations });
   <LinkConfig :link-data>
     <template #config>
       <x-text-field
+        v-bind="{ 'data-test': 'linkEmailAddress' }"
         :label="t('link-modal.target-types.email.address')"
         type="email"
         v-model="model.address"
@@ -45,11 +46,13 @@ const { t } = useI18n({ messages: translations });
 
     <template #options>
       <x-text-field
+        v-bind="{ 'data-test': 'linkEmailSubject' }"
         :label="t('link-modal.target-types.email.subject')"
         v-model="model.messageSubject"
       />
 
       <x-text-field
+        v-bind="{ 'data-test': 'linkEmailBody' }"
         :label="t('link-modal.target-types.email.body')"
         v-model="model.messageBody"
       />

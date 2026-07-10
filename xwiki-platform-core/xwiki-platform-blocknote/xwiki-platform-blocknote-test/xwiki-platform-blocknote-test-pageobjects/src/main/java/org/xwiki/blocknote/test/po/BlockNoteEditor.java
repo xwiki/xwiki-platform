@@ -71,8 +71,14 @@ public class BlockNoteEditor extends BaseElement
      */
     public BlockNoteToolBar getToolBar()
     {
-        // The toolbar is rendered via FloatingPortal into document.body (outside the component root)
-        return new BlockNoteToolBar(this.getDriver().findElement(By.cssSelector(".bn-root .bn-toolbar")));
+        // The toolbar is rendered via FloatingPortal into document.body (outside the component root). It's shown
+        // asynchronously, after the text selection is made, so we need to wait for it to be visible before looking
+        // it up.
+        By toolBarLocator = By.cssSelector(".bn-root .bn-toolbar");
+        // Use a longer timeout than the default: showing the toolbar depends on a selection change (or caret move)
+        // event being processed and can occasionally be slow under load (e.g. in the Docker test environment).
+        this.getDriver().waitUntilElementIsVisible(toolBarLocator, 40);
+        return new BlockNoteToolBar(this.getDriver().findElement(toolBarLocator));
     }
 
     /**

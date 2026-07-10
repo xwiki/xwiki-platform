@@ -55,13 +55,13 @@ class AllIT
 
     @Nested
     @Order(4)
-    class NestedMacroIT extends MacroIT
+    class NestedLinkIT extends LinkIT
     {
     }
 
     @Nested
     @Order(5)
-    class NestedLinkIT extends LinkIT
+    class NestedMacroIT extends MacroIT
     {
     }
 

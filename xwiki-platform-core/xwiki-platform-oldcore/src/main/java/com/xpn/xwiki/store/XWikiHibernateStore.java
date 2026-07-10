@@ -2996,7 +2996,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         throws XWikiException
     {
         boolean result = injectCustomMapping(bclass, context);
-        if (result == false) {
+        if (!result) {
             return getSessionFactory();
         }
 
@@ -3015,7 +3015,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         try {
             // If we haven't turned of dynamic custom mappings we should not inject them
-            if (context.getWiki().hasDynamicCustomMappings() == false) {
+            if (!context.getWiki().hasDynamicCustomMappings()) {
                 return getSessionFactory();
             }
 
@@ -3048,7 +3048,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         try {
             // If we haven't turned of dynamic custom mappings we should not inject them
-            if (context.getWiki().hasDynamicCustomMappings() == false) {
+            if (!context.getWiki().hasDynamicCustomMappings()) {
                 return false;
             }
 

@@ -4214,7 +4214,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         result.append("{table}\n");
         boolean first = true;
         for (String propertyName : bclass.getPropertyList()) {
-            if (first == true) {
+            if (first) {
                 first = false;
             } else {
                 result.append("|");
@@ -4228,7 +4228,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             if (object != null) {
                 first = true;
                 for (String propertyName : bclass.getPropertyList()) {
-                    if (first == true) {
+                    if (first) {
                         first = false;
                     } else {
                         result.append("|");
@@ -4575,9 +4575,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         // We add the new objects that have been submitted in the form, before filling them with their values.
         Map<String, List<Integer>> objectsToAdd = eform.getObjectsToAdd();
-        for (String className : objectsToAdd.keySet()) {
-            DocumentReference classReference = resolveClassReference(className);
-            List<Integer> classIds = objectsToAdd.get(className);
+        for (Map.Entry<String, List<Integer>> entry : objectsToAdd.entrySet()) {
+            DocumentReference classReference = resolveClassReference(entry.getKey());
+            List<Integer> classIds = entry.getValue();
             for (Integer classId : classIds) {
                 // we ensure that the object has not been added yet, for example because of the update or create.
                 getXObject(classReference, classId, true, context);
@@ -4593,9 +4593,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         // remove xobjects
         Map<String, List<Integer>> objectsToRemove = eform.getObjectsToRemove();
-        for (String className : objectsToRemove.keySet()) {
-            DocumentReference classReference = resolveClassReference(className);
-            List<Integer> classIds = objectsToRemove.get(className);
+        for (Map.Entry<String, List<Integer>> entry : objectsToRemove.entrySet()) {
+            DocumentReference classReference = resolveClassReference(entry.getKey());
+            List<Integer> classIds = entry.getValue();
             for (Integer classId : classIds) {
                 BaseObject xObject = getXObject(classReference, classId);
                 if (xObject != null) {

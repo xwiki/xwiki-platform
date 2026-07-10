@@ -320,13 +320,13 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
             sbValueBeforeMD5.append(username);
             sbValueBeforeMD5.append(FIELD_SEPARATOR);
-            sbValueBeforeMD5.append(password.toString());
+            sbValueBeforeMD5.append(password);
             sbValueBeforeMD5.append(FIELD_SEPARATOR);
             if (isTrue(this.useIP)) {
-                sbValueBeforeMD5.append(clientIP.toString());
+                sbValueBeforeMD5.append(clientIP);
                 sbValueBeforeMD5.append(FIELD_SEPARATOR);
             }
-            sbValueBeforeMD5.append(this.validationKey.toString());
+            sbValueBeforeMD5.append(this.validationKey);
 
             this.valueBeforeMD5 = sbValueBeforeMD5.toString();
             md5.update(this.valueBeforeMD5.getBytes());
@@ -580,8 +580,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             Cipher c1 = Cipher.getInstance(this.cipherParameters);
             c1.init(Cipher.DECRYPT_MODE, this.secretKey);
             byte[] decryptedText = c1.doFinal(decodedEncryptedText);
-            String decryptedTextString = new String(decryptedText);
-            return decryptedTextString;
+            return new String(decryptedText);
         } catch (Exception e) {
             LOGGER.error("Error decypting text: " + encryptedText, e);
             return null;

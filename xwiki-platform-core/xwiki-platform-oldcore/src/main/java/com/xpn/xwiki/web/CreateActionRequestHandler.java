@@ -485,8 +485,7 @@ public class CreateActionRequestHandler
                             Utils.getComponent(SpaceReferenceResolver.TYPE_STRING);
                         SpaceReference restrictionSpaceReference = spaceResolver.resolve(restriction);
                         // The specificity score.
-                        int specificity = restrictionSpaceReference.getReversedReferenceChain().size();
-                        return specificity;
+                        return restrictionSpaceReference.getReversedReferenceChain().size();
                     }).max()
                     // Or 0 if no restrictions are set or if none match the current space.
                     .orElse(0);

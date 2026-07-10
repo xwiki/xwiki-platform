@@ -31,7 +31,6 @@ public class XWikiResourceManagerImpl extends ResourceManagerImpl
     public Resource getResource(String string, int i, String string1) throws ResourceNotFoundException,
         ParseErrorException
     {
-        Resource result = super.getResource(string, i, string1);
-        return result;
+        return super.getResource(string, i, string1);
     }
 }

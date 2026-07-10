@@ -2224,8 +2224,7 @@ public class Document extends Api
         Range range = RangeFactory.ALL;
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
-        List<RefererStats> stats = statisticsService.getRefererStatistics("", scope, period, range, this.context);
-        return stats;
+        return statisticsService.getRefererStatistics("", scope, period, range, this.context);
     }
 
     public boolean checkAccess(String right)

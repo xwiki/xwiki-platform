@@ -474,7 +474,7 @@ public class DBListClass extends ListClass
                 firstCol = StringUtils.substringAfterLast(beforeFrom.trim(), " ");
             }
         }
-        if (first == true) {
+        if (first) {
             return firstCol;
         } else {
             return secondCol;
@@ -581,14 +581,14 @@ public class DBListClass extends ListClass
                 }
             }
 
-            if (changeInputName == true) {
+            if (changeInputName) {
                 input.setName(prefix + name + "_suggest");
                 input.setID(prefix + name + "_suggest");
             } else {
                 input.setName(prefix + name);
                 input.setID(prefix + name);
             }
-            if (setInpVal == true) {
+            if (setInpVal) {
                 input.setValue(value);
             }
 

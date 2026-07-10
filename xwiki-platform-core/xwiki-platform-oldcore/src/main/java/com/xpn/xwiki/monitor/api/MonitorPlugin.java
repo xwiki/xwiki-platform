@@ -83,7 +83,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     public void startRequest(String page, String action, URL url)
     {
-        if (isActive() == false) {
+        if (!isActive()) {
             return;
         }
 
@@ -116,7 +116,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     public void endRequest()
     {
-        if (isActive() == false) {
+        if (!isActive()) {
             return;
         }
 
@@ -156,7 +156,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     public void setWikiPage(String page)
     {
-        if (isActive() == false) {
+        if (!isActive()) {
             return;
         }
 
@@ -209,7 +209,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     public void startTimer(String timername, String desc)
     {
-        if (isActive() == false) {
+        if (!isActive()) {
             return;
         }
 
@@ -229,7 +229,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     public void setTimerDesc(String timername, String desc)
     {
-        if (isActive() == false) {
+        if (!isActive()) {
             return;
         }
 
@@ -249,7 +249,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     public void endTimer(String timername)
     {
-        if (isActive() == false) {
+        if (!isActive()) {
             return;
         }
 

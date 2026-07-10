@@ -100,10 +100,7 @@ public class XWikiPluginManager
         Object plugin = this.plugins_classes.get(className);
         this.plugins_classes.remove(className);
 
-        for (Map.Entry<String, Vector<XWikiPluginInterface>> entry : this.functionList.entrySet()) {
-            Vector<XWikiPluginInterface> pluginList = entry.getValue();
-            pluginList.remove(plugin);
-        }
+        this.functionList.values().forEach(pluginList -> pluginList.remove(plugin));
     }
 
     public void addPlugins(String[] classNames, XWikiContext context)

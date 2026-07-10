@@ -1571,12 +1571,11 @@ export class LiveDataLogic implements Logic {
         await this.updateEntries();
       } catch (e) {
         console.error("Failed to create entry", e);
-        this.translate("livedata.error.addEntryFailed")
-          .then(
-            // @ts-expect-error XWiki.widgets is expected to be globally accessible
-            (value) => new XWiki.widgets.Notification(value, "error"),
-          )
-          .catch(() => {});
+        try {
+          const message = await this.translate("livedata.error.addEntryFailed");
+          // @ts-expect-error XWiki.widgets is expected to be globally accessible
+          new XWiki.widgets.Notification(message, "error");
+      } catch { /* ignore translation failure */ }
         throw e;
       }
     }

@@ -209,7 +209,7 @@ public class FileSaveTransactionRunnableTest
         final StartableTransactionRunnable str = new StartableTransactionRunnable();
         runnable.runIn(str);
         failRunnable.runIn(str);
-        Exception exception = assertThrows(Exception.class, () -> str.start());
+        Exception exception = assertThrows(Exception.class, str::start);
 
         assertFalse(this.toSave.exists());
         assertFalse(this.temp.exists());
@@ -218,7 +218,7 @@ public class FileSaveTransactionRunnableTest
 
     private void validateRollback(final StartableTransactionRunnable tr) throws Exception
     {
-        assertThrows(Exception.class, () -> tr.start(),
+        assertThrows(Exception.class, tr::start,
             "TransactionRunnable#start() did not throw the exception thrown by run.");
 
         assertTrue(this.toSave.exists());

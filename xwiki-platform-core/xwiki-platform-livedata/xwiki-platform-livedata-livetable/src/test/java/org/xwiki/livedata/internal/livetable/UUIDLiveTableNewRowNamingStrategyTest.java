@@ -75,10 +75,6 @@ class UUIDLiveTableNewRowNamingStrategyTest
     @MockComponent
     private ContextualAuthorizationManager authorization;
 
-    @BeforeEach
-    void before()
-    {
-    }
 
     @Test
     void generate() throws Exception

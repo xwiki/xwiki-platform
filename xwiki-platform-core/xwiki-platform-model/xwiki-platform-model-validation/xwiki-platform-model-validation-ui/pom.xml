@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-model-validation</artifactId>
-    <version>17.10.10</version>
+    <version>17.10.11-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model-validation-ui</artifactId>
   <name>XWiki Platform - Model - Validation - UI</name>
@@ -37,7 +37,7 @@
   </properties>
 
   <scm>
-    <tag>xwiki-platform-17.10.10</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 
   <dependencies>

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-logging-test</artifactId>
-    <version>17.10.10</version>
+    <version>17.10.11-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-logging-test-docker</artifactId>
   <name>XWiki Platform - Logging - Tests - Functional Tests in Docker</name>

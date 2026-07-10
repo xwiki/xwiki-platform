@@ -47,7 +47,7 @@ administration.templateProvider.creationRestrictionsAreSuggestions=Erstellungsbe
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=Ermöglicht es dem Benutzer, einen beliebigen Ort zum Erstellen der Seite mit dieser Vorlage auszuwählen, wobei die erste Erstellungsbeschränkung als vorausgefüllter Standardort verwendet wird, wenn die Vorlage aus der Liste ausgewählt wird.
 administration.templateProvider.creationRestrictions.add=Erstellungsbeschränkung hinzufügen
 administration.templateProvider.creationRestrictions.remove=Erstellungsbeschränkung entfernen
-### Missing: administration.templateProvider.visibilityRestrictions.add=Add visibility restriction
-### Missing: administration.templateProvider.visibilityRestrictions.remove=Remove visibility restriction
+administration.templateProvider.visibilityRestrictions.add=Sichtbarkeitseinschränkung hinzufügen
+administration.templateProvider.visibilityRestrictions.remove=Sichtbarkeitseinschränkung entfernen
 </content>
 </xwikidoc>

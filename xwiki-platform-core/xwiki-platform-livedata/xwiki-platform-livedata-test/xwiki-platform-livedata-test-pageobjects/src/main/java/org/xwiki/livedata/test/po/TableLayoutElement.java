@@ -886,7 +886,7 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Cancel the current draft entry.public
+     * Cancel the current draft entry.
      *
      * @since 18.6.0RC1
      */

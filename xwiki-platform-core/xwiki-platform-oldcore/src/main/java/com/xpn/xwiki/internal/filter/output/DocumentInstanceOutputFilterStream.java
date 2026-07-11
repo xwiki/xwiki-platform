@@ -177,7 +177,6 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             return;
         }
 
-
         XWikiContext xcontext = this.xcontextProvider.get();
 
         try {

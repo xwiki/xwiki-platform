@@ -103,6 +103,7 @@ public class XWikiBlogNewsSource implements NewsSource
     @Override
     public NewsSource forUser(UserReference userReference)
     {
+        // Not implemented yet.
         return this;
     }
 
@@ -116,18 +117,21 @@ public class XWikiBlogNewsSource implements NewsSource
     @Override
     public NewsSource forXWikiVersion(Version targetXWikiVersion)
     {
+        // Not implemented yet.
         return this;
     }
 
     @Override
     public NewsSource forExtraParameters(Map<String, Object> extraParameters)
     {
+        // Not implemented yet.
         return this;
     }
 
     @Override
     public NewsSource withCount(int count)
     {
+        // Not implemented yet.
         return this;
     }
 

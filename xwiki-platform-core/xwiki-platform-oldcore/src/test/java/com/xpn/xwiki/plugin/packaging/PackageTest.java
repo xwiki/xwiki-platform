@@ -60,7 +60,7 @@ public class PackageTest extends AbstractPackageTest
         doc2.setTitle(docTitle);
         doc2.setContent(docContent);
 
-        XWikiDocument docs[] = { doc1, doc2 };
+        XWikiDocument[] docs = { doc1, doc2 };
 
         this.pack.Import(this.createZipFile(docs, new String[] { "ISO-8859-1", "UTF-8" }, null),
             this.oldcore.getXWikiContext());
@@ -86,7 +86,7 @@ public class PackageTest extends AbstractPackageTest
         doc2.setTitle(docTitle);
         doc2.setContent(docContent);
 
-        XWikiDocument docs[] = { doc1, doc2 };
+        XWikiDocument[] docs = { doc1, doc2 };
 
         this.pack.Import(this.createZipFileUsingCommonsCompress(docs, new String[] { "ISO-8859-1", "UTF-8" }, null),
             this.oldcore.getXWikiContext());

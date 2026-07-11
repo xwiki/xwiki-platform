@@ -496,7 +496,7 @@ public class Package
      * @throws IOException while reading the ZipFile
      * @throws XWikiException when package content is broken
      */
-    public String Import(byte file[], XWikiContext context) throws IOException, XWikiException
+    public String Import(byte[] file, XWikiContext context) throws IOException, XWikiException
     {
         return Import(new ByteArrayInputStream(file), context);
     }

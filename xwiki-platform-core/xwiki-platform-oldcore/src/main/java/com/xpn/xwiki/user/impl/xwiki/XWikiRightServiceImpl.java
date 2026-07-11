@@ -200,12 +200,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
         if (DELETE.equals(right)) {
             user = context.getWiki().checkAuth(context);
             String creator = doc.getCreator();
-            if ((user != null) && (user.getUser() != null) && (creator != null)) {
-                if (user.getUser().equals(creator)) {
-                    context.setUser(user.getUser());
+            if ((user != null) && (user.getUser() != null) && (creator != null) && user.getUser().equals(creator)) {
+                context.setUser(user.getUser());
 
-                    return true;
-                }
+                return true;
             }
         }
 
@@ -596,12 +594,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
             // Verify Wiki Owner
             String wikiOwner = context.getWiki().getWikiOwner(currentdoc.getDatabase(), context);
-            if (wikiOwner != null) {
-                if (wikiOwner.equals(userOrGroupName)) {
-                    logAllow(userOrGroupName, entityReference, accessLevel, "admin level from wiki ownership");
+            if (wikiOwner != null && wikiOwner.equals(userOrGroupName)) {
+                logAllow(userOrGroupName, entityReference, accessLevel, "admin level from wiki ownership");
 
-                    return true;
-                }
+                return true;
             }
 
             XWikiDocument entityWikiPreferences = context.getWiki().getDocument(XWIKIPREFERENCES_REFERENCE, context);

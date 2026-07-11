@@ -4543,20 +4543,14 @@ public class XWiki implements EventListener
                 context.setWikiId(database);
             }
 
-            if (currentAPIdoc != null) {
-                if (scontext != null) {
-                    scontext.setAttribute("doc", currentAPIdoc, ScriptContext.ENGINE_SCOPE);
-                }
+            if (currentAPIdoc != null && scontext != null) {
+                scontext.setAttribute("doc", currentAPIdoc, ScriptContext.ENGINE_SCOPE);
             }
-            if (currentAPIcdoc != null) {
-                if (scontext != null) {
-                    scontext.setAttribute("cdoc", currentAPIcdoc, ScriptContext.ENGINE_SCOPE);
-                }
+            if (currentAPIcdoc != null && scontext != null) {
+                scontext.setAttribute("cdoc", currentAPIcdoc, ScriptContext.ENGINE_SCOPE);
             }
-            if (currentAPItdoc != null) {
-                if (scontext != null) {
-                    scontext.setAttribute("tdoc", currentAPItdoc, ScriptContext.ENGINE_SCOPE);
-                }
+            if (currentAPItdoc != null && scontext != null) {
+                scontext.setAttribute("tdoc", currentAPItdoc, ScriptContext.ENGINE_SCOPE);
             }
         }
     }
@@ -5455,14 +5449,12 @@ public class XWiki implements EventListener
 
         String servletPath = getConfiguration().getProperty("xwiki.servletpath", "");
 
-        if (context.getRequest() != null) {
-            if (StringUtils.isEmpty(servletPath)) {
-                String currentServletpath = context.getRequest().getServletPath();
-                if (currentServletpath != null && currentServletpath.startsWith("/bin")) {
-                    servletPath = "bin/";
-                } else {
-                    servletPath = getConfiguration().getProperty("xwiki.defaultservletpath", "bin/");
-                }
+        if (context.getRequest() != null && StringUtils.isEmpty(servletPath)) {
+            String currentServletpath = context.getRequest().getServletPath();
+            if (currentServletpath != null && currentServletpath.startsWith("/bin")) {
+                servletPath = "bin/";
+            } else {
+                servletPath = getConfiguration().getProperty("xwiki.defaultservletpath", "bin/");
             }
         }
 
@@ -6175,20 +6167,18 @@ public class XWiki implements EventListener
     public XWikiStatsService getStatsService(XWikiContext context)
     {
         synchronized (this.STATS_SERVICE_LOCK) {
-            if (this.statsService == null) {
-                if ("1".equals(getConfiguration().getProperty("xwiki.stats", "1"))) {
-                    String storeClass = getConfiguration().getProperty("xwiki.stats.class",
-                        "com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl");
-                    try {
-                        this.statsService = (XWikiStatsService) Class.forName(storeClass).newInstance();
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
+            if (this.statsService == null && "1".equals(getConfiguration().getProperty("xwiki.stats", "1"))) {
+                String storeClass = getConfiguration().getProperty("xwiki.stats.class",
+                    "com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl");
+                try {
+                    this.statsService = (XWikiStatsService) Class.forName(storeClass).newInstance();
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
 
-                        this.statsService = new XWikiStatsServiceImpl();
-                    }
-
-                    this.statsService.init(context);
+                    this.statsService = new XWikiStatsServiceImpl();
                 }
+
+                this.statsService.init(context);
             }
 
             return this.statsService;

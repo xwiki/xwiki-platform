@@ -466,13 +466,11 @@ public class Package
 
     public String exportToDir(File dir, XWikiContext context) throws IOException, XWikiException
     {
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                Object[] args = new Object[1];
-                args[0] = dir.toString();
-                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
-                    "Error creating directory {0}", null, args);
-            }
+        if (!dir.exists() && !dir.mkdirs()) {
+            Object[] args = new Object[1];
+            args[0] = dir.toString();
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
+                "Error creating directory {0}", null, args);
         }
 
         for (int i = 0; i < this.files.size(); i++) {
@@ -1275,13 +1273,11 @@ public class Package
         try {
             filter(doc, context);
             File spacedir = new File(dir, getDirectoryForDocument(doc));
-            if (!spacedir.exists()) {
-                if (!spacedir.mkdirs()) {
-                    Object[] args = new Object[1];
-                    args[0] = dir.toString();
-                    throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
-                        "Error creating directory {0}", null, args);
-                }
+            if (!spacedir.exists() && !spacedir.mkdirs()) {
+                Object[] args = new Object[1];
+                args[0] = dir.toString();
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
+                    "Error creating directory {0}", null, args);
             }
             String filename = getFileNameFromDocument(doc, context);
             File file = new File(spacedir, filename);

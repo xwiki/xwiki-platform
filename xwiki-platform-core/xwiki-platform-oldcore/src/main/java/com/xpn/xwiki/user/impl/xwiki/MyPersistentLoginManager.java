@@ -517,13 +517,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String username = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME, DEFAULT_VALUE);
 
-        if (!DEFAULT_VALUE.equals(username)) {
-            if (checkValidation(request, response)) {
-                if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
-                    username = decryptText(username);
-                }
-                return username;
+        if (!DEFAULT_VALUE.equals(username) && checkValidation(request, response)) {
+            if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
+                username = decryptText(username);
             }
+            return username;
         }
         return null;
     }
@@ -540,13 +538,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public String getRememberedPassword(HttpServletRequest request, HttpServletResponse response)
     {
         String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
-        if (!DEFAULT_VALUE.equals(password)) {
-            if (checkValidation(request, response)) {
-                if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
-                    password = decryptText(password);
-                }
-                return password;
+        if (!DEFAULT_VALUE.equals(password) && checkValidation(request, response)) {
+            if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
+                password = decryptText(password);
             }
+            return password;
         }
         return null;
     }

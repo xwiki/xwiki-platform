@@ -1997,10 +1997,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public Object getPreparedTitle()
     {
         // If the content is prepared and it's allowed to use the cache, return it
-        if (this.titlePrepareDate != null) {
-            if (getCacheControl().isCacheReadAllowed(this.titlePrepareDate)) {
-                return this.preparedTitle;
-            }
+        if (this.titlePrepareDate != null && getCacheControl().isCacheReadAllowed(this.titlePrepareDate)) {
+            return this.preparedTitle;
         }
 
         return null;
@@ -3353,10 +3351,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 return null;
             }
             for (BaseObject obj : objects) {
-                if (obj != null) {
-                    if (value.equals(obj.getStringValue(key))) {
-                        return obj;
-                    }
+                if (obj != null && value.equals(obj.getStringValue(key))) {
+                    return obj;
                 }
             }
 
@@ -3999,10 +3995,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     }
                 }
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
-                if (is10Syntax(wrappingSyntaxId)) {
-                    if (isInRenderingEngine) {
-                        result.append(PRE_END);
-                    }
+                if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
+                    result.append(PRE_END);
                 }
             } else if (HIDDEN.equals(type)) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
@@ -7437,10 +7431,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     result = restoredAttachment;
                 }
 
-                if (result != null) {
-                    if (!Objects.equals(attachment.getVersion(), result.getVersion())) {
-                        result = result.getAttachmentRevision(attachment.getVersion(), context);
-                    }
+                if (result != null && !Objects.equals(attachment.getVersion(), result.getVersion())) {
+                    result = result.getAttachmentRevision(attachment.getVersion(), context);
                 }
             }
         } catch (XWikiException e) {

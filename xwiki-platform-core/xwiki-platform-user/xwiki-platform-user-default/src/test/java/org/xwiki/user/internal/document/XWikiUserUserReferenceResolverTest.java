@@ -39,7 +39,7 @@ import static org.mockito.Mockito.verify;
  * @version $Id$
  */
 @ComponentTest
-public class XWikiUserUserReferenceResolverTest
+class XWikiUserUserReferenceResolverTest
 {
     @InjectMockComponents
     private XWikiUserUserReferenceResolver resolver;

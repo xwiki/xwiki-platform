@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
  * @since 9.6RC1
  */
 @ComponentTest
-public class DefaultNotificationRSSRendererTest
+class DefaultNotificationRSSRendererTest
 {
     @InjectMockComponents
     private DefaultNotificationRSSRenderer defaultNotificationRSSRenderer;

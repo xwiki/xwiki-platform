@@ -733,8 +733,8 @@ public class XWikiDocumentMockitoTest
         doReturn("iso-8859-1").when(this.oldcore.getSpyXWiki()).getEncoding();
 
         BaseObject object1 = doc.newXObject(tagDocument.getDocumentReference(), this.oldcore.getXWikiContext());
-        BaseObject object2 = doc.newXObject(tagDocument.getDocumentReference(), this.oldcore.getXWikiContext());
-        BaseObject object3 = doc.newXObject(tagDocument.getDocumentReference(), this.oldcore.getXWikiContext());
+        doc.newXObject(tagDocument.getDocumentReference(), this.oldcore.getXWikiContext());
+        doc.newXObject(tagDocument.getDocumentReference(), this.oldcore.getXWikiContext());
 
         // Remove first object
         doc.removeXObject(object1);
@@ -1096,8 +1096,7 @@ public class XWikiDocumentMockitoTest
         this.document.setContentDirty(false);
         this.document.setMetaDataDirty(false);
         // Add attachments (2).
-        XWikiAttachment attachment2 =
-            document.addAttachment("file2", new ByteArrayInputStream(new byte[] {}), this.oldcore.getXWikiContext());
+        document.addAttachment("file2", new ByteArrayInputStream(new byte[] {}), this.oldcore.getXWikiContext());
         assertTrue(this.document.isMetaDataDirty());
         assertFalse(this.document.isContentDirty());
 
@@ -1150,7 +1149,7 @@ public class XWikiDocumentMockitoTest
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         XWikiDocument otherDocument = document.clone();
 
-        XWikiAttachment attachment = document.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
+        document.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
         XWikiAttachment otherAttachment =
             otherDocument.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
 
@@ -1168,7 +1167,7 @@ public class XWikiDocumentMockitoTest
     {
         XWikiDocument document = new XWikiDocument();
 
-        XWikiAttachment attachment = document.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
+        document.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
 
         // Force the metadata not dirty.
         document.setMetaDataDirty(false);

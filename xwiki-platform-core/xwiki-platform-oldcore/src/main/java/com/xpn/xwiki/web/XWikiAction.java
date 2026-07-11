@@ -450,7 +450,7 @@ public abstract class XWikiAction implements LegacyAction
                     // that we
                     // are parsing below.
                     VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-                    VelocityContext vcontext = velocityManager.getVelocityContext();
+                    velocityManager.getVelocityContext();
 
                     if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context)) {
                         // Starting XWiki 5.0M2, 'xwiki.virtual.redirect' was removed. Warn users still using it.

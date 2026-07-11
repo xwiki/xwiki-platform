@@ -48,7 +48,6 @@ import org.xwiki.query.hql.internal.HQLStatementValidator;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationException;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.user.CurrentUserReference;
 
@@ -104,8 +103,6 @@ public class XWiki extends Api
     private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
 
     private DocumentRevisionProvider documentRevisionProvider;
-
-    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     private HQLStatementValidator hqlValidator;
 

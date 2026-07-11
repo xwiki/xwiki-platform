@@ -780,7 +780,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, XWikiRCSNodeInfo.class.getName(),
                     times[timer++] / 1000000);
                 this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, XWikiDocument.class.getName(),
-                    times[timer++] / 1000000);
+                    times[timer] / 1000000);
             }
 
             logProgress("All document IDs has been converted successfully.");
@@ -860,7 +860,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         times[timer++] / 1000000);
                 }
                 this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, BaseObject.class.getName(),
-                    times[timer++] / 1000000);
+                    times[timer] / 1000000);
             }
 
             logProgress("All object IDs has been converted successfully.");
@@ -900,7 +900,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         this.logger.debug(TIME_ELAPSED_COLLECTION_MESSAGE, coll[0], times[timer++] / 1000000);
                     }
                     this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, statsClass.getName(),
-                        times[timer++] / 1000000);
+                        times[timer] / 1000000);
                 }
 
                 logProgress("All %s statistics IDs has been converted successfully.", klassName);

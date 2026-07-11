@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  *
  * @version $Id$
  */
-public class LocalPageReferenceTest
+class LocalPageReferenceTest
 {
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         LocalPageReference reference =
             new LocalPageReference("space", "page").replaceParent(new EntityReference("space2", EntityType.PAGE));

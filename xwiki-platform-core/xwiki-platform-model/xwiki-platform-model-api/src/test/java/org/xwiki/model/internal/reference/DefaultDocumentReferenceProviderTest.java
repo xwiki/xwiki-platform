@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultDocumentReferenceProviderTest implements TestConstants
+class DefaultDocumentReferenceProviderTest implements TestConstants
 {
     @MockComponent
     private EntityReferenceFactory entityReferenceFactory;
@@ -56,7 +56,7 @@ public class DefaultDocumentReferenceProviderTest implements TestConstants
     private DefaultDocumentReferenceProvider provider;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         when(this.entityProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DEFAULT_DOCUMENT_REFERENCE);
         when(this.spaceProvider.get())
@@ -65,7 +65,7 @@ public class DefaultDocumentReferenceProviderTest implements TestConstants
     }
 
     @Test
-    public void testGetDefaultValue()
+    void testGetDefaultValue()
     {
         assertEquals(
             DEFAULT_DOCUMENT_REFERENCE.appendParent(DEFAULT_SPACE_REFERENCE.appendParent(DEFAULT_WIKI_REFERENCE)),

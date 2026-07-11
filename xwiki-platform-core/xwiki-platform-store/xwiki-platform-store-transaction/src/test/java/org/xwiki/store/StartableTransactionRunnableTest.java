@@ -49,11 +49,13 @@ class StartableTransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onRun() throws Exception
             {
                 throw new Exception();
             }
 
+            @Override
             protected void onRollback()
             {
                 itRan();
@@ -70,16 +72,19 @@ class StartableTransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onRun() throws Exception
             {
                 throw new Exception();
             }
 
+            @Override
             protected void onRollback() throws Exception
             {
                 throw new Exception();
             }
 
+            @Override
             protected void onComplete()
             {
                 itRan();
@@ -100,6 +105,7 @@ class StartableTransactionRunnableTest
     {
         new TransactionRunnable()
         {
+            @Override
             protected void onComplete() throws Exception
             {
                 throw new Exception();

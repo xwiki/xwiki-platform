@@ -91,6 +91,7 @@ public class FileDeleteTransactionRunnableTest
         // After preRun(), before run.
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
+            @Override
             public void onRun() throws Exception
             {
                 assertFalse(temp.exists());
@@ -112,6 +113,7 @@ public class FileDeleteTransactionRunnableTest
         // After run() before onCommit()
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
+            @Override
             public void onRun() throws Exception
             {
                 assertTrue(temp.exists());
@@ -143,6 +145,7 @@ public class FileDeleteTransactionRunnableTest
 
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
+            @Override
             public void onRun() throws Exception
             {
                 assertFalse(temp.exists());

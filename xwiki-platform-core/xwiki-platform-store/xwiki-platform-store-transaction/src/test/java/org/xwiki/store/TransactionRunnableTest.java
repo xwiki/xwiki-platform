@@ -79,7 +79,7 @@ class TransactionRunnableTest
             }
         } .runIn(this.testCase));
 
-        assertThrows(TransactionException.class, () -> this.testCase.preRun());
+        assertThrows(TransactionException.class, this.testCase::preRun);
     }
 
     /**
@@ -104,7 +104,7 @@ class TransactionRunnableTest
             }
         }.runIn(this.testCase);
 
-        assertThrows(TransactionException.class, () -> this.testCase.preRun());
+        assertThrows(TransactionException.class, this.testCase::preRun);
     }
 
     /**
@@ -127,7 +127,7 @@ class TransactionRunnableTest
             }
         }.runIn(this.testCase));
 
-        assertThrows(TransactionException.class, () -> this.testCase.run());
+        assertThrows(TransactionException.class, this.testCase::run);
     }
 
     /**
@@ -152,7 +152,7 @@ class TransactionRunnableTest
             }
         }.runIn(this.testCase);
 
-        assertThrows(TransactionException.class, () -> this.testCase.run());
+        assertThrows(TransactionException.class, this.testCase::run);
     }
 
     /**
@@ -177,7 +177,7 @@ class TransactionRunnableTest
             }
         }.runIn(this.testCase));
 
-        assertThrows(TransactionException.class, () -> this.testCase.commit());
+        assertThrows(TransactionException.class, this.testCase::commit);
     }
 
     /**
@@ -202,7 +202,7 @@ class TransactionRunnableTest
             }
         }.runIn(this.testCase);
 
-        assertThrows(TransactionException.class, () -> this.testCase.commit());
+        assertThrows(TransactionException.class, this.testCase::commit);
     }
 
     /**
@@ -228,7 +228,7 @@ class TransactionRunnableTest
         }.runIn(this.testCase));
 
 
-        var e = assertThrows(TransactionException.class, () -> this.testCase.rollback());
+        var e = assertThrows(TransactionException.class, this.testCase::rollback);
         assertTrue(e.isNonRecoverable(), "onRollback failed and exception did not indicate the possibility of "
             + "storage corruption.");
         assertTrue(hasRun(), "onRollback did not run for a child of a runnable which threw an exception.");
@@ -259,7 +259,7 @@ class TransactionRunnableTest
         }.runIn(this.testCase);
 
 
-        var e = assertThrows(TransactionException.class, () -> this.testCase.rollback());
+        var e = assertThrows(TransactionException.class, this.testCase::rollback);
         assertTrue(e.isNonRecoverable(), "onRollback failed and exception did not indicate the possibility of storage"
             + " corruption.");
         assertTrue(hasRun(), "onRollback did not run for the sibling of a runnable which threw an exception.");
@@ -288,7 +288,7 @@ class TransactionRunnableTest
         }.runIn(this.testCase));
 
 
-        var e = assertThrows(TransactionException.class, () -> this.testCase.complete());
+        var e = assertThrows(TransactionException.class, this.testCase::complete);
         assertFalse(e.isNonRecoverable(), "onComplete failed and exception erroniously indicated the possibility of storage corruption.");
         assertTrue(hasRun(), "onComplete did not run for a child of a runnable which threw an exception.");
     }
@@ -317,7 +317,7 @@ class TransactionRunnableTest
             }
         }.runIn(this.testCase);
 
-        var e = assertThrows(TransactionException.class, () -> this.testCase.complete());
+        var e = assertThrows(TransactionException.class, this.testCase::complete);
         assertFalse(e.isNonRecoverable(), "onComplete failed and exception erroniously indicated the possibility of storage corruption.");
         assertTrue(hasRun(), "onComplete did not run for the sibling of a runnable which threw an exception.");
     }
@@ -349,7 +349,7 @@ class TransactionRunnableTest
             }
         }.runIn(this.testCase);
 
-        assertThrows(TransactionException.class, () -> this.testCase.preRun());
+        assertThrows(TransactionException.class, this.testCase::preRun);
         assertTrue(hasRun(), "onComplete did not run for runnable which was preRun.");
     }
 
@@ -380,7 +380,7 @@ class TransactionRunnableTest
             }
         }.runIn(this.testCase);
 
-        assertThrows(TransactionException.class, () -> this.testCase.run());
+        assertThrows(TransactionException.class, this.testCase::run);
         assertTrue(hasRun(), "onRollback did not run for runnable which was run.");
     }
 

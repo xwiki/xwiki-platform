@@ -167,9 +167,7 @@ public class FileDeleteTransactionRunnableTest
 
     private void validateRollback(final StartableTransactionRunnable str)
     {
-        assertThrows(Exception.class, () -> {
-            str.start();
-        });
+        assertThrows(Exception.class, str::start);
 
         assertTrue(this.location.exists());
         assertFalse(this.temp.exists());

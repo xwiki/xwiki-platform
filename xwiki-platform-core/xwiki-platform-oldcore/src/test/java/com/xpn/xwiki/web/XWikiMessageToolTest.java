@@ -71,7 +71,6 @@ class XWikiMessageToolTest
 
         this.translationDocumentReference2 =
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "TranslationSpace1", "TranslationPage2");
-
     }
 
     public class TestResources extends ListResourceBundle

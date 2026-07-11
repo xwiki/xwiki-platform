@@ -93,8 +93,6 @@ public class DeleteAttachmentAction extends XWikiAction
         if (context.getMode() == XWikiContext.MODE_PORTLET) {
             filename = request.getParameter("filename");
         } else {
-            // Note: We use getRequestURI() because the spec says the server doesn't decode it, as
-            // we want to use our own decoding.
             filename = getFileName();
         }
 

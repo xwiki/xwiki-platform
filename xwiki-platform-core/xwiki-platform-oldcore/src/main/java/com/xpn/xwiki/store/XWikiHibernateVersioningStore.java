@@ -57,7 +57,6 @@ import com.xpn.xwiki.web.Utils;
 @Singleton
 public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements XWikiVersioningStoreInterface
 {
-
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.

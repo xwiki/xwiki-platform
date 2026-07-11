@@ -39,6 +39,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Constraint;
 import org.xwiki.livedata.LiveDataQuery.Filter;
+import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -218,7 +219,7 @@ public class LiveTableRequestHandler
     {
         if (query.getSort() != null && !query.getSort().isEmpty()) {
             List<String> sortList =
-                query.getSort().stream().map(sortEntry -> sortEntry.getProperty()).collect(Collectors.toList());
+                query.getSort().stream().map(SortEntry::getProperty).collect(Collectors.toList());
             requestParams.put("sort", sortList.toArray(new String[sortList.size()]));
             List<String> dirList = query.getSort().stream().map(sortEntry -> sortEntry.isDescending() ? "desc" : "asc")
                 .collect(Collectors.toList());

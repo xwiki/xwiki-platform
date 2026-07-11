@@ -52,7 +52,7 @@ public class XWikiUserUserReferenceResolverTest
     void resolve()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        UserReference userReference = this.resolver.resolve(new XWikiUser(documentReference));
+        this.resolver.resolve(new XWikiUser(documentReference));
 
         verify(this.documentReferenceUserReferenceResolver).resolve(documentReference);
     }

@@ -191,7 +191,7 @@ class DefaultGroupManagerTest
     {
         try {
             when(this.groupService.getAllMembersNamesForGroup(eq(group.toString()), anyInt(), anyInt(), any()))
-                .thenReturn(groups.stream().map(element -> element.toString()).collect(Collectors.toList()));
+                .thenReturn(groups.stream().map(DocumentReference::toString).collect(Collectors.toList()));
         } catch (XWikiException e) {
             // Cannot happen
         }

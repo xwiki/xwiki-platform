@@ -62,8 +62,6 @@ public class EditForm extends XWikiForm
      */
     private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)$");
 
-    private static final String OBJECTS_CLASS_DELIMITER = "_";
-
     // ---- Form fields -------------------------------------------------
     private String content;
 

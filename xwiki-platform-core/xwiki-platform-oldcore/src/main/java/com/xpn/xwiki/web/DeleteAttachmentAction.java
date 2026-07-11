@@ -95,7 +95,6 @@ public class DeleteAttachmentAction extends XWikiAction
         } else {
             // Note: We use getRequestURI() because the spec says the server doesn't decode it, as
             // we want to use our own decoding.
-            String requestUri = request.getRequestURI();
             filename = getFileName();
         }
 

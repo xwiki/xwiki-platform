@@ -195,8 +195,6 @@ public class InternalSkinManager implements Initializable
             skin = (String) xcontext.get(CKEY_SKIN);
             if (StringUtils.isNotEmpty(skin)) {
                 return skin;
-            } else {
-                skin = null;
             }
 
             // Try to get it from URL
@@ -204,8 +202,6 @@ public class InternalSkinManager implements Initializable
                 skin = xcontext.getRequest().getParameter("skin");
                 if (StringUtils.isNotEmpty(skin)) {
                     return skin;
-                } else {
-                    skin = null;
                 }
             }
 

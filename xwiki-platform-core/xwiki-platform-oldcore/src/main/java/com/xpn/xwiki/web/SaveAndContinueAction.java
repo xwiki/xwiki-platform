@@ -51,11 +51,6 @@ public class SaveAndContinueAction extends XWikiAction
     /** Key for storing the wrapped action in the context. */
     private static final String WRAPPED_ACTION_CONTEXT_KEY = "SaveAndContinueAction.wrappedAction";
 
-    /**
-     * The default context value to put with {@link #MERGED_DOCUMENTS} key.
-     */
-    private static final String MERGED_DOCUMENTS_VALUE = "true";
-
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
 

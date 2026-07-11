@@ -64,11 +64,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private static final String FIELD_SEPARATOR = ":";
 
     /**
-     * The string used to prefix cookie domain to conform to RFC 2109.
-     */
-    private static final String COOKIE_DOT_PFX = ".";
-
-    /**
      * Log4J logger object to log messages in this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(MyPersistentLoginManager.class);

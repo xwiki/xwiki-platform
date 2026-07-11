@@ -108,7 +108,6 @@ public class AverageRatingProtectionListenerTest
         BaseObject ratingObject3 = mock(BaseObject.class);
         when(ratingObject3.getNumber()).thenReturn(3);
 
-        BaseObject previousObject1 = mock(BaseObject.class);
         BaseObject previousObject2 = mock(BaseObject.class);
 
         when(this.observationContext.isIn(new UpdatingAverageRatingEvent())).thenReturn(false);

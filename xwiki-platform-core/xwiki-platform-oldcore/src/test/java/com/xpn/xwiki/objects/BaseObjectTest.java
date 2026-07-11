@@ -246,7 +246,7 @@ class BaseObjectTest
         object.setXClassReference(classReference);
         object.setOwnerDocument(ownerDocument);
 
-        XWikiContext context = this.oldcore.getXWikiContext();;
+        XWikiContext context = this.oldcore.getXWikiContext();
         String fieldName = "myField";
         String value = "myValue";
 
@@ -298,7 +298,7 @@ class BaseObjectTest
         object.setXClassReference(classReference);
         object.setOwnerDocument(ownerDocument);
 
-        XWikiContext context = this.oldcore.getXWikiContext();;
+        XWikiContext context = this.oldcore.getXWikiContext();
         String fieldName = "myField";
         Object value = 4545;
 

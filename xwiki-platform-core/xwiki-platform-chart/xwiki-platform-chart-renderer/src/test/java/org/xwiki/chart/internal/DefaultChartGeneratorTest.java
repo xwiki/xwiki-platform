@@ -22,7 +22,6 @@ package org.xwiki.chart.internal;
 import java.util.Map;
 
 import org.jfree.chart.plot.Plot;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.chart.ChartGenerator;

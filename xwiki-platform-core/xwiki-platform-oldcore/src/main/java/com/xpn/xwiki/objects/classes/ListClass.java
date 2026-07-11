@@ -1098,11 +1098,9 @@ public abstract class ListClass extends PropertyClass
         // Add missing elements
         if (newList != null) {
             for (String element : newList) {
-                if ((previousList == null || !previousList.contains(element))) {
-                    if (!currentList.contains(element)) {
-                        currentList.add(element);
-                        mergeResult.setModified(true);
-                    }
+                if ((previousList == null || !previousList.contains(element)) && !currentList.contains(element)) {
+                    currentList.add(element);
+                    mergeResult.setModified(true);
                 }
             }
         }

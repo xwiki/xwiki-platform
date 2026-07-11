@@ -190,10 +190,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         if (element != null) {
             Set<String> properties = getPropertyList();
-            if (!properties.contains(name)) {
-                if (((BaseCollection) element).getNumber() == 0) {
-                    ((BaseCollection) element).setNumber(properties.size() + 1);
-                }
+            if (!properties.contains(name) && ((BaseCollection) element).getNumber() == 0) {
+                ((BaseCollection) element).setNumber(properties.size() + 1);
             }
 
             super.addField(name, element);

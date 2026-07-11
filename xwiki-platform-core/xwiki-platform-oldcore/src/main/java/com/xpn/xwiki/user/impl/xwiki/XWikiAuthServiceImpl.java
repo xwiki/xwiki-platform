@@ -217,10 +217,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             }
 
             final String userName = getContextUserName(wrappedRequest.getUserPrincipal(), context);
-            if (LOGGER.isInfoEnabled()) {
-                if (userName != null) {
-                    LOGGER.info(USER_AUTHENTIFIED_MESSAGE, userName);
-                }
+            if (LOGGER.isInfoEnabled() && userName != null) {
+                LOGGER.info(USER_AUTHENTIFIED_MESSAGE, userName);
             }
 
             if (userName == null) {
@@ -266,10 +264,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             }
 
             Principal principal = wrappedRequest.getUserPrincipal();
-            if (LOGGER.isInfoEnabled()) {
-                if (principal != null) {
-                    LOGGER.info(USER_AUTHENTIFIED_MESSAGE, principal.getName());
-                }
+            if (LOGGER.isInfoEnabled() && principal != null) {
+                LOGGER.info(USER_AUTHENTIFIED_MESSAGE, principal.getName());
             }
 
             if (principal == null) {

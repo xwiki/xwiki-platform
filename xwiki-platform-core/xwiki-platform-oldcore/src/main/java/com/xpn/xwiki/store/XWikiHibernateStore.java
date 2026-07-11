@@ -1662,10 +1662,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     loadXWikiProperty(property2, context, false);
                                     property.setValue(property2.getValue());
 
-                                    if (bclass != null) {
-                                        if (bclass.get(name) instanceof TextAreaClass) {
-                                            property = property2;
-                                        }
+                                    if (bclass != null && bclass.get(name) instanceof TextAreaClass) {
+                                        property = property2;
                                     }
 
                                 } else if (property instanceof LargeStringProperty) {
@@ -1675,10 +1673,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     loadXWikiProperty(property2, context, false);
                                     property.setValue(property2.getValue());
 
-                                    if (bclass != null) {
-                                        if (bclass.get(name) instanceof StringClass) {
-                                            property = property2;
-                                        }
+                                    if (bclass != null && bclass.get(name) instanceof StringClass) {
+                                        property = property2;
                                     }
                                 } else {
                                     throw e;

@@ -81,16 +81,14 @@ public class UploadAction extends XWikiAction
         Object exception = context.get("exception");
         boolean ajax = ((Boolean) context.get("ajax")).booleanValue();
         // check Exception File upload is large
-        if (exception != null) {
-            if (exception instanceof AttachmentValidationException) {
-                AttachmentValidationException exp = (AttachmentValidationException) exception;
-                response.setStatus(exp.getHttpStatus());
-                getCurrentScriptContext().setAttribute(MESSAGE, exp.getTranslationKey(), ENGINE_SCOPE);
-                getCurrentScriptContext().setAttribute("parameters", exp.getTranslationParameters(), ENGINE_SCOPE);
-                context.put(MESSAGE, exp.getContextMessage());
+        if (exception != null && exception instanceof AttachmentValidationException) {
+            AttachmentValidationException exp = (AttachmentValidationException) exception;
+            response.setStatus(exp.getHttpStatus());
+            getCurrentScriptContext().setAttribute(MESSAGE, exp.getTranslationKey(), ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute("parameters", exp.getTranslationParameters(), ENGINE_SCOPE);
+            context.put(MESSAGE, exp.getContextMessage());
 
-                return true;
-            }
+            return true;
         }
 
         // CSRF prevention

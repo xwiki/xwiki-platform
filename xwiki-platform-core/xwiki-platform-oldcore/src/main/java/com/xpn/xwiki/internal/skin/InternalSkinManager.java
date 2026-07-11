@@ -224,13 +224,11 @@ public class InternalSkinManager implements Initializable
             // TODO: shouldn't we make sure anyone see the skin whatever right he have ?
             if (testRights) {
                 XWikiDocument document = this.wikiSkinUtils.getSkinDocument(skin);
-                if (document != null) {
-                    if (!this.authorization.hasAccess(Right.VIEW, document.getDocumentReference())) {
-                        this.logger.debug(
-                            "Cannot access configured wiki skin [{}] due to access rights, using the default skin.",
-                            skin);
-                        skin = getDefaultSkinId();
-                    }
+                if (document != null && !this.authorization.hasAccess(Right.VIEW, document.getDocumentReference())) {
+                    this.logger.debug(
+                        "Cannot access configured wiki skin [{}] due to access rights, using the default skin.",
+                        skin);
+                    skin = getDefaultSkinId();
                 }
             }
 
@@ -287,13 +285,11 @@ public class InternalSkinManager implements Initializable
             // TODO: shouldn't we make sure anyone see the skin whatever right he have ?
             if (testRights) {
                 XWikiDocument document = this.wikiSkinUtils.getSkinDocument(baseSkin);
-                if (document != null) {
-                    if (!this.authorization.hasAccess(Right.VIEW, document.getDocumentReference())) {
-                        this.logger.debug(
-                            "Cannot access configured wiki skin [{}] due to access rights, using the default skin.",
-                            baseSkin);
-                        baseSkin = getDefaultParentSkinId();
-                    }
+                if (document != null && !this.authorization.hasAccess(Right.VIEW, document.getDocumentReference())) {
+                    this.logger.debug(
+                        "Cannot access configured wiki skin [{}] due to access rights, using the default skin.",
+                        baseSkin);
+                    baseSkin = getDefaultParentSkinId();
                 }
             }
 

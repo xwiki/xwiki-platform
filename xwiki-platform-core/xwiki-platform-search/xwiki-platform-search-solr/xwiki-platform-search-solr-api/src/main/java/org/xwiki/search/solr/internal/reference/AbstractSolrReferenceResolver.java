@@ -74,19 +74,15 @@ public abstract class AbstractSolrReferenceResolver implements SolrReferenceReso
     protected XWikiDocument getDocument(DocumentReference documentReference) throws Exception
     {
         XWikiContext context = this.xcontextProvider.get();
-        XWikiDocument document = context.getWiki().getDocument(documentReference, context);
-
-        return document;
+        return context.getWiki().getDocument(documentReference, context);
     }
 
     @Override
     public String getId(EntityReference reference) throws SolrIndexerException, IllegalArgumentException
     {
-        String result = this.serializer.serialize(reference);
-
         // TODO: Include locale all the other entities once object/attachment translation is implemented.
 
-        return result;
+        return this.serializer.serialize(reference);
     }
 
     @Override

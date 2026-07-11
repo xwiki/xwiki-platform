@@ -122,8 +122,7 @@ public class TemporaryChartImageWriter implements ChartImageWriter
             // Should not happen since UTF8 encoding should always be present
             throw new MacroExecutionException("Failed to compute chart image location", e);
         }
-        File locationFile = new File(directory, String.format("%s.png", imageId.getId()));
-        return locationFile;
+        return new File(directory, String.format("%s.png", imageId.getId()));
     }
 
     /**

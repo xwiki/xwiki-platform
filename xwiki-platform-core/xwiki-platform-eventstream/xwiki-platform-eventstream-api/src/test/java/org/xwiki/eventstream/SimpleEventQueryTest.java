@@ -506,22 +506,22 @@ class SimpleEventQueryTest
         SimpleEventQuery query4bis = new SimpleEventQuery();
         query4bis.eq("prop", "value");
 
-        assertTrue(query1.equals(query1));
-        assertTrue(query1bis.equals(query1bis));
+        assertEquals(query1, query1);
+        assertEquals(query1bis, query1bis);
 
-        assertTrue(query2.equals(query2));
-        assertTrue(query2bis.equals(query2bis));
+        assertEquals(query2, query2);
+        assertEquals(query2bis, query2bis);
 
-        assertTrue(query3.equals(query3));
-        assertTrue(query3bis.equals(query3bis));
+        assertEquals(query3, query3);
+        assertEquals(query3bis, query3bis);
 
-        assertTrue(query4.equals(query4));
-        assertTrue(query4bis.equals(query4bis));
+        assertEquals(query4, query4);
+        assertEquals(query4bis, query4bis);
 
-        assertFalse(query1.equals(query2));
-        assertFalse(query1.equals(query3));
-        assertFalse(query1.equals(query4));
-        assertFalse(query1.equals(null));
+        assertNotEquals(query1, query2);
+        assertNotEquals(query1, query3);
+        assertNotEquals(query1, query4);
+        assertNotEquals(query1, null);
     }
 
     @Test

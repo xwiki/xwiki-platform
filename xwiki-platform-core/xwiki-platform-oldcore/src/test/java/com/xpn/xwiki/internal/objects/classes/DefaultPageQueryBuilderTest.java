@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
  * @since 10.6
  */
 @ComponentTest
-public class DefaultPageQueryBuilderTest
+class DefaultPageQueryBuilderTest
 {
     @InjectMockComponents
     private DefaultPageQueryBuilder queryBuilder;
@@ -56,7 +56,7 @@ public class DefaultPageQueryBuilderTest
     private QueryBuilder<PageClass> implicitlyAllowedValuesQueryBuilder;
 
     @Test
-    public void build() throws Exception
+    void build() throws Exception
     {
         PageClass pageClass = new PageClass();
 

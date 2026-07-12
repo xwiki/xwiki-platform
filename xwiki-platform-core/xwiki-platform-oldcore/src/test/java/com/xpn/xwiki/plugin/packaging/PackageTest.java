@@ -34,7 +34,7 @@ import static org.mockito.Mockito.doReturn;
  * 
  * @version $Id$
  */
-public class PackageTest extends AbstractPackageTest
+class PackageTest extends AbstractPackageTest
 {
     private Package pack;
 
@@ -47,7 +47,7 @@ public class PackageTest extends AbstractPackageTest
     }
 
     @Test
-    public void testImportWithHeterogeneousEncodingInFiles() throws Exception
+    void testImportWithHeterogeneousEncodingInFiles() throws Exception
     {
         String docTitle = "Un \u00e9t\u00e9 36";
         String docContent = "\u00e0\u00e7\u00e9\u00e8\u00c0\u00c7\u00c9\u00c8\u00ef\u00f6\u00eb\u00fc";
@@ -73,7 +73,7 @@ public class PackageTest extends AbstractPackageTest
     }
 
     @Test
-    public void testImportWithHeterogeneousEncodingInFilesUsingCommonsCompress() throws Exception
+    void testImportWithHeterogeneousEncodingInFilesUsingCommonsCompress() throws Exception
     {
         String docTitle = "Un \u00e9t\u00e9 36";
         String docContent = "\u00e0\u00e7\u00e9\u00e8\u00c0\u00c7\u00c9\u00c8\u00ef\u00f6\u00eb\u00fc";

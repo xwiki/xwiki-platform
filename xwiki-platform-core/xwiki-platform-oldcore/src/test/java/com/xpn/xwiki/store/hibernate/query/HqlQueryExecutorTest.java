@@ -128,7 +128,7 @@ class HqlQueryExecutorTest
     }
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         when(this.authorization.hasAccess(Right.PROGRAM)).then(new Answer<Boolean>()
         {

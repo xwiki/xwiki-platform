@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  */
 @OldcoreTest
-public class ActionTemplateRequirementTest
+class ActionTemplateRequirementTest
 {
     @InjectMockComponents
     private ActionTemplateRequirement requirement;

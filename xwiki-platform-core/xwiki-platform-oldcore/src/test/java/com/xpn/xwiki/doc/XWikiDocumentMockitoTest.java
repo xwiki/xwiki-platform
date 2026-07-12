@@ -111,7 +111,7 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 @ReferenceComponentList
 @XWikiDocumentFilterUtilsComponentList
-public class XWikiDocumentMockitoTest
+class XWikiDocumentMockitoTest
 {
     private static final String DOCWIKI = "wiki";
 

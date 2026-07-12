@@ -102,7 +102,7 @@ class XWikiContextContextStoreTest
     private URL requestwikiURL;
 
     @BeforeEach
-    public void beforeEach() throws WikiManagerException, ComponentLookupException, MalformedURLException
+    void beforeEach() throws WikiManagerException, ComponentLookupException, MalformedURLException
     {
         this.descriptor = new WikiDescriptor(WIKI, WIKI);
         this.descriptor.setMainPageReference(new DocumentReference(this.descriptor.getId(), "Space", "MainPage"));

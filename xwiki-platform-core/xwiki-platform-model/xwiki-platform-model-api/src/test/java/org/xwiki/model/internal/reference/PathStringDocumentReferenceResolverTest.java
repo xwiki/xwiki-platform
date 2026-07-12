@@ -33,14 +33,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 5.3M1
  */
-public class PathStringDocumentReferenceResolverTest
+class PathStringDocumentReferenceResolverTest
 {
     private PathStringEntityReferenceSerializer serializer = new PathStringEntityReferenceSerializer();
 
     private PathStringDocumentReferenceResolver resolver = new PathStringDocumentReferenceResolver();
 
     @Test
-    public void serializeAndResolve()
+    void serializeAndResolve()
     {
         test("wiki", Arrays.asList("space1", "space2"), "page", "wiki/space1/space2/page");
         test("w/i?ki", Arrays.asList("Sp.a#ce"), "P a@g&e", "w%2Fi%3Fki/Sp%2Ea%23ce/P+a%40g%26e");

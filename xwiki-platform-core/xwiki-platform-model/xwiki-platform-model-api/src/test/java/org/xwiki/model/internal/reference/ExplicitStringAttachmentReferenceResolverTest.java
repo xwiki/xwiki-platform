@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ComponentList({
     DefaultSymbolScheme.class
 })
-public class ExplicitStringAttachmentReferenceResolverTest
+class ExplicitStringAttachmentReferenceResolverTest
 {
     @InjectMockComponents
     private ExplicitStringEntityReferenceResolver entityReferenceResolver;
@@ -49,14 +49,14 @@ public class ExplicitStringAttachmentReferenceResolverTest
     private AttachmentReferenceResolver<String> resolver;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         this.resolver = new ExplicitStringAttachmentReferenceResolver();
         ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver", this.entityReferenceResolver);
     }
 
     @Test
-    public void resolveWithExplicitAttachmentReference()
+    void resolveWithExplicitAttachmentReference()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         AttachmentReference reference = this.resolver.resolve("", new AttachmentReference("file", documentReference));

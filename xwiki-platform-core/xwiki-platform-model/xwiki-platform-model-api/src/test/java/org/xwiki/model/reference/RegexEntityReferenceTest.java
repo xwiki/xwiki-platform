@@ -24,8 +24,8 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * Validate {@link RegexEntityReference} class.
@@ -49,7 +49,7 @@ class RegexEntityReferenceTest
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getName(), Pattern.LITERAL), EntityType.DOCUMENT,
                 spaceReference);
 
-        assertTrue(reference.equals(REFERENCETOMATCH));
+        assertEquals(reference, REFERENCETOMATCH);
     }
 
     @Test
@@ -58,7 +58,7 @@ class RegexEntityReferenceTest
         EntityReference reference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getName(), Pattern.LITERAL), EntityType.DOCUMENT);
 
-        assertTrue(reference.equals(REFERENCETOMATCH));
+        assertEquals(reference, REFERENCETOMATCH);
     }
 
     @Test
@@ -68,7 +68,7 @@ class RegexEntityReferenceTest
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getWikiReference().getName(), Pattern.LITERAL),
                 EntityType.WIKI);
 
-        assertTrue(reference.equals(REFERENCETOMATCH));
+        assertEquals(reference, REFERENCETOMATCH);
     }
 
     @Test
@@ -76,7 +76,7 @@ class RegexEntityReferenceTest
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("p.*"), EntityType.DOCUMENT);
 
-        assertTrue(reference.equals(REFERENCETOMATCH));
+        assertEquals(reference, REFERENCETOMATCH);
     }
 
     @Test
@@ -84,7 +84,7 @@ class RegexEntityReferenceTest
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("space"), EntityType.DOCUMENT);
 
-        assertFalse(reference.equals(REFERENCETOMATCH));
+        assertNotEquals(reference, REFERENCETOMATCH);
     }
 
     @Test
@@ -94,6 +94,6 @@ class RegexEntityReferenceTest
             new RegexEntityReference(Pattern.compile("space"), EntityType.SPACE, new EntityReference("wiki",
                 EntityType.WIKI));
 
-        assertTrue(reference.equals(REFERENCETOMATCH));
+        assertEquals(reference, REFERENCETOMATCH);
     }
 }

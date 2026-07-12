@@ -150,10 +150,10 @@ public abstract class AbstractPackageTest
         OutputStreamWriter os = new OutputStreamWriter(ostr, charset);
 
         // Voluntarily ignore the first line... as it's the xml declaration
-        String line = bfr.readLine();
+        bfr.readLine();
         os.append("<?xml version=\"1.0\" encoding=\"" + charset + "\"?>\n");
 
-        line = bfr.readLine();
+        String line = bfr.readLine();
         while (null != line) {
             os.append(line);
             os.append("\n");

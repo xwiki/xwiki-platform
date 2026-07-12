@@ -221,10 +221,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
                 if ((user == null) && (needsAuth)) {
                     logDeny("unauthentified", doc.getFullName(), action, "Authentication needed");
-                    if (context.getRequest() != null) {
-                        if (!"true".equalsIgnoreCase(context.getWiki().Param("xwiki.hidelogin", "false"))) {
-                            context.getWiki().getAuthService().showLogin(context);
-                        }
+                    if (context.getRequest() != null
+                        && !"true".equalsIgnoreCase(context.getWiki().Param("xwiki.hidelogin", "false"))) {
+                        context.getWiki().getAuthService().showLogin(context);
                     }
 
                     return false;
@@ -539,24 +538,20 @@ public class XWikiRightServiceImpl implements XWikiRightService
         boolean deny = false;
         boolean allow = false;
         boolean allow_found = false;
-        boolean deny_found = false;
         boolean isReadOnly = context.getWiki().isReadOnly();
         String database = context.getWikiId();
         XWikiDocument currentdoc = null;
 
-        if (isReadOnly) {
-            if ("edit".equals(accessLevel) || DELETE.equals(accessLevel) || UNDELETE.equals(accessLevel)
-                || COMMENT.equals(accessLevel) || REGISTER.equals(accessLevel)) {
-                logDeny(userOrGroupName, entityReference, accessLevel, "server in read-only mode");
+        if (isReadOnly && ("edit".equals(accessLevel) || DELETE.equals(accessLevel) || UNDELETE.equals(accessLevel)
+            || COMMENT.equals(accessLevel) || REGISTER.equals(accessLevel))) {
+            logDeny(userOrGroupName, entityReference, accessLevel, "server in read-only mode");
 
-                return false;
-            }
+            return false;
         }
 
-        if (userOrGroupNameReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            if (needsAuth(accessLevel, context)) {
-                return false;
-            }
+        if (userOrGroupNameReference.getName().equals(XWikiRightService.GUEST_USER)
+            && needsAuth(accessLevel, context)) {
+            return false;
         }
 
         // Fast return for delete right: allow the creator to delete the document
@@ -649,7 +644,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     currentdoc =
                         currentdoc == null ? context.getWiki().getDocument(entityReference, context) : currentdoc;
                     deny = checkRight(userOrGroupName, currentdoc, accessLevel, user, false, false, context);
-                    deny_found = true;
                     if (deny) {
                         logDeny(userOrGroupName, entityReference, accessLevel, "document level");
                         return false;
@@ -686,7 +680,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     if (hasDenyRights()) {
                         try {
                             deny = checkRight(userOrGroupName, webdoc, accessLevel, user, false, true, context);
-                            deny_found = true;
                             if (deny) {
                                 logDeny(userOrGroupName, entityReference, accessLevel, "web level");
 
@@ -729,7 +722,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
             if (hasDenyRights()) {
                 try {
                     deny = checkRight(userOrGroupName, entityWikiPreferences, accessLevel, user, false, true, context);
-                    deny_found = true;
                     if (deny) {
                         logDeny(userOrGroupName, entityReference, accessLevel, "xwiki level");
 

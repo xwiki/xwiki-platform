@@ -266,12 +266,11 @@ public class UploadAction extends XWikiAction
 
         // Try to use the name provided by the user
         filename = fileupload.getFileItemAsString(filenameField, context);
-        if (!StringUtils.isBlank(filename)) {
-            // TODO These should be supported, the URL should just contain escapes.
-            if (filename.indexOf("/") != -1 || filename.indexOf("\\") != -1 || filename.indexOf(";") != -1) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_INVALID_CHARS,
-                    "Invalid filename: " + filename);
-            }
+        // TODO These should be supported, the URL should just contain escapes.
+        if (!StringUtils.isBlank(filename) && (filename.indexOf("/") != -1 || filename.indexOf("\\") != -1
+            || filename.indexOf(";") != -1)) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_INVALID_CHARS,
+                "Invalid filename: " + filename);
         }
 
         if (StringUtils.isBlank(filename)) {

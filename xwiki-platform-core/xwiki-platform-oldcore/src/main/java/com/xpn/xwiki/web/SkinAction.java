@@ -164,11 +164,10 @@ public class SkinAction extends XWikiAction
                 }
 
                 // Try on the base skin document, if it is not the same as above.
-                if (StringUtils.isNotEmpty(baseskin) && !doc.getName().equals(baseskin)) {
-                    if (renderSkin(filename, baseskindoc, context)) {
-                        found = true;
-                        break;
-                    }
+                if (StringUtils.isNotEmpty(baseskin) && !doc.getName().equals(baseskin)
+                    && renderSkin(filename, baseskindoc, context)) {
+                    found = true;
+                    break;
                 }
 
                 // Try on the default base skin, if it wasn't already tested above.

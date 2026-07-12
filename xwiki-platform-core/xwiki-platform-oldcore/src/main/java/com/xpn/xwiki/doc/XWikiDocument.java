@@ -4304,11 +4304,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         String creator = eform.getCreator();
-        if ((creator != null) && (!creator.equals(getCreator()))) {
-            if ((getCreatorReference().equals(context.getUserReference()))
-                || (context.getWiki().getRightService().hasAdminRights(context))) {
-                setCreator(creator);
-            }
+        if ((creator != null) && (!creator.equals(getCreator()))
+            && ((getCreatorReference().equals(context.getUserReference()))
+                || (context.getWiki().getRightService().hasAdminRights(context)))) {
+            setCreator(creator);
         }
 
         String parent = eform.getParent();
@@ -7868,6 +7867,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * use more rights than defined in the object, {@code false} otherwise
      * @since 16.10.0RC1
      */
+    @Override
     public boolean isEnforceRequiredRights()
     {
         return this.enforceRequiredRights;

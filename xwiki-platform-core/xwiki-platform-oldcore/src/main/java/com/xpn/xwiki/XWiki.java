@@ -8004,11 +8004,9 @@ public class XWiki implements EventListener
             String fullName = entry.getKey();
 
             XWikiDocument doc = getDocument(fullName, context);
-            if (checkRight) {
-                if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(),
-                    context)) {
-                    continue;
-                }
+            if (checkRight && !context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
+                doc.getFullName(), context)) {
+                continue;
             }
             List<String> returnedAttachmentNames = entry.getValue();
             for (XWikiAttachment attach : doc.getAttachmentList()) {

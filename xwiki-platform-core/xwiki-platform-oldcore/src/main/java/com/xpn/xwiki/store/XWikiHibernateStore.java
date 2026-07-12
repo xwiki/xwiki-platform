@@ -826,17 +826,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // It's possible the space does not yet exist yet
             maybeCreateSpace(document.getDocumentReference().getLastSpaceReference(), document.isHidden(), session);
 
-            if (!document.isNew()) {
-                // If the hidden state of an existing document did not changed there is nothing to do
-                if (document.isHidden() != document.getOriginalDocument().isHidden()) {
-                    if (document.isHidden()) {
-                        // If the document became hidden it's possible the space did too
-                        maybeMakeSpaceHidden(document.getDocumentReference().getLastSpaceReference(),
-                            document.getFullName(), session);
-                    } else {
-                        // If the document became visible then all its parents should be visible as well
-                        makeSpaceVisible(document.getDocumentReference().getLastSpaceReference(), session);
-                    }
+            // If the hidden state of an existing document did not changed there is nothing to do
+            if (!document.isNew() && document.isHidden() != document.getOriginalDocument().isHidden()) {
+                if (document.isHidden()) {
+                    // If the document became hidden it's possible the space did too
+                    maybeMakeSpaceHidden(document.getDocumentReference().getLastSpaceReference(),
+                        document.getFullName(), session);
+                } else {
+                    // If the document became visible then all its parents should be visible as well
+                    makeSpaceVisible(document.getDocumentReference().getLastSpaceReference(), session);
                 }
             }
         }
@@ -2894,11 +2892,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             XWikiDocument doc =
                 new XWikiDocument(this.defaultDocumentReferenceResolver.resolve(fullName, currentWikiReference));
-            if (checkRight) {
-                if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(),
-                    context)) {
-                    continue;
-                }
+            if (checkRight && !context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
+                doc.getFullName(), context)) {
+                continue;
             }
 
             DocumentReference documentReference = doc.getDocumentReference();

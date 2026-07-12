@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 3.0M2
  */
 @ExtendWith(XWikiTempDirExtension.class)
-public class FileSaveTransactionRunnableTest
+class FileSaveTransactionRunnableTest
 {
     private static final String[] FILE_PATH = { "path", "to", "file" };
 
@@ -68,7 +68,7 @@ public class FileSaveTransactionRunnableTest
     private File testDirectory;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         File storageLocation = new File(this.testDirectory, "test-storage" + System.identityHashCode(this.getClass()));
 
@@ -92,7 +92,7 @@ public class FileSaveTransactionRunnableTest
     }
 
     @Test
-    public void simpleTest() throws Exception
+    void simpleTest() throws Exception
     {
         assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
 
@@ -104,7 +104,7 @@ public class FileSaveTransactionRunnableTest
     }
 
     @Test
-    public void rollbackAfterPreRunTest() throws Exception
+    void rollbackAfterPreRunTest() throws Exception
     {
         assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
 
@@ -130,7 +130,7 @@ public class FileSaveTransactionRunnableTest
     }
 
     @Test
-    public void rollbackAfterRunTest() throws Exception
+    void rollbackAfterRunTest() throws Exception
     {
         assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
 
@@ -153,7 +153,7 @@ public class FileSaveTransactionRunnableTest
     }
 
     @Test
-    public void rollbackAfterFailedCommit() throws Exception
+    void rollbackAfterFailedCommit() throws Exception
     {
         assertEquals(FileUtils.readFileToString(this.toSave, StandardCharsets.UTF_8), CONTENT_VERSION1);
 
@@ -174,7 +174,7 @@ public class FileSaveTransactionRunnableTest
     }
 
     @Test
-    public void saveWithNonexistantOriginalTest() throws Exception
+    void saveWithNonexistantOriginalTest() throws Exception
     {
         this.toSave.delete();
         assertFalse(this.toSave.exists());
@@ -189,7 +189,7 @@ public class FileSaveTransactionRunnableTest
     }
 
     @Test
-    public void rollbackWithNonexistantOriginalTest() throws Exception
+    void rollbackWithNonexistantOriginalTest() throws Exception
     {
         this.toSave.delete();
         assertFalse(this.toSave.exists());

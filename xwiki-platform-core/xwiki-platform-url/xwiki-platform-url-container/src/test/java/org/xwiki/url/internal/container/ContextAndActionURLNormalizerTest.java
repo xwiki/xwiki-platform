@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @since 7.4M1
  */
 @ComponentTest
-public class ContextAndActionURLNormalizerTest
+class ContextAndActionURLNormalizerTest
 {
     @InjectMockComponents
     private ContextAndActionURLNormalizer normalizer;

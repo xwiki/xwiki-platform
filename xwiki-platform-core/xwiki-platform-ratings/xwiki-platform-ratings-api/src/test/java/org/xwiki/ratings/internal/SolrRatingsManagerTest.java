@@ -90,7 +90,7 @@ import static org.mockito.Mockito.when;
  * @since 12.9RC1
  */
 @ComponentTest
-public class SolrRatingsManagerTest
+class SolrRatingsManagerTest
 {
     @InjectMockComponents
     private SolrRatingsManager manager;

@@ -713,10 +713,9 @@ public class Package
 
             // Install the remaining documents (without class definitions).
             for (DocumentInfo docInfo : this.files) {
-                if (!this.classFiles.contains(docInfo)) {
-                    if (installDocument(docInfo, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
-                        status = DocumentInfo.INSTALL_ERROR;
-                    }
+                if (!this.classFiles.contains(docInfo)
+                    && installDocument(docInfo, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
+                    status = DocumentInfo.INSTALL_ERROR;
                 }
             }
             setStatus(status, context);
@@ -924,12 +923,11 @@ public class Package
                 context.getWiki().saveDocument(doc.getDoc(), saveMessage, context);
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 
-                if ((this.withVersions && packageHasHistory) || conserveExistingHistory) {
-                    // we need to force the saving the document archive.
-                    if (doc.getDoc().getDocumentArchive() != null) {
-                        context.getWiki().getVersioningStore()
-                            .saveXWikiDocArchive(doc.getDoc().getDocumentArchive(context), true, context);
-                    }
+                // we need to force the saving the document archive.
+                if (((this.withVersions && packageHasHistory) || conserveExistingHistory)
+                    && doc.getDoc().getDocumentArchive() != null) {
+                    context.getWiki().getVersioningStore()
+                        .saveXWikiDocArchive(doc.getDoc().getDocumentArchive(context), true, context);
                 }
 
                 if (shouldResetToInitialVersion) {

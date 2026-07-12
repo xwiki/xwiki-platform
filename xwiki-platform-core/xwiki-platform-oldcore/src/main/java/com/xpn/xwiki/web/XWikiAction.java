@@ -355,18 +355,17 @@ public abstract class XWikiAction implements LegacyAction
     protected boolean isEntityReferenceNameValid(EntityReference entityReference)
     {
         if (this.getEntityNameValidationManager().getEntityReferenceNameStrategy() != null
-            && this.getEntityNameValidationConfiguration().useValidation()) {
-            if (!this.getEntityNameValidationManager().getEntityReferenceNameStrategy().isValid(entityReference)) {
-                Object[] args = {getLocalSerializer().serialize(entityReference)};
-                XWikiException invalidNameException = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_APP_DOCUMENT_NAME_INVALID,
-                    "Cannot create document {0} because its name does not respect the name strategy of the wiki.", null,
-                    args);
-                ScriptContext scontext = getCurrentScriptContext();
-                scontext.setAttribute("invalidNameReference", entityReference, ScriptContext.ENGINE_SCOPE);
-                scontext.setAttribute("createException", invalidNameException, ScriptContext.ENGINE_SCOPE);
-                return false;
-            }
+            && this.getEntityNameValidationConfiguration().useValidation()
+            && !this.getEntityNameValidationManager().getEntityReferenceNameStrategy().isValid(entityReference)) {
+            Object[] args = {getLocalSerializer().serialize(entityReference)};
+            XWikiException invalidNameException = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_APP_DOCUMENT_NAME_INVALID,
+                "Cannot create document {0} because its name does not respect the name strategy of the wiki.", null,
+                args);
+            ScriptContext scontext = getCurrentScriptContext();
+            scontext.setAttribute("invalidNameReference", entityReference, ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("createException", invalidNameException, ScriptContext.ENGINE_SCOPE);
+            return false;
         }
         return true;
     }

@@ -749,22 +749,20 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             if (!isSensitive && oldProperty != null) {
                 isSensitive = oldProperty.isSensitive(context);
             }
-            if (newProperty == null) {
-                // The property exists in the old object, but not in the new one
-                if ((oldProperty != null) && (!"".equals(oldProperty.toText()))) {
-                    if (pclass != null) {
-                        // Put the values as they would be displayed in the interface
-                        String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                            : pclass.displayView(propertyName, oldCollection, context);
-                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, "",
-                            isSensitive));
-                    } else {
-                        // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), "",
-                            isSensitive));
-                    }
+            // The property exists in the old object, but not in the new one
+            if (newProperty == null && (oldProperty != null) && (!"".equals(oldProperty.toText()))) {
+                if (pclass != null) {
+                    // Put the values as they would be displayed in the interface
+                    String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
+                        : pclass.displayView(propertyName, oldCollection, context);
+                    difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, "",
+                        isSensitive));
+                } else {
+                    // Cannot get property definition, so use the plain value
+                    difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), "",
+                        isSensitive));
                 }
             }
         }

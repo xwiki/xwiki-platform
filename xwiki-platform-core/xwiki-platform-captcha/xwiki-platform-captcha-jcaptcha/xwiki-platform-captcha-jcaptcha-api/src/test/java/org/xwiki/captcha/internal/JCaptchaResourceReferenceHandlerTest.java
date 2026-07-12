@@ -87,7 +87,7 @@ class JCaptchaResourceReferenceHandlerTest
     private ResourceReferenceHandlerChain resourceReferenceHandlerChain;
 
     @BeforeEach
-    public void setup(MockitoComponentManager mockitoComponentManager) throws Exception
+    void setup(MockitoComponentManager mockitoComponentManager) throws Exception
     {
         Container container = mockitoComponentManager.getInstance(Container.class);
         ServletRequest request = mock(ServletRequest.class);

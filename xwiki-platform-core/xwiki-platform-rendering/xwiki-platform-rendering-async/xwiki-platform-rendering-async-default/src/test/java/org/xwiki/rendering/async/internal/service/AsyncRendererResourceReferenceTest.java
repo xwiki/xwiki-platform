@@ -31,10 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 
  * @version $Id$
  */
-public class AsyncRendererResourceReferenceTest
+class AsyncRendererResourceReferenceTest
 {
     @Test
-    public void get()
+    void get()
     {
         AsyncRendererResourceReference reference = new AsyncRendererResourceReference(new ResourceType(""),
             Arrays.asList("id1", "id2"), "clientId", 42, "wiki");

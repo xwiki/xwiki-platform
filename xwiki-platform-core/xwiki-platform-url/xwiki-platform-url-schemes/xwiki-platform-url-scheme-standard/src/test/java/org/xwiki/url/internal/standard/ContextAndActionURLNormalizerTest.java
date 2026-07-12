@@ -133,7 +133,7 @@ class ContextAndActionURLNormalizerTest
     }
 
     @Test
-    public void normalizeWithSlashRootConfiguration()
+    void normalizeWithSlashRootConfiguration()
     {
         when(this.xwikiCfg.getProperty("xwiki.webapppath")).thenReturn("/");
         when(this.servletContext.getContextPath()).thenReturn("/bad");

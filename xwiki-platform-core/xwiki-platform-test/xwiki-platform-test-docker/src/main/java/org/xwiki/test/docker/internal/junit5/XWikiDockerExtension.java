@@ -41,6 +41,7 @@ import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecuto
 import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
+import org.xwiki.test.docker.junit5.ServletEngineFileManager;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;
@@ -114,7 +115,7 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
     private static final String STOP_FILENAME = "stop.txt";
 
     private static final List<Class<?>> SUPPORTED_PARAMETER_TYPES = List.of(XWikiWebDriver.class, TestUtils.class,
-        TestConfiguration.class, ComponentManager.class, ExtensionTestUtils.class);
+        TestConfiguration.class, ComponentManager.class, ExtensionTestUtils.class, ServletEngineFileManager.class);
 
     private boolean isVncStarted;
 
@@ -353,17 +354,21 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
     {
         Class<?> type = parameterContext.getParameter().getType();
+        Object result;
         if (XWikiWebDriver.class.isAssignableFrom(type)) {
-            return loadXWikiWebDriver(extensionContext);
+            result = loadXWikiWebDriver(extensionContext);
         } else if (TestConfiguration.class.isAssignableFrom(type)) {
-            return loadTestConfiguration(extensionContext);
+            result = loadTestConfiguration(extensionContext);
         } else if (ComponentManager.class.isAssignableFrom(type)) {
-            return loadComponentManager(extensionContext);
+            result = loadComponentManager(extensionContext);
         } else if (ExtensionTestUtils.class.isAssignableFrom(type)) {
-            return loadExtensionTestUtils(extensionContext);
+            result = loadExtensionTestUtils(extensionContext);
+        } else if (ServletEngineFileManager.class.isAssignableFrom(type)) {
+            result = new ServletEngineFileManager(loadServletContainerExecutor(0, extensionContext));
         } else {
-            return loadPersistentTestContext(extensionContext).getUtil();
+            result = loadPersistentTestContext(extensionContext).getUtil();
         }
+        return result;
     }
 
     @Override

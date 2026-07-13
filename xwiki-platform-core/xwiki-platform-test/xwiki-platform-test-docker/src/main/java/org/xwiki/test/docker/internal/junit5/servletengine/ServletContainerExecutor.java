@@ -21,6 +21,7 @@ package org.xwiki.test.docker.internal.junit5.servletengine;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,6 +40,8 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.utility.MountableFile;
+import org.xwiki.test.XWikiTempDirUtil;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.internal.junit5.XWikiGenericContainer;
@@ -78,6 +82,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String DOCKER_SOCK = "/var/run/docker.sock";
 
+    /**
+     * Directory inside the servlet container used to exchange files (conversion sources and targets, etc.) between the
+     * test and the running XWiki instance. It is created world-writable so that XWiki can write into it even when it
+     * doesn't run as root inside the container.
+     */
+    private static final String CONTAINER_EXCHANGE_DIRECTORY = "/tmp/xwiki-test-exchange";
+
     private static final String ROOT_USER = "root";
 
     private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
@@ -99,6 +110,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private TestConfiguration testConfiguration;
 
     private GenericContainer<?> servletContainer;
+
+    private File hostExchangeDirectory;
+
+    private boolean containerExchangeDirectoryCreated;
 
     /**
      * @param index the index of the executor
@@ -497,6 +512,104 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
 
         return container;
+    }
+
+    /**
+     * @return {@code true} when the XWiki instance runs directly on the host (e.g. Jetty standalone) and thus shares
+     *         the host filesystem, {@code false} when it runs inside a Docker container
+     */
+    private boolean isServerOnHost()
+    {
+        // When the servlet engine runs outside Docker, no servlet container is created (see #start()).
+        return this.servletContainer == null;
+    }
+
+    /**
+     * @param fileName the name of a file
+     * @return the path, as seen by the running XWiki instance, of a file with the given name located in the directory
+     *         used to exchange files with XWiki (a host temporary directory when XWiki runs on the host, an
+     *         in-container temporary directory otherwise)
+     * @throws IOException if the exchange directory can't be created
+     * @since 18.6.0RC1
+     */
+    public String getServerFilePath(String fileName) throws IOException
+    {
+        if (isServerOnHost()) {
+            return new File(getHostExchangeDirectory(), fileName).getAbsolutePath();
+        } else {
+            createContainerExchangeDirectory();
+            return CONTAINER_EXCHANGE_DIRECTORY + '/' + fileName;
+        }
+    }
+
+    /**
+     * Make the content of the passed host file readable by the running XWiki instance (by copying it into the
+     * container when XWiki runs in Docker, or into a host temporary directory otherwise).
+     *
+     * @param hostFile the file located on the host (e.g. a test resource)
+     * @return the path, as seen by the running XWiki instance, where the file content is now available (e.g. to be
+     *         used in a {@code file:} filter source reference)
+     * @throws IOException if the file can't be made available to the server
+     * @since 18.6.0RC1
+     */
+    public String copyFileToServer(File hostFile) throws IOException
+    {
+        String serverPath = getServerFilePath(hostFile.getName());
+        if (isServerOnHost()) {
+            FileUtils.copyFile(hostFile, new File(serverPath));
+        } else {
+            this.servletContainer.copyFileToContainer(MountableFile.forHostPath(hostFile.getAbsolutePath()),
+                serverPath);
+        }
+        return serverPath;
+    }
+
+    /**
+     * Retrieve to the host a file produced by the running XWiki instance (by copying it out of the container when
+     * XWiki runs in Docker; the file is already on the host otherwise).
+     *
+     * @param serverPath the path of the file as seen by the running XWiki instance (typically obtained from
+     *            {@link #getServerFilePath(String)})
+     * @return the file on the host
+     * @throws IOException if the file can't be retrieved from the server
+     * @since 18.6.0RC1
+     */
+    public File copyFileFromServer(String serverPath) throws IOException
+    {
+        if (isServerOnHost()) {
+            return new File(serverPath);
+        } else {
+            File hostFile = new File(getHostExchangeDirectory(), new File(serverPath).getName());
+            this.servletContainer.copyFileFromContainer(serverPath, hostFile.getAbsolutePath());
+            return hostFile;
+        }
+    }
+
+    private File getHostExchangeDirectory()
+    {
+        if (this.hostExchangeDirectory == null) {
+            // Create the directory under the module's "target" directory (as the @TempDir annotation does) so that
+            // the exchanged files don't leak outside the build workspace.
+            this.hostExchangeDirectory = XWikiTempDirUtil.createTemporaryDirectory();
+        }
+        return this.hostExchangeDirectory;
+    }
+
+    private void createContainerExchangeDirectory() throws IOException
+    {
+        if (!this.containerExchangeDirectoryCreated) {
+            try {
+                // Create the directory world-writable so that XWiki can write conversion outputs into it even when it
+                // doesn't run as root inside the container.
+                this.servletContainer.execInContainer("mkdir", "-p", "-m", "777", CONTAINER_EXCHANGE_DIRECTORY);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException(
+                    String.format("Interrupted while creating exchange directory [%s] in the servlet container",
+                        CONTAINER_EXCHANGE_DIRECTORY), e);
+            }
+            this.containerExchangeDirectoryCreated = true;
+        }
     }
 
     /**

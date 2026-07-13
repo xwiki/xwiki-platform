@@ -32,16 +32,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 
  * @version $Id$
  */
-public class TikaUtilsTest
+class TikaUtilsTest
 {
     @Test
-    public void parsePDF() throws IOException, TikaException
+    void parsePDF() throws IOException, TikaException
     {
         assertEquals("\nPDF content\n\n\n", TikaUtils.parseToString(getClass().getResource("/pdf.pdf")));
     }
 
     @Test
-    public void parseAutoclosable() throws IOException, TikaException
+    void parseAutoclosable() throws IOException, TikaException
     {
         assertEquals("\nPDF content\n\n\n",
             TikaUtils.parseToString(new AutoCloseInputStream(getClass().getResourceAsStream("/pdf.pdf"))));

@@ -66,7 +66,7 @@ class ZipExplorerTest
     private ZipExplorerPlugin plugin;
 
     @BeforeEach
-    public void setUp(MockitoComponentManager componentManager) throws Exception
+    void setUp(MockitoComponentManager componentManager) throws Exception
     {
         this.plugin = new ZipExplorerPlugin("zipexplorer", ZipExplorerPlugin.class.getName(), null);
 

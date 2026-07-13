@@ -94,7 +94,7 @@ import static org.mockito.Mockito.when;
     SpaceReferenceConverter.class, DocumentReferenceConverter.class, EntityReferenceConverter.class})
 @ReferenceComponentList
 @EmbeddedSolrComponentList
-public class EventStoreTest
+class EventStoreTest
 {
     private static final DefaultEvent EVENT1 = event("id1");
 

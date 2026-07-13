@@ -717,15 +717,13 @@ public class ModelFactory
         }
 
         com.xpn.xwiki.api.Object tagsObject = doc.getObject("XWiki.TagClass", 0);
-        if (tagsObject != null) {
-            if (tagsObject.getProperty("tags") != null) {
-                String tagsUri = Utils.createURI(baseUri, PageTagsResource.class, doc.getWiki(), restSpacesValue,
-                    doc.getDocumentReference().getName()).toString();
-                Link tagsLink = this.objectFactory.createLink();
-                tagsLink.setHref(tagsUri);
-                tagsLink.setRel(Relations.TAGS);
-                pageSummary.getLinks().add(tagsLink);
-            }
+        if (tagsObject != null && tagsObject.getProperty("tags") != null) {
+            String tagsUri = Utils.createURI(baseUri, PageTagsResource.class, doc.getWiki(), restSpacesValue,
+                doc.getDocumentReference().getName()).toString();
+            Link tagsLink = this.objectFactory.createLink();
+            tagsLink.setHref(tagsUri);
+            tagsLink.setRel(Relations.TAGS);
+            pageSummary.getLinks().add(tagsLink);
         }
 
         String syntaxesUri = Utils.createURI(baseUri, SyntaxesResource.class).toString();

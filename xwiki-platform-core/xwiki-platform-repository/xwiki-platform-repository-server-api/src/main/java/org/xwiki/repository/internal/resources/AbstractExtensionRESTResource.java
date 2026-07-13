@@ -437,25 +437,23 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
                 versionDocument.getXObjects(XWikiRepositoryModel.EXTENSIONDEPENDENCY_CLASSREFERENCE);
             if (dependencies != null) {
                 for (BaseObject dependencyObject : dependencies) {
-                    if (dependencyObject != null) {
-                        if (Strings.CS.equals(this.extensionStore.getValue(dependencyObject,
-                            XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, null), version)) {
-                            ExtensionDependency dependency = extensionObjectFactory.createExtensionDependency();
-                            dependency.setId(this.extensionStore.getValue(dependencyObject,
-                                XWikiRepositoryModel.PROP_DEPENDENCY_ID));
-                            dependency.setConstraint(this.extensionStore.getValue(dependencyObject,
-                                XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT));
-                            List<String> dependencyExclusions = this.extensionStore.getValue(dependencyObject,
-                                XWikiRepositoryModel.PROP_DEPENDENCY_EXCLUSIONS);
-                            dependency.withExclusions(dependencyExclusions);
-                            dependency.setOptional(this.extensionStore.getBooleanValue(dependencyObject,
-                                XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, false));
-                            List<String> dependencyRepositories = this.extensionStore.getValue(dependencyObject,
-                                XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES);
-                            dependency.withRepositories(toExtensionRepositories(dependencyRepositories));
+                    if (dependencyObject != null && Strings.CS.equals(this.extensionStore.getValue(dependencyObject,
+                        XWikiRepositoryModel.PROP_DEPENDENCY_EXTENSIONVERSION, null), version)) {
+                        ExtensionDependency dependency = extensionObjectFactory.createExtensionDependency();
+                        dependency.setId(this.extensionStore.getValue(dependencyObject,
+                            XWikiRepositoryModel.PROP_DEPENDENCY_ID));
+                        dependency.setConstraint(this.extensionStore.getValue(dependencyObject,
+                            XWikiRepositoryModel.PROP_DEPENDENCY_CONSTRAINT));
+                        List<String> dependencyExclusions = this.extensionStore.getValue(dependencyObject,
+                            XWikiRepositoryModel.PROP_DEPENDENCY_EXCLUSIONS);
+                        dependency.withExclusions(dependencyExclusions);
+                        dependency.setOptional(this.extensionStore.getBooleanValue(dependencyObject,
+                            XWikiRepositoryModel.PROP_DEPENDENCY_OPTIONAL, false));
+                        List<String> dependencyRepositories = this.extensionStore.getValue(dependencyObject,
+                            XWikiRepositoryModel.PROP_DEPENDENCY_REPOSITORIES);
+                        dependency.withRepositories(toExtensionRepositories(dependencyRepositories));
 
-                            extensionVersion.getDependencies().add(dependency);
-                        }
+                        extensionVersion.getDependencies().add(dependency);
                     }
                 }
             }

@@ -61,13 +61,11 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
             JobStartedEvent jobEvent = (JobStartedEvent) localEvent.getEvent();
 
             // Share only specific jobs
-            if (JOBS.contains(jobEvent.getJobType())) {
-                // Don't send back remote jobs
-                if (!jobEvent.getRequest().isRemote()) {
-                    remoteEvent.setEvent(jobEvent);
+            // Don't send back remote jobs
+            if (JOBS.contains(jobEvent.getJobType()) && !jobEvent.getRequest().isRemote()) {
+                remoteEvent.setEvent(jobEvent);
 
-                    return true;
-                }
+                return true;
             }
         }
 

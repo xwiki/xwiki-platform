@@ -191,11 +191,10 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         if (groupUserRefs.contains(entry.getReference())) {
             final List<GroupSecurityReference> groups = new ArrayList<>();
             for (GroupSecurityReference group : groupRefs.keySet()) {
-                if (groupRefs.get(group).contains(entry.getReference())) {
-                    if (group.getOriginalReference().getWikiReference()
+                if (groupRefs.get(group).contains(entry.getReference())
+                    && group.getOriginalReference().getWikiReference()
                         .equals(entry.getReference().getOriginalDocumentReference().getWikiReference())) {
-                        groups.add(group);
-                    }
+                    groups.add(group);
                 }
             }
             AddUserEntry(entry, groups);
@@ -213,13 +212,11 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         if (groupUserRefs.contains(user.getReference())) {
             final List<GroupSecurityReference> groups = new ArrayList<>();
             for (GroupSecurityReference group : groupRefs.keySet()) {
-                if (groupRefs.get(group).contains(user.getReference())) {
-                    if (group.getOriginalReference().getWikiReference()
+                if (groupRefs.get(group).contains(user.getReference())
+                    && (group.getOriginalReference().getWikiReference()
                         .equals(user.getWikiReference().getOriginalWikiReference())
-                        || group.isGlobal())
-                    {
-                        groups.add(group);
-                    }
+                        || group.isGlobal())) {
+                    groups.add(group);
                 }
             }
             securityCache.add(user, groups, securityCache.getInvalidationCounter());

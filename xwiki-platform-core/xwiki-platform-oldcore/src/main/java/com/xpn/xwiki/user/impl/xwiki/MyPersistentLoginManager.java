@@ -530,6 +530,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     @Override
     // TODO: Also use the URL, in case cookies are disabled [XWIKI-1071]
+    // DEFAULT_VALUE is not a hardcoded password but a value indicating "not set cookie" - suppress the false positive.
+    @SuppressWarnings("java:S2068")
     public String getRememberedPassword(HttpServletRequest request, HttpServletResponse response)
     {
         String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);

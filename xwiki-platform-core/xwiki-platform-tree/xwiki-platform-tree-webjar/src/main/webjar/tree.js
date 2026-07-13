@@ -84,7 +84,17 @@ define([
         urlParams[pair[0]] = pair[1];
       }
     }
-    return $.post(new URL('?', url), $.param($.extend(urlParams, data), true));
+    return $.post(new URL('?', url), $.param($.extend(urlParams, data), true))
+    .done(function(response) {
+      // Handle successful response
+      console.log('AJAX Request Successful:', response);
+      // Perform actions with the response data
+    })
+    .fail(function(xhr, status, error) {
+      // Handle AJAX request failure
+      console.error('AJAX Request Failed:', error);
+      // You can provide user-friendly error messages or take appropriate actions here
+    });
   };
 
   var getChildren = function(node, callback, parameters) {
@@ -590,9 +600,12 @@ define([
         // Create a new entity.
         disableNodeBeforeLoading(data.instance, data.node);
         createEntity(data.instance, data.node).then(() => {
+          // Success
           data.instance.refreshNode(data.node.parent);
-        }).catch(() => {
+        }).catch((error) => {
           data.instance.delete_node(data.node);
+          // Log the error
+          console.error('Entity Creation Failed:', error);
         });
       }
 
@@ -611,20 +624,27 @@ define([
       if (!entityId || data.parent === data.old_parent) {
         return;
       }
-      disableNodeBeforeLoading(data.instance, data.node);
-      moveEntity(data.instance, data.node).then(() => {
-        data.instance.refreshNode(data.parent);
-      }).catch(() => {
-        // Undo the move.
-        // Disconnect the node from the associated entity to prevent moving the entity.
-        data.node.data.id = null;
-        data.instance.move_node(data.node, data.old_parent, data.old_position);
-        // Reconnect the tree node to the entity as soon as possible.
-        setTimeout(function() {
-          data.node.data.id = entityId;
-          enableNodeAfterLoading(data.instance, data.node);
-        }, 0);
-      });
+      try {
+        disableNodeBeforeLoading(data.instance, data.node);
+        moveEntity(data.instance, data.node).then(() => {
+          data.instance.refreshNode(data.parent);
+        }).catch((error) => {
+          // Handle move entity error
+        console.error('Entity Move Failed:', error);
+          // Undo the move.
+          // Disconnect the node from the associated entity to prevent moving the entity.
+          data.node.data.id = null;
+          data.instance.move_node(data.node, data.old_parent, data.old_position);
+          // Reconnect the tree node to the entity as soon as possible.
+          setTimeout(function() {
+            data.node.data.id = entityId;
+            enableNodeAfterLoading(data.instance, data.node);
+          }, 0);
+        });
+      } catch(error){
+        // Handle other errors
+        console.error('An error occurred:', error);
+      }
 
     }).on('copy_node.jstree', function(event, data) {
       var entityId = data.original.data && data.original.data.id;

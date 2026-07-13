@@ -115,6 +115,11 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     private static final String MACRO_BINDING = "wikimacro";
 
     /**
+     * The name of the metadata flagging a block as containing wiki macro content.
+     */
+    private static final String WIKIMACROCONTENT = "wikimacrocontent";
+
+    /**
      * The key under which macro body will be available inside macro context.
      * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
@@ -196,7 +201,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      */
     private static final BlockMatcher MACROCONTENT_METADATA_MATCHER =
         testedBlock -> (testedBlock instanceof MetaDataBlock)
-            && "true".equals(((MetaDataBlock) testedBlock).getMetaData().getMetaData("wikimacrocontent"));
+            && "true".equals(((MetaDataBlock) testedBlock).getMetaData().getMetaData(WIKIMACROCONTENT));
 
     /**
      * Match all the metadata blocks that contains a non-generated-content metadata.
@@ -712,7 +717,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     {
         if (this.wikimacro.getDescriptor().getContentDescriptor() != null && this.macroContent != null) {
             MetaData nonGeneratedContentMetaData = getNonGeneratedContentMetaData();
-            nonGeneratedContentMetaData.addMetaData("wikimacrocontent", "true");
+            nonGeneratedContentMetaData.addMetaData(WIKIMACROCONTENT, "true");
 
             List<Block> blocks;
             try {
@@ -762,7 +767,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
         if (parameterValue instanceof String) {
             MetaData nonGeneratedContentMetaData = getNonGeneratedParameterMetaData(parameterName);
-            nonGeneratedContentMetaData.addMetaData("wikimacrocontent", "true");
+            nonGeneratedContentMetaData.addMetaData(WIKIMACROCONTENT, "true");
 
             List<Block> blocks;
             try {

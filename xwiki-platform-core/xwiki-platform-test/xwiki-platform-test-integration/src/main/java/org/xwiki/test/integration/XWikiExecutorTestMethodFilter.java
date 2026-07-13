@@ -87,9 +87,7 @@ public class XWikiExecutorTestMethodFilter extends Filter
     public boolean shouldRun(Description description)
     {
         String testMethodName = String.format("%s#%s", description.getClassName(), description.getMethodName());
-        boolean result = testMethodName.matches(this.pattern);
-
-        return result;
+        return testMethodName.matches(this.pattern);
     }
 
     @Override

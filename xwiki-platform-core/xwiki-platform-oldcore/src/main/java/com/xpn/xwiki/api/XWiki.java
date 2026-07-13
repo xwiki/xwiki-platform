@@ -71,6 +71,9 @@ public class XWiki extends Api
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
 
+    /** Value returned when Groovy parsing is denied because of missing programming rights. */
+    private static final String GROOVY_MISSINGRIGHTS = "groovy_missingrights";
+
     /** The internal object wrapped by this API. */
     private com.xpn.xwiki.XWiki xwiki;
 
@@ -2686,7 +2689,7 @@ public class XWiki extends Api
         if (hasProgrammingRights()) {
             return this.xwiki.parseGroovyFromString(script, getXWikiContext());
         }
-        return "groovy_missingrights";
+        return GROOVY_MISSINGRIGHTS;
     }
 
     /**
@@ -2703,7 +2706,7 @@ public class XWiki extends Api
         if (this.xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext())) {
             return this.xwiki.parseGroovyFromString(doc.getContent(), jarWikiPage, getXWikiContext());
         }
-        return "groovy_missingrights";
+        return GROOVY_MISSINGRIGHTS;
     }
 
     /**
@@ -2720,7 +2723,7 @@ public class XWiki extends Api
         if (this.xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext())) {
             return this.xwiki.parseGroovyFromString(doc.getContent(), getXWikiContext());
         }
-        return "groovy_missingrights";
+        return GROOVY_MISSINGRIGHTS;
     }
 
     /**

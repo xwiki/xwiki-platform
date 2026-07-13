@@ -87,8 +87,7 @@ public class StandardURLStringEntityReferenceResolver extends DefaultStringEntit
             ResourceReference reference =
                 this.resourceResolver.resolve(extendedURL, resourceType, Collections.emptyMap());
             if (reference instanceof EntityResourceReference) {
-                EntityReference entityReference = ((EntityResourceReference) reference).getEntityReference();
-                return entityReference;
+                return ((EntityResourceReference) reference).getEntityReference();
             }
         } catch (CreateResourceReferenceException | UnsupportedResourceReferenceException | CreateResourceTypeException
             | MalformedURLException e) {

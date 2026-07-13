@@ -28,7 +28,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
-import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.script.service.ScriptService;

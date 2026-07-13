@@ -123,8 +123,8 @@ public class ListMetaClass extends PropertyMetaClass
     private BooleanClass newCheckBox(boolean checked)
     {
         BooleanClass checkBox = new BooleanClass(this);
-        checkBox.setDisplayType("yesno");
-        checkBox.setDisplayFormType("checkbox");
+        checkBox.setDisplayType(BooleanClass.DISPLAY_YESNO);
+        checkBox.setDisplayFormType(BooleanClass.DISPLAY_CHECKBOX);
         checkBox.setDefaultValue(checked ? 1 : 0);
         return checkBox;
     }

@@ -31,10 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class MailEntityDeleteEventTest
+class MailEntityDeleteEventTest
 {
     @Test
-    public void matches()
+    void matches()
     {
         MailEntityDeleteEvent event = new MailEntityDeleteEvent();
 

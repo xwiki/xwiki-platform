@@ -235,7 +235,7 @@ public class PackageAPI extends Api
      *         message is placed in the velocity context under the <code>import_error</code> key,
      * @since 2.2M1
      */
-    public boolean importPackageFromByteArray(byte data[])
+    public boolean importPackageFromByteArray(byte[] data)
     {
         try {
             this.pack.Import(data, getXWikiContext());
@@ -258,7 +258,7 @@ public class PackageAPI extends Api
      * @throws IOException while reading the ZipFile
      * @throws XWikiException when package content is broken
      */
-    public String Import(byte file[]) throws IOException, XWikiException
+    public String Import(byte[] file) throws IOException, XWikiException
     {
         return this.pack.Import(file, getXWikiContext());
     }

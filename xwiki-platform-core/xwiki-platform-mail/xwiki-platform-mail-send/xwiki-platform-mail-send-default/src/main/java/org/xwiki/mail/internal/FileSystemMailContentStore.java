@@ -171,8 +171,7 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
 
     private File getBatchDirectory(String batchId)
     {
-        File batchDirectory = new File(rootDirectory, getURLEncoded(batchId));
-        return batchDirectory;
+        return new File(rootDirectory, getURLEncoded(batchId));
     }
 
     private File getMessageFile(String batchId, String uniqueMessageId)

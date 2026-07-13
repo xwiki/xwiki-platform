@@ -89,7 +89,7 @@ public class AttachmentQueryFilter extends AbstractWhereQueryFilter
     public List filterResults(List results)
     {
         // We need at least 2 columns in the select: the document full name and the attachment file name.
-        if (results.size() > 0 && results.get(0).getClass().isArray()) {
+        if (!results.isEmpty() && results.get(0).getClass().isArray()) {
             List<AttachmentReference> attachmentReferences = new ArrayList<>();
             for (Object result : results) {
                 Object[] actualResult = (Object[]) result;

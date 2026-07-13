@@ -27,8 +27,6 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -59,9 +57,6 @@ import com.xpn.xwiki.web.Utils;
 @Singleton
 public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements XWikiVersioningStoreInterface
 {
-    /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
-
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.

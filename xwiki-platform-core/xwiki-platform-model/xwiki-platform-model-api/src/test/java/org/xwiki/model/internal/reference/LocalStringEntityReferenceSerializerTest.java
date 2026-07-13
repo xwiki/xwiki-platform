@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ComponentList({
     DefaultSymbolScheme.class
 })
-public class LocalStringEntityReferenceSerializerTest
+class LocalStringEntityReferenceSerializerTest
 {
     @InjectMockComponents
     private LocalStringEntityReferenceSerializer serializer;
@@ -47,14 +47,14 @@ public class LocalStringEntityReferenceSerializerTest
     private DefaultStringEntityReferenceResolver resolver;
 
     @Test
-    public void serializeDocumentReference()
+    void serializeDocumentReference()
     {
         EntityReference reference = this.resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
         assertEquals("space.page", this.serializer.serialize(reference));
     }
     
     @Test
-    public void serializeSpaceReferenceWithChild()
+    void serializeSpaceReferenceWithChild()
     {
         EntityReference reference = this.resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
         assertEquals("space", this.serializer.serialize(reference.getParent()));

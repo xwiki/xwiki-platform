@@ -102,7 +102,7 @@ public class DrawerMenu extends BaseElement
     public boolean hasEntry(String entryName)
     {
         show();
-        return getDriver().findElementsWithoutWaiting(By.xpath(getEntryXPath(entryName))).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(By.xpath(getEntryXPath(entryName))).isEmpty();
     }
 
     private String getEntryXPath(String entryName)

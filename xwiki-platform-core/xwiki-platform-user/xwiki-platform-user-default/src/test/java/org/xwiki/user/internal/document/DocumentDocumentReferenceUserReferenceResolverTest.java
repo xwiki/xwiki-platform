@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DocumentDocumentReferenceUserReferenceResolverTest
+class DocumentDocumentReferenceUserReferenceResolverTest
 {
     @InjectMockComponents
     private DocumentDocumentReferenceUserReferenceResolver resolver;

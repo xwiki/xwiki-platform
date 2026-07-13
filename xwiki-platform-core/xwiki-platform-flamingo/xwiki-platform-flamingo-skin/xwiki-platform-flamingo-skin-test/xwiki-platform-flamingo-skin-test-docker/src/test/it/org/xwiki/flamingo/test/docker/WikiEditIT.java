@@ -73,7 +73,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Test\\.XWikiConfigurationPageForTest"
     }
 )
-class EditIT
+class WikiEditIT
 {
     @BeforeAll
     void setup(TestUtils setup)
@@ -348,6 +348,7 @@ class EditIT
 
             // check that the warning is still displayed after a cancel
             assertTrue(editWiki.isCSRFWarningDisplayed());
+            assertTrue(editWiki.hasForceSaveCSRFButton());
             editWiki.clickForceSaveCSRFButton();
             editWiki.waitForNotificationSuccessMessage("Saved");
 
@@ -379,6 +380,7 @@ class EditIT
             editWiki.getPreviewButton().click();
             ResubmissionPage resubmissionPage = new ResubmissionPage();
             assertTrue(resubmissionPage.isOnResubmissionPage());
+            assertTrue(resubmissionPage.requestCanBeResubmitted());
 
             // check cancelling: it leads back to the page in view mode without any change
             resubmissionPage.cancel();
@@ -394,6 +396,7 @@ class EditIT
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();
             assertTrue(resubmissionPage.isOnResubmissionPage());
+            assertTrue(resubmissionPage.requestCanBeResubmitted());
             // check resubmit and go back to editor
             resubmissionPage.resubmit();
             PreviewEditPage previewEditPage = new PreviewEditPage(editWiki);
@@ -413,6 +416,7 @@ class EditIT
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();
             assertTrue(resubmissionPage.isOnResubmissionPage());
+            assertTrue(resubmissionPage.requestCanBeResubmitted());
             // check resubmit and save and continue: it should led back to the editor with the saved changes
             resubmissionPage.resubmit();
             previewEditPage = new PreviewEditPage(editWiki);
@@ -433,6 +437,7 @@ class EditIT
             editWiki.getPreviewButton().click();
             resubmissionPage = new ResubmissionPage();
             assertTrue(resubmissionPage.isOnResubmissionPage());
+            assertTrue(resubmissionPage.requestCanBeResubmitted());
             // check resubmit and save and view
             resubmissionPage.resubmit();
             previewEditPage = new PreviewEditPage(editWiki);
@@ -1135,5 +1140,41 @@ class EditIT
 
         assertEquals(test, viewPage.getDocumentTitle());
         assertEquals(test, viewPage.getContent());
+    }
+
+    /**
+     * Verify that, when the document title is made mandatory (Administration &gt; Editing &gt; Edit Mode,
+     * "Make page title field mandatory" = Yes, i.e. the {@code xwiki.title.mandatory} wiki preference), the Wiki editor
+     * does not let the user save the page with an empty title.
+     */
+    @Test
+    @Order(15)
+    void mandatoryTitle(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+        try {
+            setup.setWikiPreference("xwiki.title.mandatory", "1");
+
+            WikiEditPage editPage = WikiEditPage.gotoPage(testReference);
+
+            // The form pre-fills the title with the page name when mandatory, so clear it to trigger validation.
+            editPage.setTitle("");
+            assertFalse(editPage.isDocumentTitleValid());
+
+            // Saving with an empty title is blocked client-side (HTML5 form validation): the page is not saved and we
+            // remain in edit mode.
+            editPage.clickSaveAndView(false);
+            assertTrue(setup.getDriver().getCurrentUrl().contains("/edit/"));
+            assertFalse(editPage.isDocumentTitleValid());
+            assertEquals("This field is required.",
+                editPage.getDocumentTitleField().getDomProperty("validationMessage"));
+
+            // Providing a title makes the field valid and allows saving.
+            editPage.setTitle("My Title");
+            assertTrue(editPage.isDocumentTitleValid());
+            assertEquals("My Title", editPage.clickSaveAndView().getDocumentTitle());
+        } finally {
+            setup.setWikiPreference("xwiki.title.mandatory", "0");
+        }
     }
 }

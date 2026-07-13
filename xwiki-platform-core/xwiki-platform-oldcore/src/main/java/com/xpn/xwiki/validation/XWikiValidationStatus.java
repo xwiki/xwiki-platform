@@ -100,7 +100,7 @@ public class XWikiValidationStatus
 
     public boolean hasExceptions()
     {
-        return (getExceptions().size() > 0);
+        return (!getExceptions().isEmpty());
     }
 
     public List getExceptions()

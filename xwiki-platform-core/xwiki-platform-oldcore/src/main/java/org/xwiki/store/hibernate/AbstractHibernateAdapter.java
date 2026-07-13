@@ -122,9 +122,7 @@ public abstract class AbstractHibernateAdapter implements HibernateAdapter
     {
         // Minus (-) is not supported by many databases
         // TODO: move it to adapters which really needs it ?
-        String cleanName = name.replace('-', '_');
-
-        return cleanName;
+        return name.replace('-', '_');
     }
 
     @Override

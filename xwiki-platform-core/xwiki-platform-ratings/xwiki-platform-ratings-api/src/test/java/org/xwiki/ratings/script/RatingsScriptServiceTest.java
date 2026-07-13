@@ -74,7 +74,7 @@ import static org.xwiki.ratings.script.RatingsScriptService.EXECUTION_CONTEXT_PR
  * @version $Id$
  */
 @ComponentTest
-public class RatingsScriptServiceTest
+class RatingsScriptServiceTest
 {
     @InjectMockComponents
     private RatingsScriptService scriptService;

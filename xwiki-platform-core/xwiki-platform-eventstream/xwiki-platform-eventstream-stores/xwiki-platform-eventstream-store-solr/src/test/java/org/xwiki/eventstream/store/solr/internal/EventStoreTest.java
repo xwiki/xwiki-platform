@@ -130,8 +130,6 @@ public class EventStoreTest
 
     private static final WikiReference WIKI_REFERENCE = new WikiReference("wiki");
 
-    private static final WikiReference WIKI1_REFERENCE = new WikiReference("wiki1");
-
     private static final WikiReference WIKI2_REFERENCE = new WikiReference("wiki2");
 
     private static final SpaceReference SPACE_REFERENCE = new SpaceReference("space", WIKI_REFERENCE);
@@ -147,16 +145,6 @@ public class EventStoreTest
     private static final DocumentReference RELATED_REFERENCE = new DocumentReference("related", SPACE_REFERENCE);
 
     private static final String SPACE_STRING = "wiki:space";
-
-    private static final String SPACE1_STRING = "wiki1:space1";
-
-    private static final String SPACE2_STRING = "wiki2:space2";
-
-    private static final String DOCUMENT_STRING = "wiki:space.document";
-
-    private static final String USER_STRING = "wiki:space.user";
-
-    private static final String RELATED_STRING = "wiki:space.related";
 
     @XWikiTempDir
     private File permanentDirectory;

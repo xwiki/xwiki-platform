@@ -196,9 +196,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
         DocumentReference documentReferenceWithoutLocale = documentReference.getLocale() == null ? documentReference
             : new DocumentReference(documentReference, (Locale) null);
-        XWikiDocument document = xcontext.getWiki().getDocument(documentReferenceWithoutLocale, xcontext);
-
-        return document;
+        return xcontext.getWiki().getDocument(documentReferenceWithoutLocale, xcontext);
     }
 
     /**

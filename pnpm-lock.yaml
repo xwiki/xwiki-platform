@@ -31,8 +31,8 @@ catalogs:
       specifier: 8.3.14
       version: 8.3.14
     '@microsoft/api-extractor':
-      specifier: 7.58.7
-      version: 7.58.7
+      specifier: 7.58.9
+      version: 7.58.9
     '@playwright/experimental-ct-react':
       specifier: 1.61.0-alpha-2026-06-08
       version: 1.61.0-alpha-2026-06-08
@@ -100,8 +100,8 @@ catalogs:
       specifier: 7.0.3
       version: 7.0.3
     dompurify:
-      specifier: 3.4.9
-      version: 3.4.9
+      specifier: 3.4.11
+      version: 3.4.11
     eslint:
       specifier: 10.4.0
       version: 10.4.0
@@ -112,8 +112,8 @@ catalogs:
       specifier: 1.3.4
       version: 1.3.4
     eslint-plugin-import-x:
-      specifier: 4.16.2
-      version: 4.16.2
+      specifier: 4.17.0
+      version: 4.17.0
     eslint-plugin-prettier:
       specifier: 5.5.5
       version: 5.5.5
@@ -133,14 +133,14 @@ catalogs:
       specifier: 1.0.2
       version: 1.0.2
     globals:
-      specifier: 17.6.0
-      version: 17.6.0
+      specifier: 17.7.0
+      version: 17.7.0
     i18next:
       specifier: 26.3.1
       version: 26.3.1
     inversify:
-      specifier: 7.11.0
-      version: 7.11.0
+      specifier: 8.1.1
+      version: 8.1.1
     jiti:
       specifier: 2.7.0
       version: 2.7.0
@@ -367,7 +367,7 @@ importers:
         version: link:../../../../../xwiki-platform-node/src/main/node/core/syntaxes/xwiki
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       pinia:
         specifier: 'catalog:'
         version: 3.0.4(typescript@5.9.3)(vue@3.5.38(typescript@5.9.3))
@@ -416,7 +416,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       globals:
         specifier: 'catalog:'
-        version: 17.6.0
+        version: 17.7.0
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -455,7 +455,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       globals:
         specifier: 'catalog:'
-        version: 17.6.0
+        version: 17.7.0
       jquery:
         specifier: 'catalog:'
         version: 4.0.0
@@ -511,7 +511,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@types/jquery':
         specifier: 'catalog:'
         version: 4.0.0
@@ -737,7 +737,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.7(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0))(vue@3.5.38(typescript@5.9.3))
@@ -749,7 +749,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       globals:
         specifier: 'catalog:'
-        version: 17.6.0
+        version: 17.7.0
       publint:
         specifier: 'catalog:'
         version: 0.3.21
@@ -780,7 +780,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../dev/config
@@ -801,7 +801,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -835,7 +835,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -887,7 +887,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
@@ -911,7 +911,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       pinia:
         specifier: 'catalog:'
         version: 3.0.4(typescript@5.9.3)(vue@3.5.38(typescript@5.9.3))
@@ -938,7 +938,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -975,7 +975,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -996,7 +996,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -1033,7 +1033,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1054,7 +1054,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       jsdom:
         specifier: 'catalog:'
         version: 29.1.1
@@ -1106,7 +1106,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1127,7 +1127,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -1152,7 +1152,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -1188,11 +1188,11 @@ importers:
     dependencies:
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -1228,7 +1228,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../../../tools/tool-apiextractorconfig
@@ -1268,7 +1268,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -1307,11 +1307,11 @@ importers:
         version: link:../component-manager-api
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -1351,7 +1351,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1391,7 +1391,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1437,7 +1437,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1476,7 +1476,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -1519,7 +1519,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1577,7 +1577,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1598,7 +1598,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -1623,7 +1623,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.4.10(@vue/compiler-dom@3.5.38)(@vue/server-renderer@3.5.38(vue@3.5.38(typescript@5.9.3)))(vue@3.5.38(typescript@5.9.3))
@@ -1672,7 +1672,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1693,7 +1693,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -1727,7 +1727,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1748,7 +1748,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -1766,7 +1766,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1802,7 +1802,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.4.10(@vue/compiler-dom@3.5.38)(@vue/server-renderer@3.5.38(vue@3.5.38(typescript@5.9.3)))(vue@3.5.38(typescript@5.9.3))
@@ -1850,7 +1850,7 @@ importers:
         version: link:../../localization/localization-api
       dompurify:
         specifier: 'catalog:'
-        version: 3.4.9
+        version: 3.4.11
       eventemitter3:
         specifier: 'catalog:'
         version: 5.0.4
@@ -1872,7 +1872,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@types/jquery':
         specifier: 'catalog:'
         version: 4.0.0
@@ -1945,7 +1945,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@types/jquery':
         specifier: 'catalog:'
         version: 4.0.0
@@ -1997,7 +1997,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.4.10(@vue/compiler-dom@3.5.38)(@vue/server-renderer@3.5.38(vue@3.5.38(typescript@5.9.3)))(vue@3.5.38(typescript@5.9.3))
@@ -2042,7 +2042,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2076,7 +2076,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2119,7 +2119,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -2158,7 +2158,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2204,7 +2204,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.14
@@ -2228,7 +2228,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       jsdom:
         specifier: 'catalog:'
         version: 29.1.1
@@ -2256,7 +2256,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2277,7 +2277,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       jsdom:
         specifier: 'catalog:'
         version: 29.1.1
@@ -2298,7 +2298,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2341,7 +2341,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -2362,7 +2362,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       jsdom:
         specifier: 'catalog:'
         version: 29.1.1
@@ -2390,7 +2390,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -2411,7 +2411,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       jsdom:
         specifier: 'catalog:'
         version: 29.1.1
@@ -2439,7 +2439,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2484,7 +2484,7 @@ importers:
         version: link:../../../tools/tool-viteconfig
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -2524,7 +2524,7 @@ importers:
         version: link:../../../tools/tool-viteconfig
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -2598,7 +2598,7 @@ importers:
         version: link:../../../tools/tool-viteconfig
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -2639,7 +2639,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2673,7 +2673,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-apiextractorconfig
@@ -2740,7 +2740,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@types/mdast':
         specifier: 'catalog:'
         version: 4.0.4
@@ -2770,7 +2770,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       jsdom:
         specifier: 'catalog:'
         version: 29.1.1
@@ -2816,7 +2816,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -2835,7 +2835,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2868,7 +2868,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tool-tsconfig
@@ -2935,7 +2935,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12
@@ -2959,7 +2959,7 @@ importers:
         version: 10.4.0(jiti@2.7.0)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -3043,7 +3043,7 @@ importers:
         version: 26.3.1(typescript@5.9.3)
       inversify:
         specifier: 'catalog:'
-        version: 7.11.0(reflect-metadata@0.2.2)
+        version: 8.1.1(reflect-metadata@0.2.2)
       lodash-es:
         specifier: 'catalog:'
         version: 4.18.1
@@ -3062,7 +3062,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@playwright/experimental-ct-react':
         specifier: 'catalog:'
         version: 1.61.0-alpha-2026-06-08(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.10))(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.10))(yaml@2.9.0))(yaml@2.9.0)
@@ -3133,13 +3133,13 @@ importers:
         version: 10.0.1(eslint@10.4.0(jiti@2.7.0))
       eslint-import-resolver-typescript:
         specifier: 'catalog:'
-        version: 4.4.4(eslint-plugin-import-x@4.16.2(@typescript-eslint/utils@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.4.0(jiti@2.7.0)))(eslint@10.4.0(jiti@2.7.0))
+        version: 4.4.4(eslint-plugin-import-x@4.17.0(@typescript-eslint/utils@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.4.0(jiti@2.7.0)))(eslint@10.4.0(jiti@2.7.0))
       eslint-plugin-headers:
         specifier: 'catalog:'
         version: 1.3.4(eslint@10.4.0(jiti@2.7.0))
       eslint-plugin-import-x:
         specifier: 'catalog:'
-        version: 4.16.2(@typescript-eslint/utils@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.4.0(jiti@2.7.0))
+        version: 4.17.0(@typescript-eslint/utils@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.4.0(jiti@2.7.0))
       eslint-plugin-prettier:
         specifier: 'catalog:'
         version: 5.5.5(eslint-config-prettier@10.1.8(eslint@10.4.0(jiti@2.7.0)))(eslint@10.4.0(jiti@2.7.0))(prettier@3.6.2)
@@ -3859,25 +3859,25 @@ packages:
     resolution: {integrity: sha512-QRUCHqda1U6aR14FR0vvXD4+4gj6+fm0AhAozvSuRCw0fCvrmCugWpgiR4xH2NI6s8am6N9p5OhirplsX8ZS3g==}
     engines: {node: '>= 22'}
 
-  '@inversifyjs/common@1.5.2':
-    resolution: {integrity: sha512-WlzR9xGadABS9gtgZQ+luoZ8V6qm4Ii6RQfcfC9Ho2SOlE6ZuemFo7PKJvKI0ikm8cmKbU8hw5UK6E4qovH21w==}
+  '@inversifyjs/common@2.0.1':
+    resolution: {integrity: sha512-pJAR4IAcT2jkYfZ9bD9XhtUDBLJRr8QOiSjb+2XyaHru6DLvu0VD2Id2iP7+tVRKkEe3XFUwDUEdKxcYlF699Q==}
 
-  '@inversifyjs/container@1.15.0':
-    resolution: {integrity: sha512-U2xYsPrJTz5za2TExi5lg8qOWf8TEVBpN+pQM7B8BVA2rajtbRE9A66SLRHk8c1eGXmg+0K4Hdki6tWAsSQBUA==}
+  '@inversifyjs/container@2.0.2':
+    resolution: {integrity: sha512-a9T+jDQhDZQB7s3qVBsh9v3DwL1TwX7U7rofjbk50wTJAbzBINIpCa/gGWtIif9Cg3r7xIZVXuADDJjSPHCXJA==}
     peerDependencies:
       reflect-metadata: ~0.2.2
 
-  '@inversifyjs/core@9.2.0':
-    resolution: {integrity: sha512-Nm7BR6KmpgshIHpVQWuEDehqRVb6GBm8LFEuhc2s4kSZWrArZ15RmXQzROLk4m+hkj4kMXgvMm5Qbopot/D6Sg==}
+  '@inversifyjs/core@11.0.0':
+    resolution: {integrity: sha512-21XqVoAJMG2UBW6//1p2K49kRyBkqdX8h5Wc1in3CuactxZMPpPb3smBUwI86S1AZ66Xflr2Yp4OozwK7oxrHg==}
 
-  '@inversifyjs/plugin@0.2.0':
-    resolution: {integrity: sha512-R/JAdkTSD819pV1zi0HP54mWHyX+H2m8SxldXRgPQarS3ySV4KPyRdosWcfB8Se0JJZWZLHYiUNiS6JvMWSPjw==}
+  '@inversifyjs/plugin@0.3.1':
+    resolution: {integrity: sha512-ByklTw731fydBCTMwMpkmwm+lv0U+JWm9NEqRsz3n5KzAC5Om2XtLjqzEC2w+8Ote3gVC3Qxsx6YmG9XLIZpvg==}
 
-  '@inversifyjs/prototype-utils@0.1.3':
-    resolution: {integrity: sha512-EzRamZzNgE9Sn3QtZ8NncNa2lpPMZfspqbK6BWFguWnOpK8ymp2TUuH46ruFHZhrHKnknPd7fG22ZV7iF517TQ==}
+  '@inversifyjs/prototype-utils@0.2.1':
+    resolution: {integrity: sha512-53cVE3cw+RxnSkGlg+jOFNSox2owJF9Fv3HgFKe4f+4aPullscltIiio88QRkx2Sc5yo3VlqPsXQFGw2CVJZnw==}
 
-  '@inversifyjs/reflect-metadata-utils@1.4.1':
-    resolution: {integrity: sha512-Cp77C4d2wLaHXiUB7iH6Cxb7i1lD/YDuTIHLTDzKINqGSz0DCSoL/Dg2wVkW/6Qx03r/yQMLJ+32Agl32N2X8g==}
+  '@inversifyjs/reflect-metadata-utils@1.5.0':
+    resolution: {integrity: sha512-NpJVbRbuQ6Ao2vO+aw96un3oHDFCwXI0+pplsFt0Jh0gyR8DWk4m7ml/GBNMjdbeKVW/QgJ2S6NGXjk042uwqg==}
     peerDependencies:
       reflect-metadata: ~0.2.2
 
@@ -3922,6 +3922,10 @@ packages:
 
   '@microsoft/api-extractor@7.58.7':
     resolution: {integrity: sha512-yK6OycD46gIzLRpj6ueVUWPk1ACSpkN1LBo05gY1qPTylbWyUCanXfH7+VgkI5LJrJoRSQR5F04XuCffCXLOBw==}
+    hasBin: true
+
+  '@microsoft/api-extractor@7.58.9':
+    resolution: {integrity: sha512-S2UF4yza5GoxCmf7hJQNxJNZN9ltOVuOQv8Dy+Z21aol5ERoBNMdWcQHm4MJMPPItW4H/4rZD906iaf4mUojJA==}
     hasBin: true
 
   '@microsoft/tsdoc-config@0.18.1':
@@ -4004,9 +4008,6 @@ packages:
 
   '@one-ini/wasm@0.1.1':
     resolution: {integrity: sha512-XuySG1E38YScSJoMlqovLru4KTUNSjgVTIjyh7qMX6aNN5HY5Ct5LhRJdxO79JtTzKfzV/bnWpz+zquYrISsvw==}
-
-  '@package-json/types@0.0.12':
-    resolution: {integrity: sha512-uu43FGU34B5VM9mCNjXCwLaGHYjXdNincqKLaraaCW+7S2+SmiBg1Nv8bPnmschrIfZmfKNY9f3fC376MRrObw==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -4222,6 +4223,9 @@ packages:
     peerDependenciesMeta:
       '@types/node':
         optional: true
+
+  '@rushstack/ts-command-line@5.3.10':
+    resolution: {integrity: sha512-fwI076HYknC0IrMXdY6UmjDv+PH7NHhNJX3/pY2UblSE5XrXgndXZPiOe/6ZtuFpn6DvVDVNhtkIzQ+Qu/MhVQ==}
 
   '@rushstack/ts-command-line@5.3.9':
     resolution: {integrity: sha512-GIHqU+sRGQ3LGWAZu1O+9Yh++qwtyNIIGuNbcWHJjBTm2qRez0cwINUHZ+pQLR8UuzZDcMajrDaNbUYoaL/XtQ==}
@@ -5214,8 +5218,8 @@ packages:
     resolution: {integrity: sha512-svtcdpS8CgJyqAjEQIXdb3OjhFVVYjzGAPO8WGCmRbrml64SPw/jJD4GoE98aR7r25A0XcgrK3F02yw9R/vhQw==}
     engines: {node: '>=0.3.1'}
 
-  dompurify@3.4.9:
-    resolution: {integrity: sha512-4dPSRMRDqHvs0V4YDFCsaIZo4if5u0xM+llyxiM2fwuZFdKArUBAF3VtI2+n8NKg9P870WMdYk0UhqQNoWXbfQ==}
+  dompurify@3.4.11:
+    resolution: {integrity: sha512-zhlUV12GsaRzMsf9q5M254YhA4+VuF0fG+QFqu6aYpoGlKtz+w8//jBcGVYBgQkR5GHjUomejY84AV+/uPbWdw==}
 
   dotenv-expand@12.0.3:
     resolution: {integrity: sha512-uc47g4b+4k/M/SeaW1y4OApx+mtLWl92l5LMPP0GNXctZqELk+YGgOPIIC5elYmUH4OuoK3JLhuRUYegeySiFA==}
@@ -5359,8 +5363,8 @@ packages:
     peerDependencies:
       eslint: '>=7'
 
-  eslint-plugin-import-x@4.16.2:
-    resolution: {integrity: sha512-rM9K8UBHcWKpzQzStn1YRN2T5NvdeIfSVoKu/lKF41znQXHAUcBbYXe5wd6GNjZjTrP7viQ49n1D83x/2gYgIw==}
+  eslint-plugin-import-x@4.17.0:
+    resolution: {integrity: sha512-aM7V25Bg6YuYxtEhwjafzfS0NTMds1D2PMQI0K4KqJxQJRtkP4CO+MQTWRdBq2qAnmPxTxLevhXUBtByxJqS1w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       '@typescript-eslint/utils': ^8.56.0
@@ -5631,8 +5635,8 @@ packages:
     resolution: {integrity: sha512-Wjlyrolmm8uDpm/ogGyXZXb1Z+Ca2B8NbJwqBVg0axK9GbBeoS7yGV6vjXnYdGm6X53iehEuxxbyiKp8QmN4Vw==}
     engines: {node: 18 || 20 || >=22}
 
-  globals@17.6.0:
-    resolution: {integrity: sha512-sepffkT8stwnIYbsMBpoCHJuJM5l98FUF2AnE07hfvE0m/qp3R586hw4jF4uadbhvg1ooIdzuu7CsfD2jzCaNA==}
+  globals@17.7.0:
+    resolution: {integrity: sha512-Czmyns5dUsq4seFBR/Kdydhmo8y9kC79hiSkPn0YcGtNnYWnrgt0vjrSjx9tspoDGWm2CMarffRuLjM4xUz8xg==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -5741,8 +5745,8 @@ packages:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}
     engines: {node: '>= 0.4'}
 
-  inversify@7.11.0:
-    resolution: {integrity: sha512-yZDprSSr8TyVeMGI/AOV4ws6gwjX22hj9Z8/oHAVpJORY6WRFTcUzhnZtibBUHEw2U8ArvHcR+i863DplQ3Cwg==}
+  inversify@8.1.1:
+    resolution: {integrity: sha512-tLxs6w4T2NGCSkfgWIGPPR6HR5XSovuuLzxrXC5UadedM2DUfiEQ5RiOYaa48Nt6Ct56gQ745wu5SiXEJYNEkw==}
 
   is-array-buffer@3.0.5:
     resolution: {integrity: sha512-DDfANUiiG2wC1qawP66qlTugJeL5HyzMpfr8lLK+jMQirGzNod0B12cFB/9q838Ru27sBwfw78/rdoU7RERz6A==}
@@ -8147,31 +8151,31 @@ snapshots:
 
   '@intlify/shared@11.4.4': {}
 
-  '@inversifyjs/common@1.5.2': {}
+  '@inversifyjs/common@2.0.1': {}
 
-  '@inversifyjs/container@1.15.0(reflect-metadata@0.2.2)':
+  '@inversifyjs/container@2.0.2(reflect-metadata@0.2.2)':
     dependencies:
-      '@inversifyjs/common': 1.5.2
-      '@inversifyjs/core': 9.2.0(reflect-metadata@0.2.2)
-      '@inversifyjs/plugin': 0.2.0
-      '@inversifyjs/reflect-metadata-utils': 1.4.1(reflect-metadata@0.2.2)
+      '@inversifyjs/common': 2.0.1
+      '@inversifyjs/core': 11.0.0(reflect-metadata@0.2.2)
+      '@inversifyjs/plugin': 0.3.1
+      '@inversifyjs/reflect-metadata-utils': 1.5.0(reflect-metadata@0.2.2)
       reflect-metadata: 0.2.2
 
-  '@inversifyjs/core@9.2.0(reflect-metadata@0.2.2)':
+  '@inversifyjs/core@11.0.0(reflect-metadata@0.2.2)':
     dependencies:
-      '@inversifyjs/common': 1.5.2
-      '@inversifyjs/prototype-utils': 0.1.3
-      '@inversifyjs/reflect-metadata-utils': 1.4.1(reflect-metadata@0.2.2)
+      '@inversifyjs/common': 2.0.1
+      '@inversifyjs/prototype-utils': 0.2.1
+      '@inversifyjs/reflect-metadata-utils': 1.5.0(reflect-metadata@0.2.2)
     transitivePeerDependencies:
       - reflect-metadata
 
-  '@inversifyjs/plugin@0.2.0': {}
+  '@inversifyjs/plugin@0.3.1': {}
 
-  '@inversifyjs/prototype-utils@0.1.3':
+  '@inversifyjs/prototype-utils@0.2.1':
     dependencies:
-      '@inversifyjs/common': 1.5.2
+      '@inversifyjs/common': 2.0.1
 
-  '@inversifyjs/reflect-metadata-utils@1.4.1(reflect-metadata@0.2.2)':
+  '@inversifyjs/reflect-metadata-utils@1.5.0(reflect-metadata@0.2.2)':
     dependencies:
       reflect-metadata: 0.2.2
 
@@ -8249,6 +8253,24 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
+  '@microsoft/api-extractor@7.58.9(@types/node@24.12.4)':
+    dependencies:
+      '@microsoft/api-extractor-model': 7.33.8(@types/node@24.12.4)
+      '@microsoft/tsdoc': 0.16.0
+      '@microsoft/tsdoc-config': 0.18.1
+      '@rushstack/node-core-library': 5.23.1(@types/node@24.12.4)
+      '@rushstack/rig-package': 0.7.3
+      '@rushstack/terminal': 0.24.0(@types/node@24.12.4)
+      '@rushstack/ts-command-line': 5.3.10(@types/node@24.12.4)
+      diff: 8.0.4
+      minimatch: 10.2.3
+      resolve: 1.22.11
+      semver: 7.7.4
+      source-map: 0.6.1
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - '@types/node'
+
   '@microsoft/tsdoc-config@0.18.1':
     dependencies:
       '@microsoft/tsdoc': 0.16.0
@@ -8314,8 +8336,6 @@ snapshots:
     optional: true
 
   '@one-ini/wasm@0.1.1': {}
-
-  '@package-json/types@0.0.12': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -8487,6 +8507,15 @@ snapshots:
       supports-color: 8.1.1
     optionalDependencies:
       '@types/node': 24.12.4
+
+  '@rushstack/ts-command-line@5.3.10(@types/node@24.12.4)':
+    dependencies:
+      '@rushstack/terminal': 0.24.0(@types/node@24.12.4)
+      '@types/argparse': 1.0.38
+      argparse: 1.0.10
+      string-argv: 0.3.2
+    transitivePeerDependencies:
+      - '@types/node'
 
   '@rushstack/ts-command-line@5.3.9(@types/node@24.12.4)':
     dependencies:
@@ -9590,7 +9619,7 @@ snapshots:
 
   diff@9.0.0: {}
 
-  dompurify@3.4.9:
+  dompurify@3.4.11:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
@@ -9798,7 +9827,7 @@ snapshots:
     optionalDependencies:
       unrs-resolver: 1.11.1
 
-  eslint-import-resolver-typescript@4.4.4(eslint-plugin-import-x@4.16.2(@typescript-eslint/utils@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.4.0(jiti@2.7.0)))(eslint@10.4.0(jiti@2.7.0)):
+  eslint-import-resolver-typescript@4.4.4(eslint-plugin-import-x@4.17.0(@typescript-eslint/utils@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.4.0(jiti@2.7.0)))(eslint@10.4.0(jiti@2.7.0)):
     dependencies:
       debug: 4.4.3
       eslint: 10.4.0(jiti@2.7.0)
@@ -9809,7 +9838,7 @@ snapshots:
       tinyglobby: 0.2.15
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import-x: 4.16.2(@typescript-eslint/utils@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.4.0(jiti@2.7.0))
+      eslint-plugin-import-x: 4.17.0(@typescript-eslint/utils@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.4.0(jiti@2.7.0))
     transitivePeerDependencies:
       - supports-color
 
@@ -9817,9 +9846,8 @@ snapshots:
     dependencies:
       eslint: 10.4.0(jiti@2.7.0)
 
-  eslint-plugin-import-x@4.16.2(@typescript-eslint/utils@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.4.0(jiti@2.7.0)):
+  eslint-plugin-import-x@4.17.0(@typescript-eslint/utils@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.4.0(jiti@2.7.0)):
     dependencies:
-      '@package-json/types': 0.0.12
       '@typescript-eslint/types': 8.59.4
       comment-parser: 1.4.6
       debug: 4.4.3
@@ -10113,7 +10141,7 @@ snapshots:
       minipass: 7.1.3
       path-scurry: 2.0.2
 
-  globals@17.6.0: {}
+  globals@17.7.0: {}
 
   globalthis@1.0.4:
     dependencies:
@@ -10205,11 +10233,11 @@ snapshots:
       hasown: 2.0.4
       side-channel: 1.1.0
 
-  inversify@7.11.0(reflect-metadata@0.2.2):
+  inversify@8.1.1(reflect-metadata@0.2.2):
     dependencies:
-      '@inversifyjs/common': 1.5.2
-      '@inversifyjs/container': 1.15.0(reflect-metadata@0.2.2)
-      '@inversifyjs/core': 9.2.0(reflect-metadata@0.2.2)
+      '@inversifyjs/common': 2.0.1
+      '@inversifyjs/container': 2.0.2(reflect-metadata@0.2.2)
+      '@inversifyjs/core': 11.0.0(reflect-metadata@0.2.2)
     transitivePeerDependencies:
       - reflect-metadata
 

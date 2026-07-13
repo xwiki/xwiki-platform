@@ -19,12 +19,15 @@
  */
 package org.xwiki.captcha.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.captcha.CaptchaException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationSource;
 
 import com.octo.captcha.engine.CaptchaEngine;
 import com.octo.captcha.service.CaptchaService;
@@ -45,6 +48,10 @@ public class CaptchaServiceManager implements Initializable
 {
     private CaptchaStore captchaStore;
 
+    @Inject
+    @Named("jcaptcha")
+    private ConfigurationSource configuration;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -53,27 +60,24 @@ public class CaptchaServiceManager implements Initializable
     }
 
     /**
-     * @return the common {@link CaptchaStore} used by all the instantiated {@link CaptchaService} instance
-     */
-    public CaptchaStore getCaptchaStore()
-    {
-        return captchaStore;
-    }
-
-    /**
-     * @param engine the actual name of the service we want.
      * @return the JCaptcha CaptchaService initialized with the requested engine
      * @throws CaptchaException if the requested engine does not exist
      */
-    public CaptchaService getCaptchaService(String engine) throws CaptchaException
+    public CaptchaService getCaptchaService() throws CaptchaException
     {
         CaptchaService result = null;
 
         CaptchaEngine captchaEngine = null;
+        String engine = this.configuration.getProperty(JCaptchaCaptcha.ENGINE, JCaptchaCaptcha.DEFAULT_ENGINE);
 
         try {
-            Class<CaptchaEngine> engineClass = (Class<CaptchaEngine>) Class.forName(engine);
-            captchaEngine = engineClass.getConstructor(null).newInstance(null);
+            Class<?> engineClass = Class.forName(engine);
+            if (!CaptchaEngine.class.isAssignableFrom(engineClass)) {
+                throw new CaptchaException(String.format("Invalid engine [%s]: not a CaptchaEngine", engine));
+            }
+            captchaEngine = (CaptchaEngine) engineClass.getDeclaredConstructor().newInstance();
+        } catch (CaptchaException e) {
+            throw e;
         } catch (Exception e) {
             throw new CaptchaException(String.format("Invalid engine [%s]", engine), e);
         }

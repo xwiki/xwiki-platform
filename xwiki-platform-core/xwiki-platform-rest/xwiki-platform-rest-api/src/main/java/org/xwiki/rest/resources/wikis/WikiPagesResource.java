@@ -34,8 +34,24 @@ import org.xwiki.rest.model.jaxb.Pages;
 @Path("/wikis/{wikiName}/pages")
 public interface WikiPagesResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Returns the pages stored in the given wiki, with optional filtering and pagination.
+     *
+     * @param wikiName the identifier of the wiki whose pages are listed, for example {@code xwiki} for the main wiki
+     * @param start the 0-based index of the first page to return, used together with {@code number} for pagination;
+     *  defaults to {@code 0}
+     * @param name keeps only pages whose full name contains this value (case-insensitive), for example
+     *  {@code Main.WebHome}; empty by default (no filtering)
+     * @param space keeps only pages located in a space whose reference contains this value (case-insensitive), for
+     *  example {@code Main}; nested spaces are written {@code A/spaces/B} for the space {@code A.B}; empty by default
+     *  (no filtering)
+     * @param author keeps only pages whose content author contains this value (case-insensitive), for example
+     *  {@code XWiki.Admin}; empty by default (no filtering)
+     * @param number the maximum number of pages to return; defaults to {@code 25}, and a value that is negative or
+     *  larger than the wiki's configured REST query limit is rejected with a {@code 400} response
+     * @return the matching pages the current user is allowed to view, within the requested pagination window
+     * @throws XWikiRestException if the pages cannot be retrieved
+     */
     @GET Pages getPages(
             @PathParam("wikiName") String wikiName,
             @QueryParam("start") @DefaultValue("0") Integer start,

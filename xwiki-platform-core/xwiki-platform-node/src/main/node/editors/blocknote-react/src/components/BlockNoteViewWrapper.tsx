@@ -341,7 +341,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
                 builtMacros,
                 (built) => built.dropdownTransformItem,
               )}
-              ctxForMacros={macros ? macros.ctx : false}
+              macros={macros}
             />
           )}
         />

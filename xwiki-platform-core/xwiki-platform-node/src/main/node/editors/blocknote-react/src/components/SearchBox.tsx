@@ -26,7 +26,7 @@ import { RiLink } from "react-icons/ri";
 import type { LinkSuggestion } from "../misc/linkSuggest";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
-import type { KeyboardEvent, ReactElement } from "react";
+import type { ReactElement } from "react";
 
 export type SearchBoxProps = {
   /**
@@ -143,14 +143,13 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
   const submitRawValue = useCallback(
     // eslint-disable-next-line max-statements
-    async (e: KeyboardEvent<HTMLInputElement>, value: string) => {
+    async (value: string) => {
       if (isUrl(value)) {
         onSubmit(value);
         return;
       }
 
       if (!modelReferenceParser || !remoteURLSerializer) {
-        e.preventDefault();
         return;
       }
 
@@ -159,14 +158,12 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         .catch(() => null);
 
       if (!reference) {
-        e.preventDefault();
         return;
       }
 
       const url = remoteURLSerializer.serialize(reference);
 
       if (url === undefined) {
-        e.preventDefault();
         throw new Error("Failed to serialize entity reference: " + value);
       }
 
@@ -209,6 +206,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         <InputBase
           leftSection={<RiLink />}
           rightSection=" "
+          data-test="searchBoxInput"
           placeholder={placeholder}
           value={query}
           onChange={(event) => {
@@ -221,9 +219,15 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
           onBlur={() => {
             combobox.closeDropdown();
           }}
-          onKeyDown={(e) =>
-            e.key === "Enter" && submitRawValue(e, e.currentTarget.value)
-          }
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              // Prevent the default editing action of the Enter key: the submit handlers can move
+              // the focus back to the editor synchronously, in which case the browser would apply
+              // the default action to the editor's restored selection, deleting its content.
+              e.preventDefault();
+              submitRawValue(e.currentTarget.value);
+            }
+          }}
         />
       </Combobox.Target>
 

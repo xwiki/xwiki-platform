@@ -55,7 +55,7 @@ public class LightboxPage extends ViewPage
         Actions action = new Actions(getDriver().getWrappedDriver());
         action.moveToElement(image).build().perform();
 
-        return new ImagePopover();
+        return new ImagePopover(image);
     }
 
     public WebElement getImageElement(int index)

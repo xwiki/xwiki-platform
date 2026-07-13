@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
  * @since 12.10
  */
 @ComponentTest
-public class RatingMovedEntityListenerTest
+class RatingMovedEntityListenerTest
 {
     @InjectMockComponents
     private RatingMovedEntityListener listener;

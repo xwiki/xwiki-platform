@@ -310,6 +310,11 @@ define('xwiki-selectize', [
     // Save the width before the input is hidden.
     $(input).data('initialWidth', $(input).width());
 
+    // Remember the original tabindex attribute. Tom Select restores the tabIndex DOM property on destroy(), which
+    // defaults to 0 and gets reflected back as a tabindex="0" attribute even when the input never had one.
+    const hadTabIndex = input.hasAttribute('tabindex');
+    const originalTabIndex = input.getAttribute('tabindex');
+
     const tomSelect = new TomSelect(input, getSettings($(input), settings));
 
     // We expose the TomSelect instance through the 'selectize' property / data on the target input / select that is
@@ -335,6 +340,13 @@ define('xwiki-selectize', [
     tomSelect.on('destroy', () => {
       // Remove the custom region we added for accessibility.
       tomSelect.liveRegion.remove();
+
+      // Restore the tabindex attribute as it was before Tom Select took over (see comment above).
+      if (hadTabIndex) {
+        input.setAttribute('tabindex', originalTabIndex);
+      } else {
+        input.removeAttribute('tabindex');
+      }
 
       // Delete the references to the TomSelect instance.
       delete input.selectize;

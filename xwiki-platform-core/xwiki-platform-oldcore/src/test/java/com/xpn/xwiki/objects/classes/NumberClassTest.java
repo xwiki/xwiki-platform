@@ -20,6 +20,8 @@
 package com.xpn.xwiki.objects.classes;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -32,10 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link NumberClass} class.
- * 
+ *
  * @version $Id$
  */
 @OldcoreTest
@@ -44,6 +47,9 @@ class NumberClassTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @MockComponent
+    private ContextualLocalizationManager contextualLocalizationManager;
 
     /** Test the fromString method. */
     @Test
@@ -55,15 +61,23 @@ class NumberClassTest
         bc.setName("Some.Class");
         nc.setObject(bc);
 
+        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidFormat",
+            "asd", "long")).thenReturn("The value \"asd\" is not a valid number of type \"long\".");
+        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidFormat",
+            "1111111111111111111111111111111111", "long"))
+                .thenReturn("The value \"1111111111111111111111111111111111\" is not a valid number of type "
+                    + "\"long\".");
+
         // A String value containing non-numeric caracters can not be respresented as a numeric value, so this sould
         // throw an exception
         XWikiException xWikiException = assertThrows(XWikiException.class, () -> nc.fromString("asd"));
-        assertEquals("Error number 0 in 0: Error when parsing [asd] to type [long]",  xWikiException.getMessage());
+        assertEquals("Error number 7002 in 7: The value \"asd\" is not a valid number of type \"long\".",
+            xWikiException.getMessage());
 
         // A much too long number cannot be represented as a long value, so this should throw an exception
         xWikiException = assertThrows(XWikiException.class, () -> nc.fromString("1111111111111111111111111111111111"));
-        assertEquals("Error number 0 in 0: Error when parsing [1111111111111111111111111111111111] to type [long]",
-            xWikiException.getMessage());
+        assertEquals("Error number 7002 in 7: The value \"1111111111111111111111111111111111\" is not a valid "
+            + "number of type \"long\".", xWikiException.getMessage());
 
         BaseProperty p;
 

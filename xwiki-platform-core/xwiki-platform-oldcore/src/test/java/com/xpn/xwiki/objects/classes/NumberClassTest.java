@@ -62,22 +62,22 @@ class NumberClassTest
         nc.setObject(bc);
 
         when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidFormat",
-            "asd", "long")).thenReturn("The value \"asd\" is not a valid number of type \"long\".");
+            "asd", "long")).thenReturn("The value \"asd\" is not a valid number of type \"long\"");
         when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidFormat",
             "1111111111111111111111111111111111", "long"))
                 .thenReturn("The value \"1111111111111111111111111111111111\" is not a valid number of type "
-                    + "\"long\".");
+                    + "\"long\"");
 
         // A String value containing non-numeric caracters can not be respresented as a numeric value, so this sould
         // throw an exception
         XWikiException xWikiException = assertThrows(XWikiException.class, () -> nc.fromString("asd"));
-        assertEquals("Error number 7002 in 7: The value \"asd\" is not a valid number of type \"long\".",
+        assertEquals("Error number 7002 in 7: The value \"asd\" is not a valid number of type \"long\"",
             xWikiException.getMessage());
 
         // A much too long number cannot be represented as a long value, so this should throw an exception
         xWikiException = assertThrows(XWikiException.class, () -> nc.fromString("1111111111111111111111111111111111"));
         assertEquals("Error number 7002 in 7: The value \"1111111111111111111111111111111111\" is not a valid "
-            + "number of type \"long\".", xWikiException.getMessage());
+            + "number of type \"long\"", xWikiException.getMessage());
 
         BaseProperty p;
 

@@ -827,8 +827,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             maybeCreateSpace(document.getDocumentReference().getLastSpaceReference(), document.isHidden(), session);
 
             // If the hidden state of an existing document did not changed there is nothing to do
-            if (!document.isNew() && document.isHidden() != document.getOriginalDocument().isHidden()) {
-                if (document.isHidden()) {
+            if (!document.isNew() && !Objects.equals(document.isHidden(), document.getOriginalDocument().isHidden())) {
+                if (Boolean.TRUE.equals(document.isHidden())) {
                     // If the document became hidden it's possible the space did too
                     maybeMakeSpaceHidden(document.getDocumentReference().getLastSpaceReference(),
                         document.getFullName(), session);

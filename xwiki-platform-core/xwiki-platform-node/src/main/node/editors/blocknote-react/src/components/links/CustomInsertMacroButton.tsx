@@ -32,7 +32,7 @@ import type {
 } from "../../blocknote/utils";
 
 export type CustomInsertMacroButtonProps = {
-  openEditor: ContextForMacros["openInsertionEditor"];
+  openEditor: NonNullable<ContextForMacros["openInsertionEditor"]>;
 };
 
 export const CustomInsertMacroButton: React.FC<

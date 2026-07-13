@@ -123,7 +123,6 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     @Override
     public WikiProvisioningJob getJob(List<String> jobId) throws WikiProvisioningJobException
     {
-        WikiProvisioningJob job = jobs.get(jobId);
-        return job;
+        return jobs.get(jobId);
     }
 }

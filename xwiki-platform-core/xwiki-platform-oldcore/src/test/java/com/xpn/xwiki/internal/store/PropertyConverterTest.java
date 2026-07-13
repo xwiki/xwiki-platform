@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class PropertyConverterTest
+class PropertyConverterTest
 {
     @InjectMockComponents
     private PropertyConverter converter;

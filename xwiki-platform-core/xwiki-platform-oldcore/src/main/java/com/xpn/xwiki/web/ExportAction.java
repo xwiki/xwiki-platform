@@ -70,6 +70,8 @@ import com.xpn.xwiki.util.Util;
 @Singleton
 public class ExportAction extends XWikiAction
 {
+    private static final String EXCEPTION = "exception";
+
     /**
      * Define the different format supported by the export.
      */
@@ -202,7 +204,7 @@ public class ExportAction extends XWikiAction
             exportType = ExportType.PDF;
         } else if (exportType == null) {
             context.put("message", "core.export.formatUnknown");
-            return "exception";
+            return EXCEPTION;
         }
 
         urlFactory.init(context);
@@ -248,7 +250,7 @@ public class ExportAction extends XWikiAction
     {
         if (!context.getWiki().getRightService().hasWikiAdminRights(context)) {
             context.put("message", "needadminrights");
-            return "exception";
+            return EXCEPTION;
         }
 
         XWikiRequest request = context.getRequest();
@@ -358,7 +360,7 @@ public class ExportAction extends XWikiAction
             PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi("package", context));
             if (export == null) {
                 // No Packaging plugin configured
-                return "exception";
+                return EXCEPTION;
             }
 
             export.setWithVersions(history);

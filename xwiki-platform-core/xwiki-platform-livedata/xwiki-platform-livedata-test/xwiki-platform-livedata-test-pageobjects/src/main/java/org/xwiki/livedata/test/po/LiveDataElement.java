@@ -39,6 +39,14 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class LiveDataElement extends BaseElement
 {
+    /**
+     * Loading the Live Data can take a while, especially the first time it's displayed on a page since the browser then
+     * needs to fetch and evaluate the Vue.js library and the Live Data components, and even more so on a loaded CI
+     * agent. We thus wait longer than the default timeout to avoid false negatives, using the same timeout as
+     * {@link TableLayoutElement#waitUntilReady()}.
+     */
+    private static final int READY_TIMEOUT_SECONDS = 20;
+
     // TODO: add the operations to switch between the layouts.
 
     private final String id;
@@ -162,9 +170,9 @@ public class LiveDataElement extends BaseElement
 
     public void waitUntilReady()
     {
-        getDriver().waitUntilCondition(input -> isVueLoaded());
+        getDriver().waitUntilCondition(input -> isVueLoaded(), READY_TIMEOUT_SECONDS);
 
-        getDriver().waitUntilCondition(input -> areComponentsLoaded());
+        getDriver().waitUntilCondition(input -> areComponentsLoaded(), READY_TIMEOUT_SECONDS);
     }
 
     private boolean areComponentsLoaded()

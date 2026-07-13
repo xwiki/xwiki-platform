@@ -690,8 +690,8 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
         for (Element link : getElements(ELEM_LINK)) {
 
             // Look for images in the link.
-            boolean hasImages = link.select("img").size() > 0;
-            boolean hasImagesWithoutAlt = link.select("img[alt=''], img:not([alt])").size() > 0;
+            boolean hasImages = !link.select("img").isEmpty();
+            boolean hasImagesWithoutAlt = !link.select("img[alt=''], img:not([alt])").isEmpty();
 
             // Look for text in the link.
             boolean hasText = false;

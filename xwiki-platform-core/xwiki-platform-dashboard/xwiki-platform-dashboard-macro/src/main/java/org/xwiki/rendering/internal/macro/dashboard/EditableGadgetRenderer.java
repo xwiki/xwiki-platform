@@ -168,7 +168,7 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
     {
         List<Block> viewBlock = super.decorateGadget(gadget);
 
-        if (viewBlock.size() > 0) {
+        if (!viewBlock.isEmpty()) {
             viewBlock.get(0).addChild(getGadgetEditMetadata(gadget));
         }
 

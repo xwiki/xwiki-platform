@@ -61,7 +61,7 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @ReferenceComponentList
-public class GroupsCacheTest
+class GroupsCacheTest
 {
     @InjectMockComponents
     private MemberGroupsCache groupsCache;
@@ -106,7 +106,7 @@ public class GroupsCacheTest
     // Tests
 
     @Test
-    public void getCacheEntry()
+    void getCacheEntry()
     {
         GroupCacheEntry entry = getCacheEntry(true);
 
@@ -127,7 +127,7 @@ public class GroupsCacheTest
     }
 
     @Test
-    public void cleanCacheReference()
+    void cleanCacheReference()
     {
         // Clean user
 
@@ -161,7 +161,7 @@ public class GroupsCacheTest
     }
 
     @Test
-    public void cleanCacheWiki()
+    void cleanCacheWiki()
     {
         // Clean user wiki
 

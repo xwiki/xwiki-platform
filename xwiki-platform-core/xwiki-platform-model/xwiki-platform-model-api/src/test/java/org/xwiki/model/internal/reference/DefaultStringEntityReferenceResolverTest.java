@@ -62,7 +62,7 @@ class DefaultStringEntityReferenceResolverTest implements TestConstants
     private DefaultStringEntityReferenceResolver resolver;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         when(this.referenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
         when(this.referenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(DEFAULT_SPACE_REFERENCE);

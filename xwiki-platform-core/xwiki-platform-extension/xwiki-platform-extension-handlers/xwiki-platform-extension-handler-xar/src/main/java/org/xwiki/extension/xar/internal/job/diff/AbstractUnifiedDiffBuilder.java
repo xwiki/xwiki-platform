@@ -91,7 +91,7 @@ public abstract class AbstractUnifiedDiffBuilder
             List<UnifiedDiffBlock<String, Character>> diff =
                 createUnifiedDiff(previousValue == null ? null : previousValue.toString(), nextValue == null ? null
                     : nextValue.toString());
-            if (diff.size() > 0) {
+            if (!diff.isEmpty()) {
                 diffs.put(key, diff);
                 return true;
             }

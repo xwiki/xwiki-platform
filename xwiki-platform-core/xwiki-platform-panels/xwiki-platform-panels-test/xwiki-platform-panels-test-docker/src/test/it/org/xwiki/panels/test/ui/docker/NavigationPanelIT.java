@@ -52,7 +52,11 @@ class NavigationPanelIT
     {
         setup.loginAsSuperAdmin();
 
-        // Activate the Navigation Panel in the right column
+        // Activate the Navigation Panel in the right column. We also force the right column to be displayed since
+        // this test needs it and another test running before it in the same XWiki instance could have switched the
+        // wiki to a layout that hides the right column (the shared AllIT instance means the page layout preference
+        // is global state).
+        setup.setWikiPreference("showRightPanels", "1");
         setup.setWikiPreference("rightPanels", "Panels.Navigation");
     }
 

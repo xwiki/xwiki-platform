@@ -32,8 +32,15 @@ import org.xwiki.rest.model.jaxb.Class;
 @Path("/wikis/{wikiName}/classes/{className}")
 public interface ClassResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Returns the definition of a given XClass.
+     *
+     * @param wikiName the identifier of the wiki containing the class, for example {@code xwiki} for the main wiki
+     * @param className the reference of the XClass to return, for example {@code XWiki.XWikiUsers}
+     * @return the requested class, including its property definitions
+     * @throws XWikiRestException if the class cannot be retrieved; a {@code 404} response is returned when the class
+     *  does not exist, and a {@code 401} response when the current user is not allowed to view it
+     */
     @GET Class getClass(
             @PathParam("wikiName") String wikiName,
             @PathParam("className") String className

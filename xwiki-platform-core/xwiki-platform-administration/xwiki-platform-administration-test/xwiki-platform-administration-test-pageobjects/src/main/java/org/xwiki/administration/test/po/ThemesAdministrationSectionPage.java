@@ -225,7 +225,6 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
 
     /**
      * @return the list of available icon themes
-     * @since 18.6.0RC1
      */
     public List<String> getIconThemes()
     {
@@ -240,7 +239,6 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
      * Select the specified icon theme.
      *
      * @param iconThemeName the name of the icon theme to select (e.g. {@code Silk} or {@code Font Awesome})
-     * @since 18.6.0RC1
      */
     public void setIconTheme(String iconThemeName)
     {
@@ -261,7 +259,6 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
 
     /**
      * @return the currently selected icon theme
-     * @since 18.6.0RC1
      */
     public String getCurrentIconTheme()
     {

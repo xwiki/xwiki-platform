@@ -152,6 +152,8 @@ class MoveAttachmentJobTest
         this.job.initialize(this.request);
         when(this.xcontextProvider.get()).thenReturn(this.context);
         when(this.context.getWiki()).thenReturn(this.wiki);
+        when(this.sourceDocument.clone()).thenReturn(this.sourceDocument);
+        when(this.targetDocument.clone()).thenReturn(this.targetDocument);
 
         // The cast is mandatory otherwise the wrong method is mocked (the DocumentReference one).
         when(this.wiki.getDocument((EntityReference) SOURCE_LOCATION, this.context)).thenReturn(this.sourceDocument);
@@ -213,6 +215,8 @@ class MoveAttachmentJobTest
         verify(this.sourceAuthors).setOriginalMetadataAuthor(this.authorReference);
         verify(targetAttachment).setDoc(this.targetDocument);
         verify(this.targetDocument).setAttachment(targetAttachment);
+        verify(this.sourceDocument).clone();
+        verify(this.targetDocument).clone();
     }
 
     @Test
@@ -266,6 +270,8 @@ class MoveAttachmentJobTest
             "Failed to move attachment [Attachment xwiki:Space.Source@oldName] to "
                 + "[Attachment xwiki:Space.Target@newName]. Cause: [XWikiException: Error number 0 in 0]",
             this.logCapture.getMessage(0));
+        verify(this.sourceDocument).clone();
+        verify(this.targetDocument).clone();
     }
 
     @Test
@@ -303,6 +309,7 @@ class MoveAttachmentJobTest
         verify(this.modelBridge).setContextUserReference(AUTHOR_REFERENCE);
         verify(this.sourceAuthors, times(2)).setEffectiveMetadataAuthor(this.authorReference);
         verify(this.sourceAuthors, times(2)).setOriginalMetadataAuthor(this.authorReference);
+        verify(this.sourceDocument, times(2)).clone();
     }
 
     @ParameterizedTest

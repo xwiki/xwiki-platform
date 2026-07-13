@@ -317,6 +317,19 @@ define('xwiki-selectize', [
 
     const tomSelect = new TomSelect(input, getSettings($(input), settings));
 
+    // Tom Select sets input.tabIndex (see above) AFTER firing its own 'destroy' event, so a 'destroy' listener runs
+    // too early to fix this up (it would get overwritten right after). Wrap destroy() itself so our fix runs
+    // strictly after Tom Select's own tabIndex restoration.
+    const originalDestroy = tomSelect.destroy.bind(tomSelect);
+    tomSelect.destroy = function() {
+      originalDestroy();
+      if (hadTabIndex) {
+        input.setAttribute('tabindex', originalTabIndex);
+      } else {
+        input.removeAttribute('tabindex');
+      }
+    };
+
     // We expose the TomSelect instance through the 'selectize' property / data on the target input / select that is
     // being enhanced, in order to preserve backwards compatibility. We can do this because TomSelect is a fork of
     // Selectize, preserving its JavaScript API. On the long term we need to hide the underlying implementation and
@@ -340,13 +353,6 @@ define('xwiki-selectize', [
     tomSelect.on('destroy', () => {
       // Remove the custom region we added for accessibility.
       tomSelect.liveRegion.remove();
-
-      // Restore the tabindex attribute as it was before Tom Select took over (see comment above).
-      if (hadTabIndex) {
-        input.setAttribute('tabindex', originalTabIndex);
-      } else {
-        input.removeAttribute('tabindex');
-      }
 
       // Delete the references to the TomSelect instance.
       delete input.selectize;

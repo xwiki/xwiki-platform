@@ -75,7 +75,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     private XWikiSecurityAccess denyAllAccess;
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         defaultAccess = XWikiSecurityAccess.getDefaultAccess();
         denyAllAccess = new XWikiSecurityAccess();

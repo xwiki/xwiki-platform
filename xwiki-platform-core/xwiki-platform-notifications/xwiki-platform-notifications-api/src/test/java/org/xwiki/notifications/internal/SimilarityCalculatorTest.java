@@ -33,12 +33,12 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class SimilarityCalculatorTest
+class SimilarityCalculatorTest
 {
     private SimilarityCalculator sq;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         this.sq = new SimilarityCalculator();
     }

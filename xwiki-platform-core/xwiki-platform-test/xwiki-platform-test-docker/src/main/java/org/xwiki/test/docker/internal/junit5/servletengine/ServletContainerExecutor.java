@@ -88,6 +88,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final Version V12_1 = new DefaultVersion("12.1");
 
+    private static final String MEMORY_LIMIT_OPTION = "-Xmx1024m";
+
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
     private RepositoryResolver repositoryResolver;
@@ -191,6 +193,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         List<String> javaOpts = new ArrayList<>();
 
+        // Cap the XWiki heap to not overcommit the agent's memory.
+        javaOpts.add(MEMORY_LIMIT_OPTION);
+
         // TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 has been fixed.
         // Note that we should check the version of Java inside the Jetty container but that's hard and FTM we consider
         // that if the Maven build for the tests runs with Java 17+ then, it's very likely that Jetty/XWiki will also
@@ -280,7 +285,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             "/usr/local/tomcat/webapps/xwiki");
 
         List<String> catalinaOpts = new ArrayList<>();
-        catalinaOpts.add("-Xmx1024m");
+        catalinaOpts.add(MEMORY_LIMIT_OPTION);
         catalinaOpts.add("-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true");
         catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
         catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");

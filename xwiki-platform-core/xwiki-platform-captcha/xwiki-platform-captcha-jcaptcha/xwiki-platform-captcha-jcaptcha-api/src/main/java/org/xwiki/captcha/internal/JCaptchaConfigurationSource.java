@@ -19,25 +19,42 @@
  */
 package org.xwiki.captcha.internal;
 
-import com.octo.captcha.CaptchaFactory;
-import com.octo.captcha.engine.GenericCaptchaEngine;
-import com.octo.captcha.text.math.MathCaptchaFactory;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
- * A simple text CAPTCHA engine implemented to expose {@link MathCaptchaFactory} for demonstration purposes.
- * <p>
- * Not really recommended for production, as the JavaDoc for {@link MathCaptchaFactory} says.
+ * Dedicated configuration source for jcaptcha.
  *
  * @version $Id$
- * @since 10.8RC1
+ * @since 18.6.0RC1
+ * @since 18.4.3
+ * @since 17.10.10
  */
-public class SimpleMathCaptchaEngine extends GenericCaptchaEngine
+@Component
+@Named("jcaptcha")
+@Singleton
+public class JCaptchaConfigurationSource extends AbstractDocumentConfigurationSource
 {
-    /**
-     * Default constructor.
-     */
-    public SimpleMathCaptchaEngine()
+    @Override
+    protected DocumentReference getDocumentReference()
     {
-        super(new CaptchaFactory[] {new MathCaptchaFactory()});
+        return new DocumentReference(JCaptchaCaptcha.CONFIGURATION_DOCUMENT_REFERENCE, getCurrentWikiReference());
+    }
+
+    @Override
+    protected LocalDocumentReference getClassReference()
+    {
+        return JCaptchaCaptcha.CONFIGURATION_CLASS_REFERENCE;
+    }
+
+    @Override
+    protected String getCacheId()
+    {
+        return "configuration.document.jcaptcha";
     }
 }

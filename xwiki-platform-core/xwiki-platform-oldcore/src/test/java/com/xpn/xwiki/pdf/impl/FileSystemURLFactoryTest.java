@@ -60,7 +60,7 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 @ReferenceComponentList
 @ComponentList({DefaultLegacySpaceResolver.class})
-public class FileSystemURLFactoryTest
+class FileSystemURLFactoryTest
 {
     private static final DocumentReference USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "Alice");
 
@@ -83,7 +83,7 @@ public class FileSystemURLFactoryTest
     private XWikiRequest mockXWikiRequest;
 
     @BeforeEach
-    public void beforeEach() throws XWikiException, IOException
+    void beforeEach() throws XWikiException, IOException
     {
         this.oldcore.getXWikiContext().setUserReference(USER_REFERENCE);
 
@@ -100,7 +100,7 @@ public class FileSystemURLFactoryTest
     }
 
     @Test
-    public void createAttachmentURLWhenAttachmentDoesntExist() throws Exception
+    void createAttachmentURLWhenAttachmentDoesntExist() throws Exception
     {
         Map<String, File> usedFiles = new HashMap<>();
         this.oldcore.getXWikiContext().put("pdfexport-file-mapping", usedFiles);

@@ -40,13 +40,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ComponentList({
     DefaultSymbolScheme.class
 })
-public class ExplicitStringEntityReferenceResolverTest
+class ExplicitStringEntityReferenceResolverTest
 {
     @InjectMockComponents
     private ExplicitStringEntityReferenceResolver resolver;
 
     @Test
-    public void resolveWithExplicitDocumentReference()
+    void resolveWithExplicitDocumentReference()
     {
         EntityReference reference =
             this.resolver.resolve("", EntityType.DOCUMENT, new DocumentReference("wiki", "space", "page"));
@@ -60,7 +60,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
 
     @Test
-    public void resolveWithExplicitEntityReference()
+    void resolveWithExplicitEntityReference()
     {
         EntityReference reference =
             this.resolver.resolve("space.page", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI));
@@ -74,7 +74,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
 
     @Test
-    public void resolveWithAbsoluteReferenceAndNoExplicitReference()
+    void resolveWithAbsoluteReferenceAndNoExplicitReference()
     {
         EntityReference reference = this.resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
 
@@ -87,7 +87,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
 
     @Test
-    public void resolveWithExplicitReferenceWithHoles()
+    void resolveWithExplicitReferenceWithHoles()
     {
         EntityReference reference = this.resolver.resolve("space.page", EntityType.DOCUMENT,
             new EntityReference("page", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI)));
@@ -101,7 +101,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
     
     @Test
-    public void resolveWithNoExplicitAndPartialReference()
+    void resolveWithNoExplicitAndPartialReference()
     {
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
             () -> this.resolver.resolve("", EntityType.DOCUMENT));
@@ -110,7 +110,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
 
     @Test
-    public void resolveWithInvalidParameterType()
+    void resolveWithInvalidParameterType()
     {
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
             () -> this.resolver.resolve("", EntityType.DOCUMENT, "wrong type"));
@@ -119,7 +119,7 @@ public class ExplicitStringEntityReferenceResolverTest
     }
 
     @Test
-    public void resolveWithIncompleteExplicitReference()
+    void resolveWithIncompleteExplicitReference()
     {
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
             () -> this.resolver.resolve("", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI)));

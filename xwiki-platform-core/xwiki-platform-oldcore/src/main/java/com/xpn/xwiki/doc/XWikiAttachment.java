@@ -507,10 +507,8 @@ public class XWikiAttachment implements Cloneable
             this.doc = doc;
             this.reference = null;
 
-            if (updateDirty) {
-                if (isMetaDataDirty() && doc != null) {
-                    doc.setMetaDataDirty(true);
-                }
+            if (updateDirty && isMetaDataDirty() && doc != null) {
+                doc.setMetaDataDirty(true);
             }
         }
     }
@@ -572,10 +570,8 @@ public class XWikiAttachment implements Cloneable
     {
         setMetaDataDirty(dirty);
 
-        if (deep) {
-            if (this.content != null) {
-                this.content.setContentDirty(dirty);
-            }
+        if (deep && this.content != null) {
+            this.content.setContentDirty(dirty);
         }
     }
 

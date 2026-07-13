@@ -312,7 +312,7 @@ public class ViewPage extends BasePage
 
     public boolean isInlinePage()
     {
-        return getDriver().findElements(By.xpath("//form[@id = 'inline']")).size() > 0;
+        return !getDriver().findElements(By.xpath("//form[@id = 'inline']")).isEmpty();
     }
 
     /**
@@ -432,7 +432,6 @@ public class ViewPage extends BasePage
 
     /**
      * @return the content of the copyright section in the page footer
-     * @since 18.6.0RC1
      */
     public String getFooterCopyright()
     {
@@ -441,7 +440,6 @@ public class ViewPage extends BasePage
 
     /**
      * @return the content of the version section in the page footer
-     * @since 18.6.0RC1
      */
     public String getFooterVersion()
     {

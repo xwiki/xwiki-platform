@@ -82,11 +82,9 @@ public class BaseClassOutputFilterStream extends AbstractElementOutputFilterStre
     @Override
     public void endWikiClassProperty(String name, String type, FilterEventParameters parameters) throws FilterException
     {
-        if (this.enabled) {
-            if (getPropertyClassOutputFilterStream().getEntity() != null) {
-                this.entity.safeput(name, getPropertyClassOutputFilterStream().getEntity());
-                getPropertyClassOutputFilterStream().setEntity(null);
-            }
+        if (this.enabled && getPropertyClassOutputFilterStream().getEntity() != null) {
+            this.entity.safeput(name, getPropertyClassOutputFilterStream().getEntity());
+            getPropertyClassOutputFilterStream().setEntity(null);
         }
     }
 

@@ -225,11 +225,10 @@ public class PasswordClass extends StringClass
     public String getEquivalentPassword(String storedPassword, String plainPassword)
     {
         String result = plainPassword;
-        if (storedPassword != null && plainPassword != null) {
-            if (storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
-                result = getPasswordHash(result, getAlgorithmFromPassword(storedPassword),
-                        getSaltFromPassword(storedPassword));
-            }
+        if (storedPassword != null && plainPassword != null
+            && storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
+            result = getPasswordHash(result, getAlgorithmFromPassword(storedPassword),
+                    getSaltFromPassword(storedPassword));
         }
         return result;
     }

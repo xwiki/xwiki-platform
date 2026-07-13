@@ -407,17 +407,15 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         if (!isSensitive && oldProperty != null) {
             isSensitive = oldProperty.isSensitive(context);
         }
-        if (newProperty == null) {
-            // The property exists in the old object, but not in the new one
-            if ((oldProperty != null) && (!oldProperty.toText().isEmpty())) {
-                String oldPropertyValue = getDiffPropertyValue(context, oldProperty, oldpclass, propertyName,
-                    oldObject);
-                String pClassType = (oldpclass != null) ? oldpclass.getClassType() : "";
-                difflist.add(
-                    new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject.getGuid(),
-                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, pClassType, oldPropertyValue, "",
-                        isSensitive));
-            }
+        // The property exists in the old object, but not in the new one
+        if (newProperty == null && (oldProperty != null) && (!oldProperty.toText().isEmpty())) {
+            String oldPropertyValue = getDiffPropertyValue(context, oldProperty, oldpclass, propertyName,
+                oldObject);
+            String pClassType = (oldpclass != null) ? oldpclass.getClassType() : "";
+            difflist.add(
+                new ObjectDiff(oldObject.getXClassReference(), oldObject.getNumber(), oldObject.getGuid(),
+                    ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, pClassType, oldPropertyValue, "",
+                    isSensitive));
         }
     }
 

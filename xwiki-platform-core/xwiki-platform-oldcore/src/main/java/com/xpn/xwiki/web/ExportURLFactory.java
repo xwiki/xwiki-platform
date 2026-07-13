@@ -73,6 +73,10 @@ public class ExportURLFactory extends XWikiServletURLFactory
      */
     protected static final Logger LOGGER = LoggerFactory.getLogger(ExportURLFactory.class);
 
+    private static final String FILE_PROTOCOL = "file://";
+
+    private static final String FAILED_TO_CREATE_SKIN_URL = "Failed to create skin URL";
+
     // TODO: use real css parser
     private static Pattern CSSIMPORT = Pattern.compile("^\\s*@import\\s*\"(.*)\"\\s*;$", Pattern.MULTILINE);
 
@@ -225,7 +229,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         try {
             getFilesystemExportContext().addNeededSkin(skin);
 
-            StringBuilder newPath = new StringBuilder("file://");
+            StringBuilder newPath = new StringBuilder(FILE_PROTOCOL);
 
             // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
             adjustCSSPath(newPath);
@@ -237,7 +241,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             return new URL(newPath.toString());
         } catch (Exception e) {
-            LOGGER.error("Failed to create skin URL", e);
+            LOGGER.error(FAILED_TO_CREATE_SKIN_URL, e);
         }
 
         return super.createSkinURL(filename, skin, context);
@@ -313,7 +317,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 followCssImports(file, spaces, name, wikiId, context);
             }
 
-            StringBuilder newPath = new StringBuilder("file://");
+            StringBuilder newPath = new StringBuilder(FILE_PROTOCOL);
 
             // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
             adjustCSSPath(newPath);
@@ -322,7 +326,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             skinURL = new URL(newPath.toString());
         } catch (Exception e) {
-            LOGGER.error("Failed to create skin URL", e);
+            LOGGER.error(FAILED_TO_CREATE_SKIN_URL, e);
         }
 
         return skinURL;
@@ -450,7 +454,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 }
             }
 
-            StringBuilder newPath = new StringBuilder("file://");
+            StringBuilder newPath = new StringBuilder(FILE_PROTOCOL);
 
             // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
             adjustCSSPath(newPath);
@@ -461,7 +465,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             return new URL(newPath.toString());
         } catch (Exception e) {
-            LOGGER.error("Failed to create skin URL", e);
+            LOGGER.error(FAILED_TO_CREATE_SKIN_URL, e);
         }
 
         return super.createResourceURL(filename, forceSkinAction, context);
@@ -491,7 +495,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             {
                 StringBuffer newpath = new StringBuffer();
 
-                newpath.append("file://");
+                newpath.append(FILE_PROTOCOL);
 
                 // Adjust depending on the exported location of the current doc.
                 newpath.append(StringUtils.repeat("../", getFilesystemExportContext().getDocParentLevel()));
@@ -585,7 +589,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 context.getUserReference(), attachmentReference);
         }
 
-        StringBuilder newPath = new StringBuilder("file://");
+        StringBuilder newPath = new StringBuilder(FILE_PROTOCOL);
 
         // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
         adjustCSSPath(newPath);
@@ -632,7 +636,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         String path = url.toString();
 
         if ("file".equals(url.getProtocol())) {
-            path = path.substring("file://".length());
+            path = path.substring(FILE_PROTOCOL.length());
         }
 
         return path;

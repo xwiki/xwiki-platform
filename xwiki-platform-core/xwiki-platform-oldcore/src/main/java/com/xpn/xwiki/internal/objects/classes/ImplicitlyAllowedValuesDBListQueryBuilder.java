@@ -284,7 +284,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         StringBuilder statementBuilder =
             new StringBuilder("select distinct ").append(StringUtils.join(selectClause, COLUMN_SEPARATOR))
                 .append(" from ").append(StringUtils.join(fromClause, COLUMN_SEPARATOR));
-        if (whereClause.size() > 0) {
+        if (!whereClause.isEmpty()) {
             statementBuilder.append(" where ").append(StringUtils.join(whereClause, " and "));
         }
 

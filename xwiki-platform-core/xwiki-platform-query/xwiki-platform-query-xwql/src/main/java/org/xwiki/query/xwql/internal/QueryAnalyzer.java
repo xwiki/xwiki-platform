@@ -64,7 +64,7 @@ public class QueryAnalyzer extends DepthFirstAdapter
     @Override
     public void caseAXObjectDecl(AXObjectDecl node)
     {
-        String path[] = splitPath(node.getId().toString());
+        String[] path = splitPath(node.getId().toString());
         if (path.length != 2) {
             throw new InvalidQueryException("docalias.object('classname') expected, but got:" + node.toString());
         }
@@ -88,7 +88,7 @@ public class QueryAnalyzer extends DepthFirstAdapter
     @Override
     public void caseAPath(APath node)
     {
-        String path[] = splitPath(node.toString());
+        String[] path = splitPath(node.toString());
         QueryContext.ObjectInfo obj = context.getObject(path[0]);
         if (path.length >= 2 && obj != null) {
             obj.addProperty(path[1], node);
@@ -99,7 +99,7 @@ public class QueryAnalyzer extends DepthFirstAdapter
     public void outAXPath(AXPath node)
     {
         QueryContext.ObjectInfo obj = context.getObject(node.getXObjectDecl());
-        String path[] = splitPath(node.getProperty().toString());
+        String[] path = splitPath(node.getProperty().toString());
         obj.addProperty(path[0], node);
         super.outAXPath(node);
     }

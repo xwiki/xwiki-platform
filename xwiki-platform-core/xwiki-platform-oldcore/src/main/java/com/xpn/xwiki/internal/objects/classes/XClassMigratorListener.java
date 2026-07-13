@@ -91,7 +91,7 @@ public class XClassMigratorListener extends AbstractEventListener
     @Inject
     private Logger logger;
 
-    private record PropertyToUpdate(PropertyClass newPropertyClass, BaseProperty<?> newProperty) { };
+    private record PropertyToUpdate(PropertyClass newPropertyClass, BaseProperty<?> newProperty) { }
 
     /**
      * Set up the listener.

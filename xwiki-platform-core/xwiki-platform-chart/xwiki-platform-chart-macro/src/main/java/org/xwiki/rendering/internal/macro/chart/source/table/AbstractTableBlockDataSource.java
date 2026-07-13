@@ -97,21 +97,6 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
     private static final String CATEGORY_DATASET = "category";
 
     /**
-     * The name of the time series dataset.
-     */
-    private static final String TIME_SERIES_DATASET = "timeseries";
-
-    /**
-     * The name of the pie dataset.
-     */
-    private static final String PIE_DATASET = "pie";
-
-    /**
-     * The default dataset.
-     */
-    private static final String DEFAULT_DATASET = CATEGORY_DATASET;
-
-    /**
      * The range parameter.
      */
     private String range;

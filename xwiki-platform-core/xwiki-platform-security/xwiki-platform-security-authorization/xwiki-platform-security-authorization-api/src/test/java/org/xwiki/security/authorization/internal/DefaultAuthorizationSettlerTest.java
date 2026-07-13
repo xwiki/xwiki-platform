@@ -107,7 +107,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
 
             when(entry.getReference()).thenReturn(ref);
             when(entry.getRules()).thenReturn(rules);
-            when(entry.isEmpty()).thenReturn(rules.size() == 0);
+            when(entry.isEmpty()).thenReturn(rules.isEmpty());
 
             ref = ref.getParentSecurityReference();
             i++;

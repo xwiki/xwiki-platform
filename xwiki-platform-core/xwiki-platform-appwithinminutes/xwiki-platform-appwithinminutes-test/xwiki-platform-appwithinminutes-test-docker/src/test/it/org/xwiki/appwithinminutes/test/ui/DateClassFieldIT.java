@@ -17,36 +17,56 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.appwithinminutes;
+package org.xwiki.appwithinminutes.test.ui;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
 import org.xwiki.appwithinminutes.test.po.DateClassFieldEditPane;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
-import org.xwiki.test.ui.browser.IgnoreBrowsers;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.BootstrapDateTimePicker;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.goToEditor;
 
 /**
  * Special class editor tests that address only the Date class field type.
- * 
+ *
  * @version $Id$
  * @since 3.5
  */
-public class DateClassFieldTest extends AbstractClassEditorTest
+@UITest(properties = {
+    // Exclude the AppWithinMinutes.ClassEditSheet and AppWithinMinutes.DynamicMessageTool from the PR checker since
+    // they use the groovy macro which requires PR rights.
+    // TODO: Should be removed once XWIKI-20529 is closed.
+    // Exclude AppWithinMinutes.LiveTableEditSheet because it calls com.xpn.xwiki.api.Document.saveWithProgrammingRights
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:AppWithinMinutes\\.(ClassEditSheet|DynamicMessageTool|LiveTableEditSheet)"
+})
+class DateClassFieldIT
 {
+    @BeforeEach
+    void setUp(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.deleteSpace(testReference.getLastSpaceReference());
+    }
+
     /**
      * Tests that the user can select a date using the date picker.
      */
     @Test
-    @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    })
-    public void testDatePicker()
+    @Order(1)
+    void datePicker(TestReference testReference)
     {
+        ApplicationClassEditPage editor = goToEditor(testReference);
+
         // First select a date using the picker and assert the value of the date input.
         DateClassFieldEditPane dateField = new DateClassFieldEditPane(editor.addField("Date").getName());
         BootstrapDateTimePicker datePicker = dateField.openDatePicker();
@@ -56,7 +76,7 @@ public class DateClassFieldTest extends AbstractClassEditorTest
             .changeSecond().selectSecond("40").decrementSecond().toggleTimePicker();
         String selectedDate = dateField.getDefaultValue();
         // Ignore the number of seconds.
-        Assert.assertEquals(selectedDate, "13/10/2015 08:16:39");
+        assertEquals(selectedDate, "13/10/2015 08:16:39");
 
         // Set the value of the date input and assert the date selected by the picker.
         dateField.setDefaultValue("17/03/2020 19:43:34");
@@ -65,16 +85,16 @@ public class DateClassFieldTest extends AbstractClassEditorTest
         datePicker.close();
         datePicker = dateField.openDatePicker();
 
-        Assert.assertEquals("17", datePicker.getSelectedDay());
+        assertEquals("17", datePicker.getSelectedDay());
 
         datePicker.changeMonthAndYear();
-        Assert.assertEquals("2020", datePicker.getSelectedYear());
-        Assert.assertEquals("Mar", datePicker.getSelectedMonth());
+        assertEquals("2020", datePicker.getSelectedYear());
+        assertEquals("Mar", datePicker.getSelectedMonth());
 
         datePicker.toggleTimePicker();
-        Assert.assertEquals("19", datePicker.getSelectedHour());
-        Assert.assertEquals("43", datePicker.getSelectedMinute());
-        Assert.assertEquals("34", datePicker.getSelectedSecond());
+        assertEquals("19", datePicker.getSelectedHour());
+        assertEquals("43", datePicker.getSelectedMinute());
+        assertEquals("34", datePicker.getSelectedSecond());
     }
 
     /**
@@ -82,12 +102,11 @@ public class DateClassFieldTest extends AbstractClassEditorTest
      * serialized using the specified date format.
      */
     @Test
-    @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    })
-    public void testDateFormat()
+    @Order(2)
+    void dateFormat(TestReference testReference)
     {
+        ApplicationClassEditPage editor = goToEditor(testReference);
+
         // Add a date field and change the date format.
         DateClassFieldEditPane dateField = new DateClassFieldEditPane(editor.addField("Date").getName());
         dateField.openConfigPanel();
@@ -100,11 +119,11 @@ public class DateClassFieldTest extends AbstractClassEditorTest
         // Select a date using the date picker.
         BootstrapDateTimePicker datePicker = dateField.openDatePicker();
         // The current date format doesn't include time information.
-        Assert.assertFalse(datePicker.hasTimePicker());
+        assertFalse(datePicker.hasTimePicker());
         datePicker.selectDay("22");
         Calendar now = Calendar.getInstance();
         now.set(Calendar.DAY_OF_MONTH, 22);
-        Assert.assertEquals(new SimpleDateFormat(dateFormat).format(now.getTime()), dateField.getDefaultValue());
+        assertEquals(new SimpleDateFormat(dateFormat).format(now.getTime()), dateField.getDefaultValue());
 
         // Test if the date picker knows how to parse dates with a custom date format.
         // Set the value of the date input and assert the date selected by the picker.
@@ -114,11 +133,11 @@ public class DateClassFieldTest extends AbstractClassEditorTest
         datePicker.close();
         datePicker = dateField.openDatePicker();
 
-        Assert.assertEquals("10", datePicker.getSelectedDay());
-        Assert.assertFalse(datePicker.hasTimePicker());
+        assertEquals("10", datePicker.getSelectedDay());
+        assertFalse(datePicker.hasTimePicker());
 
         datePicker.changeMonthAndYear();
-        Assert.assertEquals("2012", datePicker.getSelectedYear());
-        Assert.assertEquals("Nov", datePicker.getSelectedMonth());
+        assertEquals("2012", datePicker.getSelectedYear());
+        assertEquals("Nov", datePicker.getSelectedMonth());
     }
 }

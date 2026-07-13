@@ -86,6 +86,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String JETTY = "jetty";
 
+    private static final String MEMORY_LIMIT_OPTION = "-Xmx1024m";
+
     private final int index;
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
@@ -202,6 +204,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         List<String> javaOpts = new ArrayList<>();
 
+        // Cap the XWiki heap to not overcommit the agent's memory.
+        javaOpts.add(MEMORY_LIMIT_OPTION);
+
         // TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 has been fixed.
         addJava17AddOpens(javaOpts);
 
@@ -268,7 +273,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             "/usr/local/tomcat/webapps/xwiki");
 
         List<String> catalinaOpts = new ArrayList<>();
-        catalinaOpts.add("-Xmx1024m");
+        catalinaOpts.add(MEMORY_LIMIT_OPTION);
 
         // Note: Tomcat automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
         // need to add them as we do for Jetty.

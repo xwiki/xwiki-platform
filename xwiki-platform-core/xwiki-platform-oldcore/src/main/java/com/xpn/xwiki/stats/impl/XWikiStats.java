@@ -213,10 +213,8 @@ public class XWikiStats extends BaseCollection
         Element oel = new DOMElement(XMLNODE_OBJECT);
 
         // Add Class
-        if (bclass != null) {
-            if (bclass.getFieldList().size() > 0) {
-                oel.add(bclass.toXML());
-            }
+        if (bclass != null && !bclass.getFieldList().isEmpty()) {
+            oel.add(bclass.toXML());
         }
 
         Element el = new DOMElement(XMLNODE_NAME);

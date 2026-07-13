@@ -60,7 +60,7 @@ public abstract class AbstractPackageTest
      * @param extension the extension id and version or null if none should be added
      * @return the XAR file as a byte array.
      */
-    protected byte[] createZipFile(XWikiDocument docs[], String[] encodings, String packageXmlEncoding,
+    protected byte[] createZipFile(XWikiDocument[] docs, String[] encodings, String packageXmlEncoding,
         ExtensionId extension) throws Exception
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -91,7 +91,7 @@ public abstract class AbstractPackageTest
      * @param extension the extension id and version or null if none should be added
      * @return the XAR file as a byte array.
      */
-    protected byte[] createZipFile(XWikiDocument docs[], String[] encodings, ExtensionId extension) throws Exception
+    protected byte[] createZipFile(XWikiDocument[] docs, String[] encodings, ExtensionId extension) throws Exception
     {
         return createZipFile(docs, encodings, "ISO-8859-1", extension);
     }
@@ -104,7 +104,7 @@ public abstract class AbstractPackageTest
      * @param packageXmlEncoding The encoding of package.xml
      * @return the XAR file as a byte array.
      */
-    protected byte[] createZipFileUsingCommonsCompress(XWikiDocument docs[], String[] encodings,
+    protected byte[] createZipFileUsingCommonsCompress(XWikiDocument[] docs, String[] encodings,
         String packageXmlEncoding, ExtensionId extension) throws Exception
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -136,7 +136,7 @@ public abstract class AbstractPackageTest
      * @param extension the extension id and version or null if none should be added
      * @return the XAR file as a byte array.
      */
-    protected byte[] createZipFileUsingCommonsCompress(XWikiDocument docs[], String[] encodings, ExtensionId extension)
+    protected byte[] createZipFileUsingCommonsCompress(XWikiDocument[] docs, String[] encodings, ExtensionId extension)
         throws Exception
     {
         return createZipFileUsingCommonsCompress(docs, encodings, "ISO-8859-1", extension);
@@ -150,10 +150,10 @@ public abstract class AbstractPackageTest
         OutputStreamWriter os = new OutputStreamWriter(ostr, charset);
 
         // Voluntarily ignore the first line... as it's the xml declaration
-        String line = bfr.readLine();
+        bfr.readLine();
         os.append("<?xml version=\"1.0\" encoding=\"" + charset + "\"?>\n");
 
-        line = bfr.readLine();
+        String line = bfr.readLine();
         while (null != line) {
             os.append(line);
             os.append("\n");
@@ -164,7 +164,7 @@ public abstract class AbstractPackageTest
         return ostr.toByteArray();
     }
 
-    private String getPackageXML(XWikiDocument docs[], String encoding, ExtensionId extension)
+    private String getPackageXML(XWikiDocument[] docs, String encoding, ExtensionId extension)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n");

@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
  * @since 6.1M2
  */
 @ComponentTest
-public class ContextExtendedURLURLNormalizerTest
+class ContextExtendedURLURLNormalizerTest
 {
     @InjectMockComponents
     private ContextExtendedURLURLNormalizer normalizer;

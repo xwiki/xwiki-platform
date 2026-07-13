@@ -158,7 +158,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
                 if (principal != null) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("User " + principal.getName() + " has been authentified from cookie");
+                        LOGGER.debug("User [{}] has been authentified from cookie", principal.getName());
                     }
 
                     // make sure the Principal contains wiki name information
@@ -211,7 +211,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         if (principal != null && authenticationFailureManager.validateForm(username, request)) {
             // login successful
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("User " + principal.getName() + " has been logged-in");
+                LOGGER.info("User [{}] has been logged-in", principal.getName());
             }
 
             authenticationFailureManager.resetAuthenticationFailureCounter(username);
@@ -252,7 +252,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             // login failed
             // set response status and forward to error page
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("User " + username + " login has failed");
+                LOGGER.info("User [{}] login has failed", username);
             }
 
             authenticationFailureManager.recordAuthenticationFailure(username, request);
@@ -292,10 +292,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         HttpServletResponse httpServletResponse, URLPatternMatcher urlPatternMatcher) throws Exception
     {
         boolean result = super.processLogout(securityRequestWrapper, httpServletResponse, urlPatternMatcher);
-        if (result == true) {
-            if (this.persistentLoginManager != null) {
-                this.persistentLoginManager.forgetLogin(securityRequestWrapper, httpServletResponse);
-            }
+        if (result && this.persistentLoginManager != null) {
+            this.persistentLoginManager.forgetLogin(securityRequestWrapper, httpServletResponse);
         }
         return result;
     }

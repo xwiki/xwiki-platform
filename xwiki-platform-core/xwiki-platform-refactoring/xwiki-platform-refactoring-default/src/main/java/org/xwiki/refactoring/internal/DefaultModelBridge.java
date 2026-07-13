@@ -362,7 +362,7 @@ public class DefaultModelBridge implements ModelBridge
 
             List<DocumentReference> childReferences = oldParentDocument.getChildrenReferences(context);
 
-            if (childReferences.size() > 0) {
+            if (!childReferences.isEmpty()) {
                 this.progressManager.pushLevelProgress(childReferences.size(), this);
                 popLevelProgress = true;
             }
@@ -382,7 +382,7 @@ public class DefaultModelBridge implements ModelBridge
                 this.progressManager.endStep(this);
             }
 
-            if (childReferences.size() > 0) {
+            if (!childReferences.isEmpty()) {
                 this.logger.info("Document parent fields updated from [{}] to [{}] for [{}] documents.",
                     oldParentReference, newParentReference, childReferences.size());
             }

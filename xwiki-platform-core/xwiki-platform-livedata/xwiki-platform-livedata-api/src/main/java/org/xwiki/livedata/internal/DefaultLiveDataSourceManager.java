@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -92,7 +93,7 @@ public class DefaultLiveDataSourceManager implements LiveDataSourceManager
             return Optional.empty();
         } else {
             return Optional.of(cm.getComponentDescriptorList((Type) LiveDataSource.class).stream()
-                .map(descriptor -> descriptor.getRoleHint()).collect(Collectors.toSet()));
+                .map(ComponentDescriptor::getRoleHint).collect(Collectors.toSet()));
         }
     }
 

@@ -251,7 +251,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
         String version, MentionLocation location, String authorReference, Syntax syntax)
     {
         Optional<XDOM> oldDom = oldBaseObject.flatMap(it -> ofNullable(it.getField(largeStringProperty.getName())))
-            .filter(it -> it instanceof LargeStringProperty)
+            .filter(LargeStringProperty.class::isInstance)
             .flatMap(it -> this.xdomService.parse(((LargeStringProperty) it).getValue(), syntax));
         return this.xdomService.parse(largeStringProperty.getValue(), syntax).flatMap(xdom -> {
             EntityReference entityReference = largeStringProperty.getReference();

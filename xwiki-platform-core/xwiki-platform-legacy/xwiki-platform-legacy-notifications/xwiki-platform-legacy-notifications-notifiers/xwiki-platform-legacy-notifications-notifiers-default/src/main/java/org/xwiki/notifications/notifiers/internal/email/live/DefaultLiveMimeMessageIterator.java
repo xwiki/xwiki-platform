@@ -97,7 +97,7 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
                     it.remove();
                 }
             }
-            if (resultCompositeEvent.getEvents().size() == 0) {
+            if (resultCompositeEvent.getEvents().isEmpty()) {
                 return Collections.emptyList();
             }
 

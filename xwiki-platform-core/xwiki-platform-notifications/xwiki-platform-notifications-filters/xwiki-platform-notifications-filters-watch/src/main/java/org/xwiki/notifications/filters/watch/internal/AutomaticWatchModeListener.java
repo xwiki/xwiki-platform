@@ -64,7 +64,7 @@ public class AutomaticWatchModeListener extends AbstractEventListener
     /**
      * The skipped events group matcher.
      */
-    private static final BeginEvent SKIPPED_EVENTS = event -> event instanceof BeginFoldEvent;
+    private static final BeginEvent SKIPPED_EVENTS = BeginFoldEvent.class::isInstance;
 
     /**
      * The events to match.

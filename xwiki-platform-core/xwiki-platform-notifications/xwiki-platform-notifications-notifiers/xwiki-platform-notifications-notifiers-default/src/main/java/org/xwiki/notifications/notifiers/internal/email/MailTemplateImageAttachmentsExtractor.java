@@ -57,6 +57,6 @@ public class MailTemplateImageAttachmentsExtractor
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
         Document document = new Document(xwiki.getDocument(documentReference, context), context);
-        return document.getAttachmentList().stream().filter(att -> att.isImage()).collect(Collectors.toList());
+        return document.getAttachmentList().stream().filter(Attachment::isImage).collect(Collectors.toList());
     }
 }

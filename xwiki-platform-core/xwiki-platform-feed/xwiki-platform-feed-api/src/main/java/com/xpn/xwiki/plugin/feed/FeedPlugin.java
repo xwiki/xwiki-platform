@@ -794,7 +794,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             }
 
             List<com.xpn.xwiki.api.Object> apiObjs = new ArrayList<>();
-            for (Object obj[] : res) {
+            for (Object[] obj : res) {
                 try {
                     XWikiDocument doc = context.getWiki().getDocument((String) obj[1], context);
                     if (context.getWiki().getRightService().checkAccess("view", doc, context)) {

@@ -22,7 +22,6 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Named;

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.webjars.internal.WebJarsResourceReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * Unit tests for {@link org.xwiki.webjars.internal.WebJarsResourceReference}.
@@ -53,10 +53,10 @@ class WebJarResourceReferenceTest
         assertEquals(reference2, reference1);
         assertEquals(reference2.hashCode(), reference1.hashCode());
 
-        assertFalse(reference3.equals(reference1));
-        assertFalse(reference3.hashCode() == reference1.hashCode());
+        assertNotEquals(reference3, reference1);
+        assertNotEquals(reference3.hashCode(), reference1.hashCode());
 
-        assertFalse(reference4.equals(reference3));
-        assertFalse(reference4.hashCode() == reference3.hashCode());
+        assertNotEquals(reference4, reference3);
+        assertNotEquals(reference4.hashCode(), reference3.hashCode());
     }
 }

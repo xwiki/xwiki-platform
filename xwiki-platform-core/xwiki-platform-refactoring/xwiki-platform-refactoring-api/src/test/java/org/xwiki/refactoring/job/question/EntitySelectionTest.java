@@ -24,9 +24,8 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link EntitySelection}.
@@ -44,11 +43,11 @@ class EntitySelectionTest
         EntitySelection unselected = new EntitySelection(entityReference);
         unselected.setSelected(false);
 
-        assertFalse(selected.equals(null));
-        assertTrue(selected.equals(selected));
-        assertFalse(selected.equals(entityReference));
-        assertFalse(selected.equals(unselected));
-        assertTrue(selected.equals(new EntitySelection(entityReference)));
+        assertNotEquals(selected, null);
+        assertEquals(selected, selected);
+        assertNotEquals(selected, entityReference);
+        assertNotEquals(selected, unselected);
+        assertEquals(selected, new EntitySelection(entityReference));
     }
 
     @Test

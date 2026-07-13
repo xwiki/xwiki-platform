@@ -26,7 +26,7 @@ import org.apache.commons.collections4.set.AbstractSetTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * Test Set interface of RightSet.
@@ -94,7 +94,7 @@ class RightSetTest extends AbstractSetTest<Right>
         final Set<Right> set2 = makeConfirmedCollection();
         // CUSTOM: the standard #testSetEquals add a String here, which does not make any sense for RightSet
         set2.add(Right.VIEW);
-        assertFalse(getCollection().equals(set2), "Empty set shouldn't equal nonempty set");
+        assertNotEquals(getCollection(), set2, "Empty set shouldn't equal nonempty set");
 
         resetFull();
         assertEquals(getCollection(), getConfirmed(), "Full sets should be equal");
@@ -102,6 +102,6 @@ class RightSetTest extends AbstractSetTest<Right>
 
         set2.clear();
         set2.addAll(Arrays.asList(getOtherElements()));
-        assertFalse(getCollection().equals(set2), "Sets with different contents shouldn't be equal");
+        assertNotEquals(getCollection(), set2, "Sets with different contents shouldn't be equal");
     }
 }

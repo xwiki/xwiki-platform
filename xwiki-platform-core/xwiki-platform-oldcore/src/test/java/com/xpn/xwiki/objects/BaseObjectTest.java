@@ -190,7 +190,7 @@ class BaseObjectTest
             .merge(previousObject, nextObject, mergeConfiguration, this.oldcore.getXWikiContext(), mergeResult);
 
         List<LogEvent> errors = mergeResult.getLog().getLogsFrom(LogLevel.ERROR);
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             fail("Found error or warning during the merge (" + errors.get(0) + ")");
         }
 
@@ -246,7 +246,7 @@ class BaseObjectTest
         object.setXClassReference(classReference);
         object.setOwnerDocument(ownerDocument);
 
-        XWikiContext context = this.oldcore.getXWikiContext();;
+        XWikiContext context = this.oldcore.getXWikiContext();
         String fieldName = "myField";
         String value = "myValue";
 
@@ -298,7 +298,7 @@ class BaseObjectTest
         object.setXClassReference(classReference);
         object.setOwnerDocument(ownerDocument);
 
-        XWikiContext context = this.oldcore.getXWikiContext();;
+        XWikiContext context = this.oldcore.getXWikiContext();
         String fieldName = "myField";
         Object value = 4545;
 

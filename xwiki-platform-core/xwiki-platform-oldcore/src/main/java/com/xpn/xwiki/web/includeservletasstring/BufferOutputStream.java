@@ -42,7 +42,7 @@ public class BufferOutputStream extends ServletOutputStream
     }
 
     @Override
-    public void write(byte b[]) throws IOException
+    public void write(byte[] b) throws IOException
     {
         this.buffer.write(b);
     }

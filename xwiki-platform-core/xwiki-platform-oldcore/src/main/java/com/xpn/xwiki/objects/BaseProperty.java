@@ -26,11 +26,11 @@ import org.dom4j.Element;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -39,9 +39,8 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 /**
  * @version $Id$
  */
-// TODO: shouldn't this be abstract? toFormString and toText
-// will never work unless getValue is overriden
-public class BaseProperty<R extends EntityReference> extends BaseElement<R> implements PropertyInterface, Cloneable
+public class BaseProperty<R extends EntityReference> extends BaseElement<R> implements PropertyInterface,
+    Cloneable
 {
     private static final long serialVersionUID = 1L;
 
@@ -149,6 +148,13 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
         return getClass().getName();
     }
 
+    /**
+     * Should set the class type, but {@link #getClassType()} actually relies on {@link #getClass()} so this should
+     * never be used.
+     * @param type the type supposed to be set.
+     * @deprecated this method does nothing.
+     */
+    @Deprecated(since = "18.2.0RC1")
     public void setClassType(String type)
     {
     }
@@ -208,6 +214,35 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
 
     public void setValue(Object value)
     {
+    }
+
+    /**
+     * Chose the value to return if the field is sensitive or not. If {@link #isSensitive(XWikiContext)} return
+     * {@code true} and the {@link PropertyClass} can be identified it returns the output of
+     * {@link PropertyClass#getObfuscatedValue(Object)} using {@link #getValue()} as input. If the {@link PropertyClass}
+     * cannot be identified, it returns {@code null} for safety. Finally, if {@link #isSensitive(XWikiContext)}
+     * returns {@code false} then it simply fallbacks on {@link #getValue()}.
+     *
+     * @return an obfuscated value or {@code null} if {@link #isSensitive(XWikiContext)} returns {@code true},
+     * otherwise the value returned by {@link #getValue()}.
+     * @see PropertyClass#getObfuscatedValue(Object)
+     * @see #isSensitive(XWikiContext)
+     * @see #getValue()
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public Object getObfuscatedValue()
+    {
+        Object value = getValue();
+        if (isSensitive(getXWikiContext())) {
+            PropertyClass propertyClass = getPropertyClass(getXWikiContext());
+            if (propertyClass != null) {
+                return propertyClass.getObfuscatedValue(getValue());
+            } else {
+                return null;
+            }
+        }
+        return value;
     }
 
     @Override
@@ -424,19 +459,18 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     public PropertyClass getPropertyClass(XWikiContext xcontext)
     {
-        if (getObject() instanceof BaseObject) {
-            XWikiDocument document = getOwnerDocument();
-            if (document != null) {
-                BaseObject xobject = document.getXObject(getReference().getParent());
-                if (xobject != null) {
-                    BaseClass xclass = xobject.getXClass(xcontext);
-
-                    return (PropertyClass) xclass.get(getName());
-                }
+        PropertyClass result = null;
+        if (getObject() instanceof BaseObject baseObject) {
+            BaseClass xclass = baseObject.getSourceXClass();
+            if (xclass == null) {
+                xclass = baseObject.getXClass(xcontext);
+            }
+            if (xclass != null) {
+                result = (PropertyClass) xclass.get(getName());
             }
         }
 
-        return null;
+        return result;
     }
 
     @Override

@@ -18,70 +18,34 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import type {
-  TranslationQuery,
+  Query,
+  Resolver,
   Translations,
-} from "@xwiki/platform-livedata-api";
+} from "@xwiki/platform-localization-api";
 import type { I18n } from "vue-i18n";
 
-function buildRequest(
-  translationsURL: string,
-  locale: string,
-  prefix: string,
-  keys: string[],
-) {
-  const usp = new URLSearchParams({
-    locale: locale,
-    prefix: prefix,
-  });
-  for (const key of keys) {
-    usp.append("key", key);
-  }
-  return `${translationsURL}?${usp.toString()}`;
-}
-
-async function getTranslations(
-  locale: string,
-  prefix: string,
-  keys: string[],
-): Promise<Translations> {
-  const translationsURL = `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(
-    XWiki.currentWiki,
-  )}/localization/translations`;
-  const input = buildRequest(translationsURL, locale, prefix, keys);
-
-  const res = await fetch(input, {
-    headers: {
-      Accept: "application/json",
-    },
-  });
-
-  const translations = (await res.json()).translations;
-  const resMap: { [key: string]: string } = {};
-  for (const value of translations) {
-    resMap[value.key] = value.rawSource;
-  }
-  return resMap;
-}
-
 /**
- * Build the translation resolver.
- * @param locale - the current locale
- * @param i18n - the i18n instance to populate
- * @since 18.0.0RC1
+ * @param resolver - the resolver to use when building the translation preloader
+ * @since 18.3.0RC1
  * @beta
  */
-function buildTranslations(locale: string, i18n: I18n) {
-  return async function resolveTranslations(
-    query: TranslationQuery,
-  ): Promise<Translations> {
-    const translations = await getTranslations(
-      locale,
-      query.prefix,
-      query.keys,
-    );
-    i18n.global.setLocaleMessage(locale, translations);
-    return translations;
+function initTranslationsBuilder(
+  resolver: Resolver,
+): (local: string, i18n: I18n) => (query: Query) => Promise<Translations> {
+  /**
+   * Build the translation resolver.
+   * @param locale - the current locale
+   * @param i18n - the i18n instance to populate
+   */
+  return function buildTranslations(locale: string, i18n: I18n) {
+    return async function resolveTranslations(
+      query: Query,
+    ): Promise<Translations> {
+      const translations = (await resolver.resolve(query)).translations;
+      i18n.global.setLocaleMessage(locale, translations);
+      return translations;
+    };
   };
 }
 
-export { buildTranslations };
+export { initTranslationsBuilder };

@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -113,6 +115,18 @@ public class Attachment extends Api
     }
 
     /**
+     * @return the reference of the author of the attachment.
+     * @see XWikiAttachment#getAuthorReference()
+     * @since 17.10.9
+     * @since 18.4.0RC1
+     */
+    @Unstable
+    public DocumentReference getAuthorReference()
+    {
+        return this.attachment.getAuthorReference();
+    }
+
+    /**
      * @return the last version number of the document
      */
     public String getVersion()
@@ -157,9 +171,10 @@ public class Attachment extends Api
     {
         try {
             // the input stream can be null if the attachment has been deleted for example.
-            InputStream contentInputStream = this.attachment.getContentInputStream(getXWikiContext());
-            if (contentInputStream != null) {
-                return IOUtils.toByteArray(contentInputStream);
+            try (InputStream contentInputStream = this.attachment.getContentInputStream(getXWikiContext())) {
+                if (contentInputStream != null) {
+                    return IOUtils.toByteArray(contentInputStream);
+                }
             }
         } catch (IOException ex) {
             // This really shouldn't happen.

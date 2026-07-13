@@ -28,7 +28,11 @@ import java.util.Vector;
 
 import javax.inject.Provider;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+
+import jakarta.inject.Named;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +42,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.ModelFactory;
@@ -56,14 +61,16 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-import jakarta.inject.Named;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -85,6 +92,9 @@ class PageResourceImplTest
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @MockComponent
+    private RefactoringConfiguration refactoringConfiguration;
+
+    @MockComponent
     @Named("context")
     private ComponentManager contextComponentManager;
 
@@ -95,6 +105,10 @@ class PageResourceImplTest
     private XWiki xwiki;
 
     private XWikiContext context;
+
+    private XWikiDocument testPageXWikiDocument;
+
+    private Document testPageDocument;
 
     @BeforeEach
     void setUp(MockitoComponentManager componentManager)
@@ -120,18 +134,131 @@ class PageResourceImplTest
     }
 
     @Test
-    void testCheckRights() throws XWikiRestException, XWikiException
+    void checkRights() throws XWikiRestException, XWikiException
     {
         String wikiName = "testWiki";
         String spaceName = "TestSpace";
         String pageName = "TestPage";
 
+        DocumentReference testPageRef = initTestPage(wikiName, spaceName, pageName);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, testPageRef)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, testPageRef)).thenReturn(false);
+        when(this.contextualAuthorizationManager.hasAccess(Right.COMMENT, testPageRef)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, testPageRef)).thenReturn(false);
+
+        Page page = this.pageResource.getPage(wikiName, spaceName, pageName, false, false, false, false, List.of(),
+            List.of());
+        assertEquals(List.of(), page.getRights());
+
+        Page pageWithRights = this.pageResource.getPage(wikiName, spaceName, pageName, false, false, false, false,
+            List.of("edit", "comment", "delete"), List.of());
+        List<org.xwiki.rest.model.jaxb.Right> rights = pageWithRights.getRights();
+        assertEquals("edit", rights.get(0).getName());
+        assertFalse(rights.get(0).isValue());
+        assertEquals("comment", rights.get(1).getName());
+        assertTrue(rights.get(1).isValue());
+        assertEquals("delete", rights.get(2).getName());
+        assertFalse(rights.get(2).isValue());
+
+        List<String> unknownRightsList = List.of("unknownRight");
+        List<String> supportedSyntaxesList = List.of();
+        assertThrows(BadRequestException.class, () -> this.pageResource.getPage(wikiName, spaceName, pageName, false,
+            false, false, false, unknownRightsList, supportedSyntaxesList));
+    }
+
+    @Test
+    void supportedSyntaxes() throws XWikiRestException, XWikiException
+    {
+        String wikiName = "testWiki";
+        String spaceName = "TestSpace";
+        String pageName = "TestPage";
+
+        DocumentReference testPageRef = initTestPage(wikiName, spaceName, pageName);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, testPageRef)).thenReturn(true);
+
+        Page pageWithoutSupportedSyntaxes = this.pageResource.getPage(wikiName, spaceName, pageName, false, false,
+            false, false, List.of(), List.of());
+        assertEquals("XWiki content.", pageWithoutSupportedSyntaxes.getContent());
+        assertNull(pageWithoutSupportedSyntaxes.getRenderedContent());
+
+        Page pageWithoutRendering = this.pageResource.getPage(wikiName, spaceName, pageName, false, false, false,
+            false, List.of(), List.of("xwiki/2.1"));
+        assertEquals("XWiki content.", pageWithoutRendering.getContent());
+        assertNull(pageWithoutRendering.getRenderedContent());
+
+        Page pageWithRendering = this.pageResource.getPage(wikiName, spaceName, pageName, false, false, false,
+            false, List.of(), List.of("markdown/1.2"));
+        assertEquals("XWiki content.", pageWithRendering.getContent());
+        assertEquals("Rendered content.", pageWithRendering.getRenderedContent());
+    }
+
+    @Test
+    void deletePageSendsToRecycleBinByDefault() throws XWikiRestException, XWikiException
+    {
+        DocumentReference reference = initTestPage("testWiki", "TestSpace", "TestPage");
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, reference)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(true);
+
+        this.pageResource.deletePage("testWiki", "TestSpace", "TestPage", false);
+
+        verify(this.testPageDocument).delete();
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+    }
+
+    @Test
+    void deletePageSkipsRecycleBinWhenActivated() throws XWikiRestException, XWikiException
+    {
+        DocumentReference reference = initTestPage("testWiki", "TestSpace", "TestPage");
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, reference)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(true);
+        when(this.refactoringConfiguration.isRecycleBinSkippingActivated()).thenReturn(true);
+
+        this.pageResource.deletePage("testWiki", "TestSpace", "TestPage", true);
+
+        verify(this.xwiki).deleteDocument(this.testPageXWikiDocument, false, this.context);
+        verify(this.testPageDocument, never()).delete();
+    }
+
+    @Test
+    void deletePageSkipRecycleBinFallsBackWhenNotActivated() throws XWikiRestException, XWikiException
+    {
+        DocumentReference reference = initTestPage("testWiki", "TestSpace", "TestPage");
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, reference)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(true);
+        when(this.refactoringConfiguration.isRecycleBinSkippingActivated()).thenReturn(false);
+
+        this.pageResource.deletePage("testWiki", "TestSpace", "TestPage", true);
+
+        verify(this.testPageDocument).delete();
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+    }
+
+    @Test
+    void deletePageWithoutDeleteRight() throws XWikiException
+    {
+        DocumentReference reference = initTestPage("testWiki", "TestSpace", "TestPage");
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, reference)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, reference)).thenReturn(false);
+
+        // The DELETE right is required regardless of the skipRecycleBin value.
+        WebApplicationException exception = assertThrows(WebApplicationException.class,
+            () -> this.pageResource.deletePage("testWiki", "TestSpace", "TestPage", false));
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), exception.getResponse().getStatus());
+
+        verify(this.testPageDocument, never()).delete();
+        verify(this.xwiki, never()).deleteDocument(any(), anyBoolean(), any());
+    }
+
+    private DocumentReference initTestPage(String wikiName, String spaceName, String pageName) throws XWikiException
+    {
         XWikiDocument testPageMock = mock(XWikiDocument.class);
         DocumentReference testPageRef = new DocumentReference(wikiName, spaceName, pageName);
         Document testPageDoc = mock(Document.class);
         when(this.xwiki.getDocument(testPageRef, this.context)).thenReturn(testPageMock);
+
         when(testPageMock.getDocumentReference()).thenReturn(testPageRef);
         when(testPageMock.newDocument(this.context)).thenReturn(testPageDoc);
+
         when(testPageDoc.getDocumentReference()).thenReturn(testPageRef);
         when(testPageDoc.getLocale()).thenReturn(Locale.ROOT);
         when(testPageDoc.getRealLocale()).thenReturn(Locale.ROOT);
@@ -144,25 +271,12 @@ class PageResourceImplTest
         when(testPageDoc.getCreationDate()).thenReturn(new Date(0));
         when(testPageDoc.getContentUpdateDate()).thenReturn(new Date(0));
         when(testPageDoc.getAuthors()).thenReturn(mock(DocumentAuthors.class));
-        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, testPageRef)).thenReturn(true);
-        when(this.contextualAuthorizationManager.hasAccess(Right.EDIT, testPageRef)).thenReturn(false);
-        when(this.contextualAuthorizationManager.hasAccess(Right.COMMENT, testPageRef)).thenReturn(true);
-        when(this.contextualAuthorizationManager.hasAccess(Right.DELETE, testPageRef)).thenReturn(false);
+        when(testPageDoc.getContent()).thenReturn("XWiki content.");
+        when(testPageDoc.displayDocument()).thenReturn("Rendered content.");
 
-        Page page = this.pageResource.getPage(wikiName, spaceName, pageName, false, false, false, false, List.of());
-        assertEquals(List.of(), page.getRights());
+        this.testPageXWikiDocument = testPageMock;
+        this.testPageDocument = testPageDoc;
 
-        Page pageWithRights = this.pageResource.getPage(wikiName, spaceName, pageName, false, false, false, false,
-            List.of("edit", "comment", "delete"));
-        List<org.xwiki.rest.model.jaxb.Right> rights = pageWithRights.getRights();
-        assertEquals("edit", rights.get(0).getName());
-        assertFalse(rights.get(0).isValue());
-        assertEquals("comment", rights.get(1).getName());
-        assertTrue(rights.get(1).isValue());
-        assertEquals("delete", rights.get(2).getName());
-        assertFalse(rights.get(2).isValue());
-
-        assertThrows(BadRequestException.class, () -> this.pageResource.getPage(wikiName, spaceName, pageName, false,
-            false, false, false, List.of("unknownRight")));
+        return testPageRef;
     }
 }

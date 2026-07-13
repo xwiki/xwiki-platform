@@ -21,33 +21,19 @@ package org.xwiki.notifications.filters.internal;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
-import org.xwiki.notifications.filters.NotificationFilterDisplayer;
 import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.preferences.NotificationPreference;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Default implementation of {@link NotificationFilterManager}.

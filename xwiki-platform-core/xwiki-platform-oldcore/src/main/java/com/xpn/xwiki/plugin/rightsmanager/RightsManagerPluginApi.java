@@ -153,7 +153,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      */
     static Object[][] createOrderTable(List<?> list)
     {
-        if (list == null || list.size() == 0) {
+        if (list == null || list.isEmpty()) {
             return null;
         }
 

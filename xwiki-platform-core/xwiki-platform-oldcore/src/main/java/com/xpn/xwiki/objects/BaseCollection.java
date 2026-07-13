@@ -67,6 +67,8 @@ import com.xpn.xwiki.web.Utils;
 public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R>
     implements ObjectInterface, Cloneable
 {
+    private static final String COLLISION_ON_PROPERTY_MESSAGE = "Collision found on property [{}]";
+
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseCollection.class);
@@ -90,7 +92,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * List of properties (eg XClass properties, XObject properties, etc).
      */
-    protected Map<String, Object> fields = new LinkedHashMap<String, Object>();
+    protected Map<String, Object> fields = new LinkedHashMap<>();
 
     protected List<Object> fieldsToRemove = new ArrayList<>();
 
@@ -478,9 +480,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         ListProperty prop = (ListProperty) safeget(name);
         if (prop == null) {
-            return new HashSet<Object>();
+            return new HashSet<>();
         } else {
-            return new HashSet<Object>((Collection<?>) prop.getValue());
+            return new HashSet<>((Collection<?>) prop.getValue());
         }
     }
 
@@ -682,7 +684,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {
-        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        // FIXME: this whole code should be refactored and factorized: some parts are also duplicated in BaseObject.
+        ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseCollection oldCollection = (BaseCollection) oldObject;
         // Iterate over the new properties first, to handle changed and added objects
         for (Object key : this.getFields().keySet()) {
@@ -692,16 +695,22 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
             String propertyType = (pclass == null) ? "" : pclass.getClassType();
+            boolean isSensitive = false;
+            if (newProperty != null) {
+                isSensitive = newProperty.isSensitive(context);
+            }
+            if (!isSensitive && oldProperty != null) {
+                isSensitive = oldProperty.isSensitive(context);
+            }
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
-                if ((newProperty != null) && (!newProperty.toText().equals(""))) {
-                    if (pclass != null) {
-                        String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
-                            : pclass.displayView(propertyName, this, context);
-                        difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
-                    }
+                if ((newProperty != null) && (!"".equals(newProperty.toText())) && pclass != null) {
+                    String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
+                        : pclass.displayView(propertyName, this, context);
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue,
+                        isSensitive));
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
                 // The property exists in both objects and is different
@@ -713,12 +722,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         : pclass.displayView(propertyName, oldCollection, context);
                     difflist
                         .add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
-                            propertyName, propertyType, oldPropertyValue, newPropertyValue));
+                            propertyName, propertyType, oldPropertyValue, newPropertyValue,
+                            isSensitive));
                 } else {
                     // Cannot get property definition, so use the plain value
                     difflist
                         .add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
-                            propertyName, propertyType, oldProperty.toText(), newProperty.toText()));
+                            propertyName, propertyType, oldProperty.toText(), newProperty.toText(),
+                            isSensitive));
                 }
             }
         }
@@ -731,21 +742,27 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
             String propertyType = (pclass == null) ? "" : pclass.getClassType();
-
-            if (newProperty == null) {
-                // The property exists in the old object, but not in the new one
-                if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
-                    if (pclass != null) {
-                        // Put the values as they would be displayed in the interface
-                        String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                            : pclass.displayView(propertyName, oldCollection, context);
-                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, ""));
-                    } else {
-                        // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), ""));
-                    }
+            boolean isSensitive = false;
+            if (newProperty != null) {
+                isSensitive = newProperty.isSensitive(context);
+            }
+            if (!isSensitive && oldProperty != null) {
+                isSensitive = oldProperty.isSensitive(context);
+            }
+            // The property exists in the old object, but not in the new one
+            if (newProperty == null && (oldProperty != null) && (!"".equals(oldProperty.toText()))) {
+                if (pclass != null) {
+                    // Put the values as they would be displayed in the interface
+                    String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
+                        : pclass.displayView(propertyName, oldCollection, context);
+                    difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, "",
+                        isSensitive));
+                } else {
+                    // Cannot get property definition, so use the plain value
+                    difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), "",
+                        isSensitive));
                 }
             }
         }
@@ -820,7 +837,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      */
     public Map<String, Object> getCustomMappingMap() throws XWikiException
     {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         for (String name : this.fields.keySet()) {
             BaseProperty property = (BaseProperty) get(name);
             map.put(name, property.getCustomMappingValue());
@@ -870,7 +887,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                             configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
                         mergeResult.setModified(true);
                     }
-                    mergeResult.getLog().error("Collision found on property [{}]", newProperty.getReference());
+                    mergeResult.getLog().error(COLLISION_ON_PROPERTY_MESSAGE, newProperty.getReference());
                 }
             } else if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
                 if (propertyResult != null) {
@@ -882,7 +899,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         // collision between DB and new: property to remove but not the same as previous
                         // version
                         // We don't remove the field in case of fallback.
-                        mergeResult.getLog().error("Collision found on property [{}]", previousProperty.getReference());
+                        mergeResult.getLog().error(COLLISION_ON_PROPERTY_MESSAGE, previousProperty.getReference());
                     }
                 } else {
                     // Already removed from DB, lets assume the user is prescient
@@ -918,7 +935,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 } else {
                     // collision between DB and new: property to modify but does not exist in DB
                     // Lets assume it's a mistake to fix
-                    mergeResult.getLog().warn("Collision found on property [{}]", newProperty.getReference());
+                    mergeResult.getLog().warn(COLLISION_ON_PROPERTY_MESSAGE, newProperty.getReference());
 
                     modifiableResult.safeput(diff.getPropName(),
                         configuration.isProvidedVersionsModifiables() ? newProperty : newProperty.clone());
@@ -944,7 +961,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
         if (clean) {
             // Delete fields that don't exist anymore
-            List<String> fieldsToDelete = new ArrayList<String>(this.fields.size());
+            List<String> fieldsToDelete = new ArrayList<>(this.fields.size());
             for (String key : this.fields.keySet()) {
                 if (newCollection.safeget(key) == null) {
                     fieldsToDelete.add(key);

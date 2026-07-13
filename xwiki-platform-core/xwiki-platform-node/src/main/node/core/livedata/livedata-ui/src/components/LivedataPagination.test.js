@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -63,40 +63,43 @@ import { describe, expect, it } from "vitest";
  * For instance
  * `$t('a.b')` returns `'a.b'`.
  *
- * @param provide (optional) an object that is merged on top of the default provide parameter.
- * @returns {number|*} a wrapper for the LivedataPagination component
+ * @param provide - (optional) an object that is merged on top of the default provide parameter.
+ * @returns a wrapper for the LivedataPagination component
  */
 function initWrapper({ provide } = {}) {
   return mount(LivedataPagination, {
     global: {
-      provide: _.merge({
-        logic: {
-          data: {
-            meta: {
-              pagination: {
-                maxShownPages: 10,
-                showEntryRange: true,
-                showPageSizeDropdown: true,
-                pageSizes: [10, 20, 30, 100],
+      provide: _.merge(
+        {
+          logic: {
+            data: {
+              meta: {
+                pagination: {
+                  maxShownPages: 10,
+                  showEntryRange: true,
+                  showPageSizeDropdown: true,
+                  pageSizes: [10, 20, 30, 100],
+                },
               },
+              query: { limit: 20 },
+              data: { count: 1 },
             },
-            query: { limit: 20 },
-            data: { count: 1 },
-          },
-          getFirstIndexOfPage() {
-            return 0;
-          },
-          getLastIndexOfPage() {
-            return 1;
-          },
-          getPageCount() {
-            return 1;
-          },
-          getPageIndex() {
-            return 1;
+            getFirstIndexOfPage() {
+              return 0;
+            },
+            getLastIndexOfPage() {
+              return 1;
+            },
+            getPageCount() {
+              return 1;
+            },
+            getPageIndex() {
+              return 1;
+            },
           },
         },
-      }, provide),
+        provide,
+      ),
       mocks: {
         $t: (key) => key,
       },
@@ -108,12 +111,16 @@ describe("LivedataPagination.vue", () => {
   it("Displays the pagination when the limit is an existing page size", () => {
     const wrapper = initWrapper();
     const select = wrapper.find("select");
-    expect(select.attributes("title")).toContain("livedata.pagination.selectPageSize");
+    expect(select.attributes("title")).toContain(
+      "livedata.pagination.selectPageSize",
+    );
     const options = wrapper.findAll("select>*");
-    expect(options.at(0).html()).toBe("<option value=\"10\">10</option>");
-    expect(options.at(1).html()).toBe("<option selected=\"\" value=\"20\">20</option>");
-    expect(options.at(2).html()).toBe("<option value=\"30\">30</option>");
-    expect(options.at(3).html()).toBe("<option value=\"100\">100</option>");
+    expect(options.at(0).html()).toBe('<option value="10">10</option>');
+    expect(options.at(1).html()).toBe(
+      '<option selected="" value="20">20</option>',
+    );
+    expect(options.at(2).html()).toBe('<option value="30">30</option>');
+    expect(options.at(3).html()).toBe('<option value="100">100</option>');
   });
 
   it("Displays the pagination when the limit is not an existing page size", () => {
@@ -131,11 +138,13 @@ describe("LivedataPagination.vue", () => {
     // The 25 pagination appears in the select options even if it is not part of the default page
     // sizes ([10, 20, 30, 100]).
     const options = wrapper.findAll("select>*");
-    expect(options.at(0).html()).toBe("<option value=\"10\">10</option>");
-    expect(options.at(1).html()).toBe("<option value=\"20\">20</option>");
-    expect(options.at(2).html()).toBe("<option selected=\"\" value=\"25\">25</option>");
-    expect(options.at(3).html()).toBe("<option value=\"30\">30</option>");
-    expect(options.at(4).html()).toBe("<option value=\"100\">100</option>");
+    expect(options.at(0).html()).toBe('<option value="10">10</option>');
+    expect(options.at(1).html()).toBe('<option value="20">20</option>');
+    expect(options.at(2).html()).toBe(
+      '<option selected="" value="25">25</option>',
+    );
+    expect(options.at(3).html()).toBe('<option value="30">30</option>');
+    expect(options.at(4).html()).toBe('<option value="100">100</option>');
   });
 
   it("Displays the pagination indexes when there is no entries", () => {
@@ -148,7 +157,9 @@ describe("LivedataPagination.vue", () => {
         },
       },
     });
-    expect(wrapper.find(".pagination-indexes").text()).toContain("livedata.pagination.loadPageByNumber");
+    expect(wrapper.find(".pagination-indexes").text()).toContain(
+      "livedata.pagination.loadPageByNumber",
+    );
     expect(wrapper.findAll(".pagination-indexes .page-nav").length).toBe(1);
     expect(wrapper.find(".pagination-indexes .page-nav").text()).toContain("1");
   });
@@ -163,13 +174,19 @@ describe("LivedataPagination.vue", () => {
         },
       },
     });
-    let pageNavs = wrapper.findAll('.pagination-indexes .page-nav');
+    let pageNavs = wrapper.findAll(".pagination-indexes .page-nav");
     expect(pageNavs.length).toBe(3);
     expect(pageNavs.at(0).text()).toContain("1");
-    expect(pageNavs.at(0).text()).toContain("livedata.pagination.loadPageByNumber");
+    expect(pageNavs.at(0).text()).toContain(
+      "livedata.pagination.loadPageByNumber",
+    );
     expect(pageNavs.at(1).text()).toContain("2");
-    expect(pageNavs.at(1).text()).toContain("livedata.pagination.loadPageByNumber");
+    expect(pageNavs.at(1).text()).toContain(
+      "livedata.pagination.loadPageByNumber",
+    );
     expect(pageNavs.at(2).text()).toContain("3");
-    expect(pageNavs.at(2).text()).toContain("livedata.pagination.loadPageByNumber");
+    expect(pageNavs.at(2).text()).toContain(
+      "livedata.pagination.loadPageByNumber",
+    );
   });
 });

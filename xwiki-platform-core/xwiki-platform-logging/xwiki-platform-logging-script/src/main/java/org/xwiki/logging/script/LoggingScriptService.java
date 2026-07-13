@@ -93,7 +93,7 @@ public class LoggingScriptService implements ScriptService
     {
         Collection<Logger> registeredLoggers = this.loggerManager.getLoggers();
 
-        Map<String, LogLevel> levels = new HashMap<String, LogLevel>(registeredLoggers.size());
+        Map<String, LogLevel> levels = new HashMap<>(registeredLoggers.size());
 
         for (Logger registeredLogger : registeredLoggers) {
             levels.put(registeredLogger.getName(), getLevel(registeredLogger.getName()));

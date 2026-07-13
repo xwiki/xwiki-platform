@@ -37,10 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 6.4
  */
-public class SendMailQueueItemTest
+class SendMailQueueItemTest
 {
     @Test
-    public void verifyToString()
+    void verifyToString()
     {
         Session session = Session.getDefaultInstance(new Properties());
         String batchId = UUID.randomUUID().toString();

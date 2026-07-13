@@ -34,10 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * 
  * @version $Id$
  */
-public class PageReferenceTest
+class PageReferenceTest
 {
     @Test
-    public void testConstructors()
+    void testConstructors()
     {
         PageReference reference = new PageReference("wiki", "space", "page");
         assertEquals(reference, new PageReference(new EntityReference("page", EntityType.PAGE,
@@ -47,7 +47,7 @@ public class PageReferenceTest
     }
 
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
             () -> new PageReference(new EntityReference("page", EntityType.DOCUMENT)));
@@ -56,7 +56,7 @@ public class PageReferenceTest
     }
 
     @Test
-    public void testInvalidNullParent()
+    void testInvalidNullParent()
     {
         IllegalArgumentException e =
             assertThrows(IllegalArgumentException.class, () -> new PageReference("page", (WikiReference) null));
@@ -65,7 +65,7 @@ public class PageReferenceTest
     }
 
     @Test
-    public void testInvalidParentType()
+    void testInvalidParentType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new PageReference(
             new EntityReference("page", EntityType.PAGE, new EntityReference("document", EntityType.DOCUMENT))));
@@ -74,14 +74,14 @@ public class PageReferenceTest
     }
 
     @Test
-    public void testGetWikiReference()
+    void testGetWikiReference()
     {
         PageReference reference = new PageReference("wiki", "space", "page");
         assertEquals(new WikiReference("wiki"), reference.getWikiReference());
     }
 
     @Test
-    public void testToString()
+    void testToString()
     {
         PageReference reference1 = new PageReference("wiki", "space", "page");
         assertEquals("wiki:space/page", reference1.toString());
@@ -91,14 +91,14 @@ public class PageReferenceTest
     }
 
     @Test
-    public void testCreatePageReferenceFromLocalPageReference()
+    void testCreatePageReferenceFromLocalPageReference()
     {
         assertEquals(new PageReference("wiki", "space", "page"),
             new PageReference(new LocalPageReference("space", "page"), new WikiReference("wiki")));
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         PageReference reference = new PageReference("wiki", "space", "page").replaceParent(
             new EntityReference("space2", EntityType.PAGE, new EntityReference("wiki2", EntityType.WIKI)));

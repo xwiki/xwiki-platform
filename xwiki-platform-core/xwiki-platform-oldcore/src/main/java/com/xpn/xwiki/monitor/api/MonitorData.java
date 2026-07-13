@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 
 public class MonitorData
 {
+    private static final String MONITOR_PREFIX = "MONITOR ";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MonitorData.class);
 
     private URL url;
@@ -197,7 +199,7 @@ public class MonitorData
             }
             tsummary.addTimer(timer.getDuration());
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("MONITOR " + this.wikiPage + " " + this.action + " " + timer.getName() + ": "
+                LOGGER.debug(MONITOR_PREFIX + this.wikiPage + " " + this.action + " " + timer.getName() + ": "
                     + timer.getDuration() + "ms " + timer.getDetails());
             }
         }
@@ -216,11 +218,11 @@ public class MonitorData
     public void log()
     {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("MONITOR " + this.wikiPage + ": " + getDuration() + "ms");
+            LOGGER.debug(MONITOR_PREFIX + this.wikiPage + ": " + getDuration() + "ms");
             Iterator<MonitorTimerSummary> it = this.timerSummaries.values().iterator();
             while (it.hasNext()) {
                 MonitorTimerSummary tsummary = it.next();
-                LOGGER.debug("MONITOR " + this.wikiPage + " " + this.action + " " + tsummary.getName() + ": "
+                LOGGER.debug(MONITOR_PREFIX + this.wikiPage + " " + this.action + " " + tsummary.getName() + ": "
                     + tsummary.getDuration() + "ms " + tsummary.getNbCalls());
             }
         }

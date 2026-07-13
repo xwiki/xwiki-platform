@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultEventStoreNoLegacyTest
+class DefaultEventStoreNoLegacyTest
 {
     private static final DefaultEvent EVENT = new DefaultEvent();
 

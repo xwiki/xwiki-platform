@@ -20,9 +20,11 @@
 package org.xwiki.javascript.importmap.internal;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import jakarta.inject.Inject;
@@ -33,6 +35,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.javascript.importmap.internal.parser.ImportmapPathDescriptor;
 import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapException;
 import org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapParser;
 import org.xwiki.model.namespace.WikiNamespace;
@@ -46,7 +49,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import static com.fasterxml.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.apache.commons.text.StringEscapeUtils.escapeXml11;
 import static org.xwiki.javascript.importmap.internal.parser.JavascriptImportmapParser.JAVASCRIPT_IMPORTMAP_PROPERTY;
 import static org.xwiki.rendering.syntax.Syntax.HTML_5_0;
 
@@ -116,23 +122,40 @@ public class JavascriptImportmapResolver
         }
     }
 
+    /**
+     * Internal record used during the computation.
+     *
+     * @param url the resolved URL of the resource
+     * @param eager whether the resource should also be emitted as a {@code <script type="module">} tag so it loads
+     *     eagerly (in addition to being available through the importmap when not anonymous)
+     * @param anonymous whether the resource has no public name in the importmap; anonymous resources are only
+     *     emitted when {@code eager} is {@code true} (as a side-effect script load)
+     */
+    private record ResolveMapEntry(String url, boolean eager, boolean anonymous)
+    {
+    }
+
     private void compute()
     {
         var wikiNamespace = new WikiNamespace(this.wikiDescriptorManager.getCurrentWikiId()).serialize();
-        List<Map<String, String>> extensionsWithImportMap = Stream.concat(
+        List<Map<String, ResolveMapEntry>> extensionsWithImportMap = Stream.concat(
                 this.installedExtensionRepository.getInstalledExtensions(wikiNamespace).stream(),
                 this.coreExtensionRepository.getCoreExtensions().stream())
             .filter(extension -> accessProperty(extension) != null)
             .map(extension -> {
                 String importMapJSON = accessProperty(extension);
-                Map<String, String> extensionImportMap;
+                Map<String, ResolveMapEntry> extensionImportMap;
                 try {
                     extensionImportMap = JAVASCRIPT_IMPORTMAP_PARSER.parse(importMapJSON)
                         .entrySet()
                         .stream()
-                        .collect(Collectors.toMap(
+                        .collect(toMap(
                             Map.Entry::getKey,
-                            e -> this.webJarsUrlFactory.url(e.getValue())
+                            e -> {
+                                ImportmapPathDescriptor descriptor = e.getValue();
+                                return new ResolveMapEntry(this.webJarsUrlFactory.url(descriptor.descriptor()),
+                                    descriptor.eager(), descriptor.anonymous());
+                            }
                         ));
                 } catch (JavascriptImportmapException e) {
                     this.logger.warn("Unable to read property [{}] for extension [{}]. Cause: [{}]",
@@ -143,31 +166,48 @@ public class JavascriptImportmapResolver
             })
             .toList();
 
-        Map<String, String> resolvedMap = new HashMap<>();
-        for (Map<String, String> objectObjectMap : extensionsWithImportMap) {
-            for (Map.Entry<String, String> objectObjectEntry : objectObjectMap.entrySet()) {
-                String key = objectObjectEntry.getKey();
-                String value = objectObjectEntry.getValue();
-                String existingValue = resolvedMap.get(key);
-                if (existingValue == null) {
-                    resolvedMap.put(key, value);
-                } else if (!value.equals(existingValue)) {
-                    this.logger.warn(
-                        "Conflicting importmap resolution for key [{}]. Existing value: [{}], new value: [{}]",
-                        key, existingValue, value);
-                }
+        Map<String, String> namedResolvedMap = new HashMap<>();
+        Map<String, String> eagerResolvedMap = new LinkedHashMap<>();
+        for (Map<String, ResolveMapEntry> extensionMap : extensionsWithImportMap) {
+            for (Map.Entry<String, ResolveMapEntry> entry : extensionMap.entrySet()) {
+                merge(entry, namedResolvedMap, value -> !value.anonymous, "importmap");
+                merge(entry, eagerResolvedMap, ResolveMapEntry::eager, "eager");
             }
         }
 
         String json;
         try {
-            json = OBJECT_MAPPER.writeValueAsString(Map.of("imports", resolvedMap));
+            json = OBJECT_MAPPER.writeValueAsString(Map.of("imports", namedResolvedMap));
         } catch (JsonProcessingException e) {
             this.logger.warn("Failed to serialize the importmap. Cause: [{}]", getRootCauseMessage(e));
             json = "{}";
         }
 
-        this.cachedValue = new RawBlock("<script type='importmap'>%s</script>".formatted(json), HTML_5_0);
+        var eagerScriptTags = eagerResolvedMap.values().stream()
+            .map(url -> "<script type=\"module\" src=\"%s\"></script>".formatted(escapeXml11(url)))
+            .collect(joining(System.lineSeparator()));
+
+        this.cachedValue =
+            new RawBlock("<script type=\"importmap\">%s</script>%s".formatted(json, eagerResolvedMap.isEmpty()
+                ? "" : System.lineSeparator() + eagerScriptTags), HTML_5_0);
+    }
+
+    private void merge(Map.Entry<String, ResolveMapEntry> entry, Map<String, String> target,
+        Predicate<ResolveMapEntry> include, String conflictLabel)
+    {
+        String key = entry.getKey();
+        ResolveMapEntry value = entry.getValue();
+        if (!include.test(value)) {
+            return;
+        }
+        String existingValue = target.get(key);
+        if (existingValue == null) {
+            target.put(key, value.url);
+        } else if (!Objects.equals(value.url, existingValue)) {
+            this.logger.warn(
+                "Conflicting {} resolution for key [{}]. Existing value: [{}], new value: [{}]",
+                conflictLabel, key, existingValue, value.url);
+        }
     }
 
     private static String accessProperty(Extension extension)

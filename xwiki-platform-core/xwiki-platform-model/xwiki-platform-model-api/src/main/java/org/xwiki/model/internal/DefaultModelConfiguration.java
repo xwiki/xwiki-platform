@@ -57,27 +57,11 @@ public class DefaultModelConfiguration implements ModelConfiguration
     /**
      * Default values for all the Entity types, see {@link #getDefaultReferenceValue(org.xwiki.model.EntityType)}.
      */
-    private static final Map<EntityType, String> DEFAULT_VALUES = new EnumMap<EntityType, String>(EntityType.class)
-    {
-        {
-            put(EntityType.WIKI, "xwiki");
-            put(EntityType.SPACE, "Main");
-            put(EntityType.DOCUMENT, "WebHome");
-            put(EntityType.ATTACHMENT, "filename");
-            put(EntityType.OBJECT, "object");
-            put(EntityType.OBJECT_PROPERTY, "property");
-            put(EntityType.CLASS_PROPERTY, get(EntityType.OBJECT_PROPERTY));
-            put(EntityType.PAGE, get(EntityType.SPACE));
-            put(EntityType.PAGE_ATTACHMENT, get(EntityType.ATTACHMENT));
-            put(EntityType.PAGE_OBJECT, get(EntityType.OBJECT));
-            put(EntityType.PAGE_OBJECT_PROPERTY, get(EntityType.OBJECT_PROPERTY));
-            put(EntityType.PAGE_CLASS_PROPERTY, get(EntityType.CLASS_PROPERTY));
-        }
-    };
+    private static final Map<EntityType, String> DEFAULT_VALUES = createDefaultValues();
 
     /**
      * We want to make sure this component can be loaded and used even if there's no ConfigurationSource available in
-     * the system. This is why we lazy load the ConfigurationSource component.
+     * the system. This is why we lazy-load the ConfigurationSource component.
      */
     @Inject
     private ComponentManager componentManager;
@@ -87,6 +71,24 @@ public class DefaultModelConfiguration implements ModelConfiguration
      */
     @Inject
     private Logger logger;
+
+    private static Map<EntityType, String> createDefaultValues()
+    {
+        Map<EntityType, String> map = new EnumMap<>(EntityType.class);
+        map.put(EntityType.WIKI, "xwiki");
+        map.put(EntityType.SPACE, "Main");
+        map.put(EntityType.DOCUMENT, "WebHome");
+        map.put(EntityType.ATTACHMENT, "filename");
+        map.put(EntityType.OBJECT, "object");
+        map.put(EntityType.OBJECT_PROPERTY, "property");
+        map.put(EntityType.CLASS_PROPERTY, map.get(EntityType.OBJECT_PROPERTY));
+        map.put(EntityType.PAGE, map.get(EntityType.SPACE));
+        map.put(EntityType.PAGE_ATTACHMENT, map.get(EntityType.ATTACHMENT));
+        map.put(EntityType.PAGE_OBJECT, map.get(EntityType.OBJECT));
+        map.put(EntityType.PAGE_OBJECT_PROPERTY, map.get(EntityType.OBJECT_PROPERTY));
+        map.put(EntityType.PAGE_CLASS_PROPERTY, map.get(EntityType.CLASS_PROPERTY));
+        return map;
+    }
 
     @Override
     public String getDefaultReferenceValue(EntityType type)
@@ -102,8 +104,8 @@ public class DefaultModelConfiguration implements ModelConfiguration
                 DEFAULT_VALUES.get(type));
         } catch (ComponentLookupException e) {
             // Failed to load the component, use default values
-            this.logger
-                .debug("Failed to load [" + ConfigurationSource.class.getName() + "]. Using default Model values", e);
+            this.logger.debug("Failed to load [{}]. Using default Model values", ConfigurationSource.class.getName(),
+                e);
             name = DEFAULT_VALUES.get(type);
         }
 

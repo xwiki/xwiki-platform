@@ -36,16 +36,21 @@ public class DefaultXWikiSolrCore implements XWikiSolrCore
 
     private final SolrClient client;
 
+    private int solrMajorVersions;
+
     /**
      * @param name the name of the core from XWiki point of view (without the prefix/suffix specific to the setup)
      * @param solrName the real name of the core
      * @param client the client used to manipulate native Solr API
+     * @param solrMajorVersions the major version of Solr used by this core (e.g. 8 or 9)
+     * @since 18.5.0RC1
      */
-    public DefaultXWikiSolrCore(String name, String solrName, SolrClient client)
+    public DefaultXWikiSolrCore(String name, String solrName, SolrClient client, int solrMajorVersions)
     {
         this.name = name;
         this.solrName = solrName;
         this.client = client;
+        this.solrMajorVersions = solrMajorVersions;
     }
 
     @Override
@@ -64,5 +69,11 @@ public class DefaultXWikiSolrCore implements XWikiSolrCore
     public SolrClient getClient()
     {
         return this.client;
+    }
+
+    @Override
+    public int getSolrMajorVersion()
+    {
+        return this.solrMajorVersions;
     }
 }

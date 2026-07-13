@@ -22,6 +22,7 @@ package org.xwiki.user.test.po;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -32,6 +33,8 @@ import org.openqa.selenium.support.FindBy;
  */
 public class ProfileUserProfilePage extends AbstractUserProfilePage
 {
+    private static final By AVATAR_IMAGE = By.xpath("//div[@id='avatar']//img");
+
     @FindBy(xpath = "//div[@class='userInfo']/div[@class='editProfileCategory']/a")
     private WebElement editProfile;
 
@@ -64,9 +67,6 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
 
     @FindBy(xpath = "//div[@id='avatar']//a")
     private WebElement changeAvatar;
-
-    @FindBy(xpath = "//div[@id='avatar']//img")
-    private WebElement userAvatarImage;
 
     @FindBy(css = ".activity-follow .notificationWatchUserFollowing")
     private WebElement followingContainer;
@@ -149,6 +149,19 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
         return this.userBlogFeed.getText();
     }
 
+    /**
+     * Gets the displayed value of a custom profile field (i.e. one added to extend the user profile), located by the
+     * pretty name shown as its label.
+     *
+     * @param prettyName the pretty name (label) of the custom field as displayed in the profile
+     * @return the displayed value of the custom field
+     */
+    public String getUserCustomProperty(String prettyName)
+    {
+        return getDriver().findElementWithoutWaiting(
+            By.xpath("//dd[preceding-sibling::dt[1]/label[. = '" + prettyName + "']]")).getText();
+    }
+
     public ChangeAvatarPage changeAvatarImage()
     {
         this.changeAvatar.click();
@@ -158,8 +171,30 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
 
     public String getAvatarImageName()
     {
-        return StringUtils.substringBefore(
-            StringUtils.substringAfterLast(this.userAvatarImage.getAttribute("src"), "/"), "?");
+        // Read the avatar image source without scrolling and without a cached element: the profile page is reloaded
+        // when the avatar is changed, so scrolling to a cached element can hit a stale element reference.
+        return StringUtils.substringBefore(StringUtils.substringAfterLast(
+            getDriver().findElementWithoutWaitingWithoutScrolling(AVATAR_IMAGE).getAttribute("src"), "/"), "?");
+    }
+
+    /**
+     * Waits until the avatar image displayed on the profile has the passed image name as its source. The profile page
+     * is reloaded after the avatar is changed, so waiting avoids reading the previous avatar or a stale image element
+     * while the page is still reloading.
+     *
+     * @param imageName the expected avatar image file name (for example {@code avatar.png})
+     * @since 18.6.0RC1
+     */
+    public void waitUntilAvatarImageName(String imageName)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return imageName.equals(getAvatarImageName());
+            } catch (NoSuchElementException | StaleElementReferenceException e) {
+                // The avatar image is not present yet or was removed from the DOM while the page was reloading.
+                return false;
+            }
+        });
     }
 
     public boolean isFollowed()

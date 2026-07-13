@@ -50,7 +50,7 @@ import static org.mockito.Mockito.*;
  * @since 6.4M2
  */
 @ComponentTest
-public class SendMailConfigClassDocumentConfigurationSourceTest
+class SendMailConfigClassDocumentConfigurationSourceTest
 {
     @InjectMockComponents
     private SendMailConfigClassDocumentConfigurationSource source;
@@ -68,7 +68,7 @@ public class SendMailConfigClassDocumentConfigurationSourceTest
     private Provider<XWikiContext> xcontextProvider;
 
     @BeforeComponent
-    public void before() throws Exception
+    void before() throws Exception
     {
         Cache<Object> cache = mock(Cache.class);
         when(this.cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cache);

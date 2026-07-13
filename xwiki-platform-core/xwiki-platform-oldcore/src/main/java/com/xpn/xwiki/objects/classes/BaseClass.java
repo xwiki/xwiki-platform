@@ -69,6 +69,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
+    private static final String INTERNAL = "internal";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseClass.class);
 
     private static final long serialVersionUID = 1L;
@@ -188,10 +190,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         if (element != null) {
             Set<String> properties = getPropertyList();
-            if (!properties.contains(name)) {
-                if (((BaseCollection) element).getNumber() == 0) {
-                    ((BaseCollection) element).setNumber(properties.size() + 1);
-                }
+            if (!properties.contains(name) && ((BaseCollection) element).getNumber() == 0) {
+                ((BaseCollection) element).setNumber(properties.size() + 1);
             }
 
             super.addField(name, element);
@@ -266,7 +266,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> enabledProperties = new ArrayList<PropertyClass>(allProperties.size());
+        List<PropertyClass> enabledProperties = new ArrayList<>(allProperties.size());
 
         for (PropertyClass property : allProperties) {
             if (property != null && !property.isDisabled()) {
@@ -294,7 +294,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> disabledProperties = new ArrayList<PropertyClass>();
+        List<PropertyClass> disabledProperties = new ArrayList<>();
 
         for (PropertyClass property : allProperties) {
             if (property != null && property.isDisabled()) {
@@ -323,7 +323,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> disabledObjectProperties = new ArrayList<PropertyClass>(disabledProperties.size());
+        List<PropertyClass> disabledObjectProperties = new ArrayList<>(disabledProperties.size());
 
         for (PropertyClass property : disabledProperties) {
             try {
@@ -355,7 +355,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<BaseProperty> deprecatedObjectProperties = new ArrayList<BaseProperty>();
+        List<BaseProperty> deprecatedObjectProperties = new ArrayList<>();
 
         for (BaseProperty property : objectProperties) {
             if (safeget(property.getName()) == null) {
@@ -873,7 +873,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             result = true;
         }
 
-        textAreaClass.setRestricted(restricted);
+        if (textAreaClass.isRestricted() != restricted) {
+            textAreaClass.setRestricted(restricted);
+            result = true;
+        }
 
         return result;
     }
@@ -1221,7 +1224,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public String getCustomMapping()
     {
         if ("XWiki.XWikiPreferences".equals(getName())) {
-            return "internal";
+            return INTERNAL;
         }
 
         if (this.customMapping == null) {
@@ -1242,12 +1245,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         String cMapping = getCustomMapping();
 
-        return (cMapping != null) && (!"".equals(cMapping)) && (!"internal".equals(cMapping));
+        return (cMapping != null) && (!"".equals(cMapping)) && (!INTERNAL.equals(cMapping));
     }
 
     public boolean hasInternalCustomMapping()
     {
-        return "internal".equals(this.customMapping);
+        return INTERNAL.equals(this.customMapping);
     }
 
     public boolean isCustomMappingValid(XWikiContext context) throws XWikiException
@@ -1270,7 +1273,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         if ((custommapping1 != null) && (custommapping1.trim().length() > 0)) {
             return context.getWiki().getStore().getCustomMappingPropertyList(this);
         } else {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
     }
 
@@ -1361,9 +1364,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = context.getWiki().getClass(className, context);
-        BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
-
-        return object;
+        return (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
     }
 
     public String getDefaultWeb()
@@ -1448,7 +1449,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         String validSript = getValidationScript();
-        if ((validSript != null) && (!validSript.trim().equals(""))) {
+        if ((validSript != null) && (!"".equals(validSript.trim()))) {
             isValid &= executeValidationScript(obj, validSript, context);
         }
 
@@ -1491,7 +1492,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {
-        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseClass oldClass = (BaseClass) oldObject;
         for (PropertyClass newProperty : (Collection<PropertyClass>) getFieldList()) {
             String propertyName = newProperty.getName();

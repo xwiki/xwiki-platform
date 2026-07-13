@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-annotation</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-annotation-io</artifactId>
   <name>XWiki Platform - Annotations - XWiki Storage Implementation</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.04</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.21</xwiki.jacoco.instructionRatio>
     </properties>
   <dependencies>
     <dependency>
@@ -75,23 +75,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
-            <id>default</id>
-            <configuration>
-              <excludes>
-                org/xwiki/annotation/io/internal/DefaultIOService.java
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

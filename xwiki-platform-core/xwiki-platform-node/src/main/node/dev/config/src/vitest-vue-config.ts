@@ -26,7 +26,7 @@ const config: UserConfig = mergeConfig(
   defaultConfig,
   defineConfig({
     test: {
-      environment: "happy-dom",
+      environment: "jsdom",
     },
   }),
 );

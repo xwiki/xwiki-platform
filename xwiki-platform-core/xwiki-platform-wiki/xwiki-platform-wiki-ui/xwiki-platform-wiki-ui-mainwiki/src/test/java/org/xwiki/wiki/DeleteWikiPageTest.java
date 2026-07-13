@@ -21,7 +21,6 @@ package org.xwiki.wiki;
 
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
-import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultExtendedRenderingConfiguration;
@@ -48,7 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @RenderingScriptServiceComponentList
 @ComponentList({
     ErrorMessageMacro.class,
-    TranslationMacro.class,
     TestNoScriptMacro.class,
     DefaultExtendedRenderingConfiguration.class,
     RenderingConfigClassDocumentConfigurationSource.class

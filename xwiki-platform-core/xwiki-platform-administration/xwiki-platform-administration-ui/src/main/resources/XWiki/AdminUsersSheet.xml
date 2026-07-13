@@ -133,7 +133,7 @@
 
 #macro (createUserModal)
   &lt;div class="modal" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserModal-label"
-      data-backdrop="static" data-keyboard="false"&gt;
+      data-backdrop="static"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -149,7 +149,9 @@
           &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
             $escapetool.xml($services.localization.render('cancel'))
           &lt;/button&gt;
-          &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;
+          ## The registration form is not present on page load so we can't bind the submit button without triggerig an
+          ## HTML validation error. That's why we set the form attribute from JavaScript instead.
+          &lt;button type="submit" class="btn btn-primary" disabled="disabled"&gt;
             $escapetool.xml($services.localization.render('create'))
           &lt;/button&gt;
         &lt;/div&gt;
@@ -160,7 +162,7 @@
 
 #macro (editUserModal)
   &lt;div class="modal" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModal-label"
-      data-backdrop="static" data-keyboard="false" data-live-data="#userstable" data-live-data-action="edit"&gt;
+      data-backdrop="static" data-live-data="#userstable" data-live-data-action="edit"&gt;
     &lt;div class="modal-dialog modal-lg" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;
@@ -447,7 +449,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
   //
   // User Creation
   //
-  var createUserModal = $('#createUserModal');
+  const createUserModal = $('#createUserModal');
+  // We set the form attribute from JavaScript in order to avoid HTML validation errors because the form is not present
+  // on page load (we load it the first time the modal is shown, see below).
+  const createUserButton = createUserModal.find('.btn-primary').attr('form', 'register');
 
   var validateCreateUserForm = function(form) {
     return form.length &amp;&amp; (!window.LiveValidation ||
@@ -455,7 +460,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
   };
 
   createUserModal.on('show.bs.modal', function() {
-    var createUserButton = createUserModal.find('.btn-primary').prop('disabled', true);
+    createUserButton.prop('disabled', true);
     var createUserURL = XWiki.currentDocument.getURL('view', 'xpage=registerinline');
     var createUserModalBody = createUserModal.find('.modal-body').empty().addClass('loading');
     $.get(createUserURL, function(html) {
@@ -467,12 +472,13 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
       createUserForm.find(':input').filter(':visible').first().focus();
       createUserButton.prop('disabled', !createUserForm.length);
     });
-  }).on('click', '.btn-primary', function(event) {
+  }).on('submit', 'form#register', function(event) {
+    event.preventDefault();
     var createUserForm = createUserModal.find('form#register');
     if (!validateCreateUserForm(createUserForm)) {
       return;
     }
-    var createUserButton = $(this).prop('disabled', true);
+    createUserButton.prop('disabled', true);
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('xe.admin.users.create.inProgress')),
       'inprogress'
@@ -513,6 +519,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
     var editUserURL = userDocument.getURL('edit');
     var parameters = {xpage: 'edituser'};
     if (forceLock === true) {
+      parameters.force_token = xm.form_token;
       parameters.force = 1;
     }
     editUserModal.find('.modal-body').first().empty().addClass('loading').load(editUserURL, parameters, function() {
@@ -836,10 +843,6 @@ require(['jquery', 'xwiki-meta', 'xwiki-livedata-modal', 'xwiki-events-bridge'],
 }
 #deleteUserModal .xform &gt; dl {
   margin-top: 1em;
-}
-/* Make sure the drop down for the new author picker is shown on top of the modal. */
-body &gt; .selectize-dropdown {
-  z-index: 10051;
 }</code>
     </property>
     <property>

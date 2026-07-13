@@ -50,6 +50,8 @@ import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wraps a {@link org.openqa.selenium.WebDriver} instance and adds new APIs useful for XWiki tests.
@@ -59,6 +61,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  */
 public class XWikiWebDriver extends RemoteWebDriver
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiWebDriver.class);
+
     private RemoteWebDriver wrappedDriver;
 
     /**
@@ -668,14 +672,21 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public List<WebElement> findElements(By by)
     {
-        return this.wrappedDriver.findElements(by);
+        long startTime = System.currentTimeMillis();
+        List<WebElement> elements = this.wrappedDriver.findElements(by);
+        // When no element matches, findElements() doesn't throw but returns an empty list only after having waited for
+        // the full implicit-wait timeout. If that's what happened then the test wastefully waited (see XWIKI-12558).
+        if (elements.isEmpty()) {
+            warnIfWastefulWait(by, System.currentTimeMillis() - startTime);
+        }
+        return elements;
     }
 
     // Make sure the element is visible by scrolling it into view. Otherwise it's possible for example  that the
     // visible floating save bar would hide the element.
     public WebElement scrollTo(WebElement element)
     {
-        executeScript("arguments[0].scrollIntoView();", element);
+        executeScript("arguments[0].scrollIntoView({behavior: 'instant'});", element);
         return element;
     }
 
@@ -712,8 +723,68 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public WebElement findElement(By by)
     {
-        WebElement element = this.wrappedDriver.findElement(by);
+        long startTime = System.currentTimeMillis();
+        WebElement element;
+        try {
+            element = this.wrappedDriver.findElement(by);
+        } catch (NoSuchElementException e) {
+            // The element wasn't found. If the lookup consumed the full implicit-wait timeout then the test wastefully
+            // waited for something that isn't there (see XWIKI-12558).
+            warnIfWastefulWait(by, System.currentTimeMillis() - startTime);
+            throw e;
+        }
         return this.scrollTo(element);
+    }
+
+    /**
+     * Logs a WARN when a wrapped {@code findElement()}/{@code findElements()} lookup found nothing after having
+     * consumed (at least) the full implicit-wait timeout. This is the wasteful-wait anti-pattern described in
+     * <a href="https://jira.xwiki.org/browse/XWIKI-12558">XWIKI-12558</a>: the test looked for an element that isn't
+     * there while the driver was configured to wait, thus incurring the full timeout for nothing. Such tests should
+     * instead look for elements that are expected to be present, and when they really need to check for absence or to
+     * avoid waiting they should use {@link #findElementWithoutWaiting(By)}, {@link #hasElementWithoutWaiting(By)} or
+     * {@link #waitUntilElementDisappears(By)}.
+     * <p>
+     * This only reports the "not found after a full wait" case on purpose: reporting slow-but-successful lookups was
+     * tried in the past and produced non-deterministic false positives.
+     * <p>
+     * Note: this method is package-private (rather than private) only so that its decision logic can be unit-tested in
+     * isolation, decoupled from the real timing of a Selenium call.
+     *
+     * @param by the locator that was being looked up
+     * @param elapsedMillis how long the (unsuccessful) lookup took, in milliseconds
+     */
+    void warnIfWastefulWait(By by, long elapsedMillis)
+    {
+        if (elapsedMillis >= getTimeout() * 1000L) {
+            Exception locationException =
+                new Exception("Stack trace to help locate the wasteful findElement()/findElements() call");
+            // Trim the noise below the offending test code (Selenium, JUnit, JDK reflection, etc.).
+            locationException.setStackTrace(truncateToLastXWikiFrame(locationException.getStackTrace()));
+            LOGGER.warn("The currently running test wasted [{}] ms waiting for element [{}] which was not found. "
+                + "Tests should look for elements that are expected to be present; to check for the absence of an "
+                + "element or to avoid waiting, use findElementWithoutWaiting(), hasElementWithoutWaiting() or "
+                + "waitUntilElementDisappears() instead.", elapsedMillis, by, locationException);
+        }
+    }
+
+    /**
+     * Keeps the passed stack trace only up to (and including) the last {@code org.xwiki.*} frame. Frames located after
+     * it (Selenium, JUnit, JDK reflection, etc.) are just noise for locating the offending test code, so they're
+     * dropped. Non-{@code org.xwiki.*} frames appearing in-between two {@code org.xwiki.*} frames are kept.
+     *
+     * @param stackTrace the full stack trace to truncate
+     * @return the truncated stack trace, or the passed one unchanged if it contains no {@code org.xwiki.*} frame
+     */
+    static StackTraceElement[] truncateToLastXWikiFrame(StackTraceElement[] stackTrace)
+    {
+        int lastXWikiIndex = -1;
+        for (int i = 0; i < stackTrace.length; i++) {
+            if (stackTrace[i].getClassName().startsWith("org.xwiki.")) {
+                lastXWikiIndex = i;
+            }
+        }
+        return lastXWikiIndex < 0 ? stackTrace : Arrays.copyOfRange(stackTrace, 0, lastXWikiIndex + 1);
     }
 
     @Override
@@ -902,7 +973,15 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public WebElement findElementWithoutScrolling(By by)
     {
-        return this.wrappedDriver.findElement(by);
+        long startTime = System.currentTimeMillis();
+        try {
+            return this.wrappedDriver.findElement(by);
+        } catch (NoSuchElementException e) {
+            // The element wasn't found. If the lookup consumed the full implicit-wait timeout then the test wastefully
+            // waited for something that isn't there (see XWIKI-12558).
+            warnIfWastefulWait(by, System.currentTimeMillis() - startTime);
+            throw e;
+        }
     }
 
     /**

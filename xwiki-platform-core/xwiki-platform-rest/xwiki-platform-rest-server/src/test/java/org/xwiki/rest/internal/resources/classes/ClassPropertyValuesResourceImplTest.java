@@ -21,6 +21,7 @@ package org.xwiki.rest.internal.resources.classes;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -61,14 +62,13 @@ import com.xpn.xwiki.objects.classes.DBListClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ClassPropertyValuesResourceImpl}.
- * 
+ *
  * @version $Id$
  * @since 9.8RC1
  */
@@ -94,7 +94,7 @@ class ClassPropertyValuesResourceImplTest
     @MockComponent
     private SecurityConfiguration securityConfiguration;
 
-    private ClassPropertyReference propertyReference =
+    private final ClassPropertyReference propertyReference =
         new ClassPropertyReference("status", new DocumentReference("wiki", Arrays.asList("Path", "To"), "Class"));
 
     @Mock
@@ -107,24 +107,24 @@ class ClassPropertyValuesResourceImplTest
     {
         this.xcontext = mock(XWikiContext.class);
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
-        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+        this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
     }
 
     @BeforeEach
     void configure() throws Exception
     {
-        when(this.resolver.resolve("Path.To.Class", propertyReference.extractReference(EntityType.WIKI)))
-            .thenReturn((DocumentReference) propertyReference.getParent());
+        when(this.resolver.resolve("Path.To.Class", this.propertyReference.extractReference(EntityType.WIKI)))
+            .thenReturn((DocumentReference) this.propertyReference.getParent());
 
         XWiki xwiki = mock(XWiki.class);
         XWikiDocument classDocument = mock(XWikiDocument.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
-        when(xwiki.getDocument(propertyReference, xcontext)).thenReturn(classDocument);
+        when(this.xcontext.getWiki()).thenReturn(xwiki);
+        when(xwiki.getDocument(this.propertyReference, this.xcontext)).thenReturn(classDocument);
         when(classDocument.getXClass()).thenReturn(this.xclass);
 
         UriInfo uriInfo = mock(UriInfo.class);
         when(uriInfo.getBaseUri()).thenReturn(new URI("/xwiki/rest"));
-        ReflectionUtils.setFieldValue(resource, "uriInfo", uriInfo);
+        ReflectionUtils.setFieldValue(this.resource, "uriInfo", uriInfo);
 
         when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
     }
@@ -132,10 +132,10 @@ class ClassPropertyValuesResourceImplTest
     @Test
     void getClassPropertyValuesUnauthorized() throws Exception
     {
-        doThrow(new AccessDeniedException(xcontext.getUserReference(), this.propertyReference)).when(
-            authorization).checkAccess(eq(Right.VIEW), eq(this.propertyReference));
+        doThrow(new AccessDeniedException(this.xcontext.getUserReference(), this.propertyReference))
+            .when(this.authorization).checkAccess(Right.VIEW, this.propertyReference);
         try {
-            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"), false);
+            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, List.of("text"), false);
             fail();
         } catch (WebApplicationException expected) {
             assertEquals(Status.UNAUTHORIZED.getStatusCode(), expected.getResponse().getStatus());
@@ -146,7 +146,7 @@ class ClassPropertyValuesResourceImplTest
     void getClassPropertyValuesNotFound() throws Exception
     {
         try {
-            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"), false);
+            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, List.of("text"), false);
             fail();
         } catch (WebApplicationException expected) {
             assertEquals(Status.NOT_FOUND.getStatusCode(), expected.getResponse().getStatus());

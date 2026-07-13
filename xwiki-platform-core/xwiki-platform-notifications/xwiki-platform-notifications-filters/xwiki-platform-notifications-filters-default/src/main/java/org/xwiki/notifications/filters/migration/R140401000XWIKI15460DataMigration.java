@@ -75,6 +75,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 @Component
 @Singleton
 @Named("R140401000XWIKI15460")
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class R140401000XWIKI15460DataMigration extends AbstractHibernateDataMigration
 {
     @Inject

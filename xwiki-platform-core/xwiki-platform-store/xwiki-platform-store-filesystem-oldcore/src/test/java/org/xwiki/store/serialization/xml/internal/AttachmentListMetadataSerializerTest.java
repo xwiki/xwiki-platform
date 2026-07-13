@@ -24,11 +24,13 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for AttachmentListMetadataSerializer
@@ -36,7 +38,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * @version $Id$
  * @since 3.0M2
  */
-public class AttachmentListMetadataSerializerTest
+class AttachmentListMetadataSerializerTest
 {
     private static final String TEST_CONTENT =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -69,52 +71,44 @@ public class AttachmentListMetadataSerializerTest
 
     private AttachmentListMetadataSerializer serializer;
 
-    @Before
-    public void setUp()
+    @BeforeEach
+    void setUp()
     {
         this.serializer = new AttachmentListMetadataSerializer(new AttachmentMetadataSerializer());
     }
 
     @Test
-    public void testParse() throws Exception
+    void parse() throws Exception
     {
         final ByteArrayInputStream bais = new ByteArrayInputStream(TEST_CONTENT.getBytes("US-ASCII"));
         final List<XWikiAttachment> attachList = this.serializer.parse(bais);
         bais.close();
-        Assert.assertTrue("Attachment list was wrong size", 3 == attachList.size());
+        assertTrue(3 == attachList.size(), "Attachment list was wrong size");
 
-        Assert.assertEquals("Attachment1 had wrong name", "file1", attachList.get(0).getFilename());
-        Assert.assertEquals("Attachment2 had wrong name", "file1", attachList.get(1).getFilename());
-        Assert.assertEquals("Attachment3 had wrong name", "file1", attachList.get(2).getFilename());
+        assertEquals("file1", attachList.get(0).getFilename(), "Attachment1 had wrong name");
+        assertEquals("file1", attachList.get(1).getFilename(), "Attachment2 had wrong name");
+        assertEquals("file1", attachList.get(2).getFilename(), "Attachment3 had wrong name");
 
-        Assert.assertEquals("Attachment1 had wrong author", "me", attachList.get(0).getAuthor());
-        Assert.assertEquals("Attachment2 had wrong author", "you", attachList.get(1).getAuthor());
-        Assert.assertEquals("Attachment3 had wrong author", "them", attachList.get(2).getAuthor());
+        assertEquals("me", attachList.get(0).getAuthor(), "Attachment1 had wrong author");
+        assertEquals("you", attachList.get(1).getAuthor(), "Attachment2 had wrong author");
+        assertEquals("them", attachList.get(2).getAuthor(), "Attachment3 had wrong author");
 
-        Assert.assertEquals("Attachment1 had wrong version", "1.1", attachList.get(0).getVersion());
-        Assert.assertEquals("Attachment2 had wrong version", "1.2", attachList.get(1).getVersion());
-        Assert.assertEquals("Attachment3 had wrong version", "1.3", attachList.get(2).getVersion());
+        assertEquals("1.1", attachList.get(0).getVersion(), "Attachment1 had wrong version");
+        assertEquals("1.2", attachList.get(1).getVersion(), "Attachment2 had wrong version");
+        assertEquals("1.3", attachList.get(2).getVersion(), "Attachment3 had wrong version");
 
-        Assert.assertEquals("Attachment1 had wrong comment",
-            attachList.get(0).getComment(),
-            "something whitty");
-        Assert.assertEquals("Attachment2 had wrong comment", "a comment", attachList.get(1).getComment());
-        Assert.assertEquals("Attachment3 had wrong comment", "i saved it", attachList.get(2).getComment());
+        assertEquals("something whitty", attachList.get(0).getComment(), "Attachment1 had wrong comment");
+        assertEquals("a comment", attachList.get(1).getComment(), "Attachment2 had wrong comment");
+        assertEquals("i saved it", attachList.get(2).getComment(), "Attachment3 had wrong comment");
 
         // We drop milliseconds for consistency with the database so last 3 digits are 0.
-        Assert.assertEquals("Attachment1 had wrong date.",
-            attachList.get(0).getDate().getTime() + "",
-            "1293045632000");
-        Assert.assertEquals("Attachment2 had wrong date.",
-            attachList.get(1).getDate().getTime() + "",
-            "1293789456000");
-        Assert.assertEquals("Attachment3 had wrong date.",
-            attachList.get(2).getDate().getTime() + "",
-            "1293012345000");
+        assertEquals("1293045632000", attachList.get(0).getDate().getTime() + "", "Attachment1 had wrong date.");
+        assertEquals("1293789456000", attachList.get(1).getDate().getTime() + "", "Attachment2 had wrong date.");
+        assertEquals("1293012345000", attachList.get(2).getDate().getTime() + "", "Attachment3 had wrong date.");
     }
 
     @Test
-    public void testParseSerialize() throws Exception
+    void parseSerialize() throws Exception
     {
         final ByteArrayInputStream bais = new ByteArrayInputStream(TEST_CONTENT.getBytes("US-ASCII"));
         final List<XWikiAttachment> attachList = this.serializer.parse(bais);
@@ -124,6 +118,6 @@ public class AttachmentListMetadataSerializerTest
         IOUtils.copy(this.serializer.serialize(attachList), baos);
         final String test = new String(baos.toByteArray(), "US-ASCII");
         final String control = TEST_CONTENT.replaceAll("[0-9][0-9][0-9]</date>", "000</date>");
-        Assert.assertEquals("Parsing and serializing yields a different output.", control, test);
+        assertEquals(control, test, "Parsing and serializing yields a different output.");
     }
 }

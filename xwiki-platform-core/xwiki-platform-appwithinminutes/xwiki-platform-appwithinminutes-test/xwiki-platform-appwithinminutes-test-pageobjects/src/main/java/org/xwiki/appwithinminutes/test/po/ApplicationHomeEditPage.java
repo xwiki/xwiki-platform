@@ -213,7 +213,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     {
         String escapedColumnLabel = columnLabel.replace("\\", "\\\\").replace("'", "\\'");
         String xpath = "//ul[@class = 'hList']/li[starts-with(., '" + escapedColumnLabel + "')]";
-        return getDriver().findElementsWithoutWaiting(getForm(), By.xpath(xpath)).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(getForm(), By.xpath(xpath)).isEmpty();
     }
 
     /**

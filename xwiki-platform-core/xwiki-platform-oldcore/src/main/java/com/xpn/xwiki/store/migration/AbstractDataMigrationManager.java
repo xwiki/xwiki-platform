@@ -742,7 +742,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         // Add the databases listed by the user (if any). If there's no database name or
         // a single database named and if it's "all" or "ALL" then automatically add all the registered databases.
         List<String> databases = this.hibernateConfiguration.getMigrationDatabases();
-        if (databases.isEmpty() || (databases.size() == 1 && databases.get(0).equals("all"))) {
+        if (databases.isEmpty() || (databases.size() == 1 && "all".equals(databases.getFirst()))) {
             // The main wiki will also be included, but, since we are using a Set, it should not be a problem.
             List<String> allwikis = getVirtualWikisDatabaseNames();
             databasesToMigrate.addAll(allwikis);
@@ -919,7 +919,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             updateMigrationStatus(getLatestVersion());
             if (this.logger.isInfoEnabled()) {
                 this.logger.info("Database [{}] upgraded to latest version [{}] without needing{} data migration",
-                    getXWikiContext().getWikiId(), getDBVersion(), (this.migrations.size() > 0) ? " further" : "");
+                    getXWikiContext().getWikiId(), getDBVersion(), !this.migrations.isEmpty() ? " further" : "");
             }
         }
     }

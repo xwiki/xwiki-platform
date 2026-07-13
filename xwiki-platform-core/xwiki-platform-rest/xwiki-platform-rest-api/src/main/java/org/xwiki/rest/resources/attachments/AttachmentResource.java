@@ -36,6 +36,18 @@ import org.xwiki.rest.XWikiRestException;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/attachments/{attachmentName}")
 public interface AttachmentResource
 {
+    /**
+     * Returns the content of an attachment.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the attachment, for example {@code WebHome}
+     * @param attachmentName the file name of the attachment, for example {@code photo.png}
+     * @return a response streaming the attachment's binary content with its media type
+     * @throws XWikiRestException if the attachment cannot be retrieved, for example the page or attachment does not
+     *  exist or the user is not allowed to view it
+     */
     @GET Response getAttachment(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -43,6 +55,22 @@ public interface AttachmentResource
             @PathParam("attachmentName") String attachmentName
     ) throws XWikiRestException;
 
+    /**
+     * Creates the attachment if it does not exist yet, or updates its content otherwise.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the attachment, for example {@code WebHome}
+     * @param attachmentName the file name to give the attachment, for example {@code photo.png}
+     * @param content the raw binary content of the attachment
+     * @return a response holding the attachment metadata, with status {@code 201} when the attachment was created and
+     *  {@code 202} when an existing attachment was updated
+     * @throws XWikiRestException if the attachment cannot be stored, for example the user is not allowed to edit the
+     *  page
+     * @throws AttachmentValidationException if the attachment content is rejected by the configured attachment
+     *  validation (for example a forbidden media type or an excessive size)
+     */
     @PUT Response putAttachment(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -51,6 +79,16 @@ public interface AttachmentResource
             byte[] content
     ) throws XWikiRestException, AttachmentValidationException;
 
+    /**
+     * Deletes an attachment.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the attachment, for example {@code WebHome}
+     * @param attachmentName the file name of the attachment to delete, for example {@code photo.png}
+     * @throws XWikiRestException if the user is not allowed to edit the page or if the deletion fails
+     */
     @DELETE void deleteAttachment(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

@@ -108,6 +108,10 @@ public class SaveAction extends EditAction
      */
     private static final String FORCE_SAVE_OVERRIDE = "override";
 
+    private static final String EXCEPTION = "exception";
+
+    private static final String PREVIOUS_VERSION = "previousVersion";
+
     @Inject
     private DocumentRevisionProvider documentRevisionProvider;
 
@@ -170,7 +174,7 @@ public class SaveAction extends EditAction
         // String defaultLanguage = ((EditForm) form).getDefaultLanguage();
         XWikiDocument tdoc;
 
-        if (doc.isNew() || (language == null) || (language.equals("")) || (language.equals("default"))
+        if (doc.isNew() || (language == null) || (language.isEmpty()) || ("default".equals(language))
             || (language.equals(doc.getDefaultLanguage()))) {
             // Saving the default document translation.
             // Need to save parent and defaultLanguage if they have changed
@@ -204,7 +208,7 @@ public class SaveAction extends EditAction
             readFromTemplate(tdoc, form.getTemplate(), context);
         } catch (XWikiException e) {
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
-                context.put("exception", e);
+                context.put(EXCEPTION, e);
                 return true;
             }
         }
@@ -280,7 +284,7 @@ public class SaveAction extends EditAction
         // Detect merge conflicts. We do this only if the previous version is known, otherwise a 3-way merge is not
         // possible, and the save request is asynchronous, i.e. the user is waiting in edit mode for the save result. If
         // a merge conflict is detected the editor will display the merge conflict modal.
-        if (isConflictCheckEnabled() && Utils.isAjaxRequest(context) && request.getParameter("previousVersion") != null
+        if (isConflictCheckEnabled() && Utils.isAjaxRequest(context) && request.getParameter(PREVIOUS_VERSION) != null
             && isConflictingWithVersion(context, originalDoc, tdoc)) {
             return true;
         }
@@ -441,7 +445,7 @@ public class SaveAction extends EditAction
 
         // TODO The check of the previousVersion should be done at a lower level or with a semaphore since
         // another job might have saved a different version of the document
-        Version previousVersion = new Version(request.getParameter("previousVersion"));
+        Version previousVersion = new Version(request.getParameter(PREVIOUS_VERSION));
         Version latestVersion = originalDoc.getRCSVersion();
 
         Date editingVersionDate = new Date(Long.parseLong(request.getParameter("editingVersionDate")));
@@ -477,7 +481,7 @@ public class SaveAction extends EditAction
 
                     List<MetaDataDiff> filteredMetaDataDiff = new ArrayList<>();
                     for (MetaDataDiff dataDiff : metaDataDiff) {
-                        if (!dataDiff.getField().equals("author")) {
+                        if (!"author".equals(dataDiff.getField())) {
                             filteredMetaDataDiff.add(dataDiff);
                         }
                     }
@@ -528,7 +532,7 @@ public class SaveAction extends EditAction
                 // we have a conflict.
                 // TODO: Improve it to return the diff between the current version and the latest recorder
                 Map<String, String> jsonObject = new LinkedHashMap<>();
-                jsonObject.put("previousVersion", previousVersion.toString());
+                jsonObject.put(PREVIOUS_VERSION, previousVersion.toString());
                 jsonObject.put("previousVersionDate", editingVersionDate.toString());
                 jsonObject.put("latestVersion", latestVersion.toString());
                 jsonObject.put("latestVersionDate", latestVersionDate.toString());
@@ -577,7 +581,7 @@ public class SaveAction extends EditAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        XWikiException e = (XWikiException) context.get("exception");
+        XWikiException e = (XWikiException) context.get(EXCEPTION);
         if ((e != null) && (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY)) {
             return "docalreadyexists";
         }
@@ -589,7 +593,7 @@ public class SaveAction extends EditAction
             return context.getAction();
         }
 
-        return "exception";
+        return EXCEPTION;
     }
 
     private boolean isAsync(XWikiRequest request)

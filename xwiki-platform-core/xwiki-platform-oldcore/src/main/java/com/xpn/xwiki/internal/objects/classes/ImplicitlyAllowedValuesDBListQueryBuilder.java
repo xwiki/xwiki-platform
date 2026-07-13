@@ -284,7 +284,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         StringBuilder statementBuilder =
             new StringBuilder("select distinct ").append(StringUtils.join(selectClause, COLUMN_SEPARATOR))
                 .append(" from ").append(StringUtils.join(fromClause, COLUMN_SEPARATOR));
-        if (whereClause.size() > 0) {
+        if (!whereClause.isEmpty()) {
             statementBuilder.append(" where ").append(StringUtils.join(whereClause, " and "));
         }
 
@@ -293,6 +293,6 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
 
     private String getTemplateName(String className)
     {
-        return StringUtils.removeEnd(className, "Class") + "Template";
+        return Strings.CS.removeEnd(className, "Class") + "Template";
     }
 }

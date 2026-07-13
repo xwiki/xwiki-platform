@@ -1,0 +1,204 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.6" reference="XWiki.WYSIWYG.Translations" locale="">
+  <web>XWiki.WYSIWYG</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WYSIWYG.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>modal.ok=OK
+modal.cancel=Cancel
+modal.close=Close
+
+resource.attach.label=Attachment
+resource.attach.placeholder=Path.To.Page@attachment.png
+resource.data.label=Data URI
+resource.doc.label=Page
+resource.doc.placeholder=Path.To.Page
+resource.icon.label=Icon
+resource.mailto.label=Mail Address
+resource.mailto.placeholder=user@example.org
+resource.path.label=Path
+resource.path.placeholder=/path/to/file
+resource.unc.label=UNC Path
+resource.unc.placeholder=//server/share/path/to/file
+resource.unknown.label=Unknown
+resource.url.label=URL
+resource.url.placeholder=http://www.example.org/image.png
+resource.user.label=User
+resource.user.placeholder=alias
+
+resourcePicker.attach.hint=Select an attachment
+resourcePicker.doc.hint=Select a page
+resourcePicker.dropdown.toggle.title=Toggle the display of resource types.
+
+entityResourceSuggester.doc.placeholder=Find a page...
+entityResourceSuggester.attach.placeholder=Find an attachment...
+entityResourceSuggester.create.resolvedInSpace=Create new page...
+entityResourceSuggester.create.fullyResolvedInput=Create with exact reference...
+
+entityResourcePicker.select=Select
+entityResourcePicker.doc.title=Select Page
+entityResourcePicker.attach.title=Select Attachment
+
+macroSelector.title=Select Macro
+macroSelector.filter.text.placeholder=Type to filter
+macroSelector.filter.category.all=All Macros
+macroSelector.filter.category.other=Other
+macroSelector.filter.category.notinstalled=Not installed
+macroSelector.failedToRetrieveMacros=Failed to retrieve the list of available macros.
+macroSelector.select=Select
+macroSelector.recommended=Recommended
+macroSelector.install=Install
+macroSelector.install.confirm=You are about to install the extension {0} {1}. Are you sure you want to continue ?
+macroSelector.install.notAllowed=You are not allowed to install this extension
+macroSelector.filter.category.placeholder=Select a category...
+
+macroEditor.title=Edit Macro
+macroEditor.more=More
+macroEditor.required=Required
+macroEditor.deprecated=Deprecated
+macroEditor.advanced=Advanced
+macroEditor.changeMacro=Change Macro
+macroEditor.submit=Submit
+macroEditor.content=Content
+macroEditor.noParameters=This macro has no parameters.
+macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
+macroEditor.parametersRequestFailed=Failed to retrieve the parameters for {0}.
+macroEditor.installRequestFailed=Failed to install the {0} macro.
+macroEditor.selectFeature=Select parameter {0}
+
+imageEditor.modal.changeImage.button=Change Image
+imageEditor.modal.loadFail.message=Failed to retrieve the image editor form.
+imageEditor.modal.title=Edit Image
+imageEditor.modal.insertButton=Insert
+imageEditor.modal.updateButton=Update
+imageEditor.modal.initialization.fail=Failed to retrieve the image selection form.
+imageEditor.modal.outscaleWarning=One of the dimensions is larger than the original image ({0}). The result may be a reduction in the quality of the displayed image.
+imageSelector.modal.title=Select Image
+imageSelector.modal.selectButton=Select
+imageSelector.modal.loadFail.message=Failed to retrieve the image selection form.
+imageSelector.modal.fileUpload.success=File upload succeeded.
+imageSelector.modal.fileUpload.fail=File upload failed.
+imageSelector.modal.fileUpload.abort=File upload aborted.
+imageSelector.modal.initialization.fail=Failed to retrieve the image selection form.
+
+wysiwyg.imageEditor.standardTab.title=Standard
+wysiwyg.imageEditor.advancedTab.title=Advanced
+wysiwyg.imageEditor.standardTab.imageStyles.label=Image Styles
+wysiwyg.imageEditor.standardTab.imageStyles.hint=Select the style to apply on the image.
+wysiwyg.imageEditor.standardTab.alt.label=Alternative Text
+wysiwyg.imageEditor.standardTab.alt.hint=Define an alternate text for an image, if the image cannot be displayed.
+wysiwyg.imageEditor.standardTab.caption.label=Caption
+wysiwyg.imageEditor.standardTab.caption.hint=Activate and define an image caption.
+wysiwyg.imageEditor.standardTab.caption.ariaLabel=Activate and define an image caption.
+
+wysiwyg.imageEditor.advancedTab.size.label=Size
+wysiwyg.imageEditor.advancedTab.size.width.label=Width
+wysiwyg.imageEditor.advancedTab.size.height.label=Height
+wysiwyg.imageEditor.advancedTab.size.hint=Define the image size.
+wysiwyg.imageEditor.advancedTab.border.label=Border
+wysiwyg.imageEditor.advancedTab.border.hint=When checked, the image is displayed with a border
+wysiwyg.imageEditor.advancedTab.alignment.label=Alignment
+wysiwyg.imageEditor.advancedTab.alignment.hint=Define the image alignment.
+wysiwyg.imageEditor.advancedTab.alignment.option.none=None
+wysiwyg.imageEditor.advancedTab.alignment.option.start=Start
+wysiwyg.imageEditor.advancedTab.alignment.option.center=Center
+wysiwyg.imageEditor.advancedTab.alignment.option.end=End
+wysiwyg.imageEditor.advancedTab.textWrap.label=Text Wrap
+wysiwyg.imageEditor.advancedTab.textWrap.hint=When checked, the text is wrapped around the image.
+
+wysiwyg.imageSelector.treeTab.title=Tree
+wysiwyg.imageSelector.uploadTab.title=Upload
+wysiwyg.imageSelector.uploadTab.file.title=File
+wysiwyg.imageSelector.uploadTab.file.hint=Select a local file to add to the page.
+wysiwyg.imageSelector.uploadTab.uploadButton=Upload
+wysiwyg.imageSelector.iconTab.title=Icon
+wysiwyg.imageSelector.iconTab.icon.title=Icon
+wysiwyg.imageSelector.iconTab.icon.hint=The identifier of the icon to display as an image.
+wysiwyg.imageSelector.iconTab.icon.placeholder=accept
+wysiwyg.imageSelector.urlTab.title=Url
+wysiwyg.imageSelector.urlTab.url.title=Url
+wysiwyg.imageSelector.urlTab.url.hint=The url of the image to display.
+wysiwyg.imageSelector.urlTab.url.placeholder=https://...
+
+wysiwyg.upload.error.csrf=The CSRF token is missing.
+wysiwyg.upload.error.emptyReturn=Error when uploading the file: it might exceed the configured maximum upload size.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10
+imageEditor.modal.backToEditor.button=Back
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  <object>
+    <name>XWiki.WYSIWYG.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>de8e7437-7d08-414a-81ba-9dd339004ee3</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

@@ -32,12 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class RegexEntityReferenceTest
+class RegexEntityReferenceTest
 {
     private static final DocumentReference REFERENCETOMATCH = new DocumentReference("wiki", "space", "page");
 
     @Test
-    public void equalsWhenExact()
+    void equalsWhenExact()
     {
         EntityReference wikiReference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getWikiReference().getName(), Pattern.LITERAL),
@@ -53,7 +53,7 @@ public class RegexEntityReferenceTest
     }
 
     @Test
-    public void equalsWithOnlyPage()
+    void equalsWithOnlyPage()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getName(), Pattern.LITERAL), EntityType.DOCUMENT);
@@ -62,7 +62,7 @@ public class RegexEntityReferenceTest
     }
 
     @Test
-    public void equalsWithOnlyWiki()
+    void equalsWithOnlyWiki()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getWikiReference().getName(), Pattern.LITERAL),
@@ -72,7 +72,7 @@ public class RegexEntityReferenceTest
     }
 
     @Test
-    public void equalsWithPattern()
+    void equalsWithPattern()
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("p.*"), EntityType.DOCUMENT);
 
@@ -80,7 +80,7 @@ public class RegexEntityReferenceTest
     }
 
     @Test
-    public void equalsWhenPatternNotMatching()
+    void equalsWhenPatternNotMatching()
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("space"), EntityType.DOCUMENT);
 
@@ -88,7 +88,7 @@ public class RegexEntityReferenceTest
     }
 
     @Test
-    public void equalsWhenNonRegexParent()
+    void equalsWhenNonRegexParent()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile("space"), EntityType.SPACE, new EntityReference("wiki",

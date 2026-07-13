@@ -103,7 +103,7 @@ public class LinkLabelGeneratorChainingListener extends AbstractChainingListener
             }
 
             // create the span around the label signaling that this is a generated label
-            Map<String, String> formatParams = new HashMap<String, String>();
+            Map<String, String> formatParams = new HashMap<>();
             formatParams.put("class", "wikigeneratedlinkcontent");
             // the same as this.format. TODO: decide which one is more semantic.
             super.beginFormat(Format.NONE, formatParams);

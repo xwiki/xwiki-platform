@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import org.xwiki.stability.Unstable;
+
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 /**
@@ -30,6 +32,13 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
  */
 public class TimezoneClass extends StringClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Timezone";
+
     /**
      * Constant defining the field name.
      **/
@@ -52,6 +61,12 @@ public class TimezoneClass extends StringClass
      **/
     public TimezoneClass()
     {
-        super();
+        // Nothing to do.
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 }

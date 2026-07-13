@@ -470,7 +470,7 @@ public class DefaultNotificationParametersFactory
         // preference.
         boolean noLocationFilter =
             notificationParameters.filterPreferences.stream()
-                .noneMatch(pref -> pref instanceof ScopeNotificationFilterPreference);
+                .noneMatch(ScopeNotificationFilterPreference.class::isInstance);
         notificationParameters.filters = notificationFilterManager.getAllFilters(true)
             .stream()
             .filter(filter -> !excludedFilters.contains(filter.getName())

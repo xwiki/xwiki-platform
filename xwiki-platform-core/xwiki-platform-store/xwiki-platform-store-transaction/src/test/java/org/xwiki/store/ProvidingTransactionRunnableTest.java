@@ -21,6 +21,7 @@ package org.xwiki.store;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -36,7 +37,7 @@ class ProvidingTransactionRunnableTest
     private static final String DATA_A1 = "hello world";
 
     @Test
-    void dataSharingTest() throws Exception
+    void dataSharingTest()
     {
         DBStartableTransactionRunnable run = new DBStartableTransactionRunnable();
         ProvidingTransactionRunnable<DBTransaction, MyInterfaceWithDataA1> tr1 = new TR1();
@@ -46,7 +47,7 @@ class ProvidingTransactionRunnableTest
 
         new TR3().runIn(tr2WithNewCapabilities);
         // This should fail at compile time: new TR3().runIn(tr2);
-        run.start();
+        assertDoesNotThrow(run::start);
     }
 
     private interface DBTransaction
@@ -119,6 +120,7 @@ class ProvidingTransactionRunnableTest
 
     private class TR2 extends TransactionRunnable<DBTransaction>
     {
+        @Override
         protected void onRun()
         {
             assertEquals(DB_CONNECTION, this.getContext().getConnection(), "DB Connection was not correct in TR2");
@@ -127,6 +129,7 @@ class ProvidingTransactionRunnableTest
 
     private class TR3 extends TransactionRunnable<MyInterfaceWithDataA1>
     {
+        @Override
         protected void onRun()
         {
             assertEquals(DATA_A1, this.getContext().getDataA1(), "Data A1 was not correct in TR3");

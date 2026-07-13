@@ -205,7 +205,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
                 Strings.CS.removeStart(parametersAsQueryString(filename, context), PARAMETER_SEPARATOR);
             if (!StringUtils.isEmpty(parameters)) {
                 String queryParamDelimiter =
-                    StringUtils.contains(url, QUERY_PARAMETER_DELIMITER) ? PARAMETER_SEPARATOR
+                    Strings.CS.contains(url, QUERY_PARAMETER_DELIMITER) ? PARAMETER_SEPARATOR
                         : QUERY_PARAMETER_DELIMITER;
                 url.append(queryParamDelimiter).append(parameters);
             }
@@ -322,7 +322,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     {
         StringBuilder result = new StringBuilder();
         // Using LinkedHashSet to preserve the extensions order.
-        Set<String> extensions = new LinkedHashSet<String>();
+        Set<String> extensions = new LinkedHashSet<>();
         // First, we add to the import string the extensions that should always be used.
         // TODO Global extensions should be able to select a set of actions for which they are enabled.
         extensions.addAll(getAlwaysUsedExtensions(context));
@@ -451,7 +451,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     public UsedExtension getCacheResources(XWikiContext context)
     {
         return new CachedItem.UsedExtension(getPulledResources(context),
-            new HashMap<String, Map<String, Object>>(getParametersMap(context)));
+            new HashMap<>(getParametersMap(context)));
     }
 
     @Override

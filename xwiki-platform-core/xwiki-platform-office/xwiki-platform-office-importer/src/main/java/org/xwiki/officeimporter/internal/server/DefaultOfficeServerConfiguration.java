@@ -100,7 +100,7 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     {
         List<String> serverPorts = this.configuration.getProperty(PREFIX + "serverPorts", List.class);
         int[] result;
-        if (serverPorts != null && serverPorts.size() > 0) {
+        if (serverPorts != null && !serverPorts.isEmpty()) {
             result = new int[serverPorts.size()];
             for (int i = 0; i < serverPorts.size(); i++) {
                 result[i] = Integer.parseInt(serverPorts.get(i));

@@ -62,6 +62,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
  */
 @Component(roles = NotificationFilterPreferenceStore.class)
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class NotificationFilterPreferenceStore
 {
     private static final String ID = "id";

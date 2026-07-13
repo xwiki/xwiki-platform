@@ -45,6 +45,6 @@ public class DeletingPage extends CopyOrRenameOrDeleteStatusPage
 
     public boolean isSuccess()
     {
-        return this.getInfoMessage().equals(DELETE_SUCCESS);
+        return DELETE_SUCCESS.equals(this.getInfoMessage());
     }
 }

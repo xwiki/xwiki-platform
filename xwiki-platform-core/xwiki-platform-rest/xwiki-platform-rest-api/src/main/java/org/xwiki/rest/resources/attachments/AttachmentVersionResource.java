@@ -35,6 +35,20 @@ import org.xwiki.rest.XWikiRestException;
     )
 public interface AttachmentVersionResource
 {
+    /**
+     * Returns the content of an attachment at a specific version of that attachment.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the attachment, for example {@code WebHome}
+     * @param attachmentName the file name of the attachment, for example {@code photo.png}
+     * @param attachmentVersion the attachment revision to retrieve, for example {@code 1.1} (as listed by the
+     *  attachment history)
+     * @return a response streaming the attachment's binary content at the requested version, with its media type
+     * @throws XWikiRestException if the attachment cannot be retrieved, for example the attachment or that version
+     *  does not exist
+     */
     @GET Response getAttachment(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

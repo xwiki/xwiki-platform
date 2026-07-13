@@ -88,6 +88,14 @@ class UserClassFieldIT
         createUser(setup, "XXX");
         createUser(setup, "YYY");
         createUser(setup, "ZZZ");
+
+        // Create an active and a disabled user, both matching "Person", to verify that the picker excludes disabled
+        // users by default and suggests them only when the field is configured to include inactive users
+        // (XWIKI-18766). We need to be super admin to be allowed to disable the user.
+        setup.loginAsSuperAdmin();
+        setup.createUser("ActivePerson", "ActivePerson", null, "first_name", "Active", "last_name", "Person");
+        setup.createUser("DisabledPerson", "DisabledPerson", null, "first_name", "Disabled", "last_name", "Person",
+            "active", "0");
     }
 
     private void createUser(TestUtils setup, String userSuffix)
@@ -140,8 +148,9 @@ class UserClassFieldIT
         assertTrue(userPicker.clear().sendKeys("a").waitForNonTypedSuggestions().getSuggestions().size() > 2);
 
         // An empty text input brings a default list of suggestions. There should be at least 3 users (the 2 users we
-        // created plus the default administrator).
-        assertTrue(userPicker.sendKeys(Keys.BACK_SPACE).waitForNonTypedSuggestions().getSuggestions().size() > 2);
+        // created plus the default administrator). Note that the default list of suggestions has already been fetched
+        // so we don't need to wait for the remote source.
+        assertTrue(userPicker.sendKeys(Keys.BACK_SPACE).waitForNonTypedSuggestions(false).getSuggestions().size() > 2);
 
         // We should be able to close the list of suggestions using the escape key.
         assertTrue(
@@ -181,11 +190,11 @@ class UserClassFieldIT
         assertEquals(singletonList("XWiki.Admin"), userPicker.getValues());
     }
 
-    /*
-    Note that this test does perform checks on the behaviour of the suggester, but it doesn't actually check the
-    behaviour of the query itself: since we don't save the application, the query is performed on the
-    AppWithinMinutes.Users property field which doesn't contain the same values than when saving a property for
-    multiple select. So we test that specific behaviour in the next test saveAndInitalSelection.
+    /**
+     * Note that this test does perform checks on the behaviour of the suggester, but it doesn't actually check the
+     * behaviour of the query itself: since we don't save the application, the query is performed on the
+     * AppWithinMinutes.Users property field which doesn't contain the same values than when saving a property for
+     * multiple select. So we test that specific behaviour in the next test saveAndInitalSelection.
      */
     @Test
     @Order(3)
@@ -200,7 +209,7 @@ class UserClassFieldIT
 
         // Select 2 users.
         userPicker.sendKeys("tmortagne").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
-        userPicker.sendKeys("2002").waitForNonTypedSuggestions().selectByValue("XWiki.Enygma2002");
+        userPicker.clear().sendKeys("2002").waitForNonTypedSuggestions().selectByValue("XWiki.Enygma2002");
         List<SuggestionElement> selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(2, selectedUsers.size());
         assertUserSuggestion(selectedUsers.get(0), "Thomas Mortagne");
@@ -211,12 +220,12 @@ class UserClassFieldIT
         selectedUsers.get(0).delete();
 
         // Select another user.
-        userPicker.sendKeys("admin").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
+        userPicker.clear().sendKeys("admin").waitForNonTypedSuggestions().sendKeys(Keys.ENTER);
         selectedUsers = userPicker.getSelectedSuggestions();
         assertEquals(2, selectedUsers.size());
-        assertUserSuggestion(selectedUsers.get(0), ADMIN_NAME, "Admin", ADMIN_AVATAR);
-        assertUserSuggestion(selectedUsers.get(1), "Eduard Moraru", "Enygma2002");
-        assertEquals(asList("XWiki.Admin", "XWiki.Enygma2002"), userPicker.getValues());
+        assertUserSuggestion(selectedUsers.get(0), "Eduard Moraru", "Enygma2002");
+        assertUserSuggestion(selectedUsers.get(1), ADMIN_NAME, "Admin", ADMIN_AVATAR);
+        assertEquals(asList("XWiki.Enygma2002", "XWiki.Admin"), userPicker.getValues());
 
         // Clear the list of selected users.
         userPicker.clearSelectedSuggestions();
@@ -265,7 +274,7 @@ class UserClassFieldIT
         suggestions.get(0).select();
 
         // We should be able to input free text also.
-        userPicker.sendKeys("foobar").waitForSuggestions().selectTypedText();
+        userPicker.clear().sendKeys("foobar").waitForSuggestions().selectTypedText();
         editor.clickSaveAndContinue();
         editor.clickCancel().edit();
 
@@ -326,6 +335,41 @@ class UserClassFieldIT
         assertEquals("Eduard Moraru", users.get(0).getText());
         assertTrue(
             users.get(0).findElement(By.className("user-avatar")).getAttribute("src").contains("/Enygma2002.png?"));
+    }
+
+    @Test
+    @Order(6)
+    void inactiveUsersSuggestions(TestUtils setup, TestReference testReference)
+    {
+        ApplicationClassEditPage editor = goToEditor(testReference);
+        SuggestClassFieldEditPane userField = new SuggestClassFieldEditPane(editor.addField("User").getName());
+        SuggestInputElement userPicker = userField.getPicker();
+
+        // By default the disabled user must not be suggested: typing "Person" only matches the active user.
+        List<SuggestionElement> suggestions =
+            userPicker.sendKeys("Person").waitForNonTypedSuggestions().getSuggestions();
+        assertEquals(1, suggestions.size());
+        assertUserSuggestion(suggestions.get(0), "Active Person", "ActivePerson", "user");
+
+        // Configure the field to also suggest inactive users and save the class so that the application entry picker
+        // uses this configuration.
+        userField.openConfigPanel();
+        userField.setIncludeInactiveUsers(true);
+        userField.closeConfigPanel();
+        editor.clickSaveAndView();
+
+        // Create an application entry and check that the disabled user is now suggested along with the active one.
+        ClassSheetPage classSheetPage = new ClassSheetPage();
+        String location = setup.serializeLocalReference(testReference.getLastSpaceReference());
+        classSheetPage.createNewDocument(location, "Entry");
+
+        String className = setup.serializeReference(
+            new DocumentReference("Class", testReference.getLastSpaceReference()).getLocalDocumentReference());
+        userPicker = new SuggestInputElement(setup.getDriver().findElement(By.id(className + "_0_user1")));
+        suggestions = userPicker.sendKeys("Person").waitForNonTypedSuggestions().getSuggestions();
+        assertEquals(2, suggestions.size());
+        assertUserSuggestion(suggestions.get(0), "Active Person", "ActivePerson", "user");
+        assertUserSuggestion(suggestions.get(1), "Disabled Person", "DisabledPerson", "user");
     }
 
     private ApplicationClassEditPage goToEditor(TestReference testReference)

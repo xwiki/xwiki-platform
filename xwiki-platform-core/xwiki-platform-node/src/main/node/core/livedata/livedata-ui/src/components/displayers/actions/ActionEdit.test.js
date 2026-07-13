@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,14 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { config, mount } from "@vue/test-utils";
-import { describe, expect, it } from "vitest";
 import ActionEdit from "./ActionEdit.vue";
+import { config, mount } from "@vue/test-utils";
 import _ from "lodash-es";
-import sinon from "sinon";
+import { fake, stub } from "sinon";
+import { describe, expect, it } from "vitest";
 
 config.global.mocks = {
-  $t: tKey => tKey,
+  $t: (tKey) => tKey,
 };
 
 function initWrapper({ setEdit = undefined }) {
@@ -34,7 +34,7 @@ function initWrapper({ setEdit = undefined }) {
   });
 
   // Mock fetch.
-  global.fetch = sinon.stub(global, "fetch");
+  global.fetch = stub(global, "fetch");
   global.fetch.resolves({
     json: async () => {
       return { icons: [] };
@@ -44,8 +44,7 @@ function initWrapper({ setEdit = undefined }) {
   return mount(ActionEdit, {
     props: {
       displayer: { setEdit },
-      closePopover: () => {
-      },
+      closePopover: () => {},
     },
     mocks: {
       $t: (key) => key,
@@ -55,8 +54,8 @@ function initWrapper({ setEdit = undefined }) {
 
 describe("ActionEdit.vue", () => {
   it("Renders and edit on click", async () => {
-    const setEdit = sinon.fake();
-    const stopPropagation = sinon.fake();
+    const setEdit = fake();
+    const stopPropagation = fake();
 
     const wrapper = initWrapper({ setEdit });
     expect(wrapper.attributes("title")).toBe("livedata.displayer.actions.edit");

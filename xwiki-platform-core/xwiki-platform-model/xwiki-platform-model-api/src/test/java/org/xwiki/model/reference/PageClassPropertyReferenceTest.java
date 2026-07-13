@@ -31,13 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * 
  * @version $Id$
  */
-public class PageClassPropertyReferenceTest
+class PageClassPropertyReferenceTest
 {
     /**
      * Ensures the equivalence of constructors.
      */
     @Test
-    public void testConstructors()
+    void testConstructors()
     {
         PageClassPropertyReference reference =
             new PageClassPropertyReference(new EntityReference("ClassProperty", EntityType.PAGE_CLASS_PROPERTY,
@@ -46,7 +46,7 @@ public class PageClassPropertyReferenceTest
     }
 
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
             () -> new PageClassPropertyReference(new EntityReference("propertyName", EntityType.PAGE)));
@@ -55,7 +55,7 @@ public class PageClassPropertyReferenceTest
     }
 
     @Test
-    public void testInvalidNullParent()
+    void testInvalidNullParent()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
             () -> new PageClassPropertyReference(new EntityReference("className", EntityType.PAGE_CLASS_PROPERTY)));
@@ -67,7 +67,7 @@ public class PageClassPropertyReferenceTest
      * Tests that an object reference throws exception if it doesn't have a document as a parent.
      */
     @Test
-    public void testInvalidParentType()
+    void testInvalidParentType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
             () -> new PageClassPropertyReference(new EntityReference("className", EntityType.PAGE_CLASS_PROPERTY,
@@ -77,7 +77,7 @@ public class PageClassPropertyReferenceTest
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         PageClassPropertyReference reference =
             new PageClassPropertyReference("prop", new PageReference("wiki", "space", "page"))

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { generateConfig } from "../../vite.config";
+import { generateConfig } from "@xwiki/platform-tool-viteconfig";
 import { defineConfig, mergeConfig } from "vite";
 
 export default mergeConfig(

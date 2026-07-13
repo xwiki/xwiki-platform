@@ -85,7 +85,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
      */
     protected Serializable serializeXWikiContext(XWikiContext context)
     {
-        HashMap<String, Serializable> remoteDataMap = new HashMap<String, Serializable>();
+        HashMap<String, Serializable> remoteDataMap = new HashMap<>();
 
         remoteDataMap.put(CONTEXT_WIKI, context.getWikiId());
         remoteDataMap.put(CONTEXT_USER, context.getUser());

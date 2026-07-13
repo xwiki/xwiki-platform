@@ -1,6 +1,6 @@
 {
   "name": "@xwiki/platform-api",
-  "version": "18.2.0-SNAPSHOT",
+  "version": "18.6.0-SNAPSHOT",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
@@ -43,7 +43,7 @@
     "vue-router": "catalog:"
   },
   "peerDependencies": {
-    "inversify": "7.x",
+    "inversify": "8.x",
     "reflect-metadata": "0.x",
     "vue": "3.x",
     "vue-router": "5.x"
@@ -51,7 +51,10 @@
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-tsdocconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",

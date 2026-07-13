@@ -29,12 +29,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
@@ -114,6 +113,8 @@ public class Document extends Api
 {
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Document.class);
+
+    private static final String DELETE = "delete";
 
     /**
      * The XWikiDocument object wrapped by this API.
@@ -1213,7 +1214,7 @@ public class Document extends Api
     public Map<String, Vector<Object>> getxWikiObjects()
     {
         Map<DocumentReference, List<BaseObject>> map = this.getDoc().getXObjects();
-        Map<String, Vector<Object>> resultmap = new HashMap<String, Vector<Object>>();
+        Map<String, Vector<Object>> resultmap = new HashMap<>();
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : map.entrySet()) {
             List<BaseObject> objects = entry.getValue();
             if (objects != null) {
@@ -1226,9 +1227,9 @@ public class Document extends Api
     protected Vector<Object> getXObjects(List<BaseObject> objects)
     {
         if (objects == null) {
-            return new Vector<Object>(0);
+            return new Vector<>(0);
         }
-        Vector<Object> result = new Vector<Object>(objects.size());
+        Vector<Object> result = new Vector<>(objects.size());
         for (BaseObject bobj : objects) {
             if (bobj != null) {
                 result.add(newObjectApi(bobj, getXWikiContext()));
@@ -1317,13 +1318,13 @@ public class Document extends Api
      */
     public Vector<Object> getObjects(String classname, String key, String value)
     {
-        Vector<Object> result = new Vector<Object>();
+        Vector<Object> result = new Vector<>();
         if (StringUtils.isBlank(key) || value == null) {
             return getObjects(classname);
         }
         try {
             Vector<BaseObject> allObjects = this.getDoc().getObjects(classname);
-            if (allObjects == null || allObjects.size() == 0) {
+            if (allObjects == null || allObjects.isEmpty()) {
                 return result;
             } else {
                 for (BaseObject obj : allObjects) {
@@ -1490,7 +1491,7 @@ public class Document extends Api
         documentProperties.setWithWikiAttachmentsContent(false);
         documentProperties.setWithJRCSRevisions(false);
         documentProperties.setWithRevisions(false);
-        documentProperties.setExcludedPropertyTypes(Set.of("Email", "Password"));
+        documentProperties.setSensitiveFieldsExcluded(true);
 
         // Output
         XAROutputProperties xarProperties = new XAROutputProperties();
@@ -1572,7 +1573,7 @@ public class Document extends Api
 
     public List<Attachment> getAttachmentList()
     {
-        List<Attachment> apis = new ArrayList<Attachment>();
+        List<Attachment> apis = new ArrayList<>();
         for (XWikiAttachment attachment : this.getDoc().getAttachmentList()) {
             apis.add(new Attachment(this, attachment, getXWikiContext()));
         }
@@ -1923,7 +1924,7 @@ public class Document extends Api
 
     public List<String> getLinkedPages()
     {
-        return new ArrayList<String>(this.doc.getUniqueLinkedPages(getXWikiContext()));
+        return new ArrayList<>(this.doc.getUniqueLinkedPages(getXWikiContext()));
     }
 
     public Attachment getAttachment(String filename)
@@ -2187,7 +2188,7 @@ public class Document extends Api
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         List<DocumentStats> stats = statisticsService.getDocumentStatistics(action, scope, period, range, this.context);
-        if (stats.size() > 0) {
+        if (!stats.isEmpty()) {
             return stats.get(0);
         }
         return new DocumentStats();
@@ -2206,7 +2207,7 @@ public class Document extends Api
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         List<DocumentStats> stats = statisticsService.getDocumentStatistics(action, scope, period, range, this.context);
-        if (stats.size() > 0) {
+        if (!stats.isEmpty()) {
             return stats.get(0);
         }
         return new DocumentStats();
@@ -2223,8 +2224,7 @@ public class Document extends Api
         Range range = RangeFactory.ALL;
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
-        List<RefererStats> stats = statisticsService.getRefererStatistics("", scope, period, range, this.context);
-        return stats;
+        return statisticsService.getRefererStatistics("", scope, period, range, this.context);
     }
 
     public boolean checkAccess(String right)
@@ -2469,7 +2469,7 @@ public class Document extends Api
 
     public List<XWikiLink> getLinks() throws XWikiException
     {
-        return new ArrayList<XWikiLink>(this.doc.getUniqueWikiLinkedPages(getXWikiContext()));
+        return new ArrayList<>(this.doc.getUniqueWikiLinkedPages(getXWikiContext()));
     }
 
     /**
@@ -3010,7 +3010,7 @@ public class Document extends Api
     public List<Object> addObjectsFromRequest(String className, String prefix) throws XWikiException
     {
         List<BaseObject> objs = getDoc().addObjectsFromRequest(className, prefix, getXWikiContext());
-        List<Object> wrapped = new ArrayList<Object>();
+        List<Object> wrapped = new ArrayList<>();
         for (BaseObject object : objs) {
             wrapped.add(new com.xpn.xwiki.api.Object(object, getXWikiContext()));
         }
@@ -3048,7 +3048,7 @@ public class Document extends Api
     public List<Object> updateObjectsFromRequest(String className, String prefix) throws XWikiException
     {
         List<BaseObject> objs = getDoc().updateObjectsFromRequest(className, prefix, getXWikiContext());
-        List<Object> wrapped = new ArrayList<Object>();
+        List<Object> wrapped = new ArrayList<>();
         for (BaseObject object : objs) {
             wrapped.add(new com.xpn.xwiki.api.Object(object, getXWikiContext()));
         }
@@ -3107,7 +3107,7 @@ public class Document extends Api
 
     public void delete() throws XWikiException
     {
-        if (hasAccessLevel("delete")) {
+        if (hasAccessLevel(DELETE)) {
             deleteDocument();
         } else {
             java.lang.Object[] args = { this.getFullName() };
@@ -3176,7 +3176,7 @@ public class Document extends Api
         XWiki xwiki = getXWikiContext().getWiki();
         FileUploadPlugin fileupload = (FileUploadPlugin) xwiki.getPlugin("fileupload", getXWikiContext());
         List<FileItem> fileuploadlist = fileupload.getFileItems(getXWikiContext());
-        List<XWikiAttachment> attachments = new ArrayList<XWikiAttachment>();
+        List<XWikiAttachment> attachments = new ArrayList<>();
         // adding attachment list to context so we find the names
         this.context.put("addedAttachments", attachments);
         int nb = 0;
@@ -3201,7 +3201,7 @@ public class Document extends Api
                 i = fname.lastIndexOf("/");
             }
             filename = fname.substring(i + 1);
-            filename = filename.replaceAll("\\+", " ");
+            filename = filename.replace("+", " ");
 
             if ((data != null) && (data.length > 0)) {
                 XWikiAttachment attachment = this.getDoc().addAttachment(filename, data, getXWikiContext());
@@ -3303,7 +3303,7 @@ public class Document extends Api
     public void rename(DocumentReference newReference) throws XWikiException
     {
         XWiki xWiki = this.context.getWiki();
-        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+        if (hasAccessLevel(DELETE) && xWiki.checkAccess("edit",
             xWiki.getDocument(newReference, this.context), this.context)) {
             List<DocumentReference> backLinkedReferences = getDocument().getBackLinkedReferences(this.context);
             List<DocumentReference> childrenReferences = getDocument().getChildrenReferences(this.context);
@@ -3361,12 +3361,12 @@ public class Document extends Api
     public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames)
         throws XWikiException
     {
-        List<DocumentReference> backlinkDocumentReferences = new ArrayList<DocumentReference>();
+        List<DocumentReference> backlinkDocumentReferences = new ArrayList<>();
         for (String backlinkDocumentName : backlinkDocumentNames) {
             backlinkDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(backlinkDocumentName));
         }
 
-        List<DocumentReference> childDocumentReferences = new ArrayList<DocumentReference>();
+        List<DocumentReference> childDocumentReferences = new ArrayList<>();
         for (String childDocumentName : childDocumentNames) {
             childDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(childDocumentName));
         }
@@ -3397,7 +3397,7 @@ public class Document extends Api
         List<DocumentReference> childDocumentNames) throws XWikiException
     {
         XWiki xWiki = this.context.getWiki();
-        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+        if (hasAccessLevel(DELETE) && xWiki.checkAccess("edit",
             xWiki.getDocument(newReference, this.context), this.context)) {
 
             // Every page given in childDocumentNames has it's parent changed whether it needs it or not.

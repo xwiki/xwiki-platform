@@ -93,11 +93,9 @@ public class XWikiPatch
      */
     public boolean isDiff()
     {
-        if (this.content != null) {
-            if (this.isDiff != isContentDiff()) {
-                LOGGER.warn("isDiff: Patch is inconsistent. Content and diff field are contradicting");
-                return isContentDiff();
-            }
+        if (this.content != null && this.isDiff != isContentDiff()) {
+            LOGGER.warn("isDiff: Patch is inconsistent. Content and diff field are contradicting");
+            return isContentDiff();
         }
         return this.isDiff;
     }
@@ -107,12 +105,10 @@ public class XWikiPatch
      */
     public void setDiff(boolean isDiff)
     {
-        if (this.content != null) {
-            if (isDiff != isContentDiff()) {
-                LOGGER.warn("setDiff: Patch is inconsistent. Content and diff field are contradicting");
-                this.isDiff = isContentDiff();
-                return;
-            }
+        if (this.content != null && isDiff != isContentDiff()) {
+            LOGGER.warn("setDiff: Patch is inconsistent. Content and diff field are contradicting");
+            this.isDiff = isContentDiff();
+            return;
         }
         this.isDiff = isDiff;
     }
@@ -218,7 +214,7 @@ public class XWikiPatch
         if (!isDiff()) {
             origText.clear();
             origText.addAll(
-                new ArrayList<String>(Arrays.asList(ToString.stringToArray(getContent()))));
+                new ArrayList<>(Arrays.asList(ToString.stringToArray(getContent()))));
         } else {
             try {
                 XWikiPatchUtils.patch(origText, getContent());

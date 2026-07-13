@@ -27,7 +27,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.query.Query;
@@ -75,7 +74,6 @@ import static org.mockito.Mockito.when;
 @WikiManagerScriptServiceComponentList
 @ComponentList({
     ErrorMessageMacro.class,
-    TranslationMacro.class,
     TestNoScriptMacro.class,
     ModelScriptService.class
 })

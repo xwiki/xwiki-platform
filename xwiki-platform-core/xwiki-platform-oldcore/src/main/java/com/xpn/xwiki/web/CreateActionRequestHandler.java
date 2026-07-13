@@ -30,6 +30,7 @@ import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,57 +78,57 @@ public class CreateActionRequestHandler
     /**
      * The name parameter.
      */
-    private static final String NAME = "name";
+    private static final String NAME_PARAMETER = "name";
 
     /**
      * The name of the deprecated space parameter. <br>
-     * Note: if you change the value of this variable, change the value of {{@link #TOCREATE_SPACE} to the previous
+     * Note: if you change the value of this variable, change the value of {{@link #TOCREATE_SPACE_PARAMETER} to the previous
      * value.
      *
      * @deprecated Use {@value #SPACE_REFERENCE} as parameter name instead.
      */
     @Deprecated
-    private static final String SPACE = "space";
+    private static final String SPACE_PARAMETER = "space";
 
     /**
      * The name of the page parameter.
      *
-     * @deprecated Use {@value #NAME} as parameter name instead.
+     * @deprecated Use {@value #NAME_PARAMETER} as parameter name instead.
      */
     @Deprecated
-    private static final String PAGE = "page";
+    private static final String PAGE_PARAMETER = "page";
 
     /**
      * The value of the tocreate parameter when a space is to be created. <br>
      * TODO: find a way to give this constant the same value as the constant above without violating checkstyle.
      */
-    private static final String TOCREATE_SPACE = SPACE;
+    private static final String TOCREATE_SPACE_PARAMETER = SPACE_PARAMETER;
 
     /**
      * The name of the "type" parameter.
      */
-    private static final String TYPE = "type";
+    private static final String TYPE_PARAMETER = "type";
 
     /**
      * The value of the tocreate parameter when a terminal/regular document is to be created.
      */
-    private static final String TOCREATE_TERMINAL = "terminal";
+    private static final String TOCREATE_TERMINAL_PARAMETER = "terminal";
 
     /**
      * The value of the tocreate parameter when a non-terminal document is to be created.
      */
-    private static final String TOCREATE_NONTERMINAL = "nonterminal";
+    private static final String TOCREATE_NONTERMINAL_PARAMETER = "nonterminal";
 
     /**
      * The name of the template field inside the template provider, or the template parameter which can be sent
      * directly, without passing through the template provider.
      */
-    private static final String TEMPLATE = "template";
+    private static final String TEMPLATE_PARAMETER = "template";
 
     /**
      * The name of the template provider parameter.
      */
-    private static final String TEMPLATE_PROVIDER = "templateprovider";
+    private static final String TEMPLATE_PROVIDER_PARAMETER = "templateprovider";
 
     /**
      * The template provider class, to create documents from templates.
@@ -159,11 +160,11 @@ public class CreateActionRequestHandler
      */
     private static final String CURRENT_MIXED_RESOLVER_HINT = "currentmixed";
 
-    private static final String TP_TERMINAL_PROPERTY = TOCREATE_TERMINAL;
+    private static final String TP_TERMINAL_PROPERTY = TOCREATE_TERMINAL_PARAMETER;
 
-    private static final String TP_TYPE_PROPERTY = TYPE;
+    private static final String TP_TYPE_PROPERTY = TYPE_PARAMETER;
 
-    private static final String TP_TYPE_PROPERTY_SPACE_VALUE = SPACE;
+    private static final String TP_TYPE_PROPERTY_SPACE_VALUE = SPACE_PARAMETER;
 
     private static final String TP_CREATION_RESTRICTIONS_PROPERTY = "creationRestrictions";
 
@@ -233,7 +234,7 @@ public class CreateActionRequestHandler
             document.getDocumentReference().getLastSpaceReference(), templateProviderClassReference, context);
 
         // Get the type of document to create
-        type = request.get(TYPE);
+        type = request.get(TYPE_PARAMETER);
 
         // Since this template can be used for creating a Page or a Space, check the passed "tocreate" parameter
         // which can be either "page" or "space". If no parameter is passed then we default to creating a Page.
@@ -244,7 +245,7 @@ public class CreateActionRequestHandler
         } else {
             // We are on an existing document...
 
-            if (request.getParameter(SPACE) != null || request.getParameter(PAGE) != null) {
+            if (request.getParameter(SPACE_PARAMETER) != null || request.getParameter(PAGE_PARAMETER) != null) {
                 // We are in Backwards Compatibility mode and we are using the deprecated parameter names.
                 processDeprecatedParameters(toCreate);
             } else {
@@ -265,14 +266,14 @@ public class CreateActionRequestHandler
                 // Note: We leave the spaceReference variable intentionally null to symbolize a top level space or
                 // non-terminal document.
 
-                name = request.getParameter(NAME);
+                name = request.getParameter(NAME_PARAMETER);
 
                 // Determine the type of document we are creating (terminal vs non-terminal).
 
-                if (TOCREATE_TERMINAL.equals(toCreate) || TOCREATE_NONTERMINAL.equals(toCreate)) {
+                if (TOCREATE_TERMINAL_PARAMETER.equals(toCreate) || TOCREATE_NONTERMINAL_PARAMETER.equals(toCreate)) {
                     // Look at the request to see what the user wanted to create (terminal or non-terminal).
 
-                    isSpace = !TOCREATE_TERMINAL.equals(toCreate);
+                    isSpace = !TOCREATE_TERMINAL_PARAMETER.equals(toCreate);
                 } else if (templateProvider != null) {
                     // A template provider is specified. Use it and extract the type of document.
 
@@ -321,10 +322,10 @@ public class CreateActionRequestHandler
 
         // Determine the type of document we are creating (terminal vs non-terminal).
 
-        if (TOCREATE_TERMINAL.equals(toCreate) || TOCREATE_NONTERMINAL.equals(toCreate)) {
+        if (TOCREATE_TERMINAL_PARAMETER.equals(toCreate) || TOCREATE_NONTERMINAL_PARAMETER.equals(toCreate)) {
             // Look at the request to see what the user wanted to create (terminal or non-terminal).
 
-            isSpace = !TOCREATE_TERMINAL.equals(toCreate);
+            isSpace = !TOCREATE_TERMINAL_PARAMETER.equals(toCreate);
         } else if (templateProvider != null) {
             // A template provider is specified. Use it and extract the type of document.
 
@@ -367,9 +368,9 @@ public class CreateActionRequestHandler
     {
         // Note: The most important details is that the deprecated "space" parameter stores unescaped space
         // names, not references!
-        String spaceParameter = request.getParameter(SPACE);
+        String spaceParameter = request.getParameter(SPACE_PARAMETER);
 
-        isSpace = TOCREATE_SPACE.equals(toCreate);
+        isSpace = TOCREATE_SPACE_PARAMETER.equals(toCreate);
         if (isSpace) {
             // Always creating top level spaces in this mode. Adapt to the new implementation.
             spaceReference = null;
@@ -380,7 +381,7 @@ public class CreateActionRequestHandler
                 spaceReference = new SpaceReference(spaceParameter, document.getDocumentReference().getWikiReference());
             }
 
-            name = request.getParameter(PAGE);
+            name = request.getParameter(PAGE_PARAMETER);
         }
     }
 
@@ -394,7 +395,7 @@ public class CreateActionRequestHandler
         BaseObject result = null;
 
         // set the template, from the template provider param
-        String templateProviderDocReferenceString = request.getParameter(TEMPLATE_PROVIDER);
+        String templateProviderDocReferenceString = request.getParameter(TEMPLATE_PROVIDER_PARAMETER);
 
         if (!StringUtils.isEmpty(templateProviderDocReferenceString)) {
             // parse this document reference
@@ -451,7 +452,7 @@ public class CreateActionRequestHandler
 
                     List<String> creationRestrictions =
                         getTemplateProviderRestrictions(templateObject, TP_CREATION_RESTRICTIONS_PROPERTY);
-                    if (creationRestrictions.size() > 0 && isTemplateProviderAllowedInSpace(templateObject,
+                    if (!creationRestrictions.isEmpty() && isTemplateProviderAllowedInSpace(templateObject,
                         spaceReference, TP_CREATION_RESTRICTIONS_PROPERTY)) {
                         // Consider providers that have creations restrictions matching the current space as
                         // "recommended" and handle them separately.
@@ -484,20 +485,21 @@ public class CreateActionRequestHandler
                             Utils.getComponent(SpaceReferenceResolver.TYPE_STRING);
                         SpaceReference restrictionSpaceReference = spaceResolver.resolve(restriction);
                         // The specificity score.
-                        int specificity = restrictionSpaceReference.getReversedReferenceChain().size();
-                        return specificity;
+                        return restrictionSpaceReference.getReversedReferenceChain().size();
                     }).max()
                     // Or 0 if no restrictions are set or if none match the current space.
                     .orElse(0);
             }).reversed());
 
             this.recommendedTemplateProviders = recommendedTemplates.stream()
-                .map(recommendedTemplate -> new Document(recommendedTemplate, context)).collect(Collectors.toList());
+                .map(recommendedTemplate -> new Document(recommendedTemplate, context))
+                .collect(Collectors.toList());
 
             // Give priority to the providers that that specify creation restrictions
             templates.addAll(0, recommendedTemplateProviders);
         } catch (Exception e) {
-            LOGGER.warn("There was an error getting the available templates for space {0}", spaceReference, e);
+            LOGGER.warn("There was an error getting the available templates for space [{}]. Root error: [{}]",
+                spaceReference, ExceptionUtils.getRootCauseMessage(e));
         }
 
         return templates;
@@ -514,7 +516,7 @@ public class CreateActionRequestHandler
     {
         // Check the allowed spaces list.
         List<String> restrictions = getTemplateProviderRestrictions(templateObject, restrictionsProperty);
-        if (restrictions.size() > 0) {
+        if (!restrictions.isEmpty()) {
             EntityReferenceSerializer<String> localSerializer = getLocalEntityReferenceSerializer();
             String spaceStringReference = localSerializer.serialize(spaceReference);
 
@@ -544,7 +546,7 @@ public class CreateActionRequestHandler
     private boolean hasRequiredRightsForTargetReference(BaseObject templateObject,
         EntityReference documentOrSpaceReference)
     {
-        String templateDocumentReferenceString = templateObject.getStringValue(TEMPLATE);
+        String templateDocumentReferenceString = templateObject.getStringValue(TEMPLATE_PARAMETER);
         if (StringUtils.isBlank(templateDocumentReferenceString)) {
             return true;
         }
@@ -564,7 +566,7 @@ public class CreateActionRequestHandler
     private List<String> getTemplateProviderRestrictions(BaseObject templateObject, String restrictionsProperty)
     {
         List<String> creationRestrictions = templateObject.getListValue(restrictionsProperty);
-        if (creationRestrictions.size() == 0) {
+        if (creationRestrictions.isEmpty()) {
             // Backwards compatibility for template providers created before 8.3M2, where the "spaces" property handled
             // both visibility and creation.
             creationRestrictions = templateObject.getListValue(SPACES_PROPERTY);
@@ -643,7 +645,8 @@ public class CreateActionRequestHandler
      */
     public boolean hasTemplate()
     {
-        return request.getParameter(TEMPLATE_PROVIDER) != null || request.getParameter(TEMPLATE) != null;
+        return request.getParameter(TEMPLATE_PROVIDER_PARAMETER) != null
+            || request.getParameter(TEMPLATE_PARAMETER) != null;
     }
 
     /**
@@ -666,7 +669,7 @@ public class CreateActionRequestHandler
             if (creationRestrictionsEnforced && !isTemplateProviderAllowedInSpace(templateProvider, spaceReference,
                 TP_CREATION_RESTRICTIONS_PROPERTY)) {
                 // put an exception on the context, for create.vm to know to display an error
-                Object[] args = { templateProvider.getStringValue(TEMPLATE), spaceReference, name };
+                Object[] args = { templateProvider.getStringValue(TEMPLATE_PARAMETER), spaceReference, name };
                 XWikiException exception = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
                     "Template {0} cannot be used in space {1} when creating page {2}", null, args);
@@ -689,7 +692,7 @@ public class CreateActionRequestHandler
                 && !hasRequiredRightsForTargetReference(this.templateProvider, documentReference)) {
                 // put an exception on the context, for create.vm to know to display an error.
                 String documentReferenceString = getLocalEntityReferenceSerializer().serialize(documentReference);
-                Object[] args = { templateProvider.getStringValue(TEMPLATE), documentReferenceString };
+                Object[] args = { templateProvider.getStringValue(TEMPLATE_PARAMETER), documentReferenceString };
                 XWikiException exception = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_TEMPLATE_REQUIRED_RIGHTS_MISSING,
                     "Template {0} cannot be used for creating page {1} due to missing rights", null,
@@ -793,7 +796,7 @@ public class CreateActionRequestHandler
 
         // otherwise, check content and objects (only empty newline content allowed and no objects)
         String content = document.getContent();
-        if (!content.equals("\n") && !content.equals("") && !content.equals("\\\\")) {
+        if (!"\n".equals(content) && !"".equals(content) && !"\\\\".equals(content)) {
             return false;
         }
 

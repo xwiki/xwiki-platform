@@ -384,7 +384,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     public List<EntityReference> getReversedReferenceChain()
     {
         if (this.referenceList == null) {
-            LinkedList<EntityReference> referenceDeque = new LinkedList<EntityReference>();
+            LinkedList<EntityReference> referenceDeque = new LinkedList<>();
 
             EntityReference reference = this;
             do {

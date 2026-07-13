@@ -35,6 +35,25 @@ import org.xwiki.rest.model.jaxb.Comments;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history/{version}/comments")
 public interface CommentsVersionResource
 {
+    /**
+     * Returns the comments of a page as they were in a given version of that page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page whose comments are listed, for example {@code WebHome}
+     * @param version the revision of the page to read the comments from, for example {@code 2.1}
+     * @param start the 0-based index of the first comment to return, used together with {@code number} for pagination;
+     *  a negative value is treated as {@code 0} and a value past the last comment yields an empty result; defaults to
+     *  {@code 0}
+     * @param number the maximum number of comments to return; {@code -1} (the default) means no limit, that is all
+     *  comments from {@code start} onwards
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the comment
+     *  author's display name) in addition to the technical references, at some extra cost; defaults to {@code false}
+     * @return the requested window of comments as stored in the given page version
+     * @throws XWikiRestException if the comments cannot be retrieved, for example the page or the requested version
+     *  does not exist or the current user is not allowed to view it
+     */
     @GET Comments getCommentsVersion(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

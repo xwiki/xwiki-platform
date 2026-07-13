@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
@@ -53,6 +54,7 @@ import org.xwiki.index.IndexException;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.IndexingUserConfig;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
@@ -237,33 +239,49 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 }
 
                 try {
-                    switch (queueEntry.operation) {
-                        case READY_MARKER:
-                            queueEntry.readyIndicator.switchToIndexQueue();
-                            DefaultSolrIndexer.this.indexQueue.put(new IndexQueueEntry(queueEntry.readyIndicator));
-                            break;
-                        case INDEX:
-                            Iterable<EntityReference> references = retrieveReferences(queueEntry);
-
-                            for (EntityReference reference : references) {
-                                indexQueue.put(new IndexQueueEntry(reference, queueEntry.operation));
-                            }
-                            break;
-                        default:
-                            if (queueEntry.recurse) {
-                                indexQueue.put(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
-                                    queueEntry.operation));
-                            } else if (queueEntry.reference != null) {
-                                indexQueue.put(new IndexQueueEntry(queueEntry.reference, queueEntry.operation));
-                            }
-                    }
+                    dispatchQueueEntry(queueEntry);
                 } catch (Throwable e) {
                     logger.warn("Failed to apply operation [{}] on root reference [{}]", queueEntry.operation,
                         queueEntry.reference, e);
+                } finally {
+                    // Decrement only for entries submitted via addToQueue(); READY_MARKER entries come from
+                    // waitReady() which does not increment pendingResolveItems.
+                    if (queueEntry.operation != IndexOperation.READY_MARKER) {
+                        DefaultSolrIndexer.this.pendingResolveItems.decrementAndGet();
+                    }
                 }
             }
 
             logger.debug("Stop SOLR resolver thread");
+        }
+
+        private void dispatchQueueEntry(ResolveQueueEntry queueEntry)
+            throws SolrIndexerException, InterruptedException
+        {
+            switch (queueEntry.operation) {
+                case READY_MARKER:
+                    queueEntry.readyIndicator.switchToIndexQueue();
+                    DefaultSolrIndexer.this.indexQueue.put(new IndexQueueEntry(queueEntry.readyIndicator));
+                    break;
+                case INDEX:
+                    Iterable<EntityReference> references = retrieveReferences(queueEntry);
+
+                    for (EntityReference reference : references) {
+                        indexQueue.put(new IndexQueueEntry(
+                            DefaultSolrIndexer.this.entityReferenceFactory.getReference(reference),
+                            queueEntry.operation));
+                    }
+                    break;
+                default:
+                    if (queueEntry.recurse) {
+                        indexQueue.put(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
+                            queueEntry.operation));
+                    } else if (queueEntry.reference != null) {
+                        indexQueue.put(new IndexQueueEntry(
+                            DefaultSolrIndexer.this.entityReferenceFactory.getReference(queueEntry.reference),
+                            queueEntry.operation));
+                    }
+            }
         }
 
         private Iterable<EntityReference> retrieveReferences(ResolveQueueEntry queueEntry) throws SolrIndexerException
@@ -354,6 +372,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Inject
     private Provider<XWikiContext> xWikiContextProvider;
 
+    @Inject
+    private EntityReferenceFactory entityReferenceFactory;
+
     /**
      * The queue of index operation to perform.
      */
@@ -395,6 +416,15 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      * Used to track progress in the resolve queue.
      */
     private final AtomicLong resolveQueueRemovalCounter = new AtomicLong();
+
+    /**
+     * Tracks the number of items currently waiting in or actively being processed by the resolver — i.e. items that
+     * have been submitted via {@link #addToQueue} but whose resolved references have not yet been fully placed into
+     * the index queue. Incrementing before the {@link #resolveQueue} put and decrementing only after all resolved
+     * references have been put into {@link #indexQueue} prevents {@link #getQueueSize()} from transiently returning
+     * zero while the resolver is in the middle of a database look-up.
+     */
+    private final AtomicInteger pendingResolveItems = new AtomicInteger();
 
     /**
      * Indicate of the component has been disposed.
@@ -458,6 +488,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         for (ResolveQueueEntry entry = this.resolveQueue.poll(); entry != null; entry = this.resolveQueue.poll()) {
             if (entry.operation == IndexOperation.READY_MARKER && entry.readyIndicator != null) {
                 entry.readyIndicator.completeExceptionally(new IndexException("Indexing stopped."));
+            } else if (entry.operation != IndexOperation.READY_MARKER) {
+                this.pendingResolveItems.decrementAndGet();
             }
         }
         this.resolveQueue.offer(RESOLVE_QUEUE_ENTRY_STOP);
@@ -746,10 +778,15 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     private void addToQueue(EntityReference reference, boolean recurse, IndexOperation operation)
     {
         if (!this.disposed) {
+            // Increment before the put so that getQueueSize() never transiently returns zero while the resolver is
+            // consuming this entry from resolveQueue but has not yet placed resolved references into indexQueue.
+            this.pendingResolveItems.incrementAndGet();
             // Don't block because the capacity of the resolver queue is not limited.
             try {
-                this.resolveQueue.put(new ResolveQueueEntry(reference, recurse, operation));
+                this.resolveQueue.put(
+                    new ResolveQueueEntry(this.entityReferenceFactory.getReference(reference), recurse, operation));
             } catch (InterruptedException e) {
+                this.pendingResolveItems.decrementAndGet();
                 this.logger.error("Failed to add reference [{}] to Solr indexing queue", reference, e);
             }
         }
@@ -758,7 +795,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Override
     public int getQueueSize()
     {
-        return this.indexQueue.size() + this.resolveQueue.size() + this.batchSize + this.committingBatchSize;
+        return this.indexQueue.size() + this.pendingResolveItems.get() + this.batchSize + this.committingBatchSize;
     }
 
     @Override

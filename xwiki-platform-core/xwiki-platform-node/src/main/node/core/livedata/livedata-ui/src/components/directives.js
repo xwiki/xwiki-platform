@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -20,18 +20,19 @@
 
 export const mousedownmove = {
   mounted(el, bindings) {
-
     // Dispatch mousemove event as mousedownmove event
     // Pass mouseclick event in the detail object of the mouse event
     const dispatchMouseDownMoveEvent = (mouseClickEvent, mouseMoveEvent) => {
-      const mouseDownMoveEvent = new MouseEvent("mousedownmove", mouseMoveEvent);
+      const mouseDownMoveEvent = new MouseEvent(
+        "mousedownmove",
+        mouseMoveEvent,
+      );
       mouseDownMoveEvent.data = mouseClickEvent.data;
       el.dispatchEvent(mouseDownMoveEvent);
     };
 
     // On click, bind event listener
-    el.addEventListener("mousedown", e => {
-
+    el.addEventListener("mousedown", (e) => {
       // Object used to store data on click event
       e.data = { clickEvent: e };
 
@@ -42,7 +43,7 @@ export const mousedownmove = {
       }
 
       // Create a wrapper function to combine both click and move event
-      const mousemoveHandler = mouseMoveEvent => {
+      const mousemoveHandler = (mouseMoveEvent) => {
         dispatchMouseDownMoveEvent(e, mouseMoveEvent);
       };
 

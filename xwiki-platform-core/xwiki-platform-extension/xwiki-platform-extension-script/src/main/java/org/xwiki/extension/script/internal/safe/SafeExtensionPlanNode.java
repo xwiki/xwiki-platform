@@ -65,7 +65,7 @@ public class SafeExtensionPlanNode extends AbstractSafeObject<ExtensionPlanNode>
             if (nodes.isEmpty()) {
                 this.wrappedChildren = Collections.emptyList();
             } else {
-                this.wrappedChildren = new ArrayList<ExtensionPlanNode>(nodes.size());
+                this.wrappedChildren = new ArrayList<>(nodes.size());
                 for (ExtensionPlanNode node : nodes) {
                     this.wrappedChildren.add(new SafeExtensionPlanNode(node, this.safeProvider));
                 }

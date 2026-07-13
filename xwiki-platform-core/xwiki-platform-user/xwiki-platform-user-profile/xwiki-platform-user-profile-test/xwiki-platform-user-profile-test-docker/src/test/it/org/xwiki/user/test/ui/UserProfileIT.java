@@ -32,6 +32,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.user.test.po.ChangeAvatarPage;
 import org.xwiki.user.test.po.GroupsUserProfilePage;
@@ -39,6 +40,7 @@ import org.xwiki.user.test.po.PreferencesEditPage;
 import org.xwiki.user.test.po.PreferencesUserProfilePage;
 import org.xwiki.user.test.po.ProfileEditPage;
 import org.xwiki.user.test.po.ProfileUserProfilePage;
+import org.xwiki.user.test.po.UserProfileAdministrationSectionPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -107,11 +109,16 @@ class UserProfileIT
 
     private static final String DEFAULT_PASSWORD = "testtest";
 
+    private static final String CUSTOM_PROPERTY_NAME = "facebook";
+
+    private static final String CUSTOM_PROPERTY_PRETTY_NAME = "Facebook";
+
+    private static final String CUSTOM_PROPERTY_VALUE = "MyFacebookProfile";
+
     private String userName;
 
     @BeforeEach
-    public void setUp(TestUtils setup, TestReference testReference)
-        throws Exception
+    void setUp(TestUtils setup, TestReference testReference) throws Exception
     {
         this.userName = testReference.getLastSpaceReference().getName();
         setup.loginAsSuperAdmin();
@@ -178,6 +185,9 @@ class UserProfileIT
         File imageFile = new File(testConfiguration.getBrowser().getTestResourcesPath(), IMAGE_NAME);
         changeAvatarImage.setAvatarImage(imageFile.getAbsolutePath());
         changeAvatarImage.submit();
+        // The avatar image is only updated once the profile page is reloaded after the upload. Wait for the new image
+        // before reading it, to avoid a stale element reference while the page is still reloading.
+        userProfilePage.waitUntilAvatarImageName(IMAGE_NAME);
         assertEquals(IMAGE_NAME, userProfilePage.getAvatarImageName());
     }
 
@@ -352,5 +362,42 @@ class UserProfileIT
         ViewPage viewPage = setup.gotoPage(testReference);
         assertFalse(viewPage.exists());
         assertTrue(gotException);
+    }
+
+    /**
+     * A custom field added to the {@code XWiki.XWikiUsers} class and configured in a profile section is displayed
+     * when viewing a user's profile.
+     */
+    @Test
+    @Order(10)
+    void extendUserProfile(TestUtils setup)
+    {
+        // Admin rights are required both to extend the XWikiUsers class and to configure the profile section.
+        setup.loginAsSuperAdmin();
+
+        // Step 1: add a new property to the XWiki.XWikiUsers class through the class editor.
+        ClassEditPage classEditPage = ClassEditPage.gotoPage("XWiki", "XWikiUsers");
+        classEditPage.addProperty(CUSTOM_PROPERTY_NAME, "TextArea").setPrettyName(CUSTOM_PROPERTY_PRETTY_NAME);
+        classEditPage.clickSaveAndView();
+
+        // Step 2: configure the "User Profile" administration section to display the new property in the "Personal"
+        // section (object number 0).
+        UserProfileAdministrationSectionPage adminSection = UserProfileAdministrationSectionPage.gotoPage();
+        adminSection.appendPropertyToSection(0, CUSTOM_PROPERTY_NAME);
+        adminSection.clickSave();
+
+        // Step 3: set a value for the new property on the test user's profile. Log in as the user so that the value is
+        // set on their own profile: this is both the realistic feature scenario and the reliable flow (editing another
+        // user's profile as admin renders a different layout - e.g. the enable/disable buttons - whose edit pencil is
+        // not exercised by any other test).
+        setup.login(this.userName, DEFAULT_PASSWORD);
+        ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        ProfileEditPage profileEditPage = userProfilePage.editProfile();
+        profileEditPage.setUserCustomProperty(CUSTOM_PROPERTY_NAME, CUSTOM_PROPERTY_VALUE);
+        profileEditPage.clickSaveAndView();
+
+        // Step 4 (expected result): the new field is displayed when viewing the user's profile.
+        userProfilePage = new ProfileUserProfilePage(this.userName);
+        assertEquals(CUSTOM_PROPERTY_VALUE, userProfilePage.getUserCustomProperty(CUSTOM_PROPERTY_PRETTY_NAME));
     }
 }

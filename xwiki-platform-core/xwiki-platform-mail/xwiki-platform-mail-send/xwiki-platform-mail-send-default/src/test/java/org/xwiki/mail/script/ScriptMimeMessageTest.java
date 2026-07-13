@@ -42,12 +42,12 @@ import static org.mockito.Mockito.mock;
  * @version $Id$
  * @since 7.1M2
  */
-public class ScriptMimeMessageTest
+class ScriptMimeMessageTest
 {
     private ScriptMimeMessage scriptMessage;
 
     @BeforeEach
-    public void setUp()
+    void setUp()
     {
         Execution execution = mock(Execution.class);
         ComponentManager componentManager = mock(ComponentManager.class);
@@ -56,21 +56,21 @@ public class ScriptMimeMessageTest
     }
 
     @Test
-    public void setSubject() throws Exception
+    void setSubject() throws Exception
     {
         this.scriptMessage.setSubject("lorem ipsum");
         assertEquals("lorem ipsum", this.scriptMessage.getSubject());
     }
 
     @Test
-    public void setFrom() throws Exception
+    void setFrom() throws Exception
     {
         this.scriptMessage.setFrom(InternetAddress.parse("john@doe.com")[0]);
         assertArrayEquals(InternetAddress.parse("john@doe.com"), this.scriptMessage.getFrom());
     }
 
     @Test
-    public void addRecipients() throws Exception
+    void addRecipients() throws Exception
     {
         Address[] address = InternetAddress.parse("john@doe.com,jane@doe.com,jannie@doe.com");
         this.scriptMessage.addRecipients(Message.RecipientType.TO, address);
@@ -78,7 +78,7 @@ public class ScriptMimeMessageTest
     }
 
     @Test
-    public void addRecipient() throws Exception
+    void addRecipient() throws Exception
     {
         this.scriptMessage.addRecipient(Message.RecipientType.TO, InternetAddress.parse("john@doe.com")[0]);
         assertArrayEquals(InternetAddress.parse("john@doe.com"),
@@ -86,7 +86,7 @@ public class ScriptMimeMessageTest
     }
 
     @Test
-    public void addHeader() throws Exception
+    void addHeader() throws Exception
     {
         String testHeader = "test";
 
@@ -96,7 +96,7 @@ public class ScriptMimeMessageTest
     }
     
     @Test
-    public void addBodyPart() throws Exception
+    void addBodyPart() throws Exception
     {
         MimeBodyPart bp = new MimeBodyPart();
         bp.addHeader("randomTestHeader", "randomTestHeader");
@@ -105,7 +105,7 @@ public class ScriptMimeMessageTest
     }
     
     @Test
-    public void addBodyPartUsingMimeTypeMethod() throws Exception
+    void addBodyPartUsingMimeTypeMethod() throws Exception
     {
         MimeBodyPart bp = new MimeBodyPart();
         bp.addHeader("randomTestHeader2", "randomTestHeader2");
@@ -114,7 +114,7 @@ public class ScriptMimeMessageTest
     }
 
     @Test
-    public void addBodyPartUsingMimetypeAndParametersMethod() throws Exception
+    void addBodyPartUsingMimetypeAndParametersMethod() throws Exception
     {
         MimeBodyPart bp = new MimeBodyPart();
         bp.addHeader("randomTestHeader3", "randomTestHeader3");

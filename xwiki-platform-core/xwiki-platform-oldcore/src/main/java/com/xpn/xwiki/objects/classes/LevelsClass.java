@@ -31,6 +31,7 @@ import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -46,6 +47,13 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class LevelsClass extends ListClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Levels";
+
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "levelslist";
@@ -77,7 +85,7 @@ public class LevelsClass extends ListClass
             list = context.getWiki().getRightService().listAllLevels(context);
         } catch (XWikiException e) {
             // TODO add log exception
-            list = new ArrayList<String>();
+            list = new ArrayList<>();
         }
 
         XWikiRequest req = context.getRequest();
@@ -94,7 +102,7 @@ public class LevelsClass extends ListClass
     @Override
     public Map<String, ListItem> getMap(XWikiContext context)
     {
-        return new HashMap<String, ListItem>();
+        return new HashMap<>();
     }
 
     @Override
@@ -105,6 +113,12 @@ public class LevelsClass extends ListClass
         BaseProperty property = new StringProperty();
         property.setName(getName());
         return property;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 
     @Override

@@ -50,4 +50,15 @@ public class Upgrade1610Test extends UpgradeTest
 
         assertEquals("false\ntrue", result.trim());
     }
+
+    @Override
+    protected void setupLogs()
+    {
+        validateConsole.getLogCaptureConfiguration().registerExpected(
+            // We don't ignore anymore property values related to missing xclass fields when reading a XAR file,
+            // so when reading the XAR file of AdminSection we find configureGlobally property which is not present
+            // in DB since when we imported the file back then we were ignoring those values, hence the warning.
+            "Object property [Home » CKEditor » AdminSection] already removed"
+        );
+    }
 }

@@ -33,6 +33,17 @@ import org.xwiki.rest.model.jaxb.Translations;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/translations")
 public interface PageTranslationsResource
 {
+    /**
+     * Returns the list of translations available for a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page whose translations are listed, for example {@code WebHome}
+     * @return the default locale of the page together with the list of locales into which it has been translated
+     * @throws XWikiRestException if the current user is not allowed to view the page or if the translations cannot be
+     *  retrieved
+     */
     @GET Translations getTranslations(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

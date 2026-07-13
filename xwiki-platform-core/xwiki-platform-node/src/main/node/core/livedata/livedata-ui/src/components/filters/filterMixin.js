@@ -1,4 +1,4 @@
-/*
+/**
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -25,7 +25,6 @@
  * It should be included in every custom filter component
  */
 export default {
-
   inject: ["logic"],
 
   props: {
@@ -51,7 +50,10 @@ export default {
     },
     // The operator used, or default one if none specified
     operator() {
-      return this.filterEntry.operator || this.logic.getFilterDefaultOperator(this.propertyId);
+      return (
+        this.filterEntry.operator ||
+        this.logic.getFilterDefaultOperator(this.propertyId)
+      );
     },
     // The property descriptor of `this.propetyId`
     propertyDescriptor() {
@@ -71,14 +73,18 @@ export default {
     // This method should be used to apply filter.
     // Since only the newValue has to be specified it is less error prone.
     /**
-     * @param newValue the new filtering value
-     * @param filterOperator the operator to apply, when undefined the default operator is used
-     * @param skipFetch when true, the filter will be applied on the reactive variables, but will not trigger an
+     * @param newValue - the new filtering value
+     * @param filterOperator - the operator to apply, when undefined the default operator is used
+     * @param skipFetch - when true, the filter will be applied on the reactive variables, but will not trigger an
      * fetch. When undefined, the default value is false. This paramter is important in the case of asynchronous
      * methods where we need to have an instance feedback on the UI (e.g., between the advanced filtering panel and
      * the top filters in the table layout)
      */
-    applyFilter: async function (newValue, filterOperator = undefined, skipFetch = false) {
+    applyFilter: async function (
+      newValue,
+      filterOperator = undefined,
+      skipFetch = false,
+    ) {
       // Once a filter is applied, the filtering state is switched to true.
       // The filtering state is switched to false only once the filtering is finished.
       // The UI must not give visual clues when the fetching is not actually started.
@@ -86,7 +92,12 @@ export default {
         this.$emit("update:isFiltering", true);
       }
       try {
-        this.logic.filter(this.propertyId, this.index, {value: newValue}, {filterOperator, skipFetch});
+        this.logic.filter(
+          this.propertyId,
+          this.index,
+          { value: newValue },
+          { filterOperator, skipFetch },
+        );
       } finally {
         // Whatever the filter promise result, the filtering state is switched to false.
         if (!skipFetch) {
@@ -95,13 +106,13 @@ export default {
       }
     },
 
-    removeFilter: function() {
+    removeFilter: function () {
       this.$emit("update:isFiltering", true);
-      this.logic.removeFilter(this.propertyId, this.index)
-        .finally(() => {
-          // Whatever the removeFilter promise result, the filtering state is switched to false.
-          this.$emit("update:isFiltering", false);
-        });
+      // eslint-disable-next-line promise/catch-or-return
+      this.logic.removeFilter(this.propertyId, this.index).finally(() => {
+        // Whatever the removeFilter promise result, the filtering state is switched to false.
+        this.$emit("update:isFiltering", false);
+      });
     },
 
     // Call applyFilter method, but using a delay
@@ -128,46 +139,55 @@ export default {
         return;
       }
       // We reverse the rules so that the last ones take precedence over the first ones
-      this.rules.slice().reverse().some(rule => {
-        // Transform everything to array
-        if (!(rule.from instanceof Array)) {
-          rule.from = [rule.from];
-        }
-        if (!(rule.to instanceof Array)) {
-          rule.to = [rule.to];
-        }
-        // Try to see if rule matches
-        if (!rule.from.includes(oldOperator)) {
-          return;
-        }
-        if (!rule.to.includes(newOperator)) {
-          return;
-        }
-        // Rule matches the `from` and `to` operator criterias
-        const newValue = rule.getValue({
-          oldValue: this.filterEntry.value,
-          oldOperator,
-          newOperator,
+      this.rules
+        .slice()
+        .reverse()
+        .some((rule) => {
+          // Transform everything to array
+          if (!(rule.from instanceof Array)) {
+            rule.from = [rule.from];
+          }
+          if (!(rule.to instanceof Array)) {
+            rule.to = [rule.to];
+          }
+          // Try to see if rule matches
+          if (!rule.from.includes(oldOperator)) {
+            return;
+          }
+          if (!rule.to.includes(newOperator)) {
+            return;
+          }
+          // Rule matches the `from` and `to` operator criterias
+          const newValue = rule.getValue({
+            oldValue: this.filterEntry.value,
+            oldOperator,
+            newOperator,
+          });
+          this.applyFilter(newValue);
         });
-        this.applyFilter(newValue);
-      });
     },
   },
 
   created() {
     // Whenever the filter operator changes
     // Update the filter value according to the rules defined in the filter widget
-    this.logic.onEventWhere("filter", {
-      type: "modify",
-      oldEntry: { property: this.propertyId, index: this.index },
-    }, e => {
-      if (e.detail.oldEntry.operator === e.detail.newEntry.operator) {
-        return;
-      }
-      // We don't want the other filter widget to call the hanlder the same value
-      e.stopImmediatePropagation();
-      this._operatorChangeHandler(e.detail.oldEntry.operator, e.detail.newEntry.operator);
-    });
+    this.logic.onEventWhere(
+      "filter",
+      {
+        type: "modify",
+        oldEntry: { property: this.propertyId, index: this.index },
+      },
+      (e) => {
+        if (e.detail.oldEntry.operator === e.detail.newEntry.operator) {
+          return;
+        }
+        // We don't want the other filter widget to call the hanlder the same value
+        e.stopImmediatePropagation();
+        this._operatorChangeHandler(
+          e.detail.oldEntry.operator,
+          e.detail.newEntry.operator,
+        );
+      },
+    );
   },
-
 };

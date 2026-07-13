@@ -19,35 +19,35 @@
  */
 package org.xwiki.platform.wiki.creationjob;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * @version $Id$
  */
-public class WikiCreationExceptionTest
+class WikiCreationExceptionTest
 {
     @Test
-    public void equalsAndHashcode() throws Exception
+    void equalsAndHashcode()
     {
         Throwable throwable = new Throwable();
-        
+
         Exception e1 = new WikiCreationException("message", throwable);
         Exception e2 = new WikiCreationException("message", throwable);
         Exception e3 = new WikiCreationException("message", throwable);
         Exception e4 = new WikiCreationException("message2", throwable);
         Exception e5 = new WikiCreationException("message", new Throwable());
         Exception e6 = new Exception();
-        
+
         // Reflective
         assertEquals(e1, e1);
 
-        // Symetric
+        // Symmetric
         assertEquals(e1, e2);
         assertEquals(e2, e1);
-                        
+
         // Transitivity
         assertEquals(e1, e2);
         assertEquals(e1.hashCode(), e2.hashCode());
@@ -55,7 +55,7 @@ public class WikiCreationExceptionTest
         assertEquals(e2.hashCode(), e3.hashCode());
         assertEquals(e1, e3);
         assertEquals(e1.hashCode(), e3.hashCode());
-        
+
         // Other
         assertNotEquals(e4, e1);
         assertNotEquals(e4.hashCode(), e1.hashCode());

@@ -68,7 +68,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class MoveJobTest extends AbstractMoveJobTest
+class MoveJobTest extends AbstractMoveJobTest
 {
     @InjectMockComponents
     private MoveJob moveJob;

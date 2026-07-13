@@ -68,6 +68,7 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named("rendering")
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class RenderingScriptService implements ScriptService
 {
     /**

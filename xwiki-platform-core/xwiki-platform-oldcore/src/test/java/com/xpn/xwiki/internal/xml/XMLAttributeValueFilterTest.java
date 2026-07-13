@@ -19,19 +19,19 @@
  */
 package com.xpn.xwiki.internal.xml;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.xml.XMLUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link XMLAttributeValueFilter}.
  * 
  * @version $Id$
  */
-public class XMLAttributeValueFilterTest
+class XMLAttributeValueFilterTest
 {
     /**
      * The object being tested.
@@ -43,11 +43,11 @@ public class XMLAttributeValueFilterTest
      * {@link XMLUtils#escape(Object)}.
      */
     @Test
-    public void process()
+    void process()
     {
-        List<String> inputs = Arrays.asList("a<b>c\"d'e{f&g");
+        List<String> inputs = List.of("a<b>c\"d'a{f&g");
         for (String input : inputs) {
-            Assert.assertEquals(XMLUtils.escape(input), filter.process(input));
+            assertEquals(XMLUtils.escape(input), this.filter.process(input));
         }
     }
 }

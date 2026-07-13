@@ -21,6 +21,7 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -96,7 +97,10 @@ public final class StoreFileUtils
             if (linkBlob.exists()) {
                 if (followLinks) {
                     // Move the target blob to the link's target blob
-                    String linkContent = IOUtils.toString(linkBlob.getStream(), StandardCharsets.UTF_8).trim();
+                    String linkContent;
+                    try (InputStream stream = linkBlob.getStream()) {
+                        linkContent = IOUtils.toString(stream, StandardCharsets.UTF_8).trim();
+                    }
                     blob = linkBlob.getStore().getBlob(linkBlob.getPath().resolveSibling(linkContent));
                 } else {
                     // Stop at the link blob if we don't follow it

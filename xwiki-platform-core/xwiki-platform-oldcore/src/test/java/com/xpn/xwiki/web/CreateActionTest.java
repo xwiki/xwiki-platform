@@ -32,8 +32,6 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.internal.web.PageTemplateRequiredRightsChecker;
 import org.xwiki.model.EntityType;
@@ -84,8 +82,6 @@ import static org.mockito.Mockito.when;
 class CreateActionTest
 {
     private static final String CSRF_TOKEN_VALUE = "token4234343";
-
-    private static final Logger log = LoggerFactory.getLogger(CreateActionTest.class);
 
     @InjectMockitoOldcore
     MockitoOldcore oldcore;

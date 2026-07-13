@@ -19,9 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,21 +97,6 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
     private static final String CATEGORY_DATASET = "category";
 
     /**
-     * The name of the time series dataset.
-     */
-    private static final String TIME_SERIES_DATASET = "timeseries";
-
-    /**
-     * The name of the pie dataset.
-     */
-    private static final String PIE_DATASET = "pie";
-
-    /**
-     * The default dataset.
-     */
-    private static final String DEFAULT_DATASET = CATEGORY_DATASET;
-
-    /**
      * The range parameter.
      */
     private String range;
@@ -187,7 +170,6 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
         datasetBuilder.setNumberOfRows(endRow - startRow + 1);
 
         if (startColumn > 0) {
-            Set<String> rowKeySet = new HashSet<String>();
             for (int i = startRow; i <= endRow; i++) {
                 TableRowBlock tableRow = (TableRowBlock) tableBlock.getChildren().get(i);
                 String key = cellContentAsString((TableCellBlock) tableRow.getChildren().get(startColumn - 1));

@@ -25,7 +25,6 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
@@ -54,9 +53,6 @@ public class DeleteJob extends AbstractEntityJobWithChecks<DeleteRequest, Entity
 
     @Inject
     private RefactoringConfiguration configuration;
-
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
 
     @Override
     protected DeleteRequest castRequest(Request request)
@@ -136,8 +132,11 @@ public class DeleteJob extends AbstractEntityJobWithChecks<DeleteRequest, Entity
 
     private void maybeDelete(DocumentReference documentReference) throws Exception
     {
-        boolean skipRecycleBin = this.configuration.isRecycleBinSkippingActivated()
-            && this.documentAccessBridge.isAdvancedUser() && getRequest().shouldSkipRecycleBin();
+        // The advanced user setting only controls what is displayed in the UI, it is not a rights check, so it must
+        // not influence whether the recycle bin is skipped. Skipping the recycle bin is driven solely by the wiki
+        // configuration allowing it and the request asking for it.
+        boolean skipRecycleBin =
+            this.configuration.isRecycleBinSkippingActivated() && getRequest().shouldSkipRecycleBin();
         EntitySelection entitySelection = this.getConcernedEntitiesEntitySelection(documentReference);
         if (entitySelection == null) {
             this.logger.info("Skipping [{}] because it does not match any entity selection.", documentReference);

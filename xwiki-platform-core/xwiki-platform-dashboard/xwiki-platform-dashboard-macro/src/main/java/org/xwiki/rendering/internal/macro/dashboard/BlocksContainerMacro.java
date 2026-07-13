@@ -53,7 +53,7 @@ class BlocksContainerMacro extends AbstractContainerMacro<ContainerMacroParamete
     /**
      * The macro block of the gadget macro inside the dashboard, will be used as the content of this box.
      */
-    private List<Block> content = new ArrayList<Block>();
+    private List<Block> content = new ArrayList<>();
 
     /**
      * Default constructor, building a blocks macro with the default name and description.

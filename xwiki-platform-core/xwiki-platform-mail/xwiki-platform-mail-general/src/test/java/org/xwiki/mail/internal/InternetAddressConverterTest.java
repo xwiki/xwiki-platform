@@ -37,13 +37,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @since 12.4RC1
  */
 @ComponentTest
-public class InternetAddressConverterTest
+class InternetAddressConverterTest
 {
     @InjectMockComponents
     private InternetAddressConverter converter;
 
     @Test
-    public void convert() throws Exception
+    void convert() throws Exception
     {
         InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
         assertEquals(address, this.converter.convert(InternetAddress.class, "John Doe(comment) <john1@doe.com>"));

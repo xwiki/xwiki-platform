@@ -56,7 +56,7 @@ public class SOLRSearchSource extends AbstractSearchSource
         boolean hasProgrammingRights, String orderField, String order, boolean distinct, int number, int start,
         Boolean withPrettyNames, String className, UriInfo uriInfo) throws Exception
     {
-        List<SearchResult> result = new ArrayList<SearchResult>();
+        List<SearchResult> result = new ArrayList<>();
 
         if (queryString == null) {
             return result;
@@ -75,7 +75,7 @@ public class SOLRSearchSource extends AbstractSearchSource
         // Show only what the current user has the right to see
         ((SecureQuery) query).checkCurrentUser(true);
 
-        List<String> fq = new ArrayList<String>();
+        List<String> fq = new ArrayList<>();
 
         // We want only documents
         fq.add("{!tag=type}type:(\"DOCUMENT\")");

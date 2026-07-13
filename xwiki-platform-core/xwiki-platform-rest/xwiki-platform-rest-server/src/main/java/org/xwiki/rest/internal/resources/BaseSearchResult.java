@@ -22,6 +22,13 @@ package org.xwiki.rest.internal.resources;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.search.SearchSource;
@@ -42,17 +49,27 @@ public class BaseSearchResult extends XWikiResource
         "q={query}(&type={type})(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))"
             + "(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
 
+    private static final String ALLOWED_QUERY_TYPES_PROPERTY = "rest.allowedQueryTypes";
+
+    private static final List<String> DEFAULT_ALLOWED_QUERY_TYPES = List.of("solr");
+
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource configurationSource;
+
     /**
-     * Search for query using xwql, hql, lucene. Limit the search only to Pages. Search for keyword
-     * 
+     * Search for query using xwql, hql, solr. Limit the search only to Pages. Search for keyword
+     *
      * @param query the query to be executed
-     * @param queryTypeString can be "xwql", "hql" or "lucene".
+     * @param queryTypeString can be "xwql", "hql" or "solr".
      * @param orderField the field to be used to order the results.
      * @param order "asc" or "desc"
      * @param number number of results to be returned
      * @param start 0-based start offset.
-     * @return a list of {@link SearchResult} objects containing the found items, or an empty list if the specified
-     *         query type string doesn't represent a supported query type.
+     * @return a list of {@link SearchResult} objects containing the found items, or an empty list if no query type is
+     *         specified.
+     * @throws WebApplicationException with status 400 if the specified query type is not allowed according to the
+     *         {@code rest.allowedQueryTypes} configuration property
      */
     // Legacy code.
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -71,14 +88,26 @@ public class BaseSearchResult extends XWikiResource
             List<SearchResult> result;
 
             if (queryTypeString != null) {
+                String normalizedQueryType = queryTypeString.toLowerCase();
+                List<String> allowedQueryTypes =
+                    this.configurationSource.getProperty(ALLOWED_QUERY_TYPES_PROPERTY, DEFAULT_ALLOWED_QUERY_TYPES);
+                if (!allowedQueryTypes.contains(normalizedQueryType)) {
+                    throw new WebApplicationException(
+                        Response.status(Status.BAD_REQUEST)
+                            .entity("Query type [%s] is not allowed. Allowed query types are: %s."
+                                .formatted(normalizedQueryType, allowedQueryTypes))
+                            .type("text/plain")
+                            .build());
+                }
+
                 SearchSource searchSource =
-                    this.componentManager.getInstance(SearchSource.class, queryTypeString.toLowerCase());
+                    this.componentManager.getInstance(SearchSource.class, normalizedQueryType);
 
                 result =
                     searchSource.search(query, wikiName, wikis, hasProgrammingRights, orderField, order,
                         distinct, number, start, withPrettyNames, className, uriInfo);
             } else {
-                result = new ArrayList<SearchResult>();
+                result = new ArrayList<>();
             }
 
             return result;
@@ -96,7 +125,7 @@ public class BaseSearchResult extends XWikiResource
      */
     protected List<KeywordSearchScope> parseSearchScopeStrings(List<String> searchScopeStrings)
     {
-        List<KeywordSearchScope> searchScopes = new ArrayList<KeywordSearchScope>();
+        List<KeywordSearchScope> searchScopes = new ArrayList<>();
         for (String searchScopeString : searchScopeStrings) {
             if (searchScopeString != null && !searchScopes.contains(searchScopeString)) {
                 try {

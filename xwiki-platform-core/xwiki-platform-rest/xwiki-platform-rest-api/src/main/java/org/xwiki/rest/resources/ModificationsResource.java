@@ -34,6 +34,28 @@ import org.xwiki.rest.model.jaxb.History;
 @Path("/wikis/{wikiName}/modifications")
 public interface ModificationsResource
 {
+    /**
+     * Returns the modifications (individual document versions) made in a wiki strictly after a given date, ordered by
+     * modification date.
+     *
+     * @param wikiName the identifier of the wiki to look for modifications in, for example {@code xwiki} for the main
+     *  wiki
+     * @param start the 0-based index of the first modification to return, used together with {@code number} for
+     *  pagination; defaults to {@code 0}
+     * @param number the maximum number of modifications to return; defaults to {@code 25}, and a value that is negative
+     *  or larger than the wiki's configured REST query limit is rejected with a {@code 400} response
+     * @param order the sort order on the modification date, either {@code asc} (oldest first) or {@code desc} (most
+     *  recent first); any other value falls back to {@code desc}; defaults to {@code desc}
+     * @param ts only return modifications made strictly after this instant, expressed in milliseconds since the epoch
+     *  (1970-01-01T00:00:00Z), for example {@code 1704067200000}; passed through the query parameter named
+     *  {@code date} and defaulting to {@code 0}, which returns every modification since the epoch
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's
+     *  display name and the document title) in addition to the technical references, at some extra cost; defaults to
+     *  {@code false}
+     * @return the modifications matching the given criteria that the current user is allowed to view, ordered by
+     *  modification date; modifications on documents the user cannot view are silently omitted
+     * @throws XWikiRestException if the modifications cannot be retrieved, for example the underlying query fails
+     */
     @GET History getModifications(
             @PathParam("wikiName") String wikiName,
             @QueryParam("start") @DefaultValue("0") Integer start,

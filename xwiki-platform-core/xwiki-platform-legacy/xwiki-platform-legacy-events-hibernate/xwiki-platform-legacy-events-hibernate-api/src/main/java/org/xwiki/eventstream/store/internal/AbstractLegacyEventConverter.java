@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.EventStatus;
@@ -118,11 +119,12 @@ public abstract class AbstractLegacyEventConverter implements LegacyEventConvert
         result.setId(e.getEventId());
         result.setDocumentTitle(e.getParam1());
         if (StringUtils.isNotEmpty(e.getParam2())) {
-            if (StringUtils.endsWith(e.getType(), "Attachment")) {
+            if (Strings.CS.endsWith(e.getType(), "Attachment")) {
                 result.setRelatedEntity(this.explicitResolver.resolve(e.getParam2(), EntityType.ATTACHMENT,
                     result.getDocument()));
-            } else if (StringUtils.endsWith(e.getType(), "Comment")
-                || StringUtils.endsWith(e.getType(), "Annotation")) {
+            } else if (Strings.CS.endsWith(e.getType(), "Comment")
+                || Strings.CS.endsWith(e.getType(), "Annotation"))
+            {
                 result.setRelatedEntity(this.explicitResolver.resolve(e.getParam2(), EntityType.OBJECT,
                     result.getDocument()));
             }

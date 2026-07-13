@@ -35,6 +35,7 @@ type BtnProps = {
     | "text";
   size?: "small";
   pill?: boolean;
+  disabled?: boolean;
 };
 
 export type { BtnProps };

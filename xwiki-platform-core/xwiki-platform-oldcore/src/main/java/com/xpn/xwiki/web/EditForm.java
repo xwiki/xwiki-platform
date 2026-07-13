@@ -62,8 +62,6 @@ public class EditForm extends XWikiForm
      */
     private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)$");
 
-    private static final String OBJECTS_CLASS_DELIMITER = "_";
-
     // ---- Form fields -------------------------------------------------
     private String content;
 
@@ -149,7 +147,7 @@ public class EditForm extends XWikiForm
         StringBuilder tags = new StringBuilder();
         boolean first = true;
         for (int i = 0; i < parameter.length; ++i) {
-            if (!parameter[i].equals("")) {
+            if (!"".equals(parameter[i])) {
                 if (first) {
                     first = false;
                 } else {
@@ -216,11 +214,12 @@ public class EditForm extends XWikiForm
     {
         @SuppressWarnings("unchecked")
         Map<String, String[]> allParameters = getRequest().getParameterMap();
-        Map<String, String[]> result = new HashMap<String, String[]>();
-        for (String name : allParameters.keySet()) {
+        Map<String, String[]> result = new HashMap<>();
+        for (Map.Entry<String, String[]> entry : allParameters.entrySet()) {
+            String name = entry.getKey();
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);
-                result.put(newname, allParameters.get(name));
+                result.put(newname, entry.getValue());
             }
         }
         return result;

@@ -13,5 +13,4 @@ org.xwiki.export.pdf.internal.job.DocumentMetadataExtractor
 org.xwiki.export.pdf.internal.job.DocumentMetadataScriptContextInitializer
 org.xwiki.export.pdf.internal.job.NavigationTreeDocumentReferenceComparator
 org.xwiki.export.pdf.internal.DefaultPDFExportConfiguration
-org.xwiki.export.pdf.internal.DefaultRequiredSkinExtensionsRecorder
 org.xwiki.export.pdf.internal.PDFExportConfigurationSource

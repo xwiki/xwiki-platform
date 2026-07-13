@@ -39,6 +39,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Constraint;
 import org.xwiki.livedata.LiveDataQuery.Filter;
+import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -65,15 +66,11 @@ public class LiveTableRequestHandler
 
     static final String CONTEXT_DOC = "$doc";
 
-    @SuppressWarnings("serial")
-    private static final Map<String, String> MATCH_TYPE = new HashMap<String, String>()
-    {
-        {
-            put("equals", "exact");
-            put("contains", "partial");
-            put("startsWith", "prefix");
-        }
-    };
+    private static final Map<String, String> MATCH_TYPE = Map.of(
+        "equals", "exact",
+        "contains", "partial",
+        "startsWith", "prefix"
+    );
 
     @Inject
     private Logger logger;
@@ -222,7 +219,7 @@ public class LiveTableRequestHandler
     {
         if (query.getSort() != null && !query.getSort().isEmpty()) {
             List<String> sortList =
-                query.getSort().stream().map(sortEntry -> sortEntry.getProperty()).collect(Collectors.toList());
+                query.getSort().stream().map(SortEntry::getProperty).collect(Collectors.toList());
             requestParams.put("sort", sortList.toArray(new String[sortList.size()]));
             List<String> dirList = query.getSort().stream().map(sortEntry -> sortEntry.isDescending() ? "desc" : "asc")
                 .collect(Collectors.toList());
@@ -240,7 +237,7 @@ public class LiveTableRequestHandler
 
             List<String> matchType = filter.getConstraints().stream()
                 .map(constraint -> constraint == null ? null : constraint.getOperator())
-                .map(operator -> MATCH_TYPE.getOrDefault(operator, StringUtils.defaultString(operator)))
+                .map(operator -> operator == null ? "" : MATCH_TYPE.getOrDefault(operator, operator))
                 .collect(Collectors.toList());
             requestParams.put(filter.getProperty() + "_match", matchType.toArray(new String[matchType.size()]));
 

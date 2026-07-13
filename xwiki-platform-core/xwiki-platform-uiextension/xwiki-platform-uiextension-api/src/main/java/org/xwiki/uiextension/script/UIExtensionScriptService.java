@@ -77,7 +77,7 @@ public class UIExtensionScriptService implements ScriptService
      */
     private String[] parseFilterParameters(String nameList)
     {
-        return nameList.replaceAll(" ", "").split(",");
+        return nameList.replace(" ", "").split(",");
     }
 
     /**

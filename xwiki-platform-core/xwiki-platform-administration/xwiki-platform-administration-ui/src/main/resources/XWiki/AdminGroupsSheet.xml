@@ -39,7 +39,7 @@
   <content>{{velocity output="false"}}
 #macro (createGroupModal)
   &lt;div class="modal" id="createGroupModal" tabindex="-1" role="dialog"
-      aria-labelledby="createGroupModal-label" data-backdrop="static" data-keyboard="false"&gt;
+      aria-labelledby="createGroupModal-label" data-backdrop="static"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;form class="modal-content xform"&gt;
         &lt;div class="modal-header"&gt;
@@ -86,7 +86,7 @@
 
 #macro (editGroupModal)
   &lt;div class="modal" id="editGroupModal" tabindex="-1" role="dialog" aria-labelledby="editGroupModal-label"
-      data-backdrop="static" data-keyboard="false" data-live-data="#groupstable" data-live-data-action="edit"&gt;
+      data-backdrop="static" data-live-data="#groupstable" data-live-data-action="edit"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
       &lt;div class="modal-content"&gt;
         &lt;div class="modal-header"&gt;

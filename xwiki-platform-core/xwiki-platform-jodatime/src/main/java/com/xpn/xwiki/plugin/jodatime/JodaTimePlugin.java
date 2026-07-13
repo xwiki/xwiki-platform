@@ -40,7 +40,8 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * Plugin for manipulating dates from velocity scripts inside xwiki documents. It is based on the <a
  * href="http://joda-time.sourceforge.net/">JodaTime framework</a>, a quality replacement for the Java date and time
  * classes.
- * 
+ *
+ * @version $Id$
  * @see JodaTimePluginApi
  */
 public class JodaTimePlugin extends XWikiDefaultPlugin
@@ -49,6 +50,11 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
      * ISO8601 date time formatter.
      */
     private static final DateTimeFormatter ISO_DATE_FORMATTER = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
+
+    /**
+     * The name of the context key holding the current locale.
+     */
+    private static final String LOCALE = "locale";
 
     /**
      * @param name the plugin name, usually ignored, since plugins have a fixed name
@@ -80,6 +86,7 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @return the current date and time
      * @see org.joda.time.DateTime#DateTime()
      */
     public DateTime getDateTime()
@@ -88,6 +95,14 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @param year the year
+     * @param monthOfYear the month of the year
+     * @param dayOfMonth the day of the month
+     * @param hourOfDay the hour of the day
+     * @param minuteOfHour the minute of the hour
+     * @param secondOfMinute the second of the minute
+     * @param millisOfSecond the millisecond of the second
+     * @return the date and time corresponding to the passed values
      * @see org.joda.time.DateTime#DateTime(int, int, int, int, int, int, int)
      */
     public DateTime getDateTime(int year, int monthOfYear, int dayOfMonth, int hourOfDay, int minuteOfHour,
@@ -97,6 +112,8 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @param instant the number of milliseconds since 1970-01-01T00:00:00Z
+     * @return the date and time corresponding to the passed instant
      * @see org.joda.time.DateTime#DateTime(long)
      */
     public DateTime getDateTime(long instant)
@@ -105,6 +122,7 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @return the current date and time as a mutable instance
      * @see org.joda.time.MutableDateTime#MutableDateTime()
      */
     public MutableDateTime getMutableDateTime()
@@ -113,6 +131,14 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @param year the year
+     * @param monthOfYear the month of the year
+     * @param dayOfMonth the day of the month
+     * @param hourOfDay the hour of the day
+     * @param minuteOfHour the minute of the hour
+     * @param secondOfMinute the second of the minute
+     * @param millisOfSecond the millisecond of the second
+     * @return the mutable date and time corresponding to the passed values
      * @see org.joda.time.MutableDateTime#MutableDateTime(int, int, int, int, int, int, int)
      */
     public MutableDateTime getMutableDateTime(int year, int monthOfYear, int dayOfMonth, int hourOfDay,
@@ -123,6 +149,8 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @param instant the number of milliseconds since 1970-01-01T00:00:00Z
+     * @return the mutable date and time corresponding to the passed instant
      * @see org.joda.time.MutableDateTime#MutableDateTime(long)
      */
     public MutableDateTime getMutableDateTime(long instant)
@@ -131,22 +159,29 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @param pattern the pattern describing the date and time format
+     * @param context the current request context, used to retrieve the locale
+     * @return a formatter for the passed pattern
      * @see org.joda.time.format.DateTimeFormat#forPattern(String)
      */
     public DateTimeFormatter getDateTimeFormatterForPattern(String pattern, XWikiContext context)
     {
-        return DateTimeFormat.forPattern(pattern).withLocale((Locale) context.get("locale"));
+        return DateTimeFormat.forPattern(pattern).withLocale((Locale) context.get(LOCALE));
     }
 
     /**
+     * @param style the style describing the date and time format
+     * @param context the current request context, used to retrieve the locale
+     * @return a formatter for the passed style
      * @see org.joda.time.format.DateTimeFormat#forStyle(String)
      */
     public DateTimeFormatter getDateTimeFormatterForStyle(String style, XWikiContext context)
     {
-        return DateTimeFormat.forStyle(style).withLocale((Locale) context.get("locale"));
+        return DateTimeFormat.forStyle(style).withLocale((Locale) context.get(LOCALE));
     }
 
     /**
+     * @return the timezone of the server
      * @see org.joda.time.DateTimeZone#getDefault()
      */
     public DateTimeZone getServerTimezone()
@@ -155,6 +190,7 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @return the UTC timezone
      * @see org.joda.time.DateTimeZone#UTC
      */
     public DateTimeZone getUTCTimezone()
@@ -163,6 +199,8 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @param locationOrOffset the identifier of the location or offset of the timezone
+     * @return the timezone corresponding to the passed identifier
      * @see org.joda.time.DateTimeZone#forID(String)
      */
     public DateTimeZone getTimezone(String locationOrOffset)
@@ -171,6 +209,8 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @param offsetHours the offset from UTC in hours
+     * @return the timezone corresponding to the passed offset
      * @see org.joda.time.DateTimeZone#forOffsetHours(int)
      */
     public DateTimeZone getTimezone(int offsetHours)
@@ -179,6 +219,9 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @param offsetHours the hours part of the offset from UTC
+     * @param offsetMinutes the minutes part of the offset from UTC
+     * @return the timezone corresponding to the passed offset
      * @see org.joda.time.DateTimeZone#forOffsetHoursMinutes(int, int)
      */
     public DateTimeZone getTimezone(int offsetHours, int offsetMinutes)
@@ -187,6 +230,8 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @param millis the duration in milliseconds
+     * @return the duration corresponding to the passed number of milliseconds
      * @see org.joda.time.Duration#Duration(long)
      */
     public Duration getDuration(long millis)
@@ -195,6 +240,9 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * @param from the start instant of the duration
+     * @param to the end instant of the duration
+     * @return the duration between the two passed instants
      * @see org.joda.time.Duration#Duration(ReadableInstant, ReadableInstant)
      */
     public Duration getDuration(ReadableInstant from, ReadableInstant to)

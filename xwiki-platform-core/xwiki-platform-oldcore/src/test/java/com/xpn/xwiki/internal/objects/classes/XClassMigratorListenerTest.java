@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.objects.classes;
 
 import java.util.Arrays;
 
+import com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -34,7 +35,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener;
 import com.xpn.xwiki.internal.store.PropertyConverter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -57,7 +57,7 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 @ComponentList({ DefaultObservationManager.class, PropertyConverter.class, XClassPropertyEventGeneratorListener.class })
 @ReferenceComponentList
-public class XClassMigratorListenerTest
+class XClassMigratorListenerTest
 {
     @MockComponent
     private QueryManager mockQueryManager;
@@ -73,7 +73,7 @@ public class XClassMigratorListenerTest
     private XWikiDocument xclassDocument;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.xclassDocument = new XWikiDocument(new DocumentReference("wiki", "Space", "Class"));
         this.xclassDocument.setSyntax(Syntax.PLAIN_1_0);
@@ -105,17 +105,21 @@ public class XClassMigratorListenerTest
     // Tests
 
     @Test
-    public void migrateProperty() throws Exception
+    void migrateProperty() throws Exception
     {
         this.xclassDocument.getXClass().addTextField("property", "property", 30);
+        this.xclassDocument.getXClass().addNumberField("property2", "property2", 30, "integer");
         saveXClassDocument();
 
         this.xobjectDocument.setStringValue(this.xclassDocument.getDocumentReference(), "property", "42");
+        this.xobjectDocument.setIntValue(this.xclassDocument.getDocumentReference(), "property2", 1337);
         this.oldcore.getSpyXWiki().saveDocument(this.xobjectDocument, this.oldcore.getXWikiContext());
 
         // Modify the class
         this.xclassDocument.getXClass().removeField("property");
         this.xclassDocument.getXClass().addNumberField("property", "property", 30, "integer");
+        this.xclassDocument.getXClass().removeField("property2");
+        this.xclassDocument.getXClass().addTextField("property2", "property2", 30);
         saveXClassDocument();
 
         // Verify the document has been modified
@@ -125,10 +129,13 @@ public class XClassMigratorListenerTest
         assertEquals(42,
             ((BaseProperty) this.xobjectDocument.getXObject(this.xclassDocument.getDocumentReference()).get("property"))
                 .getValue());
+        assertEquals("1337",
+            ((BaseProperty) this.xobjectDocument.getXObject(this.xclassDocument.getDocumentReference()).get("property2"))
+                    .getValue());
     }
 
     @Test
-    public void addNewProperty() throws Exception
+    void addNewProperty() throws Exception
     {
         this.oldcore.getSpyXWiki().saveDocument(this.xobjectDocument, this.oldcore.getXWikiContext());
 

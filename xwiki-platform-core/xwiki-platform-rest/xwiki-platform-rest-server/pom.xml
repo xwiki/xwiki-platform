@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>18.2.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - REST - Server</name>
   <description>Service for accessing XWiki through a RESTful API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.33</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.36</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -42,6 +42,11 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+    </dependency>
+    <!-- Used to parse multipart/form-data uploads (e.g. XAR import) in a JAX-RS-implementation-independent way. -->
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -106,6 +111,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Needed to check whether the recycle bin can be skipped when deleting a page. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Needed for the nested page hierarchy. -->
@@ -210,7 +221,6 @@
                 org/xwiki/rest/internal/RangeIterable.java,
                 org/xwiki/rest/internal/Utils.java,
                 org/xwiki/rest/internal/XWikiAuthentication.java,
-                org/xwiki/rest/internal/resources/BaseAttachmentsResource.java,
                 org/xwiki/rest/internal/resources/BrowserAuthenticationResource.java,
                 org/xwiki/rest/internal/resources/pages/PagesResourceImpl.java,
                 org/xwiki/rest/internal/resources/search/AbstractDatabaseSearchSource.java,

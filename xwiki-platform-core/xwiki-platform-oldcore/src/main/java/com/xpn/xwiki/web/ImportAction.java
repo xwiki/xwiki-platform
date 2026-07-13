@@ -85,6 +85,10 @@ public class ImportAction extends XWikiAction
             if ("getPackageInfos".equals(action)) {
                 getPackageInfos(doc.getAttachment(name), response, context);
             } else if ("import".equals(action)) {
+                // CSRF prevention
+                if (!csrfTokenCheck(context)) {
+                    return null;
+                }
                 result = importPackage(doc.getAttachment(name), request, context);
             }
         } catch (Exception e) {

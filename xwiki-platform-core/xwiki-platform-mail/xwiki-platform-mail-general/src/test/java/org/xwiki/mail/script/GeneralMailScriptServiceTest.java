@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
  * @since 12.4RC1
  */
 @ComponentTest
-public class GeneralMailScriptServiceTest
+class GeneralMailScriptServiceTest
 {
     @InjectMockComponents
     private GeneralMailScriptService scriptService;

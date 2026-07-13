@@ -18,10 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import {XWikiLivedata} from "@xwiki/platform-livedata-ui";
-import {XWikiLiveDataSource, buildTranslations} from "@xwiki/platform-livedata-xwiki"
+import {XWikiLiveDataSource, initTranslationsBuilder} from "@xwiki/platform-livedata-xwiki"
 import {createApp} from "vue";
 import Vue3TouchEvents from "vue3-touch-events";
-import {createI18n} from "vue-i18n";
+import { createI18n } from "vue-i18n";
+// TODO: replace with client-side component resolution when XWIKI-24047 is done.
+// @ts-expect-error xwiki-platform-localization does not export types
+import { resolver } from "xwiki-platform-localization-webjar";
+
 
 /**
  * The init function of the logic script
@@ -37,11 +41,24 @@ function init(element, $) {
 
   const data = element.dataset.config
   element.removeAttribute("data-config")
-  const contentTrusted = element.getAttribute("data-config-content-trusted") === "true";
+  let contentTrusted = false;
+  try {
+    const scriptEl = element.querySelector(':scope > script[type="application/json"]');
+    if(!scriptEl) {
+      console.error("Missing live data configuration for element", element, "The HTML content is" +
+        " considered unsafe.");
+    }
+    contentTrusted = scriptEl?.getAttribute('data-config-content-trusted') === 'true';
+  } catch (e) {
+    console.error("Failed to access the live data configuration for element", element, "The HTML content is" +
+      " considered unsafe.", e);
+  }
 
   // Vue.js replaces the container - prevent this by creating a placeholder for Vue.js to replace.
   const placeholderElement = document.createElement("div");
   element.appendChild(placeholderElement);
+
+  const buildTranslations = initTranslationsBuilder(resolver);
 
   createApp(XWikiLivedata, {
     data,

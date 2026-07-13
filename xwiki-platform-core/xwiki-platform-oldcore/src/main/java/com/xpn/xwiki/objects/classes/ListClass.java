@@ -139,7 +139,7 @@ public abstract class ListClass extends PropertyClass
     public String getSeparators()
     {
         String separators = getStringValue("separators");
-        if (separators == null || separators.equals("")) {
+        if (separators == null || separators.isEmpty()) {
             separators = "|,";
         }
         return separators;
@@ -629,7 +629,7 @@ public abstract class ListClass extends PropertyClass
 
         // If Multiselect and multiple results
         for (String item : strings) {
-            if (!item.trim().equals("")) {
+            if (!item.trim().isEmpty()) {
                 list.add(item);
             }
         }
@@ -817,6 +817,10 @@ public abstract class ListClass extends PropertyClass
             input.setName(prefix + name);
             input.setID(prefix + name);
             input.setDisabled(isDisabled());
+            // This is a text alternative fallback to explain what the input is about. If the input has already been
+            // labelled in another way, this fallback will be ignored by Assistive Techs.
+            input.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+                getTranslatedPrettyName(context)));
             buffer.append(input.toString());
         } else if (getDisplayType().equals(DISPLAYTYPE_RADIO) || getDisplayType().equals(DISPLAYTYPE_CHECKBOX)) {
             displayRadioEdit(buffer, name, prefix, object, context);
@@ -922,6 +926,10 @@ public abstract class ListClass extends PropertyClass
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
+        // This is a text alternative fallback to explain what the select is about. If the select has already been
+        // labelled in another way, this fallback will be ignored by Assistive Techs.
+        select.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+            getTranslatedPrettyName(context)));
 
         List<String> list = getList(context);
         Map<String, ListItem> map = getMap(context);
@@ -1055,14 +1063,13 @@ public abstract class ListClass extends PropertyClass
         XWikiContext context, MergeResult mergeResult)
     {
         // If it's not a multiselect then we don't have any special merge to do. We keep default StringProperty behavior
-        if (isMultiSelect()) {
-            // If not a free input assume it's not an ordered list
-            if (!DISPLAYTYPE_INPUT.equals(getDisplayType()) && currentProperty instanceof ListProperty) {
-                mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, context,
-                    mergeResult);
+        // If not a free input assume it's not an ordered list
+        if (isMultiSelect() && !DISPLAYTYPE_INPUT.equals(getDisplayType())
+            && currentProperty instanceof ListProperty) {
+            mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, context,
+                mergeResult);
 
-                return;
-            }
+            return;
         }
 
         // Fallback on default ListProperty merging
@@ -1090,11 +1097,9 @@ public abstract class ListClass extends PropertyClass
         // Add missing elements
         if (newList != null) {
             for (String element : newList) {
-                if ((previousList == null || !previousList.contains(element))) {
-                    if (!currentList.contains(element)) {
-                        currentList.add(element);
-                        mergeResult.setModified(true);
-                    }
+                if ((previousList == null || !previousList.contains(element)) && !currentList.contains(element)) {
+                    currentList.add(element);
+                    mergeResult.setModified(true);
                 }
             }
         }

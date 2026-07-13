@@ -25,7 +25,6 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.test.ui.po.ViewPage;
 
 /**
  * Represents the actions available when editing the application class. This is also the second step of the App Within
@@ -132,26 +131,6 @@ public class ApplicationClassEditPage extends ApplicationEditPage
         });
 
         return new ClassFieldEditPane(addedField.getAttribute("id").substring("field-".length()));
-    }
-
-    /**
-     * Adds a field of the given type, saves the class and opens the class template for editing.
-     *
-     * @param fieldType the type of field to add, as displayed on the field palette
-     * @return the entry edit page for the class template
-     * @since 18.6.0RC1
-     */
-    public EntryEditPage addFieldAndEditTemplate(String fieldType)
-    {
-        addField(fieldType);
-        clickSaveAndView();
-
-        // Locate the link by its href instead of its (translated) text: XWiki.ClassSheet names the template
-        // document "<ClassName>Template" (the template provider is "<ClassName>TemplateProvider", excluded below).
-        getDriver().findElement(By.cssSelector("#xwikicontent a[href*='Template']:not([href*='TemplateProvider'])"))
-            .click();
-        new ViewPage().edit();
-        return new EntryEditPage();
     }
 
     /**

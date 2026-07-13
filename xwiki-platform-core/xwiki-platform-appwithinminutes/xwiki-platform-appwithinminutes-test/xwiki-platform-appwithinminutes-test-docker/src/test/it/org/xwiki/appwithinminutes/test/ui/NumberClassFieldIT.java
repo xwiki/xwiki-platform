@@ -27,6 +27,7 @@ import org.xwiki.appwithinminutes.test.po.EntryEditPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.xclass.test.po.ClassSheetPage;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.goToEditor;
@@ -66,7 +67,10 @@ class NumberClassFieldIT
     void browserRejectsInvalidInput(TestUtils setup, TestReference testReference)
     {
         ApplicationClassEditPage editor = goToEditor(testReference.getLastSpaceReference());
-        EntryEditPage entryEditPage = editor.addFieldAndEditTemplate("Number");
+        editor.addField("Number");
+        editor.clickSaveAndView();
+        new ClassSheetPage().clickTemplateLink().edit();
+        EntryEditPage entryEditPage = new EntryEditPage();
 
         entryEditPage.setValue(FIELD_NAME, "aaa");
 
@@ -85,7 +89,10 @@ class NumberClassFieldIT
     void saveAndContinueShowsFriendlyError(TestReference testReference)
     {
         ApplicationClassEditPage editor = goToEditor(testReference.getLastSpaceReference());
-        EntryEditPage entryEditPage = editor.addFieldAndEditTemplate("Number");
+        editor.addField("Number");
+        editor.clickSaveAndView();
+        new ClassSheetPage().clickTemplateLink().edit();
+        EntryEditPage entryEditPage = new EntryEditPage();
         entryEditPage.setValue(FIELD_NAME, "42");
         entryEditPage.clickSaveAndContinue();
 

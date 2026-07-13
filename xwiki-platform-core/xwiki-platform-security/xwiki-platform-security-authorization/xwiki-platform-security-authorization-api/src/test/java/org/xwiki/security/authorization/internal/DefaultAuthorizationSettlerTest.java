@@ -630,8 +630,6 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
                 getMockedSecurityRuleEntries("denyAccessDAF", docRef,
                     Arrays.asList(Arrays.asList(denyImpliedDAF)))));
 
-        SecurityRule allowAllTestRightsUserAndAnotherGroup = getMockedSecurityRule("allowAllTestRightsUserAndAnotherGroup",
-            Arrays.asList(userRef), Arrays.asList(anotherGroupRef), allTestRights, ALLOW);
         SecurityRule denyAllTestRightsUserAndAnotherGroup = getMockedSecurityRule("denyAllTestRightsUserAndAnotherGroup",
             Arrays.asList(userRef), Arrays.asList(anotherGroupRef), allTestRights, DENY);
         SecurityRule denyAllTestRightsAnotherUserAndGroup = getMockedSecurityRule("denyAllTestRightsAnotherUserAndGroup",

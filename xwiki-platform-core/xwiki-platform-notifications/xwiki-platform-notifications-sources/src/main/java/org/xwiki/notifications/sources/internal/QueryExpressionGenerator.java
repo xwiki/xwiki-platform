@@ -318,7 +318,6 @@ public class QueryExpressionGenerator
             return excludeHiddenEvents(topNode);
         }
 
-        final DocumentReference userClass = new DocumentReference(USER_CLASS, parameters.user.getWikiReference());
         // Don't show hidden events unless the user want to display hidden pages
         boolean displayHiddenDocuments = this.userPropertiesResolver
             .resolve(this.userReferenceResolver.resolve(parameters.user)).displayHiddenDocuments();

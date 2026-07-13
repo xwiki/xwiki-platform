@@ -122,8 +122,6 @@ class ComponentDocumentTranslationBundleTest
 
     private XWikiDocument translationFrDocument;
 
-    private DocumentReference adminUserReference;
-
     /**
      * Capture logs.
      */

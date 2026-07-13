@@ -793,7 +793,6 @@ class DefaultModelBridgeTest
     @Test
     void canRestoreDeletedDocument() throws Exception
     {
-        long deletedDocumentId = 42;
         String deletedDocumentFullName = "Space.DeletedDocument";
 
         DocumentReference userReferenceToCheck = new DocumentReference("wiki", "Space", "User");

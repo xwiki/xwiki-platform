@@ -62,8 +62,6 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
     private static final String SUBMIT_BUTTONS = StringUtils.join(Arrays.asList("button[type='submit']",
         "button:not([type])", "input[type='submit']", "input[type='image'][alt]:not([alt=''])"), ", ");
 
-    private static final String DOCTYPE_ATT_NAME = "name";
-
     /**
      * Message resources.
      */

@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link NumberClass} class.
- *
+ * 
  * @version $Id$
  */
 @OldcoreTest

@@ -39,8 +39,10 @@ public class ImagePopover extends BaseElement
      */
     public Lightbox openLightbox()
     {
-        // We need to wait for the element to appear as the popover is displayed only after a delay.
-        getDriver().findElement(By.cssSelector(".popover .openLightbox")).click();
+        // Locate without scrolling: the popover is already visible (placed at the cursor over an in-viewport image),
+        // so scrolling is unnecessary, and the scroll would move the image out from under the stationary pointer,
+        // firing a mouseleave that arms the popover's auto-hide timer and racing the click into a stale element.
+        getDriver().findElementWithoutScrolling(By.cssSelector(".popover .openLightbox")).click();
 
         return new Lightbox();
     }
@@ -52,18 +54,18 @@ public class ImagePopover extends BaseElement
 
     public WebElement getCopyImageIdButton()
     {
-        return getDriver().findElement(By.cssSelector(".popover .copyImageId"));
+        return getDriver().findElementWithoutScrolling(By.cssSelector(".popover .copyImageId"));
     }
 
     public WebElement getDownloadButton()
     {
         By downloadSelector = By.cssSelector(".popover .imageDownload");
-        return getDriver().findElement(downloadSelector);
+        return getDriver().findElementWithoutScrolling(downloadSelector);
     }
 
     public WebElement getImagePermalinkButton()
     {
-        return getDriver().findElement(By.cssSelector(".popover .permalink"));
+        return getDriver().findElementWithoutScrolling(By.cssSelector(".popover .permalink"));
     }
 
     /**

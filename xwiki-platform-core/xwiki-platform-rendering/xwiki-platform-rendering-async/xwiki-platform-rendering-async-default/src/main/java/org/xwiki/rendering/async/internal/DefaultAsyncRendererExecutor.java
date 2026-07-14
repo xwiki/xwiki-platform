@@ -234,8 +234,8 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             // If async is disabled run the renderer in the current thread
             if (renderer.isCacheAllowed()) {
                 // Prepare to catch stuff to invalidate the cache
-                if (this.asyncContext instanceof DefaultAsyncContext) {
-                    ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+                if (this.asyncContext instanceof DefaultAsyncContext defaultAsyncContext) {
+                    defaultAsyncContext.pushContextUse();
                 }
 
                 // Mark the context document as used if it was explicitly set in the context, unless the context 
@@ -253,8 +253,8 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
                 AsyncRendererResult result = syncRender(renderer, true, configuration);
 
                 // Get suff to invalidate the cache
-                if (this.asyncContext instanceof DefaultAsyncContext) {
-                    ContextUse contextUse = ((DefaultAsyncContext) this.asyncContext).popContextUse();
+                if (this.asyncContext instanceof DefaultAsyncContext defaultAsyncContext) {
+                    ContextUse contextUse = defaultAsyncContext.popContextUse();
 
                     // Create a pseudo job status
                     status = new AsyncRendererJobStatus(request, result, contextUse.getReferences(),

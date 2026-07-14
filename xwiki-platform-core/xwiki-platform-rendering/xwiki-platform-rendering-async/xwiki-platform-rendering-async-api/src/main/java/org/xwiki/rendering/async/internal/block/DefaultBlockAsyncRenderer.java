@@ -124,8 +124,8 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
             if (xdom == null) {
                 Block rootBlock = block.getRoot();
 
-                if (rootBlock instanceof XDOM) {
-                    xdom = (XDOM) rootBlock;
+                if (rootBlock instanceof XDOM xdomBlock) {
+                    xdom = xdomBlock;
                 } else {
                     xdom = new XDOM(Collections.singletonList(rootBlock));
                 }
@@ -154,8 +154,8 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
         transform(block, transformationContext);
 
         // The result is often inserted in a bigger content so we remove the XDOM around it
-        if (block instanceof XDOM) {
-            return new MetaDataBlock(block.getChildren(), ((XDOM) block).getMetaData());
+        if (block instanceof XDOM xdomBlock) {
+            return new MetaDataBlock(block.getChildren(), xdomBlock.getMetaData());
         }
 
         return block;

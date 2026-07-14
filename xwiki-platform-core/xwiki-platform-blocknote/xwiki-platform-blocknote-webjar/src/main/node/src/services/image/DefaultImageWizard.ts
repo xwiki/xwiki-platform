@@ -18,7 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { Container, inject, injectable } from "inversify";
-import type { ImageWizard, ImageWizardCallback } from "./ImageWizard";
+import type {
+  ImageWithReference,
+  ImageWizard,
+  ImageWizardCallback,
+} from "./ImageWizard";
 import type {
   ResourceReference,
   ResourceReferenceParser,
@@ -113,16 +117,13 @@ export class DefaultImageWizard implements ImageWizard {
     this.showWizard(callback);
   }
 
-  public edit(
-    image: BlockOfType<"image">["props"],
-    callback: ImageWizardCallback,
-  ): void {
+  public edit(image: ImageWithReference, callback: ImageWizardCallback): void {
     this.showWizard(callback, image);
   }
 
   private showWizard(
     callback: ImageWizardCallback,
-    image?: BlockOfType<"image">["props"],
+    image?: ImageWithReference,
   ): void {
     requirejs(["xwiki-wysiwyg-image-wizard"], (imageWizard) => {
       (imageWizard as XWikiWYSIWYGImageWizard)({
@@ -134,8 +135,9 @@ export class DefaultImageWizard implements ImageWizard {
         isInsert: !image,
         upload: this.upload.bind(this),
       })
-        .then(this.getImageProperties.bind(this))
-        .then(callback.submit)
+        .then((imageData) =>
+          callback.submit(this.getImageProperties(imageData, image?.reference)),
+        )
         .catch(callback.cancel);
     });
   }
@@ -168,13 +170,12 @@ export class DefaultImageWizard implements ImageWizard {
    * @param image - image properties supported by BlockNote
    * @returns image data expected by the Image Wizard
    */
-  private getImageData(
-    image: BlockOfType<"image">["props"],
-  ): Partial<ImageData> {
+  private getImageData(image: ImageWithReference): Partial<ImageData> {
     return {
       alignment: editAlignment[image.textAlignment],
       hasCaption: !!image.caption,
-      resourceReference: this.getImageResourceReference(image),
+      resourceReference:
+        image.reference ?? this.getImageResourceReference(image),
       src: image.url,
       width: image.previewWidth === undefined ? "" : `${image.previewWidth}px`,
     };
@@ -194,12 +195,26 @@ export class DefaultImageWizard implements ImageWizard {
    */
   private getImageProperties(
     imageData: ImageData,
-  ): Partial<BlockOfType<"image">["props"]> {
+    oldReference?: ResourceReference,
+  ): Partial<ImageWithReference> {
+    const newReference = imageData.resourceReference;
     return {
       previewWidth: Number.parseInt(imageData.width),
       textAlignment: saveAlignment[imageData.alignment],
-      url: `${imageData.resourceReference.type}:${imageData.resourceReference.reference}`,
+      url: imageData.src,
+      // Preserve the old reference (with its parameters) when the image itself doesn't change, otherwise report
+      // the new reference so that the edited image points to the newly selected resource.
+      reference: this.isSameResourceReference(oldReference, newReference)
+        ? oldReference
+        : newReference,
     };
+  }
+
+  private isSameResourceReference(
+    alice?: ResourceReference,
+    bob?: ResourceReference,
+  ): boolean {
+    return alice?.type === bob?.type && alice?.reference === bob?.reference;
   }
 
   /**

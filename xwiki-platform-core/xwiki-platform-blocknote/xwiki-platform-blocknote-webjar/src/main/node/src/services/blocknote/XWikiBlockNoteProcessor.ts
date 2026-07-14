@@ -43,6 +43,9 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     // the saved source syntax with a lot of unnecessary styles.
     textAlignment: "left",
 
+    // Image
+    caption: "",
+
     // Table cells
     colspan: 1,
     rowspan: 1,
@@ -85,7 +88,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
         node.props !== null &&
         typeof node.props === "object"
       ) {
-        this.storeBlockXWikiParameters(node, blockNoteDocument);
+        this.backupBlockMetadata(node, blockNoteDocument);
       } else if (
         node.type === "text" &&
         "styles" in node &&
@@ -113,31 +116,36 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   }
 
   /**
-   * Extracts `xwikiParameters` from a block's props, assigns the block a stable UUID (so BlockNote preserves it),
-   * and stores the parameters in the metadata for re-injection during save.
+   * Backup known block metada (like `xwikiParameters`) from a block's props so that it doesn't get lost during edit.
+   * The metadata is mapped to the block id, which is generated if missing (BlockNote preserves the generated id). The
+   * metadata is restored on save.
    *
-   * Modifying propSchema of standard BlockNote blocks to carry `xwikiParameters` is not possible: the render and
+   * Modifying propSchema of standard BlockNote blocks to carry the metadata is not possible: the render and
    * toExternalHTML closures inside each block's implementation capture the original propSchema at construction time,
-   * so they would receive `xwikiParameters` in block.props but not find it in their captured propSchema, causing a
+   * so they would receive the metadata in block.props but not find it in their captured propSchema, causing a
    * TypeError in wrapInBlockStructure. The ID-injection side-channel avoids that entirely.
    *
    * @param block - the raw block node (mutable)
-   * @param blockNoteDocument - the BlockNote document to store the parameters in
+   * @param blockNoteDocument - the BlockNote document where to backup the metadata
    */
-  private storeBlockXWikiParameters(
+  private backupBlockMetadata(
     block: Record<string, unknown>,
     blockNoteDocument: BlockNoteDocument,
   ): void {
     const props = block.props as Record<string, unknown>;
-    if (
-      props.xwikiParameters !== null &&
-      typeof props.xwikiParameters === "object"
-    ) {
-      block.id = block.id ?? uuidv4();
-      blockNoteDocument.getMetadata(block.id as string, true)!.parameters =
-        props.xwikiParameters;
-      delete props.xwikiParameters;
-    }
+    const knownMetadata = [
+      "xwikiParameters",
+      "xwikiReference",
+      "xwikiFreestanding",
+    ];
+    knownMetadata
+      .filter((key) => key in props)
+      .forEach((key) => {
+        block.id = block.id ?? uuidv4();
+        blockNoteDocument.getMetadata(block.id as string, true)![key] =
+          props[key];
+        delete props[key];
+      });
   }
 
   /**
@@ -177,7 +185,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
         typeof node.props === "object"
       ) {
         this.removeDefaults(node.props);
-        this.restoreBlockXWikiParameters(node, blockNoteDocument);
+        this.restoreBlockMetadata(node, blockNoteDocument);
       } else if (
         node.type === "text" &&
         "styles" in node &&
@@ -217,21 +225,21 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   }
 
   /**
-   * Re-injects the `xwikiParameters` object that was extracted during load, identified by the block's stable ID.
+   * Re-injects the block metadata (like `xwikiParameters`) that was extracted during load and mapped to the block ID.
    *
    * @param block - the raw block node
-   * @param blockNoteDocument - the BlockNote document to retrieve the parameters from
+   * @param blockNoteDocument - the BlockNote document to retrieve the metadata from
    */
-  private restoreBlockXWikiParameters(
+  private restoreBlockMetadata(
     block: Record<string, unknown>,
     blockNoteDocument: BlockNoteDocument,
   ): void {
     if (typeof block.id === "string") {
       const metadata = blockNoteDocument.getMetadata(block.id);
-      if (metadata?.parameters) {
-        const props = block.props as Record<string, unknown>;
-        props.xwikiParameters = metadata.parameters;
-      }
+      const props = block.props as Record<string, unknown>;
+      Object.entries(metadata ?? {}).forEach(([key, value]) => {
+        props[key] = value;
+      });
     }
   }
 

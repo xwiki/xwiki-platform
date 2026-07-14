@@ -97,6 +97,7 @@ import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcesso
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { XWikiMeta } from "../services/meta/XWikiMeta";
+import type { ResourceReference } from "../services/model/reference/ResourceReferenceParser";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -105,10 +106,9 @@ import type {
 } from "@xwiki/platform-collaboration-api";
 import type {
   BlockNoteViewWrapperProps,
-  BlockOfType,
   BlockType,
   EditorLanguage,
-  ImageUpdateResult,
+  ImageEditionOverrideFn,
   InlineMacroInvocation,
   MacroBlockInvocation,
   MacroInsertionEditorPrefillData,
@@ -211,16 +211,26 @@ if (docRef && docRef.locale === undefined) {
   docRef.locale = actualLocale;
 }
 
-const imageEdition = (
-  image: BlockOfType<"image">["props"],
-  update: (updateResult: ImageUpdateResult) => void,
-) => {
+const imageEdition: ImageEditionOverrideFn = (block, update) => {
   const imageWizard: ImageWizard = container.get("ImageWizard");
-  imageWizard.edit(image, {
-    submit: (updatedProps: Partial<BlockOfType<"image">["props"]>) =>
-      update({ type: "update", updatedProps }),
-    cancel: () => update({ type: "aborted" }),
-  });
+  // The XWiki resource reference is kept as block metadata (outside the BlockNote schema), so we pass it to the image
+  // wizard and update it on submit, because the user may have selected a different image.
+  const reference = blockNoteDocument?.getMetadata(block.id)?.xwikiReference as
+    | ResourceReference
+    | undefined;
+  imageWizard.edit(
+    { ...block.props, reference },
+    {
+      submit: ({ reference: newReference, ...updatedProps }) => {
+        if (newReference) {
+          blockNoteDocument!.getMetadata(block.id, true)!.xwikiReference =
+            newReference;
+        }
+        update({ type: "update", updatedProps });
+      },
+      cancel: () => update({ type: "aborted" }),
+    },
+  );
 };
 
 const syntaxes = container.getAll<SyntaxConfig>(

@@ -194,6 +194,8 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=Velciet kolonnas, lai ma
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Dzēst
 platform.appwithinminutes.liveTableEditorAddColumnHint=Pievienot
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Dažas kolonnas ir novecojušas, iespējams tāpēc, ka attiecīgie klases lauki ir izdzēsti. Vai vēlaties izdzēst šīs kolonnas?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Dzēst novecojušās kolonnas
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Paturēt tās
 platform.appwithinminutes.liveTableEditorIcon=Ikona
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Saite uz ikonu. Jūs varat norādīt jebkuru attēlu no ikonu izvēles zem šī lauka (kad tas ir aktivizēts), vai arī norādīt saiti uz jebkuru citu viki attēlu.
 

@@ -192,6 +192,8 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=Glissez-Déposez pour mo
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Supprimer
 platform.appwithinminutes.liveTableEditorAddColumnHint=Ajouter la colonne sélectionnée
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Certaines colonnes sont obsolètes, probablement parce que les champs correspondant ont été supprimés. Souhaitez-vous les effacer ?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Supprimer les colonnes obsolètes
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Les conserver
 platform.appwithinminutes.liveTableEditorIcon=Icône
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Une référence à une icône. Cele peut être n'importe quelle image dans le wiki mais également une icône affichée dans le sélecteur d'icônes lorsque celui-ci est actif.
 

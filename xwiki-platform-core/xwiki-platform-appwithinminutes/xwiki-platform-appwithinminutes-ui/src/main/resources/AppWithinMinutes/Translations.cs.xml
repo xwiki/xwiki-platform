@@ -194,6 +194,8 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=Přetáhněte myší pro
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Smazat
 platform.appwithinminutes.liveTableEditorAddColumnHint=Přidat
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Některé sloupce jsou zastaralé. Pravděpodobně proto, že odpovídající pole třídy byla vymazána. Přejete si jejich odstranění?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Odstranit zastaralé sloupce
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Ponechat
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 

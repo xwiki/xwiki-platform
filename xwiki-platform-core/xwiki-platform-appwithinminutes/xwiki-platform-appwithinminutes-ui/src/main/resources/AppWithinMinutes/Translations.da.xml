@@ -194,6 +194,8 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=Træk og slip for at æn
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Slet
 platform.appwithinminutes.liveTableEditorAddColumnHint=Tilføj
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Nogle kolonner er forældede, måske fordi de tilsvarende felter i klassen er blevet slettet. Ønsker du at slette disse kolonner?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Slet forældede kolonner
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Behold dem
 platform.appwithinminutes.liveTableEditorIcon=Ikon
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 

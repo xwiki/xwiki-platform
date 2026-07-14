@@ -177,14 +177,11 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
 
         for (Object fieldClass : xclass.getProperties()) {
             // Wiki content stored in xobjects
-            if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
-                TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
+            if (fieldClass instanceof TextAreaClass textAreaClass && textAreaClass.isWikiContent()) {
                 PropertyInterface field = xobject.getField(textAreaClass.getName());
 
                 // Make sure the field is the right type (might happen while a document is being migrated)
-                if (field instanceof LargeStringProperty) {
-                    LargeStringProperty largeField = (LargeStringProperty) field;
-
+                if (field instanceof LargeStringProperty largeField) {
                     try {
                         // Parse property content
                         XDOM xdom = this.contentParser.parse(largeField.getValue(), document.getSyntax(),
@@ -352,13 +349,13 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
 
     private DocumentReference toDocumentReference(EntityReference entityReference)
     {
-        return entityReference instanceof DocumentReference ? (DocumentReference) entityReference
+        return entityReference instanceof DocumentReference documentReference ? documentReference
             : new DocumentReference(entityReference);
     }
 
     private AttachmentReference toAttachmentReference(EntityReference entityReference)
     {
-        return entityReference instanceof AttachmentReference ? (AttachmentReference) entityReference
+        return entityReference instanceof AttachmentReference attachmentReference ? attachmentReference
             : new AttachmentReference(entityReference);
     }
 

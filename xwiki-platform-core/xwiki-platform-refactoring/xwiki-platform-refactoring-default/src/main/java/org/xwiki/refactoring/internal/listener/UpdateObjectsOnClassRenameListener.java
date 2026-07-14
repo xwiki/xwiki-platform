@@ -99,8 +99,8 @@ public class UpdateObjectsOnClassRenameListener extends AbstractLocalEventListen
     public void processLocalEvent(Event event, Object source, Object data)
     {
         boolean updateLinks = true;
-        if (data instanceof MoveRequest) {
-            updateLinks = ((MoveRequest) data).isUpdateLinks();
+        if (data instanceof MoveRequest moveRequest) {
+            updateLinks = moveRequest.isUpdateLinks();
         }
         if (updateLinks) {
             DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;

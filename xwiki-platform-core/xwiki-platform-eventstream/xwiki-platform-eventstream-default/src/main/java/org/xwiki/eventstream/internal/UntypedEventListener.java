@@ -189,8 +189,8 @@ public class UntypedEventListener extends AbstractEventListener
 
             // First check if the "xreturn" attribute has been set
             Object xreturn = this.scriptContextManager.getCurrentScriptContext().getAttribute(XRETURN_BINDING);
-            if (xreturn instanceof Boolean) {
-                return (Boolean) xreturn;
+            if (xreturn instanceof Boolean booleanValue) {
+                return booleanValue;
             }
 
             // Otherwise, for backward-compatibility, render the template to a string, and compare this
@@ -219,11 +219,11 @@ public class UntypedEventListener extends AbstractEventListener
             // Evaluate the template and look for the "xreturn" binding
             evaluateVelocity(event, source, expression, descriptor);
             Object xreturn = this.scriptContextManager.getCurrentScriptContext().getAttribute(XRETURN_BINDING);
-            if (xreturn instanceof Iterable) {
+            if (xreturn instanceof Iterable iterable) {
                 Set<String> target = new HashSet<>();
-                for (Object o : (Iterable) xreturn) {
-                    if (o instanceof String) {
-                        target.add((String) o);
+                for (Object o : iterable) {
+                    if (o instanceof String string) {
+                        target.add(string);
                     }
                 }
                 return target;

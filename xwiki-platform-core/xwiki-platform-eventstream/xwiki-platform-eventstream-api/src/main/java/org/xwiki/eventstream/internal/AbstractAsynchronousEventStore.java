@@ -443,8 +443,7 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         // Notify event listeners
         Object notificationOuput = task.output;
         boolean skipNotify = false;
-        if (task.output instanceof Optional<?>) {
-            Optional<?> optionalOutput = (Optional<?>) task.output;
+        if (task.output instanceof Optional<?> optionalOutput) {
             if (optionalOutput.isPresent()) {
                 notificationOuput = optionalOutput.get();
             } else {

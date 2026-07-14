@@ -252,18 +252,9 @@ class RoundTripIT extends AbstractBlockNoteIT
         // Note that inline images are currently not supported by BlockNote.
         roundTrip(setup, testReference,
             """
-                [[Carol>>image:Path.To.Carol@avatar.png||alt="Carol's avatar" data-xwiki-image-style-alignment="center" width="150" height="100"]]
+                [[Carol>>image:Path.To.Carol@avatar.png||class="avatar" data-user-reference="XWiki.Carol" height="100" alt="Carol's avatar" width="150" data-xwiki-image-style-alignment="center"]]
 
-                image:icon:accept""",
-            // The content is modified on save:
-            // * the alt and height parameters are lost for some reason
-            // * parameter order is changed
-            // * information about freestanding images is lost
-            // * the editor outputs default image styles
-            """
-                [[Carol>>image:Path.To.Carol@avatar.png||width="150" data-xwiki-image-style-alignment="center"]]
-
-                [[image:icon:accept||data-xwiki-image-style-alignment="start"]]""");
+                image:icon:accept""");
     }
 
     @Test

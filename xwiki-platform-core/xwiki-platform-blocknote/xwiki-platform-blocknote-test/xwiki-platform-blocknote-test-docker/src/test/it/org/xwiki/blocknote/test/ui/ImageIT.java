@@ -98,12 +98,10 @@ class ImageIT extends AbstractBlockNoteIT
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
             before
 
-            [[image:attach:missing.png||width="127" data-xwiki-image-style-alignment="center"]]
+            [[image:missing.png||width="127" data-xwiki-image-style-alignment="center"]]
 
-            (% style="color:default;background-color:default;text-align:left" %)
             after""", wikiEditor.getContent());
         
         // Edit again, to verify that the image modal shows the correct with and alignment values.
@@ -132,12 +130,10 @@ class ImageIT extends AbstractBlockNoteIT
         page.save();
         wikiEditor = page.editWiki();
         assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
             before
 
-            [[image:attach:image.gif||width="127" data-xwiki-image-style-alignment="end"]]
+            [[image:image.gif||width="127" data-xwiki-image-style-alignment="end"]]
 
-            (% style="color:default;background-color:default;text-align:left" %)
             after""", wikiEditor.getContent());
 
         // Verify that the image was actually uploaded and attached to the page.

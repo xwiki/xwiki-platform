@@ -55,11 +55,6 @@ import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
  * @returns The created schema
  */
 function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
-  // Get rid of some block types
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { audio, video, file, toggleListItem, ...remainingBlockSpecs } =
-    defaultBlockSpecs;
-
   macros = [
     ...macros.sort((a, b) =>
       a.macro.infos.name.localeCompare(b.macro.infos.name),
@@ -68,7 +63,7 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
 
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {
-      ...remainingBlockSpecs,
+      ...defaultBlockSpecs,
       xwikiDefinitionListItem: DefinitionListItemBlock(),
       xwikiGroup: XWikiGroupBlock(),
       xwikiMacroBlock: XWikiMacroBlock(),
@@ -182,9 +177,9 @@ function querySuggestionsMenuItems(
   const locale = locales[lang].slash_menu;
 
   const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
-    candidates.findIndex(
+    candidates.some(
       (localeKey: keyof typeof locale) => locale[localeKey].title === value,
-    ) !== -1;
+    );
 
   if (!blocksSupport.headings.levels1To3) {
     items = items.filter(

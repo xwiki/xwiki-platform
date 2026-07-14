@@ -300,6 +300,18 @@ export class BlockNoteToUniAstConverter {
       case "divider":
         return { type: "break" };
 
+      case "audio":
+        throw new Error("audio blocks cannot be converted to UniAst");
+
+      case "file":
+        throw new Error("file blocks cannot be converted to UniAst");
+
+      case "video":
+        throw new Error("video blocks cannot be converted to UniAst");
+
+      case "toggleListItem":
+        throw new Error("toggleListItem blocks cannot be converted to UniAst");
+
       case "xwikiDefinitionListItem":
         throw new Error(
           "xwikiDefinitionListItem blocks cannot be converted to UniAst",

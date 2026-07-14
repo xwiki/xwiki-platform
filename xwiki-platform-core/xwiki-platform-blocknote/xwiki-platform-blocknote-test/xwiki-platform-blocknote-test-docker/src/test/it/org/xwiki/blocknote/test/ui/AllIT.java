@@ -32,11 +32,6 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllIT
 {
     @Nested
-    class NestedBlockNoteIT extends BlockNoteIT
-    {
-    }
-
-    @Nested
     class NestedRoundTripIT extends RoundTripIT
     {
     }

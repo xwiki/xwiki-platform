@@ -63,6 +63,14 @@ public class XWikiWebDriver extends RemoteWebDriver
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiWebDriver.class);
 
+    /**
+     * Number of times {@link #findElement(By)} re-locates an element when it goes stale during the scroll-into-view
+     * that follows the lookup. A DOM re-render (e.g. an async save rebuilding a form) can detach the element between
+     * locating it and scrolling to it; a couple of attempts absorb that transient, while a persistently-stale element
+     * still surfaces as a real failure.
+     */
+    private static final int FIND_SCROLL_ATTEMPTS = 3;
+
     private RemoteWebDriver wrappedDriver;
 
     /**
@@ -721,19 +729,31 @@ public class XWikiWebDriver extends RemoteWebDriver
      * implement your own {@link ExpectedCondition} using {@link #findElementWithoutScrolling(By)}.
      */
     @Override
+    // Ignore Sonar false positive: stale cannot be null after the loop because if it was null, then the method would
+    // have returned already.
+    @SuppressWarnings("java:S2259")
     public WebElement findElement(By by)
     {
         long startTime = System.currentTimeMillis();
-        WebElement element;
-        try {
-            element = this.wrappedDriver.findElement(by);
-        } catch (NoSuchElementException e) {
-            // The element wasn't found. If the lookup consumed the full implicit-wait timeout then the test wastefully
-            // waited for something that isn't there (see XWIKI-12558).
-            warnIfWastefulWait(by, System.currentTimeMillis() - startTime);
-            throw e;
+        StaleElementReferenceException stale = null;
+        for (int attempt = 0; attempt < FIND_SCROLL_ATTEMPTS; attempt++) {
+            WebElement element;
+            try {
+                element = this.wrappedDriver.findElement(by);
+            } catch (NoSuchElementException e) {
+                // The element wasn't found. If the lookup consumed the full implicit-wait timeout then the test
+                // wastefully waited for something that isn't there (see XWIKI-12558).
+                warnIfWastefulWait(by, System.currentTimeMillis() - startTime);
+                throw e;
+            }
+            try {
+                return this.scrollTo(element);
+            } catch (StaleElementReferenceException e) {
+                // The element went stale between being located and scrolled into view; re-locate and retry.
+                stale = e;
+            }
         }
-        return this.scrollTo(element);
+        throw stale;
     }
 
     /**

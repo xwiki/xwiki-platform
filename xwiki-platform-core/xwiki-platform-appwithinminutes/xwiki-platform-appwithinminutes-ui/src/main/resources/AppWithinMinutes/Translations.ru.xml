@@ -191,7 +191,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Обновить LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Для изменения порядка используйте перетаскивание мышью
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Удалить
 platform.appwithinminutes.liveTableEditorAddColumnHint=Добавить выбранный столбец
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Некоторые колонки не могут быть выведены, так как, возможно, соответствующие поля класса были удалены. Вы хотите удалить их? &lt;a href=""&gt;Да&lt;/a&gt; / &lt;a href=""&gt;Нет&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Некоторые колонки не могут быть выведены, так как, возможно, соответствующие поля класса были удалены. Вы хотите удалить их?
 platform.appwithinminutes.liveTableEditorIcon=Иконка
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Значок приложения. Вы можете выбрать значок в палитре значков или сослаться на прикрепленное изображение.
 

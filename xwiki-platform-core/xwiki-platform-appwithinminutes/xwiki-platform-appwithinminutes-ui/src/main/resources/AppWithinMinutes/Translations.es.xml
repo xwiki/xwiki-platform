@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Actualizar LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Arrastrar y soltar para cambiar el orden
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Borrar
 platform.appwithinminutes.liveTableEditorAddColumnHint=Añadir columna seleccionada
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Algunas columnas están obsoletas, probablemente porque se han eliminado los campos de aplicación correspondientes. ¿Quiere eliminarlas? &lt;a href=""&gt;Sí &lt;/a&gt; / &lt;a href=""&gt;No &lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Algunas columnas están obsoletas, probablemente porque se han eliminado los campos de aplicación correspondientes. ¿Quiere eliminarlas?
 platform.appwithinminutes.liveTableEditorIcon=Icono
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=El icono de la aplicación. Puede seleccionar un icono del selector de iconos o puede hacer referencia a una imagen adjunta.
 

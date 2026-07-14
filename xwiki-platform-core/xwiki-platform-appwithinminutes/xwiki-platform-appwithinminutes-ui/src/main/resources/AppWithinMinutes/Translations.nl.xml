@@ -186,7 +186,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=LiveTable bijwerken
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Sleep en laat vallen om de volgorde te wijzigen
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Verwijderen
 platform.appwithinminutes.liveTableEditorAddColumnHint=Toevoegen
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Een aantal kolommen zijn niet meer actueel, waarschijnlijk omdat de overeenkomstige Class velden verwijderd zijn. Wilt u deze verwijderen? &lt;a href\=""&gt;Ja&lt;/a&gt; / &lt;a href\=""&gt;Nee&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Een aantal kolommen zijn niet meer actueel, waarschijnlijk omdat de overeenkomstige Class velden verwijderd zijn. Wilt u deze verwijderen?
 platform.appwithinminutes.liveTableEditorIcon=Pictogram
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Een referentie naar een pictogram. Dit kan elke afbeelding zijn die is opgeslagen in de wiki, maar u kunt ook een pictogram kiezen via de Kiezer die verschijnt als het veld is geselecteerd.
 

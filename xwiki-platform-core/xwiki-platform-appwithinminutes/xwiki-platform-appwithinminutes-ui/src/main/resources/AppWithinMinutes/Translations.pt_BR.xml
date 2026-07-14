@@ -186,7 +186,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Atualizar Tabela Dinâmica
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Arraste e solte para mudar a ordem
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Remover
 platform.appwithinminutes.liveTableEditorAddColumnHint=Adicionar
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Algumas colunas estão obsoletas. Possivelmente porque os campos correspondentes foram removidos. Você deseja removê-las? &lt;a href\=""&gt;Yes&lt;/a&gt; / &lt;a href\=""&gt;No&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Algumas colunas estão obsoletas. Possivelmente porque os campos correspondentes foram removidos. Você deseja removê-las?
 platform.appwithinminutes.liveTableEditorIcon=Ícone
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=O ícone do aplicativo. Você pode selecionar um ícone no seletor de ícones ou fazer referência a uma imagem anexada.
 

@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Aktualizace "živé" tabulk
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Přetáhněte myší pro změnu pořadí
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Smazat
 platform.appwithinminutes.liveTableEditorAddColumnHint=Přidat
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Některé sloupce jsou zastaralé. Pravděpodobně proto, že odpovídající pole třídy byla vymazána. Přejete si jejich odstranění? &lt;a href\=""&gt; Ano &lt;/ a&gt; / &lt;a href\=""&gt; Ne &lt;/ a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Některé sloupce jsou zastaralé. Pravděpodobně proto, že odpovídající pole třídy byla vymazána. Přejete si jejich odstranění?
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 

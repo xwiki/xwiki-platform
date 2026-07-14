@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Aggiorna LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop per cambiare l'ordine
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Elimina
 platform.appwithinminutes.liveTableEditorAddColumnHint=Aggiungi
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Alcune colonne sono sconsigliate, probabilmente perchè i corrispondenti campi della classe sono stati eliminati. Si vuole eliminarle? &lt;a href\=""&gt;Sì&lt;/a&gt; / &lt;a href\=""&gt;No&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Alcune colonne sono sconsigliate, probabilmente perchè i corrispondenti campi della classe sono stati eliminati. Si vuole eliminarle?
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 

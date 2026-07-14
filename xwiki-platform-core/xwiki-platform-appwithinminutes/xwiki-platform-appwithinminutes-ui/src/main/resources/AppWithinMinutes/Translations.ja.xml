@@ -186,7 +186,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=ライブテーブルを更
 platform.appwithinminutes.liveTableEditorMoveColumnHint=ドラッグアンドドロップで順番を変更
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=削除
 platform.appwithinminutes.liveTableEditorAddColumnHint=選択したカラムを追加
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=いくつかのカラムは、対応するアプリケーションのフィールドが削除されたため非推奨です。削除してよろしいですか？&lt;a href=""&gt;はい&lt;/a&gt; / &lt;a href=""&gt;いいえ&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=いくつかのカラムは、対応するアプリケーションのフィールドが削除されたため非推奨です。削除してよろしいですか？
 platform.appwithinminutes.liveTableEditorIcon=アイコン
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=アプリケーションのアイコン。アイコンピッカーからアイコンを選択するか、添付したイメージを参照できます。
 

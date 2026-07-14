@@ -191,7 +191,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=更新动态列表
 platform.appwithinminutes.liveTableEditorMoveColumnHint=拖放以更改顺序
 ### Missing: platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
 platform.appwithinminutes.liveTableEditorAddColumnHint=添加选中的列
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=一些列已失效，可能是因为相应的应用字段已被删除。要删除这些列吗？ &lt;a href=""&gt;是&lt;/a&gt; / &lt;a href=""&gt;否&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=一些列已失效，可能是因为相应的应用字段已被删除。要删除这些列吗？
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=应用图标。你可以直接选择一个，或者引用附件中的图像。
 

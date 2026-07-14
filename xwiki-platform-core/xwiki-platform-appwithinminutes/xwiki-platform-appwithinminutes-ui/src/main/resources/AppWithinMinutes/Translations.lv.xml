@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Atjaunot tabulu
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Velciet kolonnas, lai mainītu to kārtību
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Dzēst
 platform.appwithinminutes.liveTableEditorAddColumnHint=Pievienot
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Dažas kolonnas ir novecojušas, iespējams tāpēc, ka attiecīgie klases lauki ir izdzēsti. Vai vēlaties izdzēst šīs kolonnas?\n&lt;a href=""&gt;Jā&lt;/a&gt; / &lt;a href=""&gt;Nē&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Dažas kolonnas ir novecojušas, iespējams tāpēc, ka attiecīgie klases lauki ir izdzēsti. Vai vēlaties izdzēst šīs kolonnas?
 platform.appwithinminutes.liveTableEditorIcon=Ikona
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Saite uz ikonu. Jūs varat norādīt jebkuru attēlu no ikonu izvēles zem šī lauka (kad tas ir aktivizēts), vai arī norādīt saiti uz jebkuru citu viki attēlu.
 

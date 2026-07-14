@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Ažuriraj tablicu
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Povucite i ispustite za promjenu poretka
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Obrišite
 platform.appwithinminutes.liveTableEditorAddColumnHint=Dodajte
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Neki stupci su precrtani, vjerojatno zato što su pripadna aplikacijska polja obrisana. Želite li ih ukloniti? &lt;a href\=""&gt;Da&lt;/a&gt; / &lt;a href\=""&gt;Ne&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Neki stupci su precrtani, vjerojatno zato što su pripadna aplikacijska polja obrisana. Želite li ih ukloniti?
 platform.appwithinminutes.liveTableEditorIcon=Ikona
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Ikona aplikacije. Možete odabrati ikonu iz odabirača ikona ili možete referencirati pridruženu sliku.
 

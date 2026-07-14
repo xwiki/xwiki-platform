@@ -55,8 +55,8 @@ public abstract class AbstractUnaryOperatorNode extends AbstractOperatorNode
     @Override
     public boolean equals(Object o)
     {
-        return (o instanceof AbstractUnaryOperatorNode
-                && operand.equals(((AbstractUnaryOperatorNode) o).operand));
+        return (o instanceof AbstractUnaryOperatorNode abstractUnaryOperatorNode
+                && operand.equals(abstractUnaryOperatorNode.operand));
     }
 
     @Override

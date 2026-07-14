@@ -64,15 +64,14 @@ public class ViewableAllowedDBListValueFilter implements QueryFilter
     {
         List<Object> filteredResults = new LinkedList<>();
         for (Object result : results) {
-            if (result instanceof String) {
-                DocumentReference documentReference = this.documentReferenceResolver.resolve((String) result);
+            if (result instanceof String stringResult) {
+                DocumentReference documentReference = this.documentReferenceResolver.resolve(stringResult);
                 if (this.authorization.hasAccess(Right.VIEW, documentReference)) {
                     filteredResults.add(result);
                 }
-            } else if (result instanceof Object[]) {
-                Object[] row = (Object[]) result;
-                if (row.length > 0 && row[0] instanceof String) {
-                    DocumentReference documentReference = this.documentReferenceResolver.resolve((String) row[0]);
+            } else if (result instanceof Object[] row) {
+                if (row.length > 0 && row[0] instanceof String documentFullName) {
+                    DocumentReference documentReference = this.documentReferenceResolver.resolve(documentFullName);
                     if (this.authorization.hasAccess(Right.VIEW, documentReference)) {
                         // The document full name column was added just to be able to check view right. We can discard
                         // it now and return only the relevant columns.

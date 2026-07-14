@@ -785,8 +785,8 @@ public class HibernateStore implements Disposable, Initializable
         this.logger.debug("Taken session from pool [{}]", session);
 
         // Put back legacy feature to the Hibernate session
-        if (session instanceof SessionImplementor) {
-            session = new LegacySessionImplementor((SessionImplementor) session, this.loggerConfiguration);
+        if (session instanceof SessionImplementor sessionImplementor) {
+            session = new LegacySessionImplementor(sessionImplementor, this.loggerConfiguration);
         }
 
         setCurrentSession(session);
@@ -869,8 +869,7 @@ public class HibernateStore implements Disposable, Initializable
             if (next == current) {
                 next = null;
             }
-            if (current instanceof SQLException) {
-                SQLException sx = (SQLException) current;
+            if (current instanceof SQLException sx) {
                 while (sx.getNextException() != null) {
                     sx = sx.getNextException();
                     sb.append("\nSQL next exception = [" + sx + "]");
@@ -1099,8 +1098,8 @@ public class HibernateStore implements Disposable, Initializable
             // FIXME: remove when https://hibernate.atlassian.net/browse/HHH-14627
             // (org.hibernate.mapping.PersistentClass#getProperty does not support composite ids) is fixed
             KeyValue identifier = persistentClass.getIdentifier();
-            if (identifier instanceof org.hibernate.mapping.Component) {
-                Iterator<Property> it = ((org.hibernate.mapping.Component) identifier).getPropertyIterator();
+            if (identifier instanceof org.hibernate.mapping.Component component) {
+                Iterator<Property> it = component.getPropertyIterator();
 
                 while (it.hasNext()) {
                     Property property = it.next();

@@ -409,7 +409,6 @@ public abstract class ListClass extends PropertyClass
                     previousWasSeparator = false;
                 }
                 previousSeparator = currentChar;
-                continue;
             // if we are finding a separator and we are not in escape mode, then we finished to parse one value
             // we are adding the value to the result, and start a new value to parse
             } else if (StringUtils.containsAny(separators, currentChar) && !inEscape) {
@@ -1105,7 +1104,5 @@ public abstract class ListClass extends PropertyClass
         }
 
         fromList(currentProperty, currentList);
-
-        return;
     }
 }

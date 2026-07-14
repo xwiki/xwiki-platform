@@ -101,8 +101,8 @@ public class DefaultAuthorizationManager implements AuthorizationManager
                 throw new AccessDeniedException(right, userReference, entityReference);
             }
         } catch (Exception e) {
-            if (e instanceof AccessDeniedException) {
-                throw (AccessDeniedException) e;
+            if (e instanceof AccessDeniedException accessDeniedException) {
+                throw accessDeniedException;
             } else {
                 throw new AccessDeniedException(right, userReference, entityReference, e);
             }

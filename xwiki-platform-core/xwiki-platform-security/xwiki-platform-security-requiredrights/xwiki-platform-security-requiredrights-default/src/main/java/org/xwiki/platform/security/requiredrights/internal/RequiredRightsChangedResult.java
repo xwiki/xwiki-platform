@@ -202,11 +202,11 @@ public class RequiredRightsChangedResult
         for (RequiredRightAnalysisResult requiredRightAnalysisResult : list) {
             EntityReference entityReference = requiredRightAnalysisResult.getEntityReference();
             EntityReference extractedDocument = entityReference.extractReference(EntityType.DOCUMENT);
-            if (extractedDocument instanceof DocumentReference && !extractedDocument.equals(entityReference)) {
+            if (extractedDocument instanceof DocumentReference docRef && !extractedDocument.equals(entityReference)) {
                 entityReference = entityReference.replaceParent(extractedDocument,
-                    cleanupLocale((DocumentReference) extractedDocument));
-            } else if (entityReference instanceof DocumentReference) {
-                entityReference = cleanupLocale((DocumentReference) entityReference);
+                    cleanupLocale(docRef));
+            } else if (entityReference instanceof DocumentReference documentReference) {
+                entityReference = cleanupLocale(documentReference);
             }
             if (map.containsKey(entityReference)) {
                 map.get(entityReference).add(requiredRightAnalysisResult);

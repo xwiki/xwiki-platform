@@ -393,8 +393,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         PropertyClass propertyClass, Locale locale)
     {
         Object propertyValue = property.getValue();
-        if (propertyClass instanceof StaticListClass) {
-            setStaticListPropertyValue(solrDocument, property, (StaticListClass) propertyClass, locale);
+        if (propertyClass instanceof StaticListClass staticListClass) {
+            setStaticListPropertyValue(solrDocument, property, staticListClass, locale);
         } else if (propertyClass instanceof TextAreaClass
             || (propertyClass != null && "String".equals(propertyClass.getClassType()))
             || (propertyValue instanceof CharSequence
@@ -429,9 +429,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                     setPropertyValue(solrDocument, property, new TypedValue(value), locale);
                 }
             }
-        } else if (propertyValue instanceof Integer && propertyClass instanceof BooleanClass) {
+        } else if (propertyValue instanceof Integer integerValue && propertyClass instanceof BooleanClass) {
             // Boolean properties are stored as integers (0 is false and 1 is true).
-            Boolean booleanValue = ((Integer) propertyValue) != 0;
+            Boolean booleanValue = integerValue != 0;
             setPropertyValue(solrDocument, property, new TypedValue(booleanValue), locale);
         } else if (!property.isSensitive(xcontextProvider.get())) {
             // Avoid indexing passwords and, when obfuscation is enabled, emails.

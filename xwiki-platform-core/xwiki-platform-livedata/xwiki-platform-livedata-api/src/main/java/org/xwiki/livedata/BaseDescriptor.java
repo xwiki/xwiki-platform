@@ -64,8 +64,7 @@ public class BaseDescriptor extends WithParameters
             return true;
         }
 
-        if (obj instanceof BaseDescriptor) {
-            BaseDescriptor other = (BaseDescriptor) obj;
+        if (obj instanceof BaseDescriptor other) {
             return new EqualsBuilder().appendSuper(super.equals(other)).append(getId(), other.getId()).build();
         }
 

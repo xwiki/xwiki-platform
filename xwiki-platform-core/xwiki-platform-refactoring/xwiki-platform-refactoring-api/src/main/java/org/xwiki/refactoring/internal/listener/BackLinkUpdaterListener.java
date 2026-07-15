@@ -129,12 +129,12 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
             entityReference -> this.authorization.hasAccess(Right.EDIT, entityReference);
 
         Map<EntityReference, EntityReference> updatedEntities = Map.of();
-        if (source instanceof MoveJob) {
+        if (source instanceof MoveJob moveJob) {
             MoveRequest request = (MoveRequest) data;
             updateLinks = request.isUpdateLinks();
             // Check access rights taking into account the move request.
-            canEdit = entityReference -> ((MoveJob) source).hasAccess(Right.EDIT, entityReference);
-            updatedEntities = ((MoveJob) source).getSelectedEntities();
+            canEdit = entityReference -> moveJob.hasAccess(Right.EDIT, entityReference);
+            updatedEntities = moveJob.getSelectedEntities();
         }
 
         if (updateLinks) {

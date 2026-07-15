@@ -23,8 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.Event;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @Deprecated
 class ActionExecutionEventTest
@@ -35,8 +35,8 @@ class ActionExecutionEventTest
         Event e1 = new ActionExecutionEvent("test");
         Event e2 = new ActionExecutionEvent("test");
         Event e3 = new ActionExecutionEvent("different");
-        assertTrue(e1.equals(e1));
-        assertTrue(e1.equals(e2));
-        assertFalse(e1.equals(e3));
+        assertEquals(e1, e1);
+        assertEquals(e1, e2);
+        assertNotEquals(e1, e3);
     }
 }

@@ -67,7 +67,7 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
         @Override
         public List<String> getKeys()
         {
-            return getFromWiki(() -> AbstractWikisConfigurationSource.super.getKeysInternal());
+            return getFromWiki(AbstractWikisConfigurationSource.super::getKeysInternal);
         }
 
         @Override
@@ -97,7 +97,7 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
         @Override
         public boolean isEmpty()
         {
-            return getFromWiki(() -> AbstractWikisConfigurationSource.super.isEmptyInternal());
+            return getFromWiki(AbstractWikisConfigurationSource.super::isEmptyInternal);
         }
 
         @Override
@@ -182,7 +182,7 @@ public abstract class AbstractWikisConfigurationSource extends AbstractDocumentC
     {
         CompositeConfigurationSource compositeConfigSource = new CompositeConfigurationSource();
         getWikis().stream().map(WikiConfigurationSource::new)
-            .forEachOrdered(wikiConfigSource -> compositeConfigSource.addConfigurationSource(wikiConfigSource));
+            .forEachOrdered(compositeConfigSource::addConfigurationSource);
         return compositeConfigSource;
     }
 

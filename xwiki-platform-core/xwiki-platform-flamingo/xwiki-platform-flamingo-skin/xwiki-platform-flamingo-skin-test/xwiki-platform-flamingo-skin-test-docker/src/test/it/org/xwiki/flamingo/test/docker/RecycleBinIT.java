@@ -57,7 +57,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RecycleBinIT
 {
     /**
-     * @see "XWIKI-9421: Attachment version is incremented when a document is restored from recycle bin"
+     * Verifies that restoring a document from the recycle bin preserves its attachments' versions, i.e. the
+     * attachment version must not be incremented as a side effect of the restore.
      */
     @Test
     @Order(1)
@@ -66,8 +67,10 @@ class RecycleBinIT
         setup.loginAsSuperAdmin();
 
         // Use a UUID-prefixed page name so that each execution operates on a fresh page (idempotent across
-        // repetitions). Revert once https://jira.xwiki.org/browse/XWIKI-23447 is implemented and TestUtils is
-        // modified to delete pages permanently (i.e. not put them in the trash).
+        // repetitions). This works around the fact that TestUtils can only send pages to the recycle bin and
+        // cannot delete them permanently: reusing a fixed page name would leave recycle bin entries behind and
+        // the test would not start from a clean state on repeated runs. Revert to a fixed page name once
+        // TestUtils is able to delete pages permanently (i.e. without putting them in the recycle bin).
         SpaceReference testSpace = testReference.getLastSpaceReference();
         DocumentReference pageReference = new DocumentReference(testReference.getName(),
             new SpaceReference(UUID.randomUUID() + "-" + testSpace.getName(), testSpace.getParent()));

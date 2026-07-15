@@ -129,7 +129,7 @@ class DocumentTranslationBundleFactoryTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
-    public void before() throws Exception
+    void before() throws Exception
     {
         this.oldcore.notifyDocumentCreatedEvent(true);
         this.oldcore.notifyDocumentUpdatedEvent(true);

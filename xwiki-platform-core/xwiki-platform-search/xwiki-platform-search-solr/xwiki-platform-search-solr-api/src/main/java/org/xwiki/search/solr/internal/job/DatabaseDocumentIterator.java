@@ -192,7 +192,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<DocumentI
             }
             while (wiki != null) {
                 fetchNextResults();
-                if (results.size() > 0) {
+                if (!results.isEmpty()) {
                     break;
                 }
                 wiki = getNextWiki();

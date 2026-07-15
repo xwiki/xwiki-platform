@@ -39,6 +39,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -61,10 +62,10 @@ import com.xpn.xwiki.web.Utils;
 public class XWikiRightServiceImpl implements XWikiRightService
 {
     public static final EntityReference RIGHTCLASS_REFERENCE = new EntityReference("XWikiRights", EntityType.DOCUMENT,
-        new EntityReference("XWiki", EntityType.SPACE));
+        new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     public static final EntityReference GLOBALRIGHTCLASS_REFERENCE = new EntityReference("XWikiGlobalRights",
-        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+        EntityType.DOCUMENT, new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     private static final String ADMIN = "admin";
     private static final String COMMENT = "comment";
@@ -83,12 +84,12 @@ public class XWikiRightServiceImpl implements XWikiRightService
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRightServiceImpl.class);
 
     private static final EntityReference XWIKIPREFERENCES_REFERENCE = new EntityReference("XWikiPreferences",
-        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+        EntityType.DOCUMENT, new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     private static final List<String> ALLLEVELS = Arrays.asList(ADMIN, "view", "edit", COMMENT, DELETE,
         UNDELETE, REGISTER, PROGRAMMING);
 
-    private static final EntityReference DEFAULTUSERSPACE = new EntityReference("XWiki", EntityType.SPACE);
+    private static final EntityReference DEFAULTUSERSPACE = new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE);
 
     private static Map<String, String> actionMap;
 
@@ -199,12 +200,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
         if (DELETE.equals(right)) {
             user = context.getWiki().checkAuth(context);
             String creator = doc.getCreator();
-            if ((user != null) && (user.getUser() != null) && (creator != null)) {
-                if (user.getUser().equals(creator)) {
-                    context.setUser(user.getUser());
+            if ((user != null) && (user.getUser() != null) && (creator != null) && user.getUser().equals(creator)) {
+                context.setUser(user.getUser());
 
-                    return true;
-                }
+                return true;
             }
         }
 
@@ -222,10 +221,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
                 if ((user == null) && (needsAuth)) {
                     logDeny("unauthentified", doc.getFullName(), action, "Authentication needed");
-                    if (context.getRequest() != null) {
-                        if (!"true".equalsIgnoreCase(context.getWiki().Param("xwiki.hidelogin", "false"))) {
-                            context.getWiki().getAuthService().showLogin(context);
-                        }
+                    if (context.getRequest() != null
+                        && !"true".equalsIgnoreCase(context.getWiki().Param("xwiki.hidelogin", "false"))) {
+                        context.getWiki().getAuthService().showLogin(context);
                     }
 
                     return false;
@@ -540,24 +538,20 @@ public class XWikiRightServiceImpl implements XWikiRightService
         boolean deny = false;
         boolean allow = false;
         boolean allow_found = false;
-        boolean deny_found = false;
         boolean isReadOnly = context.getWiki().isReadOnly();
         String database = context.getWikiId();
         XWikiDocument currentdoc = null;
 
-        if (isReadOnly) {
-            if ("edit".equals(accessLevel) || DELETE.equals(accessLevel) || UNDELETE.equals(accessLevel)
-                || COMMENT.equals(accessLevel) || REGISTER.equals(accessLevel)) {
-                logDeny(userOrGroupName, entityReference, accessLevel, "server in read-only mode");
+        if (isReadOnly && ("edit".equals(accessLevel) || DELETE.equals(accessLevel) || UNDELETE.equals(accessLevel)
+            || COMMENT.equals(accessLevel) || REGISTER.equals(accessLevel))) {
+            logDeny(userOrGroupName, entityReference, accessLevel, "server in read-only mode");
 
-                return false;
-            }
+            return false;
         }
 
-        if (userOrGroupNameReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            if (needsAuth(accessLevel, context)) {
-                return false;
-            }
+        if (userOrGroupNameReference.getName().equals(XWikiRightService.GUEST_USER)
+            && needsAuth(accessLevel, context)) {
+            return false;
         }
 
         // Fast return for delete right: allow the creator to delete the document
@@ -571,7 +565,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
 
         allow = isSuperAdminOrProgramming(userOrGroupName, entityReference, accessLevel, user, context);
-        if ((allow == true) || (PROGRAMMING.equals(accessLevel))) {
+        if (allow || (PROGRAMMING.equals(accessLevel))) {
             return allow;
         }
 
@@ -581,8 +575,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
             DocumentReference docReference = currentdoc.getDocumentReference();
 
             if ("edit".equals(accessLevel)
-                && (WEB_PREFERENCES.equals(docReference.getName()) || ("XWiki".equals(docReference.getLastSpaceReference().getName())
-                    && "XWikiPreferences".equals(docReference.getName())))) {
+                && (WEB_PREFERENCES.equals(docReference.getName())
+                    || (XWiki.SYSTEM_SPACE.equals(docReference.getLastSpaceReference().getName())
+                        && "XWikiPreferences".equals(docReference.getName())))) {
                 // Since edit rights on these documents would be sufficient for a user to elevate himself to
                 // admin or even programmer, we will instead check for admin access on these documents.
                 // See https://jira.xwiki.org/browse/XWIKI-6987 and https://jira.xwiki.org/browse/XWIKI-2184.
@@ -594,12 +589,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
             // Verify Wiki Owner
             String wikiOwner = context.getWiki().getWikiOwner(currentdoc.getDatabase(), context);
-            if (wikiOwner != null) {
-                if (wikiOwner.equals(userOrGroupName)) {
-                    logAllow(userOrGroupName, entityReference, accessLevel, "admin level from wiki ownership");
+            if (wikiOwner != null && wikiOwner.equals(userOrGroupName)) {
+                logAllow(userOrGroupName, entityReference, accessLevel, "admin level from wiki ownership");
 
-                    return true;
-                }
+                return true;
             }
 
             XWikiDocument entityWikiPreferences = context.getWiki().getDocument(XWIKIPREFERENCES_REFERENCE, context);
@@ -651,7 +644,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     currentdoc =
                         currentdoc == null ? context.getWiki().getDocument(entityReference, context) : currentdoc;
                     deny = checkRight(userOrGroupName, currentdoc, accessLevel, user, false, false, context);
-                    deny_found = true;
                     if (deny) {
                         logDeny(userOrGroupName, entityReference, accessLevel, "document level");
                         return false;
@@ -688,7 +680,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     if (hasDenyRights()) {
                         try {
                             deny = checkRight(userOrGroupName, webdoc, accessLevel, user, false, true, context);
-                            deny_found = true;
                             if (deny) {
                                 logDeny(userOrGroupName, entityReference, accessLevel, "web level");
 
@@ -731,7 +722,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
             if (hasDenyRights()) {
                 try {
                     deny = checkRight(userOrGroupName, entityWikiPreferences, accessLevel, user, false, true, context);
-                    deny_found = true;
                     if (deny) {
                         logDeny(userOrGroupName, entityReference, accessLevel, "xwiki level");
 

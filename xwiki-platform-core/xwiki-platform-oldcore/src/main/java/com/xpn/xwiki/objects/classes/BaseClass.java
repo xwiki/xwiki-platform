@@ -190,10 +190,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         if (element != null) {
             Set<String> properties = getPropertyList();
-            if (!properties.contains(name)) {
-                if (((BaseCollection) element).getNumber() == 0) {
-                    ((BaseCollection) element).setNumber(properties.size() + 1);
-                }
+            if (!properties.contains(name) && ((BaseCollection) element).getNumber() == 0) {
+                ((BaseCollection) element).setNumber(properties.size() + 1);
             }
 
             super.addField(name, element);
@@ -1366,9 +1364,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = context.getWiki().getClass(className, context);
-        BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
-
-        return object;
+        return (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
     }
 
     public String getDefaultWeb()

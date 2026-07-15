@@ -81,16 +81,14 @@ public class UploadAction extends XWikiAction
         Object exception = context.get("exception");
         boolean ajax = ((Boolean) context.get("ajax")).booleanValue();
         // check Exception File upload is large
-        if (exception != null) {
-            if (exception instanceof AttachmentValidationException) {
-                AttachmentValidationException exp = (AttachmentValidationException) exception;
-                response.setStatus(exp.getHttpStatus());
-                getCurrentScriptContext().setAttribute(MESSAGE, exp.getTranslationKey(), ENGINE_SCOPE);
-                getCurrentScriptContext().setAttribute("parameters", exp.getTranslationParameters(), ENGINE_SCOPE);
-                context.put(MESSAGE, exp.getContextMessage());
+        if (exception != null && exception instanceof AttachmentValidationException) {
+            AttachmentValidationException exp = (AttachmentValidationException) exception;
+            response.setStatus(exp.getHttpStatus());
+            getCurrentScriptContext().setAttribute(MESSAGE, exp.getTranslationKey(), ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute("parameters", exp.getTranslationParameters(), ENGINE_SCOPE);
+            context.put(MESSAGE, exp.getContextMessage());
 
-                return true;
-            }
+            return true;
         }
 
         // CSRF prevention
@@ -268,12 +266,11 @@ public class UploadAction extends XWikiAction
 
         // Try to use the name provided by the user
         filename = fileupload.getFileItemAsString(filenameField, context);
-        if (!StringUtils.isBlank(filename)) {
-            // TODO These should be supported, the URL should just contain escapes.
-            if (filename.indexOf("/") != -1 || filename.indexOf("\\") != -1 || filename.indexOf(";") != -1) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_INVALID_CHARS,
-                    "Invalid filename: " + filename);
-            }
+        // TODO These should be supported, the URL should just contain escapes.
+        if (!StringUtils.isBlank(filename) && (filename.indexOf("/") != -1 || filename.indexOf("\\") != -1
+            || filename.indexOf(";") != -1)) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_INVALID_CHARS,
+                "Invalid filename: " + filename);
         }
 
         if (StringUtils.isBlank(filename)) {

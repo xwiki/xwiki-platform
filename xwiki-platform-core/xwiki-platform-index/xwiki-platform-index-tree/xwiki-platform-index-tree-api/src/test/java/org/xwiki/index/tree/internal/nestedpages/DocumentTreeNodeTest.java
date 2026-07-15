@@ -108,7 +108,7 @@ class DocumentTreeNodeTest
     private DocumentReference terminalDocumentReference = new DocumentReference("wiki", "Some", "Page");
 
     @BeforeEach
-    public void before() throws Exception
+    void before() throws Exception
     {
         when(this.translationsTreeNode.getType()).thenReturn("translations");
         when(this.attachmentsTreeNode.getType()).thenReturn("attachments");

@@ -65,7 +65,7 @@ class SpacesResourceIT extends AbstractHttpIT
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(wikis.getWikis().size() > 0);
+        assertTrue(!wikis.getWikis().isEmpty());
 
         Wiki wiki = wikis.getWikis().get(0);
         Link link = getFirstLinkByRelation(wiki, Relations.SPACES);
@@ -76,7 +76,7 @@ class SpacesResourceIT extends AbstractHttpIT
 
         Spaces spaces = (Spaces) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        assertTrue(spaces.getSpaces().size() > 0);
+        assertTrue(!spaces.getSpaces().isEmpty());
 
         boolean nestedSpaceFound = false;
 

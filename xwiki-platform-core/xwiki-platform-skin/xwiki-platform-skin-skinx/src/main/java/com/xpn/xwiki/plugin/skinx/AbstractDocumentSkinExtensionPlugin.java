@@ -369,8 +369,8 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof WikiDeletedEvent) {
-            this.alwaysUsedExtensions.remove(((WikiDeletedEvent) event).getWikiId());
+        if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
+            this.alwaysUsedExtensions.remove(wikiDeletedEvent.getWikiId());
         } else {
             onDocumentEvent((XWikiDocument) source);
         }

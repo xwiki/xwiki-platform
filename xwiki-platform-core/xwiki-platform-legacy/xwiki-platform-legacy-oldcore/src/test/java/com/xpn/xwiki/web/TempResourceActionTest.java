@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class TempResourceActionTest
+class TempResourceActionTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -75,7 +75,7 @@ public class TempResourceActionTest
     private TempResourceAction action;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.action = new TempResourceAction();
         when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
@@ -114,7 +114,7 @@ public class TempResourceActionTest
      * doesn't match the known pattern.
      */
     @Test
-    public void testGetTemporaryFileForBadURI() throws Exception
+    void testGetTemporaryFileForBadURI() throws Exception
     {
         createEmptyFile("temp/secret.txt");
         assertNull(action.getTemporaryFile("/xwiki/bin/temp/secret.txt", oldcore.getXWikiContext()));
@@ -125,7 +125,7 @@ public class TempResourceActionTest
      * temporary directory by ignoring relative URIs (i.e. which use ".." to move to the parent folder).
      */
     @Test
-    public void testGetTemporaryFileForRelativeURI() throws Exception
+    void testGetTemporaryFileForRelativeURI() throws Exception
     {
         createEmptyFile("temp/secret.txt");
         assertNull(action.getTemporaryFile("/xwiki/bin/temp/../../module/secret.txt", oldcore.getXWikiContext()));
@@ -135,7 +135,7 @@ public class TempResourceActionTest
      * Tests {@link TempResourceAction#getTemporaryFile(String, XWikiContext)} when the file is missing.
      */
     @Test
-    public void testGetTemporaryFileMissing() throws Exception
+    void testGetTemporaryFileMissing() throws Exception
     {
         assertFalse(new File(this.temporaryDirectory, "temp/module/xwiki/Space/Page/file.txt").exists());
         assertNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", oldcore.getXWikiContext()));
@@ -145,7 +145,7 @@ public class TempResourceActionTest
      * Tests {@link TempResourceAction#getTemporaryFile(String, XWikiContext)} when the file is present.
      */
     @Test
-    public void testGetTemporaryFile() throws Exception
+    void testGetTemporaryFile() throws Exception
     {
         oldcore.getXWikiContext().setWikiId("wiki");
         createEmptyFile("temp/module/wiki/Space/Page/file.txt");
@@ -156,7 +156,7 @@ public class TempResourceActionTest
      * Tests {@link TempResourceAction#getTemporaryFile(String, XWikiContext)} when the URL is over encoded.
      */
     @Test
-    public void testGetTemporaryFileForOverEncodedURL() throws Exception
+    void testGetTemporaryFileForOverEncodedURL() throws Exception
     {
         createEmptyFile("temp/officeviewer/xwiki/Sp*ace/Pa-ge/presentation.odp/presentation-slide0.jpg");
         assertNotNull(action.getTemporaryFile(
@@ -169,7 +169,7 @@ public class TempResourceActionTest
      * can happen for instance when XWiki is behind Apache's {@code mode_proxy} with {@code nocanon} option disabled.
      */
     @Test
-    public void testGetTemporaryFileForPartiallyDecodedURL() throws Exception
+    void testGetTemporaryFileForPartiallyDecodedURL() throws Exception
     {
         createEmptyFile("temp/officeviewer/xwiki/Space/Page/"
             + "attach%3Axwiki%3ASpace.Page%40pres%2Fentation.odp/13/presentation-slide0.jpg");
@@ -178,7 +178,7 @@ public class TempResourceActionTest
     }
 
     @Test
-    public void renderNormalBehavior() throws Exception
+    void renderNormalBehavior() throws Exception
     {
         XWikiRequest request = mock(XWikiRequest.class);
         XWikiResponse response = mock(XWikiResponse.class);
@@ -195,7 +195,7 @@ public class TempResourceActionTest
     }
 
     @Test
-    public void renderWithForceDownload() throws Exception
+    void renderWithForceDownload() throws Exception
     {
         XWikiRequest request = mock(XWikiRequest.class);
         XWikiResponse response = mock(XWikiResponse.class);

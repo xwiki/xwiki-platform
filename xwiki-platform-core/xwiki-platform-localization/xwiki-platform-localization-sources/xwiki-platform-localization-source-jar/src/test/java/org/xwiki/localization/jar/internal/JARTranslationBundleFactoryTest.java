@@ -93,7 +93,7 @@ class JARTranslationBundleFactoryTest
     private ExtensionPackager extensionPackager;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.extensionPackager = new ExtensionPackager(null, new File("target/test-" + new Date().getTime()));
         this.extensionPackager.generateExtensions();

@@ -20,6 +20,7 @@
 package org.xwiki.chart.internal;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,9 +62,13 @@ public class DefaultChartGenerator implements ChartGenerator
     @Inject
     private Provider<List<ChartCustomizer>> customizerProvider;
 
+    @Inject
+    private ChartConfiguration configuration;
+
     @Override
-    public byte[] generate(ChartModel model, Map<String, String> parameters) throws ChartGeneratorException
+    public byte[] generate(ChartModel model, Map<String, String> requestParameters) throws ChartGeneratorException
     {
+        Map<String, String> parameters = new HashMap<>(requestParameters);
         setDefaultParams(parameters);
         String type = parameters.get(TYPE_PARAM);
         String title = parameters.get(TITLE_PARAM);
@@ -74,6 +79,13 @@ public class DefaultChartGenerator implements ChartGenerator
         } catch (ComponentLookupException e) {
             throw new ChartGeneratorException(String.format("No such chart type : [%s].", type), e);
         }
+        int width = Integer.parseInt(parameters.get(WIDTH_PARAM));
+        int height = Integer.parseInt(parameters.get(HEIGHT_PARAM));
+        if (width > configuration.getMaximumChartWidth() || height > configuration.getMaximumChartHeight()) {
+            throw new ChartGeneratorException(
+                String.format("Maximum chart width or height exceeded (limit is: [%s]x[%s]).",
+                    configuration.getMaximumChartWidth(), configuration.getMaximumChartHeight()));
+        }
 
         Plot plot = generator.generate(model, parameters);
         JFreeChart jfchart = new JFreeChart(title, plot);
@@ -82,9 +94,6 @@ public class DefaultChartGenerator implements ChartGenerator
         for (ChartCustomizer customizer : this.customizerProvider.get()) {
             customizer.customize(jfchart, parameters);
         }
-
-        int width = Integer.parseInt(parameters.get(WIDTH_PARAM));
-        int height = Integer.parseInt(parameters.get(HEIGHT_PARAM));
         try {
             return ChartUtilities.encodeAsPNG(jfchart.createBufferedImage(width, height));
         } catch (IOException ex) {

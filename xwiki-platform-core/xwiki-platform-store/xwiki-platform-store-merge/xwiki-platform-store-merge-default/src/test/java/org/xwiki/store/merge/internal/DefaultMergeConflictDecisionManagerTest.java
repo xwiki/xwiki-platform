@@ -65,7 +65,7 @@ import static org.mockito.Mockito.when;
     DefaultCacheManagerConfiguration.class,
     InfinispanCacheFactory.class })
 @ComponentTest
-public class DefaultMergeConflictDecisionManagerTest
+class DefaultMergeConflictDecisionManagerTest
 {
     @InjectMockComponents
     private DefaultMergeConflictDecisionsManager mergeConflictDecisionsManager;
@@ -77,13 +77,13 @@ public class DefaultMergeConflictDecisionManagerTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         doAnswer(AdditionalAnswers.returnsArgAt(1)).when(configurationSource).getProperty(anyString(), anyString());
     }
 
     @Test
-    public void recordDecisions()
+    void recordDecisions()
     {
         DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
         EntityReference userReference = new DocumentReference("xwiki", "XWiki", "User");

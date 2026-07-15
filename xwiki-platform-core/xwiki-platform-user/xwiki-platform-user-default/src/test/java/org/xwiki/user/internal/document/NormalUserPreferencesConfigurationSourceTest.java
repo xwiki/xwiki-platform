@@ -51,7 +51,7 @@ import static org.mockito.Mockito.mock;
  * @version $Id$
  */
 @ComponentTest
-public class NormalUserPreferencesConfigurationSourceTest
+class NormalUserPreferencesConfigurationSourceTest
 {
     @InjectMockComponents
     private NormalUserPreferencesConfigurationSource source;

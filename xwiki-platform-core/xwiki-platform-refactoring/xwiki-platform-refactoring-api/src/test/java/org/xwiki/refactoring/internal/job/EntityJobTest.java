@@ -159,7 +159,7 @@ class EntityJobTest extends AbstractEntityJobTest
         initialize(new EntityRequest());
 
         final List<DocumentReference> documentReferences = new ArrayList<>();
-        this.job.visitDocuments(spaceReference, documentReference -> documentReferences.add(documentReference));
+        this.job.visitDocuments(spaceReference, documentReferences::add);
         // Space preferences documents are handled after their siblings.
         assertEquals(Arrays.asList(carolBio, aliceBio, bobBio, bob, bobPrefs, alice, alicePrefs), documentReferences);
     }

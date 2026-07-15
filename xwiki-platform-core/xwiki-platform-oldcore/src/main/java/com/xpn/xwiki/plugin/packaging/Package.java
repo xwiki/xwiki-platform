@@ -369,7 +369,7 @@ public class Package
             docinfo.setAction(defaultAction);
             this.files.add(docinfo);
             BaseClass bclass = doc.getXClass();
-            if (bclass.getFieldList().size() > 0) {
+            if (!bclass.getFieldList().isEmpty()) {
                 this.classFiles.add(docinfo);
             }
             if (bclass.getCustomMapping() != null) {
@@ -441,7 +441,7 @@ public class Package
 
     public String export(OutputStream os, XWikiContext context) throws IOException, XWikiException
     {
-        if (this.files.size() == 0) {
+        if (this.files.isEmpty()) {
             return "No Selected file";
         }
 
@@ -466,13 +466,11 @@ public class Package
 
     public String exportToDir(File dir, XWikiContext context) throws IOException, XWikiException
     {
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                Object[] args = new Object[1];
-                args[0] = dir.toString();
-                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
-                    "Error creating directory {0}", null, args);
-            }
+        if (!dir.exists() && !dir.mkdirs()) {
+            Object[] args = new Object[1];
+            args[0] = dir.toString();
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
+                "Error creating directory {0}", null, args);
         }
 
         for (int i = 0; i < this.files.size(); i++) {
@@ -496,7 +494,7 @@ public class Package
      * @throws IOException while reading the ZipFile
      * @throws XWikiException when package content is broken
      */
-    public String Import(byte file[], XWikiContext context) throws IOException, XWikiException
+    public String Import(byte[] file, XWikiContext context) throws IOException, XWikiException
     {
         return Import(new ByteArrayInputStream(file), context);
     }
@@ -650,7 +648,7 @@ public class Package
 
         int result = DocumentInfo.INSTALL_IMPOSSIBLE;
         try {
-            if (this.files.size() == 0) {
+            if (this.files.isEmpty()) {
                 return result;
             }
 
@@ -715,10 +713,9 @@ public class Package
 
             // Install the remaining documents (without class definitions).
             for (DocumentInfo docInfo : this.files) {
-                if (!this.classFiles.contains(docInfo)) {
-                    if (installDocument(docInfo, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
-                        status = DocumentInfo.INSTALL_ERROR;
-                    }
+                if (!this.classFiles.contains(docInfo)
+                    && installDocument(docInfo, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
+                    status = DocumentInfo.INSTALL_ERROR;
                 }
             }
             setStatus(status, context);
@@ -926,12 +923,11 @@ public class Package
                 context.getWiki().saveDocument(doc.getDoc(), saveMessage, context);
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 
-                if ((this.withVersions && packageHasHistory) || conserveExistingHistory) {
-                    // we need to force the saving the document archive.
-                    if (doc.getDoc().getDocumentArchive() != null) {
-                        context.getWiki().getVersioningStore()
-                            .saveXWikiDocArchive(doc.getDoc().getDocumentArchive(context), true, context);
-                    }
+                // we need to force the saving the document archive.
+                if (((this.withVersions && packageHasHistory) || conserveExistingHistory)
+                    && doc.getDoc().getDocumentArchive() != null) {
+                    context.getWiki().getVersioningStore()
+                        .saveXWikiDocArchive(doc.getDoc().getDocumentArchive(context), true, context);
                 }
 
                 if (shouldResetToInitialVersion) {
@@ -958,7 +954,7 @@ public class Package
     private boolean documentContainsHistory(DocumentInfo doc)
     {
         if ((doc.getDoc().getDocumentArchive() == null) || (doc.getDoc().getDocumentArchive().getNodes() == null)
-            || (doc.getDoc().getDocumentArchive().getNodes().size() == 0)) {
+            || doc.getDoc().getDocumentArchive().getNodes().isEmpty()) {
             return false;
         }
         return true;
@@ -1275,13 +1271,11 @@ public class Package
         try {
             filter(doc, context);
             File spacedir = new File(dir, getDirectoryForDocument(doc));
-            if (!spacedir.exists()) {
-                if (!spacedir.mkdirs()) {
-                    Object[] args = new Object[1];
-                    args[0] = dir.toString();
-                    throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
-                        "Error creating directory {0}", null, args);
-                }
+            if (!spacedir.exists() && !spacedir.mkdirs()) {
+                Object[] args = new Object[1];
+                args[0] = dir.toString();
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
+                    "Error creating directory {0}", null, args);
             }
             String filename = getFileNameFromDocument(doc, context);
             File file = new File(spacedir, filename);

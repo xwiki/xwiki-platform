@@ -131,42 +131,38 @@ public class Utils
         if (cacheSetting == -1) {
             cacheSetting = 1;
         }
-        if ((!"download".equals(action)) && (!"skin".equals(action))) {
-            if (context.getResponse() instanceof XWikiServletResponse) {
-                // Add a last modified to tell when the page was last updated
-                if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 0, context) != 0) {
-                    if (context.getDoc() != null) {
-                        response.setDateHeader("Last-Modified", context.getDoc().getDate().getTime());
-                    }
-                }
-                // Set a nocache to make sure the page is reloaded after an edit
-                if (cacheSetting == 1) {
-                    response.setHeader("Pragma", NO_CACHE);
-                    response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
-                } else if (cacheSetting == 2) {
-                    response.setHeader("Pragma", NO_CACHE);
-                    response.setHeader(CACHE_CONTROL_HEADER, "max-age=0, no-cache, no-store");
-                } else if (cacheSetting == 3) {
-                    response.setHeader(CACHE_CONTROL_HEADER, "private");
-                } else if (cacheSetting == 4) {
-                    response.setHeader(CACHE_CONTROL_HEADER, "public");
-                }
+        if ((!"download".equals(action)) && (!"skin".equals(action))
+            && context.getResponse() instanceof XWikiServletResponse) {
+            // Add a last modified to tell when the page was last updated
+            if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 0, context) != 0
+                && context.getDoc() != null) {
+                response.setDateHeader("Last-Modified", context.getDoc().getDate().getTime());
+            }
+            // Set a nocache to make sure the page is reloaded after an edit
+            if (cacheSetting == 1) {
+                response.setHeader("Pragma", NO_CACHE);
+                response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
+            } else if (cacheSetting == 2) {
+                response.setHeader("Pragma", NO_CACHE);
+                response.setHeader(CACHE_CONTROL_HEADER, "max-age=0, no-cache, no-store");
+            } else if (cacheSetting == 3) {
+                response.setHeader(CACHE_CONTROL_HEADER, "private");
+            } else if (cacheSetting == 4) {
+                response.setHeader(CACHE_CONTROL_HEADER, "public");
+            }
 
-                // Set an expires in one month
-                long expires = context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
-                if (expires == -1) {
-                    response.setDateHeader("Expires", -1);
-                } else if (expires != 0) {
-                    response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
-                }
+            // Set an expires in one month
+            long expires = context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
+            if (expires == -1) {
+                response.setDateHeader("Expires", -1);
+            } else if (expires != 0) {
+                response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
             }
         }
 
-        if (("download".equals(action)) || ("skin".equals(action))) {
-            // Set a nocache to make sure these files are not cached by proxies
-            if (cacheSetting == 1 || cacheSetting == 2) {
-                response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
-            }
+        // Set a nocache to make sure these files are not cached by proxies
+        if ((("download".equals(action)) || ("skin".equals(action))) && (cacheSetting == 1 || cacheSetting == 2)) {
+            response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
         }
 
         context.getWiki().getPluginManager().beginParsing(context);

@@ -84,16 +84,13 @@ public class DefaultBatchOperationExecutor implements BatchOperationExecutor
 
     protected String generateBatchId()
     {
-        String result = UUID.randomUUID().toString();
-        return result;
+        return UUID.randomUUID().toString();
     }
 
     @Override
     public String getCurrentBatchId()
     {
         Object existingBatchIdObject = execution.getContext().getProperty(CONTEXT_PROPERTY);
-        String batchId = Objects.toString(existingBatchIdObject, null);
-
-        return batchId;
+        return Objects.toString(existingBatchIdObject, null);
     }
 }

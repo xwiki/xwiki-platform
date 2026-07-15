@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class LikeEventListenerTest
+class LikeEventListenerTest
 {
     @InjectMockComponents
     private LikeEventListener likeEventListener;

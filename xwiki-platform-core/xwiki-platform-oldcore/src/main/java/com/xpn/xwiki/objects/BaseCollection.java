@@ -705,14 +705,12 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
-                if ((newProperty != null) && (!"".equals(newProperty.toText()))) {
-                    if (pclass != null) {
-                        String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
-                            : pclass.displayView(propertyName, this, context);
-                        difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue,
-                            isSensitive));
-                    }
+                if ((newProperty != null) && (!"".equals(newProperty.toText())) && pclass != null) {
+                    String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
+                        : pclass.displayView(propertyName, this, context);
+                    difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue,
+                        isSensitive));
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
                 // The property exists in both objects and is different
@@ -751,22 +749,20 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             if (!isSensitive && oldProperty != null) {
                 isSensitive = oldProperty.isSensitive(context);
             }
-            if (newProperty == null) {
-                // The property exists in the old object, but not in the new one
-                if ((oldProperty != null) && (!"".equals(oldProperty.toText()))) {
-                    if (pclass != null) {
-                        // Put the values as they would be displayed in the interface
-                        String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                            : pclass.displayView(propertyName, oldCollection, context);
-                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, "",
-                            isSensitive));
-                    } else {
-                        // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
-                            ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), "",
-                            isSensitive));
-                    }
+            // The property exists in the old object, but not in the new one
+            if (newProperty == null && (oldProperty != null) && (!"".equals(oldProperty.toText()))) {
+                if (pclass != null) {
+                    // Put the values as they would be displayed in the interface
+                    String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
+                        : pclass.displayView(propertyName, oldCollection, context);
+                    difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, "",
+                        isSensitive));
+                } else {
+                    // Cannot get property definition, so use the plain value
+                    difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
+                        ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldProperty.toText(), "",
+                        isSensitive));
                 }
             }
         }

@@ -826,17 +826,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // It's possible the space does not yet exist yet
             maybeCreateSpace(document.getDocumentReference().getLastSpaceReference(), document.isHidden(), session);
 
-            if (!document.isNew()) {
-                // If the hidden state of an existing document did not changed there is nothing to do
-                if (document.isHidden() != document.getOriginalDocument().isHidden()) {
-                    if (document.isHidden()) {
-                        // If the document became hidden it's possible the space did too
-                        maybeMakeSpaceHidden(document.getDocumentReference().getLastSpaceReference(),
-                            document.getFullName(), session);
-                    } else {
-                        // If the document became visible then all its parents should be visible as well
-                        makeSpaceVisible(document.getDocumentReference().getLastSpaceReference(), session);
-                    }
+            // If the hidden state of an existing document did not changed there is nothing to do
+            if (!document.isNew() && !Objects.equals(document.isHidden(), document.getOriginalDocument().isHidden())) {
+                if (Boolean.TRUE.equals(document.isHidden())) {
+                    // If the document became hidden it's possible the space did too
+                    maybeMakeSpaceHidden(document.getDocumentReference().getLastSpaceReference(),
+                        document.getFullName(), session);
+                } else {
+                    // If the document became visible then all its parents should be visible as well
+                    makeSpaceVisible(document.getDocumentReference().getLastSpaceReference(), session);
                 }
             }
         }
@@ -1662,10 +1660,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     loadXWikiProperty(property2, context, false);
                                     property.setValue(property2.getValue());
 
-                                    if (bclass != null) {
-                                        if (bclass.get(name) instanceof TextAreaClass) {
-                                            property = property2;
-                                        }
+                                    if (bclass != null && bclass.get(name) instanceof TextAreaClass) {
+                                        property = property2;
                                     }
 
                                 } else if (property instanceof LargeStringProperty) {
@@ -1675,10 +1671,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     loadXWikiProperty(property2, context, false);
                                     property.setValue(property2.getValue());
 
-                                    if (bclass != null) {
-                                        if (bclass.get(name) instanceof StringClass) {
-                                            property = property2;
-                                        }
+                                    if (bclass != null && bclass.get(name) instanceof StringClass) {
+                                        property = property2;
                                     }
                                 } else {
                                     throw e;
@@ -2898,11 +2892,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             XWikiDocument doc =
                 new XWikiDocument(this.defaultDocumentReferenceResolver.resolve(fullName, currentWikiReference));
-            if (checkRight) {
-                if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(),
-                    context)) {
-                    continue;
-                }
+            if (checkRight && !context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
+                doc.getFullName(), context)) {
+                continue;
             }
 
             DocumentReference documentReference = doc.getDocumentReference();
@@ -2996,7 +2988,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         throws XWikiException
     {
         boolean result = injectCustomMapping(bclass, context);
-        if (result == false) {
+        if (!result) {
             return getSessionFactory();
         }
 
@@ -3015,7 +3007,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         try {
             // If we haven't turned of dynamic custom mappings we should not inject them
-            if (context.getWiki().hasDynamicCustomMappings() == false) {
+            if (!context.getWiki().hasDynamicCustomMappings()) {
                 return getSessionFactory();
             }
 
@@ -3048,7 +3040,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         try {
             // If we haven't turned of dynamic custom mappings we should not inject them
-            if (context.getWiki().hasDynamicCustomMappings() == false) {
+            if (!context.getWiki().hasDynamicCustomMappings()) {
                 return false;
             }
 

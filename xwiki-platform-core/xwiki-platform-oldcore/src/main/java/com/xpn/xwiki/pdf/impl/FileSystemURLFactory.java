@@ -118,11 +118,10 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             Map<String, File> usedFiles = getFileMapping(context);
             String key = getSkinfileKey(filename, skin);
-            if (!usedFiles.containsKey(key)) {
-                if (!copyResource("/skins/" + skin + '/' + filename, key, usedFiles, context)) {
-                    // The resource does not exist, just return a http:// URL
-                    return super.createSkinURL(filename, skin, context);
-                }
+            if (!usedFiles.containsKey(key)
+                && !copyResource("/skins/" + skin + '/' + filename, key, usedFiles, context)) {
+                // The resource does not exist, just return a http:// URL
+                return super.createSkinURL(filename, skin, context);
             }
             return usedFiles.get(key).toURI().toURL();
         } catch (Exception ex) {
@@ -137,10 +136,8 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             Map<String, File> usedFiles = getFileMapping(context);
             String key = getResourceKey(filename);
-            if (!usedFiles.containsKey(key)) {
-                if (!copyResource("/resources/" + filename, key, usedFiles, context)) {
-                    return super.createResourceURL(filename, forceSkinAction, context);
-                }
+            if (!usedFiles.containsKey(key) && !copyResource("/resources/" + filename, key, usedFiles, context)) {
+                return super.createResourceURL(filename, forceSkinAction, context);
             }
             return usedFiles.get(key).toURI().toURL();
         } catch (Exception ex) {

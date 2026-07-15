@@ -346,14 +346,14 @@ public class BaseAttachmentsResource extends XWikiResource
     {
         String fileName = attachment.getFilename().toUpperCase();
         return acceptedFileNameExtensions.stream()
-            .anyMatch(acceptedFileNamedExtension -> fileName.endsWith(acceptedFileNamedExtension));
+            .anyMatch(fileName::endsWith);
     }
 
     private boolean hasAcceptedMediaType(XWikiAttachment attachment, Set<String> acceptedMediaTypes)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         String detectedMediaType = attachment.getMimeType(xcontext).toUpperCase();
-        return acceptedMediaTypes.stream().anyMatch(acceptedMediaType -> detectedMediaType.contains(acceptedMediaType));
+        return acceptedMediaTypes.stream().anyMatch(detectedMediaType::contains);
     }
 
     private Attachment toRestAttachment(XWikiAttachment xwikiAttachment, Boolean withPrettyNames)

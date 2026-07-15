@@ -61,7 +61,7 @@ import static org.mockito.Mockito.when;
     DefaultDocumentContentAsyncParser.class,
     DocumentReferenceDequeContext.class
 })
-public class DocumentContentDisplayerTest
+class DocumentContentDisplayerTest
 {
     @InjectMockComponents
     private DocumentContentAsyncExecutor documentExecutor;
@@ -91,7 +91,7 @@ public class DocumentContentDisplayerTest
     private TransformationManager transformationManager;
 
     @Test
-    public void baseMetaDataIsSetBeforeExecutingTransformations() throws Exception
+    void baseMetaDataIsSetBeforeExecutingTransformations() throws Exception
     {
         when(this.executor.execute(any(), any())).then(new Answer<Block>()
         {

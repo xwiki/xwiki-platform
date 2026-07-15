@@ -73,8 +73,7 @@ public class UsersAndGroupsMimeMessageFactory extends AbstractIteratorMimeMessag
 
         MimeMessageFactory factory = getInternalMimeMessageFactory(factoryHint);
 
-        UsersAndGroupsMimeMessageIterator iterator = new UsersAndGroupsMimeMessageIterator(source, factory, parameters,
+        return new UsersAndGroupsMimeMessageIterator(source, factory, parameters,
             this.explicitDocumentReferenceResolver, this.execution);
-        return iterator;
     }
 }

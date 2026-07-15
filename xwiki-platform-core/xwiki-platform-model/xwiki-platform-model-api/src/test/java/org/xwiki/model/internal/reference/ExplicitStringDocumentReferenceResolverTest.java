@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ComponentList({
     DefaultSymbolScheme.class
 })
-public class ExplicitStringDocumentReferenceResolverTest
+class ExplicitStringDocumentReferenceResolverTest
 {
     @InjectMockComponents
     private ExplicitStringEntityReferenceResolver entityReferenceResolver;
@@ -48,7 +48,7 @@ public class ExplicitStringDocumentReferenceResolverTest
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         this.documentReferenceResolver = new ExplicitStringDocumentReferenceResolver();
         ReflectionUtils.setFieldValue(this.documentReferenceResolver, "entityReferenceResolver", 
@@ -56,7 +56,7 @@ public class ExplicitStringDocumentReferenceResolverTest
     }
 
     @Test
-    public void resolveWithExplicitDocumentReference()
+    void resolveWithExplicitDocumentReference()
     {
         DocumentReference reference = 
             this.documentReferenceResolver.resolve("", new DocumentReference("wiki", "space", "page"));

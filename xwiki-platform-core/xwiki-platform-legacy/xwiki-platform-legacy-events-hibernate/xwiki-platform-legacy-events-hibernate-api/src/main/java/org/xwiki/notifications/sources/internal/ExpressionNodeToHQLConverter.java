@@ -132,14 +132,14 @@ public class ExpressionNodeToHQLConverter
 
     private String parseBlock(ExpressionNode node, HQLQuery result)
     {
-        if (node instanceof AbstractValueNode) {
-            return parseValue((AbstractValueNode) node, result);
-        } else if (node instanceof AbstractUnaryOperatorNode) {
-            return parseUnaryOperator((AbstractUnaryOperatorNode) node, result);
-        } else if (node instanceof AbstractBinaryOperatorNode) {
-            return parseBinaryOperator((AbstractBinaryOperatorNode) node, result);
-        } else if (node instanceof AbstractOperatorNode) {
-            return parseOtherOperation((AbstractOperatorNode) node, result);
+        if (node instanceof AbstractValueNode valueNode) {
+            return parseValue(valueNode, result);
+        } else if (node instanceof AbstractUnaryOperatorNode unaryNode) {
+            return parseUnaryOperator(unaryNode, result);
+        } else if (node instanceof AbstractBinaryOperatorNode binaryNode) {
+            return parseBinaryOperator(binaryNode, result);
+        } else if (node instanceof AbstractOperatorNode operatorNode) {
+            return parseOtherOperation(operatorNode, result);
         } else {
             return StringUtils.EMPTY;
         }
@@ -154,14 +154,13 @@ public class ExpressionNodeToHQLConverter
     {
         String returnValue;
 
-        if (value instanceof PropertyValueNode) {
-            returnValue = PROPERTY_MAPPING.get(((PropertyValueNode) value).getContent());
+        if (value instanceof PropertyValueNode propertyNode) {
+            returnValue = PROPERTY_MAPPING.get(propertyNode.getContent());
             if (returnValue == null) {
                 returnValue = StringUtils.EMPTY;
             }
-        } else if (value instanceof StringValueNode) {
+        } else if (value instanceof StringValueNode valueNode) {
             // If we’re dealing with raw values, we have to put them in the queryParameters map
-            StringValueNode valueNode = (StringValueNode) value;
             String nodeContent = (escape) ? escape(valueNode.getContent()) : valueNode.getContent();
 
             // In order to lower the probability of having collisions in the query parameters provided by other
@@ -171,8 +170,8 @@ public class ExpressionNodeToHQLConverter
             result.queryParameters.put(mapKey, nodeContent);
 
             returnValue = String.format(VARIABLE_NAME, mapKey);
-        } else if (value instanceof EntityReferenceNode) {
-            String stringValue = serializer.serialize(((EntityReferenceNode) value).getContent());
+        } else if (value instanceof EntityReferenceNode referenceNode) {
+            String stringValue = serializer.serialize(referenceNode.getContent());
             if (escape) {
                 stringValue = escape(stringValue);
             }
@@ -182,8 +181,7 @@ public class ExpressionNodeToHQLConverter
             result.queryParameters.put(mapKey, stringValue);
 
             returnValue = String.format(VARIABLE_NAME, mapKey);
-        } else if (value instanceof DateValueNode) {
-            DateValueNode dateValueNode = (DateValueNode) value;
+        } else if (value instanceof DateValueNode dateValueNode) {
             String stringValue = dateValueNode.getContent().toString();
 
             String mapKey = String.format("date_%s",  sha256Hex(stringValue));
@@ -191,10 +189,9 @@ public class ExpressionNodeToHQLConverter
             result.queryParameters.put(mapKey, dateValueNode.getContent());
 
             returnValue = String.format(VARIABLE_NAME, mapKey);
-        } else if (value instanceof BooleanValueNode) {
-            returnValue = ((BooleanValueNode) value).getContent().toString();
-        } else if (value instanceof ConcatNode) {
-            ConcatNode node = (ConcatNode) value;
+        } else if (value instanceof BooleanValueNode booleanNode) {
+            returnValue = booleanNode.getContent().toString();
+        } else if (value instanceof ConcatNode node) {
             returnValue = String.format("CONCAT(%s, %s)",
                     parseBlock(node.getLeftOperand(), result),
                     parseBlock(node.getRightOperand(), result)
@@ -239,14 +236,12 @@ public class ExpressionNodeToHQLConverter
             returnValue = String.format("%s LIKE concat('%%', %s) ESCAPE '!'",
                     parseValue((AbstractValueNode) operator.getLeftOperand(), result),
                     parseValue((AbstractValueNode) operator.getRightOperand(), true, result));
-        } else if (operator instanceof GreaterThanNode) {
-            GreaterThanNode greater = (GreaterThanNode) operator;
+        } else if (operator instanceof GreaterThanNode greater) {
             returnValue = String.format("%s %s %s",
                 parseBlock(greater.getLeftOperand(), result),
                 greater.isOrEquals() ? ">=" : ">",
                 parseBlock(greater.getRightOperand(), result));
-        } else if (operator instanceof LesserThanNode) {
-            LesserThanNode lesser = (LesserThanNode) operator;
+        } else if (operator instanceof LesserThanNode lesser) {
             returnValue = String.format("%s %s %s",
                 parseBlock(lesser.getLeftOperand(), result),
                 lesser.isOrEquals() ? "<=" : "<",
@@ -262,8 +257,7 @@ public class ExpressionNodeToHQLConverter
     {
         String returnValue;
 
-        if (operator instanceof InNode) {
-            InNode inOperator = (InNode) operator;
+        if (operator instanceof InNode inOperator) {
             if (inOperator.getValues().isEmpty()) {
                 // Since an IN node with no value essentially mean "nothing" we replace it with an equivalent
                 returnValue = "true = false";
@@ -282,8 +276,7 @@ public class ExpressionNodeToHQLConverter
 
                 returnValue = builder.toString();
             }
-        } else if (operator instanceof InSubQueryNode) {
-            InSubQueryNode inSubQueryOperator = (InSubQueryNode) operator;
+        } else if (operator instanceof InSubQueryNode inSubQueryOperator) {
             StringBuilder builder = new StringBuilder(parseBlock(inSubQueryOperator.getLeftOperand(), result));
             builder.append(" IN (");
             builder.append(inSubQueryOperator.getSubQuery());
@@ -292,13 +285,10 @@ public class ExpressionNodeToHQLConverter
             returnValue = builder.toString();
 
             result.getQueryParameters().putAll(inSubQueryOperator.getParameters());
-        } else if (operator instanceof OrderByNode) {
-            OrderByNode orderByNode = (OrderByNode) operator;
+        } else if (operator instanceof OrderByNode orderByNode) {
             returnValue = String.format("%s ORDER BY %s %s", parseBlock(orderByNode.getQuery(), result),
                     parseBlock(orderByNode.getProperty(), result), orderByNode.getOrder().name());
-        } else if (operator instanceof ForUserNode) {
-            ForUserNode forUser = (ForUserNode) operator;
-
+        } else if (operator instanceof ForUserNode forUser) {
             StringBuilder builder = new StringBuilder("event IN (");
 
             builder.append("select status.activityEvent from LegacyEventStatus status");

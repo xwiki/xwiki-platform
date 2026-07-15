@@ -87,8 +87,7 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             // remove the annotation
             annotationService.removeAnnotation(documentName, id);
             // and then return the annotated content, as specified by the annotation request
-            AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, request);
-            return response;
+            return getSuccessResponseWithAnnotatedContent(documentName, request);
         } catch (XWikiException e) {
             getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
@@ -160,8 +159,7 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             annotationService.updateAnnotation(documentName, newAnnotation);
             this.cleanTemporaryUploadedFiles(documentReference);
             // and then return the annotated content, as specified by the annotation request
-            AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, updateRequest);
-            return response;
+            return getSuccessResponseWithAnnotatedContent(documentName, updateRequest);
         } catch (XWikiException e) {
             getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);

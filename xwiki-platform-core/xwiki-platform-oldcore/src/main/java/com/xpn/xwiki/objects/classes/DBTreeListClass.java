@@ -125,7 +125,7 @@ public class DBTreeListClass extends DBListClass
     {
         List<ListItem> list = getDBList(context);
         Map<String, List<ListItem>> map = new HashMap<>();
-        if ((list == null) || (list.size() == 0)) {
+        if ((list == null) || (list.isEmpty())) {
             return map;
         }
         // The root of the tree is considered to be the empty string.
@@ -266,7 +266,7 @@ public class DBTreeListClass extends DBListClass
 
     private void mergeItems(List<ListItem> itemPath, List<List<ListItem>> resList)
     {
-        if (itemPath == null || itemPath.size() == 0) {
+        if (itemPath == null || itemPath.isEmpty()) {
             return;
         }
 
@@ -528,7 +528,7 @@ public class DBTreeListClass extends DBListClass
                 // Let's create the complete query
                 select.append(" from ");
                 select.append(StringUtils.join(fromStatements.iterator(), ", "));
-                if (whereStatements.size() > 0) {
+                if (!whereStatements.isEmpty()) {
                     select.append(" where ");
                     select.append(StringUtils.join(whereStatements.iterator(), " and "));
                 }

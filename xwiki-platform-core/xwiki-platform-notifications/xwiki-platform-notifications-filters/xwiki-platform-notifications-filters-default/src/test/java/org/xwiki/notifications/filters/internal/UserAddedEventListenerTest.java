@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @since 13.3RC1
  */
 @ComponentTest
-public class UserAddedEventListenerTest
+class UserAddedEventListenerTest
 {
     @InjectMockComponents
     private UserAddedEventListener userAddedEventListener;

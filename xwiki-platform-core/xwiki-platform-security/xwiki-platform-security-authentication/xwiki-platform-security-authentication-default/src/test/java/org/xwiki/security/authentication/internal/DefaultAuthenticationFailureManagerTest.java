@@ -138,7 +138,7 @@ class DefaultAuthenticationFailureManagerTest
     }
 
     @BeforeEach
-    public void setup() throws Exception
+    void setup() throws Exception
     {
         when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy1", "strategy2" });
         when(configuration.getMaxAuthorizedAttempts()).thenReturn(3);

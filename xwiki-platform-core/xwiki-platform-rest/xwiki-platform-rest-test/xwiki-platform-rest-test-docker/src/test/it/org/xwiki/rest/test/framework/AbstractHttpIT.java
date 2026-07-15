@@ -455,7 +455,7 @@ public abstract class AbstractHttpIT
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(wikis.getWikis().size() > 0);
+        assertTrue(!wikis.getWikis().isEmpty());
 
         return wikis.getWikis().get(0).getName();
     }

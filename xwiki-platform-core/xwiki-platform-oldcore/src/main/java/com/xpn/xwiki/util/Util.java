@@ -206,12 +206,13 @@ public class Util
     public static <T> Map<String, T> getSubMap(Map<String, T> map, String prefix)
     {
         Map<String, T> result = new HashMap<>();
-        for (String name : map.keySet()) {
+        for (Map.Entry<String, T> entry : map.entrySet()) {
+            String name = entry.getKey();
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);
-                result.put(newname, map.get(name));
+                result.put(newname, entry.getValue());
             } else if (name.equals(prefix)) {
-                result.put("", map.get(name));
+                result.put("", entry.getValue());
             }
         }
 

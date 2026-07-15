@@ -173,7 +173,7 @@ viewers.Tags = Class.create({
       varname: 'input',
       seps: "${xwiki.getDocument('XWiki.TagClass').xWikiClass.tags.getProperty('separators').value}",
       shownoresults : false,
-      icon: '$escapetool.javascript($services.icon.renderHTML("tag")) '
+      iconHTML: '$escapetool.javascript($services.icon.renderHTML("tag")) '
     });
   }
 });

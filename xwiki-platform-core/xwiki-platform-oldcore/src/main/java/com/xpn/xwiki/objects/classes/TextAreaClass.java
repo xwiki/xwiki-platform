@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.edit.EditException;
 import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorManager;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
 import org.xwiki.security.authorization.AuthorExecutor;
@@ -397,7 +399,14 @@ public class TextAreaClass extends StringClass
         parameters.put("rows", getRows());
         parameters.put("disabled", isDisabled());
         parameters.put(RESTRICTED, isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
+        // The document reference is used client-side (e.g. to resolve relative references and build URLs).
         parameters.put("sourceDocumentReference", ownerDocument.getDocumentReferenceWithLocale());
+        // The property reference is used server-side to render the content with the rights of the document's author
+        // (instead of the current user) when the content is the unmodified stored value of the property.
+        ObjectReference objectReference = (ObjectReference) object.getReference();
+        if (objectReference != null) {
+            parameters.put("sourcePropertyReference", new ObjectPropertyReference(name, objectReference));
+        }
         Syntax syntax = null;
         String contentType = getContentType();
 

@@ -17,26 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import type { ResourceReference } from "./ResourceReference";
+
 /**
- * Client-side equivalent of ResourceReference from xwiki-rendering-api.
+ * Options used to tweak the `ResourceReferenceParser`.
  *
- * @since 18.3.0RC1
+ * @since 18.6.0RC1
  * @beta
  */
-type ResourceReference = {
-  type: string;
-  typed: boolean;
-  reference: string;
-};
-
 type ResourceReferenceParserOptions = {
   type?: string;
 };
 
 /**
- * Client-side equivalent of ResourceReferenceParser from xwiki-rendering-api.
+ * Client-side equivalent of `ResourceReferenceParser` from `xwiki-rendering-api`.
  *
- * @since 18.3.0RC1
+ * @since 18.6.0RC1
  * @beta
  */
 interface ResourceReferenceParser {
@@ -46,8 +42,4 @@ interface ResourceReferenceParser {
   ): ResourceReference;
 }
 
-export type {
-  ResourceReference,
-  ResourceReferenceParser,
-  ResourceReferenceParserOptions,
-};
+export type { ResourceReferenceParser, ResourceReferenceParserOptions };

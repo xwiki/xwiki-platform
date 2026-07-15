@@ -17,33 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { ResourceType } from "./ResourceReference";
 import { Container, injectable } from "inversify";
+import type { ResourceReference } from "./ResourceReference";
 import type {
-  ResourceReference,
   ResourceReferenceParser,
   ResourceReferenceParserOptions,
 } from "./ResourceReferenceParser";
 
+/**
+ * Default `ResourceReferenceParser` implementation.
+ *
+ * @since 18.6.0RC1
+ * @beta
+ */
 @injectable("Singleton")
 export class DefaultResourceReferenceParser implements ResourceReferenceParser {
-  // See ResourceType in xwiki-rendering-api.
-  public static readonly RESOURCE_TYPES: string[] = [
-    "unknown",
-    "doc",
-    "page",
-    "space",
-    "url",
-    "interwiki",
-    "path",
-    "mailto",
-    "attach",
-    "pageAttach",
-    "icon",
-    "unc",
-    "user",
-    "data",
-  ];
-
   public static bind(container: Container): void {
     container
       .bind("ResourceReferenceParser")
@@ -58,25 +47,28 @@ export class DefaultResourceReferenceParser implements ResourceReferenceParser {
     const parts = serializedReference.split(":");
     if (parts.length > 1) {
       const type = parts[0];
-      if (DefaultResourceReferenceParser.RESOURCE_TYPES.includes(type)) {
+      if (Object.values(ResourceType).includes(type)) {
         return {
           type,
           typed: true,
           reference: parts.slice(1).join(":"),
+          parameters: {},
         };
       } else if (parts[1].startsWith("//")) {
         return {
           type: "url",
           typed: false,
           reference: serializedReference,
+          parameters: {},
         };
       }
     }
 
     return {
-      type: options?.type ?? "unknown",
+      type: options?.type ?? ResourceType.UNKNOWN,
       typed: false,
       reference: serializedReference,
+      parameters: {},
     };
   }
 }

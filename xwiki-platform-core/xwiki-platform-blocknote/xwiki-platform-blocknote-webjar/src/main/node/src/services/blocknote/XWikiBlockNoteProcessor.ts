@@ -54,6 +54,14 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     language: "text",
   };
 
+  // The block metadata that can't be stored in the BlockNote schema and is backed up (mapped to the block id) so that
+  // it survives the editing round-trip.
+  private static readonly KNOWN_METADATA: readonly string[] = [
+    "xwikiParameters",
+    "xwikiReference",
+    "xwikiFreestanding",
+  ];
+
   public static bind(container: Container): void {
     container
       .bind("BlockNoteProcessor")
@@ -133,19 +141,14 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     blockNoteDocument: BlockNoteDocument,
   ): void {
     const props = block.props as Record<string, unknown>;
-    const knownMetadata = [
-      "xwikiParameters",
-      "xwikiReference",
-      "xwikiFreestanding",
-    ];
-    knownMetadata
-      .filter((key) => key in props)
-      .forEach((key) => {
-        block.id = block.id ?? uuidv4();
-        blockNoteDocument.getMetadata(block.id as string, true)![key] =
-          props[key];
-        delete props[key];
-      });
+    XWikiBlockNoteProcessor.KNOWN_METADATA.filter(
+      (key) => key in props,
+    ).forEach((key) => {
+      block.id = block.id ?? uuidv4();
+      blockNoteDocument.getMetadata(block.id as string, true)![key] =
+        props[key];
+      delete props[key];
+    });
   }
 
   /**

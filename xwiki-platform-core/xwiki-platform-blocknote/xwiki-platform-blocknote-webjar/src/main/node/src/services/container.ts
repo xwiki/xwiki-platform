@@ -33,7 +33,6 @@ import { XWikiMacroBlock } from "./macros/XWikiMacroBlock";
 import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
 import { DefaultModelReferenceParserProvider } from "./model/reference/DefaultModelReferenceParserProvider";
 import { DefaultModelReferenceSerializerProvider } from "./model/reference/DefaultModelReferenceSerializerProvider";
-import { DefaultResourceReferenceParser } from "./model/reference/DefaultResourceReferenceParser";
 import { XWikiModelReferenceHandler } from "./model/reference/XWikiModelReferenceHandler";
 import { XWikiModelReferenceParser } from "./model/reference/XWikiModelReferenceParser";
 import { XWikiModelReferenceSerializer } from "./model/reference/XWikiModelReferenceSerializer";
@@ -52,6 +51,7 @@ import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platfor
 import { ComponentInit as MacroServiceComponentList } from "@xwiki/platform-macros-service";
 import { ComponentInit as MarkdownSyntaxConfig } from "@xwiki/platform-markdown-syntax-config";
 import { ComponentInit as MinimalSyntaxConfig } from "@xwiki/platform-minimal-syntax-config";
+import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
 import { ComponentInit as XWikiSyntaxConfig } from "@xwiki/platform-xwiki-syntax-config";
 import { Container } from "inversify";
 

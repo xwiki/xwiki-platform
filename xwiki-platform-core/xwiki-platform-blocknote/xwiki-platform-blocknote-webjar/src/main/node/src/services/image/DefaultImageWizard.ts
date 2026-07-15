@@ -23,13 +23,13 @@ import type {
   ImageWizard,
   ImageWizardCallback,
 } from "./ImageWizard";
-import type {
-  ResourceReference,
-  ResourceReferenceParser,
-} from "../model/reference/ResourceReferenceParser";
 import type { XWikiEntityReference } from "../model/reference/XWikiEntityReference";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type { BlockOfType } from "@xwiki/platform-editors-blocknote-react";
+import type {
+  ResourceReference,
+  ResourceReferenceParser,
+} from "@xwiki/platform-rendering-api";
 
 // The image alignment options supported by the Image Wizard.
 type ImageAlignment = "none" | "start" | "center" | "end";

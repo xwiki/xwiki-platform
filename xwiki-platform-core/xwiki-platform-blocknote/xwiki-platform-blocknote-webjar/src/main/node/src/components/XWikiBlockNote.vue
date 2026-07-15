@@ -97,7 +97,6 @@ import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcesso
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { XWikiMeta } from "../services/meta/XWikiMeta";
-import type { ResourceReference } from "../services/model/reference/ResourceReferenceParser";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -119,6 +118,7 @@ import type {
 } from "@xwiki/platform-macros-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
 import type { Ref } from "vue";
 

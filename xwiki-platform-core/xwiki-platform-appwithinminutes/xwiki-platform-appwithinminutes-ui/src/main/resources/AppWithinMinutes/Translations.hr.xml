@@ -194,8 +194,6 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=Povucite i ispustite za 
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Obrišite
 platform.appwithinminutes.liveTableEditorAddColumnHint=Dodajte
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Neki stupci su precrtani, vjerojatno zato što su pripadna aplikacijska polja obrisana. Želite li ih ukloniti?
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Ukloni zastarjele stupce
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Zadrži ih
 platform.appwithinminutes.liveTableEditorIcon=Ikona
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Ikona aplikacije. Možete odabrati ikonu iz odabirača ikona ili možete referencirati pridruženu sliku.
 

@@ -194,8 +194,6 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=Arrastrar y soltar para 
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Borrar
 platform.appwithinminutes.liveTableEditorAddColumnHint=Añadir columna seleccionada
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Algunas columnas están obsoletas, probablemente porque se han eliminado los campos de aplicación correspondientes. ¿Quiere eliminarlas?
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Eliminar columnas obsoletas
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Conservarlas
 platform.appwithinminutes.liveTableEditorIcon=Icono
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=El icono de la aplicación. Puede seleccionar un icono del selector de iconos o puede hacer referencia a una imagen adjunta.
 

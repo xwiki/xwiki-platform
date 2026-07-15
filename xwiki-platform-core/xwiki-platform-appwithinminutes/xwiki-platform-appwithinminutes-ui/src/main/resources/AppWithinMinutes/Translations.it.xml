@@ -194,8 +194,6 @@ platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop per cambia
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Elimina
 platform.appwithinminutes.liveTableEditorAddColumnHint=Aggiungi
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Alcune colonne sono sconsigliate, probabilmente perchè i corrispondenti campi della classe sono stati eliminati. Si vuole eliminarle?
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Elimina colonne sconsigliate
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Mantienile
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 

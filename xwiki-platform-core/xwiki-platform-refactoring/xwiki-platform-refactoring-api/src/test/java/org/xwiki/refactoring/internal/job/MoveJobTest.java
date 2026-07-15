@@ -812,7 +812,6 @@ class MoveJobTest extends AbstractMoveJobTest
                 when(mock.isOverwrite()).thenReturn(false);
             })) {
             this.moveJob.initialize(request);
-            EntityJobStatus<MoveRequest> status = this.moveJob.getStatus();
 
             run(request);
         }

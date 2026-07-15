@@ -92,11 +92,6 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
         Pattern.compile("^([A-Z]+|\\.)([0-9]+|\\.)-([A-Z]+|\\.)([0-9]+|\\.)$");
 
     /**
-     * The name of the category dataset.
-     */
-    private static final String CATEGORY_DATASET = "category";
-
-    /**
      * The range parameter.
      */
     private String range;

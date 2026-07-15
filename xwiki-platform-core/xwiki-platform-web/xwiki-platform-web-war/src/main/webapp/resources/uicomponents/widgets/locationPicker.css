@@ -28,8 +28,8 @@
 .location-picker > dd > .breadcrumb-container > .location-actions {
   /* Lay the action buttons out in a row. */
   display: flex;
-  /* Keep the buttons pinned to the top so they align with the first breadcrumb line when it wraps. */
-  align-items: flex-start;
+  /* Center the buttons vertically against the breadcrumb line. */
+  align-items: center;
   /* Remove rounded corners on the left so that the transition is seamless. */
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;

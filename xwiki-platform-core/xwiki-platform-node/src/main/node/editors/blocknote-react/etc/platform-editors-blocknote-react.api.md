@@ -56,6 +56,7 @@ export type BlockNoteViewWrapperProps = {
     depsContainer: Container;
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
+        linkEdition?: LinkEditionHooks;
     };
     syntax: SyntaxConfig;
     refs?: {
@@ -142,6 +143,18 @@ export type InlineMacroInvocation = {
     } | {
         type: "none";
     };
+};
+
+// @beta
+export type LinkData = {
+    title: string;
+    url: string;
+};
+
+// @beta
+export type LinkEditionHooks = {
+    beforeEdit?: (linkData: LinkData) => LinkData | void;
+    beforeUpdate?: (linkData: LinkData) => LinkData | void;
 };
 
 // @beta

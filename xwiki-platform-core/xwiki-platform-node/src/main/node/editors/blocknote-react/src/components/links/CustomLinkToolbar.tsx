@@ -20,21 +20,25 @@
 import { LinkEditor } from "./LinkEditor";
 import { LinkToolbarExtension } from "@blocknote/core/extensions";
 import { useComponentsContext, useExtension } from "@blocknote/react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   RiDeleteBin6Line,
   RiExternalLinkLine,
   RiPencilLine,
 } from "react-icons/ri";
+import type { LinkData } from "./LinkEditor";
+import type { LinkEditionHooks } from "./linkEditionHooks";
 import type { LinkToolbarProps } from "@blocknote/react";
 
 export type CustomLinkToolbarProps = {
   linkToolbarProps: LinkToolbarProps;
+  linkEditionHooks?: LinkEditionHooks;
 };
 
 export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
   linkToolbarProps,
+  linkEditionHooks,
 }) => {
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
@@ -42,6 +46,32 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
   const { editLink, deleteLink } = useExtension(LinkToolbarExtension);
 
   const [showLinkEditor, setShowLinkEditor] = useState(false);
+  // The link data shown in the editor popover. It is set from the current link, giving the integration
+  // a chance to transform it (e.g. to resolve an XWiki resource reference) right before the popover
+  // opens, through the beforeEdit hook.
+  const [editData, setEditData] = useState<LinkData>();
+
+  const openEditor = useCallback(() => {
+    const current: LinkData = {
+      url: linkToolbarProps.url,
+      title: linkToolbarProps.text,
+    };
+    setEditData(linkEditionHooks?.beforeEdit?.(current) ?? current);
+    setShowLinkEditor(true);
+  }, [linkToolbarProps.url, linkToolbarProps.text, linkEditionHooks]);
+
+  const updateLink = useCallback(
+    ({ title, url }: LinkData) => {
+      // Let the integration intercept the link before it is written into the content. Throwing from
+      // the hook cancels the edition.
+      const linkData = linkEditionHooks?.beforeUpdate?.({ title, url }) ?? {
+        title,
+        url,
+      };
+      editLink(linkData.url, linkData.title, linkToolbarProps.range.from);
+    },
+    [editLink, linkEditionHooks, linkToolbarProps.range.from],
+  );
 
   return (
     <>
@@ -54,7 +84,7 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
             data-test="editLink"
             label={t("blocknote.linkToolbar.buttons.edit")}
             icon={<RiPencilLine />}
-            onClick={() => setShowLinkEditor(true)}
+            onClick={openEditor}
           />
         </Components.Generic.Popover.Trigger>
         <Components.Generic.Popover.Content
@@ -62,13 +92,13 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
           variant="form-popover"
         >
           <LinkEditor
-            current={{
-              url: linkToolbarProps.url,
-              title: linkToolbarProps.text,
-            }}
-            updateLink={({ url, title }) =>
-              editLink(url, title, linkToolbarProps.range.from)
+            current={
+              editData ?? {
+                url: linkToolbarProps.url,
+                title: linkToolbarProps.text,
+              }
             }
+            updateLink={updateLink}
           />
         </Components.Generic.Popover.Content>
       </Components.Generic.Popover.Root>

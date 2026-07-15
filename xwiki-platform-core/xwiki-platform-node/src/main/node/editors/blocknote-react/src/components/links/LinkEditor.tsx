@@ -37,6 +37,12 @@ import type { ModelReferenceSerializerProvider } from "@xwiki/platform-model-ref
 import type { RemoteURLParserProvider } from "@xwiki/platform-model-remote-url-api";
 import type { Container } from "inversify";
 
+/**
+ * The data describing a link being created or edited.
+ *
+ * @since 18.6.0RC1
+ * @beta
+ */
 type LinkData = {
   title: string;
   url: string;

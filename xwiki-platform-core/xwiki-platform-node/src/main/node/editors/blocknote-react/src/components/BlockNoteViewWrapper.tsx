@@ -57,6 +57,7 @@ import type {
   ContextForMacros,
 } from "../blocknote/utils";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
+import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
@@ -179,6 +180,13 @@ type BlockNoteViewWrapperProps = {
      * Intercept image edition mechanism (i.e. clicking on the edition icon in images' toolbar)
      */
     imageEdition?: ImageEditionOverrideFn;
+
+    /**
+     * Hooks to intercept the link creation / edition flow.
+     *
+     * @since 18.6.0RC1
+     */
+    linkEdition?: LinkEditionHooks;
   };
 
   /**
@@ -337,6 +345,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
             <CustomFormattingToolbar
               formattingToolbarProps={props}
               imageEditionOverrideFn={overrides?.imageEdition}
+              linkEditionHooks={overrides?.linkEdition}
               additionalBlockTypes={filterMap(
                 builtMacros,
                 (built) => built.dropdownTransformItem,
@@ -349,7 +358,10 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
         <LinkToolbarController
           linkToolbar={(props) => (
             <FormattingToolbar>
-              <CustomLinkToolbar linkToolbarProps={props} />
+              <CustomLinkToolbar
+                linkToolbarProps={props}
+                linkEditionHooks={overrides?.linkEdition}
+              />
             </FormattingToolbar>
           )}
         />

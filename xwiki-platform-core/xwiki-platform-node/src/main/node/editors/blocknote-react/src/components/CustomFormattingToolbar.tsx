@@ -48,6 +48,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { RiSubscript, RiSuperscript } from "react-icons/ri";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
+import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type { ContextForMacros } from "../blocknote/utils";
 import type {
   BlockTypeSelectItem,
@@ -103,6 +104,7 @@ type CustomFormattingToolbarProps = {
   additionalBlockTypes: BlockTypeSelectItem[];
   macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
+  linkEditionHooks?: LinkEditionHooks;
 };
 
 export const CustomFormattingToolbar: React.FC<
@@ -111,6 +113,7 @@ export const CustomFormattingToolbar: React.FC<
   formattingToolbarProps,
   additionalBlockTypes,
   imageEditionOverrideFn,
+  linkEditionHooks,
   macros,
 }) => {
   const Components = useComponentsContext()!;
@@ -142,6 +145,7 @@ export const CustomFormattingToolbar: React.FC<
           combinedBlockTypeSelectItems,
           macros,
           t,
+          linkEditionHooks,
         )
       )}
     </Components.FormattingToolbar.Root>
@@ -152,6 +156,7 @@ const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
   macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false,
   t: (key: string) => string,
+  linkEditionHooks?: LinkEditionHooks,
 ): JSX.Element[] =>
   // NOTE: This should return **exactly** the same items as BlockNote's default toolbar
   // So, when BlockNote updates theirs, we should update ours
@@ -197,7 +202,10 @@ const getDefaultFormattingToolbarItems = (
     <UnnestBlockButton key={"unnestBlockButton"} />,
     // This button has the exact same appearance as the default creation link button
     // But brings a custom popover to support XWiki references
-    <CustomCreateLinkButton key={"createLinkButton"} />,
+    <CustomCreateLinkButton
+      key={"createLinkButton"}
+      linkEditionHooks={linkEditionHooks}
+    />,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
   ].concat(

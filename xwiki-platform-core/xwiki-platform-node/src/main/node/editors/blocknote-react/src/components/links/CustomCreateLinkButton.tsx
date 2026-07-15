@@ -23,8 +23,15 @@ import { formatKeyboardShortcut } from "@blocknote/core";
 import { useComponentsContext, useDictionary } from "@blocknote/react";
 import { useCallback, useState } from "react";
 import { RiLink } from "react-icons/ri";
+import type { LinkEditionHooks } from "./linkEditionHooks";
 
-export const CustomCreateLinkButton: React.FC = () => {
+export type CustomCreateLinkButtonProps = {
+  linkEditionHooks?: LinkEditionHooks;
+};
+
+export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
+  linkEditionHooks,
+}) => {
   const editor = useEditor();
   const Components = useComponentsContext()!;
   const dict = useDictionary();
@@ -32,11 +39,19 @@ export const CustomCreateLinkButton: React.FC = () => {
   const [opened, setOpened] = useState(false);
 
   const insertLink = useCallback(
-    (url: string) => {
-      editor.createLink(url);
+    (title: string, url: string) => {
+      // Let the integration intercept the link before it is written into the content (e.g. to resolve
+      // and store an XWiki resource reference). Throwing from the hook cancels the insertion.
+      const linkData = linkEditionHooks?.beforeUpdate?.({ title, url }) ?? {
+        title,
+        url,
+      };
+      // Don't pass the title as text: we want to link the current selection in place, without
+      // replacing it (which would strip its inline formatting).
+      editor.createLink(linkData.url);
       editor.focus();
     },
-    [editor],
+    [editor, linkEditionHooks],
   );
 
   // TODO: check if we need to update in realtime when the selection change?
@@ -70,7 +85,7 @@ export const CustomCreateLinkButton: React.FC = () => {
             title: selected,
             url: "",
           }}
-          updateLink={({ url }) => insertLink(url)}
+          updateLink={({ title, url }) => insertLink(title, url)}
         />
       </Components.Generic.Popover.Content>
     </Components.Generic.Popover.Root>

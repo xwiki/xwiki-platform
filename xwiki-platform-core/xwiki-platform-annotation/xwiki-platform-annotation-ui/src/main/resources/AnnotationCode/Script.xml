@@ -1316,6 +1316,17 @@ XWiki.Annotation = Class.create({
     }.bindAsEventListener(this));
   },
 
+  // Solving an annotation is a plain link to the core "save" action (like Delete's plain link to "objectremove"),
+  // so it needs only a confirm step, not an AJAX round-trip: on confirm, the browser navigates there normally and
+  // the action itself redirects back to the current page via xredirect.
+  addSolveListener : function(item) {
+    item.observe('click', function(event) {
+      if (!window.confirm("$services.localization.render('annotations.action.solve.confirm')")) {
+        event.stop();
+      }
+    });
+  },
+
   addValidateListener : function(item, id, container, inBubble) {
     item.observe('click', function(event) {
       item.blur();
@@ -1600,6 +1611,10 @@ XWiki.Annotation = Class.create({
     var editButton = container.down('a.edit');
     if (editButton) {
       this.addEditListener(editButton, annotationId, container, inBubble);
+    }
+    var solveButton = container.down('a.solve');
+    if (solveButton) {
+      this.addSolveListener(solveButton);
     }
     let closeButton = container.down('.annotation-bubble-close button');
     if (closeButton &amp;&amp; inBubble) {

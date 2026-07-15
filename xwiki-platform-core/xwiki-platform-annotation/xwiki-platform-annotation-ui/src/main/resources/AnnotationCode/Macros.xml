@@ -290,6 +290,17 @@
       $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
       &lt;/a&gt;##
     #end
+    #if ("$!ann.selection" != '' &amp;&amp; ($hasAdmin || ($hasEdit &amp;&amp; $isUserComment)))
+      ## Converts the annotation into a plain comment by blanking its anchoring fields, the same way Delete uses a
+      ## plain core action (objectremove) rather than the annotation module's own service layer.
+      #set ($commentClassPrefix = "XWiki.XWikiComments_${ann.id}")
+      #set ($solveQueryString = "form_token=${escapetool.url($services.csrf.token)}&amp;xredirect=${escapetool.url($doc.getURL('view'))}&amp;${commentClassPrefix}_target=&amp;${commentClassPrefix}_selection=&amp;${commentClassPrefix}_selectionLeftContext=&amp;${commentClassPrefix}_selectionRightContext=&amp;${commentClassPrefix}_originalSelection=&amp;${commentClassPrefix}_state=")
+      #set ($solveURL = $xwiki.getURL($doc.fullName, 'save', $solveQueryString, "xwikicomment_${ann.id}"))
+      &lt;a class="solve btn btn-default infomessage" rel="nofollow" href="$solveURL"
+        title="$services.localization.render('annotations.action.solve.tooltip')"&gt;
+        $services.icon.renderHTML('check') $!escapetool.xml($services.localization.render('annotations.action.solve.text'))
+      &lt;/a&gt;##
+    #end
     #if ($hasAdmin || ($hasEdit &amp;&amp; $isUserComment))
       #set ($queryString = $escapetool.url({
         'form_token': $services.csrf.token,

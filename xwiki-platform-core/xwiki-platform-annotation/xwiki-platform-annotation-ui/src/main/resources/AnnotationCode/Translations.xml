@@ -69,6 +69,10 @@ annotations.action.delete.inProgress=Deleting annotation...
 annotations.action.delete.done=Annotation deleted
 annotations.action.delete.failed=Failed to delete annotation:
 
+annotations.action.solve.text=Mark as solved
+annotations.action.solve.tooltip=Mark this annotation as solved (converts it to a plain comment)
+annotations.action.solve.confirm=Are you sure you want to mark this annotation as solved? It will become a regular comment and will no longer be anchored to the selected text.
+
 annotations.action.create.submit.text=Add annotation
 annotations.action.create.cancel.text=Cancel
 annotations.action.create.selection.invalid=Please select a non-empty text in the page content.

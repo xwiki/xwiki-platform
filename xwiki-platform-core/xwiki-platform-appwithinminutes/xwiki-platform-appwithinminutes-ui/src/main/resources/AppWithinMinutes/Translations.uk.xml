@@ -191,7 +191,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Оновити динамі
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Перетягніть для зміни порядку
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Видалити
 platform.appwithinminutes.liveTableEditorAddColumnHint=Додати вибраний стовпець
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Деякі стовпці вважаються застарілими, напевно, тому, що відповідне поле додатка було видалено. Ви хочете їх видалити? &lt;a href=""&gt;Так&lt;/a&gt; / &lt;a href=""&gt;Ні&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Деякі стовпці вважаються застарілими, напевно, тому, що відповідне поле додатка було видалено. Ви хочете їх видалити?
 platform.appwithinminutes.liveTableEditorIcon=Піктограма
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Піктограма додатку. Ви можете вибрати піктограму з каталогу або посилатися на вкладене зображення.
 
@@ -269,5 +269,8 @@ platform.appwithinminutes.wizardStep3Description=Персоналізувати 
 platform.appwithinminutes.appsLiveTable.doc.space=Назва програми
 appWithinMinutes.classEditor.title={0} Структура
 appWithinMinutes.templateProviderEditor.title={0} Записи
-</content>
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Деякі стовпці вважаються застарілими, напевно, тому, що відповідне поле додатка було видалено. Ви хочете їх видалити? &lt;a href=""&gt;Так&lt;/a&gt; / &lt;a href=""&gt;Ні&lt;/a&gt;</content>
 </xwikidoc>

@@ -105,6 +105,9 @@
 #set($xsVariablesValues = {
     "figure-caption-font-size": "90%",
     "figure-caption-color": {"css": "var(--text-muted)", "less": "@text-muted"},
+    ## Since 17.9RC1: moved from cssVariablesInit.css's $newVariables (CSS-only) now that it also has a LESS
+    ## variable equivalent (@login-form-max-width, with @loginFormMaxWidth kept in variables.less as a
+    ## backwards-compatible alias).
     "login-form-max-width": "450px",
     "target-size-minimum": "24px",
     "target-size-recommended": "44px",

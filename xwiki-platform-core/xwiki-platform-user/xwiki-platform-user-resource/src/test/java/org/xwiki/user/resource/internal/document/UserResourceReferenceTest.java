@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  *
  * @version $Id$
  */
-public class UserResourceReferenceTest
+class UserResourceReferenceTest
 {
     @Test
     void equalsAndHashcode()

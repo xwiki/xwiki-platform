@@ -40,7 +40,7 @@ import static org.mockito.Mockito.verify;
  * @since 4.0M1
  */
 @ComponentTest
-public class CSRFTokenInvalidatorTest
+class CSRFTokenInvalidatorTest
 {
     /** Tested component. */
     @InjectMockComponents
@@ -53,7 +53,7 @@ public class CSRFTokenInvalidatorTest
      * Test that the list of monitored events contains an ActionExecutingEvent for the /logout/ action.
      */
     @Test
-    public void testEvents()
+    void testEvents()
     {
         List<Event> events = this.invalidator.getEvents();
         assertTrue(events.contains(new ActionExecutingEvent("logout")),
@@ -66,7 +66,7 @@ public class CSRFTokenInvalidatorTest
      * @throws Exception
      */
     @Test
-    public void testInvalidationOnLogout()
+    void testInvalidationOnLogout()
     {
         this.invalidator.onEvent(new ActionExecutingEvent("logout"), null, null);
         verify(mockCSRFTokenManager, atLeastOnce()).clearToken();

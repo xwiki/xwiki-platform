@@ -730,7 +730,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     }
 
     @Test
-    public void testAddSecurityAccessEntry() throws Exception
+    void testAddSecurityAccessEntry() throws Exception
     {
         InsertUsers();
         InsertEntities();

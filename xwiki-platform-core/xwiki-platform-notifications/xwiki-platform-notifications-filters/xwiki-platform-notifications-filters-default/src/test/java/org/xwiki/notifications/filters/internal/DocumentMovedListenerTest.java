@@ -105,7 +105,7 @@ class DocumentMovedListenerTest
     }
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         when(this.contextProvider.get()).thenReturn(this.xwikicontext);
         when(this.xwikicontext.getWiki()).thenReturn(this.xwiki);

@@ -103,7 +103,7 @@ class DefaultSolrTest
     }
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         when(this.mockEnvironment.getPermanentDirectory()).thenReturn(this.permanentDirectory);
 

@@ -32,10 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  * @since 2.2M1
  */
-public class SpaceReferenceTest
+class SpaceReferenceTest
 {
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
             () -> new SpaceReference(new EntityReference("space", EntityType.WIKI)));
@@ -44,7 +44,7 @@ public class SpaceReferenceTest
     }
 
     @Test
-    public void testInvalidNullParent()
+    void testInvalidNullParent()
     {
         IllegalArgumentException e =
             assertThrows(IllegalArgumentException.class, () -> new SpaceReference("page", (WikiReference) null));
@@ -53,7 +53,7 @@ public class SpaceReferenceTest
     }
 
     @Test
-    public void testInvalidParentType()
+    void testInvalidParentType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new SpaceReference(
             new EntityReference("space", EntityType.SPACE, new EntityReference("whatever", EntityType.DOCUMENT))));
@@ -62,7 +62,7 @@ public class SpaceReferenceTest
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         SpaceReference reference = new SpaceReference("wiki", "space", "page").replaceParent(
             new EntityReference("space2", EntityType.SPACE, new EntityReference("wiki2", EntityType.WIKI)));

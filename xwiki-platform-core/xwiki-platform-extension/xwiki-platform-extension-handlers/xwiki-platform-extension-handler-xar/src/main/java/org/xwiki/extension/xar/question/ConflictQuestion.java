@@ -109,7 +109,7 @@ public class ConflictQuestion
         {
             return this.actions;
         }
-    };
+    }
 
     public enum GlobalAction
     {
@@ -143,7 +143,7 @@ public class ConflictQuestion
          * configure default answers in the request for example.
          */
         ASK
-    };
+    }
 
     // Question datas
 

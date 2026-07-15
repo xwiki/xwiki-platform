@@ -307,7 +307,7 @@ public class XWikiUser
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     EMAIL_CHECKED_PROPERTY, checkedFlag);
                 context.getWiki().saveDocument(userdoc, localizePlainOrKey(
-                    "core.users." + (checked ? "email_checked" : "email_unchecked") + ".saveComment"), context);
+                    "core.users." + (checked ? EMAIL_CHECKED_PROPERTY : "email_unchecked") + ".saveComment"), context);
             } catch (XWikiException e) {
                 this.logger.error("Error while setting email_checked status of user [{}]", getUser(), e);
             }

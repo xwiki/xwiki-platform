@@ -71,7 +71,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class VersioningStoreQueryFactoryTest
+class VersioningStoreQueryFactoryTest
 {
     @Mock
     private Session session;

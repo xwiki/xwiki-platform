@@ -20,12 +20,12 @@
 package org.xwiki.store.filesystem.internal;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -47,6 +47,10 @@ class DefaultFilesystemAttachmentsConfigurationTest
     @Named("xwikiproperties")
     private ConfigurationSource configurationSource;
 
+    // Use a directory under the module's "target" directory so that it doesn't leak outside the build workspace.
+    @TempDir
+    private Path temporaryDirectory;
+
     @Test
     void cleanOnStartup()
     {
@@ -60,8 +64,8 @@ class DefaultFilesystemAttachmentsConfigurationTest
     {
         assertNull(configuration.getDirectory());
 
-        Path tempDir = Files.createTempDirectory("testxwiki");
-        when(configurationSource.getProperty("store.file.directory")).thenReturn(tempDir.toString());
-        assertEquals(tempDir.toFile(), configuration.getDirectory());
+        when(configurationSource.getProperty("store.file.directory"))
+            .thenReturn(this.temporaryDirectory.toString());
+        assertEquals(this.temporaryDirectory.toFile(), configuration.getDirectory());
     }
 }

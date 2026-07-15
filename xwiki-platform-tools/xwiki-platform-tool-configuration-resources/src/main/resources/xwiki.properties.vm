@@ -314,6 +314,23 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# attribute.
 # xml.htmlElementSanitizer.forbidAttributes =
 
+#-# [Since 18.6.0RC1]
+#-# [Since 18.4.2]
+#-# [Since 17.10.10]
+#-# Additional element restrictions for attributes that should only be allowed on certain elements. Each entry maps an
+#-# attribute name to the list of elements on which the attribute should be allowed; commas separate entries for
+#-# different attributes, while the elements of a single attribute are separated by whitespace. Listing an attribute
+#-# here restricts it to the configured elements (in addition to any built-in defaults), so it can be used both to
+#-# extend a built-in restriction and to restrict an attribute that is otherwise allowed everywhere.
+#-# This property can be set on several lines to declare several attributes (one attribute per line); listing the same
+#-# attribute on several lines does not accumulate, only the last line is kept, so list all elements of an attribute
+#-# in a single value.
+#-# By default, only the "name" attribute is restricted: to mitigate DOM clobbering it is allowed solely on "a" (legacy
+#-# anchors) and "map" (image maps) and forbidden on all other elements. For example, to additionally allow "name" on
+#-# "div" and "section" and to restrict the "headers" attribute to the table cells "th" and "td":
+#-#   xml.htmlElementSanitizer.extraElementRestrictedAttributes = name = div section, headers = th td
+# xml.htmlElementSanitizer.extraElementRestrictedAttributes =
+
 #-# [Since 14.6RC1]
 #-# If unknown protocols shall be allowed. This means all protocols like "xwiki:" will be allowed in links, however,
 #-# script and data-URIs will still be forbidden (for data-URIs see also below).  By default, unknown protocols are
@@ -1877,5 +1894,17 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# case-insensitive sorting. Possible values depend on the used database engine and its configuration, a possible
 #-# value for MariaDB is utf8mb4_general_ci. By default, no collation is configured.
 # index.sortCollation=
+
+#-------------------------------------------------------------------------------------
+# Chart
+#-------------------------------------------------------------------------------------
+
+#-# [Since 18.6.0RC1, 18.4.3, 17.10.10]
+#-# Define the maximum authorized height of a chart in pixels. By default the value is configured at 2048 pixels.
+# chart.height.max=2048
+
+#-# [Since 18.6.0RC1, 18.4.3, 17.10.10]
+#-# Define the maximum authorized width of a chart in pixels. By default the value is configured at 2048 pixels.
+# chart.width.max=2048
 
 $!xwikiPropertiesAdditionalProperties

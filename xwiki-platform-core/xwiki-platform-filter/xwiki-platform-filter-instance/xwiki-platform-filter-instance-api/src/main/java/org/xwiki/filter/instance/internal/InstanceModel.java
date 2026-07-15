@@ -36,16 +36,24 @@ import org.xwiki.model.reference.WikiReference;
 public interface InstanceModel
 {
     /**
+     * @return the references of all the wikis of the instance
+     * @throws FilterException when failing to get the wiki references
      * @since 7.2M1
      */
     List<WikiReference> getWikiReferences() throws FilterException;
 
     /**
+     * @param wiki the wiki to get the space references for
+     * @return the tree of space references contained in the passed wiki
+     * @throws FilterException when failing to get the space references
      * @since 7.2M1
      */
     EntityReferenceTreeNode getSpaceReferences(WikiReference wiki) throws FilterException;
 
     /**
+     * @param spaceReference the space to get the document references for
+     * @return the references of the documents contained in the passed space
+     * @throws FilterException when failing to get the document references
      * @since 7.2M1
      */
     List<DocumentReference> getDocumentReferences(SpaceReference spaceReference) throws FilterException;

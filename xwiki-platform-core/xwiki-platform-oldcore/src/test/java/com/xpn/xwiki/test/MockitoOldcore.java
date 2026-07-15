@@ -1474,11 +1474,9 @@ public class MockitoOldcore
      */
     public WikiDescriptorManager getWikiDescriptorManager() throws ComponentLookupException
     {
-        if (this.wikiDescriptorManager == null) {
-            // Avoid initializing it if not needed
-            if (this.componentManager.hasComponent(WikiDescriptorManager.class)) {
-                this.wikiDescriptorManager = this.componentManager.getInstance(WikiDescriptorManager.class);
-            }
+        // Avoid initializing it if not needed
+        if (this.wikiDescriptorManager == null && this.componentManager.hasComponent(WikiDescriptorManager.class)) {
+            this.wikiDescriptorManager = this.componentManager.getInstance(WikiDescriptorManager.class);
         }
 
         return this.wikiDescriptorManager;

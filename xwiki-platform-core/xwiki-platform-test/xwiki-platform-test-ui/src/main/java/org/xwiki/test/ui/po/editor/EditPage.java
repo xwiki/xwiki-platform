@@ -468,6 +468,17 @@ public class EditPage extends BasePage
     }
 
     /**
+     * @return {@code true} if the button to resubmit in case of CSRF warning is displayed.
+     * @since 18.6.0RC1
+     * @since 17.10.10
+     * @since 18.4.3
+     */
+    public boolean hasForceSaveCSRFButton()
+    {
+        return this.forceSaveCSRFButton.isDisplayed();
+    }
+
+    /**
      * Cancel the edition by using keyboard shortcut.
      * @return a new {@link ViewPage}
      * @since 11.9RC1

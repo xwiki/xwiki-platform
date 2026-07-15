@@ -80,7 +80,8 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
     private static final String FILENAME = HINT + "DataMigration-users.txt";
 
     private static final String XWQL_QUERY = "select distinct doc.fullName from Document doc, "
-        + "doc.object(XWiki.XWikiUsers) objUser where objUser.password not like 'hash:%' and objUser.password <> '' "
+        + "doc.object(XWiki.XWikiUsers) objUser where objUser.password not like 'hash:%' and "
+        + "length(objUser.password) > 0 "
         + "order by doc.fullName";
 
     private static final String PASSWORD_FIELD = "password";

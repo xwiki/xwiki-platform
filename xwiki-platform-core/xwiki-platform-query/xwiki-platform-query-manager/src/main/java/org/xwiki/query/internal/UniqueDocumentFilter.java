@@ -120,7 +120,7 @@ public class UniqueDocumentFilter extends AbstractQueryFilter
     public List filterResults(List results)
     {
         // If we had to put multiple columns in the select we need to remove them.
-        if (results.size() > 0 && results.get(0).getClass().isArray()) {
+        if (!results.isEmpty() && results.get(0).getClass().isArray()) {
             List filteredResults = new ArrayList();
             for (Object result : results) {
                 Object[] actualResult = (Object[]) result;

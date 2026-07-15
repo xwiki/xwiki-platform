@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
  * 
  * @version $Id$
  */
-public class RemoteEventDataTest
+class RemoteEventDataTest
 {
     @Test
-    public void constructor()
+    void constructor()
     {
         RemoteEventData data = new RemoteEventData("event", "source", "data");
 

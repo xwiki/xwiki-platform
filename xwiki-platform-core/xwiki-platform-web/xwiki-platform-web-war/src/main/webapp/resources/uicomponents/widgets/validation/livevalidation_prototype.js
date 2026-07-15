@@ -858,14 +858,14 @@ var Validate = {
         params.within = lowerWithin;
         if(typeof value == 'string') value = value.toLowerCase();
       }
-      var found = (params.within.indexOf(value) == -1) ? false : true;
+      var found = params.within.indexOf(value) != -1;
       if(params.partialMatch){
         found = false;
         params.within.each( function(arrayVal){
           if(value.indexOf(arrayVal) != -1 ) found = true;
         });
       }
-      if( (!params.negate && !found) || (params.negate && found) ) Validate.fail(params.failureMessage);
+      if( !!params.negate == found ) Validate.fail(params.failureMessage);
     }
     return true;
   },

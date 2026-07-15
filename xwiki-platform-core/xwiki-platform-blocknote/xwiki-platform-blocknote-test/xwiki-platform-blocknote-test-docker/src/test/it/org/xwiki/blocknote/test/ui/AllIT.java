@@ -52,6 +52,11 @@ class AllIT
     }
 
     @Nested
+    class NestedLinkIT extends LinkIT
+    {
+    }
+
+    @Nested
     class NestedCollaborationIT extends CollaborationIT
     {
     }

@@ -323,7 +323,7 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     {
         // if there is no event in the list, or the event is a start event or there is no start event in the list, just
         // append the event to the end of the list
-        if (list.size() == 0 || evt.getType() == AnnotationEventType.START
+        if (list.isEmpty() || evt.getType() == AnnotationEventType.START
             || list.get(list.size() - 1).getType() == AnnotationEventType.END) {
             list.add(evt);
         } else {

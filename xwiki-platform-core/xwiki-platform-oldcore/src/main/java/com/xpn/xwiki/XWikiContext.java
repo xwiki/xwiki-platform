@@ -168,6 +168,10 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private static final String LANGUAGE_KEY = "language";
 
+    private static final String LINKS_ACTION_KEY = "links_action";
+
+    private static final String LINKS_QS_KEY = "links_qs";
+
     private Locale interfaceLocale;
 
     private int mode;
@@ -893,32 +897,32 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public void setLinksAction(String action)
     {
-        put("links_action", action);
+        put(LINKS_ACTION_KEY, action);
     }
 
     public void unsetLinksAction()
     {
-        remove("links_action");
+        remove(LINKS_ACTION_KEY);
     }
 
     public String getLinksAction()
     {
-        return (String) get("links_action");
+        return (String) get(LINKS_ACTION_KEY);
     }
 
     public void setLinksQueryString(String value)
     {
-        put("links_qs", value);
+        put(LINKS_QS_KEY, value);
     }
 
     public void unsetLinksQueryString()
     {
-        remove("links_qs");
+        remove(LINKS_QS_KEY);
     }
 
     public String getLinksQueryString()
     {
-        return (String) get("links_qs");
+        return (String) get(LINKS_QS_KEY);
     }
 
     /**

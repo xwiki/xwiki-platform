@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class PrefilteringLiveNotificationEmailDispatcherTest
+class PrefilteringLiveNotificationEmailDispatcherTest
 {
     @InjectMockComponents
     private PrefilteringLiveNotificationEmailDispatcher dispatcher;

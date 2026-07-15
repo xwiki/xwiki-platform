@@ -35,7 +35,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -62,6 +65,28 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     private static final char SEPARATOR = '/';
 
     private LegacySpaceResolver legacySpaceResolver = Utils.getComponent(LegacySpaceResolver.class);
+
+    private ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+
+    private boolean checkAccess;
+
+    /**
+     * ExportURLFactory constructor.
+     */
+    public FileSystemURLFactory()
+    {
+    }
+
+    /**
+     * @param checkAccess true if the access to linked resources should be verified against the context user
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    public FileSystemURLFactory(boolean checkAccess)
+    {
+        this.checkAccess = checkAccess;
+    }
 
     @Override
     public URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
@@ -93,11 +118,10 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             Map<String, File> usedFiles = getFileMapping(context);
             String key = getSkinfileKey(filename, skin);
-            if (!usedFiles.containsKey(key)) {
-                if (!copyResource("/skins/" + skin + '/' + filename, key, usedFiles, context)) {
-                    // The resource does not exist, just return a http:// URL
-                    return super.createSkinURL(filename, skin, context);
-                }
+            if (!usedFiles.containsKey(key)
+                && !copyResource("/skins/" + skin + '/' + filename, key, usedFiles, context)) {
+                // The resource does not exist, just return a http:// URL
+                return super.createSkinURL(filename, skin, context);
             }
             return usedFiles.get(key).toURI().toURL();
         } catch (Exception ex) {
@@ -112,10 +136,8 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             Map<String, File> usedFiles = getFileMapping(context);
             String key = getResourceKey(filename);
-            if (!usedFiles.containsKey(key)) {
-                if (!copyResource("/resources/" + filename, key, usedFiles, context)) {
-                    return super.createResourceURL(filename, forceSkinAction, context);
-                }
+            if (!usedFiles.containsKey(key) && !copyResource("/resources/" + filename, key, usedFiles, context)) {
+                return super.createResourceURL(filename, forceSkinAction, context);
             }
             return usedFiles.get(key).toURI().toURL();
         } catch (Exception ex) {
@@ -152,33 +174,48 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         Map<String, File> usedFiles = getFileMapping(context);
         List<String> spaceNames = this.legacySpaceResolver.resolve(spaces);
         String key = getAttachmentKey(spaceNames, name, filename, revision);
+        DocumentReference documentReference =
+            new DocumentReference(Objects.toString(wiki, context.getWikiId()), spaceNames, name);
+        AttachmentReference attachmentReference = new AttachmentReference(filename, documentReference);
+
+        // Check if we already resolved this attachment
         if (!usedFiles.containsKey(key)) {
-            File file = getTemporaryFile(key, context);
-            LOGGER.debug("Temporary PDF export file [{}]", file.toString());
-            XWikiDocument doc = context.getWiki().getDocument(new DocumentReference(
-                Objects.toString(wiki, context.getWikiId()), spaceNames, name), context);
+            // Copy the attachment file in the package only if the target user is allowed to access the attachment
+            if (!this.checkAccess || this.authorization.hasAccess(Right.VIEW, attachmentReference)) {
+                XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
+                XWikiAttachment attachment = doc.getAttachment(filename);
+                if (attachment == null) {
+                    LOGGER.warn("Attachment [{}] doesn't exist in [{}]. Generated content will have invalid content ("
+                        + "empty image or broken link)", filename, doc.getDocumentReference());
 
-            XWikiAttachment attachment = doc.getAttachment(filename);
-            if (attachment == null) {
-                LOGGER.warn("Attachment [{}] doesn't exist in [{}]. Generated content will have invalid content ("
-                    + "empty image or broken link)", filename, doc.getDocumentReference());
-                // By returning null, the generated HTML will have empty IMG SRC or empty A HREF which leads to
-                // good degraded results for the LO office export.
-                return null;
-            }
-
-            if (StringUtils.isNotEmpty(revision)) {
-                attachment = attachment.getAttachmentRevision(revision, context);
-            }
-
-            try (FileOutputStream fos = new FileOutputStream(file)) {
-                try (InputStream content = attachment.getContentInputStream(context)) {
-                    IOUtils.copy(content, fos);
+                    // By returning null, the generated HTML will have empty IMG SRC or empty A HREF which leads to
+                    // good degraded results for the LO office export.
+                    return null;
                 }
+
+                File file = getTemporaryFile(key, context);
+                LOGGER.debug("Temporary PDF export file [{}]", file.toString());
+
+                if (StringUtils.isNotEmpty(revision)) {
+                    attachment = attachment.getAttachmentRevision(revision, context);
+                }
+
+                try (FileOutputStream fos = new FileOutputStream(file)) {
+                    try (InputStream content = attachment.getContentInputStream(context)) {
+                        IOUtils.copy(content, fos);
+                    }
+                }
+
+                // Remember the fact that we resolved this attachment already
+                usedFiles.put(key, file);
+            } else {
+                LOGGER.warn("User [{}] doesn't have access to attachment [{}] so it won't be exported",
+                    context.getUserReference(), attachmentReference);
             }
-            usedFiles.put(key, file);
         }
-        return usedFiles.get(key).toURI().toURL();
+
+        File file = usedFiles.get(key);
+        return file != null ? file.toURI().toURL() : null;
     }
 
     /**

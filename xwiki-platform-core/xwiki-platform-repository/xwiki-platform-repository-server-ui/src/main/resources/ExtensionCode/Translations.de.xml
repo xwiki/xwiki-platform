@@ -82,10 +82,12 @@ ExtensionCode.ExtensionSupportPlanClass_paying=Bezahlen
 
 ## Extension sheet
 repository.extension.sheet.name=Name
+repository.extension.sheet.project=Projekt
 repository.extension.sheet.type=Typ
 repository.extension.sheet.category=Kategorie
 repository.extension.sheet.summary=Zusammenfassung
 repository.extension.sheet.authors=Autoren
+repository.extension.sheet.authors.removePage=Entfernen
 repository.extension.sheet.rating=Bewertung
 repository.extension.sheet.title=Bogen der Erweiterung
 repository.extension.sheet.imported=Erweiterung aus dem Repository importiert

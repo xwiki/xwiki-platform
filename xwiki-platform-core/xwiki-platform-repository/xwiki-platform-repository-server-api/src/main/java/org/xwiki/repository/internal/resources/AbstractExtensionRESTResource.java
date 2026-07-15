@@ -385,6 +385,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION)));
         scm.setDeveloperConnection(toScmConnection(this.extensionStore.getValue(extensionVersionObjects,
             XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION)));
+        scm.setTag(this.extensionStore.getValue(extensionVersionObjects, XWikiRepositoryModel.PROP_EXTENSION_STAG));
         extension.setScm(scm);
 
         // Issue Management
@@ -653,7 +654,9 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             toScmConnection(getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION, true)));
         scm.setDeveloperConnection(
             toScmConnection(getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION, true)));
-        if (scm.getUrl() != null || scm.getConnection() != null || scm.getDeveloperConnection() != null) {
+        scm.setTag(getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_SCMTAG, true));
+        if (scm.getUrl() != null || scm.getConnection() != null || scm.getDeveloperConnection() != null
+            || scm.getTag() != null) {
             extension.setScm(scm);
         }
 

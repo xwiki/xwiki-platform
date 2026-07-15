@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
  * @since 9.11.6
  */
 @ComponentTest
-public class AbstractRecordableEventDescriptorTest
+class AbstractRecordableEventDescriptorTest
 {
     @InjectMockComponents
     private FakeRecordableEventDescriptor fakeRecordableEventDescriptor;
@@ -112,7 +112,7 @@ public class AbstractRecordableEventDescriptorTest
     }
 
     @Test
-    public void getDescriptionAndApplicationWithExceptionTest() throws Exception
+    void getDescriptionAndApplicationWithExceptionTest() throws Exception
     {
         // Mocks
         Exception e = new Exception("some error");
@@ -185,7 +185,7 @@ public class AbstractRecordableEventDescriptorTest
     }
 
     @Test
-    public void equalsAndHashCodeTest()
+    void equalsAndHashCodeTest()
     {
         OtherFakeRecordableEventDescriptor descriptor1 = new OtherFakeRecordableEventDescriptor(
                 "app1",  "type1");

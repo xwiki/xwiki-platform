@@ -47,6 +47,30 @@ public class BooleanClass extends PropertyClass
     @Unstable
     public static final String PROPERTY_TYPE = "Boolean";
 
+    /**
+     * Display value showing the property as a "yes/no" label. Usable as a display type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_YESNO = "yesno";
+
+    /**
+     * Display value using a select box. Usable both as a display type and as a form (edit) type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_SELECT = "select";
+
+    /**
+     * Display value using a checkbox. Usable both as a display type and as a form (edit) type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_CHECKBOX = "checkbox";
+
+    /**
+     * Display value using radio buttons. Usable as a form (edit) type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_RADIO = "radio";
+
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "boolean";
@@ -65,7 +89,7 @@ public class BooleanClass extends PropertyClass
     public BooleanClass()
     {
         this(null);
-        setDisplayFormType("select");
+        setDisplayFormType(DISPLAY_SELECT);
     }
 
     public void setDisplayType(String type)
@@ -77,7 +101,7 @@ public class BooleanClass extends PropertyClass
     {
         String dtype = getStringValue("displayType");
         if ((dtype == null) || (dtype.isEmpty())) {
-            return "yesno";
+            return DISPLAY_YESNO;
         }
         return dtype;
     }
@@ -86,7 +110,7 @@ public class BooleanClass extends PropertyClass
     {
         String dtype = getStringValue("displayFormType");
         if ((dtype == null) || (dtype.isEmpty())) {
-            return "radio";
+            return DISPLAY_RADIO;
         }
         return dtype;
     }
@@ -174,13 +198,13 @@ public class BooleanClass extends PropertyClass
     {
         String displayFormType = getDisplayFormType();
 
-        if ("checkbox".equals(getDisplayType())) {
-            displayFormType = "checkbox";
+        if (DISPLAY_CHECKBOX.equals(getDisplayType())) {
+            displayFormType = DISPLAY_CHECKBOX;
         }
 
-        if ("checkbox".equals(displayFormType)) {
+        if (DISPLAY_CHECKBOX.equals(displayFormType)) {
             displayCheckboxEdit(buffer, name, prefix, object, context);
-        } else if ("select".equals(displayFormType)) {
+        } else if (DISPLAY_SELECT.equals(displayFormType)) {
             displaySelectEdit(buffer, name, prefix, object, context);
         } else {
             displayRadioEdit(buffer, name, prefix, object, context);
@@ -195,6 +219,10 @@ public class BooleanClass extends PropertyClass
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
+        // This is a text alternative fallback to explain what the select is about. If the select has already been
+        // labelled in another way, this fallback will be ignored by Assistive Techs.
+        select.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+            getTranslatedPrettyName(context)));
 
         String String0 = getDisplayValue(context, 0);
         String String1 = getDisplayValue(context, 1);

@@ -114,6 +114,8 @@ public class Document extends Api
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(Document.class);
 
+    private static final String DELETE = "delete";
+
     /**
      * The XWikiDocument object wrapped by this API.
      */
@@ -1322,7 +1324,7 @@ public class Document extends Api
         }
         try {
             Vector<BaseObject> allObjects = this.getDoc().getObjects(classname);
-            if (allObjects == null || allObjects.size() == 0) {
+            if (allObjects == null || allObjects.isEmpty()) {
                 return result;
             } else {
                 for (BaseObject obj : allObjects) {
@@ -2186,7 +2188,7 @@ public class Document extends Api
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         List<DocumentStats> stats = statisticsService.getDocumentStatistics(action, scope, period, range, this.context);
-        if (stats.size() > 0) {
+        if (!stats.isEmpty()) {
             return stats.get(0);
         }
         return new DocumentStats();
@@ -2205,7 +2207,7 @@ public class Document extends Api
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         List<DocumentStats> stats = statisticsService.getDocumentStatistics(action, scope, period, range, this.context);
-        if (stats.size() > 0) {
+        if (!stats.isEmpty()) {
             return stats.get(0);
         }
         return new DocumentStats();
@@ -2222,8 +2224,7 @@ public class Document extends Api
         Range range = RangeFactory.ALL;
         Period period = PeriodFactory.getCurrentMonth();
         XWikiStatsService statisticsService = getXWikiContext().getWiki().getStatsService(getXWikiContext());
-        List<RefererStats> stats = statisticsService.getRefererStatistics("", scope, period, range, this.context);
-        return stats;
+        return statisticsService.getRefererStatistics("", scope, period, range, this.context);
     }
 
     public boolean checkAccess(String right)
@@ -3106,7 +3107,7 @@ public class Document extends Api
 
     public void delete() throws XWikiException
     {
-        if (hasAccessLevel("delete")) {
+        if (hasAccessLevel(DELETE)) {
             deleteDocument();
         } else {
             java.lang.Object[] args = { this.getFullName() };
@@ -3200,7 +3201,7 @@ public class Document extends Api
                 i = fname.lastIndexOf("/");
             }
             filename = fname.substring(i + 1);
-            filename = filename.replaceAll("\\+", " ");
+            filename = filename.replace("+", " ");
 
             if ((data != null) && (data.length > 0)) {
                 XWikiAttachment attachment = this.getDoc().addAttachment(filename, data, getXWikiContext());
@@ -3302,7 +3303,7 @@ public class Document extends Api
     public void rename(DocumentReference newReference) throws XWikiException
     {
         XWiki xWiki = this.context.getWiki();
-        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+        if (hasAccessLevel(DELETE) && xWiki.checkAccess("edit",
             xWiki.getDocument(newReference, this.context), this.context)) {
             List<DocumentReference> backLinkedReferences = getDocument().getBackLinkedReferences(this.context);
             List<DocumentReference> childrenReferences = getDocument().getChildrenReferences(this.context);
@@ -3396,7 +3397,7 @@ public class Document extends Api
         List<DocumentReference> childDocumentNames) throws XWikiException
     {
         XWiki xWiki = this.context.getWiki();
-        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+        if (hasAccessLevel(DELETE) && xWiki.checkAccess("edit",
             xWiki.getDocument(newReference, this.context), this.context)) {
 
             // Every page given in childDocumentNames has it's parent changed whether it needs it or not.

@@ -1,8 +1,33 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "sharedGlobals": [
+      "{workspaceRoot}/pnpm-workspace.yaml",
+      "{workspaceRoot}/nx.json"
+    ],
+    "default": [
+      "sharedGlobals",
+      "{projectRoot}/**/*",
+      "!{projectRoot}/dist/**",
+      "!{projectRoot}/temp/**"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/src/**/__tests__/**",
+      "!{projectRoot}/**/*.spec.ts",
+      "!{projectRoot}/**/*.spec.tsx",
+      "!{projectRoot}/**/*.test.ts",
+      "!{projectRoot}/**/*.test.tsx",
+      "!{projectRoot}/**/*.test.js"
+    ]
+  },
   "targetDefaults": {
     "build": {
       "cache": true,
+      "inputs": [
+        "production",
+        "^production"
+      ],
       "dependsOn": [
         "^build",
         "typecheck"
@@ -13,18 +38,50 @@
     },
     "typecheck": {
       "cache": true,
+      "inputs": [
+        "default",
+        "^production"
+      ],
       "dependsOn": [
         "^build"
       ]
     },
     "test": {
       "cache": true,
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "test:unit": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production"
+      ],
       "dependsOn": [
         "^build"
       ]
     },
     "lint": {
-      "cache": true
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "api-extractor:ci": {
+      "cache": true,
+      "inputs": ["production", "^production", "{projectRoot}/etc/**"],
+      "dependsOn": ["build"]
+    },
+    "api-extractor:local": {
+      "cache": true,
+      "inputs": ["production", "^production"],
+      "dependsOn": ["build"],
+      "outputs": ["{projectRoot}/etc"]
     }
   },
   "analytics": false

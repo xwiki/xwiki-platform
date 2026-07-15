@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 @ComponentList({DefaultConverterManager.class, ContextComponentManagerProvider.class, EnumConverter.class,
     ConvertUtilsConverter.class})
-public class SpaceReferenceConverterTest
+class SpaceReferenceConverterTest
 {
     @InjectMockComponents
     private SpaceReferenceConverter spaceReferenceConverter;
@@ -72,13 +72,13 @@ public class SpaceReferenceConverterTest
     private EntityReferenceSerializer<String> mockSerialier;
 
     @BeforeEach
-    public void setup(MockitoComponentManager componentManager) throws ComponentLookupException
+    void setup(MockitoComponentManager componentManager) throws ComponentLookupException
     {
         this.converterManager = componentManager.getInstance(ConverterManager.class);
     }
 
     @Test
-    public void testConvertFromString()
+    void testConvertFromString()
     {
         when(this.mockStringResolver.resolve("wiki:space", EntityType.SPACE))
             .thenReturn(new EntityReference("space", EntityType.SPACE, new WikiReference("wiki")));
@@ -87,7 +87,7 @@ public class SpaceReferenceConverterTest
     }
 
     @Test
-    public void testConvertFromReference()
+    void testConvertFromReference()
     {
         EntityReference reference;
 
@@ -100,13 +100,13 @@ public class SpaceReferenceConverterTest
     }
 
     @Test
-    public void testConvertFromNull()
+    void testConvertFromNull()
     {
         assertNull(this.converterManager.convert(SpaceReference.class, null));
     }
 
     @Test
-    public void testConvertToString()
+    void testConvertToString()
     {
         when(this.mockSerialier.serialize(new SpaceReference("wiki", "space"))).thenReturn("wiki:space");
         assertEquals("wiki:space", this.converterManager.convert(String.class, new SpaceReference("wiki", "space")));

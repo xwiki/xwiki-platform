@@ -82,6 +82,14 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
      */
     private static final String TIMEZONE_FIELD = "timezone";
 
+    private static final String YESNO = "yesno";
+
+    private static final String IMAGE_TEXT = "Image|Text";
+
+    private static final String ANONYMOUS = "Anonymous";
+
+    private static final String REGISTERED = "Registered";
+
     private static final LocalDocumentReference SHEET_REFERENCE =
         new LocalDocumentReference(XWiki.SYSTEM_SPACE, "AdminSheet");
 
@@ -106,10 +114,10 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.setCustomMapping("internal");
 
         xclass.addTextField("parent", "Parent Space", 30);
-        xclass.addBooleanField("multilingual", "Multi-Lingual", "yesno");
+        xclass.addBooleanField("multilingual", "Multi-Lingual", YESNO);
         xclass.addTextField("default_language", "Default Language", 5);
-        xclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
-        xclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
+        xclass.addBooleanField("authenticate_edit", "Authenticated Edit", YESNO);
+        xclass.addBooleanField("authenticate_view", "Authenticated View", YESNO);
 
         xclass.addPageField("skin", "Skin", 30, false, false, ", BaseObject obj"
                         + " where doc.fullName = obj.name and obj.className = 'XWiki.XWikiSkins'",
@@ -128,7 +136,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
                 + "and theme.id = propName.id and propName.name = 'name'");
         xclass.addTextField("stylesheet", "Default Stylesheet", 30);
         xclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
-        xclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
+        xclass.addBooleanField("accessibility", "Enable extra accessibility features", YESNO);
 
         xclass.addStaticListField("editor", "Default Editor", "Text|Wysiwyg");
 
@@ -139,7 +147,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextField("dateformat", "Date Format", 30);
 
         // mail
-        xclass.addBooleanField("use_email_verification", "Use eMail Verification", "yesno");
+        xclass.addBooleanField("use_email_verification", "Use eMail Verification", YESNO);
         xclass.addTextField("admin_email", "Admin eMail", 30);
         xclass.addTextField("smtp_server", "SMTP Server", 30);
         xclass.addTextField("smtp_port", "SMTP Port", 5);
@@ -150,14 +158,14 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         xclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10,
             ContentType.PURE_TEXT);
         xclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10, ContentType.PURE_TEXT);
-        xclass.addBooleanField("obfuscateEmailAddresses", "Obfuscate Email Addresses", "yesno");
+        xclass.addBooleanField("obfuscateEmailAddresses", "Obfuscate Email Addresses", YESNO);
 
-        xclass.addStaticListField("registration_anonymous", "Anonymous", "Image|Text");
-        xclass.addStaticListField("registration_registered", "Registered", "Image|Text");
-        xclass.addStaticListField("edit_anonymous", "Anonymous", "Image|Text");
-        xclass.addStaticListField("edit_registered", "Registered", "Image|Text");
-        xclass.addStaticListField("comment_anonymous", "Anonymous", "Image|Text");
-        xclass.addStaticListField("comment_registered", "Registered", "Image|Text");
+        xclass.addStaticListField("registration_anonymous", ANONYMOUS, IMAGE_TEXT);
+        xclass.addStaticListField("registration_registered", REGISTERED, IMAGE_TEXT);
+        xclass.addStaticListField("edit_anonymous", ANONYMOUS, IMAGE_TEXT);
+        xclass.addStaticListField("edit_registered", REGISTERED, IMAGE_TEXT);
+        xclass.addStaticListField("comment_anonymous", ANONYMOUS, IMAGE_TEXT);
+        xclass.addStaticListField("comment_registered", REGISTERED, IMAGE_TEXT);
 
         xclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
@@ -167,19 +175,19 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
 
         // Document editing
         xclass.addTextField("core.defaultDocumentSyntax", "Default document syntax", 60);
-        xclass.addBooleanField("xwiki.title.mandatory", "Make document title field mandatory", "yesno");
+        xclass.addBooleanField("xwiki.title.mandatory", "Make document title field mandatory", YESNO);
 
         // for tags
-        xclass.addBooleanField("tags", "Activate the tagging", "yesno");
+        xclass.addBooleanField("tags", "Activate the tagging", YESNO);
 
         // for backlinks
-        xclass.addBooleanField("backlinks", "Activate the backlinks", "yesno");
+        xclass.addBooleanField("backlinks", "Activate the backlinks", YESNO);
 
         // New fields for the XWiki 1.0 skin
         xclass.addTextField("leftPanels", "Panels displayed on the left", 60);
         xclass.addTextField("rightPanels", "Panels displayed on the right", 60);
-        xclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
-        xclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
+        xclass.addBooleanField("showLeftPanels", "Display the left panel column", YESNO);
+        xclass.addBooleanField("showRightPanels", "Display the right panel column", YESNO);
         xclass.addStaticListField("leftPanelsWidth", "Width of the left panel column", "Small|Medium|Large");
         xclass.addStaticListField("rightPanelsWidth", "Width of the right panel column", "Small|Medium|Large");
         xclass.addTextField("languages", "Supported languages", 30);
@@ -188,34 +196,34 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
 
         // Only used by LDAP authentication service
 
-        xclass.addBooleanField("ldap", "Ldap", "yesno");
+        xclass.addBooleanField("ldap", "Ldap", YESNO);
         xclass.addTextField("ldap_server", "Ldap server adress", 60);
         xclass.addTextField("ldap_port", "Ldap server port", 60);
         xclass.addTextField("ldap_bind_DN", "Ldap login matching", 60);
         xclass.addPasswordField("ldap_bind_pass", "Ldap password matching", 60, PasswordMetaClass.CLEAR);
-        xclass.addBooleanField("ldap_validate_password", "Validate Ldap user/password", "yesno");
+        xclass.addBooleanField("ldap_validate_password", "Validate Ldap user/password", YESNO);
         xclass.addTextField("ldap_user_group", "Ldap group filter", 60);
         xclass.addTextField("ldap_exclude_group", "Ldap group to exclude", 60);
         xclass.addTextField("ldap_base_DN", "Ldap base DN", 60);
         xclass.addTextField("ldap_UID_attr", "Ldap UID attribute name", 60);
         xclass.addTextAreaField("ldap_fields_mapping", "Ldap user fields mapping", 60, 1, ContentType.PURE_TEXT);
-        xclass.addBooleanField("ldap_update_user", "Update user from LDAP", "yesno");
-        xclass.addBooleanField("ldap_update_photo", "Update user photo from LDAP", "yesno");
+        xclass.addBooleanField("ldap_update_user", "Update user from LDAP", YESNO);
+        xclass.addBooleanField("ldap_update_photo", "Update user photo from LDAP", YESNO);
         xclass.addTextField("ldap_photo_attachment_name", "Attachment name to save LDAP photo", 30);
         xclass.addTextField("ldap_photo_attribute", "Ldap photo attribute name", 60);
         xclass.addTextAreaField("ldap_group_mapping", "Ldap groups mapping", 60, 5, ContentType.PURE_TEXT);
         xclass.addTextField("ldap_groupcache_expiration", "LDAP groups members cache", 60);
         xclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode", "always|create");
-        xclass.addBooleanField("ldap_trylocal", "Try local login", "yesno");
+        xclass.addBooleanField("ldap_trylocal", "Try local login", YESNO);
 
-        xclass.addBooleanField("showannotations", "Show document annotations", "yesno");
-        xclass.addBooleanField("showcomments", "Show document comments", "yesno");
-        xclass.addBooleanField("showattachments", "Show document attachments", "yesno");
-        xclass.addBooleanField("showhistory", "Show document history", "yesno");
-        xclass.addBooleanField("showinformation", "Show document information", "yesno");
-        xclass.addBooleanField("editcomment", "Enable version summary", "yesno");
-        xclass.addBooleanField("editcomment_mandatory", "Make version summary mandatory", "yesno");
-        xclass.addBooleanField("minoredit", "Enable minor edits", "yesno");
+        xclass.addBooleanField("showannotations", "Show document annotations", YESNO);
+        xclass.addBooleanField("showcomments", "Show document comments", YESNO);
+        xclass.addBooleanField("showattachments", "Show document attachments", YESNO);
+        xclass.addBooleanField("showhistory", "Show document history", YESNO);
+        xclass.addBooleanField("showinformation", "Show document information", YESNO);
+        xclass.addBooleanField("editcomment", "Enable version summary", YESNO);
+        xclass.addBooleanField("editcomment_mandatory", "Make version summary mandatory", YESNO);
+        xclass.addBooleanField("minoredit", "Enable minor edits", YESNO);
     }
 
     @Override

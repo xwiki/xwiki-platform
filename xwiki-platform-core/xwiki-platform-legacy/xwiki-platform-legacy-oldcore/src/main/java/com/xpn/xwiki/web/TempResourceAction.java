@@ -124,7 +124,7 @@ public class TempResourceAction extends XWikiAction
         response.setContentType(contentType);
         if ("1".equals(request.getParameter("force-download"))) {
             String fileName = StringUtils.defaultIfBlank(request.getParameter("force-filename"), tempFile.getName());
-            fileName = Util.encodeURI(fileName, context).replaceAll("\\+", "%20");
+            fileName = Util.encodeURI(fileName, context).replace("+", "%20");
             response.addHeader("Content-disposition", "attachment; filename*=utf-8''" + fileName);
         }
         try (FileInputStream tempFileInputStream = FileUtils.openInputStream(tempFile)) {

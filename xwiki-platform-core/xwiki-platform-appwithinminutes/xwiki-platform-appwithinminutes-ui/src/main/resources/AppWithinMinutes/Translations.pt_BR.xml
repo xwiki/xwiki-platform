@@ -186,7 +186,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Atualizar Tabela Dinâmica
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Arraste e solte para mudar a ordem
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Remover
 platform.appwithinminutes.liveTableEditorAddColumnHint=Adicionar
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Algumas colunas estão obsoletas. Possivelmente porque os campos correspondentes foram removidos. Você deseja removê-las? &lt;a href\=""&gt;Yes&lt;/a&gt; / &lt;a href\=""&gt;No&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Algumas colunas estão obsoletas. Possivelmente porque os campos correspondentes foram removidos. Você deseja removê-las?
 platform.appwithinminutes.liveTableEditorIcon=Ícone
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=O ícone do aplicativo. Você pode selecionar um ícone no seletor de ícones ou fazer referência a uma imagem anexada.
 
@@ -264,5 +264,8 @@ platform.appwithinminutes.wizardStep3Description=Personalize a página inicial d
 platform.appwithinminutes.appsLiveTable.doc.space=Nome da Aplicação
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
 appWithinMinutes.templateProviderEditor.title={0} Entradas
-</content>
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Algumas colunas estão obsoletas. Possivelmente porque os campos correspondentes foram removidos. Você deseja removê-las? &lt;a href\=""&gt;Yes&lt;/a&gt; / &lt;a href\=""&gt;No&lt;/a&gt;</content>
 </xwikidoc>

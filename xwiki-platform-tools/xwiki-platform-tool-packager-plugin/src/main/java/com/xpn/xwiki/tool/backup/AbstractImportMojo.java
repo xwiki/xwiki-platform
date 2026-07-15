@@ -81,10 +81,8 @@ public abstract class AbstractImportMojo extends AbstractOldCoreMojo
         Collections.reverse(dependenciesFirstArtifacts);
 
         for (Artifact artifact : dependenciesFirstArtifacts) {
-            if (!artifact.isOptional()) {
-                if ("xar".equals(artifact.getType())) {
-                    installXAR(artifact, importer, this.oldCoreHelper.getXWikiContext());
-                }
+            if (!artifact.isOptional() && "xar".equals(artifact.getType())) {
+                installXAR(artifact, importer, this.oldCoreHelper.getXWikiContext());
             }
         }
     }

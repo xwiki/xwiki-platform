@@ -103,12 +103,11 @@ public class LocalUidStringEntityReferenceSerializer implements EntityReferenceS
 
         // FIXME: Not really nice to parse here the serialized XClass reference to remove its wiki name when local.
         // This also why this is not a simple derived class of UidStringEntityReferenceSerializer.
-        if (wikiReference != null && currentReference.getType() == EntityType.OBJECT) {
-            if (name.startsWith(wikiReference.getName()
+        if (wikiReference != null && currentReference.getType() == EntityType.OBJECT
+            && name.startsWith(wikiReference.getName()
                 + this.symbolScheme.getSeparatorSymbols().get(EntityType.SPACE).get(EntityType.WIKI)))
-            {
-                name = name.substring(wikiReference.getName().length() + 1);
-            }
+        {
+            name = name.substring(wikiReference.getName().length() + 1);
         }
         representation.append(name.length()).append(':').append(name);
 

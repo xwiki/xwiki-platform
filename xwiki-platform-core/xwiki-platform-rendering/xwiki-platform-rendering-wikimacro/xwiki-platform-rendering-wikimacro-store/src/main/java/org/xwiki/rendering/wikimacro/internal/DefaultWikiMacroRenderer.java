@@ -187,7 +187,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     /**
      * Match all the macro marker blocks.
      */
-    private static final BlockMatcher MACRO_MARKER_MATCHER = testedBlock -> (testedBlock instanceof MacroMarkerBlock);
+    private static final BlockMatcher MACRO_MARKER_MATCHER = MacroMarkerBlock.class::isInstance;
 
     private static final BlockMatcher PLACEHOLDERS_BLOCKMATCHER = testedBlock -> ((testedBlock instanceof RawBlock
         && (((RawBlock) testedBlock).getSyntax().getType().equals(SyntaxType.XHTML)

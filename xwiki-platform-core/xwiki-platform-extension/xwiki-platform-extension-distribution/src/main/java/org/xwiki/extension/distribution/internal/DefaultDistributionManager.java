@@ -357,8 +357,8 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
         DistributionJobStatus farmJobStatus;
         if (jobStatus != null) {
-            if (jobStatus instanceof DistributionJobStatus) {
-                farmJobStatus = (DistributionJobStatus) jobStatus;
+            if (jobStatus instanceof DistributionJobStatus distributionJobStatus) {
+                farmJobStatus = distributionJobStatus;
             } else {
                 // RETRO-COMPATIBILITY: the status used to be a DistributionJobStatus
                 farmJobStatus = new DistributionJobStatus(jobStatus, this.observationManagerProvider.get(),

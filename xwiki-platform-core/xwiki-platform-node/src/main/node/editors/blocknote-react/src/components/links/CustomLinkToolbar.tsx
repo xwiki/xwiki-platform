@@ -63,16 +63,26 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
   const updateLink = useCallback(
     (linkData: LinkData) => {
       // Let the integration intercept the link (including its resource reference) before it is written
-      // into the content. Throwing from the hook cancels the edition.
+      // into the content. The current link data (with its original url) is passed so the hook can bind
+      // the update to the existing link. Throwing from the hook cancels the edition.
       const updatedLinkData =
-        linkEditionHooks?.beforeUpdate?.(linkData) ?? linkData;
+        linkEditionHooks?.beforeUpdate?.(linkData, {
+          url: linkToolbarProps.url,
+          title: linkToolbarProps.text,
+        }) ?? linkData;
       editLink(
         updatedLinkData.url,
         updatedLinkData.title,
         linkToolbarProps.range.from,
       );
     },
-    [editLink, linkEditionHooks, linkToolbarProps.range.from],
+    [
+      editLink,
+      linkEditionHooks,
+      linkToolbarProps.range.from,
+      linkToolbarProps.url,
+      linkToolbarProps.text,
+    ],
   );
 
   return (

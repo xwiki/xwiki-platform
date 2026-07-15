@@ -156,7 +156,7 @@ export type LinkData = {
 // @beta
 export type LinkEditionHooks = {
     beforeEdit?: (linkData: LinkData) => LinkData | void;
-    beforeUpdate?: (linkData: LinkData) => LinkData | void;
+    beforeUpdate?: (linkData: LinkData, previous?: LinkData) => LinkData | void;
 };
 
 // @beta

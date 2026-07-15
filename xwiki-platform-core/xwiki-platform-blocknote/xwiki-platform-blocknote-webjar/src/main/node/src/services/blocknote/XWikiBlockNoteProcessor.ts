@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { BlockNoteDocument } from "./BlockNoteProcessor";
+import { extractLinkId, injectLinkId, stripLinkId } from "./linkId";
 import { Container, inject, injectable } from "inversify";
 import { uuidv4 } from "lib0/random";
 import type { BlockNoteIterator, NodeType } from "./BlockNoteIterator";
@@ -91,6 +92,8 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
       if (node.type === "xwikiMacroBlock") {
         this.loadMacro(node as BlockType);
         return true;
+      } else if (node.type === "link") {
+        this.backupLinkMetadata(node, blockNoteDocument);
       } else if (
         "props" in node &&
         node.props !== null &&
@@ -152,6 +155,37 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   }
 
   /**
+   * Backup the metadata of a link (resource reference, parameters, freestanding flag) so that it
+   * survives the editing round-trip. Unlike a block, a link is inline content and has no id that
+   * BlockNote preserves, so the metadata is mapped to a synthetic id that is stored in the link href
+   * (the only part of a link that BlockNote preserves verbatim). The BlockNote link schema has no
+   * props, so the props (holding the metadata) are removed after being backed up.
+   *
+   * @param link - the raw link node (mutable)
+   * @param blockNoteDocument - the BlockNote document where to backup the metadata
+   */
+  private backupLinkMetadata(
+    link: Record<string, unknown>,
+    blockNoteDocument: BlockNoteDocument,
+  ): void {
+    const props = (link.props ?? {}) as Record<string, unknown>;
+    const metadata: Record<string, unknown> = {};
+    XWikiBlockNoteProcessor.KNOWN_METADATA.filter(
+      (key) => key in props,
+    ).forEach((key) => {
+      metadata[key] = props[key];
+    });
+    if (Object.keys(metadata).length > 0) {
+      const id = uuidv4();
+      Object.assign(blockNoteDocument.getMetadata(id, true)!, metadata);
+      link.href = injectLinkId(link.href as string, id);
+    }
+    // The BlockNote link schema doesn't support props so we drop them (the metadata they held is
+    // backed up above and restored on save).
+    delete link.props;
+  }
+
+  /**
    * Converts the `xwikiParameters` value in a text style object from an object to a JSON string so that BlockNote
    * can store it as a primitive style value.
    *
@@ -182,6 +216,8 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
       if (node.type === "xwikiMacroBlock") {
         this.saveMacro(node as BlockType);
         return true;
+      } else if (node.type === "link") {
+        this.restoreLinkMetadata(node, blockNoteDocument);
       } else if (
         "props" in node &&
         node.props !== null &&
@@ -243,6 +279,29 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
       Object.entries(metadata ?? {}).forEach(([key, value]) => {
         props[key] = value;
       });
+    }
+  }
+
+  /**
+   * Reverses {@link backupLinkMetadata}: reads the synthetic id from the link href, restores the
+   * backed up metadata into the link props (recreating them, since the BlockNote link schema has no
+   * props) and removes the synthetic id from the href.
+   *
+   * @param link - the raw link node (mutable)
+   * @param blockNoteDocument - the BlockNote document to retrieve the metadata from
+   */
+  private restoreLinkMetadata(
+    link: Record<string, unknown>,
+    blockNoteDocument: BlockNoteDocument,
+  ): void {
+    const id =
+      typeof link.href === "string" ? extractLinkId(link.href) : undefined;
+    if (id) {
+      link.href = stripLinkId(link.href as string);
+      const metadata = blockNoteDocument.getMetadata(id);
+      if (metadata) {
+        link.props = { ...metadata };
+      }
     }
   }
 

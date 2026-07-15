@@ -40,10 +40,13 @@ type LinkEditionHooks = {
    * new link) or `editLink` (for an existing link) is called.
    *
    * @param linkData - the link data about to be written
+   * @param previous - the link data before the edition, when editing an existing link; undefined when
+   *   creating a new link. This lets the integration tell an edit (which should preserve the metadata
+   *   bound to the existing link) apart from a creation.
    * @returns a (possibly transformed) link data to write instead, or nothing to write the provided
    *   link data unchanged. Throwing cancels the write.
    */
-  beforeUpdate?: (linkData: LinkData) => LinkData | void;
+  beforeUpdate?: (linkData: LinkData, previous?: LinkData) => LinkData | void;
 };
 
 export type { LinkEditionHooks };

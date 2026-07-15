@@ -51,7 +51,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 /**
@@ -149,7 +149,7 @@ class SendMailRunnableTest
             // "UnknownHostException: xwiki-unknown"
             // "ConnectException: Connection refused"
             // Thus for now I only assert that there's an error set, but not its content.
-            assertTrue(status.getErrorSummary() != null);
+            assertNotNull(status.getErrorSummary());
             errorCount++;
         }
         assertEquals(2, errorCount);

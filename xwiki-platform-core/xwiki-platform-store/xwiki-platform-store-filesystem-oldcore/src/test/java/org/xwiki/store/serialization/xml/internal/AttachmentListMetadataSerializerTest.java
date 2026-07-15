@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import com.xpn.xwiki.doc.XWikiAttachment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for AttachmentListMetadataSerializer
@@ -83,7 +82,7 @@ class AttachmentListMetadataSerializerTest
         final ByteArrayInputStream bais = new ByteArrayInputStream(TEST_CONTENT.getBytes("US-ASCII"));
         final List<XWikiAttachment> attachList = this.serializer.parse(bais);
         bais.close();
-        assertTrue(3 == attachList.size(), "Attachment list was wrong size");
+        assertEquals(3, attachList.size(), "Attachment list was wrong size");
 
         assertEquals("file1", attachList.get(0).getFilename(), "Attachment1 had wrong name");
         assertEquals("file1", attachList.get(1).getFilename(), "Attachment2 had wrong name");

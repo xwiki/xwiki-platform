@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -316,7 +317,7 @@ class RightMapTest
         for (Right key : POPULATED_KEYS) {
             other.put(key, newValue());
         }
-        assertFalse(populatedMap.equals(other));
+        assertNotEquals(populatedMap, other);
     }
 
     @Test
@@ -327,7 +328,7 @@ class RightMapTest
             largerMap.put(key, populatedMap.get(key));
         }
         largerMap.put(Right.PROGRAM, newValue());
-        assertFalse(populatedMap.equals(largerMap));
+        assertNotEquals(populatedMap, largerMap);
     }
 
     @Test
@@ -337,7 +338,7 @@ class RightMapTest
         for (int i = 0; i < POPULATED_KEYS.length - 1; i++) {
             smallerMap.put(POPULATED_KEYS[i], populatedMap.get(POPULATED_KEYS[i]));
         }
-        assertFalse(populatedMap.equals(smallerMap));
+        assertNotEquals(populatedMap, smallerMap);
     }
 
     @Test

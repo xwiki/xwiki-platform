@@ -192,7 +192,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<DocumentI
             }
             while (wiki != null) {
                 fetchNextResults();
-                if (results.size() > 0) {
+                if (!results.isEmpty()) {
                     break;
                 }
                 wiki = getNextWiki();
@@ -286,7 +286,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<DocumentI
         if (rootReference == null) {
             List<String> wikis;
             try {
-                wikis = new ArrayList<String>(wikiDescriptorManager.getAllIds());
+                wikis = new ArrayList<>(wikiDescriptorManager.getAllIds());
             } catch (WikiManagerException e) {
                 throw new IllegalStateException("Failed to get the list of available wikis.", e);
             }

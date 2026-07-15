@@ -35,6 +35,21 @@ import org.xwiki.rest.model.jaxb.Properties;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/objects/{className}/{objectNumber}/properties")
 public interface ObjectPropertiesResource
 {
+    /**
+     * Retrieves the properties of an object attached to a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the object, for example {@code WebHome}
+     * @param className the reference of the XClass of the object, for example {@code XWiki.XWikiUsers}
+     * @param objectNumber the number identifying the object among those of the same class on the page; object numbers
+     *  are 0-based and assigned in creation order, so a value that no object carries yields a {@code 404} response
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's
+     *  display name), at some extra cost; defaults to {@code false}
+     * @return all the properties of the requested object
+     * @throws XWikiRestException if the properties cannot be retrieved from the store
+     */
     @GET Properties getObjectProperties(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

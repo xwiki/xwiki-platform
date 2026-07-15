@@ -145,7 +145,7 @@ public class DiffDocumentIterator extends AbstractDocumentIterator<DiffDocumentI
             action = Action.DELETE;
         }
 
-        return new ImmutablePair<DocumentReference, Action>(documentReference, action);
+        return new ImmutablePair<>(documentReference, action);
     }
 
     /**

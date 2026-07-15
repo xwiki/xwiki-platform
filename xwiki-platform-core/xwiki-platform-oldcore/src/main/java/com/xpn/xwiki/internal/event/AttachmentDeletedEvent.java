@@ -49,7 +49,7 @@ public class AttachmentDeletedEvent extends AbstractAttachmentEvent
      */
     public AttachmentDeletedEvent()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

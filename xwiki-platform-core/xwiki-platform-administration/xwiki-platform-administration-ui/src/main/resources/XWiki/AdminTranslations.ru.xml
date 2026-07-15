@@ -138,7 +138,9 @@ administration.section.users.deleteUser.newAuthor.hint=Выберите поль
 administration.section.users.deleteUser.newAuthor.error=Выбранный пользователь не имеет прав {0}!
 administration.section.users.deleteUser.newAuthor.programming=программирование
 administration.section.users.deleteUser.newAuthor.script=скрипт
-admin.usersgroups.extensionrights=Права расширений
+admin.usersgroups.extensionrights=Права расширений: Страница и дочерние
+### Missing: admin.usersgroups.extensionrights.space=Extension Rights: Page &amp; Children
+### Missing: admin.usersgroups.extensionrights.page=Extension Rights: Page
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=Исключение участника из группы

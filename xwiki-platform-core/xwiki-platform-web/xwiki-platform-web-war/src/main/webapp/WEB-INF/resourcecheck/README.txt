@@ -1,0 +1,1 @@
+This folder is used at init to identify the behavior of the application server related to resource path interpretation, and especially how it handles encoded URL characters in resource paths.

@@ -29,11 +29,6 @@
   // Skip Eclipse M2E special setup "dependency"
   "ignoreDeps": ["org.eclipse.m2e:lifecycle-mapping"],
 
-   ignorePaths: [
-     // Ignore boostrap until we are ready to move its build to more recent libraries (see XWIKI-22858).
-     "xwiki-platform-core/xwiki-platform-bootstrap/**"
-   ],
-
    // Set a "dependencies" label on all pull requests created by Renovate
   "labels": ["dependencies"],
 
@@ -74,6 +69,12 @@
       "matchDatasources": ["npm"],
       "groupName": "react",
       "matchDepPatterns": "^react(-dom)?"
+    },
+    // Group BlockNote dependencies together
+    {
+      "matchDatasources": ["npm"],
+      "groupName": "blocknote",
+      "matchDepPatterns": "@blocknote/.+"
     }
   ]
 }

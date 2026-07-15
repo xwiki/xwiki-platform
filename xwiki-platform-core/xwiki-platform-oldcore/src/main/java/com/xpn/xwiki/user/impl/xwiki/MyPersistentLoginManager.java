@@ -64,11 +64,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private static final String FIELD_SEPARATOR = ":";
 
     /**
-     * The string used to prefix cookie domain to conform to RFC 2109.
-     */
-    private static final String COOKIE_DOT_PFX = ".";
-
-    /**
      * Log4J logger object to log messages in this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(MyPersistentLoginManager.class);
@@ -187,7 +182,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String protectedUsername = username;
         String protectedPassword = password;
-        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
+        if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
             protectedUsername = encryptText(protectedUsername);
             protectedPassword = encryptText(protectedPassword);
             if (protectedUsername == null || protectedPassword == null) {
@@ -217,7 +212,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         Cookie rememberCookie = new Cookie(getCookiePrefix() + COOKIE_REMEMBERME, !sessionCookie + "");
         setupCookie(rememberCookie, sessionCookie, secureCookie, cookieDomain, response);
 
-        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
+        if (PROTECTION_ALL.equals(this.protection) || PROTECTION_VALIDATION.equals(this.protection)) {
             String validationHash = getValidationHash(protectedUsername, protectedPassword, getClientIP(request));
             if (validationHash != null) {
                 // Validation
@@ -320,13 +315,13 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
             sbValueBeforeMD5.append(username);
             sbValueBeforeMD5.append(FIELD_SEPARATOR);
-            sbValueBeforeMD5.append(password.toString());
+            sbValueBeforeMD5.append(password);
             sbValueBeforeMD5.append(FIELD_SEPARATOR);
             if (isTrue(this.useIP)) {
-                sbValueBeforeMD5.append(clientIP.toString());
+                sbValueBeforeMD5.append(clientIP);
                 sbValueBeforeMD5.append(FIELD_SEPARATOR);
             }
-            sbValueBeforeMD5.append(this.validationKey.toString());
+            sbValueBeforeMD5.append(this.validationKey);
 
             this.valueBeforeMD5 = sbValueBeforeMD5.toString();
             md5.update(this.valueBeforeMD5.getBytes());
@@ -370,7 +365,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 // with something else. Bas64 does not use _, and it is allowed in cookies, so
                 // we're using that instead of =. In decryptText the reverse operation is perfomed.
                 // See XWIKI-2211
-                return encryptedEncodedText.replaceAll("=", "_");
+                return encryptedEncodedText.replace("=", "_");
             }
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error("ERROR! >> SecretKey not generated...");
@@ -487,7 +482,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     private boolean checkValidation(HttpServletRequest request, HttpServletResponse response)
     {
-        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
+        if (PROTECTION_ALL.equals(this.protection) || PROTECTION_VALIDATION.equals(this.protection)) {
             String username = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME, DEFAULT_VALUE);
             String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
             String cookieHash =
@@ -517,13 +512,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String username = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME, DEFAULT_VALUE);
 
-        if (!username.equals(DEFAULT_VALUE)) {
-            if (checkValidation(request, response)) {
-                if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
-                    username = decryptText(username);
-                }
-                return username;
+        if (!DEFAULT_VALUE.equals(username) && checkValidation(request, response)) {
+            if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
+                username = decryptText(username);
             }
+            return username;
         }
         return null;
     }
@@ -537,16 +530,16 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     @Override
     // TODO: Also use the URL, in case cookies are disabled [XWIKI-1071]
+    // DEFAULT_VALUE is not a hardcoded password but a value indicating "not set cookie" - suppress the false positive.
+    @SuppressWarnings("java:S2068")
     public String getRememberedPassword(HttpServletRequest request, HttpServletResponse response)
     {
         String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
-        if (!password.equals(DEFAULT_VALUE)) {
-            if (checkValidation(request, response)) {
-                if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
-                    password = decryptText(password);
-                }
-                return password;
+        if (!DEFAULT_VALUE.equals(password) && checkValidation(request, response)) {
+            if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
+                password = decryptText(password);
             }
+            return password;
         }
         return null;
     }
@@ -554,7 +547,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     @Override
     public boolean rememberingLogin(HttpServletRequest request)
     {
-        if (getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_REMEMBERME, "false").equals("true")) {
+        if ("true".equals(getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_REMEMBERME, DEFAULT_VALUE))) {
             return true;
         } else {
             return false;
@@ -576,12 +569,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             // so here we must re-introduce the = sign needed by Base64.
             // See XWIKI-2211
             byte[] decodedEncryptedText =
-                Base64.decodeBase64(encryptedText.replaceAll("_", "=").getBytes("ISO-8859-1"));
+                Base64.decodeBase64(encryptedText.replace("_", "=").getBytes("ISO-8859-1"));
             Cipher c1 = Cipher.getInstance(this.cipherParameters);
             c1.init(Cipher.DECRYPT_MODE, this.secretKey);
             byte[] decryptedText = c1.doFinal(decodedEncryptedText);
-            String decryptedTextString = new String(decryptedText);
-            return decryptedTextString;
+            return new String(decryptedText);
         } catch (Exception e) {
             LOGGER.error("Error decypting text: " + encryptedText, e);
             return null;

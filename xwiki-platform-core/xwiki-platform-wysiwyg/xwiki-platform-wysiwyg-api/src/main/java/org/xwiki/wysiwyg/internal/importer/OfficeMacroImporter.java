@@ -103,7 +103,7 @@ public class OfficeMacroImporter
      */
     public XDOM buildXDOM(AttachmentReference attachmentReference, boolean filterStyles)
     {
-        Map<String, String> macroParams = new HashMap<String, String>();
+        Map<String, String> macroParams = new HashMap<>();
         macroParams.put("attachment", attachmentReference.getName());
         if (!filterStyles) {
             macroParams.put("filterStyles", "false");

@@ -33,7 +33,7 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
  */
 @ComponentTest
 @ReferenceComponentList
-public class PageHistoryResourceImplTest extends AbstractPageHistoryResourceImplTest
+class PageHistoryResourceImplTest extends AbstractPageHistoryResourceImplTest
 {
     @InjectMockComponents
     private PageHistoryResourceImpl pageHistoryResource;

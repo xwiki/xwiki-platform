@@ -19,12 +19,12 @@
  */
 package org.xwiki.resource;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link ResourceReferenceHandler}.
@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.1M2
  */
-public class ResourceReferenceHandlerTest
+class ResourceReferenceHandlerTest
 {
     private class TestableResourceReferenceHandler extends AbstractResourceReferenceHandler<ResourceType>
     {
@@ -44,7 +44,7 @@ public class ResourceReferenceHandlerTest
         @Override
         public List<ResourceType> getSupportedResourceReferences()
         {
-            return Arrays.asList(new ResourceType("test"));
+            return List.of(new ResourceType("test"));
         }
 
         @Override
@@ -52,10 +52,10 @@ public class ResourceReferenceHandlerTest
             ResourceReferenceHandlerException
         {
         }
-    };
+    }
 
     @Test
-    public void priority()
+    void priority()
     {
         ResourceReferenceHandler handler1 = new TestableResourceReferenceHandler(500);
         assertEquals(500, handler1.getPriority());

@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -120,7 +119,7 @@ class CachedFilterPreferencesModelBridgeTest
     void saveFilterPreferencesForUser() throws Exception
     {
         List<NotificationFilterPreference> filterPreferenceList =
-            Arrays.asList(mock(NotificationFilterPreference.class), mock(NotificationFilterPreference.class));
+            List.of(mock(NotificationFilterPreference.class), mock(NotificationFilterPreference.class));
 
         this.cachedModelBridge.saveFilterPreferences(USER, filterPreferenceList);
 
@@ -131,7 +130,7 @@ class CachedFilterPreferencesModelBridgeTest
     void saveFilterPreferencesForWiki() throws Exception
     {
         List<NotificationFilterPreference> filterPreferenceList =
-            Arrays.asList(mock(NotificationFilterPreference.class), mock(NotificationFilterPreference.class));
+            List.of(mock(NotificationFilterPreference.class), mock(NotificationFilterPreference.class));
 
         this.cachedModelBridge.saveFilterPreferences(WIKI, filterPreferenceList);
 

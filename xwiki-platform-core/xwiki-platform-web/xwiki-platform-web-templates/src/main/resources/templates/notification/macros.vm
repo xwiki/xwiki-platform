@@ -165,21 +165,26 @@
 #**
  * Display a line with a user (its name and a small avatar)
  * @param $user the reference of the user to display
+ * @param $onlyAvatar (boolean), when true, do not display the userName.
  *#
 #macro(displayNotificationEventUser $user $onlyAvatar)
-  #set ($userDoc = $xwiki.getDocument($user))
-  #getUserAvatarURL($userDoc.documentReference, $avatarURL, 40)
-  #set ($userName = $xwiki.getUserName($user))
-  #set ($plainUserName = $xwiki.getPlainUserName($user))
-  <span class="notification-event-user" data-xwiki-lightbox="false">
-    <img src="$avatarURL.url" alt="$escapetool.xml($plainUserName)"/>#if(!$onlyAvatar)${userName}#end
-  </span>##
+  #if($onlyAvatar)
+    #set ($userDoc = $xwiki.getDocument($user))
+    #getUserAvatarURL($userDoc.documentReference, $avatarURL, 40)
+    #set ($plainUserName = $xwiki.getPlainUserName($user))
+    <span class="notification-event-user" data-xwiki-lightbox="false">
+      <img src="$avatarURL.url" alt="$escapetool.xml($plainUserName)"/>
+    </span>##
+  #else
+    #displayUser($user {'useInlineHTML': true})
+  #end
 #end
 #**
  * Display a line with the name of all users.
  * The result is not HTML-escaped when the $link parameter is false.
  * @param $users the users to display
  * @param $link (since 9.5) either or not an HTML link to the user must be generated (default: true)
+ * @param $onlyAvatars (boolean) do not display the user name, even when there's only one user to display.
  *#
 #macro(displayNotificationEventUsers $users $link $onlyAvatars)##
 ## The indent is bad to not introduce space charaters in the results

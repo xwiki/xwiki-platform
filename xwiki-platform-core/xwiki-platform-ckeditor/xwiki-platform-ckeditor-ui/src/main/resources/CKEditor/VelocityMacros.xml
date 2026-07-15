@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.6" reference="CKEditor.VelocityMacros" locale="">
+<xwikidoc version="1.7" reference="CKEditor.VelocityMacros" locale="">
   <web>CKEditor</web>
   <name>VelocityMacros</name>
   <language/>
@@ -47,7 +47,7 @@
   #end
   #if ($toHTML)
     #set ($source = {
-      'documentReference': $doc.documentReference,
+      'documentReferenceWithLocale': $tdoc.documentReferenceWithLocale,
       'syntax': $sourceSyntax,
       'restricted' : $request.wysiwygRestricted
     })
@@ -94,10 +94,17 @@
   #set ($macro.previousDisplayMode = $xcontext.displayMode)
   #set ($discard = $xcontext.setDisplayMode('view'))
   #set ($restricted = "$!source.restricted" == 'true')
+  ## The source reference is used to determine the author whose rights are used to render the content. It's the object
+  ## property reference when editing an object property (so that the document author is used for the unmodified stored
+  ## value) and the document reference otherwise.
+  #set ($sourceReference = $source.sourceReference)
+  #if (!$sourceReference)
+    #set ($sourceReference = $source.documentReferenceWithLocale)
+  #end
   #if ($source.html)
-    #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference, $restricted))
+    #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $sourceReference, $restricted))
   #else
-    #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $source.documentReference, $restricted))
+    #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $sourceReference, $restricted))
   #end
   #if ("$!html" == '')
     ## Prevent Firefox from inserting bogus whitespace when the text area is empty.
@@ -124,11 +131,9 @@
     'xwiki-version': $services.extension.core.getCoreExtension(
       'org.xwiki.platform:xwiki-platform-tree-webjar').version.value,
     'fast-diff-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:fast-diff',
-      "wiki:$xcontext.database").version.value,
-    'bs3typeahead-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:bootstrap-3-typeahead',
       "wiki:$xcontext.database").version.value
   }))
-  #ckeditor_importCSS('org.xwiki.platform' 'xwiki-platform-ckeditor-plugins' 'webjar.bundle.min.css' true)
+  #ckeditor_importCSS('org.xwiki.platform' 'xwiki-platform-wysiwyg-webjar' 'webjar.bundle.min.css')
   ## Tree styles needed for the document/attachment tree picker.
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
     {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -158,21 +163,36 @@
   ##
   #set ($sourceDocumentReference = $parameters.attributes.get('data-sourceDocumentReference'))
   #if (!$sourceDocumentReference)
-    #set ($sourceDocumentReference = $tdoc.documentReference)
+    #set ($sourceDocumentReference = $tdoc.documentReferenceWithLocale)
   #end
+  ## The source reference used server-side to determine the author whose rights are used to render the content (e.g. the
+  ## object property reference when editing an object property). We remove it from the attributes so that it's not
+  ## output as an HTML attribute, it's only meant to be used server-side.
+  #set ($sourcePropertyReference = $parameters.attributes.remove('data-sourcePropertyReference'))
   #set ($source = {
-    'documentReference': $sourceDocumentReference,
+    'documentReferenceWithLocale': $sourceDocumentReference,
+    'sourceReference': $sourcePropertyReference,
     'syntax': $syntaxId,
     'content': $parameters.content,
     'restricted': $parameters.attributes.data-restricted
   })
+  ## The source document reference is kept with its locale in $source because it's needed server-side to render
+  ## the edited content in the right translation. The value written to the data-sourceDocumentReference HTML
+  ## attribute must however be a properly serialized reference string: the client resolves it to build the file
+  ## upload URL and to store temporary attachments, which are keyed on a locale-free reference. A raw reference
+  ## object would be serialized with its implicit toString() into an invalid "wiki:Space.Page()" value (empty
+  ## locale parameters rendered as "()"), which resolves to the wrong document and breaks image uploads.
+  #if ($parameters.attributes.containsKey('data-sourceDocumentReference'))
+    #set ($discard = $parameters.attributes.put('data-sourceDocumentReference',
+      $services.model.serialize($sourceDocumentReference)))
+  #end
   ##
   ## Disable the file upload and drag &amp; drop when the current user doesn't have edit right on the source document, if
   ## the source is restricted. This is the case for instance when an user with comment right adds a comment to a page
   ## they don't have edit right on. They are allowed to add the comment but they can't upload files because that
   ## requires edit right. We check if the source is in restricted mode because in some cases (such as for Change Request
   ## Application) we want to allow file upload even if the current user doesn't have edit right on the source document.
-  #if ($source.restricted == 'true' &amp;&amp; !$services.security.authorization.hasAccess('edit', $source.documentReference))
+  #if ($source.restricted == 'true' &amp;&amp; !$services.security.authorization.hasAccess('edit', $source.documentReferenceWithLocale))
     #set ($parameters.attributes.data-upload-disabled = 'true')
   #end
   ## We use the velocity template context to convey the startupFocus parameter to CKEditor.
@@ -234,29 +254,6 @@
     &lt;/dt&gt;
     &lt;dd&gt;#displayCKEditorConfigPropertyValue($configDoc 'advanced' $action)&lt;/dd&gt;
   &lt;/dl&gt;
-#end
-
-#**
- * Deprecated. Use #initRequiredSkinExtensions() from display_macros.vm instead.
-*#
-#macro (ckeditor_initRequiredSkinExtensions)
-  #set ($requiredSkinExtensions = $collectiontool.orderedMap)
-  ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
-  ## (they are aready available on the edit page so there's no need to load them).
-  #foreach ($pluginName in ['ssrx', 'ssfx', 'ssx', 'linkx', 'jsrx', 'jsfx', 'jsx'])
-    #set ($discard = $requiredSkinExtensions.put($pluginName, $xwiki.get($pluginName).importString))
-  #end
-#end
-
-#**
- * Deprecated. Use #getRequiredSkinExtensions() from display_macros.vm instead.
-*#
-#macro (ckeditor_getRequiredSkinExtensions)
-  #foreach ($entry in $requiredSkinExtensions.entrySet())
-    #set ($importString = $xwiki.get($entry.key).importString)
-    ## Remove the always used skin extensions, keep only those that have been requested by the macro parameter pickers.
-    $!stringtool.removeStart($importString, $entry.value).trim()##
-  #end
 #end
 {{/velocity}}</content>
 </xwikidoc>

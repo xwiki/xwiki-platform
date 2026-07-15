@@ -91,7 +91,7 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
         SyndContent entryDescription = new SyndContentImpl();
 
         // The users contained in the CompositeEvent are already stored in a Set, they are therefore necessarily unique
-        List<SyndPerson> eventAuthors = new ArrayList<SyndPerson>();
+        List<SyndPerson> eventAuthors = new ArrayList<>();
 
         // Convert every author of the CompositeEvent to a SyndPerson and add it to the new entry
         for (DocumentReference author : eventNotification.getUsers()) {
@@ -116,7 +116,7 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
 
             // Try to get a template associated with the composite event
             Template template = this.templateManager.getTemplate(String.format("notification/rss/%s.vm",
-                    eventNotification.getType().replaceAll("\\/", ".")));
+                    eventNotification.getType().replace("/", ".")));
 
             // If no template is found, fallback on the default one
             if (template == null) {
@@ -149,8 +149,9 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
     private String getTitle(CompositeEvent eventNotification)
     {
         String entryTitle;
-        String eventTitle = eventNotification.getEvents().get(0).getTitle();
-        String documentTitle = eventNotification.getEvents().get(0).getDocumentTitle();
+        int mainEventIndex = getMainEventIndex(eventNotification);
+        String eventTitle = eventNotification.getEvents().get(mainEventIndex).getTitle();
+        String documentTitle = eventNotification.getEvents().get(mainEventIndex).getDocumentTitle();
         boolean concernsDocument = !StringUtils.isEmpty(documentTitle);
         boolean translationExist = !StringUtils.isEmpty(eventTitle)
             && this.contextualLocalizationManager.getTranslation(eventTitle) != null;
@@ -167,5 +168,23 @@ public class DefaultNotificationRSSRenderer implements NotificationRSSRenderer
                 .getTranslationPlain("notifications.rss.defaultTitle");
         }
         return entryTitle;
+    }
+
+    /**
+     * @return the index of the event representing the composite event, i.e. the first event whose type matches the
+     *     composite event type. This mirrors {@link CompositeEvent#getType()} so that the entry title is taken from the
+     *     actual event (e.g. a comment addition) rather than from a technical event (e.g. the document update triggered
+     *     by that comment) which can share the same date and end up first in the composite
+     */
+    private int getMainEventIndex(CompositeEvent eventNotification)
+    {
+        String type = eventNotification.getType();
+        for (int i = 0; i < eventNotification.getEvents().size(); i++) {
+            if (type != null && type.equals(eventNotification.getEvents().get(i).getType())) {
+                return i;
+            }
+        }
+        // Fallback: no event matches the composite type, keep the most recent one.
+        return 0;
     }
 }

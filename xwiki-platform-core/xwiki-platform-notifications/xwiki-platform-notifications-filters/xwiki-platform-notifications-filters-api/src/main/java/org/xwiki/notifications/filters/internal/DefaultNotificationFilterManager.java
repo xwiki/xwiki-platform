@@ -205,7 +205,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     @Override
     public Stream<NotificationFilter> getToggleableFilters(Collection<NotificationFilter> filters)
     {
-        return filters.stream().filter(filter -> filter instanceof ToggleableNotificationFilter);
+        return filters.stream().filter(ToggleableNotificationFilter.class::isInstance);
     }
 
     @Override
@@ -237,10 +237,8 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     public Block displayFilter(NotificationFilter filter, NotificationFilterPreference preference)
             throws NotificationException
     {
-        /**
-         * Try to find a {@link NotificationFilterDisplayer} that corresponds to the given filter.
-         * If no renderer is found, fallback on the default one.
-         */
+        // Try to find a {@link NotificationFilterDisplayer} that corresponds to the given filter.
+        // If no renderer is found, fallback on the default one.
         try {
             List<NotificationFilterDisplayer> renderers =
                     componentManager.getInstanceList(NotificationFilterDisplayer.class);

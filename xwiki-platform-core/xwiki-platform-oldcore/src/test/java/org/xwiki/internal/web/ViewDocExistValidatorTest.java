@@ -19,6 +19,8 @@
  */
 package org.xwiki.internal.web;
 
+import java.util.Locale;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -43,6 +45,7 @@ import ch.qos.logback.classic.Level;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -68,6 +71,9 @@ class ViewDocExistValidatorTest
 
     @Mock
     private XWikiDocument doc;
+
+    @Mock
+    private XWikiDocument tdoc;
 
     @Mock
     private XWikiDocument revisionDoc;
@@ -121,6 +127,59 @@ class ViewDocExistValidatorTest
         when(this.request.get("rev")).thenReturn("deleted:2");
         when(this.documentRevisionProvider.getRevision(this.doc, "deleted:2")).thenReturn(null);
         assertTrue(this.validator.docExist(this.doc, this.context));
+    }
+
+    @Test
+    void docExistHasRevExistsWithTranslation() throws Exception
+    {
+        when(this.request.get("rev")).thenReturn("1.2");
+        when(this.context.get("tdoc")).thenReturn(this.tdoc);
+        when(this.tdoc.getLocale()).thenReturn(Locale.FRENCH);
+        when(this.tdoc.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        when(this.documentRevisionProvider.getRevision(this.tdoc, "1.2")).thenReturn(this.revisionDoc);
+        assertFalse(this.validator.docExist(this.doc, this.context));
+    }
+
+    @Test
+    void docExistHasRevDoesNotExistWithTranslation() throws Exception
+    {
+        when(this.request.get("rev")).thenReturn("1.2");
+        when(this.context.get("tdoc")).thenReturn(this.tdoc);
+        when(this.tdoc.getLocale()).thenReturn(Locale.FRENCH);
+        when(this.tdoc.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+        assertTrue(this.validator.docExist(this.doc, this.context));
+
+        // Verify that the check is done on the right document (i.e. the tdoc)
+        verify(this.documentRevisionProvider).getRevision(this.tdoc, "1.2");
+    }
+
+    @Test
+    void docExistHasRevWithRootLocaleTranslation() throws Exception
+    {
+        // When tdoc has ROOT locale, the root doc should be used for revision check (not tdoc)
+        when(this.request.get("rev")).thenReturn("1.2");
+        when(this.context.get("tdoc")).thenReturn(this.tdoc);
+        when(this.tdoc.getLocale()).thenReturn(Locale.ROOT);
+        when(this.documentRevisionProvider.getRevision(this.doc, "1.2")).thenReturn(this.revisionDoc);
+        assertFalse(this.validator.docExist(this.doc, this.context));
+
+        // Verify that tdoc.getLocale() is called to be sure there's a check as otherwise there's no proof we're
+        // checking anything related to tdoc
+        verify(this.tdoc).getLocale();
+    }
+
+    @Test
+    void docExistHasRevWithNullTdoc() throws Exception
+    {
+        // When tdoc is null in context, the root doc should be used for revision check
+        when(this.request.get("rev")).thenReturn("1.2");
+        when(this.context.get("tdoc")).thenReturn(null);
+        when(this.documentRevisionProvider.getRevision(this.doc, "1.2")).thenReturn(this.revisionDoc);
+        assertFalse(this.validator.docExist(this.doc, this.context));
+
+        // Verify that context.get("tdoc") is called to be sure there's a check as otherwise there's no proof we're
+        // checking anything related to tdoc
+        verify(this.context).get("tdoc");
     }
 
     @Test

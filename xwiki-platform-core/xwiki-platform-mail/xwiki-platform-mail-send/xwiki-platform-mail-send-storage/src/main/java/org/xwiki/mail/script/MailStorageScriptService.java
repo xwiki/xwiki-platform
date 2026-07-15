@@ -115,8 +115,7 @@ public class MailStorageScriptService extends AbstractMailScriptService
     {
         try {
             MailStatusResult statusResult = this.mailResender.resendAsynchronously(batchId, uniqueMessageId);
-            ScriptMailResult scriptMailResult = new ScriptMailResult(new DefaultMailResult(batchId), statusResult);
-            return scriptMailResult;
+            return new ScriptMailResult(new DefaultMailResult(batchId), statusResult);
         } catch (MailStoreException e) {
             // Save the exception for reporting through the script services's getLastError() API
             setError(e);
@@ -312,8 +311,7 @@ public class MailStorageScriptService extends AbstractMailScriptService
 
     private MimeMessage loadMessage(Session session, String batchId, String mailId) throws MailStoreException
     {
-        MimeMessage message = this.mailContentStore.load(session, batchId, mailId);
-        return message;
+        return this.mailContentStore.load(session, batchId, mailId);
     }
 
     private List<ScriptMailResult> resendGeneric(Map<String, Object> filterMap, int offset, int count,

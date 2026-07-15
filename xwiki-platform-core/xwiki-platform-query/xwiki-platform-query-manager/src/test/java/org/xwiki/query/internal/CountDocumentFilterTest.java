@@ -19,16 +19,19 @@
  */
 package org.xwiki.query.internal;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
-import org.apache.commons.collections.ListUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.xwiki.query.Query;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 /**
  * Tests for {@link CountDocumentFilter}
@@ -36,13 +39,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  */
 @ComponentTest
-public class CountDocumentFilterTest
+class CountDocumentFilterTest
 {
     @InjectMockComponents
     private CountDocumentFilter filter;
 
     @Test
-    public void filterSelectStatement()
+    void filterSelectStatement()
     {
         assertEquals("select count(doc.fullName) from XWikiDocument doc",
             this.filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
@@ -53,49 +56,49 @@ public class CountDocumentFilterTest
     }
 
     @Test
-    public void filterSelectStatementWithWhitespace()
+    void filterSelectStatementWithWhitespace()
     {
         assertEquals("select count(doc.fullName) from XWikiDocument as doc",
             this.filter.filterStatement("  select doc.fullName from XWikiDocument as doc ", Query.HQL));
     }
 
     @Test
-    public void filterSelectDistinctStatement()
+    void filterSelectDistinctStatement()
     {
         assertEquals("select count(distinct doc.fullName) from XWikiDocument doc",
             this.filter.filterStatement("select distinct doc.fullName from XWikiDocument doc", Query.HQL));
     }
 
     @Test
-    public void filterSelectWithAsStatement()
+    void filterSelectWithAsStatement()
     {
         assertEquals("select count(doc.fullName) from XWikiDocument as doc",
             this.filter.filterStatement("select doc.fullName from XWikiDocument as doc", Query.HQL));
     }
 
     @Test
-    public void filterSelectStatementWithMismatchingDocAlias()
+    void filterSelectStatementWithMismatchingDocAlias()
     {
         assertEquals("select mydoc.fullName from XWikiDocument mydoc",
             this.filter.filterStatement("select mydoc.fullName from XWikiDocument mydoc", Query.HQL));
     }
 
     @Test
-    public void filterStatementWhenStatementAlreadyContainsCount()
+    void filterStatementWhenStatementAlreadyContainsCount()
     {
         assertEquals("select count(distinct doc.fullName) from XWikiDocument doc",
             this.filter.filterStatement("select count(distinct doc.fullName) from XWikiDocument doc", Query.HQL));
     }
 
     @Test
-    public void filterStatementWhenStatementContainsOrderBy()
+    void filterStatementWhenStatementContainsOrderBy()
     {
         assertEquals("select count(doc.fullName) from XWikiDocument doc ",
             this.filter.filterStatement("select doc.fullName from XWikiDocument doc order by doc.name", Query.HQL));
     }
 
     @Test
-    public void filterStatementWhenStatementContainsOrderByAndGroupBy()
+    void filterStatementWhenStatementContainsOrderByAndGroupBy()
     {
         assertEquals("select count(doc.fullName) from XWikiDocument doc group by doc.web",
             this.filter.filterStatement("select doc.fullName from XWikiDocument doc order by doc.name group by doc.web",
@@ -104,14 +107,14 @@ public class CountDocumentFilterTest
     }
 
     @Test
-    public void filterStatementWhenStatementContainsDistinct()
+    void filterStatementWhenStatementContainsDistinct()
     {
         assertEquals("select count(distinct doc.fullName) from XWikiDocument doc",
             this.filter.filterStatement("select distinct doc.fullName from XWikiDocument doc", Query.HQL));
     }
 
     @Test
-    public void filterStatementWhenStatementContainsMultipleColumns()
+    void filterStatementWhenStatementContainsMultipleColumns()
     {
         assertEquals("select count(doc.fullName) from XWikiDocument doc group by doc.web",
             this.filter.filterStatement(
@@ -121,79 +124,64 @@ public class CountDocumentFilterTest
     }
 
     @Test
-    public void getSelectColumns()
+    void getSelectColumns()
     {
         String[] columns = { "doc.fullName", "doc.name", "doc.space" };
         List<String> result =
             this.filter.getSelectColumns("select doc.fullName, doc.name, doc.space from XWikiDocument doc");
 
-        assertEquals(Arrays.asList(columns), result);
+        assertEquals(List.of(columns), result);
     }
 
     @Test
-    public void getSelectColumnsWithAdditionalSpaces()
+    void getSelectColumnsWithAdditionalSpaces()
     {
         String[] columns = { "doc.fullName", "doc.name", "doc.space" };
         List<String> result =
             this.filter.getSelectColumns("select  doc.fullName  , doc.name ,   doc.space from XWikiDocument doc");
 
-        assertEquals(Arrays.asList(columns), result);
+        assertEquals(List.of(columns), result);
     }
 
     @Test
-    public void getSelectColumnsWithDistinct()
+    void getSelectColumnsWithDistinct()
     {
         String[] columns = { "distinct doc.fullName" };
         List<String> result = this.filter.getSelectColumns("select distinct doc.fullName from XWikiDocument doc");
 
-        assertEquals(Arrays.asList(columns), result);
+        assertEquals(List.of(columns), result);
     }
 
-    @Test
-    public void getOrderByColumns()
+    static Stream<Arguments> getOrderByColumnsSource()
     {
-        String[] columns = { "doc.name" };
-        List<String> result =
-            this.filter.getOrderByColumns("select doc.fullName from XWikiDocument doc order by doc.name");
-
-        assertEquals(Arrays.asList(columns), result);
+        return Stream.of(
+            arguments(
+                "getOrderByColumns",
+                "select doc.fullName from XWikiDocument doc order by doc.name",
+                List.of("doc.name")),
+            arguments(
+                "getOrderByColumnsWithoutOrderBy",
+                "select doc.fullName from XWikiDocument doc",
+                List.of()),
+            arguments(
+                "getOrderByColumnsWithMultipleColumns",
+                "select doc.fullName from XWikiDocument doc order by doc.name, doc.web",
+                List.of("doc.name", "doc.web")),
+            arguments(
+                "getOrderByColumnsWithGroupBy",
+                "select doc.fullName from XWikiDocument doc order by doc.name, doc.web group by doc.web",
+                List.of("doc.name", "doc.web")),
+            arguments(
+                "getOrderByColumnsWithAdditionalSpaces",
+                "select doc.fullName from XWikiDocument doc order by doc.name  ,  doc.web  group by doc.web",
+                List.of("doc.name", "doc.web"))
+        );
     }
 
-    @Test
-    public void getOrderByColumnsWithoutOrderBy()
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("getOrderByColumnsSource")
+    void getOrderByColumns(String description, String statement, List<String> expected)
     {
-        List<String> result = this.filter.getOrderByColumns("select doc.fullName from XWikiDocument doc");
-
-        assertEquals(ListUtils.EMPTY_LIST, result);
-    }
-
-    @Test
-    public void getOrderByColumnsWithMultipleColumns()
-    {
-        String[] columns = { "doc.name", "doc.web" };
-        List<String> result = this.filter.getOrderByColumns(
-            "select doc.fullName from XWikiDocument doc order by doc.name, doc.web");
-
-        assertEquals(Arrays.asList(columns), result);
-    }
-
-    @Test
-    public void getOrderByColumnsWithGroupBy()
-    {
-        String[] columns = { "doc.name", "doc.web" };
-        List<String> result = this.filter.getOrderByColumns(
-            "select doc.fullName from XWikiDocument doc order by doc.name, doc.web group by doc.web");
-
-        assertEquals(Arrays.asList(columns), result);
-    }
-
-    @Test
-    public void getOrderByColumnsWithAdditionalSpaces()
-    {
-        String[] columns = { "doc.name", "doc.web" };
-        List<String> result = this.filter.getOrderByColumns(
-            "select doc.fullName from XWikiDocument doc order by doc.name  ,  doc.web  group by doc.web");
-
-        assertEquals(Arrays.asList(columns), result);
+        assertEquals(expected, this.filter.getOrderByColumns(statement));
     }
 }

@@ -18,9 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { toXWikiEntityReference } from "./XWikiEntityReference";
-import { EntityReference, EntityType } from "@xwiki/platform-model-api";
-import { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
+import { EntityType } from "@xwiki/platform-model-api";
 import { Container, injectable } from "inversify";
+import type { EntityReference } from "@xwiki/platform-model-api";
+import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
 
 @injectable("Singleton")
 export class XWikiModelReferenceSerializer implements ModelReferenceSerializer {

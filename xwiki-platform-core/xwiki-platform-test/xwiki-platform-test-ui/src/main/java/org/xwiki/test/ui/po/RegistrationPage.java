@@ -34,6 +34,18 @@ import org.openqa.selenium.support.FindBy;
  */
 public class RegistrationPage extends AbstractRegistrationPage
 {
+    /** The locator of the message displayed when the registration succeeds. */
+    private static final By SUCCESS_MESSAGE_LOCATOR = By.xpath(
+        "//*[(contains(@class, 'infomessage') or contains(@class, 'registration-success-headline')) and "
+            + "(contains(., 'Registration successful.') or contains(., 'Welcome '))]");
+
+    /** The locator of a server-side error (e.g. the user already exists on a closed wiki). */
+    private static final By ERROR_MESSAGE_LOCATOR = By.cssSelector("div.errormessage");
+
+    /** The locator of a live validation error (e.g. the user already exists on an open wiki). */
+    private static final By LIVE_VALIDATION_ERROR_LOCATOR =
+        By.cssSelector("dd > span.LV_validation_message.LV_invalid");
+
     @FindBy(css = "form#register input[type='submit']")
     private WebElement submitButton;
 
@@ -61,14 +73,15 @@ public class RegistrationPage extends AbstractRegistrationPage
      */
     public Optional<String> getRegistrationSuccessMessage()
     {
-        List<WebElement> infos = getDriver().findElements(
-            By.xpath("//*[contains(@class, 'infomessage') or" +
-             " contains(@class, 'registration-success-headline')]"));
-        for (WebElement info : infos) {
-            if (info.getText().contains("Registration successful.") ||
-                info.getText().contains("Welcome ")) {
-                return Optional.of(info.getText().replaceAll("\n", " "));
-            }
+        // First wait for the form submission to produce an outcome (success, server-side error or live validation
+        // error). This lets us then look for the success message without waiting: on failure it's legitimately absent
+        // and a plain findElements() would otherwise block for the full Selenium implicit-wait timeout.
+        getDriver().waitUntilElementsAreVisible(
+            new By[] { SUCCESS_MESSAGE_LOCATOR, ERROR_MESSAGE_LOCATOR, LIVE_VALIDATION_ERROR_LOCATOR }, false);
+
+        List<WebElement> infos = getDriver().findElementsWithoutWaiting(SUCCESS_MESSAGE_LOCATOR);
+        if (!infos.isEmpty()) {
+            return Optional.of(infos.getFirst().getText().replaceAll("\n", " "));
         }
 
         return Optional.empty();

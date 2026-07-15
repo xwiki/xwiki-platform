@@ -34,13 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  */
 @ComponentTest
-public class LogEventConverterTest
+class LogEventConverterTest
 {
     @InjectMockComponents
     private LogEventConverter converter;
 
     @Test
-    public void toRemote()
+    void toRemote()
     {
         assertFalse(this.converter.toRemote(new LocalEventData(null, null, null), null));
         assertTrue(this.converter.toRemote(new LocalEventData(new LogEvent(), null, null), null));

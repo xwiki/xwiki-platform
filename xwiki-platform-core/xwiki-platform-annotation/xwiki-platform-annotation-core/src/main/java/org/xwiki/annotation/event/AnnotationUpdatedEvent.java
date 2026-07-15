@@ -49,7 +49,7 @@ public class AnnotationUpdatedEvent extends AbstractAnnotationEvent
      */
     public AnnotationUpdatedEvent()
     {
-        super();
+        // Nothing to do.
     }
 
     /**

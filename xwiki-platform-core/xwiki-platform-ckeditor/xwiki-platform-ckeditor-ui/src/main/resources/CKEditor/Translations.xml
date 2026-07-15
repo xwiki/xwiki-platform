@@ -123,45 +123,6 @@ ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not suppo
 ckeditor.plugin.icon.iconsFetchFailed=Failed to retrieve the icon list.
 ckeditor.plugin.icon.iconThemesFetchFailed=Failed to retrieve the available icon themes.
 
-ckeditor.plugin.image.imageEditor.standardTab.title=Standard
-ckeditor.plugin.image.imageEditor.advancedTab.title=Advanced
-ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=Image Styles
-ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=Select the style to apply on the image.
-ckeditor.plugin.image.imageEditor.standardTab.alt.label=Alternative Text
-ckeditor.plugin.image.imageEditor.standardTab.alt.hint=Define an alternate text for an image, if the image cannot be displayed.
-ckeditor.plugin.image.imageEditor.standardTab.caption.label=Caption
-ckeditor.plugin.image.imageEditor.standardTab.caption.hint=Activate and define an image caption.
-ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=Activate and define an image caption.
-
-ckeditor.plugin.image.imageEditor.advancedTab.size.label=Size
-ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=Width
-ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=Height
-ckeditor.plugin.image.imageEditor.advancedTab.size.hint=Define the image size.
-ckeditor.plugin.image.imageEditor.advancedTab.border.label=Border
-ckeditor.plugin.image.imageEditor.advancedTab.border.hint=When checked, the image is displayed with a border
-ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=Alignment
-ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=Define the image alignment.
-ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=None
-ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=Start
-ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Center
-ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=End
-ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Text Wrap
-ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=When checked, the text is wrapped around the image.
-
-ckeditor.plugin.image.imageSelector.treeTab.title=Tree
-ckeditor.plugin.image.imageSelector.uploadTab.title=Upload
-ckeditor.plugin.image.imageSelector.uploadTab.file.title=File
-ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Select a local file to add to the page.
-ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=Upload
-ckeditor.plugin.image.imageSelector.iconTab.title=Icon
-ckeditor.plugin.image.imageSelector.iconTab.icon.title=Icon
-ckeditor.plugin.image.imageSelector.iconTab.icon.hint=The identifier of the icon to display as an image.
-ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=accept
-ckeditor.plugin.image.imageSelector.urlTab.title=Url
-ckeditor.plugin.image.imageSelector.urlTab.url.title=Url
-ckeditor.plugin.image.imageSelector.urlTab.url.hint=The url of the image to display.
-ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
-
 ckeditor.plugin.image.slash.currentPageBadge=This page
 ckeditor.plugin.image.slash.externalBadge=External
 ckeditor.plugin.image.slash.loading=Loading...
@@ -275,92 +236,10 @@ ckeditor.plugin.upload.imageUploadFailed=Failed to upload {0} out of {1} pasted 
 
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 
-ckeditor.upload.error.csrf=The CSRF token is missing.
-ckeditor.upload.error.emptyReturn=Error when uploading the file: it might exceed the configured maximum upload size.
-
-modal.ok=OK
-modal.cancel=Cancel
-modal.close=Close
-
-resource.attach.label=Attachment
-resource.attach.placeholder=Path.To.Page@attachment.png
-resource.data.label=Data URI
-resource.doc.label=Page
-resource.doc.placeholder=Path.To.Page
-resource.icon.label=Icon
-resource.mailto.label=Mail Address
-resource.mailto.placeholder=user@example.org
-resource.path.label=Path
-resource.path.placeholder=/path/to/file
-resource.unc.label=UNC Path
-resource.unc.placeholder=//server/share/path/to/file
-resource.unknown.label=Unknown
-resource.url.label=URL
-resource.url.placeholder=http://www.example.org/image.png
-resource.user.label=User
-resource.user.placeholder=alias
-
-resourcePicker.attach.hint=Select an attachment
-resourcePicker.doc.hint=Select a page
-resourcePicker.dropdown.toggle.title=Toggle the display of resource types.
-
-entityResourceSuggester.doc.placeholder=Find a page...
-entityResourceSuggester.attach.placeholder=Find an attachment...
-entityResourceSuggester.create.resolvedInSpace=Create new page...
-entityResourceSuggester.create.fullyResolvedInput=Create with exact reference...
-
-entityResourcePicker.select=Select
-entityResourcePicker.doc.title=Select Page
-entityResourcePicker.attach.title=Select Attachment
-
-macroSelector.title=Select Macro
-macroSelector.filter.text.placeholder=Type to filter
-macroSelector.filter.category.all=All Macros
-macroSelector.filter.category.other=Other
-macroSelector.filter.category.notinstalled=Not installed
-macroSelector.failedToRetrieveMacros=Failed to retrieve the list of available macros.
-macroSelector.select=Select
-macroSelector.recommended=Recommended
-macroSelector.install=Install
-macroSelector.install.confirm=You are about to install the extension {0} {1}. Are you sure you want to continue ?
-macroSelector.install.notAllowed=You are not allowed to install this extension
-macroSelector.filter.category.placeholder=Select a category...
-
-macroEditor.title=Edit Macro
-macroEditor.more=More
-macroEditor.required=Required
-macroEditor.deprecated=Deprecated
-macroEditor.advanced=Advanced
-macroEditor.changeMacro=Change Macro
-macroEditor.submit=Submit
-macroEditor.content=Content
-macroEditor.noParameters=This macro has no parameters.
-macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.
-macroEditor.parametersRequestFailed=Failed to retrieve the parameters for {0}.
-macroEditor.installRequestFailed=Failed to install the {0} macro.
-macroEditor.selectFeature=Select parameter {0}
-
-
-imageEditor.modal.changeImage.button=Change Image
-imageEditor.modal.loadFail.message=Failed to retrieve the image editor form.
-imageEditor.modal.title=Edit Image
-imageEditor.modal.insertButton=Insert
-imageEditor.modal.updateButton=Update
-imageEditor.modal.initialization.fail=Failed to retrieve the image selection form.
-imageEditor.modal.outscaleWarning=One of the dimensions is larger than the original image ({0}). The result may be a reduction in the quality of the displayed image.
-imageSelector.modal.title=Select Image
-imageSelector.modal.selectButton=Select
-imageSelector.modal.loadFail.message=Failed to retrieve the image selection form.
-imageSelector.modal.fileUpload.success=File upload succeeded.
-imageSelector.modal.fileUpload.fail=File upload failed.
-imageSelector.modal.fileUpload.abort=File upload aborted.
-imageSelector.modal.initialization.fail=Failed to retrieve the image selection form.
-
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
 ## Deprecated since 14.10
-imageEditor.modal.backToEditor.button=Back
 ckeditor.plugin.image.imageSelector.documentTreeTab.title=Document Tree
 
 ## Deprecated since 16.10.10, 17.4.3, 17.6.0RC1
@@ -376,6 +255,46 @@ ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=Temporar
 ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=No changes were made. Re-joining the realtime session.
 ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=There are unsaved changes, but no one else is in the realtime session. Re-joining.
 ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=Could not rejoin the realtime session because there are unsaved changes.
+
+## Deprecated since 18.2.0RC1
+ckeditor.plugin.image.imageEditor.standardTab.title=Standard
+ckeditor.plugin.image.imageEditor.advancedTab.title=Advanced
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=Image Styles
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=Select the style to apply on the image.
+ckeditor.plugin.image.imageEditor.standardTab.alt.label=Alternative Text
+ckeditor.plugin.image.imageEditor.standardTab.alt.hint=Define an alternate text for an image, if the image cannot be displayed.
+ckeditor.plugin.image.imageEditor.standardTab.caption.label=Caption
+ckeditor.plugin.image.imageEditor.standardTab.caption.hint=Activate and define an image caption.
+ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=Activate and define an image caption.
+ckeditor.plugin.image.imageEditor.advancedTab.size.label=Size
+ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=Width
+ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=Height
+ckeditor.plugin.image.imageEditor.advancedTab.size.hint=Define the image size.
+ckeditor.plugin.image.imageEditor.advancedTab.border.label=Border
+ckeditor.plugin.image.imageEditor.advancedTab.border.hint=When checked, the image is displayed with a border
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=Alignment
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=Define the image alignment.
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=None
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=Start
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Center
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=End
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Text Wrap
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=When checked, the text is wrapped around the image.
+ckeditor.plugin.image.imageSelector.treeTab.title=Tree
+ckeditor.plugin.image.imageSelector.uploadTab.title=Upload
+ckeditor.plugin.image.imageSelector.uploadTab.file.title=File
+ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Select a local file to add to the page.
+ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=Upload
+ckeditor.plugin.image.imageSelector.iconTab.title=Icon
+ckeditor.plugin.image.imageSelector.iconTab.icon.title=Icon
+ckeditor.plugin.image.imageSelector.iconTab.icon.hint=The identifier of the icon to display as an image.
+ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=accept
+ckeditor.plugin.image.imageSelector.urlTab.title=Url
+ckeditor.plugin.image.imageSelector.urlTab.url.title=Url
+ckeditor.plugin.image.imageSelector.urlTab.url.hint=The url of the image to display.
+ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
+ckeditor.upload.error.csrf=The CSRF token is missing.
+ckeditor.upload.error.emptyReturn=Error when uploading the file: it might exceed the configured maximum upload size.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

@@ -23,90 +23,85 @@ import java.io.FileInputStream;
 import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
 import org.xwiki.template.TemplateManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.sommeri.less4j.Less4jException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @version $Id$
  */
-public class Less4jCompilerTest
+@ComponentTest
+class Less4jCompilerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<Less4jCompiler> mocker = new MockitoComponentMockingRule<>(Less4jCompiler.class);
+    @InjectMockComponents
+    private Less4jCompiler less4jCompiler;
 
+    @MockComponent
     private TemplateManager templateManager;
 
+    @MockComponent
     private SkinManager skinManager;
-    
+
+    @Mock
     private Skin skin;
-    
-    @Before
-    public void setUp() throws Exception
-    {
-        templateManager = mocker.getInstance(TemplateManager.class);
-        skinManager = mocker.getInstance(SkinManager.class);
-        skin = mock(Skin.class);
-    }
-    
+
     @Test
-    public void compile() throws Exception
+    void compile() throws Exception
     {
         // Mocks
-        when(skinManager.getSkin("skin")).thenReturn(skin);
-        
+        when(this.skinManager.getSkin("skin")).thenReturn(this.skin);
+
         // Is is actually more an integration test than a unit test
-        
+
         // Import 1
-        when(skin.getResource("less/style.less.vm")).thenReturn(mock(Resource.class));
+        when(this.skin.getResource("less/style.less.vm")).thenReturn(mock(Resource.class));
         StringWriter import1source = new StringWriter();
         IOUtils.copy(new FileInputStream(getClass().getResource("/style.less.vm").getFile()), import1source);
-        when(templateManager.renderFromSkin("less/style.less.vm", skin)).thenReturn(import1source.toString());
-        
-        
+        when(this.templateManager.renderFromSkin("less/style.less.vm", this.skin)).thenReturn(import1source.toString());
+
         // Import 2
-        when(skin.getResource("less/subdir/import2.less")).thenReturn(mock(Resource.class));
+        when(this.skin.getResource("less/subdir/import2.less")).thenReturn(mock(Resource.class));
         Template import2 = mock(Template.class);
-        when(templateManager.getTemplate("less/subdir/import2.less", skin)).thenReturn(import2);
+        when(this.templateManager.getTemplate("less/subdir/import2.less", this.skin)).thenReturn(import2);
         TemplateContent importContent2 = mock(TemplateContent.class);
         when(import2.getContent()).thenReturn(importContent2);
         StringWriter import2source = new StringWriter();
         IOUtils.copy(new FileInputStream(getClass().getResource("/import2.less").getFile()), import2source);
         when(importContent2.getContent()).thenReturn(import2source.toString());
-        
+
         // Import 3
-        when(skin.getResource("less/subdir/import3.less")).thenReturn(mock(Resource.class));
+        when(this.skin.getResource("less/subdir/import3.less")).thenReturn(mock(Resource.class));
         Template import3 = mock(Template.class);
-        when(templateManager.getTemplate("less/subdir/import3.less", skin)).thenReturn(import3);
+        when(this.templateManager.getTemplate("less/subdir/import3.less", this.skin)).thenReturn(import3);
         TemplateContent importContent3 = mock(TemplateContent.class);
         when(import3.getContent()).thenReturn(importContent3);
         StringWriter import3source = new StringWriter();
         IOUtils.copy(new FileInputStream(getClass().getResource("/import3.less").getFile()), import3source);
         when(importContent3.getContent()).thenReturn(import3source.toString());
-        
 
         // Test
         StringWriter source = new StringWriter();
         IOUtils.copy(new FileInputStream(getClass().getResource("/style3.less").getFile()), source);
-        String result = mocker.getComponentUnderTest().compile(source.toString(), "skin", false);
+        String result = this.less4jCompiler.compile(source.toString(), "skin", false);
 
-	    // Now with sourcemaps.
-        String result2 = mocker.getComponentUnderTest().compile(source.toString(), "skin", true);
+        // Now with sourcemaps.
+        String result2 = this.less4jCompiler.compile(source.toString(), "skin", true);
 
         // Verify
         StringWriter expected = new StringWriter();
@@ -117,19 +112,19 @@ public class Less4jCompilerTest
     }
 
     @Test
-    public void compileWhenImportDoesNotExist() throws Exception
+    void compileWhenImportDoesNotExist() throws Exception
     {
         // Mocks
-        when(skinManager.getSkin("skin")).thenReturn(skin);
+        when(this.skinManager.getSkin("skin")).thenReturn(this.skin);
 
-        // Is is actually more an integration test than a unit test
+        // It is actually more an integration test than a unit test
 
         // Test
         Less4jException caughtException = null;
         try {
             StringWriter source = new StringWriter();
             IOUtils.copy(new FileInputStream(getClass().getResource("/style3.less").getFile()), source);
-            mocker.getComponentUnderTest().compile(source.toString(), "skin", false);
+            this.less4jCompiler.compile(source.toString(), "skin", false);
         } catch (Less4jException e) {
             caughtException = e;
         }

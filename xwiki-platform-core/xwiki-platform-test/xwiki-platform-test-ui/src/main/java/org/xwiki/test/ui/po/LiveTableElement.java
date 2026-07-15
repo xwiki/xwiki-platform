@@ -90,7 +90,7 @@ public class LiveTableElement extends BaseElement
         List<WebElement> elements = getDriver().findElementsWithoutWaiting(
             By.xpath("//th[contains(@class, 'xwiki-livetable-display-header-text') and normalize-space(.) = '"
                 + columnTitle + "']"));
-        return elements.size() > 0;
+        return !elements.isEmpty();
     }
 
     public void filterColumn(String inputId, String filterValue)
@@ -101,7 +101,7 @@ public class LiveTableElement extends BaseElement
 
         WebElement element = getDriver().findElement(By.id(livetableId)).findElement(By.id(inputId));
         if ("select".equals(element.getTagName())) {
-            if (element.getAttribute("class").contains("selectized")) {
+            if (element.getAttribute("class").contains("tomselected")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(element);
                 suggestInputElement.sendKeys(filterValue).selectTypedText();
             } else {
@@ -152,7 +152,7 @@ public class LiveTableElement extends BaseElement
     {
         List<WebElement> elements = getRows(columnTitle);
 
-        boolean result = elements.size() > 0;
+        boolean result = !elements.isEmpty();
         boolean match = false;
         if (result) {
             for (WebElement element : elements) {

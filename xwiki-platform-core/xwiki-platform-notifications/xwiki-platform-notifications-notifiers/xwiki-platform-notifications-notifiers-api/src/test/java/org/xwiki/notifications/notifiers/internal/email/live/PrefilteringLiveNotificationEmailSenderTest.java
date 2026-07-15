@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class PrefilteringLiveNotificationEmailSenderTest
+class PrefilteringLiveNotificationEmailSenderTest
 {
     @InjectMockComponents
     private PrefilteringLiveNotificationEmailSender sender;
@@ -74,7 +74,7 @@ public class PrefilteringLiveNotificationEmailSenderTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Test
-    public void testSendMail() throws Exception
+    void testSendMail() throws Exception
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
 

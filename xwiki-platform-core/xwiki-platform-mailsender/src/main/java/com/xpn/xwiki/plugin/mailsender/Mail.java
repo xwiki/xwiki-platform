@@ -50,7 +50,7 @@ public class Mail
 
     public Mail()
     {
-        this.headers = new TreeMap<String, String>();
+        this.headers = new TreeMap<>();
     }
 
     public Mail(String from, String to, String cc, String bcc, String subject, String textPart, String htmlPart)

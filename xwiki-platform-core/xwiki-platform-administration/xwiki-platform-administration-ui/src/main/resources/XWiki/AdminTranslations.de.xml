@@ -138,12 +138,20 @@ administration.section.users.deleteUser.newAuthor.hint=Wählen Sie einen Benutze
 administration.section.users.deleteUser.newAuthor.error=Der ausgewählte Benutzer hat keine {0} Rechte!
 administration.section.users.deleteUser.newAuthor.programming=Programmieren
 administration.section.users.deleteUser.newAuthor.script=Script
-admin.usersgroups.extensionrights=Extension Rechte
+admin.usersgroups.extensionrights=Erweiterung Rechte
+admin.usersgroups.extensionrights.space=Erweiterung Rechte: Seite &amp; Unterseiten
+admin.usersgroups.extensionrights.page=Erweiterung Rechte: Seite
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=Mitglied aus der Gruppe entfernen
 administration.section.groups.deleteUserFromGroup.success=Mitglied erfolgreich aus der Gruppe entfernt
 administration.section.groups.deleteUserFromGroup.failure=Das Mitglied konnte nicht aus der Gruppe entfernt werden
+
+# Rights for page section
+administration.section.pagerights.hint=Diese Rechte gelten ausschließlich für diese Seite. Sie haben keine Auswirkungen auf die {0}Unterseiten{1}.
+
+# Rights for page and children section
+administration.section.pageandchildrenrights.hint=Diese Rechte gelten für diese Seite und {0}alle ihre Unterseiten{1}.
 
 # Other Category
 admin.other=Andere

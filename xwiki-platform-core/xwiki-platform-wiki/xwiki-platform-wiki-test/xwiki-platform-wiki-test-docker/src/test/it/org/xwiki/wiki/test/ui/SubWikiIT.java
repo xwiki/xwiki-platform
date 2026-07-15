@@ -28,7 +28,6 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.ExtensionOverride;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -95,8 +94,7 @@ class SubWikiIT
 
     @Test
     @Order(1)
-    void movePageToSubwiki(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
-        throws Exception
+    void movePageToSubwiki(TestUtils setup, TestReference testReference) throws Exception
     {
         createSubWiki(setup);
 
@@ -138,7 +136,7 @@ class SubWikiIT
                 setup.serializeLocalReference(bobPage)));
 
         // Wait for the Solr indexing to be completed before moving the page
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Move the page to subwiki.
         ViewPage viewPage = setup.gotoPage(testReference);

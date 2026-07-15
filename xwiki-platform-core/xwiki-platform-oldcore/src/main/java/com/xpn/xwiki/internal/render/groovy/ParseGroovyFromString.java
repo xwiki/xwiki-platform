@@ -106,9 +106,11 @@ public class ParseGroovyFromString
             Class<?> gc;
 
             if (cgc == null) {
-                GroovyClassLoader gcl =
-                    (parentClassLoader == null) ? new GroovyClassLoader() : new GroovyClassLoader(parentClassLoader);
-                gc = gcl.parseClass(script);
+                try (GroovyClassLoader gcl = (parentClassLoader == null)
+                    ? new GroovyClassLoader() : new GroovyClassLoader(parentClassLoader))
+                {
+                    gc = gcl.parseClass(script);
+                }
                 cgc = new CachedGroovyClass(gc);
                 this.classCache.set(script, cgc);
             } else {

@@ -18,15 +18,16 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <template>
-  <div class="xwiki-blocknote">
+  <div class="xwiki-blocknote" v-if="!isLoading">
     <suspense>
       <BlocknoteEditor
         v-if="editorContent"
         ref="editor"
         :editor-props
         :editor-content
-        :container
-        :macros="false"
+        :deps-container="container"
+        :macros
+        :collaboration
         @instant-change="dirty = true"
         @debounced-change="updateValue"
       ></BlocknoteEditor>
@@ -64,28 +65,73 @@
       :form
       :disabled
     />
+    <input
+      v-if="collaborationKey"
+      type="hidden"
+      name="collaboration"
+      :value="collaborationKey"
+      :form
+      :disabled
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { MACRO_UI_PLACEHOLDER } from "../services/macros/placeholderUi";
+import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
-import { EditorLanguage } from "@xwiki/platform-editors-blocknote-react";
-import {
-  markdownToUniAstConverterName,
-  uniAstToMarkdownConverterName,
-} from "@xwiki/platform-uniast-markdown";
+import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
+import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
 import { Container } from "inversify";
-import { inject, onBeforeMount, ref, shallowRef, useTemplateRef } from "vue";
-import type { UniAst } from "@xwiki/platform-uniast-api";
+import {
+  inject,
+  onBeforeMount,
+  onUnmounted,
+  ref,
+  shallowRef,
+  useTemplateRef,
+} from "vue";
+import { resolver } from "xwiki-platform-localization-webjar";
+import type { ImageWizard } from "../services/image/ImageWizard";
+import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
+import type { XWikiMeta } from "../services/meta/XWikiMeta";
+import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
+import type { CristalApp } from "@xwiki/platform-api";
 import type {
-  MarkdownToUniAstConverter,
-  UniAstToMarkdownConverter,
-} from "@xwiki/platform-uniast-markdown";
+  Collaboration,
+  CollaborationManager,
+  CollaborationManagerProvider,
+} from "@xwiki/platform-collaboration-api";
+import type {
+  BlockNoteViewWrapperProps,
+  BlockOfType,
+  EditorLanguage,
+  ImageUpdateResult,
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  MacroInsertionEditorPrefillData,
+} from "@xwiki/platform-editors-blocknote-react";
+import type {
+  MacroWithUnknownParamsType,
+  UnknownMacroParamsType,
+} from "@xwiki/platform-macros-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
+import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { UniAst } from "@xwiki/platform-uniast-api";
+import type { Ref } from "vue";
 
 //
 // Injected
 //
 const container = inject<Container>("container")!;
+const uniAstProcessor: UniAstProcessor = container.get("UniAstProcessor", {
+  name: "XWiki",
+});
+const xwikiMeta: XWikiMeta = container.get("XWikiMeta");
+const modelReferenceParser = container
+  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+  .get();
 
 //
 // Props
@@ -95,8 +141,13 @@ const {
   initialValue = "",
   form = undefined,
   disabled = false,
-  inputSyntax = "markdown/1.2",
+  inputSyntax = "uniast/1.0",
   outputSyntax = "xwiki/2.1",
+  collaborationURL = undefined,
+  documentReference = XWiki.Model.serialize(
+    XWiki.currentDocument.documentReference,
+  ),
+  locale,
 } = defineProps<{
   // The key used to submit the edited content.
   name?: string;
@@ -115,27 +166,72 @@ const {
 
   // The syntax of the edited content, as expected by the back-end storage.
   outputSyntax?: string;
+
+  // The URL of the collaboration server used for real-time editing. If not specified, real-time editing is disabled.
+  collaborationURL?: string;
+
+  // The reference of the XWiki document whose field is being edited using BlockNote. This is required for real-time
+  // collaboration in order to join the corresponding collaboration session. It is also used to contextualize some of
+  // the editor features.
+  documentReference?: string;
+
+  /**
+   * The locale to use for the editor UI, and also the locale of the edited content, in case the provided document
+   * reference doesn't specify a locale.
+   */
+  locale?: string;
 }>();
+
+const actualLocale = locale || xwikiMeta.locale;
 
 //
 // Data
 //
 const value = ref(initialValue);
 const dirty = ref(false);
+const isLoading = ref(true);
 
-const markdownToUniAst = container.get<MarkdownToUniAstConverter>(
-  markdownToUniAstConverterName,
-);
-const uniAstToMarkdown = container.get<UniAstToMarkdownConverter>(
-  uniAstToMarkdownConverterName,
-);
-
+// This is passed to the BlockNote editor component.
 const editorContent = ref();
 
-onBeforeMount(async () => {
-  editorContent.value = await markdownToUniAst.parseMarkdown(initialValue);
-});
+const defaultLabel = "Editor";
 
+const docRef = documentReference
+  ? (modelReferenceParser?.parse(
+      `doc:${documentReference}`,
+    ) as DocumentReference)
+  : undefined;
+if (docRef && docRef.locale === undefined) {
+  docRef.locale = actualLocale;
+}
+
+const imageEdition = (
+  image: BlockOfType<"image">["props"],
+  update: (updateResult: ImageUpdateResult) => void,
+) => {
+  const imageWizard: ImageWizard = container.get("ImageWizard");
+  imageWizard.edit(image, {
+    submit: (updatedProps: Partial<BlockOfType<"image">["props"]>) =>
+      update({ type: "update", updatedProps }),
+    cancel: () => update({ type: "aborted" }),
+  });
+};
+
+const syntaxes = container.getAll<SyntaxConfig>(
+  SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
+);
+
+const syntax =
+  syntaxes.find((conf) => conf.id === outputSyntax) ??
+  syntaxes.find((conf) => conf.id === MINIMAL_SYNTAX_NAME);
+
+if (!syntax) {
+  throw new Error(
+    "Document syntax is not supported, and minimal syntax is not available",
+  );
+}
+
+// This is passed to the BlockNote editor component.
 const editorProps = shallowRef<
   InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
 >({
@@ -145,8 +241,106 @@ const editorProps = shallowRef<
     defaultStyles: false,
   },
   theme: "light",
-  lang: getLanguage(),
+  lang: (actualLocale || "en") as EditorLanguage,
+  label: defaultLabel,
+  overrides: {
+    imageEdition,
+  },
+  syntax,
 });
+
+// This is passed to the BlockNote editor component.
+const collaboration: Ref<Collaboration | undefined> = ref(undefined);
+let collaborationManager: CollaborationManager | undefined = undefined;
+const collaborationKey: Ref<string | undefined> = ref();
+
+onBeforeMount(async () => {
+  editorContent.value = uniAstProcessor.load(initialValue);
+
+  editorProps.value.label =
+    (await resolver.resolve(["platform.blocknote.editor.label"])).translations[
+      "platform.blocknote.editor.label"
+    ] ?? defaultLabel;
+
+  if (collaborationURL && docRef) {
+    const cristalApp = container.get<CristalApp>("CristalApp");
+    cristalApp.getWikiConfig().realtimeURL = collaborationURL;
+
+    collaborationManager = container
+      .get<CollaborationManagerProvider>(collaborationManagerProviderName)
+      .get();
+    // Join the realtime collaboration session for the specified XWiki document.
+    collaboration.value = await collaborationManager.join(docRef);
+    collaborationKey.value = `${encodeURIComponent(documentReference)}/${encodeURIComponent(actualLocale)}`;
+  }
+
+  isLoading.value = false;
+});
+
+onUnmounted(() => {
+  collaborationManager?.leave();
+});
+
+// This is passed to the BlockNote editor component.
+const macros: BlockNoteViewWrapperProps["macros"] = {
+  list: container.getAll<MacroWithUnknownParamsType>("Macro"),
+  ctx: {
+    openParamsEditor: async (
+      macro: MacroWithUnknownParamsType,
+      parameters: UnknownMacroParamsType,
+      update: (newProps: UnknownMacroParamsType) => void,
+    ) => {
+      try {
+        const macroWizard: BlockNoteMacroWizard = container.get(
+          "BlockNoteMacroWizard",
+        );
+        update(
+          await macroWizard.insertOrUpdate(macro, parameters, {
+            syntax: outputSyntax,
+            inlineParametersSyntax: inputSyntax,
+          }),
+        );
+      } catch (error) {
+        console.error("Failed to edit the macro", error);
+      }
+    },
+
+    openInsertionEditor: async (
+      prefill: MacroInsertionEditorPrefillData,
+      insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
+    ) => {
+      const macroWizard: BlockNoteMacroWizard = container.get(
+        "BlockNoteMacroWizard",
+      );
+
+      const call = await macroWizard.insert(prefill.kind, prefill.params);
+
+      const invocation: MacroBlockInvocation | InlineMacroInvocation = {
+        kind: call.inline ? "inline" : "block",
+        id: call.name,
+        body: call.content
+          ? { type: "raw", content: call.content }
+          : { type: "none" },
+        params: Object.fromEntries(
+          Object.entries(call.parameters).map(([key, value]) => [
+            key,
+            typeof value === "string" ? value : value.value,
+          ]),
+        ),
+      };
+
+      insert({
+        kind: call.inline ? "inline" : "block",
+        id: call.inline ? "xwikiInlineMacro" : "xwikiMacroBlock",
+        params: {
+          call: JSON.stringify(invocation),
+          output: JSON.stringify(MACRO_UI_PLACEHOLDER),
+        },
+        body: { type: "none" },
+      });
+    },
+  },
+};
 
 //
 // Computed
@@ -171,10 +365,7 @@ async function updateValue(editorContent?: UniAst | Error): Promise<string> {
     throw editorContent || new Error("Could not get the editor content.");
   }
 
-  const newValue = await uniAstToMarkdown.toMarkdown(editorContent as UniAst);
-  if (newValue instanceof Error) {
-    throw newValue;
-  }
+  const newValue = uniAstProcessor.save(editorContent);
 
   value.value = newValue;
   dirty.value = false;
@@ -187,10 +378,6 @@ async function updateValue(editorContent?: UniAst | Error): Promise<string> {
   }
 
   return newValue;
-}
-
-function getLanguage(): EditorLanguage {
-  return (document.documentElement.lang || "en") as EditorLanguage;
 }
 
 defineExpose({

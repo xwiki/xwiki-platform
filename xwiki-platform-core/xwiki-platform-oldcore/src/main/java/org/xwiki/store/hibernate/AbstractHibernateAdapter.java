@@ -26,6 +26,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -74,7 +75,7 @@ public abstract class AbstractHibernateAdapter implements HibernateAdapter
         if (virtualModePropertyValue == null) {
             virtualModePropertyValue = VIRTUAL_MODE_SCHEMA;
         }
-        return StringUtils.equals(virtualModePropertyValue, VIRTUAL_MODE_SCHEMA);
+        return Strings.CS.equals(virtualModePropertyValue, VIRTUAL_MODE_SCHEMA);
     }
 
     @Override
@@ -121,9 +122,7 @@ public abstract class AbstractHibernateAdapter implements HibernateAdapter
     {
         // Minus (-) is not supported by many databases
         // TODO: move it to adapters which really needs it ?
-        String cleanName = name.replace('-', '_');
-
-        return cleanName;
+        return name.replace('-', '_');
     }
 
     @Override

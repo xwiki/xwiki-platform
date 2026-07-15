@@ -171,7 +171,7 @@ public class SheetScriptService implements ScriptService
      */
     public List<DocumentReference> getDocuments(DocumentReference sheetReference)
     {
-        List<DocumentReference> documents = new ArrayList<DocumentReference>();
+        List<DocumentReference> documents = new ArrayList<>();
         documents.addAll(this.documentSheetBinder.getDocuments(sheetReference));
         documents.addAll(this.classSheetBinder.getDocuments(sheetReference));
         return filterViewable(documents);
@@ -183,7 +183,7 @@ public class SheetScriptService implements ScriptService
      */
     private List<DocumentReference> filterViewable(List<DocumentReference> documentReferences)
     {
-        List<DocumentReference> viewable = new ArrayList<DocumentReference>();
+        List<DocumentReference> viewable = new ArrayList<>();
         for (DocumentReference documentReference : documentReferences) {
             if (this.documentAccessBridge.isDocumentViewable(documentReference)) {
                 viewable.add(documentReference);

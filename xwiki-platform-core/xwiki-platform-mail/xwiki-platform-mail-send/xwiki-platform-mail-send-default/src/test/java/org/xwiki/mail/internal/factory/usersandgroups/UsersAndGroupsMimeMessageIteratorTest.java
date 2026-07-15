@@ -29,9 +29,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MimeMessageFactory;
@@ -39,15 +38,20 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link UsersAndGroupsMimeMessageIterator}.
@@ -56,11 +60,8 @@ import static org.mockito.Mockito.*;
  * @since 6.4.2
  * @since 7.0M2
  */
-public class UsersAndGroupsMimeMessageIteratorTest
+class UsersAndGroupsMimeMessageIteratorTest
 {
-    @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
-
     private Execution execution;
 
     private XWikiContext xwikiContext;
@@ -71,8 +72,8 @@ public class UsersAndGroupsMimeMessageIteratorTest
 
     private XWiki xwiki;
 
-    @Before
-    public void setUpBaseMocks()
+    @BeforeEach
+    void setUp()
     {
         this.execution = mock(Execution.class);
         this.xwikiContext = mock(XWikiContext.class);
@@ -87,7 +88,7 @@ public class UsersAndGroupsMimeMessageIteratorTest
     }
 
     @Test
-    public void getMimeMessageWithSingleUserReferenceAndEmail() throws Exception
+    void getMimeMessageWithSingleUserReferenceAndEmail() throws Exception
     {
         DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
         setUpUserPageMocks(userReference, "john@doe.com");
@@ -95,7 +96,7 @@ public class UsersAndGroupsMimeMessageIteratorTest
         source.put("users", Collections.singletonList(userReference));
         source.put("emails", Collections.singletonList("mary@doe.com"));
         DocumentReference templateReference = new DocumentReference("templatewiki", "templatespace", "templatepage");
-        Map<String, Object> parameters = Collections.<String, Object>singletonMap("source", templateReference);
+        Map<String, Object> parameters = Collections.singletonMap("source", templateReference);
 
         MimeMessage message = mock(MimeMessage.class);
         when(this.factory.createMessage(templateReference, null)).thenReturn(message);
@@ -114,27 +115,23 @@ public class UsersAndGroupsMimeMessageIteratorTest
     }
 
     @Test
-    public void getMimeMessageWhenErrorCreatingMessage() throws Exception
+    void getMimeMessageWhenErrorCreatingMessage() throws Exception
     {
         DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
         setUpUserPageMocks(userReference, "john@doe.com");
         Map<String, Object> source = new HashMap<>();
         source.put("users", Collections.singletonList(userReference));
         DocumentReference templateReference = new DocumentReference("templatewiki", "templatespace", "templatepage");
-        Map<String, Object> parameters = Collections.<String, Object>singletonMap("source", templateReference);
+        Map<String, Object> parameters = Collections.singletonMap("source", templateReference);
 
-        when(this.factory.createMessage(templateReference, null)).thenThrow(
-            new MessagingException("error"));
+        when(this.factory.createMessage(templateReference, null)).thenThrow(new MessagingException("error"));
 
         Iterator<MimeMessage> iterator = new UsersAndGroupsMimeMessageIterator(source, this.factory, parameters,
             this.resolver, this.execution);
 
         assertTrue(iterator.hasNext());
-        try {
-            iterator.next();
-        } catch (RuntimeException expected) {
-            assertEquals("Failed to create Mime Message for recipient john@doe.com", expected.getMessage());
-        }
+        Throwable exception = assertThrows(RuntimeException.class, iterator::next);
+        assertEquals("Failed to create Mime Message for recipient john@doe.com", exception.getMessage());
     }
 
     private void setUpUserPageMocks(DocumentReference userReference, String email) throws Exception

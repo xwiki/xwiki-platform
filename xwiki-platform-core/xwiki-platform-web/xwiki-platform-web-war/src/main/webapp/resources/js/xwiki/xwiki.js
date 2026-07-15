@@ -223,6 +223,16 @@ Object.extend(XWiki, {
         if (new URLSearchParams(window.location.search).get('minify') === 'false') {
           parameters.append('minify', 'false');
         }
+        // Include the document revision when viewing a specific revision, but only for the attachments tab for now,
+        // since other tabs need to add support for revision viewing first (and remove actions so that the view is
+        // readonly). See also
+        // https://forum.xwiki.org/t/behavior-of-docextra-tabs-when-a-revision-is-being-viewed-more/18411
+        if (extraID === 'Attachments') {
+          const rev = new URLSearchParams(globalThis.location.search).get('rev');
+          if (rev) {
+            parameters.append('rev', rev);
+          }
+        }
 
         new Ajax.Request(
           window.docgeturl,

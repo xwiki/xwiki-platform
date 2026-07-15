@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="ExtensionCode.ExtensionDependencyClass" locale="">
+<xwikidoc version="1.6" reference="ExtensionCode.ExtensionDependencyClass" locale="">
   <web>ExtensionCode</web>
   <name>ExtensionDependencyClass</name>
   <language/>
@@ -49,6 +49,7 @@
     <constraint>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>constraint</name>
       <number>3</number>
       <picker>0</picker>
@@ -59,9 +60,35 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </constraint>
+    <exclusions>
+      <cache>0</cache>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayType>input</displayType>
+      <freeText/>
+      <hint/>
+      <largeStorage>0</largeStorage>
+      <multiSelect>1</multiSelect>
+      <name>exclusions</name>
+      <number>6</number>
+      <picker>0</picker>
+      <prettyName>Exclusions</prettyName>
+      <relationalStorage>1</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <sort/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values/>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </exclusions>
     <extensionVersion>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>extensionVersion</name>
       <number>1</number>
       <picker>0</picker>
@@ -75,6 +102,7 @@
     <id>
       <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>id</name>
       <number>2</number>
       <picker>0</picker>
@@ -91,6 +119,7 @@
       <disabled>0</disabled>
       <displayFormType>checkbox</displayFormType>
       <displayType/>
+      <hint/>
       <name>optional</name>
       <number>5</number>
       <prettyName>Optional</prettyName>
@@ -102,8 +131,12 @@
     <repositories>
       <cache>0</cache>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>select</displayType>
+      <freeText/>
+      <hint/>
+      <largeStorage>0</largeStorage>
       <multiSelect>1</multiSelect>
       <name>repositories</name>
       <number>4</number>

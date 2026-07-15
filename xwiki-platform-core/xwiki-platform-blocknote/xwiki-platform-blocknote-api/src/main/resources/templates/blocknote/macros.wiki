@@ -1,6 +1,16 @@
 ##!source.syntax=xwiki/2.1
 {{velocity output="false"}}
 #macro (blocknote $parameters)
+  ## Load the CSS needed by the Image and Macro Wizards.
+  #set ($discard = $xwiki.linkx.use(
+    $services.webjars.url(
+      'org.xwiki.platform:xwiki-platform-wysiwyg-webjar',
+      'webjar.bundle.min.css'
+    ), {
+      'type': 'text/css',
+      'rel': 'stylesheet'
+    }
+  ))
   #set ($discard = $xwiki.linkx.use(
     $services.webjars.url(
       'org.xwiki.platform:xwiki-platform-blocknote-webjar',
@@ -63,9 +73,19 @@
   ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
   #set ($macro.previousDisplayMode = $xcontext.displayMode)
   #set ($discard = $xcontext.setDisplayMode('view'))
+  #set ($targetSyntax = 'uniast/1.0')
   #set ($restricted = "$!source.restricted" == 'true')
   #set ($xdom = $services.rendering.parse($source.content, $source.syntax))
-  #set ($renderedContent = $services.rendering.render($xdom, 'markdown/1.2'))
+  #set ($transformationContext = $services.rendering.createTransformationContext())
+  #set ($discard = $transformationContext.setId("BlockNote:${source.documentReference}"))
+  #set ($discard = $transformationContext.setXDOM($xdom))
+  #set ($discard = $transformationContext.setSyntax($source.syntax))
+  #set ($discard = $transformationContext.setTargetSyntax($targetSyntax))
+  #set ($discard = $transformationContext.setRestricted($restricted))
+  #set ($discard = $transformationContext.setTransformationNames(['macro']))
+  #set ($discard = $transformationContext.setContentDocument($source.documentReference))
+  #set ($discard = $services.rendering.transform($xdom, $transformationContext))
+  #set ($renderedContent = $services.rendering.render($xdom, $targetSyntax))
   ## Restore the previous display mode.
   #set ($discard = $xcontext.setDisplayMode($macro.previousDisplayMode))
   $!renderedContent##

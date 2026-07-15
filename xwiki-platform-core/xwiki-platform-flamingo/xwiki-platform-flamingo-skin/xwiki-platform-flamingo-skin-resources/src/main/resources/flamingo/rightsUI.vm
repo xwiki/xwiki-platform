@@ -25,9 +25,10 @@
 ##
 ## Most of the time, it is the current document
 #set ($targetDocument = $doc)
-#if ($request.section == 'PageRights')
+#if ($request.section == 'PageRights' || $request.section == 'usersgroups.extensionrights.page')
   ## But when the current page is the "PageRights" section of the page administration, the target doc is actually the
   ## "WebHome" page of the current space.
+  ## Same logic applies for the page-only extension rights section.
   #set ($parentSpace = $doc.documentReference.lastSpaceReference)
   #set ($targetDocument = $xwiki.getDocument($parentSpace))
 #end
@@ -44,11 +45,13 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   'createwiki', 'creator'])
 #set ($sectionWikiRights = 'wikis.rights')
 #set ($sectionExtensionRights = 'usersgroups.extensionrights')
+#set ($sectionSpaceExtensionRights = 'usersgroups.extensionrights.space')
+#set ($sectionPageExtensionRights = 'usersgroups.extensionrights.page')
 #set ($isStandardRights = false)
 #if("$!request.section"==$sectionWikiRights)
   #set ($rightsLevels = {'createwiki': 0})
   #set ($allowWins = [0])
-#elseif ("$!request.section"==$sectionExtensionRights)
+#elseif ("$!request.section" == $sectionExtensionRights || "$!request.section" == $sectionPageExtensionRights || "$!request.section" == $sectionSpaceExtensionRights)
   #set ($allRights = $services.security.authorization.allRightsNames)
   #set ($rightsLevels = {})
   #set ($allowWins = [])
@@ -96,7 +99,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     #set ($clsname = 'XWiki.XWikiRights')
   #end
 #end
-#if ("$!request.section"==$sectionExtensionRights)
+#if ("$!request.section"==$sectionExtensionRights || "$!request.section"==$sectionPageExtensionRights || "$!request.section" == $sectionSpaceExtensionRights)
   #set ($maxlevel = $index - 1)
 #end
 ## Get rights allowed for the current user

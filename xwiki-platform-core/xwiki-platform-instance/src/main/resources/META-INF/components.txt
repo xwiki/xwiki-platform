@@ -1,3 +1,0 @@
-org.xwiki.instance.internal.DefaultInstanceIdManager
-org.xwiki.instance.internal.script.InstanceIdConverter
-org.xwiki.instance.script.InstanceScriptService

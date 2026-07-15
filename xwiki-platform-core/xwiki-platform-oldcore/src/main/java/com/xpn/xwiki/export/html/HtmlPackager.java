@@ -368,7 +368,7 @@ public class HtmlPackager
             attachmentDir.mkdirs();
 
             // Create and initialize a custom URL factory
-            ExportURLFactory urlf = new ExportURLFactory();
+            ExportURLFactory urlf = new ExportURLFactory(true);
             Provider<FilesystemExportContext> exportContextProvider =
                 Utils.getComponent(new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
             // Note that the following line will set a FilesystemExportContext instance in the Execution Context

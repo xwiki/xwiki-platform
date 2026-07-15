@@ -498,7 +498,7 @@
 #macro (displaySearchResult_document $searchResult)
   #displaySearchResultTitle()
   #displaySearchResultLocation()
-  &lt;div class="search-result-author"&gt;
+  &lt;div class="search-result-author force-underline"&gt;
     $services.localization.render('core.footer.modification', [
       "#displayUser($searchResult.author {'useInlineHTML': true})",
       $xwiki.formatDate($searchResult.date)
@@ -508,15 +508,15 @@
 
 #macro (displaySearchResult_attachment $searchResult)
   &lt;h2 class="search-result-title"&gt;
-    $services.icon.renderHTML('attach')
     #set ($attachmentURL = $xwiki.getURL($searchResultReference))
     #set ($downloadHint = $services.localization.render('core.viewers.attachments.download'))
     &lt;a href="$attachmentURL" title="$escapetool.xml($downloadHint)"&gt;
+      $services.icon.renderHTML('attach')
       $escapetool.xml($searchResultReference.name)
     &lt;/a&gt;
     #set ($attachmentHistoryURL = $xwiki.getURL($searchResultReference, 'viewattachrev', $NULL))
     #set ($historyHint = $services.localization.render('core.viewers.attachments.showHistory'))
-    &lt;a href="$attachmentHistoryURL" title="$escapetool.xml($historyHint)" class="search-result-version"&gt;
+    &lt;a href="$attachmentHistoryURL" title="$escapetool.xml($historyHint)" class="search-result-version force-no-underline"&gt;
       $escapetool.xml($searchResult.attversion)
     &lt;/a&gt;
   &lt;/h2&gt;
@@ -553,8 +553,10 @@
     #set ($titleURL = $xwiki.getURL($searchResultReference, 'view', "language=$searchResult.locale"))
   #end
   &lt;h2 class="search-result-title"&gt;
-    $services.icon.renderHTML('file-white')
-    &lt;a href="$titleURL"&gt;$escapetool.xml($searchResult.title_)&lt;/a&gt;
+    &lt;a href="$titleURL"&gt;
+      $services.icon.renderHTML('file-white')
+      $escapetool.xml($searchResult.title_)
+    &lt;/a&gt;
     #if ($showLocale)
       &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
         class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;

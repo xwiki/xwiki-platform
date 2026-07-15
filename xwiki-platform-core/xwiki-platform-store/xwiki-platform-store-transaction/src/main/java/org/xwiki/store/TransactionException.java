@@ -95,7 +95,7 @@ public class TransactionException extends Exception
         final boolean isNonRecoverable)
     {
         super(message);
-        this.causes = new ArrayList<Throwable>(causes);
+        this.causes = new ArrayList<>(causes);
         boolean nonRecoverable = isNonRecoverable;
 
         int total = 0;
@@ -118,7 +118,7 @@ public class TransactionException extends Exception
     @Override
     public synchronized Throwable getCause()
     {
-        return this.causes.isEmpty() ? super.getCause() : this.causes.get(0);
+        return (this.causes == null || this.causes.isEmpty()) ? super.getCause() : this.causes.get(0);
     }
 
     /**
@@ -126,7 +126,7 @@ public class TransactionException extends Exception
      */
     public List<Throwable> getCauses()
     {
-        return new ArrayList<Throwable>(this.causes);
+        return new ArrayList<>(this.causes);
     }
 
     /**
@@ -208,20 +208,22 @@ public class TransactionException extends Exception
         }
         writeTo.println("Caused by:");
 
-        for (Throwable cause : causes) {
+        if (causes != null) {
+            for (Throwable cause : causes) {
 
-            writeTo.println(cause.getClass().getName());
-            writeTo.print(TAB);
-            writeTo.print(("" + cause.getMessage()).replaceAll(NEWLINE, NEWLINE + TAB));
-            writeTo.print(NEWLINE);
+                writeTo.println(cause.getClass().getName());
+                writeTo.print(TAB);
+                writeTo.print(("" + cause.getMessage()).replaceAll(NEWLINE, NEWLINE + TAB));
+                writeTo.print(NEWLINE);
 
-            if (includeStackTrace) {
-                // Include the stack trace tabbed in for each so they are recognizable as different.
-                // TODO End the stack trace at the frame which caused the TransactionException to throw.
-                final Writer stw = new StringWriter();
-                final PrintWriter stpw = new PrintWriter(stw);
-                cause.printStackTrace(stpw);
-                writeTo.print(stw.toString().replaceAll(NEWLINE, NEWLINE + TAB));
+                if (includeStackTrace) {
+                    // Include the stack trace tabbed in for each so they are recognizable as different.
+                    // TODO End the stack trace at the frame which caused the TransactionException to throw.
+                    final Writer stw = new StringWriter();
+                    final PrintWriter stpw = new PrintWriter(stw);
+                    cause.printStackTrace(stpw);
+                    writeTo.print(stw.toString().replaceAll(NEWLINE, NEWLINE + TAB));
+                }
             }
         }
         if (includeStackTrace) {

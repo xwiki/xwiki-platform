@@ -20,9 +20,11 @@
 
 package org.xwiki.model.internal.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -39,31 +41,32 @@ public class DeprecatedLocalReferenceEntityReferenceSerializerTest
 {
     private EntityReferenceSerializer<EntityReference> serializer;
 
-    @Before
-    public void setUp()
+    @BeforeEach
+    void setUp()
     {
         this.serializer = new DeprecatedLocalReferenceEntityReferenceSerializer();
     }
 
     @Test
-    public void testSerializeDocumentReference() throws Exception
+    void testSerializeDocumentReference() throws Exception
     {
         EntityReference reference = this.serializer.serialize(new DocumentReference("wiki", "space", "page"));
 
-        Assert.assertEquals(EntityType.DOCUMENT, reference.getType());
-        Assert.assertEquals("page", reference.getName());
-        Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
-        Assert.assertEquals("space", reference.getParent().getName());
-        Assert.assertNull(reference.getParent().getParent());
+        assertEquals(EntityType.DOCUMENT, reference.getType());
+        assertEquals("page", reference.getName());
+        assertEquals(EntityType.SPACE, reference.getParent().getType());
+        assertEquals("space", reference.getParent().getName());
+        assertNull(reference.getParent().getParent());
     }
 
     @Test
-    public void testSerializeSpaceReferenceWithChild()
+    void testSerializeSpaceReferenceWithChild()
     {
-        EntityReference reference = this.serializer.serialize(new SpaceReference("space", new WikiReference("wiki")));
+        EntityReference reference =
+            this.serializer.serialize(new SpaceReference("space", new WikiReference("wiki")));
 
-        Assert.assertEquals(EntityType.SPACE, reference.getType());
-        Assert.assertEquals("space", reference.getName());
-        Assert.assertNull(reference.getParent());
+        assertEquals(EntityType.SPACE, reference.getType());
+        assertEquals("space", reference.getName());
+        assertNull(reference.getParent());
     }
 }

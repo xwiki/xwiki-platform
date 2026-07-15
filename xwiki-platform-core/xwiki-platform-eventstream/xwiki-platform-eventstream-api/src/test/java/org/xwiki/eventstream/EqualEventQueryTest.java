@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class EqualEventQueryTest
+class EqualEventQueryTest
 {
     @Test
     void conditions()

@@ -23,15 +23,8 @@ import { formatKeyboardShortcut } from "@blocknote/core";
 import { useComponentsContext, useDictionary } from "@blocknote/react";
 import { useCallback, useState } from "react";
 import { RiLink } from "react-icons/ri";
-import type { LinkEditionContext } from "../../misc/linkSuggest";
 
-export type CustomCreateLinkButtonProps = {
-  linkEditionCtx: LinkEditionContext;
-};
-
-export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
-  linkEditionCtx,
-}) => {
+export const CustomCreateLinkButton: React.FC = () => {
   const editor = useEditor();
   const Components = useComponentsContext()!;
   const dict = useDictionary();
@@ -73,7 +66,6 @@ export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
       >
         <LinkEditor
           creationMode
-          linkEditionCtx={linkEditionCtx}
           current={{
             title: selected,
             url: "",

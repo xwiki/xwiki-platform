@@ -60,15 +60,7 @@ widgets.FullScreen = Class.create({
       this.toolbarPlaceholder = new Element("span");
       // The controls that will close the fullscreen
       this.createCloseButtons();
-      // When coming back from preview, check if the user was in full screen before hitting preview, and if so restore
-      // that full screen
       this.maximizedReference = $(document.body).down("input[name='x-maximized']");
-      if (this.maximizedReference && this.maximizedReference.value != "") {
-        var matches = $$(this.maximizedReference.value);
-        if (matches && matches.length > 0) {
-          this.makeFullScreen(matches[0]);
-        }
-      }
       // Cleanup before the window unloads.
       this.unloadHandler = this.cleanup.bind(this);
       Event.observe(window, 'unload', this.unloadHandler);
@@ -85,6 +77,16 @@ widgets.FullScreen = Class.create({
       } else {
         // a div element with class maximazable
         this.addElementButton(item);
+      }
+    }
+  },
+  restoreFullscreenFromPreview : function () {
+    // When coming back from preview, check if the user was in full screen before hitting preview, and if so restore
+    // that full screen
+    if (this.maximizedReference && this.maximizedReference.value != "") {
+      var matches = $$(this.maximizedReference.value);
+      if (matches && matches.length > 0) {
+        this.makeFullScreen(matches[0]);
       }
     }
   },
@@ -412,12 +414,14 @@ require(['jquery', 'xwiki-events-bridge'], function ($) {
       XWiki.widgets.__fullscreenInstance.initDom();
       XWiki.widgets.__fullscreenInstance.addBehavior($(this)[0]);
     });
+    XWiki.widgets.__fullscreenInstance.restoreFullscreenFromPreview();
   });
   let init = function () {
     XWiki.widgets.__fullscreenInstance.initDom();
     $(document).find('textarea,.maximizable').each(function () {
       XWiki.widgets.__fullscreenInstance.addBehavior($(this)[0]);
     });
+    XWiki.widgets.__fullscreenInstance.restoreFullscreenFromPreview();
   }
   XWiki.domIsLoaded && init() || document.observe('xwiki:dom:loaded', init);
 });

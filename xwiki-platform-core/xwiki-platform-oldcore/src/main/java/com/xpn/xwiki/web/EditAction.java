@@ -200,19 +200,19 @@ public class EditAction extends XWikiAction
 
 
         String language = context.getWiki().getLanguagePreference(context);
-        if (doc.isNew() && doc.getDefaultLanguage().equals("")) {
+        if (doc.isNew() && "".equals(doc.getDefaultLanguage())) {
             doc.setDefaultLanguage(language);
         }
 
         String languageToEdit = StringUtils.isEmpty(editForm.getLanguage()) ? language : editForm.getLanguage();
 
         // If no specific language is set or if it is "default" then we edit the current doc.
-        if (languageToEdit == null || languageToEdit.equals("default")) {
+        if (languageToEdit == null || "default".equals(languageToEdit)) {
             languageToEdit = "";
         }
         // If the document is new or if the language to edit is the default language then we edit the default
         // translation.
-        if (doc.isNew() || doc.getDefaultLanguage().equals(languageToEdit)) {
+        if (doc.isNew() || languageToEdit.equals(doc.getDefaultLanguage())) {
             languageToEdit = "";
         }
         // If the doc does not exist in the language to edit and the language was not explicitly set in the URL then
@@ -223,7 +223,7 @@ public class EditAction extends XWikiAction
 
         // Initialize the translated document.
         XWikiDocument tdoc;
-        if (languageToEdit.equals("")) {
+        if (languageToEdit.isEmpty()) {
             // Edit the default document translation (default language).
             tdoc = doc;
             if (doc.isNew()) {
@@ -279,7 +279,7 @@ public class EditAction extends XWikiAction
         // Update the edited title.
         if (editForm.getTitle() != null) {
             document.setTitle(editForm.getTitle());
-        } else if (sectionNumber > 0 && document.getSections().size() > 0) {
+        } else if (sectionNumber > 0 && !document.getSections().isEmpty()) {
             // The edited content is either the content of the specified section or the content provided on the
             // request. We assume the content provided on the request is meant to overwrite the specified section.
             // In both cases the document content is currently having one section, so we can take its title.

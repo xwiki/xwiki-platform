@@ -65,4 +65,24 @@ public class AllIT
     class NestedPresentationIT extends PresentationIT
     {
     }
+
+    @Nested
+    class NestedDateTimeIT extends DateTimeIT
+    {
+    }
+
+    @Nested
+    class NestedUserEditIT extends UserEditIT
+    {
+    }
+
+    @Nested
+    class NestedEditingIT extends EditingIT
+    {
+    }
+
+    @Nested
+    class NestedIconThemeIT extends IconThemeIT
+    {
+    }
 }

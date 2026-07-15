@@ -35,6 +35,7 @@ import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -46,6 +47,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static java.util.Collections.singletonMap;
+import static org.xwiki.rendering.syntax.Syntax.HTML_5_0;
 import static org.xwiki.security.authorization.Right.SCRIPT;
 
 /**
@@ -145,7 +147,16 @@ public class LiveDataRenderer
             boolean trustedContent =
                 StringUtils.isBlank(advancedParameters) || (this.contextualAuthorizationManager.hasAccess(SCRIPT)
                     && !restricted);
-            output.setParameter("data-config-content-trusted", Boolean.toString(trustedContent));
+            // A script element is used instead of an HTML attribute because the HTML sanitizer strips script elements
+            // from untrusted markup, ensuring the contentTrusted property only originate from this macro, and cannot
+            // be introduced through user-provided HTML content.
+            // The content trusted configuration is then passed as a data attribute on the script element, because
+            // the content of the script can be wrapped in a CDATA in situation where the Live Data is wrapped in an
+            // HTML macro with clean=true (see XCOMMONS-2487).
+            output.addChild(new RawBlock(
+                """
+                    <script type='application/json' data-config-content-trusted="%s"></script>""".formatted(
+                    trustedContent), HTML_5_0));
         } catch (Exception e) {
             throw new LiveDataException("Failed to generate live data configuration from macro parameters.", e);
         }

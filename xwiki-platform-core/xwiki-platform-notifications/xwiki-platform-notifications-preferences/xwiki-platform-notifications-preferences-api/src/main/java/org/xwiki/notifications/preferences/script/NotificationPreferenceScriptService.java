@@ -71,6 +71,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 @Named("notification.preferences")
 @Singleton
+// Fan-out reached because of the usage of DocumentUserReference which should be removed in the future
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class NotificationPreferenceScriptService implements ScriptService
 {
     @Inject

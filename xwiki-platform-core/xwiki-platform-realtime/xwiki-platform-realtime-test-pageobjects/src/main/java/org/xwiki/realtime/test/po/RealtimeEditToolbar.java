@@ -44,7 +44,7 @@ public class RealtimeEditToolbar extends BaseElement
     private static final By SUMMARIZE_AND_DONE_ACTION =
         By.cssSelector(".realtime-edit-toolbar-left .realtime-action-summarize");
 
-    private static final String VALUE = "value";
+    private static final By DONE_ACTION = By.cssSelector(".realtime-edit-toolbar .realtime-action-done");
 
     /**
      * Waits until the user is connected to the realtime editing session.
@@ -54,7 +54,8 @@ public class RealtimeEditToolbar extends BaseElement
     public RealtimeEditToolbar waitUntilConnected()
     {
         getDriver().waitUntilCondition(ExpectedConditions.attributeToBe(
-            By.cssSelector(".realtime-edit-toolbar realtime-status.realtime-connection-status"), VALUE, "clean"));
+            By.cssSelector(".realtime-edit-toolbar realtime-status.realtime-connection-status"), ATTRIBUTE_VALUE,
+            "clean"));
         return this;
     }
 
@@ -118,11 +119,12 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public void clickDone()
     {
-        getDriver().findElement(By.cssSelector(".realtime-edit-toolbar .realtime-action-done")).click();
+        getDriver().findElement(DONE_ACTION).click();
     }
 
     /**
      * Click on the "Summarize and done" button to open the modal for summarizing the changes.
+     * 
      * @return the modal to summarize.
      */
     public SummaryModal clickSummarizeAndDone()
@@ -199,7 +201,7 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public SaveStatus getSaveStatus()
     {
-        return SaveStatus.fromValue(getDriver().findElement(SAVE_STATUS).getDomAttribute(VALUE));
+        return SaveStatus.fromValue(getDriver().findElement(SAVE_STATUS).getDomAttribute(ATTRIBUTE_VALUE));
     }
 
     /**
@@ -214,8 +216,8 @@ public class RealtimeEditToolbar extends BaseElement
         // we need to wait at most 100 seconds (adding an error margin of 20 seconds).
         int timeout = (int) (status == SaveStatus.SAVED ? 100
             : getDriver().manage().timeouts().getImplicitWaitTimeout().toSeconds());
-        getDriver().waitUntilCondition(ExpectedConditions.attributeToBe(SAVE_STATUS, VALUE, status.getValue()),
-            timeout);
+        getDriver().waitUntilCondition(
+            ExpectedConditions.attributeToBe(SAVE_STATUS, ATTRIBUTE_VALUE, status.getValue()), timeout);
         return this;
     }
 
@@ -236,8 +238,11 @@ public class RealtimeEditToolbar extends BaseElement
     {
         getDriver().switchTo().activeElement().sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
         if (wait) {
-            getDriver()
-                .waitUntilCondition(ExpectedConditions.attributeToBe(SAVE_STATUS, VALUE, SaveStatus.SAVED.getValue()));
+            getDriver().waitUntilCondition(ExpectedConditions.and(
+                // Wait for the content to be saved.
+                ExpectedConditions.attributeToBe(SAVE_STATUS, ATTRIBUTE_VALUE, SaveStatus.SAVED.getValue()),
+                // Wait for the edit form to be re-enabled.
+                ExpectedConditions.elementToBeClickable(DONE_ACTION)));
         }
     }
 

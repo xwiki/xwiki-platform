@@ -139,11 +139,19 @@ administration.section.users.deleteUser.newAuthor.error=L''utilisateur sélectio
 administration.section.users.deleteUser.newAuthor.programming=de programmation
 administration.section.users.deleteUser.newAuthor.script=script
 admin.usersgroups.extensionrights=Droits des extensions
+admin.usersgroups.extensionrights.space=Droits des extensions : Page &amp; Enfants
+admin.usersgroups.extensionrights.page=Droits des extensions : Page
 
 # Groups section
 administration.section.groups.deleteUserFromGroup.loading=Membre en cours de suppression du groupe
 administration.section.groups.deleteUserFromGroup.success=Le membre a été supprimé du groupe avec succès
 administration.section.groups.deleteUserFromGroup.failure=Échec de suppression du membre du groupe
+
+# Rights for page section
+administration.section.pagerights.hint=Ces droits s''appliquent uniquement à cette page et n''affectent pas {0}ses enfants{1}.
+
+# Rights for page and children section
+administration.section.pageandchildrenrights.hint=Ces droits s''appliquent à cette page {0}et à tous ses enfants{1}.
 
 # Other Category
 admin.other=Divers

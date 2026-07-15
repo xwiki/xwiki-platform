@@ -189,8 +189,10 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
   ckeditorPromise.then(ckeditor =&gt; {
     function getUserMentionsConfig(editor) {
       return {
-        feed: function (opts, callback) {
-          search(opts.query, callback);
+        dataCallback: function (options, callback) {
+          // Remove the marker prefix and replace non-breaking space.
+          const text = options.query.substring(1).replaceAll('\u00A0', ' ');
+          search(text, callback);
         },
         marker: '@',
         minChars: 0,
@@ -232,13 +234,8 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
     });
 
     function maybeEnableUserMentions(editor) {
-      return waitForEditorReady(editor).then((editor) =&gt; {
-        // Check if the Mentions plugin is enabled for the given editor instance.
-        // TODO: Add support for disabling the user mentions for a particular editor instance (without disabling all
-        // types of mentions).
-        if (editor.plugins.mentions) {
-          editor.plugins.mentions.instances.push(new ckeditor.plugins.mentions(editor, getUserMentionsConfig(editor)));
-        }
+      return waitForEditorReady(editor).then(editor =&gt; {
+        new CKEDITOR.plugins.AdvancedAutoComplete(editor, getUserMentionsConfig(editor));
         return editor;
       });
     }

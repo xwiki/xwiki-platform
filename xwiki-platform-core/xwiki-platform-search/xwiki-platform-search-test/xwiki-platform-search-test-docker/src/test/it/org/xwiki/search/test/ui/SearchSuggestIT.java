@@ -58,7 +58,7 @@ class SearchSuggestIT
 {
     @Test
     @Order(1)
-    void verifySearchSuggestTitles(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    void verifySearchSuggestTitles(TestUtils setup, TestReference testReference)
         throws Exception
     {
         setup.loginAsSuperAdmin();
@@ -67,7 +67,7 @@ class SearchSuggestIT
         setup.rest().savePage(testReference, "Hello World!", testDocumentTitle);
         setup.gotoPage(testReference);
 
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         QuickSearchElement quickSearchElement = new QuickSearchElement();
         quickSearchElement.search(testDocumentTitle);
@@ -80,7 +80,7 @@ class SearchSuggestIT
      */
     @Test
     @Order(2)
-    void searchExclusions(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    void searchExclusions(TestUtils setup, TestReference testReference)
         throws Exception
     {
         setup.loginAsSuperAdmin();
@@ -93,7 +93,7 @@ class SearchSuggestIT
             "Banana");
 
         // Wait for the created pages to be indexed.
-        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Reset search exclusions.
         SearchAdministrationPage searchAdminPage = SearchAdministrationPage.gotoPage();

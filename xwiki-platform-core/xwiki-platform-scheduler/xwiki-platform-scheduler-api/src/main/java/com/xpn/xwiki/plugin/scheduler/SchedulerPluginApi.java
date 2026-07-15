@@ -22,7 +22,6 @@ package com.xpn.xwiki.plugin.scheduler;
 import java.util.Date;
 import java.util.List;
 
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.stability.Unstable;
@@ -53,6 +52,10 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerPluginApi.class);
 
+    private static final String ERROR = "error";
+
+    private static final String JOB_NAME = "jobName";
+
     public SchedulerPluginApi(SchedulerPlugin plugin, XWikiContext context)
     {
         super(plugin, context);
@@ -81,7 +84,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
         try {
             return getJobStatus(object.getXWikiObject()).getValue();
         } catch (Exception e) {
-            this.context.put("error", e.getMessage());
+            this.context.put(ERROR, e.getMessage());
             return null;
         }
     }
@@ -90,12 +93,12 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
      * Return the trigger state as a ${@link JobState}, that holds both the integer trigger's inner value of the state
      * and a String as a human readable representation of that state
      */
-    public JobState getJobStatus(BaseObject object) throws SchedulerException
+    public JobState getJobStatus(BaseObject object) throws SchedulerPluginException
     {
         return getProtectedPlugin().getJobStatus(object, this.context);
     }
 
-    public JobState getJobStatus(Object object) throws SchedulerException, SchedulerPluginException
+    public JobState getJobStatus(Object object) throws SchedulerPluginException
     {
         return getProtectedPlugin().getJobStatus(retrieveBaseObject(object), this.context);
     }
@@ -151,7 +154,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
             getProtectedPlugin().scheduleJob(object, this.context);
             return true;
         } catch (Exception e) {
-            this.context.put("error", e.getMessage());
+            this.context.put(ERROR, e.getMessage());
             return false;
         }
     }
@@ -177,7 +180,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
                 result &= scheduleJob(object);
             }
         } catch (Exception e) {
-            this.context.put("error", e.getMessage());
+            this.context.put(ERROR, e.getMessage());
             return false;
         }
         return result;
@@ -205,10 +208,10 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
     {
         try {
             getProtectedPlugin().pauseJob(object, this.context);
-            LOGGER.debug("Pause Job: [{}]", object.getStringValue("jobName"));
+            LOGGER.debug("Pause Job: [{}]", object.getStringValue(JOB_NAME));
             return true;
         } catch (XWikiException e) {
-            this.context.put("error", e.getMessage());
+            this.context.put(ERROR, e.getMessage());
             return false;
         }
     }
@@ -235,10 +238,10 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
     {
         try {
             getProtectedPlugin().resumeJob(object, this.context);
-            LOGGER.debug("Resume Job: [{}]", object.getStringValue("jobName"));
+            LOGGER.debug("Resume Job: [{}]", object.getStringValue(JOB_NAME));
             return true;
         } catch (XWikiException e) {
-            this.context.put("error", e.getMessage());
+            this.context.put(ERROR, e.getMessage());
             return false;
         }
     }
@@ -265,10 +268,10 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
     {
         try {
             getProtectedPlugin().unscheduleJob(object, this.context);
-            LOGGER.debug("Delete Job: [{}]", object.getStringValue("jobName"));
+            LOGGER.debug("Delete Job: [{}]", object.getStringValue(JOB_NAME));
             return true;
         } catch (XWikiException e) {
-            this.context.put("error", e.getMessage());
+            this.context.put(ERROR, e.getMessage());
             return false;
         }
     }
@@ -300,10 +303,10 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
     {
         try {
             getProtectedPlugin().triggerJob(object, this.context);
-            LOGGER.debug("Trigger Job: [{}]", object.getStringValue("jobName"));
+            LOGGER.debug("Trigger Job: [{}]", object.getStringValue(JOB_NAME));
             return true;
         } catch (XWikiException e) {
-            this.context.put("error", e.getMessage());
+            this.context.put(ERROR, e.getMessage());
             return false;
         }
     }
@@ -339,7 +342,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
         try {
             return getProtectedPlugin().getPreviousFireTime(object, this.context);
         } catch (SchedulerPluginException e) {
-            this.context.put("error", e.getMessage());
+            this.context.put(ERROR, e.getMessage());
             return null;
         }
     }
@@ -371,7 +374,7 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
         try {
             return getProtectedPlugin().getNextFireTime(object, this.context);
         } catch (SchedulerPluginException e) {
-            this.context.put("error", e.getMessage());
+            this.context.put(ERROR, e.getMessage());
             return null;
         }
     }

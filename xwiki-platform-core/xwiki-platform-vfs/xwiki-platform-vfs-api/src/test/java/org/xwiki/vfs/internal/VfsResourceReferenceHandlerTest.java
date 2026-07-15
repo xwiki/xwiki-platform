@@ -23,20 +23,18 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.Response;
 import org.xwiki.model.reference.DocumentReference;
@@ -44,7 +42,12 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceReferenceSerializer;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.vfs.VfsException;
 import org.xwiki.vfs.VfsPermissionChecker;
 import org.xwiki.vfs.VfsResourceReference;
@@ -58,8 +61,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import net.java.truevfs.access.TArchiveDetector;
 import net.java.truevfs.access.TConfig;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link VfsResourceReferenceHandler}.
@@ -70,11 +77,29 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 7.4M2
  */
-public class VfsResourceReferenceHandlerTest
+@ComponentTest
+class VfsResourceReferenceHandlerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<VfsResourceReferenceHandler> mocker =
-        new MockitoComponentMockingRule<>(VfsResourceReferenceHandler.class);
+    @InjectMockComponents
+    private VfsResourceReferenceHandler handler;
+
+    @MockComponent
+    private Container container;
+
+    @MockComponent
+    @Named("truevfs")
+    private ResourceReferenceSerializer<VfsResourceReference, URI> trueVfsResourceReferenceSerializer;
+
+    @MockComponent
+    @Named("cascading")
+    private VfsPermissionChecker permissionChecker;
+
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     private ByteArrayOutputStream baos;
 
@@ -84,25 +109,25 @@ public class VfsResourceReferenceHandlerTest
 
     private Response response = mock(Response.class);
 
+    @BeforeComponent
+    void beforeComponent(MockitoComponentManager cm)
+    {
+        when(this.componentManagerProvider.get()).thenReturn(cm);
+    }
+
     private void setUp(String scheme, String wikiName, String spaceName, String pageName, String attachmentName,
         List<String> path) throws Exception
     {
-        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        when(componentManagerProvider.get()).thenReturn(this.mocker);
-
         String attachmentReferenceAsString =
             String.format("%s:%s:%s.%s@%s", scheme, wikiName, spaceName, pageName, attachmentName);
         this.reference = new VfsResourceReference(URI.create(attachmentReferenceAsString), path);
 
-        ResourceReferenceSerializer<VfsResourceReference, URI> trueVfsResourceReferenceSerializer =
-            this.mocker.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
-                VfsResourceReference.class, URI.class), "truevfs");
         String truevfsURIFragment = String.format("%s://%s:%s.%s/%s/%s", scheme, wikiName, spaceName, pageName,
             attachmentName, StringUtils.join(path, '/'));
-        when(trueVfsResourceReferenceSerializer.serialize(this.reference)).thenReturn(URI.create(truevfsURIFragment));
+        when(this.trueVfsResourceReferenceSerializer.serialize(this.reference)).thenReturn(URI.create(truevfsURIFragment));
 
-        Provider<XWikiContext> xwikiContextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xwikiContextProvider =
+            this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xwikiContextProvider.get()).thenReturn(xcontext);
 
@@ -110,8 +135,8 @@ public class VfsResourceReferenceHandlerTest
         when(xcontext.getWiki()).thenReturn(xwiki);
 
         DocumentReferenceResolver<String> documentReferenceResolver =
-            mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING);
-        this.documentReference = new DocumentReference(wikiName, Arrays.asList(spaceName), pageName);
+            this.componentManager.registerMockComponent(DocumentReferenceResolver.TYPE_STRING);
+        this.documentReference = new DocumentReference(wikiName, List.of(spaceName), pageName);
         String documentReferenceAsString = String.format("%s:%s.%s", wikiName, spaceName, pageName);
         when(documentReferenceResolver.resolve(documentReferenceAsString)).thenReturn(this.documentReference);
 
@@ -127,8 +152,7 @@ public class VfsResourceReferenceHandlerTest
         when(attachment.getContentInputStream(xcontext)).thenReturn(
             createZipInputStream(StringUtils.join(path, '/'), "success!"));
 
-        Container container = this.mocker.getInstance(Container.class);
-        when(container.getResponse()).thenReturn(response);
+        when(this.container.getResponse()).thenReturn(this.response);
 
         this.baos = new ByteArrayOutputStream();
         when(this.response.getOutputStream()).thenReturn(this.baos);
@@ -138,31 +162,29 @@ public class VfsResourceReferenceHandlerTest
         // Note: Make sure we add our own Archive Detector to the existing Detector so that all archive formats
         // supported by TrueVFS are handled properly.
         config.setArchiveDetector(new TArchiveDetector(config.getArchiveDetector(), "attach",
-            new AttachDriver(this.mocker)));
+            new AttachDriver(this.componentManager)));
     }
 
     @Test
-    public void handleOk() throws Exception
+    void handleOk() throws Exception
     {
-        setUp("attach", "wiki1", "space1", "page1", "test.zip", Arrays.asList("test.txt"));
+        setUp("attach", "wiki1", "space1", "page1", "test.zip", List.of("test.txt"));
 
-        assertEquals(Arrays.asList(VfsResourceReference.TYPE),
-            this.mocker.getComponentUnderTest().getSupportedResourceReferences());
-        this.mocker.getComponentUnderTest().handle(this.reference, mock(ResourceReferenceHandlerChain.class));
+        assertEquals(List.of(VfsResourceReference.TYPE), this.handler.getSupportedResourceReferences());
+        this.handler.handle(this.reference, mock(ResourceReferenceHandlerChain.class));
 
         assertEquals("success!", this.baos.toString());
     }
 
     @Test
-    public void handlecustomContentType() throws Exception
+    void handleCustomContentType() throws Exception
     {
-        setUp("attach", "wiki1", "space1", "page1", "test.zip", Arrays.asList("test.txt"));
+        setUp("attach", "wiki1", "space1", "page1", "test.zip", List.of("test.txt"));
 
         this.reference.addParameter("content-type", "custom content type");
 
-        assertEquals(Arrays.asList(VfsResourceReference.TYPE),
-            this.mocker.getComponentUnderTest().getSupportedResourceReferences());
-        this.mocker.getComponentUnderTest().handle(this.reference, mock(ResourceReferenceHandlerChain.class));
+        assertEquals(List.of(VfsResourceReference.TYPE), this.handler.getSupportedResourceReferences());
+        this.handler.handle(this.reference, mock(ResourceReferenceHandlerChain.class));
 
         assertEquals("success!", this.baos.toString());
 
@@ -170,20 +192,15 @@ public class VfsResourceReferenceHandlerTest
     }
 
     @Test
-    public void handleWhenNoGenericPermissionForScheme() throws Exception
+    void handleWhenNoGenericPermissionForScheme() throws Exception
     {
-        setUp("customscheme", "wiki3", "space3", "page3", "test.zip", Arrays.asList("test.txt"));
+        setUp("customscheme", "wiki3", "space3", "page3", "test.zip", List.of("test.txt"));
 
-        // Don't allow permission for "customscheme"
-        VfsPermissionChecker checker = this.mocker.getInstance(VfsPermissionChecker.class, "cascading");
-        doThrow(new VfsException("no permission")).when(checker).checkPermission(this.reference);
+        doThrow(new VfsException("no permission")).when(this.permissionChecker).checkPermission(this.reference);
 
-        try {
-            this.mocker.getComponentUnderTest().handle(this.reference, mock(ResourceReferenceHandlerChain.class));
-            fail("Should have thrown exception here");
-        } catch (ResourceReferenceHandlerException expected) {
-            assertEquals("VfsException: no permission", ExceptionUtils.getRootCauseMessage(expected));
-        }
+        ResourceReferenceHandlerException exception = assertThrows(ResourceReferenceHandlerException.class,
+            () -> this.handler.handle(this.reference, mock(ResourceReferenceHandlerChain.class)));
+        assertEquals("VfsException: no permission", ExceptionUtils.getRootCauseMessage(exception));
     }
 
     private InputStream createZipInputStream(String fileName, String content) throws Exception

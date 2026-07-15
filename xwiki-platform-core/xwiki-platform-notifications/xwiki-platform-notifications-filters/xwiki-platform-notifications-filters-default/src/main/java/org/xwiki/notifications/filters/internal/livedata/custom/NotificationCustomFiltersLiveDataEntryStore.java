@@ -65,6 +65,7 @@ import org.xwiki.template.TemplateManager;
 @Component
 @Singleton
 @Named(NotificationCustomFiltersLiveDataSource.NAME)
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotificationFilterLiveDataEntryStore
 {
     private static final String WIKI = "wiki";

@@ -4,10 +4,12 @@
     "outDir": "dist",
     "resolveJsonModule": true
   },
-  "extends": "../../tsconfig.json",
-  "include": ["src/**/*"],
+  "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
+  "include": [
+    "src/**/*"
+  ],
   "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts"
+    "**/*.test.*",
+    "**/*.spec.*"
   ]
 }

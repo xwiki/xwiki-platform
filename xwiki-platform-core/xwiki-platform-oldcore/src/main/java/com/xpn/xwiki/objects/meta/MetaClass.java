@@ -22,6 +22,7 @@ package com.xpn.xwiki.objects.meta;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -101,7 +102,7 @@ public class MetaClass extends BaseClass
             // In previous versions the property name was the full Java class name of the property class implementation.
             // Extract the actual property name (the hint used to lookup the property class provider) by removing the
             // Java package prefix and the Class suffix.
-            property = safeget(StringUtils.removeEnd(StringUtils.substringAfterLast(name, "."), "Class"));
+            property = safeget(Strings.CS.removeEnd(StringUtils.substringAfterLast(name, "."), "Class"));
         }
         return property;
     }

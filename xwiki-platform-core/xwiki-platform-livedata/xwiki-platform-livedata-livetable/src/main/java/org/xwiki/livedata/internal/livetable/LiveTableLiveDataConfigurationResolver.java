@@ -22,7 +22,6 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -80,15 +79,11 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
     private static final String QUERY_FILTERS = "queryFilters";
 
-    @SuppressWarnings("serial")
-    private static final Map<String, String> DEFAULT_OPERATOR = new HashMap<String, String>()
-    {
-        {
-            put("exact", "equals");
-            put("partial", "contains");
-            put("prefix", "startsWith");
-        }
-    };
+    private static final Map<String, String> DEFAULT_OPERATOR = Map.of(
+        "exact", "equals",
+        "partial", "contains",
+        "prefix", "startsWith"
+    );
 
     @Inject
     private Logger logger;

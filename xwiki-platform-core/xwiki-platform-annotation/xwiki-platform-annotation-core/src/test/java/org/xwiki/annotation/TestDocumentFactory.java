@@ -121,7 +121,7 @@ public class TestDocumentFactory
     protected void saveKeyToDoc(String currentKey, String currentValue, MockDocument doc, String docName)
         throws IOException
     {
-        if (currentKey.equals("annotation")) {
+        if ("annotation".equals(currentKey)) {
             // parse the annotation value
             Annotation ann = parseAnnotation(currentValue, docName);
             doc.getAnnotations().add(ann);
@@ -133,7 +133,7 @@ public class TestDocumentFactory
             doc.set(key, currentValue);
             doc.set(key + "Syntax", syntax);
         } else {
-            doc.set(currentKey, currentValue.toString());
+            doc.set(currentKey, currentValue);
         }
     }
 

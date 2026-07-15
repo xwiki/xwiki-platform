@@ -21,7 +21,7 @@ import js from "@eslint/js";
 import { defineConfig } from "eslint/config";
 // @ts-expect-error no types are available for this package
 import headers from "eslint-plugin-headers";
-import importPlugin from "eslint-plugin-import";
+import { flatConfigs as importFlatConfigs } from "eslint-plugin-import-x";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 // @ts-expect-error no types are available for this package
 import pluginPromise from "eslint-plugin-promise";
@@ -57,12 +57,18 @@ const eslintConfig: Config[] = defineConfig([
     extends: ["js/recommended"],
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
-  // eslint-disable-next-line import/no-named-as-default-member
+  // eslint-disable-next-line import-x/no-named-as-default-member
   tseslint.configs.recommended,
+  {
+    rules: {
+      // This rule is safe to disable since TypeScript is checking it already.
+      "no-undef": "off",
+    },
+  },
   pluginVue.configs["flat/essential"],
   {
     files: ["**/*.vue"],
-    // eslint-disable-next-line import/no-named-as-default-member
+    // eslint-disable-next-line import-x/no-named-as-default-member
     languageOptions: { parserOptions: { parser: tseslint.parser } },
     rules: {
       "vue/no-deprecated-slot-attribute": [
@@ -73,7 +79,7 @@ const eslintConfig: Config[] = defineConfig([
       ],
     },
   },
-  importPlugin.flatConfigs.recommended,
+  importFlatConfigs.recommended,
   pluginPromise.configs["flat/recommended"],
   {
     plugins: {
@@ -86,19 +92,16 @@ const eslintConfig: Config[] = defineConfig([
   eslintPluginPrettierRecommended,
   {
     files: ["**/*.{ts,tsx}"],
-    extends: [
-      importPlugin.flatConfigs.recommended,
-      importPlugin.flatConfigs.typescript,
-    ],
+    extends: [importFlatConfigs.recommended, importFlatConfigs.typescript],
     // other configs...
   },
   {
     files: ["**/*.{js,mjs,cjs,ts,tsx,vue}"],
     settings: {
-      "import/parsers": {
+      "import-x/parsers": {
         espree: [".js", ".cjs", ".mjs", ".jsx"],
       },
-      "import/resolver": {
+      "import-x/resolver": {
         typescript: true,
         node: true,
       },
@@ -108,7 +111,7 @@ const eslintConfig: Config[] = defineConfig([
       sourceType: "module",
     },
     rules: {
-      "import/order": [
+      "import-x/order": [
         "error",
         {
           groups: [
@@ -127,12 +130,12 @@ const eslintConfig: Config[] = defineConfig([
           named: { import: true, export: true },
         },
       ],
-      "import/export": "error",
-      "import/group-exports": "error",
-      "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
+      "import-x/export": "error",
+      "import-x/group-exports": "error",
+      "import-x/consistent-type-specifier-style": ["error", "prefer-top-level"],
       curly: "error",
       "max-statements": "error",
-      "import/no-cycle": "error",
+      "import-x/no-cycle": "error",
     },
   },
   {

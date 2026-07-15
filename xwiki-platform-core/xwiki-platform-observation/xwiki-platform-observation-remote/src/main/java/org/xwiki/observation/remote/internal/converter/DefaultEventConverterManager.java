@@ -19,8 +19,6 @@
  */
 package org.xwiki.observation.remote.internal.converter;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,8 +26,6 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.EventConverterManager;
@@ -47,55 +43,21 @@ import org.xwiki.observation.remote.converter.RemoteEventConverter;
 public class DefaultEventConverterManager implements EventConverterManager
 {
     @Inject
-    private ComponentManager componentManager;
+    private EventConverters eventConverters;
 
     @Inject
     private Logger logger;
 
-    /**
-     * The local events converters.
-     */
-    private List<LocalEventConverter> localEventConverters;
-
-    /**
-     * The remote events converters.
-     */
-    private List<RemoteEventConverter> remoteEventConverters;
-
-    private <T> List<T> loadConverters(Class<T> converterType, Comparator<T> c)
-    {
-        // Load converters lazily to avoid cycles if any of those inject directly or indirectly the converter manager
-        try {
-            List<T> converters = this.componentManager.getInstanceList(converterType);
-            Collections.sort(converters, c);
-            return converters;
-        } catch (ComponentLookupException e) {
-            this.logger.error("Failed to lookup event converters", e);
-        }
-
-        return List.of();
-    }
-
     @Override
     public List<LocalEventConverter> getLocalEventConverters()
     {
-        if (this.localEventConverters == null) {
-            this.localEventConverters =
-                loadConverters(LocalEventConverter.class, (c1, c2) -> c1.getPriority() - c2.getPriority());
-        }
-
-        return this.localEventConverters;
+        return this.eventConverters.getLocalEventConverters();
     }
 
     @Override
     public List<RemoteEventConverter> getRemoteEventConverters()
     {
-        if (this.remoteEventConverters == null) {
-            this.remoteEventConverters =
-                loadConverters(RemoteEventConverter.class, (c1, c2) -> c1.getPriority() - c2.getPriority());
-        }
-
-        return this.remoteEventConverters;
+        return this.eventConverters.getRemoteEventConverters();
     }
 
     @Override

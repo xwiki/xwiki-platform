@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
 
   "compilerOptions": {
     /* Bundler mode */

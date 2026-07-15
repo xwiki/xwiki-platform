@@ -75,6 +75,7 @@ import org.xwiki.user.UserReference;
 @Component
 @Named("solr")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class SolrRatingsManager implements RatingsManager
 {
     private static final int BULK_OPERATIONS_BATCH_SIZE = 100;

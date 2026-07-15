@@ -115,7 +115,7 @@ public abstract class AbstractSkin implements Skin
 
         if (resource == null) {
             // Make sure to not try several times the same skin
-            Set<String> skins = new HashSet<String>();
+            Set<String> skins = new HashSet<>();
             skins.add(getId());
             for (ResourceRepository parent = getParent(); parent != null && resource == null
                 && !skins.contains(parent.getId()); parent = parent.getParent()) {

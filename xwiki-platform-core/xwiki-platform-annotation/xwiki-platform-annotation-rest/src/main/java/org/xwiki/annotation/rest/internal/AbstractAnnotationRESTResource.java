@@ -23,7 +23,6 @@ package org.xwiki.annotation.rest.internal;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -33,7 +32,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationService;
 import org.xwiki.annotation.AnnotationServiceException;
@@ -77,6 +75,14 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
     private static final String COMMENT_KEY = "comment";
 
     private static final String COMMENT_SYNTAX_KEY = "comment_syntax";
+
+    /**
+     * The name of the transient metadata field holding the comma-separated list of temporary uploaded file names that
+     * must be attached to the annotated document when the annotation is persisted (e.g. images inserted in the
+     * annotation comment). It matches the {@code uploadedFiles} request parameter and is never stored as an annotation
+     * object property.
+     */
+    protected static final String UPLOADED_FILES_FIELD = "uploadedFiles";
 
     /**
      * The name of the request parameter value represents the parameter that requires
@@ -187,7 +193,7 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         List<String> requestedFields)
     {
         ObjectFactory factory = new ObjectFactory();
-        List<AnnotationStub> set = new ArrayList<AnnotationStub>();
+        List<AnnotationStub> set = new ArrayList<>();
 
         Set<String> actualRequestedFields = new LinkedHashSet<>(requestedFields);
         actualRequestedFields.add(Annotation.PLAIN_TEXT_START_OFFSET_FIELD);
@@ -318,14 +324,14 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
      */
     protected Collection<Annotation> filterAnnotations(Collection<Annotation> annotations, AnnotationRequest request)
     {
-        Collection<Annotation> result = new ArrayList<Annotation>();
+        Collection<Annotation> result = new ArrayList<>();
 
-        Map<String, List<String>> filters = new HashMap<String, List<String>>();
+        Map<String, List<String>> filters = new HashMap<>();
         for (AnnotationField annotationField : request.getFilter().getFields()) {
             String filterName = annotationField.getName();
             List<String> values = filters.get(filterName);
             if (values == null) {
-                values = new ArrayList<String>();
+                values = new ArrayList<>();
                 filters.put(filterName, values);
             }
             if (annotationField.getValue() != null) {
@@ -414,18 +420,18 @@ public abstract class AbstractAnnotationRESTResource extends XWikiResource
         return metadataMap;
     }
 
-    protected void handleTemporaryUploadedFiles(DocumentReference documentReference, Map<String, Object> metadataMap)
+    protected boolean handleTemporaryUploadedFiles(DocumentReference documentReference, Map<String, Object> metadataMap)
         throws XWikiException
     {
         String documentName = this.referenceSerializer.serialize(documentReference);
         boolean canUploadAttachment = this.annotationRightService.canUploadAttachment(documentName, getXWikiUser());
-        if (canUploadAttachment && metadataMap.containsKey("uploadedFiles")) {
-            XWikiContext context = this.xcontextProvider.get();
-            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
-            String[] uploadedFiles = StringUtils.split(String.valueOf(metadataMap.get("uploadedFiles")), ",");
-            this.temporaryAttachmentSessionsManager
-                .attachTemporaryAttachmentsInDocument(document, Arrays.asList(uploadedFiles));
+        // When the user is not allowed to upload attachments, drop the temporary uploaded file names so that they are
+        // never persisted. When allowed, the names stay in the metadata, reach the Annotation object, and the IO
+        // service persists the attachments on the same document instance that holds the annotation, in a single save.
+        if (!canUploadAttachment) {
+            metadataMap.remove(UPLOADED_FILES_FIELD);
         }
+        return canUploadAttachment;
     }
 
     protected void cleanTemporaryUploadedFiles(DocumentReference documentReference)

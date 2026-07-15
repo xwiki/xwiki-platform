@@ -18,27 +18,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { componentStore } from "@/components/store.js";
-
-import displayerMixin from "./components/displayers/displayerMixin.js";
-import BaseDisplayer from "./components/displayers/BaseDisplayer.vue";
-import XWikiIcon from "./components/utilities/XWikiIcon.vue";
-
 require(["jquery"], ($) => {
   $.fn.liveData = function(config) {
     return this.each(function() {
       if (!$(this).data("liveData")) {
         const instanceConfig = $.extend($(this).data("config"), config);
         import("./services/init.js").then(
-          (init) =>
-            $(this).attr("data-config", JSON.stringify(instanceConfig)).data("liveData",
-              init.init(this, $)));
+          ({init}) => {
+             $(this).attr("data-config", JSON.stringify(instanceConfig));
+            init(this, $);
+          });
       }
     });
   };
 
   const init = function(event, data) {
-    import("@/components/populateStore.js").then(() => {
+    import("@xwiki/platform-livedata-ui").then(({populateStore}) => {
+      populateStore()
       const container = $((data && data.elements) || document);
       container.find(".liveData").liveData();
     });
@@ -47,7 +43,3 @@ require(["jquery"], ($) => {
   $(document).on("xwiki:dom:updated", init);
   $(init);
 });
-
-export {
-  componentStore, displayerMixin, BaseDisplayer, XWikiIcon,
-};

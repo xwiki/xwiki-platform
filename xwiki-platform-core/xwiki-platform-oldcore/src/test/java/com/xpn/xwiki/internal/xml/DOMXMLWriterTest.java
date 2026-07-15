@@ -24,24 +24,25 @@ import java.io.IOException;
 import org.dom4j.Document;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests for {@link DOMXMLWriter}.
  * 
  * @version $Id$
  */
-public class DOMXMLWriterTest
+class DOMXMLWriterTest
 {
     /**
      * Before 3.0M2 there was a bug where write and writeOpen were reversed.
      * 
-     * @throws IOException
      * @see "XWIKI-5937"
      */
     @Test
-    public void writeVersusWriteOpen() throws IOException
+    void writeVersusWriteOpen() throws IOException
     {
         Document doc = new DOMDocument();
         DOMXMLWriter writer = new DOMXMLWriter(doc);
@@ -50,7 +51,7 @@ public class DOMXMLWriterTest
         writer.write(new DOMElement("b"));
         writer.writeClose(e);
         writer.close();
-        Assert.assertNotNull(doc.getRootElement().element("b"));
+        assertNotNull(doc.getRootElement().element("b"));
 
         doc = new DOMDocument();
         writer = new DOMXMLWriter(doc);
@@ -58,6 +59,6 @@ public class DOMXMLWriterTest
         writer.write(e);
         writer.write(new DOMElement("d"));
         writer.close();
-        Assert.assertNull(doc.getRootElement().element("d"));
+        assertNull(doc.getRootElement().element("d"));
     }
 }

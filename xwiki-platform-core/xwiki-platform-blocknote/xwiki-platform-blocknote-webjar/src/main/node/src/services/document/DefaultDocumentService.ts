@@ -18,10 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { toCristalEntityReference } from "../model/reference/XWikiEntityReference";
-import { DocumentChange, DocumentService } from "@xwiki/platform-document-api";
-import { Container, injectable } from "inversify";
+import { Container, inject, injectable } from "inversify";
 import { ref } from "vue";
+import type { XWikiMeta } from "../meta/XWikiMeta";
 import type { PageData } from "@xwiki/platform-api";
+import type {
+  DocumentChange,
+  DocumentService,
+} from "@xwiki/platform-document-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { Ref } from "vue";
 
@@ -34,17 +38,19 @@ export class DefaultDocumentService implements DocumentService {
       .inSingletonScope();
   }
 
+  constructor(@inject("XWikiMeta") private readonly xwikiMeta: XWikiMeta) {}
+
   public getCurrentDocument(): Ref<PageData | undefined> {
     // TODO
     throw new Error("Method not implemented.");
   }
 
   public getCurrentDocumentReference(): Ref<DocumentReference | undefined> {
-    return ref(
-      toCristalEntityReference(
-        XWiki.currentDocument.documentReference,
-      ) as DocumentReference,
-    );
+    const documentReference = toCristalEntityReference(
+      XWiki.currentDocument.documentReference,
+    ) as DocumentReference;
+    documentReference.locale = this.xwikiMeta.locale;
+    return ref(documentReference);
   }
 
   public getCurrentDocumentReferenceString(): Ref<string | undefined> {
@@ -113,6 +119,11 @@ export class DefaultDocumentService implements DocumentService {
     page: DocumentReference,
   ): Promise<void> {
     // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  removeDocumentChangeListener(): void {
+    // TODO implement along with registerDocumentChangeListener
     throw new Error("Method not implemented.");
   }
 }

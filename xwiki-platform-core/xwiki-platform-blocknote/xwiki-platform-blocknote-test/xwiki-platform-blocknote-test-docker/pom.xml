@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-blocknote-test</artifactId>
-    <version>18.1.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-blocknote-test-docker</artifactId>
   <name>XWiki Platform - BlockNote Integration - Tests - Functional Docker Tests</name>
@@ -44,6 +44,51 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Provides the implementation for the services used by the Image and Macro wizard, as well as some UI
+      extensions. We don't have a UI module for BlockNote so we put this dependency here for now. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <!-- Used to test the integration with the in-place edit mode. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <!-- We need this to test the Image Styles with the image dialog. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-style-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <!-- We need this for the image attachment gallery picker. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <!-- We need an implementation of the WebSocket API (using XWiki components) for realtime collaboration. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-websocket</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- We need an implementation for the User REST API. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-user-rest-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test only dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -55,6 +100,30 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-blocknote-test-pageobjects</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used to enable multilingual. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Realtime synchronization is done through WebSockets. -->
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-client-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

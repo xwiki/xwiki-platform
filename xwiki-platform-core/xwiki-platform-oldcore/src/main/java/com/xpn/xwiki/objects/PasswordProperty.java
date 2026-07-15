@@ -31,6 +31,13 @@ import com.xpn.xwiki.XWikiContext;
 @Unstable
 public class PasswordProperty extends BaseStringProperty
 {
+    /**
+     * The type used as a hint to find the property.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Password";
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -41,5 +48,11 @@ public class PasswordProperty extends BaseStringProperty
     public boolean isSensitive(XWikiContext context)
     {
         return true;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 }

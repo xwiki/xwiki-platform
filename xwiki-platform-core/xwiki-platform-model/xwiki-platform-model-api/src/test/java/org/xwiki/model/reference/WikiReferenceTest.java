@@ -31,10 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  * @since 2.2M1
  */
-public class WikiReferenceTest
+class WikiReferenceTest
 {
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
             () -> new WikiReference(new EntityReference("wiki", EntityType.DOCUMENT)));
@@ -42,7 +42,7 @@ public class WikiReferenceTest
     }
 
     @Test
-    public void testInvalidParent()
+    void testInvalidParent()
     {
         EntityReference badParent = new EntityReference("other", EntityType.DOCUMENT);
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,

@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-public class XWikiStubContextInitializerTest
+class XWikiStubContextInitializerTest
 {
     @MockComponent
     private XWikiStubContextProvider stubContextProvider;
@@ -46,7 +46,7 @@ public class XWikiStubContextInitializerTest
     private XWikiStubContextInitializer initializer;
 
     @Test
-    public void testWithAndWithoutXWikiContext() throws Exception
+    void testWithAndWithoutXWikiContext() throws Exception
     {
         XWikiContext stubContext = new XWikiContext();
 

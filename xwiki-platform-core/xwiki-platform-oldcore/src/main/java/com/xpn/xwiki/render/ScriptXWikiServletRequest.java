@@ -26,6 +26,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.xwiki.jakartabridge.servlet.internal.JakartaToJavaxHttpServletRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -62,6 +63,12 @@ public class ScriptXWikiServletRequest extends WrappingXWikiRequest
         super(request);
 
         this.authorization = authorization;
+    }
+
+    @Override
+    public jakarta.servlet.http.HttpServletRequest getJakarta()
+    {
+        return new JakartaToJavaxHttpServletRequest<>(this);
     }
 
     /**

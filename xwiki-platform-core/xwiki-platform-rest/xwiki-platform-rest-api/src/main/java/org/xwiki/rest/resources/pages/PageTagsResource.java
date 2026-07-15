@@ -36,12 +36,37 @@ import org.xwiki.rest.model.jaxb.Tags;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/tags")
 public interface PageTagsResource
 {
+    /**
+     * Returns the tags currently associated with a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page whose tags are returned, for example {@code WebHome}
+     * @return the tags of the page (an empty list when the page carries no tag object), each linked to the resource
+     *  listing the pages sharing that tag
+     * @throws XWikiRestException if the tags cannot be retrieved, for example the page does not exist
+     */
     @GET Tags getPageTags(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName
     ) throws XWikiRestException;
 
+    /**
+     * Sets the tags associated with a page, replacing the existing ones with the supplied list.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page whose tags are set, for example {@code WebHome}
+     * @param minorRevision when {@code true}, the change is saved as a minor version; when {@code null} (the default)
+     *  or {@code false}, it is saved as a normal (major) version
+     * @param tags the complete set of tags to store on the page; the page's existing tags are entirely replaced by
+     *  this list (an empty list clears all tags)
+     * @return a response with status {@code 202} holding the tags that were stored
+     * @throws XWikiRestException if the current user is not allowed to edit the page or if the tags cannot be stored
+     */
     @PUT Response setTags(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

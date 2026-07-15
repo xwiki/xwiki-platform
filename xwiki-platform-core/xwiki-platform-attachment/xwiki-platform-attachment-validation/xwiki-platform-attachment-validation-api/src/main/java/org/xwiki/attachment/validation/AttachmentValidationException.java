@@ -19,6 +19,7 @@
  */
 package org.xwiki.attachment.validation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +37,13 @@ public class AttachmentValidationException extends Exception
 
     private final String translationKey;
 
+    /**
+     * The declared type is the {@link List} interface, which is not guaranteed serializable, but in practice the
+     * stored list is always a serializable {@link ArrayList} (see the constructor) holding serializable values, so
+     * S1948 is a false positive here. Keeping the field serializable (rather than transient) preserves the parameters
+     * when the exception is serialized, e.g. in job logs.
+     */
+    @SuppressWarnings("java:S1948")
     private final List<Object> translationParameters;
 
     private final String contextMessage;
@@ -73,7 +81,7 @@ public class AttachmentValidationException extends Exception
         super(message);
         this.httpStatus = httpStatus;
         this.translationKey = translationKey;
-        this.translationParameters = translationParameters;
+        this.translationParameters = new ArrayList<>(translationParameters);
         this.contextMessage = contextMessage;
     }
 

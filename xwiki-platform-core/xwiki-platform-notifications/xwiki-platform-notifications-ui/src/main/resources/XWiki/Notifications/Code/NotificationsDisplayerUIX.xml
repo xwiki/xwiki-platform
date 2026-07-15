@@ -53,9 +53,9 @@ Get the actual notifications.
         &lt;div class="col-xs-8 text-right"&gt;
           &lt;p&gt;
             &lt;span class="notifications-header-link"&gt;
-              &lt;a href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"
+              &lt;a href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get')"
                   class="notifications-header-link notifications-rss-link" rel="nofollow external"&gt;
-                $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))
+                $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))##
               &lt;/a&gt;
             &lt;/span&gt;
             &lt;span class="notifications-header-link"&gt;

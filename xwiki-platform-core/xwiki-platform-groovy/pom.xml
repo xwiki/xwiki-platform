@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>18.1.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-groovy</artifactId>
   <name>XWiki Platform - Groovy</name>
@@ -55,17 +55,10 @@
       <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-tool-test-jmock</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>

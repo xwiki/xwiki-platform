@@ -597,7 +597,7 @@ public final class StatsUtil
         } else {
             throw new UnsupportedOperationException("The current storage engine does not support querying statistics");
         }
-        if (solist != null && solist.size() > 0) {
+        if (solist != null && !solist.isEmpty()) {
             visitStats = solist.get(0);
         }
 
@@ -748,7 +748,7 @@ public final class StatsUtil
         }
 
         if (!StringUtils.isBlank(users)) {
-            userList = new ArrayList<String>();
+            userList = new ArrayList<>();
 
             int begin = 0;
             boolean escaped = false;

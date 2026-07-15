@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-repository</artifactId>
-    <version>18.1.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-repository-test</artifactId>
   <name>XWiki Platform - Repository - Tests - Parent POM</name>
@@ -38,8 +38,15 @@
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
   <modules>
-    <module>xwiki-platform-repository-test-tests</module>
     <module>xwiki-platform-repository-test-pageobjects</module>
     <module>xwiki-platform-repository-test-utils</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-repository-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ComponentList({
     DefaultSymbolScheme.class
 })
-public class LocalUidStringEntityReferenceSerializerTest
+class LocalUidStringEntityReferenceSerializerTest
 {
     @InjectMockComponents
     private LocalUidStringEntityReferenceSerializer serializer;
@@ -52,7 +52,7 @@ public class LocalUidStringEntityReferenceSerializerTest
     private DefaultStringEntityReferenceResolver resolver;
 
     @Test
-    public void serializeDocumentReference()
+    void serializeDocumentReference()
     {
         EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
         assertEquals("5:space4:page", serializer.serialize(reference));
@@ -65,7 +65,7 @@ public class LocalUidStringEntityReferenceSerializerTest
     }
 
     @Test
-    public void serializeDocumentReferenceWithLocale()
+    void serializeDocumentReferenceWithLocale()
     {
         EntityReference reference = new DocumentReference("wiki", "space", "page", Locale.US);
         assertEquals("5:space4:page5:en_US", serializer.serialize(reference));
@@ -75,21 +75,21 @@ public class LocalUidStringEntityReferenceSerializerTest
     }
 
     @Test
-    public void serializeSpaceReference()
+    void serializeSpaceReference()
     {
         EntityReference reference = resolver.resolve("wiki:space1.space2", EntityType.SPACE);
         assertEquals("6:space16:space2", serializer.serialize(reference));
     }
 
     @Test
-    public void serializeAttachmentReference() throws Exception
+    void serializeAttachmentReference() throws Exception
     {
         EntityReference reference = resolver.resolve("wiki:space.page@filename", EntityType.ATTACHMENT);
         assertEquals("5:space4:page8:filename", serializer.serialize(reference));
     }
 
     @Test
-    public void serializeReferenceWithChild()
+    void serializeReferenceWithChild()
     {
         EntityReference reference = resolver.resolve("wiki:Space.Page", EntityType.DOCUMENT);
         assertEquals("5:Space", serializer.serialize(reference.getParent()));
@@ -101,7 +101,7 @@ public class LocalUidStringEntityReferenceSerializerTest
      * Tests resolving and re-serializing an object reference.
      */
     @Test
-    public void serializeObjectReference()
+    void serializeObjectReference()
     {
         EntityReference reference = resolver.resolve("wiki:space.page^wiki:space.class[0]", EntityType.OBJECT);
         assertEquals("5:space4:page14:space.class[0]", serializer.serialize(reference));
@@ -121,7 +121,7 @@ public class LocalUidStringEntityReferenceSerializerTest
      * Tests resolving and re-serializing an property reference.
      */
     @Test
-    public void serializeObjectPropertyReference()
+    void serializeObjectPropertyReference()
     {
         EntityReference reference =
             resolver.resolve("wiki:space.page^wiki:space.class[0].prop", EntityType.OBJECT_PROPERTY);
@@ -136,10 +136,10 @@ public class LocalUidStringEntityReferenceSerializerTest
     }
 
     /**
-     * Tests resolving and re-serializing an class property reference.
+     * Tests resolving and re-serializing a class property reference.
      */
     @Test
-    public void serializeClassPropertyReference()
+    void serializeClassPropertyReference()
     {
         EntityReference reference = resolver.resolve("wiki:space.page^ClassProperty", EntityType.CLASS_PROPERTY);
         assertEquals("5:space4:page13:ClassProperty", serializer.serialize(reference));
@@ -150,7 +150,7 @@ public class LocalUidStringEntityReferenceSerializerTest
     }
 
     @Test
-    public void serializeRelativeReference()
+    void serializeRelativeReference()
     {
         EntityReference reference = new EntityReference("page", EntityType.DOCUMENT);
         assertEquals("4:page", serializer.serialize(reference));

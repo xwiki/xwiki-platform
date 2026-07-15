@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #set ($feedContent = $services.notification.notifiers.getFeed(20))
-#if ($xcontext.action == 'get' &amp;&amp; "$request.outputSyntax" == 'plain')
+#if ($xcontext.action == 'get')
   #rawResponse($feedContent, 'application/xml')
 #else
   {{code language="xml" source="script:feedContent" /}}

@@ -682,11 +682,29 @@ define('paged-polyfill-patched', [
     }
   }
 
+  /**
+   * Logs the time spent to layout each print page, useful for debugging PDF export timeouts.
+   */
+  class LoggingHandler extends Paged.Handler {
+    constructor(chunker, polisher, caller) {
+      super(chunker, polisher, caller);
+    }
+
+    beforePageLayout(page) {
+      console.time(`Page ${page.position + 1}`);
+    }
+
+    afterPageLayout(pageFragment, page) {
+      console.timeEnd(`Page ${page.position + 1}`);
+    }
+  }
+
   const handlers = [
     ShowInvisibleRowsOnPageBreaks,
     FixFloatingImages,
     FixTableLayout,
-    FixMaxChars
+    FixMaxChars,
+    LoggingHandler
   ];
   // The following handlers are more opionated, so we provide a way to disable them.
   const config = new URLSearchParams(window.location.search);
@@ -749,6 +767,9 @@ require([
   'xwiki-export-pdf-config',
   'xwiki-export-pdf-mutationObserverManager'
 ], function($, pageReady, pdfExportConfig, mutationObserverManager) {
+  console.time('PrintPreview');
+  console.time('PageReady');
+
   // Workaround for a paged.js bug (#267: Missing CSS stylesheets can break the page rendering).
   // See https://github.com/pagedjs/pagedjs/issues/267
   const protectAgainstMissingStyleSheets = function() {
@@ -803,82 +824,37 @@ require([
     }
   }
 
-  const refactorAnchors = function() {
-    // Fix anchors that use relative URLs to point to the right document (that generated that anchor).
-    fixRelativeAnchors($('#xwikicontent'));
-    // Convert external anchors that target exported documents into internal anchor, whenever possible.
-    pdfExportConfig.documents?.forEach?.(document =&gt; {
-      const documentReference = XWiki.Model.resolve(document.reference, XWiki.EntityType.DOCUMENT,
-        XWiki.currentDocument.documentReference);
-      makeInternalAnchors($('#xwikicontent'), documentReference, document.idMap);
+  function refactorAnchors() {
+    const docInfos = (pdfExportConfig.documents || []).map(getAnchorRefactoringDocInfo);
+
+    const container = document.getElementById('xwikicontent');
+    container.querySelectorAll('a[href]').forEach(anchor =&gt; {
+      // Fix anchors that use relative URLs to point to the right document (that generated that anchor).
+      fixRelativeAnchor(anchor, container);
+
+      // Convert external anchors that target exported documents into internal anchor, whenever possible.
+      docInfos.some(docInfo =&gt; makeInternalAnchor(anchor, docInfo));
     });
+
     // The anchors in the PDF table of contents are already using global fragment identifiers.
-    makeInternalAnchors($('.pdf-toc'), XWiki.currentDocument.documentReference);
-  };
-
-  /**
-   * When exporting multiple documents to PDF each of them can produce anchors with relative URLs that are by default
-   * resolved based on the current document used to trigger the PDF export, which is not what we want. Those relative
-   * anchors should target the documents that generated them.
-   *
-   * @param container where to look for relative anchors that need to be fixed
-   */
-  const fixRelativeAnchors = function(container) {
-    container.find('a[href]').each(function() {
-      const anchor = $(this);
-      let documentReference = anchor.parentsUntil(container).last().prevAll('h1[data-xwiki-document-reference]')
-        .first().attr('data-xwiki-document-reference');
-      if (documentReference) {
-        documentReference = XWiki.Model.resolve(documentReference, XWiki.EntityType.DOCUMENT,
-          XWiki.currentDocument.documentReference);
-        const document = new XWiki.Document(documentReference);
-        const documentURL = new URL(document.getURL(), pdfExportConfig.baseURL);
-        try {
-          anchor.attr('href', new URL(anchor.attr('href'), documentURL).href);
-        } catch (e) {
-          console.log('Failed to fix relative URL: ' + anchor.attr('href'));
-        }
-      }
+    const currentDocInfo = getAnchorRefactoringDocInfo({
+      reference: XWiki.Model.serialize(XWiki.currentDocument.documentReference)
     });
-  };
+    document.querySelectorAll('.pdf-toc a[href]').forEach(anchor =&gt; makeInternalAnchor(anchor, currentDocInfo));
+  }
 
-  /**
-   * Look for external anchors that target the specified document (which is included in the PDF export) and convert them
-   * to internal anchors like this:
-   * &lt;ul&gt;
-   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document =&gt; #documentTitleHeadingId&lt;/li&gt;
-   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document#localFragmentId =&gt; #globalFragmentId&lt;/li&gt;
-   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document#globalFragmentId =&gt; #globalFragmentId&lt;/li&gt;
-   * &lt;/ul&gt;
-   */
-  const makeInternalAnchors = function(container, documentReference, idMap) {
-    const document = new XWiki.Document(documentReference);
-    const documentURL = new URL(document.getURL(), pdfExportConfig.baseURL).href;
-    container.find('a[href]').each(function() {
-      const anchor = $(this);
-      try {
-        const anchorURL = new URL(anchor.attr('href'), pdfExportConfig.baseURL);
-        // Drop the '#' from the end of the URL when the hash is empty.
-        anchorURL.hash = anchorURL.hash;
-        if (anchorURL.href === documentURL + anchorURL.hash) {
-          // Assume the anchor targets a document fragment specified by its global id.
-          let fragmentId = anchorURL.hash.substring(1);
-          if (!fragmentId) {
-            // The anchor targets the start of the document.
-            fragmentId = getDocumentFragmentId(documentReference);
-          } else if (idMap) {
-            // The anchor targets a document fragment specified by its local id.
-            fragmentId = idMap[fragmentId];
-          }
-          if (fragmentId) {
-            anchor.attr('href', '#' + fragmentId);
-          }
-        }
-      } catch (e) {
-        console.log('Failed to parse URL: ' + anchor.prop('href'));
-      }
-    });
-  };
+  function getAnchorRefactoringDocInfo(doc) {
+    const resolvedReference = XWiki.Model.resolve(doc.reference, XWiki.EntityType.DOCUMENT,
+      XWiki.currentDocument.documentReference);
+    const xwikiDocument = new XWiki.Document(resolvedReference);
+    const url = new URL(xwikiDocument.getURL(), pdfExportConfig.baseURL).href;
+    return {
+      ...doc,
+      resolvedReference,
+      url,
+      fragmentId: getDocumentFragmentId(doc.reference)
+    };
+  }
 
   /**
    * Search for the heading that marks the start of the specified document in the rendering output and return its id,
@@ -886,11 +862,109 @@ require([
    *
    * @return the id of the heading that marks the start of the specified document
    */
-  const getDocumentFragmentId = function(documentReference) {
-    const stringDocRef = XWiki.Model.serialize(documentReference);
-    return $('#xwikicontent &gt; h1[data-xwiki-document-reference]').filter(function() {
-      return $(this).attr('data-xwiki-document-reference') === stringDocRef;
-    }).attr('id');
+  const getDocumentFragmentId = function(stringDocRef) {
+    const docTitleHeadings = document.querySelectorAll('#xwikicontent &gt; h1[data-xwiki-document-reference]');
+    for (let i = 0; i &lt; docTitleHeadings.length; i++) {
+      const docTitleHeading = docTitleHeadings[i];
+      if (docTitleHeading.dataset.xwikiDocumentReference === stringDocRef) {
+        return docTitleHeading.getAttribute('id');
+      }
+    }
+  };
+
+  /**
+   * When exporting multiple documents to PDF each of them can produce anchors with relative URLs that are by default
+   * resolved based on the current document used to trigger the PDF export, which is not what we want. Those relative
+   * anchors should target the documents that generated them.
+   *
+   * @param anchor the anchor that may need to be fixed
+   * @param container where to look for headings holding the document reference
+   */
+  function fixRelativeAnchor(anchor, container) {
+    const documentURL = getDocumentURLFromParent(anchor, container);
+    if (documentURL) {
+      const href = anchor.getAttribute('href');
+      try {
+        anchor.setAttribute('href', new URL(href, documentURL).href);
+      } catch (e) {
+        console.log('Failed to fix relative URL: ' + href);
+      }
+    }
+  }
+
+  /**
+   * Get the URL of the XWiki document that generated the given DOM node. Look within the specified subtree, which may
+   * include nodes generated by multiple XWiki documents.
+   *
+   * @param node the node for which to return the XWiki document URL
+   * @param root the subtree where to look for the XWiki document URL
+   */
+  function getDocumentURLFromParent(node, root) {
+    const path = [];
+
+    // Look for an ancestor that has the document URL.
+    while (node &amp;&amp; !node._xwikiDocumentURL &amp;&amp; node.parentNode !== root) {
+      path.push(node);
+      node = node.parentNode;
+    }
+
+    // Look for a previous level 1 sibling heading that has the document URL.
+    while (node &amp;&amp; !node._xwikiDocumentURL) {
+      if (node.nodeName?.toLowerCase() === 'h1' &amp;&amp; node.dataset.xwikiDocumentReference) {
+        const documentReference = XWiki.Model.resolve(node.dataset.xwikiDocumentReference, XWiki.EntityType.DOCUMENT,
+          XWiki.currentDocument.documentReference);
+        const document = new XWiki.Document(documentReference);
+        node._xwikiDocumentURL = new URL(document.getURL(), pdfExportConfig.baseURL);
+        break;
+      }
+      path.push(node);
+      node = node.previousSibling;
+    }
+
+    if (node?._xwikiDocumentURL) {
+      // Cache the URL for the entire path.
+      for (let item of path) {
+        item._xwikiDocumentURL = node._xwikiDocumentURL;
+      }
+      return node._xwikiDocumentURL;
+    }
+  }
+
+  /**
+   * Make the give anchor internal if it targets the specified document (included in the PDF export), like this:
+   *
+   * &lt;ul&gt;
+   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document =&gt; #documentTitleHeadingId&lt;/li&gt;
+   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document#localFragmentId =&gt; #globalFragmentId&lt;/li&gt;
+   *   &lt;li&gt;/xwiki/bin/view/Path/To/Document#globalFragmentId =&gt; #globalFragmentId&lt;/li&gt;
+   * &lt;/ul&gt;
+   *
+   * @return whether the anchor has been updated
+   */
+  const makeInternalAnchor = function(anchor, docInfo) {
+    try {
+      const anchorURL = new URL(anchor.getAttribute('href'), pdfExportConfig.baseURL);
+      // Drop the '#' from the end of the URL when the hash is empty.
+      anchorURL.hash = anchorURL.hash;
+      if (anchorURL.href === docInfo.url + anchorURL.hash) {
+        // Assume the anchor targets a document fragment specified by its global id.
+        let fragmentId = anchorURL.hash.substring(1);
+        if (!fragmentId) {
+          // The anchor targets the start of the document.
+          fragmentId = docInfo.fragmentId;
+        } else if (docInfo.idMap) {
+          // The anchor targets a document fragment specified by its local id.
+          fragmentId = docInfo.idMap[fragmentId];
+        }
+        if (fragmentId) {
+          anchor.setAttribute('href', '#' + fragmentId);
+          return true;
+        }
+      }
+    } catch (e) {
+      console.log('Failed to parse URL: ' + anchor.getAttribute('href'));
+    }
+    return false;
   };
 
   const replaceCanvasesWithImages = function(container) {
@@ -1104,14 +1178,39 @@ require([
 
   // Adjust the exported content before performing the print layout.
   pageReady.afterPageReady(() =&gt; {
+    console.timeEnd('PageReady');
+
+    console.time('protectAgainstMissingStyleSheets');
     protectAgainstMissingStyleSheets();
+    console.timeEnd('protectAgainstMissingStyleSheets');
+
+    console.time('refactorAnchors');
     refactorAnchors();
+    console.timeEnd('refactorAnchors');
+
+    console.time('removeEmptyTableOfContents');
     removeEmptyTableOfContents();
+    console.timeEnd('removeEmptyTableOfContents');
+
+    console.time('validateTableOfContentsAnchors');
     validateTableOfContentsAnchors();
+    console.timeEnd('validateTableOfContentsAnchors');
+
+    console.time('storeFormFieldValues');
     storeFormFieldValues();
+    console.timeEnd('storeFormFieldValues');
+
+    console.time('makeTableCellWidthRelative');
     makeTableCellWidthRelative();
+    console.timeEnd('makeTableCellWidthRelative');
+
+    console.time('preserveWhiteSpaceInCodeBlocks');
     preserveWhiteSpaceInCodeBlocks();
+    console.timeEnd('preserveWhiteSpaceInCodeBlocks');
+
+    console.time('preventLazyImageLoading');
     preventLazyImageLoading();
+    console.timeEnd('preventLazyImageLoading');
   });
 
   // Trigger the print preview after the page is ready. Note that by returning a promise we're making the next page
@@ -1125,9 +1224,12 @@ require([
       return new Promise((resolve, reject) =&gt; {
         // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become
         // blank when they are moved around within the DOM tree.
+        console.time('replaceCanvasesWithImages');
         replaceCanvasesWithImages($('#xwikicontent')).catch((cause) =&gt; {
           console.log('Failed to replace canvases with images. Cause: ' + cause);
         }).finally(() =&gt; {
+          console.timeEnd('replaceCanvasesWithImages');
+
           // Splitting the content into print pages triggers a lot of DOM mutations. We disconnect all the mutation
           // observers in order to speed up the print preview generation and also because we consider the current state
           // of the content as final (i.e. that's how the content should end up in the PDF) so the DOM mutations
@@ -1137,16 +1239,16 @@ require([
           // Recent versions of Paged.js fail if standard JavaScript types (e.g. Array) are overwritten by Prototype.js
           restoreOriginalPrototypes();
 
-          console.debug('Generating print preview...');
-          const start = Date.now();
+          console.time('PrintLayout');
           // Don't start generating the print preview automatically because we need to patch Paged.js before. See the
           // paged-polyfill-patched module defined above.
           window.PagedConfig = {auto: false};
           require(['paged-polyfill'], previewer =&gt; {
-            previewer.preview().then((...args) =&gt; {
-              const duration = (Date.now() - start) / 1000;
-              console.debug(`Print preview ready in ${duration}s`);
-              resolve(...args);
+            previewer.preview().then(flow =&gt; {
+              const durationPerPage = flow.performance / (flow.total || 1);
+              console.debug(`Rendered ${flow.total} print pages in ${flow.performance} ms (${durationPerPage} ms/page).`);
+              console.timeEnd('PrintLayout');
+              resolve(flow);
             }, reject);
           }, reject);
         })
@@ -1168,6 +1270,8 @@ require([
     // the base URL). We want the base URL to be taken into account only when resolving relative links in the generated
     // PDF.
     $('&lt;base/&gt;').attr('href', pdfExportConfig.baseURL).prependTo('head');
+
+    console.timeEnd('PrintPreview');
   });
 
   /**

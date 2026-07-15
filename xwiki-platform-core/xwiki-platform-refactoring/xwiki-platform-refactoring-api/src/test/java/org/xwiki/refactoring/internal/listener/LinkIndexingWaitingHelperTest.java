@@ -93,7 +93,7 @@ class LinkIndexingWaitingHelperTest
     private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeEach
-    public void configure()
+    void configure()
     {
         when(this.jobContext.getCurrentJob()).thenReturn(mock());
         when(this.jobContext.getCurrentJob().getStatus()).thenReturn(this.jobStatus);

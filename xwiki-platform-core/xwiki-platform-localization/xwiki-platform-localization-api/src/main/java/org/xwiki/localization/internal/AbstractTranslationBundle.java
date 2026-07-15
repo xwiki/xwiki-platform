@@ -44,7 +44,7 @@ public abstract class AbstractTranslationBundle implements TranslationBundle
         public Translation getTranslation(String key, Locale locale)
         {
             return null;
-        };
+        }
     };
 
     /**

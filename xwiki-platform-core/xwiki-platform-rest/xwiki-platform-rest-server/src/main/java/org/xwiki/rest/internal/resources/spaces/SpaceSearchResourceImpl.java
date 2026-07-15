@@ -45,6 +45,8 @@ public class SpaceSearchResourceImpl extends BaseSearchResult implements SpaceSe
     private KeywordSearchSource keywordSearchSource;
 
     @Override
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:MissingJavadocMethod"})
     public SearchResults search(String wikiName, String spaceName, String keywords, List<String> searchScopeStrings,
         Integer number, Integer start, String orderField, String order, Boolean withPrettyNames, Boolean isLocaleAware)
         throws XWikiRestException

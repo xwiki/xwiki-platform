@@ -31,13 +31,13 @@ import static org.junit.jupiter.api.Assertions.fail;
  * 
  * @version $Id$
  */
-public class PageObjectReferenceTest
+class PageObjectReferenceTest
 {
     /**
      * Ensures the equivalence of constructors.
      */
     @Test
-    public void testConstructors()
+    void testConstructors()
     {
         PageObjectReference reference = new PageObjectReference(new EntityReference("Object", EntityType.PAGE_OBJECT,
             new EntityReference("Page", EntityType.PAGE, new EntityReference("wiki", EntityType.WIKI))));
@@ -45,7 +45,7 @@ public class PageObjectReferenceTest
     }
 
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
         try {
             new PageObjectReference(new EntityReference("className", EntityType.PAGE));
@@ -57,7 +57,7 @@ public class PageObjectReferenceTest
     }
 
     @Test
-    public void testInvalidNullParent()
+    void testInvalidNullParent()
     {
         try {
             new PageObjectReference(new EntityReference("className", EntityType.PAGE_OBJECT));
@@ -72,7 +72,7 @@ public class PageObjectReferenceTest
      * Tests that an object reference throws exception if it doesn't have a document as a parent.
      */
     @Test
-    public void testInvalidParentType()
+    void testInvalidParentType()
     {
         try {
             new PageObjectReference(
@@ -85,7 +85,7 @@ public class PageObjectReferenceTest
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         PageObjectReference reference =
             new PageObjectReference("object", new PageReference("wiki", "space", "page"))

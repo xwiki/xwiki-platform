@@ -36,11 +36,7 @@ import org.xwiki.query.WrappingQuery;
  */
 public final class HqlQueryUtils
 {
-    private static final String FROM = "from";
-
     private static final String WHERE = "where ";
-
-    private static final String ORDER = "order";
 
     private static final String ORDER_BY = "order by";
 
@@ -166,7 +162,7 @@ public final class HqlQueryUtils
         sql.append(getColumnsForSelectStatement(normalizedWhereSQL));
         sql.append(" from XWikiDocument as doc");
 
-        if (!normalizedWhereSQL.equals("")) {
+        if (!normalizedWhereSQL.isEmpty()) {
             if ((!normalizedWhereSQL.startsWith(WHERE)) && (normalizedWhereSQL.charAt(0) != ',')) {
                 sql.append(" where ");
             } else {

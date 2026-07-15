@@ -79,7 +79,7 @@ public class AddTagsPane extends BaseElement
             @Override
             public Boolean apply(WebDriver driver)
             {
-                return getDriver().findElements(By.className("xnotification-error")).size() == 0;
+                return getDriver().findElements(By.className("xnotification-error")).isEmpty();
             }
         });
 
@@ -92,13 +92,13 @@ public class AddTagsPane extends BaseElement
             @Override
             public Boolean apply(WebDriver driver)
             {
-                return getDriver().findElements(By.className(FORM_CLASS_NAME)).size() == 0
-                    || getDriver().findElements(By.className("xnotification-error")).size() > 0;
+                return getDriver().findElements(By.className(FORM_CLASS_NAME)).isEmpty()
+                    || !getDriver().findElements(By.className("xnotification-error")).isEmpty();
             }
         });
 
         // If the add tags panel is still visible then there was a problem adding the tags.
-        return getDriver().findElementsWithoutWaiting(By.className(FORM_CLASS_NAME)).size() == 0;
+        return getDriver().findElementsWithoutWaiting(By.className(FORM_CLASS_NAME)).isEmpty();
     }
 
     /**

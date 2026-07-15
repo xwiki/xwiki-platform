@@ -23,12 +23,12 @@ import {
 } from "../reference/XWikiEntityReference";
 import {
   DocumentReference,
-  EntityReference,
   EntityType,
   SpaceReference,
 } from "@xwiki/platform-model-api";
-import { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
 import { Container, injectable } from "inversify";
+import type { EntityReference } from "@xwiki/platform-model-api";
+import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
 
 @injectable("Singleton")
 export class XWikiRemoteURLSerializer implements RemoteURLSerializer {

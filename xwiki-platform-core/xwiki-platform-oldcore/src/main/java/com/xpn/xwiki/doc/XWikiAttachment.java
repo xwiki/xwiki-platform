@@ -254,7 +254,9 @@ public class XWikiAttachment implements Cloneable
             throw new XWikiException("Failed to clone the attachment", null);
         }
         clone.setFilename(name);
-        clone.setContent(this.getContentInputStream(context));
+        try (InputStream sourceContent = getContentInputStream(context)) {
+            clone.setContent(sourceContent);
+        }
         clone.setAttachment_archive(getAttachmentArchive(context).clone(clone, context));
         return clone;
     }
@@ -505,10 +507,8 @@ public class XWikiAttachment implements Cloneable
             this.doc = doc;
             this.reference = null;
 
-            if (updateDirty) {
-                if (isMetaDataDirty() && doc != null) {
-                    doc.setMetaDataDirty(true);
-                }
+            if (updateDirty && isMetaDataDirty() && doc != null) {
+                doc.setMetaDataDirty(true);
             }
         }
     }
@@ -570,10 +570,8 @@ public class XWikiAttachment implements Cloneable
     {
         setMetaDataDirty(dirty);
 
-        if (deep) {
-            if (this.content != null) {
-                this.content.setContentDirty(dirty);
-            }
+        if (deep && this.content != null) {
+            this.content.setContentDirty(dirty);
         }
     }
 
@@ -1053,7 +1051,7 @@ public class XWikiAttachment implements Cloneable
      */
     public List<Version> getVersionList() throws XWikiException
     {
-        final List<Version> list = new ArrayList<Version>();
+        final List<Version> list = new ArrayList<>();
         final String currentVersion = this.version.toString();
         Version v = new Version("1.1");
         for (;;) {
@@ -1273,7 +1271,9 @@ public class XWikiAttachment implements Cloneable
                 // can happen for small files if AutoCloseInputStream is used, which supports the mark and reset methods
                 // so Tika uses it directly. In this case, the input stream is automatically closed after the first
                 // detector reads it so the next detector fails to read it.
-                mediaType = TikaUtils.detect(new BufferedInputStream(getContentInputStream(xcontext)));
+                try (InputStream stream = new BufferedInputStream(getContentInputStream(xcontext))) {
+                    mediaType = TikaUtils.detect(stream);
+                }
             } catch (Exception e) {
                 LOGGER.warn("Failed to read the content of [{}] in order to detect its mime type. Root cause: [{}]",
                     getReference(), ExceptionUtils.getRootCauseMessage(e));
@@ -1346,7 +1346,7 @@ public class XWikiAttachment implements Cloneable
             // Note: If the attachment from which to copy data from has a null content, don't copy the content.
             if (isContentDifferentButNotNull(attachment)) {
 				try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
-					setContent(attachment.getContentInputStream(null));
+					setContent(attachmentIs);
 					modified = true;
 				}
             }

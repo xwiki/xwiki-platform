@@ -20,7 +20,7 @@
 package org.xwiki.wysiwyg.internal.converter;
 
 import java.io.StringReader;
-import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -61,7 +61,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultHTMLConverterTest
+class DefaultHTMLConverterTest
 {
     @InjectMockComponents
     private DefaultHTMLConverter converter;
@@ -70,13 +70,13 @@ public class DefaultHTMLConverterTest
     private MockitoComponentManager componentManager;
 
     @AfterComponent
-    public void overrideComponent() throws Exception
+    void overrideComponent() throws Exception
     {
         this.componentManager.registerComponent(RenderingContext.class, mock(MutableRenderingContext.class));
     }
 
     @BeforeComponent
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
     }
@@ -85,7 +85,7 @@ public class DefaultHTMLConverterTest
      * Unit test for {@link DefaultHTMLConverter#fromHTML(String, String)}.
      */
     @Test
-    public void fromHTML() throws Exception
+    void fromHTML() throws Exception
     {
         String html = "some HTML";
         String syntaxId = "syntax/x.y";
@@ -111,14 +111,14 @@ public class DefaultHTMLConverterTest
      * Unit test for {@link DefaultHTMLConverter#toHTML(String, String)}.
      */
     @Test
-    public void toHTML() throws Exception
+    void toHTML() throws Exception
     {
         String source = "wiki syntax";
         Syntax syntax = new Syntax(new SyntaxType("syntax", "Syntax"), "x.y");
 
         // The source should be parsed.
         ContentParser contentParser = this.componentManager.getInstance(ContentParser.class);
-        XDOM xdom = new XDOM(Collections.emptyList());
+        XDOM xdom = new XDOM(List.of());
         when(contentParser.parse(source, syntax, null)).thenReturn(xdom);
 
         assertEquals("", this.converter.toHTML(source, syntax.toIdString()));
@@ -144,7 +144,7 @@ public class DefaultHTMLConverterTest
      * Unit test for {@link DefaultHTMLConverter#parseAndRender(String, String)}.
      */
     @Test
-    public void parseAndRender() throws Exception
+    void parseAndRender() throws Exception
     {
         String html = "some HTML";
         String syntaxId = "syntax/x.y";
@@ -154,7 +154,7 @@ public class DefaultHTMLConverterTest
         when(cleaner.clean(html)).thenReturn(html);
 
         // Verify the HTML is parsed into XDOM.
-        XDOM xdom = new XDOM(Collections.emptyList());
+        XDOM xdom = new XDOM(List.of());
         Parser xhtmlParser = this.componentManager.getInstance(Parser.class, "xhtml/5");
         when(xhtmlParser.parse(any(StringReader.class))).thenReturn(xdom);
 

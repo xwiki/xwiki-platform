@@ -146,7 +146,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
     private DefaultDistributionJob farmDistributionJob;
 
-    private Map<String, DistributionJob> wikiDistributionJobs = new ConcurrentHashMap<String, DistributionJob>();
+    private Map<String, DistributionJob> wikiDistributionJobs = new ConcurrentHashMap<>();
 
     @Override
     public void initialize() throws InitializationException

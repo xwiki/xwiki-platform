@@ -20,6 +20,7 @@
 package org.xwiki.filter.instance.internal.output;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -37,6 +38,7 @@ import org.xwiki.filter.instance.internal.InstanceUtils;
 import org.xwiki.filter.instance.output.InstanceOutputProperties;
 import org.xwiki.filter.instance.output.OutputInstanceFilterStreamFactory;
 import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
+import org.xwiki.filter.output.OutputFilterStream;
 
 /**
  * @version $Id$
@@ -54,6 +56,8 @@ public class InstanceOutputFilterStream extends AbstractBeanOutputFilterStream<I
     @Named("context")
     private Provider<ComponentManager> componentManager;
 
+    private List<OutputFilterStream> outputFilterStreams;
+
     @Override
     public void setProperties(InstanceOutputProperties properties) throws FilterException
     {
@@ -67,10 +71,13 @@ public class InstanceOutputFilterStream extends AbstractBeanOutputFilterStream<I
                 "Failed to get registered instances of OutputInstanceFilterStreamFactory components", e);
         }
 
+        this.outputFilterStreams = new ArrayList<>(factories.size());
         Object[] filters = new Object[factories.size()];
         int i = 0;
         for (OutputInstanceFilterStreamFactory factory : factories) {
-            filters[i++] = factory.createOutputFilterStream(properties).getFilter();
+            OutputFilterStream outputFilterStream = factory.createOutputFilterStream(properties);
+            this.outputFilterStreams.add(outputFilterStream);
+            filters[i++] = outputFilterStream.getFilter();
         }
 
         this.filter = this.filterManager.createCompositeFilter(filters);
@@ -85,6 +92,10 @@ public class InstanceOutputFilterStream extends AbstractBeanOutputFilterStream<I
     @Override
     public void close() throws IOException
     {
-        // Nothing to close
+        if (this.outputFilterStreams != null) {
+            for (OutputFilterStream filterStream : this.outputFilterStreams) {
+                filterStream.close();
+            }
+        }
     }
 }

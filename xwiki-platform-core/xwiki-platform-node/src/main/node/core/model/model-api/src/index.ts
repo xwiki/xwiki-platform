@@ -81,6 +81,14 @@ class DocumentReference implements BaseEntityReference {
    */
   terminal: boolean;
 
+  /**
+   * The locale of the referenced document.
+   *
+   * @since 18.4.0RC1
+   * @beta
+   */
+  locale?: string;
+
   constructor(name: string, space?: SpaceReference, terminal?: boolean) {
     this.space = space;
     this.name = name;

@@ -125,7 +125,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
                 String versionString = databaMetadata.getDatabaseProductVersion();
                 Version version = new DefaultVersion(versionString);
 
-                if (productName.equalsIgnoreCase("mariadb")) {
+                if ("mariadb".equalsIgnoreCase(productName)) {
                     // Impossible to apply this migration on MariaDB lower than 10.2
                     if (version.compareTo(MARIADB102) < 0) {
                         warnDatabaseTooOld("MariaDB", MARIADB102);

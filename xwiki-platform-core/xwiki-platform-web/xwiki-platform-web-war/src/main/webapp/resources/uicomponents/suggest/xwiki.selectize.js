@@ -25,11 +25,21 @@ define('xwiki-selectize-messages', {
 });
 
 define('xwiki-selectize', [
+  'module',
   'jquery',
-  'selectize',
+  'tom-select',
   'xwiki-l10n!xwiki-selectize-messages',
   'xwiki-events-bridge'
-], function($, Selectize, l10n) {
+], function(module, $, TomSelect, l10n) {
+  // Load the CSS.
+  module.config().css?.forEach(url => {
+    $('<link>').attr({
+      type: 'text/css',
+      rel: 'stylesheet',
+      href: url
+    }).appendTo('head');
+  });
+
   var optionTemplate = [
     '<div class="xwiki-selectize-option" data-value="">',
       '<span class="xwiki-selectize-option-icon"></span>',
@@ -108,10 +118,10 @@ define('xwiki-selectize', [
     labelField: 'label',
     loadThrottle: 500,
     onDropdownClose: function(dropdown) {
-      dropdown.removeClass('active');
+      dropdown.classList.remove('active');
     },
     onDropdownOpen: function(dropdown) {
-      dropdown.addClass('active');
+      dropdown.classList.add('active');
     },
     // We normally don't want to persist the custom values (free text) that the user selects but unfortunately Selectize
     // marks all loaded values (fetched from the server) as user values and so they get removed on delete / backspace if
@@ -137,21 +147,15 @@ define('xwiki-selectize', [
       // given value.
       var loading = typeof this.settings.load === 'function' && !this.loadedSearches.hasOwnProperty(value);
       this.get$('wrapper').toggleClass(this.settings.loadingClass, loading);
-    },
-    onInitialize: function() {
-      this.get$('control').on('click', 'a.xwiki-selectize-option-label', function(event) {
-        // Clicking on the label should select the option not follow the link.
-        event.preventDefault();
-      });
     }
   };
 
-  var loadSelectedValues = function() {
-    var selectize = this.selectize;
-    var wrapper = selectize.get$('wrapper');
+  function loadSelectedValues(input) {
+    const selectize = input.selectize;
+    const wrapper = selectize.get$('wrapper');
     wrapper.addClass(selectize.settings.loadingClass);
     selectize.loading++;
-    selectize.items.reduce(function(deferred, value) {
+    selectize.items.reduce((deferred, value) => {
       return deferred.then(() => loadSelectedValue(selectize, value));
     }, Promise.resolve()).finally(function() {
       selectize.loading = Math.max(selectize.loading - 1, 0);
@@ -159,7 +163,7 @@ define('xwiki-selectize', [
         wrapper.removeClass(selectize.settings.loadingClass);
       }
     });
-  };
+  }
 
   var loadSelectedValue = function(selectize, value) {
     return new Promise((resolve, reject) => {
@@ -187,46 +191,47 @@ define('xwiki-selectize', [
     });
   };
 
-  var customize = function() {
-    var oldPositionDropdown = this.selectize.positionDropdown;
-    this.selectize.positionDropdown = function() {
+  function customize(input) {
+    const tomSelect = input.selectize;
+    const oldPositionDropdown = tomSelect.positionDropdown;
+    tomSelect.positionDropdown = function(...args) {
       // We don't need to recompute the position if the dropdown is a child of the selectize widget.
       if (this.settings.dropdownParent === 'body') {
-        oldPositionDropdown.call(this);
+        oldPositionDropdown.apply(this, args);
       }
       // 'auto' means the dropdown width should be variable based on its content, but no less than the width of the
       // specified form field, otherwise the dropdown should have the same width as the form field.
       if (this.settings.dropdownWidth === 'auto') {
         this.get$('dropdown').css({
-          width: '',
+          width: 'auto',
           'min-width': this.get$('control')[0].getBoundingClientRect().width
         });
       }
     }
-    let oldOnOptionSelect = this.selectize.onOptionSelect;
-    this.selectize.onOptionSelect = function(...args) {
-      const result = oldOnOptionSelect.apply(this, args);
-      return result;
-    }
-    let oldSetActiveOption = this.selectize.setActiveOption;
-    this.selectize.setActiveOption = function(option, ...args) {
+
+    const oldSetActiveOption = tomSelect.setActiveOption;
+    tomSelect.setActiveOption = function(option, ...args) {
       this.liveRegion?.text($(option).text());
       return oldSetActiveOption.call(this, option, ...args);
     }
+
     // Create a live region to store the value of the currently active option.
-    this.selectize.liveRegion = $('<span>');
-    this.selectize.liveRegion.attr('aria-live', 'assertive');
-    this.selectize.liveRegion.addClass('sr-only');
-    this.selectize.get$('input').after(this.selectize.liveRegion);
-    setDropDownAlignment(this.selectize);
-    if (this.selectize.settings.takeInputWidth) {
-      this.selectize.get$('control').width($(this).data('initialWidth'));
+    tomSelect.liveRegion = $('<span>');
+    tomSelect.liveRegion.attr('aria-live', 'assertive');
+    tomSelect.liveRegion.addClass('sr-only');
+    tomSelect.get$('input').after(tomSelect.liveRegion);
+
+    setDropDownAlignment(tomSelect);
+    if (tomSelect.settings.takeInputWidth) {
+      tomSelect.get$('control').width($(input).data('initialWidth'));
     }
+
     // Set the title of the input field.
-    this.selectize.get$('control_input').attr('title', $(this).attr('title'));
+    tomSelect.get$('control_input').attr('title', $(input).attr('title'));
+
     // Set the text alternative of the input field.
-    this.selectize.get$('control_input').attr('aria-label', $(this).attr('aria-label'));
-  };
+    tomSelect.get$('control_input').attr('aria-label', $(input).attr('aria-label'));
+  }
 
   var setDropDownAlignment = function(selectize) {
     var dropdownAlignment = selectize.settings.dropdownAlignment;
@@ -234,15 +239,16 @@ define('xwiki-selectize', [
       dropdownAlignment = 'left';
     }
     if (dropdownAlignment) {
-      selectize.get$('dropdown').addClass('selectize-dropdown-' + dropdownAlignment);
+      selectize.get$('dropdown').addClass('ts-dropdown-' + dropdownAlignment);
     }
   };
 
-  // Hack needed in order to be able to access internal selectize fields that are prefixed with $ when the JavaScript is
-  // minified, because this code is parsed with Velocity. Otherwise, if we access these fields directly by their name
-  // (e.g. selectize.$control) then we might get a Velocity syntax error on the minified JavaScript file.
-  Selectize.prototype.get$ = function(key) {
-    return this['$' + key];
+  // This started as a hack needed in order to be able to access internal selectize fields that are prefixed with $ when
+  // the JavaScript is minified, because this code is parsed with Velocity. Otherwise, if we access these fields directly
+  // by their name (e.g. selectize.$control) then we might get a Velocity syntax error on the minified JavaScript file.
+  // We keept this after replacing selectize.js with Tom Select in order to keep backwards compatibility.
+  TomSelect.prototype.get$ = function(key) {
+    return $(this[key]);
   };
 
   var getDefaultSettings = function(input) {
@@ -277,7 +283,14 @@ define('xwiki-selectize', [
     var selectize = input.selectize;
     var values = $(input).val() || [];
     if (typeof values === 'string') {
-      values = values.split(selectize.settings.delimiter);
+      // In order to distinguish between no value (i.e. no constraint) and empty value (i.e. a constraint), both
+      // represented by an empty string when the underlying field is a text input rather than a select, we make the
+      // convension that a string consisting only in the configured delimiter indicates that empty evalue is selected.
+      if (selectize.settings.maxItems === 1 && values !== selectize.settings.delimiter) {
+        values = [values];
+      } else {
+        values = values.split(selectize.settings.delimiter);
+      }
     }
     // Clear the selection without triggering a change event.
     selectize.clear(true);
@@ -287,56 +300,66 @@ define('xwiki-selectize', [
         selectize.addItem(value, true);
       } else {
         // Select unknown value.
-        selectize.createItem(value, false);
+        selectize.createItem(value);
       }
     });
-    loadSelectedValues.call(input);
+    loadSelectedValues(input);
   };
+
+  function createTomSelect(input, settings) {
+    // Save the width before the input is hidden.
+    $(input).data('initialWidth', $(input).width());
+
+    const tomSelect = new TomSelect(input, getSettings($(input), settings));
+
+    // We expose the TomSelect instance through the 'selectize' property / data on the target input / select that is
+    // being enhanced, in order to preserve backwards compatibility. We can do this because TomSelect is a fork of
+    // Selectize, preserving its JavaScript API. On the long term we need to hide the underlying implementation and
+    // expose our own API.
+    input.selectize = tomSelect;
+    $(input).data('selectize', tomSelect);
+
+    $(input).on('change.xwikiSelectize', function(event) {
+      // Check if the value of the selectize widget is synchronized with the value of the underlying input.
+      if (isSelectizeValueUpToDate(input)) {
+        // Update the live table if the widget is used as a live table filter.
+        var liveTableId = $(input).closest('.xwiki-livetable-display-header-filter').closest('.xwiki-livetable')
+          .attr('id');
+        liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
+      } else {
+        // The input value has been changed outside of the selectize widget. Update the widget.
+        updateSelectizeValue(input);
+      }
+    });
+
+    tomSelect.on('destroy', () => {
+      // Remove the custom region we added for accessibility.
+      tomSelect.liveRegion.remove();
+
+      // Delete the references to the TomSelect instance.
+      delete input.selectize;
+      $(input).removeData('selectize');
+
+      $(input).off('change.xwikiSelectize');
+    });
+
+    customize(input);
+
+    loadSelectedValues(input);
+  }
 
   $.fn.xwikiSelectize = function(settings) {
-    // Save the width before the input is hidden.
-    // Each input in the current collection might have a different initial width.
-    this.each(function() {
-      $(this).data('initialWidth', $(this).width());
-    });
-    return this.not('.selectized, .selectize-control')
-      .on('initialize', customize)
-      .on('change', function(event) {
-        // Check if the value of the selectize widget is synchronized with the value of the underlying input.
-        if (isSelectizeValueUpToDate(this)) {
-          // Update the live table if the widget is used as a live table filter.
-          var liveTableId = $(this).closest('.xwiki-livetable-display-header-filter')
-            .closest('.xwiki-livetable').attr('id');
-          liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
-        } else {
-          // The input value has been changed outside of the selectize widget. Update the widget.
-          updateSelectizeValue(this);
-        }
-      })
-      // Each input in the current collection might have different in-line settings.
-      .each(function() {
-        // FIXME: Apostrophe in input id breaks the selectize widget. The workaround is to remove the id before creating
-        // the selectize widget and then restore it afterwards. Remove this hack when the reported issue is closed.
-        // See https://github.com/selectize/selectize.js/issues/1568
-        var id = $(this).attr('id');
-        $(this).removeAttr('id');
-
-        $(this).selectize(getSettings($(this), settings));
-
-        if (id) {
-          // Workaround for selectize bug #1568 (see above).
-          this.selectize.get$('control_input').attr('id', id + '-selectized');
-          // We call filter instead of using a CSS selector because the id can contain special characters.
-          $('label').filter(function() {
-            return $(this).attr('for') === id;
-          }).attr('for', id + '-selectized');
-          // Restore the id.
-          $(this).attr('id', id);
-        }
-      })
-      .trigger('initialize')
-      .each(loadSelectedValues);
+    // Each input in the matched collection might have different in-line settings.
+    return this.not('.tomselected, .ts-wrapper').each((index, input) => createTomSelect(input, settings));
   };
+
+  if (!$.fn.selectize) {
+    // We noticed there are contributed XWiki extensions that are requiring / importing the 'xwiki-selectize' module,
+    // expecting to get Selectize as a transitive dependency. This is not the case anymore since we replaced Selectize
+    // with TomSelect. Some of those extensions are calling $(...).selectize() instead of our own function. We make
+    // $.fn.selectize a shortcut for our own function in order to avoid breaking those extensions.
+    $.fn.selectize = $.fn.xwikiSelectize;
+  }
 });
 
 require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {

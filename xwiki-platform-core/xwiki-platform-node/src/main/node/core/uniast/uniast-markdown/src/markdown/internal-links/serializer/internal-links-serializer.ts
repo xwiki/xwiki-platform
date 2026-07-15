@@ -21,17 +21,33 @@ import type { UniAstToMarkdownConverter } from "../../uni-ast-to-markdown-conver
 import type { Link, LinkTarget } from "@xwiki/platform-uniast-api";
 
 /**
- * Serialize internal link and image for a specific backend.
+ * Serialize internal links and images for a specific backend.
  *
- * @since 18.0.0RC1
+ * @beta
+ * @since 18.2.0RC1
  */
 export interface InternalLinksSerializer {
+  /**
+   * Serialize an internal link to Markdown.
+   *
+   * @param content - the link content
+   * @param target - the internal target of the link
+   * @param uniAstToMarkdownConverter - the Markdown converter to convert the link content to markdown
+   * @returns the serialized internal link string
+   */
   serialize(
     content: Link["content"],
     target: Extract<LinkTarget, { type: "internal" }>,
     uniAstToMarkdownConverter: UniAstToMarkdownConverter,
   ): Promise<string>;
 
+  /**
+   * Serialize an internal image to markdown.
+   *
+   * @param target - the internal target of the image
+   * @param alt - the alt text of the image
+   * @returns the serialized internal image string
+   */
   serializeImage(
     target: Extract<LinkTarget, { type: "internal" }>,
     alt?: string,

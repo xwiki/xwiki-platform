@@ -125,7 +125,7 @@ require(['jquery'], function ($) {
     }
   }
 
-  XWiki = window.XWiki || {};
+  const XWiki = globalThis.XWiki = globalThis.XWiki || {};
   XWiki.editors = XWiki.editors || {};
   XWiki.editors.SimpleToolbar = new SimpleToolbar();
   $(document).on('xwiki:dom:updated', function (event, data) {

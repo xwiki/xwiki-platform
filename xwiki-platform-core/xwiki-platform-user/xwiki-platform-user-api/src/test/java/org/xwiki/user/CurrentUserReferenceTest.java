@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * @version $Id$
  */
-public class CurrentUserReferenceTest
+class CurrentUserReferenceTest
 {
     @Test
     void isGlobal()

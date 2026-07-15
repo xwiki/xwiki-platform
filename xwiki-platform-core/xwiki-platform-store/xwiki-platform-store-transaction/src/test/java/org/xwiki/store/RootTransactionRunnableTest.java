@@ -19,7 +19,9 @@
  */
 package org.xwiki.store;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Make sure RootTransactionRunnable cannot be run in a larger TR.
@@ -29,15 +31,19 @@ import org.junit.Test;
  */
 public class RootTransactionRunnableTest
 {
-    @Test(expected = IllegalArgumentException.class)
-    public void runInTest() throws Exception
+    @Test
+    void runInTest()
     {
-        new RootTransactionRunnable().runIn(new TransactionRunnable());
+        RootTransactionRunnable rootTransactionRunnable = new RootTransactionRunnable();
+        TransactionRunnable parentRunnable = new TransactionRunnable();
+        assertThrows(IllegalArgumentException.class, () -> rootTransactionRunnable.runIn(parentRunnable));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void runInAsProviderTest() throws Exception
+    @Test
+    void runInAsProviderTest()
     {
-        new RootTransactionRunnable().asProvider().runIn(new TransactionRunnable());
+        TransactionRunnable provider = new RootTransactionRunnable().asProvider();
+        TransactionRunnable parentRunnable = new TransactionRunnable();
+        assertThrows(IllegalArgumentException.class, () -> provider.runIn(parentRunnable));
     }
 }

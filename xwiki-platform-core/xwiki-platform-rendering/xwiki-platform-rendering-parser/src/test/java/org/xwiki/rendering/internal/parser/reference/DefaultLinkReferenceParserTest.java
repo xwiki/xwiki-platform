@@ -19,9 +19,8 @@
  */
 package org.xwiki.rendering.internal.parser.reference;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.InterWikiResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -29,10 +28,15 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ResourceReferenceParser;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.*;
 
 /**
  * Integration tests for {@link DefaultLinkReferenceParser} in the context of XWiki.
@@ -40,22 +44,23 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 2.6M1
  */
+@ComponentTest
 @AllComponents
-public class DefaultLinkReferenceParserTest
+class DefaultLinkReferenceParserTest
 {
-    @Rule
-    public final MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     private ResourceReferenceParser parser;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
         this.parser = this.componentManager.getInstance(ResourceReferenceParser.class, "link");
     }
 
     @Test
-    public void parseWhenInWikiMode() throws Exception
+    void parseWhenInWikiMode() throws Exception
     {
         // Create a Mock WikiModel implementation so that the link parser works in wiki mode
         WikiModel mockWikiModel = this.componentManager.registerMockComponent(WikiModel.class);

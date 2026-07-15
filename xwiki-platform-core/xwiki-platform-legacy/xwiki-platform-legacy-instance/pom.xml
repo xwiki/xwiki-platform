@@ -25,32 +25,33 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>18.1.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-instance</artifactId>
   <name>XWiki Platform - Legacy - Instance</name>
   <packaging>jar</packaging>
-  <description>xwiki-platform-instance repackaging including legacy aspects</description>
+  <description>xwiki-platform-instance-api repackaging including legacy aspects</description>
   <properties>
     <!-- The features provided by this module so that it's found when resolving extension that pretty much never
          depend on this one -->
     <xwiki.extension.features>
-      org.xwiki.platform:xwiki-platform-instance
+      org.xwiki.platform:xwiki-platform-instance,
+      org.xwiki.platform:xwiki-platform-instance-api
     </xwiki.extension.features>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
-    <!-- Trigger xwiki-platform-instance dependencies (but without xwiki-platform-instance jar itself) -->
+    <!-- Trigger xwiki-platform-instance-api dependencies (but without xwiki-platform-instance-api jar itself) -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-instance</artifactId>
+      <artifactId>xwiki-platform-instance-api</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
     <!-- We need this dependency so that the wrapped module is built before this one -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-instance</artifactId>
+      <artifactId>xwiki-platform-instance-api</artifactId>
       <version>${project.version}</version>
       <!-- We don't want to draw this dependency since we're wrapping it -->
       <scope>provided</scope>
@@ -77,7 +78,7 @@
               <weaveDependencies>
                 <weaveDependency>
                   <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-instance</artifactId>
+                  <artifactId>xwiki-platform-instance-api</artifactId>
                 </weaveDependency>
               </weaveDependencies>
             </configuration>

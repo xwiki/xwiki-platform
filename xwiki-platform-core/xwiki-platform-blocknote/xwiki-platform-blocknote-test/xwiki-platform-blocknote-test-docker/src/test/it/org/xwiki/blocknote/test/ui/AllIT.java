@@ -35,4 +35,29 @@ class AllIT
     class NestedBlockNoteIT extends BlockNoteIT
     {
     }
+
+    @Nested
+    class NestedRoundTripIT extends RoundTripIT
+    {
+    }
+
+    @Nested
+    class NestedImageIT extends ImageIT
+    {
+    }
+
+    @Nested
+    class NestedMacroIT extends MacroIT
+    {
+    }
+
+    @Nested
+    class NestedLinkIT extends LinkIT
+    {
+    }
+
+    @Nested
+    class NestedCollaborationIT extends CollaborationIT
+    {
+    }
 }

@@ -19,7 +19,27 @@
  */
 package com.xpn.xwiki.objects;
 
+import org.xwiki.stability.Unstable;
+
+/**
+ * Property defining a {@link Long}.
+ *
+ * @version $Id$
+ */
 public class LongProperty extends NumberProperty<Long>
 {
+    /**
+     * The type used as a hint to find the property.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Long";
+
     private static final long serialVersionUID = 1L;
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
+    }
 }

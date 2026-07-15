@@ -161,6 +161,16 @@ public class ObjectEditPage extends EditPage
     }
 
     /**
+     * @return {@code true} if the editor has a warning box about deprecated properties.
+     * @since 18.4.0
+     * @since 17.10.9
+     */
+    public boolean hasDeprecatedProperties()
+    {
+        return getDriver().hasElement(By.className("deprecatedProperties"));
+    }
+
+    /**
      * @param className a class name
      * @param propertyName a class field name
      * @return {@code true} if the specified class field is listed as deprecated, {@code false} otherwise
@@ -169,9 +179,9 @@ public class ObjectEditPage extends EditPage
     {
         WebElement xclass = getDriver().findElement(By.id("xclass_" + className));
         List<WebElement> deprecatedPropertiesElements = xclass.findElements(By.className("deprecatedProperties"));
-        if (deprecatedPropertiesElements.size() > 0) {
+        if (!deprecatedPropertiesElements.isEmpty()) {
             String xpath = "//label[. = '" + propertyName + ":']";
-            return deprecatedPropertiesElements.get(0).findElements(By.xpath(xpath)).size() > 0;
+            return !deprecatedPropertiesElements.get(0).findElements(By.xpath(xpath)).isEmpty();
         }
         return false;
     }

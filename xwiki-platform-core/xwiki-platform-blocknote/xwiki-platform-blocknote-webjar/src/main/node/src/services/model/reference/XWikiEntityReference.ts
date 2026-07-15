@@ -20,11 +20,11 @@
 import {
   AttachmentReference,
   DocumentReference,
-  EntityReference,
   EntityType,
   SpaceReference,
   WikiReference,
 } from "@xwiki/platform-model-api";
+import type { EntityReference } from "@xwiki/platform-model-api";
 
 type XWikiEntityReference = {
   name: string;
@@ -57,14 +57,18 @@ declare global {
       serialize: (reference: XWikiEntityReference) => string;
     };
     Document: new (reference: XWikiEntityReference) => {
-      getURL: () => string;
+      getURL: (action?: string, parameters?: URLSearchParams) => string;
     };
     Attachment: new (reference: XWikiEntityReference) => {
       getURL: () => string;
     };
     currentDocument: {
       documentReference: XWikiEntityReference;
+      getURL: (action?: string, parameters?: URLSearchParams) => string;
     };
+    currentWiki: string;
+    contextPath: string;
+    docsyntax: string;
   };
 }
 

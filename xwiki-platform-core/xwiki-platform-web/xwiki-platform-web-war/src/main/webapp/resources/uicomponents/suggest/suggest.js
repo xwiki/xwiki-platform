@@ -105,7 +105,7 @@ var XWiki = (function(XWiki){
     loaderNode: null,
     // A list of key codes for which to propagate the keyboard event.
     // Useful when another keyboard event listener exists on the input field, even if it may be registered at a diferent level.
-    // By default, the handled key events do not propagate, the rest do. See #onKeyPress
+    // By default, the handled key events do not propagate, the rest do. See #onKeyDown
     propagateEventKeyCodes : []
   },
   sInput : "",
@@ -180,12 +180,8 @@ var XWiki = (function(XWiki){
     // Bind the key listeners on the input field.
     this.onKeyUp = this.onKeyUp.bindAsEventListener(this);
     this.fld.observe("keyup", this.onKeyUp);
-    this.onKeyPress = this.onKeyPress.bindAsEventListener(this);
-    if (Prototype.Browser.IE || Prototype.Browser.WebKit || browser.isIE11up) {
-      this.fld.observe("keydown", this.onKeyPress);
-    } else {
-      this.fld.observe("keypress", this.onKeyPress);
-    }
+    this.onKeyDown = this.onKeyDown.bindAsEventListener(this);
+    this.fld.observe("keydown", this.onKeyDown);
 
     // Prevent normal browser autocomplete
     this.fld.setAttribute("autocomplete", "off");
@@ -199,15 +195,14 @@ var XWiki = (function(XWiki){
 
   /**
    * Treats normal characters and triggers the autocompletion behavior. This is needed since the field value is not
-   * updated when keydown/keypress are called, so the suggest would work with the previous value. The disadvantage is
-   * that keyUp is not fired for each stroke in a long keypress, but only once at the end. This is not a real problem,
-   * though.
+   * updated when keyDown is called, so the suggest would work with the previous value. The disadvantage is that keyUp is
+   * not fired for each stroke when the key is kept down, but only once at the end. This is not a real problem, though.
    */
   onKeyUp: function(event)
   {
     var key = event.keyCode;
     switch(key) {
-      // Ignore special keys, which are treated in onKeyPress
+      // Ignore special keys, which are treated in onKeyDown
       case Event.KEY_RETURN:
       case Event.KEY_ESC:
       case Event.KEY_UP:
@@ -239,7 +234,7 @@ var XWiki = (function(XWiki){
    * Treats Up and Down arrows, Enter and Escape, affecting the UI meta-behavior. Enter puts the currently selected
    * value inside the target field, Escape closes the suggest dropdown, Up and Down move the current selection.
    */
-  onKeyPress: function(event) {
+  onKeyDown: function(event) {
     if(!$(this.isActive)) {
       // Let the key events pass through if the UI is not displayed
       return;
@@ -498,7 +493,7 @@ var XWiki = (function(XWiki){
 
     if (!$(this.options.parentContainer).down('.suggestItems')) {
       // If the suggestion top container is not in the DOM already, we create it and inject it
-      
+
       // We populate the suggestion container with information that was not on the page.
       // This meaningful change in the DOM must be announced 
       // so that assistive technology users can notice it without trouble.
@@ -596,13 +591,14 @@ var XWiki = (function(XWiki){
 
           if (typeof source.icon != 'undefined') {
             // If there is an icon for this source group, set it as background image
+            // TODO: Replace with the use of the icon theme (see XWIKI-24323).
             var iconImage = new Image();
             iconImage.onload = function(){
               this.sourceHeader.setStyle({
                 backgroundImage: "url(" + this.iconImage.src + ")"
               });
               this.sourceHeader.setStyle({
-                textIndent:(this.iconImage.width + 6) + 'px'
+                textIndent:(this.iconImage.width + 8) + 'px'
               });
             }.bind({
               sourceHeader:sourceHeader,
@@ -635,6 +631,7 @@ var XWiki = (function(XWiki){
                         && typeof this.options.hideButton.positions === "object"
                         && this.options.hideButton.positions.length > 0;
     if (withEnableButton && !this.container.down('.hide-button')) {
+      // TODO: replace the label "hide suggestions" to an icon (see XWIKI-24324).
       var positions = this.options.hideButton.positions;
       for (var i=0; i< positions.length; i++) {
         var hideButton = new Element('button', {'class' : 'hide-button', 'type' : 'button'})
@@ -1085,11 +1082,7 @@ var XWiki = (function(XWiki){
   detach : function() {
     if (this.fld) {
       Event.stopObserving(this.fld, "keyup", this.onKeyUp);
-      if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
-        Event.stopObserving(this.fld, "keydown", this.onKeyPress);
-      } else {
-        Event.stopObserving(this.fld, "keypress", this.onKeyPress);
-      }
+      Event.stopObserving(this.fld, "keydown", this.onKeyDown);
       this.clearSuggestions();
       this.fld.__x_suggest = null;
       this.fld.setAttribute("autocomplete", "on");

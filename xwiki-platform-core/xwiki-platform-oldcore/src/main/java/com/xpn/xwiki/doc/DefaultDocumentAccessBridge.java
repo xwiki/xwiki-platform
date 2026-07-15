@@ -67,6 +67,8 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 @Singleton
 public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 {
+    private static final String FAILED_TO_GET_PROPERTY = "Failed to get property";
+
     private static final LocalDocumentReference USERCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
 
     @Inject
@@ -399,7 +401,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;
@@ -424,7 +426,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;
@@ -450,7 +452,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;
@@ -476,7 +478,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;
@@ -502,7 +504,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;
@@ -527,7 +529,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;
@@ -539,7 +541,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         List<Object> result;
         try {
             XWikiContext xcontext = getContext();
-            result = new ArrayList<Object>(
+            result = new ArrayList<>(
                 xcontext.getWiki().getDocument(documentReference, xcontext).getObject(className).getFieldList());
         } catch (Exception ex) {
             result = Collections.emptyList();
@@ -715,7 +717,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         List<XWikiAttachment> attachments =
             xcontext.getWiki().getDocument(documentReference, xcontext).getAttachmentList();
 
-        List<AttachmentReference> attachmentReferences = new ArrayList<AttachmentReference>(attachments.size());
+        List<AttachmentReference> attachmentReferences = new ArrayList<>(attachments.size());
         for (XWikiAttachment attachment : attachments) {
             attachmentReferences.add(attachment.getReference());
         }
@@ -847,7 +849,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Deprecated
     public List<String> getAttachmentURLs(DocumentReference documentReference, boolean isFullURL) throws Exception
     {
-        List<String> urls = new ArrayList<String>();
+        List<String> urls = new ArrayList<>();
         for (AttachmentReference attachmentReference : getAttachmentReferences(documentReference)) {
             urls.add(getAttachmentURL(attachmentReference, isFullURL));
         }
@@ -998,6 +1000,13 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = this.readonlyContextProvider.get();
         return xcontext != null ? xcontext.getAuthorReference() : null;
+    }
+
+    @Override
+    public int getLocalReferenceMaxLength()
+    {
+        XWikiContext xWikiContext = this.readonlyContextProvider.get();
+        return xWikiContext.getWiki().getStore().getLimitSize(xWikiContext, XWikiDocument.class, "fullName");
     }
 
     /**

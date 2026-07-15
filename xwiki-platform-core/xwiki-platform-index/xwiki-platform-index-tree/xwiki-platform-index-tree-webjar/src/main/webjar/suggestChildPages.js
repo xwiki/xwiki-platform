@@ -25,7 +25,7 @@
 (function(pageIcon, webHome) {
   "use strict";
 
-define('xwiki-suggestChildPages', ['jquery', 'jquery-ui', 'jquery-ui-touch-punch', 'xwiki-selectize'], function($) {
+define('xwiki-suggestChildPages', ['jquery', 'jquery-ui', 'xwiki-selectize'], function($) {
   webHome = webHome || 'WebHome';
 
   function getSelectizeOptions(select) {

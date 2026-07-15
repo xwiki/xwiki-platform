@@ -36,6 +36,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -108,7 +109,7 @@ public class LiveTableLiveDataPropertyStore extends WithParameters implements Li
             // Load property descriptors for properties of extra classes that are specified in the form
             // <property>_class=My.Class.
             if (key.endsWith(CLASS_SUFFIX) && parameter.getValue() instanceof String className) {
-                String propertyName = StringUtils.removeEnd(key, CLASS_SUFFIX);
+                String propertyName = Strings.CS.removeEnd(key, CLASS_SUFFIX);
                 getPropertyDescriptor(className, propertyName).ifPresent(properties::add);
             }
         }

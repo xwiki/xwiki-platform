@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications-notifiers</artifactId>
-    <version>18.1.0-SNAPSHOT</version>
+    <version>18.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-notifications-notifiers-api</artifactId>
   <name>XWiki Platform - Notifications - Notifiers - API</name>
@@ -34,7 +34,7 @@
     <!-- Skipping revapi since xwiki-platform-legacy-notifications-notifiers-api wraps this module and runs checks on it
      -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.79</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

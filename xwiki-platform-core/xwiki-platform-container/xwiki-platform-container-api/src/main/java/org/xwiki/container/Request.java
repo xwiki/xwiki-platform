@@ -45,7 +45,7 @@ public interface Request
      * @since 17.0.0RC1
      */
     @Unstable
-    public static final String ATTRIBUTE_EFFECTIVE_AUTHOR = Request.class.getName() + "#effectiveAuthor";
+    String ATTRIBUTE_EFFECTIVE_AUTHOR = Request.class.getName() + "#effectiveAuthor";
 
     /**
      * Returns the value of a request parameter as a <code>String</code>, or <code>null</code> if the parameter does not
@@ -174,6 +174,8 @@ public interface Request
     // Deprecated
 
     /**
+     * @param key the name of the property to look up
+     * @return the value of the matching request parameter or attribute, or {@code null} if none exists
      * @deprecated use {@link #getParameter(String)} or {@link #getAttribute(String)} instead depending on the need
      */
     @Deprecated(since = "17.0.0RC1")
@@ -191,6 +193,8 @@ public interface Request
     }
 
     /**
+     * @param key the name of the properties to look up
+     * @return the values of the matching request parameters and attributes
      * @deprecated use {@link #getParameterValues(String)} or {@link #getAttribute(String)} instead depending on the
      *             need
      * @since 3.2M3
@@ -214,6 +218,8 @@ public interface Request
     }
 
     /**
+     * @param key the name of the property to set
+     * @param value the value to set
      * @deprecated use {@link #setAttribute(String, Object)} instead
      */
     @Deprecated(since = "17.0.0RC1")
@@ -223,6 +229,7 @@ public interface Request
     }
 
     /**
+     * @param key the name of the property to remove
      * @deprecated use {@link #removeAttribute(String)} instead
      */
     @Deprecated(since = "17.0.0RC1")

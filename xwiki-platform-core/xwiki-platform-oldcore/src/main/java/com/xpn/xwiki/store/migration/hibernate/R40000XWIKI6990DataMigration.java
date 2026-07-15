@@ -116,6 +116,16 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     /** Mark internal mapping. */
     private static final String INTERNAL = "internal";
 
+    private static final String TIME_ELAPSED_COLLECTION_MESSAGE = "Time elapsed for {} collection: {} ms";
+
+    private static final String TIME_ELAPSED_CLASS_MESSAGE = "Time elapsed for {} class: {} ms";
+
+    private static final String CHANGESET_START = "  <changeSet id=\"R";
+
+    private static final String CHANGESET_END = "  </changeSet>\n";
+
+    private static final String ELEMENT_CLOSE = "\"/>\n";
+
     /** Stub statistic class used to compute new ids from existing objects. */
     private static final class StatsIdComputer extends XWikiStats
     {
@@ -125,7 +135,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         private String name;
 
         /** Number of the statistic. */
-        private int number;
+        private int statNumber;
 
         /**
          * Return the new identifier for a statistic having given name and number.
@@ -137,7 +147,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         public long getId(String name, int number)
         {
             this.name = name;
-            this.number = number;
+            this.statNumber = number;
             return super.getId();
         }
 
@@ -150,7 +160,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         @Override
         public int getNumber()
         {
-            return this.number;
+            return this.statNumber;
         }
     }
 
@@ -223,21 +233,21 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         public static final String DOCID = "docId";
 
         /** The old identifier. */
-        private long oldId;
+        private long currentOldId;
 
         /** The new identifier. */
-        private long newId;
+        private long currentNewId;
 
         @Override
         public void setNewId(long newId)
         {
-            this.newId = newId;
+            this.currentNewId = newId;
         }
 
         @Override
         public void setOldId(long oldId)
         {
-            this.oldId = oldId;
+            this.currentOldId = oldId;
         }
 
         @Override
@@ -276,7 +286,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             sb.append("update ").append(name).append(" klass set klass.").append(field).append('=').append(':')
                 .append(NEWID).append(" where klass.").append(field).append('=').append(':').append(OLDID);
             long now = System.nanoTime();
-            this.session.createQuery(sb.toString()).setParameter(NEWID, this.newId).setParameter(OLDID, this.oldId)
+            this.session.createQuery(sb.toString()).setParameter(NEWID, this.currentNewId).setParameter(OLDID, this.currentOldId)
                 .executeUpdate();
             return System.nanoTime() - now;
         }
@@ -294,7 +304,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             sb.append("UPDATE ").append(name).append(" SET ").append(field).append('=').append(':').append(NEWID)
                 .append(" WHERE ").append(field).append('=').append(':').append(OLDID);
             long now = System.nanoTime();
-            this.session.createSQLQuery(sb.toString()).setParameter(NEWID, this.newId).setParameter(OLDID, this.oldId)
+            this.session.createSQLQuery(sb.toString()).setParameter(NEWID, this.currentNewId).setParameter(OLDID, this.currentOldId)
                 .executeUpdate();
             return System.nanoTime() - now;
         }
@@ -761,16 +771,16 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             if (this.logger.isDebugEnabled()) {
                 int timer = 0;
                 for (String[] coll : docsColl) {
-                    this.logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++] / 1000000);
+                    this.logger.debug(TIME_ELAPSED_COLLECTION_MESSAGE, coll[0], times[timer++] / 1000000);
                 }
                 for (Class<?> doclinkClass : DOCLINK_CLASSES) {
-                    this.logger.debug("Time elapsed for {} class: {} ms", doclinkClass.getName(),
+                    this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, doclinkClass.getName(),
                         times[timer++] / 1000000);
                 }
-                this.logger.debug("Time elapsed for {} class: {} ms", XWikiRCSNodeInfo.class.getName(),
+                this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, XWikiRCSNodeInfo.class.getName(),
                     times[timer++] / 1000000);
-                this.logger.debug("Time elapsed for {} class: {} ms", XWikiDocument.class.getName(),
-                    times[timer++] / 1000000);
+                this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, XWikiDocument.class.getName(),
+                    times[timer] / 1000000);
             }
 
             logProgress("All document IDs has been converted successfully.");
@@ -839,7 +849,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             if (this.logger.isDebugEnabled()) {
                 int timer = 0;
                 for (String[] coll : objsColl) {
-                    this.logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++] / 1000000);
+                    this.logger.debug(TIME_ELAPSED_COLLECTION_MESSAGE, coll[0], times[timer++] / 1000000);
                 }
                 for (String customMappedClass : customClassToProcess) {
                     this.logger.debug("Time elapsed for {} custom table: {} ms", customMappedClass,
@@ -849,8 +859,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     this.logger.debug("Time elapsed for {} property table: {} ms", propertyClass,
                         times[timer++] / 1000000);
                 }
-                this.logger.debug("Time elapsed for {} class: {} ms", BaseObject.class.getName(),
-                    times[timer++] / 1000000);
+                this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, BaseObject.class.getName(),
+                    times[timer] / 1000000);
             }
 
             logProgress("All object IDs has been converted successfully.");
@@ -887,10 +897,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 if (this.logger.isDebugEnabled()) {
                     int timer = 0;
                     for (String[] coll : statsColl) {
-                        this.logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++] / 1000000);
+                        this.logger.debug(TIME_ELAPSED_COLLECTION_MESSAGE, coll[0], times[timer++] / 1000000);
                     }
-                    this.logger.debug("Time elapsed for {} class: {} ms", statsClass.getName(),
-                        times[timer++] / 1000000);
+                    this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, statsClass.getName(),
+                        times[timer] / 1000000);
                 }
 
                 logProgress("All %s statistics IDs has been converted successfully.", klassName);
@@ -935,7 +945,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             sb.append("\"  constraintName=\"").append(pkName);
         }
 
-        sb.append("\"/>\n");
+        sb.append(ELEMENT_CLOSE);
     }
 
     /**
@@ -964,7 +974,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             sb.append("\"  constraintName=\"").append(pkName);
         }
 
-        sb.append("\"/>\n");
+        sb.append(ELEMENT_CLOSE);
     }
 
     /**
@@ -976,7 +986,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     private void appendDropIndex(StringBuilder sb, Index index)
     {
         sb.append("    <dropIndex indexName=\"").append(index.getName()).append("\"  tableName=\"")
-            .append(index.getTable().getName()).append("\"/>\n");
+            .append(index.getTable().getName()).append(ELEMENT_CLOSE);
     }
 
     /**
@@ -993,7 +1003,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         Iterator<Column> columns = index.getColumnIterator();
         while (columns.hasNext()) {
             Column column = columns.next();
-            sb.append("      <column name=\"").append(column.getName()).append("\"/>\n");
+            sb.append("      <column name=\"").append(column.getName()).append(ELEMENT_CLOSE);
         }
 
         sb.append("</createIndex>\n");
@@ -1030,7 +1040,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     {
         String tableName = table.getName();
 
-        sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion()).append('-')
+        sb.append(CHANGESET_START).append(this.getVersion().getVersion()).append('-')
             .append(Util.getHash(String.format("modifyDataType-%s-%s", table, column))).append("\" author=\"xwiki\">\n")
             .append("    <comment>Upgrade identifier [").append(column).append("] from table [").append(tableName)
             .append("] to BIGINT type</comment >\n");
@@ -1063,7 +1073,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             }
         }
 
-        sb.append("  </changeSet>\n");
+        sb.append(CHANGESET_END);
         this.logCount++;
     }
 
@@ -1153,7 +1163,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         // Preamble
         String tableName = table.getName();
-        sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion()).append('-')
+        sb.append(CHANGESET_START).append(this.getVersion().getVersion()).append('-')
             .append(Util.getHash(String.format("dropForeignKeyConstraint-%s", tableName)))
             .append("\" author=\"xwiki\" runOnChange=\"true\" runAlways=\"true\" failOnError=\"false\">\n")
             .append("    <comment>Drop foreign keys on table [").append(tableName).append("]</comment>\n");
@@ -1169,7 +1179,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             }
         }
         // All done!
-        sb.append("  </changeSet>\n");
+        sb.append(CHANGESET_END);
         this.logCount++;
     }
 
@@ -1186,7 +1196,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         // Preamble
         String tableName = table.getName();
-        sb.append("  <changeSet id=\"R").append(this.getVersion().getVersion()).append('-')
+        sb.append(CHANGESET_START).append(this.getVersion().getVersion()).append('-')
             .append(Util.getHash(String.format("addForeignKeyConstraint-%s", tableName)))
             .append("\" author=\"xwiki\" runOnChange=\"true\" runAlways=\"true\">\n")
             .append("    <comment>Add foreign keys on table [").append(tableName)
@@ -1236,7 +1246,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             }
         }
         // All done!
-        sb.append("  </changeSet>\n");
+        sb.append(CHANGESET_END);
         this.logCount++;
     }
 
@@ -1263,7 +1273,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             return (String) query.uniqueResult()[1];
         });
 
-        this.isMySQLMyISAM = (createTable != null && createTable.equals("MyISAM"));
+        this.isMySQLMyISAM = "MyISAM".equals(createTable);
     }
 
     @Override

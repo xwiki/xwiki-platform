@@ -38,6 +38,21 @@ import org.xwiki.rest.model.jaxb.Object;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/objects/{className}/{objectNumber}")
 public interface ObjectResource
 {
+    /**
+     * Retrieves an object attached to a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the object, for example {@code WebHome}
+     * @param className the reference of the XClass of the object to retrieve, for example {@code XWiki.XWikiUsers}
+     * @param objectNumber the number identifying the object among those of the same class on the page; object numbers
+     *  are 0-based and assigned in creation order, so a value that no object carries yields a {@code 404} response
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's
+     *  display name), at some extra cost; defaults to {@code false}
+     * @return the requested object
+     * @throws XWikiRestException if the object cannot be retrieved from the store
+     */
     @GET Object getObject(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -47,6 +62,23 @@ public interface ObjectResource
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;
 
+    /**
+     * Updates an object attached to a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the object, for example {@code WebHome}
+     * @param className the reference of the XClass of the object to update, for example {@code XWiki.XWikiUsers}
+     * @param objectNumber the number identifying the object among those of the same class on the page; object numbers
+     *  are 0-based and assigned in creation order, so a value that no object carries yields a {@code 404} response
+     * @param minorRevision when {@code true}, saves the change as a minor version; when {@code null} (the default) or
+     *  {@code false}, saves it as a normal (major) version
+     * @param object the new state of the object; its property values replace those of the stored object
+     * @return a response with status {@code 202} holding the updated object
+     * @throws XWikiRestException if the object cannot be updated, for example the current user is not allowed to edit
+     *  the page
+     */
     @PUT Response updateObject(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -57,6 +89,19 @@ public interface ObjectResource
             Object object
     ) throws XWikiRestException;
 
+    /**
+     * Deletes an object attached to a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the object, for example {@code WebHome}
+     * @param className the reference of the XClass of the object to delete, for example {@code XWiki.XWikiUsers}
+     * @param objectNumber the number identifying the object among those of the same class on the page; object numbers
+     *  are 0-based and assigned in creation order, so a value that no object carries yields a {@code 404} response
+     * @throws XWikiRestException if the object cannot be deleted, for example the current user is not allowed to edit
+     *  the page
+     */
     @DELETE void deleteObject(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

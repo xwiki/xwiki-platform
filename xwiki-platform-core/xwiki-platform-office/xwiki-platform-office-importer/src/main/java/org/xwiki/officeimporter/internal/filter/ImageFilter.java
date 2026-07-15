@@ -197,7 +197,7 @@ public class ImageFilter extends AbstractHTMLFilter
                 concerns "&" character.
                 Finally '@' is used in XWiki Syntax so it needs to be escaped to build the link properly.
                  */
-                fileName = fileName.replaceAll("\\+", "%2B");
+                fileName = fileName.replace("+", "%2B");
                 // We have to decode the image file name in case it contains URL special characters.
                 fileName = URLDecoder.decode(fileName, UTF_8);
             } catch (Exception e) {

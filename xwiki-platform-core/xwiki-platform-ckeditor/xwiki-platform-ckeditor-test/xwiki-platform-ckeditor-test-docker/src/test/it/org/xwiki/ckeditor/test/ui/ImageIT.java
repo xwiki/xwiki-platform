@@ -36,19 +36,12 @@ import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.LinkDialog;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
-import org.xwiki.ckeditor.test.po.image.ImageDialogEditModal;
-import org.xwiki.ckeditor.test.po.image.ImageDialogSelectModal;
-import org.xwiki.ckeditor.test.po.image.edit.ImageDialogAdvancedEditForm;
-import org.xwiki.ckeditor.test.po.image.edit.ImageDialogStandardEditForm;
-import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
-import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestLocalReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -58,6 +51,12 @@ import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
+import org.xwiki.wysiwyg.test.po.image.ImageDialogSelectModal;
+import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogAdvancedEditForm;
+import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogStandardEditForm;
+import org.xwiki.wysiwyg.test.po.image.select.ImageDialogIconSelectForm;
+import org.xwiki.wysiwyg.test.po.image.select.ImageDialogUrlSelectForm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -92,9 +91,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 class ImageIT extends AbstractCKEditorIT
 {
     @BeforeAll
-    void beforeAll(TestUtils setup, TestConfiguration testConfiguration) throws Exception {
+    void beforeAll(TestUtils setup) throws Exception {
         setup.loginAsSuperAdmin();
-        waitForSolrIndexing(setup, testConfiguration);
+        waitForSolrIndexing(setup);
     }
     
     @BeforeEach
@@ -439,11 +438,14 @@ class ImageIT extends AbstractCKEditorIT
 
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
-        editor.getToolBar().insertOrEditLink().setResourceValue("doc:", false).submit();
+        LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
+        // The reference (suggest) input is focused when the link dialog is opened so the dropdown is opened.
+        linkDialog.getResourceSuggestInput().waitForSuggestions().hideSuggestions();
+        linkDialog.submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
-        assertEquals("[[~[~[image:image.gif~]~]>>doc:]]", savedPage.editWiki().getContent());
+        assertEquals("[[~[~[image:image.gif~]~]>>]]", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -471,7 +473,7 @@ class ImageIT extends AbstractCKEditorIT
 
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
-        editor.getToolBar().insertOrEditLink().setResourceValue("doc:Main.WebHome", false).submit();
+        editor.getToolBar().insertOrEditLink().setResourceReference("Main.WebHome").createLinkOfNewPage(true).submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
@@ -495,10 +497,10 @@ class ImageIT extends AbstractCKEditorIT
 
         // Verify that the link is still set.
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
-        LinkDialog linkSelectorModal = editor.getToolBar().insertOrEditLink();
-        assertEquals("doc", linkSelectorModal.getSelectedResourceType());
-        assertEquals("Main.WebHome", linkSelectorModal.getSelectedResourceReference());
-        linkSelectorModal.cancel();
+        LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
+        assertEquals(List.of("xwiki:Main.WebHome"),
+            linkDialog.getResourceSuggestInput().waitForSuggestions().hideSuggestions().getValues());
+        linkDialog.cancel();
 
         // Change the caption to ensure that saving again works.
         editor.executeOnEditedContent(

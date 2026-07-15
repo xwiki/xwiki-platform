@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.EntityReference;
@@ -74,7 +75,7 @@ public class WikiMacroParameterObjectRequiredRightAnalyzer implements RequiredRi
         String type = object.getStringValue(PARAMETER_TYPE_PROPERTY);
         try {
             // Only check types that contain "<" to avoid parsing types that cannot be the list block type.
-            if (PARAMETER_TYPE_WIKI.equals(type) || (StringUtils.contains(type, "<") && Block.LIST_BLOCK_TYPE.equals(
+            if (PARAMETER_TYPE_WIKI.equals(type) || (Strings.CS.contains(type, "<") && Block.LIST_BLOCK_TYPE.equals(
                 ReflectionUtils.unserializeType(type, Thread.currentThread().getContextClassLoader()))))
             {
                 results.addAll(analyzeWikiContent(object, PARAMETER_DEFAULT_VALUE_PROPERTY));

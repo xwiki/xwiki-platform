@@ -25,3 +25,4 @@ export {
 } from "./component-init";
 export { type MarkdownToUniAstConverter } from "./markdown/markdown-to-uni-ast-converter";
 export { type UniAstToMarkdownConverter } from "./markdown/uni-ast-to-markdown-converter";
+export { type InternalLinksSerializer } from "./markdown/internal-links/serializer/internal-links-serializer";

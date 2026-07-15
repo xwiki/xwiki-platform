@@ -118,6 +118,45 @@ test("beforeUpdate can rewrite the URL written into the content", async ({
   ).toHaveText("2nd");
 });
 
+// eslint-disable-next-line max-statements
+test("Submitting a raw URL builds a url resource reference for beforeUpdate", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteWithLinkEditionHooks
+      content={buildParagraphWithLink()}
+      captureReference
+    />,
+  );
+
+  const editorEl = component.locator(".bn-editor");
+  const linkEl = editorEl.locator('a[href="https://xwiki.org"]');
+  await linkEl.waitFor({ state: "attached" });
+
+  // Hover the link to trigger the link toolbar, then open the edit popover.
+  await linkEl.hover();
+  const editLinkButtonEl = page.locator('button[data-test="editLink"]');
+  await editLinkButtonEl.waitFor({ state: "attached" });
+  await editLinkButtonEl.click();
+
+  // Type a new raw URL and submit it.
+  const searchBoxInputEl = page.locator('input[data-test="searchBoxInput"]');
+  await searchBoxInputEl.waitFor({ state: "attached" });
+  await searchBoxInputEl.fill("https://example.com/");
+  await searchBoxInputEl.press("Enter");
+
+  // beforeUpdate received a url-typed resource reference pointing at the raw URL.
+  await expect(page.locator('[data-test="capturedReference"]')).toHaveText(
+    JSON.stringify({
+      type: "url",
+      typed: false,
+      reference: "https://example.com/",
+      parameters: {},
+    }),
+  );
+});
+
 function buildParagraphWithLink(): BlockType[] {
   return [
     {

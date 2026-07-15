@@ -61,14 +61,16 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
   }, [linkToolbarProps.url, linkToolbarProps.text, linkEditionHooks]);
 
   const updateLink = useCallback(
-    ({ title, url }: LinkData) => {
-      // Let the integration intercept the link before it is written into the content. Throwing from
-      // the hook cancels the edition.
-      const linkData = linkEditionHooks?.beforeUpdate?.({ title, url }) ?? {
-        title,
-        url,
-      };
-      editLink(linkData.url, linkData.title, linkToolbarProps.range.from);
+    (linkData: LinkData) => {
+      // Let the integration intercept the link (including its resource reference) before it is written
+      // into the content. Throwing from the hook cancels the edition.
+      const updatedLinkData =
+        linkEditionHooks?.beforeUpdate?.(linkData) ?? linkData;
+      editLink(
+        updatedLinkData.url,
+        updatedLinkData.title,
+        linkToolbarProps.range.from,
+      );
     },
     [editLink, linkEditionHooks, linkToolbarProps.range.from],
   );

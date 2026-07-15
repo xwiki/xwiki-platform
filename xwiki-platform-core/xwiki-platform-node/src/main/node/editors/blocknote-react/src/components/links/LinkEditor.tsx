@@ -35,6 +35,7 @@ import { useTranslation } from "react-i18next";
 import { RiFileLine, RiText } from "react-icons/ri";
 import type { ModelReferenceSerializerProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLParserProvider } from "@xwiki/platform-model-remote-url-api";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Container } from "inversify";
 
 /**
@@ -46,6 +47,12 @@ import type { Container } from "inversify";
 type LinkData = {
   title: string;
   url: string;
+  /**
+   * The XWiki resource reference the link points to, built from the user's selection (a raw URL, a
+   * suggestion or a typed entity reference). It rides alongside the URL so the integration can persist
+   * it without having to parse the URL back into a reference.
+   */
+  reference?: ResourceReference;
 };
 
 type LinkEditorProps = {
@@ -65,15 +72,23 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
 
   const [title, setTitle] = useState(current?.title ?? "");
   const [url, setUrl] = useState(current?.url ?? "");
+  // Initialized from the incoming data so a title-only edit preserves the reference injected by the
+  // beforeEdit hook; updated whenever the user picks a new target in the search box.
+  const [reference, setReference] = useState(current?.reference);
 
   const submit = useCallback(
-    (overrides?: { title?: string; url?: string }) => {
+    (overrides?: {
+      title?: string;
+      url?: string;
+      reference?: ResourceReference;
+    }) => {
       updateLink({
         title: overrides?.title ?? title,
         url: overrides?.url ?? url,
+        reference: overrides?.reference ?? reference,
       });
     },
-    [updateLink, title, url],
+    [updateLink, title, url, reference],
   );
 
   const suggestLinks = useCallback(
@@ -135,8 +150,15 @@ export const LinkEditor: React.FC<LinkEditorProps> = ({
             </Text>
           </Stack>
         )}
-        onSelect={(url) => (creationMode ? submit({ url }) : setUrl(url))}
-        onSubmit={(url) => submit({ url })}
+        onSelect={(url, reference) => {
+          if (creationMode) {
+            submit({ url, reference });
+          } else {
+            setUrl(url);
+            setReference(reference);
+          }
+        }}
+        onSubmit={(url, reference) => submit({ url, reference })}
       />
 
       {!creationMode && (

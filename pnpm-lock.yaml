@@ -3071,6 +3071,9 @@ importers:
       '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../core/model/model-remote-url/model-remote-url-api
+      '@xwiki/platform-rendering-api':
+        specifier: workspace:*
+        version: link:../../core/rendering/rendering-api
       '@xwiki/platform-syntaxes-config':
         specifier: workspace:*
         version: link:../../core/syntaxes/syntaxes-config

@@ -33,7 +33,8 @@
   /* Remove rounded corners on the left so that the transition is seamless. */
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  padding: 4px .5em;
+  /* No vertical padding: keep the block as close as possible to its pre-button-group height. */
+  padding: 0 .5em;
 }
 
 .location-edit {

@@ -72,8 +72,8 @@ public class DefaultLiveDataSourceManager implements LiveDataSourceManager
         if (cm != null && cm.hasComponent(LiveDataSource.class, sourceConfig.getId())) {
             try {
                 LiveDataSource liveDataSource = cm.getInstance(LiveDataSource.class, sourceConfig.getId());
-                if (liveDataSource instanceof WithParameters) {
-                    ((WithParameters) liveDataSource).getParameters().putAll(sourceConfig.getParameters());
+                if (liveDataSource instanceof WithParameters withParameters) {
+                    withParameters.getParameters().putAll(sourceConfig.getParameters());
                 }
                 return Optional.of(liveDataSource);
             } catch (ComponentLookupException e) {

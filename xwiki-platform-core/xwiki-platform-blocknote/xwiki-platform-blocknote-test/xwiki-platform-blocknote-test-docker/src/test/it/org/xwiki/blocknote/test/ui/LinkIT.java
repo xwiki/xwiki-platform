@@ -246,7 +246,7 @@ class LinkIT extends AbstractBlockNoteIT
         assertEquals("""
             (%% style="color:default;background-color:default;text-align:left" %%)
             First [[second>>doc:%s]] third fourth"""
-            .formatted(serialize(targetPage)), wikiEditor.getContent());
+            .formatted(setup.serializeReference(targetPage)), wikiEditor.getContent());
     }
 
     @Test
@@ -290,7 +290,7 @@ class LinkIT extends AbstractBlockNoteIT
         assertEquals("""
             (%% style="color:default;background-color:default;text-align:left" %%)
             First [[second>>attach:%s@%s]] third fourth"""
-            .formatted(serialize(targetPage), attachmentName), wikiEditor.getContent());
+            .formatted(setup.serializeReference(targetPage), attachmentName), wikiEditor.getContent());
     }
 
     @Test
@@ -412,7 +412,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Start fresh.
         setup.deletePage(testReference);
         setup.createPage(testReference,
-            "First [[second>>doc:%s]] third fourth".formatted(serialize(oldTargetPage)));
+            "First [[second>>doc:%s]] third fourth".formatted(setup.serializeReference(oldTargetPage)));
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -439,7 +439,7 @@ class LinkIT extends AbstractBlockNoteIT
         assertEquals("""
             (%% style="color:default;background-color:default;text-align:left" %%)
             First [[second>>doc:%s]] third fourth"""
-            .formatted(serialize(newTargetPage)), wikiEditor.getContent());
+            .formatted(setup.serializeReference(newTargetPage)), wikiEditor.getContent());
     }
 
     @Test
@@ -465,7 +465,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Start fresh.
         setup.deletePage(testReference);
         setup.createPage(testReference,
-            "First [[second>>attach:%s@%s]] third fourth".formatted(serialize(oldTargetPage), attachmentName));
+            "First [[second>>attach:%s@%s]] third fourth".formatted(setup.serializeReference(oldTargetPage), attachmentName));
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -493,7 +493,7 @@ class LinkIT extends AbstractBlockNoteIT
         assertEquals("""
             (%% style="color:default;background-color:default;text-align:left" %%)
             First [[second>>attach:%s@%s]] third fourth"""
-            .formatted(serialize(newTargetPage), attachmentName), wikiEditor.getContent());
+            .formatted(setup.serializeReference(newTargetPage), attachmentName), wikiEditor.getContent());
     }
 
     @Test
@@ -528,21 +528,6 @@ class LinkIT extends AbstractBlockNoteIT
         assertEquals("""
             (% style="color:default;background-color:default;text-align:left" %)
             First [[second>>mailto:other@xwiki.org]] third fourth""", wikiEditor.getContent());
-    }
-
-    /**
-     * Serializes the given reference the way {@code XWiki.Model.serialize()} would (i.e., including the wiki name).
-     *
-     * @param reference the reference to serialize
-     * @return the serialized reference
-     */
-    private String serialize(DocumentReference reference)
-    {
-        String spacePath = reference.getLastSpaceReference().getReversedReferenceChain().stream()
-            .filter(ref -> ref.getType() == EntityType.SPACE)
-            .map(EntityReference::getName)
-            .collect(Collectors.joining("."));
-        return reference.getWikiReference().getName() + ':' + spacePath + '.' + reference.getName();
     }
 
     /**

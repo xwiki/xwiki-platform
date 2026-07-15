@@ -18,6 +18,10 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script type="module" lang="ts">
+// NOTE: type="module" is required to export types from within a Vue component file
+// Given the types defined here are only relevant to this specific component, extracting
+// to a separate file would mean more code scatter.
+
 type SearchLinkSuggestion<T, U> = {
   value: T;
   renderingData: U;

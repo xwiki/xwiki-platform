@@ -168,11 +168,9 @@ public class DocumentContentAsyncExecutor
     {
         // Traverse the XDOM and adapt all image and heading blocks.
         content.getBlocks(block -> {
-            if (block instanceof ImageBlock) {
-                ImageBlock imageBlock = (ImageBlock) block;
+            if (block instanceof ImageBlock imageBlock) {
                 imageBlock.setId(adaptId(idGenerator, imageBlock.getId()));
-            } else if (block instanceof HeaderBlock) {
-                HeaderBlock headerBlock = (HeaderBlock) block;
+            } else if (block instanceof HeaderBlock headerBlock) {
                 headerBlock.setId(adaptId(idGenerator, headerBlock.getId()));
             }
             return false;

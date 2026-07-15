@@ -93,9 +93,8 @@ public class DefaultWikiComponentManagerEventListener extends AbstractEventListe
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (source instanceof DocumentModelBridge) {
+        if (source instanceof DocumentModelBridge document) {
             // Get the document reference
-            DocumentModelBridge document = (DocumentModelBridge) source;
             DocumentReference documentReference = document.getDocumentReference();
 
             if (event instanceof  DocumentCreatedEvent || event instanceof DocumentUpdatedEvent) {

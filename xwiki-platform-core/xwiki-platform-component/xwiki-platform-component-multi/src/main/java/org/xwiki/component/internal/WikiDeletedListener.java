@@ -82,9 +82,9 @@ public class WikiDeletedListener implements EventListener
         ComponentManager componentManager =
             this.componentManagerManager.getComponentManager(new WikiNamespace(wiki).serialize(), false);
 
-        if (componentManager instanceof Disposable) {
+        if (componentManager instanceof Disposable disposable) {
             try {
-                ((Disposable) componentManager).dispose();
+                disposable.dispose();
             } catch (ComponentLifecycleException e) {
                 this.logger.error(String.format("Failed to dispose component manager for wiki [%s]", wiki), e);
             }

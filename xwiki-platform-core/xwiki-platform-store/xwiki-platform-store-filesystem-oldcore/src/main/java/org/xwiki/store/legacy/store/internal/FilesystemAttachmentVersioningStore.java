@@ -87,8 +87,8 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
         try {
             return this.loadArchive(attachment, this.fileTools.getAttachmentFileProvider(attachment.getReference()));
         } catch (Exception e) {
-            if (e instanceof XWikiException) {
-                throw (XWikiException) e;
+            if (e instanceof XWikiException xWikiException) {
+                throw xWikiException;
             }
             final Object[] args = { attachment.getFilename(), UNKNOWN_NAME };
             if (attachment.getDoc() != null) {
@@ -156,8 +156,8 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
         try {
             this.getArchiveSaveRunnable(archive, context).start();
         } catch (Exception e) {
-            if (e instanceof XWikiException) {
-                throw (XWikiException) e;
+            if (e instanceof XWikiException xWikiException) {
+                throw xWikiException;
             }
             final Object[] args = { UNKNOWN_NAME, UNKNOWN_NAME };
             if (archive.getAttachment() != null) {
@@ -209,8 +209,8 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
             final XWikiAttachmentArchive archive = this.loadArchive(attachment, context, bTransaction);
             this.getArchiveDeleteRunnable(archive).start();
         } catch (Exception e) {
-            if (e instanceof XWikiException) {
-                throw (XWikiException) e;
+            if (e instanceof XWikiException xWikiException) {
+                throw xWikiException;
             }
             final Object[] args = { attachment.getFilename(), UNKNOWN_NAME };
             if (attachment.getDoc() != null) {

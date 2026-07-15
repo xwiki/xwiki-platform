@@ -93,8 +93,8 @@ public class DefaultWikiObjectComponentManagerEventListener extends AbstractEven
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof AbstractDocumentEvent) {
-            handleDocumentEvents((AbstractDocumentEvent) event, (XWikiDocument) source);
+        if (event instanceof AbstractDocumentEvent documentEvent) {
+            handleDocumentEvents(documentEvent, (XWikiDocument) source);
 
             /*
              * If we are at application startup time, we have to instantiate every document or object that we can find

@@ -19,6 +19,7 @@
  */
 import { BlockNoteForTest } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
+import { useState } from "react";
 import type { BlockType } from "../../blocknote";
 
 /**
@@ -32,22 +33,37 @@ export const BlockNoteWithLinkEditionHooks: React.FC<{
   beforeEditTitle?: string;
   // When set, beforeUpdate returns the current link data with this url, to change what is persisted.
   beforeUpdateUrl?: string;
-}> = ({ content, beforeEditTitle, beforeUpdateUrl }) => (
-  <BlockNoteForTest
-    content={content}
-    macros={false}
-    syntax={FULL_SYNTAX}
-    overrides={{
-      linkEdition: {
-        beforeEdit:
-          beforeEditTitle === undefined
-            ? undefined
-            : (linkData) => ({ ...linkData, title: beforeEditTitle }),
-        beforeUpdate:
-          beforeUpdateUrl === undefined
-            ? undefined
-            : (linkData) => ({ ...linkData, url: beforeUpdateUrl }),
-      },
-    }}
-  />
-);
+  // When true, beforeUpdate renders the received resource reference so tests can assert on it.
+  captureReference?: boolean;
+}> = ({ content, beforeEditTitle, beforeUpdateUrl, captureReference }) => {
+  const [capturedReference, setCapturedReference] = useState<string>();
+
+  return (
+    <>
+      {capturedReference !== undefined && (
+        <div data-test="capturedReference">{capturedReference}</div>
+      )}
+      <BlockNoteForTest
+        content={content}
+        macros={false}
+        syntax={FULL_SYNTAX}
+        overrides={{
+          linkEdition: {
+            beforeEdit:
+              beforeEditTitle === undefined
+                ? undefined
+                : (linkData) => ({ ...linkData, title: beforeEditTitle }),
+            beforeUpdate: (linkData) => {
+              if (captureReference) {
+                setCapturedReference(JSON.stringify(linkData.reference));
+              }
+              return beforeUpdateUrl === undefined
+                ? linkData
+                : { ...linkData, url: beforeUpdateUrl };
+            },
+          },
+        }}
+      />
+    </>
+  );
+};

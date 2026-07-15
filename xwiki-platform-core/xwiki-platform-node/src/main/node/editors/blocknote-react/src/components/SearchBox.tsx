@@ -19,6 +19,8 @@
  */
 import { DepsContainerContext } from "../contexts";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
+import { LinkType } from "@xwiki/platform-link-suggest-api";
+import { ResourceType } from "@xwiki/platform-rendering-api";
 import { t } from "i18next";
 import { debounce } from "lodash-es";
 import { useCallback, useContext, useEffect, useState } from "react";
@@ -26,6 +28,10 @@ import { RiLink } from "react-icons/ri";
 import type { LinkType } from "../misc/linkEditionCtx";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
+import type {
+  ResourceReference,
+  ResourceReferenceParser,
+} from "@xwiki/platform-rendering-api";
 import type { ReactElement } from "react";
 
 type SearchBoxProps = {
@@ -59,15 +65,21 @@ type SearchBoxProps = {
 
   /**
    * Triggered when a result is selected in the list of suggestions
+   *
+   * @param url - the URL of the selected result
+   * @param reference - the XWiki resource reference of the selected result
    */
-  onSelect: (url: string) => void;
+  onSelect: (url: string, reference: ResourceReference) => void;
 
   /**
    * Triggered when a result is submitted by the user
    *
    * e.g. when the user uses the `<Enter>` key on an URL
+   *
+   * @param url - the submitted URL
+   * @param reference - the XWiki resource reference matching the submitted value
    */
-  onSubmit: (url: string) => void;
+  onSubmit: (url: string, reference: ResourceReference) => void;
 };
 
 /**
@@ -111,6 +123,10 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   const remoteURLSerializer = depsContainer
     .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
     .get()!;
+
+  const resourceReferenceParser = depsContainer.get<ResourceReferenceParser>(
+    "ResourceReferenceParser",
+  );
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -157,7 +173,12 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     // eslint-disable-next-line max-statements
     async (value: string) => {
       if (isUrl(value)) {
-        onSubmit(value);
+        onSubmit(value, {
+          type: ResourceType.URL,
+          typed: false,
+          reference: value,
+          parameters: {},
+        });
         return;
       }
 
@@ -179,9 +200,19 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         throw new Error("Failed to serialize entity reference: " + value);
       }
 
-      onSubmit(url);
+      // Build the resource reference directly from the typed entity reference, rather than parsing it
+      // back from the URL we just serialized.
+      onSubmit(
+        url,
+        resourceReferenceParser.parse(value, { type: ResourceType.DOCUMENT }),
+      );
     },
-    [onSubmit, modelReferenceParser, remoteURLSerializer],
+    [
+      onSubmit,
+      modelReferenceParser,
+      remoteURLSerializer,
+      resourceReferenceParser,
+    ],
   );
 
   // Automatically perform a search when the query changes
@@ -211,7 +242,14 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
         combobox.closeDropdown();
         setQuery(result.title);
-        onSelect(url);
+        // Build the resource reference from the suggestion's entity reference (with the right default
+        // type), rather than parsing it back from the URL.
+        onSelect(
+          url,
+          resourceReferenceParser.parse(result.reference, {
+            type: linkTypeToResourceType(result.type),
+          }),
+        );
       }}
     >
       <Combobox.Target>

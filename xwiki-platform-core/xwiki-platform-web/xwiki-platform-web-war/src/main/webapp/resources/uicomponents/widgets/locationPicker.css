@@ -36,15 +36,6 @@
   padding: 4px .5em;
 }
 
-.location-action {
-  /* Leave some space between the actions. */
-  margin-left: 3px;
-}
-
-.location-action:first-of-type {
-  margin-left: 0;
-}
-
 .location-edit {
   /* Indent the advanced location edit fields under the breadcrumb. */
   padding: 0 2em;

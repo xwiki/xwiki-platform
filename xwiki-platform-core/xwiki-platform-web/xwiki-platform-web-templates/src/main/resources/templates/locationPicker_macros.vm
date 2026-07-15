@@ -85,7 +85,7 @@
 #end
 
 #macro (locationPickerActions $options)
-  <div class="location-actions">
+  <div class="location-actions btn-group">
     ## Tree picker toggle
     #if ($isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
       #documentPickerModal($options)

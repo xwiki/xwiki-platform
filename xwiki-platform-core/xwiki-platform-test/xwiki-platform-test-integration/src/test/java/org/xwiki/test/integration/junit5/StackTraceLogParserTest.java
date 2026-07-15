@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 11.4RC1
  */
-public class StackTraceLogParserTest
+class StackTraceLogParserTest
 {
     @Test
-    public void parseLogWithStackTrace() throws Exception
+    void parseLogWithStackTrace() throws Exception
     {
         String log = IOUtils.toString(this.getClass().getClassLoader().getResourceAsStream("stacktrace.txt"), "UTF-8");
         StackTraceLogParser parser = new StackTraceLogParser();
@@ -53,7 +53,7 @@ public class StackTraceLogParserTest
     }
 
     @Test
-    public void parseWithInvalidStacktrace()
+    void parseWithInvalidStacktrace()
     {
         // Verify that it works if the third line is shorter or equal to the searched patterns.
         String log = "date - line1\n"
@@ -74,7 +74,7 @@ public class StackTraceLogParserTest
     }
 
     @Test
-    public void parseWithLeadingStacktrace()
+    void parseWithLeadingStacktrace()
     {
         String log = "date - line1\n"
             + "date - line2\n"
@@ -90,7 +90,7 @@ public class StackTraceLogParserTest
     }
 
     @Test
-    public void parseWithCapturedLogs()
+    void parseWithCapturedLogs()
     {
         String log = ""
             + "date [x] INFO  Class - STDOUT: date [main] ERROR OtherClass"
@@ -107,7 +107,7 @@ public class StackTraceLogParserTest
     }
 
     @Test
-    public void parseWithNoPrefixedLogs()
+    void parseWithNoPrefixedLogs()
     {
         String log = ""
             + "WARN  - stacktrace\n"

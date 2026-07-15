@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
  * @since 15.5RC1
  */
 @ComponentTest
-public class LegacyDefaultNotificationFilterManagerTest
+class LegacyDefaultNotificationFilterManagerTest
 {
     @InjectMockComponents
     private LegacyDefaultNotificationFilterManager filterManager;

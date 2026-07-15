@@ -143,7 +143,7 @@ class IncludeMacroTest
     private PrintRendererFactory rendererFactory;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         MemoryConfigurationSource memoryConfigurationSource = new MemoryConfigurationSource();
         this.componentManager.registerComponent(ConfigurationSource.class, memoryConfigurationSource);

@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
  * @since 10.9
  */
 @ComponentTest
-public class AbstractPanelsUIExtensionManagerTest
+class AbstractPanelsUIExtensionManagerTest
 {
     @MockComponent
     @Named("currentmixed")
@@ -69,7 +69,7 @@ public class AbstractPanelsUIExtensionManagerTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.ERROR);
 
     @Test
-    public void get() throws Exception
+    void get() throws Exception
     {
         // We create a mock of the component manager to control the order on which the extensions will be retreived.
         WikiUIExtension wikiUIExtensionMenu1 = mock(WikiUIExtension.class);
@@ -116,7 +116,7 @@ public class AbstractPanelsUIExtensionManagerTest
     }
 
     @Test
-    public void getWhenLookupError() throws Exception
+    void getWhenLookupError() throws Exception
     {
         ComponentManager failingCM = mock(ComponentManager.class);
         when(contextComponentManagerProvider.get()).thenReturn(failingCM);

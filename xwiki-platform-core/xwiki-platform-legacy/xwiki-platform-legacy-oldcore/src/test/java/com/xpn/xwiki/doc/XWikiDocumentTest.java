@@ -107,7 +107,7 @@ class XWikiDocumentTest
     private BaseObject baseObject;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         XWikiVersioningStoreInterface mockXWikiVersioningStore =
             this.componentManager.registerMockComponent(XWikiVersioningStoreInterface.class);

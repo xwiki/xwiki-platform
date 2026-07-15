@@ -116,7 +116,7 @@ class DefaultDataURIConverterTest
     }
 
     @BeforeEach
-    public void setUp()
+    void setUp()
     {
         when(this.userReferenceSerializer.serialize(CurrentUserReference.INSTANCE)).thenReturn(CURRENT_USER);
 

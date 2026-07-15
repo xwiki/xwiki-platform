@@ -105,7 +105,7 @@ class WikiUIExtensionParametersTest
     private MockitoComponentManager componentManager;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         VelocityContext velocityContext = new VelocityContext();
         ExecutionContext executionContext = mock(ExecutionContext.class);

@@ -33,8 +33,10 @@ export type { SearchLinkSuggestion, SearchLinkSuggestor };
 </script>
 
 <script setup lang="ts" generic="T, U">
+import { translations } from "../translations";
 import { debounce } from "lodash-es";
 import { ref, shallowRef, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
 const { initialValue, getSuggestions, trySubmitRaw } = defineProps<{
   /**
@@ -84,6 +86,8 @@ const emit = defineEmits<{
    */
   select: [suggestion: T];
 }>();
+
+const { t } = useI18n({ messages: translations });
 
 const query = ref(initialValue ?? "");
 
@@ -248,16 +252,14 @@ watch(suggestions, (suggestions) => {
         class="status-message"
         v-if="suggestions.status === 'backendSearchUnsupported'"
       >
-        <!-- TODO: add translation -->
-        Backend search is unsupported.
+        {{ t("link-modal.search-box.backend-unsupported") }}
       </h3>
 
       <h3
         class="status-message"
         v-if="suggestions.status === 'uninitialized' && loading"
       >
-        <!-- TODO: add translation -->
-        Loading...
+        {{ t("link-modal.search-box.loading") }}
       </h3>
 
       <h3
@@ -266,8 +268,7 @@ watch(suggestions, (suggestions) => {
           suggestions.status === 'resolved' && suggestions.results.length === 0
         "
       >
-        <!-- TODO: add translation -->
-        No result found
+        {{ t("link-modal.search-box.no-result") }}
       </h3>
 
       <!-- NOTE: `@mousedown.prevent` prevents the `blur` event from the query `input` field above to trigger *before*
@@ -293,8 +294,7 @@ watch(suggestions, (suggestions) => {
           "
         >
           <slot name="renderSuggestion" v-bind="suggestion">
-            <!-- TODO: add translation -->
-            <em>Missing suggestion rendering slot</em>
+            <em>Internal error: missing suggestion rendering slot</em>
           </slot>
         </li>
       </ul>

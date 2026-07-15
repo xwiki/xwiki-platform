@@ -22,5 +22,9 @@
 
   "link-modal.target-types.attachment.label": "Attachment",
   "link-modal.target-types.attachment.reference": "Attachment reference",
-  "link-modal.target-types.attachment.query-string": "Query string"
+  "link-modal.target-types.attachment.query-string": "Query string",
+
+  "link-modal.search-box.backend-unsupported": "Backend search is unsupported.",
+  "link-modal.search-box.loading": "Loading...",
+  "link-modal.search-box.no-result": "No result found"
 }

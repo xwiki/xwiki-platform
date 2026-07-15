@@ -36,8 +36,6 @@
 ## whole mixins. There should be no overlap between this category of variables and the others.
 ## List of versions where variables were introduced:
 ## * 17.3.0RC1: 100vw, int-viewport-width, font-weight-regular, font-weight-semibold, font-weight-bold
-## * 17.9.0RC1: login-form-max-width (moved to variablelist.vm's $xsVariablesValues since it also got a LESS
-##   variable equivalent)
 ## * 18.0.0RC1: mark-bg, mark-highlighted-bg
 #set($newVariables = {
 "100vw": "100vw",

@@ -1,7 +1,9 @@
 //
 // New variables provided by XWiki
 // --------------------------------------------------
-
+// Deprecated: kept as an alias for backwards compatibility with skins/extensions that still reference the old
+// camelCase name. The canonical declaration now lives in variablelist.vm as @login-form-max-width.
+@loginFormMaxWidth:                 @login-form-max-width;
 // We create a guarded mixin to change the background color alternative differently depending on the
 // initial color. The simple 'if' syntax didn't compile.
 ._menubackground-alt(@a) when (lightness(@a) < 50%) {
@@ -11,7 +13,3 @@
   @menu-default-bg:               darken(desaturate(@a, 20%), 10%);
 }
 ._menubackground-alt(@navbar-default-bg);
-
-// Deprecated: kept as an alias for backwards compatibility.
-// The canonical declaration now lives in variablelist.vm as @login-form-max-width.
-@loginFormMaxWidth:               @login-form-max-width;

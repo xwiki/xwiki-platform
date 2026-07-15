@@ -78,12 +78,18 @@
 
 <script setup lang="ts">
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
+import {
+  extractLinkId,
+  injectLinkId,
+  stripLinkId,
+} from "../services/blocknote/linkId";
 import { MACRO_UI_PLACEHOLDER } from "../services/macros/placeholderUi";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
 import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
 import { Container } from "inversify";
+import { uuidv4 } from "lib0/random";
 import {
   inject,
   onBeforeMount,
@@ -262,14 +268,37 @@ const editorProps = shallowRef<
   overrides: {
     imageEdition,
     linkEdition: {
-      // Runs before the popover is opened to edit an existing link. Return a transformed LinkData to
-      // pre-fill the popover with, or return nothing to keep the current link data unchanged. This is
-      // where the XWiki resource reference associated with the link can be resolved and injected.
-      beforeEdit: (linkData) => linkData,
+      // Runs before the popover is opened to edit an existing link. The XWiki resource reference is
+      // kept as link metadata (outside the BlockNote schema), mapped to a synthetic id stored in the
+      // link url, so we resolve it here and inject it into the link data to pre-fill the popover. The
+      // synthetic id is stripped from the url shown in the popover; beforeUpdate recovers it from the
+      // previous link data.
+      beforeEdit: (linkData) => {
+        const id = extractLinkId(linkData.url);
+        const reference = id
+          ? (blockNoteDocument?.getMetadata(id)?.xwikiReference as
+              | ResourceReference
+              | undefined)
+          : undefined;
+        return { ...linkData, url: stripLinkId(linkData.url), reference };
+      },
       // Runs right before the link is written into the content (i.e. before createLink / editLink).
-      // Return a transformed LinkData to change what is persisted, or nothing to keep it unchanged.
-      // This is where the XWiki resource reference can be computed and stored.
-      beforeUpdate: (linkData) => linkData,
+      // We store the (possibly updated) resource reference as link metadata, mapped to a synthetic id
+      // that we carry in the link url. When editing, we reuse the id of the edited link (taken from
+      // the previous link data) so that the other link metadata (parameters, freestanding flag) is
+      // preserved even when the target changes; when creating, we mint a new id.
+      beforeUpdate: (linkData, previous) => {
+        const id = extractLinkId(previous?.url ?? "") ?? uuidv4();
+        if (linkData.reference) {
+          blockNoteDocument!.getMetadata(id, true)!.xwikiReference =
+            linkData.reference;
+          return {
+            ...linkData,
+            url: injectLinkId(stripLinkId(linkData.url), id),
+          };
+        }
+        return linkData;
+      },
     },
   },
   syntax,

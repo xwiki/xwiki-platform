@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -207,7 +206,7 @@ public class LiveTableRequestHandler
                     stream = Stream.of(entry.getValue());
                 }
                 List<String> values =
-                    stream.filter(Objects::nonNull).map(Object::toString).collect(Collectors.toList());
+                    stream.filter(Objects::nonNull).map(Object::toString).toList();
                 if (!values.isEmpty()) {
                     requestParams.put(entry.getKey(), values.toArray(new String[values.size()]));
                 }
@@ -219,10 +218,10 @@ public class LiveTableRequestHandler
     {
         if (query.getSort() != null && !query.getSort().isEmpty()) {
             List<String> sortList =
-                query.getSort().stream().map(SortEntry::getProperty).collect(Collectors.toList());
+                query.getSort().stream().map(SortEntry::getProperty).toList();
             requestParams.put("sort", sortList.toArray(new String[sortList.size()]));
             List<String> dirList = query.getSort().stream().map(sortEntry -> sortEntry.isDescending() ? "desc" : "asc")
-                .collect(Collectors.toList());
+                .toList();
             requestParams.put("dir", dirList.toArray(new String[dirList.size()]));
         }
     }
@@ -230,7 +229,7 @@ public class LiveTableRequestHandler
     private void addFilterRequestParameters(Filter filter, Map<String, String[]> requestParams)
     {
         List<String> values = filter.getConstraints().stream().filter(Objects::nonNull).map(Constraint::getValue)
-            .filter(Objects::nonNull).map(Object::toString).collect(Collectors.toList());
+            .filter(Objects::nonNull).map(Object::toString).toList();
         if (!values.isEmpty()) {
             requestParams.put(filter.getProperty(), values.toArray(new String[values.size()]));
             requestParams.put(filter.getProperty() + "/join_mode", new String[] {filter.isMatchAll() ? "AND" : "OR"});
@@ -238,7 +237,7 @@ public class LiveTableRequestHandler
             List<String> matchType = filter.getConstraints().stream()
                 .map(constraint -> constraint == null ? null : constraint.getOperator())
                 .map(operator -> operator == null ? "" : MATCH_TYPE.getOrDefault(operator, operator))
-                .collect(Collectors.toList());
+                .toList();
             requestParams.put(filter.getProperty() + "_match", matchType.toArray(new String[matchType.size()]));
 
             // Add a value to the empty fields since otherwise they are dismissed by LiveTableResultMacros.

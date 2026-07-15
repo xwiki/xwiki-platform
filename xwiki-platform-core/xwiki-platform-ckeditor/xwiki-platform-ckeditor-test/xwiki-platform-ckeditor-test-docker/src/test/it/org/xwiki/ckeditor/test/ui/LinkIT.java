@@ -35,8 +35,6 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Test of the CKEditor Link Plugin.
  *
@@ -150,7 +148,9 @@ class LinkIT extends AbstractCKEditorIT
         LinkPickerModal linkPickerModal = linkDialog.openLinkPickerModal();
         LinkTreeElement tree = linkPickerModal.getTree();
         tree.waitForIt();
-        assertTrue(tree.hasNewPageCreation(testReference));
+        // The tree opens asynchronously to the currently edited page, so wait for the new page creation node (a child
+        // of that page's node) to be loaded before interacting with it.
+        tree.waitForNewPageCreation(testReference);
         tree.createNode(testReference, "SubPage");
         SpaceReference testReferenceLastSpace = new SpaceReference("SubPage", testReference.getLastSpaceReference());
         DocumentReference subPage = new DocumentReference("WebHome", testReferenceLastSpace);

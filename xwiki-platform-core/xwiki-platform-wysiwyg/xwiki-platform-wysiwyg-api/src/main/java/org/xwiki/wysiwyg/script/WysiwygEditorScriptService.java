@@ -31,6 +31,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -348,10 +349,15 @@ public class WysiwygEditorScriptService implements ScriptService
             this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, true);
 
             DocumentReference userAuthorReference = getAuthorExecutor(source, sourceReference);
+            // The source reference can be an object property reference (e.g. when editing a TextArea property),
+            // but the converter and the author executor work at the document level, so we resolve the document
+            // reference from the source reference.
+            DocumentReference sourceDocumentReference =
+                new DocumentReference(sourceReference.extractReference(EntityType.DOCUMENT));
             return this.authorExecutor.call(
-                () -> this.htmlConverter.toHTML(source, syntax, sourceReference, restricted),
+                () -> this.htmlConverter.toHTML(source, syntax, sourceDocumentReference, restricted),
                 userAuthorReference,
-                new DocumentReference(sourceReference));
+                sourceDocumentReference);
         } catch (Exception e) {
             // Return the source text in case of an exception.
             return source;
@@ -379,7 +385,8 @@ public class WysiwygEditorScriptService implements ScriptService
             }
         } else if (sourceReference instanceof ObjectPropertyReference objectPropertyReference) {
             XWikiDocument document = context.getWiki().getDocument(objectPropertyReference, context);
-            BaseObject object = document.getXObject(objectPropertyReference);
+            // getXObject() doesn't accept an object property reference, so we extract the object reference from it.
+            BaseObject object = document.getXObject(objectPropertyReference.extractReference(EntityType.OBJECT));
             if (object != null && source.equals(object.getStringValue(objectPropertyReference.getName()))) {
                 UserReference author = document.getAuthors().getEffectiveMetadataAuthor();
                 result = this.userDocumentReferenceSerializer.serialize(author);

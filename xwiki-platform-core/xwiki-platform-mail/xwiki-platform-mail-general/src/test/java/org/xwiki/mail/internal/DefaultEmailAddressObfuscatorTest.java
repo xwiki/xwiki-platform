@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 12.4RC1
  */
 @ComponentTest
-public class DefaultEmailAddressObfuscatorTest
+class DefaultEmailAddressObfuscatorTest
 {
     @InjectMockComponents
     private DefaultEmailAddressObfuscator obfuscator;

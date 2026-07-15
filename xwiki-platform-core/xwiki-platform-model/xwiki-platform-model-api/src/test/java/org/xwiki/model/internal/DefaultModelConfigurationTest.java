@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
     RelativeStringEntityReferenceResolver.class,
     DefaultStringEntityReferenceSerializer.class
 })
-public class DefaultModelConfigurationTest
+class DefaultModelConfigurationTest
 {
     @InjectMockComponents
     private DefaultModelConfiguration configuration;
@@ -52,13 +52,13 @@ public class DefaultModelConfigurationTest
     private MemoryConfigurationSource configurationSource;
     
     @BeforeEach
-    public void before(MockitoComponentManager componentManager) throws Exception
+    void before(MockitoComponentManager componentManager) throws Exception
     {
         this.configurationSource = componentManager.registerMemoryConfigurationSource();
     }
 
     @Test
-    public void getDefaultReferenceNameWhenDefinedInConfiguration()
+    void getDefaultReferenceNameWhenDefinedInConfiguration()
     {
         this.configurationSource.setProperty("model.reference.default.wiki", "defaultWiki");
         this.configurationSource.setProperty("model.reference.default.document", "defaultDocument");
@@ -76,7 +76,7 @@ public class DefaultModelConfigurationTest
     }
 
     @Test
-    public void testGetDefaultReferenceNameWhenNotDefinedInConfiguration() throws ComponentLookupException
+    void testGetDefaultReferenceNameWhenNotDefinedInConfiguration() throws ComponentLookupException
     {
         assertEquals("xwiki", this.configuration.getDefaultReferenceValue(EntityType.WIKI));
         assertEquals("WebHome", this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT));

@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @version $Id$
  */
-public class SuperAdminUserReferenceTest
+class SuperAdminUserReferenceTest
 {
     @Test
     void isGlobal()

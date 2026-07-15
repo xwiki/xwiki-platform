@@ -219,11 +219,13 @@ type ContextForMacros = {
   /**
    * Request the opening of a UI to edit the macro's parameters (e.g. a modal)
    *
+   * When not provided, the actions to edit a macro's parameters are hidden.
+   *
    * @param macro - Description of the macro being edited
    * @param params - Current parameters of the macro
    * @param update - Calling this function will replace the existing macro's parameters with the provided ones
    */
-  openParamsEditor(
+  openParamsEditor?(
     macro: MacroWithUnknownParamsType,
     params: UnknownMacroParamsType,
     update: (newProps: UnknownMacroParamsType) => void,
@@ -232,20 +234,22 @@ type ContextForMacros = {
   /**
    * Request the opening of a UI (e.g. modal) to insert a new block macro
    *
+   * When not provided, the action to insert a macro is hidden.
+   *
    * @param prefill - Information to prefill the modal with (ID, body, ...)
    * @param insert - Insert the new macro, replacing the user-selected content (if any)
    *
    * @since 18.5.0RC1
    * @beta
    */
-  openInsertionEditor(
+  openInsertionEditor?(
     prefill: MacroInsertionEditorPrefillData,
     insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
   ): void;
 };
 
 /**
- * Informations to fill the insertion modal UI with
+ * Information to fill the insertion modal UI with
  *
  * @since 18.5.0RC1
  * @beta
@@ -377,9 +381,12 @@ function adaptMacroForBlockNote(
     // Tracking issue: https://jira.xwiki.org/browse/CRISTAL-742
     update: (newParams: Props<PropSchema>) => void,
   ): JSX.Element {
-    const openParamsEditor = () =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ctx.openParamsEditor(macro, props, update as any);
+    // When no params editor is available, no double-click handler is attached.
+    const openParamsEditor = ctx.openParamsEditor
+      ? () =>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ctx.openParamsEditor!(macro, props, update as any)
+      : undefined;
 
     /** The macro's raw body */
     const rawBody =

@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 2.3M1
  */
-public class ModelScriptServiceTest
+class ModelScriptServiceTest
 {
     private ModelScriptService service;
 
@@ -71,7 +71,7 @@ public class ModelScriptServiceTest
 
     @SuppressWarnings("unchecked")
     @BeforeEach
-    public void beforeEach() throws ComponentLookupException
+    void beforeEach() throws ComponentLookupException
     {
         this.service = new ModelScriptService();
 
@@ -96,7 +96,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createDocumentReferenceWithSpecifiedHint() throws Exception
+    void createDocumentReferenceWithSpecifiedHint() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
             .thenReturn(this.documentResolver);
@@ -107,7 +107,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createDocumentReferenceWithDefaultHint() throws Exception
+    void createDocumentReferenceWithDefaultHint() throws Exception
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
         when(this.documentResolver.resolve(reference)).thenReturn(reference);
@@ -116,7 +116,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createDocumentReferenceWhenEmptyParameters() throws Exception
+    void createDocumentReferenceWhenEmptyParameters() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
             .thenReturn(this.documentResolver);
@@ -127,7 +127,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createPageReferenceWhenEmptyParameters() throws Exception
+    void createPageReferenceWhenEmptyParameters() throws Exception
     {
         PageReference reference = new PageReference("defaultwiki", "defaultpage");
         when(this.entityResolver.resolve(null, EntityType.PAGE)).thenReturn(reference);
@@ -136,7 +136,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createDocumentReferenceWhenWikiParameterEmpty() throws Exception
+    void createDocumentReferenceWhenWikiParameterEmpty() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
             .thenReturn(this.documentResolver);
@@ -149,7 +149,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createDocumentReferenceWhenSpaceParameterEmpty() throws Exception
+    void createDocumentReferenceWhenSpaceParameterEmpty() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
             .thenReturn(this.documentResolver);
@@ -164,7 +164,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createDocumentReferenceWhenPageParameterEmpty() throws Exception
+    void createDocumentReferenceWhenPageParameterEmpty() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
             .thenReturn(this.documentResolver);
@@ -177,7 +177,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createDocumentReferenceWhenWikiAndSpaceParametersEmpty() throws Exception
+    void createDocumentReferenceWhenWikiAndSpaceParametersEmpty() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "default"))
             .thenReturn(this.documentResolver);
@@ -190,7 +190,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createDocumentReferenceWhenInvalidHint() throws Exception
+    void createDocumentReferenceWhenInvalidHint() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "invalid"))
             .thenThrow(new ComponentLookupException("error"));
@@ -202,7 +202,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createDocumentReferenceWithDeprecatedHint() throws Exception
+    void createDocumentReferenceWithDeprecatedHint() throws Exception
     {
         when(this.componentManager.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "current/reference"))
             .thenThrow(new ComponentLookupException("error"));
@@ -222,7 +222,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createDocumentReferenceFromPageNameAndSpaceReference()
+    void createDocumentReferenceFromPageNameAndSpaceReference()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         assertEquals(documentReference, this.service.createDocumentReference(documentReference.getName(),
@@ -230,13 +230,13 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createWikiReference()
+    void createWikiReference()
     {
         assertEquals(new WikiReference("wiki"), this.service.createWikiReference("wiki"));
     }
 
     @Test
-    public void createSpaceReference()
+    void createSpaceReference()
     {
         assertEquals(new SpaceReference("space", new WikiReference("wiki")),
             this.service.createSpaceReference("space", this.service.createWikiReference("wiki")));
@@ -251,14 +251,14 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void createEntityReferenceWithoutParent()
+    void createEntityReferenceWithoutParent()
     {
         assertEquals(new EntityReference("page", EntityType.DOCUMENT),
             this.service.createEntityReference("page", EntityType.DOCUMENT));
     }
 
     @Test
-    public void createEntityReferenceWithParent()
+    void createEntityReferenceWithParent()
     {
         assertEquals(new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE)),
             this.service.createEntityReference("page", EntityType.DOCUMENT,
@@ -266,7 +266,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void resolveSpace() throws Exception
+    void resolveSpace() throws Exception
     {
         SpaceReference reference = new SpaceReference("Space", new WikiReference("wiki"));
         when(this.stringEntityReferenceResolver.resolve("x", EntityType.SPACE, new Object[] {})).thenReturn(reference);
@@ -275,7 +275,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void resolveSpaceWithHintAndParameters() throws Exception
+    void resolveSpaceWithHintAndParameters() throws Exception
     {
         when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "custom"))
             .thenReturn(this.stringEntityReferenceResolver);
@@ -288,7 +288,7 @@ public class ModelScriptServiceTest
     }
 
     @Test
-    public void resolveClassPropertyWithHintAndParameters() throws Exception
+    void resolveClassPropertyWithHintAndParameters() throws Exception
     {
         when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "custom"))
             .thenReturn(this.stringEntityReferenceResolver);

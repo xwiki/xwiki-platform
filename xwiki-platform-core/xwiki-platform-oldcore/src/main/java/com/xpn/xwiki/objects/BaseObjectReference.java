@@ -207,12 +207,10 @@ public class BaseObjectReference extends ObjectReference
             name = builder.toString();
         } else {
             Matcher matcher = NUMBERPATTERN.matcher(name);
-            if (matcher.find()) {
-                if (matcher.group(1).length() % 2 == 0) {
-                    StringBuilder builder = new StringBuilder(name);
-                    builder.insert(matcher.start(), '\\');
-                    name = builder.toString();
-                }
+            if (matcher.find() && matcher.group(1).length() % 2 == 0) {
+                StringBuilder builder = new StringBuilder(name);
+                builder.insert(matcher.start(), '\\');
+                name = builder.toString();
             }
         }
 

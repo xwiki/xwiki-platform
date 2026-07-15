@@ -287,7 +287,7 @@ class LiveTableLiveDataEntryStoreTest
         when(this.currentDocumentReferenceResolver.resolve("MyTest.MyClass")).thenReturn(classDocumentReference);
 
         this.entryStore.getParameters().put("className", "MyTest.MyClass");
-        Optional<Object> save = this.entryStore.save(entry);
+        this.entryStore.save(entry);
 
         verify(this.modelBridge).updateAll(entry, objectDocumentReference, classDocumentReference, Map.of());
     }

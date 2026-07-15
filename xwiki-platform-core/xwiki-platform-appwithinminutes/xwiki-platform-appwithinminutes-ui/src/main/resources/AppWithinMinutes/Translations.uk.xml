@@ -191,7 +191,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Оновити динамі
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Перетягніть для зміни порядку
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Видалити
 platform.appwithinminutes.liveTableEditorAddColumnHint=Додати вибраний стовпець
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Деякі стовпці вважаються застарілими, напевно, тому, що відповідне поле додатка було видалено. Ви хочете їх видалити? &lt;a href=""&gt;Так &lt;/a&gt; / &lt;a href=""&gt;Ні &lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Деякі стовпці вважаються застарілими, напевно, тому, що відповідне поле додатка було видалено. Ви хочете їх видалити? &lt;a href=""&gt;Так&lt;/a&gt; / &lt;a href=""&gt;Ні&lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Піктограма
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Піктограма додатку. Ви можете вибрати піктограму з каталогу або посилатися на вкладене зображення.
 

@@ -1063,14 +1063,13 @@ public abstract class ListClass extends PropertyClass
         XWikiContext context, MergeResult mergeResult)
     {
         // If it's not a multiselect then we don't have any special merge to do. We keep default StringProperty behavior
-        if (isMultiSelect()) {
-            // If not a free input assume it's not an ordered list
-            if (!DISPLAYTYPE_INPUT.equals(getDisplayType()) && currentProperty instanceof ListProperty) {
-                mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, context,
-                    mergeResult);
+        // If not a free input assume it's not an ordered list
+        if (isMultiSelect() && !DISPLAYTYPE_INPUT.equals(getDisplayType())
+            && currentProperty instanceof ListProperty) {
+            mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, context,
+                mergeResult);
 
-                return;
-            }
+            return;
         }
 
         // Fallback on default ListProperty merging
@@ -1098,11 +1097,9 @@ public abstract class ListClass extends PropertyClass
         // Add missing elements
         if (newList != null) {
             for (String element : newList) {
-                if ((previousList == null || !previousList.contains(element))) {
-                    if (!currentList.contains(element)) {
-                        currentList.add(element);
-                        mergeResult.setModified(true);
-                    }
+                if ((previousList == null || !previousList.contains(element)) && !currentList.contains(element)) {
+                    currentList.add(element);
+                    mergeResult.setModified(true);
                 }
             }
         }

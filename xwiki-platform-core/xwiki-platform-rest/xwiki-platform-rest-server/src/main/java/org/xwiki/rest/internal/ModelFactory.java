@@ -285,9 +285,6 @@ public class ModelFactory
         if (propertyNames.length > 0) {
             try {
                 String firstPropertyName = propertyNames[0];
-                BaseClass baseClass = xwikiObject.getXClass(this.xcontextProvider.get());
-                PropertyInterface field = baseClass.getField(firstPropertyName);
-                // The property might not exist in the class. But if it does, it will be a PropertyClass.
                 objectSummary.setHeadline(serializePropertyValue(xwikiObject.get(firstPropertyName)));
             } catch (XWikiException e) {
                 // Should never happen

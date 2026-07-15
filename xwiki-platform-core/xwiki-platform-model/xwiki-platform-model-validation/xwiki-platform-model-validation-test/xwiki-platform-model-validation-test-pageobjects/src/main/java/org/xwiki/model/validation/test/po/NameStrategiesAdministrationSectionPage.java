@@ -29,6 +29,8 @@ import org.xwiki.test.ui.po.Select;
  * saved, and where a name can be entered to test the currently selected strategy.
  *
  * @version $Id$
+ * @since 17.10.10
+ * @since 18.4.3
  * @since 18.5.0RC1
  */
 public class NameStrategiesAdministrationSectionPage extends AdministrationSectionPage
@@ -45,6 +47,12 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     private static final By TEST_VALID_TRUE = By.id("testNameStrategyIsValid_true");
 
     private static final By TEST_TRANSFORMED_NAME = By.id("testNameStrategyTransformedName");
+
+    private static final By USE_TRANSFORMATION_SELECT =
+        By.id("XWiki.EntityNameValidation.ConfigurationClass_0_useTransformation");
+
+    private static final By USE_VALIDATION_SELECT =
+        By.id("XWiki.EntityNameValidation.ConfigurationClass_0_useValidation");
 
     /**
      * Open the Name Strategies administration section.
@@ -81,6 +89,30 @@ public class NameStrategiesAdministrationSectionPage extends AdministrationSecti
     public String getSelectedStrategy()
     {
         return new Select(getDriver().findElement(STRATEGY_SELECT)).getFirstSelectedOption().getAttribute("value");
+    }
+
+    /**
+     * Enable or disable the automatic transformation of names that don't respect the selected strategy. This only
+     * changes the selected value in the form; call {@link #save()} to persist it.
+     *
+     * @param enabled {@code true} to enable the automatic transformation, {@code false} to disable it
+     * @since 18.6.0RC1
+     */
+    public void setTransformNameAutomatically(boolean enabled)
+    {
+        new Select(getDriver().findElement(USE_TRANSFORMATION_SELECT)).selectByValue(enabled ? "1" : "0");
+    }
+
+    /**
+     * Enable or disable the validation of names before saving. This only changes the selected value in the form; call
+     * {@link #save()} to persist it.
+     *
+     * @param enabled {@code true} to enable the validation, {@code false} to disable it
+     * @since 18.6.0RC1
+     */
+    public void setValidateNames(boolean enabled)
+    {
+        new Select(getDriver().findElement(USE_VALIDATION_SELECT)).selectByValue(enabled ? "1" : "0");
     }
 
     /**

@@ -90,13 +90,12 @@ class R160500000XWIKI22271DataMigrationTest
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
-    private HibernateStore hibernateStore;
     private XWikiHibernateStore hibernateBaseStore;
 
     @BeforeComponent
     void beforeComponent(MockitoComponentManager componentManager) throws Exception
     {
-        this.hibernateStore = componentManager.registerMockComponent(HibernateStore.class);
+        componentManager.registerMockComponent(HibernateStore.class);
         this.hibernateBaseStore = componentManager.registerMockComponent(XWikiStoreInterface.class,
             XWikiHibernateBaseStore.HINT, XWikiHibernateStore.class, false);
     }

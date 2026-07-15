@@ -72,6 +72,8 @@ public class PasswordClass extends StringClass
     private static final String PASSWORD_FIELD_TYPE = "password";
     private static final String XCLASSNAME = PASSWORD_FIELD_TYPE;
 
+    private static final SecureRandom RANDOM = new SecureRandom();
+
     /**
      * Default constructor with a metaclass.
      * @param wclass the metaclass value.
@@ -223,11 +225,10 @@ public class PasswordClass extends StringClass
     public String getEquivalentPassword(String storedPassword, String plainPassword)
     {
         String result = plainPassword;
-        if (storedPassword != null && plainPassword != null) {
-            if (storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
-                result = getPasswordHash(result, getAlgorithmFromPassword(storedPassword),
-                        getSaltFromPassword(storedPassword));
-            }
+        if (storedPassword != null && plainPassword != null
+            && storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
+            result = getPasswordHash(result, getAlgorithmFromPassword(storedPassword),
+                    getSaltFromPassword(storedPassword));
         }
         return result;
     }
@@ -333,9 +334,8 @@ public class PasswordClass extends StringClass
     public static String randomSalt()
     {
         StringBuilder salt = new StringBuilder();
-        SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[32];
-        random.nextBytes(bytes);
+        RANDOM.nextBytes(bytes);
         for (byte temp : bytes) {
             String s = Integer.toHexString(Byte.valueOf(temp));
             while (s.length() < 2) {

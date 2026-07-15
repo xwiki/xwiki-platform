@@ -44,6 +44,7 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -730,7 +731,7 @@ public class XarPackage
             try {
                 writer.close();
             } catch (XMLStreamException e) {
-                throw new XarException("Failed to close XML writer", e);
+                LOGGER.warn("Failed to close XML writer: [{}]", ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

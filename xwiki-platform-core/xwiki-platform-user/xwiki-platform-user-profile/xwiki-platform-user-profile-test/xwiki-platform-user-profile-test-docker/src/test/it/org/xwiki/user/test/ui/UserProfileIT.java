@@ -185,6 +185,9 @@ class UserProfileIT
         File imageFile = new File(testConfiguration.getBrowser().getTestResourcesPath(), IMAGE_NAME);
         changeAvatarImage.setAvatarImage(imageFile.getAbsolutePath());
         changeAvatarImage.submit();
+        // The avatar image is only updated once the profile page is reloaded after the upload. Wait for the new image
+        // before reading it, to avoid a stale element reference while the page is still reloading.
+        userProfilePage.waitUntilAvatarImageName(IMAGE_NAME);
         assertEquals(IMAGE_NAME, userProfilePage.getAvatarImageName());
     }
 

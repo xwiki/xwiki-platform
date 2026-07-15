@@ -367,6 +367,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set ($xclass = $doc.getxWikiClass().getXWikiClass())
     #set ($discard = $xclass.addField($field.name, $field))
     #set ($discard = $field.setObject($xclass))
+    ## Set the class document author to the current user so that customDisplay code is rendered with the current user's
+    ## rights, not the class document author's rights.
+    #set ($discard = $doc.document.authors.setEffectiveMetadataAuthor($services.user.currentUserReference))
     #displayField($doc.getxWikiClass().get($field.name) $formFieldDoc)
   #else
     Unsupported form field.
@@ -419,6 +422,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   ##
   ## Display the field.
   #set ($field = $doc.getxWikiClass().get($fieldName))
+  ## Set the class document author to the current user so that customDisplay code is rendered with the current user's
+  ## rights, not the class document author's rights.
+  #set ($discard = $doc.document.authors.setEffectiveMetadataAuthor($services.user.currentUserReference))
   #displayPropertyEditInput($field, "${doc.fullName}_0_", $object)
 #end
 
@@ -427,6 +433,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro (displayEditForm)
   #set ($discard = $xwiki.jsx.use('AppWithinMinutes.ClassEditSheet'))
+  ## Reusable helper used to recover gracefully when a preview or field-add request is rejected because the CSRF
+  ## token expired (e.g. after a server restart).
+  #set ($discard = $xwiki.jsx.use('AppWithinMinutes.Code.CSRFTokenRefresh'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassEditSheet'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
   #if ("$!request.wizard" == 'true')
@@ -445,10 +454,21 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * Displays either the edit class form or a new form field. The later is used when adding a new form field via AJAX.
  *#
 #macro (doEdit)
-  #if ("$!request.field" != '')
-    #displayNewField()
-  #elseif ("$!request.preview" == 'true')
-    #previewField()
+  #if ("$!request.field" != '' || "$!request.preview" == 'true')
+    ## CSRF protection.
+    #if (!$services.csrf.isTokenValid($request.form_token))
+      $response.setStatus(403)
+      ## Return a fresh token (using the same JSON shape as XWikiAction#csrfTokenCheck) so that the client can recover
+      ## from an expired token (e.g. after a server restart) by refreshing it, after an explicit user confirmation,
+      ## and retrying the request. Returning the token in the response is safe because the same-origin policy prevents
+      ## a CSRF attacker from reading it.
+      $response.setContentType('application/json')
+      $jsontool.serialize({'errorType': 'CSRF', 'newToken': $services.csrf.getToken()})
+    #elseif ("$!request.field" != '')
+      #displayNewField()
+    #else
+      #previewField()
+    #end
   #else
     ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
     &lt;div class="hidden"&gt;
@@ -1120,14 +1140,41 @@ XWiki.FormField = Class.create({
   enhance : function(data) {
     this.container.insert({top: this._createToolBox()});
     if (data) {
-      this.container.addClassName('loading');
-      new Ajax.Request(data, {
-        method: 'get',
-        onSuccess: this._display.bind(this)
-      });
+      this._loadField(data);
     } else {
       this._display(null);
     }
+  },
+  _loadField : function (url) {
+    // The field URL embeds the CSRF token that was valid when the page was rendered. Always refresh it from the
+    // current form_token input (the single source of truth, updated when the token is refreshed after an expired
+    // token recovery) so that, once the token has been refreshed, adding further fields does not prompt again.
+    const formToken = this.container.up('form')?.down('input[name="form_token"]');
+    if (formToken) {
+      const fieldURL = new URL(url, window.location.href);
+      fieldURL.searchParams.set('form_token', formToken.value);
+      url = fieldURL.toString();
+    }
+    this.container.addClassName('loading');
+    const self = this;
+    new Ajax.Request(url, {
+      method: 'get',
+      onSuccess: this._display.bind(this),
+      // A 403 means the CSRF token expired (e.g. the server was restarted while the user was editing). Offer to
+      // refresh the token and retry, instead of leaving the loading spinner spinning forever.
+      on403: function (response) {
+        this.container.removeClassName('loading');
+        require(['xwiki-appwithinminutes-csrf'], function (csrf) {
+          csrf.recoverFromExpiredToken(response, function () {
+            // The token has been refreshed in the form: retry, _loadField will pick up the fresh token.
+            self._loadField(url);
+          });
+        });
+      }.bind(this),
+      onFailure: function () {
+        this.container.removeClassName('loading');
+      }.bind(this)
+    });
   },
   getContainer : function() {
     return this.container;
@@ -1248,6 +1295,12 @@ XWiki.FormField = Class.create({
     // Add parameters required by the AJAX preview request.
     this.previewData.set('preview', true);
     this.previewData.set('xpage', 'plain');
+    // Find and add the mandatory CSRF token.
+    const editForm = this.container.up('form');
+    const formToken = editForm &amp;&amp; editForm.down('input[name="form_token"]');
+    if (formToken) {
+      this.previewData.set('form_token', formToken.value);
+    }
   },
   _maybePreview : function() {
     if(!this.previewData) {
@@ -1279,6 +1332,7 @@ XWiki.FormField = Class.create({
     var preview = this.getViewer().down('dd');
     if (preview) {
       preview.addClassName('loading');
+      const self = this;
       // Firefox 3.6 doesn't resolve the empty string to the current page URL so we have to explicitly specify it.
       new Ajax.Request(window.location.href, {
         parameters: data.toQueryString(),
@@ -1288,6 +1342,20 @@ XWiki.FormField = Class.create({
           this.previewData = data;
           document.fire('xwiki:class:previewField', {field: this});
           document.fire('xwiki:dom:updated', {elements: [preview]});
+        }.bind(this),
+        // A 403 means the CSRF token expired (e.g. the server was restarted while the user was editing). Offer to
+        // refresh the token and retry the preview, instead of leaving the loading spinner spinning forever.
+        on403: function (response) {
+          preview.removeClassName('loading');
+          require(['xwiki-appwithinminutes-csrf'], function (csrf) {
+            csrf.recoverFromExpiredToken(response, function (token) {
+              data.set('form_token', token);
+              self._preview(data);
+            });
+          });
+        }.bind(this),
+        onFailure: function () {
+          preview.removeClassName('loading');
         }.bind(this)
       });
     }

@@ -69,6 +69,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
+    private static final String INTERNAL = "internal";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseClass.class);
 
     private static final long serialVersionUID = 1L;
@@ -188,10 +190,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         if (element != null) {
             Set<String> properties = getPropertyList();
-            if (!properties.contains(name)) {
-                if (((BaseCollection) element).getNumber() == 0) {
-                    ((BaseCollection) element).setNumber(properties.size() + 1);
-                }
+            if (!properties.contains(name) && ((BaseCollection) element).getNumber() == 0) {
+                ((BaseCollection) element).setNumber(properties.size() + 1);
             }
 
             super.addField(name, element);
@@ -1224,7 +1224,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public String getCustomMapping()
     {
         if ("XWiki.XWikiPreferences".equals(getName())) {
-            return "internal";
+            return INTERNAL;
         }
 
         if (this.customMapping == null) {
@@ -1245,12 +1245,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         String cMapping = getCustomMapping();
 
-        return (cMapping != null) && (!"".equals(cMapping)) && (!"internal".equals(cMapping));
+        return (cMapping != null) && (!"".equals(cMapping)) && (!INTERNAL.equals(cMapping));
     }
 
     public boolean hasInternalCustomMapping()
     {
-        return "internal".equals(this.customMapping);
+        return INTERNAL.equals(this.customMapping);
     }
 
     public boolean isCustomMappingValid(XWikiContext context) throws XWikiException
@@ -1364,9 +1364,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = context.getWiki().getClass(className, context);
-        BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
-
-        return object;
+        return (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
     }
 
     public String getDefaultWeb()

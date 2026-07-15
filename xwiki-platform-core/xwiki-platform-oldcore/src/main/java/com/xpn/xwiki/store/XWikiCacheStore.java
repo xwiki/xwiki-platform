@@ -321,10 +321,8 @@ public class XWikiCacheStore extends AbstractXWikiStore
     public void onEvent(Event event, Object source, Object data)
     {
         // only react to remote events since local actions are already taken into account
-        if (this.remoteObservationManagerContext.isRemoteState()) {
-            if (event instanceof WikiDeletedEvent) {
-                flushCache();
-            }
+        if (this.remoteObservationManagerContext.isRemoteState() && event instanceof WikiDeletedEvent) {
+            flushCache();
         }
     }
 

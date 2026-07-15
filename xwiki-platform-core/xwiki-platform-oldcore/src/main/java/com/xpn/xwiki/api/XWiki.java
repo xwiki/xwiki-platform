@@ -48,7 +48,6 @@ import org.xwiki.query.hql.internal.HQLStatementValidator;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationException;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.user.CurrentUserReference;
 
@@ -104,8 +103,6 @@ public class XWiki extends Api
     private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
 
     private DocumentRevisionProvider documentRevisionProvider;
-
-    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     private HQLStatementValidator hqlValidator;
 
@@ -410,8 +407,7 @@ public class XWiki extends Api
     public List<DeletedDocument> getDeletedDocuments(String fullname, String locale) throws XWikiException
     {
         XWikiDeletedDocument[] deletedDocuments = this.xwiki.getDeletedDocuments(fullname, locale, this.context);
-        List<DeletedDocument> result = wrapDeletedDocuments(deletedDocuments);
-        return result;
+        return wrapDeletedDocuments(deletedDocuments);
     }
 
     /**
@@ -424,8 +420,7 @@ public class XWiki extends Api
     public List<DeletedDocument> getDeletedDocuments(String batchId) throws XWikiException
     {
         XWikiDeletedDocument[] deletedDocuments = this.xwiki.getDeletedDocuments(batchId, this.context);
-        List<DeletedDocument> result = wrapDeletedDocuments(deletedDocuments);
-        return result;
+        return wrapDeletedDocuments(deletedDocuments);
     }
 
     private List<DeletedDocument> wrapDeletedDocuments(XWikiDeletedDocument[] deletedDocuments)
@@ -625,8 +620,8 @@ public class XWiki extends Api
     public Document getDocument(String space, String fullname) throws XWikiException
     {
         XWikiDocument doc = this.xwiki.getDocument(space, fullname, getXWikiContext());
-        if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
-            getXWikiContext()) == false) {
+        if (!this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
+            getXWikiContext())) {
             return null;
         }
 

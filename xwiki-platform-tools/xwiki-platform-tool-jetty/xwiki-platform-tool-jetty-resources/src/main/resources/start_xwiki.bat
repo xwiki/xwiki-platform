@@ -167,6 +167,9 @@ REM Jetty does not work well with a relative directory, so we use the absolute o
 set "JETTY_BASE=%XWIKI_HOME%"
 REM Also make sure the log directory exists since Jetty won't create it.
 if not exist "%JETTY_BASE%\logs" mkdir "%JETTY_BASE%\logs"
+REM Make sure the "work" directory exists so that Jetty reuses a persistent, stable temp directory for the webapps
+REM instead of creating a new random tmp\jetty-*-any-<random> folder on each startup.
+if not exist "%JETTY_BASE%\work" mkdir "%JETTY_BASE%\work"
 
 REM Specify Jetty's home directory to be the directory named "jetty" inside the Jetty base directory.
 set "JETTY_HOME=%JETTY_BASE%\jetty"

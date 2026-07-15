@@ -547,11 +547,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     @Override
     public boolean rememberingLogin(HttpServletRequest request)
     {
-        if ("true".equals(getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_REMEMBERME, DEFAULT_VALUE))) {
-            return true;
-        } else {
-            return false;
-        }
+        return "true".equals(
+            getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_REMEMBERME, DEFAULT_VALUE));
     }
 
     /**

@@ -61,7 +61,7 @@ class DefaultDocumentReferenceProviderTest implements TestConstants
         when(this.entityProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DEFAULT_DOCUMENT_REFERENCE);
         when(this.spaceProvider.get())
             .thenReturn(new SpaceReference(DEFAULT_SPACE_REFERENCE.appendParent(DEFAULT_WIKI_REFERENCE)));
-        when(this.entityReferenceFactory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
+        when(this.entityReferenceFactory.getReference(any())).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Test

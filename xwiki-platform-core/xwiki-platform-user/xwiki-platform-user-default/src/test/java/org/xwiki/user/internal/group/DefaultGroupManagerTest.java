@@ -128,10 +128,10 @@ class DefaultGroupManagerTest
 
         WikiDescriptorManager wikiManager = this.oldcore.getWikiDescriptorManager();
 
-        when(wikiManager.getAllIds()).thenAnswer((invocation) -> {
+        when(wikiManager.getAllIds()).thenAnswer(invocation -> {
             return wikis;
         });
-        when(wikiManager.getCurrentWikiId()).thenAnswer((invocation) -> {
+        when(wikiManager.getCurrentWikiId()).thenAnswer(invocation -> {
             return oldcore.getXWikiContext().getWikiId();
         });
 

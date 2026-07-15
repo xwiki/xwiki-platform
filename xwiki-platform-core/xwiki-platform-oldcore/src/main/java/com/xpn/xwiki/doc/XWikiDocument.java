@@ -5018,15 +5018,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         // Datas
 
-        if (!equalsData(doc)) {
-            return false;
-        }
-
         // We consider that 2 documents are still equal even when they have different original
         // documents (see getOriginalDocument() for more details as to what is an original
         // document).
 
-        return true;
+        return equalsData(doc);
     }
 
     /**
@@ -8281,11 +8277,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             }
         }
 
-        if (HTML_TAG_PATTERN.matcher(content2).find()) {
-            return true;
-        }
-
-        return false;
+        return HTML_TAG_PATTERN.matcher(content2).find();
     }
 
     public boolean isProgrammaticContent()

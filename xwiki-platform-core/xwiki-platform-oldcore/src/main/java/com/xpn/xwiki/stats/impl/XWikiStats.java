@@ -199,11 +199,7 @@ public class XWikiStats extends BaseCollection
             return false;
         }
 
-        if (getNumber() != ((BaseCollection) obj).getNumber()) {
-            return false;
-        }
-
-        return true;
+        return getNumber() == ((BaseCollection) obj).getNumber();
     }
 
     @Override

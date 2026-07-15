@@ -2291,11 +2291,7 @@ public class Document extends Api
     {
         try {
             XWikiLock lock = this.doc.getLock(getXWikiContext());
-            if (lock != null && !getXWikiContext().getUser().equals(lock.getUserName())) {
-                return true;
-            } else {
-                return false;
-            }
+            return lock != null && !getXWikiContext().getUser().equals(lock.getUserName());
         } catch (Exception e) {
             return false;
         }

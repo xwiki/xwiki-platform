@@ -83,18 +83,10 @@ public class PropertyChangedRule extends DocChangeRule {
         for (int i = 0; i < vobj1.size(); i++) {
             if (!((vobj1.get(i) == null) && (vobj2.get(i) == null))) {
                 if (vobj1.get(i) == null) {
-                    if (((BaseObject)vobj2.get(i)).safeget(propertyName) == null) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return ((BaseObject)vobj2.get(i)).safeget(propertyName) == null;
                 }
                 if (vobj2.get(i) == null) {
-                    if (((BaseObject)vobj1.get(i)).safeget(propertyName) == null) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return ((BaseObject)vobj1.get(i)).safeget(propertyName) == null;
                 }
                 BaseProperty prop1 = 
                     (BaseProperty) ((BaseObject)vobj1.get(i)).safeget(propertyName);

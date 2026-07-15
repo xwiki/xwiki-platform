@@ -184,8 +184,7 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
         // Oracle databases treat NULL and empty strings similarly. Thus the list passed as parameter can have some
         // elements being NULL (for XWiki string properties which were empty strings). This means we need to check
         // for NULL and ignore NULL entries from the list.
-        if (result instanceof Object[]) {
-            Object[] row = (Object[]) result;
+        if (result instanceof Object[] row) {
             if (row.length > 0 && row[0] != null) {
                 value = new PropertyValue(row[0]);
                 if (row.length > 1 && row[1] != null) {

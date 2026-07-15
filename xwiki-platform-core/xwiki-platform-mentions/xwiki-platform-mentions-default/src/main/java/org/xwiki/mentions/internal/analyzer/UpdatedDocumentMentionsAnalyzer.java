@@ -224,8 +224,8 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
                     });
             } else {
                 for (Object o : baseObject.getProperties()) {
-                    if (o instanceof LargeStringProperty) {
-                        handleProperty(oldBaseObject, (LargeStringProperty) o, version, TEXT_FIELD, authorReference,
+                    if (o instanceof LargeStringProperty largeStringProperty) {
+                        handleProperty(oldBaseObject, largeStringProperty, version, TEXT_FIELD, authorReference,
                             syntax).ifPresent(mentionNotificationParametersList::add);
                     }
                 }

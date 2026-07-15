@@ -149,8 +149,7 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
     protected PropertyValue getValueFromQueryResult(Object result, T propertyDefinition)
     {
         PropertyValue value = super.getValueFromQueryResult(result, propertyDefinition);
-        if (value != null && value.getValue() instanceof DocumentReference) {
-            DocumentReference documentReference = (DocumentReference) value.getValue();
+        if (value != null && value.getValue() instanceof DocumentReference documentReference) {
             WikiReference wikiReference =
                 propertyDefinition.getOwnerDocument().getDocumentReference().getWikiReference();
             // Serialize the document reference relative to the wiki were the property is defined.

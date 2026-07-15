@@ -191,7 +191,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Tabelle aktualisieren
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Ziehen und platzieren Sie die Einträge, um die Reihenfolge zu ändern
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Löschen
 platform.appwithinminutes.liveTableEditorAddColumnHint=Hinzufügen
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Einige Spalten sind nicht mehr aktuell, wahrscheinlich, weil die zugehörigen Felder gelöscht wurden. Möchten Sie diese Spalten entfernen?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Einige Spalten sind nicht mehr aktuell, wahrscheinlich, weil die zugehörigen Felder gelöscht wurden. Möchten Sie diese Spalten entfernen?
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Veraltete Spalten entfernen
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Behalten
 platform.appwithinminutes.liveTableEditorIcon=Symbol
@@ -271,5 +271,8 @@ platform.appwithinminutes.wizardStep3Description=Geben Sie der Startseite Ihrer 
 platform.appwithinminutes.appsLiveTable.doc.space=Anwendungsname
 appWithinMinutes.classEditor.title={0} Struktur
 appWithinMinutes.templateProviderEditor.title={0} Enträge
-</content>
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Einige Spalten sind nicht mehr aktuell, wahrscheinlich, weil die zugehörigen Felder gelöscht wurden. Möchten Sie diese Spalten entfernen? &lt;a href=""&gt;Ja&lt;/a&gt; / &lt;a href=""&gt;Nein&lt;/a&gt;</content>
 </xwikidoc>

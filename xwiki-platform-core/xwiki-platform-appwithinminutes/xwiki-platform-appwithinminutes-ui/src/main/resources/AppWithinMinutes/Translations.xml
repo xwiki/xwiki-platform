@@ -198,7 +198,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Update LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop to change the order
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
 platform.appwithinminutes.liveTableEditorAddColumnHint=Add selected column
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them?
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Remove deprecated columns
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Keep them
 platform.appwithinminutes.liveTableEditorIcon=Icon
@@ -276,7 +276,11 @@ platform.appwithinminutes.wizardStep3Description=Customize the application homep
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Application name
 appWithinMinutes.classEditor.title={0} Structure
-appWithinMinutes.templateProviderEditor.title={0} Entries</content>
+appWithinMinutes.templateProviderEditor.title={0} Entries
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;</content>
   <object>
     <name>AppWithinMinutes.Translations</name>
     <number>0</number>

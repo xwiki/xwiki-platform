@@ -71,7 +71,7 @@
 #macro (displayDeprecatedColumnsWarning)
   #define ($deprecatedColumnsWarning)
     &lt;p&gt;$escapetool.xml($services.localization.render(
-      'platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning'))&lt;/p&gt;
+      'platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage'))&lt;/p&gt;
     &lt;div class="buttons"&gt;
       &lt;span class="buttonwrapper"&gt;&lt;button type="button" class="button secondary removeDeprecatedColumns"&gt;$escapetool.xml($services.localization.render(
         'platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove'))&lt;/button&gt;&lt;/span&gt;

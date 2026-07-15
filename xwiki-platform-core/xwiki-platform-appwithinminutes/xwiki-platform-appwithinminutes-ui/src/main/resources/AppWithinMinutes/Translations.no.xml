@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Oppdater Live-tabell
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Dra og slipp for å endre rekkefølgen
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Slett
 platform.appwithinminutes.liveTableEditorAddColumnHint=Legg til valgt kolonne
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Noen kolonner er utdatert, sannsynligvis fordi de tilsvarende programfeltene er slettet. Ønsker du å slette de?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Noen kolonner er utdatert, sannsynligvis fordi de tilsvarende programfeltene er slettet. Ønsker du å slette de?
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Slett utdaterte kolonner
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Behold dem
 platform.appwithinminutes.liveTableEditorIcon=Ikon
@@ -268,5 +268,9 @@ platform.appwithinminutes.wizardStep3Description=Tilpass applikasjonens startsid
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Applikasjonsnavn
 appWithinMinutes.classEditor.title={0} Struktur
-appWithinMinutes.templateProviderEditor.title={0} Oppføringer</content>
+appWithinMinutes.templateProviderEditor.title={0} Oppføringer
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Noen kolonner er utdatert, sannsynligvis fordi de tilsvarende programfeltene er slettet. Ønsker du å slette de? &lt;a href=""&gt;Ja&lt;/a&gt; / &lt;a href=""&gt;Nei&lt;/a&gt;</content>
 </xwikidoc>

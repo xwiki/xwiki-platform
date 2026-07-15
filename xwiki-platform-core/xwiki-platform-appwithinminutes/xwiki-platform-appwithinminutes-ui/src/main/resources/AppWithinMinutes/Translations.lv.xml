@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Atjaunot tabulu
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Velciet kolonnas, lai mainītu to kārtību
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Dzēst
 platform.appwithinminutes.liveTableEditorAddColumnHint=Pievienot
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Dažas kolonnas ir novecojušas, iespējams tāpēc, ka attiecīgie klases lauki ir izdzēsti. Vai vēlaties izdzēst šīs kolonnas?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Dažas kolonnas ir novecojušas, iespējams tāpēc, ka attiecīgie klases lauki ir izdzēsti. Vai vēlaties izdzēst šīs kolonnas?
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Dzēst novecojušās kolonnas
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Paturēt tās
 platform.appwithinminutes.liveTableEditorIcon=Ikona
@@ -268,5 +268,9 @@ platform.appwithinminutes.wizardStep3Description=Pielāgojiet lietotnes sākuma 
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Lietotnes nosaukums
 appWithinMinutes.classEditor.title={0} struktūra
-appWithinMinutes.templateProviderEditor.title={0} ieraksti</content>
+appWithinMinutes.templateProviderEditor.title={0} ieraksti
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Dažas kolonnas ir novecojušas, iespējams tāpēc, ka attiecīgie klases lauki ir izdzēsti. Vai vēlaties izdzēst šīs kolonnas?\n&lt;a href=""&gt;Jā&lt;/a&gt; / &lt;a href=""&gt;Nē&lt;/a&gt;</content>
 </xwikidoc>

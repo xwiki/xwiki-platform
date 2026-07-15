@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Aggiorna LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop per cambiare l'ordine
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Elimina
 platform.appwithinminutes.liveTableEditorAddColumnHint=Aggiungi
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Alcune colonne sono sconsigliate, probabilmente perchè i corrispondenti campi della classe sono stati eliminati. Si vuole eliminarle?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Alcune colonne sono sconsigliate, probabilmente perchè i corrispondenti campi della classe sono stati eliminati. Si vuole eliminarle?
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Elimina colonne sconsigliate
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Mantienile
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
@@ -268,5 +268,9 @@ platform.appwithinminutes.wizardStep3Description=Personalizzazione della home pa
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Nome Applicazione
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries</content>
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Alcune colonne sono sconsigliate, probabilmente perchè i corrispondenti campi della classe sono stati eliminati. Si vuole eliminarle? &lt;a href\=""&gt;Sì&lt;/a&gt; / &lt;a href\=""&gt;No&lt;/a&gt;</content>
 </xwikidoc>

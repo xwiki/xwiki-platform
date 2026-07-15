@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Aktualizace "živé" tabulk
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Přetáhněte myší pro změnu pořadí
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Smazat
 platform.appwithinminutes.liveTableEditorAddColumnHint=Přidat
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Některé sloupce jsou zastaralé. Pravděpodobně proto, že odpovídající pole třídy byla vymazána. Přejete si jejich odstranění?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Některé sloupce jsou zastaralé. Pravděpodobně proto, že odpovídající pole třídy byla vymazána. Přejete si jejich odstranění?
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Odstranit zastaralé sloupce
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Ponechat
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
@@ -268,5 +268,9 @@ platform.appwithinminutes.wizardStep3Description=Přizpůsobte domovskou stránk
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Název aplikace
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries</content>
+### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Některé sloupce jsou zastaralé. Pravděpodobně proto, že odpovídající pole třídy byla vymazána. Přejete si jejich odstranění? &lt;a href\=""&gt; Ano &lt;/ a&gt; / &lt;a href\=""&gt; Ne &lt;/ a&gt;</content>
 </xwikidoc>

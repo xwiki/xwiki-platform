@@ -191,7 +191,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Mettre à jour le tableau d
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Glissez-Déposez pour modifier l'ordre
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Supprimer
 platform.appwithinminutes.liveTableEditorAddColumnHint=Ajouter la colonne sélectionnée
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Certaines colonnes sont obsolètes, probablement parce que les champs correspondant ont été supprimés. Souhaitez-vous les effacer ?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Certaines colonnes sont obsolètes, probablement parce que les champs correspondant ont été supprimés. Souhaitez-vous les effacer ?
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Supprimer les colonnes obsolètes
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Les conserver
 platform.appwithinminutes.liveTableEditorIcon=Icône
@@ -271,5 +271,8 @@ platform.appwithinminutes.wizardStep3Description=Personnalisez la page d'accueil
 platform.appwithinminutes.appsLiveTable.doc.space=Nom de l'application
 appWithinMinutes.classEditor.title={0} Structure
 appWithinMinutes.templateProviderEditor.title={0} éléments
-</content>
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Certaines colonnes sont obsolètes, probablement parce que les champs correspondant ont été supprimés. Souhaitez-vous les effacer ? &lt;a href=""&gt;Oui&lt;/a&gt; / &lt;a href=""&gt;Non&lt;/a&gt;</content>
 </xwikidoc>

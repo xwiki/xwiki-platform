@@ -85,9 +85,10 @@
 #end
 
 #macro (locationPickerActions $options)
+  #set ($isTreePickerAvailable = $isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
   <div class="location-actions btn-group">
     ## Tree picker toggle
-    #if ($isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
+    #if ($isTreePickerAvailable)
       #set ($label = $escapetool.xml($services.localization.render('core.create.locationPreview.actions.pick')))
       <button type="button" class="btn btn-default btn-xs location-action location-action-pick"
          title="$label" aria-label="$label">
@@ -104,7 +105,7 @@
       </button>
     #end
   </div>
-  #if ($isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
+  #if ($isTreePickerAvailable)
     #documentPickerModal($options)
   #end
 #end

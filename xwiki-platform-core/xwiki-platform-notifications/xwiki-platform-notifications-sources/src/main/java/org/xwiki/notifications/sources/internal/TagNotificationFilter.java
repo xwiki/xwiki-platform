@@ -21,7 +21,6 @@ package org.xwiki.notifications.sources.internal;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -96,7 +95,7 @@ public class TagNotificationFilter implements NotificationFilter
         List<String> enabledTags = filterPreferences.stream()
                 .filter(nfp -> nfp instanceof TagNotificationFilterPreference && nfp.isEnabled())
                 .map(nfp -> ((TagNotificationFilterPreference) nfp).getTag().toLowerCase())
-                .collect(Collectors.toList());
+                .toList();
 
         if (enabledTags.isEmpty()) {
             return null;

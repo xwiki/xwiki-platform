@@ -22,7 +22,6 @@ package com.xpn.xwiki.store.migration.hibernate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -148,7 +147,7 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
         Set<String> missingProperties = new HashSet<>(xclass.getPropertyList());
         missingProperties.removeAll(getCurrentProperties(objectId, session));
         return missingProperties.stream().map(propertyName -> (PropertyClass) xclass.get(propertyName))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private List<String> getCurrentProperties(Long objectId, Session session)

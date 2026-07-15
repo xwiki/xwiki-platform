@@ -293,7 +293,7 @@ public class LogCaptureValidator
                 }
             }
             return true;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     private void displayMissingWarning(List<Line> definitions, List<Line> matchingDefinitions, String missingType)

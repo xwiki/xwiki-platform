@@ -20,7 +20,6 @@
 package org.xwiki.refactoring.internal.listener;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -124,7 +123,7 @@ public class UpdateObjectsOnClassRenameListener extends AbstractLocalEventListen
             query.bindValue("className", this.localEntityReferenceSerializer.serialize(oldClassReference));
             List<DocumentReference> documentsToUpdate = query.<String>execute().stream()
                 .map(fullName -> this.documentReferenceResolver.resolve(fullName, oldClassReference))
-                .collect(Collectors.toList());
+                .toList();
             if (!documentsToUpdate.isEmpty()) {
                 updateObjects(documentsToUpdate, oldClassReference, newClassReference);
             }

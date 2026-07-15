@@ -121,7 +121,7 @@ public abstract class AbstractTreeNode implements TreeNode
     private List<TreeFilter> getFilters()
     {
         return ((List<?>) getProperties().getOrDefault(PROPERTY_FILTERS, Collections.emptyList())).stream()
-            .map(this::getFilter).filter(Objects::nonNull).collect(Collectors.toList());
+            .map(this::getFilter).filter(Objects::nonNull).toList();
     }
 
     private TreeFilter getFilter(Object filter)

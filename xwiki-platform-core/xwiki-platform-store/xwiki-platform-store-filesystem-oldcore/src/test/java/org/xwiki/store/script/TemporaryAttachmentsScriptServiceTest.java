@@ -56,7 +56,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 import ch.qos.logback.classic.Level;
 
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -204,7 +203,7 @@ class TemporaryAttachmentsScriptServiceTest
 
         assertEquals(List.of(xWikiAttachment1, xWikiAttachment0),
             this.temporaryAttachmentsScriptService.listTemporaryAttachments(DOCUMENT_REFERENCE).stream()
-                .map(Attachment::getAttachment).collect(toList()));
+                .map(Attachment::getAttachment).toList());
     }
 
     @Test
@@ -229,7 +228,7 @@ class TemporaryAttachmentsScriptServiceTest
         when(xWikiAttachment1.getFilename()).thenReturn("a.png");
         assertEquals(List.of(xWikiAttachment1, xWikiAttachment0),
             this.temporaryAttachmentsScriptService.listAllAttachments(DOCUMENT_REFERENCE).stream()
-                .map(Attachment::getAttachment).collect(toList()));
+                .map(Attachment::getAttachment).toList());
     }
 
     @Test
@@ -247,7 +246,7 @@ class TemporaryAttachmentsScriptServiceTest
         when(xWikiAttachment1.getFilename()).thenReturn("a.png");
         assertEquals(List.of(xWikiAttachment1, xWikiAttachment0),
             this.temporaryAttachmentsScriptService.listAllAttachments(DOCUMENT_REFERENCE).stream()
-                .map(Attachment::getAttachment).collect(toList()));
+                .map(Attachment::getAttachment).toList());
     }
 
     @Test
@@ -272,7 +271,7 @@ class TemporaryAttachmentsScriptServiceTest
         when(xWikiAttachmentTemporary1.getFilename()).thenReturn("a.png");
         assertEquals(List.of(xWikiAttachmentTemporary1, xWikiAttachmentTemporary0, xWikiAttachment0),
             this.temporaryAttachmentsScriptService.listAllAttachments(DOCUMENT_REFERENCE).stream()
-                .map(Attachment::getAttachment).collect(toList()));
+                .map(Attachment::getAttachment).toList());
     }
 
     @Test

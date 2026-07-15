@@ -44,6 +44,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/rendering/rendering-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/markdown
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/minimal

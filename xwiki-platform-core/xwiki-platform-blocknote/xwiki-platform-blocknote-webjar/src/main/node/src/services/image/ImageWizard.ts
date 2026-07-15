@@ -17,8 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { ResourceReference } from "../model/reference/ResourceReferenceParser";
 import type { BlockOfType } from "@xwiki/platform-editors-blocknote-react";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 /**
  * The image block properties augmented with the full-fidelity XWiki resource reference. The plain BlockNote image URL

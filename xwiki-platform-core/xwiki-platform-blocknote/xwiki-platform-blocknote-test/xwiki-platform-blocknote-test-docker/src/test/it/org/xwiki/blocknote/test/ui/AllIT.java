@@ -19,10 +19,7 @@
  */
 package org.xwiki.blocknote.test.ui;
 
-import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.TestClassOrder;
 import org.xwiki.test.docker.junit5.UITest;
 
 /**
@@ -32,35 +29,29 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 17.6.0RC1
  */
 @UITest
-@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class AllIT
 {
     @Nested
-    @Order(1)
     class NestedBlockNoteIT extends BlockNoteIT
     {
     }
 
     @Nested
-    @Order(2)
     class NestedRoundTripIT extends RoundTripIT
     {
     }
 
     @Nested
-    @Order(3)
     class NestedImageIT extends ImageIT
     {
     }
 
     @Nested
-    @Order(4)
     class NestedLinkIT extends LinkIT
     {
     }
 
     @Nested
-    @Order(5)
     class NestedMacroIT extends MacroIT
     {
     }
@@ -70,7 +61,6 @@ class AllIT
     // doesn't catch. This can leave the shared browser/server session degraded, so this class must run last to
     // avoid poisoning any of the other nested test classes above.
     @Nested
-    @Order(6)
     class NestedCollaborationIT extends CollaborationIT
     {
     }

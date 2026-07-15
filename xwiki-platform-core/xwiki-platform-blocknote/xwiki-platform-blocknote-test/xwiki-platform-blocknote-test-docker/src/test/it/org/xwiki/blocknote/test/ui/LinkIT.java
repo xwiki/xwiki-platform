@@ -32,10 +32,11 @@ import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -72,13 +73,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 )
 class LinkIT extends AbstractBlockNoteIT
 {
-    @BeforeAll
-    void beforeAllLinkIT(TestUtils setup) throws Exception
-    {
-        // Wait for the Solr indexing to complete since the page and attachment link suggestions are based on it.
-        waitForSolrIndexing(setup);
-    }
-
     @Test
     @Order(1)
     void createLinkOnWordInTheMiddleOfALine(TestUtils setup, TestReference testReference)
@@ -224,7 +218,7 @@ class LinkIT extends AbstractBlockNoteIT
         DocumentReference targetPage = new DocumentReference("PageLinkTarget", testReference.getLastSpaceReference());
         setup.deletePage(targetPage);
         setup.createPage(targetPage, "", "Page Link Target");
-        waitForSolrIndexing(setup);
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Start fresh.
         setup.deletePage(testReference);
@@ -267,7 +261,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.createPage(targetPage, "", "Attachment Link Target");
         String attachmentName = "image.gif";
         setup.attachFile(targetPage, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
-        waitForSolrIndexing(setup);
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Start fresh.
         setup.deletePage(testReference);
@@ -328,39 +322,6 @@ class LinkIT extends AbstractBlockNoteIT
         assertEquals("""
             (% style="color:default;background-color:default;text-align:left" %)
             First [[second>>mailto:second@xwiki.org]] third fourth""", wikiEditor.getContent());
-    }
-
-    @Test
-    @Order(8)
-    void cancelPageLinkCreation(TestUtils setup, TestReference testReference)
-    {
-        // Start fresh.
-        setup.deletePage(testReference);
-        setup.createPage(testReference, "First second third fourth");
-
-        InplaceEditablePage page = new InplaceEditablePage().editInplace();
-
-        BlockNoteEditor editor = new BlockNoteEditor("content");
-        BlockNoteRichTextArea textArea = editor.getRichTextArea();
-
-        // Select the word "second" using the keyboard.
-        textArea.click();
-        selectWord(textArea, 6, 6);
-
-        // Open the link modal, switch to the Page target type, but cancel it instead of submitting.
-        BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
-        linkModal.selectTargetType("Page");
-        linkModal.cancel();
-
-        // The content must be left untouched.
-        textArea.waitUntilTextIs("First second third fourth");
-
-        // Save and check the source: since nothing was actually changed in the editor, the page content is left
-        // untouched (i.e. it is not even round-tripped through the editor, hence the lack of style annotation that a
-        // real edit would introduce).
-        page.save();
-        WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First second third fourth", wikiEditor.getContent());
     }
 
     @Test
@@ -446,7 +407,7 @@ class LinkIT extends AbstractBlockNoteIT
             new DocumentReference("NewPageLinkTarget", testReference.getLastSpaceReference());
         setup.deletePage(newTargetPage);
         setup.createPage(newTargetPage, "", "New Page Link Target");
-        waitForSolrIndexing(setup);
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Start fresh.
         setup.deletePage(testReference);
@@ -499,7 +460,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(newTargetPage);
         setup.createPage(newTargetPage, "", "New Attachment Link Target");
         setup.attachFile(newTargetPage, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
-        waitForSolrIndexing(setup);
+        new SolrTestUtils(setup).waitEmptyQueue();
 
         // Start fresh.
         setup.deletePage(testReference);

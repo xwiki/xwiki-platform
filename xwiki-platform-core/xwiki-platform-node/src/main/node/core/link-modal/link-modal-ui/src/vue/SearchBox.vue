@@ -126,7 +126,6 @@ const performSearch = debounce(async (search: string) => {
 });
 
 function selectSuggestion(suggestion: SearchLinkSuggestion<T, U>): void {
-  console.log(suggestion);
   justDynamicallyUpdatedQuery.value = true;
   query.value = suggestion.equivalentQuery;
   closeSuggestions();

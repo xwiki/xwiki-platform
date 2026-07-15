@@ -1,6 +1,6 @@
 :root {
     --cr-sizes-max-page-width: calc(var(--max-screen-size) * 1px); /*This value controls the width of the main content. It should be 100% for spanning text along the whole width or an arbitraty value*/
-    --cr-sizes-main-sidebar-width: var(--panel-column-left-width);; /*The default width of the main sidebar*/
+    --cr-sizes-main-sidebar-width: var(--panel-column-left-width); /*The default width of the main sidebar*/
     --cr-sizes-main-sidebar-min-width: 0; /*The minimum width of the main sidebar*/
     --cr-base-font-size: var(--font-size-base);
     --cr-base-text-color: var(--text-color);
@@ -29,7 +29,7 @@
     --cr-font-size-4x-large: calc(var(--cr-base-font-size) * 4.5);
 
     /* Font weights */
-    --cr-font-weight-light: cal(var(--font-weight-regular) -100); /* deriving it because we currently don't define it*/
+    --cr-font-weight-light: calc(var(--font-weight-regular) -100); /* deriving it because we currently don't define it*/
     --cr-font-weight-normal: var(--font-weight-regular);
     --cr-font-weight-semibold: var(--font-weight-semibold);
     --cr-font-weight-bold: var(--font-weight-bold);

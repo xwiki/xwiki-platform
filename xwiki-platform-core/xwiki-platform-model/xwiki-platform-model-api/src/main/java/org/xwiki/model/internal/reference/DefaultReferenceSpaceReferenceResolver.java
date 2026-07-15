@@ -51,8 +51,8 @@ public class DefaultReferenceSpaceReferenceResolver implements SpaceReferenceRes
     @Override
     public SpaceReference resolve(EntityReference spaceReferenceRepresentation, Object... parameters)
     {
-        if (spaceReferenceRepresentation instanceof SpaceReference) {
-            return (SpaceReference) spaceReferenceRepresentation;
+        if (spaceReferenceRepresentation instanceof SpaceReference spaceReference) {
+            return spaceReference;
         }
 
         return new SpaceReference(this.entityReferenceResolver.resolve(spaceReferenceRepresentation, EntityType.SPACE,

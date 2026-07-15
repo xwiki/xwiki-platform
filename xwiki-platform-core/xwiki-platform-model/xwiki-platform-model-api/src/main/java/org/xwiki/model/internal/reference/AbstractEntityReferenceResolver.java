@@ -91,13 +91,11 @@ public abstract class AbstractEntityReferenceResolver
     {
         EntityReference resolvedDefaultValue = null;
 
-        if (parameters != null && parameters.length > 0 && parameters[0] instanceof EntityReference) {
-            // Try to extract the required type from the passed parameter.
-            EntityReference referenceParameter = (EntityReference) parameters[0];
+        if (parameters != null && parameters.length > 0 && parameters[0] instanceof EntityReference reference) {
             // Make sure to use a compatible reference
-            referenceParameter = toCompatibleEntityReference(referenceParameter, type);
+            reference = toCompatibleEntityReference(reference, type);
 
-            EntityReference extractedReference = referenceParameter.extractReference(type);
+            EntityReference extractedReference = reference.extractReference(type);
             if (extractedReference != null) {
                 resolvedDefaultValue = extractedReference;
 

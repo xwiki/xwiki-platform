@@ -113,8 +113,8 @@ public class LocalUidStringEntityReferenceSerializer implements EntityReferenceS
         representation.append(name.length()).append(':').append(name);
 
         // Append Locale
-        if (currentReference instanceof DocumentReference) {
-            Locale locale = ((DocumentReference) currentReference).getLocale();
+        if (currentReference instanceof DocumentReference documentReference) {
+            Locale locale = documentReference.getLocale();
             if (locale != null) {
                 String localeString = locale.toString();
                 if (!localeString.isEmpty()) {

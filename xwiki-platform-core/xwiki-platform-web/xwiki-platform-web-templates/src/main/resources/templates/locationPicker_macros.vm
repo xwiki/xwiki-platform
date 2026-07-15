@@ -104,8 +104,6 @@
       </button>
     #end
   </div>
-  ## The modal is rendered outside of the btn-group so it doesn't become the group's DOM
-  ## first-child, which would break the rounded-corner styling of the first real button.
   #if ($isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
     #documentPickerModal($options)
   #end

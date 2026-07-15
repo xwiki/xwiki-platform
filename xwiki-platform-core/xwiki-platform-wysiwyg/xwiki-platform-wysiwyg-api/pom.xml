@@ -75,6 +75,21 @@
     </dependency>
 
     <!-- Test dependencies -->
+    <!-- Entry point for the Oldcore test tools (MockitoOldcore, @OldcoreTest, etc.). -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+    <!-- Provides the logging implementation expected by the oldcore-based tests. -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-logback</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- The HTMLCleanerTestSuite uses the deprecated XWikiComponentInitializer which initializes the ECM and some
          module draws the webjars-api module which itself has a dependency on the xwiki-platform-classloader-xwiki one
          which contains the ThreadClassloaderExecutionContextInitializer. Since HTMLCleanerTestSuite calls

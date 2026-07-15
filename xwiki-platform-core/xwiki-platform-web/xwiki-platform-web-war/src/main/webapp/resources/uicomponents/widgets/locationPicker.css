@@ -28,13 +28,17 @@
 .location-picker > dd > .breadcrumb-container > .location-actions {
   /* Lay the action buttons out in a row. */
   display: flex;
-  /* Center the buttons vertically against the breadcrumb line. */
+  /* Center the two buttons against each other. */
   align-items: center;
+  /* Don't stretch to the breadcrumb's full height when it wraps to several lines: stay aligned
+     with the breadcrumb's first line instead of floating in the middle of the whole block. */
+  align-self: flex-start;
   /* Remove rounded corners on the left so that the transition is seamless. */
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  /* No vertical padding: keep the block as close as possible to its pre-button-group height. */
-  padding: 0 .5em;
+  /* Horizontal breathing room, plus just enough top offset to center the buttons on the
+     breadcrumb's first line (matches the breadcrumb's own vertical padding/line-height). */
+  padding: 4px .5em 0;
 }
 
 .location-edit {

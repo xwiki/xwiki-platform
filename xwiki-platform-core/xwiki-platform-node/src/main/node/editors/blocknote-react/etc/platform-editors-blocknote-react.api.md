@@ -57,6 +57,7 @@ export type BlockNoteViewWrapperProps = {
     linkEditionHandler: LinkEditionHandler;
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
+        linkEdition?: LinkEditionHooks;
     };
     syntax: SyntaxConfig;
     refs?: {

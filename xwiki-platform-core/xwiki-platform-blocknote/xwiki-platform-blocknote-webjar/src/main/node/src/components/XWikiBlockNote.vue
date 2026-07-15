@@ -261,6 +261,16 @@ const editorProps = shallowRef<
   label: defaultLabel,
   overrides: {
     imageEdition,
+    linkEdition: {
+      // Runs before the popover is opened to edit an existing link. Return a transformed LinkData to
+      // pre-fill the popover with, or return nothing to keep the current link data unchanged. This is
+      // where the XWiki resource reference associated with the link can be resolved and injected.
+      beforeEdit: (linkData) => linkData,
+      // Runs right before the link is written into the content (i.e. before createLink / editLink).
+      // Return a transformed LinkData to change what is persisted, or nothing to keep it unchanged.
+      // This is where the XWiki resource reference can be computed and stored.
+      beforeUpdate: (linkData) => linkData,
+    },
   },
   syntax,
 });

@@ -36,11 +36,19 @@ export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
   const dict = useDictionary();
 
   const insertLink = useCallback(
-    (url: string) => {
-      editor.createLink(url);
+    (title: string, url: string) => {
+      // Let the integration intercept the link before it is written into the content (e.g. to resolve
+      // and store an XWiki resource reference). Throwing from the hook cancels the insertion.
+      const linkData = linkEditionHooks?.beforeUpdate?.({ title, url }) ?? {
+        title,
+        url,
+      };
+      // Don't pass the title as text: we want to link the current selection in place, without
+      // replacing it (which would strip its inline formatting).
+      editor.createLink(linkData.url);
       editor.focus();
     },
-    [editor],
+    [editor, linkEditionHooks],
   );
 
   // TODO: check if we need to update in realtime when the selection change?

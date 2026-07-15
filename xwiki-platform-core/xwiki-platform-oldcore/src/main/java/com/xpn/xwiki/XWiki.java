@@ -4227,7 +4227,8 @@ public class XWiki implements EventListener
 
         try {
             // TODO: Verify existing user
-            XWikiDocument doc = getDocument(new DocumentReference(context.getWikiId(), "XWiki", userName), context);
+            XWikiDocument doc =
+                getDocument(new DocumentReference(context.getWikiId(), SYSTEM_SPACE, userName), context);
 
             if (!doc.isNew()) {
                 // TODO: throws Exception

@@ -443,8 +443,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
         // Using an XML comment is pretty safe, as extensions probably wouldn't work in other type
         // of documents, like RTF, CSV or JSON.
         String hook = "<!-- " + this.getClass().getCanonicalName() + " -->";
-        String result = content.replaceFirst(hook, getImportString(context));
-        return result;
+        return content.replaceFirst(hook, getImportString(context));
     }
 
     @Override

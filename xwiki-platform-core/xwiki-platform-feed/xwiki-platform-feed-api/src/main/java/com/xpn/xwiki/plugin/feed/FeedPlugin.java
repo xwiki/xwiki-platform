@@ -300,12 +300,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             XWikiFeedFetcher feedFetcher = new XWikiFeedFetcher();
             feedFetcher.setUserAgent(context.getWiki().Param("xwiki.plugins.feed.useragent",
                 context.getWiki().getHttpUserAgent(context)));
-            SyndFeed feed =
-                feedFetcher.retrieveFeed(
-                    feedURL,
-                    (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.timeout",
-                        context.getWiki().getHttpTimeout(context)));
-            return feed;
+            return feedFetcher.retrieveFeed(
+                feedURL,
+                (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.timeout",
+                    context.getWiki().getHttpTimeout(context)));
         } catch (Exception ex) {
             if (ignoreInvalidFeeds) {
                 @SuppressWarnings("unchecked")

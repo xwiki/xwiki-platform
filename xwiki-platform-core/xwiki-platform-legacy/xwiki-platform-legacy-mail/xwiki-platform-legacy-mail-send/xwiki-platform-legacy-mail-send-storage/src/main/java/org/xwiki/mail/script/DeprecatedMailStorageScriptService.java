@@ -117,8 +117,7 @@ public class DeprecatedMailStorageScriptService extends AbstractMailScriptServic
     {
         try {
             MailStatusResult statusResult = this.mailResender.resendAsynchronously(batchId, uniqueMessageId);
-            ScriptMailResult scriptMailResult = new ScriptMailResult(new DefaultMailResult(batchId), statusResult);
-            return scriptMailResult;
+            return new ScriptMailResult(new DefaultMailResult(batchId), statusResult);
         } catch (MailStoreException e) {
             // Save the exception for reporting through the script services's getLastError() API
             setError(e);
@@ -311,8 +310,7 @@ public class DeprecatedMailStorageScriptService extends AbstractMailScriptServic
 
     private MimeMessage loadMessage(Session session, String batchId, String mailId) throws MailStoreException
     {
-        MimeMessage message = this.mailContentStore.load(session, batchId, mailId);
-        return message;
+        return this.mailContentStore.load(session, batchId, mailId);
     }
 
     @Override

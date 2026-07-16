@@ -116,7 +116,7 @@ public abstract class AbstractIncludeMacro<P> extends AbstractMacro<P>
             .ifPresent(sectionOrHeaderBlock -> {
                 if (sectionOrHeaderBlock instanceof SectionBlock) {
                     List<Block> sectionChildren = sectionOrHeaderBlock.getChildren();
-                    sectionChildren.stream().findFirst().filter(block -> block instanceof HeaderBlock)
+                    sectionChildren.stream().findFirst().filter(HeaderBlock.class::isInstance)
                         .ifPresent(headerBlock ->
                             xdom.replaceChild(sectionChildren.subList(1, sectionChildren.size()),
                                 sectionOrHeaderBlock));

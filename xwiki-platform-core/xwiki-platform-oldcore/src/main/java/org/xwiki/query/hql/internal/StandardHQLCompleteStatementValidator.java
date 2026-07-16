@@ -255,7 +255,7 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
             Statements statements = validation.getParsedStatements();
 
             Statement statement = statements.getStatements().get(0);
-            if (statement instanceof Select && isSelectSafe((Select) statement)) {
+            if (statement instanceof Select select && isSelectSafe(select)) {
                 return Optional.of(true);
             }
         }
@@ -267,8 +267,8 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
     {
         SelectBody selectBody = select.getSelectBody();
 
-        if (selectBody instanceof PlainSelect) {
-            return isNodeSafe(((PlainSelect) selectBody).getASTNode());
+        if (selectBody instanceof PlainSelect plainSelect) {
+            return isNodeSafe(plainSelect.getASTNode());
         }
 
         return false;
@@ -290,17 +290,17 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
 
     private boolean isNodeSafe(Node node)
     {
-        if (node instanceof SimpleNode) {
+        if (node instanceof SimpleNode simpleNode) {
             // Check if the node is a function
-            Object value = ((SimpleNode) node).jjtGetValue();
-            if (value instanceof Function) {
+            Object value = simpleNode.jjtGetValue();
+            if (value instanceof Function function) {
                 // Check if the function is allowed
-                if (!isFunctionSafe((Function) value)) {
+                if (!isFunctionSafe(function)) {
                     return false;
                 }
-            } else if (value instanceof PlainSelect) {
+            } else if (value instanceof PlainSelect plainSelect) {
                 // Check if the select is safe
-                if (!isPlainSelectSafe((PlainSelect) value)) {
+                if (!isPlainSelectSafe(plainSelect)) {
                     return false;
                 }
             }
@@ -341,8 +341,8 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
 
     private void addFromItem(FromItem item, Map<String, String> tables)
     {
-        if (item instanceof Table) {
-            String tableName = ((Table) item).getName();
+        if (item instanceof Table table) {
+            String tableName = table.getName();
             tables.put(item.getAlias() != null ? item.getAlias().getName() : tableName, tableName);
         }
     }
@@ -353,8 +353,8 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
      */
     private boolean isSelectItemAllowed(SelectItem selectItem, Map<String, String> tables)
     {
-        if (selectItem instanceof SelectExpressionItem) {
-            return isSelectExpressionAllowed(((SelectExpressionItem) selectItem).getExpression(), tables);
+        if (selectItem instanceof SelectExpressionItem selectExpressionItem) {
+            return isSelectExpressionAllowed(selectExpressionItem.getExpression(), tables);
         }
 
         // TODO: we could support more select items
@@ -365,8 +365,8 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
     private boolean isAllowedAllTableColumns(ExpressionList parameters, Map<String, String> tables)
     {
         Expression expression = parameters.getExpressions().get(0);
-        return expression instanceof AllTableColumns
-            && isTableAllowed(getTableName(((AllTableColumns) expression).getTable(), tables));
+        return expression instanceof AllTableColumns allTableColumns
+            && isTableAllowed(getTableName(allTableColumns.getTable(), tables));
     }
 
     private boolean isAllowedAllColumns(ExpressionList parameters, Map<String, String> tables)
@@ -385,12 +385,12 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
     {
         boolean safe = false;
 
-        if (expression instanceof Column) {
-            if (isColumnAllowed(((Column) expression), tables)) {
+        if (expression instanceof Column column) {
+            if (isColumnAllowed(column, tables)) {
                 safe = true;
             }
-        } else if (expression instanceof Function) {
-            safe = isSelectFunctionSafe(((Function) expression), tables);
+        } else if (expression instanceof Function function) {
+            safe = isSelectFunctionSafe(function, tables);
         } else if (ALLOWED_VALUE_CLASSES.contains(expression.getClass())) {
             safe = true;
         }

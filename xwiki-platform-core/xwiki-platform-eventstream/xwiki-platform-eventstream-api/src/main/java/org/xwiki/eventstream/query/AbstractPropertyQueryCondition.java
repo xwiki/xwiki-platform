@@ -134,9 +134,7 @@ public abstract class AbstractPropertyQueryCondition extends QueryCondition
             return true;
         }
 
-        if (super.equals(obj) && obj instanceof AbstractPropertyQueryCondition) {
-            AbstractPropertyQueryCondition otherContition = (AbstractPropertyQueryCondition) obj;
-
+        if (super.equals(obj) && obj instanceof AbstractPropertyQueryCondition otherContition) {
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.append(getProperty(), otherContition.getProperty());

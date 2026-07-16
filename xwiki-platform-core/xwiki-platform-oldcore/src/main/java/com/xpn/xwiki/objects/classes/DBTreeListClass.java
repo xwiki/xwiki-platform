@@ -195,8 +195,8 @@ public class DBTreeListClass extends DBListClass
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
             selectlist = new ArrayList<>();
-        } else if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+        } else if (prop instanceof ListProperty listProperty) {
+            selectlist = listProperty.getList();
         } else {
             selectlist = new ArrayList<>();
             selectlist.add(String.valueOf(prop.getValue()));
@@ -358,8 +358,8 @@ public class DBTreeListClass extends DBListClass
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
             selectlist = new ArrayList<>();
-        } else if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+        } else if (prop instanceof ListProperty listProperty) {
+            selectlist = listProperty.getList();
         } else {
             selectlist = new ArrayList<>();
             selectlist.add(String.valueOf(prop.getValue()));

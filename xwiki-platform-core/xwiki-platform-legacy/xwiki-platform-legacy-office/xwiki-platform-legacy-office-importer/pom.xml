@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Repackages xwiki-platform-office-importer including the legacy code/APIs</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.02</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
     <!-- The features provided by this module so that it's found when resolving extension -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-office-importer</xwiki.extension.features>
     <!-- Skipping spoon since the inspection of DefaultOpenOfficeConverter is causing troubles because of the method

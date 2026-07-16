@@ -35,7 +35,7 @@ class CurrentUserReferenceTest
     void isGlobal()
     {
         Throwable exception = assertThrows(RuntimeException.class,
-            () -> CurrentUserReference.INSTANCE.isGlobal());
+            CurrentUserReference.INSTANCE::isGlobal);
         assertEquals("You need to resolve the current user first to find if it's a global user or not.",
             exception.getMessage());
     }

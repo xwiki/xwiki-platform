@@ -195,8 +195,8 @@ public class QueryExpressionGenerator
                 NotificationFilter filter = filterIterator.next();
                 ExpressionNode node =
                     filter.filterExpression(parameters.user, parameters.filterPreferences, preference);
-                if (node != null && node instanceof AbstractOperatorNode) {
-                    preferenceTypeNode = preferenceTypeNode.and((AbstractOperatorNode) node);
+                if (node != null && node instanceof AbstractOperatorNode operatorNode) {
+                    preferenceTypeNode = preferenceTypeNode.and(operatorNode);
                 }
             }
 
@@ -225,11 +225,11 @@ public class QueryExpressionGenerator
         for (NotificationFilter filter : parameters.filters) {
             ExpressionNode node = filter.filterExpression(parameters.user, parameters.filterPreferences,
                 NotificationFilterType.EXCLUSIVE, parameters.format);
-            if (node instanceof AbstractOperatorNode) {
+            if (node instanceof AbstractOperatorNode operatorNode) {
                 if (globalFiltersNode == null) {
-                    globalFiltersNode = (AbstractOperatorNode) node;
+                    globalFiltersNode = operatorNode;
                 } else {
-                    globalFiltersNode = globalFiltersNode.and((AbstractOperatorNode) node);
+                    globalFiltersNode = globalFiltersNode.and(operatorNode);
                 }
             }
         }
@@ -244,11 +244,11 @@ public class QueryExpressionGenerator
         for (NotificationFilter filter : parameters.filters) {
             ExpressionNode node = filter.filterExpression(parameters.user, parameters.filterPreferences,
                 NotificationFilterType.INCLUSIVE, parameters.format, parameters.preferences);
-            if (node != null && node instanceof AbstractOperatorNode) {
+            if (node != null && node instanceof AbstractOperatorNode operatorNode) {
                 if (globalFiltersNode == null) {
-                    globalFiltersNode = (AbstractOperatorNode) node;
+                    globalFiltersNode = operatorNode;
                 } else {
-                    globalFiltersNode = globalFiltersNode.or((AbstractOperatorNode) node);
+                    globalFiltersNode = globalFiltersNode.or(operatorNode);
                 }
             }
         }
@@ -318,7 +318,6 @@ public class QueryExpressionGenerator
             return excludeHiddenEvents(topNode);
         }
 
-        final DocumentReference userClass = new DocumentReference(USER_CLASS, parameters.user.getWikiReference());
         // Don't show hidden events unless the user want to display hidden pages
         boolean displayHiddenDocuments = this.userPropertiesResolver
             .resolve(this.userReferenceResolver.resolve(parameters.user)).displayHiddenDocuments();

@@ -79,9 +79,9 @@ public class WikiNotificationPreferenceProvider extends AbstractDocumentNotifica
     protected void savePreferences(List<NotificationPreference> preferences, EntityReference target)
             throws NotificationException
     {
-        if (target instanceof WikiReference) {
+        if (target instanceof WikiReference wikiReference) {
             cachedNotificationPreferenceModelBridge
-                .saveNotificationsPreferences(new DocumentReference(GLOBAL_PREFERENCES, (WikiReference) target),
+                .saveNotificationsPreferences(new DocumentReference(GLOBAL_PREFERENCES, wikiReference),
                     preferences);
         } else {
             logger.warn("Preference's target [{}] is not a wiki reference. The corresponding preference will not be"

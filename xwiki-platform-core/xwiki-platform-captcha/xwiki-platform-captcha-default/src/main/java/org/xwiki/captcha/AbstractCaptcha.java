@@ -203,7 +203,6 @@ public abstract class AbstractCaptcha implements Captcha
      */
     protected XWikiContext getContext()
     {
-        XWikiContext context = contextProvider.get();
-        return context;
+        return contextProvider.get();
     }
 }

@@ -121,7 +121,7 @@ public class LineBreakFilter extends AbstractHTMLFilter
         boolean isBlockElement = false;
         if (null != node) {
             for (String blockElement : BLOCK_ELEMENT_TAGS) {
-                isBlockElement = blockElement.equals(node.getNodeName()) ? true : isBlockElement;
+                isBlockElement = blockElement.equals(node.getNodeName()) || isBlockElement;
             }
         }
         return isBlockElement;

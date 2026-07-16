@@ -129,7 +129,7 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
         List<SortEntry> sortEntries = new ArrayList<>();
         for (int i = 0; i < sortList.size(); i++) {
             String property = sortList.get(i);
-            boolean descending = i < descendingList.size() ? descendingList.get(i) : false;
+            boolean descending = i < descendingList.size() && descendingList.get(i);
             sortEntries.add(new SortEntry(property, descending));
         }
         return sortEntries;

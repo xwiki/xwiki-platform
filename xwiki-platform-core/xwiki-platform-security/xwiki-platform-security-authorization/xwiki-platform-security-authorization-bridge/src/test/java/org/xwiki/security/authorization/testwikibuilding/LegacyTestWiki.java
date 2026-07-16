@@ -462,8 +462,7 @@ public class LegacyTestWiki extends AbstractTestWiki
         TestSpace getTestSpace(String spaceName)
         {
             if (this.spaces.containsKey(spaceName)) {
-                TestSpace space = mockSpace(spaceName);
-                return space;
+                return mockSpace(spaceName);
             }
 
             return null;

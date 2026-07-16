@@ -72,9 +72,7 @@ public class StatusQueryCondition extends AbstractEntityQueryCondition
             return true;
         }
 
-        if (obj instanceof StatusQueryCondition) {
-            StatusQueryCondition status = (StatusQueryCondition) obj;
-
+        if (obj instanceof StatusQueryCondition status) {
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.appendSuper(super.equals(obj));

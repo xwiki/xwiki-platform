@@ -1006,11 +1006,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public boolean isAllowed(Extension extension, String namespace)
     {
-        if (extension instanceof IndexedExtension) {
-            if (Boolean.FALSE.equals(((IndexedExtension) extension).isCompatible(namespace))) {
-                // If the extension has explicitly been marked as incompatible, return false
-                return false;
-            }
+        if (extension instanceof IndexedExtension
+            && Boolean.FALSE.equals(((IndexedExtension) extension).isCompatible(namespace))) {
+            // If the extension has explicitly been marked as incompatible, return false
+            return false;
         }
 
         return this.namespaceResolver.isAllowed(extension.getAllowedNamespaces(), namespace);

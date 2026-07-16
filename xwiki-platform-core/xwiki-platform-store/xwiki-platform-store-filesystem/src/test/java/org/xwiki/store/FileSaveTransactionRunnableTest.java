@@ -209,7 +209,7 @@ class FileSaveTransactionRunnableTest
         final StartableTransactionRunnable str = new StartableTransactionRunnable();
         runnable.runIn(str);
         failRunnable.runIn(str);
-        Exception exception = assertThrows(Exception.class, str::start);
+        assertThrows(Exception.class, str::start);
 
         assertFalse(this.toSave.exists());
         assertFalse(this.temp.exists());

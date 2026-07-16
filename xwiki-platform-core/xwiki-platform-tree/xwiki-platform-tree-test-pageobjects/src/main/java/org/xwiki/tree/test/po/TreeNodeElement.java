@@ -83,7 +83,14 @@ public class TreeNodeElement extends BaseElement
      */
     public String getId()
     {
-        return getElement().getAttribute(ID);
+        // The rendered id is prefixed with the tree's own id, to keep it unique when the same entity is shown by
+        // more than one tree on the same page (see tree.js). Strip it back off to get the actual node id.
+        String renderedId = getElement().getAttribute(ID);
+        String prefix = this.treeElement.getAttribute(ID);
+        if (prefix != null && !prefix.isEmpty() && renderedId != null && renderedId.startsWith(prefix + "-")) {
+            return renderedId.substring(prefix.length() + 1);
+        }
+        return renderedId;
     }
 
     /**
@@ -209,8 +216,7 @@ public class TreeNodeElement extends BaseElement
             try {
                 // The aria-busy attribute is not directly on the li element, but it's on the element located as a
                 // child of the li in the DOM.
-                WebElement anchor = getDriver().findElementWithoutWaiting(getElement(), By.id(String.format("%s_anchor",
-                    getId())));
+                WebElement anchor = getDriver().findElementWithoutWaiting(getElement(), By.xpath("./a"));
                 return !Boolean.parseBoolean(anchor.getAttribute("aria-busy"));
             } catch (StaleElementReferenceException e) {
                 // The element has just been replaced. Try again.

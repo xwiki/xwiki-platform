@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -114,7 +113,7 @@ public class DefaultQuoteService implements QuoteService
                 block = new ParagraphBlock(
                     Stream.of(mentionBlock.getPreviousSibling(), mentionBlock, mentionBlock.getNextSibling())
                         .filter(Objects::nonNull)
-                        .collect(Collectors.toList())
+                        .toList()
                 );
             } else {
                 block = parent;

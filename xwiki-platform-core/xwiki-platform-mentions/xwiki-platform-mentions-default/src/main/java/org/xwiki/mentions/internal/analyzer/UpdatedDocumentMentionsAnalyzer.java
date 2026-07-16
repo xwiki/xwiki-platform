@@ -50,7 +50,6 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import static com.xpn.xwiki.doc.XWikiDocument.COMMENTSCLASS_REFERENCE;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.xwiki.annotation.Annotation.SELECTION_FIELD;
 import static org.xwiki.mentions.MentionLocation.ANNOTATION;
@@ -135,7 +134,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
             // Retrieve new mentions with a new anchor
             List<String> anchorsToNotify = newAnchorIds.stream().filter(
                 value -> !isEmpty(value) && !oldAnchorsIds.contains(value))
-                .collect(toList());
+                .toList();
 
             // Compute if there's new mentions without an anchor
             long newEmptyAnchorsNumber = newAnchorIds.stream().filter(StringUtils::isEmpty).count();

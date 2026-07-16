@@ -454,9 +454,7 @@ public class DefaultEvent implements Event
             return true;
         }
 
-        if (obj instanceof Event) {
-            Event otherEvent = (Event) obj;
-
+        if (obj instanceof Event otherEvent) {
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.append(getApplication(), otherEvent.getApplication());

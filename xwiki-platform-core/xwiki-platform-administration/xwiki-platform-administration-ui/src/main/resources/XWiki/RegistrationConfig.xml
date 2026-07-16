@@ -528,7 +528,7 @@
 #if($noReadableName)
   #set($displayName = $userName)
 #end
-#set($headline = $escapetool.xml($services.localization.render('core.register.successful.welcome', [$displayName, 
+#set($headline = $escapetool.xml($services.localization.render('core.register.successful.welcome.headline', [$displayName,
 '__headlinesmall__'])))
 #set($userLink = $xwiki.getUserName("$userSpace$userName"))
 #set($successAndLogin = $services.localization.render('core.register.successful.successandlogin'))

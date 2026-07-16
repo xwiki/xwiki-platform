@@ -191,7 +191,9 @@ platform.appwithinminutes.liveTableEditorSaveComment=Mettre à jour le tableau d
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Glissez-Déposez pour modifier l'ordre
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Supprimer
 platform.appwithinminutes.liveTableEditorAddColumnHint=Ajouter la colonne sélectionnée
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Certaines colonnes sont obsolètes, probablement parce que les champs correspondant ont été supprimés. Souhaitez-vous les effacer ?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Certaines colonnes sont obsolètes, probablement parce que les champs correspondant ont été supprimés. Souhaitez-vous les retirer ?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Retirer les colonnes obsolètes
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Les conserver
 platform.appwithinminutes.liveTableEditorIcon=Icône
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Une référence à une icône. Cele peut être n'importe quelle image dans le wiki mais également une icône affichée dans le sélecteur d'icônes lorsque celui-ci est actif.
 
@@ -272,5 +274,6 @@ appWithinMinutes.templateProviderEditor.title={0} éléments
 
 ### Since 18.6.0
 #@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Certaines colonnes sont obsolètes, probablement parce que les champs correspondant ont été supprimés. Souhaitez-vous les effacer ? &lt;a href=""&gt;Oui&lt;/a&gt; / &lt;a href=""&gt;Non&lt;/a&gt;</content>
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Certaines colonnes sont obsolètes, probablement parce que les champs correspondant ont été supprimés. Souhaitez-vous les effacer ? &lt;a href=""&gt;Oui&lt;/a&gt; / &lt;a href=""&gt;Non&lt;/a&gt;
+</content>
 </xwikidoc>

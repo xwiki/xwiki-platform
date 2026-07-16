@@ -128,7 +128,7 @@ public class R35100XWIKI7564DataMigration extends AbstractHibernateDataMigration
                 }
                 throw ex;
             } catch (IOException ex) {
-                // Shouldn't happen, the script is supposed to be there
+                // Shouldn't happen: UTF-8 is always available and the script is supposed to be there
             }
         }
     }

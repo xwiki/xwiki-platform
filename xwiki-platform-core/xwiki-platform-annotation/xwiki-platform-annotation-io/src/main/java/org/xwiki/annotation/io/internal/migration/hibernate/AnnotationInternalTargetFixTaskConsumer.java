@@ -78,7 +78,8 @@ public class AnnotationInternalTargetFixTaskConsumer implements TaskConsumer
             XWikiContext context = this.contextProvider.get();
             XWikiDocument document = context.getWiki().getDocument(documentReference, context);
             if (!document.isNew()) {
-                task(document);
+                // Clone the document to avoid modifying the cached instance.
+                task(document.clone());
             } else {
                 this.logger.info("[{}] skipped because it does not exist", document);
             }

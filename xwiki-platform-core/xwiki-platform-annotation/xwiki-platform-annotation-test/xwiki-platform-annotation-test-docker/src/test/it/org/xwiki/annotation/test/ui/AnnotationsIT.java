@@ -19,9 +19,7 @@
  */
 package org.xwiki.annotation.test.ui;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -83,14 +81,8 @@ class AnnotationsIT
 
         setup.deletePage(testReference);
 
-        setup.createUser(USER_NAME, USER_PASS, "", "");
-
         // The user is advanced to simplify the move operations.
-        Map<String, Object> userProperties = new HashMap<>();
-        userProperties.put("usertype", "Advanced");
-        setup.updateObject("XWiki", "UserAnnotation", "XWiki.XWikiUsers", 0, userProperties);
-
-        setup.login(USER_NAME, USER_PASS);
+        setup.createUserAndLogin(USER_NAME, USER_PASS, "usertype", "Advanced");
     }
 
     /**
@@ -204,7 +196,7 @@ class AnnotationsIT
         // Move the page to check that the annotations are still displayed afterward.
         RenamePage renamePage = annotatableViewPage.getWrappedViewPage().rename();
         renamePage.getDocumentPicker().setName("NewName");
-        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton();
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
         assertEquals("Done.", renameStatusPage.getInfoMessage());
         renameStatusPage.gotoNewPage();
 

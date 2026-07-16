@@ -164,7 +164,8 @@ public class DefaultIOService implements IOService
             // in a different wiki
             // TODO: figure out if this is the best idea in terms of target serialization
             // 1/ the good part is that it is a fixed value that can be searched with a query in all objects in the wiki
-            // 2/ the bad part is that copying a document to another space will not also update its annotation targets
+            // 2/ the bad part is that when the target points to another document (e.g., an object property), copying
+            // or moving that document will not also update the annotation targets pointing to it
             // 3/ if annotations are stored in the same document they annotate, the targets are only required for object
             // fields
             // ftm don't store the type of the reference since we only need to recognize the field, not to also read it.

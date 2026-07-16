@@ -19,7 +19,6 @@
  */
 package org.xwiki.annotation.io.internal;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Named;
@@ -39,6 +38,7 @@ import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.properties.internal.DefaultConverterManager;
 import org.xwiki.properties.internal.converter.ConvertUtilsConverter;
@@ -49,6 +49,7 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.XWikiCommentsDocumentInitializer;
@@ -69,13 +70,19 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.annotation.Annotation.AUTHOR_FIELD;
+import static org.xwiki.annotation.Annotation.DATE_FIELD;
+import static org.xwiki.annotation.Annotation.STATE_FIELD;
+import static org.xwiki.annotation.Annotation.TARGET_FIELD;
 
 /**
  * Tests that {@link DefaultIOService} attaches the temporary uploaded files (e.g. images inserted in an annotation
- * comment) to the exact document instance that is saved with the annotation, and does so before that document is
- * saved (otherwise the attachment would not be persisted). This is a wiring test: the
- * {@link TemporaryAttachmentSessionsManager} collaborator is mocked, so it verifies the delegation and its ordering
- * but not the end-to-end attachment persistence, which is exercised by the functional tests.
+ * comment) to the exact document instance that is saved with the annotation, and does so before that document is saved
+ * (otherwise the attachment would not be persisted). This is a wiring test: the
+ * {@link TemporaryAttachmentSessionsManager} collaborator is mocked, so it verifies the delegation and its ordering but
+ * not the end-to-end attachment persistence, which is exercised by the functional tests.
+ * <p>
+ * Also test that annotations attached to the current document are saved with an empty target field.
  *
  * @version $Id$
  */
@@ -92,7 +99,9 @@ import static org.mockito.Mockito.when;
 @ReferenceComponentList
 class DefaultIOServiceTest
 {
-    private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Space", "Page");
+    private static final String WIKI_ID = "xwiki";
+
+    private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference(WIKI_ID, "Space", "Page");
 
     private static final String TARGET = "xwiki:Space.Page";
 
@@ -111,7 +120,6 @@ class DefaultIOServiceTest
     @MockComponent
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
 
-    // Needed for the mandatory document initializer
     @MockComponent
     private JobProgressManager jobProgressManager;
 
@@ -128,21 +136,12 @@ class DefaultIOServiceTest
     private DocumentReference annotationClassReference;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
-        this.annotationClassReference =
-            new DocumentReference(COMMENTS_DOCUMENT_REFERENCE, DOCUMENT_REFERENCE.getWikiReference());
+        this.annotationClassReference = new DocumentReference(COMMENTS_DOCUMENT_REFERENCE, new WikiReference(WIKI_ID));
         when(this.configuration.getAnnotationClassReference()).thenReturn(this.annotationClassReference);
-        when(this.configuration.isInstalled()).thenReturn(true);
 
         this.oldcore.getSpyXWiki().initializeMandatoryDocuments(this.oldcore.getXWikiContext());
-    }
-
-    private XWikiDocument saveNewDocument() throws Exception
-    {
-        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
-        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
-        return document;
     }
 
     @Test
@@ -160,14 +159,14 @@ class DefaultIOServiceTest
         // The attachments must be added to the exact instance that is saved, and before it is saved (otherwise they
         // would not be persisted).
         ArgumentCaptor<XWikiDocument> documentCaptor = ArgumentCaptor.forClass(XWikiDocument.class);
-        InOrder inOrder = inOrder(this.temporaryAttachmentSessionsManager, this.oldcore.getSpyXWiki());
-        inOrder.verify(this.temporaryAttachmentSessionsManager).attachTemporaryAttachmentsInDocument(
-            documentCaptor.capture(), eq(Arrays.asList("image1.png", "image2.png")));
-        inOrder.verify(this.oldcore.getSpyXWiki())
-            .saveDocument(same(documentCaptor.getValue()), anyString(), eq(true), eq(context));
+        XWiki xwiki = this.oldcore.getSpyXWiki();
+        InOrder inOrder = inOrder(this.temporaryAttachmentSessionsManager, xwiki);
+        inOrder.verify(this.temporaryAttachmentSessionsManager)
+            .attachTemporaryAttachmentsInDocument(documentCaptor.capture(), eq(List.of("image1.png", "image2.png")));
+        inOrder.verify(xwiki).saveDocument(same(documentCaptor.getValue()), anyString(), eq(true), eq(context));
 
         // The uploaded files list must not be written as a (bogus) annotation object property.
-        XWikiDocument savedDocument = this.oldcore.getSpyXWiki().getDocument(DOCUMENT_REFERENCE, context);
+        XWikiDocument savedDocument = xwiki.getDocument(DOCUMENT_REFERENCE, context);
         BaseObject annotationObject = savedDocument.getXObjects(this.annotationClassReference).get(0);
         assertEquals("", annotationObject.getStringValue("uploadedFiles"));
     }
@@ -195,7 +194,8 @@ class DefaultIOServiceTest
         XWikiDocument document = saveNewDocument();
         XWikiContext context = this.oldcore.getXWikiContext();
         document.newXObject(this.annotationClassReference, context);
-        this.oldcore.getSpyXWiki().saveDocument(document, context);
+        XWiki xwiki = this.oldcore.getSpyXWiki();
+        xwiki.saveDocument(document, context);
 
         // An update whose only change is an uploaded image: updateObject would report no change, but the attachment
         // must still be persisted, forcing a save.
@@ -205,16 +205,18 @@ class DefaultIOServiceTest
         this.ioService.updateAnnotations(TARGET, List.of(annotation));
 
         ArgumentCaptor<XWikiDocument> documentCaptor = ArgumentCaptor.forClass(XWikiDocument.class);
-        InOrder inOrder = inOrder(this.temporaryAttachmentSessionsManager, this.oldcore.getSpyXWiki());
+        InOrder inOrder = inOrder(this.temporaryAttachmentSessionsManager, xwiki);
         inOrder.verify(this.temporaryAttachmentSessionsManager)
-            .attachTemporaryAttachmentsInDocument(documentCaptor.capture(), eq(Arrays.asList("image.png")));
-        inOrder.verify(this.oldcore.getSpyXWiki())
+            .attachTemporaryAttachmentsInDocument(documentCaptor.capture(), eq(List.of("image.png")));
+        inOrder.verify(xwiki)
             .saveDocument(same(documentCaptor.getValue()), anyString(), eq(true), eq(context));
     }
 
     @Test
-    void addAnnotationSetsStateDateAuthorAndSkipsTargetForSameDocument() throws Exception
+    void addAnnotationSkipsTargetForSameDocument() throws Exception
     {
+        when(this.configuration.isInstalled()).thenReturn(true);
+
         saveNewDocument();
         XWikiContext context = this.oldcore.getXWikiContext();
         context.setUser("xwiki:XWiki.Author");
@@ -226,11 +228,11 @@ class DefaultIOServiceTest
 
         XWikiDocument savedDocument = this.oldcore.getSpyXWiki().getDocument(DOCUMENT_REFERENCE, context);
         BaseObject annotationObject = savedDocument.getXObjects(this.annotationClassReference).get(0);
-        assertEquals("SAFE", annotationObject.getStringValue(Annotation.STATE_FIELD));
-        assertNotNull(annotationObject.getDateValue(Annotation.DATE_FIELD));
-        assertEquals("xwiki:XWiki.Author", annotationObject.getStringValue(Annotation.AUTHOR_FIELD));
+        assertEquals("SAFE", annotationObject.getStringValue(STATE_FIELD));
+        assertNotNull(annotationObject.getDateValue(DATE_FIELD));
+        assertEquals("xwiki:XWiki.Author", annotationObject.getStringValue(AUTHOR_FIELD));
         // The target is not stored when it points to the very document the annotation object is stored in.
-        assertEquals("", annotationObject.getStringValue(Annotation.TARGET_FIELD));
+        assertEquals("", annotationObject.getStringValue(TARGET_FIELD));
         // The clone (not the cached document) is the one updated and saved.
         assertEquals("XWiki.Author", savedDocument.getAuthor());
     }
@@ -243,15 +245,15 @@ class DefaultIOServiceTest
 
         // An annotation on the document content is stored with a blank target: it matches a document-type target.
         BaseObject blankTargetObject = document.newXObject(this.annotationClassReference, context);
-        blankTargetObject.setStringValue(Annotation.TARGET_FIELD, "");
-        blankTargetObject.setStringValue(Annotation.STATE_FIELD, "SAFE");
+        blankTargetObject.setStringValue(TARGET_FIELD, "");
+        blankTargetObject.setStringValue(STATE_FIELD, "SAFE");
 
         BaseObject matchingObject = document.newXObject(this.annotationClassReference, context);
-        matchingObject.setStringValue(Annotation.TARGET_FIELD, "Space.Page");
-        matchingObject.setStringValue(Annotation.STATE_FIELD, "SAFE");
+        matchingObject.setStringValue(TARGET_FIELD, "Space.Page");
+        matchingObject.setStringValue(STATE_FIELD, "SAFE");
 
         BaseObject otherTargetObject = document.newXObject(this.annotationClassReference, context);
-        otherTargetObject.setStringValue(Annotation.TARGET_FIELD, "OtherSpace.Page");
+        otherTargetObject.setStringValue(TARGET_FIELD, "OtherSpace.Page");
 
         this.oldcore.getSpyXWiki().saveDocument(document, context);
 
@@ -268,14 +270,14 @@ class DefaultIOServiceTest
         XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
 
         // A document-content annotation (blank target): it must NOT be returned for an object property target,
-        // otherwise content annotations would leak into every object property (regression guarded by this test).
+        // otherwise content annotations would leak into every object property.
         BaseObject documentContentAnnotation = document.newXObject(this.annotationClassReference, context);
-        documentContentAnnotation.setStringValue(Annotation.TARGET_FIELD, "");
+        documentContentAnnotation.setStringValue(TARGET_FIELD, "");
 
         // An annotation actually targeting the requested object property: it must be returned.
         BaseObject objectPropertyAnnotation = document.newXObject(this.annotationClassReference, context);
-        objectPropertyAnnotation.setStringValue(Annotation.TARGET_FIELD, "Space.Page^XWiki.MyClass[0].myProperty");
-        objectPropertyAnnotation.setStringValue(Annotation.STATE_FIELD, "SAFE");
+        objectPropertyAnnotation.setStringValue(TARGET_FIELD, "Space.Page^XWiki.MyClass[0].myProperty");
+        objectPropertyAnnotation.setStringValue(STATE_FIELD, "SAFE");
 
         this.oldcore.getSpyXWiki().saveDocument(document, context);
 
@@ -287,10 +289,10 @@ class DefaultIOServiceTest
     {
         XWikiContext context = this.oldcore.getXWikiContext();
         XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
-        // Object #0, unused, only here to push the object under test to index 1 (the annotation id used below).
+        // Object 0 is unused and only here to push the object under test to index 1 (the annotation id used below).
         document.newXObject(this.annotationClassReference, context);
         BaseObject object = document.newXObject(this.annotationClassReference, context);
-        object.setStringValue(Annotation.TARGET_FIELD, "OtherSpace");
+        object.setStringValue(TARGET_FIELD, "OtherSpace");
         this.oldcore.getSpyXWiki().saveDocument(document, context);
 
         assertNull(this.ioService.getAnnotation(TARGET, "1"));
@@ -302,11 +304,11 @@ class DefaultIOServiceTest
     {
         XWikiContext context = this.oldcore.getXWikiContext();
         XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
-        // Object #0, unused, only here to push the object under test to index 1 (the annotation id used below).
+        // Object 0 is unused and only here to push the object under test to index 1 (the annotation id used below).
         document.newXObject(this.annotationClassReference, context);
         BaseObject object = document.newXObject(this.annotationClassReference, context);
-        object.setStringValue(Annotation.TARGET_FIELD, xObjectTarget);
-        object.setStringValue(Annotation.STATE_FIELD, "SAFE");
+        object.setStringValue(TARGET_FIELD, xObjectTarget);
+        object.setStringValue(STATE_FIELD, "SAFE");
         this.oldcore.getSpyXWiki().saveDocument(document, context);
 
         Annotation annotation = this.ioService.getAnnotation(TARGET, "1");
@@ -322,17 +324,24 @@ class DefaultIOServiceTest
         context.setUser("xwiki:XWiki.Author");
 
         XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
-        // Object #0, unused, only here to push the object under test to index 1 (the annotation id used below).
+        // Object 0 ius unused and only here to push the object under test to index 1 (the annotation id used below).
         document.newXObject(this.annotationClassReference, context);
         // An annotation on the document content is stored with a blank target; removing it through the document
         // target must still delete the object.
         BaseObject object = document.newXObject(this.annotationClassReference, context);
-        object.setStringValue(Annotation.TARGET_FIELD, "");
+        object.setStringValue(TARGET_FIELD, "");
         this.oldcore.getSpyXWiki().saveDocument(document, context);
 
         this.ioService.removeAnnotation(TARGET, "1");
 
         XWikiDocument savedDocument = this.oldcore.getSpyXWiki().getDocument(DOCUMENT_REFERENCE, context);
         assertNull(savedDocument.getXObject(this.annotationClassReference, 1));
+    }
+
+    private XWikiDocument saveNewDocument() throws Exception
+    {
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
+        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
+        return document;
     }
 }

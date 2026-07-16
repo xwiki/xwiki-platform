@@ -44,7 +44,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * @version $Id$
  * @since 17.10.11
  * @since 18.4.3
- * @since 18.6.0RC1
+ * @since 18.6.0
  */
 @Component
 @Named("R180600000XWIKI20699")

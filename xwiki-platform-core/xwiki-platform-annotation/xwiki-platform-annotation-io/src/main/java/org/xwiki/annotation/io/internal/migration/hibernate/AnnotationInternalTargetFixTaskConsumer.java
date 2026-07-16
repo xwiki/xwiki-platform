@@ -50,7 +50,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @see <a href="https://jira.xwiki.org/browse/XWIKI-20699">XWIKI-20699</a>
  * @since 17.10.11
  * @since 18.4.3
- * @since 18.6.0RC1
+ * @since 18.6.0
  */
 @Component
 @Singleton

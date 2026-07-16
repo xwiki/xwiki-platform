@@ -52,9 +52,6 @@ import static org.xwiki.model.EntityType.DOCUMENT;
  * Test of {@link AnnotationInternalTargetFixTaskConsumer}.
  *
  * @version $Id$
- * @since 17.10.11
- * @since 18.4.3
- * @since 18.6.0RC1
  */
 @OldcoreTest
 @ReferenceComponentList
@@ -67,8 +64,6 @@ class AnnotationInternalTargetFixTaskConsumerTest
     @InjectMockComponents
     private AnnotationInternalTargetFixTaskConsumer consumer;
 
-    // Kept as a mock: it's an annotation-specific component whose own resolution logic is tested elsewhere, only its
-    // contract matters here.
     @MockComponent
     private TypedStringEntityReferenceResolver referenceResolver;
 

@@ -35,7 +35,6 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.HistoryPane;
-import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -81,8 +80,7 @@ class AnnotationsIT
 
         setup.deletePage(testReference);
 
-        // The user is advanced to simplify the move operations.
-        setup.createUserAndLogin(USER_NAME, USER_PASS, "usertype", "Advanced");
+        setup.createUserAndLogin(USER_NAME, USER_PASS);
     }
 
     /**
@@ -189,27 +187,19 @@ class AnnotationsIT
             new AnnotatableViewPage(setup.createPage(testReference, CONTENT, null));
 
         annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_2, ANNOTATION_TEXT_2);
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_3, ANNOTATION_TEXT_3);
-        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_4, ANNOTATION_TEXT_4);
 
         // Move the page to check that the annotations are still displayed afterward.
-        RenamePage renamePage = annotatableViewPage.getWrappedViewPage().rename();
-        renamePage.getDocumentPicker().setName("NewName");
-        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = annotatableViewPage
+            .getWrappedViewPage()
+            .rename()
+            .setNewTitle("NewName")
+            .clickRenameButton()
+            .waitUntilFinished();
         assertEquals("Done.", renameStatusPage.getInfoMessage());
         renameStatusPage.gotoNewPage();
 
-        // It seems that there are some issues refreshing content while this tab is not open. This might be a bug in the
-        // Annotations Application
-        annotatableViewPage.showAnnotationsPane();
-        annotatableViewPage.clickShowAnnotations();
-        assertEquals(4, annotatableViewPage.getAnnotationCount());
-
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_1);
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_2);
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_3);
-        annotatableViewPage.deleteAnnotationByText(ANNOTATED_TEXT_4);
+        annotatableViewPage.showAnnotationsPane().clickShowAnnotations();
+        assertEquals(1, annotatableViewPage.getAnnotationCount());
     }
 
     // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed

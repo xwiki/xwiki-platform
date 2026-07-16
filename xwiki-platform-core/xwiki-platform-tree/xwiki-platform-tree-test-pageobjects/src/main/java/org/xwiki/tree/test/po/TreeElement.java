@@ -53,12 +53,26 @@ public class TreeElement extends BaseElement
     }
 
     /**
+     * The rendered DOM id of a node is prefixed with the tree's own id, to keep it unique when the same entity is
+     * shown by more than one tree on the same page (see tree.js). This reconstructs that rendered id from the node
+     * id.
+     *
+     * @param nodeId the node identifier
+     * @return the corresponding DOM id
+     */
+    private String getRenderedNodeId(String nodeId)
+    {
+        String prefix = this.element.getAttribute("id");
+        return (prefix == null || prefix.isEmpty()) ? nodeId : (prefix + "-" + nodeId);
+    }
+
+    /**
      * @param nodeId the node identifier
      * @return the node with the specified identifier
      */
     public TreeNodeElement getNode(String nodeId)
     {
-        return new TreeNodeElement(this.element, By.id(nodeId));
+        return new TreeNodeElement(this.element, By.id(getRenderedNodeId(nodeId)));
     }
 
     /**
@@ -72,7 +86,7 @@ public class TreeElement extends BaseElement
         // be). Such an element id is technically invalid but the browsers are handling it fine.
         // See https://code.google.com/p/selenium/issues/detail?id=8173
         return !getDriver().findElementsWithoutWaiting(this.element,
-            By.xpath(".//*[@id = '" + nodeId + "']")).isEmpty();
+            By.xpath(".//*[@id = '" + getRenderedNodeId(nodeId) + "']")).isEmpty();
     }
 
     /**
@@ -133,7 +147,8 @@ public class TreeElement extends BaseElement
     public TreeElement waitForNodeSelected(String nodeId)
     {
         String selectedNodeXPath =
-            String.format(".//*[@id = '%s_anchor' and contains(@class, 'jstree-clicked')]", nodeId);
+            String.format(".//*[@id = '%s_anchor' and contains(@class, 'jstree-clicked')]",
+                getRenderedNodeId(nodeId));
         getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));
         return this;
     }

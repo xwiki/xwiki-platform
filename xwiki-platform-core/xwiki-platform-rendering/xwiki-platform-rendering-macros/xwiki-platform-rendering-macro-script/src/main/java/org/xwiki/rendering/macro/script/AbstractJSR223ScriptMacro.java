@@ -265,10 +265,10 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     {
         List<Block> result;
 
-        if (scriptResult instanceof XDOM) {
-            result = ((XDOM) scriptResult).getChildren();
-        } else if (scriptResult instanceof Block) {
-            result = Collections.singletonList((Block) scriptResult);
+        if (scriptResult instanceof XDOM xdom) {
+            result = xdom.getChildren();
+        } else if (scriptResult instanceof Block block) {
+            result = Collections.singletonList(block);
         } else if (scriptResult instanceof List && !((List<?>) scriptResult).isEmpty()
             && ((List<?>) scriptResult).get(0) instanceof Block) {
             result = (List<Block>) scriptResult;

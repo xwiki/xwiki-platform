@@ -170,8 +170,8 @@ public class XWikiErrorBlockGenerator extends DefaultErrorBlockGenerator
     protected List<Block> generateErrorBlocks(boolean inline, Message message, Message description)
     {
         String messageId;
-        if (message.getMarker() instanceof TranslationMarker) {
-            messageId = ((TranslationMarker) message.getMarker()).getTranslationKey();
+        if (message.getMarker() instanceof TranslationMarker translationMarker) {
+            messageId = translationMarker.getTranslationKey();
         } else {
             messageId = null;
         }

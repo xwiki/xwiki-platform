@@ -151,7 +151,7 @@ public class RightsManagerGroupsApi extends Api
                 RightsManager.getInstance().countAllWikiUsersOrGroups(false, wikiName,
                     RightsManagerPluginApi.createMatchingTable(matchFields), this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to count all groups in wiki [{0}]", new Object[] { wikiName }), e);
+            logError(MessageFormat.format("Try to count all groups in wiki [{0}]", wikiName), e);
         }
 
         return count;

@@ -43,25 +43,25 @@ public class DocumentInfo
 
     private int fileType;
 
-    public final static int TYPE_SAMPLE = 0;
+    public static final int TYPE_SAMPLE = 0;
 
-    public final static int TYPE_NORMAL = 1;
+    public static final int TYPE_NORMAL = 1;
 
-    public final static int ACTION_NOT_DEFINED = -1;
+    public static final int ACTION_NOT_DEFINED = -1;
 
-    public final static int ACTION_OVERWRITE = 0;
+    public static final int ACTION_OVERWRITE = 0;
 
-    public final static int ACTION_SKIP = 1;
+    public static final int ACTION_SKIP = 1;
 
-    public final static int ACTION_MERGE = 2;
+    public static final int ACTION_MERGE = 2;
 
-    public final static int INSTALL_IMPOSSIBLE = 0;
+    public static final int INSTALL_IMPOSSIBLE = 0;
 
-    public final static int INSTALL_ALREADY_EXIST = 1;
+    public static final int INSTALL_ALREADY_EXIST = 1;
 
-    public final static int INSTALL_OK = 2;
+    public static final int INSTALL_OK = 2;
 
-    public final static int INSTALL_ERROR = 4;
+    public static final int INSTALL_ERROR = 4;
 
     public DocumentInfo(XWikiDocument doc)
     {

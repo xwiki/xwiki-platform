@@ -81,7 +81,7 @@ import static org.mockito.Mockito.when;
 @ComponentList(DefaultWikiMacro.class)
 class DefaultWikiMacroFactoryTest
 {
-    private final static DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Macros", "Test");
+    private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Macros", "Test");
 
     private BaseObject macroObject;
 

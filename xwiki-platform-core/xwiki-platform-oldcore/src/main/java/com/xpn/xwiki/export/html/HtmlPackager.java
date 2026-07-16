@@ -480,7 +480,7 @@ public class HtmlPackager
 
             // Don't include vm and LESS files by default
             FileFilter filter =
-                new NotFileFilter(new SuffixFileFilter(new String[]{ ".vm", ".less", "skin.properties" }));
+                new NotFileFilter(new SuffixFileFilter(".vm", ".less", "skin.properties"));
 
             addDirToZip(file, filter, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR,
                 exportedSkinFiles);

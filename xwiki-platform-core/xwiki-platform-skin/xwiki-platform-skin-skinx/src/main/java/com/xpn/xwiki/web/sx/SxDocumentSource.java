@@ -112,8 +112,8 @@ public class SxDocumentSource implements SxSource
                     }
                 } catch (Exception ex) {
                     LOGGER.warn("SX object [{}#{}] has an invalid cache policy: [{}]",
-                        new Object[]{this.document.getFullName(), sxObj.getStringValue(NAME_PROPERTY_NAME),
-                            sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME)});
+                        this.document.getFullName(), sxObj.getStringValue(NAME_PROPERTY_NAME),
+                        sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME));
                 }
             }
         }

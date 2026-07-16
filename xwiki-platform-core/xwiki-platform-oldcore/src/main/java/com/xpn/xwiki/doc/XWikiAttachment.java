@@ -1037,7 +1037,7 @@ public class XWikiAttachment implements Cloneable
             return getAttachment_archive().getVersions();
         } catch (Exception ex) {
             LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: {}",
-                new Object[] {getFilename(), getDoc().getDocumentReference(), ex.getMessage()});
+                getFilename(), getDoc().getDocumentReference(), ex.getMessage());
             return new Version[] {new Version(this.getVersion())};
         }
     }

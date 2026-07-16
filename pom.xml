@@ -58,7 +58,7 @@
     <!-- Dependencies versions -->
     <batik.version>1.19</batik.version>
     <tika.version>3.3.1</tika.version>
-    <pdfbox.version>3.0.7</pdfbox.version>
+    <pdfbox.version>3.0.8</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.server.version>12.1.8</jetty.server.version>

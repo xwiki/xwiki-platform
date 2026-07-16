@@ -147,8 +147,7 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
         List<File> temporaryFiles = new ArrayList<>();
         try {
             Object content = message.getContent();
-            if (content instanceof Multipart) {
-                Multipart multipart = (Multipart) content;
+            if (content instanceof Multipart multipart) {
                 for (int i = 0; i < multipart.getCount(); i++) {
                     Part part = multipart.getBodyPart(i);
                     String[] temporaryFileLocations =

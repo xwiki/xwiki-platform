@@ -101,8 +101,8 @@ public class WikiReader
         InputStream stream;
 
         InputSource source = this.properties.getSource();
-        if (source instanceof InputStreamInputSource) {
-            stream = ((InputStreamInputSource) source).getInputStream();
+        if (source instanceof InputStreamInputSource inputStreamInputSource) {
+            stream = inputStreamInputSource.getInputStream();
         } else {
             throw new FilterException("Unsupported source type [" + source.getClass() + "]");
         }

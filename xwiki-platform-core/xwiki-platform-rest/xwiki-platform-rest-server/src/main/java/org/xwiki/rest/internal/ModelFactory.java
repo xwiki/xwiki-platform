@@ -358,9 +358,7 @@ public class ModelFactory
                 property.getAttributes().add(attribute);
             }
 
-            if (propertyClass instanceof ListClass) {
-                ListClass listClass = (ListClass) propertyClass;
-
+            if (propertyClass instanceof ListClass listClass) {
                 List allowedValueList = listClass.getList(xwikiContext);
 
                 if (!allowedValueList.isEmpty()) {
@@ -1075,8 +1073,8 @@ public class ModelFactory
         }
 
         java.lang.Object value = ((BaseProperty) property).getObfuscatedValue();
-        if (value instanceof List) {
-            return StringUtils.join((List) value, "|");
+        if (value instanceof List list) {
+            return StringUtils.join(list, "|");
         } else if (value != null) {
             return value.toString();
         } else {

@@ -1318,12 +1318,22 @@ XWiki.Annotation = Class.create({
 
   // Solving an annotation is a plain link to the core "save" action (like Delete's plain link to "objectremove"),
   // so it needs only a confirm step, not an AJAX round-trip: on confirm, the browser navigates there normally and
-  // the action itself redirects back to the current page via xredirect.
+  // the action itself redirects back to the current page via xredirect. Reuse the same styled confirmation dialog
+  // as Delete (XWiki.widgets.ConfirmedAjaxRequest is built on top of XWiki.widgets.ConfirmationBox), instead of the
+  // native browser confirm(), for a consistent look between the two destructive actions.
   addSolveListener : function(item) {
     item.observe('click', function(event) {
-      if (!window.confirm("$services.localization.render('annotations.action.solve.confirm')")) {
-        event.stop();
-      }
+      event.stop();
+      new XWiki.widgets.ConfirmationBox(
+        {
+          onYes : function() {
+            window.location = item.href;
+          }
+        },
+        {
+          confirmationText : "$services.localization.render('annotations.action.solve.confirm')"
+        }
+      );
     });
   },
 

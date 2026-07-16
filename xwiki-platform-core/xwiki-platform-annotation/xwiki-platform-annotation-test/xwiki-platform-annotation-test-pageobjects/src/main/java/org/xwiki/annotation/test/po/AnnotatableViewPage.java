@@ -338,10 +338,11 @@ public class AnnotatableViewPage extends BaseElement
         // native WebDriver click to scroll to - dispatch the click directly via JavaScript instead.
         getDriver().executeJavascript("arguments[0].click();", getDriver().findElement(By.id(id)));
         getDriver().waitUntilElementIsVisible(By.cssSelector(".annotation-bubble a.solve"));
-        // "Mark as solved" is a plain link to the "save" action, confirmed via a native window.confirm() dialog
-        // rather than an AJAX round-trip - silence it so the click proceeds without blocking on a real alert.
-        getDriver().makeConfirmDialogSilent(true);
         getDriver().findElement(By.cssSelector(".annotation-bubble a.solve")).click();
+        // "Mark as solved" is a plain link to the "save" action, confirmed via the same XWiki.widgets.ConfirmationBox
+        // dialog as Delete (see AnnotationsLabel#deleteAnnotationById), not a native browser confirm().
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".buttons button"));
+        getDriver().findElement(By.cssSelector(".buttons button")).click();
         // The action navigates back to the same page (via xredirect); the toggle button for this annotation id no
         // longer exists once the reloaded page no longer treats it as an annotation.
         getDriver().waitUntilElementDisappears(By.id(id));

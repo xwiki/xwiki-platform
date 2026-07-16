@@ -103,8 +103,6 @@ public class XWiki extends Api
      */
     private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer;
 
-    private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
-
     private DocumentRevisionProvider documentRevisionProvider;
 
     private HQLStatementValidator hqlValidator;
@@ -132,16 +130,6 @@ public class XWiki extends Api
         }
 
         return this.currentMixedDocumentReferenceResolver;
-    }
-
-    private DocumentReferenceResolver<EntityReference> getCurrentgetdocumentResolver()
-    {
-        if (this.currentgetdocumentResolver == null) {
-            this.currentgetdocumentResolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
-        }
-
-        return this.currentgetdocumentResolver;
     }
 
     private DocumentReferenceResolver<String> getDefaultDocumentReferenceResolver()

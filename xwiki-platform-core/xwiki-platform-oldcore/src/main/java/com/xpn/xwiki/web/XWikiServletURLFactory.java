@@ -467,29 +467,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     /**
-     * Same rationale as {@link #encodeWithinPath(String, XWikiContext)}. Note that we also encode spaces as {@code %20}
-     * even though we could also have encoded them as {@code +}. We do this for consistency (it allows to have the same
-     * implementation for both URL paths and query string).
-     *
-     * @param name the query string part to encode
-     * @return the URL-encoded query string part
-     */
-    private String encodeWithinQuery(String name)
-    {
-        // Note: Ideally the following would have been the correct way of writing this method but it causes the issues
-        // mentioned in the javadoc of this method
-        // String encodedName;
-        // try {
-        // encodedName = URIUtil.encodeWithinQuery(name, "UTF-8");
-        // } catch (URIException e) {
-        // throw new RuntimeException("Missing charset [UTF-8]", e);
-        // }
-        // return encodedName;
-
-        return encodeWithinPath(name);
-    }
-
-    /**
      * Encodes the given fragment identifier so that it can be safely appended to an URL.
      * 
      * @param fragment the fragment identifier to be encoded

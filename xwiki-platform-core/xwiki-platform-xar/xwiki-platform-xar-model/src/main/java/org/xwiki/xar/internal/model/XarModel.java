@@ -92,4 +92,12 @@ public class XarModel
      */
     @Deprecated
     public static final int ACTION_MERGE = 2;
+
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private XarModel()
+    {
+        // Utility class
+    }
 }

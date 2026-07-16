@@ -73,4 +73,12 @@ public class XarAttachmentModel
      * @since 12.0RC1
      */
     public static final String ELEMENT_REVISIONS = "revisions";
+
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private XarAttachmentModel()
+    {
+        // Utility class
+    }
 }

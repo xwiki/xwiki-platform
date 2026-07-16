@@ -528,12 +528,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         super.fromXML(element);
     }
 
-    @Override
-    public void fromXML(String xml) throws XWikiException
-    {
-        super.fromXML(xml);
-    }
-
     public boolean addTextField(String fieldName, String fieldPrettyName, int size)
     {
         if (get(fieldName) == null) {

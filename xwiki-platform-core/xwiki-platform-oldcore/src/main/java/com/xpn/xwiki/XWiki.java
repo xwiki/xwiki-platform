@@ -5046,31 +5046,11 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
-     * wiki).
-     */
-    private static EntityReferenceSerializer<String> getCompactWikiEntityReferenceSerializer()
-    {
-        return Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-    }
-
-    /**
      * Used to convert a proper Document Reference to string (compact form).
      */
     private static EntityReferenceSerializer<String> getCompactEntityReferenceSerializer()
     {
         return Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compact");
-    }
-
-    /**
-     * Used to resolve a ResourceReference into a proper Entity Reference using the current document to fill the blanks.
-     */
-    private static EntityReferenceResolver<org.xwiki.rendering.listener.reference.ResourceReference>
-        getResourceReferenceEntityReferenceResolver()
-    {
-        return Utils
-            .getComponent(new DefaultParameterizedType(null, EntityReferenceResolver.class,
-                org.xwiki.rendering.listener.reference.ResourceReference.class));
     }
 
     /**

@@ -85,6 +85,15 @@ describe("XWikiBlockNoteProcessor", () => {
       });
     });
 
+    it("normalizes bare string elements in link content into text objects", () => {
+      const doc = documentWithLink({});
+      firstLink(doc).content = ["label"];
+      const document = processor.load(JSON.stringify(doc));
+      expect(firstLink(document.content).content).toEqual([
+        { type: "text", text: "label", styles: {} },
+      ]);
+    });
+
     it("does not inject a synthetic id when the link has no metadata", () => {
       const document = processor.load(JSON.stringify(documentWithLink({})));
       const link = firstLink(document.content);

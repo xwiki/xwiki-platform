@@ -230,8 +230,7 @@
  *#
 #macro(displayAnnotationTitle $ann)
   #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'dd/MM/yyyy hh:mm'))
-  #set ($authorDoc = $xwiki.getDocument($ann.author))
-  &lt;a href="$xwiki.getURL($authorDoc)"&gt;$escapetool.xml($authorDoc.name)&lt;/a&gt;
+  $!xwiki.getUserName($ann.author)
 ## Do not indent this, or the comma will be misplaced
 #if("$!{ann.date}" != '')&lt;span class="annotationDate"&gt;$xwiki.formatDate($ann.date, $dateFormat)&lt;/span&gt;#end
 #end
@@ -271,6 +270,14 @@
     ## redirect is missing or unsafe.
     #set($replyFallbackURL = "$xwiki.getURL($docRef, 'view', $!{request.queryString})")
     #getSanitizedURLAttributeValue('a', 'href', "$!request.get('xredirect')", $replyFallbackURL, $xredirect)
+    ## $hasAdmin/$hasEdit/$isUserComment are normally bound by the calling template (xwikivars.vm for the first
+    ## two, commentsinline.vm's per-comment loop for the third) - true when this macro is reached from the
+    ## Comments tab, but NOT when the annotation bubble fetches its own content via AnnotationCode.DisplayForm
+    ## (rendered through the lightweight "get" action, which never runs either of those templates). Compute them
+    ## locally so the Edit/Delete/Solve actions are gated correctly regardless of which caller reached this macro.
+    #set($hasAdmin = $services.security.authorization.hasAccess('admin', $docRef))
+    #set($hasEdit = $services.security.authorization.hasAccess('edit', $docRef))
+    #set($isUserComment = "$!ann.get('author')" != '' &amp;&amp; $services.model.resolveDocument("$!ann.get('author')", 'user') == $xcontext.userReference)
     #if($threadCount &gt; 0)
       &lt;button class="thread-toggle btn btn-default infomessage" data-toggle="collapse" data-target="#comment-thread-${ann.id}" aria-expanded="false" aria-controls="comment-thread-${ann.id}"&gt;
         $services.icon.renderHTML('comments') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))

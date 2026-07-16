@@ -47,7 +47,9 @@ public class AnnotationsLabel extends BaseElement
 
     private void hoverOnAnnotationById(String annotationId)
     {
-        getDriver().findElement(By.className(annotationId)).click();
+        // The toggle button (id="ID<n>") that opens the bubble is visually hidden (sr-only, for accessibility) and
+        // has no on-screen position for a native WebDriver click to scroll to - dispatch the click via JavaScript.
+        getDriver().executeJavascript("arguments[0].click();", getDriver().findElement(By.id(annotationId)));
         getDriver().waitUntilElementIsVisible(By.className("annotation-box-view"));
     }
 
@@ -77,11 +79,11 @@ public class AnnotationsLabel extends BaseElement
     public void deleteAnnotationById(String idText)
     {
         this.showAnnotationById(idText);
-        // The id format is "ID<index>".
-        String index = idText.substring(2);
-        getDriver().findElement(By.cssSelector("#annotation_view_" + index + " a.delete")).click();
-        getDriver().waitUntilElementIsVisible(By.xpath("//input[@value='Yes']"));
-        getDriver().findElement(By.xpath("//input[@value='Yes']")).click();
+        getDriver().findElement(By.cssSelector(".annotation-bubble a.delete")).click();
+        // Delete asks for confirmation via XWiki.widgets.ConfirmedAjaxRequest, a JS-generated dialog (not a native
+        // browser confirm), whose "Yes" button is the first button in its ".buttons" container.
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".buttons button"));
+        getDriver().findElement(By.cssSelector(".buttons button")).click();
     }
 
     public String getAnnotationsAuthorByText(String searchText)

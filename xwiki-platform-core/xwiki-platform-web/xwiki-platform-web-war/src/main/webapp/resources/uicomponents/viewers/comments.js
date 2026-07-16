@@ -683,11 +683,9 @@ require(['jquery'], function($) {
    * Copy the permalink to the clipboard.
    */
   $(document).on('click', '#permalink-copy-button', function() {
-    var button = this;
-    var permalinkValue = $('#permalinkModal').find('.form-control').val();
-    navigator.clipboard.writeText(permalinkValue).then(function() {
-      new XWiki.widgets.Notification($(button).data('copiedMessage'), 'info');
-    });
+    $('#permalinkModal').find('.form-control').select();
+    document.execCommand('copy');
+    new XWiki.widgets.Notification($(this).data('copiedMessage'), 'info');
   });
 });
 

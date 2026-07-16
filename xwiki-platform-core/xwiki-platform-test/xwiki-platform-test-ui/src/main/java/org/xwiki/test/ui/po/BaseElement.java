@@ -112,6 +112,14 @@ public class BaseElement
     }
 
     /**
+     * @since 18.6.0RC1
+     */
+    public void waitForNotificationInfoMessage(String message)
+    {
+        waitForNotificationMessage("info", message);
+    }
+
+    /**
      * Waits for a notification message of the specified type with the given message to be displayed.
      * 
      * @param level the notification type (one of error, warning, done)

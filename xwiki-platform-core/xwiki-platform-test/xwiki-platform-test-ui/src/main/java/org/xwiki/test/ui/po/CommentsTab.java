@@ -282,6 +282,24 @@ public class CommentsTab extends BaseElement
     }
 
     /**
+     * Opens the "Permalink" modal for a comment (or annotation, since they share the same markup), identified by its
+     * id.
+     *
+     * @param id the comment id
+     * @return the opened permalink modal
+     * @since 18.6.0RC1
+     */
+    public PermalinkModal openPermalinkModalByID(int id)
+    {
+        PermalinkModal permalinkModal = new PermalinkModal();
+        getDriver()
+            .findElement(By.xpath(String.format("//div[@id='xwikicomment_%d']//a[contains(@class, 'permalink')]", id)))
+            .click();
+        getDriver().waitUntilElementIsVisible(By.id("permalinkModal"));
+        return permalinkModal;
+    }
+
+    /**
      * Click on the annotation of a given id.
      *
      * @param id the id of the comment

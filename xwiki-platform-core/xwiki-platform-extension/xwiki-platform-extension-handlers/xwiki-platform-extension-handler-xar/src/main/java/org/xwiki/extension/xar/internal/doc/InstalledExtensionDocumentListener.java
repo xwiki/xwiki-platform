@@ -161,8 +161,8 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
     private void forEachExtensionDocument(ExtensionEvent extensionEvent, InstalledExtension installedExtension,
         Consumer<DocumentReference> action)
     {
-        if (extensionEvent.hasNamespace() && installedExtension instanceof XarInstalledExtension) {
-            getExtensionDocuments((XarInstalledExtension) installedExtension, extensionEvent.getNamespace()).stream()
+        if (extensionEvent.hasNamespace() && installedExtension instanceof XarInstalledExtension xarExtension) {
+            getExtensionDocuments(xarExtension, extensionEvent.getNamespace()).stream()
                 .forEach(action);
         }
     }

@@ -57,10 +57,10 @@ public class WikiDistributionWikiEventListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object o, Object context)
     {
-        if (event instanceof WikiCopiedEvent) {
-            onWikiCopied((WikiCopiedEvent) event);
-        } else if (event instanceof WikiDeletedEvent) {
-            onWikiDeleted((WikiDeletedEvent) event);
+        if (event instanceof WikiCopiedEvent wikiCopiedEvent) {
+            onWikiCopied(wikiCopiedEvent);
+        } else if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
+            onWikiDeleted(wikiDeletedEvent);
         }
     }
 

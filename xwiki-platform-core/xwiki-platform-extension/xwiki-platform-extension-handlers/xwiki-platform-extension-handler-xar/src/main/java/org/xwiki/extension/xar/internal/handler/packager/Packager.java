@@ -323,8 +323,8 @@ public class Packager
     {
         // Remove the version if any since it does not make sense in a XAR
         DocumentReference documentReference = reference;
-        if (reference instanceof DocumentVersionReference) {
-            documentReference = ((DocumentVersionReference) reference).removeVersion();
+        if (reference instanceof DocumentVersionReference documentVersionReference) {
+            documentReference = documentVersionReference.removeVersion();
         }
 
         return documentReference;

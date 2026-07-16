@@ -57,13 +57,11 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
     @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        if (localEvent.getEvent() instanceof JobStartedEvent) {
-            JobStartedEvent jobEvent = (JobStartedEvent) localEvent.getEvent();
-
+        if (localEvent.getEvent() instanceof JobStartedEvent jobStartedEvent) {
             // Share only specific jobs
             // Don't send back remote jobs
-            if (JOBS.contains(jobEvent.getJobType()) && !jobEvent.getRequest().isRemote()) {
-                remoteEvent.setEvent(jobEvent);
+            if (JOBS.contains(jobStartedEvent.getJobType()) && !jobStartedEvent.getRequest().isRemote()) {
+                remoteEvent.setEvent(jobStartedEvent);
 
                 return true;
             }
@@ -75,11 +73,9 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
     @Override
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
-        if (remoteEvent.getEvent() instanceof JobStartedEvent) {
-            JobStartedEvent jobEvent = (JobStartedEvent) remoteEvent.getEvent();
-
-            if (JOBS.contains(jobEvent.getJobType())) {
-                Request request = jobEvent.getRequest();
+        if (remoteEvent.getEvent() instanceof JobStartedEvent jobStartedEvent) {
+            if (JOBS.contains(jobStartedEvent.getJobType())) {
+                Request request = jobStartedEvent.getRequest();
 
                 // Indicate the job has been triggered by a remote event
                 if (!(request instanceof AbstractRequest)) {
@@ -89,7 +85,7 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
 
                 // We don't want to directly simulate a new JobStartedEvent event but we want to start a new job
                 // which will generate a new JobStartedEvent
-                localEvent.setEvent(new RemoteExtensionJobStartedEvent(jobEvent.getJobType(), request));
+                localEvent.setEvent(new RemoteExtensionJobStartedEvent(jobStartedEvent.getJobType(), request));
 
                 return true;
             }

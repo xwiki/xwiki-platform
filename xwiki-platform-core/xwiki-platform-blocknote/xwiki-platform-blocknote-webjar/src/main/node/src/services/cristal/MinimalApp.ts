@@ -29,6 +29,7 @@ export class MinimalApp {
   private readonly wikiConfig = {
     getType: () => "XWiki",
     realtimeHint: "xwiki",
+    baseURL: XWiki.contextPath,
   };
 
   constructor(@inject("Container") private readonly container: Container) {}

@@ -36,6 +36,9 @@ catalogs:
     '@playwright/experimental-ct-react':
       specifier: 1.61.0-alpha-2026-06-08
       version: 1.61.0-alpha-2026-06-08
+    '@playwright/experimental-ct-vue':
+      specifier: 1.61.0-alpha-2026-06-08
+      version: 1.61.0-alpha-2026-06-08
     '@playwright/test':
       specifier: 1.61.0-alpha-2026-06-08
       version: 1.61.0-alpha-2026-06-08
@@ -78,6 +81,9 @@ catalogs:
     '@vitest/eslint-plugin':
       specifier: 1.6.17
       version: 1.6.17
+    '@vue/compiler-dom':
+      specifier: 3.5.38
+      version: 3.5.38
     '@vue/eslint-config-prettier':
       specifier: 10.2.0
       version: 10.2.0
@@ -323,6 +329,12 @@ importers:
       '@xwiki/platform-collaboration-xwiki':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/collaboration/collaboration-xwiki
+      '@xwiki/platform-component-manager-api':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-api
+      '@xwiki/platform-component-manager-default':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-default
       '@xwiki/platform-document-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/document/document-api
@@ -338,6 +350,9 @@ importers:
       '@xwiki/platform-link-suggest-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api
+      '@xwiki/platform-link-suggest-xwiki':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-xwiki
       '@xwiki/platform-macros-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/macros/macros-api
@@ -1670,6 +1685,94 @@ importers:
         specifier: 'catalog:'
         version: 3.3.4(typescript@5.9.3)
 
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui:
+    dependencies:
+      '@blocknote/core':
+        specifier: 'catalog:'
+        version: 0.51.4(@types/hast@3.0.4)
+      '@xwiki/platform-attachments-api':
+        specifier: workspace:*
+        version: link:../../attachments/attachments-api
+      '@xwiki/platform-document-api':
+        specifier: workspace:*
+        version: link:../../document/document-api
+      '@xwiki/platform-dsapi':
+        specifier: workspace:*
+        version: link:../../ds/api
+      '@xwiki/platform-icons':
+        specifier: workspace:*
+        version: link:../../icons
+      '@xwiki/platform-link-suggest-api':
+        specifier: workspace:*
+        version: link:../../link-suggest/link-suggest-api
+      '@xwiki/platform-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
+      '@xwiki/platform-model-reference-api':
+        specifier: workspace:*
+        version: link:../../model/model-reference/model-reference-api
+      '@xwiki/platform-model-remote-url-api':
+        specifier: workspace:*
+        version: link:../../model/model-remote-url/model-remote-url-api
+      lodash-es:
+        specifier: 'catalog:'
+        version: 4.18.1
+      vue-i18n:
+        specifier: 'catalog:'
+        version: 11.4.4(vue@3.5.38(typescript@5.9.3))
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.58.9(@types/node@24.12.4)
+      '@types/lodash-es':
+        specifier: 'catalog:'
+        version: 4.17.12
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      '@xwiki/platform-fn-utils':
+        specifier: workspace:*
+        version: link:../../fn-utils
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 10.4.0(jiti@2.7.0)
+      inversify:
+        specifier: 'catalog:'
+        version: 8.1.1(reflect-metadata@0.2.2)
+      reflect-metadata:
+        specifier: 'catalog:'
+        version: 0.2.2
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.6(@types/node@24.12.4)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0))
+      vitest-mock-extended:
+        specifier: 'catalog:'
+        version: 4.0.0(typescript@5.9.3)(vitest@4.1.6(@types/node@24.12.4)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0)))
+      vue:
+        specifier: 'catalog:'
+        version: 3.5.38(typescript@5.9.3)
+      vue-tsc:
+        specifier: 'catalog:'
+        version: 3.3.4(typescript@5.9.3)
+
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api:
     dependencies:
       '@xwiki/platform-api':
@@ -2942,12 +3045,24 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.58.9(@types/node@24.12.4)
+      '@playwright/experimental-ct-vue':
+        specifier: 'catalog:'
+        version: 1.61.0-alpha-2026-06-08(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0))(vue@3.5.38(typescript@5.9.3))(yaml@2.9.0)
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12
+      '@vue/compiler-dom':
+        specifier: 'catalog:'
+        version: 3.5.38
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/platform-link-modal-ui':
+        specifier: workspace:*
+        version: link:../../core/link-modal/link-modal-ui
+      '@xwiki/platform-syntaxes-config':
+        specifier: workspace:*
+        version: link:../../core/syntaxes/syntaxes-config
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../tools/tool-apiextractorconfig
@@ -2960,6 +3075,9 @@ importers:
       '@xwiki/platform-tool-viteconfig':
         specifier: workspace:*
         version: link:../../tools/tool-viteconfig
+      cross-env:
+        specifier: 'catalog:'
+        version: 7.0.3
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
@@ -4028,6 +4146,11 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  '@playwright/experimental-ct-vue@1.61.0-alpha-2026-06-08':
+    resolution: {integrity: sha512-AhgT0cUZU81+HHhHTNy+HNJJo700mZEYFm3/+Zeoe6JGjUW9sAJQA4aBrdZzsACtRg/6nGJcwvxuMeCmq/giag==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   '@playwright/test@1.61.0-alpha-2026-06-08':
     resolution: {integrity: sha512-JgwFFggy+h/q9N/hsooZnE4Xnnqbq68e4WtAvw6kzq1kEHH2bKzSyD+6DCmOYGt9blqCcwvie9D/1ow/vu7Azg==}
     engines: {node: '>=18'}
@@ -4664,6 +4787,13 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
+
+  '@vitejs/plugin-vue@5.2.4':
+    resolution: {integrity: sha512-7Yx/SXSOcQq5HiiV3orevHUFn+pmMB4cgbEkDYgnkUWb0WfeQ/wa2yFv6D5ICiCQOVpjA7vYDXrC7AGO8yjDHA==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    peerDependencies:
+      vite: ^5.0.0 || ^6.0.0
+      vue: ^3.2.25
 
   '@vitejs/plugin-vue@6.0.7':
     resolution: {integrity: sha512-km+p+XdSz9Sxm5rqUbqcSfZYaAniKxWBj1KURl+Jr7UaPvvX7BmaWMdP69I5rrFDeQGyxAG7NXdc57vz+snhWg==}
@@ -8571,6 +8701,24 @@ snapshots:
       - tsx
       - yaml
 
+  '@playwright/experimental-ct-core@1.61.0-alpha-2026-06-08(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0)':
+    dependencies:
+      playwright: 1.61.0-alpha-2026-06-08
+      playwright-core: 1.61.0-alpha-2026-06-08
+      vite: 6.4.1(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0)
+    transitivePeerDependencies:
+      - '@types/node'
+      - jiti
+      - less
+      - lightningcss
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - terser
+      - tsx
+      - yaml
+
   '@playwright/experimental-ct-react@1.61.0-alpha-2026-06-08(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.10))(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.10))(yaml@2.9.0))(yaml@2.9.0)':
     dependencies:
       '@playwright/experimental-ct-core': 1.61.0-alpha-2026-06-08(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.10))(yaml@2.9.0)
@@ -8588,6 +8736,25 @@ snapshots:
       - terser
       - tsx
       - vite
+      - yaml
+
+  '@playwright/experimental-ct-vue@1.61.0-alpha-2026-06-08(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0))(vue@3.5.38(typescript@5.9.3))(yaml@2.9.0)':
+    dependencies:
+      '@playwright/experimental-ct-core': 1.61.0-alpha-2026-06-08(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0)
+      '@vitejs/plugin-vue': 5.2.4(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0))(vue@3.5.38(typescript@5.9.3))
+    transitivePeerDependencies:
+      - '@types/node'
+      - jiti
+      - less
+      - lightningcss
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - terser
+      - tsx
+      - vite
+      - vue
       - yaml
 
   '@playwright/test@1.61.0-alpha-2026-06-08':
@@ -9217,6 +9384,11 @@ snapshots:
       vite: 7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
+
+  '@vitejs/plugin-vue@5.2.4(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0))(vue@3.5.38(typescript@5.9.3))':
+    dependencies:
+      vite: 7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0)
+      vue: 3.5.38(typescript@5.9.3)
 
   '@vitejs/plugin-vue@6.0.7(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0))(vue@3.5.38(typescript@5.9.3))':
     dependencies:
@@ -12502,6 +12674,21 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.7.0
       sugarss: 5.0.1(postcss@8.5.10)
+      yaml: 2.9.0
+
+  vite@6.4.1(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0):
+    dependencies:
+      esbuild: 0.25.12
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
+      postcss: 8.5.15
+      rollup: 4.55.1
+      tinyglobby: 0.2.15
+    optionalDependencies:
+      '@types/node': 24.12.4
+      fsevents: 2.3.3
+      jiti: 2.7.0
+      sugarss: 5.0.1(postcss@8.5.15)
       yaml: 2.9.0
 
   vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.10))(yaml@2.9.0):

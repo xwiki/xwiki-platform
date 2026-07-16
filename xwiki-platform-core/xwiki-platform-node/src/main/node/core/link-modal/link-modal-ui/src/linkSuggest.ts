@@ -18,23 +18,39 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { EntityType } from "@xwiki/platform-model-api";
+import type { AttachmentsService } from "@xwiki/platform-attachments-api";
+import type { DocumentService } from "@xwiki/platform-document-api";
 import type {
   Link,
+  LinkSuggestService,
   LinkSuggestServiceProvider,
-  LinkType,
 } from "@xwiki/platform-link-suggest-api";
 import type {
   AttachmentReference,
   DocumentReference,
 } from "@xwiki/platform-model-api";
-import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type {
+  ModelReferenceHandler,
+  ModelReferenceHandlerProvider,
+  ModelReferenceParser,
+  ModelReferenceParserProvider,
+  ModelReferenceSerializer,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
+import type {
+  RemoteURLParser,
+  RemoteURLParserProvider,
+  RemoteURLSerializer,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 import type { Container } from "inversify";
 
 /**
  * Describe a link suggestion action (i.e., a search result entry).
  *
- * @since 18.0.0RC1
+ * @since 18.5.0RC1
  * @beta
  */
 type LinkSuggestion = {
@@ -48,10 +64,80 @@ type LinkSuggestion = {
 /**
  * Shape of a function providing a list of link suggestions for a given query
  *
- * @since 18.0.0RC1
+ * @since 18.5.0RC1
  * @beta
  */
-type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
+type LinkSuggestor = (params: {
+  query: string;
+  type?: LinkType;
+}) => Promise<LinkSuggestion[]>;
+
+/**
+ * (Internal) Link edition context
+ *
+ * Contains various services needed by multiple components, avoids duplication
+ */
+type LinkEditionContext = {
+  linkSuggestService: LinkSuggestService | null;
+  modelReferenceParser: ModelReferenceParser;
+  modelReferenceSerializer: ModelReferenceSerializer;
+  modelReferenceHandler: ModelReferenceHandler;
+  remoteURLParser: RemoteURLParser;
+  remoteURLSerializer: RemoteURLSerializer;
+  attachmentsService: AttachmentsService;
+  documentService: DocumentService;
+};
+
+/**
+ * Create a link edition context from a Cristal container
+ *
+ * @param container - The container to provide from
+ * @returns The link edition context
+ *
+ * @since 18.5.0RC1
+ * @beta
+ */
+function createLinkEditionContext(container: Container): LinkEditionContext {
+  const linkSuggestServiceProvider = container.get<LinkSuggestServiceProvider>(
+    "LinkSuggestServiceProvider",
+  );
+
+  const modelReferenceParser = container
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!;
+
+  const modelReferenceSerializer = container
+    .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+    .get()!;
+
+  const modelReferenceHandler = container
+    .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
+    .get()!;
+
+  const remoteURLParser = container
+    .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+    .get()!;
+
+  const remoteURLSerializer = container
+    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+    .get()!;
+
+  const attachmentsService =
+    container.get<AttachmentsService>("AttachmentsService");
+
+  const documentService = container.get<DocumentService>("DocumentService")!;
+
+  return {
+    linkSuggestService: linkSuggestServiceProvider.get() ?? null,
+    modelReferenceParser,
+    modelReferenceSerializer,
+    modelReferenceHandler,
+    remoteURLParser,
+    remoteURLSerializer,
+    attachmentsService,
+    documentService,
+  };
+}
 
 /**
  * Build a function returning an array of link suggestions from a string.
@@ -61,29 +147,24 @@ type LinkSuggestor = (params: { query: string }) => Promise<LinkSuggestion[]>;
  * @since 18.0.0RC1
  * @beta
  */
-function createLinkSuggestor(depsContainer: Container): LinkSuggestor | null {
-  const linkSuggestService = depsContainer
-    .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
-    .get()!;
-
+function createLinkSuggestor({
+  linkSuggestService,
+  modelReferenceParser,
+}: LinkEditionContext): LinkSuggestor | null {
   if (!linkSuggestService) {
     return null;
   }
 
-  const modelReferenceParser = depsContainer
-    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-    .get()!;
-
   // Return an array of suggestions from a query
 
-  return async ({ query }) => {
+  return async ({ query, type }) => {
     // TODO: add upload attachment action
     // TODO: add create new page action
     // TODO: add links suggestions
     let links: Link[];
 
     try {
-      links = await linkSuggestService.getLinks(query);
+      links = await linkSuggestService.getLinks(query, type);
     } catch (e) {
       console.group("Failed to fetch remote links");
       console.error(e);
@@ -100,6 +181,10 @@ function createLinkSuggestor(depsContainer: Container): LinkSuggestor | null {
         // need to think me precisely of the architecture we want for this.
         const entityReference = modelReferenceParser?.parse(link.reference, {
           relative: false,
+          type:
+            link.type === LinkType.ATTACHMENT
+              ? EntityType.ATTACHMENT
+              : undefined,
         });
 
         const documentReference =
@@ -115,7 +200,7 @@ function createLinkSuggestor(depsContainer: Container): LinkSuggestor | null {
         }
 
         return {
-          title: documentReference.name,
+          title: link.label,
           segments,
           reference: link.reference,
           url: link.url,
@@ -132,5 +217,5 @@ function queryEqualityOperator(query: string) {
   };
 }
 
-export { createLinkSuggestor };
-export type { LinkSuggestion, LinkSuggestor, LinkType };
+export { createLinkEditionContext, createLinkSuggestor };
+export type { LinkEditionContext, LinkSuggestion, LinkSuggestor, LinkType };

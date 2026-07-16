@@ -17,32 +17,26 @@
   Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script lang="ts" setup>
-import { computed } from "vue";
-import type { BtnProps } from "@xwiki/platform-dsapi";
+<script setup lang="ts">
+import { useId } from "vue";
+import type { SelectProps } from "@xwiki/platform-dsapi";
 
-const { variant, size } = defineProps<BtnProps>();
-const bVariant = computed(() => {
-  if (!variant) {
-    return "btn-default";
-  }
-  switch (variant) {
-    case "text":
-      return "btn-link";
-    case "neutral":
-      return "btn-default";
-    default:
-      return "btn-" + variant;
-  }
-});
-const bSize = computed(() => {
-  if (size === "small") {
-    return "btn-sm";
-  } else {
-    return "";
-  }
+const { label, items } = defineProps<SelectProps>();
+
+const model = defineModel<string>();
+
+const selectId = useId();
+
+defineOptions({
+  inheritAttrs: false,
 });
 </script>
+
 <template>
-  <button :class="['btn', bVariant, bSize]"><slot /></button>
+  <label :for="selectId">{{ label }}</label>
+  <select :id="selectId" v-model="model" v-bind="$attrs">
+    <option v-for="item in items" :key="item" :value="item">
+      {{ item }}
+    </option>
+  </select>
 </template>

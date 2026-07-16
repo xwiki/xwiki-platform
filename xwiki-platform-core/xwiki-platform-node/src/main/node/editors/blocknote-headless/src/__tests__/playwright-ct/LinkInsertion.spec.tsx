@@ -17,36 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { BlockNoteForTest } from "./BlockNote.story";
+import { mountBlockNoteHeadless } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
-import { expect, test } from "@playwright/experimental-ct-react";
-import type { BlockType } from "../../blocknote";
+import { buildParagraphs, pressKeySettled } from "./utils";
+import { expect, test } from "@playwright/experimental-ct-vue";
 
 // eslint-disable-next-line max-statements
 test("Creating a link on a word in the middle of a line keeps the text intact", async ({
   mount,
   page,
 }) => {
-  const component = await mount(
-    <BlockNoteForTest
-      content={buildParagraph("First second third fourth")}
-      macros={false}
-      syntax={FULL_SYNTAX}
-    />,
-  );
+  const component = await mountBlockNoteHeadless(mount, {
+    editorContent: buildParagraphs(["First second third fourth"]),
+    editorProps: {
+      syntax: FULL_SYNTAX,
+    },
+    macros: false,
+  });
 
   const editorEl = component.locator(".bn-editor");
   const paragraph = editorEl.locator("p.bn-inline-content");
   await paragraph.waitFor({ state: "attached" });
 
-  // Select the word "second" (offsets 6 to 12) with the keyboard.
+  // Select the word "second" (offsets 6 to 12) with the keyboard. Each key press is awaited until it is painted
+  // (see pressKeySettled) so that sending them in quick succession doesn't outrun the editor's selection update.
   await paragraph.click();
-  await page.keyboard.press("Home");
+  await pressKeySettled(page, "Home");
   for (let i = 0; i < 6; i++) {
-    await page.keyboard.press("ArrowRight");
+    await pressKeySettled(page, "ArrowRight");
   }
   for (let i = 0; i < 6; i++) {
-    await page.keyboard.press("Shift+ArrowRight");
+    await pressKeySettled(page, "Shift+ArrowRight");
   }
 
   // The formatting toolbar is rendered via FloatingPortal into document.body.
@@ -54,10 +55,17 @@ test("Creating a link on a word in the middle of a line keeps the text intact", 
   await linkButtonEl.waitFor({ state: "attached" });
   await linkButtonEl.click();
 
-  const urlInputEl = page.locator(".bn-form-popover input");
+  // The link modal defaults to the "Page" target type, switch it to "URL".
+  const targetTypeSelectEl = page.locator('[data-test="linkTargetType"]');
+  await targetTypeSelectEl.waitFor({ state: "attached" });
+  await targetTypeSelectEl.selectOption("URL");
+
+  const urlInputEl = page.locator('[data-test="linkUrl"]');
   await urlInputEl.waitFor({ state: "attached" });
   await urlInputEl.fill("https://xwiki.org");
-  await urlInputEl.press("Enter");
+
+  const submitButtonEl = page.locator('[data-test="linkSubmit"]');
+  await submitButtonEl.click();
 
   // The link must be inserted around the selected word...
   const linkEl = editorEl.locator('a[href="https://xwiki.org"]');
@@ -66,25 +74,3 @@ test("Creating a link on a word in the middle of a line keeps the text intact", 
   // ...and the rest of the line must be intact.
   await expect(editorEl).toHaveText("First second third fourth");
 });
-
-function buildParagraph(text: string): BlockType[] {
-  return [
-    {
-      id: Math.random().toString(),
-      type: "paragraph",
-      props: {
-        backgroundColor: "default",
-        textAlignment: "left",
-        textColor: "default",
-      },
-      content: [
-        {
-          type: "text",
-          text,
-          styles: {},
-        },
-      ],
-      children: [],
-    },
-  ];
-}

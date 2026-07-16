@@ -45,6 +45,7 @@ import {
 } from "@blocknote/react";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { ContextForMacros } from "../blocknote/utils";
+import type { LinkEditionHandler } from "./links/linkEdition";
 import type {
   BlockTypeSelectItem,
   FormattingToolbarProps,
@@ -56,6 +57,7 @@ type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
   additionalBlockTypes: BlockTypeSelectItem[];
   macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false;
+  linkEditionHandler: LinkEditionHandler;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
 };
 
@@ -66,6 +68,7 @@ export const CustomFormattingToolbar: React.FC<
   additionalBlockTypes,
   imageEditionOverrideFn,
   macros,
+  linkEditionHandler,
 }) => {
   const Components = useComponentsContext()!;
   const dict = useDictionary();
@@ -91,7 +94,11 @@ export const CustomFormattingToolbar: React.FC<
         />
       ) : (
         // For others, simply show the "normal", default toolbar
-        getDefaultFormattingToolbarItems(combinedBlockTypeSelectItems, macros)
+        getDefaultFormattingToolbarItems(
+          combinedBlockTypeSelectItems,
+          macros,
+          linkEditionHandler,
+        )
       )}
     </Components.FormattingToolbar.Root>
   );
@@ -100,6 +107,7 @@ export const CustomFormattingToolbar: React.FC<
 const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
   macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false,
+  linkEditorHandler: LinkEditionHandler,
 ): JSX.Element[] =>
   // NOTE: This should return **exactly** the same items as BlockNote's default toolbar
   // So, when BlockNote updates theirs, we should update ours
@@ -133,7 +141,10 @@ const getDefaultFormattingToolbarItems = (
     <UnnestBlockButton key={"unnestBlockButton"} />,
     // This button has the exact same appearance as the default creation link button
     // But brings a custom popover to support XWiki references
-    <CustomCreateLinkButton key={"createLinkButton"} />,
+    <CustomCreateLinkButton
+      key={"createLinkButton"}
+      linkEditionHandler={linkEditorHandler}
+    />,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
   ].concat(

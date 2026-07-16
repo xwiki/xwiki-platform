@@ -34,4 +34,11 @@ public class XarObjectModel
     public static final String ELEMENT_CLASSNAME = "className";
 
     public static final String ELEMENT_GUID = "guid";
+
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private XarObjectModel()
+    {
+    }
 }

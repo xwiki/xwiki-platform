@@ -59,21 +59,6 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
         super(PLUGIN_NAME, className, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * We must override this method since the plugin manager only calls it for classes that provide their own
-     * implementation, and not an inherited one.
-     * </p>
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiPluginInterface#virtualInit(com.xpn.xwiki.XWikiContext)
-     */
-    @Override
-    public void virtualInit(XWikiContext context)
-    {
-        super.virtualInit(context);
-    }
-
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
@@ -99,20 +84,5 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     protected String getExtensionName()
     {
         return "Stylesheet";
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * We must override this method since the plugin manager only calls it for classes that provide their own
-     * implementation, and not an inherited one.
-     * </p>
-     * 
-     * @see AbstractSkinExtensionPlugin#endParsing(String, XWikiContext)
-     */
-    @Override
-    public String endParsing(String content, XWikiContext context)
-    {
-        return super.endParsing(content, context);
     }
 }

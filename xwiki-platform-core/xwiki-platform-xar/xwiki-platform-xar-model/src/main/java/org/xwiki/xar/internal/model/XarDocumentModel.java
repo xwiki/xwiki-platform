@@ -187,4 +187,11 @@ public class XarDocumentModel
     public static final String ELEMENT_REVISION_MINOR = "minorEdit";
 
     public static final String ELEMENT_REVISIONS = "versions";
+
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private XarDocumentModel()
+    {
+    }
 }

@@ -32,4 +32,11 @@ public class XarClassPropertyModel
      * @since 10.11RC1
      */
     public static final String ELEMENT_NAME = "name";
+
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private XarClassPropertyModel()
+    {
+    }
 }

@@ -39,4 +39,11 @@ public class XWikiConstant
 
     /** The context key which is used to signify that permissions have been dropped. */
     public static final String DROPPED_PERMISSIONS = "hasDroppedPermissions";
+
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private XWikiConstant()
+    {
+    }
 }

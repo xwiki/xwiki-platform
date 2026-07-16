@@ -28,4 +28,11 @@ public class XarObjectPropertyModel
     public static final String ELEMENT_PROPERTY = "property";
 
     public static final String ATTRIBUTE_TYPE = "type";
+
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private XarObjectPropertyModel()
+    {
+    }
 }

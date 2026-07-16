@@ -77,6 +77,13 @@ public class Utils
     private static ComponentManager rootComponentManager;
 
     /**
+     * Utility class, so it should not be instantiated.
+     */
+    private Utils()
+    {
+    }
+
+    /**
      * Generate the response by parsing a velocity template and printing the result to the {@link XWikiResponse
      * Response}. This is the main entry point to the View part of the XWiki MVC architecture.
      *

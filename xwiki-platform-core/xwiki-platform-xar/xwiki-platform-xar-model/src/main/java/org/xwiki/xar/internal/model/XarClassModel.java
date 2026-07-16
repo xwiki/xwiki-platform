@@ -42,4 +42,11 @@ public class XarClassModel
     public static final String ELEMENT_NAMEFIELD = "nameField";
 
     public static final String ELEMENT_VALIDATIONSCRIPT = "validationScript";
+
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private XarClassModel()
+    {
+    }
 }

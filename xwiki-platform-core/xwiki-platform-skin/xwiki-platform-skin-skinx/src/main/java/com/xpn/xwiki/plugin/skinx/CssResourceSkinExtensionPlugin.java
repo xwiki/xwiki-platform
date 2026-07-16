@@ -61,19 +61,4 @@ public class CssResourceSkinExtensionPlugin extends AbstractResourceSkinExtensio
     {
         return "<link rel='stylesheet' type='text/css' href='" + XMLUtils.escapeAttributeValue(url) + "'/>\n";
     }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * We must override this method since the plugin manager only calls it for classes that provide their own
-     * implementation, and not an inherited one.
-     * </p>
-     * 
-     * @see AbstractSkinExtensionPlugin#endParsing(String, XWikiContext)
-     */
-    @Override
-    public String endParsing(String content, XWikiContext context)
-    {
-        return super.endParsing(content, context);
-    }
 }

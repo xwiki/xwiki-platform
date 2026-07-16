@@ -391,17 +391,6 @@ public class EditForm extends XWikiForm
 
     /**
      * see {@link #getObjectPolicy}
-     * 
-
-     * @since 7.0RC1
-     */
-    private void setObjectPolicy(ObjectPolicyType objectPolicy)
-    {
-        this.objectPolicy = objectPolicy;
-    }
-
-    /**
-     * see {@link #getObjectPolicy}
      *
      * @param objectPolicyName is a string converted to {@link com.xpn.xwiki.web.ObjectPolicyType ObjectPolicyType}
      * @since 7.0RC1

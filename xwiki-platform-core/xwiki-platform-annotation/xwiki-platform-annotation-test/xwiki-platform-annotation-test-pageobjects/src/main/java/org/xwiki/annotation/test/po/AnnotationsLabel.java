@@ -81,9 +81,8 @@ public class AnnotationsLabel extends BaseElement
         this.showAnnotationById(idText);
         getDriver().findElement(By.cssSelector(".annotation-bubble a.delete")).click();
         // Delete asks for confirmation via XWiki.widgets.ConfirmedAjaxRequest, a JS-generated dialog (not a native
-        // browser confirm), whose "Yes" button is the first button in its ".buttons" container.
-        getDriver().waitUntilElementIsVisible(By.cssSelector(".buttons button"));
-        getDriver().findElement(By.cssSelector(".buttons button")).click();
+        // browser confirm).
+        confirmAction();
     }
 
     public String getAnnotationsAuthorByText(String searchText)

@@ -341,8 +341,7 @@ public class AnnotatableViewPage extends BaseElement
         getDriver().findElement(By.cssSelector(".annotation-bubble a.solve")).click();
         // "Mark as solved" is a plain link to the "save" action, confirmed via the same XWiki.widgets.ConfirmationBox
         // dialog as Delete (see AnnotationsLabel#deleteAnnotationById), not a native browser confirm().
-        getDriver().waitUntilElementIsVisible(By.cssSelector(".buttons button"));
-        getDriver().findElement(By.cssSelector(".buttons button")).click();
+        confirmAction();
         // The action navigates back to the same page (via xredirect); the toggle button for this annotation id no
         // longer exists once the reloaded page no longer treats it as an annotation.
         getDriver().waitUntilElementDisappears(By.id(id));

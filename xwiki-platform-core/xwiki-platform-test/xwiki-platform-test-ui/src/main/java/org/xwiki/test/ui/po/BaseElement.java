@@ -120,8 +120,21 @@ public class BaseElement
     }
 
     /**
+     * Confirms a {@code XWiki.widgets.ConfirmationBox} dialog (or a subclass, e.g.
+     * {@code XWiki.widgets.ConfirmedAjaxRequest}) by clicking its "Yes" button, which is the first button in the
+     * dialog's {@code .buttons} container.
+     *
+     * @since 18.6.0RC1
+     */
+    public void confirmAction()
+    {
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".buttons button"));
+        getDriver().findElement(By.cssSelector(".buttons button")).click();
+    }
+
+    /**
      * Waits for a notification message of the specified type with the given message to be displayed.
-     * 
+     *
      * @param level the notification type (one of error, warning, done)
      * @param message the notification message
      * @see 4.3

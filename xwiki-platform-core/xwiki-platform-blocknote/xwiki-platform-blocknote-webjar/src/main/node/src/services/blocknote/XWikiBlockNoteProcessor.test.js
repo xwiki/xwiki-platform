@@ -143,4 +143,72 @@ describe("XWikiBlockNoteProcessor", () => {
       expect(link.href).toBe("/xwiki/bin/view/Space/Page");
     });
   });
+
+  describe("generated label", () => {
+    // A link without a label is rendered with an empty content and its generated label stored in the
+    // xwikiGeneratedLabel property.
+    function documentWithGeneratedLabel(generatedLabel) {
+      return [
+        {
+          id: "p1",
+          type: "paragraph",
+          props: {},
+          content: [
+            {
+              type: "link",
+              props: {
+                xwikiReference: {
+                  type: "doc",
+                  typed: true,
+                  reference: "Space.Page",
+                  parameters: {},
+                },
+                xwikiGeneratedLabel: generatedLabel,
+              },
+              href: "/xwiki/bin/view/Space/Page",
+              content: [],
+            },
+          ],
+          children: [],
+        },
+      ];
+    }
+
+    it("shows the generated label as the link content on load", () => {
+      const document = processor.load(
+        JSON.stringify(documentWithGeneratedLabel("Page")),
+      );
+      const link = firstLink(document.content);
+      expect(link.content).toEqual([
+        { type: "text", text: "Page", styles: {} },
+      ]);
+    });
+
+    it("keeps the marker on save when the generated label is not changed", () => {
+      const document = processor.load(
+        JSON.stringify(documentWithGeneratedLabel("Page")),
+      );
+      const saved = JSON.parse(processor.save(document));
+      const link = firstLink(saved);
+      expect(link.props.xwikiGeneratedLabel).toBe("Page");
+      expect(link.props.xwikiReference.reference).toBe("Space.Page");
+    });
+
+    it("drops the marker on save when the user changed the generated label", () => {
+      const document = processor.load(
+        JSON.stringify(documentWithGeneratedLabel("Page")),
+      );
+      // Simulate the user editing the label.
+      firstLink(document.content).content = [
+        { type: "text", text: "Custom", styles: {} },
+      ];
+      const saved = JSON.parse(processor.save(document));
+      const link = firstLink(saved);
+      expect(link.props.xwikiGeneratedLabel).toBeUndefined();
+      expect(link.props.xwikiReference.reference).toBe("Space.Page");
+      expect(link.content).toEqual([
+        { type: "text", text: "Custom", styles: {} },
+      ]);
+    });
+  });
 });

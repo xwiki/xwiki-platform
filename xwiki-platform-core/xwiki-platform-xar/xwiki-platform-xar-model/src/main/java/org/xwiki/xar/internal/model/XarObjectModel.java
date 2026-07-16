@@ -40,5 +40,6 @@ public class XarObjectModel
      */
     private XarObjectModel()
     {
+        // Utility class
     }
 }

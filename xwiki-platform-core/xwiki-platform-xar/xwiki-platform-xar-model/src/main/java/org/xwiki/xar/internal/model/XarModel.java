@@ -98,5 +98,6 @@ public class XarModel
      */
     private XarModel()
     {
+        // Utility class
     }
 }

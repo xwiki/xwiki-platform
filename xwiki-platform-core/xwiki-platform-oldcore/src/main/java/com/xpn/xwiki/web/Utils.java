@@ -81,6 +81,7 @@ public class Utils
      */
     private Utils()
     {
+        // Utility class
     }
 
     /**

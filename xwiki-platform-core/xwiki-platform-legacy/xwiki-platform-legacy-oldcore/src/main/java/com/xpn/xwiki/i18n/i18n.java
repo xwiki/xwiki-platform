@@ -48,5 +48,6 @@ public class i18n
      */
     private i18n()
     {
+        // Utility class
     }
 }

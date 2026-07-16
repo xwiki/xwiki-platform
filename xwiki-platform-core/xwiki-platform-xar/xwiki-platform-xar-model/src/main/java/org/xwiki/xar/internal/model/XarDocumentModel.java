@@ -193,5 +193,6 @@ public class XarDocumentModel
      */
     private XarDocumentModel()
     {
+        // Utility class
     }
 }

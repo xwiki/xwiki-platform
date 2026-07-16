@@ -38,5 +38,6 @@ public class XarClassPropertyModel
      */
     private XarClassPropertyModel()
     {
+        // Utility class
     }
 }

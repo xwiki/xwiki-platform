@@ -55,6 +55,7 @@ public class XWikiConfigurationService
      */
     private XWikiConfigurationService()
     {
+        // Utility class
     }
 
     public static synchronized String getProperty(String propertyKey, String defaultValue, ServletContext context)

@@ -79,5 +79,6 @@ public class XarAttachmentModel
      */
     private XarAttachmentModel()
     {
+        // Utility class
     }
 }

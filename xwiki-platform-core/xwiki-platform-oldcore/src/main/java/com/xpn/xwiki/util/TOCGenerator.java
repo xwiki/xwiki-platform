@@ -42,6 +42,7 @@ public class TOCGenerator
      */
     private TOCGenerator()
     {
+        // Utility class
     }
 
     public static Map<String, Map<String, Object>> generateTOC(String content, int init, int max, boolean numbered,

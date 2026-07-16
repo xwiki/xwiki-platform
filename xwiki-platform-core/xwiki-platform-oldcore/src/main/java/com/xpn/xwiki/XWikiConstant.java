@@ -45,5 +45,6 @@ public class XWikiConstant
      */
     private XWikiConstant()
     {
+        // Utility class
     }
 }

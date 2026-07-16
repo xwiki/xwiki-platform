@@ -128,6 +128,7 @@ catalog:
   micromark-extension-gfm-strikethrough: 2.1.0
   micromark-extension-gfm-table: 2.1.1
   micromark-extension-gfm-task-list-item: 2.1.0
+  npm-package-json-lint: 10.4.1
   npm-run-all: 4.1.5
   npm-run-all2: 8.0.4
   nx: 23.0.1

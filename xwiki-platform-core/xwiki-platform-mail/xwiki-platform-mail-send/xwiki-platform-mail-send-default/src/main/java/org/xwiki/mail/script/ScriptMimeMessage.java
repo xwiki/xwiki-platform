@@ -20,6 +20,7 @@
 package org.xwiki.mail.script;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -156,7 +157,8 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
     public void setSubject(String subject)
     {
         try {
-            super.setSubject(subject);
+            // Set the subject with an explicit UTF-8 charset (otherwise the JVM default charset is used)
+            super.setSubject(subject, StandardCharsets.UTF_8.name());
         } catch (Exception e) {
             setError(e);
         }

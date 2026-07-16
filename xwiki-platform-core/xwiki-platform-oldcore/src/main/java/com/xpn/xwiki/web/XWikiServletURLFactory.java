@@ -130,8 +130,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         // Check if the request is a deamon thread request
         XWikiRequest request = context.getRequest();
-        this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub
-            && ((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon();
+        this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub stub
+            && stub.isDaemon();
 
         // Remember initial request base URL for path for last resort
         if (homepageConfigration != null && context.isMainWiki()) {
@@ -527,10 +527,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     private void appendQueryParameter(String key, Object paramValue, StringBuilder stringBuilder)
         throws UnsupportedEncodingException
     {
-        if (paramValue instanceof String) {
+        if (paramValue instanceof String stringValue) {
             stringBuilder.append(URLEncoder.encode(key, UTF8));
             stringBuilder.append('=');
-            stringBuilder.append(URLEncoder.encode((String) paramValue, UTF8));
+            stringBuilder.append(URLEncoder.encode(stringValue, UTF8));
         } else if (paramValue.getClass().isArray()) {
             Class ofArray = paramValue.getClass().getComponentType();
             if (ofArray.isPrimitive()) {
@@ -551,8 +551,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     }
                 }
             }
-        } else if (paramValue instanceof Collection) {
-            Collection zeCollection = (Collection) paramValue;
+        } else if (paramValue instanceof Collection zeCollection) {
             int index = 0;
             for (Object paramValueElement : zeCollection) {
                 appendQueryParameter(key, paramValueElement.toString(), stringBuilder);

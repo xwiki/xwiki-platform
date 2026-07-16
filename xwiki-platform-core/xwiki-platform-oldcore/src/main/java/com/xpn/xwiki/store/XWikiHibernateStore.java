@@ -849,8 +849,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             session.save(space);
 
             // Update parent space
-            if (space.getSpaceReference().getParent() instanceof SpaceReference) {
-                maybeCreateSpace((SpaceReference) space.getSpaceReference().getParent(), space.isHidden(), session);
+            if (space.getSpaceReference().getParent() instanceof SpaceReference parentReference) {
+                maybeCreateSpace(parentReference, space.isHidden(), session);
             }
         } finally {
             lock.unlock();
@@ -872,8 +872,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             session.update(space);
 
             // Update parent
-            if (space.getSpaceReference().getParent() instanceof SpaceReference) {
-                makeSpaceVisible((SpaceReference) space.getSpaceReference().getParent(), session);
+            if (space.getSpaceReference().getParent() instanceof SpaceReference parentReference) {
+                makeSpaceVisible(parentReference, session);
             }
         }
     }
@@ -902,8 +902,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             session.update(space);
 
             // Update space parent
-            if (spaceReference.getParent() instanceof SpaceReference) {
-                maybeMakeSpaceHidden((SpaceReference) spaceReference.getParent(), modifiedDocument, session);
+            if (spaceReference.getParent() instanceof SpaceReference parentReference) {
+                maybeMakeSpaceHidden(parentReference, modifiedDocument, session);
             }
         }
     }
@@ -1380,8 +1380,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             session.delete(space);
 
             // Update parent
-            if (spaceReference.getParent() instanceof SpaceReference) {
-                maybeDeleteXWikiSpace((SpaceReference) spaceReference.getParent(), deletedDocument, session);
+            if (spaceReference.getParent() instanceof SpaceReference parentReference) {
+                maybeDeleteXWikiSpace(parentReference, deletedDocument, session);
             }
         } else {
             // Update space hidden property if needed
@@ -1768,8 +1768,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     cobject.setDocumentReference(object.getDocumentReference());
                     cobject.setClassName(object.getClassName());
                     cobject.setNumber(object.getNumber());
-                    if (object instanceof BaseObject) {
-                        cobject.setGuid(((BaseObject) object).getGuid());
+                    if (object instanceof BaseObject baseObject) {
+                        cobject.setGuid(baseObject.getGuid());
                     }
                     cobject.setId(object.getId());
                     if (evict) {
@@ -1813,8 +1813,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     session.load(property, (Serializable) property);
                     // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all,
                     // it is safe to assume that a retrieved NULL value should actually be an empty string.
-                    if (property instanceof BaseStringProperty) {
-                        BaseStringProperty stringProperty = (BaseStringProperty) property;
+                    if (property instanceof BaseStringProperty stringProperty) {
                         if (stringProperty.getValue() == null) {
                             stringProperty.setValue("");
                         }
@@ -1830,8 +1829,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 // Let's force reading lists if there is a list
                 // This seems to be an issue since Hibernate 3.0
                 // Without this test ViewEditTest.testUpdateAdvanceObjectProp fails
-                if (property instanceof ListProperty) {
-                    ((ListProperty) property).getList();
+                if (property instanceof ListProperty listProperty) {
+                    listProperty.getList();
                 }
             } catch (Exception e) {
                 BaseCollection obj = property.getObject();
@@ -2397,11 +2396,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         if (documentReference instanceof PageAttachmentReference) {
             documentReference = documentReference.extractReference(EntityType.PAGE);
         }
-        if (documentReference instanceof PageReference) {
+        if (documentReference instanceof PageReference pageReference) {
             // If the reference is a PageReference then we can't know if it points to a terminal page or a
             // non-terminal one, and thus we need to resolve it.
             documentReference =
-                this.currentPageReferenceDocumentReferenceResolver.resolve((PageReference) documentReference);
+                this.currentPageReferenceDocumentReferenceResolver.resolve(pageReference);
         } else {
             documentReference = documentReference.extractReference(EntityType.DOCUMENT);
         }
@@ -2751,8 +2750,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 // and
                 // String
                 String referenceString;
-                if (result instanceof String) {
-                    referenceString = (String) result;
+                if (result instanceof String stringResult) {
+                    referenceString = stringResult;
                 } else {
                     referenceString = (String) ((Object[]) result)[0];
                 }
@@ -2881,8 +2880,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         for (Object result : documentDatas) {
             String fullName;
             String locale = null;
-            if (result instanceof String) {
-                fullName = (String) result;
+            if (result instanceof String stringResult) {
+                fullName = stringResult;
             } else {
                 fullName = (String) ((Object[]) result)[0];
                 if (distinctbylanguage) {

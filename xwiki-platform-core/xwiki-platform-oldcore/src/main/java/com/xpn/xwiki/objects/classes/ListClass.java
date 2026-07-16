@@ -470,7 +470,7 @@ public abstract class ListClass extends PropertyClass
      */
     public static String getStringFromList(List<String> list, String separators)
     {
-        if ((list instanceof PersistentCollection) && (!((PersistentCollection) list).wasInitialized())) {
+        if ((list instanceof PersistentCollection persistentCollection) && (!persistentCollection.wasInitialized())) {
             return "";
         }
 
@@ -560,8 +560,7 @@ public abstract class ListClass extends PropertyClass
     public String toFormString(BaseProperty property)
     {
         String result;
-        if (property instanceof ListProperty) {
-            ListProperty listProperty = (ListProperty) property;
+        if (property instanceof ListProperty listProperty) {
             result = ListClass.getStringFromList(listProperty.getList(), getSeparators());
         } else {
             result = property.toText();
@@ -651,8 +650,8 @@ public abstract class ListClass extends PropertyClass
         List<Element> elist = ppcel.elements(ListXarObjectPropertySerializer.ELEMENT_VALUE);
         BaseProperty lprop = newProperty();
 
-        if (lprop instanceof ListProperty) {
-            List<String> llist = ((ListProperty) lprop).getList();
+        if (lprop instanceof ListProperty listProperty) {
+            List<String> llist = listProperty.getList();
             for (int i = 0; i < elist.size(); i++) {
                 Element el = elist.get(i);
                 llist.add(el.getText());
@@ -735,8 +734,8 @@ public abstract class ListClass extends PropertyClass
         if (rawvalue == null) {
             return "";
         }
-        if (rawvalue instanceof Object[]) {
-            return ((Object[]) rawvalue)[1].toString();
+        if (rawvalue instanceof Object[] objectArray) {
+            return objectArray[1].toString();
         }
         return getDisplayValue(rawvalue.toString(), name, map, context);
     }
@@ -753,8 +752,8 @@ public abstract class ListClass extends PropertyClass
         if (rawvalue == null) {
             return "";
         }
-        if (rawvalue instanceof Object[]) {
-            return ((Object[]) rawvalue)[0].toString();
+        if (rawvalue instanceof Object[] objectArray) {
+            return objectArray[0].toString();
         }
         return rawvalue.toString();
     }
@@ -1006,8 +1005,8 @@ public abstract class ListClass extends PropertyClass
 
         if (property == null) {
             list = Collections.emptyList();
-        } else if (property instanceof ListProperty) {
-            list = ((ListProperty) property).getList();
+        } else if (property instanceof ListProperty listProperty) {
+            list = listProperty.getList();
         } else {
             list = Arrays.asList(String.valueOf(property.getValue()));
         }
@@ -1047,8 +1046,8 @@ public abstract class ListClass extends PropertyClass
                 actualList = list;
             }
 
-            if (property instanceof ListProperty) {
-                ((ListProperty) property).setList(actualList);
+            if (property instanceof ListProperty listProperty) {
+                listProperty.setList(actualList);
             } else if (isMultiSelect()) {
                 property.setValue(getStringFromList(actualList, getFirstSeparator()));
             } else {

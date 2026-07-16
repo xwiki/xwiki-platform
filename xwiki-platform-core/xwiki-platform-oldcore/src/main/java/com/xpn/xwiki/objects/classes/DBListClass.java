@@ -96,8 +96,8 @@ public class DBListClass extends ListClass
             // were empty strings). This means we need to check for NULL and ignore NULL entries
             // from the list.
             if (item != null) {
-                if (item instanceof String) {
-                    result.add(new ListItem((String) item));
+                if (item instanceof String string) {
+                    result.add(new ListItem(string));
                 } else {
                     Object[] res = (Object[]) item;
                     if (res.length == 1) {
@@ -621,8 +621,8 @@ public class DBListClass extends ListClass
             return;
         }
 
-        if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+        if (prop instanceof ListProperty listProperty) {
+            selectlist = listProperty.getList();
             List<String> newlist = new ArrayList<>();
             for (String entry : selectlist) {
                 newlist.add(getDisplayValue(entry, name, map, context));

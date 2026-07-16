@@ -94,6 +94,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
         this.loadMacro(node as BlockType);
         return true;
       } else if (node.type === "link") {
+        this.normalizeLinkContent(node);
         this.backupLinkMetadata(node, blockNoteDocument);
       } else if (
         "props" in node &&
@@ -186,6 +187,25 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     delete link.props;
 
     this.showGeneratedLabel(link, metadata.xwikiGeneratedLabel);
+  }
+
+  /**
+   * BlockNote's link inline content, unlike block or table-cell content, doesn't accept bare strings inside its
+   * content array: each array element must be a styled-text object (`type: "text"` with `text` and `styles`). A bare
+   * string element makes BlockNote throw when it builds the ProseMirror node (it reads `.text` on the string). Wrap
+   * any bare string element into a styled-text object so such link content can still be loaded. A whole-string content
+   * is left untouched, since BlockNote accepts it (the link content type is `string | StyledText[]`).
+   *
+   * @param link - the raw link node (mutable)
+   */
+  private normalizeLinkContent(link: Record<string, unknown>): void {
+    if (Array.isArray(link.content)) {
+      link.content = link.content.map((child) =>
+        typeof child === "string"
+          ? { type: "text", text: child, styles: {} }
+          : child,
+      );
+    }
   }
 
   /**

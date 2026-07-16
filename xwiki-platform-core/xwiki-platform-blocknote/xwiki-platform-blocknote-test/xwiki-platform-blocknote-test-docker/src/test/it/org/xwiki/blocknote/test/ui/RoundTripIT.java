@@ -237,12 +237,9 @@ class RoundTripIT extends AbstractBlockNoteIT
     {
         roundTrip(setup, testReference,
             """
-                begin https://www.xwiki.org [[label>>Some.Page||anchor="Heading" queryString="foo=bar"]] attach:file.pdf [[Other.Page]] end""",
-            // The content is modified on save:
-            // * anchor and queryString parameters are lost; we can specify then only for external URLs
-            // * links with generated labels are lost
-            """
-                begin  [[label>>Some.Page]]   end""");
+                begin https://www.xwiki.org [[label>>Some.Page||queryString="foo=bar" anchor="Heading"]] attach:file.pdf [[Other.Page]] end
+
+                [[styled **text**>>path:/Some/Page||class="special-link" data-foo="bar"]]""");
     }
 
     @Test

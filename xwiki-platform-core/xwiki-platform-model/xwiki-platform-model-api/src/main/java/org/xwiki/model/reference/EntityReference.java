@@ -809,8 +809,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
                 return 1;
             }
 
-            if (value.getClass() == otherValue.getClass() && value instanceof Comparable) {
-                return ((Comparable) value).compareTo(otherValue);
+            if (value.getClass() == otherValue.getClass() && value instanceof Comparable comparable) {
+                return comparable.compareTo(otherValue);
             }
 
             if (!value.equals(otherValue)) {

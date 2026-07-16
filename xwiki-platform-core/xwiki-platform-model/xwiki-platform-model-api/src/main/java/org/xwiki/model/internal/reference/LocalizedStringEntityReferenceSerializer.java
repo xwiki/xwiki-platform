@@ -55,13 +55,11 @@ public class LocalizedStringEntityReferenceSerializer extends DefaultStringEntit
         super.serializeEntityReference(currentReference, representation, isLastReference, parameters);
 
         // Append parameters for DocumentReference (if any)
-        if (currentReference instanceof DocumentReference) {
-            DocumentReference documentReference = (DocumentReference) currentReference;
+        if (currentReference instanceof DocumentReference documentReference) {
             if (documentReference.getLocale() != null) {
                 representation.append('(').append(documentReference.getLocale()).append(')');
             }
-        } else if (currentReference instanceof LocalDocumentReference) {
-            LocalDocumentReference documentReference = (LocalDocumentReference) currentReference;
+        } else if (currentReference instanceof LocalDocumentReference documentReference) {
             if (documentReference.getLocale() != null) {
                 representation.append('(').append(documentReference.getLocale()).append(')');
             }

@@ -62,8 +62,8 @@ public class AttachmentReferenceConverter extends AbstractConverter<AttachmentRe
 
         AttachmentReference reference;
 
-        if (value instanceof EntityReference) {
-            reference = this.referenceResolver.resolve((EntityReference) value);
+        if (value instanceof EntityReference entityReference) {
+            reference = this.referenceResolver.resolve(entityReference);
         } else {
             reference = this.stringResolver.resolve(value.toString());
         }

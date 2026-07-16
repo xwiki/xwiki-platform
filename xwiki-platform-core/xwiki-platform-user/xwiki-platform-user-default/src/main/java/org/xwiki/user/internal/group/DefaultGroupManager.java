@@ -122,10 +122,10 @@ public class DefaultGroupManager implements GroupManager
         Collection<String> searchWikis = new TreeSet<>();
 
         for (Object wiki : wikiTarget) {
-            if (wiki instanceof String) {
-                searchWikis.add((String) wiki);
-            } else if (wiki instanceof WikiReference) {
-                searchWikis.add(((WikiReference) wiki).getName());
+            if (wiki instanceof String string) {
+                searchWikis.add(string);
+            } else if (wiki instanceof WikiReference wikiReference) {
+                searchWikis.add(wikiReference.getName());
             } else if (wiki instanceof WikiTarget) {
                 searchWikis.addAll(getSearchWikis(reference, wikiTarget, resolve));
             }
@@ -139,14 +139,14 @@ public class DefaultGroupManager implements GroupManager
     {
         Collection<String> cacheWikis;
 
-        if (wikiTarget instanceof WikiTarget) {
-            cacheWikis = getSearchWikis(reference, (WikiTarget) wikiTarget, resolve);
-        } else if (wikiTarget instanceof String) {
-            cacheWikis = Collections.singleton((String) wikiTarget);
-        } else if (wikiTarget instanceof WikiReference) {
-            cacheWikis = Collections.singleton(((WikiReference) wikiTarget).getName());
-        } else if (wikiTarget instanceof Collection && !((Collection) wikiTarget).isEmpty()) {
-            cacheWikis = getSearchWikis(reference, (Collection) wikiTarget, resolve);
+        if (wikiTarget instanceof WikiTarget wikiTargetValue) {
+            cacheWikis = getSearchWikis(reference, wikiTargetValue, resolve);
+        } else if (wikiTarget instanceof String string) {
+            cacheWikis = Collections.singleton(string);
+        } else if (wikiTarget instanceof WikiReference wikiReference) {
+            cacheWikis = Collections.singleton(wikiReference.getName());
+        } else if (wikiTarget instanceof Collection collection && !collection.isEmpty()) {
+            cacheWikis = getSearchWikis(reference, collection, resolve);
         } else if (wikiTarget == null) {
             cacheWikis = getSearchWikis(reference, WikiTarget.ALL, resolve);
         } else {

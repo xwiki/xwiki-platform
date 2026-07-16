@@ -114,8 +114,8 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     private LiveDataPropertyDescriptorStore getPropertyStore(Source sourceConfig)
     {
         LiveDataPropertyDescriptorStore propertyStore = this.propertyStoreProvider.get();
-        if (propertyStore instanceof WithParameters && sourceConfig != null) {
-            ((WithParameters) propertyStore).getParameters().putAll(sourceConfig.getParameters());
+        if (propertyStore instanceof WithParameters withParameters && sourceConfig != null) {
+            withParameters.getParameters().putAll(sourceConfig.getParameters());
         }
         return propertyStore;
     }

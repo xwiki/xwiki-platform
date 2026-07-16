@@ -241,8 +241,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         Block parentBlock = currentBlock.getParent();
 
         if (parentBlock != null) {
-            if (parentBlock instanceof MacroMarkerBlock) {
-                MacroMarkerBlock parentMacro = (MacroMarkerBlock) parentBlock;
+            if (parentBlock instanceof MacroMarkerBlock parentMacro) {
 
                 if (isRecursive(parentMacro, reference)) {
                     throw new MacroExecutionException("Found recursive inclusion of document [" + reference + "]");

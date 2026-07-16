@@ -71,15 +71,15 @@ class GroupsCacheTest
 
     private MapCache<GroupCacheEntry> cache = spy(new MapCache<>());
 
-    private final static DocumentReference USER = new DocumentReference("userwiki", "userspace", "userdocument");
+    private static final DocumentReference USER = new DocumentReference("userwiki", "userspace", "userdocument");
 
-    private final static DocumentReference GROUP1 =
+    private static final DocumentReference GROUP1 =
         new DocumentReference("groupwiki1", "groupspace1", "groupdocument1");
 
-    private final static DocumentReference GROUP2 =
+    private static final DocumentReference GROUP2 =
         new DocumentReference("groupwiki2", "groupspace2", "groupdocument2");
 
-    private final static List<String> WIKIS = Arrays.asList("wiki1", "wiki2");
+    private static final List<String> WIKIS = Arrays.asList("wiki1", "wiki2");
 
     @BeforeComponent
     public void beforeComponent() throws CacheException

@@ -6204,7 +6204,7 @@ public class XWiki implements EventListener
                     LOGGER.debug("Using custom URLFactory Service Class [{}]", urlFactoryServiceClass);
                 }
                 factoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
-                    .getConstructor(new Class<?>[] { XWiki.class }).newInstance(new Object[] { this });
+                    .getConstructor(XWiki.class).newInstance(this);
             } catch (Exception e) {
                 LOGGER.warn("Failed to initialize URLFactory Service [{}]", urlFactoryServiceClass, e);
             }

@@ -146,7 +146,7 @@ public class SkinAction extends XWikiAction
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
 
         LOGGER.debug("document: [{}] ; baseskin: [{}] ; defaultbaseskin: [{}]",
-            new Object[] { doc.getDocumentReference(), baseskin, defaultbaseskin });
+            doc.getDocumentReference(), baseskin, defaultbaseskin);
 
         // Since we don't know exactly what does the URL point at, meaning that we don't know where the skin identifier
         // ends and where the path to the file starts, we must try to split at every '/' character.

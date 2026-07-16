@@ -143,9 +143,9 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             // skip these fields as we don't want to overwrite them with whatever is in this map. Setters should be used
             // for these values or constructor
             Collection<String> skippedFields =
-                Arrays.asList(new String[] {Annotation.SELECTION_FIELD, Annotation.SELECTION_LEFT_CONTEXT_FIELD,
+                Arrays.asList(Annotation.SELECTION_FIELD, Annotation.SELECTION_LEFT_CONTEXT_FIELD,
                     Annotation.SELECTION_RIGHT_CONTEXT_FIELD, Annotation.ORIGINAL_SELECTION_FIELD,
-                    Annotation.AUTHOR_FIELD, Annotation.STATE_FIELD});
+                    Annotation.AUTHOR_FIELD, Annotation.STATE_FIELD);
 
             for (Map.Entry<String, Object> field : annotationMetaData.entrySet()) {
                 if (!skippedFields.contains(field.getKey())) {

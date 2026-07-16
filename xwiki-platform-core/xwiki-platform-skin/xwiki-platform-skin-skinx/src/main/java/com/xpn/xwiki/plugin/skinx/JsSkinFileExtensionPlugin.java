@@ -85,6 +85,21 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     /**
      * {@inheritDoc}
      * <p>
+     * We must override this method since the plugin manager only calls it for classes that provide their own
+     * implementation, and not an inherited one.
+     * </p>
+     * 
+     * @see AbstractSkinExtensionPlugin#endParsing(String, XWikiContext)
+     */
+    @Override
+    public String endParsing(String content, XWikiContext context)
+    {
+        return super.endParsing(content, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
      * There is no support for always used skinfile-based extensions.
      * </p>
      * 

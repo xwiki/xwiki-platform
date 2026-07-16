@@ -57,4 +57,10 @@ public class PackagePlugin extends XWikiDefaultPlugin implements XWikiPluginInte
     public void flushCache()
     {
     }
+
+    @Override
+    public void init(XWikiContext context)
+    {
+        super.init(context);
+    }
 }

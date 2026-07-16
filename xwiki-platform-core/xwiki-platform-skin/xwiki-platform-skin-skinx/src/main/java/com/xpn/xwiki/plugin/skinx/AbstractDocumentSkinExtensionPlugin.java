@@ -324,6 +324,21 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * We must override this method since the plugin manager only calls it for classes that provide their own
+     * implementation, and not an inherited one.
+     * </p>
+     * 
+     * @see AbstractSkinExtensionPlugin#endParsing(String, XWikiContext)
+     */
+    @Override
+    public String endParsing(String content, XWikiContext context)
+    {
+        return super.endParsing(content, context);
+    }
+
+    /**
      * Creates or updates the XClass used for this type of extension. Usually called on {@link #init(XWikiContext)} and
      * {@link #virtualInit(XWikiContext)}.
      * 

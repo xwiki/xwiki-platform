@@ -61,6 +61,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     "xwikiParameters",
     "xwikiReference",
     "xwikiFreestanding",
+    "xwikiGeneratedLabel",
   ];
 
   public static bind(container: Container): void {
@@ -183,6 +184,53 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     // The BlockNote link schema doesn't support props so we drop them (the metadata they held is
     // backed up above and restored on save).
     delete link.props;
+
+    this.showGeneratedLabel(link, metadata.xwikiGeneratedLabel);
+  }
+
+  /**
+   * A link without a label is rendered with an empty content and its generated label stored as metadata. Show the
+   * generated label as the link content so that the link is visible and editable. If the user changes it, the label is
+   * no longer generated and the marker is dropped on save (see {@link restoreLinkMetadata}).
+   *
+   * @param link - the raw link node (mutable)
+   * @param generatedLabel - the generated label backed up from the link metadata, if any
+   */
+  private showGeneratedLabel(
+    link: Record<string, unknown>,
+    generatedLabel: unknown,
+  ): void {
+    if (typeof generatedLabel === "string" && this.getLinkText(link) === "") {
+      link.content = [{ type: "text", text: generatedLabel, styles: {} }];
+    }
+  }
+
+  /**
+   * @param link - the raw link node
+   * @returns the plain text of the link content (the link label); returns undefined if the link has styled content
+   */
+  private getLinkText(link: Record<string, unknown>): string | undefined {
+    let content = link.content;
+    if (!Array.isArray(content)) {
+      content = [content];
+    }
+    let text = "";
+    for (const child of content as (
+      | string
+      | { type: "text"; text: string; styles?: Record<string, unknown> }
+    )[]) {
+      if (typeof child === "string") {
+        text += child;
+      } else if (
+        child?.type === "text" &&
+        (!child.styles || Object.keys(child.styles).length === 0)
+      ) {
+        text += child.text;
+      } else {
+        return;
+      }
+    }
+    return text;
   }
 
   /**
@@ -300,7 +348,13 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
       link.href = stripLinkId(link.href as string);
       const metadata = blockNoteDocument.getMetadata(id);
       if (metadata) {
-        link.props = { ...metadata };
+        const props = { ...metadata };
+        // Drop the generated label marker if the user changed the (originally generated) label, so that the modified
+        // label is preserved on save instead of being discarded as a generated label.
+        if (props.xwikiGeneratedLabel !== this.getLinkText(link)) {
+          delete props.xwikiGeneratedLabel;
+        }
+        link.props = props;
       }
     }
   }

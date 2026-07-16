@@ -140,7 +140,9 @@ class DefaultIOServiceTest
     {
         this.annotationClassReference = new DocumentReference(COMMENTS_DOCUMENT_REFERENCE, new WikiReference(WIKI_ID));
         when(this.configuration.getAnnotationClassReference()).thenReturn(this.annotationClassReference);
-
+        // Must be before initializeMandatoryDocuments because AnnotationClassDocumentInitializer only creates the
+        // annotation class when the application reports itself as installed.
+        when(this.configuration.isInstalled()).thenReturn(true);
         this.oldcore.getSpyXWiki().initializeMandatoryDocuments(this.oldcore.getXWikiContext());
     }
 
@@ -215,7 +217,6 @@ class DefaultIOServiceTest
     @Test
     void addAnnotationSkipsTargetForSameDocument() throws Exception
     {
-        when(this.configuration.isInstalled()).thenReturn(true);
 
         saveNewDocument();
         XWikiContext context = this.oldcore.getXWikiContext();
@@ -324,7 +325,7 @@ class DefaultIOServiceTest
         context.setUser("xwiki:XWiki.Author");
 
         XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
-        // Object 0 ius unused and only here to push the object under test to index 1 (the annotation id used below).
+        // Object 0 is unused and only here to push the object under test to index 1 (the annotation id used below).
         document.newXObject(this.annotationClassReference, context);
         // An annotation on the document content is stored with a blank target; removing it through the document
         // target must still delete the object.

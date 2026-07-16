@@ -216,8 +216,8 @@ public abstract class AbstractValueNode<T> extends AbstractNode
     @Override
     public boolean equals(Object o)
     {
-        return (o instanceof AbstractValueNode
-                && content.equals(((AbstractValueNode) o).content));
+        return (o instanceof AbstractValueNode abstractValueNode
+                && content.equals(abstractValueNode.content));
     }
 
     @Override

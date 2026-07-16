@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { applyXWikiParameters } from "./parameters";
 import { createStyleSpec } from "@blocknote/core";
 
 /**
@@ -79,9 +80,10 @@ const VerbatimStyle = createStyleSpec(
 );
 
 /**
- * BlockNote style spec that preserves XWiki inline parameters (e.g., `(% data-foo="bar" %)`). These parameters are not
- * visible or editable by the user; the style value holds a JSON-serialized string of the parameter map and renders as a
- * transparent `<span>`.
+ * BlockNote style spec that preserves XWiki inline parameters (e.g., `(% class="foo" %)`). These parameters are not
+ * visible or directly editable by the user; the style value holds the parameter map (a JSON-serialized string in the
+ * top-level document, a raw object inside macro output) and renders as a `<span>` carrying the parameters as
+ * attributes, so the output matches what the server produced (macro CSS often targets these attributes).
  *
  * @since 18.6.0RC1
  * @beta
@@ -89,8 +91,9 @@ const VerbatimStyle = createStyleSpec(
 const XWikiParametersStyle = createStyleSpec(
   { type: "xwikiParameters", propSchema: "string" },
   {
-    render: () => {
+    render: (value) => {
       const span = document.createElement("span");
+      applyXWikiParameters(span, value);
       return { dom: span, contentDOM: span };
     },
     parse: () => undefined,

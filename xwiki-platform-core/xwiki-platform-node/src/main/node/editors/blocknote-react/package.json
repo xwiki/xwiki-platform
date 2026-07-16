@@ -88,6 +88,7 @@
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "cross-env": "catalog:",
     "eslint": "catalog:",
+    "jsdom": "catalog:",
     "postcss": "catalog:",
     "postcss-preset-mantine": "catalog:",
     "postcss-simple-vars": "catalog:",

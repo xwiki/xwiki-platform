@@ -4043,11 +4043,7 @@ public class XWiki implements EventListener
         map.put(XWikiUser.ACTIVE_PROPERTY, "1");
         map.put(XWikiUsersDocumentInitializer.FIRST_NAME_FIELD, xwikiname);
 
-        if (createUser(xwikiname, map, userRights, context) == 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return createUser(xwikiname, map, userRights, context) == 1;
     }
 
     public void sendConfirmationEmail(String xwikiname, String password, String email, String message,

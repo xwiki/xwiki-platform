@@ -1304,11 +1304,7 @@ public class XWikiAttachment implements Cloneable
     public boolean isImage(XWikiContext context)
     {
         String contenttype = getMimeType(context);
-        if (contenttype.startsWith("image/")) {
-            return true;
-        } else {
-            return false;
-        }
+        return contenttype.startsWith("image/");
     }
 
     public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException

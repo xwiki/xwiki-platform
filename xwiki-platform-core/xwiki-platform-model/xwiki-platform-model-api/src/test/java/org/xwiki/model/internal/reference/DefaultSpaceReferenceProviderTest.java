@@ -60,7 +60,7 @@ class DefaultSpaceReferenceProviderTest implements TestConstants
     {
         when(this.entityProvider.getDefaultReference(EntityType.SPACE)).thenReturn(DEFAULT_SPACE_REFERENCE);
         when(this.wikiReferenceProvider.get()).thenReturn(new WikiReference(DEFAULT_WIKI_REFERENCE));
-        when(this.entityReferenceFactory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
+        when(this.entityReferenceFactory.getReference(any())).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Test

@@ -953,11 +953,8 @@ public class Package
      */
     private boolean documentContainsHistory(DocumentInfo doc)
     {
-        if ((doc.getDoc().getDocumentArchive() == null) || (doc.getDoc().getDocumentArchive().getNodes() == null)
-            || doc.getDoc().getDocumentArchive().getNodes().isEmpty()) {
-            return false;
-        }
-        return true;
+        return doc.getDoc().getDocumentArchive() != null && doc.getDoc().getDocumentArchive().getNodes() != null
+            && !doc.getDoc().getDocumentArchive().getNodes().isEmpty();
     }
 
     private List<String> getStringList(String name, XWikiContext context)

@@ -515,11 +515,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return false;
         }
 
-        if (!getNameField().equals(bclass.getNameField())) {
-            return false;
-        }
-
-        return true;
+        return getNameField().equals(bclass.getNameField());
     }
 
     public void merge(BaseClass bclass)

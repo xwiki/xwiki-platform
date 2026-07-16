@@ -656,11 +656,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             currentReference2 = currentReference2.getParent();
         }
 
-        if (currentReference2 == null || to.isAllowedAncestor(currentReference2.getType())) {
-            return true;
-        }
-
-        return false;
+        return currentReference2 == null || to.isAllowedAncestor(currentReference2.getType());
     }
 
     /**

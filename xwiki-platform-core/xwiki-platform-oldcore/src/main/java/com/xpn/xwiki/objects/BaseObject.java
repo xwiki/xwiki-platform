@@ -341,11 +341,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             return false;
         }
 
-        if (getNumber() != ((BaseObject) obj).getNumber()) {
-            return false;
-        }
-
-        return true;
+        return getNumber() == ((BaseObject) obj).getNumber();
     }
 
     @Override

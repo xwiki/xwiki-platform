@@ -1,15 +1,11 @@
-input[type="text"].xtree-finder {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/search.png')");
-  background-repeat: no-repeat;
-  margin: .5em 0;
-  width: 100%;
+.xtree-finder-container {
+  display: flex;
+  gap: .5em;
+  align-items: center;
 }
 
-input[type="text"].xtree-finder,
-input[type="text"].xtree-finder.loading {
-  background-position: 2px center;
-  padding-left: 20px;
-  padding-right: 20px;
+input[type="text"].xtree-finder {
+  width: 100%;
 }
 
 div.suggestItems.xtree-finder-suggestions {

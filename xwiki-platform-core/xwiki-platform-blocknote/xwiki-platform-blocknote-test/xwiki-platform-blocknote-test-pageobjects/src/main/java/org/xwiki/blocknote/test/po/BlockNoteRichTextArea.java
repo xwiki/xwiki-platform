@@ -193,8 +193,8 @@ public class BlockNoteRichTextArea extends BaseElement
         // The double click event listener is registered on the macro output wrapper which is the first child of the
         // block content.
         WebElement macro = this.container.findElements(By.cssSelector("""
-            .bn-block-content[data-content-type="Macro_xwikiMacroBlock"] > :first-child,
-            .bn-inline-content-section[data-inline-content-type="Macro_xwikiInlineMacro"] > :first-child"""))
+            .bn-block-content[data-content-type="xwikiMacroBlock"] > :first-child,
+            .bn-inline-content-section[data-inline-content-type="xwikiInlineMacro"] > :first-child"""))
             .get(index);
         getDriver().createActions().doubleClick(macro).perform();
         return new MacroDialogEditModal().waitUntilReady();

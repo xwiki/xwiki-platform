@@ -220,4 +220,85 @@ describe("XWikiBlockNoteProcessor", () => {
       ]);
     });
   });
+
+  describe("macros", () => {
+    // A block macro node with an object call and an array output.
+    function blockMacro() {
+      return {
+        id: "m1",
+        type: "xwikiMacroBlock",
+        props: {
+          call: { name: "info", parameters: { title: "Note" }, content: "hi" },
+          output: [
+            { type: "paragraph", props: {}, content: "hi", children: [] },
+          ],
+        },
+        children: [],
+      };
+    }
+
+    // A paragraph holding an inline macro (with an object call and an inline content output) between two text runs.
+    function documentWithInlineMacro() {
+      return [
+        {
+          id: "p1",
+          type: "paragraph",
+          props: {},
+          content: [
+            { type: "text", text: "first ", styles: {} },
+            {
+              type: "xwikiInlineMacro",
+              props: {
+                call: {
+                  name: "success",
+                  parameters: { title: "OK" },
+                  content: "done",
+                },
+                output: [{ type: "text", text: "done", styles: {} }],
+              },
+            },
+            { type: "text", text: " line", styles: {} },
+          ],
+          children: [],
+        },
+      ];
+    }
+
+    it("stringifies the call and output of a block macro on load", () => {
+      const macro = blockMacro();
+      const document = processor.load(JSON.stringify([macro]));
+      const loaded = document.content[0];
+      expect(loaded.props.call).toBe(JSON.stringify(macro.props.call));
+      expect(loaded.props.output).toBe(JSON.stringify(macro.props.output));
+    });
+
+    it("stringifies the call and output of an inline macro on load", () => {
+      const doc = documentWithInlineMacro();
+      const inlineMacro = doc[0].content[1];
+      const document = processor.load(JSON.stringify(doc));
+      const loaded = document.content[0].content[1];
+      expect(loaded.props.call).toBe(JSON.stringify(inlineMacro.props.call));
+      expect(loaded.props.output).toBe(
+        JSON.stringify(inlineMacro.props.output),
+      );
+    });
+
+    it("restores the call and output objects of a block macro on save round-trip", () => {
+      const macro = blockMacro();
+      const document = processor.load(JSON.stringify([macro]));
+      const saved = JSON.parse(processor.save(document));
+      expect(saved[0].props.call).toEqual(macro.props.call);
+      expect(saved[0].props.output).toEqual(macro.props.output);
+    });
+
+    it("restores the call and output objects of an inline macro on save round-trip", () => {
+      const doc = documentWithInlineMacro();
+      const inlineMacro = doc[0].content[1];
+      const document = processor.load(JSON.stringify(doc));
+      const saved = JSON.parse(processor.save(document));
+      const savedMacro = saved[0].content[1];
+      expect(savedMacro.props.call).toEqual(inlineMacro.props.call);
+      expect(savedMacro.props.output).toEqual(inlineMacro.props.output);
+    });
+  });
 });

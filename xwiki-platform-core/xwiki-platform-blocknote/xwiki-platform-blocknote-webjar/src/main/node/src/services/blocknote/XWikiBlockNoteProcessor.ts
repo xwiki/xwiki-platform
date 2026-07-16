@@ -23,7 +23,6 @@ import { Container, inject, injectable } from "inversify";
 import { uuidv4 } from "lib0/random";
 import type { BlockNoteIterator, NodeType } from "./BlockNoteIterator";
 import type { BlockNoteProcessor } from "./BlockNoteProcessor";
-import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
 
 /**
  * XWik specific implementation of a BlockNoteProcessor.
@@ -90,8 +89,8 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     blockNoteDocument: BlockNoteDocument,
   ): boolean {
     if (typeof node === "object") {
-      if (node.type === "xwikiMacroBlock") {
-        this.loadMacro(node as BlockType);
+      if (this.isMacroNode(node)) {
+        this.loadMacro(node as { props?: unknown });
         return true;
       } else if (node.type === "link") {
         this.normalizeLinkContent(node);
@@ -115,12 +114,24 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
   }
 
   /**
-   * By default, BlockNote supports only primitive values for block properties. To overcome this limitation, we need to
-   * pre-process the macro block properties to convert the call and output objects into strings (JSON serialization).
+   * @param node - the node to test
+   * @returns `true` if the given node is a macro node (block or inline macro). The inline macro type is compared as a
+   *   string because it is not part of the (statically-typed) inline content schema: it is registered through an index
+   *   signature on the editor side so that it doesn't tighten the schema, so its literal type is not available here.
+   */
+  private isMacroNode(node: object): boolean {
+    const type = (node as { type?: unknown }).type;
+    return type === "xwikiMacroBlock" || type === "xwikiInlineMacro";
+  }
+
+  /**
+   * By default, BlockNote supports only primitive values for block and inline content properties. To overcome this
+   * limitation, we need to pre-process the macro properties (both block and inline macros) to convert the call and
+   * output objects into strings (JSON serialization).
    *
    * @param macroNode - the macro node to pre-process
    */
-  private loadMacro(macroNode: BlockType): void {
+  private loadMacro(macroNode: { props?: unknown }): void {
     const props = macroNode.props as Record<string, unknown>;
     props.call = JSON.stringify(props.call);
     if (props.output) {
@@ -281,8 +292,8 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
     blockNoteDocument: BlockNoteDocument,
   ): boolean {
     if (typeof node === "object") {
-      if (node.type === "xwikiMacroBlock") {
-        this.saveMacro(node as BlockType);
+      if (this.isMacroNode(node)) {
+        this.saveMacro(node as { props?: unknown });
         return true;
       } else if (node.type === "link") {
         this.restoreLinkMetadata(node, blockNoteDocument);
@@ -321,7 +332,7 @@ export class XWikiBlockNoteProcessor implements BlockNoteProcessor {
    *
    * @param macroNode - the macro node to post-process
    */
-  private saveMacro(macroNode: BlockType): void {
+  private saveMacro(macroNode: { props?: unknown }): void {
     const props = macroNode.props as Record<string, unknown>;
     if (typeof props.call === "string") {
       props.call = JSON.parse(props.call);

@@ -85,9 +85,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
-            First [[second>>https://xwiki.org]] third fourth""", wikiEditor.getContent());
+        assertEquals("First [[second>>https://xwiki.org]] third fourth", wikiEditor.getContent());
     }
 
     @Test
@@ -117,9 +115,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
-            First [[2nd>>https://xwiki.org]] third fourth""", wikiEditor.getContent());
+        assertEquals("First [[2nd>>https://xwiki.org]] third fourth", wikiEditor.getContent());
     }
 
     /**

@@ -452,9 +452,9 @@ public class TextAreaClass extends StringClass
         // The document reference is used client-side (e.g. to resolve relative references and build URLs).
         parameters.put("sourceDocumentReference", ownerDocument.getDocumentReferenceWithLocale());
         // The property reference is used server-side to render the content with the rights of the document's author
-        // (instead of the current user) when the content is the unmodified stored value of the property.
-        ObjectReference objectReference = (ObjectReference) object.getReference();
-        if (objectReference != null) {
+        // (instead of the current user) when the content is the unmodified stored value of an object property.
+        // For class properties, there is no equivalent meta property reference, so we don't set it.
+        if (object.getReference() instanceof ObjectReference objectReference) {
             parameters.put("sourcePropertyReference", new ObjectPropertyReference(name, objectReference));
         }
         Syntax syntax = null;

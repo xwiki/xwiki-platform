@@ -61,10 +61,10 @@ public class ViewableQueryFilter implements QueryFilter
         List<Object> filteredResults = new LinkedList<>();
         for (Object result : results) {
             EntityReference entityReference = null;
-            if (result instanceof EntityReference) {
-                entityReference = (EntityReference) result;
-            } else if (result instanceof Object[] && ((Object[]) result)[0] instanceof EntityReference) {
-                entityReference = (EntityReference) ((Object[]) result)[0];
+            if (result instanceof EntityReference reference) {
+                entityReference = reference;
+            } else if (result instanceof Object[] array && array[0] instanceof EntityReference reference) {
+                entityReference = reference;
             }
             if (entityReference != null && this.authorization.hasAccess(Right.VIEW, entityReference)) {
                 filteredResults.add(result);

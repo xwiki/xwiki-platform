@@ -58,12 +58,11 @@ public class DocumentQueryFilter implements QueryFilter
     {
         for (int i = 0; i < results.size(); i++) {
             Object result = results.get(i);
-            if (result instanceof String) {
-                results.set(i, this.documentReferenceResolver.resolve((String) result));
-            } else if (result instanceof Object[]) {
-                Object[] row = (Object[]) result;
-                if (row.length > 0 && row[0] instanceof String) {
-                    row[0] = this.documentReferenceResolver.resolve((String) row[0]);
+            if (result instanceof String resultString) {
+                results.set(i, this.documentReferenceResolver.resolve(resultString));
+            } else if (result instanceof Object[] row) {
+                if (row.length > 0 && row[0] instanceof String rowString) {
+                    row[0] = this.documentReferenceResolver.resolve(rowString);
                 }
             }
         }

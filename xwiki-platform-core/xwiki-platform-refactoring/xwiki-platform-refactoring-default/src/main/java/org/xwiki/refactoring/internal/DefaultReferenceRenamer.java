@@ -165,8 +165,7 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
         boolean modified = false;
 
         for (Block matchingBlock : blocks) {
-            if (matchingBlock instanceof MacroBlock) {
-                MacroBlock macroBlock = (MacroBlock) matchingBlock;
+            if (matchingBlock instanceof MacroBlock macroBlock) {
                 Optional<MacroBlock> optionalMacroBlock = handleMacroBlock(macroBlock, currentDocumentReference,
                     oldTarget, newTarget, macroRefactoringLambda);
                 if (optionalMacroBlock.isPresent()) {
@@ -175,11 +174,9 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
                 }
             } else {
                 ResourceReference reference;
-                if (matchingBlock instanceof LinkBlock) {
-                    LinkBlock linkBlock = (LinkBlock) matchingBlock;
+                if (matchingBlock instanceof LinkBlock linkBlock) {
                     reference = linkBlock.getReference();
-                } else if (matchingBlock instanceof ImageBlock) {
-                    ImageBlock imageBlock = (ImageBlock) matchingBlock;
+                } else if (matchingBlock instanceof ImageBlock imageBlock) {
                     reference = imageBlock.getReference();
                 } else {
                     throw new IllegalArgumentException(String.format(
@@ -218,9 +215,9 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
             // last fallback in the unlikely case of there's no document syntax
             syntax = this.extendedRenderingConfiguration.getDefaultContentSyntax();
         }
-        if (this.renderingContext instanceof MutableRenderingContext) {
+        if (this.renderingContext instanceof MutableRenderingContext mutableRenderingContext) {
             // Set the default syntax
-            ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
+            mutableRenderingContext.push(this.renderingContext.getTransformation(),
                 this.renderingContext.getXDOM(), syntax, this.renderingContext.getTransformationId(),
                 this.renderingContext.isRestricted(), this.renderingContext.getTargetSyntax());
         }
@@ -231,8 +228,8 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
                 + "document [{}]", oldTarget, newTarget, macroBlock.getId(), currentDocumentReference);
         } finally {
             // don't forget to pop the rendering context.
-            if (this.renderingContext instanceof MutableRenderingContext) {
-                ((MutableRenderingContext) this.renderingContext).pop();
+            if (this.renderingContext instanceof MutableRenderingContext mutableRenderingContext) {
+                mutableRenderingContext.pop();
             }
         }
         return Optional.empty();

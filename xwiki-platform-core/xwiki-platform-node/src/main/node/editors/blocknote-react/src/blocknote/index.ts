@@ -20,7 +20,7 @@
 
 import { DefinitionListItemBlock } from "./definitionList";
 import { XWikiGroupBlock } from "./group";
-import { XWikiMacroBlock } from "./macroBlock";
+import { XWikiInlineMacro, XWikiMacroBlock } from "./macro";
 import { XWikiRawBlock } from "./raw";
 import {
   SubscriptStyle,
@@ -84,6 +84,12 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
 
     inlineContentSpecs: {
       ...defaultInlineContentSpecs,
+
+      // The generic inline macro (server-rendered inline macros without a dedicated client-side rendering). It is
+      // registered through Object.fromEntries so that its type stays erased under an index signature, like the dynamic
+      // macros below: a statically-typed custom inline content entry would tighten the inline content schema and break
+      // the call sites that expect the default inline content schema.
+      ...Object.fromEntries([["xwikiInlineMacro", XWikiInlineMacro]]),
 
       // Macros
       ...Object.fromEntries(

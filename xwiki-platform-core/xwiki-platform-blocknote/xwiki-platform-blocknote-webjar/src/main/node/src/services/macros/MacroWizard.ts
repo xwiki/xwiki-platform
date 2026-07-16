@@ -237,7 +237,7 @@ export class DefaultBlockNoteMacroWizard implements BlockNoteMacroWizard {
       },
       {
         inlineParameters: {},
-        inlineParametersSyntax: "uniast/1.0",
+        inlineParametersSyntax: "blocknote/1.0",
         showInlineParameters: true,
         sourceDocumentReference: XWiki.currentDocument.documentReference,
         syntax: XWiki.docsyntax,

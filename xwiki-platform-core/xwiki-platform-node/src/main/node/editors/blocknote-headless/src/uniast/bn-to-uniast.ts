@@ -425,46 +425,62 @@ export class BlockNoteToUniAstConverter {
         };
   }
 
+  private convertInlineMacro(
+    inlineContent: EditorStyledText | Link<EditorStyleSchema>,
+    id: string,
+  ): InlineContent {
+    if (!Object.hasOwn(this.macros, id)) {
+      throw new Error(`Found unregistered macro: "${id}"`);
+    }
+
+    const {
+      infos: { bodyType },
+    } = this.macros[id];
+
+    return {
+      type: "inlineMacro",
+      call: {
+        kind: "inline",
+        id,
+        // Conversion is required because the AST is dynamically typed
+        params: (
+          inlineContent as unknown as {
+            props: Record<string, boolean | number | string>;
+          }
+        ).props,
+        body:
+          bodyType === "none"
+            ? { type: "none" }
+            : bodyType === "raw"
+              ? {
+                  type: "raw",
+                  content: extractMacroRawContent([inlineContent]),
+                }
+              : {
+                  type: "inlineContent",
+                  inlineContent: this.convertInlineContent(inlineContent),
+                },
+      },
+    };
+  }
+
   private convertInlineContent(
     inlineContent: EditorStyledText | Link<EditorStyleSchema>,
   ): InlineContent {
     // Handle macros
     if (inlineContent.type.startsWith(MACRO_NAME_PREFIX)) {
-      const id = inlineContent.type.substring(MACRO_NAME_PREFIX.length);
+      return this.convertInlineMacro(
+        inlineContent,
+        inlineContent.type.substring(MACRO_NAME_PREFIX.length),
+      );
+    }
 
-      if (!Object.hasOwn(this.macros, id)) {
-        throw new Error(`Found unregistered macro: "${id}"`);
-      }
-
-      const {
-        infos: { bodyType },
-      } = this.macros[id];
-
-      return {
-        type: "inlineMacro",
-        call: {
-          kind: "inline",
-          id,
-          // Conversion is required because the AST is dynamically typed
-          params: (
-            inlineContent as unknown as {
-              props: Record<string, boolean | number | string>;
-            }
-          ).props,
-          body:
-            bodyType === "none"
-              ? { type: "none" }
-              : bodyType === "raw"
-                ? {
-                    type: "raw",
-                    content: extractMacroRawContent([inlineContent]),
-                  }
-                : {
-                    type: "inlineContent",
-                    inlineContent: this.convertInlineContent(inlineContent),
-                  },
-        },
-      };
+    // The xwikiInlineMacro inline content is a direct BlockNote representation of a server-side macro and cannot be
+    // converted to UniAst.
+    if ((inlineContent.type as string) === "xwikiInlineMacro") {
+      throw new Error(
+        "xwikiInlineMacro inline content cannot be converted to UniAst",
+      );
     }
 
     switch (inlineContent.type) {

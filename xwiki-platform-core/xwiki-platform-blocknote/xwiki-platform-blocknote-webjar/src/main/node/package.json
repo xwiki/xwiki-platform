@@ -32,7 +32,6 @@
     "@xwiki/platform-model-remote-url-api": "workspace:*",
     "@xwiki/platform-rendering-api": "workspace:*",
     "@xwiki/platform-syntaxes-config": "workspace:*",
-    "@xwiki/platform-uniast-api": "workspace:*",
     "@xwiki/platform-xwiki-syntax-config": "workspace:*",
     "inversify": "catalog:",
     "lib0": "catalog:",

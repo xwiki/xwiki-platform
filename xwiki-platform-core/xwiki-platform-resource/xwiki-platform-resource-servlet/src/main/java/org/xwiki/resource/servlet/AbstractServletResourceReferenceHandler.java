@@ -92,7 +92,7 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
                     sendError(HttpStatus.SC_NOT_FOUND, "Resource not found [%s].",
                         getResourceName(typedResourceReference));
                 }
-            } catch (IOException | ResourceReferenceHandlerException e) {
+            } catch (Exception e) {
                 this.logger.error(e.getMessage(), e);
                 sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             }

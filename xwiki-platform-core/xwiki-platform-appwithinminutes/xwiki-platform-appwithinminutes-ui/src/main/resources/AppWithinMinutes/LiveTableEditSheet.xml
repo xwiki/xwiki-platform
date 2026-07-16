@@ -65,6 +65,23 @@
     'platform.appwithinminutes.liveTableEditorAddColumnHint')"&gt;$services.icon.renderHTML('add')&lt;/a&gt;
 #end
 
+## The warning displayed when the live table references deprecated columns. It is hidden by default (via the
+## Bootstrap 'hidden' class) and the edit script shows it (and moves it next to the columns field) when there are
+## deprecated columns to remove.
+#macro (displayDeprecatedColumnsWarning)
+  #define ($deprecatedColumnsWarning)
+    &lt;p&gt;$escapetool.xml($services.localization.render(
+      'platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage'))&lt;/p&gt;
+    &lt;div class="buttons"&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;button type="button" class="button secondary removeDeprecatedColumns"&gt;$escapetool.xml($services.localization.render(
+        'platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove'))&lt;/button&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;button type="button" class="button secondary keepDeprecatedColumns"&gt;$escapetool.xml($services.localization.render(
+        'platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep'))&lt;/button&gt;&lt;/span&gt;
+    &lt;/div&gt;
+  #end
+  #warning($deprecatedColumnsWarning 'deprecatedColumns hidden')
+#end
+
 #macro (displayHelpPanel)
   #set ($genericColumns = {
     'doc.title': [
@@ -153,7 +170,7 @@
       &lt;label id='availableColumnsLabel' for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;
       &lt;span id='availableColumnsHint' class="xHint"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorColumnsHint')&lt;/span&gt;
     &lt;/dt&gt;
-    &lt;dd&gt;#displayPropertyValue('columns')&lt;/dd&gt;
+    &lt;dd&gt;#displayPropertyValue('columns')#displayDeprecatedColumnsWarning()&lt;/dd&gt;
   &lt;/dl&gt;
 #end
 
@@ -337,9 +354,7 @@
   #updateAndSaveIcon()
   #if ($action == 'save')
     #if ($errorMessage)
-      {{html clean="false"}}
-      &lt;div class="box errormessage"&gt;$errorMessage&lt;/div&gt;
-      {{/html}}
+      {{error}}$services.rendering.escape($errorMessage, 'xwiki/2.1'){{/error}}
     #else
       ## Redirect to view mode.
       $response.sendRedirect($doc.getURL())
@@ -478,7 +493,7 @@ XWiki.LiveTableEditor = Class.create({
     this.columnsInput.hide();
 
     this._createColumnPicker();
-    this._createDeprecationMessage();
+    this._initDeprecationMessage();
     this._createColumnList();
 
     document.observe('xwiki:inline:save', this._onSave.bind(this));
@@ -501,7 +516,7 @@ XWiki.LiveTableEditor = Class.create({
     var item = new Element('li').update('&lt;span title="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorMoveColumnHint'))"&gt;' + prettyName.escapeHTML() + '&lt;/span&gt;&lt;span title="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorDeleteColumnHint'))" class="delete"&gt;X&lt;/span&gt;');
     if (deprecated) {
       item.addClassName('deprecated');
-      this.deprecationMessage.show();
+      this.deprecationMessage.classList.remove('hidden');
     }
     if (isClassField) {
       item.addClassName('classField');
@@ -552,8 +567,8 @@ XWiki.LiveTableEditor = Class.create({
   _onDeleteColumn : function(event) {
     event.element().up('li').remove();
     // Hide deprecation message if there are no deprecated columns.
-    if (this.list.select('.deprecated').length == 0) {
-      this.deprecationMessage.hide();
+    if (this.list.querySelectorAll('.deprecated').length === 0) {
+      this.deprecationMessage.classList.add('hidden');
     }
   },
   _createColumnList : function() {
@@ -566,24 +581,22 @@ XWiki.LiveTableEditor = Class.create({
       }
     }.bind(this));
   },
-  _createDeprecationMessage : function() {
-    this.deprecationMessage = new Element('div', {'class': 'warningmessage'}).update('$escapetool.javascript($services.localization.render('platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning'))');
-    this.columnsInput.up().insert(this.deprecationMessage);
-    this.deprecationMessage.hide();
-    var yes = this.deprecationMessage.down('a');
-    yes.observe('click', this._onRemoveDeprecatedColumns.bindAsEventListener(this));
-    var no = yes.next();
-    no.observe('click', function(event) {
-      event.stop();
-      this.deprecationMessage.hide();
-    }.bindAsEventListener(this));
+  _initDeprecationMessage : function() {
+    // The warning box is rendered (hidden) by the sheet so that its icon and standard message-box markup come from
+    // the server. Here we only move it next to the columns field and wire the action buttons.
+    this.deprecationMessage = document.querySelector('.warningmessage.deprecatedColumns');
+    this.columnsInput.parentNode.appendChild(this.deprecationMessage);
+    this.deprecationMessage.querySelector('.removeDeprecatedColumns')
+      .addEventListener('click', this._onRemoveDeprecatedColumns.bind(this));
+    this.deprecationMessage.querySelector('.keepDeprecatedColumns').addEventListener('click', event => {
+      event.preventDefault();
+      this.deprecationMessage.classList.add('hidden');
+    });
   },
   _onRemoveDeprecatedColumns : function(event) {
-    event.stop();
-    this.list.select('.deprecated').each(function(item) {
-      item.remove();
-    });
-    this.deprecationMessage.hide();
+    event.preventDefault();
+    this.list.querySelectorAll('.deprecated').forEach(item => item.remove());
+    this.deprecationMessage.classList.add('hidden');
   },
   _onSave : function() {
     var columns = [];

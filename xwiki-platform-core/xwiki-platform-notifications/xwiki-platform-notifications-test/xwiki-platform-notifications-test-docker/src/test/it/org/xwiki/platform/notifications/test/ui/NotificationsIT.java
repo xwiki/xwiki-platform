@@ -19,6 +19,8 @@
  */
 package org.xwiki.platform.notifications.test.ui;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -26,18 +28,21 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.platform.notifications.test.po.GroupedNotificationElementPage;
 import org.xwiki.platform.notifications.test.po.NotificationWatchButtonElement;
+import org.xwiki.platform.notifications.test.po.NotificationsContainerElement;
 import org.xwiki.platform.notifications.test.po.NotificationsRSS;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.platform.notifications.test.po.NotificationsWatchModal;
 import org.xwiki.platform.notifications.test.po.preferences.filters.SystemNotificationFilterPreference;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.WikisSource;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.CommentsTab;
@@ -45,6 +50,8 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import com.rometools.rome.feed.synd.SyndEntry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -229,8 +236,7 @@ class NotificationsIT
 
     @Test
     @Order(2)
-    void compositeNotifications(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration) throws Exception
+    void compositeNotifications(TestUtils setup, TestReference testReference) throws Exception
     {
         NotificationsUserProfilePage p;
         NotificationsTrayPage tray;
@@ -312,19 +318,34 @@ class NotificationsIT
         assertEquals(22, groupedNotificationsPage.getNumberOfElements(1));
 
         NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        notificationsRSS.loadEntries(
-            String.format("%s:%s", servletEngine.getInternalIP(), servletEngine.getInternalPort()),
-            String.format("%s:%s", servletEngine.getIP(), servletEngine.getPort()));
+        notificationsRSS.loadEntries(setup);
         assertEquals(2, notificationsRSS.getEntries().size());
 
-        // FIXME: This needs to be enabled back once XWIKI-21059 is fixed.
-        //assertEquals("A comment has been added to the page \"Linux as a title\"",
-        //        notificationsRSS.getEntries().get(0).getTitle());
-        //assertTrue(notificationsRSS.getEntries().get(0).getDescription().getValue().contains(
-        //        "<strong>Pages: [addComment]</strong>"));
-        //assertEquals("The page \"Linux as a title\" has been modified",
-        //        notificationsRSS.getEntries().get(1).getTitle());
+        // Both RSS feeds must be served with a feed media type so that browsers and feed readers recognize them as
+        // feeds instead of rendering the XML as HTML (see XWIKI-24543). The menu feed is served by the
+        // NotificationRSSService wiki page (application/xml) while the macro feed is served by the /notifications/rss
+        // REST endpoint (application/rss+xml).
+        assertTrue(notificationsRSS.getContentType().startsWith("application/xml"),
+            "Menu RSS feed Content-Type was: " + notificationsRSS.getContentType());
+
+        String macroRSSURL = String.format(
+            "%srest/notifications/rss?userId=%s&useUserPreferences=false&count=10&displayOwnEvents=true",
+            setup.getBaseURL(), URLEncoder.encode("xwiki:XWiki." + SECOND_USER_NAME, StandardCharsets.UTF_8));
+        NotificationsRSS macroRSS = new NotificationsRSS(macroRSSURL, SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        macroRSS.loadEntries(setup);
+        assertTrue(macroRSS.getContentType().startsWith("application/rss+xml"),
+            "Macro (REST) RSS feed Content-Type was: " + macroRSS.getContentType());
+
+        // The comment event and the page-update composite event can share the same timestamp (posting a
+        // comment also updates the page), so the RSS feed may return them in either order (see XWIKI-21059).
+        // Match the entries by title rather than by position.
+        SyndEntry commentEntry = getEntryByTitle(notificationsRSS,
+            "A comment has been added to the page \"Linux as a title\"");
+        getEntryByTitle(notificationsRSS, "The page \"Linux as a title\" has been modified");
+        String descriptionValue = commentEntry.getDescription().getValue();
+        assertTrue(descriptionValue.contains("<strong>Pages</strong>"), "Value was: " + descriptionValue);
+        assertTrue(descriptionValue.contains("Linux as a title"), "Value was: " + descriptionValue);
+        assertTrue(descriptionValue.contains("edited by " + FIRST_USER_NAME), "Value was: " + descriptionValue);
 
         tray.clearAllNotifications();
     }
@@ -477,5 +498,72 @@ class NotificationsIT
         assertTrue(new NotificationsTrayPage().isNotificationMenuVisible());
         setup.forceGuestUser();
         assertFalse(new NotificationsTrayPage().isNotificationMenuVisible());
+    }
+
+    @ParameterizedTest
+    @Order(6)
+    @WikisSource(mainWiki = false, extensions = { "org.xwiki.platform:xwiki-platform-notifications-ui" })
+    void displayNotificationsOnSubwikis(WikiReference wikiReference, TestUtils setup, TestReference testReference)
+        throws Exception
+    {
+        String notificationMacroDashboard = """
+            {{notifications useUserPreferences="false" displayOwnEvents="true" displayRSSLink="true" /}}
+            """;
+        setup.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+
+        DocumentReference mainWikiDashboard = new DocumentReference("Dashboard", testReference.getLastSpaceReference());
+        SpaceReference subWikiSpace =
+            testReference.getLastSpaceReference().replaceParent(new WikiReference("xwiki"), wikiReference);
+        DocumentReference subWikiDashboard = new DocumentReference("Dashboard", subWikiSpace);
+
+        // We perform waits to ensure of the order of the events for next asserts
+        // TODO: we should probably implement an ordering of the events strictly based on the moment the event is
+        //  triggered to avoid having to rely on this kind of hack...
+        setup.rest().savePage(testReference, "Some content", "Test Notif Main");
+        Thread.sleep(1000);
+        setup.rest().savePage(testReference.replaceParent(new WikiReference("xwiki"), wikiReference),
+            "Some content", "Test Notif Subwiki");
+        Thread.sleep(1000);
+        setup.rest().savePage(mainWikiDashboard, notificationMacroDashboard, "Main Wiki Dashboard");
+        Thread.sleep(1000);
+        setup.rest().savePage(subWikiDashboard, notificationMacroDashboard, "Sub Wiki Dashboard");
+
+        setup.forceGuestUser();
+        setup.gotoPage(subWikiDashboard);
+        // Events are processed asynchronously, so wait until the macro displays the two expected notifications.
+        NotificationsContainerElement notificationsContainerElement =
+            NotificationsContainerElement.waitUntilNotificationCount(2);
+
+        for (int i = 0; i < notificationsContainerElement.getNotificationsListCount(); i++) {
+            assertFalse(notificationsContainerElement.isNotificationEventRelatedToOtherWiki(i),
+                String.format("Found notifications for another wiki with page [%s]",
+                    notificationsContainerElement.getNotificationPage(i)));
+        }
+        assertEquals(2, notificationsContainerElement.getNotificationsListCount());
+        assertEquals("Sub Wiki Dashboard", notificationsContainerElement.getNotificationPage(0));
+        assertEquals("Test Notif Subwiki", notificationsContainerElement.getNotificationPage(1));
+
+        setup.gotoPage(mainWikiDashboard);
+        // This test should have produced 6 events, but more were produced with previous tests. Wait until at least
+        // the 6 events of this test are displayed.
+        notificationsContainerElement = NotificationsContainerElement.waitUntilNotificationCount(6);
+
+        assertTrue(notificationsContainerElement.getNotificationsListCount() >= 6);
+        assertEquals("Sub Wiki Dashboard (wiki1)", notificationsContainerElement.getNotificationPage(0));
+        assertEquals("Main Wiki Dashboard", notificationsContainerElement.getNotificationPage(1));
+        assertEquals("Test Notif Subwiki (wiki1)", notificationsContainerElement.getNotificationPage(2));
+        assertEquals("Test Notif Main", notificationsContainerElement.getNotificationPage(3));
+
+        assertTrue(notificationsContainerElement.getNotificationPage(4).startsWith("Profile of "));
+        assertTrue(notificationsContainerElement.getNotificationPage(5).startsWith("Profile of "));
+    }
+
+    private SyndEntry getEntryByTitle(NotificationsRSS rss, String title)
+    {
+        return rss.getEntries().stream()
+            .filter(entry -> title.equals(entry.getTitle()))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError(String.format("No RSS entry with title [%s]. Titles: %s",
+                title, rss.getEntries().stream().map(SyndEntry::getTitle).toList())));
     }
 }

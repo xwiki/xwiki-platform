@@ -48,6 +48,16 @@ public class DeleteUserConfirmationModal extends ConfirmationModal
     }
 
     /**
+     * @return the href value of the message displayed when removing a user with script rights
+     * @since 17.4.0RC1
+     * @since 16.10.9
+     */
+    public String getScriptRightUserErrorMessageHrefValue()
+    {
+        return this.container.findElement(By.cssSelector(".errormessage.xform a")).getDomAttribute("href");
+    }
+
+    /**
      * The modal content is loaded asynchronously so we must wait for it.
      * 
      * @return this modal

@@ -19,11 +19,11 @@
  */
 package org.xwiki.refactoring.internal.job;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
@@ -34,6 +34,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.batch.BatchOperation;
 import org.xwiki.refactoring.batch.BatchOperationExecutor;
+import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.security.authorization.Right;
@@ -45,6 +46,7 @@ import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
@@ -68,9 +70,6 @@ class DeleteJobTest extends AbstractEntityJobTest
 
     @MockComponent
     private RefactoringConfiguration configuration;
-
-    @MockComponent
-    private DocumentAccessBridge documentAccessBridge;
 
     @MockComponent
     private BatchOperationExecutor batchOperationExecutor;
@@ -101,7 +100,34 @@ class DeleteJobTest extends AbstractEntityJobTest
         verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(DeleteJob.class),
             eq(Map.of(documentReference, new EntitySelection(documentReference))));
         verify(this.modelBridge).setContextUserReference(userReference);
-        verify(this.modelBridge).delete(documentReference);
+        verify(this.modelBridge).delete(documentReference, false);
+    }
+
+    @Test
+    void onDocumentDeletedWithAutomaticRedirect() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        when(this.modelBridge.exists(documentReference)).thenReturn(true);
+        DocumentReference redirectReference = new DocumentReference("wiki", "Space", "Redirect");
+
+        DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
+        DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
+
+        DeleteRequest request = createRequest(documentReference);
+        request.setCheckRights(false);
+        request.setCheckAuthorRights(false);
+        request.setUserReference(userReference);
+        request.setAuthorReference(authorReference);
+        request.setAutoRedirect(true);
+        request.setNewBacklinkTargets(Collections.singletonMap(documentReference, redirectReference));
+
+        run(request);
+
+        verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(DeleteJob.class),
+            eq(Map.of(documentReference, new EntitySelection(documentReference))));
+        verify(this.modelBridge).setContextUserReference(userReference);
+        verify(this.modelBridge).delete(documentReference, false);
+        verify(this.modelBridge).createRedirect(documentReference, redirectReference);
     }
 
     @Test
@@ -111,17 +137,16 @@ class DeleteJobTest extends AbstractEntityJobTest
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
 
         when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(true);
-        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
 
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
         DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");
 
-        EntityRequest request = createRequest(documentReference);
+        DeleteRequest request = createRequest(documentReference);
         request.setCheckRights(false);
         request.setCheckAuthorRights(false);
         request.setUserReference(userReference);
         request.setAuthorReference(authorReference);
-        request.setProperty(DeleteJob.SHOULD_SKIP_RECYCLE_BIN_PROPERTY, true);
+        request.setShouldSkipRecycleBin(true);
 
         run(request);
 
@@ -141,7 +166,7 @@ class DeleteJobTest extends AbstractEntityJobTest
         assertEquals(1, getLogCapture().size());
         assertEquals(Level.WARN, getLogCapture().getLogEvent(0).getLevel());
         assertEquals("Skipping [wiki:Space.Page] because it doesn't exist.", getLogCapture().getMessage(0));
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class), anyBoolean());
     }
 
     @Test
@@ -167,7 +192,7 @@ class DeleteJobTest extends AbstractEntityJobTest
         assertEquals(1, getLogCapture().size());
         assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
         assertEquals("You are not allowed to delete [wiki:Space.Page].", getLogCapture().getMessage(0));
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
+        verify(this.modelBridge, never()).delete(any(DocumentReference.class), anyBoolean());
     }
 
     @Test
@@ -254,13 +279,13 @@ class DeleteJobTest extends AbstractEntityJobTest
         }
     }
 
-    private EntityRequest createRequest(EntityReference entityReference)
+    private DeleteRequest createRequest(EntityReference entityReference)
     {
         doAnswer(it -> {
             this.deleteJob.process(entityReference);
             return null;
         }).when(this.batchOperationExecutor).execute(any(BatchOperation.class));
-        EntityRequest request = new EntityRequest();
+        DeleteRequest request = new DeleteRequest();
         request.setEntityReferences(List.of(entityReference));
         return request;
     }

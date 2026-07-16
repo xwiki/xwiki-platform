@@ -143,7 +143,7 @@ class IncludeMacroTest
     private PrintRendererFactory rendererFactory;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         MemoryConfigurationSource memoryConfigurationSource = new MemoryConfigurationSource();
         this.componentManager.registerComponent(ConfigurationSource.class, memoryConfigurationSource);
@@ -649,11 +649,11 @@ class IncludeMacroTest
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("document");
         parameters.setExcludeFirstHeading(true);
-        parameters.setSection("HHeading");
+        parameters.setSection("HReferencedHeading");
 
         MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
-        setupDocumentMocks("document", resolvedReference, "= Heading =\ncontent");
+        setupDocumentMocks("document", resolvedReference, "= Referenced Heading =\ncontent");
         when(this.dab.getCurrentDocumentReference())
             .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
 

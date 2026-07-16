@@ -71,8 +71,8 @@ public class TreeElement extends BaseElement
         // such as backslash (which is used to escape special characters in an entity reference which the node id can
         // be). Such an element id is technically invalid but the browsers are handling it fine.
         // See https://code.google.com/p/selenium/issues/detail?id=8173
-        return getDriver().findElementsWithoutWaiting(this.element,
-            By.xpath(".//*[@id = '" + nodeId + "']")).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(this.element,
+            By.xpath(".//*[@id = '" + nodeId + "']")).isEmpty();
     }
 
     /**
@@ -110,13 +110,13 @@ public class TreeElement extends BaseElement
      */
     public TreeElement waitForIt()
     {
-        // Wait for the loading animation container. This element is generated from JavaScript when the tree is
-        // being initialized, so its presence guarantees that the tree initialization has started.
-        getDriver().waitUntilElementIsVisible(this.element, By.cssSelector(".jstree-container-ul"));
         // Wait for the root node to be loaded.
         getDriver().waitUntilCondition(driver ->
-            // The tree element is marked as busy while the tree nodes are being loaded.
-            !Boolean.parseBoolean(this.element.getAttribute("aria-busy"))
+            // Wait for the loading animation container. This element is generated from JavaScript when the tree is
+            // being initialized, so its presence guarantees that the tree initialization has started.
+            getDriver().hasElement(this.element, By.cssSelector(".jstree-container-ul"))
+                // The tree element is marked as busy while the tree nodes are being loaded.
+                && !Boolean.parseBoolean(this.element.getAttribute("aria-busy"))
                 // Check if there is any descendant of the element that is marked as busy.
                 && this.element.findElements(By.cssSelector("[aria-busy = 'true']")).isEmpty()
         );

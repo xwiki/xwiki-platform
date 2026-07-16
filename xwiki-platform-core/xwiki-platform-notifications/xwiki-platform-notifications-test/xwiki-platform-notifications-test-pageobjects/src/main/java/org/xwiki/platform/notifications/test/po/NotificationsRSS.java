@@ -21,10 +21,12 @@ package org.xwiki.platform.notifications.test.po;
 
 import java.util.List;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.xwiki.test.ui.TestUtils;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -43,6 +45,8 @@ import com.rometools.rome.io.impl.Base64;
 public class NotificationsRSS
 {
     private SyndFeed feed;
+
+    private String contentType;
 
     private String url;
     private String user;
@@ -65,17 +69,17 @@ public class NotificationsRSS
      * it might be different than the one from the retrieved URL since this class is not executed inside a docker
      * container, and the servletEngine might not be inside a container either.
      *
-     * @param containerDomain the domain used inside the browser
-     * @param realDomain the real domain to use to access the servletEngine from the test.
-     * @since 12.3RC1
+     * @param testUtils the test related utilities
+     * @since 18.3.0RC1
      */
-    public void loadEntries(String containerDomain, String realDomain)
+    public void loadEntries(TestUtils testUtils)
     {
         String originalURL = this.url;
-        this.url = this.url.replace(containerDomain, realDomain);
-        HttpClient client = HttpClientBuilder.create().build();
 
         try {
+            this.url = testUtils.toHttpClientUri(this.url);
+            HttpClient client = HttpClientBuilder.create().build();
+
             HttpGet request = new HttpGet(url);
             request.addHeader("Authorization", "Basic " + Base64.encode(user + ":" + password));
 
@@ -85,13 +89,17 @@ public class NotificationsRSS
                     response.getStatusLine().getStatusCode()));
             }
 
+            // Capture the Content-Type before consuming the entity so that tests can verify the feed is served with a
+            // feed media type (and not, e.g., text/html which browsers would render as HTML).
+            Header responseContentType = response.getEntity().getContentType();
+            this.contentType = (responseContentType == null) ? null : responseContentType.getValue();
+
             SyndFeedInput input = new SyndFeedInput();
             feed = input.build(new XmlReader(response.getEntity().getContent()));
         } catch (Exception e) {
             throw new AssertionError(
-                String.format("Error while loading and parsing the RSS feed from URL [%s]. "
-                    + "Original URL was [%s] internal domain [%s] replaced by external one [%s].",
-                    url, originalURL, containerDomain, realDomain),
+                String.format("Error while loading and parsing the RSS feed from URL [%s]. " + "Original URL was [%s].",
+                    url, originalURL),
                 e);
         }
     }
@@ -102,5 +110,14 @@ public class NotificationsRSS
     public List<SyndEntry> getEntries()
     {
         return feed.getEntries();
+    }
+
+    /**
+     * @return the value of the {@code Content-Type} HTTP response header returned when the feed was loaded
+     * @since 18.6.0RC1
+     */
+    public String getContentType()
+    {
+        return this.contentType;
     }
 }

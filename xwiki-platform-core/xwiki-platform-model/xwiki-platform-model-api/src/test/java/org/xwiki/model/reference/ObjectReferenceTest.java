@@ -32,13 +32,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  * @since 2.3M1
  */
-public class ObjectReferenceTest
+class ObjectReferenceTest
 {
     /**
      * Ensures the equivalence of constructors.
      */
     @Test
-    public void testConstructors()
+    void testConstructors()
     {
         ObjectReference reference = new ObjectReference(
             new EntityReference("Object", EntityType.OBJECT, new EntityReference("Page", EntityType.DOCUMENT,
@@ -47,7 +47,7 @@ public class ObjectReferenceTest
     }
 
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
             () -> new ObjectReference(new EntityReference("className", EntityType.DOCUMENT)));
@@ -56,7 +56,7 @@ public class ObjectReferenceTest
     }
 
     @Test
-    public void testInvalidNullParent()
+    void testInvalidNullParent()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
             () -> new ObjectReference(new EntityReference("className", EntityType.OBJECT)));
@@ -68,7 +68,7 @@ public class ObjectReferenceTest
      * Tests that an object reference throws exception if it doesn't have a document as a parent.
      */
     @Test
-    public void testInvalidParentType()
+    void testInvalidParentType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new ObjectReference(
             new EntityReference("className", EntityType.OBJECT, new EntityReference("Space", EntityType.SPACE))));
@@ -77,7 +77,7 @@ public class ObjectReferenceTest
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         ObjectReference reference = new ObjectReference("object", new DocumentReference("wiki", "space", "page"))
             .replaceParent(new DocumentReference("wiki2", "space2", "page2"));

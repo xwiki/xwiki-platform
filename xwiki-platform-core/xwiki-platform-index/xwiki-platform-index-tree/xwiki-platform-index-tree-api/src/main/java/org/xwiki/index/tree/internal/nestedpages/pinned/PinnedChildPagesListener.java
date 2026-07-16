@@ -37,9 +37,11 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.AbstractLocalEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 
@@ -56,6 +58,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Named("PinnedChildPagesListener")
 public class PinnedChildPagesListener extends AbstractLocalEventListener
 {
+    private static final DocumentRenamingEvent DOCUMENT_RENAMING_EVENT = new DocumentRenamingEvent();
+
     @Inject
     private PinnedChildPagesManager pinnedChildPagesManager;
 
@@ -64,6 +68,9 @@ public class PinnedChildPagesListener extends AbstractLocalEventListener
 
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @Inject
+    private ObservationContext observationContext;
 
     /**
      * Default constructor.
@@ -76,10 +83,9 @@ public class PinnedChildPagesListener extends AbstractLocalEventListener
     @Override
     public void processLocalEvent(Event event, Object source, Object data)
     {
-        if (event instanceof DocumentRenamedEvent) {
-            DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
+        if (event instanceof DocumentRenamedEvent documentRenamedEvent) {
             onDocumentRenamed(documentRenamedEvent.getSourceReference(), documentRenamedEvent.getTargetReference());
-        } else if (event instanceof DocumentDeletedEvent && RefactoringJobs.DELETE.equals(getCurrentJobType())) {
+        } else if (event instanceof DocumentDeletedEvent && !this.observationContext.isIn(DOCUMENT_RENAMING_EVENT)) {
             // A delete event is triggered before each document rename event, but we don't want to remove the pinned
             // child page in this case because we won't be able to replace the pinned child page later when the rename
             // event is triggered. For this reason we have to check if this is really a delete and not a rename.
@@ -160,8 +166,7 @@ public class PinnedChildPagesListener extends AbstractLocalEventListener
         String currentJobType = getCurrentJobType();
         if (RefactoringJobs.RENAME.equals(currentJobType) || RefactoringJobs.MOVE.equals(currentJobType)) {
             Request request = this.jobContext.getCurrentJob().getRequest();
-            if (request instanceof MoveRequest) {
-                MoveRequest moveRequest = (MoveRequest) request;
+            if (request instanceof MoveRequest moveRequest) {
                 Collection<EntityReference> movedEntities = moveRequest.getEntityReferences();
                 return contains(movedEntities, documentReference);
             }

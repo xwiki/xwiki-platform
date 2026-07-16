@@ -142,6 +142,19 @@
     <property name="hibernate.connection.SetBigStringTryClob">true</property>
     <property name="hibernate.jdbc.batch_size">0</property>
 #end
+    <!-- Control whether or not the compression of some tables (like the history table) is enabled.
+         The default behavior depends on the database, currently:
+         * enabled by default for MySQL/MariaDB
+         * disabled by default for Oracle
+         * this property has no effect in other databases
+     -->
+#if ($xwikiDbCompressionAllowed)
+    <property name="xwiki.compressionAllowed">$xwikiDbCompression</property>
+#else
+    <!--
+    <property name="xwiki.compressionAllowed">true</property>
+    -->
+#end
 
     <property name="hibernate.connection.charSet">UTF-8</property>
     <property name="hibernate.connection.useUnicode">true</property>
@@ -289,6 +302,7 @@ jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=tr
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
            - if you want the main wiki schema to be different than "xwiki"
              you will also have to set the property xwiki.db in xwiki.cfg file
+           - switch the xwiki.compressionAllowed property to true if compression is enabled in Oracle
 
     <property name="hibernate.connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
     <property name="hibernate.connection.username">xwiki</property>

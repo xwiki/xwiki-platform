@@ -91,8 +91,8 @@ public class DefaultQuoteService implements QuoteService
         public boolean match(Block block)
         {
             boolean ret;
-            if (block instanceof MacroBlock) {
-                ret = ((MacroBlock) block).getId().equals("mention")
+            if (block instanceof MacroBlock macroBlock) {
+                ret = "mention".equals(macroBlock.getId())
                     && Objects.equals(Objects.toString(block.getParameter("anchor"), ""), this.anchorId);
             } else {
                 ret = false;

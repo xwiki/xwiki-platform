@@ -24,11 +24,12 @@
 [depend]
 ext
 console-capture
-ee10-apache-jsp
-ee10-deploy
-ee10-websocket-jakarta
+requestlog
+ee11-apache-jsp
+ee11-deploy
+ee11-websocket-jakarta
 http
-http-forwarded
+forwarded
 work
 
 [xml]

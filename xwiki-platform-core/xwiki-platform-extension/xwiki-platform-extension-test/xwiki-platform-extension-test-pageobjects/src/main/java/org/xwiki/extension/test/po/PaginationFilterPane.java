@@ -63,7 +63,7 @@ public class PaginationFilterPane extends BaseElement
     /**
      * The index of the last page.
      */
-    @FindBy(xpath = "//span[@class = 'pagination']/*[last()]")
+    @FindBy(xpath = "//ul[@class = 'pagination-list']/*[last()]")
     private WebElement lastPageIndex;
 
     /**
@@ -126,7 +126,7 @@ public class PaginationFilterPane extends BaseElement
      */
     public boolean hasNextPage()
     {
-        return getDriver().findElements(By.className(NEXT_PAGE_CLASS_NAME)).size() > 0;
+        return !getDriver().findElements(By.className(NEXT_PAGE_CLASS_NAME)).isEmpty();
     }
 
     /**
@@ -145,7 +145,7 @@ public class PaginationFilterPane extends BaseElement
      */
     public boolean hasPreviousPage()
     {
-        return getDriver().findElements(By.className(PREVIOUS_PAGE_CLASS_NAME)).size() > 0;
+        return !getDriver().findElements(By.className(PREVIOUS_PAGE_CLASS_NAME)).isEmpty();
     }
 
     /**
@@ -156,7 +156,7 @@ public class PaginationFilterPane extends BaseElement
      */
     public PaginationFilterPane gotoPage(int index)
     {
-        getDriver().findElement(By.xpath("//span[@class = 'pagination']/a[. = '" + index + "']")).click();
+        getDriver().findElement(By.xpath("//ul[@class = 'pagination-list']/li/a[. = '" + index + "']")).click();
         return new PaginationFilterPane();
     }
 }

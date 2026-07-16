@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
@@ -33,7 +34,6 @@ import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.internal.skin.SkinReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 
@@ -77,13 +77,13 @@ public class CacheKeyFactory
                      +  colorTheme.length()    + CACHE_KEY_SEPARATOR + colorTheme;
 
         if (withContext) {
-            /** Also take into account the request parameters, if any, except parameters which are already
-             * taken into account or that are irrelevant. */
+            // Also take into account the request parameters, if any, except parameters which are already
+            // taken into account or that are irrelevant.
             Request request = container.getRequest();
             List<String> excludes = Arrays.asList("skin", "colorTheme", "colorThemeVersion", "language", "docVersion",
                 XWiki.CACHE_VERSION);
-            if (request instanceof ServletRequest) {
-                Map<String, String[]> parameters = ((ServletRequest) request).getHttpServletRequest().getParameterMap();
+            if (request instanceof ServletRequest servletRequest) {
+                Map<String, String[]> parameters = servletRequest.getHttpServletRequest().getParameterMap();
                 for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
                     if (!excludes.contains(entry.getKey())) {
                         String[] values = entry.getValue();

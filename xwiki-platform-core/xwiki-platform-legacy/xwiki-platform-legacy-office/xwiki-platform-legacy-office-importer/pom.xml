@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-office</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>18.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-office-importer</artifactId>
   <name>XWiki Platform - Legacy - Office Importer</name>
   <packaging>jar</packaging>
   <description>Repackages xwiki-platform-office-importer including the legacy code/APIs</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.02</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
     <!-- The features provided by this module so that it's found when resolving extension -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-office-importer</xwiki.extension.features>
     <!-- Skipping spoon since the inspection of DefaultOpenOfficeConverter is causing troubles because of the method

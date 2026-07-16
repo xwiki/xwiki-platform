@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -89,7 +88,18 @@ public class LiveDataRendererConfiguration
         return this.jsonMerge.merge(advancedConfig, basicConfig);
     }
 
-    private LiveDataConfiguration getLiveDataConfiguration(LiveDataRendererParameters parameters) throws Exception
+    /**
+     * Resolve a complete Live Data configuration from a set of parameters.
+     *
+     * @param parameters the Live Data script service parameters
+     * @return the complete Live Data configuration
+     * @throws Exception in case of error when resolving the configuration
+     * @since 18.0.0RC1
+     * @since 17.10.1
+     * @since 17.4.8
+     * @since 16.10.16
+     */
+    public LiveDataConfiguration getLiveDataConfiguration(LiveDataRendererParameters parameters) throws Exception
     {
         LiveDataConfiguration liveDataConfig = new LiveDataConfiguration();
         liveDataConfig.setId(parameters.getId());
@@ -116,7 +126,7 @@ public class LiveDataRendererConfiguration
         if (properties == null) {
             return null;
         } else {
-            return getSplitStringStream(properties).collect(Collectors.toList());
+            return getSplitStringStream(properties).toList();
         }
     }
 
@@ -146,7 +156,7 @@ public class LiveDataRendererConfiguration
             return getSplitStringStream(sort)
                 .filter(StringUtils::isNotEmpty)
                 .map(this::getSortEntry)
-                .collect(Collectors.toList());
+                .toList();
         }
     }
 
@@ -166,7 +176,7 @@ public class LiveDataRendererConfiguration
     {
         List<LiveDataQuery.Filter> filters =
             getURLParameters('?' + StringUtils.defaultString(filtersString)).entrySet().stream()
-                .map(this::getFilter).collect(Collectors.toList());
+                .map(this::getFilter).toList();
         return filters.isEmpty() ? null : filters;
     }
 
@@ -175,7 +185,7 @@ public class LiveDataRendererConfiguration
         LiveDataQuery.Filter filter = new LiveDataQuery.Filter();
         filter.setProperty(entry.getKey());
         filter.getConstraints()
-            .addAll(entry.getValue().stream().map(LiveDataQuery.Constraint::new).collect(Collectors.toList()));
+            .addAll(entry.getValue().stream().map(LiveDataQuery.Constraint::new).toList());
         return filter;
     }
 
@@ -203,7 +213,7 @@ public class LiveDataRendererConfiguration
         } else {
             return getSplitStringStream(parameters.getLayouts())
                 .map(LiveDataLayoutDescriptor::new)
-                .collect(Collectors.toList());
+                .toList();
         }
     }
 
@@ -214,7 +224,7 @@ public class LiveDataRendererConfiguration
         if (parameters.getPageSizes() != null) {
             pagination.setPageSizes(getSplitStringStream(parameters.getPageSizes())
                 .map(Integer::parseInt)
-                .collect(Collectors.toList()));
+                .toList());
         }
         return pagination;
     }

@@ -20,10 +20,8 @@
 package org.xwiki.search.solr;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.core.SolrCore;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.search.solr.internal.DefaultXWikiSolrCore;
-import org.xwiki.stability.Unstable;
 
 /**
  * The central entry point to access a Solr core.
@@ -46,13 +44,31 @@ public interface Solr
     /**
      * @param name the name of the core form XWiki point of view (so without potential prefix/suffix part of the real
      *            solr core specific to the setup)
-     * @return the cached {@link SolrCore} instance to use to manipulate the core
+     * @return the cached {@link XWikiSolrCore} instance to use to manipulate the core
      * @throws SolrException when failing to create the solr client
      * @since 16.2.0RC1
      */
-    @Unstable
     default XWikiSolrCore getCore(String name) throws SolrException
     {
-        return new DefaultXWikiSolrCore(name, name, getClient(name));
+        return new DefaultXWikiSolrCore(name, name, getClient(name), getSolrMajorVersion());
+    }
+
+    /**
+     * @return true if the implementation is able to create cores on the fly when they don't exist yet, false if the
+     *         cores must be created beforehand (e.g. by the administrator) before being used by XWiki.
+     * @since 18.5.0RC1
+     */
+    default boolean canCreateCore()
+    {
+        return false;
+    }
+
+    /**
+     * @return the major version of Solr server behind this implementation, -1 if unknown.
+     * @since 18.5.0RC1
+     */
+    default int getSolrMajorVersion()
+    {
+        return -1;
     }
 }

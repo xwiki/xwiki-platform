@@ -21,6 +21,8 @@ package org.xwiki.officeimporter.internal.server;
 
 import java.io.File;
 import java.io.InputStream;
+import java.time.Duration;
+import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -199,8 +201,21 @@ public class DefaultOfficeServer implements OfficeServer
         initialize();
         try {
             this.jodManager.start();
+            // wait 30 sec for jodManager to be running
+            Date currentTime = new Date();
+            while (!this.jodManager.isRunning()) {
+                Date now = new Date();
+                if (Duration.between(currentTime.toInstant(), now.toInstant()).getSeconds() >= 30) {
+                    setState(ServerState.ERROR);
+                    throw new OfficeServerException("Couldn't connect to office server within 30 seconds.");
+                } else {
+                    Thread.sleep(100);
+                }
+            }
             setState(ServerState.CONNECTED);
             this.logger.info("Open Office instance started.");
+        } catch (ThreadDeath e) {
+            throw e;
         } catch (Exception e) {
             setState(ServerState.ERROR);
             throw new OfficeServerException("Error while connecting / starting the office server.", e);

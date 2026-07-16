@@ -212,10 +212,12 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
 
     // Events
 
-    private EntityReference getDefaultDocumentReference()
+    @Override
+    protected EntityReference getDefaultReference()
     {
-        if (this.properties != null && this.properties.getDefaultReference() != null) {
-            return this.properties.getDefaultReference();
+        EntityReference reference = super.getDefaultReference();
+        if (reference != null) {
+            return reference;
         }
 
         if (this.entity != null) {
@@ -227,8 +229,7 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
 
     private void begin(FilterEventParameters parameters) throws FilterException
     {
-        DocumentReference documentReference =
-            this.documentEntityResolver.resolve(this.currentEntityReference, getDefaultDocumentReference());
+        DocumentReference documentReference = resolveCurrentDocumentReference();
 
         if (this.entity == null) {
             this.entity = new XWikiDocument(documentReference, this.currentLocale);

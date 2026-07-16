@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
@@ -196,7 +197,7 @@ public class ImageFilter extends AbstractHTMLFilter
                 concerns "&" character.
                 Finally '@' is used in XWiki Syntax so it needs to be escaped to build the link properly.
                  */
-                fileName = fileName.replaceAll("\\+", "%2B");
+                fileName = fileName.replace("+", "%2B");
                 // We have to decode the image file name in case it contains URL special characters.
                 fileName = URLDecoder.decode(fileName, UTF_8);
             } catch (Exception e) {
@@ -214,8 +215,8 @@ public class ImageFilter extends AbstractHTMLFilter
     {
         String result = fileName;
 
-        if (StringUtils.startsWith(fileName, replacePrefix) && replacementPrefix != null) {
-            result = replacementPrefix + StringUtils.removeStart(fileName, replacePrefix);
+        if (Strings.CS.startsWith(fileName, replacePrefix) && replacementPrefix != null) {
+            result = replacementPrefix + Strings.CS.removeStart(fileName, replacePrefix);
         }
 
         return result;

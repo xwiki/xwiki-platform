@@ -1,0 +1,355 @@
+/**
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+import { MACRO_NAME_PREFIX } from "./utils";
+import translations from "../translations";
+import {
+  BlockNoteEditor,
+  BlockNoteSchema,
+  combineByGroup,
+  defaultBlockSpecs,
+  defaultInlineContentSpecs,
+} from "@blocknote/core";
+import { filterSuggestionItems } from "@blocknote/core/extensions";
+import * as locales from "@blocknote/core/locales";
+import { getDefaultReactSlashMenuItems } from "@blocknote/react";
+import { filterMap } from "@xwiki/platform-fn-utils";
+import type { BlockNoteConcreteMacro } from "./utils";
+import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
+import type { DefaultReactSuggestionItem } from "@blocknote/react";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+
+/**
+ * Create the BlockNote editor's schema
+ *
+ * Contains all the blocks usable inside the editor
+ *
+ * @returns The created schema
+ */
+function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
+  // Get rid of some block types
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { audio, video, file, toggleListItem, ...remainingBlockSpecs } =
+    defaultBlockSpecs;
+
+  macros = [
+    ...macros.sort((a, b) =>
+      a.macro.infos.name.localeCompare(b.macro.infos.name),
+    ),
+  ];
+
+  const blockNoteSchema = BlockNoteSchema.create({
+    blockSpecs: {
+      ...remainingBlockSpecs,
+
+      // Macros
+      ...Object.fromEntries(
+        filterMap(macros, ({ macro, bnRendering }) =>
+          bnRendering.type === "block"
+            ? [
+                `${MACRO_NAME_PREFIX}${macro.infos.id}`,
+                bnRendering.block.block(),
+              ]
+            : null,
+        ),
+      ),
+    },
+
+    inlineContentSpecs: {
+      ...defaultInlineContentSpecs,
+
+      // Macros
+      ...Object.fromEntries(
+        filterMap(macros, ({ macro, bnRendering }) =>
+          bnRendering.type === "inline"
+            ? [
+                `${MACRO_NAME_PREFIX}${macro.infos.id}`,
+                bnRendering.inlineContent.inlineContent,
+              ]
+            : null,
+        ),
+      ),
+    },
+  });
+
+  return blockNoteSchema;
+}
+
+/**
+ * Create a translated dictionary for the BlockNote editor
+ *
+ * @param lang - The dictionary's language
+ *
+ * @returns The dictionary in the requested language
+ */
+function createDictionary(lang: EditorLanguage) {
+  // eslint-disable-next-line import-x/namespace
+  return locales[lang];
+}
+
+/**
+ * @since 18.0.0RC1
+ * @beta
+ */
+type EditorLanguage = keyof typeof locales & keyof typeof translations;
+
+/**
+ * Suggests a set of suggestion from the menu items.
+ *
+ * @param editor - the editor type
+ * @param query - the query to filter the suggestions by
+ * @param macros - the available macros
+ */
+// eslint-disable-next-line max-statements
+function querySuggestionsMenuItems(
+  editor: EditorType,
+  query: string,
+  macros: BlockNoteConcreteMacro[],
+  syntax: SyntaxConfig,
+  lang: EditorLanguage,
+): DefaultReactSuggestionItem[] {
+  const { blocks: blocksSupport, inlineContents: inlineSupport } =
+    syntax.features;
+
+  let items = filterSuggestionItems(
+    combineByGroup(
+      getDefaultReactSlashMenuItems(editor),
+
+      // Block macros
+      blocksSupport.macros
+        ? filterMap(macros, ({ bnRendering }) =>
+            bnRendering.type === "block" && bnRendering.block.slashMenuEntry
+              ? bnRendering.block.slashMenuEntry(editor)
+              : null,
+          )
+        : [],
+
+      // Inline macros
+      inlineSupport.macros
+        ? filterMap(macros, ({ bnRendering }) =>
+            bnRendering.type === "inline" &&
+            bnRendering.inlineContent.slashMenuEntry
+              ? bnRendering.inlineContent.slashMenuEntry(editor)
+              : null,
+          )
+        : [],
+    ),
+    query,
+  );
+
+  // NOTE: A bug with ESLint prevents it from correctly seeing the type of the expression below
+  // eslint-disable-next-line import-x/namespace
+  const locale = locales[lang].slash_menu;
+
+  const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
+    candidates.findIndex(
+      (localeKey: keyof typeof locale) => locale[localeKey].title === value,
+    ) !== -1;
+
+  if (!blocksSupport.headings.levels1To3) {
+    items = items.filter(
+      (item) =>
+        !isLocale(item.title, [
+          "heading",
+          "heading_2",
+          "heading_3",
+          "toggle_heading",
+          "toggle_heading_2",
+          "toggle_heading_3",
+        ]),
+    );
+  }
+
+  if (!blocksSupport.headings.levels4To6) {
+    items = items.filter(
+      (item) => !isLocale(item.title, ["heading_4", "heading_5", "heading_6"]),
+    );
+  }
+
+  if (!blocksSupport.code.basicCodeBlocks) {
+    items = items.filter((item) => !isLocale(item.title, ["code_block"]));
+  }
+
+  if (!blocksSupport.quotes) {
+    items = items.filter((item) => !isLocale(item.title, ["quote"]));
+  }
+
+  if (!blocksSupport.lists.bulletLists) {
+    items = items.filter(
+      (item) => !isLocale(item.title, ["bullet_list", "toggle_list"]),
+    );
+  }
+
+  if (!blocksSupport.lists.contiguousNumberedLists) {
+    items = items.filter((item) => !isLocale(item.title, ["numbered_list"]));
+  }
+
+  if (!blocksSupport.lists.checkableLists) {
+    items = items.filter((item) => !isLocale(item.title, ["check_list"]));
+  }
+
+  if (!blocksSupport.tables.basicTables) {
+    items = items.filter((item) => !isLocale(item.title, ["table"]));
+  }
+
+  if (!blocksSupport.images.basicImages) {
+    items = items.filter((item) => !isLocale(item.title, ["image"]));
+  }
+
+  if (!blocksSupport.dividers) {
+    items = items.filter((item) => !isLocale(item.title, ["divider"]));
+  }
+
+  return items;
+}
+
+/**
+ * Schema of the BlockNote editor
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type EditorSchema = ReturnType<typeof createBlockNoteSchema>;
+
+/**
+ * Block schema for BlockNote
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type EditorBlockSchema =
+  EditorSchema extends BlockNoteSchema<
+    infer BlockSchema,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    infer _,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    infer __
+  >
+    ? BlockSchema
+    : never;
+
+/**
+ * Inline content schema for BlockNote
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type EditorInlineContentSchema =
+  EditorSchema extends BlockNoteSchema<
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    infer _,
+    infer InlineContentSchema,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    infer __
+  >
+    ? InlineContentSchema
+    : never;
+
+/**
+ * Style schema for BlockNote
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type EditorStyleSchema =
+  EditorSchema extends BlockNoteSchema<
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    infer _,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    infer __,
+    infer StyleSchema
+  >
+    ? StyleSchema
+    : never;
+
+/**
+ * Type of a BlockNote editor instance
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type EditorType = BlockNoteEditor<
+  EditorBlockSchema,
+  EditorInlineContentSchema,
+  EditorStyleSchema
+>;
+
+/**
+ * Typesafe BlockNote type
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type BlockType = Block<
+  EditorBlockSchema,
+  EditorInlineContentSchema,
+  EditorStyleSchema
+>;
+
+/**
+ * Typesafe BlockNote type of the a given kind
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type BlockOfType<B extends BlockType["type"]> = Extract<BlockType, { type: B }>;
+
+/**
+ * Typesafe BlockNote inline content
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type InlineContentType = InlineContent<
+  EditorInlineContentSchema,
+  EditorStyleSchema
+>;
+
+/**
+ * Typesafe BlockNote styled text
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type EditorStyledText = StyledText<EditorStyleSchema>;
+
+/**
+ * Typesafe BlockNote link
+ *
+ * @since 18.0.0RC1
+ * @beta
+ */
+type EditorLink = Link<EditorStyleSchema>;
+
+export type {
+  BlockOfType,
+  BlockType,
+  EditorBlockSchema,
+  EditorInlineContentSchema,
+  EditorLanguage,
+  EditorLink,
+  EditorSchema,
+  EditorStyleSchema,
+  EditorStyledText,
+  EditorType,
+  InlineContentType,
+};
+
+export { createBlockNoteSchema, createDictionary, querySuggestionsMenuItems };

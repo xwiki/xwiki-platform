@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 
  * @version $Id$
  */
-public class HqlQueryUtilsTest
+class HqlQueryUtilsTest
 {
     @Test
-    public void replaceLegacyQueryParameters()
+    void replaceLegacyQueryParameters()
     {
         assertEquals("select column from table where table.column = ?1",
             HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column = ?"));
@@ -51,5 +51,32 @@ public class HqlQueryUtilsTest
             HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column >?"));
         assertEquals("select column from table where table.column <?1",
             HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column <?"));
+    }
+
+    @Test
+    void toCompleteStatement()
+    {
+        assertEquals("from table", HqlQueryUtils.toCompleteStatement("from table"));
+        assertEquals("select * from table", HqlQueryUtils.toCompleteStatement("select * from table"));
+
+        assertEquals("select doc.fullName from XWikiDocument doc where doc.name = 'name'",
+            HqlQueryUtils.toCompleteStatement("where doc.name = 'name'"));
+        assertEquals("select doc.fullName from XWikiDocument doc order by doc.name",
+            HqlQueryUtils.toCompleteStatement("order by doc.name"));
+        assertEquals("select doc.fullName from XWikiDocument doc , XWikiSpace space",
+            HqlQueryUtils.toCompleteStatement(", XWikiSpace space"));
+    }
+
+    @Test
+    void getValidQueryOrder()
+    {
+        assertEquals("asc", HqlQueryUtils.getValidQueryOrder("asc", "desc"));
+        assertEquals("desc", HqlQueryUtils.getValidQueryOrder("desc", "asc"));
+        assertEquals("ASC", HqlQueryUtils.getValidQueryOrder("ASC", "desc"));
+        assertEquals("DESC", HqlQueryUtils.getValidQueryOrder("DESC", "asc"));
+
+        assertEquals("desc", HqlQueryUtils.getValidQueryOrder(null, "desc"));
+        assertEquals("desc", HqlQueryUtils.getValidQueryOrder("wrong", "desc"));
+        assertEquals("asc", HqlQueryUtils.getValidQueryOrder("wrong", "asc"));
     }
 }

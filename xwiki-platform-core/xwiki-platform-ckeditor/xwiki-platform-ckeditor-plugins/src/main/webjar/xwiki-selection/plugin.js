@@ -31,7 +31,7 @@
         // selection when the Source mode is active. In that case we take the selection directly from the plain text
         // area used for editing the source. We'll have to update this code when and if we'll add support for syntax
         // highlighting to the Source area.
-        const selection = editor.getSelection();
+        const selection = this._getSelection(editor);
         const domRanges = selection?.getRanges().map(range => {
           const domRange = range.startContainer.$.ownerDocument.createRange();
           domRange.setStart(range.startContainer.$, range.startOffset);
@@ -51,11 +51,25 @@
       }
     },
 
+    _getSelection: function(editor) {
+      let selection = editor.getSelection();
+      if (selection && !selection.isFake) {
+        // CKEditor's selection is not always up to date, which can cause us problems when we convert it to a native
+        // selection (e.g. by setting the offset of a native range outside the valid bounds). For this reason we have to
+        // get the real selection, unless it's a fake one.
+        selection = editor.getSelection(/* force real selection */ true);
+      }
+      return selection;
+    },
+
     saveSelection: function(editor) {
       var editable = editor.editable();
       if (editable) {
         const domRanges = this.getSelection(editor);
-        editor._.textSelection = this.textSelection.from(editable.$, domRanges);
+        if (!editor._.textSelection) {
+          editor._.textSelection = new CKEDITOR.plugins.xwikiSelection.TextSelection();
+        }
+        editor._.textSelection.update(editable.$, domRanges);
         // Remember to also restore the focus when restoring the selection. In order to know if we have to restore the
         // focus we need to check the active element on the top level window. We can't rely on the focus state of the
         // editable area because the focus is lost when the user switches to a different browser tab or a different
@@ -67,33 +81,107 @@
       }
     },
 
-    restoreSelection: function(editor, ranges) {
-      var editable = editor.editable();
-      var textSelection = editor._.textSelection;
-      if (editable && textSelection) {
-        const focus = textSelection.restoreFocus ? {preventScroll: !textSelection.contentOverwritten} : false;
-        if (focus) {
-          // This is mostly needed for the Source mode. For the WYSIWYG mode we take care of focusing the editable area
-          // that contains the selection when we apply it.
-          editable.$.focus(focus);
-        }
-        if (ranges) {
-          // Apply the provided selection.
-          this.setSelection(editor, ranges, focus);
-        } else {
-          // Restore the saved text selection.
-          // Scroll the restored selection into view if the editor content was overwritten since we saved the selection
-          // and the editing area had the focus when the selection was saved.
-          const scrollIntoView = focus && !focus.preventScroll;
-          textSelection.applyTo(editable.$, {
-            scrollIntoView,
-            applyDOMRange: domRange => {
-              maybeMoveToFirstNestedEditable(editor, domRange, !focus.preventScroll);
-              this.setSelection(editor, [domRange], focus);
-            }
-          });
-        }
+    restoreSelection: async function(editor, options) {
+      const editable = editor.editable();
+      let textSelection = editor._.textSelection;
+      let {ranges, beforeApply, async = true} = options || {};
+      if (!editable || !textSelection) {
+        beforeApply?.();
+        return;
       }
+
+      const notification = this._showRestoringSelectionNotification(editor);
+      try {
+        if (!ranges) {
+          // Transform the saved text selection to reflect the changes made to the edited content since the selection
+          // was saved.
+          const maybePromise = textSelection.transform(editable.$, async);
+          if (async) {
+            // Wait for the transformation to complete in a different (WebWorker) thread.
+            await maybePromise;
+          }
+        }
+
+        beforeApply?.();
+        beforeApply = () => {};
+
+        // Apply the transformed text selection or the provided selection ranges.
+        this._applySelection({editor, editable, textSelection, ranges});
+      } catch (e) {
+        console.error("Failed to restore selection: ", e);
+        beforeApply?.();
+      } finally {
+        notification.hide();
+      }
+    },
+
+    _applySelection: function({editor, editable, textSelection, ranges}) {
+      const focus = textSelection.restoreFocus ? {preventScroll: !textSelection.contentOverwritten} : false;
+      if (focus) {
+        // This is mostly needed for the Source mode. For the WYSIWYG mode we take care of focusing the editable area
+        // that contains the selection when we apply it.
+        editable.$.focus(focus);
+      }
+
+      if (ranges) {
+        // Apply the provided selection.
+        this.setSelection(editor, ranges, focus);
+      } else {
+        // Apply the transformed saved text selection.
+        textSelection.applyTo(editable.$, {
+          // Scroll the restored selection into view if the editor content was overwritten since we saved the
+          // selection and the editing area had the focus when the selection was saved.
+          scrollIntoView: focus && !focus.preventScroll,
+          applyDOMRange: domRange => {
+            maybeOptimizeRange(editor, domRange, !focus.preventScroll);
+            this.setSelection(editor, [domRange], focus);
+          }
+        });
+      }
+    },
+
+    _showRestoringSelectionNotification: function(editor) {
+      if (editor._.restoringSelectionNotification) {
+        // Abort the ongoing selection restore operation.
+        editor._.restoringSelectionNotification.hide();
+      } else {
+        // Register the abort listener only once, when the notification is created for the first time.
+        editor.on('notificationHide', (event) => {
+          if (event.data.notification === editor._.restoringSelectionNotification) {
+            delete editor._.restoringSelectionNotification;
+            // Abort the ongoing selection restore operation.
+            editor._.textSelection?.abortApplyTo?.();
+          }
+        });
+      }
+
+      // Create a new notification.
+      const notification = editor._.restoringSelectionNotification = new CKEDITOR.plugins.notification(editor, {
+        message: editor.localization.get('xwiki-selection.restoring'),
+        type: 'progress',
+      });
+      // Show the notification only if the selection restore takes more than usual, to avoid flickering.
+      setTimeout(() => {
+        if (notification === editor._.restoringSelectionNotification) {
+          notification.show();
+          this._showFakeProgress(notification);
+        }
+      }, 1000);
+
+      return notification;
+    },
+
+    _showFakeProgress: function(notification) {
+      let step = 0;
+      const interval = setInterval(() => {
+        if (notification.isVisible()) {
+          // Reaches 63% after 5 seconds and 99% after 9 seconds. Replace 4 with a higher number to slow down the
+          // progression.
+          notification.update({progress: 1 - Math.exp(-1 * step++ / 4)});
+        } else {
+          clearInterval(interval);
+        }
+      }, 1000);
     },
 
     isEditingAreaFocused: function(editor) {
@@ -157,7 +245,7 @@
     editable?.focus(options);
   }
 
-  function maybeMoveToFirstNestedEditable(editor, range, shouldMove) {
+  function maybeOptimizeRange(editor, range, shouldMove) {
     const selectedWidget = shouldMove && getSelectedWidget(editor, range);
     const firstNestedEditable = Object.values(selectedWidget?.editables)[0];
     if (firstNestedEditable) {
@@ -166,6 +254,13 @@
       ckRange.moveToElementEditablePosition(firstNestedEditable);
       range.setStart(ckRange.startContainer.$, ckRange.startOffset);
       range.collapse(true);
+    } else if (selectedWidget && !range.collapsed) {
+      // The selected widget doesn't have any nested editable areas, so everything inside the widget is read-only. This
+      // means we cannot place the caret inside the widget. We select the entire widget wrapper in order to highlight
+      // the widget. Note that we don't do this when the range is collapsed because when editing in realtime someone may
+      // insert a widget just after your caret and you wouldn't want that widget to be suddenly selected while you are
+      // typing.
+      range.selectNode(selectedWidget.wrapper.$);
     }
   }
 
@@ -186,9 +281,10 @@
   }
 
   CKEDITOR.plugins.add('xwiki-selection', {
+    requires: 'notification',
     onLoad: function() {
-      require(['textSelection'], function(textSelection) {
-        CKEDITOR.plugins.xwikiSelection.textSelection = textSelection;
+      require(['textSelection'], function(TextSelection) {
+        CKEDITOR.plugins.xwikiSelection.TextSelection = TextSelection;
       });
 
       // Make sure the ContextManager used by the balloon toolbar doesn't shrink the selection when it's fake.
@@ -237,113 +333,136 @@
           }
         }, true);
       });
+
+      // When content is pasted or inserted into the editor, the Widget plugin scans the new content for widgets to be
+      // upcasted. When widgets are upcasted the content is transformed and the caret may end up inside the read-only
+      // part of the widget or inside one of its nested editable areas. If this is the case then we need to focus either
+      // the widget or the nested editable, otherwise the caret gets hidden and the user can't get it back without using
+      // the mouse.
+      editor.widgets?.on('checkWidgets', event => {
+        const selection = editor.getSelection();
+        if (selection?.isCollapsed()) {
+          const container = selection.getStartElement();
+          const widget = editor.widgets.getByElement(container);
+          if (widget) {
+            // The caret is inside a widget.
+            if (container.isReadOnly()) {
+              // The caret is hidden inside the read-only part of the widget. We focus the widget in order to select it.
+              widget.focus();
+            } else {
+              // The caret is inside a nested editable area. Some browsers (e.g. Chrome) don't show the caret if the
+              // nested editable area is not focused.
+              CKEDITOR.plugins.widget.getNestedEditable(widget.wrapper, container)?.focus();
+            }
+          }
+        }
+      });
     }
   });
 })();
 
-define('node-module', ['jquery'], function($) {
-  return {
-    load: function(name, req, onLoad, config) {
-      $.get(req.toUrl(name + '.js'), function(text) {
-        onLoad.fromText('define(function(require, exports, module) {' + text + '});');
-      }, 'text');
-    }
-  };
-});
-
-define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], function($, diff, scrollUtils) {
-  function isTextInput(element) {
-    return typeof element.setSelectionRange === 'function';
+(function() {
+  const currentScript = document.currentScript.src;
+  let diffWorkerPath = 'diffWorker.js?evaluate=true';
+  if (currentScript.endsWith('webjar.bundle.min.js')) {
+    // The 'xwiki-selection' plugin is bundled with the other plugins rather than being loaded separately.
+    diffWorkerPath = 'xwiki-selection/' + diffWorkerPath;
   }
+  const diffWorkerURL = new URL(diffWorkerPath, currentScript).href;
 
-  function getTextSelection(root, ranges) {
-    if (isTextInput(root)) {
-      return {
-        text: root.value,
-        startOffset: root.selectionStart,
-        endOffset: root.selectionEnd
-      };
-    } else {
-      // We currently support only one range.
-      const range = ranges?.[0];
-      if (range && root.contains(range.commonAncestorContainer)) {
-        return getTextSelectionFromRange(root, range);
+  define('xwiki-diff-service', ['node-module!fast-diff'], function(diff) {
+    class DiffService {
+      constructor() {
+        // Reuse the same worker to serve a queue of diff computation requests.
+        this._queue = [];
+        // Have the worker ready before the first diff computation is requested (because worker creation is costly).
+        this._recreateWorker();
       }
-      return {
-        text: getVisibleText(root),
-        startOffset: 0,
-        endOffset: 0
-      };
-    }
-  }
 
-  function getTextSelectionFromRange(root, range) {
-    const beforeRange = root.ownerDocument.createRange();
-    beforeRange.setStart(root, 0);
-    beforeRange.setEnd(range.startContainer, range.startOffset);
-    const beforeText = getVisibleTextInRange(beforeRange);
+      diff(previous, next) {
+        return diff(previous, next);
+      }
 
-    const selectionRange = root.ownerDocument.createRange();
-    selectionRange.setStart(range.startContainer, range.startOffset);
-    selectionRange.setEnd(range.endContainer, range.endOffset);
-    const lastSelectedNode = range.endContainer.childNodes[range.endOffset - 1];
-    if (!range.collapsed && lastSelectedNode?.nodeType === Node.ELEMENT_NODE) {
-      // Place the selection range end inside the last selected element, after its last child node, in order to exclude
-      // the end separator associated with the last selected node from the selected text. We need this to be able to
-      // represent the fact that the selection ends after the last selected element (if that element is focusable) and
-      // not at the start of the next focusable element or visible text node.
-      selectionRange.setEnd(lastSelectedNode, lastSelectedNode.childNodes.length);
-    }
-    const selectedText = getVisibleTextInRange(selectionRange);
+      /**
+       * Schedule a diff computation.
+       *
+       * @param {string} previous the previous version of the text
+       * @param {string} next the next version of the text
+       * @returns {object} an object like {cancel: function, promise: Promise} that allows to cancel the diff
+       *   computation or to wait for the computed diff
+       */
+      diffAsync(previous, next) {
+        const entry = {previous, next};
+        this._queue.push(entry);
+        if (this._queue.length === 1) {
+          // Start the diff computation if this is the only entry in the queue.
+          this._processQueue();
+        }
 
-    const afterRange = root.ownerDocument.createRange();
-    afterRange.setStart(selectionRange.endContainer, selectionRange.endOffset);
-    afterRange.setEnd(root, root.childNodes.length);
-    const afterText = getVisibleTextInRange(afterRange);
+        return {
+          // A promise that resolves with the computed diff or rejects with an error (e.g. when the diff computation is
+          // cancelled).
+          promise: new Promise((resolve, reject) => {
+            entry.resolve = resolve;
+            entry.reject = reject;
+          }),
 
-    const startOffset = beforeText.length;
-    return {
-      text: beforeText + selectedText + afterText,
-      startOffset,
-      endOffset: startOffset + selectedText.length,
-      // Remember the text selection direction. This is especially important when editing in realtime because the user
-      // might be selecting text backwards (e.g. using Shift + Left Arrow) when a remove change is applied.
-      reversed: range.reversed
-    };
-  }
-
-  function getVisibleText(node) {
-    const range = node.ownerDocument.createRange();
-    range.selectNodeContents(node);
-    return getVisibleTextInRange(range);
-  }
-
-  function getVisibleTextInRange(range) {
-    // Partial text nodes are included in the iteration so we have to remember to remove the text before the start
-    // offset and after the end offset.
-    let visibleText = '', removeStart = 0, removeEnd = 0;
-    iterateRangeWithCaret(range, {
-      before: node => {
-        if (node.nodeType === Node.TEXT_NODE) {
-          visibleText += node.nodeValue;
-          if (node === range.startContainer) {
-            removeStart = range.startOffset;
+          /**
+           * Unschedule or terminate the diff computation.
+           */
+          cancel: () => {
+            const error = new Error('Diff computation cancelled.');
+            const index = this._queue.indexOf(entry);
+            if (index === 0) {
+              // Stop the current diff computation.
+              this._worker.onerror(error);
+            } else if (index > 0) {
+              // Unschedule the diff computation.
+              this._queue.splice(index, 1);
+              entry.reject(error);
+            }
           }
-        } else {
-          visibleText += '\n';
-        }
-      },
-      after: node => {
-        visibleText += '\n';
-        if (node.nodeType === Node.TEXT_NODE && node === range.endContainer) {
-          // Note that we add 1 to take into account the separator (new line) added after each text fragment.
-          removeEnd = node.length - range.endOffset + 1;
+        };
+      }
+
+      _recreateWorker() {
+        this._worker = new Worker(diffWorkerURL);
+        this._worker.onerror = error => {
+          this._worker.terminate();
+          if (this._queue.length) {
+            // A diff computation error occurred or the diff computation was cancelled.
+            this._queue.shift().reject(error);
+            this._recreateWorker();
+            // Continue with the next diff computation.
+            this._processQueue();
+          } else {
+            // Worker initialization error.
+            throw error;
+          }
+        };
+        this._worker.onmessage = event => {
+          // We received the computed diff.
+          this._queue.shift().resolve(event.data);
+          // Continue with the next diff computation.
+          this._processQueue();
+        };
+      }
+
+      _processQueue() {
+        if (this._queue.length) {
+          const {previous, next} = this._queue[0];
+          // Ask the worker to compute the diff.
+          this._worker.postMessage([previous, next]);
         }
       }
-    });
+    }
 
-    return visibleText.substring(removeStart, visibleText.length - removeEnd);
-  }
+    return DiffService;
+  });
+})();
+
+define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], function($, DiffService, scrollUtils) {
+  const diffService = new DiffService();
 
   function iterateRangeWithCaret(range, visitor) {
     // We're going to iterate the given range using a clone, by moving the start until the clone collapses.
@@ -397,9 +516,9 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
   }
 
   const maybeVisitText = (visitor, node) => node.nodeType === Node.TEXT_NODE &&
-    (visitor.before(node) || visitor.after(node));
-  const maybeVisitBeforeElement = (visitor, element) => canPlaceCaretBeforeElement(element) && visitor.before(element);
-  const maybeVisitAfterElement = (visitor, element) => canPlaceCaretAfterElement(element) && visitor.after(element);
+    (visitor.before(node) || visitor.after(node)),
+    maybeVisitBeforeElement = (visitor, element) => canPlaceCaretBeforeElement(element) && visitor.before(element),
+    maybeVisitAfterElement = (visitor, element) => canPlaceCaretAfterElement(element) && visitor.after(element);
 
   function canPlaceCaretBeforeElement(element) {
     return element.hasAttribute('tabindex') || (element.nodeName === 'BR' &&
@@ -408,18 +527,6 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
 
   function canPlaceCaretAfterElement(element) {
     return isNodeVisible(element) && element.hasAttribute('tabindex');
-  }
-
-  function getRangeFromTextSelection(root, textSelection) {
-    const start = findTextOffsetInDOM(root, textSelection.startOffset);
-    const end = textSelection.endOffset === textSelection.startOffset ? start :
-      findTextOffsetInDOM(root, textSelection.endOffset);
-    const range = root.ownerDocument.createRange();
-    range.setStart(start.node, start.offset);
-    range.setEnd(end.node, end.offset);
-    // Preserve the text selection direction.
-    range.reversed = textSelection.reversed;
-    return range;
   }
 
   function findTextOffsetInDOM(root, offset) {
@@ -470,18 +577,6 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
     };
   }
 
-  function changeText(textSelection, newText) {
-    const changes = diff(textSelection.text, newText);
-    const startOffset = findTextOffsetInChanges(changes, textSelection.startOffset);
-    const endOffset = textSelection.endOffset === textSelection.startOffset ? startOffset :
-      findTextOffsetInChanges(changes, textSelection.endOffset);
-    return {
-      text: newText,
-      startOffset,
-      endOffset
-    };
-  }
-
   function findTextOffsetInChanges(changes, oldOffset) {
     let count = 0, newOffset = oldOffset;
     for (let i = 0; i < changes.length && count < oldOffset; i++) {
@@ -507,21 +602,306 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
     return newOffset;
   }
 
+  class TextSelection {
+    /**
+     * Update the text selection from the given root editable (and selection ranges) or text area.
+     *
+     * @param {Element} root the root editable element or the text area
+     * @param {Array[Range]} ranges the selection ranges
+     * @returns {TextSelection} this text selection
+     */
+    update(root, ranges) {
+      if (this._isTextInput(root)) {
+        this.text = root.value;
+        this.startOffset = root.selectionStart;
+        this.endOffset = root.selectionEnd;
+      } else {
+        // We currently support only one range.
+        const range = ranges?.[0];
+        if (range && root.contains(range.commonAncestorContainer)) {
+          this._updateFromRange(root, range);
+        } else {
+          this.text = this._getVisibleText(root);
+          this.startOffset = 0;
+          this.endOffset = 0;
+        }
+      }
+
+      return this;
+    }
+
+    _isTextInput(element) {
+      return typeof element?.setSelectionRange === 'function';
+    }
+
+    _updateFromRange(root, range) {
+      const beforeRange = root.ownerDocument.createRange();
+      beforeRange.setStart(root, 0);
+      beforeRange.setEnd(range.startContainer, range.startOffset);
+      const beforeText = this._getVisibleTextInRange(beforeRange);
+
+      const selectionRange = root.ownerDocument.createRange();
+      selectionRange.setStart(range.startContainer, range.startOffset);
+      selectionRange.setEnd(range.endContainer, range.endOffset);
+      const lastSelectedNode = range.endContainer.childNodes[range.endOffset - 1];
+      if (!range.collapsed && lastSelectedNode?.nodeType === Node.ELEMENT_NODE) {
+        // Place the selection range end inside the last selected element, after its last child node, in order to
+        // exclude the end separator associated with the last selected node from the selected text. We need this to be
+        // able to represent the fact that the selection ends after the last selected element (if that element is
+        // focusable) and not at the start of the next focusable element or visible text node.
+        selectionRange.setEnd(lastSelectedNode, lastSelectedNode.childNodes.length);
+      }
+      const selectedText = this._getVisibleTextInRange(selectionRange);
+
+      const afterRange = root.ownerDocument.createRange();
+      afterRange.setStart(selectionRange.endContainer, selectionRange.endOffset);
+      afterRange.setEnd(root, root.childNodes.length);
+      const afterText = this._getVisibleTextInRange(afterRange);
+
+      this.text = beforeText + selectedText + afterText;
+      this.startOffset = beforeText.length;
+      this.endOffset = this.startOffset + selectedText.length;
+      // Remember the text selection direction. This is especially important when editing in realtime because the user
+      // might be selecting text backwards (e.g. using Shift + Left Arrow) when a remove change is applied.
+      this.reversed = range.reversed;
+    }
+
+    _getVisibleText(node) {
+      const range = node.ownerDocument.createRange();
+      range.selectNodeContents(node);
+      return this._getVisibleTextInRange(range);
+    }
+
+    _getVisibleTextInRange(range) {
+      // Partial text nodes are included in the iteration so we have to remember to remove the text before the start
+      // offset and after the end offset.
+      let visibleText = '', removeStart = 0, removeEnd = 0;
+      iterateRangeWithCaret(range, {
+        before: node => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            visibleText += node.nodeValue;
+            if (node === range.startContainer) {
+              removeStart = range.startOffset;
+            }
+          } else {
+            visibleText += '\n';
+          }
+        },
+        after: node => {
+          visibleText += '\n';
+          if (node.nodeType === Node.TEXT_NODE && node === range.endContainer) {
+            // Note that we add 1 to take into account the separator (new line) added after each text fragment.
+            removeEnd = node.length - range.endOffset + 1;
+          }
+        }
+      });
+
+      return visibleText.substring(removeStart, visibleText.length - removeEnd);
+    }
+
+    /**
+     * Apply this text selection to the given root editable or text area.
+     *
+     * @param {Element} element the root editable element or a text area element
+     * @param {Object} options configure how the text selection is applied
+     */
+    applyTo(element, options) {
+      options = Object.assign({
+        scrollIntoView: true,
+        applyDOMRange: range => {
+          const selection = element.ownerDocument.defaultView.getSelection();
+          if (range.reversed) {
+            selection.setBaseAndExtent(range.endContainer, range.endOffset, range.startContainer, range.startOffset);
+          } else {
+            selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+          }
+        }
+      }, options);
+
+      const range = this._isTextInput(element) ? this : this.asRange(element);
+      if (options.scrollIntoView) {
+        scrollUtils.scrollSelectionIntoView(element, range);
+      }
+
+      if (this._isTextInput(element)) {
+        element.setSelectionRange(range.startOffset, range.endOffset);
+      } else {
+        options.applyDOMRange(range);
+      }
+    }
+
+    /**
+     * Transform this text selection to reflect the changes made to the text, that is either given directly or extracted
+     * from the given root editable or text area.
+     *
+     * @param {string | Element} textOrElement the new text or the root editable element or the text area
+     * @param {boolean} async whether to perform the transformation asynchronously or not
+     * @returns a promise that resolves to this text selection after the transformation is complete
+     */
+    async transform(textOrElement, async = true) {
+      const text = this._isTextInput(textOrElement) ? textOrElement.value :
+        (textOrElement?.nodeType === Node.ELEMENT_NODE ? this._getVisibleText(textOrElement) : textOrElement);
+      if (typeof text === 'string' && text !== this.text) {
+        const promise = this._changeText(text, async);
+        if (async) {
+          await promise;
+
+          // If text selection transformation is asynchronous then the text can change while we are waiting for the Web
+          // Worker to compute the diff. This means we need to trigger a new transformation until the text doesn't
+          // change.
+          await this.transform(textOrElement);
+        }
+      }
+
+      return this;
+    }
+
+    async _changeText(newText, async = true) {
+      let changes;
+      if (async) {
+        const {promise, cancel} = diffService.diffAsync(this.text, newText);
+        this.abortApplyTo = cancel;
+        changes = await promise;
+      } else {
+        changes = diffService.diff(this.text, newText);
+      }
+
+      const startOffset = findTextOffsetInChanges(changes, this.startOffset);
+      const endOffset = this.endOffset === this.startOffset ? startOffset :
+        findTextOffsetInChanges(changes, this.endOffset);
+      this.text = newText;
+      this.startOffset = startOffset;
+      this.endOffset = endOffset;
+    }
+
+    /**
+     * Converts this text selection to a DOM Range inside the given root editable element.
+     *
+     * @param {Element} root the root editable element
+     * @returns a DOM Range that corresponds to this text selection
+     */
+    asRange(root) {
+      const start = findTextOffsetInDOM(root, this.startOffset);
+      const end = this.endOffset === this.startOffset ? start :
+        findTextOffsetInDOM(root, this.endOffset);
+      const range = root.ownerDocument.createRange();
+      range.setStart(start.node, start.offset);
+      range.setEnd(end.node, end.offset);
+      // Preserve the text selection direction.
+      range.reversed = this.reversed;
+      return range;
+    }
+  }
+
+  return TextSelection;
+});
+
+define('scrollUtils', ['jquery'], function($) {
+  /**
+   * Look for the first ancestor, starting from the given element, that has vertical scroll.
+   */
+  function getVerticalScrollParent(element) {
+    let parent = element.parentNode;
+    while (parent && !(parent.nodeType === Node.ELEMENT_NODE && hasVerticalScrollBar(parent))) {
+      parent = parent.parentNode;
+    }
+    return parent || element.ownerDocument.scrollingElement || element.ownerDocument.documentElement;
+  }
+
+  function hasVerticalScrollBar(element) {
+    const overflowY = $(element).css('overflow-y');
+    // There is content that exceeds the element's height and this excess content is neither hidden nor visible.
+    return element.scrollHeight > element.clientHeight && (overflowY.includes('scroll') || overflowY.includes('auto'));
+  }
+
+  /**
+   * Compute the top offset of the given element within the specified ancestor.
+   */
+  function getRelativeTopOffset(element, ancestor) {
+    // Save the vertical scroll position so that we can restore it afterwards.
+    const originalScrollTop = ancestor.scrollTop;
+    // Scroll the contents of the specified ancestor to the top, temporarily, so that the element offset, relative to
+    // its ancestor, is positive.
+    ancestor.scrollTop = 0;
+    const relativeTopOffset = $(element).offset().top - $(ancestor).offset().top;
+    // Restore the previous vertical scroll position.
+    ancestor.scrollTop = originalScrollTop;
+    return relativeTopOffset;
+  }
+
+  function isCenteredVertically(verticalScrollParent, padding, position) {
+    return position >= (verticalScrollParent.scrollTop + padding) &&
+      position <= (verticalScrollParent.scrollTop + verticalScrollParent.clientHeight - padding);
+  }
+
+  /**
+   * Center the given element vertically within its scroll parent, if needed.
+   *
+   * @param element the element to center vertically
+   * @param padding the amount of pixels from the top and from the bottom of the scroll parent that delimits the center
+   *          area; when specified, the element is centered vertically only if it's not already in the center area
+   *          defined by this padding
+   * @param verticalRange the vertical segment of the given element that should be centered, defaults to the entire
+   *          element
+   */
+  function centerVertically(
+    element,
+    padding = 0,
+    verticalRange = {startOffset: 0, endOffset: element.clientHeight}
+  ) {
+    const verticalScrollParent = getVerticalScrollParent(element);
+    if (verticalScrollParent) {
+      const rangeHeight = verticalRange.endOffset - verticalRange.startOffset;
+      const relativeTopOffset = getRelativeTopOffset(element, verticalScrollParent) + verticalRange.startOffset;
+      if (!padding || !isCenteredVertically(verticalScrollParent, padding, relativeTopOffset)) {
+        if (rangeHeight < verticalScrollParent.clientHeight) {
+          // Center the specified vertical range inside the scroll parent.
+          verticalScrollParent.scrollTop = relativeTopOffset - (verticalScrollParent.clientHeight - rangeHeight) / 2;
+        } else {
+          // Align the top of the specified vertical range to the top of the scroll parent.
+          verticalScrollParent.scrollTop = relativeTopOffset;
+        }
+      }
+    }
+  }
+
   function scrollSelectionIntoView(element, range) {
-    if (isTextInput(element)) {
+    const padding = 65;
+    if (typeof element?.setSelectionRange === 'function') {
+      // We handle text areas differently because we want to center the selected text.
       // See https://bugs.chromium.org/p/chromium/issues/detail?id=331233
-      var fullText = element.value;
+      const fullText = element.value;
+      const styleBackup = element.style.cssText;
+      // Determine the scroll offset corresponding to the start and end of the text selection.
+      element.style.height = element.style.minHeight = 0;
+      element.style.overflowY = 'hidden';
+      // Cut the text after the selection start.
+      element.value = fullText.substring(0, range.startOffset);
+      const scrollStartOfset = element.scrollHeight;
+      // Cut the text after the selection end.
       element.value = fullText.substring(0, range.endOffset);
-      // Scroll to the bottom.
-      element.scrollTop = element.scrollHeight;
-      var canScroll = element.scrollHeight > element.clientHeight;
+      const scrollEndOffset = element.scrollHeight;
+      const selectionHeight = scrollEndOffset - scrollStartOfset;
+      // Restore the full text and the text area styles.
       element.value = fullText;
-      if (canScroll) {
-        // Scroll to center the selection.
-        element.scrollTop += element.clientHeight / 2;
+      element.style.cssText = styleBackup;
+      const canScrollVertically = element.scrollHeight > element.clientHeight;
+      if (canScrollVertically) {
+        if (selectionHeight < element.clientHeight) {
+          // Center the selection inside the text area.
+          element.scrollTop = scrollStartOfset - (element.clientHeight - selectionHeight) / 2;
+        } else {
+          // Align the selection start to the top of the text area.
+          element.scrollTop = scrollStartOfset;
+        }
+      } else {
+        centerVertically(element, padding, {
+          startOffset: scrollStartOfset,
+          endOffset: scrollEndOffset
+        });
       }
     } else {
-      scrollUtils.centerVertically(getScrollTarget(range), 65);
+      centerVertically(getScrollTarget(range), padding);
     }
   }
 
@@ -537,124 +917,11 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
   }
 
   return {
-    from: function(root, ranges) {
-      return $.extend({}, this, getTextSelection(root, ranges));
-    },
-
-    applyTo: function(element, options) {
-      options = Object.assign({
-        scrollIntoView: true,
-        applyDOMRange: range => {
-          const selection = element.ownerDocument.defaultView.getSelection();
-          if (range.reversed) {
-            selection.setBaseAndExtent(range.endContainer, range.endOffset, range.startContainer, range.startOffset);
-          } else {
-            selection.setBaseAndExtent(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-          }
-        }
-      }, options);
-
-      var range;
-      if (isTextInput(element)) {
-        range = this.withText(element.value);
-      } else {
-        range = this.withText(getVisibleText(element)).asRange(element);
-      }
-
-      if (options.scrollIntoView) {
-        scrollSelectionIntoView(element, range);
-      }
-
-      if (isTextInput(element)) {
-        element.setSelectionRange(range.startOffset, range.endOffset);
-      } else {
-        options.applyDOMRange(range);
-      }
-    },
-
-    withText: function(text) {
-      if (this.text === text) {
-        return this;
-      } else {
-        return $.extend({}, this, changeText(this, text));
-      }
-    },
-
-    asRange: function(root) {
-      return getRangeFromTextSelection(root, this);
-    }
-  };
-});
-
-define('scrollUtils', ['jquery'], function($) {
-  /**
-   * Look for the first ancestor, starting from the given element, that has vertical scroll.
-   */
-  var getVerticalScrollParent = function(element) {
-    var parent = element.parentNode;
-    while (parent && !(parent.nodeType === Node.ELEMENT_NODE && hasVerticalScrollBar(parent))) {
-      parent = parent.parentNode;
-    }
-    return parent;
-  };
-
-  var hasVerticalScrollBar = function(element) {
-    var overflowY = $(element).css('overflow-y');
-    // Use a delta to detect the vertical scroll bar, in order to overcome a bug in Chrome.
-    // See https://bugs.chromium.org/p/chromium/issues/detail?id=34224 (Incorrect scrollHeight on the <body> element)
-    var delta = 4;
-    return element.scrollHeight > (element.clientHeight + delta) && overflowY !== 'hidden' &&
-      // The HTML and BODY tags can have vertical scroll bars even if overflow is visible.
-      (overflowY !== 'visible' || element === element.ownerDocument.documentElement ||
-        element === element.ownerDocument.body);
-  };
-
-  /**
-   * Compute the top offset of the given element within the specified ancestor.
-   */
-  var getRelativeTopOffset = function(element, ancestor) {
-    // Save the vertical scroll position so that we can restore it afterwards.
-    var originalScrollTop = ancestor.scrollTop;
-    // Scroll the contents of the specified ancestor to the top, temporarily, so that the element offset, relative to
-    // its ancestor, is positive.
-    ancestor.scrollTop = 0;
-    var relativeTopOffset = $(element).offset().top - $(ancestor).offset().top;
-    // Restore the previous vertical scroll position.
-    ancestor.scrollTop = originalScrollTop;
-    return relativeTopOffset;
-  };
-
-  var isCenteredVertically = function(verticalScrollParent, padding, position) {
-    return position >= (verticalScrollParent.scrollTop + padding) &&
-      position <= (verticalScrollParent.scrollTop + verticalScrollParent.clientHeight - padding);
-  };
-
-  /**
-   * Center the given element vertically within its scroll parent, if needed.
-   *
-   * @param element the element to center vertically
-   * @param padding the amount of pixels from the top and from the bottom of the scroll parent that delimits the center
-   *          area; when specified, the element is centered vertically only if it's not already in the center area
-   *          defined by this padding
-   */
-  var centerVertically = function(element, padding) {
-    var verticalScrollParent = getVerticalScrollParent(element);
-    if (verticalScrollParent) {
-      var relativeTopOffset = getRelativeTopOffset(element, verticalScrollParent);
-      if (!padding || !isCenteredVertically(verticalScrollParent, padding, relativeTopOffset)) {
-        // Center the element by removing half of the scroll parent height (i.e. half of the visible vertical space)
-        // from the element's relative position. If this is a negative value then the browser will use 0 instead.
-        var scrollTop = relativeTopOffset - (verticalScrollParent.clientHeight / 2);
-        verticalScrollParent.scrollTop = scrollTop;
-      }
-    }
-  };
-
-  return {
-    getVerticalScrollParent: getVerticalScrollParent,
-    hasVerticalScrollBar: hasVerticalScrollBar,
-    getRelativeTopOffset: getRelativeTopOffset,
-    isCenteredVertically: isCenteredVertically,
-    centerVertically: centerVertically
+    getVerticalScrollParent,
+    hasVerticalScrollBar,
+    getRelativeTopOffset,
+    isCenteredVertically,
+    centerVertically,
+    scrollSelectionIntoView
   };
 });

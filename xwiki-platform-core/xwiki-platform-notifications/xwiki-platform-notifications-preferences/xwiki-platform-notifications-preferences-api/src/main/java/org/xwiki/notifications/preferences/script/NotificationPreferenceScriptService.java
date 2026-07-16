@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.Strings;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -70,6 +71,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 @Named("notification.preferences")
 @Singleton
+// Fan-out reached because of the usage of DocumentUserReference which should be removed in the future
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class NotificationPreferenceScriptService implements ScriptService
 {
     @Inject
@@ -124,10 +127,10 @@ public class NotificationPreferenceScriptService implements ScriptService
         */
 
         List<NotificationPreference> existingPreferences = Collections.emptyList();
-        if (target instanceof DocumentReference) {
-            existingPreferences = notificationPreferenceManager.getAllPreferences((DocumentReference) target);
-        } else if (target instanceof WikiReference) {
-            existingPreferences = notificationPreferenceManager.getAllPreferences((WikiReference) target);
+        if (target instanceof DocumentReference documentReference) {
+            existingPreferences = notificationPreferenceManager.getAllPreferences(documentReference);
+        } else if (target instanceof WikiReference wikiReference) {
+            existingPreferences = notificationPreferenceManager.getAllPreferences(wikiReference);
         }
 
         // Instantiate a new copy of TargetableNotificationPreferenceBuilder because this component is not thread-safe.
@@ -371,8 +374,8 @@ public class NotificationPreferenceScriptService implements ScriptService
         DocumentReference userDocumentReference;
         if (userReference == CurrentUserReference.INSTANCE) {
             userDocumentReference = documentAccessBridge.getCurrentUserReference();
-        } else if (userReference instanceof DocumentUserReference) {
-            userDocumentReference = ((DocumentUserReference) userReference).getReference();
+        } else if (userReference instanceof DocumentUserReference documentUserReference) {
+            userDocumentReference = documentUserReference.getReference();
         } else {
             throw new NotificationException(
                 String.format("The method isEventTypeEnabledForUser should only be used with DocumentUserReference, "
@@ -388,7 +391,7 @@ public class NotificationPreferenceScriptService implements ScriptService
     {
         for (NotificationPreference preference : allPreferences) {
             Object prefEventType = preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE);
-            if (prefEventType != null && StringUtils.equals((String) prefEventType, eventType)
+            if (prefEventType != null && Strings.CS.equals((String) prefEventType, eventType)
                 && preference.getFormat() == format) {
                 return preference.isNotificationEnabled();
             }

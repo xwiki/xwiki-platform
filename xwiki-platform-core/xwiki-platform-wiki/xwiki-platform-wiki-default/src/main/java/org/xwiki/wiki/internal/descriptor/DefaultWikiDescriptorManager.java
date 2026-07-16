@@ -239,7 +239,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext != null ? xcontext.isMainWiki(wikiId) : true;
+        return xcontext == null || xcontext.isMainWiki(wikiId);
     }
 
     @Override

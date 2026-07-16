@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class XWikiMessageToolTest
+class XWikiMessageToolTest
 {
     @InjectMockitoOldcore
     MockitoOldcore oldcore;
@@ -59,14 +59,8 @@ public class XWikiMessageToolTest
 
     private DocumentReference translationDocumentReference2;
 
-    private DocumentReference translationDocumentReferenceFR2;
-
-    private String translationDocumentName1;
-
-    private String translationDocumentName2;
-
     @BeforeEach
-    protected void beforeEach() throws Exception
+    void beforeEach()
     {
         this.tool = new XWikiMessageTool(new TestResources(), this.oldcore.getXWikiContext());
 
@@ -75,14 +69,8 @@ public class XWikiMessageToolTest
 
         this.translationDocumentReferenceFR1 = new DocumentReference(this.translationDocumentReference1, Locale.FRENCH);
 
-        this.translationDocumentName1 = "TranslationSpace1.TranslationPage1";
-
         this.translationDocumentReference2 =
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "TranslationSpace1", "TranslationPage2");
-
-        this.translationDocumentReferenceFR2 = new DocumentReference(this.translationDocumentReference2, Locale.FRENCH);
-
-        this.translationDocumentName2 = "TranslationSpace2.TranslationPage2";
     }
 
     public class TestResources extends ListResourceBundle
@@ -178,13 +166,13 @@ public class XWikiMessageToolTest
      * When no preference exist the returned value is the value of the key.
      */
     @Test
-    public void testGetWhenPreferenceDoesNotExist()
+    void getWhenPreferenceDoesNotExist()
     {
         assertEquals("invalid", this.tool.get("invalid"));
     }
 
     @Test
-    public void testGetWhenNoTranslationAvailable()
+    void getWhenNoTranslationAvailable()
     {
         assertEquals("value", this.tool.get("key"));
     }
@@ -193,13 +181,13 @@ public class XWikiMessageToolTest
      * When the key is null the returned value is null.
      */
     @Test
-    public void testGetWhenKeyIsNull()
+    void tgetWhenKeyIsNull()
     {
         assertNull(this.tool.get(null));
     }
 
     @Test
-    public void testGetWhenInXWikiPreferences() throws XWikiException
+    void getWhenInXWikiPreferences() throws XWikiException
     {
         saveTranslations(this.translationDocumentReference1, "somekey=somevalue");
         saveTranslations(this.translationDocumentReference2, "someKey=someValue\n" + "keyInXWikiPreferences=eureka");
@@ -209,7 +197,7 @@ public class XWikiMessageToolTest
     }
 
     @Test
-    public void testGetWhenInXWikiConfigurationFile() throws XWikiException
+    void getWhenInXWikiConfigurationFile() throws XWikiException
     {
         saveTranslations("keyInXWikiCfg=gotcha", false);
 
@@ -222,7 +210,7 @@ public class XWikiMessageToolTest
      * @throws XWikiException
      */
     @Test
-    public void testGetWithParameters() throws XWikiException
+    void getWithParameters() throws XWikiException
     {
         saveTranslations("key=We have {0} new documents with {1} objects. {2}");
 
@@ -237,7 +225,7 @@ public class XWikiMessageToolTest
      * Verify that a document listed as a bundle document that doesn't exist is not returned as a bundle document.
      */
     @Test
-    public void testGetDocumentBundlesWhenDocumentDoesNotExist()
+    void getDocumentBundlesWhenDocumentDoesNotExist()
     {
         setPreferencesTranslationBundle(this.translationDocumentReference1);
         setCfgTranslationBundle(this.translationDocumentReference2);
@@ -247,7 +235,7 @@ public class XWikiMessageToolTest
     }
 
     @Test
-    public void testGetWhenDocumentModifiedAfterItIsInCache() throws XWikiException
+    void getWhenDocumentModifiedAfterItIsInCache() throws XWikiException
     {
         saveTranslations("key=value");
 
@@ -263,7 +251,7 @@ public class XWikiMessageToolTest
     }
 
     @Test
-    public void testGetWhenWithTranslation() throws XWikiException
+    void getWhenWithTranslation() throws XWikiException
     {
         saveTranslations(this.translationDocumentReference1, "somekey=somevalue\nsomekey2=somevalue2");
         saveTranslations(this.translationDocumentReferenceFR1, "somekey=somevaluetrans");
@@ -279,7 +267,7 @@ public class XWikiMessageToolTest
     }
 
     @Test
-    public void testGetWhenWithUTF8Translation() throws XWikiException
+    void getWhenWithUTF8Translation() throws XWikiException
     {
         saveTranslations(this.translationDocumentReference1, "somekey=some\u00E9value\nsomekey2=some\\u00E9value2");
         saveTranslations(this.translationDocumentReferenceFR1, "somekey=somevaluetrans");

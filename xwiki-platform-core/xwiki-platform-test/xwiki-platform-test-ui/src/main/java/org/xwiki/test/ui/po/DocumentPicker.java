@@ -21,8 +21,9 @@ package org.xwiki.test.ui.po;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -113,6 +114,42 @@ public class DocumentPicker extends BaseElement
         return this.container.findElement(By.className("location-parent-field"));
     }
 
+    private Stream<WebElement> getParentFieldLiveValidationElements()
+    {
+        getDriver().waitUntilCondition(webDriver -> {
+             String parentClasses = getParentInput().getDomAttribute("class");
+             return parentClasses.contains("LV_valid_field") || parentClasses.contains("LV_invalid_field");
+        });
+
+        return this.container.findElements(By.cssSelector(".location-parent-field ~ .LV_validation_message"))
+            .stream()
+            .filter(WebElement::isDisplayed);
+    }
+
+    /**
+     * @return {@code true} if a unique live validation message is displayed for the parent field and is a success.
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public boolean isParentLiveValidationSuccess()
+    {
+        List<WebElement> liveValidationElements = getParentFieldLiveValidationElements().toList();
+        return liveValidationElements.size() == 1
+            && liveValidationElements.get(0).getDomAttribute("class").contains("LV_validation_message LV_valid");
+    }
+
+    /**
+     * @return all the live validation messages displayed for the parent field concatenated with {@code \n}.
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public String getParentLiveValidationMessages()
+    {
+        return getParentFieldLiveValidationElements()
+            .map(WebElement::getText)
+            .collect(Collectors.joining("\n"));
+    }
+
     public String getName()
     {
         return getNameInput().getAttribute("value");
@@ -126,6 +163,41 @@ public class DocumentPicker extends BaseElement
     public WebElement getNameInput()
     {
         return this.container.findElement(By.className("location-name-field"));
+    }
+
+    private Stream<WebElement> getNameFieldLiveValidationElements()
+    {
+        getDriver().waitUntilCondition(webDriver -> {
+            String nameClasses = getNameInput().getDomAttribute("class");
+            return nameClasses.contains("LV_valid_field") || nameClasses.contains("LV_invalid_field");
+        });
+        return this.container.findElements(By.cssSelector(".location-name-field ~ .LV_validation_message"))
+            .stream()
+            .filter(WebElement::isDisplayed);
+    }
+
+    /**
+     * @return {@code true} if a unique live validation message is displayed for the name field and is a success.
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public boolean isNameLiveValidationSuccess()
+    {
+        List<WebElement> liveValidationElements = getNameFieldLiveValidationElements().toList();
+        return liveValidationElements.size() == 1
+            && liveValidationElements.get(0).getDomAttribute("class").contains("LV_validation_message LV_valid");
+    }
+
+    /**
+     * @return all the live validation messages displayed for the name field concatenated with {@code \n}.
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public String getNameLiveValidationMessages()
+    {
+        return getNameFieldLiveValidationElements()
+            .map(WebElement::getText)
+            .collect(Collectors.joining("\n"));
     }
 
     private DocumentPicker setAdvancedField(WebElement field, String value)
@@ -258,7 +330,7 @@ public class DocumentPicker extends BaseElement
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
-            public @Nullable Boolean apply(@Nullable WebDriver driver)
+            public Boolean apply(WebDriver driver)
             {
                 // Wait until the document picker JavaScript initialization code is executed.
                 // The pick action is available only if the document tree is available.

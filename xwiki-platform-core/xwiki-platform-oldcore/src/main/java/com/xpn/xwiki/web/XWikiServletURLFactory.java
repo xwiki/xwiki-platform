@@ -28,12 +28,14 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +55,17 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
 @Deprecated(since = "17.0.0RC1")
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletURLFactory.class);
+
+    private static final String HTML_AMPERSAND = "&amp;";
+
+    private static final String UTF8 = "UTF-8";
 
     private EntityReferenceResolver<String> relativeEntityReferenceResolver;
 
@@ -122,8 +130,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         // Check if the request is a deamon thread request
         XWikiRequest request = context.getRequest();
-        this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub
-            && ((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon();
+        this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub stub
+            && stub.isDaemon();
 
         // Remember initial request base URL for path for last resort
         if (homepageConfigration != null && context.isMainWiki()) {
@@ -273,7 +281,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         // Path based mode we fallback on original default
-        if (context.getWiki().isPathBased() && !StringUtils.equals(context.getOriginalWikiId(), wikiId)) {
+        if (context.getWiki().isPathBased() && !Strings.CS.equals(context.getOriginalWikiId(), wikiId)) {
             return getServerURL(context.getOriginalWikiId(), context);
         }
 
@@ -322,7 +330,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
         }
 
         if (!StringUtils.isEmpty(anchor)) {
@@ -446,14 +454,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         String encodedName;
         try {
-            encodedName = URLEncoder.encode(name, "UTF-8");
+            encodedName = URLEncoder.encode(name, UTF8);
         } catch (Exception e) {
             // Should not happen (UTF-8 is always available)
             throw new RuntimeException("Missing charset [UTF-8]", e);
         }
 
         // The previous call will convert " " into "+" (and "+" into "%2B") so we need to convert "+" into "%20"
-        encodedName = encodedName.replaceAll("\\+", "%20");
+        encodedName = encodedName.replace("+", "%20");
 
         return encodedName;
     }
@@ -491,7 +499,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         try {
             String encodedFragment =
-                StringUtils.removeStart(new URI(null, null, null, -1, null, null, fragment).toString(), "#");
+                Strings.CS.removeStart(new URI(null, null, null, -1, null, null, fragment).toString(), "#");
             // We encode single quotes (apostrophes) even though they are allowed in the URL fragment component because
             // we want to avoid breaking HTML links. This is also consistent with the encoding we do for the path URL
             // component where we also encode single quotes, see #encodeWithinPath().
@@ -519,10 +527,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     private void appendQueryParameter(String key, Object paramValue, StringBuilder stringBuilder)
         throws UnsupportedEncodingException
     {
-        if (paramValue instanceof String) {
-            stringBuilder.append(URLEncoder.encode(key, "UTF-8"));
+        if (paramValue instanceof String stringValue) {
+            stringBuilder.append(URLEncoder.encode(key, UTF8));
             stringBuilder.append('=');
-            stringBuilder.append(URLEncoder.encode((String) paramValue, "UTF-8"));
+            stringBuilder.append(URLEncoder.encode(stringValue, UTF8));
         } else if (paramValue.getClass().isArray()) {
             Class ofArray = paramValue.getClass().getComponentType();
             if (ofArray.isPrimitive()) {
@@ -543,8 +551,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     }
                 }
             }
-        } else if (paramValue instanceof Collection) {
-            Collection zeCollection = (Collection) paramValue;
+        } else if (paramValue instanceof Collection zeCollection) {
             int index = 0;
             for (Object paramValueElement : zeCollection) {
                 appendQueryParameter(key, paramValueElement.toString(), stringBuilder);
@@ -687,13 +694,13 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         // If we are getting an attachment from the context doc, we can directly load its version from it.
-        else if (action.equals("download") && isContextDoc(xwikidb, spaces, name, context)
+        else if ("download".equals(action) && isContextDoc(xwikidb, spaces, name, context)
             && Locale.ROOT.equals(context.getDoc().getLocale())) {
             attachment = context.getDoc().getAttachment(filename);
 
             // We are getting an attachment from another doc: we can try to load it to retrieve its version
             // in order to avoid cache issues.
-        } else if (action.equals("download")) {
+        } else if ("download".equals(action)) {
             // The doc might be in a different wiki.
             WikiReference originalWikiReference = context.getWikiReference();
             context.setWikiId(xwikidb);
@@ -757,7 +764,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
         }
 
         try {
@@ -860,7 +867,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     String querystring = url.getQuery();
                     if (!StringUtils.isEmpty(querystring)) {
                         relativeURLBuilder.append("?")
-                            .append(StringUtils.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+                            .append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
                     }
 
                     String anchor = url.getRef();
@@ -901,7 +908,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         XWikiAttachment attachment = null;
         XWikiDocument rdoc = context.getWiki().getDocument(doc, docRevision, context);
-        if (filename != null) {
+        if (rdoc == null) {
+            rdoc = getMainDocumentRevisionForTranslation(doc, context);
+        }
+        if (rdoc != null && filename != null) {
             attachment = rdoc.getAttachment(filename);
         }
 
@@ -911,9 +921,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public long findDeletedAttachmentForDocRevision(XWikiDocument doc, String docRevision, String filename,
         XWikiContext context) throws XWikiException
     {
-        XWikiAttachment attachment = null;
+        XWikiAttachment attachment;
         XWikiDocument rdoc = context.getWiki().getDocument(doc, docRevision, context);
-        if (context.getWiki().hasAttachmentRecycleBin(context) && filename != null) {
+        if (rdoc == null) {
+            rdoc = getMainDocumentRevisionForTranslation(doc, context);
+        }
+        if (rdoc != null && context.getWiki().hasAttachmentRecycleBin(context) && filename != null) {
             attachment = rdoc.getAttachment(filename);
             if (attachment != null) {
                 List<DeletedAttachment> deleted = context.getWiki().getAttachmentRecycleBinStore()
@@ -928,6 +941,33 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         return -1;
+    }
+
+    private XWikiDocument getMainDocumentRevisionForTranslation(XWikiDocument doc, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
+        if (tdoc != null && !Locale.ROOT.equals(tdoc.getLocale())) {
+            XWikiDocument rdoc = getDocumentRevisionAtDate(doc, tdoc.getDate(), context);
+            if (rdoc != null) {
+                return rdoc;
+            }
+        }
+        return doc;
+    }
+
+    private XWikiDocument getDocumentRevisionAtDate(XWikiDocument doc, Date date, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocumentArchive archive = doc.getDocumentArchive(context);
+        if (archive != null) {
+            for (XWikiRCSNodeInfo node : archive.getNodes()) {
+                if (!node.getDate().after(date)) {
+                    return context.getWiki().getDocument(doc, node.getVersion().toString(), context);
+                }
+            }
+        }
+        return null;
     }
 
     /**

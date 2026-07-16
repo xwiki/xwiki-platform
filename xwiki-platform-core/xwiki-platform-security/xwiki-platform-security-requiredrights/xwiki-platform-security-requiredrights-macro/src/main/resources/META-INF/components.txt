@@ -1,0 +1,2 @@
+org.xwiki.platform.security.requiredrights.internal.MacroContentSourceReferenceMacroParameterRequiredRightsAnalyzer
+org.xwiki.platform.security.requiredrights.internal.WikiSyntaxMacroParameterRequiredRightsAnalyzer

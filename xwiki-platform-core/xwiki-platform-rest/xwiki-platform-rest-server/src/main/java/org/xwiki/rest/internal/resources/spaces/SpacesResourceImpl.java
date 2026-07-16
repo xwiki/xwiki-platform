@@ -46,12 +46,13 @@ public class SpacesResourceImpl extends XWikiResource implements SpacesResource
     public Spaces getSpaces(String wikiName, Integer start, Integer number)
             throws XWikiRestException
     {
+        int limit = validateAndGetLimit(number);
         Spaces spaces = objectFactory.createSpaces();
 
         try {
             List<String> spaceNames = queryManager.getNamedQuery("getSpaces").addFilter(
                     componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden")).setOffset(start)
-                    .setLimit(number).setWiki(wikiName).execute();
+                .setLimit(limit).setWiki(wikiName).execute();
 
             for (String spaceName : spaceNames) {
                 List<String> spaceList = Utils.getSpacesFromSpaceId(spaceName);

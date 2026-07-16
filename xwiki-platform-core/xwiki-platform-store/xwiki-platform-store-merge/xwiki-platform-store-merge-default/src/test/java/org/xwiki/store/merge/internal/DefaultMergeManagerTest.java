@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.xwiki.cache.CacheManager;
@@ -63,13 +62,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ComponentList({ DefaultDiffManager.class })
 @ComponentTest
-public class DefaultMergeManagerTest
+class DefaultMergeManagerTest
 {
     @InjectMockComponents
     private DefaultMergeManager mergeManager;
@@ -82,7 +80,7 @@ public class DefaultMergeManagerTest
     private List<ConflictDecision> conflictDecisionList;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         this.documentReference = new DocumentReference("xwiki", "Space", "Page");
         this.userReference = new DocumentReference("xwiki", "XWiki", "User");
@@ -93,7 +91,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeWhenDifferences()
+    void mergeWhenDifferences()
     {
         MergeManagerResult<String, String> result =
             mergeManager.mergeLines("content", "content\n", "content", new MergeConfiguration());
@@ -110,11 +108,11 @@ public class DefaultMergeManagerTest
         assertEquals("content\n", result.getMergeResult());
         assertTrue(result.isModified());
         assertFalse(result.hasConflicts());
-        verify(conflictDecisionsManager, times(1)).getConflictDecisionList(documentReference, userReference);
+        verify(conflictDecisionsManager).getConflictDecisionList(documentReference, userReference);
     }
 
     @Test
-    public void mergeWhenCurrentStringDoesntEndWithNewLine()
+    void mergeWhenCurrentStringDoesntEndWithNewLine()
     {
         MergeManagerResult<String, String> result = mergeManager.mergeLines("content", "content", "content",
             new MergeConfiguration());
@@ -124,7 +122,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeWhenCurrentStringEndsWithNewLine()
+    void mergeWhenCurrentStringEndsWithNewLine()
     {
         MergeManagerResult<String, String> result = mergeManager.mergeLines("content\n", "content\n", "content\n",
             new MergeConfiguration());
@@ -134,7 +132,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeObjectSimple()
+    void mergeObjectSimple()
     {
         MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "old",
             new MergeConfiguration());
@@ -144,7 +142,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeObjectAlreadyDone()
+    void mergeObjectAlreadyDone()
     {
         MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "new",
             new MergeConfiguration());
@@ -154,7 +152,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeObjectWhileModified()
+    void mergeObjectWhileModified()
     {
         MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "old modified",
             new MergeConfiguration());
@@ -167,7 +165,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeListSimple()
+    void mergeListSimple()
     {
         List<String> current = new ArrayList<String>(Arrays.asList("old1", "old2"));
         MergeManagerResult<List<String>, String> result = mergeManager.mergeList(Arrays.asList("old1", "old2"),
@@ -178,7 +176,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeListAlreadyDone()
+    void mergeListAlreadyDone()
     {
         List<String> current = new ArrayList<String>(Arrays.asList("new1", "new2"));
         MergeManagerResult<List<String>, String> result = mergeManager.mergeList(Arrays.asList("old1", "old2"),
@@ -190,7 +188,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeListWhileModified()
+    void mergeListWhileModified()
     {
         List<String> current = new ArrayList<String>(Arrays.asList("new1", "old modified2"));
         MergeManagerResult<List<String>, String> result = mergeManager.mergeList(Arrays.asList("new1", "old2"),
@@ -220,7 +218,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeCharactersSimple()
+    void mergeCharactersSimple()
     {
         MergeManagerResult<String, Character> result =
             mergeManager.mergeCharacters("ab", "aib", "abc", new MergeConfiguration());
@@ -230,7 +228,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeCharactersNull()
+    void mergeCharactersNull()
     {
         MergeManagerResult<String, Character> result =
             mergeManager.mergeCharacters(null, null, null, new MergeConfiguration());
@@ -240,7 +238,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeCharactersEmpty()
+    void mergeCharactersEmpty()
     {
         MergeManagerResult<String, Character> result =
             mergeManager.mergeCharacters("", "", "", new MergeConfiguration());
@@ -250,7 +248,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeCharactersWhileModified()
+    void mergeCharactersWhileModified()
     {
         MergeManagerResult<String, Character> result =
             mergeManager.mergeCharacters("ab", "aib", "ajb", new MergeConfiguration());
@@ -260,7 +258,7 @@ public class DefaultMergeManagerTest
     }
 
     @Test
-    public void mergeCharactersNoChanges()
+    void mergeCharactersNoChanges()
     {
         MergeManagerResult<String, Character> result =
             mergeManager.mergeCharacters("ab", "ab", "ab", new MergeConfiguration());
@@ -270,7 +268,6 @@ public class DefaultMergeManagerTest
     }
 
     @Nested
-    @DisplayName("Merge Documents tests")
     @ComponentList(value = {
         DefaultDiffManager.class,
         DefaultMergeManager.class,
@@ -278,7 +275,7 @@ public class DefaultMergeManagerTest
     })
     @ReferenceComponentList
     @OldcoreTest
-    public class MergeManagerDocumentsTest
+    class MergeManagerDocumentsTest
     {
         @InjectMockitoOldcore
         private MockitoOldcore oldcore;
@@ -302,7 +299,7 @@ public class DefaultMergeManagerTest
         private MergeConfiguration configuration;
 
         @BeforeEach
-        public void before() throws Exception
+        void before() throws Exception
         {
             this.currentDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
             this.previousDocument = this.currentDocument.clone();
@@ -350,7 +347,7 @@ public class DefaultMergeManagerTest
         // #merge
 
         @Test
-        public void testMergeContent() throws Exception
+        void testMergeContent() throws Exception
         {
             this.previousDocument.setContent("some content");
             this.nextDocument.setContent("some new content");
@@ -362,7 +359,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeDefaultLocale() throws Exception
+        void testMergeDefaultLocale() throws Exception
         {
             this.previousDocument.setDefaultLocale(Locale.ENGLISH);
             this.nextDocument.setDefaultLocale(Locale.FRENCH);
@@ -374,7 +371,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeContentModified() throws Exception
+        void testMergeContentModified() throws Exception
         {
             this.previousDocument.setContent("some content");
             this.nextDocument.setContent("some content\nafter");
@@ -394,7 +391,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeNewObjectAdded() throws Exception
+        void testMergeNewObjectAdded() throws Exception
         {
             this.nextDocument.addXObject(this.xobject);
 
@@ -404,7 +401,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeNewObjectRemoved() throws Exception
+        void testMergeNewObjectRemoved() throws Exception
         {
             this.previousDocument.addXObject(this.xobject);
             this.currentDocument.addXObject(this.xobject.clone());
@@ -415,7 +412,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeObjectModified() throws Exception
+        void testMergeObjectModified() throws Exception
         {
             BaseObject previousobj = this.xobject;
             previousobj.setStringValue("test", "test1");
@@ -438,7 +435,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeCurrentObjectRemoved() throws Exception
+        void testMergeCurrentObjectRemoved() throws Exception
         {
             this.xobject.setStringValue("test", "");
             this.xobject.setStringValue("previoustest", "previoustest");
@@ -449,15 +446,46 @@ public class DefaultMergeManagerTest
             newobj.setStringValue("newtest", "newtest");
             this.nextDocument.addXObject(newobj);
 
-            merge();
+            MergeDocumentResult result = this.mergeManager.mergeDocument(this.previousDocument, this.nextDocument,
+                this.currentDocument, this.configuration);
+            List<LogEvent> logs = result.getLog().getLogs(LogLevel.ERROR);
+            // We get 2 logs: one for the change on existing property, one for the new property.
+            assertEquals(2, logs.size());
+            assertEquals("Collision found on object [Object wiki:space.page^classspace.class[0]]",
+                logs.get(0).getFormattedMessage());
+            assertEquals("Collision found on object [Object wiki:space.page^classspace.class[0]]",
+                logs.get(1).getFormattedMessage());
 
-            BaseObject mergedobj = this.currentDocument.getXObject(this.xclass.getReference(), 0);
-
+            BaseObject mergedobj = ((XWikiDocument) result.getMergeResult()).getXObject(this.xclass.getReference(), 0);
             assertNull(mergedobj);
         }
 
         @Test
-        public void testMergeAttachmentEquals() throws Exception
+        void testMergeCurrentObjectRemovedFallbackNext() throws Exception
+        {
+            this.configuration.setConflictFallbackVersion(MergeConfiguration.ConflictFallbackVersion.NEXT);
+            this.xobject.setStringValue("test", "");
+            this.xobject.setStringValue("previoustest", "previoustest");
+            this.previousDocument.addXObject(this.xobject);
+
+            BaseObject newobj = this.xobject.clone();
+            newobj.setStringValue("test", "test2");
+            newobj.setStringValue("newtest", "newtest");
+            this.nextDocument.addXObject(newobj);
+
+            MergeDocumentResult result = this.mergeManager.mergeDocument(this.previousDocument, this.nextDocument,
+                this.currentDocument, this.configuration);
+            List<LogEvent> logs = result.getLog().getLogs(LogLevel.ERROR);
+            // We get a single log because at second pass the object is set.
+            assertEquals(1, logs.size());
+            assertEquals("Collision found on object [Object wiki:space.page^classspace.class[0]]", logs.get(0).getFormattedMessage());
+
+            BaseObject mergedobj = ((XWikiDocument) result.getMergeResult()).getXObject(this.xclass.getReference(), 0);
+            assertEquals(newobj, mergedobj);
+        }
+
+        @Test
+        void testMergeAttachmentEquals() throws Exception
         {
             XWikiAttachment attachment = new XWikiAttachment();
 
@@ -475,7 +503,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeAttachmentEqualsDeletedCurrent() throws Exception
+        void testMergeAttachmentEqualsDeletedCurrent() throws Exception
         {
             XWikiAttachment attachment = new XWikiAttachment();
 
@@ -492,7 +520,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeAttachmentEqualsAddedCurrent() throws Exception
+        void testMergeAttachmentEqualsAddedCurrent() throws Exception
         {
             XWikiAttachment attachment = new XWikiAttachment();
 
@@ -508,7 +536,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeAttachmentEqualsModifiedCurrent() throws Exception
+        void testMergeAttachmentEqualsModifiedCurrent() throws Exception
         {
             XWikiAttachment attachment = new XWikiAttachment();
 
@@ -531,7 +559,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeAttachmentNew() throws Exception
+        void testMergeAttachmentNew() throws Exception
         {
             XWikiAttachment attachment = new XWikiAttachment();
 
@@ -553,7 +581,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void mergeAttachmentNewButAddedInCurrent() throws Exception
+        void mergeAttachmentNewButAddedInCurrent() throws Exception
         {
             XWikiAttachment attachment = new XWikiAttachment();
 
@@ -577,7 +605,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeAttachmentDeleted() throws Exception
+        void testMergeAttachmentDeleted() throws Exception
         {
             XWikiAttachment attachment = new XWikiAttachment();
 
@@ -598,7 +626,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeAttachmentModified() throws Exception
+        void testMergeAttachmentModified() throws Exception
         {
             XWikiAttachment attachment = new XWikiAttachment();
 
@@ -626,10 +654,73 @@ public class DefaultMergeManagerTest
             assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, newAttachment.getContent(null));
         }
 
+        @Test
+        void testMergeAttachmentModifiedDeletedInCurrent() throws Exception
+        {
+            XWikiAttachment attachment = new XWikiAttachment();
+
+            attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+            attachment.setLongSize(10);
+            attachment.setFilename("file");
+
+            this.previousDocument.addAttachment(attachment);
+
+            attachment = attachment.clone();
+            attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
+            attachment.setLongSize(9);
+
+            this.nextDocument.addAttachment(attachment);
+
+            MergeDocumentResult result = this.mergeManager.mergeDocument(this.previousDocument, this.nextDocument,
+                this.currentDocument, this.configuration);
+            List<LogEvent> logs = result.getLog().getLogs(LogLevel.ERROR);
+            assertEquals(1, logs.size());
+            assertEquals("Collision found on attachment [Attachment wiki:space.page@file]",
+                logs.get(0).getFormattedMessage());
+
+            assertFalse(result.isModified());
+
+            XWikiAttachment newAttachment = ((XWikiDocument) result.getMergeResult()).getAttachment("file");
+            assertNull(newAttachment);
+        }
+
+        @Test
+        void testMergeAttachmentModifiedDeletedInCurrentFallbackOnNext() throws Exception
+        {
+            this.configuration.setConflictFallbackVersion(MergeConfiguration.ConflictFallbackVersion.NEXT);
+            XWikiAttachment attachment = new XWikiAttachment();
+
+            attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+            attachment.setLongSize(10);
+            attachment.setFilename("file");
+
+            this.previousDocument.addAttachment(attachment);
+
+            attachment = attachment.clone();
+            attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
+            attachment.setLongSize(9);
+
+            this.nextDocument.addAttachment(attachment);
+
+            MergeDocumentResult result = this.mergeManager.mergeDocument(this.previousDocument, this.nextDocument,
+                this.currentDocument, this.configuration);
+            List<LogEvent> logs = result.getLog().getLogs(LogLevel.ERROR);
+            assertEquals(1, logs.size());
+            assertEquals("Collision found on attachment [Attachment wiki:space.page@file]",
+                logs.get(0).getFormattedMessage());
+
+            assertTrue(result.isModified());
+
+            XWikiAttachment newAttachment = ((XWikiDocument) result.getMergeResult()).getAttachment("file");
+            assertNotNull(newAttachment);
+            assertEquals(9, newAttachment.getLongSize());
+            assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, newAttachment.getContent(null));
+        }
+
         // #apply
 
         @Test
-        public void testApplyWithUnmodifiedObject()
+        void testApplyWithUnmodifiedObject()
         {
             this.previousDocument.addXObject(this.xobject);
             this.currentDocument.addXObject(this.xobject.clone());
@@ -638,7 +729,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testApplyWithModifiedObjectAndClean()
+        void testApplyWithModifiedObjectAndClean()
         {
             this.previousDocument.addXObject(this.xobject);
             BaseObject modifiedObject = this.xobject.clone();
@@ -650,7 +741,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeWithAddedSameObject() throws Exception
+        void testMergeWithAddedSameObject() throws Exception
         {
             this.currentDocument.addXObject(this.xobject);
             this.nextDocument.addXObject(this.xobject.clone());
@@ -661,7 +752,7 @@ public class DefaultMergeManagerTest
         }
 
         @Test
-        public void testMergeWithAddedSameProperty() throws Exception
+        void testMergeWithAddedSameProperty() throws Exception
         {
             this.previousDocument.addXObject(xobject);
             BaseObject xobj = this.xobject.clone();

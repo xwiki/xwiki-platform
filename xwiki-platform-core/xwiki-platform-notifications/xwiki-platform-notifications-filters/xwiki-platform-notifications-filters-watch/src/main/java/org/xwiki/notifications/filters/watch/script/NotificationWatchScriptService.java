@@ -37,7 +37,6 @@ import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
 import org.xwiki.notifications.filters.watch.WatchedEntityReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.internal.document.DocumentUserReference;
@@ -133,7 +132,6 @@ public class NotificationWatchScriptService implements ScriptService
      * @throws NotificationException in case of problem for computing the status
      * @since 16.5.0RC1
      */
-    @Unstable
     public Pair<EntityReference, WatchedEntityReference.WatchedStatus> getFirstFilteredAncestor(EntityReference
         location) throws NotificationException
     {
@@ -228,8 +226,8 @@ public class NotificationWatchScriptService implements ScriptService
         DocumentReference result;
         if (userReference == null || userReference == CurrentUserReference.INSTANCE) {
             result = documentAccessBridge.getCurrentUserReference();
-        } else if (userReference instanceof DocumentUserReference) {
-            result = ((DocumentUserReference) userReference).getReference();
+        } else if (userReference instanceof DocumentUserReference documentUserReference) {
+            result = documentUserReference.getReference();
         } else {
             throw new NotificationException(
                 String.format("This should only be used with DocumentUserReference, "

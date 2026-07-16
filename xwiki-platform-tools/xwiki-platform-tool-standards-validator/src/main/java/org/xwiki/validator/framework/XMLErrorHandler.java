@@ -19,17 +19,18 @@
  */
 package org.xwiki.validator.framework;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 import org.xwiki.validator.ValidationError;
 import org.xwiki.validator.ValidationError.Type;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Implements {@link ErrorHandler} to stored found errors.
- * 
+ *
  * @version $Id$
  */
 public class XMLErrorHandler implements ErrorHandler
@@ -50,7 +51,14 @@ public class XMLErrorHandler implements ErrorHandler
     @Override
     public void warning(SAXParseException e)
     {
-        this.errors.add(new ValidationError(Type.WARNING, e));
+        // I couldn't find a way to ignore this error by configuration of the validaor.  Instead, the error is
+        // ignored by it's label.
+        // TODO: see XWIKI-23198 for enabling this validation.
+        if (!Objects.equals(e.getMessage(),
+            "Trailing slash on void elements has no effect and interacts badly with unquoted attribute values."))
+        {
+            this.errors.add(new ValidationError(Type.WARNING, e));
+        }
     }
 
     @Override

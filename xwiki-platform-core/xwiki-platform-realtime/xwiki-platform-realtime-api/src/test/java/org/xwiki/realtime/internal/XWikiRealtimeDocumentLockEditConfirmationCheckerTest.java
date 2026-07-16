@@ -20,13 +20,6 @@
 
 package org.xwiki.realtime.internal;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.Locale;
 import java.util.Optional;
 
@@ -45,20 +38,23 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @ComponentTest
 class XWikiRealtimeDocumentLockEditConfirmationCheckerTest
 {
-
-    private static final String WYSIWYG = "wysiwyg";
-
-    // We use the Spy decorator on the class to test because we need to mock the
-    // super call.
+    // We use the Spy decorator on the class to test because we need to mock the super call.
     @Spy
     @InjectMockComponents
     private XWikiRealtimeDocumentLockEditConfirmationChecker xwikiRealtimeDocumentLockEditConfirmationChecker;
 
     @MockComponent
-    private RealtimeEditorManager realtimeEditorManager;
+    private RealtimeSessionManager realtimeEditorManager;
 
     @MockComponent
     private Provider<XWikiContext> xwikiContextProvider;
@@ -82,13 +78,13 @@ class XWikiRealtimeDocumentLockEditConfirmationCheckerTest
         when(document.getDocumentReference()).thenReturn(reference);
         when(xwikiContext.get("tdoc")).thenReturn(document);
         when(xwikiContextProvider.get()).thenReturn(xwikiContext);
- 
+
         // We consider the active session case the default, but we test both.
-        when(realtimeEditorManager.getSelectedEditor()).thenReturn(WYSIWYG);
-        when(realtimeEditorManager.sessionIsActive(reference, Locale.ENGLISH, WYSIWYG)).thenReturn(true);
-        
+        when(realtimeEditorManager.canJoinSession(reference, Locale.ENGLISH)).thenReturn(true);
+
         // Provide a dummy result for the super call.
-        doReturn(Optional.of(mock(EditConfirmationCheckerResult.class))).when(xwikiRealtimeDocumentLockEditConfirmationChecker).parentCheck();
+        doReturn(Optional.of(mock(EditConfirmationCheckerResult.class)))
+            .when(xwikiRealtimeDocumentLockEditConfirmationChecker).parentCheck();
     }
 
     @Test
@@ -97,16 +93,16 @@ class XWikiRealtimeDocumentLockEditConfirmationCheckerTest
         assertTrue(xwikiRealtimeDocumentLockEditConfirmationChecker.check().isEmpty());
         // When the session is active, we should override the behavior of the parent class.
         // Thus the parent check should *not* be called.
-        verify(xwikiRealtimeDocumentLockEditConfirmationChecker, times(0)).parentCheck();
+        verify(xwikiRealtimeDocumentLockEditConfirmationChecker, never()).parentCheck();
     }
 
     @Test
     void checkWhenInactive()
     {
-        when(realtimeEditorManager.sessionIsActive(reference, Locale.ENGLISH, WYSIWYG)).thenReturn(false);
+        when(realtimeEditorManager.canJoinSession(reference, Locale.ENGLISH)).thenReturn(false);
         assertTrue(xwikiRealtimeDocumentLockEditConfirmationChecker.check().isPresent());
         // When the session is not active, we should use the behavior of the parent class.
         // The parent check should be called.
-        verify(xwikiRealtimeDocumentLockEditConfirmationChecker, times(1)).parentCheck();
+        verify(xwikiRealtimeDocumentLockEditConfirmationChecker).parentCheck();
     }
 }

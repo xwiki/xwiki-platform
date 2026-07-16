@@ -167,9 +167,6 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     public void removeLiveTableColumn(String columnLabel)
     {
         WebElement column = getLiveTableColumn(columnLabel);
-        // FIXME: This doesn't trigger the :hover CSS pseudo class. The click still works because the delete X (text) is
-        // not really hidden: it is displayed with white color (the page background-color).
-        new Actions(getDriver().getWrappedDriver()).moveToElement(column).perform();
         getDriver().scrollTo(column.findElement(By.className("delete"))).click();
     }
 
@@ -216,7 +213,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     {
         String escapedColumnLabel = columnLabel.replace("\\", "\\\\").replace("'", "\\'");
         String xpath = "//ul[@class = 'hList']/li[starts-with(., '" + escapedColumnLabel + "')]";
-        return getDriver().findElementsWithoutWaiting(getForm(), By.xpath(xpath)).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(getForm(), By.xpath(xpath)).isEmpty();
     }
 
     /**
@@ -237,7 +234,10 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     public void removeAllDeprecatedLiveTableColumns(boolean yes)
     {
         WebElement warningMessage = getDriver().findElementWithoutWaiting(getForm(), By.className("warningmessage"));
-        getDriver().findElementWithoutWaiting(warningMessage, By.linkText(yes ? "Yes" : "No")).click();
+        WebElement button = getDriver().findElementWithoutWaiting(warningMessage,
+            By.className(yes ? "removeDeprecatedColumns" : "keepDeprecatedColumns"));
+        getDriver().scrollTo(button);
+        button.click();
     }
 
     /**

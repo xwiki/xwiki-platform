@@ -19,16 +19,18 @@
  */
 package com.xpn.xwiki.internal.objects.classes;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.objects.classes.DBListClass;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.*;
 
 /**
@@ -37,33 +39,34 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 9.8RC1
  */
-public class DefaultDBListQueryBuilderTest
+@ComponentTest
+class DefaultDBListQueryBuilderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<QueryBuilder<DBListClass>> mocker =
-        new MockitoComponentMockingRule<QueryBuilder<DBListClass>>(DefaultDBListQueryBuilder.class);
+    @InjectMockComponents
+    private DefaultDBListQueryBuilder builder;
+
+    @MockComponent
+    @Named("explicitlyAllowedValues")
+    private QueryBuilder<DBListClass> explicitlyAllowedValuesQueryBuilder;
+
+    @MockComponent
+    @Named("implicitlyAllowedValues")
+    private QueryBuilder<DBListClass> implicitlyAllowedValuesQueryBuilder;
 
     @Test
-    public void build() throws Exception
+    void build() throws Exception
     {
         DBListClass dbListClass = new DBListClass();
 
-        DefaultParameterizedType dbListQueryBuilderType =
-            new DefaultParameterizedType(null, QueryBuilder.class, DBListClass.class);
-        QueryBuilder<DBListClass> explicitlyAllowedValuesQueryBuilder =
-            this.mocker.getInstance(dbListQueryBuilderType, "explicitlyAllowedValues");
-        QueryBuilder<DBListClass> implicitlyAllowedValuesQueryBuilder =
-            this.mocker.getInstance(dbListQueryBuilderType, "implicitlyAllowedValues");
-
         Query explicitlyAllowedValuesQuery = mock(Query.class, "explicit");
-        when(explicitlyAllowedValuesQueryBuilder.build(dbListClass)).thenReturn(explicitlyAllowedValuesQuery);
+        when(this.explicitlyAllowedValuesQueryBuilder.build(dbListClass)).thenReturn(explicitlyAllowedValuesQuery);
 
         Query implicitlyAllowedValuesQuery = mock(Query.class, "implicit");
-        when(implicitlyAllowedValuesQueryBuilder.build(dbListClass)).thenReturn(implicitlyAllowedValuesQuery);
+        when(this.implicitlyAllowedValuesQueryBuilder.build(dbListClass)).thenReturn(implicitlyAllowedValuesQuery);
 
-        assertSame(implicitlyAllowedValuesQuery, this.mocker.getComponentUnderTest().build(dbListClass));
+        assertSame(implicitlyAllowedValuesQuery, this.builder.build(dbListClass));
 
         dbListClass.setSql("test");
-        assertSame(explicitlyAllowedValuesQuery, this.mocker.getComponentUnderTest().build(dbListClass));
+        assertSame(explicitlyAllowedValuesQuery, this.builder.build(dbListClass));
     }
 }

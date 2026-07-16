@@ -75,7 +75,7 @@ public class WikiCreator
     public boolean createWiki(UsernamePasswordCredentials credentials, String wikiId, boolean failOnExist)
         throws Exception
     {
-        String xwikiRESTURL = String.format("%s/rest", DockerTestUtils.getXWikiURL(this.context));
+        String xwikiRESTURL = DockerTestUtils.getCurrentXWikiExecutor(this.context).getHttpClientBaseURL() + "rest";
 
         // Check of the wiki already exists
         if (exists(xwikiRESTURL, credentials, wikiId)) {
@@ -90,7 +90,9 @@ public class WikiCreator
 
         // Create the wiki
         WikiCreationRequest wikiRequest = new WikiCreationRequest();
+        wikiRequest.setId("wikicreation" + wikiId);
         wikiRequest.setWikiId(wikiId);
+        wikiRequest.setPrettyName(wikiId);
         wikiRequest.setAlias(wikiId);
         wikiRequest.setFailOnExist(failOnExist);
         wikiRequest.setInteractive(false);

@@ -33,6 +33,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.CursorMarkParams;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.link.LinkException;
 import org.xwiki.link.LinkStore;
@@ -59,6 +60,8 @@ import org.xwiki.store.ReadyIndicator;
 @Singleton
 public class DefaultLinkStore implements LinkStore
 {
+    private static final int ROWS = 1000;
+
     @Inject
     private Solr solr;
 
@@ -123,8 +126,8 @@ public class DefaultLinkStore implements LinkStore
         Collection<Object> links = solrDocument.getFieldValues(FieldUtils.LINKS);
         Set<EntityReference> entities = new HashSet<>(links.size());
         for (Object link : links) {
-            if (link instanceof String) {
-                EntityReference entityLink = this.linkSerializer.unserialize((String) link);
+            if (link instanceof String linkString) {
+                EntityReference entityLink = this.linkSerializer.unserialize(linkString);
 
                 if (entityLink != null) {
                     // Make sure to resolve the reference as a DOCUMENT based references and not a PAGE one
@@ -154,8 +157,6 @@ public class DefaultLinkStore implements LinkStore
             filter.append(FieldUtils.LINKS_EXTENDED);
             filter.append(':');
             filter.append(this.utils.toCompleteFilterQueryString(this.linkSerializer.serialize(pageBasedReference)));
-        }
-        if (filter.length() > 0) {
             filter.append(" OR ");
         }
         filter.append(FieldUtils.LINKS_EXTENDED);
@@ -164,28 +165,35 @@ public class DefaultLinkStore implements LinkStore
 
         SolrQuery solrQuery = new SolrQuery(filter.toString());
 
-        solrQuery.setRows(Integer.MAX_VALUE - 1);
+        solrQuery.setRows(ROWS);
+        // Set sorting based on the ID for cursor-based pagination to work.
+        solrQuery.addSort(FieldUtils.ID, SolrQuery.ORDER.asc);
+        solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
 
         // Load only the field we need
         solrQuery.setFields(FieldUtils.REFERENCE);
 
         QueryResponse response;
-        try {
-            response = getClient().query(solrQuery);
-        } catch (Exception e) {
-            throw new LinkException("Failed to search Solr for the backlinks of an entity", e);
-        }
-
-        SolrDocumentList solrDocuments = response.getResults();
-
-        Set<EntityReference> references = new HashSet<>(solrDocuments.size());
-        for (SolrDocument solrDocument : solrDocuments) {
-            String referenceStr = (String) solrDocument.getFieldValue(FieldUtils.REFERENCE);
-
-            if (referenceStr != null) {
-                references.add(this.referenceResolver.resolve(referenceStr, null));
+        Set<EntityReference> references = new HashSet<>();
+        do {
+            try {
+                response = getClient().query(solrQuery);
+            } catch (Exception e) {
+                throw new LinkException("Failed to search Solr for the backlinks of an entity", e);
             }
-        }
+
+            SolrDocumentList solrDocuments = response.getResults();
+
+            for (SolrDocument solrDocument : solrDocuments) {
+                String referenceStr = (String) solrDocument.getFieldValue(FieldUtils.REFERENCE);
+
+                if (referenceStr != null) {
+                    references.add(this.referenceResolver.resolve(referenceStr, null));
+                }
+            }
+
+            solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, response.getNextCursorMark());
+        } while (response.getResults().size() == ROWS);
 
         return references;
     }
@@ -205,8 +213,8 @@ public class DefaultLinkStore implements LinkStore
         }
 
         if (entityReference.getType() == EntityType.PAGE) {
-            return this.currentDocumentResolver.resolve(pageReference instanceof PageReference
-                ? (PageReference) pageReference : new PageReference(pageReference));
+            return this.currentDocumentResolver.resolve(pageReference instanceof PageReference pageRef
+                ? pageRef : new PageReference(pageReference));
         }
 
         EntityType documentBasedType =
@@ -217,7 +225,7 @@ public class DefaultLinkStore implements LinkStore
 
         // Find the right DOCUMENT reference
         DocumentReference documentReference = this.currentDocumentResolver.resolve(
-            pageReference instanceof PageReference ? (PageReference) pageReference : new PageReference(pageReference));
+            pageReference instanceof PageReference pageRef ? pageRef : new PageReference(pageReference));
 
         // Switch the parent
         return documentBasedReference.replaceParent(documentBasedReference.extractReference(EntityType.DOCUMENT),

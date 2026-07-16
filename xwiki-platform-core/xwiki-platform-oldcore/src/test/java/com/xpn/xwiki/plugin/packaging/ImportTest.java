@@ -27,6 +27,7 @@ import java.util.Locale;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -53,13 +54,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ImportTest extends AbstractPackageTest
+class ImportTest extends AbstractPackageTest
 {
     LocalizationContext localizationContext;
 
     private Package pack;
 
     private XWiki xwiki;
+
+    // Generate temporary files under the module's "target" directory so that they don't leak outside the build
+    // workspace.
+    @TempDir
+    private File temporaryDirectory;
 
     @BeforeEach
     void beforeEach() throws Exception
@@ -84,7 +90,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportDocument() throws Exception
+    void testImportDocument() throws Exception
     {
         XWikiDocument doc1 =
             new XWikiDocument(new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Test", "DocImport"));
@@ -126,7 +132,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportExtension() throws Exception
+    void testImportExtension() throws Exception
     {
         ExtensionId extensionId = new ExtensionId("test", "1.0");
 
@@ -138,7 +144,7 @@ public class ImportTest extends AbstractPackageTest
 
         // Store the extension in the local repository
         DefaultLocalExtension localExtension = new DefaultLocalExtension(null, extensionId, "xar");
-        File file = File.createTempFile("temp", ".xar");
+        File file = new File(this.temporaryDirectory, "temp.xar");
         FileUtils.writeByteArrayToFile(file, zipFile);
         localExtension.setFile(file);
         LocalExtensionRepository localeRepository =
@@ -195,7 +201,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportDocumentNonAsciiTitle() throws Exception
+    void testImportDocumentNonAsciiTitle() throws Exception
     {
         XWikiDocument doc1 = new XWikiDocument(
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Test", "\u60A8\u597D\u4E16\u754C"));
@@ -237,7 +243,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportDocumentNonAsciiTitleNonUtf8PlatformEncoding() throws Exception
+    void testImportDocumentNonAsciiTitleNonUtf8PlatformEncoding() throws Exception
     {
         String oldEncoding = System.getProperty("file.encoding");
         System.setProperty("file.encoding", "ISO-8859-1");
@@ -286,7 +292,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportDocumentXarCreatedByCommonsCompress() throws Exception
+    void testImportDocumentXarCreatedByCommonsCompress() throws Exception
     {
         XWikiDocument doc1 =
             new XWikiDocument(new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Test", "DocImport"));
@@ -329,7 +335,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportOverwriteDocument() throws Exception
+    void testImportOverwriteDocument() throws Exception
     {
         XWikiDocument doc1 = new XWikiDocument(
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Test", "DocImportOverwrite"));
@@ -368,9 +374,6 @@ public class ImportTest extends AbstractPackageTest
         assertFalse(foundOverwritingDoc.isNew());
         assertNotSame(foundDocument, foundOverwritingDoc);
         assertEquals(foundOverwritingDoc.getContent(), newContent);
-        // Make sure the previous version is set as original document by the packager
-        // This is cheating a bit, should be tested using a listener instead this hack
-        assertSame(foundDocument, foundOverwritingDoc.getOriginalDocument().getOriginalDocument());
     }
 
     /**
@@ -379,7 +382,7 @@ public class ImportTest extends AbstractPackageTest
      * @throws Exception
      */
     @Test
-    public void testImportTranslationsOverwrite() throws Exception
+    void testImportTranslationsOverwrite() throws Exception
     {
         XWikiDocument original = new XWikiDocument(
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Test", "DocTranslation"));

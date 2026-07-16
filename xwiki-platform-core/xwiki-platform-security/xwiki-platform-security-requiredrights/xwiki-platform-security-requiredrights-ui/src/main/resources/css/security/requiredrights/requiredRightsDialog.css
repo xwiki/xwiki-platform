@@ -1,0 +1,179 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+#required-rights-dialog .enforce-selection ul {
+  color: var(--text-muted);
+}
+
+#required-rights-dialog .enforce-selection:has(input[value="1"]:checked) + .rights-selection {
+  display: block;
+}
+
+#required-rights-dialog .rights-selection {
+  background-color: var(--panel-bg);
+  color: var(--panel-default-text);
+  display: none;
+  margin: 0 -0.5em 10px;
+  padding: 0.5em;
+}
+
+#required-rights-dialog .rights-selection ul {
+  list-style-type: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(max-content, 1fr));
+  gap: 0.5em;
+  margin: 0;
+  padding: 0;
+  /* TODO: this doesn't seem to work to align the text vertically. */
+  align-items: center;
+}
+
+#required-rights-dialog .rights-selection li {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-template-columns: subgrid;
+  /* Make the list item span 2 rows in the parent grid */
+  grid-row: span 2;
+  grid-column: span 1;
+}
+
+#required-rights-dialog .rights-selection li p {
+  margin: 0;
+  color: var(--text-muted);
+  /* TODO: would be nice to have a variable for this font size. */
+  font-size: 0.9em;
+  text-align: center;
+}
+
+#required-rights-dialog .rights-selection li p button.tip {
+  border-radius: 2em;
+  padding: 0.2em 0.5em;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+}
+
+#required-rights-dialog .rights-selection li .label-wrapper {
+  border: 2px solid transparent;
+  border-radius: 2em;
+  padding: 2px;
+}
+
+#required-rights-dialog .rights-selection li .label-wrapper label {
+  background-color: var(--xwiki-page-content-bg);
+  color: var(--text-color);
+  border: 1px solid var(--panel-bg);
+  border-radius: 2em;
+  padding: 0.5em 1em;
+  display: block;
+  margin: 0;
+}
+
+#required-rights-dialog .rights-selection li .label-wrapper label:has(input:checked) {
+  background-color: var(--alert-info-bg);
+  color: var(--brand-primary);
+  border-color: var(--brand-info);
+}
+
+#required-rights-dialog .rights-selection li.required .label-wrapper,
+#required-rights-dialog .rights-selection li.enough .label-wrapper {
+  border-color: var(--xwiki-border-color);
+}
+
+#required-rights-dialog .rights-selection li.required .label-wrapper:has(input:checked),
+#required-rights-dialog .rights-selection li.enough .label-wrapper:has(input:checked) {
+  border-color: var(--brand-primary);
+}
+
+#required-rights-dialog .rights-selection li.maybe-required .label-wrapper,
+#required-rights-dialog .rights-selection li.maybe-enough .label-wrapper {
+  border-color: var(--xwiki-border-color);
+  border-style: dashed;
+}
+
+#required-rights-dialog .rights-selection li.maybe-required .label-wrapper:has(input:checked),
+#required-rights-dialog .rights-selection li.maybe-enough .label-wrapper:has(input:checked) {
+  border-color: var(--brand-primary);
+}
+
+#required-rights-dialog .rights-selection li .label-wrapper label:has(input[disabled]) {
+  cursor: not-allowed;
+  color:var(--text-muted);
+  background-color: transparent;
+}
+
+#required-rights-dialog #required-rights-results .panel-heading {
+  padding: 0.7em;
+}
+
+#required-rights-dialog #required-rights-results .panel-group {
+  margin-bottom: 0.5em;
+}
+
+#required-rights-dialog .panel-title a .fa, .required-rights-advanced-toggle .fa {
+  width: 0.5em;
+}
+
+#required-rights-dialog a[aria-expanded="false"] .icon-expanded {
+  display: none;
+}
+
+#required-rights-dialog a[aria-expanded="true"] .icon-collapsed {
+  display: none;
+}
+
+/* Switch rows and columns for small screens. The width uses em as the required width depends on the font size. */
+@media (max-width: 42em) {
+  #required-rights-dialog .rights-selection ul {
+    grid-template-columns: repeat(2, minmax(max-content, 1fr));
+    grid-template-rows: repeat(auto-fill, 1fr);
+  }
+
+  #required-rights-dialog .rights-selection li {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+
+  #required-rights-dialog .rights-selection li p {
+    text-align: start;
+    margin: auto 0;
+  }
+}
+
+/* In "wide" layout, make the dialog wide enough to fit the required rights selection. */
+@media (min-width: 42em) {
+  #required-rights-dialog .modal-dialog {
+    min-width: min-content;
+  }
+
+  /* When setting the minimum width to min-content, the required rights results shouldn't contribute to that width. */
+  #required-rights-dialog #required-rights-results {
+    contain: inline-size;
+  }
+}
+
+/* Styles for the warning box above the content. */
+.box.requiredrights-warning > div {
+  display: flex;
+  align-items: baseline;
+}
+
+.box.requiredrights-warning > div :first-child {
+  flex-grow: 1;
+}

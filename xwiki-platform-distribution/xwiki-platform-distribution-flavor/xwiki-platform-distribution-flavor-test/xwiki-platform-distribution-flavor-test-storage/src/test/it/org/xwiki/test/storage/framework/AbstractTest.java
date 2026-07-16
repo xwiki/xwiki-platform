@@ -60,9 +60,9 @@ public class AbstractTest
         AbstractTest.executor = executor;
     }
 
-    protected short getPort()
+    protected short getHttpPort()
     {
-        return (short) executor.getPort();
+        return (short) executor.getHttpClientPort();
     }
 
     protected String getAddressPrefix()

@@ -296,11 +296,11 @@
       subtypes.attr('aria-expanded', 'true');
     }
     subtypes.toggle(selected);
-    var togglerButton = category.find('.facet-value-toggler');
+    var toggleButton = category.find('.facet-value-toggle');
     var dropdownID = category.attr('id') + '-dropdown';
     subtypes.attr('id', dropdownID);
-    togglerButton.attr('aria-controls', dropdownID);
-    togglerButton.on('click', function() {
+    toggleButton.attr('aria-controls', dropdownID);
+    toggleButton.on('click', function() {
       category.toggleClass('expanded');
       subtypes.attr('aria-expanded', subtypes.attr('aria-expanded') === 'true' ? 'false' : 'true');
       subtypes.toggle();
@@ -448,7 +448,7 @@
   align-items: center;
 }
 
-.search-facet-body .facet-value-toggler:hover {
+.search-facet-body .facet-value-toggle:hover {
   background-color: $theme.highlightColor;
 }
 

@@ -50,17 +50,23 @@ public class ConversionFilter implements Filter
     @Override
     public void destroy()
     {
+        // No cleanup needed.
     }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
         throws IOException, ServletException
     {
-        RequestParameterConverter converter = Utils.getComponent(RequestParameterConverter.class);
         Execution execution = Utils.getComponent(Execution.class);
         execution.pushContext(new ExecutionContext());
-        Optional<ServletRequest> servletRequest = converter.convert(req, res);
-        execution.popContext();
+        RequestParameterConverter defaultConverter = Utils.getComponent(RequestParameterConverter.class);
+        Optional<ServletRequest> servletRequest;
+        try {
+            servletRequest = defaultConverter.convert(req, res);
+        } finally {
+            execution.popContext();
+        }
+
         if (servletRequest.isPresent()) {
             chain.doFilter(servletRequest.get(), res);
         }
@@ -69,5 +75,6 @@ public class ConversionFilter implements Filter
     @Override
     public void init(FilterConfig config) throws ServletException
     {
+        // No initialization needed.
     }
 }

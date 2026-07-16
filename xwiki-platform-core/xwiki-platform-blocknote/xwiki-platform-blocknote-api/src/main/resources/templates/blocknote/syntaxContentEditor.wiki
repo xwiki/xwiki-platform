@@ -1,0 +1,20 @@
+##!source.syntax=xwiki/2.1
+{{template name="editors/xdom_macros.vm"/}}
+
+{{template name="blocknote/macros.wiki" /}}
+
+{{velocity}}
+{{html clean="false"}}
+#if ($edit)
+  #getTextArea
+  #if ($services.wysiwyg.isSyntaxSupported($syntaxId))
+    #set ($discard = $textArea.attributes.put('data-source-document-reference',
+      $edit.parameters.sourceDocumentReference))
+    #blocknote($textArea)
+  #else
+    ## Fall back on a plain text area.
+    #printTextArea($textArea)
+  #end
+#end
+{{/html}}
+{{/velocity}}

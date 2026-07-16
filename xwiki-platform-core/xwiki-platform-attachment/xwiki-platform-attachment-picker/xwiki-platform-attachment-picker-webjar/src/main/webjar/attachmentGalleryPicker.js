@@ -80,7 +80,7 @@ define('xwiki-attachment-picker',
           .addClass('active')
           .append($('<input/>')
             .attr('type', 'radio')
-            .attr('checked', true)
+            .attr('checked', 'checked')
             .attr('name', 'scope')
             .attr('value', 'local'))
           .append(document.createTextNode(translations.get('searchField.scope.currentPage')));
@@ -227,11 +227,10 @@ define('xwiki-attachment-picker',
           .prop('href', downloadURL)
           .data('index', index)
           .append($('<span>').append(preview).addClass('previewWrapper'))
-          .append('<br/>')
           .append(textSpan);
 
         const attachmentGroup = $('<span class="attachmentGroup">')
-          .append($('<div/>').append(link))
+          .append(link)
           .data('id', result.id);
         if (result.isLocal) {
           attachmentGroup.addClass('localAttachment');

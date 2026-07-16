@@ -75,6 +75,7 @@ import org.xwiki.user.UserReference;
 @Component
 @Named("solr")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class SolrRatingsManager implements RatingsManager
 {
     private static final int BULK_OPERATIONS_BATCH_SIZE = 100;
@@ -583,8 +584,8 @@ public class SolrRatingsManager implements RatingsManager
                 throw new RatingsException(String.format("The reference [%s] is not an existing page.", reference));
             }
         } catch (Exception e) {
-            if (e instanceof RatingsException) {
-                throw (RatingsException) e;
+            if (e instanceof RatingsException ratingsException) {
+                throw ratingsException;
             } else {
                 throw new RatingsException(String.format("An error occurred while checking of [%s] exists", reference),
                     e);

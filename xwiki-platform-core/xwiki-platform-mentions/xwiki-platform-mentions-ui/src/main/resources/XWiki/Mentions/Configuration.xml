@@ -339,6 +339,20 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </quoteActivated>
+      <selfMentionsForeground>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>selfMentionsForeground</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>selfMentionsForeground</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </selfMentionsForeground>
       <selfMentionsColor>
         <customDisplay/>
         <disabled>0</disabled>
@@ -355,13 +369,16 @@
       </selfMentionsColor>
     </class>
     <property>
-      <mentionsColor>rgba(194, 194, 194, 0.8)</mentionsColor>
+      <mentionsColor>var(--breadcrumb-bg)</mentionsColor>
     </property>
     <property>
       <quoteActivated>1</quoteActivated>
     </property>
     <property>
-      <selfMentionsColor>rgba(255, 0, 1, 0.5)</selfMentionsColor>
+      <selfMentionsForeground>var(--btn-danger-color)</selfMentionsForeground>
+    </property>
+    <property>
+      <selfMentionsColor>var(--btn-danger-bg)</selfMentionsColor>
     </property>
   </object>
 </xwikidoc>

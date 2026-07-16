@@ -26,9 +26,22 @@ import javax.ws.rs.PathParam;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Tags;
 
+/**
+ * Resource for listing all the tags that exist in a wiki.
+ *
+ * @version $Id$
+ */
 @Path("/wikis/{wikiName}/tags")
 public interface TagsResource
 {
+    /**
+     * Returns all the tags defined in a wiki.
+     *
+     * @param wikiName the identifier of the wiki whose tags are listed, for example {@code xwiki} for the main wiki
+     * @return all the distinct tags defined in the wiki, sorted case-insensitively by name, each carrying a link to the
+     *  resource listing the pages tagged with it
+     * @throws XWikiRestException if the tags cannot be retrieved
+     */
     @GET Tags getTags(
             @PathParam("wikiName") String wikiName
     ) throws XWikiRestException;

@@ -226,9 +226,7 @@ public class SolrIndexScriptService implements ScriptService
         EntityType type;
         try {
             type = EntityType.valueOf((String) document.get(FieldUtils.TYPE));
-        } catch (IllegalArgumentException e) {
-            return null;
-        } catch (NullPointerException e) {
+        } catch (IllegalArgumentException | NullPointerException e) {
             return null;
         }
 
@@ -313,7 +311,7 @@ public class SolrIndexScriptService implements ScriptService
      */
     private void checkAccessToWikiIndex(List<EntityReference> references) throws AccessDeniedException
     {
-        Set<EntityReference> representatives = new HashSet<EntityReference>();
+        Set<EntityReference> representatives = new HashSet<>();
         for (EntityReference reference : references) {
             EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
             if (!representatives.contains(wikiReference)) {

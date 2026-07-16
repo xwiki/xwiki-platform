@@ -21,6 +21,7 @@ package com.xpn.xwiki.doc;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
@@ -41,7 +42,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.doc.ListAttachmentArchive;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * JRCS based implementation of an archive for XWikiAttachment.
@@ -113,8 +114,10 @@ public class XWikiAttachmentArchive implements Cloneable
                     // Update the revision with the new attachment information.
                     newRevision.setFilename(attachment.getFilename());
                     newRevision.setDoc(attachment.getDoc());
-                    // The context needs to be copied, otherwise the location is not found on the storage. 
-                    newRevision.setContent(newRevision.getContentInputStream(context));
+                    // The context needs to be copied, otherwise the location is not found on the storage.
+                    try (InputStream content = newRevision.getContentInputStream(context)) {
+                        newRevision.setContent(content);
+                    }
                     return newRevision;
                 } catch (XWikiException e) {
                     LOGGER.warn("Failed to access revision [{}] for attachment [{}]. Cause: [{}].", version,
@@ -179,10 +182,8 @@ public class XWikiAttachmentArchive implements Cloneable
      */
     public String getArchiveAsString(final XWikiContext context) throws XWikiException
     {
-        if (this.archive == null) {
-            if (context != null) {
-                updateArchive(context);
-            }
+        if (this.archive == null && context != null) {
+            updateArchive(context);
         }
 
         return getArchiveAsString();
@@ -213,10 +214,8 @@ public class XWikiAttachmentArchive implements Cloneable
      */
     public byte[] getArchive(final XWikiContext context) throws XWikiException
     {
-        if (this.archive == null) {
-            if (context != null) {
-                updateArchive(context);
-            }
+        if (this.archive == null && context != null) {
+            updateArchive(context);
         }
 
         return getArchive();

@@ -50,5 +50,10 @@ platform.userdirectory.customizeNotAllowed=Sie sind nicht berechtigt, dieses Ben
 platform.userdirectory.configTitle=Konfiguration des Benutzerverzeichnisses
 platform.userdirectory.configSheetTitle=Konfigurationsblatt für das Benutzerverzeichnis
 platform.userdirectory.configSheetApplyOnConfiguration=Dieses Blatt muss auf das Konfigurationsdokument des Benutzerverzeichnisses angewendet werden.
+platform.userdirectory.isCustomizedWarning=Du befindest dich gerade in einem individuell angepassten Benutzerverzeichnis. Du kannst es auf die Standardeinstellungen zurücksetzen oder weiter anpassen.
+platform.userdirectory.canCustomizeInfo=Das Benutzerverzeichnis lässt sich so anpassen, dass nur die Spalten angezeigt werden, die du sehen möchtest.
+platform.userdirectory.canCustomizeInfoGuest=Das Benutzerverzeichnis lässt sich so anpassen, dass nur die Spalten angezeigt werden, die du sehen möchtest, aber du musst dich zuerst anmelden.
+platform.userdirectory.customizeButton=Anpassen
+platform.userdirectory.resetButton=Zurücksetzen
 </content>
 </xwikidoc>

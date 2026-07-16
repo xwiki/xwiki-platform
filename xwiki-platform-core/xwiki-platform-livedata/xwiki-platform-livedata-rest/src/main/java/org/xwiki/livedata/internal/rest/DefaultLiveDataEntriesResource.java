@@ -25,11 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -55,13 +53,12 @@ import org.xwiki.rest.model.jaxb.Link;
 
 /**
  * Default implementation of {@link LiveDataEntriesResource}.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataEntriesResource")
-@Singleton
 public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource implements LiveDataEntriesResource
 {
     private static final String FILTERS_PREFIX = "filters.";
@@ -70,13 +67,18 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
     private LiveDataResourceContextInitializer contextInitializer;
 
     @Override
+    // The GET request to retrieve, sort and filter the live data entries has many request parameters.
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public Entries getEntries(String sourceId, String namespace, List<String> properties, List<String> matchAll,
         List<String> sort, List<Boolean> descending, long offset, int limit) throws Exception
     {
         this.contextInitializer.initialize(namespace);
 
-        LiveDataConfiguration config = initConfig(sourceId, properties, matchAll, sort, descending, offset, limit);
-        return getEntries(namespace, offset, limit, config);
+        int validatedLimit = validateAndGetLimit(limit);
+
+        LiveDataConfiguration config =
+            initConfig(sourceId, properties, matchAll, sort, descending, offset, validatedLimit);
+        return getEntries(namespace, offset, validatedLimit, config);
     }
 
     @Override
@@ -110,7 +112,7 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
     {
         LiveDataQuery query = new LiveDataQuery();
         query.setSource(getLiveDataQuerySource(sourceId));
-        query.setProperties(properties.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList()));
+        query.setProperties(properties.stream().filter(StringUtils::isNotEmpty).toList());
         query.setFilters(getFilters(matchAll));
         query.setSort(getSort(sort, descending));
         query.setOffset(offset);
@@ -126,7 +128,7 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
         List<SortEntry> sortEntries = new ArrayList<>();
         for (int i = 0; i < sortList.size(); i++) {
             String property = sortList.get(i);
-            boolean descending = i < descendingList.size() ? descendingList.get(i) : false;
+            boolean descending = i < descendingList.size() && descendingList.get(i);
             sortEntries.add(new SortEntry(property, descending));
         }
         return sortEntries;
@@ -174,19 +176,19 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
 
         List<Entry> entries = liveData.getEntries().stream()
             .map(values -> this.createEntry(values, values.get(idProperty), source, namespace))
-            .collect(Collectors.toList());
+            .toList();
         return (Entries) new Entries().withEntries(entries).withCount(liveData.getCount()).withLinks(self, parent);
     }
 
     private LiveDataConfiguration initConfig(String sourceId, List<String> properties, List<String> matchAll,
         List<String> sort, List<Boolean> descending, long offset, int limit) throws LiveDataException
     {
-        // Workaround for https://github.com/restlet/restlet-framework-java/issues/922 (JaxRs multivalue 
+        // Workaround for https://github.com/restlet/restlet-framework-java/issues/922 (JaxRs multivalue
         // query-params gives list with null element).
-        List<String> actualProperties = properties.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<String> actualMatchAll = matchAll.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<String> actualSort = sort.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<Boolean> actualDescending = descending.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<String> actualProperties = properties.stream().filter(Objects::nonNull).toList();
+        List<String> actualMatchAll = matchAll.stream().filter(Objects::nonNull).toList();
+        List<String> actualSort = sort.stream().filter(Objects::nonNull).toList();
+        List<Boolean> actualDescending = descending.stream().filter(Objects::nonNull).toList();
         return getConfig(sourceId, actualProperties, actualMatchAll, actualSort, actualDescending, offset, limit);
     }
 

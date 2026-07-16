@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class MergeDocumentResultScriptTest
+class MergeDocumentResultScriptTest
 {
     private XWikiDocument mockDocument(XWikiContext xcontext)
     {
@@ -52,7 +52,7 @@ public class MergeDocumentResultScriptTest
     }
 
     @Test
-    public void misc()
+    void misc()
     {
         XWikiContext xcontext = mock(XWikiContext.class);
 

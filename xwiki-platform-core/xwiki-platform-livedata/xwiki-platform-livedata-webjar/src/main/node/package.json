@@ -1,0 +1,55 @@
+{
+  "private": true,
+  "name": "xwiki-platform-livedata",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "run-p type-check \"build-only {@}\" --",
+    "build-only": "vite build",
+    "dev": "vite",
+    "format": "prettier --write src/",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "test:unit": "vitest --run --passWithNoTests",
+    "type-check": "vue-tsc --build"
+  },
+  "dependencies": {
+    "@xwiki/platform-livedata-ui": "workspace:*",
+    "@xwiki/platform-livedata-xwiki": "workspace:*",
+    "@xwiki/platform-localization-api": "workspace:*",
+    "vue-i18n": "catalog:",
+    "vue3-touch-events": "catalog:"
+  },
+  "peerDependencies": {
+    "jquery": "4.x",
+    "vue": "3.x",
+    "vue-i18n": "11.x",
+    "xwiki-platform-localization-webjar": "*"
+  },
+  "devDependencies": {
+    "@tsconfig/node24": "catalog:",
+    "@types/jsdom": "catalog:",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vitest/eslint-plugin": "catalog:",
+    "@vue/eslint-config-prettier": "catalog:",
+    "@vue/eslint-config-typescript": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "@vue/tsconfig": "catalog:",
+    "eslint": "catalog:",
+    "eslint-plugin-vue": "catalog:",
+    "flush-promises": "catalog:",
+    "jiti": "catalog:",
+    "jquery": "catalog:",
+    "jsdom": "catalog:",
+    "lodash-es": "catalog:",
+    "npm-run-all2": "catalog:",
+    "sinon": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:",
+    "xwiki-platform-localization-webjar": "workspace:*"
+  }
+}

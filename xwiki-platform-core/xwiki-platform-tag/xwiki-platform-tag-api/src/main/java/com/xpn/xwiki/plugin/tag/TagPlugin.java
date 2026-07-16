@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -128,12 +129,14 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             BaseProperty prop = (BaseProperty) document.getObject(TAG_CLASS).safeget(TAG_PROPERTY);
             List<String> tags = (List<String>) prop.getValue();
             if (tags != null) {
-                return new ArrayList<String>(tags);
+                return new ArrayList<>(tags);
             }
         } catch (NullPointerException ex) {
+            // TODO: This needs to be fixed, it's a very bad way to check for some non-existing Tag xobject or Tags
+            // property.
         }
 
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     /**
@@ -396,7 +399,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public TagOperationResult addTagToDocument(String tag, String documentName, XWikiContext context)
         throws XWikiException
     {
-        return addTagToDocument(tag, context.getWiki().getDocument(documentName, context), context);
+        XWikiDocument document = context.getWiki().getDocument(documentName, context);
+
+        // Avoid modifying the cached document
+        document = document.clone();
+
+        return addTagToDocument(tag, document, context);
     }
 
     /**
@@ -443,7 +451,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public TagOperationResult addTagsToDocument(String tags, String documentName, XWikiContext context)
         throws XWikiException
     {
-        return addTagsToDocument(tags, context.getWiki().getDocument(documentName, context), context);
+        XWikiDocument document = context.getWiki().getDocument(documentName, context);
+
+        // Avoid modifying the cached document
+        document = document.clone();
+
+        return addTagsToDocument(tags, document, context);
     }
 
     /**
@@ -513,7 +526,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public TagOperationResult removeTagFromDocument(String tag, String documentName, XWikiContext context)
         throws XWikiException
     {
-        return removeTagFromDocument(tag, context.getWiki().getDocument(documentName, context), context);
+        XWikiDocument document = context.getWiki().getDocument(documentName, context);
+
+        // Avoid modifying the cached document
+        document = document.clone();
+
+        return removeTagFromDocument(tag, document, context);
     }
 
     /**
@@ -572,7 +590,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         // Since we're renaming a tag, we want to rename it even if the document is hidden. A hidden document is still
         // accessible to users, it's just not visible for simple users; it doesn't change permissions.
         List<String> docNamesToProcess = getDocumentsWithTag(tag, true, caseSensitive);
-        if (StringUtils.equals(tag, newTag) || docNamesToProcess.isEmpty() || StringUtils.isBlank(newTag)) {
+        if (Strings.CS.equals(tag, newTag) || docNamesToProcess.isEmpty() || StringUtils.isBlank(newTag)) {
             return TagOperationResult.NO_EFFECT;
         }
 
@@ -580,6 +598,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         for (String docName : docNamesToProcess) {
             XWikiDocument doc = context.getWiki().getDocument(docName, context);
+
+            // Avoid modifying the cached document
+            doc = doc.clone();
+
             List<String> tags = getTagsFromDocument(doc);
 
             if (tags.contains(newTag)) {
@@ -617,7 +639,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         // accessible to users, it's just not visible for simple users; it doesn't change permissions.
         List<String> docsToProcess = getDocumentsWithTag(tag, true, context);
 
-        if (docsToProcess.size() == 0) {
+        if (docsToProcess.isEmpty()) {
             return TagOperationResult.NO_EFFECT;
         }
         for (String docName : docsToProcess) {

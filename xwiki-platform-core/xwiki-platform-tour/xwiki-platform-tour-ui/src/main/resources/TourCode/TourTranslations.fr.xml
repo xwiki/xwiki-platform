@@ -62,6 +62,7 @@ tour.livetable.targetClass=Classe cible
 tour.popover.previous=« Précédent
 tour.popover.next=Suivant »
 tour.popover.end=Terminer
+tour.popover.quit=Arrêter la visite
 tour.popover.show=Lancer la visite guidée
 tour.popover.show.hint=Vous pouvez relancer la visite guidée à tout moment en cliquant sur ce bouton
 
@@ -75,6 +76,7 @@ TourCode.StepClass_placement=Emplacement
 TourCode.StepClass_targetPage=Page cible
 TourCode.StepClass_action=Action cible
 TourCode.StepClass_queryString=Chaîne de requête
+TourCode.StepClass_reflex=Réflexe
 tour.steps=Étapes
 tour.steps.new_step=Nouvelle étape
 tour.steps.add_step=Ajouter l'étape

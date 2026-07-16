@@ -303,7 +303,11 @@
         #set ($document = $xwiki.getDocument($reference).translatedDocument)
       #end
       #if ($document)
-        #set ($label = $escapetool.xml($document.plainTitle))
+        ## Only use the title as a label when it's not empty (otherwise keep the reference name set above).
+        #set ($plainTitle = "$!document.plainTitle")
+        #if ($plainTitle != '')
+          #set ($label = $escapetool.xml($plainTitle))
+        #end
       #end
     #elseif ($reference.type == 'WIKI')
       #if ($foreach.index == 0 && !$options.plain)

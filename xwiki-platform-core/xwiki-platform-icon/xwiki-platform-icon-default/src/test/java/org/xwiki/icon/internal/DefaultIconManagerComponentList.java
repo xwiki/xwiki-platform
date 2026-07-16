@@ -26,12 +26,12 @@ import java.lang.annotation.Target;
 
 import org.xwiki.bridge.internal.DefaultDocumentContextExecutor;
 import org.xwiki.icon.internal.context.IconSetContext;
-import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.skinx.internal.CssDocumentSkinExtension;
 import org.xwiki.skinx.internal.JsDocumentSkinExtension;
 import org.xwiki.skinx.internal.JsFileSkinExtension;
 import org.xwiki.skinx.internal.LinkSkinExtension;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.velocity.internal.util.VelocityDetector;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
@@ -61,7 +61,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     JsDocumentSkinExtension.class,
     VelocityRenderer.class,
     DefaultDocumentContextExecutor.class,
-    AuthorExecutor.class,
+    IconTemplateRendererManager.class,
+    VelocityDetector.class,
 })
 @Inherited
 public @interface DefaultIconManagerComponentList

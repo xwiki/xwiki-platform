@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.PUT;
@@ -54,7 +53,6 @@ import com.xpn.xwiki.XWikiException;
 @Component
 @Named("org.xwiki.annotation.rest.internal.SingleAnnotationRESTResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/annotation/{id}")
-@Singleton
 public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
 {
     /**
@@ -89,12 +87,8 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             // remove the annotation
             annotationService.removeAnnotation(documentName, id);
             // and then return the annotated content, as specified by the annotation request
-            AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, request);
-            return response;
-        } catch (XWikiException e) {
-            getLogger().error(e.getMessage(), e);
-            return getErrorResponse(e);
-        } catch (AnnotationServiceException e) {
+            return getSuccessResponseWithAnnotatedContent(documentName, request);
+        } catch (XWikiException | AnnotationServiceException e) {
             getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         }
@@ -138,7 +132,11 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             }
             Map<String, Object> annotationMetaData = getMap(updateRequest.getAnnotation());
 
-            this.handleTemporaryUploadedFiles(documentReference, annotationMetaData);
+            // The annotation fields were already copied above from the request; if the user is not allowed to upload
+            // attachments, make sure the uploaded file names don't survive on the annotation either.
+            if (!this.handleTemporaryUploadedFiles(documentReference, annotationMetaData)) {
+                newAnnotation.set(UPLOADED_FILES_FIELD, null);
+            }
             // skip these fields as we don't want to overwrite them with whatever is in this map. Setters should be used
             // for these values or constructor
             Collection<String> skippedFields =
@@ -158,12 +156,8 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             annotationService.updateAnnotation(documentName, newAnnotation);
             this.cleanTemporaryUploadedFiles(documentReference);
             // and then return the annotated content, as specified by the annotation request
-            AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, updateRequest);
-            return response;
-        } catch (XWikiException e) {
-            getLogger().error(e.getMessage(), e);
-            return getErrorResponse(e);
-        } catch (AnnotationServiceException e) {
+            return getSuccessResponseWithAnnotatedContent(documentName, updateRequest);
+        } catch (XWikiException | AnnotationServiceException e) {
             getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         }

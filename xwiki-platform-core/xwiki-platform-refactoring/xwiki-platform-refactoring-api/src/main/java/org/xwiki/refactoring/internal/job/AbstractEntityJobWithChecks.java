@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -63,11 +64,28 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
                 // Process
                 progressManager.startStep(this);
                 setContextUser();
+
+                // FIXME: this should probably be the selected entities only...
                 process(entityReferences);
             }
         } finally {
             progressManager.popLevelProgress(this);
         }
+    }
+
+    /**
+     * @return the list of references that have been selected to be refactored.
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
+     */
+    public Map<EntityReference, EntityReference> getSelectedEntities()
+    {
+        return this.concernedEntities.values().stream()
+            .filter(EntitySelection::isSelected)
+            .filter(entity -> entity.getTargetEntityReference().isPresent())
+            .collect(Collectors.toMap(EntitySelection::getEntityReference,
+                entity -> entity.getTargetEntityReference().get()));
     }
 
     protected void getEntities(Collection<EntityReference> entityReferences)
@@ -156,8 +174,7 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
     protected EntitySelection getConcernedEntitiesEntitySelection(EntityReference reference)
     {
         EntitySelection entitySelection = this.concernedEntities.get(reference);
-        if (entitySelection == null && reference instanceof DocumentReference) {
-            DocumentReference documentReference = (DocumentReference) reference;
+        if (entitySelection == null && reference instanceof DocumentReference documentReference) {
             if (Locale.ROOT.equals(documentReference.getLocale())) {
                 entitySelection = this.concernedEntities.get(
                     new DocumentReference(documentReference.withoutLocale(), (Locale) null));

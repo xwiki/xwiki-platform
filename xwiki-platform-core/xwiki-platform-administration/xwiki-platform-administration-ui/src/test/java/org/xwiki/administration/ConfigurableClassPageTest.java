@@ -211,7 +211,7 @@ class ConfigurableClassPageTest extends PageTest
         this.xwiki.saveDocument(configClassDoc, this.context);
 
         XWikiDocument mySectionDoc = new XWikiDocument(MY_SECTION);
-        BaseObject configObject = mySectionDoc.newXObject(configClassRef, this.context);
+        mySectionDoc.newXObject(configClassRef, this.context);
         BaseObject object = mySectionDoc.newXObject(CONFIGURABLE_CLASS, this.context);
         object.setStringValue("displayInCategory", "other");
         object.setStringValue("displayInSection", "other");
@@ -257,8 +257,7 @@ class ConfigurableClassPageTest extends PageTest
         XWikiDocument mySectionDoc = new XWikiDocument(MY_SECTION);
         this.xwiki.saveDocument(mySectionDoc, this.context);
 
-        when(this.oldcore.getMockRightService()
-            .hasAccessLevel(eq("view"), any(), eq("xwiki:" + MY_SECTION_SERIALIZED), any())).thenReturn(false);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, MY_SECTION)).thenReturn(false);
 
         // Make sure the section document is returned by the query.
         when(this.query.execute()).thenReturn(List.of(MY_SECTION_SERIALIZED)).thenReturn(List.of());

@@ -99,7 +99,7 @@ public class ClassPropertyValuesResourceImpl extends XWikiResource implements Cl
             }
         } else {
             propertyValues = this.propertyValuesProvider
-                .getValues(classPropertyReference, limit, filterParameters.toArray());
+                .getValues(classPropertyReference, validateAndGetLimit(limit), filterParameters.toArray());
         }
         propertyValues.getLinks().add(propertyLink);
 

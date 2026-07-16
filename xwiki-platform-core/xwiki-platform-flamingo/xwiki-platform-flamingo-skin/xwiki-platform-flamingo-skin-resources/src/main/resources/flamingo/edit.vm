@@ -48,6 +48,14 @@
           ## Allow the user to force the edit.
           #set ($newQueryString = "$!request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')"
             + '&amp;force=1')
+          #set ($forceTokenParameter = "force_token=$!{services.csrf.getToken()}")
+          #if (!$newQueryString.contains($forceTokenParameter))
+            ## Prepend the token to ensure it is the first value for the force_token parameter as we use the first
+            ## value if there are several and there could be an invalid token in the query string already.
+            ## We don't set the form_token parameter as this would also authorize other parameter that might already
+            ## be in the URL that are interpreted by the edit action and that could be used for attacks.
+            #set ($newQueryString = $forceTokenParameter + '&amp;' + $newQueryString)
+          #end
           #set ($forceEditURL = $tdoc.getURL($xcontext.action, ${newQueryString}))
           <a href="$forceEditURL" class="btn btn-warning">$escapetool.xml($editConfirmation.confirm)</a>
           $response.setStatus(423)
@@ -127,7 +135,6 @@
   ##################
   <div id="xwikieditor">
   <div id="xwikieditorinner">
-  <div class="leftsidecolumns main">
   <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
   <div id="mainEditArea">
@@ -151,9 +158,14 @@
         #template("menus_content.vm")
       </div>
     #end
-    #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
+    #if (($editor == 'wiki' || $editor == 'wysiwyg'))
+      #set ($docLink = "<a href=""$doc.getURL()"">$escapetool.xml($doc.plainTitle)</a>")
       <h1 class="sr-only">
-        $services.localization.render('core.editors.content.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
+        #if ($request.section)
+          $services.localization.render('core.editors.section.title.text', [$docLink])
+        #else
+          $services.localization.render('core.editors.content.title.text', [$docLink])
+        #end
       </h1>
       <div id="editMeta" class="col-xs-12#if ($displayContentMenu) col-md-7#end">
         #template('editmeta.vm')
@@ -214,8 +226,6 @@
   </div> ## mainEditArea
   </div> ## alleditcontent
   </div> ## editcolumn
-  <div class="clearfix"></div>
-  </div> ## leftsidecolumns
   #template("editpanels.vm")
   <div class="clearfix"></div>
   </div> ## xwikieditorinner

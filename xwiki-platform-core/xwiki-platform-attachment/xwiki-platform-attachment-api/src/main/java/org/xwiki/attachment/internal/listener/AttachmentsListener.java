@@ -39,7 +39,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
 
 import static java.util.Collections.singletonList;
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.HINT;
 
 /**

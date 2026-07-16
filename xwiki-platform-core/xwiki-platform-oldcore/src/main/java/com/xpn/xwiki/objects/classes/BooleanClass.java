@@ -27,9 +27,11 @@ import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.label;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -38,6 +40,37 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class BooleanClass extends PropertyClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "Boolean";
+
+    /**
+     * Display value showing the property as a "yes/no" label. Usable as a display type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_YESNO = "yesno";
+
+    /**
+     * Display value using a select box. Usable both as a display type and as a form (edit) type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_SELECT = "select";
+
+    /**
+     * Display value using a checkbox. Usable both as a display type and as a form (edit) type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_CHECKBOX = "checkbox";
+
+    /**
+     * Display value using radio buttons. Usable as a form (edit) type.
+     * @since 18.6.0RC1
+     */
+    public static final String DISPLAY_RADIO = "radio";
+
     private static final long serialVersionUID = 1L;
 
     private static final String XCLASSNAME = "boolean";
@@ -50,13 +83,13 @@ public class BooleanClass extends PropertyClass
     
     public BooleanClass(PropertyMetaClass wclass)
     {
-        super(XCLASSNAME, "Boolean", wclass);
+        super(XCLASSNAME, PROPERTY_TYPE, wclass);
     }
 
     public BooleanClass()
     {
         this(null);
-        setDisplayFormType("select");
+        setDisplayFormType(DISPLAY_SELECT);
     }
 
     public void setDisplayType(String type)
@@ -67,8 +100,8 @@ public class BooleanClass extends PropertyClass
     public String getDisplayType()
     {
         String dtype = getStringValue("displayType");
-        if ((dtype == null) || (dtype.equals(""))) {
-            return "yesno";
+        if ((dtype == null) || (dtype.isEmpty())) {
+            return DISPLAY_YESNO;
         }
         return dtype;
     }
@@ -76,8 +109,8 @@ public class BooleanClass extends PropertyClass
     public String getDisplayFormType()
     {
         String dtype = getStringValue("displayFormType");
-        if ((dtype == null) || (dtype.equals(""))) {
-            return "radio";
+        if ((dtype == null) || (dtype.isEmpty())) {
+            return DISPLAY_RADIO;
         }
         return dtype;
     }
@@ -98,7 +131,7 @@ public class BooleanClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value) throws XWikiException
     {
         BaseProperty property = newProperty();
         Number nvalue = null;
@@ -122,6 +155,12 @@ public class BooleanClass extends PropertyClass
         BaseProperty property = new IntegerProperty();
         property.setName(getName());
         return property;
+    }
+
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
     }
 
     @Override
@@ -159,13 +198,13 @@ public class BooleanClass extends PropertyClass
     {
         String displayFormType = getDisplayFormType();
 
-        if (getDisplayType().equals("checkbox")) {
-            displayFormType = "checkbox";
+        if (DISPLAY_CHECKBOX.equals(getDisplayType())) {
+            displayFormType = DISPLAY_CHECKBOX;
         }
 
-        if (displayFormType.equals("checkbox")) {
+        if (DISPLAY_CHECKBOX.equals(displayFormType)) {
             displayCheckboxEdit(buffer, name, prefix, object, context);
-        } else if (displayFormType.equals("select")) {
+        } else if (DISPLAY_SELECT.equals(displayFormType)) {
             displaySelectEdit(buffer, name, prefix, object, context);
         } else {
             displayRadioEdit(buffer, name, prefix, object, context);
@@ -180,6 +219,10 @@ public class BooleanClass extends PropertyClass
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
+        // This is a text alternative fallback to explain what the select is about. If the select has already been
+        // labelled in another way, this fallback will be ignored by Assistive Techs.
+        select.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+            getTranslatedPrettyName(context)));
 
         String String0 = getDisplayValue(context, 0);
         String String1 = getDisplayValue(context, 1);

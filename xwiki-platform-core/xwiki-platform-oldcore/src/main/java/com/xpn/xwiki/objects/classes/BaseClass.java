@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
@@ -67,6 +69,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
+    private static final String INTERNAL = "internal";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseClass.class);
 
     private static final long serialVersionUID = 1L;
@@ -84,11 +88,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     private String validationScript;
 
     private String nameField;
-
-    /**
-     * Set to true if the class is modified from the database version of it.
-     */
-    private boolean isDirty = true;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -191,10 +190,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         if (element != null) {
             Set<String> properties = getPropertyList();
-            if (!properties.contains(name)) {
-                if (((BaseCollection) element).getNumber() == 0) {
-                    ((BaseCollection) element).setNumber(properties.size() + 1);
-                }
+            if (!properties.contains(name) && ((BaseCollection) element).getNumber() == 0) {
+                ((BaseCollection) element).setNumber(properties.size() + 1);
             }
 
             super.addField(name, element);
@@ -269,7 +266,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> enabledProperties = new ArrayList<PropertyClass>(allProperties.size());
+        List<PropertyClass> enabledProperties = new ArrayList<>(allProperties.size());
 
         for (PropertyClass property : allProperties) {
             if (property != null && !property.isDisabled()) {
@@ -297,7 +294,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> disabledProperties = new ArrayList<PropertyClass>();
+        List<PropertyClass> disabledProperties = new ArrayList<>();
 
         for (PropertyClass property : allProperties) {
             if (property != null && property.isDisabled()) {
@@ -326,7 +323,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<PropertyClass> disabledObjectProperties = new ArrayList<PropertyClass>(disabledProperties.size());
+        List<PropertyClass> disabledObjectProperties = new ArrayList<>(disabledProperties.size());
 
         for (PropertyClass property : disabledProperties) {
             try {
@@ -358,7 +355,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return Collections.emptyList();
         }
 
-        List<BaseProperty> deprecatedObjectProperties = new ArrayList<BaseProperty>();
+        List<BaseProperty> deprecatedObjectProperties = new ArrayList<>();
 
         for (BaseProperty property : objectProperties) {
             if (safeget(property.getName()) == null) {
@@ -408,7 +405,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return fromMap(map, object);
     }
 
-    public BaseCollection fromMap(Map<String, ?> map, BaseCollection object)
+    public BaseCollection fromMap(Map<String, ?> map, BaseCollection object) throws XWikiException
     {
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
@@ -454,7 +451,21 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public BaseClass clone()
     {
-        BaseClass bclass = (BaseClass) super.clone();
+        return (BaseClass) super.clone();
+    }
+
+    @Override
+    public BaseClass clone(boolean detach)
+    {
+        return (BaseClass) super.clone(detach);
+    }
+
+    @Override
+    protected void cloneContent(BaseElement<DocumentReference> element)
+    {
+        super.cloneContent(element);
+
+        BaseClass bclass = (BaseClass) element;
 
         bclass.setCustomClass(getCustomClass());
         bclass.setCustomMapping(getCustomMapping());
@@ -463,11 +474,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         bclass.setDefaultEditSheet(getDefaultEditSheet());
         bclass.setValidationScript(getValidationScript());
         bclass.setNameField(getNameField());
-
-        bclass.setDirty(this.isDirty);
-        bclass.setOwnerDocument(this.ownerDocument);
-
-        return bclass;
     }
 
     @Override
@@ -867,7 +873,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             result = true;
         }
 
-        textAreaClass.setRestricted(restricted);
+        if (textAreaClass.isRestricted() != restricted) {
+            textAreaClass.setRestricted(restricted);
+            result = true;
+        }
 
         return result;
     }
@@ -1215,7 +1224,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public String getCustomMapping()
     {
         if ("XWiki.XWikiPreferences".equals(getName())) {
-            return "internal";
+            return INTERNAL;
         }
 
         if (this.customMapping == null) {
@@ -1236,12 +1245,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         String cMapping = getCustomMapping();
 
-        return (cMapping != null) && (!"".equals(cMapping)) && (!"internal".equals(cMapping));
+        return (cMapping != null) && (!"".equals(cMapping)) && (!INTERNAL.equals(cMapping));
     }
 
     public boolean hasInternalCustomMapping()
     {
-        return "internal".equals(this.customMapping);
+        return INTERNAL.equals(this.customMapping);
     }
 
     public boolean isCustomMappingValid(XWikiContext context) throws XWikiException
@@ -1264,7 +1273,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         if ((custommapping1 != null) && (custommapping1.trim().length() > 0)) {
             return context.getWiki().getStore().getCustomMappingPropertyList(this);
         } else {
-            return new ArrayList<String>();
+            return new ArrayList<>();
         }
     }
 
@@ -1355,9 +1364,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = context.getWiki().getClass(className, context);
-        BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
-
-        return object;
+        return (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
     }
 
     public String getDefaultWeb()
@@ -1442,7 +1449,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         String validSript = getValidationScript();
-        if ((validSript != null) && (!validSript.trim().equals(""))) {
+        if ((validSript != null) && (!"".equals(validSript.trim()))) {
             isValid &= executeValidationScript(obj, validSript, context);
         }
 
@@ -1485,7 +1492,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context)
     {
-        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        ArrayList<ObjectDiff> difflist = new ArrayList<>();
         BaseClass oldClass = (BaseClass) oldObject;
         for (PropertyClass newProperty : (Collection<PropertyClass>) getFieldList()) {
             String propertyName = newProperty.getName();
@@ -1586,37 +1593,37 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
         BaseClass newBaseClass = (BaseClass) newElement;
 
-        if (!StringUtils.equals(getCustomClass(), newBaseClass.getCustomClass())) {
+        if (!Strings.CS.equals(getCustomClass(), newBaseClass.getCustomClass())) {
             setCustomClass(newBaseClass.getCustomClass());
             modified = true;
         }
 
-        if (!StringUtils.equals(getCustomMapping(), newBaseClass.getCustomMapping())) {
+        if (!Strings.CS.equals(getCustomMapping(), newBaseClass.getCustomMapping())) {
             setCustomMapping(newBaseClass.getCustomMapping());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultWeb(), newBaseClass.getDefaultWeb())) {
+        if (!Strings.CS.equals(getDefaultWeb(), newBaseClass.getDefaultWeb())) {
             setDefaultWeb(newBaseClass.getDefaultWeb());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultViewSheet(), newBaseClass.getDefaultViewSheet())) {
+        if (!Strings.CS.equals(getDefaultViewSheet(), newBaseClass.getDefaultViewSheet())) {
             setDefaultViewSheet(newBaseClass.getDefaultViewSheet());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultEditSheet(), newBaseClass.getDefaultEditSheet())) {
+        if (!Strings.CS.equals(getDefaultEditSheet(), newBaseClass.getDefaultEditSheet())) {
             setDefaultEditSheet(newBaseClass.getDefaultEditSheet());
             modified = true;
         }
 
-        if (!StringUtils.equals(getValidationScript(), newBaseClass.getValidationScript())) {
+        if (!Strings.CS.equals(getValidationScript(), newBaseClass.getValidationScript())) {
             setValidationScript(newBaseClass.getValidationScript());
             modified = true;
         }
 
-        if (!StringUtils.equals(getNameField(), newBaseClass.getNameField())) {
+        if (!Strings.CS.equals(getNameField(), newBaseClass.getNameField())) {
             setNameField(newBaseClass.getNameField());
             modified = true;
         }
@@ -1639,22 +1646,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (this.ownerDocument != null) {
                 setDocumentReference(this.ownerDocument.getDocumentReference());
             }
-
-            if (ownerDocument != null && this.isDirty) {
-                ownerDocument.setMetaDataDirty(true);
-            }
-        }
-    }
-
-    /**
-     * @param isDirty Indicate if the dirty flag should be set or cleared.
-     * @since 4.3M2
-     */
-    public void setDirty(boolean isDirty)
-    {
-        this.isDirty = isDirty;
-        if (isDirty && this.ownerDocument != null) {
-            this.ownerDocument.setMetaDataDirty(true);
         }
     }
 }

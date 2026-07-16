@@ -66,8 +66,8 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
         BooleanClass disabledClass = new BooleanClass(this);
         disabledClass.setName("disabled");
         disabledClass.setPrettyName("Disabled");
-        disabledClass.setDisplayType("yesno");
-        disabledClass.setDisplayFormType("checkbox");
+        disabledClass.setDisplayType(BooleanClass.DISPLAY_YESNO);
+        disabledClass.setDisplayFormType(BooleanClass.DISPLAY_CHECKBOX);
         safeput(disabledClass.getName(), disabledClass);
 
         addPresentationMetaProperties();
@@ -159,6 +159,12 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
     public PropertyMetaClass clone()
     {
         return (PropertyMetaClass) super.clone();
+    }
+
+    @Override
+    public PropertyMetaClass clone(boolean detach)
+    {
+        return (PropertyMetaClass) super.clone(detach);
     }
 
     /**

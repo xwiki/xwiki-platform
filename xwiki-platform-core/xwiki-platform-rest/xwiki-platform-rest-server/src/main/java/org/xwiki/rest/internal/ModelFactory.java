@@ -210,7 +210,10 @@ public class ModelFactory
             modified = true;
         }
 
-        doc.setHidden(restPage.isHidden());
+        if (doc.isHidden() != restPage.isHidden()) {
+            doc.setHidden(restPage.isHidden());
+            modified = true;
+        }
 
         if (restPage.isEnforceRequiredRights() != null) {
             doc.setEnforceRequiredRights(restPage.isEnforceRequiredRights());
@@ -282,15 +285,7 @@ public class ModelFactory
         if (propertyNames.length > 0) {
             try {
                 String firstPropertyName = propertyNames[0];
-                BaseClass baseClass = xwikiObject.getXClass(this.xcontextProvider.get());
-                PropertyInterface field = baseClass.getField(firstPropertyName);
-                // The property might not exist in the class. But if it does, it will be a PropertyClass.
-                if (field != null) {
-                    String classType = ((com.xpn.xwiki.objects.classes.PropertyClass) field).getClassType();
-                    objectSummary.setHeadline(cleanupBeforeMakingPublic(classType, xwikiObject.get(firstPropertyName)));
-                } else {
-                    objectSummary.setHeadline(serializePropertyValue(xwikiObject.get(firstPropertyName)));
-                }
+                objectSummary.setHeadline(serializePropertyValue(xwikiObject.get(firstPropertyName)));
             } catch (XWikiException e) {
                 // Should never happen
             }
@@ -326,6 +321,7 @@ public class ModelFactory
     }
 
     public void toObject(com.xpn.xwiki.api.Object xwikiObject, org.xwiki.rest.model.jaxb.Object restObject)
+        throws XWikiException
     {
         for (Property restProperty : restObject.getProperties()) {
             xwikiObject.set(restProperty.getName(), restProperty.getValue());
@@ -362,31 +358,31 @@ public class ModelFactory
                 property.getAttributes().add(attribute);
             }
 
-            if (propertyClass instanceof ListClass) {
-                ListClass listClass = (ListClass) propertyClass;
-
+            if (propertyClass instanceof ListClass listClass) {
                 List allowedValueList = listClass.getList(xwikiContext);
 
                 if (!allowedValueList.isEmpty()) {
-                    Formatter f = new Formatter();
-                    for (int i = 0; i < allowedValueList.size(); i++) {
-                        if (i != allowedValueList.size() - 1) {
-                            f.format("%s,", allowedValueList.get(i).toString());
-                        } else {
-                            f.format("%s", allowedValueList.get(i).toString());
+                    try (Formatter f = new Formatter()) {
+                        for (int i = 0; i < allowedValueList.size(); i++) {
+                            if (i != allowedValueList.size() - 1) {
+                                f.format("%s,", allowedValueList.get(i).toString());
+                            } else {
+                                f.format("%s", allowedValueList.get(i).toString());
+                            }
                         }
-                    }
 
-                    Attribute attribute = this.objectFactory.createAttribute();
-                    attribute.setName(Constants.ALLOWED_VALUES_ATTRIBUTE_NAME);
-                    attribute.setValue(f.toString());
-                    property.getAttributes().add(attribute);
+                        Attribute attribute = this.objectFactory.createAttribute();
+                        attribute.setName(Constants.ALLOWED_VALUES_ATTRIBUTE_NAME);
+                        attribute.setValue(f.toString());
+                        property.getAttributes().add(attribute);
+                    }
                 }
             }
 
             property.setName(propertyClass.getName());
             property.setType(propertyClass.getClassType());
-            if (hasAccess(property)) {
+            // ComputedField properties don't have any value by definition so we ignore those.
+            if (hasAccess(property) && !(propertyClass instanceof ComputedFieldClass)) {
                 try {
                     property.setValue(
                         serializePropertyValue(xwikiObject.get(propertyClass.getName()), propertyClass, xwikiContext));
@@ -719,15 +715,13 @@ public class ModelFactory
         }
 
         com.xpn.xwiki.api.Object tagsObject = doc.getObject("XWiki.TagClass", 0);
-        if (tagsObject != null) {
-            if (tagsObject.getProperty("tags") != null) {
-                String tagsUri = Utils.createURI(baseUri, PageTagsResource.class, doc.getWiki(), restSpacesValue,
-                    doc.getDocumentReference().getName()).toString();
-                Link tagsLink = this.objectFactory.createLink();
-                tagsLink.setHref(tagsUri);
-                tagsLink.setRel(Relations.TAGS);
-                pageSummary.getLinks().add(tagsLink);
-            }
+        if (tagsObject != null && tagsObject.getProperty("tags") != null) {
+            String tagsUri = Utils.createURI(baseUri, PageTagsResource.class, doc.getWiki(), restSpacesValue,
+                doc.getDocumentReference().getName()).toString();
+            Link tagsLink = this.objectFactory.createLink();
+            tagsLink.setHref(tagsUri);
+            tagsLink.setRel(Relations.TAGS);
+            pageSummary.getLinks().add(tagsLink);
         }
 
         String syntaxesUri = Utils.createURI(baseUri, SyntaxesResource.class).toString();
@@ -757,6 +751,14 @@ public class ModelFactory
 
     public Page toRestPage(URI baseUri, URI self, Document doc, boolean useVersion, Boolean withPrettyNames,
         Boolean withObjects, Boolean withXClass, Boolean withAttachments) throws XWikiException
+    {
+        return this.toRestPage(baseUri, self, doc, useVersion, withPrettyNames, withObjects, withXClass,
+            withAttachments, List.of(), List.of());
+    }
+
+    public Page toRestPage(URI baseUri, URI self, Document doc, boolean useVersion, Boolean withPrettyNames,
+        Boolean withObjects, Boolean withXClass, Boolean withAttachments, List<Right> checkRights,
+        List<String> supportedSyntaxes) throws XWikiException
     {
         Page page = this.objectFactory.createPage();
         toRestPageSummary(page, baseUri, doc, useVersion, withPrettyNames);
@@ -851,6 +853,31 @@ public class ModelFactory
         // Add xclass
         if (withXClass) {
             page.setClazz(toRestClass(baseUri, doc.getxWikiClass()));
+        }
+
+        // Add rights
+        for (Right checkRight : checkRights) {
+            org.xwiki.rest.model.jaxb.Right right = this.objectFactory.createRight();
+            right.setName(checkRight.getName());
+            right.setValue(this.authorizationManagerProvider.get().hasAccess(checkRight,
+                doc.getDocumentReference()));
+            page.withRights(right);
+        }
+
+        // Add html rendering if needed
+        if (!supportedSyntaxes.isEmpty() && !supportedSyntaxes.contains(page.getSyntax())) {
+            XWikiDocument xwikiDocument = xcontext.getWiki().getDocument(doc.getDocumentReference(), xcontext);
+            XWikiDocument oldDoc = xcontext.getDoc();
+
+            try {
+                // Set the right document for rendering.
+                xcontext.setDoc(xwikiDocument);
+
+                page.setRenderedContent(doc.displayDocument());
+            } finally {
+                // Reset context.
+                xcontext.setDoc(oldDoc);
+            }
         }
 
         return page;
@@ -1034,7 +1061,7 @@ public class ModelFactory
     }
 
     /**
-     * Serializes the value of the given XObject property. {@link ComputedFieldClass} properties are not evaluated.
+     * Serializes the value of the given XObject property.
      *
      * @param property an XObject property
      * @return the String representation of the property value
@@ -1045,9 +1072,9 @@ public class ModelFactory
             return "";
         }
 
-        java.lang.Object value = ((BaseProperty) property).getValue();
-        if (value instanceof List) {
-            return StringUtils.join((List) value, "|");
+        java.lang.Object value = ((BaseProperty) property).getObfuscatedValue();
+        if (value instanceof List list) {
+            return StringUtils.join(list, "|");
         } else if (value != null) {
             return value.toString();
         } else {
@@ -1067,25 +1094,26 @@ public class ModelFactory
     private String serializePropertyValue(PropertyInterface property,
         com.xpn.xwiki.objects.classes.PropertyClass propertyClass, XWikiContext context)
     {
-        if (propertyClass instanceof ComputedFieldClass) {
+        String result;
+        if (propertyClass instanceof ComputedFieldClass computedFieldClass) {
             // TODO: the XWikiDocument needs to be explicitely set in the context, otherwise method
             // PropertyClass.renderInContext fires a null pointer exception: bug?
             XWikiDocument document = context.getDoc();
             try {
                 context.setDoc(property.getObject().getOwnerDocument());
-                ComputedFieldClass computedFieldClass = (ComputedFieldClass) propertyClass;
                 return computedFieldClass.getComputedValue(propertyClass.getName(), "", property.getObject(), context);
             } catch (Exception e) {
                 logger.error("Error while computing property value [{}] of [{}]", propertyClass.getName(),
                     property.getObject(), e);
-                return serializePropertyValue(property);
+                result = serializePropertyValue(property);
             } finally {
                 // Reset the context document to its original value, even if an exception is raised.
                 context.setDoc(document);
             }
         } else {
-            return cleanupBeforeMakingPublic(propertyClass.getClassType(), property);
+            result = serializePropertyValue(property);
         }
+        return result;
     }
 
     public JobRequest toRestJobRequest(Request request) throws XWikiRestException

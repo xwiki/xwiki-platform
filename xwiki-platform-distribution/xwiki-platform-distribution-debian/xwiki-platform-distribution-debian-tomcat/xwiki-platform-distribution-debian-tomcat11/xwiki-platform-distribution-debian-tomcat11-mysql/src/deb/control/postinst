@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+#########################
+# Restart Tomcat
+#########################
+
+# Restart tomcat service (only if it's active)
+if ( systemctl -q is-active tomcat[[debian.tomcat.version]].service || systemctl -q is-enabled tomcat[[debian.tomcat.version]].service )
+then
+  deb-systemd-invoke restart tomcat[[debian.tomcat.version]].service
+fi

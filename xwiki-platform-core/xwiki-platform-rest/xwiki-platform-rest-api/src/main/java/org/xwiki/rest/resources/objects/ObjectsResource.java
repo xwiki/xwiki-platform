@@ -38,6 +38,22 @@ import org.xwiki.rest.model.jaxb.Objects;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/objects")
 public interface ObjectsResource
 {
+    /**
+     * Retrieves the objects attached to a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the objects, for example {@code WebHome}
+     * @param start the 0-based index of the first object to return, used together with {@code number} for pagination; a
+     *  negative value is treated as {@code 0}; defaults to {@code 0}
+     * @param number the maximum number of objects to return; {@code -1} (the default), or any other negative value,
+     *  returns all of them
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's
+     *  display name), at some extra cost; defaults to {@code false}
+     * @return the requested window of objects attached to the page, across all their classes
+     * @throws XWikiRestException if the objects cannot be retrieved from the store
+     */
     @GET Objects getObjects(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -47,6 +63,22 @@ public interface ObjectsResource
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;
 
+    /**
+     * Adds a new object to a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page to add the object to, for example {@code WebHome}
+     * @param minorRevision when {@code true}, saves the change as a minor version; when {@code null} (the default) or
+     *  {@code false}, saves it as a normal (major) version
+     * @param object the object to add; its {@code className} must be set to the XClass reference of the object to
+     *  create (for example {@code XWiki.XWikiUsers}), and its number is assigned automatically
+     * @return a response with status {@code 201} whose {@code Location} header points to the created object and whose
+     *  body holds it
+     * @throws XWikiRestException if the object cannot be added, for example the current user is not allowed to edit the
+     *  page
+     */
     @POST Response addObject(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

@@ -27,8 +27,10 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.url.FrontendURLCheckPolicy;
 import org.xwiki.url.URLConfiguration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.atLeastOnce;
@@ -64,5 +66,34 @@ class DefaultURLConfigurationTest
         when(configurationSource.getProperty(property, true)).thenReturn(false);
         assertFalse(defaultURLConfiguration.useResourceLastModificationDate());
         verify(configurationSource, atLeastOnce()).getProperty(property, true);
+    }
+
+    @Test
+    void getFrontendUrlCheckPolicy()
+    {
+        String deprecatedProperty = "url.frontendUrlCheckEnabled";
+        String newProperty = "url.frontendUrlCheckPolicy";
+        when(configurationSource.getProperty(deprecatedProperty, Boolean.class)).thenReturn(false);
+        when(configurationSource.getProperty(newProperty)).thenReturn("enabled");
+
+        when(configurationSource.containsKey(newProperty)).thenReturn(true);
+        when(configurationSource.containsKey(deprecatedProperty)).thenReturn(true);
+        assertEquals(FrontendURLCheckPolicy.ENABLED, defaultURLConfiguration.getFrontendUrlCheckPolicy());
+
+        when(configurationSource.getProperty(newProperty)).thenReturn("comments");
+        assertEquals(FrontendURLCheckPolicy.COMMENTS, defaultURLConfiguration.getFrontendUrlCheckPolicy());
+
+        when(configurationSource.containsKey(newProperty)).thenReturn(false);
+        assertEquals(FrontendURLCheckPolicy.DISABLED, defaultURLConfiguration.getFrontendUrlCheckPolicy());
+
+        when(configurationSource.getProperty(deprecatedProperty, Boolean.class)).thenReturn(true);
+        assertEquals(FrontendURLCheckPolicy.ENABLED, defaultURLConfiguration.getFrontendUrlCheckPolicy());
+
+        when(configurationSource.containsKey(deprecatedProperty)).thenReturn(false);
+        assertEquals(FrontendURLCheckPolicy.COMMENTS, defaultURLConfiguration.getFrontendUrlCheckPolicy());
+
+        when(configurationSource.containsKey(newProperty)).thenReturn(true);
+        when(configurationSource.getProperty(newProperty)).thenReturn("foo");
+        assertEquals(FrontendURLCheckPolicy.COMMENTS, defaultURLConfiguration.getFrontendUrlCheckPolicy());
     }
 }

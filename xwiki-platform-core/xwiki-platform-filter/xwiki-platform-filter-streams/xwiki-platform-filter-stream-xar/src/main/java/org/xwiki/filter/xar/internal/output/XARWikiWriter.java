@@ -52,6 +52,13 @@ public class XARWikiWriter implements Closeable
 
     private XarPackage xarPackage = new XarPackage();
 
+    /**
+     * Default constructor.
+     *
+     * @param name the name of the package.
+     * @param xarProperties the properties to be used for writing the XAR.
+     * @throws FilterException in case of problem for creating the output target.
+     */
     public XARWikiWriter(String name, XAROutputProperties xarProperties) throws FilterException
     {
         this.name = name;
@@ -71,12 +78,12 @@ public class XARWikiWriter implements Closeable
         OutputTarget target = this.xarProperties.getTarget();
 
         try {
-            if (target instanceof FileOutputTarget && ((FileOutputTarget) target).getFile().isDirectory()) {
+            if (target instanceof FileOutputTarget fileOutputTarget && fileOutputTarget.getFile().isDirectory()) {
                 this.zipStream =
-                    new ZipArchiveOutputStream(new File(((FileOutputTarget) target).getFile(), name + ".xar"));
-            } else if (target instanceof OutputStreamOutputTarget) {
+                    new ZipArchiveOutputStream(new File(fileOutputTarget.getFile(), name + ".xar"));
+            } else if (target instanceof OutputStreamOutputTarget outputStreamOutputTarget) {
                 this.zipStream = new ZipArchiveOutputStream(
-                    new CloseShieldOutputStream(((OutputStreamOutputTarget) target).getOutputStream()));
+                    new CloseShieldOutputStream(outputStreamOutputTarget.getOutputStream()));
             } else {
                 throw new FilterException(String.format("Unsupported output target [%s]. Only [%s] is supported",
                     target, OutputStreamOutputTarget.class));
@@ -93,6 +100,9 @@ public class XARWikiWriter implements Closeable
         this.zipStream.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS);
     }
 
+    /**
+     * @return the name of the package
+     */
     public String getName()
     {
         return this.name;
@@ -113,6 +123,12 @@ public class XARWikiWriter implements Closeable
         path.append(escapeXARPath(spaceReference.getName())).append('/');
     }
 
+    /**
+     * Creates a new entry based on the given reference and returns the output stream for writing it.
+     * @param reference the reference of the document for creating the entry in the XAR.
+     * @return the output stream for writing it.
+     * @throws FilterException in case of problem for creating the entry.
+     */
     public OutputStream newEntry(LocalDocumentReference reference) throws FilterException
     {
         StringBuilder path = new StringBuilder();
@@ -146,6 +162,10 @@ public class XARWikiWriter implements Closeable
         return this.zipStream;
     }
 
+    /**
+     * Close the archive: no write should be performed after calling this.
+     * @throws FilterException in case of problem when closing.
+     */
     public void closeEntry() throws FilterException
     {
         try {

@@ -69,8 +69,8 @@ public class AnchorFilter extends AbstractHTMLFilter
     public void filter(Document document, Map<String, String> cleaningParameters)
     {
         List<Element> links = filterDescendants(document.getDocumentElement(), new String[] {TAG_A});
-        Set<String> fragmentIdentifiers = new HashSet<String>();
-        List<Element> anchorsToRemove = new ArrayList<Element>();
+        Set<String> fragmentIdentifiers = new HashSet<>();
+        List<Element> anchorsToRemove = new ArrayList<>();
         for (Element link : links) {
             if (isAnchor(link)) {
                 String fragmentIdentifier = link.getAttribute(ATTRIBUTE_NAME);
@@ -97,6 +97,6 @@ public class AnchorFilter extends AbstractHTMLFilter
      */
     private boolean isAnchor(Node node)
     {
-        return node instanceof Element && !"".equals(((Element) node).getAttribute(ATTRIBUTE_NAME));
+        return node instanceof Element element && !"".equals(element.getAttribute(ATTRIBUTE_NAME));
     }
 }

@@ -29,11 +29,10 @@ package org.xwiki.security.authorization.testwikibuilding;
  */
 public interface HasSpaces extends HasAcl
 {
-
     /**
      * @param name The name of the space to add.
      * @param alt The pretty name of the space. (optional)
-     * @returns a representation of the space that may hold documents and the acl for the space.
+     * @return a representation of the space that may hold documents and the acl for the space.
      */
     HasDocuments addSpace(String name, String alt);
 

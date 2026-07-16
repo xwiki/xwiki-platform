@@ -22,16 +22,20 @@ package org.xwiki.extension.security.internal;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.index.security.review.Review;
 import org.xwiki.extension.index.security.review.ReviewsMap;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static ch.qos.logback.classic.Level.WARN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,6 +57,9 @@ class ReviewMapFilterTest
 
     @MockComponent
     private CoreExtensionRepository coreExtensionRepository;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void filterEmpty()
@@ -90,5 +97,18 @@ class ReviewMapFilterTest
             r2
         ));
         assertEquals(expected, this.filter.filter(reviewsMap));
+    }
+
+    @Test
+    void filterWithEmptyValue()
+    {
+        ReviewsMap reviewsMap = new ReviewsMap();
+        reviewsMap.getReviewsMap().put("a", null);
+        ReviewsMap expected = new ReviewsMap();
+        expected.getReviewsMap().put("a", List.of());
+        assertEquals(expected, this.filter.filter(reviewsMap));
+
+        assertEquals("[a] contains an empty value",this.logCapture.getMessage(0) );
+        assertEquals(WARN,this.logCapture.getLogEvent(0).getLevel() );
     }
 }

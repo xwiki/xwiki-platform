@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultNotificationCacheManagerTest
+class DefaultNotificationCacheManagerTest
 {
     @InjectMockComponents
     private DefaultNotificationCacheManager defaultNotificationCacheManager;
@@ -101,7 +101,7 @@ public class DefaultNotificationCacheManagerTest
     }
 
     @Test
-    public void getFromCache()
+    void getFromCache()
     {
         this.defaultNotificationCacheManager.getFromCache("anykey", true, false);
         verify(this.longCountCache).get("anykey");
@@ -116,7 +116,7 @@ public class DefaultNotificationCacheManagerTest
     }
 
     @Test
-    public void setInCache()
+    void setInCache()
     {
         List<Object> events = Arrays.asList(mock(Event.class), mock(Event.class),
             mock(Event.class));
@@ -133,7 +133,7 @@ public class DefaultNotificationCacheManagerTest
     }
 
     @Test
-    public void createCacheKey()
+    void createCacheKey()
     {
         DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Foobar");
         when(this.entityReferenceSerializer.serialize(userReference)).thenReturn("xwiki:XWiki.Foobar");

@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Zeigt Liste aller Wikis
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Arbeitsgebiete (veraltet)
 rendering.macro.workspaces.description=Veraltetes Makro, das nur noch aus Gründen der Rückwärtskompatibilität vorhanden ist. Bitte verwenden Sie statt dessen das "Wikis" Makro.
-
-## Browse
-platform.wiki.browse=Wikis durchsuchen
 platform.wiki.browse.emptyvalue=n/a
 platform.wiki.browse.wikiprettyname=Name
 platform.wiki.browse.description=Beschreibung
@@ -188,7 +185,7 @@ WikiManager.WikiUserClass_userScope_local_only=Das Wiki kennt nur seine eigenen,
 WikiManager.WikiUserClass_userScope_global_only=Das Wiki kennt nur globale Benutzer
 WikiManager.WikiUserClass_userScope_local_and_global=Das Wiki kennt sowohl lokale als auch globale Benutzer
 platform.wiki.prop.wikiname=Wiki Bezeichner
-platform.wiki.prop.wikiprettyname=Name
+platform.wiki.prop.wikiprettyname=Anzeigename
 ### Missing: platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.description=Beschreibung
 platform.wiki.prop.owner=Besitzer
@@ -255,7 +252,7 @@ platform.wiki.sheet.desc.iswikitemplate=Signalisiert, dass dieses Wiki als Vorla
 platform.wiki.sheet.desc.server=Der Alias, under dem das Wiki erreichbar sein wird.
 platform.wiki.sheet.desc.description=Eine kurze Beschreibung.
 platform.wiki.sheet.desc.homepage=Die Startseite des Wikis.
-platform.wiki.sheet.prop.wikiprettyname=Name
+platform.wiki.sheet.prop.wikiprettyname=Anzeigename
 platform.wiki.sheet.prop.owner=Besitzer
 platform.wiki.sheet.prop.secure=Sicher (SSL)
 ### Missing: platform.wiki.sheet.prop.port=Port
@@ -300,6 +297,9 @@ platform.wiki.create.wizard.step.provisioning.finalize=Fertigstellen
 #######################################
 platform.wiki.delete.confirmation.yes=Ja, das Wiki bitte löschen!
 platform.wiki.delete.confirmation.no=Nein, bring mich zurück!
+
+## Browse
+platform.wiki.browse=Wikis durchsuchen
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

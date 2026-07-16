@@ -77,7 +77,20 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     @Override
     protected boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference) throws Exception
     {
-        if (!hasAccess(Right.DELETE, oldReference)) {
+        boolean isWebPreferences =
+            isSpacePreferencesReference(oldReference) && isSpacePreferencesReference(newReference);
+        DocumentReference oldHomeReference = getSpaceHomeReference(oldReference);
+        // if it's a WebPreferences document and the operation concerns also its WebHome then we check the rights of the
+        // WebHome only.
+        if (isWebPreferences && this.concernedEntities.containsKey(oldHomeReference)) {
+            if (!hasAccess(Right.DELETE, oldHomeReference)) {
+                this.logger.error("You don't have sufficient permissions over the home document of WebPreferences "
+                        + "[{}].",
+                    newReference);
+                return false;
+            }
+            return super.checkAllRights(oldReference, newReference);
+        } else if (!hasAccess(Right.DELETE, oldReference)) {
             // The move operation is implemented as Copy + Delete.
             this.logger.error("You are not allowed to delete [{}].", oldReference);
             return false;

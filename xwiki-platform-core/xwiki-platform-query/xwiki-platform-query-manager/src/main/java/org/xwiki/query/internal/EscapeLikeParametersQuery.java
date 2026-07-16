@@ -142,11 +142,9 @@ public class EscapeLikeParametersQuery extends WrappingQuery
     private String modifyStatement(String statementString) throws JSQLParserException
     {
         Statement statement = CCJSqlParserUtil.parse(statementString);
-        if (statement instanceof Select) {
-            Select select = (Select) statement;
+        if (statement instanceof Select select) {
             SelectBody selectBody = select.getSelectBody();
-            if (selectBody instanceof PlainSelect) {
-                PlainSelect plainSelect = (PlainSelect) selectBody;
+            if (selectBody instanceof PlainSelect plainSelect) {
                 Expression where = plainSelect.getWhere();
                 where.accept(new XWikiExpressionVisitor());
             }

@@ -61,9 +61,11 @@ import javax.inject.Provider;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Document;
@@ -105,6 +107,7 @@ import org.xwiki.link.LinkException;
 import org.xwiki.link.LinkStore;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.DefaultDocumentAuthors;
@@ -221,9 +224,30 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
 
+    private static final String DOCUMENT = "document";
+
+    private static final String REFERENCE = "reference";
+
+    private static final String INLINE = "inline";
+
     private static final String TM_FAILEDDOCUMENTPARSE = "core.document.error.failedParse";
 
-    private static final String CLOSE_HTML_MACRO = "{{/html}}";
+    private static final String[] HTML_MACRO_SEARCH_STRINGS = new String[] { "{{html", "{{/html" };
+
+    private static final String[] HTML_MACRO_REPLACE_STRINGS = new String[] { "&#123;&#123;html", "&#123;&#123;/html" };
+
+    private static final String CURRENT = "current";
+
+    private static final String PRE_START = "{pre}";
+
+    private static final String PRE_END = "{/pre}";
+
+    private static final String HIDDEN = "hidden";
+
+    private static final String XWIKIGUEST_REFERENCE_WARNING =
+        "A reference to XWikiGuest user has been set instead of null. This is probably a mistake.";
+
+    private static final String SEE_STACK_TRACE = "See stack trace";
 
     /**
      * An attachment waiting to be deleted at next document save.
@@ -346,7 +370,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private static DocumentReferenceResolver<String> getCurrentDocumentReferenceResolver()
     {
-        return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT);
     }
 
     /**
@@ -378,7 +402,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private static DocumentReferenceResolver<EntityReference> getCurrentReferenceDocumentReferenceResolver()
     {
-        return Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+        return Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, CURRENT);
     }
 
     /**
@@ -412,7 +436,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private static ObjectReferenceResolver<EntityReference> getCurrentReferenceObjectReferenceResolver()
     {
-        return Utils.getComponent(ObjectReferenceResolver.TYPE_REFERENCE, "current");
+        return Utils.getComponent(ObjectReferenceResolver.TYPE_REFERENCE, CURRENT);
     }
 
     /**
@@ -467,7 +491,35 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private DocumentReference documentReference;
 
-    private String content;
+    private class Content
+    {
+        final String content;
+
+        /**
+         * Wiki syntax supported by this document. This is used to support different syntaxes inside the same wiki. For
+         * example a page can use the MediaWiki 1.0 syntax while another one uses the XWiki 2.1 syntax.
+         * <p>
+         * This variable is nullable because it's not possible to get the default syntax in the XWikiDocument
+         * constructor right now.
+         */
+        Syntax syntax;
+
+        XDOM xdom;
+
+        volatile LocalDateTime prepareDate;
+
+        Content(String content, Syntax syntax)
+        {
+            this.content = StringUtils.defaultString(content);
+            this.syntax = syntax;
+        }
+    }
+
+    /**
+     * The document structure expressed as a tree of Block objects. We store it for performance reasons since parsing is
+     * a costly operation that we don't want to repeat whenever some code ask for the XDOM information.
+     */
+    private Content content = new Content("", null);
 
     private String meta;
 
@@ -513,12 +565,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     private String comment;
 
     /**
-     * Wiki syntax supported by this document. This is used to support different syntaxes inside the same wiki. For
-     * example a page can use the MediaWiki 1.0 syntax while another one uses the XWiki 2.1 syntax.
-     */
-    private Syntax syntax;
-
-    /**
      * If required rights that can be defined in a {@code XWiki.RequiredRightClass} shall be enforced. For
      * backwards-compatibility reasons, this is {@code false} by default.
      * @since 16.10.0RC1
@@ -539,6 +585,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * Used to make sure the MetaData String is regenerated.
      */
     private boolean isMetaDataDirty = true;
+
+    private boolean changeTracked;
 
     private int elements = HAS_OBJECTS | HAS_ATTACHMENTS;
 
@@ -640,9 +688,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private boolean cached;
 
-    private List<BaseObject> xObjectsToRemove = new ArrayList<BaseObject>();
+    private List<BaseObject> xObjectsToRemove = new ArrayList<>();
 
-    private List<XWikiAttachmentToRemove> attachmentsToRemove = new ArrayList<XWikiAttachmentToRemove>();
+    private List<XWikiAttachmentToRemove> attachmentsToRemove = new ArrayList<>();
 
     /**
      * The view template (vm file) to use. When not set the default view template is used.
@@ -714,14 +762,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     private VelocityContextFactory velocityContextFactory;
 
     private EntityReferenceFactory entityReferenceFactory;
-
-    /**
-     * The document structure expressed as a tree of Block objects. We store it for performance reasons since parsing is
-     * a costly operation that we don't want to repeat whenever some code ask for the XDOM information.
-     */
-    private XDOM xdomCache;
-
-    private volatile LocalDateTime xdomCachePrepareDate;
 
     /**
      * Use to store rendered documents in #getRenderedContent(). Do not inject the component here to avoid any simple
@@ -968,17 +1008,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private String localizePlainOrKey(String key, Object... parameters)
     {
-        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+        return Objects.toString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     private UserReferenceSerializer<DocumentReference> getUserReferenceDocumentReferenceSerializer()
     {
-        return Utils.getComponent(UserReferenceSerializer.TYPE_DOCUMENT_REFERENCE, "document");
+        return Utils.getComponent(UserReferenceSerializer.TYPE_DOCUMENT_REFERENCE, DOCUMENT);
     }
 
     private UserReferenceResolver<DocumentReference> getUserReferenceDocumentReferenceResolver()
     {
-        return Utils.getComponent(UserReferenceResolver.TYPE_DOCUMENT_REFERENCE, "document");
+        return Utils.getComponent(UserReferenceResolver.TYPE_DOCUMENT_REFERENCE, DOCUMENT);
     }
 
     private UserReferenceSerializer<String> getUserReferenceStringSerializer()
@@ -1295,30 +1335,37 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     @Override
     public String getContent()
     {
-        return this.content;
+        return this.content.content;
     }
 
     public void setContent(String content)
     {
-        if (content == null) {
-            content = "";
-        }
-
-        boolean notEqual = !content.equals(this.content);
-
-        this.content = content;
-
-        if (notEqual) {
-            // invalidate parsed xdom
-            resetXDOM();
-            setContentDirty(true);
-            setWikiNode(null);
-        }
+        setContent(content, this.content.syntax);
     }
 
     public void setContent(XDOM content) throws XWikiException
     {
         setContent(renderXDOM(content, getSyntax()));
+    }
+
+    /**
+     * @param content the content of the document
+     * @param syntax the syntax of the content
+     * @since 17.2.0
+     * @since 16.10.6
+     */
+    public void setContent(String content, Syntax syntax)
+    {
+        if (content == null) {
+            content = "";
+        }
+
+        if (!content.equals(this.content.content) || !Objects.equals(syntax, this.content.syntax)) {
+            this.content = new Content(content, syntax);
+
+            setContentDirty(true);
+            setWikiNode(null);
+        }
     }
 
     /**
@@ -1666,7 +1713,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param sourceSyntaxId the id of the Syntax used by the passed text (e.g. {@code xwiki/2.1})
      * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @param sDocument the {@link XWikiDocument} to use as secure document, if null keep the current one
-     * @param isolated true of the content should be executed in this document's context
+     * @param isolated true if the content should be executed in this document's context
      * @param context the XWiki context
      * @return the given text rendered in the context of this document using the passed Syntax
      * @since 14.10
@@ -1950,10 +1997,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public Object getPreparedTitle()
     {
         // If the content is prepared and it's allowed to use the cache, return it
-        if (this.titlePrepareDate != null) {
-            if (getCacheControl().isCacheReadAllowed(this.titlePrepareDate)) {
-                return this.preparedTitle;
-            }
+        if (this.titlePrepareDate != null && getCacheControl().isCacheReadAllowed(this.titlePrepareDate)) {
+            return this.preparedTitle;
         }
 
         return null;
@@ -2087,7 +2132,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // The user API is missing the concept of relative user references ATM so we're forced to check where the users
         // are stored in order to make sure user references stored in the database are relative.
         // See also XWIKI-19442: APIs to generate various String references from a UserReference
-        if ("document".equals(getUserConfiguration().getStoreHint())) {
+        if (DOCUMENT.equals(getUserConfiguration().getStoreHint())) {
             // Users are stored as documents. We want the user references that are stored in the database to be relative
             // as much as possible (because it makes the content portable). For this we omit the wiki reference when the
             // user (profile document) reference is from the same wiki as this document.
@@ -2106,7 +2151,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // The user API is missing the concept of relative user references ATM so if we want to resolve (partial) user
         // references that were stored in the database relative to this document then we need to check where the users
         // are stored. See also XWIKI-19442: APIs to generate various String references from a UserReference
-        if ("document".equals(getUserConfiguration().getStoreHint())) {
+        if (DOCUMENT.equals(getUserConfiguration().getStoreHint())) {
             return getUserReferenceStringResolver().resolve(userString, getDocumentReference().getWikiReference());
         } else {
             return getUserReferenceStringResolver().resolve(userString);
@@ -2141,8 +2186,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             this.authors.setEffectiveMetadataAuthor(GuestUserReference.INSTANCE);
         } else {
             if (authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                    new Exception("See stack trace"));
+                LOGGER.warn(XWIKIGUEST_REFERENCE_WARNING,
+                    new Exception(SEE_STACK_TRACE));
             }
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(authorReference);
             this.authors.setEffectiveMetadataAuthor(user);
@@ -2200,8 +2245,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             this.authors.setContentAuthor(GuestUserReference.INSTANCE);
         } else {
             if (contentAuthorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                    new Exception("See stack trace"));
+                LOGGER.warn(XWIKIGUEST_REFERENCE_WARNING,
+                    new Exception(SEE_STACK_TRACE));
             }
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(contentAuthorReference);
             this.authors.setContentAuthor(user);
@@ -2256,8 +2301,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             this.authors.setCreator(GuestUserReference.INSTANCE);
         } else {
             if (creatorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                    new Exception("See stack trace"));
+                LOGGER.warn(XWIKIGUEST_REFERENCE_WARNING,
+                    new Exception(SEE_STACK_TRACE));
             }
             UserReference user = this.getUserReferenceDocumentReferenceResolver().resolve(creatorReference);
             this.authors.setCreator(user);
@@ -2426,7 +2471,66 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     public void setMetaDataDirty(boolean metaDataDirty)
     {
+        if (metaDataDirty && !this.isMetaDataDirty && isCached()) {
+            // Warn about abusive modification of cached document
+            warnWithStackTrace("Abusive modification of the cached document",
+                "Abusive modification of the cached document [{}]", getDocumentReferenceWithLocale());
+        }
+
         this.isMetaDataDirty = metaDataDirty;
+    }
+
+    /**
+     * @param dirty true the value of the dirty flag(s)
+     * @param deep true if the dirty flag should be set to all children
+     * @since 17.2.1
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public void setDirty(boolean dirty, boolean deep)
+    {
+        setMetaDataDirty(dirty);
+        setContentDirty(dirty);
+
+        if (deep) {
+            if (this.xClass != null) {
+                this.xClass.setDirty(dirty, deep);
+            }
+
+            if (this.xObjects != null) {
+                this.xObjects.values().forEach(objects -> objects.setDirty(dirty, deep));
+            }
+
+            this.attachmentList.setDirty(dirty, deep);
+        }
+    }
+
+    /**
+     * Indicate if flags indicating which part of the document has been modified can be trusted.
+     * 
+     * @return the true if change made to this {@link XWikiDocument} instance are tracked
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    @Unstable
+    public boolean isChangeTracked()
+    {
+        return this.changeTracked;
+    }
+
+    /**
+     * Indicate if flags indicating which part of the document has been modified can be trusted.
+     * 
+     * @param changeTracked true if change made to this {@link XWikiDocument} instance are tracked
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    @Unstable
+    public void setChangeTracked(boolean changeTracked)
+    {
+        this.changeTracked = changeTracked;
     }
 
     public String getAttachmentURL(String filename, XWikiContext context)
@@ -2498,7 +2602,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private boolean isRedirectAbsolute(XWikiContext context)
     {
-        return StringUtils.equals("1", context.getWiki().Param("xwiki.redirect.absoluteurl"));
+        return Strings.CS.equals("1", context.getWiki().Param("xwiki.redirect.absoluteurl"));
     }
 
     public String getURL(String action, boolean redirect, XWikiContext context)
@@ -2564,7 +2668,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public com.xpn.xwiki.api.Document newDocument(String customClassName, XWikiContext context)
     {
-        if (!((customClassName == null) || (customClassName.equals("")))) {
+        if (!((customClassName == null) || (customClassName.isEmpty()))) {
             try {
                 return newDocument(Class.forName(customClassName), context);
             } catch (ClassNotFoundException e) {
@@ -2682,7 +2786,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // discarded by the Garbage collector as long as the context is closed (usually during the
         // request)
         if (arch != null) {
-            this.archive = new SoftReference<XWikiDocumentArchive>(arch);
+            this.archive = new SoftReference<>(arch);
         } else {
             // Some APIs are expecting the archive to be null for loading it
             // (e.g. VersioningStore#loadXWikiDocumentArchive), so we allow setting it back to null.
@@ -2711,7 +2815,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @since 15.10.8
      * @since 16.2.0RC1
      */
-    @Unstable
     public long getRevisionsCount(RevisionCriteria criteria, XWikiContext context) throws XWikiException
     {
         return getVersioningStore(context).getXWikiDocVersionsCount(this, criteria, context);
@@ -2864,7 +2967,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public List<BaseClass> getXClasses(XWikiContext context)
     {
-        List<BaseClass> list = new ArrayList<BaseClass>();
+        List<BaseClass> list = new ArrayList<>();
 
         // getXObjects() is a TreeMap, with elements sorted by className reference
         for (DocumentReference classReference : getXObjects().keySet()) {
@@ -2902,17 +3005,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         DocumentReference absoluteClassReference = resolveClassReference(classReference);
         BaseObject object = BaseClass.newCustomClassInstance(absoluteClassReference, context);
         object.setOwnerDocument(this);
-        object.setXClassReference(classReference);
-        BaseObjects objects = this.xObjects.get(absoluteClassReference);
-        if (objects == null) {
-            objects = new BaseObjects();
-            this.xObjects.put(absoluteClassReference, objects);
-        }
-        objects.add(object);
-        int nb = objects.size() - 1;
-        object.setNumber(nb);
-        setMetaDataDirty(true);
-        return nb;
+        this.addXObject(object);
+        return object.getNumber();
     }
 
     /**
@@ -2972,7 +3066,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         List<BaseObject> xobjects = null;
 
         if (classReference != null) {
-            xobjects = getXObjects().get(classReference);
+            xobjects = getXObjects().get(resolveClassReference(classReference));
         }
 
         return xobjects != null ? xobjects : Collections.emptyList();
@@ -2992,8 +3086,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         if (reference.getType() == EntityType.DOCUMENT) {
             // class reference
-            return getXObjects(
-                getCurrentReferenceDocumentReferenceResolver().resolve(reference, getDocumentReference()));
+            return getXObjects(resolveClassReference(reference));
         }
 
         return Collections.emptyList();
@@ -3006,7 +3099,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public Vector<BaseObject> getObjects(String className)
     {
         List<BaseObject> result = this.xObjects.get(resolveClassReference(className));
-        return result == null ? null : new Vector<BaseObject>(result);
+        return result == null ? null : new Vector<>(result);
     }
 
     /**
@@ -3014,8 +3107,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public void setXObjects(DocumentReference classReference, List<BaseObject> objects)
     {
+        DocumentReference resolvedClassReference = resolveClassReference(classReference);
         // Remove existing objects
-        List<BaseObject> existingbjects = this.xObjects.get(classReference);
+        List<BaseObject> existingbjects = this.xObjects.get(resolvedClassReference);
         if (existingbjects != null) {
             existingbjects.clear();
         }
@@ -3025,7 +3119,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         // Add new objects
-        this.xObjects.put(classReference, new BaseObjects(objects));
+        this.xObjects.put(resolvedClassReference, new BaseObjects(objects));
 
         setMetaDataDirty(true);
     }
@@ -3055,7 +3149,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public BaseObject getXObject(DocumentReference classReference)
     {
         BaseObject result = null;
-        List<BaseObject> objects = getXObjects().get(classReference);
+
+        List<BaseObject> objects = getXObjects().get(resolveClassReference(classReference));
         if (objects != null) {
             for (BaseObject object : objects) {
                 if (object != null) {
@@ -3153,7 +3248,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(DocumentReference classReference, int nb)
     {
-        List<BaseObject> objects = getXObjects().get(classReference);
+        List<BaseObject> objects = getXObjects().get(resolveClassReference(classReference));
 
         if (objects != null && objects.size() > nb) {
             return objects.get(nb);
@@ -3199,8 +3294,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(EntityReference classReference, int nb)
     {
-        return getXObject(
-            getCurrentReferenceDocumentReferenceResolver().resolve(classReference, getDocumentReference()), nb);
+        return getXObject(resolveClassReference(classReference), nb);
     }
 
     /**
@@ -3234,15 +3328,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(EntityReference reference, String key, String value, boolean failover)
     {
-        if (reference instanceof DocumentReference) {
-            return getXObject((DocumentReference) reference, key, value, failover);
-        } else if (reference.getType() == EntityType.DOCUMENT) {
-            // class reference
-            return getXObject(getCurrentReferenceDocumentReferenceResolver().resolve(reference, getDocumentReference()),
-                key, value, failover);
-        }
-
-        return null;
+        return getXObject(resolveClassReference(reference), key, value, failover);
     }
 
     /**
@@ -3250,35 +3336,34 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(DocumentReference classReference, String key, String value, boolean failover)
     {
+        DocumentReference resolvedClassReference = resolveClassReference(classReference);
         try {
             if (value == null) {
                 if (failover) {
-                    return getXObject(classReference);
+                    return getXObject(resolvedClassReference);
                 } else {
                     return null;
                 }
             }
 
-            List<BaseObject> objects = getXObjects().get(classReference);
-            if ((objects == null) || (objects.size() == 0)) {
+            List<BaseObject> objects = getXObjects().get(resolvedClassReference);
+            if ((objects == null) || (objects.isEmpty())) {
                 return null;
             }
             for (BaseObject obj : objects) {
-                if (obj != null) {
-                    if (value.equals(obj.getStringValue(key))) {
-                        return obj;
-                    }
+                if (obj != null && value.equals(obj.getStringValue(key))) {
+                    return obj;
                 }
             }
 
             if (failover) {
-                return getXObject(classReference);
+                return getXObject(resolvedClassReference);
             } else {
                 return null;
             }
         } catch (Exception e) {
             if (failover) {
-                return getXObject(classReference);
+                return getXObject(resolvedClassReference);
             }
 
             LOGGER.warn("Exception while accessing objects for document [{}]: {}", getDocumentReference(),
@@ -3390,6 +3475,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     /**
      * @return true if the document is a new one (i.e. it has never been saved) or false otherwise
      */
+    @Override
     public boolean isNew()
     {
         return this.isNew;
@@ -3693,6 +3779,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     /**
      * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param obj the object containing the field to display
+     * @param isolated true if the property should be displayed in it's own document context
+     * @param number true if the number you be part of the input name, false otherwise
+     * @param context the XWiki context
+     * @return the rendered field
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public String display(String fieldname, String type, BaseObject obj, boolean isolated, boolean number,
+        XWikiContext context)
+    {
+        return display(fieldname, type, "", obj, isolated, number, context);
+    }
+
+    /**
+     * @param fieldname the name of the field to display
      * @param mode the mode to use ("view", "edit", ...)
      * @param prefix the prefix to add in the field identifier in edit display for example
      * @param context the XWiki context
@@ -3764,6 +3867,25 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param type the type of the field to display
      * @param pref the prefix to add in the field identifier in edit display for example
      * @param obj the object containing the field to display
+     * @param isolated true if the property should be displayed in it's own document context
+     * @param number true if the number you be part of the input name, false otherwise
+     * @param context the XWiki context
+     * @return the rendered field
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public String display(String fieldname, String type, String pref, BaseObject obj, boolean isolated, boolean number,
+        XWikiContext context)
+    {
+        return display(fieldname, type, pref, obj, context.getWiki().getCurrentContentSyntaxId(getSyntaxId(), context),
+            isolated, number, context);
+    }
+
+    /**
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param pref the prefix to add in the field identifier in edit display for example
+     * @param obj the object containing the field to display
      * @param wrappingSyntaxId the syntax of the content in which the result will be included. This to take care of some
      *            escaping depending of the syntax.
      * @param context the XWiki context
@@ -3789,12 +3911,32 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public String display(String fieldname, String type, String pref, BaseObject obj, String wrappingSyntaxId,
         boolean isolated, XWikiContext context)
     {
+        return display(fieldname, type, pref, obj, wrappingSyntaxId, isolated, true, context);
+    }
+
+    /**
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param pref the prefix to add in the field identifier in edit display for example
+     * @param obj the object containing the field to display
+     * @param wrappingSyntaxId the syntax of the content in which the result will be included. This to take care of some
+     *            escaping depending of the syntax.
+     * @param isolated true if the property should be displayed in it's own document context
+     * @param number true if the number you be part of the input name, false otherwise
+     * @param context the XWiki context
+     * @return the rendered field
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public String display(String fieldname, String type, String pref, BaseObject obj, String wrappingSyntaxId,
+        boolean isolated, boolean number, XWikiContext context)
+    {
         if (obj == null) {
             return "";
         }
 
         boolean isInRenderingEngine = BooleanUtils.toBoolean((Boolean) context.get("isInRenderingEngine"));
-        HashMap<String, Object> backup = new HashMap<String, Object>();
+        HashMap<String, Object> backup = new HashMap<>();
         XWikiDocument currentSDoc = (XWikiDocument) context.get(CKEY_SDOC);
         try {
             if (isolated) {
@@ -3815,16 +3957,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             type = type.toLowerCase();
             StringBuffer result = new StringBuffer();
             PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
-            String prefix = pref + LOCAL_REFERENCE_SERIALIZER.serialize(obj.getXClass(context).getDocumentReference())
-                + "_" + obj.getNumber() + "_";
+
+            StringBuilder builder = new StringBuilder(pref);
+            builder.append(LOCAL_REFERENCE_SERIALIZER.serialize(obj.getXClass(context).getDocumentReference()));
+            if (number) {
+                builder.append('_');
+                builder.append(obj.getNumber());
+            }
+            builder.append('_');
+            String prefix = builder.toString();
 
             if (pclass == null) {
                 return "";
             } else if (pclass.isCustomDisplayed(context)) {
                 pclass.displayCustom(result, fieldname, prefix, type, obj, context);
-            } else if (type.equals("view")) {
+            } else if ("view".equals(type)) {
                 pclass.displayView(result, fieldname, prefix, obj, isolated, context);
-            } else if (type.equals("rendered")) {
+            } else if ("rendered".equals(type)) {
                 String fcontent = pclass.displayView(fieldname, prefix, obj, context);
                 // This mode is deprecated for the new rendering and should also be removed for the old rendering
                 // since the way to implement this now is to choose the type of rendering to do in the class itself.
@@ -3834,7 +3983,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 } else {
                     result.append(fcontent);
                 }
-            } else if (type.equals("edit")) {
+            } else if ("edit".equals(type)) {
                 context.addDisplayedField(fieldname);
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
@@ -3842,33 +3991,31 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 if (is10Syntax(wrappingSyntaxId)) {
                     // Don't use pre when not in the rendernig engine since for template we don't evaluate wiki syntax.
                     if (isInRenderingEngine) {
-                        result.append("{pre}");
+                        result.append(PRE_START);
                     }
                 }
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
-                if (is10Syntax(wrappingSyntaxId)) {
-                    if (isInRenderingEngine) {
-                        result.append("{/pre}");
-                    }
+                if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
+                    result.append(PRE_END);
                 }
-            } else if (type.equals("hidden")) {
+            } else if (HIDDEN.equals(type)) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
                 if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
-                    result.append("{pre}");
+                    result.append(PRE_START);
                 }
                 pclass.displayHidden(result, fieldname, prefix, obj, context);
                 if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
-                    result.append("{/pre}");
+                    result.append(PRE_END);
                 }
-            } else if (type.equals("search")) {
+            } else if ("search".equals(type)) {
                 // Backward compatibility
 
                 // Check if the method has been injected using aspects
                 Method searchMethod = null;
                 for (Method method : pclass.getClass().getMethods()) {
-                    if (method.getName().equals("displaySearch") && method.getParameterTypes().length == 5) {
+                    if ("displaySearch".equals(method.getName()) && method.getParameterTypes().length == 5) {
                         searchMethod = method;
                         break;
                     }
@@ -3880,12 +4027,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     // the
                     // escaping. For example for a textarea check the TextAreaClass class.
                     if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
-                        result.append("{pre}");
+                        result.append(PRE_START);
                     }
                     prefix = LOCAL_REFERENCE_SERIALIZER.serialize(obj.getXClass(context).getDocumentReference()) + "_";
                     searchMethod.invoke(pclass, result, fieldname, prefix, context.get("query"), context);
                     if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
-                        result.append("{/pre}");
+                        result.append(PRE_END);
                     }
                 } else {
                     pclass.displayView(result, fieldname, prefix, obj, context);
@@ -3903,14 +4050,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             // macro syntax since it's not needed for pure text
             if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId)
                 && (HTMLUtils.containsElementText(result) || result.indexOf("{") != -1)) {
-                result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
-                // Escape closing HTML macro syntax.
-                int startIndex = 0;
-                // Start searching at the last match to avoid scanning the whole string again.
-                while ((startIndex = result.indexOf(CLOSE_HTML_MACRO, startIndex)) != -1) {
-                    result.replace(startIndex, startIndex + 2, "&#123;&#123;");
-                }
-                result.append(CLOSE_HTML_MACRO);
+                // Escapes closing and opening HTML macro syntax. We need to escape the opening HTML macro syntax in
+                // addition to the closing one as otherwise, the wrapping HTML macro might not close correctly.
+                // For simplicity, to avoid having to deal with complex expressions that would need to be
+                // synchronized with the parser, match just the start of the opening/closing macro syntax.
+                return "{{html clean=\"false\" wiki=\"false\"}}"
+                    + StringUtils.replaceEach(result.toString(), HTML_MACRO_SEARCH_STRINGS, HTML_MACRO_REPLACE_STRINGS)
+                    + "{{/html}}";
             }
 
             return result.toString();
@@ -3967,7 +4113,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         BaseClass bclass = firstobject.getXClass(context);
-        if (bclass.getPropertyList().size() == 0) {
+        if (bclass.getPropertyList().isEmpty()) {
             return "";
         }
 
@@ -4054,7 +4200,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         BaseClass bclass = firstobject.getXClass(context);
-        if (bclass.getPropertyList().size() == 0) {
+        if (bclass.getPropertyList().isEmpty()) {
             return "";
         }
 
@@ -4062,7 +4208,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         result.append("{table}\n");
         boolean first = true;
         for (String propertyName : bclass.getPropertyList()) {
-            if (first == true) {
+            if (first) {
                 first = false;
             } else {
                 result.append("|");
@@ -4076,14 +4222,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             if (object != null) {
                 first = true;
                 for (String propertyName : bclass.getPropertyList()) {
-                    if (first == true) {
+                    if (first) {
                         first = false;
                     } else {
                         result.append("|");
                     }
                     String data = display(propertyName, object, context);
                     data = data.trim();
-                    data = data.replaceAll("\n", " ");
+                    data = data.replace("\n", " ");
                     if (data.length() == 0) {
                         result.append("&nbsp;");
                     } else {
@@ -4113,7 +4259,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @return true if this {@link XWikiDocument} is in the document cache
      * @since 16.10.0RC1
      */
-    @Unstable
     public boolean isCached()
     {
         return this.cached;
@@ -4123,7 +4268,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param cached true if this {@link XWikiDocument} is in the document cache
      * @since 16.10.0RC1
      */
-    @Unstable
     public void setCached(boolean cached)
     {
         this.cached = cached;
@@ -4160,11 +4304,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         String creator = eform.getCreator();
-        if ((creator != null) && (!creator.equals(getCreator()))) {
-            if ((getCreatorReference().equals(context.getUserReference()))
-                || (context.getWiki().getRightService().hasAdminRights(context))) {
-                setCreator(creator);
-            }
+        if ((creator != null) && (!creator.equals(getCreator()))
+            && ((getCreatorReference().equals(context.getUserReference()))
+                || (context.getWiki().getRightService().hasAdminRights(context)))) {
+            setCreator(creator);
         }
 
         String parent = eform.getParent();
@@ -4179,7 +4322,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         // Read the minor edit checkbox from the form
-        setMinorEdit(eform.isMinorEdit());
+        boolean minorEdit = context.getWiki().hasMinorEdit(context) && eform.isMinorEdit();
+        setMinorEdit(minorEdit);
 
         String tags = eform.getTags();
         if (!StringUtils.isEmpty(tags)) {
@@ -4424,9 +4568,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         // We add the new objects that have been submitted in the form, before filling them with their values.
         Map<String, List<Integer>> objectsToAdd = eform.getObjectsToAdd();
-        for (String className : objectsToAdd.keySet()) {
-            DocumentReference classReference = resolveClassReference(className);
-            List<Integer> classIds = objectsToAdd.get(className);
+        for (Map.Entry<String, List<Integer>> entry : objectsToAdd.entrySet()) {
+            DocumentReference classReference = resolveClassReference(entry.getKey());
+            List<Integer> classIds = entry.getValue();
             for (Integer classId : classIds) {
                 // we ensure that the object has not been added yet, for example because of the update or create.
                 getXObject(classReference, classId, true, context);
@@ -4442,9 +4586,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         // remove xobjects
         Map<String, List<Integer>> objectsToRemove = eform.getObjectsToRemove();
-        for (String className : objectsToRemove.keySet()) {
-            DocumentReference classReference = resolveClassReference(className);
-            List<Integer> classIds = objectsToRemove.get(className);
+        for (Map.Entry<String, List<Integer>> entry : objectsToRemove.entrySet()) {
+            DocumentReference classReference = resolveClassReference(entry.getKey());
+            List<Integer> classIds = entry.getValue();
             for (Integer classId : classIds) {
                 BaseObject xObject = getXObject(classReference, classId);
                 if (xObject != null) {
@@ -4462,7 +4606,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         if (templateDocumentReference != null) {
             String content = getContent();
-            if (!content.equals("\n") && !content.equals("") && !isNew()) {
+            if (!"\n".equals(content) && !"".equals(content) && !isNew()) {
                 Object[] args = {getDefaultEntityReferenceSerializer().serialize(getDocumentReference())};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
@@ -4485,6 +4629,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     // is copied into the new document
                     setSyntax(templatedoc.getSyntax());
 
+                    // Keep the enforce required rights setting from the template
+                    setEnforceRequiredRights(templatedoc.isEnforceRequiredRights());
+
                     // If the parent is not set in the current document set the template parent as the parent.
                     if (getParentReference() == null) {
                         setParentReference(templatedoc.getRelativeParentReference());
@@ -4493,7 +4640,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     if (isNew()) {
                         // We might have received the objects from the cache and the template objects might have been
                         // copied already we need to remove them
-                        setXObjects(new TreeMap<DocumentReference, List<BaseObject>>());
+                        setXObjects(new TreeMap<>());
                     }
                     // Merge the external objects.
                     // Currently the choice is not to merge the base class and object because it is not the preferred
@@ -4503,7 +4650,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     // Copy the attachments from the template document, but don't overwrite existing attachments because
                     // the user can add attachments from the WYSIWYG editor before the save button is clicked (and thus
                     // before the template is applied).
-                    copyAttachments(templatedoc, false);
+                    copyAttachments(templatedoc, false, true);
                 }
             }
         }
@@ -4595,6 +4742,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             Constructor<? extends XWikiDocument> constructor = getClass().getConstructor(DocumentReference.class);
             doc = constructor.newInstance(newDocumentReference);
 
+            if (keepsIdentity && getDocumentReference().equals(doc.getDocumentReference())) {
+                doc.setChangeTracked(isChangeTracked());
+            }
+
             // Make sure the coordinate of the document is fully accurate before any other manipulation
             doc.setLocale(getLocale());
 
@@ -4610,7 +4761,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 doc.setDocumentArchive((XWikiDocumentArchive) null);
             }
             doc.getAuthors().copyAuthors(getAuthors());
-            doc.setContent(getContent());
             doc.setCreationDate(getCreationDate());
             doc.setDate(getDate());
             doc.setCustomClass(getCustomClass());
@@ -4630,13 +4780,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             doc.setValidationScript(getValidationScript());
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
-            doc.setSyntax(getSyntax());
             doc.setHidden(isHidden());
             doc.setRestricted(isRestricted());
             doc.setEnforceRequiredRights(isEnforceRequiredRights());
 
             if (this.xClass != null) {
-                doc.setXClass(this.xClass.clone());
+                doc.setXClass(this.xClass.clone(true));
             }
 
             if (keepsIdentity) {
@@ -4647,6 +4796,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 doc.copyAttachments(this);
             }
             doc.cloneXObjects(this, keepsIdentity);
+
+            // Keep the same content and more importantly the same cache of parser/prepared content (it will become
+            // different if the content/syntax is modified in any of the documents)
+            doc.content = this.content;
 
             doc.setContentDirty(isContentDirty());
             doc.setMetaDataDirty(isMetaDataDirty());
@@ -4699,6 +4852,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private void copyAttachments(XWikiDocument sourceDocument, boolean overwrite)
     {
+        copyAttachments(sourceDocument, overwrite, false);
+    }
+
+    private void copyAttachments(XWikiDocument sourceDocument, boolean overwrite, boolean reset)
+    {
         if (overwrite) {
             // Note: when clearing the attachment list, we automatically mark the document's metadata as dirty.
             getAttachmentList().clear();
@@ -4707,13 +4865,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         for (XWikiAttachment attachment : sourceDocument.getAttachmentList()) {
             if (overwrite || this.getAttachment(attachment.getFilename()) == null) {
                 try {
-                    copyAttachment(attachment, true);
+                    copyAttachment(attachment, reset);
                 } catch (XWikiException e) {
                     LOGGER.warn("Cannot copy attachment [{}] from [{}] to [{}]. Root cause is [{}].",
                         attachment.getFilename(), sourceDocument.getDocumentReference(), this.getDocumentReference(),
                         ExceptionUtils.getRootCauseMessage(e));
-                    // Skip this attachment because we cannot load its content.
-                    continue;
                 }
             }
         }
@@ -4729,28 +4885,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private void copyAttachment(XWikiAttachment attachment, boolean reset) throws XWikiException
     {
-        XWikiContext xcontext = getXWikiContext();
-        XWikiAttachment newAttachment = attachment.clone();
-
-        // Make sure we copy the attachment content also, not just its meta data. For this we need to load
-        // the attachment content from the source document. Note that the owner document will be overwritten
-        // below when we call setAttachment().
-        newAttachment.setDoc(attachment.getDoc(), false);
-        newAttachment.loadAttachmentContent(xcontext);
-        // We need to set the content of the attachment to be dirty because the dirty bit is used to signal
-        // that there is a reason to save the copied attachment, otherwise the copied attachment will be
-        // empty since the original attachment content is not modified in this operation.
-        newAttachment.getAttachment_content().setContentDirty(true);
+        XWikiAttachment newAttachment = attachment.cloneWithActualContent(getXWikiContext());
 
         if (reset) {
             // Reset the meta data that is specific to the original attachment (version, author, date).
             newAttachment.setRCSVersion(null);
-            newAttachment.setAuthorReference(xcontext.getUserReference());
+            newAttachment.setAuthorReference(getXWikiContext().getUserReference());
             newAttachment.setDate(new Date());
         }
 
         // Add the attachment copy to the list of attachments of this document.
+        newAttachment.setDirty(true, true);
         setAttachment(newAttachment);
+        setMetaDataDirty(true);
     }
 
     /**
@@ -5690,7 +5837,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         try {
             List<String> list = context.getUtil().getUniqueMatches(getContent(), "\\[(.*?)\\]", 1);
-            pageNames = new HashSet<DocumentReference>(list.size());
+            pageNames = new HashSet<>(list.size());
 
             DocumentReference currentDocumentReference = getDocumentReference();
             for (String name : list) {
@@ -5712,8 +5859,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 }
 
                 // Let's get rid of anything that's not a real link
-                if (name.trim().equals("") || (name.indexOf('$') != -1) || (name.indexOf("://") != -1)
-                    || (name.indexOf('"') != -1) || (name.indexOf('\'') != -1) || (name.indexOf("..") != -1)
+                if (name.trim().isEmpty() || (name.indexOf('$') != -1) || (name.contains("://"))
+                    || (name.indexOf('"') != -1) || (name.indexOf('\'') != -1) || (name.contains(".."))
                     || (name.indexOf(':') != -1) || (name.indexOf('=') != -1)) {
                     continue;
                 }
@@ -5946,7 +6093,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * Returns a list of references of all documents which list this document as their parent, in the current wiki.
+     * Returns a list of references of all documents which list this document as their parent, in the wiki of current
+     * document.
      *
      * @param nb The number of results to return.
      * @param start The number of results to skip before we begin returning results.
@@ -5967,24 +6115,25 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // the current wiki.
         // - the parent document reference saved in the database matches the page name part of this document's
         // reference (eg "page") and the parent document's space is the same as this document's space.
-        List<DocumentReference> children = new ArrayList<DocumentReference>();
+        List<DocumentReference> children = new ArrayList<>();
 
         try {
+            WikiReference wikiReference = this.getDocumentReference().getWikiReference();
             Query query = getStore().getQueryManager()
                 .createQuery("select distinct doc.fullName from XWikiDocument doc where "
                     + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
                     Query.XWQL);
-            query.addFilter(Utils.getComponent(QueryFilter.class, "hidden"));
+            query.addFilter(Utils.getComponent(QueryFilter.class, HIDDEN));
             query.bindValue("prefixedFullName",
                 getDefaultEntityReferenceSerializer().serialize(getDocumentReference()));
             query.bindValue("fullName", LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference()));
             query.bindValue("name", getDocumentReference().getName());
             query.bindValue("space",
                 LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference().getLastSpaceReference()));
-            query.setLimit(nb).setOffset(start);
+            query.setLimit(nb).setOffset(start).setWiki(wikiReference.getName());
 
             List<String> queryResults = query.execute();
-            WikiReference wikiReference = this.getDocumentReference().getWikiReference();
+
             for (String fullName : queryResults) {
                 children.add(getCurrentDocumentReferenceResolver().resolve(fullName, wikiReference));
             }
@@ -6002,7 +6151,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     @Deprecated(since = "2.2M2")
     public List<String> getChildren(int nb, int start, XWikiContext context) throws XWikiException
     {
-        List<String> childrenNames = new ArrayList<String>();
+        List<String> childrenNames = new ArrayList<>();
         for (DocumentReference reference : getChildrenReferences(nb, start, context)) {
             childrenNames.add(LOCAL_REFERENCE_SERIALIZER.serialize(reference));
         }
@@ -6144,7 +6293,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             // Find all include macros listed on the page
             XDOM dom = getXDOM();
 
-            List<String> result = new ArrayList<String>();
+            List<String> result = new ArrayList<>();
             List<MacroBlock> macroBlocks =
                 dom.getBlocks(new ClassBlockMatcher(MacroBlock.class), Block.Axes.DESCENDANT);
             for (MacroBlock macroBlock : macroBlocks) {
@@ -6154,10 +6303,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 // This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to
                 // play nice with people migrating from 1.0 to 2.0 syntax
 
-                if (macroBlock.getId().equalsIgnoreCase("include") || macroBlock.getId().equalsIgnoreCase("display")) {
-                    String documentName = macroBlock.getParameters().get("reference");
+                if ("include".equalsIgnoreCase(macroBlock.getId()) || "display".equalsIgnoreCase(macroBlock.getId())) {
+                    String documentName = macroBlock.getParameters().get(REFERENCE);
                     if (StringUtils.isEmpty(documentName)) {
-                        documentName = macroBlock.getParameters().get("document");
+                        documentName = macroBlock.getParameters().get(DOCUMENT);
                         if (StringUtils.isEmpty(documentName)) {
                             continue;
                         }
@@ -6173,7 +6322,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     documentName = LOCAL_REFERENCE_SERIALIZER.serialize(documentReference);
 
                     result.add(documentName);
-                } else if (macroBlock.getId().equalsIgnoreCase("velocity")
+                } else if ("velocity".equalsIgnoreCase(macroBlock.getId())
                     && !StringUtils.isEmpty(macroBlock.getContent())) {
                     // Try to find matching content inside each velocity macro
                     result.addAll(getIncludedPagesForXWiki10Syntax(macroBlock.getContent(), context));
@@ -6243,17 +6392,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public XWikiAttachment getAttachment(String filename)
     {
         XWikiAttachment output = this.attachmentList.getByFilename(filename);
-        if (output != null) {
-            return output;
-        }
-
-        for (XWikiAttachment attach : getAttachmentList()) {
-            if (attach.getFilename().startsWith(filename + ".")) {
-                return attach;
+        if (output == null && filename != null) {
+            for (XWikiAttachment attach : getAttachmentList()) {
+                if (attach.getFilename().startsWith(filename + ".")) {
+                    output = attach;
+                    break;
+                }
             }
         }
-
-        return null;
+        return output;
     }
 
     /**
@@ -6292,6 +6439,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public XWikiAttachment setAttachment(XWikiAttachment attachment)
     {
+        attachment.setDoc(this);
         return this.attachmentList.set(attachment);
     }
 
@@ -6890,7 +7038,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public String getRealLanguage()
     {
         String lang = getLanguage();
-        if (lang.equals("")) {
+        if ("".equals(lang)) {
             return getDefaultLanguage();
         } else {
             return lang;
@@ -6936,7 +7084,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         List<String> translations = getTranslationList(context);
 
-        List<Locale> locales = new ArrayList<Locale>(translations.size());
+        List<Locale> locales = new ArrayList<>(translations.size());
         for (String translationString : translations) {
             locales.add(LocaleUtils.toLocale(translationString));
         }
@@ -6996,7 +7144,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             LOGGER.debug("Exception getting differences from previous version", ex);
         }
 
-        return new ArrayList<Delta>();
+        return new ArrayList<>();
     }
 
     public List<Delta> getRenderedContentDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
@@ -7027,7 +7175,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     protected List<Delta> getDeltas(Revision rev)
     {
-        List<Delta> list = new ArrayList<Delta>();
+        List<Delta> list = new ArrayList<>();
         for (int i = 0; i < rev.size(); i++) {
             list.add(rev.getDelta(i));
         }
@@ -7053,7 +7201,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public List<MetaDataDiff> getMetaDataDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
         throws XWikiException
     {
-        List<MetaDataDiff> list = new ArrayList<MetaDataDiff>();
+        List<MetaDataDiff> list = new ArrayList<>();
 
         if (fromDoc == null || toDoc == null) {
             return list;
@@ -7075,7 +7223,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         if (ObjectUtils.notEqual(fromDoc.getDocumentReference(), toDoc.getDocumentReference())) {
-            list.add(new MetaDataDiff("reference", fromDoc.getDocumentReference(), toDoc.getDocumentReference()));
+            list.add(new MetaDataDiff(REFERENCE, fromDoc.getDocumentReference(), toDoc.getDocumentReference()));
         }
 
         if (!fromDoc.getSpace().equals(toDoc.getSpace())) {
@@ -7099,7 +7247,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         if (fromDoc.isHidden() != toDoc.isHidden()) {
-            list.add(new MetaDataDiff("hidden", fromDoc.isHidden(), toDoc.isHidden()));
+            list.add(new MetaDataDiff(HIDDEN, fromDoc.isHidden(), toDoc.isHidden()));
         }
 
         if (fromDoc.isEnforceRequiredRights() != toDoc.isEnforceRequiredRights()) {
@@ -7140,7 +7288,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public List<List<ObjectDiff>> getObjectDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
     {
-        List<List<ObjectDiff>> difflist = new ArrayList<List<ObjectDiff>>();
+        List<List<ObjectDiff>> difflist = new ArrayList<>();
 
         // Since objects could have been deleted or added, we iterate on both the old and the new
         // object collections.
@@ -7204,7 +7352,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     public List<List<ObjectDiff>> getClassDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
     {
-        List<List<ObjectDiff>> difflist = new ArrayList<List<ObjectDiff>>();
+        List<List<ObjectDiff>> difflist = new ArrayList<>();
         BaseClass oldClass = fromDoc.getXClass();
         BaseClass newClass = toDoc.getXClass();
 
@@ -7228,7 +7376,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public List<AttachmentDiff> getAttachmentDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
     {
-        List<AttachmentDiff> difflist = new ArrayList<AttachmentDiff>();
+        List<AttachmentDiff> difflist = new ArrayList<>();
         for (XWikiAttachment origAttach : fromDoc.getAttachmentList()) {
             String fileName = origAttach.getFilename();
             XWikiAttachment newAttach = toDoc.getAttachment(fileName);
@@ -7282,10 +7430,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     result = restoredAttachment;
                 }
 
-                if (result != null) {
-                    if (!Objects.equals(attachment.getVersion(), result.getVersion())) {
-                        result = result.getAttachmentRevision(attachment.getVersion(), context);
-                    }
+                if (result != null && !Objects.equals(attachment.getVersion(), result.getVersion())) {
+                    result = result.getAttachmentRevision(attachment.getVersion(), context);
                 }
             }
         } catch (XWikiException e) {
@@ -7348,7 +7494,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         // If the copied document has a title set to the original page name then set the new title to be the new page
         // name.
-        if (StringUtils.equals(newdoc.getTitle(), getPrettyName(this.getDocumentReference()))) {
+        if (Strings.CS.equals(newdoc.getTitle(), getPrettyName(this.getDocumentReference()))) {
             newdoc.setTitle(getPrettyName(newDocumentReference));
         }
 
@@ -7515,8 +7661,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     private String getDefaultEditModeInternal(XWikiContext context) throws XWikiException
     {
         String editModeProperty = "defaultEditMode";
-        DocumentReference editModeClass =
-            getCurrentReferenceDocumentReferenceResolver().resolve(XWikiConstant.EDIT_MODE_CLASS);
+        LocalDocumentReference editModeClass = new LocalDocumentReference(XWikiConstant.EDIT_MODE_CLASS);
         // check if the current document has any edit mode class object attached to it, and read the edit mode from it
         BaseObject editModeObject = this.getXObject(editModeClass);
         if (editModeObject != null) {
@@ -7531,7 +7676,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
         if (is10Syntax()) {
             if (getContent().indexOf("includeForm(") != -1) {
-                return "inline";
+                return INLINE;
             }
         } else {
             // Algorithm: look in all include macros and for all document included check if one of them
@@ -7546,9 +7691,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 // For backward-compatibility we also check for a "document" parameter since this is the parameter name
                 // that was used prior to XWiki 3.4M1 when the "reference" one was introduced and thus when the
                 // "document" one was deprecated.
-                String includedDocumentReference = macroBlock.getParameter("reference");
+                String includedDocumentReference = macroBlock.getParameter(REFERENCE);
                 if (includedDocumentReference == null) {
-                    includedDocumentReference = macroBlock.getParameter("document");
+                    includedDocumentReference = macroBlock.getParameter(DOCUMENT);
                 }
                 if (includedDocumentReference != null) {
                     // Resolve the document name into a valid Reference
@@ -7568,7 +7713,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                             if (StringUtils.isBlank(defaultEditMode)) {
                                 // TODO: maybe here the real value should be returned if the object is edit mode class,
                                 // and inline only if the object is sheetclass
-                                return "inline";
+                                return INLINE;
                             } else {
                                 return defaultEditMode;
                             }
@@ -7585,8 +7730,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         String editMode = getDefaultEditMode(context);
 
-        if ("inline".equals(editMode)) {
-            return getEditURL("inline", "", context);
+        if (INLINE.equals(editMode)) {
+            return getEditURL(INLINE, "", context);
         } else {
             com.xpn.xwiki.XWiki xwiki = context.getWiki();
             String editor = xwiki.getEditorPreference(context);
@@ -7600,7 +7745,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         String language = "";
         XWikiDocument tdoc = (XWikiDocument) context.get(CKEY_TDOC);
         String realLang = tdoc.getRealLanguage(context);
-        if ((xwiki.isMultiLingual(context) == true) && (!realLang.equals(""))) {
+        if (xwiki.isMultiLingual(context) && (!"".equals(realLang))) {
             language = realLang;
         }
 
@@ -7610,13 +7755,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     public String getEditURL(String action, String mode, String language, XWikiContext context)
     {
         StringBuilder editparams = new StringBuilder();
-        if (!mode.equals("")) {
+        if (!"".equals(mode)) {
             editparams.append("xpage=");
             editparams.append(mode);
         }
 
-        if (!language.equals("")) {
-            if (!mode.equals("")) {
+        if (!"".equals(language)) {
+            if (!"".equals(mode)) {
                 editparams.append("&");
             }
             editparams.append("language=");
@@ -7658,11 +7803,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         // Can't be initialized in the XWikiDocument constructor because #getDefaultDocumentSyntax() need to create a
         // XWikiDocument object to get preferences from wiki preferences pages and would thus generate an infinite loop
-        if (isNew() && this.syntax == null) {
-            this.syntax = getDefaultDocumentSyntax();
+        if (isNew() && this.content.syntax == null) {
+            this.content.syntax = getDefaultDocumentSyntax();
         }
 
-        return this.syntax;
+        return this.content.syntax;
     }
 
     /**
@@ -7688,14 +7833,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public void setSyntax(Syntax syntax)
     {
-        if (ObjectUtils.notEqual(this.syntax, syntax)) {
-            this.syntax = syntax;
-
-            // invalidate parsed xdom
-            resetXDOM();
-            setContentDirty(true);
-            setWikiNode(null);
-        }
+        setContent(this.content.content, syntax);
     }
 
     /**
@@ -7729,7 +7867,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * use more rights than defined in the object, {@code false} otherwise
      * @since 16.10.0RC1
      */
-    @Unstable
+    @Override
     public boolean isEnforceRequiredRights()
     {
         return this.enforceRequiredRights;
@@ -7741,7 +7879,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * more rights than defined in the object
      * @since 16.10.0RC1
      */
-    @Unstable
     public void setEnforceRequiredRights(boolean enforceRequiredRights)
     {
         this.enforceRequiredRights = enforceRequiredRights;
@@ -7755,9 +7892,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         if (list == null) {
             return null;
         } else if (asc) {
-            return new Vector<BaseObject>(list);
+            return new Vector<>(list);
         } else {
-            Vector<BaseObject> newlist = new Vector<BaseObject>();
+            Vector<BaseObject> newlist = new Vector<>();
             for (int i = list.size() - 1; i >= 0; i--) {
                 newlist.add(list.get(i));
             }
@@ -7914,8 +8051,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     {
         @SuppressWarnings("unchecked")
         Map<String, String[]> map = context.getRequest().getParameterMap();
-        List<Integer> objectsNumberDone = new ArrayList<Integer>();
-        List<BaseObject> objects = new ArrayList<BaseObject>();
+        List<Integer> objectsNumberDone = new ArrayList<>();
+        List<BaseObject> objects = new ArrayList<>();
         String start = pref + LOCAL_REFERENCE_SERIALIZER.serialize(classReference) + "_";
 
         for (String name : map.keySet()) {
@@ -8102,8 +8239,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         DocumentReference absoluteClassReference = resolveClassReference(classReference);
         @SuppressWarnings("unchecked")
         Map<String, String[]> map = context.getRequest().getParameterMap();
-        List<Integer> objectsNumberDone = new ArrayList<Integer>();
-        List<BaseObject> objects = new ArrayList<BaseObject>();
+        List<Integer> objectsNumberDone = new ArrayList<>();
+        List<BaseObject> objects = new ArrayList<>();
         String start = pref + LOCAL_REFERENCE_SERIALIZER.serialize(absoluteClassReference) + "_";
 
         for (String name : map.keySet()) {
@@ -8301,7 +8438,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         if (is10Syntax()) {
             return getSections10();
         } else {
-            List<DocumentSection> splitSections = new ArrayList<DocumentSection>();
+            List<DocumentSection> splitSections = new ArrayList<>();
             List<HeaderBlock> headers = getFilteredHeaders();
 
             int sectionNumber = 1;
@@ -8344,7 +8481,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private List<HeaderBlock> getFilteredHeaders()
     {
-        List<HeaderBlock> filteredHeaders = new ArrayList<HeaderBlock>();
+        List<HeaderBlock> filteredHeaders = new ArrayList<>();
 
         // Get the maximum header level
         int sectionDepth = 2;
@@ -8423,7 +8560,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // Pattern to match the title. Matches only level 1 and level 2 headings.
         Pattern headingPattern = Pattern.compile("^[ \\t]*+(1(\\.1){0,1}+)[ \\t]++(.++)$", Pattern.MULTILINE);
         Matcher matcher = headingPattern.matcher(getContent());
-        List<DocumentSection> splitSections = new ArrayList<DocumentSection>();
+        List<DocumentSection> splitSections = new ArrayList<>();
         int sectionNumber = 0;
         // find title to split
         while (matcher.find()) {
@@ -8862,11 +8999,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             validationScript = req.get("xvalidation");
         }
 
-        if ((validationScript == null) || (validationScript.trim().equals(""))) {
+        if ((validationScript == null) || (validationScript.trim().isEmpty())) {
             validationScript = getValidationScript();
         }
 
-        if ((validationScript != null) && (!validationScript.trim().equals(""))) {
+        if ((validationScript != null) && (!validationScript.trim().isEmpty())) {
             isValid &= executeValidationScript(context, validationScript);
         }
 
@@ -8952,10 +9089,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public void setHidden(Boolean hidden)
     {
+        boolean hiddenValue;
         if (hidden == null) {
-            this.hidden = false;
+            hiddenValue = false;
         } else {
-            this.hidden = hidden;
+            hiddenValue = hidden;
+        }
+
+        if (this.hidden != hiddenValue) {
+            this.hidden = hiddenValue;
+
+            setMetaDataDirty(hiddenValue);
         }
     }
 
@@ -9047,18 +9191,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     @Override
     public XDOM getXDOM()
     {
-        if (this.xdomCache == null) {
-            this.xdomCache = parseContentNoException();
+        if (this.content.xdom == null) {
+            this.content.xdom = parseContentNoException();
         }
 
-        return this.xdomCache.clone();
+        return this.content.xdom.clone();
     }
 
     @Override
     public XDOM getPreparedXDOM()
     {
-        LocalDateTime xdomPrepareDate = this.xdomCachePrepareDate;
-        XDOM xdom = this.xdomCache;
+        LocalDateTime xdomPrepareDate = this.content.prepareDate;
+        XDOM xdom = this.content.xdom;
 
         // If the content is prepared and it's allowed to use the cache, return it
         if (xdomPrepareDate != null) {
@@ -9082,17 +9226,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         xdomPrepareDate = LocalDateTime.now();
         getMacroTransformation().prepare(xdom);
 
-        // Update the cached content
-        this.xdomCache = xdom;
-        this.xdomCachePrepareDate = xdomPrepareDate;
+        // Update the cached XDOM
+        this.content.xdom = xdom;
+        this.content.prepareDate = xdomPrepareDate;
 
-        return this.xdomCache.clone();
-    }
-
-    private void resetXDOM()
-    {
-        this.xdomCache = null;
-        this.xdomCachePrepareDate = null;
+        return this.content.xdom.clone();
     }
 
     /**
@@ -9127,7 +9265,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         this.contentUpdateDate.setTime((this.contentUpdateDate.getTime() / 1000) * 1000);
         this.creationDate = new Date();
         this.creationDate.setTime((this.creationDate.getTime() / 1000) * 1000);
-        this.content = "";
+        this.content = new Content("", this.content.syntax);
         this.format = "";
         this.locale = Locale.ROOT;
         this.defaultLocale = Locale.ROOT;
@@ -9258,12 +9396,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * Transforms a XClass reference relative to this document into an absolute reference.
+     * Transforms an XClass reference to an absolute reference relative to the current document wiki.
      */
     private DocumentReference resolveClassReference(EntityReference reference)
     {
-        if (reference instanceof DocumentReference) {
-            return (DocumentReference) reference;
+        if (reference instanceof DocumentReference classReference) {
+            DocumentReference relativeXClassReference = classReference;
+            // The class reference is always relative to the current wiki of the document.
+            if (!classReference.getWikiReference().equals(getDocumentReference().getWikiReference())) {
+                relativeXClassReference = classReference.replaceParent(classReference.getWikiReference(),
+                    getDocumentReference().getWikiReference());
+                warnWithStackTrace("Wiki part of XClass reference is wrong",
+                    "Calling xclass [{}] on document [{}]: the wiki part of the xclass reference is wrong, "
+                        + "replacing it.", classReference, getDocumentReference());
+            }
+            return relativeXClassReference;
         } else if (reference instanceof LocalDocumentReference) {
             return new DocumentReference((LocalDocumentReference) reference, getDocumentReference().getWikiReference());
         } else {
@@ -9271,6 +9418,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 new DocumentReference(getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,
                     getDocumentReference().getName());
             return getExplicitReferenceDocumentReferenceResolver().resolve(reference, defaultReference);
+        }
+    }
+
+    private void warnWithStackTrace(String exceptionMessage, String logMessage, Object... parameters)
+    {
+        LoggerConfiguration loggerConfiguration = Utils.getComponent(LoggerConfiguration.class);
+        IllegalStateException exception = new IllegalStateException(exceptionMessage);
+        if (loggerConfiguration.isDeprecatedLogEnabled()) {
+            // We generally don't print a stack trace in case of warning log, but in this specific case the warning
+            // is almost useless without a way to know what code is responsible for this call
+            LOGGER.warn(logMessage, ArrayUtils.add(parameters, exception));
+        } else {
+            LOGGER.debug(logMessage, ArrayUtils.add(parameters, exception));
         }
     }
 
@@ -9290,8 +9450,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private BaseObject prepareXObject(EntityReference classReference)
     {
-        DocumentReference absoluteClassReference = resolveClassReference(classReference);
-        BaseObject bobject = getXObject(absoluteClassReference);
+        DocumentReference resolvedClassReference = resolveClassReference(classReference);
+        BaseObject bobject = getXObject(resolvedClassReference);
         if (bobject == null) {
             bobject = new BaseObject();
             bobject.setXClassReference(classReference);
@@ -9376,7 +9536,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // /////////////////////////////////
         // Document
 
-        if (!StringUtils.equals(getContent(), document.getContent())) {
+        if (!Strings.CS.equals(getContent(), document.getContent())) {
             setContent(document.getContent());
             modified = true;
         }
@@ -9390,12 +9550,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             modified = true;
         }
 
-        if (!StringUtils.equals(getTitle(), document.getTitle())) {
+        if (!Strings.CS.equals(getTitle(), document.getTitle())) {
             setTitle(document.getTitle());
             modified = true;
         }
 
-        if (!StringUtils.equals(getDefaultTemplate(), document.getDefaultTemplate())) {
+        if (!Strings.CS.equals(getDefaultTemplate(), document.getDefaultTemplate())) {
             setDefaultTemplate(document.getDefaultTemplate());
             modified = true;
         }
@@ -9404,12 +9564,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             modified = true;
         }
 
-        if (!StringUtils.equals(getCustomClass(), document.getCustomClass())) {
+        if (!Strings.CS.equals(getCustomClass(), document.getCustomClass())) {
             setCustomClass(document.getCustomClass());
             modified = true;
         }
 
-        if (!StringUtils.equals(getValidationScript(), document.getValidationScript())) {
+        if (!Strings.CS.equals(getValidationScript(), document.getValidationScript())) {
             setValidationScript(document.getValidationScript());
             modified = true;
         }
@@ -9550,7 +9710,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param userReference the reference of the new author of the document
      * @since 16.1.0RC1
      */
-    @Unstable
     public void setAuthor(UserReference userReference)
     {
         getAuthors().setEffectiveMetadataAuthor(userReference);

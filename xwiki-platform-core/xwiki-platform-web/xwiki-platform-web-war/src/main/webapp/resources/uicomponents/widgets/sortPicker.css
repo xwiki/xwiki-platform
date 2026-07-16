@@ -1,0 +1,9 @@
+.sortPicker > .input-group {
+  display: flex;
+}
+.sortPicker-field {
+  flex: 1 70%;
+}
+.sortPicker-order {
+  flex: 1 30%;
+}

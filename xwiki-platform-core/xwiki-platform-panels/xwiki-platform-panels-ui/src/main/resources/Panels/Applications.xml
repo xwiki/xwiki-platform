@@ -187,7 +187,7 @@
       'xhtml/1.0'))
   #end
   &lt;li&gt;
-    &lt;a href="$xwiki.getURL($params.target, 'view', "$!params.targetQueryString")" title="$escapetool.xml($params.label)"&gt;
+    &lt;a href="$escapetool.xml($xwiki.getURL($params.target, 'view', "$!params.targetQueryString"))" title="$escapetool.xml($params.label)"&gt;
       &lt;span class="application-img"&gt;$icon&lt;/span&gt;
       &lt;span class="application-label"&gt;$escapetool.xml($params.label)&lt;/span&gt;
     &lt;/a&gt;
@@ -590,7 +590,7 @@ require(['scriptaculous/effects'], function() {
   margin-left: 15px;
 }
 
-.panel-width-Small .applicationPanelMoreContainer > ul > li > a {
+.panel-width-Small .applicationPanelMoreContainer &gt; ul &gt; li &gt; a {
   gap: .5em;
   text-align: left;
   margin-left: 0;

@@ -57,7 +57,7 @@ rendering.macro.documentTree.parameter.showObjects.description=Pour montrer les 
 rendering.macro.documentTree.parameter.showClassProperties.name=Montrer les propriétés de Class
 rendering.macro.documentTree.parameter.showClassProperties.description=Pour montrer les propriétés de classe pour les documents qui définissent les classes.
 rendering.macro.documentTree.parameter.root.name=Racine
-rendering.macro.documentTree.parameter.root.description=L'identifiant du noeud de la racine. C'est utile si vous souhaitez afficher uniquement les descendants d'un noeud donné (qui est la racine spécifiée). L'arbre affiche les enfants du noeud racine sur le premier niveau, de sorte que le noeud racine n'est pas réellement affiché. L'arbre entier s'affiche si le noeud racine n'est pas spécifié. Le format d'un identificateur de noeud est entityType: EntityReference, où le type d'entité peut être par exemple wiki, espace, document. Par exemple: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
+rendering.macro.documentTree.parameter.root.description=L'identifiant du nœud de la racine. C'est utile si vous souhaitez afficher uniquement les descendants d'un nœud donné (qui est la racine spécifiée). L'arbre affiche les enfants du nœud racine sur le premier niveau, de sorte que le nœud racine n'est pas réellement affiché. L'arbre entier s'affiche si le nœud racine n'est pas spécifié.
 rendering.macro.documentTree.parameter.showRoot.name=Afficher la racine
 rendering.macro.documentTree.parameter.showRoot.description=Affiche ou non la racine. Par défaut la racine est masquée car le contexte dans lequel est affichée l’arborescence donne suffisamment d'indications (par exemple présence d'un titre au dessus de l’arborescence).
 rendering.macro.documentTree.parameter.compact.name=Compacte
@@ -67,7 +67,7 @@ rendering.macro.documentTree.parameter.links.description=Indique si les labels d
 rendering.macro.documentTree.parameter.checkboxes.name=Cases à cocher
 rendering.macro.documentTree.parameter.checkboxes.description=Pour afficher une case à cocher en face de chaque noeud de l'arbre afin de permettre à l'utilisateur de sélectionner plusieurs noeuds de l'arbre.
 rendering.macro.documentTree.parameter.openTo.name=Ouvrir à
-rendering.macro.documentTree.parameter.openTo.description=L'id du noeud pour ouvrir l'arbre. Tous les ancêtres du noeud spécifié, jusqu'à la racine de l'arbre, seront ouverts également. Le format de l'identifiant de noeud est celui utilisé pour le paramètre de la racine.
+rendering.macro.documentTree.parameter.openTo.description=L'identifiant du nœud pour ouvrir l'arbre. Tous les ancêtres du nœud spécifié, jusqu'à la racine de l'arbre, seront ouverts également.
 rendering.macro.documentTree.parameter.showOnlyViewable.name=Montrer seulement ce qui est visible
 rendering.macro.documentTree.parameter.showOnlyViewable.description=N'afficher que le wiki, espace et nœuds de documents pour lesquels l'utilisateur a le droit de "voir". Si c'est la valeur false, le wiki, espace et nœuds de documents qui ne sont pas visibles par l'utilisateur actuel sont répertoriés dans l'arbre en utilisant leurs noms. L'utilisateur ne sera pas en mesure de voir leur contenu en suivant leurs liens (l'utilisateur sera seulement au courant de leur existence).
 rendering.macro.documentTree.parameter.filterByClass.name=Filtrer par Class
@@ -82,13 +82,36 @@ rendering.macro.documentTree.parameter.limit.name=Limite
 rendering.macro.documentTree.parameter.limit.description=Le nombre maximum de nœuds fils à afficher lorsqu'un nœud père est déplié pour la première fois. Les autres nœuds sont accessibles grâce au lien "Plus...". Ce paramètre sert essentiellement à définir la pagination afin d'améliorer les performances lorsque les nœuds fils sont nombreux.
 rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 rendering.macro.documentTree.parameter.exclusions.description=Liste de noeuds à exclure de l'arbre. Les noeuds sont indiqués par leur ID et séparés par des virgules (,).
-
+rendering.macro.documentTree.parameter.sortDocumentsBy.name=Trier les pages par
+rendering.macro.documentTree.parameter.sortDocumentsBy.description=Le champ appartenant à la page utilisé pour filtrer les pages enfants, suivi de l'ordre de tri.
+rendering.macro.documentTree.parameter.expandToLevel.name=Déplier jusqu'au niveau
+rendering.macro.documentTree.parameter.expandToLevel.description=Définit la profondeur de l'arbre jusqu'où déplier automatiquement. La valeur par défaut 0 signifie que seules les pages de premier niveau sont affichées. Un niveau 1 les déplie, un niveau 2 déplie aussi les enfants sous les éléments nouvellement affichés, etc. Veuillez noter qu'une valeur élevée peut rendre l'affichage par le navigateur coûteux en ressources.
+rendering.macro.children.name=Enfants
+rendering.macro.children.description=Affiche un arbre des pages enfants de la page courante
+rendering.macro.children.parameter.sort.name=Trier par
+rendering.macro.children.parameter.sort.description=Le champ de page utilisé pour trier les pages enfants, suivi de l'ordre de tri.
+rendering.macro.children.parameter.root.name=Racine
+rendering.macro.children.parameter.root.description=L'identifiant du nœud de la racine. C'est utile si vous souhaitez afficher uniquement les descendants d'un nœud donné (qui est la racine spécifiée). L'arbre affiche les enfants du nœud racine sur le premier niveau, de sorte que le nœud racine n'est pas réellement affiché. L'arbre entier s'affiche si le nœud racine n'est pas spécifié.
+rendering.macro.documentTree.group.show.name=Éléments à afficher
+rendering.macro.documentTree.group.filters.name=Filtres
+rendering.macro.documentTree.group.style.name=Options d'affichage
 index.documentTree.empty=Aucune page trouvée
 index.documentTree.more={0} autres...
+index.documentTree.addDocument=Nouvelle page...
+index.documentTree.documentSortDisplayer.field=Champ de tri
+index.documentTree.documentSortDisplayer.field.default=---
+index.documentTree.documentSortDisplayer.field.title=Titre
+index.documentTree.documentSortDisplayer.field.date=Date de dernière modification
+index.documentTree.documentSortDisplayer.field.creationDate=Date de création
+index.documentTree.documentSortDisplayer.order=Ordre de tri
+index.documentTree.documentSortDisplayer.order.default=---
+index.documentTree.documentSortDisplayer.order.asc=Croissant
+index.documentTree.documentSortDisplayer.order.desc=Décroissant
 
 ## Deprecated translation keys
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Montrer les documents enfants
-rendering.macro.documentTree.parameter.showChildDocuments.description=Montrer les documents enfant basé sur le champ parent du document.</content>
+rendering.macro.documentTree.parameter.showChildDocuments.description=Montrer les documents enfant basé sur le champ parent du document.
+</content>
 </xwikidoc>

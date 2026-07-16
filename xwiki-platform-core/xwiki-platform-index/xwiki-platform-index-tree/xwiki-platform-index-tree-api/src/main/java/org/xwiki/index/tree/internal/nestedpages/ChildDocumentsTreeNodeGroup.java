@@ -33,10 +33,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.index.tree.internal.AbstractChildDocumentsTreeNodeGroup;
+import org.xwiki.index.tree.internal.macro.DocumentSort;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.properties.converter.Converter;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
@@ -98,6 +100,9 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
     @Named("documentReferenceResolver/nestedPages")
     private QueryFilter documentReferenceResolverFilter;
 
+    @Inject
+    private Converter<DocumentSort> documentSortConverter;
+
     /**
      * Default constructor.
      */
@@ -110,31 +115,7 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
     protected List<DocumentReference> getChildDocuments(EntityReference parentReference, int offset, int limit)
         throws QueryException
     {
-        String orderBy = getOrderBy();
-        Query query;
-        if (canHaveTerminalChildDocuments(parentReference)) {
-            if (FIELD_TITLE.equals(orderBy)) {
-                query = this.queryManager.getNamedQuery("nestedPagesOrderedByTitle");
-                query.bindValue(PARAMETER_LOCALE, this.localizationContext.getCurrentLocale().toString());
-            } else {
-                query = this.queryManager.getNamedQuery("nestedPagesOrderedByName");
-            }
-            Set<String> excludedDocuments = getExcludedDocuments(parentReference.getParent());
-            if (!excludedDocuments.isEmpty()) {
-                query.bindValue(PARAMETER_EXCLUDED_DOCUMENTS, excludedDocuments);
-                query.addFilter(this.excludedDocumentFilter);
-            }
-        } else {
-            if (FIELD_TITLE.equals(orderBy)) {
-                query = this.queryManager.getNamedQuery("nonTerminalPagesOrderedByTitle");
-                query.bindValue(PARAMETER_LOCALE, this.localizationContext.getCurrentLocale().toString());
-            } else {
-                // Query only the spaces table.
-                query = this.queryManager.createQuery(
-                    "select reference, 0 as terminal from XWikiSpace page order by lower(name), name", Query.HQL);
-            }
-        }
-
+        Query query = getChildDocumentsQuery(parentReference);
         query.setWiki(parentReference.extractReference(EntityType.WIKI).getName());
         query.setOffset(offset);
         query.setLimit(limit);
@@ -159,6 +140,72 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
         }
 
         return query.addFilter(this.documentReferenceResolverFilter).execute();
+    }
+
+    private Query getChildDocumentsQuery(EntityReference parentReference) throws QueryException
+    {
+        DocumentSort sort = this.documentSortConverter.convert(DocumentSort.class, getOrderBy());
+        Query query;
+        if (canHaveTerminalChildDocuments(parentReference)) {
+            query = getChildDocumentsQueryOrderedBy("nestedPagesOrderedBy", sort);
+            Set<String> excludedDocuments = getExcludedDocuments(parentReference.getParent());
+            if (!excludedDocuments.isEmpty()) {
+                query.bindValue(PARAMETER_EXCLUDED_DOCUMENTS, excludedDocuments);
+                query.addFilter(this.excludedDocumentFilter);
+            }
+        } else {
+            query = getNonTerminalChildDocumentsQuery(sort);
+        }
+        return query;
+    }
+
+    private Query getChildDocumentsQueryOrderedBy(String namedQueryPrefix, DocumentSort sort) throws QueryException
+    {
+        String fieldName = sort != null ? sort.getField() : null;
+        if (fieldName == null) {
+            fieldName = "name";
+        }
+        fieldName = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+
+        Query query = this.queryManager.getNamedQuery(namedQueryPrefix + fieldName + getOrder(sort));
+        if (FIELD_TITLE.equalsIgnoreCase(fieldName)) {
+            query.bindValue(PARAMETER_LOCALE, this.localizationContext.getCurrentLocale().toString());
+        }
+
+        return query;
+    }
+
+    private String getOrder(DocumentSort sort)
+    {
+        // TODO: The default order could depend on the sort field (e.g. titles are normally sorted in ascending order
+        // while dates are normally sorted in descending order, e.g. most recent documents first).
+        return sort != null && Boolean.FALSE.equals(sort.isAscending()) ? "Desc" : "Asc";
+    }
+
+    private Query getNonTerminalChildDocumentsQuery(DocumentSort sort) throws QueryException
+    {
+        Query query;
+        String order = getOrder(sort);
+        String fieldName = sort != null ? sort.getField() : null;
+        if (FIELD_TITLE.equals(fieldName)) {
+            query = this.queryManager.getNamedQuery("nonTerminalPagesOrderedByTitle" + order);
+            query.bindValue(PARAMETER_LOCALE, this.localizationContext.getCurrentLocale().toString());
+        } else {
+            // Query only the spaces table by default.
+            StringBuilder statement = new StringBuilder("select space.reference, 0 as terminal from XWikiSpace space");
+            if (fieldName != null && List.of("date", "creationDate").contains(fieldName)) {
+                // We need the space home page to be able to sort by creation date and last modification date.
+                statement.append(" left outer join XWikiDocument doc on doc.space = space.reference");
+                statement.append(" and doc.name = 'WebHome' and doc.translation = 0");
+                // Put null values (coming from missing space home pages) last.
+                statement.append(String.format(" order by doc.%s %s nulls last", fieldName, order.toLowerCase()));
+            } else {
+                statement
+                    .append(String.format(" order by lower(space.name) %1$s, space.name %1$s", order.toLowerCase()));
+            }
+            query = this.queryManager.createQuery(statement.toString(), Query.HQL);
+        }
+        return query;
     }
 
     @Override

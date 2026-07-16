@@ -38,6 +38,7 @@
   <hidden>true</hidden>
   <content>skin.sheet.title=Skin
 skin.sheet.properties=Eigenschaften Skin
+skin.sheet.properties.logo.warning=Dieses Logo wird in der Regel durch das im Farbschema definierte Logo überschrieben. Wenn man das Wiki-Logo ändern möchte, sollte man stattdessen das aktuelle Farbschema bearbeiten.
 skin.sheet.deprecatedProperties=Veraltete Eigenschaften
 skin.sheet.overriddenTemplates=Überschriebene Vorlagen
 skin.sheet.addTemplate=Fügen Sie eine neue überschreibende Vorlage hinzu

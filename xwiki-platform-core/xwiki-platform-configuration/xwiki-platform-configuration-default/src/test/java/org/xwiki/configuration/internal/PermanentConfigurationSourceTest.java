@@ -21,7 +21,6 @@ package org.xwiki.configuration.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -29,8 +28,11 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import jakarta.inject.Named;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSaveException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.test.TestEnvironment;
@@ -55,17 +57,21 @@ class PermanentConfigurationSourceTest
     @Inject
     private Environment environment;
 
+    @MockComponent
+    @Named("system")
+    private ConfigurationSource configurationSource;
+
     @InjectMockComponents
     private PermanentConfigurationSource configuration;
 
     @MockComponent
     private ConverterManager converter;
 
-    private void assertEqualProperties(Map<String, Object> expect) throws FileNotFoundException, IOException
+    private void assertEqualProperties(Map<String, Object> expect) throws IOException
     {
         Properties properties = new Properties();
         try (InputStream stream =
-            new FileInputStream(new File(environment.getPermanentDirectory(), "configuration.properties"))) {
+            new FileInputStream(new File(this.environment.getPermanentDirectory(), "configuration.properties"))) {
             properties.load(stream);
         }
 
@@ -73,7 +79,7 @@ class PermanentConfigurationSourceTest
     }
 
     @Test
-    void initialize() throws FileNotFoundException, IOException
+    void initialize() throws IOException
     {
         File file = new File(this.environment.getPermanentDirectory(), "configuration.properties");
 
@@ -84,7 +90,7 @@ class PermanentConfigurationSourceTest
     }
 
     @Test
-    void setProperty() throws ConfigurationSaveException, FileNotFoundException, IOException
+    void setProperty() throws ConfigurationSaveException, IOException
     {
         this.configuration.setProperty("prop1", "value1");
 
@@ -106,7 +112,7 @@ class PermanentConfigurationSourceTest
     }
 
     @Test
-    void setProperties() throws ConfigurationSaveException, FileNotFoundException, IOException
+    void setProperties() throws ConfigurationSaveException, IOException
     {
         when(this.converter.convert(String.class, this)).thenReturn("OK");
 

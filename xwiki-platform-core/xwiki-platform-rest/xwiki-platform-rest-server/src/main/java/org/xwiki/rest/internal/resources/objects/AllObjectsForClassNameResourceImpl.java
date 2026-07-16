@@ -55,6 +55,7 @@ public class AllObjectsForClassNameResourceImpl extends XWikiResource implements
             Boolean withPrettyNames) throws XWikiRestException
     {
         String database = Utils.getXWikiContext(componentManager).getWikiId();
+        int limit = validateAndGetLimit(number);
 
         try {
             Objects objects = new Objects();
@@ -63,14 +64,20 @@ public class AllObjectsForClassNameResourceImpl extends XWikiResource implements
 
             String query = "select doc, obj from BaseObject as obj, XWikiDocument as doc "
                 + "where obj.name=doc.fullName and obj.className=:className";
+            // Always order by a unique key (document full name + object number) so that pagination via limit/offset
+            // returns a stable, deterministic order. Without it, the database is free to return rows in an arbitrary
+            // order that can differ between queries (observed on PostgreSQL), breaking paginated retrieval.
             if ("date".equals(order)) {
-                query += " order by doc.date desc";
+                query += " order by doc.date desc, doc.fullName asc, obj.number asc";
+            } else {
+                query += " order by doc.fullName asc, obj.number asc";
             }
 
             List<Object> queryResult = null;
             queryResult =
-                    queryManager.createQuery(query, Query.XWQL).bindValue("className", className).setLimit(number)
-                            .setOffset(start).execute();
+                this.queryManager.createQuery(query, Query.XWQL).bindValue("className", className)
+                    .setLimit(limit)
+                    .setOffset(start).execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;

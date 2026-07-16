@@ -32,8 +32,11 @@ import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -46,6 +49,13 @@ import com.xpn.xwiki.web.Utils;
 
 public class DBListClass extends ListClass
 {
+    /**
+     * The type used as a hint to find the class.
+     * @since 18.2.0RC1
+     */
+    @Unstable
+    public static final String PROPERTY_TYPE = "DBList";
+
     /**
      * Serialization identifier.
      */
@@ -86,8 +96,8 @@ public class DBListClass extends ListClass
             // were empty strings). This means we need to check for NULL and ignore NULL entries
             // from the list.
             if (item != null) {
-                if (item instanceof String) {
-                    result.add(new ListItem((String) item));
+                if (item instanceof String string) {
+                    result.add(new ListItem(string));
                 } else {
                     Object[] res = (Object[]) item;
                     if (res.length == 1) {
@@ -117,19 +127,36 @@ public class DBListClass extends ListClass
     {
         List<ListItem> list = getCachedDBList(context);
         if (list == null) {
-            try {
-                DefaultParameterizedType dbListQueryBuilderType =
-                    new DefaultParameterizedType(null, QueryBuilder.class, DBListClass.class);
-                QueryBuilder<DBListClass> dbListQueryBuilder = Utils.getComponent(dbListQueryBuilderType);
-                // Execute the query with the rights of the class last author.
-                AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
-                list = makeList(authorExecutor.call(() -> {
-                    return dbListQueryBuilder.build(this).execute();
-                }, getOwnerDocument().getAuthorReference(), getDocumentReference()));
-            } catch (Exception e) {
-                LOGGER.warn("Failed to get the Database List values. Root cause is [{}].",
-                    ExceptionUtils.getRootCauseMessage(e));
+            if (getOwnerDocument() == null && !loadOwnerDocument()) {
+                String objectIdentifier = (this.getObject() != null) ?
+                    getLocalEntityReferenceSerializer().serialize(this.getObject().getReference()) : "";
+                LOGGER.warn("Cannot load the owner document of property [{}] from object [{}] and from doc with "
+                        + "reference [{}]. Falling back on empty database list values.",
+                    this.getName(), objectIdentifier, getDocumentReference());
                 list = new ArrayList<>();
+            } else {
+                try {
+                    SecurityConfiguration securityConfiguration = Utils.getComponent(SecurityConfiguration.class);
+                    DefaultParameterizedType dbListQueryBuilderType =
+                        new DefaultParameterizedType(null, QueryBuilder.class, DBListClass.class);
+                    QueryBuilder<DBListClass> dbListQueryBuilder = Utils.getComponent(dbListQueryBuilderType);
+                    // Execute the query with the rights of the class last author.
+                    AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
+
+                    list = makeList(authorExecutor.call(() -> {
+                        Query query = dbListQueryBuilder.build(this);
+                        int configuredLimit = securityConfiguration.getQueryItemsLimit();
+                        // Limit unlimited queries or queries with a high limit to the configured limit.
+                        if (configuredLimit > 0 && (query.getLimit() <= 0 || query.getLimit() > configuredLimit)) {
+                            query.setLimit(configuredLimit);
+                        }
+                        return query.execute();
+                    }, getOwnerDocument().getAuthorReference(), getDocumentReference()));
+                } catch(Exception e){
+                    LOGGER.warn("Failed to get the Database List values. Root cause is [{}].",
+                        ExceptionUtils.getRootCauseMessage(e));
+                    list = new ArrayList<>();
+                }
             }
             setCachedDBList(list, context);
         }
@@ -161,7 +188,7 @@ public class DBListClass extends ListClass
     {
         List<ListItem> list = getDBList(context);
         Map<String, ListItem> result = new LinkedHashMap<>();
-        if ((list == null) || (list.size() == 0)) {
+        if ((list == null) || (list.isEmpty())) {
             return result;
         }
 
@@ -305,7 +332,7 @@ public class DBListClass extends ListClass
                 // Let's create the complete query
                 select.append(" from ");
                 select.append(StringUtils.join(fromStatements.iterator(), ", "));
-                if (whereStatements.size() > 0) {
+                if (!whereStatements.isEmpty()) {
                     select.append(" where ");
                     select.append(StringUtils.join(whereStatements.iterator(), " and "));
                 }
@@ -391,6 +418,12 @@ public class DBListClass extends ListClass
         super.flushCache();
     }
 
+    @Override
+    public String getPropertyType()
+    {
+        return PROPERTY_TYPE;
+    }
+
     // return first or second column from user query
     public String returnCol(String hqlQuery, boolean first)
     {
@@ -441,7 +474,7 @@ public class DBListClass extends ListClass
                 firstCol = StringUtils.substringAfterLast(beforeFrom.trim(), " ");
             }
         }
-        if (first == true) {
+        if (first) {
             return firstCol;
         } else {
             return secondCol;
@@ -514,7 +547,7 @@ public class DBListClass extends ListClass
                 String hibquery = this.getSql();
                 String secondCol = "-", firstCol = "-";
 
-                if (hibquery != null && !hibquery.equals("")) {
+                if (hibquery != null && !hibquery.isEmpty()) {
                     firstCol = returnCol(hibquery, true);
                     secondCol = returnCol(hibquery, false);
 
@@ -548,14 +581,14 @@ public class DBListClass extends ListClass
                 }
             }
 
-            if (changeInputName == true) {
+            if (changeInputName) {
                 input.setName(prefix + name + "_suggest");
                 input.setID(prefix + name + "_suggest");
             } else {
                 input.setName(prefix + name);
                 input.setID(prefix + name);
             }
-            if (setInpVal == true) {
+            if (setInpVal) {
                 input.setValue(value);
             }
 
@@ -567,7 +600,7 @@ public class DBListClass extends ListClass
             displaySelectEdit(buffer, name, prefix, object, context);
         }
 
-        if (!getDisplayType().equals("input")) {
+        if (!"input".equals(getDisplayType())) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
             hidden.setAttributeFilter(new XMLAttributeValueFilter());
             buffer.append(hidden);
@@ -588,8 +621,8 @@ public class DBListClass extends ListClass
             return;
         }
 
-        if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+        if (prop instanceof ListProperty listProperty) {
+            selectlist = listProperty.getList();
             List<String> newlist = new ArrayList<>();
             for (String entry : selectlist) {
                 newlist.add(getDisplayValue(entry, name, map, context));

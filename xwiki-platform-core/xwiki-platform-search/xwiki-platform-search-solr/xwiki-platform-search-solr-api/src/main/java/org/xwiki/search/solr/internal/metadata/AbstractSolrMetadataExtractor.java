@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.metadata;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,7 +40,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -59,9 +59,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.EmailClass;
 import com.xpn.xwiki.objects.classes.ListItem;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -124,9 +122,6 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     @Inject
     protected SolrLinkSerializer linkSerializer;
 
-    @Inject
-    protected GeneralMailConfiguration generalMailConfiguration;
-
     private int shortTextLimit = -1;
 
     /**
@@ -151,11 +146,11 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     }
 
     @Override
-    public LengthSolrInputDocument getSolrDocument(EntityReference entityReference)
+    public XWikiSolrInputDocument getSolrDocument(EntityReference entityReference)
         throws SolrIndexerException, IllegalArgumentException
     {
         try {
-            LengthSolrInputDocument solrDocument = new LengthSolrInputDocument();
+            XWikiSolrInputDocument solrDocument = new XWikiSolrInputDocument();
 
             solrDocument.setField(FieldUtils.ID, this.seachUtils.getId(entityReference));
             solrDocument.setField(FieldUtils.REFERENCE,
@@ -180,12 +175,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     }
 
     /**
-     * @param solrDocument the {@link LengthSolrInputDocument} to modify
+     * @param solrDocument the {@link XWikiSolrInputDocument} to modify
      * @param entityReference the reference of the entity
      * @return false if the entity should not be indexed (generally mean it does not exist), true otherwise
      * @throws Exception in case of errors
      */
-    protected abstract boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    protected abstract boolean setFieldsInternal(XWikiSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception;
 
     /**
@@ -201,9 +196,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
         DocumentReference documentReferenceWithoutLocale = documentReference.getLocale() == null ? documentReference
             : new DocumentReference(documentReference, (Locale) null);
-        XWikiDocument document = xcontext.getWiki().getDocument(documentReferenceWithoutLocale, xcontext);
-
-        return document;
+        return xcontext.getWiki().getDocument(documentReferenceWithoutLocale, xcontext);
     }
 
     /**
@@ -260,13 +253,17 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
         solrDocument.setField(FieldUtils.WIKI, documentReference.getWikiReference().getName());
         solrDocument.setField(FieldUtils.NAME, documentReference.getName());
+        solrDocument.setField(FieldUtils.FULLNAME, this.localSerializer.serialize(documentReference));
 
         // Set the fields that are used to query / filter the document hierarchy.
         setHierarchyFields(solrDocument, documentReference.getParent());
 
-        Locale locale = getLocale(documentReference);
-        solrDocument.setField(FieldUtils.LOCALE, locale.toString());
-        solrDocument.setField(FieldUtils.LANGUAGE, locale.getLanguage());
+        Locale realLocale = getRealLocale(documentReference);
+        solrDocument.setField(FieldUtils.LOCALE, realLocale.toString());
+        solrDocument.setField(FieldUtils.LANGUAGE, realLocale.getLanguage());
+
+        solrDocument.setField(FieldUtils.DOC_ID, new XWikiDocument(documentReference,
+            documentReference.getLocale() != null ? documentReference.getLocale() : Locale.ROOT).getId());
 
         return true;
     }
@@ -282,7 +279,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected Set<Locale> getLocales(XWikiDocument xdocument, Locale entityLocale)
         throws XWikiException, SolrIndexerException
     {
-        Set<Locale> locales = new HashSet<Locale>();
+        Set<Locale> locales = new HashSet<>();
 
         String entityLocaleString = entityLocale != null ? entityLocale.toString() : null;
 
@@ -319,7 +316,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         }
 
         // 4) Make sure that the original document's locale is there as well.
-        locales.add(getLocale(xdocument.getDocumentReference()));
+        locales.add(getRealLocale(xdocument.getDocumentReference()));
 
         return locales;
     }
@@ -338,7 +335,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @return the locale code of the referenced document.
      * @throws SolrIndexerException if problems occur.
      */
-    protected Locale getLocale(DocumentReference documentReference) throws SolrIndexerException
+    protected Locale getRealLocale(DocumentReference documentReference) throws SolrIndexerException
     {
         Locale locale = null;
 
@@ -365,7 +362,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param locale the locale of the indexed document; in case of translations, this will obviously be different than
      *            the original document's locale
      */
-    protected void setObjectContent(SolrInputDocument solrDocument, BaseObject object, Locale locale)
+    protected void setObjectContent(XWikiSolrInputDocument solrDocument, BaseObject object, Locale locale)
     {
         if (object == null) {
             // Yes, the platform can return null objects.
@@ -392,12 +389,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param propertyClass the class that describes the given property
      * @param locale the locale of the indexed document
      */
-    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
+    protected void setPropertyValue(XWikiSolrInputDocument solrDocument, BaseProperty<?> property,
         PropertyClass propertyClass, Locale locale)
     {
         Object propertyValue = property.getValue();
-        if (propertyClass instanceof StaticListClass) {
-            setStaticListPropertyValue(solrDocument, property, (StaticListClass) propertyClass, locale);
+        if (propertyClass instanceof StaticListClass staticListClass) {
+            setStaticListPropertyValue(solrDocument, property, staticListClass, locale);
         } else if (propertyClass instanceof TextAreaClass
             || (propertyClass != null && "String".equals(propertyClass.getClassType()))
             || (propertyValue instanceof CharSequence
@@ -432,13 +429,11 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                     setPropertyValue(solrDocument, property, new TypedValue(value), locale);
                 }
             }
-        } else if (propertyValue instanceof Integer && propertyClass instanceof BooleanClass) {
+        } else if (propertyValue instanceof Integer integerValue && propertyClass instanceof BooleanClass) {
             // Boolean properties are stored as integers (0 is false and 1 is true).
-            Boolean booleanValue = ((Integer) propertyValue) != 0;
+            Boolean booleanValue = integerValue != 0;
             setPropertyValue(solrDocument, property, new TypedValue(booleanValue), locale);
-        } else if (!(propertyClass instanceof PasswordClass)
-            && !((propertyClass instanceof EmailClass) && this.generalMailConfiguration.shouldObfuscate()))
-        {
+        } else if (!property.isSensitive(xcontextProvider.get())) {
             // Avoid indexing passwords and, when obfuscation is enabled, emails.
             setPropertyValue(solrDocument, property, new TypedValue(propertyValue), locale);
         }
@@ -454,7 +449,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param locale the locale of the indexed document
      * @see "XWIKI-9417: Search does not return any results for Static List values"
      */
-    private void setStaticListPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
+    private void setStaticListPropertyValue(XWikiSolrInputDocument solrDocument, BaseProperty<?> property,
         StaticListClass propertyClass, Locale locale)
     {
         // The list of known values specified in the XClass.
@@ -489,7 +484,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param typedValue the value to add
      * @param locale the locale of the indexed document
      */
-    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
+    protected void setPropertyValue(XWikiSolrInputDocument solrDocument, BaseProperty<?> property,
         TypedValue typedValue, Locale locale)
     {
         // Collect all the property values from all the objects of a document in a single (localized) field.
@@ -508,12 +503,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param fieldName the field name
      * @param fieldValue the field value to add
      */
-    protected void addFieldValueOnce(SolrInputDocument solrDocument, String fieldName, Object fieldValue)
+    protected void addFieldValueOnce(XWikiSolrInputDocument solrDocument, String fieldName, Object fieldValue)
     {
-        Collection<Object> fieldValues = solrDocument.getFieldValues(fieldName);
-        if (fieldValues == null || !fieldValues.contains(fieldValue)) {
-            solrDocument.addField(fieldName, fieldValue);
-        }
+        solrDocument.addFieldOnce(fieldName, fieldValue);
     }
 
     /**
@@ -544,17 +536,25 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     private void setHierarchyFields(SolrInputDocument solrDocument, EntityReference path)
     {
         solrDocument.setField(FieldUtils.SPACE_EXACT, this.localSerializer.serialize(path));
+
+        // Add the hierarchy fields for the spaces
         List<EntityReference> ancestors = path.getReversedReferenceChain();
+        List<String> spaces = new ArrayList<>(ancestors.size() - 1);
+        List<String> spacePrefix = new ArrayList<>(ancestors.size() - 1);
+        List<String> spaceFacet = new ArrayList<>(ancestors.size() - 1);
         // Skip the wiki reference because we want to index the local space references.
         for (int i = 1; i < ancestors.size(); i++) {
-            solrDocument.addField(FieldUtils.SPACES, ancestors.get(i).getName());
+            spaces.add(ancestors.get(i).getName());
             String localAncestorReference = this.localSerializer.serialize(ancestors.get(i));
-            solrDocument.addField(FieldUtils.SPACE_PREFIX, localAncestorReference);
+            spacePrefix.add(localAncestorReference);
             // We prefix the local ancestor reference with the depth in order to use 'facet.prefix'. We also add a
             // trailing slash in order to distinguish between space names with the same prefix (e.g. 0/Gallery/ and
             // 0/GalleryCode/).
-            solrDocument.addField(FieldUtils.SPACE_FACET, (i - 1) + "/" + localAncestorReference + ".");
+            spaceFacet.add((i - 1) + "/" + localAncestorReference + ".");
         }
+        solrDocument.setField(FieldUtils.SPACES, spaces);
+        solrDocument.setField(FieldUtils.SPACE_PREFIX, spacePrefix);
+        solrDocument.setField(FieldUtils.SPACE_FACET, spaceFacet);
     }
 
     protected void extendLink(EntityReference reference, Set<String> linksExtended)

@@ -17,26 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+'use strict';
 (function () {
   // We expect this code to be loaded right before Prototype.js code.
 
+  function preventAssignment(target, property, forbiddenValueProvider, onlyOnce) {
+    let value = target[property];
+    Object.defineProperty(target, property, {
+      configurable: true,
+      get: () => value,
+      set: function(newValue) {
+        if (!window.Prototype || newValue !== forbiddenValueProvider()) {
+          // Allowed value.
+          value = newValue;
+        } else if (onlyOnce) {
+          // We expect a single try to assign the forbidden value. We remove the protection (getter/setter) once
+          // this happens, keeping the current value, i.e. preventing the forbidden value.
+          delete this[property];
+          this[property] = value;
+        }
+      }
+    });
+  }
+
   // Prevent Prototype.js from overriding the Array.from function.
   // See https://github.com/prototypejs/prototype/issues/338.
-  let arrayFrom = Array.from;
-  Object.defineProperty(Array, "from", {
-    get: () => arrayFrom,
-    set: function(newArrayFrom) {
-      if (window.Prototype && newArrayFrom === window.$A) {
-        // Prototype.js tries to override the Array.from function.
-        // We delete the defined property because we don't want to to prevent anyone from overriding Array.from, we just
-        // want to prevent Prototype.js from doing it because we know that Prototype's implementation is outdated and
-        // causes new code to fail.
-        delete this.from;
-        this.from = arrayFrom;
-      } else {
-        // Allow others to override Array.from (their need may be valid, we don't know).
-        arrayFrom = newArrayFrom;
-      }
-    }
-  });
+  preventAssignment(Array, "from", () => window.$A, true);
+
+  // Prototype.js first overwrites Array.entries with its own Enumerable.entries only to delete Array.entries shortly
+  // after, breaking any code that relies on Array.entries (such as the Inversify library).
+  preventAssignment(Array.prototype, "entries", () => window.Enumerable.entries, true);
+
+  // Prototype.js' Element#remove() throws an exception when called on a detached element, while the native
+  // implementation does nothing, which is what the caller expects.
+  // Note that we can't prevent the assignment only once because Prototype.js calls Element.addMethods() multiple times.
+  preventAssignment(HTMLElement.prototype, "remove", () => Element?.Methods?.remove?._methodized);
 })();

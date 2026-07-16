@@ -29,8 +29,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.util.Util;
 
-import net.sf.json.JSONObject;
-
 /**
  * @version $Id$
  * @deprecated since 5.2, use Filter framework instead
@@ -180,7 +178,7 @@ public class PackageAPI extends Api
     public List<DocumentInfoAPI> getFiles()
     {
         List<DocumentInfo> files = this.pack.getFiles();
-        ArrayList<DocumentInfoAPI> apiFiles = new ArrayList<DocumentInfoAPI>(files.size());
+        ArrayList<DocumentInfoAPI> apiFiles = new ArrayList<>(files.size());
 
         for (DocumentInfo docInfo : files) {
             apiFiles.add(new DocumentInfoAPI(docInfo, getXWikiContext()));
@@ -237,15 +235,12 @@ public class PackageAPI extends Api
      *         message is placed in the velocity context under the <code>import_error</code> key,
      * @since 2.2M1
      */
-    public boolean importPackageFromByteArray(byte data[])
+    public boolean importPackageFromByteArray(byte[] data)
     {
         try {
             this.pack.Import(data, getXWikiContext());
             return true;
-        } catch (XWikiException e) {
-            getXWikiContext().put("import_error", e.getMessage());
-            return false;
-        } catch (IOException e) {
+        } catch (XWikiException | IOException e) {
             getXWikiContext().put("import_error", e.getMessage());
             return false;
         }
@@ -260,7 +255,7 @@ public class PackageAPI extends Api
      * @throws IOException while reading the ZipFile
      * @throws XWikiException when package content is broken
      */
-    public String Import(byte file[]) throws IOException, XWikiException
+    public String Import(byte[] file) throws IOException, XWikiException
     {
         return this.pack.Import(file, getXWikiContext());
     }
@@ -297,14 +292,14 @@ public class PackageAPI extends Api
 
     public String toXml()
     {
-        return this.pack.toXml(getXWikiContext());
+        return this.pack.toXMLString(getXWikiContext());
     }
 
     /**
-     * @return a representation of this package under the JSON format
-     * @since 2.2M1
+     * @return a representation of this package that can be easily serialized in the JSON format
+     * @since 17.6.0RC1
      */
-    public JSONObject toJSON()
+    public Object toJSON()
     {
         return this.pack.toJSON(getXWikiContext());
     }

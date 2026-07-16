@@ -129,6 +129,8 @@ platform.appwithinminutes.classEditorPreviewFieldHint=Feldeditor schließen und 
 platform.appwithinminutes.classEditorMoveFieldLabel=Bewegen
 platform.appwithinminutes.classEditorMoveFieldHint=Hier ziehen, um die Reihenfolge der Felder zu ändern
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Vorbelegung (kann leer gelassen werden)
+platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Anzeigename
+platform.appwithinminutes.classEditorFieldHintToolTip=Hinweis
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=Ok
@@ -142,7 +144,9 @@ platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Hinzufügen
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Löschen
 appWithinMinutes.templateProviderEditor.hint=Anwendungseinträge sind Wiki-Seiten, die strukturierte Daten enthalten.
+appWithinMinutes.templateProviderEditor.icon.name=Icon
 appWithinMinutes.templateProviderEditor.icon.hint=Das Symbol, das einem Anwendungseintrag zugeordnet ist.
+appWithinMinutes.templateProviderEditor.description.name=Beschreibung
 appWithinMinutes.templateProviderEditor.description.hint=Kurze Beschreibung eines Applikationseintrags.
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Woher sollen die Einträge erstellt werden
 appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Wenn kein Ort ausgewählt ist, können die Einträge von jeder Seite aus erstellt werden.
@@ -150,6 +154,7 @@ appWithinMinutes.templateProviderEditor.creationRestrictions.name=Wo die Einträ
 appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Wenn kein Ort ausgewählt ist, können die Einträge überall im Wiki erstellt werden.
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Eintragsort nicht erzwingen
 appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Verwenden Sie die oben angegebenen Orte nur als Vorschläge, damit der Benutzer beim Erstellen eines Anwendungseintrags einen anderen Ort auswählen kann.
+appWithinMinutes.templateProviderEditor.terminal.name=Terminal
 appWithinMinutes.templateProviderEditor.terminal.hint=Ob die Anwendungseinträge Terminalseiten sein sollen oder nicht.
 
 ### Wizard Step 3: Application Presentation
@@ -186,7 +191,9 @@ platform.appwithinminutes.liveTableEditorSaveComment=Tabelle aktualisieren
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Ziehen und platzieren Sie die Einträge, um die Reihenfolge zu ändern
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Löschen
 platform.appwithinminutes.liveTableEditorAddColumnHint=Hinzufügen
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Einige Spalten sind nicht mehr aktuell, wahrscheinlich, weil die zugehörigen Felder gelöscht wurden. Möchten Sie diese Spalten entfernen? &lt;a href=""&gt;Ja&lt;/a&gt; / &lt;a href=""&gt;Nein&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Einige Spalten sind nicht mehr aktuell, wahrscheinlich, weil die zugehörigen Felder gelöscht wurden. Möchten Sie diese Spalten entfernen?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Veraltete Spalten entfernen
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Behalten
 platform.appwithinminutes.liveTableEditorIcon=Symbol
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Das Anwendungssymbol. Sie können ein Symbol aus der Symbolauswahl auswählen oder auf ein angehängtes Bild verweisen.
 
@@ -264,5 +271,9 @@ platform.appwithinminutes.wizardStep3Description=Geben Sie der Startseite Ihrer 
 platform.appwithinminutes.appsLiveTable.doc.space=Anwendungsname
 appWithinMinutes.classEditor.title={0} Struktur
 appWithinMinutes.templateProviderEditor.title={0} Enträge
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Einige Spalten sind nicht mehr aktuell, wahrscheinlich, weil die zugehörigen Felder gelöscht wurden. Möchten Sie diese Spalten entfernen? &lt;a href=""&gt;Ja&lt;/a&gt; / &lt;a href=""&gt;Nein&lt;/a&gt;
 </content>
 </xwikidoc>

@@ -20,11 +20,7 @@
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.security.MessageDigest;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.servlet.http.Cookie;
@@ -32,11 +28,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.container.servlet.HttpServletUtils;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 
 /**
  * Class responsible for remembering the login information between requests. It uses (encrypted) cookies for this. The
@@ -67,11 +64,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private static final String FIELD_SEPARATOR = ":";
 
     /**
-     * The string used to prefix cookie domain to conform to RFC 2109.
-     */
-    private static final String COOKIE_DOT_PFX = ".";
-
-    /**
      * Log4J logger object to log messages in this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(MyPersistentLoginManager.class);
@@ -80,16 +72,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * Default value to use when getting the authentication cookie values.
      */
     private static final String DEFAULT_VALUE = "false";
-
-    /** Date formatter for the cookie "Expires" value. */
-    private static final DateFormat COOKIE_EXPIRE_FORMAT = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss z",
-        Locale.US);
-    static {
-        COOKIE_EXPIRE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
-
-    /** For performance, cache the often used epoch date which forces a cookie to be removed. */
-    private static final String COOKIE_EXPIRE_NOW = COOKIE_EXPIRE_FORMAT.format(new Date(0));
 
     /**
      * The domain generalization for which the cookies are active. Configured by the xwiki.authentication.cookiedomains
@@ -122,34 +104,15 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     }
 
     /**
-     * Ensure cookie domains are prefixed with a dot to conform to RFC 2109.
-     *
-     * @param domain a cookie domain.
-     * @return a conform cookie domain.
-     */
-    private String conformCookieDomain(String domain)
-    {
-        if (domain != null && !domain.startsWith(COOKIE_DOT_PFX)) {
-            return COOKIE_DOT_PFX.concat(domain);
-        } else {
-            return domain;
-        }
-    }
-
-    /**
      * Setter for the {@link #cookieDomains} parameter.
      *
-     * @param cdlist The new value for {@link #cookieDomains}. The list is processed, so that any value not starting
-     *            with a dot is prefixed with one, to respect the RFC 2109.
+     * @param cdlist The new value for {@link #cookieDomains}
      * @see #cookieDomains
      */
     public void setCookieDomains(String[] cdlist)
     {
         if (cdlist != null && cdlist.length > 0) {
-            this.cookieDomains = new String[cdlist.length];
-            for (int i = 0; i < cdlist.length; ++i) {
-                this.cookieDomains[i] = conformCookieDomain(cdlist[i]);
-            }
+            this.cookieDomains = Arrays.copyOf(cdlist, cdlist.length);
         } else {
             this.cookieDomains = null;
         }
@@ -202,6 +165,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         if (cookieDomain != null) {
             cookie.setDomain(cookieDomain);
         }
+        cookie.setHttpOnly(true);
         addCookie(response, cookie);
     }
 
@@ -218,7 +182,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String protectedUsername = username;
         String protectedPassword = password;
-        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
+        if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
             protectedUsername = encryptText(protectedUsername);
             protectedPassword = encryptText(protectedPassword);
             if (protectedUsername == null || protectedPassword == null) {
@@ -248,7 +212,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         Cookie rememberCookie = new Cookie(getCookiePrefix() + COOKIE_REMEMBERME, !sessionCookie + "");
         setupCookie(rememberCookie, sessionCookie, secureCookie, cookieDomain, response);
 
-        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
+        if (PROTECTION_ALL.equals(this.protection) || PROTECTION_VALIDATION.equals(this.protection)) {
             String validationHash = getValidationHash(protectedUsername, protectedPassword, getClientIP(request));
             if (validationHash != null) {
                 // Validation
@@ -263,7 +227,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 }
             }
         }
-        return;
     }
 
     /**
@@ -295,49 +258,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             LOGGER.debug("Adding cookie: " + cookie.getDomain() + cookie.getPath() + " " + cookie.getName() + "="
                 + cookie.getValue());
         }
-        // We don't use the container's response.addCookie, since the HttpOnly cookie flag was introduced only recently
-        // in the servlet specification, and we're still using the older 2.4 specification as a minimal requirement for
-        // compatibility with as many containers as possible. Instead, we write the cookie manually as a HTTP header.
-        StringBuilder cookieValue = new StringBuilder(150);
-        cookieValue.append(cookie.getName() + "=");
-        if (StringUtils.isNotEmpty(cookie.getValue())) {
-            cookieValue.append("\"" + cookie.getValue() + "\"");
-        }
-        cookieValue.append("; Version=1");
-        if (cookie.getMaxAge() >= 0) {
-            cookieValue.append("; Max-Age=" + cookie.getMaxAge());
-            // IE is such a pain, it doesn't understand the modern, safer Max-Age
-            cookieValue.append("; Expires=");
-            if (cookie.getMaxAge() == 0) {
-                cookieValue.append(COOKIE_EXPIRE_NOW);
-            } else {
-                cookieValue.append(COOKIE_EXPIRE_FORMAT.format(new Date(System.currentTimeMillis() + cookie.getMaxAge()
-                    * 1000L)));
-            }
-        }
-        if (StringUtils.isNotEmpty(cookie.getDomain())) {
-            // IE needs toLowerCase for the domain name
-            cookieValue.append("; Domain=" + cookie.getDomain().toLowerCase());
-        }
-        if (StringUtils.isNotEmpty(cookie.getPath())) {
-            cookieValue.append("; Path=" + cookie.getPath());
-        }
-        // Protect cookies from being used from JavaScript, see http://www.owasp.org/index.php/HttpOnly
-        cookieValue.append("; HttpOnly");
-        // Only send this cookie on HTTPS connections coming from a page in the same domain
-        if (cookie.getSecure()) {
-            cookieValue.append("; Secure");
-        }
-
-        // Session cookies should be discarded.
-        // FIXME Safari 5 can't handle properly "Discard", as it really discards all the response header data after the
-        // first "Discard" encountered, so it will only see the first such cookie. Disabled for the moment until Safari
-        // gets fixed, or a better idea comes to mind.
-        // Since we don't set a Max-Age, the rfc2109 behavior will kick in, and recognize this as a session cookie.
-        // if (cookie.getMaxAge() < 0) {
-        // cookieValue.append("; Discard");
-        // }
-        response.addHeader("Set-Cookie", cookieValue.toString());
+        response.addCookie(cookie);
     }
 
     /**
@@ -352,10 +273,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String cookieDomain = null;
         if (this.cookieDomains != null) {
-            // Conform the server name like we conform cookie domain by prefixing with a dot.
-            // This will ensure both localhost.localdomain and any.localhost.localdomain will match
-            // the same cookie domain.
-            String servername = conformCookieDomain(request.getServerName());
+            String servername = request.getServerName();
             for (String domain : this.cookieDomains) {
                 if (servername.endsWith(domain)) {
                     cookieDomain = domain;
@@ -396,13 +314,13 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
             sbValueBeforeMD5.append(username);
             sbValueBeforeMD5.append(FIELD_SEPARATOR);
-            sbValueBeforeMD5.append(password.toString());
+            sbValueBeforeMD5.append(password);
             sbValueBeforeMD5.append(FIELD_SEPARATOR);
             if (isTrue(this.useIP)) {
-                sbValueBeforeMD5.append(clientIP.toString());
+                sbValueBeforeMD5.append(clientIP);
                 sbValueBeforeMD5.append(FIELD_SEPARATOR);
             }
-            sbValueBeforeMD5.append(this.validationKey.toString());
+            sbValueBeforeMD5.append(this.validationKey);
 
             this.valueBeforeMD5 = sbValueBeforeMD5.toString();
             md5.update(this.valueBeforeMD5.getBytes());
@@ -446,7 +364,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 // with something else. Bas64 does not use _, and it is allowed in cookies, so
                 // we're using that instead of =. In decryptText the reverse operation is perfomed.
                 // See XWIKI-2211
-                return encryptedEncodedText.replaceAll("=", "_");
+                return encryptedEncodedText.replace("=", "_");
             }
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error("ERROR! >> SecretKey not generated...");
@@ -474,7 +392,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         removeCookie(request, response, getCookiePrefix() + COOKIE_PASSWORD);
         removeCookie(request, response, getCookiePrefix() + COOKIE_REMEMBERME);
         removeCookie(request, response, getCookiePrefix() + COOKIE_VALIDATION);
-        return;
     }
 
     /**
@@ -563,7 +480,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     private boolean checkValidation(HttpServletRequest request, HttpServletResponse response)
     {
-        if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
+        if (PROTECTION_ALL.equals(this.protection) || PROTECTION_VALIDATION.equals(this.protection)) {
             String username = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME, DEFAULT_VALUE);
             String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
             String cookieHash =
@@ -593,13 +510,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String username = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME, DEFAULT_VALUE);
 
-        if (!username.equals(DEFAULT_VALUE)) {
-            if (checkValidation(request, response)) {
-                if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
-                    username = decryptText(username);
-                }
-                return username;
+        if (!DEFAULT_VALUE.equals(username) && checkValidation(request, response)) {
+            if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
+                username = decryptText(username);
             }
+            return username;
         }
         return null;
     }
@@ -613,16 +528,16 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     @Override
     // TODO: Also use the URL, in case cookies are disabled [XWIKI-1071]
+    // DEFAULT_VALUE is not a hardcoded password but a value indicating "not set cookie" - suppress the false positive.
+    @SuppressWarnings("java:S2068")
     public String getRememberedPassword(HttpServletRequest request, HttpServletResponse response)
     {
         String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
-        if (!password.equals(DEFAULT_VALUE)) {
-            if (checkValidation(request, response)) {
-                if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
-                    password = decryptText(password);
-                }
-                return password;
+        if (!DEFAULT_VALUE.equals(password) && checkValidation(request, response)) {
+            if (PROTECTION_ALL.equals(this.protection) || PROTECTION_ENCRYPTION.equals(this.protection)) {
+                password = decryptText(password);
             }
+            return password;
         }
         return null;
     }
@@ -630,7 +545,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     @Override
     public boolean rememberingLogin(HttpServletRequest request)
     {
-        if (getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_REMEMBERME, "false").equals("true")) {
+        if ("true".equals(getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_REMEMBERME, DEFAULT_VALUE))) {
             return true;
         } else {
             return false;
@@ -652,12 +567,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             // so here we must re-introduce the = sign needed by Base64.
             // See XWIKI-2211
             byte[] decodedEncryptedText =
-                Base64.decodeBase64(encryptedText.replaceAll("_", "=").getBytes("ISO-8859-1"));
+                Base64.decodeBase64(encryptedText.replace("_", "=").getBytes("ISO-8859-1"));
             Cipher c1 = Cipher.getInstance(this.cipherParameters);
             c1.init(Cipher.DECRYPT_MODE, this.secretKey);
             byte[] decryptedText = c1.doFinal(decodedEncryptedText);
-            String decryptedTextString = new String(decryptedText);
-            return decryptedTextString;
+            return new String(decryptedText);
         } catch (Exception e) {
             LOGGER.error("Error decypting text: " + encryptedText, e);
             return null;
@@ -674,19 +588,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     protected String getClientIP(HttpServletRequest request)
     {
-        // TODO: This HTTP header can have multiple values (each proxy is supposed to add a new value) and so the
-        // trustworthy value should be determined based on the known (configurable) number of proxies, as per
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For#selecting_an_ip_address . For
-        // instance, if XWiki is not aware of any proxy then it should ignore all values. If XWiki is aware of one proxy
-        // then it should use the last value (not the first!). When two proxies are configured then the value before
-        // last should be used, and so on.
-        String remoteIP = request.getHeader("X-Forwarded-For");
-        if (remoteIP == null || "".equals(remoteIP)) {
-            remoteIP = request.getRemoteAddr();
-        } else if (remoteIP.indexOf(',') != -1) {
-            remoteIP = remoteIP.substring(0, remoteIP.indexOf(','));
-        }
-        return remoteIP;
+        return HttpServletUtils.getClientIP(JakartaServletBridge.toJakarta(request));
     }
 
     /**

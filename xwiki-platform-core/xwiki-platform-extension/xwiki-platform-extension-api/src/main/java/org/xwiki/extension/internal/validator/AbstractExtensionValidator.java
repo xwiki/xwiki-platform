@@ -98,8 +98,8 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
     {
         Object obj = request.getProperty(property);
 
-        if (obj instanceof DocumentReference) {
-            return (DocumentReference) obj;
+        if (obj instanceof DocumentReference documentReference) {
+            return documentReference;
         }
 
         return null;
@@ -152,7 +152,7 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
 
         if (namespace.getType() != null) {
             // User
-            if (namespace.getType().equals("user")) {
+            if ("user".equals(namespace.getType())) {
                 EntityReference reference = this.resolver.resolve(namespace.getValue(), EntityType.DOCUMENT);
 
                 checkUserRight(reference, request);

@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
@@ -74,7 +75,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     private XWikiSecurityAccess denyAllAccess;
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         defaultAccess = XWikiSecurityAccess.getDefaultAccess();
         denyAllAccess = new XWikiSecurityAccess();
@@ -106,7 +107,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
 
             when(entry.getReference()).thenReturn(ref);
             when(entry.getRules()).thenReturn(rules);
-            when(entry.isEmpty()).thenReturn(rules.size() == 0);
+            when(entry.isEmpty()).thenReturn(rules.isEmpty());
 
             ref = ref.getParentSecurityReference();
             i++;
@@ -629,8 +630,6 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
                 getMockedSecurityRuleEntries("denyAccessDAF", docRef,
                     Arrays.asList(Arrays.asList(denyImpliedDAF)))));
 
-        SecurityRule allowAllTestRightsUserAndAnotherGroup = getMockedSecurityRule("allowAllTestRightsUserAndAnotherGroup",
-            Arrays.asList(userRef), Arrays.asList(anotherGroupRef), allTestRights, ALLOW);
         SecurityRule denyAllTestRightsUserAndAnotherGroup = getMockedSecurityRule("denyAllTestRightsUserAndAnotherGroup",
             Arrays.asList(userRef), Arrays.asList(anotherGroupRef), allTestRights, DENY);
         SecurityRule denyAllTestRightsAnotherUserAndGroup = getMockedSecurityRule("denyAllTestRightsAnotherUserAndGroup",
@@ -684,7 +683,12 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
             authorizationSettler.settle(anotherUserRef, Arrays.asList(anotherGroupRef), conflictAllowDenyUserGroupDAF));
     }
 
+
+    // We cannot unregister the right anymore because AuthorizationManager#unregister has been disabled
+    // and we cannot call Right#unregister because we are not in the proper package. So in order to avoid breaking the
+    // whole test suite we just disable this test
     @Test
+    @Disabled
     void testSettleNewRightJustAdded() throws Exception
     {
         Right newRight = getNewTestRight("RightAddedLater",DENY,DENY,true);

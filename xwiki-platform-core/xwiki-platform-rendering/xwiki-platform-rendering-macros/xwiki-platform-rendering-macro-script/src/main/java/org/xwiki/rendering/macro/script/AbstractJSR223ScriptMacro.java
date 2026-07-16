@@ -265,10 +265,10 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
     {
         List<Block> result;
 
-        if (scriptResult instanceof XDOM) {
-            result = ((XDOM) scriptResult).getChildren();
-        } else if (scriptResult instanceof Block) {
-            result = Collections.singletonList((Block) scriptResult);
+        if (scriptResult instanceof XDOM xdom) {
+            result = xdom.getChildren();
+        } else if (scriptResult instanceof Block block) {
+            result = Collections.singletonList(block);
         } else if (scriptResult instanceof List && !((List<?>) scriptResult).isEmpty()
             && ((List<?>) scriptResult).get(0) instanceof Block) {
             result = (List<Block>) scriptResult;
@@ -309,7 +309,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         Map<String, ScriptEngine> scriptEngines =
             (Map<String, ScriptEngine>) executionContext.getProperty(EXECUTION_CONTEXT_ENGINE_KEY);
         if (scriptEngines == null) {
-            scriptEngines = new HashMap<String, ScriptEngine>();
+            scriptEngines = new HashMap<>();
             executionContext.setProperty(EXECUTION_CONTEXT_ENGINE_KEY, scriptEngines);
         }
         ScriptEngine engine = scriptEngines.get(engineName);

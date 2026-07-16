@@ -82,11 +82,11 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     @Override
     public void initialize() throws InitializationException
     {
-        this.jobs = new HashMap<List<String>, WikiProvisioningJob>();
+        this.jobs = new HashMap<>();
 
         // Setup jobs thread
         BasicThreadFactory factory =
-                new BasicThreadFactory.Builder().namingPattern("XWiki provisioning thread").daemon(true)
+                BasicThreadFactory.builder().namingPattern("XWiki provisioning thread").daemon(true)
                         .priority(Thread.MIN_PRIORITY).build();
         this.jobExecutor = Executors.newCachedThreadPool(factory);
     }
@@ -101,7 +101,7 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
             // Create the job
             WikiProvisioningJob job = componentManager.getInstance(Job.class, provisioningJobName);
             // Id of the new job
-            List<String> jobId = new ArrayList<String>();
+            List<String> jobId = new ArrayList<>();
             jobId.add("wiki");
             jobId.add("provisioning");
             jobId.add(provisioningJobName);
@@ -123,7 +123,6 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     @Override
     public WikiProvisioningJob getJob(List<String> jobId) throws WikiProvisioningJobException
     {
-        WikiProvisioningJob job = jobs.get(jobId);
-        return job;
+        return jobs.get(jobId);
     }
 }

@@ -41,6 +41,6 @@
 {{velocity}}
 #set ($customize = $request.customize == 'true')
 #displayUserDirectory($customize)
-#set ($docextras = [])
+#set ($displayDocExtra = false)
 {{/velocity}}</content>
 </xwikidoc>

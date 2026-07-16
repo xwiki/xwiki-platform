@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class JCaptchaInternalScriptServiceTest
+class JCaptchaInternalScriptServiceTest
 {
     @InjectMockComponents
     private JCaptchaInternalScriptService scriptService;
@@ -62,7 +61,7 @@ public class JCaptchaInternalScriptServiceTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    public void getURL() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
+    void getURL() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
     {
         ExtendedURL extendedURL = mock(ExtendedURL.class);
         when(serializer.serialize(any())).thenReturn(extendedURL);
@@ -71,26 +70,26 @@ public class JCaptchaInternalScriptServiceTest
         JCaptchaResourceReference jCaptchaResourceReference = new JCaptchaResourceReference("myType", "myEngine");
         jCaptchaResourceReference.addParameter("customParam", "customValue");
 
-        verify(serializer, times(1)).serialize(jCaptchaResourceReference);
-        verify(extendedURL, times(1)).serialize();
+        verify(serializer).serialize(jCaptchaResourceReference);
+        verify(extendedURL).serialize();
     }
 
     @Test
-    public void getURLSerializerError() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
+    void getURLSerializerError() throws UnsupportedResourceReferenceException, SerializeResourceReferenceException
     {
         when(serializer.serialize(any())).thenThrow(new UnsupportedResourceReferenceException("customMessage"));
         assertNull(this.scriptService.getURL("myType", "myEngine", null));
 
         JCaptchaResourceReference jCaptchaResourceReference = new JCaptchaResourceReference("myType", "myEngine");
 
-        verify(serializer, times(1)).serialize(jCaptchaResourceReference);
+        verify(serializer).serialize(jCaptchaResourceReference);
         assertEquals("Error while serializing JCaptcha URL for type [myType], engine = [myEngine]."
                 + " Root cause = [UnsupportedResourceReferenceException: customMessage]",
             logCapture.getMessage(0));
     }
 
     @Test
-    public void getURLNullParams()
+    void getURLNullParams()
     {
         assertNull(this.scriptService.getURL(null, "foo", null));
         assertNull(this.scriptService.getURL("foo", null, null));

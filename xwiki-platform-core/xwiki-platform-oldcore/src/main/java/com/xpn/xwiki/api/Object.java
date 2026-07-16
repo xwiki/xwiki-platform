@@ -21,9 +21,13 @@ package com.xpn.xwiki.api;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.evaluation.ObjectEvaluator;
 import org.xwiki.evaluation.ObjectEvaluatorException;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -31,8 +35,20 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
 
+/**
+ * API representation of an XObject.
+ * This class has been created to allow manipulating xobjects in scripts safely.
+ * @version $Id$
+ */
 public class Object extends Collection
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Object.class);
+
+    /**
+     * Default constructor.
+     * @param obj the wrapped object
+     * @param context the context to manipulate the object
+     */
     public Object(BaseObject obj, XWikiContext context)
     {
         super(obj, context);
@@ -43,6 +59,10 @@ public class Object extends Collection
         return (BaseObject) getCollection();
     }
 
+    /**
+     * Retrieve the wrapped object when the user has programming rights.
+     * @return the wrapped object or {@code null}.
+     */
     public BaseObject getXWikiObject()
     {
         if (hasProgrammingRights()) {
@@ -52,11 +72,20 @@ public class Object extends Collection
         }
     }
 
+    /**
+     * @return the wrapped object guid.
+     * @see BaseObject#getGuid()
+     */
     public String getGuid()
     {
         return getBaseObject().getGuid();
     }
 
+    /**
+     * Set the wrapped object guid.
+     * @param guid the guid to set
+     * @see BaseObject#setGuid(String)
+     */
     public void setGuid(String guid)
     {
         getBaseObject().setGuid(guid);
@@ -68,6 +97,8 @@ public class Object extends Collection
      * This method's name is misleading since it doesn't return the Object's property value; it"s equivalent to
      * {@link #display(String, String)} (with {@code type} equals to the context action ("view" or "edit" usually). The
      * right method to get the field value is {@link #getValue(String)}.
+     * @param name the name of the field for which to display the value.
+     * @return a string representing the display output or {@code null} in case of problem
      */
     public java.lang.Object get(String name)
     {
@@ -80,6 +111,7 @@ public class Object extends Collection
 
             return doc.display(name, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
+            LOGGER.debug("Error while displaying [{}]", name, e);
             return null;
         }
     }
@@ -102,9 +134,26 @@ public class Object extends Collection
      * @param name the name of the property
      * @param mode the edit mode in which the property should be displayed ("view", "edit", etc.)
      * @param isolated true if the property should be displayed in it's own document context
+     * @return a string representing the display output or {@code null} in case of problem
      * @since 13.0
      */
     public java.lang.Object display(String name, String mode, boolean isolated)
+    {
+        return display(name, mode, isolated, true);
+    }
+
+    /**
+     * Display the property with the passed name in the context of the current document or its own document.
+     * 
+     * @param name the name of the property
+     * @param mode the edit mode in which the property should be displayed ("view", "edit", etc.)
+     * @param isolated true if the property should be displayed in it's own document context
+     * @param number true if the number you be part of the input name, false otherwise
+     * @return a string representing the display output or {@code null} in case of problem
+     * @since 17.3.0RC1
+     */
+    @Unstable
+    public String display(String name, String mode, boolean isolated, boolean number)
     {
         try {
             XWikiDocument doc = getBaseObject().getOwnerDocument();
@@ -113,8 +162,10 @@ public class Object extends Collection
                     getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(), getXWikiContext());
             }
 
-            return doc.display(name, mode, getBaseObject(), isolated, getXWikiContext());
+            return doc.display(name, mode, getBaseObject(), isolated, number, getXWikiContext());
         } catch (XWikiException e) {
+            LOGGER.debug("Error while displaying [{}] number [{}] with mode [{}] and isolation set to [{}]",
+                name, number, mode, isolated, e);
             return null;
         }
     }
@@ -129,7 +180,26 @@ public class Object extends Collection
         return o.getXWikiContext().equals(getXWikiContext()) && this.element.equals(o.element);
     }
 
-    public void set(String fieldname, java.lang.Object value)
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder()
+            .append(getXWikiContext())
+            .append(this.element)
+            .toHashCode();
+    }
+
+    /**
+     * Set the defined property with the given value in the current object.
+     * The given value might be a {@link String} or a type supported by the property. If a {@link String} is given
+     * then {@link com.xpn.xwiki.objects.classes.PropertyClassInterface#fromString(String)} will be used.
+     * Note that this method also set the author of the document to match the object owner.
+     * @param fieldname the name of the property to set
+     * @param value the value to set
+     * @throws XWikiException in case of problem when parsing the value
+     * @see BaseObject#set(String, java.lang.Object, XWikiContext)
+     */
+    public void set(String fieldname, java.lang.Object value) throws XWikiException
     {
         XWikiContext xcontext = getXWikiContext();
 

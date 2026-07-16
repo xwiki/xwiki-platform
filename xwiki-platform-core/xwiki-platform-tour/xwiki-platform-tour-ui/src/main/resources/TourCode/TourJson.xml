@@ -131,7 +131,7 @@
         ##--------------------------------------------------------
         ## Sort the steps
         ##--------------------------------------------------------
-        #set ($tour.steps = $properSortTool.sort($tour.steps, 'order'))
+        #set ($tour.steps = $collectiontool.sort($tour.steps, 'order'))
       #end
     #end
   #end

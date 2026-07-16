@@ -55,7 +55,7 @@ public class DefaultTranslationMessage implements TranslationMessage
     public DefaultTranslationMessage(String rawSource, List<TranslationMessageElement> elements)
     {
         this.rawSource = rawSource;
-        this.elements = new ArrayList<TranslationMessageElement>(elements);
+        this.elements = new ArrayList<>(elements);
     }
 
     @Override

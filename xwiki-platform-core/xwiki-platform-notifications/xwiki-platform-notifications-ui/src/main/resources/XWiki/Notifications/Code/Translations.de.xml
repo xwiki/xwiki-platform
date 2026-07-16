@@ -255,6 +255,7 @@ notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS
 notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Du ignorierst diese Seite und ihre untergeordneten Seiten: Du erhältst keine Benachrichtigungen für sie.
 notifications.watch.modal.title.CUSTOM=Benutzerdefinierte Einstellungen zur Seitenbeobachtung
 notifications.watch.modal.description.CUSTOM=Du verwendest benutzerdefinierte Benachrichtigungseinstellungen für diese Seite: Möglicherweise folgst Du bestimmten Ereignissen auf der Seite oder blockierst sie, oder Du wählst nur bestimmte Kanäle für die Benachrichtigungen aus. Wir laden Dich ein, Deine Benachrichtigungseinstellungen in Deinem Profil zu überprüfen.
+notifications.watch.modal.option.hint.toggle=Details zu dieser Option einblenden/ausblenden
 notifications.watch.modal.option.watchpage.title=Seite folgen
 notifications.watch.modal.option.watchpage.hint=Du wirst nur für diese Seite benachrichtigt.
 notifications.watch.modal.option.watchspace.title=Aktueller Seite und ihren Unterseiten folgen

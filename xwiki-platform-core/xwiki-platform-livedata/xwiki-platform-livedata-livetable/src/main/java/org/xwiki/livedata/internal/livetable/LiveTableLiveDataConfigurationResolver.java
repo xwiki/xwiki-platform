@@ -22,10 +22,8 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -63,6 +61,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Component
 @Named("liveTable")
 @Singleton
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigurationResolver<LiveTableConfiguration>
 {
     private static final String HTML = "html";
@@ -79,15 +78,11 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
 
     private static final String QUERY_FILTERS = "queryFilters";
 
-    @SuppressWarnings("serial")
-    private static final Map<String, String> DEFAULT_OPERATOR = new HashMap<String, String>()
-    {
-        {
-            put("exact", "equals");
-            put("partial", "contains");
-            put("prefix", "startsWith");
-        }
-    };
+    private static final Map<String, String> DEFAULT_OPERATOR = Map.of(
+        "exact", "equals",
+        "partial", "contains",
+        "prefix", "startsWith"
+    );
 
     @Inject
     private Logger logger;
@@ -213,7 +208,7 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
                         Filter filter = new Filter();
                         filter.setProperty(entry.getKey());
                         filter.getConstraints()
-                            .addAll(entry.getValue().stream().map(Constraint::new).collect(Collectors.toList()));
+                            .addAll(entry.getValue().stream().map(Constraint::new).toList());
                         filters.add(filter);
                     } else if (entry.getValue().size() == 1) {
                         // Convert to a live data source parameter.
@@ -322,7 +317,8 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         DisplayerDescriptor displayerConfig = new DisplayerDescriptor();
         if (columnProperties.path(ACTIONS).isArray()) {
             displayerConfig.setId(ACTIONS);
-            displayerConfig.setParameter(ACTIONS, columnProperties.get(ACTIONS));
+            displayerConfig.setParameter(ACTIONS,
+                columnProperties.get(ACTIONS).valueStream().map(JsonNode::asText).toList());
         } else if (columnProperties.path(LINK).isTextual()) {
             displayerConfig.setId(LINK);
             displayerConfig.setParameter("propertyHref", getLinkTarget(column, columnProperties.get(LINK).asText()));
@@ -344,12 +340,12 @@ public class LiveTableLiveDataConfigurationResolver implements LiveDataConfigura
         String docURL = "doc.url";
         String columnURL = column + "_url";
         if ("auto".equals(linkType)) {
-            return new String[] {columnURL, docURL};
+            return List.of(columnURL, docURL);
         } else if ("field".equals(linkType)) {
             return columnURL;
         } else {
             String linkTypeURL = String.format("doc.%s_url", linkType);
-            return new String[] {linkTypeURL, docURL};
+            return List.of(linkTypeURL, docURL);
         }
     }
 

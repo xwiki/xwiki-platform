@@ -19,9 +19,6 @@
  */
 package org.xwiki.test.ui.po;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +28,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.XWikiWebDriver;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Represent an select field enhanced with the "bootstrap-select" plugin.
@@ -76,6 +76,18 @@ public class BootstrapSelect
                 }
                 return value;
             }).collect(Collectors.toList());
+    }
+
+    /**
+     * @return the text displayed in the button of the enhanced select, which is usually the text of the selected option
+     * or options.
+     *
+     * @since 18.2.0RC1
+     * @since 17.10.4
+     */
+    public String getDisplayedText()
+    {
+        return this.button.getAttribute("title");
     }
 
     public void selectByValue(String value)

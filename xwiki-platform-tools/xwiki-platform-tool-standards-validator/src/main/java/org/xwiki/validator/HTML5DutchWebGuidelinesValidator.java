@@ -62,8 +62,6 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
     private static final String SUBMIT_BUTTONS = StringUtils.join(Arrays.asList("button[type='submit']",
         "button:not([type])", "input[type='submit']", "input[type='image'][alt]:not([alt=''])"), ", ");
 
-    private static final String DOCTYPE_ATT_NAME = "name";
-
     /**
      * Message resources.
      */
@@ -90,6 +88,7 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
     }
 
     @Override
+    @SuppressWarnings({"checkstyle:ExecutableStatementCount", "checkstyle:JavaNCSS", "checkstyle:MethodLength"})
     protected void validate(Document document)
     {
         // RPD 1
@@ -292,9 +291,9 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
                 ATTR_SELECT, ATTR_UNLOAD);
         for (Element linkElement : linkElements) {
             if (!ListUtils.intersection(getAttributeNames(linkElement), forbiddenAttributes).isEmpty()) {
-                assertFalse(Type.ERROR, "rpd1s3.inlineEventHandlers", getAttributeValue(linkElement, ATTR_HREF).equals(
-                    "")
-                    || getAttributeValue(linkElement, ATTR_HREF).equals("#"));
+                assertFalse(Type.ERROR, "rpd1s3.inlineEventHandlers",
+                    getAttributeValue(linkElement, ATTR_HREF).isEmpty()
+                    || "#".equals(getAttributeValue(linkElement, ATTR_HREF)));
             }
         }
 
@@ -657,7 +656,7 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
 
         // alt attributes are mandatory in <input type="image">
         for (Element input : getElements(ELEM_INPUT)) {
-            if (getAttributeValue(input, ATTR_TYPE).equals(IMAGE)) {
+            if (IMAGE.equals(getAttributeValue(input, ATTR_TYPE))) {
                 assertTrue(Type.ERROR, "rpd7s1.input", hasAttribute(input, ATTR_ALT));
             }
         }
@@ -689,8 +688,8 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
         for (Element link : getElements(ELEM_LINK)) {
 
             // Look for images in the link.
-            boolean hasImages = link.select("img").size() > 0;
-            boolean hasImagesWithoutAlt = link.select("img[alt=''], img:not([alt])").size() > 0;
+            boolean hasImages = !link.select("img").isEmpty();
+            boolean hasImagesWithoutAlt = !link.select("img[alt=''], img:not([alt])").isEmpty();
 
             // Look for text in the link.
             boolean hasText = false;

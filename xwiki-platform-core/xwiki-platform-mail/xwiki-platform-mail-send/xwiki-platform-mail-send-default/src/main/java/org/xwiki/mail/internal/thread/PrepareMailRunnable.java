@@ -143,8 +143,8 @@ public class PrepareMailRunnable extends AbstractMailRunnable
                 // Update the listener with the total number of messages prepared so that the user can know when
                 // all the messages have been processed for the batch. We update here, even in case of failure
                 // so that waiting process have a chance to see an end.
-                if (result instanceof UpdateableMailStatusResult) {
-                    ((UpdateableMailStatusResult) result).setTotalSize(messageCounter);
+                if (result instanceof UpdateableMailStatusResult updateableResult) {
+                    updateableResult.setTotalSize(messageCounter);
                 }
                 listener.onPrepareEnd(Collections.emptyMap());
             }

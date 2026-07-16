@@ -19,13 +19,9 @@
  */
 package org.xwiki.realtime.wysiwyg.test.po;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.realtime.test.po.RealtimeEditToolbar;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
@@ -37,8 +33,7 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  */
 public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
 {
-    @FindBy(className = "realtime-allow")
-    private WebElement allowRealtimeCheckbox;
+    private RealtimeEditToolbar toolbar;
 
     /**
      * Open the specified page in realtime WYSIWYG edit mode.
@@ -57,10 +52,7 @@ public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
      */
     public RealtimeWYSIWYGEditPage()
     {
-        // Wait for the "Allow Realtime" checkbox to be injected in the action buttons toolbar.
-        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(this.allowRealtimeCheckbox));
-        // The "Save" button is disabled while the realtime connection is being established.
-        getDriver().waitUntilElementIsEnabled(this.save);
+        this.toolbar = new RealtimeEditToolbar().waitUntilConnected();
     }
 
     /**
@@ -72,46 +64,27 @@ public class RealtimeWYSIWYGEditPage extends WYSIWYGEditPage
     }
 
     /**
-     * @return {@code true} if realtime editing is enabled, {@code false} otherwise
+     * @return the edit mode toolbar (holding the button to save the changes)
+     * @since 16.10.6
+     * @since 17.3.0RC1
      */
-    public boolean isRealtimeEditing()
+    public RealtimeEditToolbar getToolbar()
     {
-        return this.allowRealtimeCheckbox.isSelected();
-    }
-    
-    /**
-     * @return {code true} if it is possible to join or leave the editing session, {@code false} otherwise
-     * @since 15.10.12
-     * @since 16.4.2
-     * @since 16.7.0
-     */
-    public boolean canToggleRealtimeEditing()
-    {
-        return this.allowRealtimeCheckbox.isEnabled();
-    }
-    
-    /**
-     * Leave the realtime editing session.
-     */
-    public void leaveRealtimeEditing()
-    {
-        if (isRealtimeEditing()) {
-            this.allowRealtimeCheckbox.click();
-            getDriver().findElement(By.cssSelector(".modal-popup .realtime-buttons .btn-primary")).click();
-        }
+        return this.toolbar;
     }
 
     /**
-     * Join the realtime editing session.
+     * Clicks on the Done button to leave the edit mode and waits for the page to be loaded in view mode.
+     * 
+     * @return the view page
      */
-    public void joinRealtimeEditing()
+    public ViewPage clickDone()
     {
-        if (!isRealtimeEditing()) {
-            this.allowRealtimeCheckbox.click();
-            // The checkbox is disabled while the connection is being established.
-            getDriver().waitUntilElementIsEnabled(this.allowRealtimeCheckbox);
-            // The checkbox is unchecked if the connection fails.
-            assertTrue(isRealtimeEditing());
-        }
+        getDriver().addPageNotYetReloadedMarker();
+
+        this.toolbar.clickDone();
+
+        getDriver().waitUntilPageIsReloaded();
+        return new ViewPage();
     }
 }

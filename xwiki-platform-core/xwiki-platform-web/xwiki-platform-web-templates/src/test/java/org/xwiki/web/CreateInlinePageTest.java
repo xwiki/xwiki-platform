@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,8 +32,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.velocity.VelocityManager;
 
@@ -41,6 +45,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests the {@code createinline.vm} template.
@@ -61,6 +67,10 @@ class CreateInlinePageTest extends PageTest
     private static final String CREATE_EXCEPTION_VELOCITY_KEY = "createException";
 
     private static final String ERROR_MESSAGE_CLASS = "errormessage";
+    
+    @MockComponent(classToMock = IconManagerScriptService.class)
+    @Named("icon")
+    private ScriptService iconManagerScriptService;
 
     @Inject
     private VelocityManager velocityManager;
@@ -76,6 +86,9 @@ class CreateInlinePageTest extends PageTest
 
         // Set a context document to avoid problems
         this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("xwiki", "space", "page")));
+
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
+            .then(invocationOnMock -> { return invocationOnMock.getArgument(0) + "Icon";});
     }
 
     /**
@@ -159,10 +172,12 @@ class CreateInlinePageTest extends PageTest
 
         String expectedMessage;
         if (allowedSpaces.size() == 1) {
-            expectedMessage = String.format("core.create.template.allowedspace.inline [%s, %s]",
+            expectedMessage = String.format("exclamationIcon error " 
+                + "core.create.template.allowedspace.inline [%s, %s]",
                 provider, allowedSpaces.get(0));
         } else {
-            expectedMessage = String.format("core.create.template.allowedspaces.inline [%s, %s]",
+            expectedMessage = String.format("exclamationIcon error "
+                + "core.create.template.allowedspaces.inline [%s, %s]",
                 provider, allowedSpaces);
         }
         assertEquals(expectedMessage, errormessage.text());

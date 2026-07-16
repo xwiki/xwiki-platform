@@ -48,7 +48,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -75,7 +74,7 @@ import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 @Component
 @Named("R160300000XWIKI17243")
 @Singleton
-@Unstable
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class R160300000XWIKI17243DataMigration extends AbstractHibernateDataMigration
 {
     private static final String WATCHLIST_CLASSNAME = "WatchListClass";
@@ -224,10 +223,10 @@ public class R160300000XWIKI17243DataMigration extends AbstractHibernateDataMigr
         List<String> values;
         PropertyInterface objProperty = obj.safeget(fieldName);
         // Support both pre and post 7.0 type of watchlist objects
-        if (objProperty instanceof ListProperty) {
-            values = ((ListProperty) objProperty).getList();
-        } else if (objProperty instanceof LargeStringProperty) {
-            values = ListClass.getListFromString(((LargeStringProperty) objProperty).getValue(), ",", false);
+        if (objProperty instanceof ListProperty listProperty) {
+            values = listProperty.getList();
+        } else if (objProperty instanceof LargeStringProperty largeStringProperty) {
+            values = ListClass.getListFromString(largeStringProperty.getValue(), ",", false);
         } else {
             values = Collections.emptyList();
         }

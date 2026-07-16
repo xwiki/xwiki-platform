@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 
 import org.apache.tika.mime.MediaType;
 import org.xwiki.classloader.ClassLoaderManager;
+import org.xwiki.classloader.internal.ClassLoaderUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
@@ -76,8 +77,8 @@ public class WebJarsResourceReferenceHandler extends AbstractServletResourceRefe
     @Override
     protected InputStream getResourceStream(WebJarsResourceReference resourceReference)
     {
-        String resourcePath = String.format("%s%s", WEBJARS_RESOURCE_PREFIX, getResourceName(resourceReference));
-        return getClassLoader(resourceReference.getNamespace()).getResourceAsStream(resourcePath);
+        return ClassLoaderUtils.getResourceAsStream(getClassLoader(resourceReference.getNamespace()),
+            WEBJARS_RESOURCE_PREFIX, getResourceName(resourceReference));
     }
 
     @Override

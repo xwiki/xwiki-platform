@@ -99,12 +99,14 @@ class NotificationsSettingsIT
     @BeforeEach
     void setup(TestUtils testUtils)
     {
+        testUtils.forceGuestUser();
         testUtils.createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD, "", "");
     }
 
     @AfterEach
     void tearDown(TestUtils testUtils)
     {
+        testUtils.loginAsSuperAdmin();
         testUtils.deletePage("XWiki", FIRST_USER_NAME);
     }
 

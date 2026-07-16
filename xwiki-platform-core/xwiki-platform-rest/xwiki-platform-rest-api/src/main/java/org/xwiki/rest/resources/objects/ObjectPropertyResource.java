@@ -34,9 +34,28 @@ import org.xwiki.rest.model.jaxb.Property;
 /**
  * @version $Id$
  */
+// @Path annotations have very long URI templates in some object-related resources
+@SuppressWarnings("checkstyle:LineLength")
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/objects/{className}/{objectNumber}/properties/{propertyName}")
 public interface ObjectPropertyResource
 {
+    /**
+     * Retrieves a single property of an object attached to a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the object, for example {@code WebHome}
+     * @param className the reference of the XClass of the object, for example {@code XWiki.XWikiUsers}
+     * @param objectNumber the number identifying the object among those of the same class on the page; object numbers
+     *  are 0-based and assigned in creation order, so a value that no object carries yields a {@code 404} response
+     * @param propertyName the name of a property of the object's class to retrieve, for example {@code email}; when the
+     *  object has no property with this name a {@code 404} response is returned
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's
+     *  display name), at some extra cost; defaults to {@code false}
+     * @return the requested property
+     * @throws XWikiRestException if the property cannot be retrieved from the store
+     */
     @GET Property getObjectProperty(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
@@ -47,6 +66,26 @@ public interface ObjectPropertyResource
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;
 
+    /**
+     * Updates a single property of an object attached to a page.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the object, for example {@code WebHome}
+     * @param className the reference of the XClass of the object, for example {@code XWiki.XWikiUsers}
+     * @param objectNumber the number identifying the object among those of the same class on the page; object numbers
+     *  are 0-based and assigned in creation order, so a value that no object carries yields a {@code 404} response
+     * @param propertyName the name of the property to update, for example {@code email}
+     * @param minorRevision when {@code true}, saves the change as a minor version; when {@code null} (the default) or
+     *  {@code false}, saves it as a normal (major) version
+     * @param property the new state of the property; only its {@code value} is applied to the object
+     * @return a response with status {@code 202} holding the object's updated property
+     * @throws XWikiRestException if the property cannot be updated, for example the current user is not allowed to edit
+     *  the page
+     */
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @PUT Response updateObjectProperty(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

@@ -75,7 +75,6 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
     // of it!
     ScriptMimeMessage(Execution execution, ComponentManager componentManager)
     {
-        super();
         this.execution = execution;
         this.componentManager = componentManager;
     }
@@ -126,7 +125,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
         BodyPart bodyPart;
 
         try {
-            if (!(content instanceof BodyPart)) {
+            if (!(content instanceof BodyPart contentPart)) {
                 MimeBodyPartFactory factory = getBodyPartFactory(mimeType, content.getClass());
 
                 // Pass the mime type in the parameters so that generic Mime Body Part factories can use it.
@@ -137,7 +136,7 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
 
                 bodyPart = factory.create(content, enhancedParameters);
             } else {
-                bodyPart = (BodyPart) content;
+                bodyPart = contentPart;
             }
             Multipart multipart = getMultipart();
             multipart.addBodyPart(bodyPart);
@@ -279,8 +278,8 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
             setContent(multipart);
         } else {
             Object contentObject = getContent();
-            if (contentObject instanceof Multipart) {
-                multipart = (Multipart) contentObject;
+            if (contentObject instanceof Multipart multipartContent) {
+                multipart = multipartContent;
             } else {
                 throw new MessagingException(String.format("Unknown mail content type [%s]: [%s]",
                     contentObject.getClass().getName(), contentObject));

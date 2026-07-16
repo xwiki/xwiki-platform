@@ -93,6 +93,10 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
 
         try {
             XWikiDocument descriptorDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);
+
+            // Avoid modifying the cached document
+            descriptorDocument = descriptorDocument.clone();
+
             BaseObject object = descriptorDocument.getXObject(WikiTemplateClassDocumentInitializer.SERVER_CLASS,
                     true, context);
             object.setIntValue(WikiTemplateClassDocumentInitializer.FIELD_ISWIKITEMPLATE,

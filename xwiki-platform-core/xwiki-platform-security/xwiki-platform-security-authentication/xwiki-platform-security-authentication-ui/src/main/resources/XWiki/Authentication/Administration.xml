@@ -520,11 +520,11 @@
   };
 
   var disableFields = function () {
-    retrieveFields().attr('disabled', true);
+    retrieveFields().attr('disabled', 'disabled');
   };
 
   var enableFields = function () {
-    retrieveFields().attr('disabled', false);
+    retrieveFields().removeAttr('disabled');
   };
 
   var initialize = function () {

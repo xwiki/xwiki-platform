@@ -22,23 +22,22 @@ package org.xwiki.icon.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.icon.IconSetCache;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.observation.event.Event;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -53,26 +52,21 @@ import static org.mockito.Mockito.when;
  * @since 6.2M1
  * @version $Id$
  */
-public class IconThemeListenerTest
+@ComponentTest
+class IconThemeListenerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<IconThemeListener> mocker =
-            new MockitoComponentMockingRule<>(IconThemeListener.class);
+    @InjectMockComponents
+    private IconThemeListener listener;
 
+    @MockComponent
     private IconSetCache iconSetCache;
 
-    @Before
-    public void setUp() throws ComponentLookupException
-    {
-       iconSetCache = mocker.getInstance(IconSetCache.class);
-    }
-
     @Test
-    public void onEvent() throws Exception
+    void onEvent()
     {
         // Mocks
         XWikiDocument doc = mock(XWikiDocument.class);
-        List<BaseObject> list = new ArrayList<BaseObject>();
+        List<BaseObject> list = new ArrayList<>();
         BaseObject obj = mock(BaseObject.class);
         list.add(obj);
         when(obj.getStringValue("name")).thenReturn("icontheme1");
@@ -84,7 +78,7 @@ public class IconThemeListenerTest
         when(doc.getXObjects(eq(iconThemeClassRef))).thenReturn(list);
 
         // Tests
-        mocker.getComponentUnderTest().onEvent(null, doc, null);
+        this.listener.onEvent(null, doc, null);
 
         // Verify
         verify(iconSetCache, atLeastOnce()).clear(docRef);
@@ -92,40 +86,40 @@ public class IconThemeListenerTest
     }
 
     @Test
-    public void onEventWhenNoObjects() throws Exception
+    void onEventWhenNoObjects()
     {
         // Mocks
         XWikiDocument doc = mock(XWikiDocument.class);
         when(doc.getXObject(any(DocumentReference.class))).thenReturn(null);
 
         // Tests
-        mocker.getComponentUnderTest().onEvent(null, doc, null);
+        this.listener.onEvent(null, doc, null);
 
         // Verify
         verify(iconSetCache, never()).clear(any(DocumentReference.class));
     }
 
     @Test
-    public void onEventWhenEmptyListObjects() throws Exception
+    void onEventWhenEmptyListObjects()
     {
         // Mocks
         XWikiDocument doc = mock(XWikiDocument.class);
-        List<BaseObject> list = new ArrayList<BaseObject>();
+        List<BaseObject> list = new ArrayList<>();
 
         LocalDocumentReference iconThemeClassRef = new LocalDocumentReference("IconThemesCode", "IconThemeClass");
         when(doc.getXObjects(eq(iconThemeClassRef))).thenReturn(list);
 
         // Tests
-        mocker.getComponentUnderTest().onEvent(null, doc, null);
+        this.listener.onEvent(null, doc, null);
 
         // Verify
         verify(iconSetCache, never()).clear(any(DocumentReference.class));
     }
 
     @Test
-    public void getEvents() throws Exception
+    void getEvents()
     {
-        List<Event> results = mocker.getComponentUnderTest().getEvents();
+        List<Event> results = this.listener.getEvents();
 
         // Verify
         assertEquals(2, results.size());
@@ -134,9 +128,8 @@ public class IconThemeListenerTest
     }
 
     @Test
-    public void getName() throws Exception
+    void getName()
     {
-        assertEquals("Icon Theme listener.", mocker.getComponentUnderTest().getName());
+        assertEquals("Icon Theme listener.", this.listener.getName());
     }
-
 }

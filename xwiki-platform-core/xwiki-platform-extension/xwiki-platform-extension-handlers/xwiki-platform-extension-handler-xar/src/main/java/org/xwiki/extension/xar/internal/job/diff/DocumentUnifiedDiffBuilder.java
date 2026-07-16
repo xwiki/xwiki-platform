@@ -174,7 +174,8 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
                 // It can be null when objects are deleted and the document is still in the cache storage.
                 if (previousObject != null) {
                     BaseObject nextObject =
-                        nextDocument.getXObject(previousObject.getXClassReference(), previousObject.getNumber());
+                        nextDocument.getXObject(previousObject.getRelativeXClassReference(),
+                            previousObject.getNumber());
                     if (previousObject != nextObject) {
                         addObjectDiff(previousObject, nextObject, documentDiff);
                     }
@@ -188,7 +189,7 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
                 // It can be null when objects are deleted and the document is still in the cache storage.
                 if (nextObject != null) {
                     BaseObject previousObject =
-                        previousDocument.getXObject(nextObject.getXClassReference(), nextObject.getNumber());
+                        previousDocument.getXObject(nextObject.getRelativeXClassReference(), nextObject.getNumber());
                     if (previousObject == null) {
                         addObjectDiff(previousObject, nextObject, documentDiff);
                     }
@@ -256,19 +257,7 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
 
     private boolean isPrivateProperty(BaseProperty<?> property)
     {
-        BaseCollection<?> object = property == null ? null : property.getObject();
-        if (object != null) {
-            BaseClass xclass = object.getXClass(this.xcontextProvider.get());
-            if (xclass != null) {
-                PropertyClass propertyClass = (PropertyClass) xclass.get(property.getName());
-                String propertyType = propertyClass == null ? null : propertyClass.getClassType();
-
-                return "Password".equals(propertyType)
-                    || ("Email".equals(propertyType) && this.emailProvider.get().shouldObfuscate());
-            }
-        }
-
-        return false;
+        return property != null && property.isSensitive(this.xcontextProvider.get());
     }
 
     private void addClassPropertyDiffs(BaseClass previousClass, BaseClass nextClass, DocumentUnifiedDiff documentDiff)

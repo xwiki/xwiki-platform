@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,8 +57,11 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({ DefaultDocumentContentAsyncParser.class })
-public class DocumentContentDisplayerTest
+@ComponentList({
+    DefaultDocumentContentAsyncParser.class,
+    DocumentReferenceDequeContext.class
+})
+class DocumentContentDisplayerTest
 {
     @InjectMockComponents
     private DocumentContentAsyncExecutor documentExecutor;
@@ -88,7 +91,7 @@ public class DocumentContentDisplayerTest
     private TransformationManager transformationManager;
 
     @Test
-    public void baseMetaDataIsSetBeforeExecutingTransformations() throws Exception
+    void baseMetaDataIsSetBeforeExecutingTransformations() throws Exception
     {
         when(this.executor.execute(any(), any())).then(new Answer<Block>()
         {
@@ -107,6 +110,8 @@ public class DocumentContentDisplayerTest
         // The document being displayed.
         XDOM content = new XDOM(Collections.emptyList());
         when(this.document.getPreparedXDOM()).thenReturn(content);
+
+        when(this.document.getDocumentReference()).thenReturn(mock());
 
         // The reference of the current document musts be set as the value of the BASE meta data.
         DocumentReference currentDocRef = new DocumentReference("wiki", "Space", "Page");
@@ -137,7 +142,7 @@ public class DocumentContentDisplayerTest
         assertSame(content, this.documentDisplayer.display(document, parameters));
 
         // Make sure the transformations are executed exactly once, and on the right content.
-        verify(this.transformationManager, times(1)).performTransformations(same(content),
+        verify(this.transformationManager).performTransformations(same(content),
             any(TransformationContext.class));
     }
 }

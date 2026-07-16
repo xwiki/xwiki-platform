@@ -21,10 +21,8 @@ package org.xwiki.image.lightbox.test.po;
 
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
@@ -57,7 +55,7 @@ public class LightboxPage extends ViewPage
         Actions action = new Actions(getDriver().getWrappedDriver());
         action.moveToElement(image).build().perform();
 
-        return new ImagePopover();
+        return new ImagePopover(image);
     }
 
     public WebElement getImageElement(int index)

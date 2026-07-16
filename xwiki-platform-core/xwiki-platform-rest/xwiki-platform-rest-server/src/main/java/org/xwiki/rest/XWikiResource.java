@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -45,6 +46,8 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
+import org.xwiki.security.SecurityConfiguration;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -95,6 +98,40 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      */
     @Inject
     protected QueryManager queryManager;
+
+    @Inject
+    private SecurityConfiguration securityConfiguration;
+
+    /**
+     * Validates and returns the query limit based on the provided limit and the system's configuration.
+     * If the provided limit is null, the method returns the configured default limit.
+     * If the provided limit exceeds the configured limit or is negative, an exception is thrown.
+     *
+     * @param limit the desired query limit, it can be null
+     * @return the validated query limit value, either the provided limit or the configured default limit
+     * @throws WebApplicationException if the provided limit is invalid (negative or exceeds the allowed maximum)
+     * @since 17.7.0RC1
+     * @since 17.4.4
+     * @since 16.10.11
+     */
+    @Unstable
+    protected int validateAndGetLimit(Integer limit)
+    {
+        int configuredLimit = this.securityConfiguration.getQueryItemsLimit();
+        if (limit == null) {
+            return configuredLimit;
+        } else if (configuredLimit >= 0 && (limit < 0 || limit > configuredLimit)) {
+            throw new WebApplicationException(
+                Response.status(Status.BAD_REQUEST)
+                    .entity(
+                        "Invalid limit value: %s. The limit must be a positive integer and less than or equal to %s."
+                            .formatted(limit, configuredLimit))
+                    .type("text/plain")
+                    .build());
+        } else {
+            return limit;
+        }
+    }
 
     /**
      * A wrapper class for returning an XWiki document enriched with information about its status.

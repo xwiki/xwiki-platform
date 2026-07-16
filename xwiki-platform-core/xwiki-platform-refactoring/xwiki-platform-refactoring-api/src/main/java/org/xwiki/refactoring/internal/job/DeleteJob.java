@@ -20,20 +20,20 @@
 package org.xwiki.refactoring.internal.job;
 
 import java.util.Collection;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.ObjectUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.batch.BatchOperationExecutor;
+import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.EntityJobStatus;
-import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.security.authorization.Right;
@@ -46,22 +46,19 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Named(RefactoringJobs.DELETE)
-public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, EntityJobStatus<EntityRequest>>
+public class DeleteJob extends AbstractEntityJobWithChecks<DeleteRequest, EntityJobStatus<DeleteRequest>>
 {
-    /**
-     * Key of the optional property that indicates whether the document should be send to the recycle bin
-     * or removed permanently.
-     */
-    public static final String SHOULD_SKIP_RECYCLE_BIN_PROPERTY = "shouldSkipRecycleBin";
-
     @Inject
     private BatchOperationExecutor batchOperationExecutor;
 
     @Inject
     private RefactoringConfiguration configuration;
 
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
+    @Override
+    protected DeleteRequest castRequest(Request request)
+    {
+        return new DeleteRequest(request);
+    }
 
     @Override
     public String getType()
@@ -135,10 +132,11 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
 
     private void maybeDelete(DocumentReference documentReference) throws Exception
     {
-        Boolean shouldSkipRecycleBinProperty = this.getRequest().getProperty(SHOULD_SKIP_RECYCLE_BIN_PROPERTY);
-        boolean skipRecycleBin = this.configuration.isRecycleBinSkippingActivated()
-                                     && this.documentAccessBridge.isAdvancedUser()
-                                     && ObjectUtils.defaultIfNull(shouldSkipRecycleBinProperty, false);
+        // The advanced user setting only controls what is displayed in the UI, it is not a rights check, so it must
+        // not influence whether the recycle bin is skipped. Skipping the recycle bin is driven solely by the wiki
+        // configuration allowing it and the request asking for it.
+        boolean skipRecycleBin =
+            this.configuration.isRecycleBinSkippingActivated() && getRequest().shouldSkipRecycleBin();
         EntitySelection entitySelection = this.getConcernedEntitiesEntitySelection(documentReference);
         if (entitySelection == null) {
             this.logger.info("Skipping [{}] because it does not match any entity selection.", documentReference);
@@ -149,11 +147,33 @@ public class DeleteJob extends AbstractEntityJobWithChecks<EntityRequest, Entity
         } else if (!hasAccess(Right.DELETE, documentReference)) {
             this.logger.error("You are not allowed to delete [{}].", documentReference);
         } else if (!skipRecycleBin) {
-            this.modelBridge.delete(documentReference);
-            this.logger.debug("[{}] has been successfully moved to the recycle bin.", documentReference);
+            delete(documentReference, false, "[{}] has been successfully moved to the recycle bin.");
         } else {
-            this.modelBridge.delete(documentReference, true);
-            this.logger.debug("[{}] has been successfully deleted.", documentReference);
+            delete(documentReference, true, "[{}] has been successfully deleted.");
+        }
+    }
+
+    private void delete(DocumentReference documentReference, boolean skipRecycleBin, String logMessage)
+    {
+        // Delete the document
+        this.modelBridge.delete(documentReference, skipRecycleBin);
+        this.logger.debug(logMessage, documentReference);
+
+        DocumentReference backlinkDocumentReference = documentReference;
+        // the NewBackLinkTargets map store the document reference without a locale specified so ensure to remove it
+        // from the reference if it's the root locale.
+        if (documentReference.getLocale() == Locale.ROOT) {
+            backlinkDocumentReference = new DocumentReference(documentReference, (Locale) null);
+        }
+
+        // Create a redirect, if requested
+        DocumentReference newTarget = getRequest().getNewBacklinkTargets().get(backlinkDocumentReference);
+
+        if (getRequest().isAutoRedirect() && newTarget != null) {
+            if (getRequest().isVerbose()) {
+                this.logger.info("Creating automatic redirect from [{}] to [{}].", documentReference, newTarget);
+            }
+            this.modelBridge.createRedirect(documentReference, newTarget);
         }
     }
 }

@@ -40,6 +40,7 @@ import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
@@ -138,7 +139,7 @@ public abstract class ListClass extends PropertyClass
     public String getSeparators()
     {
         String separators = getStringValue("separators");
-        if (separators == null || separators.equals("")) {
+        if (separators == null || separators.isEmpty()) {
             separators = "|,";
         }
         return separators;
@@ -408,7 +409,6 @@ public abstract class ListClass extends PropertyClass
                     previousWasSeparator = false;
                 }
                 previousSeparator = currentChar;
-                continue;
             // if we are finding a separator and we are not in escape mode, then we finished to parse one value
             // we are adding the value to the result, and start a new value to parse
             } else if (StringUtils.containsAny(separators, currentChar) && !inEscape) {
@@ -469,7 +469,7 @@ public abstract class ListClass extends PropertyClass
      */
     public static String getStringFromList(List<String> list, String separators)
     {
-        if ((list instanceof PersistentCollection) && (!((PersistentCollection) list).wasInitialized())) {
+        if ((list instanceof PersistentCollection persistentCollection) && (!persistentCollection.wasInitialized())) {
             return "";
         }
 
@@ -559,8 +559,7 @@ public abstract class ListClass extends PropertyClass
     public String toFormString(BaseProperty property)
     {
         String result;
-        if (property instanceof ListProperty) {
-            ListProperty listProperty = (ListProperty) property;
+        if (property instanceof ListProperty listProperty) {
             result = ListClass.getStringFromList(listProperty.getList(), getSeparators());
         } else {
             result = property.toText();
@@ -574,6 +573,9 @@ public abstract class ListClass extends PropertyClass
         BaseProperty lprop;
 
         // FIXME: this if is actually wrong: it means a multiselect static list cannot be stored with a large storage.
+        // But on the other hand, large storage is quite bad for performance, so if really needed we should ideally
+        // find a better solution than simply using a larger storage.
+        // Any change of this logic might need to be mirrored in UsedValuesListQueryBuilder and LiveTableResultsMacros.
         if (isRelationalStorage() && isMultiSelect()) {
             lprop = new DBStringListProperty();
         } else if (isMultiSelect()) {
@@ -589,7 +591,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromString(String value)
+    public BaseProperty fromString(String value) throws XWikiException
     {
         BaseProperty prop = newProperty();
         if (isMultiSelect()) {
@@ -601,7 +603,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty fromStringArray(String[] strings)
+    public BaseProperty fromStringArray(String[] strings) throws XWikiException
     {
         if (!isMultiSelect()) {
             return fromString(strings[0]);
@@ -625,7 +627,7 @@ public abstract class ListClass extends PropertyClass
 
         // If Multiselect and multiple results
         for (String item : strings) {
-            if (!item.trim().equals("")) {
+            if (!item.trim().isEmpty()) {
                 list.add(item);
             }
         }
@@ -637,7 +639,7 @@ public abstract class ListClass extends PropertyClass
     }
 
     @Override
-    public BaseProperty newPropertyfromXML(Element ppcel)
+    public BaseProperty newPropertyfromXML(Element ppcel) throws XWikiException
     {
         if (!isMultiSelect()) {
             return super.newPropertyfromXML(ppcel);
@@ -647,8 +649,8 @@ public abstract class ListClass extends PropertyClass
         List<Element> elist = ppcel.elements(ListXarObjectPropertySerializer.ELEMENT_VALUE);
         BaseProperty lprop = newProperty();
 
-        if (lprop instanceof ListProperty) {
-            List<String> llist = ((ListProperty) lprop).getList();
+        if (lprop instanceof ListProperty listProperty) {
+            List<String> llist = listProperty.getList();
             for (int i = 0; i < elist.size(); i++) {
                 Element el = elist.get(i);
                 llist.add(el.getText());
@@ -731,8 +733,8 @@ public abstract class ListClass extends PropertyClass
         if (rawvalue == null) {
             return "";
         }
-        if (rawvalue instanceof Object[]) {
-            return ((Object[]) rawvalue)[1].toString();
+        if (rawvalue instanceof Object[] objectArray) {
+            return objectArray[1].toString();
         }
         return getDisplayValue(rawvalue.toString(), name, map, context);
     }
@@ -749,8 +751,8 @@ public abstract class ListClass extends PropertyClass
         if (rawvalue == null) {
             return "";
         }
-        if (rawvalue instanceof Object[]) {
-            return ((Object[]) rawvalue)[0].toString();
+        if (rawvalue instanceof Object[] objectArray) {
+            return objectArray[0].toString();
         }
         return rawvalue.toString();
     }
@@ -813,6 +815,10 @@ public abstract class ListClass extends PropertyClass
             input.setName(prefix + name);
             input.setID(prefix + name);
             input.setDisabled(isDisabled());
+            // This is a text alternative fallback to explain what the input is about. If the input has already been
+            // labelled in another way, this fallback will be ignored by Assistive Techs.
+            input.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+                getTranslatedPrettyName(context)));
             buffer.append(input.toString());
         } else if (getDisplayType().equals(DISPLAYTYPE_RADIO) || getDisplayType().equals(DISPLAYTYPE_CHECKBOX)) {
             displayRadioEdit(buffer, name, prefix, object, context);
@@ -918,6 +924,10 @@ public abstract class ListClass extends PropertyClass
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
+        // This is a text alternative fallback to explain what the select is about. If the select has already been
+        // labelled in another way, this fallback will be ignored by Assistive Techs.
+        select.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+            getTranslatedPrettyName(context)));
 
         List<String> list = getList(context);
         Map<String, ListItem> map = getMap(context);
@@ -994,8 +1004,8 @@ public abstract class ListClass extends PropertyClass
 
         if (property == null) {
             list = Collections.emptyList();
-        } else if (property instanceof ListProperty) {
-            list = ((ListProperty) property).getList();
+        } else if (property instanceof ListProperty listProperty) {
+            list = listProperty.getList();
         } else {
             list = Arrays.asList(String.valueOf(property.getValue()));
         }
@@ -1035,8 +1045,8 @@ public abstract class ListClass extends PropertyClass
                 actualList = list;
             }
 
-            if (property instanceof ListProperty) {
-                ((ListProperty) property).setList(actualList);
+            if (property instanceof ListProperty listProperty) {
+                listProperty.setList(actualList);
             } else if (isMultiSelect()) {
                 property.setValue(getStringFromList(actualList, getFirstSeparator()));
             } else {
@@ -1051,14 +1061,13 @@ public abstract class ListClass extends PropertyClass
         XWikiContext context, MergeResult mergeResult)
     {
         // If it's not a multiselect then we don't have any special merge to do. We keep default StringProperty behavior
-        if (isMultiSelect()) {
-            // If not a free input assume it's not an ordered list
-            if (!DISPLAYTYPE_INPUT.equals(getDisplayType()) && currentProperty instanceof ListProperty) {
-                mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, context,
-                    mergeResult);
+        // If not a free input assume it's not an ordered list
+        if (isMultiSelect() && !DISPLAYTYPE_INPUT.equals(getDisplayType())
+            && currentProperty instanceof ListProperty) {
+            mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, context,
+                mergeResult);
 
-                return;
-            }
+            return;
         }
 
         // Fallback on default ListProperty merging
@@ -1086,17 +1095,13 @@ public abstract class ListClass extends PropertyClass
         // Add missing elements
         if (newList != null) {
             for (String element : newList) {
-                if ((previousList == null || !previousList.contains(element))) {
-                    if (!currentList.contains(element)) {
-                        currentList.add(element);
-                        mergeResult.setModified(true);
-                    }
+                if ((previousList == null || !previousList.contains(element)) && !currentList.contains(element)) {
+                    currentList.add(element);
+                    mergeResult.setModified(true);
                 }
             }
         }
 
         fromList(currentProperty, currentList);
-
-        return;
     }
 }

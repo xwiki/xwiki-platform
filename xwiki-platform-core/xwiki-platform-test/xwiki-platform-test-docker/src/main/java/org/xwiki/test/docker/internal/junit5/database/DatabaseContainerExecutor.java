@@ -281,7 +281,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         start(databaseContainer, testConfiguration);
 
         if (testConfiguration.getServletEngine().isOutsideDocker()) {
-            testConfiguration.getDatabase().setIP(databaseContainer.getContainerIpAddress());
+            testConfiguration.getDatabase().setIP(databaseContainer.getHost());
             testConfiguration.getDatabase().setPort(databaseContainer.getMappedPort(port));
         } else {
             testConfiguration.getDatabase().setIP(databaseContainer.getNetworkAliases().get(0));

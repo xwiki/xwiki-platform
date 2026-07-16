@@ -61,11 +61,10 @@ class WikiMacrosTest
     {
         this.macroDocument = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
         this.macroDocument.setSyntax(Syntax.XWIKI_2_0);
-        this.macroObject = new BaseObject();
-        this.macroObject.setXClassReference(new DocumentReference("wiki", "XWiki", "WikiMacroClass"));
+        this.macroObject = this.macroDocument.newXObject(WikiMacroConstants.WIKI_MACRO_CLASS_REFERENCE,
+            this.oldcore.getXWikiContext());
         this.macroObject.setStringValue("id", "macroid");
         this.macroObject.setLargeStringValue("code", "code");
-        this.macroDocument.addXObject(macroObject);
 
         this.oldcore.getXWikiContext().setWikiId("wiki");
 

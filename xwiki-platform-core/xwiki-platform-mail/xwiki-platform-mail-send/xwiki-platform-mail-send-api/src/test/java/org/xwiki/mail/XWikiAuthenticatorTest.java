@@ -21,10 +21,9 @@ package org.xwiki.mail;
 
 import javax.mail.PasswordAuthentication;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,14 +32,14 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class XWikiAuthenticatorTest
+class XWikiAuthenticatorTest
 {
     private static final String MAIL_USER = "mailuser";
 
     private static final String MAIL_PASSWORD = "mailpassword";
 
     @Test
-    public void testJavaMailPasswordAuthentication() throws Exception
+    void javaMailPasswordAuthentication()
     {
         MailSenderConfiguration mailSenderConfiguration = mock(MailSenderConfiguration.class);
         when(mailSenderConfiguration.getUsername()).thenReturn(MAIL_USER);
@@ -49,7 +48,7 @@ public class XWikiAuthenticatorTest
         XWikiAuthenticator xWikiAuthenticator = new XWikiAuthenticator(mailSenderConfiguration);
         PasswordAuthentication passwordAuthentication = xWikiAuthenticator.getPasswordAuthentication();
 
-        assertThat(passwordAuthentication.getUserName(), equalTo(MAIL_USER));
-        assertThat(passwordAuthentication.getPassword(), equalTo(MAIL_PASSWORD));
+        assertEquals(MAIL_USER, passwordAuthentication.getUserName());
+        assertEquals(MAIL_PASSWORD, passwordAuthentication.getPassword());
     }
 }

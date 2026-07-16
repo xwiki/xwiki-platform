@@ -115,9 +115,10 @@ public class PropertyChangedRule extends DocChangeRule {
         return true;
     }
 
+    @Override
     public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context) {
-        if (this.className == null || this.className.equals("") 
-                || this.propertyName == null || this.propertyName.equals("")) {
+        if (this.className == null || "".equals(this.className)
+                || this.propertyName == null || "".equals(this.propertyName)) {
             // Not enough information, never notify
             return;
         }

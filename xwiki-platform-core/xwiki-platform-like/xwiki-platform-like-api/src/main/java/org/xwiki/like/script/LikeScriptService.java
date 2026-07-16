@@ -127,8 +127,7 @@ public class LikeScriptService implements ScriptService
         XWikiContext xWikiContext = this.contextProvider.get();
         DocumentReference currentUser = xWikiContext.getUserReference();
 
-        if (entityReference instanceof DocumentReference) {
-            DocumentReference documentReference = (DocumentReference) entityReference;
+        if (entityReference instanceof DocumentReference documentReference) {
             if (isAuthorized(documentReference)) {
                 UserReference userReference = this.userReferenceResolver.resolve(currentUser);
                 try {
@@ -157,8 +156,7 @@ public class LikeScriptService implements ScriptService
         XWikiContext xWikiContext = this.contextProvider.get();
         DocumentReference currentUser = xWikiContext.getUserReference();
 
-        if (entityReference instanceof DocumentReference) {
-            DocumentReference documentReference = (DocumentReference) entityReference;
+        if (entityReference instanceof DocumentReference documentReference) {
             if (this.isAuthorized(documentReference)) {
                 UserReference userReference = this.userReferenceResolver.resolve(currentUser);
                 try {

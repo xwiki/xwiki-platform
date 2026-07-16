@@ -67,7 +67,10 @@ org.xwiki.rest.internal.resources.search.XWQLSearchSource
 org.xwiki.rest.internal.resources.tags.TagsResourceImpl
 org.xwiki.rest.internal.resources.tags.PagesForTagsResourceImpl
 org.xwiki.rest.internal.resources.ModificationsResourceImpl
+org.xwiki.rest.internal.resources.DatabaseKeywordSearchSource
+org.xwiki.rest.internal.resources.DefaultKeywordSearchSource
 org.xwiki.rest.internal.resources.user.CurrentUserPropertyResourceImpl
+org.xwiki.rest.internal.representations.MultipartInputStreamReader
 org.xwiki.rest.internal.representations.pages.TextPlainPageReader
 org.xwiki.rest.internal.representations.pages.FormUrlEncodedPageReader
 org.xwiki.rest.internal.representations.objects.TextPlainPropertyReader

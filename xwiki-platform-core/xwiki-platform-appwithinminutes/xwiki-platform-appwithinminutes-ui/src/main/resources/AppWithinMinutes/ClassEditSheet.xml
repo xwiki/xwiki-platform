@@ -228,9 +228,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
           ["#pageLink($sheetReference)"])
       &lt;/span&gt;
     #else
-      &lt;span class="warningmessage"&gt;
-        $services.localization.render('platform.appwithinminutes.classEditorMultipleSheetsWarning')
-      &lt;/span&gt;
+        #inlineWarning($services.localization.render('platform.appwithinminutes.classEditorMultipleSheetsWarning'))
     #end
     &lt;/dd&gt;
     &lt;dt&gt;
@@ -314,6 +312,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * Displays a configuration property of a class field. This macro can also be used to display a property of an object.
  *#
 #macro (displayFieldProperty $property $prefix $field)
+  ## This 'displayFormType' property only exists for boolean fields.
   #set ($displayFormType = $property.getProperty('displayFormType'))
   #if ($property.classType == 'Boolean' &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
     &lt;dt&gt;
@@ -368,6 +367,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set ($xclass = $doc.getxWikiClass().getXWikiClass())
     #set ($discard = $xclass.addField($field.name, $field))
     #set ($discard = $field.setObject($xclass))
+    ## Set the class document author to the current user so that customDisplay code is rendered with the current user's
+    ## rights, not the class document author's rights.
+    #set ($discard = $doc.document.authors.setEffectiveMetadataAuthor($services.user.currentUserReference))
     #displayField($doc.getxWikiClass().get($field.name) $formFieldDoc)
   #else
     Unsupported form field.
@@ -420,6 +422,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   ##
   ## Display the field.
   #set ($field = $doc.getxWikiClass().get($fieldName))
+  ## Set the class document author to the current user so that customDisplay code is rendered with the current user's
+  ## rights, not the class document author's rights.
+  #set ($discard = $doc.document.authors.setEffectiveMetadataAuthor($services.user.currentUserReference))
   #displayPropertyEditInput($field, "${doc.fullName}_0_", $object)
 #end
 
@@ -428,6 +433,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  *#
 #macro (displayEditForm)
   #set ($discard = $xwiki.jsx.use('AppWithinMinutes.ClassEditSheet'))
+  ## Reusable helper used to recover gracefully when a preview or field-add request is rejected because the CSRF
+  ## token expired (e.g. after a server restart).
+  #set ($discard = $xwiki.jsx.use('AppWithinMinutes.Code.CSRFTokenRefresh'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassEditSheet'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
   #if ("$!request.wizard" == 'true')
@@ -446,10 +454,21 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * Displays either the edit class form or a new form field. The later is used when adding a new form field via AJAX.
  *#
 #macro (doEdit)
-  #if ("$!request.field" != '')
-    #displayNewField()
-  #elseif ("$!request.preview" == 'true')
-    #previewField()
+  #if ("$!request.field" != '' || "$!request.preview" == 'true')
+    ## CSRF protection.
+    #if (!$services.csrf.isTokenValid($request.form_token))
+      $response.setStatus(403)
+      ## Return a fresh token (using the same JSON shape as XWikiAction#csrfTokenCheck) so that the client can recover
+      ## from an expired token (e.g. after a server restart) by refreshing it, after an explicit user confirmation,
+      ## and retrying the request. Returning the token in the response is safe because the same-origin policy prevents
+      ## a CSRF attacker from reading it.
+      $response.setContentType('application/json')
+      $jsontool.serialize({'errorType': 'CSRF', 'newToken': $services.csrf.getToken()})
+    #elseif ("$!request.field" != '')
+      #displayNewField()
+    #else
+      #previewField()
+    #end
   #else
     ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
     &lt;div class="hidden"&gt;
@@ -457,6 +476,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #if ($request.wizard == 'true')
         ## Preserve the wizard mode.
         &lt;input type="hidden" name="wizard" value="true" /&gt;
+        ## Provide the URL of the next wizard step as xredirect value (used by the AJAX Save &amp; View implementation).
+        #set ($appWizardNextStepURL = "#getNextStepURL()")
+        &lt;input type="hidden" id="xredirect" name="xredirect" value="$escapetool.xml($appWizardNextStepURL)" /&gt;
       #end
       ## Compute the application title to be used as the wizard step title.
       #getAppTitle
@@ -694,6 +716,26 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #end
 
 #**
+ * Prints the URL of the next wizard step.
+ *#
+#macro (getNextStepURL)
+  #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))
+  #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
+  #set ($queryString = {
+    'wizard': true,
+    'sheet': 'AppWithinMinutes.TemplateProviderEditSheet'
+  })
+  #if (!$xwiki.exists($templateProviderReference))
+    #set ($discard = $queryString.putAll({
+        'form_token': $services.csrf.getToken(),
+        'template': 'XWiki.TemplateProviderTemplate',
+        'parent': $doc.fullName
+      }))
+  #end
+$xwiki.getURL($templateProviderReference, 'edit', $escapetool.url($queryString))##
+#end
+
+#**
  * Updates and saves the class definition, the class sheet and the class template.
  *#
 #macro (doSave)
@@ -704,31 +746,27 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #updateAndSaveSheet
   #updateAndSaveTranslations
   #if ($action == 'save')
-    #if ($errorMessage)
-      &lt;div class="box errormessage"&gt;$errorMessage&lt;/div&gt;
+    #if ($request.getHeader('X-Requested-With') == 'XMLHttpRequest')
+      ## When saving through AJAX, don't redirect and don't render an error page. Let the client-side handle both.
+      #if ($errorMessage)
+        $response.setStatus(400)
+        #rawResponse($errorMessage, 'text/plain')
+      #else
+        $response.setStatus(204)
+      #end
+    #elseif ($errorMessage)
+      #error($errorMessage)
     #elseif ("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
-      #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))
-      #set ($templateProviderReference = $services.model.resolveDocument("${className}TemplateProvider"))
-      #set ($queryString = {
-        'wizard': true,
-        'sheet': 'AppWithinMinutes.TemplateProviderEditSheet'
-      })
-      #if (!$xwiki.exists($templateProviderReference))
-        #set ($discard = $queryString.putAll({
-          'form_token': $services.csrf.getToken(),
-          'template': 'XWiki.TemplateProviderTemplate',
-          'parent': $doc.fullName
-        }))
-      #end
-      $response.sendRedirect($xwiki.getURL($templateProviderReference, 'edit', $escapetool.url($queryString)))
+      $response.sendRedirect("#getNextStepURL()")
     #else
       ## Redirect to view mode.
       $response.sendRedirect($doc.getURL())
     #end
   #else
     #if ($errorMessage)
-      $response.sendError(400, $errorMessage)
+      $response.setStatus(400)
+      #rawResponse($errorMessage, 'text/plain')
     #else
       $response.setStatus(204)
     #end
@@ -1102,14 +1140,41 @@ XWiki.FormField = Class.create({
   enhance : function(data) {
     this.container.insert({top: this._createToolBox()});
     if (data) {
-      this.container.addClassName('loading');
-      new Ajax.Request(data, {
-        method: 'get',
-        onSuccess: this._display.bind(this)
-      });
+      this._loadField(data);
     } else {
       this._display(null);
     }
+  },
+  _loadField : function (url) {
+    // The field URL embeds the CSRF token that was valid when the page was rendered. Always refresh it from the
+    // current form_token input (the single source of truth, updated when the token is refreshed after an expired
+    // token recovery) so that, once the token has been refreshed, adding further fields does not prompt again.
+    const formToken = this.container.up('form')?.down('input[name="form_token"]');
+    if (formToken) {
+      const fieldURL = new URL(url, window.location.href);
+      fieldURL.searchParams.set('form_token', formToken.value);
+      url = fieldURL.toString();
+    }
+    this.container.addClassName('loading');
+    const self = this;
+    new Ajax.Request(url, {
+      method: 'get',
+      onSuccess: this._display.bind(this),
+      // A 403 means the CSRF token expired (e.g. the server was restarted while the user was editing). Offer to
+      // refresh the token and retry, instead of leaving the loading spinner spinning forever.
+      on403: function (response) {
+        this.container.removeClassName('loading');
+        require(['xwiki-appwithinminutes-csrf'], function (csrf) {
+          csrf.recoverFromExpiredToken(response, function () {
+            // The token has been refreshed in the form: retry, _loadField will pick up the fresh token.
+            self._loadField(url);
+          });
+        });
+      }.bind(this),
+      onFailure: function () {
+        this.container.removeClassName('loading');
+      }.bind(this)
+    });
   },
   getContainer : function() {
     return this.container;
@@ -1230,6 +1295,12 @@ XWiki.FormField = Class.create({
     // Add parameters required by the AJAX preview request.
     this.previewData.set('preview', true);
     this.previewData.set('xpage', 'plain');
+    // Find and add the mandatory CSRF token.
+    const editForm = this.container.up('form');
+    const formToken = editForm &amp;&amp; editForm.down('input[name="form_token"]');
+    if (formToken) {
+      this.previewData.set('form_token', formToken.value);
+    }
   },
   _maybePreview : function() {
     if(!this.previewData) {
@@ -1261,6 +1332,7 @@ XWiki.FormField = Class.create({
     var preview = this.getViewer().down('dd');
     if (preview) {
       preview.addClassName('loading');
+      const self = this;
       // Firefox 3.6 doesn't resolve the empty string to the current page URL so we have to explicitly specify it.
       new Ajax.Request(window.location.href, {
         parameters: data.toQueryString(),
@@ -1270,6 +1342,20 @@ XWiki.FormField = Class.create({
           this.previewData = data;
           document.fire('xwiki:class:previewField', {field: this});
           document.fire('xwiki:dom:updated', {elements: [preview]});
+        }.bind(this),
+        // A 403 means the CSRF token expired (e.g. the server was restarted while the user was editing). Offer to
+        // refresh the token and retry the preview, instead of leaving the loading spinner spinning forever.
+        on403: function (response) {
+          preview.removeClassName('loading');
+          require(['xwiki-appwithinminutes-csrf'], function (csrf) {
+            csrf.recoverFromExpiredToken(response, function (token) {
+              data.set('form_token', token);
+              self._preview(data);
+            });
+          });
+        }.bind(this),
+        onFailure: function () {
+          preview.removeClassName('loading');
         }.bind(this)
       });
     }
@@ -1392,8 +1478,10 @@ XWiki.FormFieldPrettyNameManager = Class.create({
       var label = previousDT.down('label');
       prettyNameInput.title = label.textContent || label.innerText;
     }
+    prettyNameInput.ariaLabel = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldPrettyNameToolTip'))';
     // Replace the preview label with the pretty name input.
     var previewLabel = field.getViewer().down('label');
+    // We unset the for attribute, so that this label will not be set implicitely OR explicitely anymore.
     previewLabel.writeAttribute('for', '');
     previewLabel.removeChild(previewLabel.lastChild);
     previewLabel.insert(prettyNameInput);
@@ -1418,10 +1506,12 @@ XWiki.FormFieldDefaultValueManager = Class.create({
   _enhanceFieldDefaultValue : function(event) {
     var field = event.memo.field;
     var fieldName = field.getName();
-    field.getViewer().select('input[type=text]', 'textarea').each(function(input) {
+    // We select the default field input and update it.
+    field.getViewer().select('dd :input').each(function(input) {
       if (!input.title &amp;&amp; input.name.endsWith('_0_' + fieldName)) {
         input.title = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldDefaultValueToolTip'))';
       }
+      input.ariaLabel = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldDefaultValueToolTip'))';
     });
   },
   _onSave : function() {
@@ -1456,7 +1546,8 @@ XWiki.FormFieldHintManager = Class.create({
     if (hintInput) {
       hintInput.addClassName('xHint');
       if (!hintInput.title) {
-        hintInput.title = 'Hint';
+        hintInput.title = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldHintToolTip'))';
+        hintInput.ariaLabel = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldHintToolTip'))';
       }
       // Move the hint input below the pretty name input, in the field viewer.
       var dd = hintInput.up('dd');
@@ -1619,21 +1710,14 @@ return XWiki;
     // Remove the preview button.
     form.down("input[name='action_preview']").remove();
 
-    // Rename the save buttons.
-    form.down("input[name='action_save']").name = 'xaction_save';
-    form.down("input[name='action_saveandcontinue']").name = 'xaction_saveandcontinue';
+    // Let actionButtons.js submit a custom value for the submit buttons to avoid triggering the standard save action
+    // on the server side.
+    form.down("input[name='action_save']").dataset.submitValue = 'xaction_save';
+    form.down("input[name='action_saveandcontinue']").dataset.submitValue = 'xaction_saveandcontinue';
 
-    // Make sure the 'Save &amp; Continue' button is submitted when clicked.
-    document.observe('xwiki:class:save', function(event) {
-      event = event.memo.originalEvent;
-      if (event.memo['continue']) {
-        var submitButton = event.memo.originalEvent.element();
-        submitButton.insert({after: new Element('input', {type: 'hidden', 'name': submitButton.name})});
-        (function () {
-          submitButton.next().remove();
-        }).defer();
-      }
-    }.bindAsEventListener(window));
+    // actionButtons.js detects this as a custom form due to the submit URL that is not the standard one.
+    // Force the standard behavior by setting the customForm attribute to false.
+    form.dataset.customForm = 'false';
 
     // Be prepared to enhance some of the field properties.
     new XWiki.FormFieldNameManager();

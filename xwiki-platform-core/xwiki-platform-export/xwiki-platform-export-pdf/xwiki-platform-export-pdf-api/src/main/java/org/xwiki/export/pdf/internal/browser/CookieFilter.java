@@ -22,12 +22,12 @@ package org.xwiki.export.pdf.internal.browser;
 import java.net.URL;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.xwiki.component.annotation.Role;
 
 /**
- * Filter the cookies passed to the web browser used for PDF printing.
+ * Filter the cookies used by a client to access a target URL.
  * 
  * @version $Id$
  * @since 14.10
@@ -43,18 +43,19 @@ public interface CookieFilter
     interface CookieFilterContext
     {
         /**
-         * @return the IP address of the web browser that is going to use the cookies
+         * @return the IP address of the client that is going to access the target URL
          */
-        String getBrowserIPAddress();
+        String getClientIPAddress();
 
         /**
-         * @return the URL that is going to be accessed by the web browser
+         * @return the URL that is going to be accessed by the client with the specified IP address
          */
         URL getTargetURL();
     }
 
     /**
-     * Adds, removes or modifies cookies before they are passed to the web browser used for PDF printing.
+     * Adds, removes or modifies cookies before they are used in the specified context (by the specified client to
+     * access the target URL).
      * 
      * @param cookies the cookies to filter
      * @param cookieFilterContext provides contextual information for cookie filtering

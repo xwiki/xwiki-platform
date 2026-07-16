@@ -47,16 +47,16 @@ public class CharacterDiffService implements DiffService
     {
         // get differences at character level
         // FIXME: do we want at character level or we'd better get word level, to have it working faster
-        Collection<XDelta> deltas = new ArrayList<XDelta>();
-        List<Character> previousContent = new ArrayList<Character>();
+        Collection<XDelta> deltas = new ArrayList<>();
+        List<Character> previousContent = new ArrayList<>();
         for (int i = 0; i < previous.length(); ++i) {
             previousContent.add(previous.charAt(i));
         }
-        List<Character> currentContent = new ArrayList<Character>();
+        List<Character> currentContent = new ArrayList<>();
         for (int i = 0; i < current.length(); ++i) {
             currentContent.add(current.charAt(i));
         }
-        Diff<Character> diff = new Diff<Character>(previousContent, currentContent);
+        Diff<Character> diff = new Diff<>(previousContent, currentContent);
         // prepare the XDeltas for all diffs
         for (Difference it : diff.diff()) {
             XDelta delta = getDelta(previous, current, it);

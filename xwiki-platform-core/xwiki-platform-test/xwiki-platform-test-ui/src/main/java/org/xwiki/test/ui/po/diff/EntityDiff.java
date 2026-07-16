@@ -77,10 +77,10 @@ public class EntityDiff extends BaseElement
             this.container.findElement(By.xpath(String.format(XPATH_PROPERTY_DIFF, propertyName)));
         List<String> diff = new ArrayList<>();
         for (WebElement line : getDriver().findElementsWithoutWaiting(element, By.xpath(".//td[3]"))) {
-            if (getDriver().findElementsWithoutWaiting(line, By.tagName("ins")).size() > 0
-                || getDriver().findElementsWithoutWaiting(line, By.tagName("del")).size() > 0) {
+            if (!getDriver().findElementsWithoutWaiting(line, By.tagName("ins")).isEmpty()
+                || !getDriver().findElementsWithoutWaiting(line, By.tagName("del")).isEmpty()) {
                 diff.add(String.valueOf(getDriver().executeJavascript("return arguments[0].innerHTML", line)));
-            } else if (getDriver().findElementsWithoutWaiting(line, By.className("diff-choices")).size() > 0) {
+            } else if (!getDriver().findElementsWithoutWaiting(line, By.className("diff-choices")).isEmpty()) {
                 diff.add("[Conflict Resolution]");
             } else {
                 diff.add(line.getText());
@@ -103,5 +103,20 @@ public class EntityDiff extends BaseElement
             conflictList.add(new Conflict(conflictIdElement.getAttribute("value")));
         }
         return conflictList;
+    }
+
+    /**
+     * Check if the given diff property is obfuscated.
+     * @param propertyName a property
+     * @return {@code true} if the diff is obfuscated for that property.
+     * @since 17.10.2
+     * @since 18.0.0RC1
+     */
+    public boolean isDiffObfuscated(String propertyName)
+    {
+        WebElement element = getDriver().findElementWithoutWaiting(this.container,
+            By.cssSelector(String.format(".diff-header[data-property-name=\"%s\"]", propertyName)));
+        return getDriver().hasElementWithoutWaiting(element,
+            By.cssSelector(".diff-info-icon[title=\"Private information\"]"));
     }
 }

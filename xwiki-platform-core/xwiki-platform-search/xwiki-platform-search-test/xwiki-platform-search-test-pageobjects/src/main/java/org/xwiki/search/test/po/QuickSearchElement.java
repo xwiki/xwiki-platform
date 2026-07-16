@@ -47,24 +47,17 @@ public class QuickSearchElement extends BaseElement
     }
 
     /**
-     * Get a suggest item from the "Page Titles" category.
-     * @param index the index of the item to get
-     * @return the title of the item, or null if it could not be found
+     * @param source the search suggest source that provides the results, e.g. "Page titles"
+     * @return the list of quick search results from the given source
+     * @since 17.8.0RC1
      */
-    public WebElement getSuggestItemTitles(int index)
+    public List<QuickSearchResult> getResults(String source)
     {
-        getDriver().waitUntilElementIsVisible(By.cssSelector(".searchSuggest .results0:not(.loading)"));
-
-        WebElement suggestItemsListTitles = getDriver().findElement(By.cssSelector(".results0 .suggestList"));
-        if (suggestItemsListTitles == null) {
-            return null;
-        }
-
-        List<WebElement> titles = suggestItemsListTitles.findElements(By.xpath("//div[@class = 'value']"));
-        if (index < titles.size()) {
-            return titles.get(index);
-        } else {
-            return null;
-        }
+        By sourceContainerSelector =
+            By.xpath("//div[contains(@class, 'searchSuggest')]//div[contains(@class, 'results')]"
+                + "[descendant::div[contains(@class, 'sourceName') and text() = '" + source + "']]");
+        getDriver().waitUntilElementIsVisible(sourceContainerSelector);
+        return getDriver().findElement(sourceContainerSelector).findElements(By.cssSelector(".suggestList .xitem"))
+            .stream().map(QuickSearchResult::new).toList();
     }
 }

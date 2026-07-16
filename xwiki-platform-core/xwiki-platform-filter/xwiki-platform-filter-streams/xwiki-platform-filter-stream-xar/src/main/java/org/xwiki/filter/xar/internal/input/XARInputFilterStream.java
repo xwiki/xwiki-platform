@@ -26,6 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -45,6 +47,7 @@ import org.xwiki.model.reference.EntityReference;
  * @since 6.2M1
  */
 @Component(hints = {
+    XARFilterUtils.ROLEHINT_17,
     XARFilterUtils.ROLEHINT_16,
     XARFilterUtils.ROLEHINT_15,
     XARFilterUtils.ROLEHINT_14,
@@ -61,6 +64,9 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
     @Inject
     private Provider<DocumentLocaleReader> documentLocaleReaderProvider;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public void close() throws IOException
     {
@@ -75,10 +81,10 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
         if (this.properties.isForceDocument() || inputSource instanceof ReaderInputSource
             || inputSource instanceof SourceInputSource) {
             readDocument(filter, proxyFilter);
-        } else if (inputSource instanceof InputStreamInputSource) {
+        } else if (inputSource instanceof InputStreamInputSource inputStreamInputSource) {
             InputStream stream;
             try {
-                stream = ((InputStreamInputSource) inputSource).getInputStream();
+                stream = inputStreamInputSource.getInputStream();
             } catch (IOException e) {
                 throw new FilterException("Failed to get input stream", e);
             }
@@ -98,7 +104,7 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
                 try {
                     inputSource.close();
                 } catch (IOException e) {
-                    throw new FilterException("Failed to close the source", e);
+                    this.logger.warn("Failed to close the source: [{}]", ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         } else {

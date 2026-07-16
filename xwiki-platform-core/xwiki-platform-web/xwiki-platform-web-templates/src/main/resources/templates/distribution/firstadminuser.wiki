@@ -24,15 +24,27 @@
     #end
     ##
     #if ($validUser)
-      #set($userProperties  = {})
-      #set($void = $userProperties.put('first_name', $request.register_first_name))
-      #set($void = $userProperties.put('last_name', $request.register_last_name))
-      #set($void = $userProperties.put('password', $request.register_password))
-      #set($void = $userProperties.put('email', $request.register_email))
-      #set($void = $userProperties.put('active', '1'))
       ## Create the user
-      #set($createResult = $xwiki.getXWiki().createUser($request.xwikiname, $userProperties, $xcontext.context))
-      #if ($createResult == 1)
+      #set($createResult = $xwiki.createUser())
+      #if($createResult && $createResult <= 0)
+        {{error}}
+          #if($createResult == -2)
+            {{translation key="core.register.passwordMismatch"/}}
+          ## -3 means username taken, -8 means username is superadmin name
+          #elseif($createResult == -3 || $reg == -8)
+            {{translation key="core.register.userAlreadyExists"/}}
+          #elseif($createResult == -4)
+            {{translation key="core.register.invalidUsername"/}}
+          #elseif ($createResult == -9)
+            {{translation key="core.register.invalidCaptcha"/}}
+          ## Note that -10 is reserved already (see api.XWiki#createUser)
+          #elseif($createResult == -11)
+            {{translation key="core.register.mailSenderWronglyConfigured"/}}
+          #else
+            {{translation key="core.register.registerFailed" parameters="$createResult"/}}
+          #end
+        {{/error}}
+      #elseif ($createResult == 1)
         ## Set the user as wiki owner
         #set($descriptor = $services.wiki.currentWikiDescriptor)
         #set($void = $descriptor.setOwnerId("XWiki.${request.xwikiname}"));

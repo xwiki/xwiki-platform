@@ -27,6 +27,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.xwiki.test.docker.junit5.DockerTestException;
 
 /**
@@ -98,7 +99,7 @@ public class PropertiesMerger
                     Set<String> merge = mergeList(originalValue, newValue, separator);
                     properties.setProperty(key, StringUtils.join(merge, separator));
                 } else {
-                    properties.setProperty(key, StringUtils.removeStart(newValue, CARET));
+                    properties.setProperty(key, Strings.CS.removeStart(newValue, CARET));
                 }
             } else {
                 if (override) {

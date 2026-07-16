@@ -21,15 +21,16 @@ package org.xwiki.lesscss.internal.skin;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
@@ -37,85 +38,83 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * @since 6.4RC1
  * @version $Id$
+ * @since 6.4RC1
  */
-public class DefaultSkinReferenceFactoryTest
+@ComponentTest
+class DefaultSkinReferenceFactoryTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultSkinReferenceFactory> mocker =
-            new MockitoComponentMockingRule<>(DefaultSkinReferenceFactory.class);
+    @InjectMockComponents
+    private DefaultSkinReferenceFactory defaultSkinReferenceFactory;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @Mock
     private XWikiContext xcontext;
 
+    @Mock
     private XWiki xwiki;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        documentReferenceResolver = mocker.getInstance(new DefaultParameterizedType(null,
-                DocumentReferenceResolver.class, String.class));
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
     }
 
     @Test
-    public void createReferenceWhenSkinOnDB() throws Exception
+    void createReferenceWhenSkinOnDB() throws Exception
     {
         // Mocks
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
         DocumentReference skinDocRef = new DocumentReference("wikiId", "XWiki", "MySkin");
-        when(documentReferenceResolver.resolve(eq("XWiki.MySkin"), eq(new WikiReference("wikiId"))))
+        when(this.documentReferenceResolver.resolve("XWiki.MySkin", new WikiReference("wikiId")))
             .thenReturn(skinDocRef);
-        when(xwiki.exists(skinDocRef, xcontext)).thenReturn(true);
+        when(this.xwiki.exists(skinDocRef, this.xcontext)).thenReturn(true);
         XWikiDocument skinDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(skinDocRef, xcontext)).thenReturn(skinDoc);
-        when(skinDoc.getXObjectSize(eq(new DocumentReference("wikiId", "XWiki", "XWikiSkins")))).thenReturn(1);
+        when(this.xwiki.getDocument(skinDocRef, this.xcontext)).thenReturn(skinDoc);
+        when(skinDoc.getXObjectSize(new DocumentReference("wikiId", "XWiki", "XWikiSkins"))).thenReturn(1);
 
         // Test
-        SkinReference skinReference = mocker.getComponentUnderTest().createReference("XWiki.MySkin");
+        SkinReference skinReference = this.defaultSkinReferenceFactory.createReference("XWiki.MySkin");
 
         // Verify
-        assertTrue(skinReference instanceof DocumentSkinReference);
+        assertInstanceOf(DocumentSkinReference.class, skinReference);
         DocumentSkinReference docSkinRef = (DocumentSkinReference) skinReference;
         assertEquals(skinDocRef, docSkinRef.getSkinDocument());
     }
 
     @Test
-    public void createReferenceWhenSkinOnDBWithException() throws Exception
+    void createReferenceWhenSkinOnDBWithException() throws Exception
     {
         // Mocks
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
         DocumentReference skinDocRef = new DocumentReference("wikiId", "XWiki", "MySkin");
-        when(documentReferenceResolver.resolve(eq("XWiki.MySkin"), eq(new WikiReference("wikiId"))))
-                .thenReturn(skinDocRef);
-        when(xwiki.exists(skinDocRef, xcontext)).thenReturn(true);
+        when(this.documentReferenceResolver.resolve("XWiki.MySkin", new WikiReference("wikiId")))
+            .thenReturn(skinDocRef);
+        when(this.xwiki.exists(skinDocRef, this.xcontext)).thenReturn(true);
         Exception exception = new XWikiException();
-        when(xwiki.getDocument(skinDocRef, xcontext)).thenThrow(exception);
+        when(this.xwiki.getDocument(skinDocRef, this.xcontext)).thenThrow(exception);
 
         // Test
         LESSCompilerException caughtException = null;
         try {
-            mocker.getComponentUnderTest().createReference("XWiki.MySkin");
-        } catch(LESSCompilerException e) {
+            this.defaultSkinReferenceFactory.createReference("XWiki.MySkin");
+        } catch (LESSCompilerException e) {
             caughtException = e;
         }
 
@@ -126,23 +125,23 @@ public class DefaultSkinReferenceFactoryTest
     }
 
     @Test
-    public void createReferenceWhenSkinOnFS() throws Exception
+    void createReferenceWhenSkinOnFS() throws Exception
     {
         // Mocks
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
         DocumentReference skinDocRef = new DocumentReference("wikiId", "Main", "Flamingo");
-        when(documentReferenceResolver.resolve(eq("flamingo"), eq(new WikiReference("wikiId"))))
-                .thenReturn(skinDocRef);
-        when(xwiki.exists(skinDocRef, xcontext)).thenReturn(true);
+        when(this.documentReferenceResolver.resolve("flamingo", new WikiReference("wikiId")))
+            .thenReturn(skinDocRef);
+        when(this.xwiki.exists(skinDocRef, this.xcontext)).thenReturn(true);
         XWikiDocument skinDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(skinDocRef, xcontext)).thenReturn(skinDoc);
-        when(skinDoc.getXObjectSize(eq(new DocumentReference("wikiId", "XWiki", "XWikiSkins")))).thenReturn(0);
+        when(this.xwiki.getDocument(skinDocRef, this.xcontext)).thenReturn(skinDoc);
+        when(skinDoc.getXObjectSize(new DocumentReference("wikiId", "XWiki", "XWikiSkins"))).thenReturn(0);
 
         // Test
-        SkinReference skinReference = mocker.getComponentUnderTest().createReference("flamingo");
+        SkinReference skinReference = this.defaultSkinReferenceFactory.createReference("flamingo");
 
         // Verify
-        assertTrue(skinReference instanceof FSSkinReference);
+        assertInstanceOf(FSSkinReference.class, skinReference);
         FSSkinReference fsSkinRef = (FSSkinReference) skinReference;
         assertEquals("flamingo", fsSkinRef.getSkinName());
         assertEquals("SkinFS[flamingo]", fsSkinRef.toString());

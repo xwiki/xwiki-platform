@@ -19,8 +19,10 @@
  */
 package org.xwiki.store;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for ProvidingTransactionRunnable.
@@ -28,14 +30,14 @@ import org.junit.Test;
  * @version $Id$
  * @since 3.0M2
  */
-public class ProvidingTransactionRunnableTest
+class ProvidingTransactionRunnableTest
 {
     private static final String DB_CONNECTION = "Hello, I'm a database connection!";
 
     private static final String DATA_A1 = "hello world";
 
     @Test
-    public void dataSharingTest() throws Exception
+    void dataSharingTest()
     {
         DBStartableTransactionRunnable run = new DBStartableTransactionRunnable();
         ProvidingTransactionRunnable<DBTransaction, MyInterfaceWithDataA1> tr1 = new TR1();
@@ -45,24 +47,15 @@ public class ProvidingTransactionRunnableTest
 
         new TR3().runIn(tr2WithNewCapabilities);
         // This should fail at compile time: new TR3().runIn(tr2);
-        run.start();
+        assertDoesNotThrow(run::start);
     }
 
-    public void providingTest() throws Exception
-    {
-        DBStartableTransactionRunnable run = new DBStartableTransactionRunnable();
-        ProvidingTransactionRunnable<DBTransaction, MyInterfaceWithDataA1> tr1 = new TR1();
-        tr1.runIn(run);
-        new TR3().runIn(tr1.asProvider());
-        run.start();
-    }
-
-    public static interface DBTransaction
+    private interface DBTransaction
     {
         String getConnection();
     }
 
-    public static class MyDBTransaction implements DBTransaction
+    private static class MyDBTransaction implements DBTransaction
     {
         public String getConnection()
         {
@@ -70,12 +63,12 @@ public class ProvidingTransactionRunnableTest
         }
     }
 
-    public static interface MyInterfaceWithDataA1 extends DBTransaction
+    private interface MyInterfaceWithDataA1 extends DBTransaction
     {
         String getDataA1();
     }
 
-    public static class ImplementationWithDataA1 implements MyInterfaceWithDataA1
+    private static class ImplementationWithDataA1 implements MyInterfaceWithDataA1
     {
         private final DBTransaction DBTrans;
 
@@ -98,7 +91,7 @@ public class ProvidingTransactionRunnableTest
         }
     }
 
-    public static class DBStartableTransactionRunnable extends StartableTransactionRunnable<DBTransaction>
+    private static class DBStartableTransactionRunnable extends StartableTransactionRunnable<DBTransaction>
     {
         @Override
         protected DBTransaction getProvidedContext()
@@ -107,15 +100,14 @@ public class ProvidingTransactionRunnableTest
         }
     }
 
-    public static class TR1 extends ProvidingTransactionRunnable<DBTransaction, MyInterfaceWithDataA1>
+    private static class TR1 extends ProvidingTransactionRunnable<DBTransaction, MyInterfaceWithDataA1>
     {
         private String dataA1;
 
         @Override
         protected void onRun()
         {
-            Assert.assertEquals("DB Connection was not correct in TR1",
-                DB_CONNECTION, this.getContext().getConnection());
+            assertEquals(DB_CONNECTION, this.getContext().getConnection(), "DB Connection was not correct in TR1");
             this.dataA1 = DATA_A1;
         }
 
@@ -126,23 +118,22 @@ public class ProvidingTransactionRunnableTest
         }
     }
 
-    public class TR2 extends TransactionRunnable<DBTransaction>
+    private class TR2 extends TransactionRunnable<DBTransaction>
     {
+        @Override
         protected void onRun()
         {
-            Assert.assertEquals("DB Connection was not correct in TR2",
-                DB_CONNECTION, this.getContext().getConnection());
+            assertEquals(DB_CONNECTION, this.getContext().getConnection(), "DB Connection was not correct in TR2");
         }
     }
 
-    public class TR3 extends TransactionRunnable<MyInterfaceWithDataA1>
+    private class TR3 extends TransactionRunnable<MyInterfaceWithDataA1>
     {
+        @Override
         protected void onRun()
         {
-            Assert.assertEquals("Data A1 was not correct in TR3",
-                DATA_A1, this.getContext().getDataA1());
-            Assert.assertEquals("DB Connection was not correct in TR3",
-                DB_CONNECTION, this.getContext().getConnection());
+            assertEquals(DATA_A1, this.getContext().getDataA1(), "Data A1 was not correct in TR3");
+            assertEquals(DB_CONNECTION, this.getContext().getConnection(), "DB Connection was not correct in TR3");
         }
     }
 }

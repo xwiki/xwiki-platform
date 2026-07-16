@@ -26,13 +26,15 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+
+import static org.xwiki.security.authorization.Right.PROGRAM;
 
 /**
  * Provides Component-specific Scripting APIs.
@@ -70,20 +72,17 @@ public class ComponentScriptService implements ScriptService
     private ComponentManagerManager componentManagerManager;
 
     /**
-     * Used to check for Programming Rights.
-     */
-    @Inject
-    private DocumentAccessBridge bridge;
-
-    /**
      * Provides access to the current context.
      */
     @Inject
     private Execution execution;
 
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
     /**
      * A Component Manager which read in contextual Component Manager and write in root component manager.
-     * 
+     *
      * @return the Component Manager if the document has Programming Rights or null otherwise
      * @deprecated since 6.4.1, 6.2.6, use {@link #getContextComponentManager()} or
      *             {@link #getContextComponentManager()} instead
@@ -91,7 +90,8 @@ public class ComponentScriptService implements ScriptService
     @Deprecated
     public ComponentManager getComponentManager()
     {
-        return this.bridge.hasProgrammingRights() ? this.contextrootComponentManagerProvider.get() : null;
+        return this.contextualAuthorizationManager.hasAccess(PROGRAM) ? this.contextrootComponentManagerProvider.get()
+            : null;
     }
 
     /**
@@ -101,7 +101,8 @@ public class ComponentScriptService implements ScriptService
      */
     public ComponentManager getContextComponentManager()
     {
-        return this.bridge.hasProgrammingRights() ? this.contextComponentManagerProvider.get() : null;
+        return this.contextualAuthorizationManager.hasAccess(PROGRAM) ? this.contextComponentManagerProvider.get()
+            : null;
     }
 
     /**
@@ -123,13 +124,14 @@ public class ComponentScriptService implements ScriptService
      * specific document has access to the components registered specifically for that document or for any of its
      * namespace ancestors (space, wiki, root). The root (top level) component manager is returned if you pass
      * {@code null}.
-     * 
+     *
      * @param namespace a namespace or {@code null} for the root {@link ComponentManager}
      * @return the component manager associated with the specified namespace, if any, {@code null otherwise}
      */
     public ComponentManager getComponentManager(String namespace)
     {
-        return this.bridge.hasProgrammingRights() ? this.componentManagerManager.getComponentManager(namespace, false)
+        return this.contextualAuthorizationManager.hasAccess(PROGRAM)
+            ? this.componentManagerManager.getComponentManager(namespace, false)
             : null;
     }
 

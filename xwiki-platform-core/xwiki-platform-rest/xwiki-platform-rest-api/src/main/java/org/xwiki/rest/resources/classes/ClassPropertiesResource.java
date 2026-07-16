@@ -32,6 +32,16 @@ import org.xwiki.rest.model.jaxb.Properties;
 @Path("/wikis/{wikiName}/classes/{className}/properties")
 public interface ClassPropertiesResource
 {
+    /**
+     * Returns the property definitions of an XClass.
+     *
+     * @param wikiName the identifier of the wiki containing the class, for example {@code xwiki} for the main wiki
+     * @param className the reference of the XClass whose property definitions are returned, for example
+     *  {@code XWiki.XWikiUsers}
+     * @return the property definitions of the class, together with a link back to the class itself
+     * @throws XWikiRestException if the class properties cannot be retrieved; the class must exist and the current user
+     *  must be allowed to view it, otherwise a {@code 404} or {@code 401} response is returned respectively
+     */
     @GET Properties getClassProperties(
             @PathParam("wikiName") String wikiName,
             @PathParam("className") String className

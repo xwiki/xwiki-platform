@@ -22,7 +22,7 @@ package com.xpn.xwiki.doc;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * Unit tests for the {@link XWikiLink} class.
@@ -55,7 +55,7 @@ class XWikiLinkTest
         assertEquals(l1, l3);
 
         // equals null == false
-        assertFalse(l1.equals(null));
+        assertNotEquals(l1, null);
     }
 
     @Test

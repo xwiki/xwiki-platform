@@ -115,7 +115,7 @@ public class LogoAttachmentExtractor
         attachment.loadAttachmentContent(xcontext);
 
         // Make sure the attachment have the right name
-        if (!attachment.getFilename().equals(LOGO)) {
+        if (!LOGO.equals(attachment.getFilename())) {
             return newLogoAttachment(attachment.getMimeType(xcontext),
                 (XWikiAttachmentContent) attachment.getAttachment_content().clone(), xcontext);
         } else {
@@ -137,8 +137,8 @@ public class LogoAttachmentExtractor
     {
         InputSource inputSource = sourceImageIS.getInputSource();
 
-        if (inputSource instanceof InputStreamInputSource) {
-            try (InputStreamInputSource inputStreamSource = (InputStreamInputSource) inputSource) {
+        if (inputSource instanceof InputStreamInputSource inputStreamSource) {
+            try (inputStreamSource) {
                 XWikiAttachmentContent content = new XWikiAttachmentContent();
                 content.setContent(inputStreamSource.getInputStream());
 

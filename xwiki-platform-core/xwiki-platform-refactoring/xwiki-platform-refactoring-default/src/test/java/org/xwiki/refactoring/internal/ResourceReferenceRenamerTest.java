@@ -111,7 +111,6 @@ class ResourceReferenceRenamerTest
                 new EntityReference("wiki", EntityType.WIKI))));
         AttachmentReference newReference =
             new AttachmentReference("file2.txt", new DocumentReference("wiki", "space", "page"));
-        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(oldReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, newReference)).thenReturn(newReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, oldReference)).thenReturn(oldReference);
         when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null)).thenReturn(relativeReference);
@@ -136,7 +135,6 @@ class ResourceReferenceRenamerTest
             new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE)));
         AttachmentReference newReference =
             new AttachmentReference("file2.txt", new DocumentReference("wiki", "space", "page"));
-        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(oldReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, newReference)).thenReturn(newReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, oldReference)).thenReturn(oldReference);
         when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null)).thenReturn(relativeReference);

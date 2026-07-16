@@ -19,15 +19,10 @@
  */
 package org.xwiki.officeimporter.internal.filter;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
 
@@ -47,18 +42,19 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.ooxi.jdatauri.DataUri;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ImageFilter}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
 @ComponentList({ XHTMLMarkerResourceReferenceSerializer.class })
-public class ImageFilterTest extends AbstractHTMLFilterTest
+class ImageFilterTest extends AbstractHTMLFilterTest
 {
     @MockComponent
     private DocumentAccessBridge dab;
@@ -67,7 +63,7 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
     @Named("currentmixed")
     private DocumentReferenceResolver<String> currentMixedResolver;
 
-    private DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path.To"), "Page");
+    private final DocumentReference documentReference = new DocumentReference("wiki", List.of("Path.To"), "Page");
 
     @BeforeEach
     @Override
@@ -78,13 +74,13 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
     }
 
     @Test
-    public void filterRemovesAlignAttribute()
+    void filterRemovesAlignAttribute()
     {
-        filterAndAssertOutput("<img align=\"center\"/>", "<img/>");
+        assertFilteredOutput("<img align=\"center\"/>", Map.of(), "<img/>");
     }
 
     @Test
-    public void filterAddsImageMarkers()
+    void filterAddsImageMarkers()
     {
         AttachmentReference attachmentReference = new AttachmentReference("-foo--bar.png-", this.documentReference);
         when(this.dab.getAttachmentURL(attachmentReference, false)).thenReturn("/path/to/foo.png");
@@ -92,17 +88,17 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
         ResourceReference resourceReference = new ResourceReference("-foo--bar.png-", ResourceType.ATTACHMENT);
         resourceReference.setTyped(false);
 
-        filterAndAssertOutput("<img src=\"../../some/path/-foo--b%61r.png-\"/>",
-            Collections.singletonMap("targetDocument", "Path.To.Page"),
+        assertFilteredOutput("<img src=\"../../some/path/-foo--b%61r.png-\"/>",
+            Map.of("targetDocument", "Path.To.Page"),
             "<!--startimage:false|-|attach|-|-foo-\\-bar.png-\\--><img src=\"/path/to/foo.png\"/><!--stopimage-->");
     }
 
     @Test
-    public void filterAddsImageMarkersSpecialCharacters() throws UnsupportedEncodingException
+    void filterAddsImageMarkersSpecialCharacters()
     {
         String imageNameUrl = "foo&amp;+_b%61r@.png";
         String imageName = "foo&+_bar\\@.png";
-        String encodedImageName = URLEncoder.encode(imageName, "UTF-8");
+        String encodedImageName = URLEncoder.encode(imageName, UTF_8);
         AttachmentReference attachmentReference = new AttachmentReference(imageName, this.documentReference);
         when(this.dab.getAttachmentURL(attachmentReference, false)).thenReturn("/path/to/" + encodedImageName);
 
@@ -110,24 +106,24 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
         resourceReference.setTyped(false);
         String imageNameEscaped = "foo&+_bar\\\\@.png";
 
-        filterAndAssertOutput(String.format( "<img src=\"../../some/path/%s\"/>", imageNameUrl),
-            Collections.singletonMap("targetDocument", "Path.To.Page"),
+        assertFilteredOutput(String.format("<img src=\"../../some/path/%s\"/>", imageNameUrl),
+            Map.of("targetDocument", "Path.To.Page"),
             String.format("<!--startimage:false|-|attach|-|%s--><img src=\"/path/to/%s\"/><!--stopimage-->",
                 imageNameEscaped, encodedImageName));
     }
 
     @Test
-    public void filterIgnoresAbsoluteURLs()
+    void filterIgnoresAbsoluteURLs()
     {
-        filterAndAssertOutput("<img src=\"http://server/path/to/image.png\"/>",
-            Collections.singletonMap("targetDocument", "Path.To.Page"),
+        assertFilteredOutput("<img src=\"http://server/path/to/image.png\"/>",
+            Map.of("targetDocument", "Path.To.Page"),
             "<img src=\"http://server/path/to/image.png\"/>");
-        filterAndAssertOutput("<img src=\"file://path/to/image.png\"/>",
-            Collections.singletonMap("targetDocument", "Path.To.Page"), "<img src=\"file://path/to/image.png\"/>");
+        assertFilteredOutput("<img src=\"file://path/to/image.png\"/>",
+            Map.of("targetDocument", "Path.To.Page"), "<img src=\"file://path/to/image.png\"/>");
     }
 
     @Test
-    public void filterCollectsEmbeddedImages()
+    void filterCollectsEmbeddedImages()
     {
         AttachmentReference attachmentReference = new AttachmentReference("foo.png", this.documentReference);
         when(this.dab.getAttachmentURL(attachmentReference, false)).thenReturn("/path/to/foo.png");
@@ -136,18 +132,19 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
         resourceReference.setTyped(false);
 
         String fileName =
-            DataUri.parse("data:image/jpeg;base64,GgoAAAAN==", Charset.forName("UTF-8")).hashCode() + ".jpg";
+            DataUri.parse("data:image/jpeg;base64,GgoAAAAN==", UTF_8).hashCode() + ".jpg";
         attachmentReference = new AttachmentReference(fileName, this.documentReference);
         when(this.dab.getAttachmentURL(attachmentReference, false)).thenReturn("/path/to/" + fileName);
 
         resourceReference = new ResourceReference(fileName, ResourceType.ATTACHMENT);
         resourceReference.setTyped(false);
 
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("targetDocument", "Path.To.Page");
-        parameters.put("attachEmbeddedImages", "true");
+        Map<String, String> parameters = Map.of(
+            "targetDocument", "Path.To.Page",
+            "attachEmbeddedImages", "true"
+        );
 
-        Document document = filterAndAssertOutput(
+        Document document = assertFilteredOutput(
             "<img src=\"data:image/png;fileName=foo.png;base64,iVBORw0K==\"/>"
                 + "<img src=\"data:image/jpeg;base64,GgoAAAAN==\"/>",
             parameters,
@@ -157,11 +154,11 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
 
         @SuppressWarnings("unchecked")
         Map<String, byte[]> embeddedImages = (Map<String, byte[]>) document.getUserData("embeddedImages");
-        assertEquals(new HashSet<>(Arrays.asList("foo.png", fileName)), embeddedImages.keySet());
+        assertEquals(Set.of("foo.png", fileName), embeddedImages.keySet());
     }
 
     @Test
-    void rewriteImagePrefix() throws UnsupportedEncodingException
+    void rewriteImagePrefix()
     {
         Map<String, String> configuration = Map.of(
             "targetDocument", "Path.To.Page",
@@ -170,11 +167,11 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
         );
 
         String imageName = "re\\@placement_image.png";
-        String encodedImageName = URLEncoder.encode(imageName.replace("\\@", "@"), StandardCharsets.UTF_8);
+        String encodedImageName = URLEncoder.encode(imageName.replace("\\@", "@"), UTF_8);
         AttachmentReference attachmentReference = new AttachmentReference(imageName, this.documentReference);
         when(this.dab.getAttachmentURL(attachmentReference, false)).thenReturn("/path/to/" + encodedImageName);
 
-        filterAndAssertOutput("<img src=\"output_image.png\" />", configuration,
+        assertFilteredOutput("<img src=\"output_image.png\" />", configuration,
             "<!--startimage:false|-|attach|-|re\\\\@placement_image.png-->"
                 + "<img src=\"/path/to/re%40placement_image.png\"/><!--stopimage-->");
 

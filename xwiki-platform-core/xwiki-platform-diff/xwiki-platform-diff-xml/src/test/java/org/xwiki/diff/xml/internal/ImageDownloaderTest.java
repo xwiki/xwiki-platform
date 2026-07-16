@@ -103,7 +103,7 @@ class ImageDownloaderTest
     private HttpEntity httpEntity;
 
     @BeforeEach
-    public void setupMocks() throws IOException
+    void setupMocks() throws IOException
     {
         when(this.httpClientBuilderFactory.create()).thenReturn(this.httpClientBuilder);
         when(this.httpClientBuilder.build()).thenReturn(this.httpClient);

@@ -28,6 +28,8 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -51,9 +53,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.UsersClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -66,7 +69,7 @@ import static org.mockito.Mockito.when;
  * @since 9.8
  */
 @ComponentTest
-public class UsersClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
+class UsersClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
 {
     @InjectMockComponents
     private UsersClassPropertyValuesProvider provider;
@@ -74,7 +77,7 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
     @MockComponent
     private WikiUserManager wikiUserManager;
 
-    private ClassPropertyReference propertyReference = new ClassPropertyReference("owner", this.classReference);
+    private final ClassPropertyReference propertyReference = new ClassPropertyReference("owner", this.classReference);
 
     @MockComponent
     private UserConfiguration userConfiguration;
@@ -86,8 +89,9 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
     @MockComponent
     private UserPropertiesResolver userPropertiesResolver;
 
+    @Override
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         super.configure();
 
@@ -96,15 +100,18 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
             .thenReturn("url/to/noavatar.png");
     }
 
-    @Test
-    public void getValuesLocal() throws Exception
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void getValuesLocal(boolean hasAccess) throws Exception
     {
+        when(this.authorizationManager.hasAccess(any(), any())).thenReturn(hasAccess);
+
         when(this.wikiUserManager.getUserScope(this.classReference.getWikiReference().getName()))
             .thenReturn(UserScope.LOCAL_ONLY);
 
         DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
         when(this.allowedValuesQuery.execute())
-            .thenReturn(Collections.singletonList(new Object[]{ aliceReference, " Alice One " }));
+            .thenReturn(Collections.singletonList(new Object[] { aliceReference, " Alice One " }));
         when(this.xcontext.getWiki().getDocument(aliceReference, this.xcontext))
             .thenReturn(mock(XWikiDocument.class, "alice"));
 
@@ -114,7 +121,7 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         DocumentReference bobReference = new DocumentReference("wiki", "Users", "Bob");
         when(this.usedValuesQuery.getFilters()).thenReturn(filters);
         when(this.usedValuesQuery.execute())
-            .thenReturn(Arrays.asList(new Object[]{ bobReference, 17L }, new Object[]{ aliceReference, 3L }));
+            .thenReturn(Arrays.asList(new Object[] { bobReference, 17L }, new Object[] { aliceReference, 3L }));
 
         EntityReferenceSerializer<String> compactSerializer =
             this.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, "compact");
@@ -145,20 +152,24 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         assertEquals("Users.Alice", values.getPropertyValues().get(0).getValue());
         assertEquals("Alice One", values.getPropertyValues().get(0).getMetaData().get("label"));
         assertEquals(3L, values.getPropertyValues().get(0).getMetaData().get("count"));
-        assertTrue(values.getPropertyValues().get(0).getMetaData().get("icon") instanceof Map);
+        assertInstanceOf(Map.class, values.getPropertyValues().get(0).getMetaData().get("icon"));
         assertEquals("url/to/alice", values.getPropertyValues().get(0).getMetaData().get("url"));
 
         assertEquals("Users.Bob", values.getPropertyValues().get(1).getValue());
         assertEquals("Bob the Great", values.getPropertyValues().get(1).getMetaData().get("label"));
         assertEquals(17L, values.getPropertyValues().get(1).getMetaData().get("count"));
-        assertTrue(values.getPropertyValues().get(1).getMetaData().get("icon") instanceof Map);
+        assertInstanceOf(Map.class, values.getPropertyValues().get(1).getMetaData().get("icon"));
         Map icon = (Map) values.getPropertyValues().get(1).getMetaData().get("icon");
-        assertEquals("url/to/bob/avatar", icon.get("url"));
-        assertEquals("IMAGE", icon.get("iconSetType"));
+        if (hasAccess) {
+            assertEquals("url/to/bob/avatar", icon.get("url"));
+            assertEquals("IMAGE", icon.get("iconSetType"));
+        } else {
+            assertEquals("user", mockingDetails(icon).getMockCreationSettings().getMockName().toString());
+        }
         assertEquals("url/to/bob", values.getPropertyValues().get(1).getMetaData().get("url"));
 
         verify(this.allowedValuesQuery, never()).setWiki(any(String.class));
-        verify(this.allowedValuesQuery, times(1)).execute();
+        verify(this.allowedValuesQuery).execute();
 
         verify(filters).clear();
         verify(this.usedValuesQuery).addFilter(documentFilter);
@@ -166,7 +177,7 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
     }
 
     @Test
-    public void getValuesGlobal() throws Exception
+    void getValuesGlobal() throws Exception
     {
         when(this.wikiUserManager.getUserScope(this.classReference.getWikiReference().getName()))
             .thenReturn(UserScope.GLOBAL_ONLY);
@@ -177,11 +188,11 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         this.provider.getValues(this.propertyReference, 5, "foo");
 
         verify(this.allowedValuesQuery).setWiki("math");
-        verify(this.allowedValuesQuery, times(1)).execute();
+        verify(this.allowedValuesQuery).execute();
     }
 
     @Test
-    public void getValuesLocalAndGlobal() throws Exception
+    void getValuesLocalAndGlobal() throws Exception
     {
         when(this.wikiUserManager.getUserScope(this.classReference.getWikiReference().getName()))
             .thenReturn(UserScope.LOCAL_AND_GLOBAL);

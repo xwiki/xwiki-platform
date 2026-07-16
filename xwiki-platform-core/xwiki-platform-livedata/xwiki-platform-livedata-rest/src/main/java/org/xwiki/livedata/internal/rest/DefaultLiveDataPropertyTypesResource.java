@@ -22,10 +22,8 @@ package org.xwiki.livedata.internal.rest;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -43,13 +41,12 @@ import org.xwiki.rest.model.jaxb.Link;
 
 /**
  * Default implementation of {@link LiveDataPropertyTypesResource}.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
 @Component
 @Named("org.xwiki.livedata.internal.rest.DefaultLiveDataPropertyTypesResource")
-@Singleton
 public class DefaultLiveDataPropertyTypesResource extends AbstractLiveDataResource
     implements LiveDataPropertyTypesResource
 {
@@ -74,7 +71,7 @@ public class DefaultLiveDataPropertyTypesResource extends AbstractLiveDataResour
                 namespace, source.getParameters());
 
         List<PropertyDescriptor> types = propertyTypes.stream()
-            .map(propertyType -> createPropertyType(propertyType, source, namespace)).collect(Collectors.toList());
+            .map(propertyType -> createPropertyType(propertyType, source, namespace)).toList();
         return (Types) new Types().withTypes(types).withLinks(self, parent);
     }
 }

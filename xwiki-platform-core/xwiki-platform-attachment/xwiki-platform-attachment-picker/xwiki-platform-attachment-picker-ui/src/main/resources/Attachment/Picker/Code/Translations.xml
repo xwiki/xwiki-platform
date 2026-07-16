@@ -36,10 +36,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>attachment.picker.ckeditor.pluginsImageSelector.title=Gallery
+  <content>attachment.picker.wysiwyg.imageSelector.title=Gallery
 attachment.picker.searchField.placeholder=Search...
 attachment.picker.searchField.scope.currentPage=Current Page
-attachment.picker.searchField.scope.allPages=All Pages</content>
+attachment.picker.searchField.scope.allPages=All Pages
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 18.2.0RC1
+#@deprecated attachment.picker.wysiwyg.imageSelector.title
+attachment.picker.ckeditor.pluginsImageSelector.title=Gallery
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
   <object>
     <name>Attachment.Picker.Code.Translations</name>
     <number>0</number>

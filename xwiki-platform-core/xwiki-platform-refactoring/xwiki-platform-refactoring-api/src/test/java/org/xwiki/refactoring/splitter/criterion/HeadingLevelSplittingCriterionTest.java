@@ -29,6 +29,7 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.HeaderLevel;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -43,18 +44,18 @@ class HeadingLevelSplittingCriterionTest
         new SectionBlock(Arrays.asList(new HeaderBlock(Arrays.asList(new WordBlock("Test")), HeaderLevel.LEVEL1)))));
 
     @Test
-    void testIterateCondition() throws Exception
+    void iterateCondition()
     {
         SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(new int[] {3, 2, 1});
         Block sectionBlock = this.xdom.getChildren().get(0);
-        assertTrue(!splittingCriterion.shouldIterate(this.xdom, 0));
+        assertFalse(splittingCriterion.shouldIterate(this.xdom, 0));
         assertTrue(splittingCriterion.shouldIterate(sectionBlock, 1));
         assertTrue(splittingCriterion.shouldSplit(sectionBlock, 3));
-        assertTrue(!splittingCriterion.shouldSplit(sectionBlock, 4));
+        assertFalse(splittingCriterion.shouldSplit(sectionBlock, 4));
     }
 
     @Test
-    void testSplitCondition() throws Exception
+    void splitCondition()
     {
         SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(new int[] {3, 2, 1});
         Block sectionBlock = this.xdom.getChildren().get(0);

@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url-schemes</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>18.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-url-scheme-filesystem</artifactId>
   <name>XWiki Platform - URL - Scheme - Filesystem Implementation</name>
   <packaging>jar</packaging>
   <description>URLs to XWiki Resources exported on the filesystem format</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.42</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.49</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Filesystem URL Scheme</xwiki.extension.name>
   </properties>

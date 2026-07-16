@@ -119,8 +119,7 @@ public class SolrIndexInitializeListener implements EventListener
                         request.setId(requestId);
                     }
                 } else if (startupMode == SolrConfiguration.SynchronizeAtStartupMode.WIKI
-                    && event instanceof WikiReadyEvent) {
-                    WikiReadyEvent wikiReadyEvent = (WikiReadyEvent) event;
+                    && event instanceof WikiReadyEvent wikiReadyEvent) {
                     WikiReference wikiReference = new WikiReference(wikiReadyEvent.getWikiId());
                     request = new IndexerRequest();
                     request.setRootReference(wikiReference);
@@ -130,6 +129,9 @@ public class SolrIndexInitializeListener implements EventListener
                 }
 
                 if (request != null) {
+                    // Remove invalid entries after the synchronization
+                    request.setCleanInvalid(true);
+
                     this.solrIndexer.get().startIndex(request);
                 }
             } catch (SolrIndexerException | WikiManagerException e) {

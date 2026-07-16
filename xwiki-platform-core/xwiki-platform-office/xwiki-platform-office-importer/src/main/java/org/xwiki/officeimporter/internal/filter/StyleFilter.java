@@ -63,7 +63,7 @@ public class StyleFilter extends AbstractHTMLFilter
      */
     public StyleFilter()
     {
-        this.attributeMappingsStrict = new HashMap<String, String>();
+        this.attributeMappingsStrict = new HashMap<>();
         this.attributeMappingsStrict.put(TAG_A, "|href|name|");
         this.attributeMappingsStrict.put(TAG_IMG, "|alt|src|height|width|");
         this.attributeMappingsStrict.put(TAG_TD, "|colspan|rowspan|");
@@ -74,7 +74,7 @@ public class StyleFilter extends AbstractHTMLFilter
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         String mode = cleaningParams.get("filterStyles");
-        if (null != mode && mode.equals("strict")) {
+        if ("strict".equals(mode)) {
             filter(document.getDocumentElement(), this.attributeMappingsStrict);
         }
     }
@@ -87,8 +87,7 @@ public class StyleFilter extends AbstractHTMLFilter
      */
     private void filter(Node node, Map<String, String> attributeMappings)
     {
-        if (node instanceof Element) {
-            Element element = (Element) node;
+        if (node instanceof Element element) {
             String allowedAttributes = attributeMappings.get(element.getNodeName().toLowerCase());
             NamedNodeMap currentAttributes = element.getAttributes();
             if (null == allowedAttributes) {
@@ -98,7 +97,7 @@ public class StyleFilter extends AbstractHTMLFilter
                 }
             } else {
                 // Collect those attributes that need to be removed.
-                List<String> attributesToBeRemoved = new ArrayList<String>();
+                List<String> attributesToBeRemoved = new ArrayList<>();
                 for (int i = 0; i < currentAttributes.getLength(); i++) {
                     String attributeName = currentAttributes.item(i).getNodeName();
                     String pattern = ATTRIBUTE_SEPARATOR + attributeName.toLowerCase() + ATTRIBUTE_SEPARATOR;

@@ -60,7 +60,7 @@ class DefaultEntityResourceActionListerTest
     private MockitoComponentManager componentManager;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         when(this.componentManagerProvider.get()).thenReturn(this.componentManager);
     }

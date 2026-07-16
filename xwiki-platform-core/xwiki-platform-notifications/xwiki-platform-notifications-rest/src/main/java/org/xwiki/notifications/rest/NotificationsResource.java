@@ -24,6 +24,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
@@ -42,6 +43,7 @@ public interface NotificationsResource
      * @throws Exception if an error occurs
      */
     @GET
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:JavadocMethod"})
     Response getNotifications(
             @QueryParam("useUserPreferences") String useUserPreferences,
             @QueryParam("userId") String userId,
@@ -74,6 +76,7 @@ public interface NotificationsResource
      */
     @GET
     @Path("/count")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:JavadocMethod"})
     Response getNotificationsCount(
             @QueryParam("useUserPreferences") String useUserPreferences,
             @QueryParam("userId") String userId,
@@ -104,6 +107,11 @@ public interface NotificationsResource
      */
     @GET
     @Path("/rss")
+    // Force the RSS media type on the response: the method returns a raw String, so without this the JAX-RS runtime
+    // negotiates the content type from the browser's Accept header (typically text/html), which makes browsers and
+    // feed readers render the feed as HTML instead of recognizing it as an RSS feed.
+    @Produces("application/rss+xml")
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:JavadocMethod"})
     String getNotificationsRSS(
             @QueryParam("useUserPreferences") String useUserPreferences,
             @QueryParam("userId") String userId,
@@ -138,6 +146,7 @@ public interface NotificationsResource
      * @since 9.11.8
      */
     @POST
+    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:JavadocMethod"})
     Response postNotifications(
         @FormParam("useUserPreferences") String useUserPreferences,
         @FormParam("userId") String userId,

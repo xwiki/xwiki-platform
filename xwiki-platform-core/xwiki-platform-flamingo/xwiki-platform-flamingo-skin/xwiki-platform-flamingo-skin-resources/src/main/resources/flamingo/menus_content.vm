@@ -59,15 +59,18 @@
     ## * multilingual is on
     ## * the user can edit the current document
     ## * the user is viewing the original document version
-    ## * the document is translatable (either has a default locale specified or it has existing translations)
-    ## * the current UI locale doesn't match the original document locale
+    ## * the document is translatable (either has a default locale specified or it has existing translations for the
+    ##   supported locales)
+    ## * the current UI locale doesn't match the original document locale, and there's no existing translation for it
+    #set ($supportedTranslationLocales = $doc.translationLocales)
+    #set ($discard = $supportedTranslationLocales.retainAll($xwiki.availableLocales))
     #if (
       $displayTranslateMenu &&
       $xwiki.isMultiLingual() &&
       $hasEdit && !$isReadOnly &&
       $xcontext.action == 'view' && $tdoc.realLocale == $doc.realLocale &&
-      ("$!doc.realLocale" != '' || !$doc.translationLocales.isEmpty()) &&
-      $doc.realLocale != $xcontext.locale
+      ("$!doc.realLocale" != '' || !$supportedTranslationLocales.isEmpty()) &&
+      $doc.realLocale != $xcontext.locale && !$supportedTranslationLocales.contains($xcontext.locale)
     )
       #displayTranslateMenu()
     #end
@@ -109,7 +112,6 @@
       #displayOptionsMenu()
       #if ($canView)
         #template("export_modal.vm")
-        #exportModal()
       #end
     #end
   #end
@@ -123,23 +125,28 @@
   ##
   ## Display the menu
   ##
-  <div id="contentmenu" class="pull-right actionmenu">
+  <ul id="contentmenu" class="pull-right actionmenu">
     $menuContent
 
     #if($keyboardShortcutsEnabled)
       #keyboardShortcuts()
     #end
-  </div>
+  </ul>
+## Display the submenu modals next to the list. Note that those could be pretty much anywhere but in the ul for HTML
+## correctness sake.
+#if ("$!notificationsWatchModal" != "")$notificationsWatchModal#end
+#if ($!_exportModalAvailable)#exportModal()#end
 #end
 
 #**
  * Display a menu if it has some content.
+ * This menu is a list item, made to fit inside the ul `#contentmenu`.
  *
  * @param $id the id of the menu
  * @param $icon the icon of the menu
- * @param $content the content of the menu
+ * @param $menuContent the content of the menu
  * @param $titleKey translation key of the link title to use
- * @param $titleAsLabel if the link title should also be used as link label
+ * @param $titleAsLabel if the title should also be used as a visible label
  * @param $actionUrl (optional) the link of the top menu entry.
  *   If not provided, the top menu entry will act as an activator for the dropdown
  * @param $extraAttribute (optional) additional attributes to add (such as ref="nofollow" for example)
@@ -150,7 +157,7 @@
  * @since 7.3M2
  *#
 #macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl $extraAttribute)
-  <div class="btn-group" id="$id">
+  <li class="btn-group" id="$id">
     <#if ("$!actionUrl" == '')button type="button"#{else}a#end class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
     #if ("$!actionUrl" != '')
       href="$actionUrl"
@@ -159,9 +166,9 @@
     #end
     #if ("$!extraAttribute" != '') ${extraAttribute}#end>
       $services.icon.renderHTML($icon)
-      #if ($titleAsLabel)
-        <span class="btn-label">$services.localization.render($titleKey)</span>
-      #end
+      ## Screen readers benefit from having some kind of text alternative for an interactive element outside of the 
+      ## title attribute.
+      <span class="#if ($titleAsLabel)btn-label#{else}sr-only#end">$services.localization.render($titleKey)</span>
     </#if ("$!actionUrl" == '')button#{else}a#end>
     #if ($stringtool.isNotBlank("$!menuContent"))
       #if ("$!actionUrl" != '')
@@ -174,7 +181,7 @@
         $menuContent
       </dl>
     #end
-  </div>
+  </li>
 #end
 
 #**
@@ -195,7 +202,14 @@
   #set ($discard = $extensions.addAll($staticExtensions))
   ## Add the dynamic UIX to the list of of UIX to display
   #foreach($uix in $services.uix.getExtensions($name))
-    #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+    ## TODO: Is this check really needed? $services.uix.getExtensions() should already make sure the returned UI
+    ## extensions are safe for the current user (i.e. either registered by the current user at user scope, or registered
+    ## by a wiki administrator at wiki scope or by someone with programming right at global level). This is normally done
+    ## when the UI extesion is registered. Forbidding the current user to use UI extensons registered by themselves at
+    ## user scope seems unnecessary. Moreover, this check seems to be targeted towards UI extensions implemented in wiki
+    ## pages, because for UI extensions implemented in Java it doesn't make sense.
+    #if (!$uix.documentReference || $services.security.authorization.hasAccess('admin', $uix.authorReference,
+        $services.wiki.currentWikiDescriptor.reference))
       #set ($separator = ("$!uix.getParameters().separator" == 'true'))
       #set ($order = $numbertool.toNumber($uix.getParameters().order).intValue())
       #if ("$!order" == '')

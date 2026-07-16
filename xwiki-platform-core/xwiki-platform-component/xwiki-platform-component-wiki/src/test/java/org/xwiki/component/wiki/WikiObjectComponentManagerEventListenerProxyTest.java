@@ -43,7 +43,6 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -97,7 +96,7 @@ class WikiObjectComponentManagerEventListenerProxyTest
 
         this.testWithWikiObjectComponentBuilder(componentBuilder, objectReference, source);
 
-        verify(componentBuilder, times(1)).buildComponents(objectReference);
+        verify(componentBuilder).buildComponents(objectReference);
     }
 
     @Test
@@ -109,7 +108,7 @@ class WikiObjectComponentManagerEventListenerProxyTest
 
         this.testWithWikiObjectComponentBuilder(componentBuilder, objectReference, source);
 
-        verify(componentBuilder, times(1)).buildComponents(any(BaseObject.class));
+        verify(componentBuilder).buildComponents(any(BaseObject.class));
     }
 
     @Test
@@ -118,7 +117,7 @@ class WikiObjectComponentManagerEventListenerProxyTest
         ObjectReference testReference = mock(ObjectReference.class);
         this.listenerProxy.unregisterObjectComponents(testReference);
 
-        verify(this.wikiComponentManagerEventListenerHelper, times(1)).unregisterComponents(testReference);
+        verify(this.wikiComponentManagerEventListenerHelper).unregisterComponents(testReference);
     }
 
     private void testWithWikiObjectComponentBuilder(WikiObjectComponentBuilder buider,

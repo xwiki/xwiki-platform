@@ -81,8 +81,7 @@ public class WikiMacroEventListener implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        return Arrays
-            .<Event> asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
+        return Arrays.<Event>asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
     }
 
     @Override
@@ -102,7 +101,7 @@ public class WikiMacroEventListener implements EventListener
             // register/unregister button (and thus provide visual feedback when the action fails).
 
             if (event instanceof DocumentCreatedEvent || event instanceof DocumentUpdatedEvent) {
-                registerMacro(documentReference);
+                registerMacro(document);
             } else if (event instanceof DocumentDeletedEvent) {
                 unregisterMacro(documentReference);
             }
@@ -110,31 +109,31 @@ public class WikiMacroEventListener implements EventListener
     }
 
     /**
-     * @param documentReference the reference of the document containing the macro to register
+     * @param document the document containing the macro to register
      */
-    private void registerMacro(DocumentReference documentReference)
+    private void registerMacro(DocumentModelBridge document)
     {
-        // Unregister any existing macro registered under this document.
-        if (unregisterMacro(documentReference)) {
-            // Check whether the given document has a wiki macro defined in it.
-            if (this.macroFactory.containsWikiMacro(documentReference)) {
-                // Attempt to create a wiki macro.
-                WikiMacro wikiMacro;
-                try {
-                    wikiMacro = this.macroFactory.createWikiMacro(documentReference);
-                } catch (WikiMacroException e) {
-                    this.logger.error(String.format("Failed to create wiki macro [%s]", documentReference), e);
-                    return;
-                }
-                if (wikiMacro != null) {
+        DocumentReference documentReference = document.getDocumentReference();
 
-                    // Register the macro.
-                    registerMacro(documentReference, wikiMacro);
-                } else {
-                    // This should only occur when creating a new WikiMacro object from object editor.
-                    this.logger.debug("Macro from document [{}] cannot be registered because its id is null.",
-                        documentReference);
-                }
+        // Unregister any existing macro registered under this document.
+        // Check whether the given document has a wiki macro defined in it.
+        if (unregisterMacro(documentReference) && this.macroFactory.containsWikiMacro(document)) {
+            // Attempt to create a wiki macro.
+            WikiMacro wikiMacro;
+            try {
+                wikiMacro = this.macroFactory.createWikiMacro(documentReference);
+            } catch (WikiMacroException e) {
+                this.logger.error(String.format("Failed to create wiki macro [%s]", documentReference), e);
+                return;
+            }
+            if (wikiMacro != null) {
+
+                // Register the macro.
+                registerMacro(documentReference, wikiMacro);
+            } else {
+                // This should only occur when creating a new WikiMacro object from object editor.
+                this.logger.debug("Macro from document [{}] cannot be registered because its id is null.",
+                    documentReference);
             }
         }
     }
@@ -150,9 +149,8 @@ public class WikiMacroEventListener implements EventListener
         try {
             this.wikiMacroManager.registerWikiMacro(documentReference, wikiMacro);
         } catch (WikiMacroException e) {
-            this.logger.debug(
-                String.format("Unable to register macro [%s] in document [%s]", wikiMacro.getDescriptor().getId()
-                    .getId(), documentReference), e);
+            this.logger.debug(String.format("Unable to register macro [%s] in document [%s]",
+                wikiMacro.getDescriptor().getId().getId(), documentReference), e);
         } catch (InsufficientPrivilegesException e) {
             this.logger.debug(String.format("Insufficient privileges for registering macro [%s] in document [%s]",
                 wikiMacro.getDescriptor().getId().getId(), documentReference), e);

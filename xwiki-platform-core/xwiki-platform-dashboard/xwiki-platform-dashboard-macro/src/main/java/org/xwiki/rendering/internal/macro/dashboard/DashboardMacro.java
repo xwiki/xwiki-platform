@@ -256,10 +256,8 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         ExecutionContext ec = this.execution.getContext();
         if (ec != null) {
             Integer dashboardCalls = (Integer) ec.getProperty(DASHBOARD_MACRO_CALLS);
-            if (dashboardCalls != null) {
-                if (dashboardCalls > 0) {
-                    ec.setProperty(DASHBOARD_MACRO_CALLS, dashboardCalls - 1);
-                }
+            if (dashboardCalls != null && dashboardCalls > 0) {
+                ec.setProperty(DASHBOARD_MACRO_CALLS, dashboardCalls - 1);
             }
         }
     }
@@ -271,7 +269,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
      */
     protected void includeResources(boolean editMode)
     {
-        Map<String, Object> fxParamsForceSkinAction = new HashMap<String, Object>();
+        Map<String, Object> fxParamsForceSkinAction = new HashMap<>();
         fxParamsForceSkinAction.put("forceSkinAction", true);
         this.ssfx.use("uicomponents/dashboard/dashboard.css", fxParamsForceSkinAction);
         // include the js resources, for editing, in edit mode only

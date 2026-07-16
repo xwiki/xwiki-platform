@@ -27,12 +27,42 @@ import javax.ws.rs.QueryParam;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.SearchResults;
 
+/**
+ * Resource for executing queries (XWQL, HQL, Solr, etc.) across several wikis.
+ *
+ * @version $Id$
+ */
 @Path("/wikis/query")
 public interface WikisSearchQueryResource
 {
+    /**
+     * Executes a query across the requested wikis and returns the matching results.
+     *
+     * @param query the query statement to execute; the underlying search source is a full-text (Solr) search, for
+     *  example {@code type:DOCUMENT AND title:release}
+     * @param number the maximum number of results to return; when {@code null} the configured REST query limit is used,
+     *  and a value that is negative or larger than that configured limit is rejected with a {@code 400} response
+     * @param start the 0-based index of the first result to return, used together with {@code number} for pagination;
+     *  defaults to {@code 0}
+     * @param distinct when {@code true}, collapses duplicate results; defaults to {@code true}
+     * @param searchWikis a comma-separated list of the wiki identifiers to search in, for example
+     *  {@code xwiki,subwikiA}
+     * @param orderField the document field used to order the results, for example {@code doc.title}; empty by default
+     *  (the query's own ordering is kept)
+     * @param order the order direction applied to {@code orderField}, either {@code asc} or {@code desc}; defaults to
+     *  {@code asc}
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's
+     *  display name) in addition to the technical references, at some extra cost; defaults to {@code false}
+     * @param className restricts the results to documents holding an object of the given class, for example
+     *  {@code XWiki.XWikiUsers}; empty by default (no restriction)
+     * @return the results matching the query, honoring the current user's view rights
+     * @throws XWikiRestException if the query cannot be executed
+     */
+    // Needs a lot of parameters to bind path and query parameters
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @GET SearchResults search(
             @QueryParam("q") String query,
-            @QueryParam("number") @DefaultValue("-1") Integer number,
+            @QueryParam("number") Integer number,
             @QueryParam("start") @DefaultValue("0") Integer start,
             @QueryParam("distinct") @DefaultValue("true") Boolean distinct,
             @QueryParam("wikis") String searchWikis,

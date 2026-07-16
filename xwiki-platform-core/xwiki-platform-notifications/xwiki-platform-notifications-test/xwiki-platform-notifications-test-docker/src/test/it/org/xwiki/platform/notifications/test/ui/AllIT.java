@@ -19,7 +19,6 @@
  */
 package org.xwiki.platform.notifications.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -33,19 +32,16 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Overall Notifications Settings UI tests")
     class NestedNotificationsSettingsIT extends NotificationsSettingsIT
     {
     }
 
     @Nested
-    @DisplayName("Overall Notifications Display UI tests")
     class NestedNotificationsIT extends NotificationsIT
     {
     }
 
     @Nested
-    @DisplayName("Overall Notifications Emails tests")
     class NestedNotificationsEmailsIT extends NotificationsEmailsIT
     {
     }

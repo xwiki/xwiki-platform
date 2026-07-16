@@ -45,8 +45,8 @@ import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
  */
 @Component
 @Singleton
-public class DefaultRemoteObservationManagerConfiguration implements RemoteObservationManagerConfiguration,
-    Initializable
+public class DefaultRemoteObservationManagerConfiguration
+    implements RemoteObservationManagerConfiguration, Initializable
 {
     /**
      * USed to access configuration storage.
@@ -65,7 +65,7 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
     {
         Boolean enabled = this.configurationSource.getProperty("observation.remote.enabled", Boolean.class);
 
-        return enabled != null ? enabled : false;
+        return enabled != null && enabled;
     }
 
     @Override
@@ -92,24 +92,29 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
     @Override
     public void initialize() throws InitializationException
     {
-        Path observation = getObservationDirectory();
-        observation.toFile().mkdirs();
-        Path idFile = getIdFile();
-        if (!Files.exists(idFile)) {
-            try {
-                String idString = UUID.randomUUID().toString();
-                Files.writeString(idFile, idString);
-                this.id = idString;
-            } catch (IOException e) {
-                throw new InitializationException(String.format("Failed to create observation id file [%s]", idFile),
-                    e);
-            }
-        } else {
-            try {
-                this.id = Files.readString(idFile);
-            } catch (IOException e) {
-                throw new InitializationException(String.format("Failed to read the observation id file [%s]", idFile),
-                    e);
+        this.id = this.configurationSource.getProperty("observation.remote.id");
+
+        // If the remote observation id is not provided generate and store it in the permanent directory
+        if (this.id == null) {
+            Path observation = getObservationDirectory();
+            observation.toFile().mkdirs();
+            Path idFile = getIdFile();
+            if (!Files.exists(idFile)) {
+                try {
+                    String idString = UUID.randomUUID().toString();
+                    Files.writeString(idFile, idString);
+                    this.id = idString;
+                } catch (IOException e) {
+                    throw new InitializationException(
+                        String.format("Failed to create observation id file [%s]", idFile), e);
+                }
+            } else {
+                try {
+                    this.id = Files.readString(idFile);
+                } catch (IOException e) {
+                    throw new InitializationException(
+                        String.format("Failed to read the observation id file [%s]", idFile), e);
+                }
             }
         }
     }

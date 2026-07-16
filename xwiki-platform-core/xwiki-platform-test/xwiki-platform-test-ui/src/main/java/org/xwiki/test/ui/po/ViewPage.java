@@ -41,6 +41,12 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
  */
 public class ViewPage extends BasePage
 {
+    private static final String COMMENTS_TAB_ID = "Comments";
+
+    private static final String HISTORY_TAB_ID = "History";
+
+    private static final String INFORMATION_TAB_ID = "Information";
+
     @FindBy(id = "xwikicontent")
     private WebElement content;
 
@@ -50,28 +56,133 @@ public class ViewPage extends BasePage
     private BreadcrumbElement breadcrumb;
 
     /**
+     * @param id the tab identifier
+     * @return {@code true} if the tab with the given id is available on this page, {@code false} otherwise
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    public boolean hasDocExtraPane(String id)
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(id + "link"));
+    }
+
+    /**
+     * Opens the document extra tab with the given id and returns its content.
+     * 
+     * @param id the tab identifier
+     * @return the content of the specified document extra tab
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    public DocExtraPane openDocExtraPane(String id)
+    {
+        getDriver().findElement(By.id(id + "link")).click();
+        waitForDocExtraPaneActive(id);
+        return new DocExtraPane(id);
+    }
+
+    /**
+     * @param id the tab identifier
+     * @return {@code true} if the tab with the given id is currently active (visible), {@code false} otherwise
+     * @since 17.9.0RC1
+     * @since 17.4.6
+     * @since 16.10.13
+     */
+    public boolean isDocExtraPaneActive(String id)
+    {
+        return getDriver().findElement(By.id(id + "pane")).isDisplayed();
+    }
+
+    /**
+     * @param id the tab identifier
+     */
+    public void waitForDocExtraPaneActive(String id)
+    {
+        getDriver().waitUntilElementIsVisible(By.id(id + "pane"));
+    }
+
+    public DocExtraPane useShortcutForDocExtraPane(String id, CharSequence... shortcut)
+    {
+        // We send the shortcut to the active element because using the Actions API doesn't seem to work with key
+        // combinations (like Shift+T, tested both on Firefox and Chrome).
+        getDriver().switchTo().activeElement().sendKeys(shortcut);
+        waitForDocExtraPaneActive(id);
+        return new DocExtraPane(id);
+    }
+
+    /**
+     * @return if the comments extra pane is available on this page
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean hasCommentsDocExtraPane()
+    {
+        return hasDocExtraPane(COMMENTS_TAB_ID);
+    }
+
+    /**
      * Opens the comments tab.
      * 
      * @return element for controlling the comments tab
      */
     public CommentsTab openCommentsDocExtraPane()
     {
-        getDriver().findElement(By.id("Commentslink")).click();
-        waitForDocExtraPaneActive("comments");
+        openDocExtraPane(COMMENTS_TAB_ID);
         return new CommentsTab();
+    }
+
+    public CommentsTab useShortcutKeyForCommentPane()
+    {
+        useShortcutForDocExtraPane(COMMENTS_TAB_ID, "c");
+        return new CommentsTab();
+    }
+
+    /**
+     * @return if the history extra pane is available on this page
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean hasHistoryDocExtraPane()
+    {
+        return hasDocExtraPane(HISTORY_TAB_ID);
     }
 
     public HistoryPane openHistoryDocExtraPane()
     {
-        getDriver().findElement(By.id("Historylink")).click();
-        waitForDocExtraPaneActive("history");
+        openDocExtraPane(HISTORY_TAB_ID);
         return new HistoryPane();
+    }
+
+    public HistoryPane useShortcutKeyForHistoryPane()
+    {
+        useShortcutForDocExtraPane(HISTORY_TAB_ID, "h");
+        return new HistoryPane();
+    }
+
+    /**
+     * @return if the information extra pane is available on this page
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean hasInformationDocExtraPane()
+    {
+        return hasDocExtraPane(INFORMATION_TAB_ID);
     }
 
     public InformationPane openInformationDocExtraPane()
     {
-        getDriver().findElement(By.id("Informationlink")).click();
-        waitForDocExtraPaneActive("information");
+        openDocExtraPane(INFORMATION_TAB_ID);
+        return new InformationPane();
+    }
+
+    public InformationPane useShortcutKeyForInformationPane()
+    {
+        useShortcutForDocExtraPane(INFORMATION_TAB_ID, "i");
         return new InformationPane();
     }
 
@@ -201,15 +312,7 @@ public class ViewPage extends BasePage
 
     public boolean isInlinePage()
     {
-        return getDriver().findElements(By.xpath("//form[@id = 'inline']")).size() > 0;
-    }
-
-    /**
-     * @param paneId valid values: "history", "comments", etc
-     */
-    public void waitForDocExtraPaneActive(String paneId)
-    {
-        getDriver().waitUntilElementIsVisible(By.id(paneId + "content"));
+        return !getDriver().findElements(By.xpath("//form[@id = 'inline']")).isEmpty();
     }
 
     /**
@@ -266,30 +369,6 @@ public class ViewPage extends BasePage
         getDriver().scrollTo(0, 0);
     }
 
-    protected void useShortcutForDocExtraPane(String shortcut, String pane)
-    {
-        getDriver().createActions().sendKeys(shortcut).perform();
-        waitForDocExtraPaneActive(pane);
-    }
-
-    public HistoryPane useShortcutKeyForHistoryPane()
-    {
-        useShortcutForDocExtraPane("h", "history");
-        return new HistoryPane();
-    }
-
-    public CommentsTab useShortcutKeyForCommentPane()
-    {
-        useShortcutForDocExtraPane("c", "comments");
-        return new CommentsTab();
-    }
-
-    public InformationPane useShortcutKeyForInformationPane()
-    {
-        useShortcutForDocExtraPane("i", "information");
-        return new InformationPane();
-    }
-
     public String getTitleColor()
     {
         return getElementCSSValue(By.id("document-title"), "color");
@@ -317,5 +396,53 @@ public class ViewPage extends BasePage
     public String getLastModifiedText()
     {
         return getDriver().findElement(By.className("xdocLastModification")).getText();
+    }
+
+    /**
+     * @param wait if {@code true} waits (with the standard timeout) until the required rights warning is present,
+     *     otherwise returns immediately
+     * @return {@code true} if the page has a required rights warning, {@code false} otherwise
+     * @since 17.4.0RC1
+     */
+    public boolean hasRequiredRightsWarning(boolean wait)
+    {
+        By requiredRightsWarningSelector = By.cssSelector("#missing-required-rights-warning .requiredrights-warning");
+        if (wait) {
+            return getDriver().hasElementWithoutWaiting(requiredRightsWarningSelector);
+        } else {
+            return getDriver().hasElement(requiredRightsWarningSelector);
+        }
+    }
+
+    /**
+     * Opens the required rights modal by clicking on the button in the required rights warning.
+     *
+     * @return the opened required rights modal
+     * @since 17.4.0RC1
+     */
+    public RequiredRightsModal openRequiredRightsModal()
+    {
+        WebElement reviewButton = getDriver().findElement(By.cssSelector("#missing-required-rights-warning button"));
+        // Wait until the button isn't disabled anymore to avoid clicking the button before the event handler has been
+        // initialized.
+        getDriver().waitUntilCondition(driver -> reviewButton.isEnabled());
+        reviewButton.click();
+        return new RequiredRightsModal();
+    }
+
+    /**
+     * @return the content of the copyright section in the page footer
+     */
+    public String getFooterCopyright()
+    {
+        return getDriver().findElement(By.id("xwikilicence")).getText();
+    }
+
+    /**
+     * @return the content of the version section in the page footer
+     */
+    public String getFooterVersion()
+    {
+        return getDriver().findElement(By.id("xwikiplatformversion")).getText();
     }
 }

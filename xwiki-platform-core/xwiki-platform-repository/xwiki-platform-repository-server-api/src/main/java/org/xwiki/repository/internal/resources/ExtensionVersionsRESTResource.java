@@ -21,15 +21,10 @@
 package org.xwiki.repository.internal.resources;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -38,6 +33,9 @@ import javax.ws.rs.QueryParam;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersions;
 import org.xwiki.extension.version.InvalidVersionRangeException;
@@ -48,6 +46,9 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.repository.Resources;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+
 /**
  * @version $Id$
  * @since 3.2M3
@@ -55,22 +56,43 @@ import org.xwiki.repository.Resources;
 @Component
 @Named("org.xwiki.repository.internal.resources.ExtensionVersionsRESTResource")
 @Path(Resources.EXTENSION_VERSIONS)
-@Singleton
 public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
 {
     @GET
     public ExtensionVersions getExtensionVersions(@PathParam("extensionId") String extensionId,
         @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("0") int offset,
         @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number,
-        @QueryParam(Resources.QPARAM_VERSIONS_RANGES) String ranges) throws QueryException, InvalidVersionRangeException
+        @QueryParam(Resources.QPARAM_VERSIONS_RANGES) String ranges)
+        throws QueryException, InvalidVersionRangeException, XWikiException, ResolveException
     {
-        Query query = createExtensionsSummariesQuery(null, "extension.id = :extensionId", 0, -1, true);
+        XWikiDocument extensionDocument = getExistingExtensionDocumentById(extensionId);
 
-        query.bindValue("extensionId", extensionId);
+        checkRights(extensionDocument);
 
         ExtensionVersions extensions = this.extensionObjectFactory.createExtensionVersions();
 
-        getExtensionSummaries(extensions.getExtensionVersionSummaries(), query);
+        if (this.extensionStore.isVersionProxyingEnabled(extensionDocument)) {
+            ExtensionRepository repository = this.repositoryManager.getExtensionRepository(extensionDocument);
+            if (repository != null) {
+                IterableResult<Version> versions = repository.resolveVersions(extensionId, 0, -1);
+
+                String extensionName = this.extensionStore.getExtensionName(extensionDocument);
+                String extensionType = this.extensionStore.getExtensionType(extensionDocument);
+
+                for (Version version : versions) {
+                    extensions.getExtensionVersionSummaries()
+                        .add(createExtensionVersionSummary(extensionId, extensionType, extensionName, version));
+                }
+            }
+        } else {
+            boolean versionPageEnabled = this.extensionStore.isVersionPageEnabled(extensionDocument);
+            Query query = createExtensionsSummariesQuery(null, "extensionVersion.id = :extensionId", 0, -1, true,
+                versionPageEnabled);
+
+            query.bindValue("extensionId", extensionId);
+
+            getExtensionSummaries(extensions.getExtensionVersionSummaries(), query);
+        }
 
         // Filter by ranges
         if (StringUtils.isNotBlank(ranges)) {
@@ -88,29 +110,6 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
             }
         }
 
-        // Order by version
-        final Map<String, Version> versionCache = new HashMap<>();
-        Collections.sort(extensions.getExtensionVersionSummaries(), new Comparator<ExtensionVersionSummary>()
-        {
-            @Override
-            public int compare(ExtensionVersionSummary o1, ExtensionVersionSummary o2)
-            {
-                return toVersion(o1.getVersion()).compareTo(toVersion(o2.getVersion()));
-            }
-
-            private Version toVersion(String versionString)
-            {
-                Version version = versionCache.get(versionString);
-
-                if (version == null) {
-                    version = extensionFactory.getVersion(versionString);
-                    versionCache.put(versionString, version);
-                }
-
-                return version;
-            }
-        });
-
         extensions.setTotalHits(extensions.getExtensionVersionSummaries().size());
         extensions.setOffset(offset);
 
@@ -119,7 +118,7 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
                 extensions.getExtensionVersionSummaries().clear();
             } else {
                 List<ExtensionVersionSummary> limited =
-                    new ArrayList<ExtensionVersionSummary>(extensions.getExtensionVersionSummaries());
+                    new ArrayList<>(extensions.getExtensionVersionSummaries());
                 extensions.getExtensionVersionSummaries().clear();
                 extensions.withExtensionVersionSummaries(limited.subList(offset < 0 ? 0 : offset,
                     number < 0 ? extensions.getExtensionVersionSummaries().size() : offset + number));

@@ -20,7 +20,6 @@
 package org.xwiki.wysiwyg.internal.importer;
 
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -108,7 +107,7 @@ class OfficeAttachmentImporterTest
         when(officeMacroImporter.buildXDOM(ATTACHMENT_REFERENCE, false)).thenReturn(xdom);
         when(officeMacroImporter.render(xdom)).thenReturn("foo");
 
-        Map<String, Object> parameters = Collections.singletonMap("useOfficeViewer", "true");
+        Map<String, Object> parameters = Map.of("useOfficeViewer", "true");
         assertEquals("foo", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
     }
 
@@ -116,7 +115,7 @@ class OfficeAttachmentImporterTest
     void toHTMLRequiresEditRight() throws Exception
     {
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, Collections.emptyMap());
+            officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, Map.of());
         });
         assertEquals("Edit right is required in order to import [Some.Page@my.doc].", runtimeException.getMessage());
     }
@@ -126,7 +125,7 @@ class OfficeAttachmentImporterTest
     {
         when(this.authorization.hasAccess(Right.EDIT, ATTACHMENT_REFERENCE)).thenReturn(true);
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, Collections.emptyMap());
+            officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, Map.of());
         });
         assertEquals("Attachment not found: [Some.Page@my.doc].", runtimeException.getMessage());
     }
@@ -138,7 +137,7 @@ class OfficeAttachmentImporterTest
         when(this.documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn("1.3");
 
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, Collections.emptyMap());
+            officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, Map.of());
         });
         assertEquals("The office server is not connected.", runtimeException.getMessage());
     }
@@ -156,10 +155,10 @@ class OfficeAttachmentImporterTest
         XDOMOfficeDocument xdomOfficeDocument = mock(XDOMOfficeDocument.class);
         when(documentBuilder.build(attachmentContent, "my.doc", ATTACHMENT_REFERENCE.getDocumentReference(), true))
             .thenReturn(xdomOfficeDocument);
-        when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Collections.emptyMap());
+        when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Map.of());
         when(xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0")).thenReturn("test");
 
-        Map<String, Object> parameters = Collections.singletonMap("filterStyles", "true");
+        Map<String, Object> parameters = Map.of("filterStyles", "true");
         assertEquals("test", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
     }
 
@@ -180,10 +179,10 @@ class OfficeAttachmentImporterTest
         XDOMOfficeDocument xdomOfficeDocument = mock(XDOMOfficeDocument.class);
         when(documentBuilder.build(attachmentContent, "my.doc", ATTACHMENT_REFERENCE.getDocumentReference(), true))
             .thenReturn(xdomOfficeDocument);
-        when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Collections.emptyMap());
+        when(xdomOfficeDocument.getArtifactsMap()).thenReturn(Map.of());
         when(xdomOfficeDocument.getContentAsString("annotatedxhtml/1.0")).thenReturn("test");
 
-        Map<String, Object> parameters = Collections.singletonMap("filterStyles", "true");
+        Map<String, Object> parameters = Map.of("filterStyles", "true");
         assertEquals("test", officeAttachmentImporter.toHTML(ATTACHMENT_REFERENCE, parameters));
     }
 }

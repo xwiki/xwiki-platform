@@ -1,0 +1,477 @@
+<!--
+  See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership.
+
+  This is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of
+  the License, or (at your option) any later version.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this software; if not, write to the Free
+  Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<template>
+  <div class="xwiki-blocknote" v-if="!isLoading">
+    <suspense>
+      <BlocknoteEditor
+        v-if="editorContent"
+        ref="editor"
+        :editor-props
+        :editor-content
+        :deps-container="container"
+        :macros
+        :collaboration
+        @instant-change="dirty = true"
+        @debounced-change="updateValue"
+      ></BlocknoteEditor>
+    </suspense>
+    <input
+      v-if="name"
+      ref="valueInput"
+      type="hidden"
+      :name
+      :value
+      :form
+      :disabled
+    />
+    <input
+      v-if="name"
+      type="hidden"
+      name="RequiresConversion"
+      :value="name"
+      :form
+      :disabled
+    />
+    <input
+      v-if="name"
+      type="hidden"
+      :name="name + '_inputSyntax'"
+      :value="inputSyntax"
+      :form
+      :disabled
+    />
+    <input
+      v-if="name"
+      type="hidden"
+      :name="name + '_outputSyntax'"
+      :value="outputSyntax"
+      :form
+      :disabled
+    />
+    <input
+      v-if="collaborationKey"
+      type="hidden"
+      name="collaboration"
+      :value="collaborationKey"
+      :form
+      :disabled
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { MACRO_UI_PLACEHOLDER } from "../services/macros/placeholderUi";
+import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
+import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
+import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
+import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
+import { Container } from "inversify";
+import {
+  inject,
+  onBeforeMount,
+  onUnmounted,
+  ref,
+  shallowRef,
+  useTemplateRef,
+} from "vue";
+import { resolver } from "xwiki-platform-localization-webjar";
+import type { ImageWizard } from "../services/image/ImageWizard";
+import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
+import type { XWikiMeta } from "../services/meta/XWikiMeta";
+import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
+import type { CristalApp } from "@xwiki/platform-api";
+import type {
+  Collaboration,
+  CollaborationManager,
+  CollaborationManagerProvider,
+} from "@xwiki/platform-collaboration-api";
+import type {
+  BlockNoteViewWrapperProps,
+  BlockOfType,
+  EditorLanguage,
+  ImageUpdateResult,
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  MacroInsertionEditorPrefillData,
+} from "@xwiki/platform-editors-blocknote-react";
+import type {
+  MacroWithUnknownParamsType,
+  UnknownMacroParamsType,
+} from "@xwiki/platform-macros-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
+import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { UniAst } from "@xwiki/platform-uniast-api";
+import type { Ref } from "vue";
+
+//
+// Injected
+//
+const container = inject<Container>("container")!;
+const uniAstProcessor: UniAstProcessor = container.get("UniAstProcessor", {
+  name: "XWiki",
+});
+const xwikiMeta: XWikiMeta = container.get("XWikiMeta");
+const modelReferenceParser = container
+  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+  .get();
+
+//
+// Props
+//
+const {
+  name = undefined,
+  initialValue = "",
+  form = undefined,
+  disabled = false,
+  inputSyntax = "uniast/1.0",
+  outputSyntax = "xwiki/2.1",
+  collaborationURL = undefined,
+  documentReference = XWiki.Model.serialize(
+    XWiki.currentDocument.documentReference,
+  ),
+  locale,
+} = defineProps<{
+  // The key used to submit the edited content.
+  name?: string;
+
+  // The initial content when the editor is created.
+  initialValue?: string;
+
+  // The ID of the form this editor is associated with.
+  form?: string;
+
+  // Prevent the edited content and the conversion metadata from being submitted.
+  disabled?: boolean;
+
+  // The syntax of the edited content, as expected by the editor.
+  inputSyntax?: string;
+
+  // The syntax of the edited content, as expected by the back-end storage.
+  outputSyntax?: string;
+
+  // The URL of the collaboration server used for real-time editing. If not specified, real-time editing is disabled.
+  collaborationURL?: string;
+
+  // The reference of the XWiki document whose field is being edited using BlockNote. This is required for real-time
+  // collaboration in order to join the corresponding collaboration session. It is also used to contextualize some of
+  // the editor features.
+  documentReference?: string;
+
+  /**
+   * The locale to use for the editor UI, and also the locale of the edited content, in case the provided document
+   * reference doesn't specify a locale.
+   */
+  locale?: string;
+}>();
+
+const actualLocale = locale || xwikiMeta.locale;
+
+//
+// Data
+//
+const value = ref(initialValue);
+const dirty = ref(false);
+const isLoading = ref(true);
+
+// This is passed to the BlockNote editor component.
+const editorContent = ref();
+
+const defaultLabel = "Editor";
+
+const docRef = documentReference
+  ? (modelReferenceParser?.parse(
+      `doc:${documentReference}`,
+    ) as DocumentReference)
+  : undefined;
+if (docRef && docRef.locale === undefined) {
+  docRef.locale = actualLocale;
+}
+
+const imageEdition = (
+  image: BlockOfType<"image">["props"],
+  update: (updateResult: ImageUpdateResult) => void,
+) => {
+  const imageWizard: ImageWizard = container.get("ImageWizard");
+  imageWizard.edit(image, {
+    submit: (updatedProps: Partial<BlockOfType<"image">["props"]>) =>
+      update({ type: "update", updatedProps }),
+    cancel: () => update({ type: "aborted" }),
+  });
+};
+
+const syntaxes = container.getAll<SyntaxConfig>(
+  SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
+);
+
+const syntax =
+  syntaxes.find((conf) => conf.id === outputSyntax) ??
+  syntaxes.find((conf) => conf.id === MINIMAL_SYNTAX_NAME);
+
+if (!syntax) {
+  throw new Error(
+    "Document syntax is not supported, and minimal syntax is not available",
+  );
+}
+
+// This is passed to the BlockNote editor component.
+const editorProps = shallowRef<
+  InstanceType<typeof BlocknoteEditor>["$props"]["editorProps"]
+>({
+  blockNoteOptions: {
+    // We want the edited content to be styled using the XWiki skin / color theme as musch as possible, in order to have
+    // consistency between edit and view modes.
+    defaultStyles: false,
+  },
+  theme: "light",
+  lang: (actualLocale || "en") as EditorLanguage,
+  label: defaultLabel,
+  overrides: {
+    imageEdition,
+  },
+  syntax,
+});
+
+// This is passed to the BlockNote editor component.
+const collaboration: Ref<Collaboration | undefined> = ref(undefined);
+let collaborationManager: CollaborationManager | undefined = undefined;
+const collaborationKey: Ref<string | undefined> = ref();
+
+onBeforeMount(async () => {
+  editorContent.value = uniAstProcessor.load(initialValue);
+
+  editorProps.value.label =
+    (await resolver.resolve(["platform.blocknote.editor.label"])).translations[
+      "platform.blocknote.editor.label"
+    ] ?? defaultLabel;
+
+  if (collaborationURL && docRef) {
+    const cristalApp = container.get<CristalApp>("CristalApp");
+    cristalApp.getWikiConfig().realtimeURL = collaborationURL;
+
+    collaborationManager = container
+      .get<CollaborationManagerProvider>(collaborationManagerProviderName)
+      .get();
+    // Join the realtime collaboration session for the specified XWiki document.
+    collaboration.value = await collaborationManager.join(docRef);
+    collaborationKey.value = `${encodeURIComponent(documentReference)}/${encodeURIComponent(actualLocale)}`;
+  }
+
+  isLoading.value = false;
+});
+
+onUnmounted(() => {
+  collaborationManager?.leave();
+});
+
+// This is passed to the BlockNote editor component.
+const macros: BlockNoteViewWrapperProps["macros"] = {
+  list: container.getAll<MacroWithUnknownParamsType>("Macro"),
+  ctx: {
+    openParamsEditor: async (
+      macro: MacroWithUnknownParamsType,
+      parameters: UnknownMacroParamsType,
+      update: (newProps: UnknownMacroParamsType) => void,
+    ) => {
+      try {
+        const macroWizard: BlockNoteMacroWizard = container.get(
+          "BlockNoteMacroWizard",
+        );
+        update(
+          await macroWizard.insertOrUpdate(macro, parameters, {
+            syntax: outputSyntax,
+            inlineParametersSyntax: inputSyntax,
+          }),
+        );
+      } catch (error) {
+        console.error("Failed to edit the macro", error);
+      }
+    },
+
+    openInsertionEditor: async (
+      prefill: MacroInsertionEditorPrefillData,
+      insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
+    ) => {
+      const macroWizard: BlockNoteMacroWizard = container.get(
+        "BlockNoteMacroWizard",
+      );
+
+      const call = await macroWizard.insert(prefill.kind, prefill.params);
+
+      const invocation: MacroBlockInvocation | InlineMacroInvocation = {
+        kind: call.inline ? "inline" : "block",
+        id: call.name,
+        body: call.content
+          ? { type: "raw", content: call.content }
+          : { type: "none" },
+        params: Object.fromEntries(
+          Object.entries(call.parameters).map(([key, value]) => [
+            key,
+            typeof value === "string" ? value : value.value,
+          ]),
+        ),
+      };
+
+      insert({
+        kind: call.inline ? "inline" : "block",
+        id: call.inline ? "xwikiInlineMacro" : "xwikiMacroBlock",
+        params: {
+          call: JSON.stringify(invocation),
+          output: JSON.stringify(MACRO_UI_PLACEHOLDER),
+        },
+        body: { type: "none" },
+      });
+    },
+  },
+};
+
+//
+// Computed
+//
+const valueInput = useTemplateRef<HTMLInputElement>("valueInput");
+const editorInstance =
+  useTemplateRef<InstanceType<typeof BlocknoteEditor>>("editor");
+
+//
+// Methods
+//
+// eslint-disable-next-line max-statements
+async function updateValue(editorContent?: UniAst | Error): Promise<string> {
+  if (!dirty.value) {
+    // The value is already up-to-date.
+    return value.value;
+  }
+
+  const instantUpdate = !editorContent;
+  editorContent = editorContent || editorInstance.value?.getContent();
+  if (!editorContent || editorContent instanceof Error) {
+    throw editorContent || new Error("Could not get the editor content.");
+  }
+
+  const newValue = uniAstProcessor.save(editorContent);
+
+  value.value = newValue;
+  dirty.value = false;
+
+  if (instantUpdate) {
+    // Update the value input immediately. This is important for instance when the form containing the BlockNote
+    // editor is submitted. Alternatively, we have to delay the form submission until the next tick when Vue will
+    // have updated the value input, but that is more complex.
+    valueInput.value!.value = newValue;
+  }
+
+  return newValue;
+}
+
+defineExpose({
+  updateValue,
+});
+</script>
+
+<style>
+.xwiki-blocknote {
+  .bn-container {
+    --bn-font-family: unset;
+    --mantine-font-size-md: inherit;
+    --mantine-font-size-xs: 80%;
+  }
+
+  .bn-editor {
+    --bn-colors-editor-text: unset;
+    --bn-colors-editor-background: unset;
+    /* Overwrite the inline padding coming from BlockNote. Note that we don't set it to 0 because it leads to a
+      horizontal scrollbar in Firefox. */
+    padding-inline: 0 1px;
+
+    h5 {
+      font-size: unset; /* --font-size-h5 */
+    }
+
+    h6 {
+      font-size: 13px; /* --font-size-h6 */
+    }
+
+    [data-content-type="bulletListItem"] > p.bn-inline-content,
+    [data-content-type="numberedListItem"] > p.bn-inline-content {
+      margin: 0;
+    }
+
+    [data-content-type="table"] {
+      table {
+        margin-bottom: 0;
+      }
+
+      th,
+      td {
+        border: 0 none;
+        border-top: 1px solid var(--table-border-color);
+        padding: 8px 10px; /* @table-cell-padding */
+
+        > p {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  /* Overwrite styles coming from XWiki */
+  .bn-editor ~ * .container {
+    width: auto;
+    padding: 0;
+    margin: 0;
+  }
+
+  .bn-toolbar {
+    button,
+    select {
+      --ai-size: 30px !important;
+    }
+  }
+
+  .bn-block-outer {
+    line-height: unset;
+  }
+
+  .bn-block-content {
+    padding: 0;
+  }
+
+  .link-editor label {
+    line-height: 34px; /* @input-height-base */
+    margin-bottom: 0;
+  }
+}
+
+/**
+ * Standalone edit mode
+ */
+
+/* There's no border around the content editor so we need to show the top border of the action toolbar. */
+form#edit .bottom-editor > .sticky-buttons {
+  border-top: var(--border-width) solid var(--input-border);
+  border-top-left-radius: var(--border-radius-base);
+  border-top-right-radius: var(--border-radius-base);
+}
+
+/* There's no border around the content editor so we need to leave some space before the action toolbar. */
+#xwikieditcontent > .xwiki-blocknote-wrapper {
+  margin-bottom: calc(var(--grid-gutter-width) / 2);
+}
+</style>

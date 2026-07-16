@@ -66,7 +66,7 @@ class ZipExplorerTest
     private ZipExplorerPlugin plugin;
 
     @BeforeEach
-    public void setUp(MockitoComponentManager componentManager) throws Exception
+    void setUp(MockitoComponentManager componentManager) throws Exception
     {
         this.plugin = new ZipExplorerPlugin("zipexplorer", ZipExplorerPlugin.class.getName(), null);
 
@@ -84,15 +84,15 @@ class ZipExplorerTest
     @Test
     void isZipFile() throws Exception
     {
-        byte txtbuf[] = { 0x00, 0x01, 0x02, 0x03, 0x06, 0x07 };
+        byte[] txtbuf = { 0x00, 0x01, 0x02, 0x03, 0x06, 0x07 };
         ByteArrayInputStream txtBais = new ByteArrayInputStream(txtbuf);
         assertFalse(this.plugin.isZipFile(txtBais));
 
-        byte tinybuf[] = { 0x00 };
+        byte[] tinybuf = { 0x00 };
         ByteArrayInputStream tinyBais = new ByteArrayInputStream(tinybuf);
         assertFalse(this.plugin.isZipFile(tinyBais));
 
-        byte zipbuf[] = createZipFile("test");
+        byte[] zipbuf = createZipFile("test");
         ByteArrayInputStream zipBais = new ByteArrayInputStream(zipbuf);
         assertTrue(this.plugin.isZipFile(zipBais));
     }

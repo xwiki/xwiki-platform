@@ -145,8 +145,8 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         Response response = this.container.getResponse();
         response.setContentType("application/json; charset=utf-8");
 
-        if (response instanceof ServletResponse) {
-            ((ServletResponse) response).getHttpServletResponse().setStatus(HttpServletResponse.SC_ACCEPTED);
+        if (response instanceof ServletResponse servletResponse) {
+            servletResponse.getHttpServletResponse().setStatus(HttpServletResponse.SC_ACCEPTED);
         }
 
         // TODO: Send back a REST version of the job status
@@ -177,7 +177,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
     private void addUse(AsyncRendererResourceReference reference, AsyncRendererJobStatus status, Response response)
     {
         Map<String, Collection<Object>> uses = status.getUses();
-        if (uses != null && response instanceof ServletResponse) {
+        if (uses != null && response instanceof ServletResponse servletResponse) {
             // Create the asynchronous HTML meta
             StringBuilder head = new StringBuilder();
             StringBuilder scripts = new StringBuilder();
@@ -196,10 +196,10 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
                 }
             }
             if (head.length() > 0) {
-                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
+                servletResponse.getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
             }
             if (scripts.length() > 0) {
-                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-SCRIPTS",
+                servletResponse.getHttpServletResponse().addHeader("X-XWIKI-HTML-SCRIPTS",
                     scripts.toString());
             }
         }

@@ -38,6 +38,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -354,18 +355,17 @@ public abstract class XWikiAction implements LegacyAction
     protected boolean isEntityReferenceNameValid(EntityReference entityReference)
     {
         if (this.getEntityNameValidationManager().getEntityReferenceNameStrategy() != null
-            && this.getEntityNameValidationConfiguration().useValidation()) {
-            if (!this.getEntityNameValidationManager().getEntityReferenceNameStrategy().isValid(entityReference)) {
-                Object[] args = {getLocalSerializer().serialize(entityReference)};
-                XWikiException invalidNameException = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_APP_DOCUMENT_NAME_INVALID,
-                    "Cannot create document {0} because its name does not respect the name strategy of the wiki.", null,
-                    args);
-                ScriptContext scontext = getCurrentScriptContext();
-                scontext.setAttribute("invalidNameReference", entityReference, ScriptContext.ENGINE_SCOPE);
-                scontext.setAttribute("createException", invalidNameException, ScriptContext.ENGINE_SCOPE);
-                return false;
-            }
+            && this.getEntityNameValidationConfiguration().useValidation()
+            && !this.getEntityNameValidationManager().getEntityReferenceNameStrategy().isValid(entityReference)) {
+            Object[] args = {getLocalSerializer().serialize(entityReference)};
+            XWikiException invalidNameException = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_APP_DOCUMENT_NAME_INVALID,
+                "Cannot create document {0} because its name does not respect the name strategy of the wiki.", null,
+                args);
+            ScriptContext scontext = getCurrentScriptContext();
+            scontext.setAttribute("invalidNameReference", entityReference, ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("createException", invalidNameException, ScriptContext.ENGINE_SCOPE);
+            return false;
         }
         return true;
     }
@@ -396,7 +396,7 @@ public abstract class XWikiAction implements LegacyAction
         DefaultJobProgress actionProgress = null;
         String docName = "";
 
-        boolean debug = StringUtils.equals(context.getRequest().get("debug"), "true");
+        boolean debug = Strings.CS.equals(context.getRequest().get("debug"), "true");
 
         String sasync = context.getRequest().get("async");
 
@@ -425,7 +425,7 @@ public abstract class XWikiAction implements LegacyAction
             // Verify that the requested wiki exists
             try {
                 // Don't show init screen if async is forced to false
-                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization || StringUtils.equals(sasync, "false"), context);
+                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization || Strings.CS.equals(sasync, "false"), context);
 
                 // If XWiki is still initializing display initialization template
                 if (xwiki == null) {
@@ -449,7 +449,7 @@ public abstract class XWikiAction implements LegacyAction
                     // that we
                     // are parsing below.
                     VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-                    VelocityContext vcontext = velocityManager.getVelocityContext();
+                    velocityManager.getVelocityContext();
 
                     if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context)) {
                         // Starting XWiki 5.0M2, 'xwiki.virtual.redirect' was removed. Warn users still using it.
@@ -511,14 +511,14 @@ public abstract class XWikiAction implements LegacyAction
 
             String sajax = context.getRequest().get("ajax");
             boolean ajax = false;
-            if (sajax != null && !sajax.trim().equals("") && !sajax.equals("0")) {
+            if (sajax != null && !"".equals(sajax.trim()) && !"0".equals(sajax)) {
                 ajax = true;
             }
             context.put("ajax", ajax);
 
             boolean async = false;
             if (StringUtils.isNotEmpty(sasync)) {
-                async = sasync.equals("true");
+                async = "true".equals(sasync);
             } else {
                 // By default allow asynchronous rendering for "human oriented" actions which are not executing an ajax
                 // request
@@ -647,7 +647,7 @@ public abstract class XWikiAction implements LegacyAction
                         String page = Utils.getPage(context.getRequest(), renderResult);
 
                         getProgress().startStep(this, "Execute template [" + page + "]");
-                        Utils.parseTemplate(page, !page.equals("direct"), context);
+                        Utils.parseTemplate(page, !"direct".equals(page), context);
                     }
                 }
                 return;
@@ -704,7 +704,7 @@ public abstract class XWikiAction implements LegacyAction
                         // Don't log "Broken Pipe" exceptions since they're not real errors and we don't want to pollute
                         // the logs with unnecessary stack traces. It just means the client side has cancelled the
                         // connection.
-                        if (ExceptionUtils.getRootCauseMessage(e).equals("IOException: Broken pipe")) {
+                        if ("IOException: Broken pipe".equals(ExceptionUtils.getRootCauseMessage(e))) {
                             return;
                         }
                         LOGGER.warn("Uncaught exception: " + e.getMessage(), e);
@@ -1063,7 +1063,7 @@ public abstract class XWikiAction implements LegacyAction
         throws XWikiException
     {
         XWikiDocument tdoc;
-        if (StringUtils.isBlank(language) || language.equals("default") || language.equals(doc.getDefaultLanguage())) {
+        if (StringUtils.isBlank(language) || "default".equals(language) || language.equals(doc.getDefaultLanguage())) {
             tdoc = doc;
         } else {
             tdoc = doc.getTranslatedDocument(language, context);
@@ -1111,6 +1111,7 @@ public abstract class XWikiAction implements LegacyAction
                     if (jsonAnswer) {
                         Map<String, String> jsonObject = new LinkedHashMap<>();
                         jsonObject.put("errorType", "CSRF");
+                        jsonObject.put("allowResubmit", String.valueOf(csrf.isResubmitAllowedForCurrentRequest()));
                         jsonObject.put("resubmissionURI", csrf.getRequestURI());
                         jsonObject.put("newToken", csrf.getToken());
                         this.answerJSON(context, HttpServletResponse.SC_FORBIDDEN, jsonObject);
@@ -1295,5 +1296,36 @@ public abstract class XWikiAction implements LegacyAction
             }
         }
         return false;
+    }
+
+    /**
+     * @param isAjaxRequest Indicate if this is an ajax request.
+     * @param exception The exception to handle.
+     * @param context The XWiki context.
+     * @throws XWikiException unless it is an ajax request.
+     */
+    protected void handleSaveException(boolean isAjaxRequest, Exception exception, XWikiContext context)
+        throws XWikiException
+    {
+        if (isAjaxRequest) {
+            String errorMessage =
+                localizePlainOrKey("core.editors.saveandcontinue.exceptionWhileSaving", exception.getMessage());
+
+            writeAjaxErrorResponse(javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
+
+            String logMessage = "Caught exception during save and continue";
+            if (exception instanceof XWikiException) {
+                LOGGER.info(logMessage, exception);
+            } else {
+                LOGGER.error(logMessage, exception);
+            }
+        } else {
+            if (exception instanceof XWikiException) {
+                throw (XWikiException) exception;
+            } else {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Uncaught exception", exception);
+            }
+        }
     }
 }

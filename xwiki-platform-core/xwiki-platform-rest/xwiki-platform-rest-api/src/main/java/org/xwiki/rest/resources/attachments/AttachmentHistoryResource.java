@@ -35,12 +35,29 @@ import org.xwiki.rest.model.jaxb.Attachments;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/attachments/{attachmentName}/history")
 public interface AttachmentHistoryResource
 {
+    /**
+     * Returns the successive versions (the revision history) of an attachment, from the oldest to the most recent.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the attachment, for example {@code WebHome}
+     * @param attachmentName the file name of the attachment, for example {@code photo.png}
+     * @param start the 0-based index into the version history of the first version to return, used together with
+     *  {@code number} for pagination; defaults to {@code 0}
+     * @param number the maximum number of versions to return; when {@code null} the wiki's configured REST query limit
+     *  is used, and a value that is negative or larger than that configured limit is rejected with a {@code 400}
+     *  response
+     * @return the requested window of attachment versions, each carrying that version's metadata
+     * @throws XWikiRestException if the attachment history cannot be retrieved, for example the page or attachment does
+     *  not exist
+     */
     @GET Attachments getAttachmentHistory(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
             @PathParam("attachmentName") String attachmentName,
             @QueryParam("start") @DefaultValue("0") Integer start,
-            @QueryParam("number") @DefaultValue("-1") Integer number
+            @QueryParam("number") Integer number
     ) throws XWikiRestException;
 }

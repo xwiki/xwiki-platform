@@ -22,7 +22,11 @@ package org.xwiki.flamingo.test.docker;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.WebDriver;
 import org.xwiki.administration.test.po.GlobalRightsAdministrationSectionPage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -34,7 +38,11 @@ import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.test.ui.TestUtils.ADMIN_CREDENTIALS;
 
 /**
  * Test the Login feature.
@@ -101,7 +109,7 @@ class LoginIT
         LoginPage.gotoPage();
         LoginPage loginPage = new LoginPage();
         loginPage.loginAs("Admin", "wrong password");
-        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        assertTrue(loginPage.hasInvalidCredentialsErrorMessage(), "Obtained message: "+ loginPage.getErrorMessages());
         logCaptureConfiguration.registerExpected("Authentication failure with login [Admin]");
 
         loginPage.loginAs("non existent user", "admin");
@@ -189,15 +197,84 @@ class LoginIT
 
         // Since we switched user (from guest to Admin), the CSRF protection will ask for confirmation
         ResubmissionPage resubmissionPage = new ResubmissionPage();
+        assertTrue(resubmissionPage.isOnResubmissionPage());
+
+        // We used a GET request so we cannot resubmit this.
+        assertFalse(resubmissionPage.requestCanBeResubmitted());
+
+        setup.gotoPage(testReference);
+        setup.recacheSecretToken();
+
+        DocumentReference testPage = new DocumentReference("TestPage", testReference.getLastSpaceReference());
+        String pageContent = String.format("{{html clean=\"false\"}}"
+            + "<form method=\"post\" action=\"/xwiki/bin/save/%s\">"
+            + "<input type=\"submit\" id=\"dataIsPreservedTest\" value=\"Save\" />"
+            + "</form>"
+            + "{{/html}}", setup.serializeLocalReference(testPage).replace('.', '/'));
+
+        setup.createPage(testReference, pageContent);
+
+        // Force guest user so that the save will redirect to the login page
+        setup.forceGuestUser();
+        setup.gotoPage(testReference);
+        setup.getDriver().findElementWithoutWaiting(By.id("dataIsPreservedTest")).click();
+
+        loginPage = new LoginPage();
+        loginPage.assertOnPage();
+
+        // Now login
+        loginPage.loginAsAdmin();
+
+        // Since we switched user (from guest to Admin), the CSRF protection will ask for confirmation
+        resubmissionPage = new ResubmissionPage();
+        assertTrue(resubmissionPage.isOnResubmissionPage());
+        assertTrue(resubmissionPage.requestCanBeResubmitted());
         resubmissionPage.resubmit();
 
         // Verify that the page we tried to create is now created (thanks to the automatic redirect) with the proper
         // content.
         ViewPage viewPage = new ViewPage();
-        setup.assertOnPage(testReference);
-        assertEquals("some content", viewPage.getContent());
+        setup.assertOnPage(testPage);
+        assertTrue(viewPage.exists());
 
         // Since we got a CSRF warning, we expect it to be in the logs too.
         logCaptureConfiguration.registerExpected("Secret CSRF token verification failed");
+    }
+
+    @Test
+    @Order(6)
+    void persistentLoginWhenSessionExpired(TestUtils setup, TestReference testReference)
+    {
+        // Login as Admin.
+        setup.loginAsAdmin();
+        ViewPage viewPage = setup.gotoPage(testReference);
+        assertEquals(ADMIN_CREDENTIALS.getUserName(), viewPage.getCurrentUser());
+
+        WebDriver.Options options = setup.getDriver().manage();
+        Cookie sessionId = options.getCookieNamed("JSESSIONID");
+        assertNotNull(sessionId);
+        // Delete the session cookie to simulate a session expiration.
+        options.deleteCookie(sessionId);
+
+        // Refresh the page to see the effect of the deleted session cookie.
+        setup.getDriver().navigate().refresh();
+        // New ViewPage to correctly wait for the page to load.
+        viewPage = new ViewPage();
+        // Verify that we're still logged-in thanks to the persistent login feature.
+        assertTrue(viewPage.isAuthenticated());
+        assertEquals(ADMIN_CREDENTIALS.getUserName(), viewPage.getCurrentUser());
+
+        // Verify that the cookies for persistent login are HttpOnly for better security. Only verify the username
+        // cookie since all cookies are set by the same code path and should have the same HttpOnly attribute.
+        Cookie usernameCookie = options.getCookieNamed("username");
+        assertNotNull(usernameCookie);
+        assertTrue(usernameCookie.isHttpOnly());
+
+        viewPage.logout();
+        assertFalse(viewPage.isAuthenticated());
+
+        // Ensure that the cookies used for persistent login are deleted upon logout.
+        assertNull(options.getCookieNamed("username"));
+        assertNull(options.getCookieNamed("password"));
     }
 }

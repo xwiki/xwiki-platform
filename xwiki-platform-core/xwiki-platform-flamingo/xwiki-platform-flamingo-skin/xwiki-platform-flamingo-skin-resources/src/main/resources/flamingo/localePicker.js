@@ -57,15 +57,20 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
     return this.each((index, input) => init($(input), settings));
   };
 
-  var defaultSettings = {
+  const defaultSettings = {
     allowEmpty: true,
     multiple: false
   };
 
-  var init = function(input, settings) {
+  function init(input, settings) {
     settings = $.extend({}, defaultSettings, input.data('settings'), settings);
-    var selectedLocales = getLocalesFromInput(input);
-    var select = $('<select></select>');
+    const select = createSelect(input, settings);
+    addOptions(select, input, settings);
+    select.bootstrapSelect();
+  }
+
+  function createSelect(input, settings) {
+    const select = $('<select></select>');
     if (settings.multiple) {
       // Hide the input and insert the select after.
       input.hide().after(select.attr('multiple', 'multiple'));
@@ -80,9 +85,6 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
         name: input.attr('name')
       }));
     }
-    if (settings.allowEmpty) {
-      $('<option></option>').attr('value', '').text('None').appendTo(select);
-    }
     if (settings.label) {
       select.attr('aria-label', settings.label);
     }
@@ -92,30 +94,54 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
       hint.attr('id', hintId);
       select.attr('aria-describedby', hintId);
     }
-    select.append(locales.map(function(locale) {
-      var index = selectedLocales.indexOf(locale.code);
-      if (index >= 0) {
-        // Remove it from the list of selected locales so that we can add the remaining ones at the end.
-        selectedLocales.splice(index, 1);
-      }
-      return $('<option></option>').attr('value', locale.code).html(locale.name).prop('selected', index >= 0);
-    }));
+    return select;
+  }
+
+  function addOptions(select, input, settings) {
+    if (settings.allowEmpty) {
+      $('<option></option>').attr('value', '').text('None').appendTo(select);
+    }
+    const selectedLocales = getLocalesFromInput(input);
+    select.append(createOptions(selectedLocales, settings));
     // Add selected locales that are unknown.
-    select.append(selectedLocales.map(function(locale) {
+    select.append(selectedLocales.map(locale => {
       return $('<option></option>').attr('value', locale).text(locale).prop('selected', true);
     }));
-    select.bootstrapSelect();
-  };
+    // Explain why some options are disabled. We can't do this through bootstrap-select's configuration though.
+    if (settings.disabledLocalesHint && settings.disabledLocales?.length) {
+      select.on('shown.bs.select', () => {
+        $('.bootstrap-select.dropdown.open li.disabled').attr('title', settings.disabledLocalesHint);
+      });
+    }
+  }
+
+  function createOptions(selectedLocales, settings) {
+    return locales.filter(locale => {
+      // Include only the supported locales, if specified.
+      return !settings.supportedLocales || settings.supportedLocales.includes(locale.code);
+    }).map(locale => createOption(locale, selectedLocales, settings));
+  }
+
+  function createOption(locale, selectedLocales, settings) {
+    const index = selectedLocales.indexOf(locale.code);
+    if (index >= 0) {
+      // Remove it from the list of selected locales so that we can add the remaining ones at the end.
+      selectedLocales.splice(index, 1);
+    }
+    const disabled = index < 0 && settings.disabledLocales?.includes(locale.code);
+    return $('<option></option>').attr({
+      'value': locale.code,
+      'disabled': disabled ? 'disabled' : undefined
+    }).text(locale.name).prop('selected', index >= 0);
+  }
 
   /**
    * Get the initial values of the input
    * @return an array of locales codes
    */
-  var getLocalesFromInput = function (input) {
-    return input.val().split(/\s*,\s*|\s+/).filter(function(locale) {
-      return locale !== '';
-    });
-  };
+  function getLocalesFromInput(input) {
+    return input.val().split(/\s*,\s*|\s+/).filter(locale => locale !== '');
+  }
 
   $.fn.bootstrapSelect = function() {
     // Force 100% width on the select using the form-control CSS class.
@@ -133,10 +159,10 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
 });
 
 require(['jquery', 'xwiki-locale-picker', 'xwiki-events-bridge'], function($) {
-  var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+  function init(event, data) {
+    const container = $(data?.elements || document);
     container.find('input[data-type="locale"]').localePicker();
-  };
+  }
 
   $(document).on('xwiki:dom:updated', init);
   return XWiki.domIsLoaded && init();

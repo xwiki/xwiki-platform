@@ -24,7 +24,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.ckeditor.test.ui.AbstractCKEditorIT;
 import org.xwiki.test.docker.junit5.MultiUserTestUtils;
-import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.ui.TestUtils;
 
 /**
@@ -45,15 +44,20 @@ abstract class AbstractRealtimeWYSIWYGEditorIT extends AbstractCKEditorIT
     }
 
     @AfterEach
-    void afterEach(TestUtils setup, MultiUserTestUtils multiUserSetup, TestReference testReference)
+    void afterEach(TestUtils setup, MultiUserTestUtils multiUserSetup)
     {
         // Handle the edit mode leave confirmation modal (when there are unsaved changes).
         setup.getDriver().getWindowHandles().forEach(handle -> {
             multiUserSetup.switchToBrowserTab(handle);
-            maybeLeaveEditMode(setup, testReference);
+            setup.maybeLeaveEditMode();
         });
 
         multiUserSetup.closeTabs();
+    }
+
+    protected void loginAsJohn(TestUtils setup)
+    {
+        setup.login("John", "pass");
     }
 
     protected void loginAsBob(TestUtils setup)

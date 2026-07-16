@@ -19,17 +19,26 @@
  */
 package org.xwiki.sharepage;
 
+import javax.inject.Named;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.csrf.script.CSRFTokenScriptService;
+import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Page test for the {@code shareinline} template.
@@ -41,6 +50,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 })
 class ShareInlineTemplateTest extends PageTest
 {
+    private static final String VALID_TOKEN = "VALID";
+
+    @MockComponent(classToMock = IconManagerScriptService.class)
+    @Named("icon")
+    private ScriptService iconManagerScriptService;
+
+    @MockComponent(classToMock = CSRFTokenScriptService.class)
+    @Named("csrf")
+    private ScriptService csrfTokenScriptService;
+
+    @BeforeEach
+    void setup()
+    {
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
+            .then(invocationOnMock -> invocationOnMock.getArgument(0) + "Icon");
+        when(((CSRFTokenScriptService) this.csrfTokenScriptService).isTokenValid(VALID_TOKEN)).thenReturn(true);
+    }
+
     /**
      * Verify that when no "from" address is specified, one is constructed automatically, based on the server name.
      */
@@ -59,6 +86,9 @@ class ShareInlineTemplateTest extends PageTest
         // Simulate a target recipient to send the share page to, specified using an email address
         this.request.put("target", "john@doe.com");
 
+        // Simulate valid CSRF token
+        this.stubRequest.put("form_token", VALID_TOKEN);
+
         // Register a fake MailSenderPlugin in which we assert the "from" parameter for the mail sending call.
         this.oldcore.getSpyXWiki().getPluginManager().addPlugin("mailsender", TestableMailSenderPlugin.class.getName(),
             this.oldcore.getXWikiContext());
@@ -71,7 +101,15 @@ class ShareInlineTemplateTest extends PageTest
         TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         String result = templateManager.render("shareinline.vm");
 
-        assertTrue(result.contains("<div class=\"box infomessage\">core.viewers.share.send.success [john]</div>"));
+        assertTrue(result.trim().contains("""
+                <div class="box infomessage ">
+                    <span class="icon-block">infoIcon</span>
+                    <span class="sr-only">info</span>
+                    <div>
+                            core.viewers.share.send.success [john]
+                    </div>
+                  </div>"""),
+            String.format("Actual result is: %s", result));
     }
 
     @Test
@@ -86,14 +124,43 @@ class ShareInlineTemplateTest extends PageTest
         // The '@' is required in order to make it considered as a mail.
         this.request.put("target", "<strong>hello</strong>@");
 
+        // Simulate valid CSRF token
+        this.stubRequest.put("form_token", VALID_TOKEN);
+
         this.request.put("message", "Test message");
 
         TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
 
         Document document = Jsoup.parse(templateManager.render("shareinline.vm"));
 
-        assertEquals("error: core.viewers.share.send.error "
+        assertEquals("exclamationIcon error core.viewers.share.send.error "
                 + "[<strong>hello</strong>, core.viewers.share.error.serverError]",
             document.selectFirst(".errormessage").text());
+    }
+
+    @Test
+    void invalidCSRF() throws Exception
+    {
+        // Log in (since the template checks that a user is logged in)
+        this.oldcore.getXWikiContext().setUserReference(new DocumentReference("xwiki", "XWiki", "SomeUser"));
+
+        // Simulate that we're using the shareinline template to send the emails
+        this.stubRequest.put("send", "1");
+
+        this.stubRequest.put("message", "Test message");
+
+        TemplateManager templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
+
+        String result = templateManager.render("shareinline.vm");
+
+        assertTrue(result.trim().contains("""
+                <div class="box errormessage ">
+                    <span class="icon-block">exclamationIcon</span>
+                    <span class="sr-only">error</span>
+                    <div>
+                            core.viewers.share.error.invalidCSRF
+                    </div>
+                  </div>"""),
+            String.format("Actual result is: %s", result));
     }
 }

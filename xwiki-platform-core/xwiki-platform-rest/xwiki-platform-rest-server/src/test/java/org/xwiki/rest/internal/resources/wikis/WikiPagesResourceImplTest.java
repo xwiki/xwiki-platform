@@ -21,7 +21,6 @@ package org.xwiki.rest.internal.resources.wikis;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -33,7 +32,6 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -43,6 +41,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Pages;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -79,12 +78,15 @@ class WikiPagesResourceImplTest
     private QueryManager queryManager;
 
     @MockComponent
+    private SecurityConfiguration securityConfiguration;
+
+    @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @MockComponent
     @Named("context")
     private ComponentManager contextComponentManager;
-    
+
     @MockComponent
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
@@ -102,7 +104,7 @@ class WikiPagesResourceImplTest
 
     @BeforeEach
     void setUp(MockitoComponentManager componentManager)
-        throws ComponentLookupException, URISyntaxException, IllegalAccessException
+        throws Exception
     {
         Utils.setComponentManager(componentManager);
 
@@ -118,7 +120,9 @@ class WikiPagesResourceImplTest
         FieldUtils.writeField(this.wikiPagesResource, "uriInfo", this.uriInfo, true);
         Provider<XWikiContext> contextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         this.context = contextProvider.get();
-        when(this.context.getURLFactory()).thenReturn(urlFactory);
+        when(this.context.getURLFactory()).thenReturn(this.urlFactory);
+
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
     }
 
     @Test
@@ -132,7 +136,7 @@ class WikiPagesResourceImplTest
         int number = 3;
 
         Query mockQuery = mock(Query.class);
-        when(queryManager.createQuery(any(), eq(Query.XWQL))).thenReturn(mockQuery);
+        when(this.queryManager.createQuery(any(), eq(Query.XWQL))).thenReturn(mockQuery);
         when(mockQuery.setOffset(anyInt())).thenReturn(mockQuery);
         when(mockQuery.setLimit(anyInt())).thenReturn(mockQuery);
         when(mockQuery.setWiki(any())).thenReturn(mockQuery);
@@ -161,13 +165,13 @@ class WikiPagesResourceImplTest
         String doc1URI = "https://test/xwiki/bin/view/Space1/Doc1";
         URL doc1AbsoluteURL = new URL(doc1URI);
         String doc1RelativeURL = "/xwiki/bin/view/Space1/Doc1";
-        
+
         when(this.localEntityReferenceSerializer.serialize(doc1Ref)).thenReturn(doc1FullName);
         when(this.entityReferenceSerializer.serialize(doc1Ref)).thenReturn(doc1Id);
         when(mockDoc1.getSpace()).thenReturn(doc1Space);
         when(mockDoc1.getParent()).thenReturn(doc1Parent);
         when(mockDoc1.getTitle()).thenReturn(doc1Title);
-        when(this.urlFactory.createExternalURL(doc1Space,"Doc1","view", null, null,this.context))
+        when(this.urlFactory.createExternalURL(doc1Space, "Doc1", "view", null, null, this.context))
             .thenReturn(doc1AbsoluteURL);
         when(this.urlFactory.getURL(doc1AbsoluteURL, this.context)).thenReturn(doc1RelativeURL);
 
@@ -185,7 +189,7 @@ class WikiPagesResourceImplTest
         when(mockDoc3.getSpace()).thenReturn(doc3Space);
         when(mockDoc3.getParent()).thenReturn(doc3Parent);
         when(mockDoc3.getTitle()).thenReturn(doc3Title);
-        when(this.urlFactory.createExternalURL(doc3Space,"Doc3","view", null, null,this.context))
+        when(this.urlFactory.createExternalURL(doc3Space, "Doc3", "view", null, null, this.context))
             .thenReturn(doc3AbsoluteURL);
         when(this.urlFactory.getURL(doc3AbsoluteURL, this.context)).thenReturn(doc3RelativeURL);
 
@@ -199,7 +203,7 @@ class WikiPagesResourceImplTest
         assertEquals(doc1Space, doc1Summary.getSpace());
         assertEquals(doc1Title, doc1Summary.getTitle());
         assertEquals(doc1Parent, doc1Summary.getParent());
-        assertEquals(doc1Ref.getName(),doc1Summary.getName());
+        assertEquals(doc1Ref.getName(), doc1Summary.getName());
         assertEquals(wikiName, doc1Summary.getWiki());
         assertEquals(doc1AbsoluteURL.toString(), doc1Summary.getXwikiAbsoluteUrl());
         assertEquals(doc1RelativeURL, doc1Summary.getXwikiRelativeUrl());
@@ -210,7 +214,7 @@ class WikiPagesResourceImplTest
         assertEquals(doc3Space, doc3Summary.getSpace());
         assertEquals(doc3Title, doc3Summary.getTitle());
         assertEquals(doc3Parent, doc3Summary.getParent());
-        assertEquals(doc3Ref.getName(),doc3Summary.getName());
+        assertEquals(doc3Ref.getName(), doc3Summary.getName());
         assertEquals(wikiName, doc3Summary.getWiki());
         assertEquals(doc3AbsoluteURL.toString(), doc3Summary.getXwikiAbsoluteUrl());
         assertEquals(doc3RelativeURL, doc3Summary.getXwikiRelativeUrl());

@@ -19,7 +19,6 @@
  */
 package org.xwiki.realtime.wysiwyg.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -34,7 +33,6 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllIT
 {
     @Nested
-    @DisplayName("Realtime WYSIWYG Editor Tests")
     class NestedRealtimeWYSIWYGEditorIT extends RealtimeWYSIWYGEditorIT
     {
     }

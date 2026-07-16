@@ -20,7 +20,6 @@
 package org.xwiki.notifications.filters.event;
 
 import org.xwiki.observation.event.AbstractCancelableEvent;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event triggered when a user filter is about to be deleted, the event is sent with the following data:
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @since 15.10.2
  * @since 16.0.0RC1
  */
-@Unstable
 public class CleaningFilterEvent extends AbstractCancelableEvent
 {
     /**

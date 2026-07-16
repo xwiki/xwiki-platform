@@ -1,0 +1,129 @@
+/**
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+import { toCristalEntityReference } from "../model/reference/XWikiEntityReference";
+import { Container, inject, injectable } from "inversify";
+import { ref } from "vue";
+import type { XWikiMeta } from "../meta/XWikiMeta";
+import type { PageData } from "@xwiki/platform-api";
+import type {
+  DocumentChange,
+  DocumentService,
+} from "@xwiki/platform-document-api";
+import type { DocumentReference } from "@xwiki/platform-model-api";
+import type { Ref } from "vue";
+
+@injectable("Singleton")
+export class DefaultDocumentService implements DocumentService {
+  public static bind(container: Container): void {
+    container
+      .bind("DocumentService")
+      .to(DefaultDocumentService)
+      .inSingletonScope();
+  }
+
+  constructor(@inject("XWikiMeta") private readonly xwikiMeta: XWikiMeta) {}
+
+  public getCurrentDocument(): Ref<PageData | undefined> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  public getCurrentDocumentReference(): Ref<DocumentReference | undefined> {
+    const documentReference = toCristalEntityReference(
+      XWiki.currentDocument.documentReference,
+    ) as DocumentReference;
+    documentReference.locale = this.xwikiMeta.locale;
+    return ref(documentReference);
+  }
+
+  public getCurrentDocumentReferenceString(): Ref<string | undefined> {
+    return ref(XWiki.Model.serialize(XWiki.currentDocument.documentReference));
+  }
+
+  public getCurrentDocumentRevision(): Ref<string | undefined> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  public getCurrentDocumentAction(): Ref<string | undefined> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  public getDisplayTitle(): Ref<string> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  public getTitle(): Ref<string | undefined> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  public isLoading(): Ref<boolean> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  public getError(): Ref<Error | undefined> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  public setCurrentDocument(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    documentReference: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    revision?: string,
+  ): Promise<void> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  public refreshCurrentDocument(): Promise<void> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  public registerDocumentChangeListener(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    change: DocumentChange,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    listener: (page: DocumentReference) => Promise<void>,
+  ): void {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  public notifyDocumentChange(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    change: DocumentChange,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    page: DocumentReference,
+  ): Promise<void> {
+    // TODO
+    throw new Error("Method not implemented.");
+  }
+
+  removeDocumentChangeListener(): void {
+    // TODO implement along with registerDocumentChangeListener
+    throw new Error("Method not implemented.");
+  }
+}

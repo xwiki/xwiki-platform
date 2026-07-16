@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -201,10 +202,10 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
         StringBuilder url = new StringBuilder(context.getWiki().getSkinFile(filename, forceSkinAction, context));
         if (forceSkinAction) {
             String parameters =
-                StringUtils.removeStart(parametersAsQueryString(filename, context), PARAMETER_SEPARATOR);
+                Strings.CS.removeStart(parametersAsQueryString(filename, context), PARAMETER_SEPARATOR);
             if (!StringUtils.isEmpty(parameters)) {
                 String queryParamDelimiter =
-                    StringUtils.contains(url, QUERY_PARAMETER_DELIMITER) ? PARAMETER_SEPARATOR
+                    Strings.CS.contains(url, QUERY_PARAMETER_DELIMITER) ? PARAMETER_SEPARATOR
                         : QUERY_PARAMETER_DELIMITER;
                 url.append(queryParamDelimiter).append(parameters);
             }
@@ -321,7 +322,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     {
         StringBuilder result = new StringBuilder();
         // Using LinkedHashSet to preserve the extensions order.
-        Set<String> extensions = new LinkedHashSet<String>();
+        Set<String> extensions = new LinkedHashSet<>();
         // First, we add to the import string the extensions that should always be used.
         // TODO Global extensions should be able to select a set of actions for which they are enabled.
         extensions.addAll(getAlwaysUsedExtensions(context));
@@ -442,15 +443,14 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
         // Using an XML comment is pretty safe, as extensions probably wouldn't work in other type
         // of documents, like RTF, CSV or JSON.
         String hook = "<!-- " + this.getClass().getCanonicalName() + " -->";
-        String result = content.replaceFirst(hook, getImportString(context));
-        return result;
+        return content.replaceFirst(hook, getImportString(context));
     }
 
     @Override
     public UsedExtension getCacheResources(XWikiContext context)
     {
         return new CachedItem.UsedExtension(getPulledResources(context),
-            new HashMap<String, Map<String, Object>>(getParametersMap(context)));
+            new HashMap<>(getParametersMap(context)));
     }
 
     @Override

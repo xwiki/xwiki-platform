@@ -43,13 +43,11 @@
   #set($finished = $jobStatus.state.name() == 'FINISHED')
   #if ($finished)
     #if (!$jobStatus.logTail.hasLogLevel('ERROR'))
-      &lt;div class="box successmessage"&gt;
-        Done.
-      &lt;/div&gt;
+      ## Remove when the following issue is resolved:
+      ## TODO XWIKI-22710: Add translations for FilterStreamJobJSON
+      #success('Done.')
     #else
-      &lt;div class="box errormessage"&gt;
-        Error has been found during the conversion !
-      &lt;/div&gt;
+      #error('Error has been found during the conversion !')
     #end
   #end
 #end

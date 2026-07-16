@@ -21,10 +21,11 @@ package org.xwiki.wiki.internal.manager;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.configuration.WikiConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -35,8 +36,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -44,15 +47,23 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class DefaultWikiCreatorTest
+@ComponentTest
+class DefaultWikiCreatorTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultWikiCreator> mocker =
-            new MockitoComponentMockingRule(DefaultWikiCreator.class);
+    @InjectMockComponents
+    private DefaultWikiCreator defaultWikiCreator;
 
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
+
+    @MockComponent
+    private WikiDescriptorBuilder wikiDescriptorBuilder;
+
+    @MockComponent
+    private WikiConfiguration wikiConfiguration;
 
     private XWikiContext xcontext;
 
@@ -60,77 +71,70 @@ public class DefaultWikiCreatorTest
 
     private XWikiStoreInterface store;
 
-    private WikiDescriptorBuilder wikiDescriptorBuilder;
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(com.xpn.xwiki.XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
-        store = mock(XWikiStoreInterface.class);
-        when(xwiki.getStore()).thenReturn(store);
-        wikiDescriptorBuilder = mocker.getInstance(WikiDescriptorBuilder.class);
+        this.xcontext = mock(XWikiContext.class);
+        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
+        this.xwiki = mock(com.xpn.xwiki.XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+        this.store = mock(XWikiStoreInterface.class);
+        when(this.xwiki.getStore()).thenReturn(this.store);
     }
 
     @Test
-    public void create() throws Exception
+    void create() throws Exception
     {
-        WikiConfiguration wikiConfiguration = mocker.getInstance(WikiConfiguration.class);
-        when(wikiConfiguration.shouldCreateDatabase()).thenReturn(true);
+        when(this.wikiConfiguration.shouldCreateDatabase()).thenReturn(true);
 
         // Other mocks
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1", "owner");
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
-        when(wikiDescriptorBuilder.save(eq(descriptor))).thenReturn(descriptorDocument);
-        when(wikiDescriptorManager.getById("wikiid1")).thenReturn(descriptor);
-        when(store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
+        when(this.wikiDescriptorBuilder.save(eq(descriptor))).thenReturn(descriptorDocument);
+        when(this.wikiDescriptorManager.getById("wikiid1")).thenReturn(descriptor);
+        when(this.store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
 
         // Create
-        WikiDescriptor newWikiDescriptor = this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1", "owner");
+        WikiDescriptor newWikiDescriptor = this.defaultWikiCreator.create("wikiid1", "wikialias1", "owner");
         assertNotNull(newWikiDescriptor);
 
         // Verify that the wiki descriptor is an instance of DefaultWikiDescriptor
         assertTrue(newWikiDescriptor instanceof DefaultWikiDescriptor);
         // Verify that the wiki has been created
-        verify(store).createWiki(eq("wikiid1"), any(XWikiContext.class));
+        verify(this.store).createWiki(eq("wikiid1"), any(XWikiContext.class));
         // Verify that the wiki has been updated
-        verify(xwiki).initializeWiki(eq("wikiid1"), eq(true), any(XWikiContext.class));
+        verify(this.xwiki).initializeWiki(eq("wikiid1"), eq(true), any(XWikiContext.class));
         // Verify that the descriptor document has been saved
-        verify(wikiDescriptorBuilder).save(eq(descriptor));
+        verify(this.wikiDescriptorBuilder).save(eq(descriptor));
         // Verify that the descriptor has been reloaded after being saved
-        assertTrue(descriptor == newWikiDescriptor);
+        assertSame(descriptor, newWikiDescriptor);
     }
 
     @Test
-    public void createWhenSkippingDatabaseCreation() throws Exception
+    void createWhenSkippingDatabaseCreation() throws Exception
     {
-        WikiConfiguration wikiConfiguration = mocker.getInstance(WikiConfiguration.class);
-        when(wikiConfiguration.shouldCreateDatabase()).thenReturn(false);
+        when(this.wikiConfiguration.shouldCreateDatabase()).thenReturn(false);
 
         // Other mocks
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1", "owner");
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
-        when(wikiDescriptorBuilder.save(eq(descriptor))).thenReturn(descriptorDocument);
-        when(wikiDescriptorManager.getById("wikiid1")).thenReturn(descriptor);
-        when(store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
+        when(this.wikiDescriptorBuilder.save(eq(descriptor))).thenReturn(descriptorDocument);
+        when(this.wikiDescriptorManager.getById("wikiid1")).thenReturn(descriptor);
+        when(this.store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
 
         // Create
-        WikiDescriptor newWikiDescriptor = this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1", "owner");
+        WikiDescriptor newWikiDescriptor = this.defaultWikiCreator.create("wikiid1", "wikialias1", "owner");
         assertNotNull(newWikiDescriptor);
 
         // Verify that the wiki descriptor is an instance of DefaultWikiDescriptor
-        assertTrue(newWikiDescriptor instanceof DefaultWikiDescriptor);
+        assertInstanceOf(DefaultWikiDescriptor.class, newWikiDescriptor);
         // Verify that the DB has not been created
-        verify(store, never()).createWiki(eq("wikiid1"), any(XWikiContext.class));
+        verify(this.store, never()).createWiki(eq("wikiid1"), any(XWikiContext.class));
         // Verify that the wiki has been updated
-        verify(xwiki).initializeWiki(eq("wikiid1"), eq(true), any(XWikiContext.class));
+        verify(this.xwiki).initializeWiki(eq("wikiid1"), eq(true), any(XWikiContext.class));
         // Verify that the descriptor document has been saved
-        verify(wikiDescriptorBuilder).save(eq(descriptor));
+        verify(this.wikiDescriptorBuilder).save(eq(descriptor));
         // Verify that the descriptor has been reloaded after being saved
-        assertTrue(descriptor == newWikiDescriptor);
+        assertSame(descriptor, newWikiDescriptor);
     }
 }

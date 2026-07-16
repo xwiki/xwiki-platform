@@ -64,7 +64,7 @@ import static org.mockito.Mockito.when;
     SearchSuggestSourceObjectEvaluator.class,
     TestNoScriptMacro.class,
 })
-public class SearchSuggestConfigSheetPageTest extends PageTest
+class SearchSuggestConfigSheetPageTest extends PageTest
 {
     private static final String WIKI_NAME = "xwiki";
 

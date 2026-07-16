@@ -37,13 +37,16 @@ import org.xwiki.component.annotation.Component;
 @Singleton
 public class ChildPageFilter extends AbstractNestedPageFilter
 {
+    @Override
     protected String filterNestedPagesStatement(String statement)
     {
         // The constraint is different depending on whether we filter a native SQL query or an HQL query.
-        String constraint = statement.indexOf("XWS_REFERENCE") < 0 ? "parent = :parent " : "XWS_PARENT = :parent ";
+        String constraint =
+            statement.indexOf("XWS_REFERENCE") < 0 ? "space.parent = :parent " : "XWS_PARENT = :parent ";
         return insertWhereConstraint(statement, constraint);
     }
 
+    @Override
     protected String filterTerminalPagesStatement(String statement)
     {
         return statement + " and doc.XWD_WEB = :parent ";

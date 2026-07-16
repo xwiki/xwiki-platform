@@ -128,8 +128,7 @@ public class TagNotificationFilter implements NotificationFilter
     private String findCurrentWiki(Collection<NotificationFilterPreference> filterPreferences)
     {
         for (NotificationFilterPreference nfp : filterPreferences) {
-            if (nfp.isEnabled() && nfp instanceof TagNotificationFilterPreference) {
-                TagNotificationFilterPreference pref = (TagNotificationFilterPreference) nfp;
+            if (nfp.isEnabled() && nfp instanceof TagNotificationFilterPreference pref) {
                 return pref.getCurrentWiki();
             }
         }

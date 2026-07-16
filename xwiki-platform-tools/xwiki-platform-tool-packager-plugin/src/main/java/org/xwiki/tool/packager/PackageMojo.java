@@ -78,6 +78,10 @@ import com.xpn.xwiki.tool.backup.Importer;
 @Mojo(name = "package", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.RUNTIME, requiresProject = true, threadSafe = true)
 public class PackageMojo extends AbstractOldCoreMojo
 {
+    private static final String PLATFORM_GROUPID = "org.xwiki.platform";
+
+    private static final String DISTRIBUTION_WAR_ID = "xwiki-platform-web-war";
+
     /**
      * The directory where to create the packaging.
      */
@@ -210,7 +214,7 @@ public class PackageMojo extends AbstractOldCoreMojo
             File warDirectory = new File(this.webappsDirectory, getContextPath(warArtifact));
             unzip(warArtifact.getFile(), warDirectory);
             // Only generate the extension.xed descriptor for the distribution war
-            if (warArtifact.getArtifactId().equals("xwiki-platform-web-war")) {
+            if (warArtifact.getArtifactId().equals(DISTRIBUTION_WAR_ID)) {
                 generateDistributionXED(warDirectory, warArtifact);
             }
         }
@@ -271,7 +275,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         if (this.test) {
             String property = System.getProperty("skipTests");
 
-            return property != null && Boolean.valueOf(property);
+            return Boolean.parseBoolean(property);
         } else {
             return false;
         }
@@ -291,9 +295,9 @@ public class PackageMojo extends AbstractOldCoreMojo
             getLog().info(String.format("  Replacing variables in [%s]...", startFile));
             try {
                 String content = org.apache.commons.io.FileUtils.readFileToString(startFile, StandardCharsets.UTF_8);
-                OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(startFile));
-                writer.write(replaceProperty(content, velocityContext));
-                writer.close();
+                try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(startFile))) {
+                    writer.write(replaceProperty(content, velocityContext));
+                }
             } catch (Exception e) {
                 // Failed to read or write file...
                 throw new MojoExecutionException(String.format("Failed to process start shell script [%s]", startFile),
@@ -307,7 +311,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         String result = content;
         for (Object key : velocityContext.getKeys()) {
             Object value = velocityContext.get(key.toString());
-            result = StringUtils.replace(result, String.format("${%s}", key.toString()), value.toString());
+            result = StringUtils.replace(result, String.format("${%s}", key), value.toString());
         }
         return result;
     }
@@ -366,7 +370,7 @@ public class PackageMojo extends AbstractOldCoreMojo
     private void generateConfigurationFiles(File configurationFileTargetDirectory) throws MojoExecutionException
     {
         VelocityContext context = createVelocityContext();
-        Artifact configurationResourcesArtifact = this.repositorySystem.createArtifact("org.xwiki.platform",
+        Artifact configurationResourcesArtifact = this.repositorySystem.createArtifact(PLATFORM_GROUPID,
             "xwiki-platform-tool-configuration-resources", getXWikiPlatformVersion(), "", "jar");
         resolveArtifact(configurationResourcesArtifact);
 
@@ -375,18 +379,20 @@ public class PackageMojo extends AbstractOldCoreMojo
         // Since the jar comes from a trusted source, there is no risk of "zip slip" attack. Consequently, the
         // entries of the jar do not need to be validated.
         try (JarInputStream jarInputStream =
-            new JarInputStream(new FileInputStream(configurationResourcesArtifact.getFile()))) {
+            new JarInputStream(new FileInputStream(configurationResourcesArtifact.getFile())))
+        {
             JarEntry entry;
             while ((entry = jarInputStream.getNextJarEntry()) != null) {
                 if (entry.getName().endsWith(".vm")) {
                     String fileName = entry.getName().replace(".vm", "");
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
-                    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile));
-                    getLog().info("Writing config file: " + outputFile);
-                    // Note: Init is done once even if this method is called several times...
-                    Velocity.init();
-                    Velocity.evaluate(context, writer, "", IOUtils.toString(jarInputStream, StandardCharsets.UTF_8));
-                    writer.close();
+                    try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(outputFile))) {
+                        getLog().info("Writing config file: " + outputFile);
+                        // Note: Init is done once even if this method is called several times...
+                        Velocity.init();
+                        Velocity.evaluate(context, writer, "", IOUtils.toString(jarInputStream,
+                            StandardCharsets.UTF_8));
+                    }
                     jarInputStream.closeEntry();
                 }
             }
@@ -498,7 +504,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         // If the Jetty artifact wasn't defined, try to resolve the default Jetty artifact
         if (jettyArtifact == null) {
-            jettyArtifact = this.repositorySystem.createArtifact("org.xwiki.platform",
+            jettyArtifact = this.repositorySystem.createArtifact(PLATFORM_GROUPID,
                 "xwiki-platform-tool-jetty-resources", getXWikiPlatformVersion(), "", "zip");
         }
 
@@ -525,9 +531,9 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         // If there are no WAR artifacts specified in the list of dependencies then use the default WAR artifacts.
         if (warArtifacts.isEmpty()) {
-            warArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform", "xwiki-platform-web-war",
+            warArtifacts.add(this.repositorySystem.createArtifact(PLATFORM_GROUPID, DISTRIBUTION_WAR_ID,
                 getXWikiPlatformVersion(), "", "war"));
-            warArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            warArtifacts.add(this.repositorySystem.createArtifact(PLATFORM_GROUPID,
                 "xwiki-platform-tool-rootwebapp", getXWikiPlatformVersion(), "", "war"));
         }
 
@@ -544,7 +550,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         if (contextPath == null) {
             // Should we put this as default "contextPathMapping" configuration in a parent POM? (and rely on
             // configuration merging)
-            if (warArtifact.getArtifactId().equals("xwiki-platform-web-war")) {
+            if (warArtifact.getArtifactId().equals(DISTRIBUTION_WAR_ID)) {
                 contextPath = "xwiki";
             } else if (warArtifact.getArtifactId().equals("xwiki-platform-tool-rootwebapp")) {
                 contextPath = "root";
@@ -572,7 +578,7 @@ public class PackageMojo extends AbstractOldCoreMojo
                 skinArtifacts.add(resolveArtifactItem(skinArtifactItem));
             }
         } else {
-            Artifact defaultSkin = resolveArtifact("org.xwiki.platform", "xwiki-platform-flamingo-skin-resources",
+            Artifact defaultSkin = resolveArtifact(PLATFORM_GROUPID, "xwiki-platform-flamingo-skin-resources",
                 getXWikiPlatformVersion(), "jar");
             skinArtifacts.add(defaultSkin);
         }
@@ -608,13 +614,13 @@ public class PackageMojo extends AbstractOldCoreMojo
     {
         Set<Artifact> mandatoryTopLevelArtifacts = new HashSet<>();
 
-        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact(PLATFORM_GROUPID,
             "xwiki-platform-minimaldependencies", getXWikiPlatformVersion(), null, "pom"));
 
         // Add a special JAR used for functional tests to discover if some scripts in some wiki page require Programming
         // Rights.
         if (this.test && !isSkipTests() && this.testProgrammingRights) {
-            mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact(PLATFORM_GROUPID,
                 "xwiki-platform-test-checker", getXWikiPlatformVersion(), null, "jar"));
         }
 
@@ -641,7 +647,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         ArtifactResolutionResult resolutionResult = this.repositorySystem.resolve(request);
         if (resolutionResult.hasExceptions()) {
             throw new MojoExecutionException(String.format("Failed to resolve artifacts [%s]", artifacts),
-                resolutionResult.getExceptions().get(0));
+                resolutionResult.getExceptions().getFirst());
         }
 
         return resolutionResult.getArtifacts();
@@ -665,7 +671,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
     private MavenProject getPlatformPOMProject() throws MojoExecutionException
     {
-        return this.extensionHelper.getMavenProject(this.repositorySystem.createProjectArtifact("org.xwiki.platform",
+        return this.extensionHelper.getMavenProject(this.repositorySystem.createProjectArtifact(PLATFORM_GROUPID,
             "xwiki-platform-core", getXWikiPlatformVersion()));
     }
 
@@ -755,7 +761,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         ArtifactResolutionResult resolutionResult = this.repositorySystem.resolve(request);
         if (resolutionResult.hasExceptions()) {
             throw new MojoExecutionException(String.format("Failed to resolve artifact [%s]", artifact),
-                resolutionResult.getExceptions().get(0));
+                resolutionResult.getExceptions().getFirst());
         }
     }
 
@@ -769,11 +775,10 @@ public class PackageMojo extends AbstractOldCoreMojo
 
     private VelocityContext createVelocityContext()
     {
-        Map<String, Object> properties = new HashMap<>();
-        properties.putAll(getDefaultConfigurationProperties());
+        Map<String, Object> properties = new HashMap<>(getDefaultConfigurationProperties());
         final Properties projectProperties = this.project.getProperties();
-        for (Object key : projectProperties.keySet()) {
-            properties.put(key.toString(), projectProperties.get(key).toString());
+        for (Map.Entry<Object, Object> entry : projectProperties.entrySet()) {
+            properties.put(entry.getKey().toString(), entry.getValue().toString());
         }
 
         VelocityContext context = new VelocityContext(properties);

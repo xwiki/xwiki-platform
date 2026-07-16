@@ -107,7 +107,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     private SecurityReference aMissingWikiRef;
 
     @BeforeComponent
-    public void configureCacheManager() throws CacheException
+    void configureCacheManager() throws CacheException
     {
         if (this.cache == null) {
             this.cache = new TestCache<>();
@@ -116,7 +116,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     }
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure()
     {
         when(this.xWikiBridge.getMainWikiReference()).thenReturn(new WikiReference("xwiki"));
         when(this.xWikiBridge.toCompatibleEntityReference(any(EntityReference.class)))
@@ -166,13 +166,14 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         WikiReference userWiki = entry.getUserReference().getWikiReference().getOriginalWikiReference();
         if (!Objects.equals(entityWiki, userWiki)) {
             if (entry.getUserReference().isGlobal()) {
-                securityCache.add(entry, factory.newEntityReference(entityWiki));
+                securityCache.add(entry, factory.newEntityReference(entityWiki),
+                    securityCache.getInvalidationCounter());
                 return cache.getLastInsertedKey();
             } else {
                 return null;
             }
         } else {
-            securityCache.add(entry);
+            securityCache.add(entry, securityCache.getInvalidationCounter());
             return cache.getLastInsertedKey();
         }
     }
@@ -180,7 +181,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     private String AddUserEntry(SecurityRuleEntry entry, Collection<GroupSecurityReference> groups)
         throws ParentEntryEvictedException, ConflictingInsertionException
     {
-        securityCache.add(entry, groups);
+        securityCache.add(entry, groups, securityCache.getInvalidationCounter());
         return cache.getLastInsertedKey();
     }
 
@@ -188,20 +189,19 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         throws ParentEntryEvictedException, ConflictingInsertionException
     {
         if (groupUserRefs.contains(entry.getReference())) {
-            final List<GroupSecurityReference> groups = new ArrayList<GroupSecurityReference>();
+            final List<GroupSecurityReference> groups = new ArrayList<>();
             for (GroupSecurityReference group : groupRefs.keySet()) {
-                if (groupRefs.get(group).contains(entry.getReference())) {
-                    if (group.getOriginalReference().getWikiReference()
+                if (groupRefs.get(group).contains(entry.getReference())
+                    && group.getOriginalReference().getWikiReference()
                         .equals(entry.getReference().getOriginalDocumentReference().getWikiReference())) {
-                        groups.add(group);
-                    }
+                    groups.add(group);
                 }
             }
             AddUserEntry(entry, groups);
         } else if (userRefs.contains(entry.getReference())) {
             AddUserEntry(entry, null);
         } else {
-            securityCache.add(entry);
+            securityCache.add(entry, securityCache.getInvalidationCounter());
         }
         return cache.getLastInsertedKey();
     }
@@ -210,20 +210,18 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         throws ParentEntryEvictedException, ConflictingInsertionException
     {
         if (groupUserRefs.contains(user.getReference())) {
-            final List<GroupSecurityReference> groups = new ArrayList<GroupSecurityReference>();
+            final List<GroupSecurityReference> groups = new ArrayList<>();
             for (GroupSecurityReference group : groupRefs.keySet()) {
-                if (groupRefs.get(group).contains(user.getReference())) {
-                    if (group.getOriginalReference().getWikiReference()
+                if (groupRefs.get(group).contains(user.getReference())
+                    && (group.getOriginalReference().getWikiReference()
                         .equals(user.getWikiReference().getOriginalWikiReference())
-                        || group.isGlobal())
-                    {
-                        groups.add(group);
-                    }
+                        || group.isGlobal())) {
+                    groups.add(group);
                 }
             }
-            securityCache.add(user, groups);
+            securityCache.add(user, groups, securityCache.getInvalidationCounter());
         } else {
-            securityCache.add(user, null);
+            securityCache.add(user, null, securityCache.getInvalidationCounter());
         }
         return cache.getLastInsertedKey();
     }
@@ -231,7 +229,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     private Map<String, SecurityEntry> InsertUsersWithouShadow()
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
-        Map<String, SecurityEntry> entries = new HashMap<String, SecurityEntry>();
+        Map<String, SecurityEntry> entries = new HashMap<>();
 
         // Add wikis
         for (SecurityReference ref : wikiRefs) {
@@ -306,7 +304,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     private Map<String, SecurityEntry> InsertEntities()
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
-        Map<String, SecurityEntry> entries = new HashMap<String, SecurityEntry>();
+        Map<String, SecurityEntry> entries = new HashMap<>();
 
         for (SecurityReference ref : entityRefs) {
             if (securityCache.get(ref) == null) {
@@ -320,7 +318,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
     private Map<String, SecurityEntry> InsertAccess() throws ConflictingInsertionException, ParentEntryEvictedException
     {
-        Map<String, SecurityEntry> entries = new HashMap<String, SecurityEntry>();
+        Map<String, SecurityEntry> entries = new HashMap<>();
 
         // Insert access for simple users
         for (UserSecurityReference user : userRefs) {
@@ -424,11 +422,13 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(docRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return entry.getReference() != docRef;
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return entry.getReference() != docRef;
@@ -439,11 +439,13 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(anotherWikiUserRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return entry.getReference() != anotherWikiUserRef;
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return entry.getUserReference() != anotherWikiUserRef;
@@ -454,16 +456,19 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(anotherGroupXUserRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return entry.getReference() != anotherGroupXUserRef;
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return entry.getUserReference() != anotherGroupXUserRef;
             }
 
+            @Override
             public boolean keepShadow(SecurityShadowEntry entry)
             {
                 return entry.getReference() != anotherGroupXUserRef;
@@ -474,6 +479,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(groupRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return (entry.getReference() != groupRef && (!groupRefs.get(groupRef).contains(entry.getReference())
@@ -481,12 +487,14 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
                         .getOriginalWikiReference()));
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return (!groupRefs.get(groupRef).contains(entry.getUserReference()) || entry.getReference()
                     .getOriginalReference().extractReference(EntityType.WIKI) != wikiRef.getOriginalWikiReference());
             }
 
+            @Override
             public boolean keepShadow(SecurityShadowEntry entry)
             {
                 return (!groupRefs.get(groupRef).contains(entry.getReference()) || entry.getWikiReference() != wikiRef);
@@ -497,12 +505,14 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(spaceRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return (entry.getReference().getOriginalReference().extractReference(EntityType.SPACE) != spaceRef
                     .getOriginalSpaceReference());
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return (entry.getReference().getOriginalReference().extractReference(EntityType.SPACE) != spaceRef
@@ -514,18 +524,21 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(wikiRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return (entry.getReference().getOriginalReference().extractReference(EntityType.WIKI) != wikiRef
                     .getOriginalWikiReference());
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return (entry.getReference().getOriginalReference().extractReference(EntityType.WIKI) != wikiRef
                     .getOriginalWikiReference());
             }
 
+            @Override
             public boolean keepShadow(SecurityShadowEntry entry)
             {
                 return (entry.getWikiReference() != wikiRef);
@@ -537,16 +550,19 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(xwikiRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return false;
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return false;
             }
 
+            @Override
             public boolean keepShadow(SecurityShadowEntry entry)
             {
                 return false;
@@ -558,7 +574,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     @Test
     void testAddSecurityRuleEntry() throws Exception
     {
-        final List<SecurityRuleEntry> ruleEntries = new ArrayList<SecurityRuleEntry>();
+        final List<SecurityRuleEntry> ruleEntries = new ArrayList<>();
 
         // Insert and check insertion individually
         for (SecurityReference ref : entityRefs) {
@@ -608,16 +624,16 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
         // Check a non-conflicting duplicate insertion
         try {
-            AddRuleEntry(ruleEntries.get(0));
+            AddRuleEntry(ruleEntries.getFirst());
         } catch (ConflictingInsertionException e) {
             fail("Inserting the same rule entry twice should NOT throw a ConflictingInsertionException.");
         }
 
         // Check a conflicting duplicate insertion
         try {
-            final SecurityReference ref = ruleEntries.get(0).getReference();
+            final SecurityReference ref = ruleEntries.getFirst().getReference();
             SecurityRuleEntry entry =
-                mock(SecurityRuleEntry.class, "Another entry for " + ruleEntries.get(0).getReference().toString());
+                mock(SecurityRuleEntry.class, "Another entry for " + ruleEntries.getFirst().getReference().toString());
             when(entry.getReference()).thenReturn(ref);
 
             AddRuleEntry(entry);
@@ -649,14 +665,14 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     {
         InsertUsersWithouShadow();
 
-        final List<SecurityShadowEntry> allEntries = new ArrayList<SecurityShadowEntry>();
+        final List<SecurityShadowEntry> allEntries = new ArrayList<>();
 
         // Check inserting shadow users
         for (UserSecurityReference ref : userRefs) {
             if (ref.isGlobal()) {
                 for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
-                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance((SecurityEntry) entry));
+                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance(entry));
                     allEntries.add(entry);
                 }
             }
@@ -667,7 +683,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             if (ref.isGlobal()) {
                 for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
-                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance((SecurityEntry) entry));
+                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance(entry));
                     allEntries.add(entry);
                 }
             }
@@ -678,7 +694,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
             if (ref.isGlobal()) {
                 for (SecurityReference wiki : Arrays.asList(wikiRef, anotherWikiRef)) {
                     SecurityShadowEntry entry = mockSecurityShadowEntry(ref, wiki);
-                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance((SecurityEntry) entry));
+                    assertThat(securityCache.get(AddUserEntry(entry)), sameInstance(entry));
                     allEntries.add(entry);
                 }
             }
@@ -711,12 +727,12 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     }
 
     @Test
-    public void testAddSecurityAccessEntry() throws Exception
+    void testAddSecurityAccessEntry() throws Exception
     {
         InsertUsers();
         InsertEntities();
 
-        final List<SecurityAccessEntry> allEntries = new ArrayList<SecurityAccessEntry>();
+        final List<SecurityAccessEntry> allEntries = new ArrayList<>();
 
         // Insert and check insertion individually for simple users
         for (UserSecurityReference user : userRefs) {
@@ -756,11 +772,11 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
         // Check a conflicting duplicate insertion
         try {
-            final SecurityReference ref = allEntries.get(0).getReference();
-            final UserSecurityReference user = allEntries.get(0).getUserReference();
-            SecurityAccessEntry entry =
-                mock(SecurityAccessEntry.class, "Another access for " + allEntries.get(0).getUserReference().toString()
-                    + " on " + allEntries.get(0).getReference().toString());
+            final SecurityReference ref = allEntries.getFirst().getReference();
+            final UserSecurityReference user = allEntries.getFirst().getUserReference();
+            SecurityAccessEntry entry = mock(SecurityAccessEntry.class,
+                "Another access for " + allEntries.getFirst().getUserReference().toString()
+                    + " on " + allEntries.getFirst().getReference().toString());
             when(entry.getUserReference()).thenReturn(user);
             when(entry.getReference()).thenReturn(ref);
 
@@ -833,6 +849,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return entry.getReference() != docRef || entry.getUserReference() != userRef;
@@ -852,6 +869,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         securityCache.remove(userRef, docRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return entry.getReference() != docRef || entry.getUserReference() != userRef;
@@ -862,15 +880,18 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     @Test
     void testKeyCollisions() throws Exception
     {
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)));
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new WikiReference("wiki"))));
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "page1"))));
+        long invalidationCounter = this.securityCache.getInvalidationCounter();
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)), invalidationCounter);
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new WikiReference("wiki"))),
+            invalidationCounter);
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "page1"))),
+            invalidationCounter);
 
         SecurityReference spaceReference = newEntityReference(new SpaceReference("wiki", "page1", "page2"));
         SecurityRuleEntry page1Space = mockSecurityRuleEntry(spaceReference);
 
         // Add a cache entry associated to SPACE wiki:page1.page2
-        this.securityCache.add(page1Space);
+        this.securityCache.add(page1Space, invalidationCounter);
 
         assertSame(page1Space, this.securityCache.get(spaceReference));
 
@@ -881,7 +902,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         SecurityRuleEntry page1Document = mockSecurityRuleEntry(documentReference);
 
         // Add a cache entry associated to DOCUMENT wiki:page1.page2
-        this.securityCache.add(page1Document);
+        this.securityCache.add(page1Document, invalidationCounter);
 
         assertSame(page1Space, this.securityCache.get(spaceReference));
         assertSame(page1Document, this.securityCache.get(documentReference));
@@ -890,17 +911,20 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     @Test
     void testRejectAccessEntryWithNonUserParent() throws Exception
     {
+        long invalidationCounter = this.securityCache.getInvalidationCounter();
         // Insert the hierarchy for the user into the cache, but not as user.
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)));
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new WikiReference("wiki"))));
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "XWiki"))));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)), invalidationCounter);
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new WikiReference("wiki"))),
+            invalidationCounter);
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "XWiki"))),
+            invalidationCounter);
         DocumentReference userDocRef = new DocumentReference("wiki", "XWiki", "nonUserParent");
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(userDocRef)));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(userDocRef)), invalidationCounter);
         UserSecurityReference userSecurityReference = newUserReference(userDocRef);
 
         DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "page1");
         SecurityReference documentSecurityReference = newEntityReference(documentReference);
-        this.securityCache.add(mockSecurityRuleEntry(documentSecurityReference));
+        this.securityCache.add(mockSecurityRuleEntry(documentSecurityReference), invalidationCounter);
 
         // Create an access entry with the user with non-user parent
         SecurityAccessEntry entry = mockSecurityAccessEntry(documentSecurityReference, userSecurityReference);
@@ -917,21 +941,24 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     @Test
     void testRejectUserEntryWithNonGroupGroup() throws Exception
     {
+        long invalidationCounter = this.securityCache.getInvalidationCounter();
         // Insert the hierarchy for the group and the user into the cache.
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)));
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new WikiReference("wiki"))));
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "XWiki"))));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)), invalidationCounter);
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new WikiReference("wiki"))),
+            invalidationCounter);
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "XWiki"))),
+            invalidationCounter);
 
         // Insert the group entry but as regular document.
         DocumentReference groupDocRef = new DocumentReference("wiki", "XWiki", "group");
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(groupDocRef)));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(groupDocRef)), invalidationCounter);
         GroupSecurityReference groupSecurityReference = newGroupReference(groupDocRef);
 
         // Insert the user as user entry.
         DocumentReference userDocRef = new DocumentReference("wiki", "XWiki", "user");
         ParentEntryEvictedException exception = assertThrows(ParentEntryEvictedException.class, () ->
             this.securityCache.add(mockSecurityRuleEntry(newUserReference(userDocRef)),
-                Collections.singleton(groupSecurityReference)));
+                Collections.singleton(groupSecurityReference), invalidationCounter));
         assertEquals("The parent [Rules for Document wiki:XWiki.group] is not a group entry.",
             exception.getMessage());
     }
@@ -939,13 +966,16 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     @Test
     void testAcceptsMainWikiAsUserParent() throws Exception
     {
-        // Insert the main wiki entry into the cache, but not as user.
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)));
+        long invalidationCounter = this.securityCache.getInvalidationCounter();
 
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("xwiki", "XWiki"))));
+        // Insert the main wiki entry into the cache, but not as user.
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)), invalidationCounter);
+
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("xwiki", "XWiki"))),
+            invalidationCounter);
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "page1");
         SecurityReference documentSecurityReference = newEntityReference(documentReference);
-        this.securityCache.add(mockSecurityRuleEntry(documentSecurityReference));
+        this.securityCache.add(mockSecurityRuleEntry(documentSecurityReference), invalidationCounter);
 
         // Create an access entry with the user
         UserSecurityReference userSecurityReference = newUserReference(null);
@@ -961,18 +991,22 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     @Test
     void testAcceptsMainWikiShadowAsUserParent() throws Exception
     {
+        long invalidationCounter = this.securityCache.getInvalidationCounter();
+
         // Insert the main wiki entry into the cache, but not as user.
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(null)), invalidationCounter);
         SecurityReference subWikiReference = newEntityReference(new WikiReference("wiki"));
-        this.securityCache.add(mockSecurityRuleEntry(subWikiReference));
+        this.securityCache.add(mockSecurityRuleEntry(subWikiReference), invalidationCounter);
         // Insert the shadow entry for the subwiki
-        this.securityCache.add(mockSecurityShadowEntry(newUserReference(null), subWikiReference), null);
+        this.securityCache.add(mockSecurityShadowEntry(newUserReference(null), subWikiReference), null,
+            invalidationCounter);
         UserSecurityReference userSecurityReference = newUserReference(null);
 
-        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "XWiki"))));
+        this.securityCache.add(mockSecurityRuleEntry(newEntityReference(new SpaceReference("wiki", "XWiki"))),
+            invalidationCounter);
         DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "page1");
         SecurityReference documentSecurityReference = newEntityReference(documentReference);
-        this.securityCache.add(mockSecurityRuleEntry(documentSecurityReference));
+        this.securityCache.add(mockSecurityRuleEntry(documentSecurityReference), invalidationCounter);
 
         // Create an access entry with the user
         SecurityAccessEntry entry = mockSecurityAccessEntry(documentSecurityReference, userSecurityReference);

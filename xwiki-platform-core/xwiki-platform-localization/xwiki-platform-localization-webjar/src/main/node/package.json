@@ -1,0 +1,34 @@
+{
+  "private": true,
+  "name": "xwiki-platform-localization-webjar",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "run-p type-check \"build-only {@}\" --",
+    "build-only": "vite build",
+    "dev": "vite",
+    "format": "prettier --write src/",
+    "lint": "eslint .",
+    "test:unit": "vitest --run --passWithNoTests",
+    "type-check": "tsc --build"
+  },
+  "types": "src/index.d.ts",
+  "dependencies": {
+    "@xwiki/platform-localization-api": "workspace:*",
+    "@xwiki/platform-localization-default": "workspace:*",
+    "@xwiki/platform-localization-resolver-xwiki-rest": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/requirejs": "catalog:",
+    "@xwiki/platform-tool-eslintconfig": "workspace:*",
+    "@xwiki/platform-tool-tsconfig": "workspace:*",
+    "@xwiki/platform-tool-viteconfig": "workspace:*",
+    "eslint": "catalog:",
+    "npm-run-all": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -84,9 +84,10 @@ public class DefaultJGroupsReceiver extends ReceiverAdapter implements JGroupsRe
     @Override
     public void receive(Message msg)
     {
-        if (msg instanceof BytesMessage) {
-            RemoteEventData remoteEvent = (RemoteEventData) ((BytesMessage) msg)
-                .getObject(this.classLoaderManager.getURLClassLoader(null, false));
+        if (msg instanceof BytesMessage byteMessage) {
+            // Pass the root namespace classloader to be able to unserialize objects coming from an installed extension
+            RemoteEventData remoteEvent =
+                (RemoteEventData) byteMessage.getObject(this.classLoaderManager.getURLClassLoader(null, false));
 
             this.logger.debug("Received JGroups remote event [{}]", remoteEvent);
 

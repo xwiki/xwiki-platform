@@ -133,7 +133,7 @@ public class ActiveInstallsInitializerListener implements EventListener, Initial
         // Make sure we always have at least one ping thread.
         if (this.executorService == null) {
             // Start a thread to regularly send pings to the active installs server.
-            BasicThreadFactory factory = new BasicThreadFactory.Builder()
+            BasicThreadFactory factory = BasicThreadFactory.builder()
                 .namingPattern("Active Installs 2 Ping Thread")
                 .daemon(true)
                 .priority(Thread.MIN_PRIORITY)

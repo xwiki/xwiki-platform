@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -62,8 +61,6 @@ public class EditForm extends XWikiForm
      * {@code XWiki.XWikiRights_0}).
      */
     private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)$");
-
-    private static final String OBJECTS_CLASS_DELIMITER = "_";
 
     // ---- Form fields -------------------------------------------------
     private String content;
@@ -150,7 +147,7 @@ public class EditForm extends XWikiForm
         StringBuilder tags = new StringBuilder();
         boolean first = true;
         for (int i = 0; i < parameter.length; ++i) {
-            if (!parameter[i].equals("")) {
+            if (!"".equals(parameter[i])) {
                 if (first) {
                     first = false;
                 } else {
@@ -217,11 +214,12 @@ public class EditForm extends XWikiForm
     {
         @SuppressWarnings("unchecked")
         Map<String, String[]> allParameters = getRequest().getParameterMap();
-        Map<String, String[]> result = new HashMap<String, String[]>();
-        for (String name : allParameters.keySet()) {
+        Map<String, String[]> result = new HashMap<>();
+        for (Map.Entry<String, String[]> entry : allParameters.entrySet()) {
+            String name = entry.getKey();
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);
-                result.put(newname, allParameters.get(name));
+                result.put(newname, entry.getValue());
             }
         }
         return result;
@@ -366,7 +364,6 @@ public class EditForm extends XWikiForm
      * @return the enforce required rights flag, see {@link XWikiDocument#isEnforceRequiredRights()}
      * @since 16.10.0RC1
      */
-    @Unstable
     public String getEnforceRequiredRights()
     {
         return this.enforceRequiredRights;
@@ -376,7 +373,6 @@ public class EditForm extends XWikiForm
      * @param enforceRequiredRights the enforce required rights flag, see {@link XWikiDocument#isEnforceRequiredRights()}
      * @since 16.10.0RC1
      */
-    @Unstable
     public void setEnforceRequiredRights(String enforceRequiredRights)
     {
         this.enforceRequiredRights = enforceRequiredRights;

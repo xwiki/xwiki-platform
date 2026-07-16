@@ -19,7 +19,6 @@
  */
 package org.xwiki.edit.test.ui;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.xwiki.test.docker.junit5.UITest;
 
@@ -34,20 +33,22 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllIT
 {
     @Nested
-    @DisplayName("In-place edit")
     class NestedInplaceEditIT extends InplaceEditIT
     {
     }
 
     @Nested
-    @DisplayName("In-place translate")
     class NestedInplaceTranslateIT extends InplaceTranslateIT
     {
     }
 
     @Nested
-    @DisplayName("In-place edit with annotations")
     class NestedInplaceEditWithAnnotationsIT extends InplaceEditWithAnnotationsIT
+    {
+    }
+
+    @Nested
+    class NestedTextAreaImageUploadIT extends TextAreaImageUploadIT
     {
     }
 }

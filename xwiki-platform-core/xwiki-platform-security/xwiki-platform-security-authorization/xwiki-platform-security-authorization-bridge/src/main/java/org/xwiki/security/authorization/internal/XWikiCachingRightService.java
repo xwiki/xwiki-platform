@@ -28,7 +28,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -132,10 +131,6 @@ public class XWikiCachingRightService implements XWikiRightService
     private DocumentReferenceResolver<String> userAndGroupReferenceResolver
         = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "user");
 
-    /** The rendering context to check PR for signed macro. */
-    private final RenderingContext renderingContext
-        = Utils.getComponent(RenderingContext.class);
-
     /** The authorization manager used to really do the job. */
     private final AuthorizationManager authorizationManager
         = Utils.getComponent(AuthorizationManager.class);
@@ -215,7 +210,7 @@ public class XWikiCachingRightService implements XWikiRightService
                  * will call checkAccess with action 'view', if the document 'XWiki.XWikiLogin' exists.
                  */
                 && !LOGIN_ACTION.equals(context.getAction())
-                && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
+                && !"true".equalsIgnoreCase(context.getWiki().Param("xwiki.hidelogin", "false"))) {
                 context.getWiki().getAuthService().showLogin(context);
             }
         } catch (XWikiException e) {

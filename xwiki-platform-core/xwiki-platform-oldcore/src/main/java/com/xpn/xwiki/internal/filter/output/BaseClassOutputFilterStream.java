@@ -39,7 +39,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class BaseClassOutputFilterStream extends AbstractEntityOutputFilterStream<BaseClass> implements Initializable
+public class BaseClassOutputFilterStream extends AbstractElementOutputFilterStream<BaseClass> implements Initializable
 {
     @Inject
     private EntityOutputFilterStream<PropertyClass> propertyFilter;
@@ -82,11 +82,9 @@ public class BaseClassOutputFilterStream extends AbstractEntityOutputFilterStrea
     @Override
     public void endWikiClassProperty(String name, String type, FilterEventParameters parameters) throws FilterException
     {
-        if (this.enabled) {
-            if (getPropertyClassOutputFilterStream().getEntity() != null) {
-                this.entity.safeput(name, getPropertyClassOutputFilterStream().getEntity());
-                getPropertyClassOutputFilterStream().setEntity(null);
-            }
+        if (this.enabled && getPropertyClassOutputFilterStream().getEntity() != null) {
+            this.entity.safeput(name, getPropertyClassOutputFilterStream().getEntity());
+            getPropertyClassOutputFilterStream().setEntity(null);
         }
     }
 

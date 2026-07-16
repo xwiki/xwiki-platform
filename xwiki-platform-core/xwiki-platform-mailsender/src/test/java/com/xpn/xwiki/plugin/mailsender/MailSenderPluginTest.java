@@ -19,10 +19,9 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
@@ -30,15 +29,18 @@ import org.xwiki.test.TestEnvironment;
 
 import com.xpn.xwiki.web.Utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link MailSenderPlugin mailsender plugin}.
- * 
+ *
  * @version $Id$
  */
-public class MailSenderPluginTest
+class MailSenderPluginTest
 {
     /** The empty {@link Mail} object used for testing. */
     private Mail mail;
@@ -46,8 +48,8 @@ public class MailSenderPluginTest
     /** The {@link MailSenderPlugin plugin} instance used for testing. */
     private static MailSenderPlugin plugin;
 
-    @BeforeClass
-    public static void setUpPlugin() throws ComponentLookupException
+    @BeforeAll
+    static void setUpPlugin() throws ComponentLookupException
     {
         ComponentManager componentManager = mock(ComponentManager.class);
         when(componentManager.getInstance(ComponentManager.class, "context")).thenReturn(componentManager);
@@ -58,122 +60,109 @@ public class MailSenderPluginTest
     }
 
     /** Setup: create a new {@code Mail} object and a plugin instance. */
-    @Before
-    public void setUp()
+    @BeforeEach
+    void setUp()
     {
         this.mail = new Mail();
     }
 
     /** Test that a {@code null} Mail throws an exception. */
     @Test
-    public void testParseRawMessageWithNullMail()
+    void parseRawMessageWithNullMail()
     {
-        boolean thrown = false;
-        try {
-            plugin.parseRawMessage("Subject:Greetings!\n\nDear John,\nHello and Goodbye!", null);
-        } catch (IllegalArgumentException ex) {
-            thrown = true;
-        }
-        Assert.assertTrue(thrown);
+        assertThrows(IllegalArgumentException.class,
+            () -> plugin.parseRawMessage("Subject:Greetings!\n\nDear John,\nHello and Goodbye!", null));
     }
 
     /** Test that a {@code null} message throws an exception. */
     @Test
-    public void testParseRawMessageWithNullMessage()
+    void parseRawMessageWithNullMessage()
     {
-        boolean thrown = false;
-        try {
-            plugin.parseRawMessage(null, this.mail);
-        } catch (IllegalArgumentException ex) {
-            thrown = true;
-        }
-        Assert.assertTrue(thrown);
+        assertThrows(IllegalArgumentException.class, () -> plugin.parseRawMessage(null, this.mail));
     }
 
     /** Test that a simple mail with no headers becomes the Mail's textPart. */
     @Test
-    public void testParseRawMessageWithSimpleMessage()
+    void parseRawMessageWithSimpleMessage()
     {
         plugin.parseRawMessage("Dear John,\nHello and Goodbye!", this.mail);
-        Assert.assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        Assert.assertEquals(0, this.mail.getHeaders().size());
-
+        assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        assertEquals(0, this.mail.getHeaders().size());
     }
 
     /** Test that the Subject header is treated as a special header and placed in the Mail correctly. */
     @Test
-    public void testParseRawMessageWithSubject()
+    void parseRawMessageWithSubject()
     {
         plugin.parseRawMessage("Subject:Greetings!\n\nDear John,\nHello and Goodbye!", this.mail);
-        Assert.assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        Assert.assertEquals("Greetings!", this.mail.getSubject());
-        Assert.assertEquals(0, this.mail.getHeaders().size());
+        assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        assertEquals("Greetings!", this.mail.getSubject());
+        assertEquals(0, this.mail.getHeaders().size());
     }
 
     /** Test that both Subject and From are detected as special headers. */
     @Test
-    public void testParseRawMessageWithSubjectAndFrom()
+    void parseRawMessageWithSubjectAndFrom()
     {
-        plugin
-            .parseRawMessage("Subject:Greetings!\nFrom:user@example.org\n\nDear John,\nHello and Goodbye!", this.mail);
-        Assert.assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        Assert.assertEquals("Greetings!", this.mail.getSubject());
-        Assert.assertEquals("user@example.org", this.mail.getFrom());
-        Assert.assertEquals(0, this.mail.getHeaders().size());
+        plugin.parseRawMessage("Subject:Greetings!\nFrom:user@example.org\n\nDear John,\nHello and Goodbye!", this.mail);
+        assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        assertEquals("Greetings!", this.mail.getSubject());
+        assertEquals("user@example.org", this.mail.getFrom());
+        assertEquals(0, this.mail.getHeaders().size());
     }
 
     /** Test that the first empty line marks the start of the body. */
     @Test
-    public void testParseRawMessageWithFakeFrom()
+    void parseRawMessageWithFakeFrom()
     {
         plugin.parseRawMessage("Subject:Greetings!\n\nFrom:user@example.org\n\nDear John,\nHello and Goodbye!",
             this.mail);
-        Assert.assertEquals("From:user@example.org\r\n\r\nDear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        Assert.assertEquals("Greetings!", this.mail.getSubject());
-        Assert.assertNull(this.mail.getFrom());
-        Assert.assertEquals(0, this.mail.getHeaders().size());
+        assertEquals("From:user@example.org\r\n\r\nDear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        assertEquals("Greetings!", this.mail.getSubject());
+        assertNull(this.mail.getFrom());
+        assertEquals(0, this.mail.getHeaders().size());
     }
 
     /** Test that the header name stops at the first colon. */
     @Test
-    public void testParseRawMessageWithColonInHeader()
+    void parseRawMessageWithColonInHeader()
     {
         plugin.parseRawMessage("Subject:Greetings:Human!\n\nDear John,\nHello and Goodbye!", this.mail);
-        Assert.assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        Assert.assertEquals("Greetings:Human!", this.mail.getSubject());
-        Assert.assertNull(this.mail.getFrom());
-        Assert.assertEquals(0, this.mail.getHeaders().size());
+        assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        assertEquals("Greetings:Human!", this.mail.getSubject());
+        assertNull(this.mail.getFrom());
+        assertEquals(0, this.mail.getHeaders().size());
     }
 
     /** Test that custom header are simply passed to the mail as-is. */
     @Test
-    public void testParseRawMessageWithExtraHeaders()
+    void parseRawMessageWithExtraHeaders()
     {
         plugin.parseRawMessage("X-Header:Something extra!\n\nDear John,\nHello and Goodbye!", this.mail);
-        Assert.assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        Assert.assertNull(this.mail.getSubject());
-        Assert.assertEquals(1, this.mail.getHeaders().size());
+        assertEquals("Dear John,\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        assertNull(this.mail.getSubject());
+        assertEquals(1, this.mail.getHeaders().size());
     }
 
     /** RFC 2822 allows headers to be split on multiple lines using "folding white spaces". */
     @Test
-    public void testParseRawMessageWithMultilineSubject()
+    void parseRawMessageWithMultilineSubject()
     {
         plugin.parseRawMessage("Subject:Greetings\n from\n\thome\nFrom:user@example.org\n\nHello and Goodbye!",
             this.mail);
-        Assert.assertEquals("Hello and Goodbye!\r\n", this.mail.getTextPart());
-        Assert.assertEquals("Greetings from\thome", this.mail.getSubject());
-        Assert.assertEquals("user@example.org", this.mail.getFrom());
-        Assert.assertEquals(0, this.mail.getHeaders().size());
+        assertEquals("Hello and Goodbye!\r\n", this.mail.getTextPart());
+        assertEquals("Greetings from\thome", this.mail.getSubject());
+        assertEquals("user@example.org", this.mail.getFrom());
+        assertEquals(0, this.mail.getHeaders().size());
     }
 
     /** Headers can't contain spaces. Test that such lines are correctly used as the body. */
     @Test
-    public void testParseRawMessageWithFakeHeaders()
+    void parseRawMessageWithFakeHeaders()
     {
         plugin.parseRawMessage("To Susan:Greetings!\n\nHello and Goodbye!", this.mail);
-        Assert.assertEquals("To Susan:Greetings!\r\n\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
-        Assert.assertNull(this.mail.getSubject());
-        Assert.assertEquals(0, this.mail.getHeaders().size());
+        assertEquals("To Susan:Greetings!\r\n\r\nHello and Goodbye!\r\n", this.mail.getTextPart());
+        assertNull(this.mail.getSubject());
+        assertEquals(0, this.mail.getHeaders().size());
     }
 }

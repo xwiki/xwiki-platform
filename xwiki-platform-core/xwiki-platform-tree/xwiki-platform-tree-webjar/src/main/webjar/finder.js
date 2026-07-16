@@ -17,7 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
+define('xwiki-tree-finder-icons', [], {
+  icons: ['search']
+});
+
+define(['jquery', 'xwiki-icon!xwiki-tree-finder-icons', 'jsTree', 'xwiki-events-bridge'],
+    function($, icons) {
   'use strict';
 
   // jsTree uses the underscore notation for its API, instead of camel case.
@@ -38,7 +43,10 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
   $.jstree.defaults.core.allow_reselect = true;
 
   var createSuggestInput = function(options) {
-    var input = document.createElement('input');
+    let container = document.createElement('div');
+    container.classList.add('xtree-finder-container');
+    container.appendChild(icons.search.render());
+    let input = document.createElement('input');
     input.type = 'text';
     input.className = 'xtree-finder';
     input.placeholder = options.finder.placeholder;
@@ -61,8 +69,8 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
       timeout: 0,
       varname: 'query'
     });
-
-    return input;
+    container.appendChild(input);
+    return container;
   };
 
   var findNode = function(event, data) {
@@ -96,6 +104,27 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
       parent.init.call(this, element, options);
 
       $(createSuggestInput(options)).insertBefore(element).on('xwiki:suggest:selected', findNode.bind(this));
+    };
+
+    this.destroy = function (keep_html) {
+      const result = parent.destroy.apply(this, arguments);
+      this._getFinderSuggestInput()?.detach();
+      if (!keep_html) {
+        this._getFinderInput().remove();
+      }
+      return result;
+    };
+
+    this.clearFinderSuggestions = function() {
+      this._getFinderSuggestInput()?.clearSuggestions();
+    };
+
+    this._getFinderInput = function() {
+      return this.element.prevAll('.xtree-finder').first();
+    };
+
+    this._getFinderSuggestInput = function() {
+      return this._getFinderInput()[0]?.__x_suggest;
     };
   };
 });

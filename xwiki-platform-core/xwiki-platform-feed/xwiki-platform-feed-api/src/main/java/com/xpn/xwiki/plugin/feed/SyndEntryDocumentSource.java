@@ -140,6 +140,11 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
     public static final String CONTENT_LENGTH = "ContentLength";
 
+    /**
+     * The JTidy configuration property name holding the input encoding.
+     */
+    private static final String INPUT_ENCODING = "input-encoding";
+
     public static final Properties TIDY_FEED_CONFIG;
 
     public static final Properties TIDY_XML_CONFIG;
@@ -180,7 +185,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         TIDY_XML_CONFIG.setProperty("input-xml", "yes");
         TIDY_XML_CONFIG.setProperty("output-xml", "yes");
         TIDY_XML_CONFIG.setProperty("add-xml-pi", "no");
-        TIDY_XML_CONFIG.setProperty("input-encoding", "UTF8");
+        TIDY_XML_CONFIG.setProperty(INPUT_ENCODING, "UTF8");
 
         // HTML specific configuration
         TIDY_HTML_CONFIG = new Properties(TIDY_FEED_CONFIG);
@@ -189,10 +194,10 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         TIDY_HTML_CONFIG.setProperty("drop-empty-paras", "yes");
         TIDY_HTML_CONFIG.setProperty("enclose-text", "yes");
         TIDY_HTML_CONFIG.setProperty("logical-emphasis", "yes");
-        TIDY_HTML_CONFIG.setProperty("input-encoding", "UTF8");
+        TIDY_HTML_CONFIG.setProperty(INPUT_ENCODING, "UTF8");
 
         // default parameters for all instances of this class
-        DEFAULT_PARAMS = new HashMap<String, Object>();
+        DEFAULT_PARAMS = new HashMap<>();
         DEFAULT_PARAMS.put(CONTENT_TYPE, "text/html");
         DEFAULT_PARAMS.put(CONTENT_LENGTH, -1); // no limit by default
     }
@@ -206,7 +211,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
     public SyndEntryDocumentSource()
     {
-        this(new HashMap<String, Object>());
+        this(new HashMap<>());
     }
 
     /**
@@ -401,7 +406,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
             categories = getListValue(mapping, doc, context);
         }
 
-        List<SyndCategory> result = new ArrayList<SyndCategory>();
+        List<SyndCategory> result = new ArrayList<>();
         for (Object category : categories) {
             if (category instanceof SyndCategory) {
                 result.add((SyndCategory) category);
@@ -469,7 +474,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     protected List<String> getDefaultContributors(Document doc, Map<String, Object> params, XWikiContext context)
     {
         XWiki xwiki = context.getWiki();
-        List<String> contributors = new ArrayList<String>();
+        List<String> contributors = new ArrayList<>();
         contributors.add(xwiki.getUserName(doc.getAuthor(), null, false, context));
         return contributors;
     }
@@ -489,7 +494,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
             rawContributors = getListValue(mapping, doc, context);
         }
 
-        List<String> contributors = new ArrayList<String>();
+        List<String> contributors = new ArrayList<>();
         for (Object rawContributor : rawContributors) {
             if (rawContributor instanceof String) {
                 contributors.add((String) rawContributor);
@@ -550,7 +555,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         }
         String[] array = strRep.substring(1, strRep.length() - 1).split(",");
         if (array.length > 0) {
-            List<Object> list = new ArrayList<Object>();
+            List<Object> list = new ArrayList<>();
             for (int i = 0; i < array.length; i++) {
                 list.add(array[i]);
             }
@@ -607,7 +612,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      */
     protected Map<String, Object> joinParams(Map<String, Object> base, Map<String, Object> extra)
     {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.putAll(base);
 
         for (Map.Entry<String, Object> entry : extra.entrySet()) {
@@ -636,7 +641,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         // Even if we add a message listener we still have to redirect the output. Otherwise all the messages will be
         // written to the standard output (besides being logged by TIDY_LOGGER).
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ByteArrayInputStream in = new ByteArrayInputStream(xmlFragment.getBytes(Charset.forName(config.getProperty("input-encoding"))));
+        ByteArrayInputStream in = new ByteArrayInputStream(xmlFragment.getBytes(Charset.forName(config.getProperty(INPUT_ENCODING))));
         return tidy.parseDOM(in, out);
     }
 

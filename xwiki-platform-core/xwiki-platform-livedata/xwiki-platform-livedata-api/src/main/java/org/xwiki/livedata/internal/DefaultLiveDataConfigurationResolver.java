@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -116,7 +115,11 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         // Prevent null values (make the configuration explicit).
         mergedConfig.initialize();
 
-        handleLayouts(config.getMeta().getLayouts(), mergedConfig.getMeta());
+        Collection<LiveDataLayoutDescriptor> layout = null;
+        if (config.getMeta() != null) {
+            layout = config.getMeta().getLayouts();
+        }
+        handleLayouts(layout, mergedConfig.getMeta());
         handlePageSizes(mergedConfig);
 
         // Translate using the context locale.
@@ -174,7 +177,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
                     .filter(baseConfigLayout -> Objects.equals(baseConfigLayout.getId(), configLayout.getId()))
                     .findFirst()
                     .orElse(configLayout))
-                .collect(Collectors.toList()));
+                .toList());
         }
     }
 

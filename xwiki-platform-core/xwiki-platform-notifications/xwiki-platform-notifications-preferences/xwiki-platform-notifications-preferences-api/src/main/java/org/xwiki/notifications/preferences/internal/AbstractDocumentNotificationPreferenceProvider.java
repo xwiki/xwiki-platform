@@ -59,9 +59,7 @@ public abstract class AbstractDocumentNotificationPreferenceProvider implements 
         Map<EntityReference, List<NotificationPreference>> preferencesPerTarget = new HashMap<>();
 
         for (NotificationPreference preference : preferences) {
-            if (preference instanceof TargetableNotificationPreference) {
-                TargetableNotificationPreference targetablePreference = (TargetableNotificationPreference) preference;
-
+            if (preference instanceof TargetableNotificationPreference targetablePreference) {
                 List<NotificationPreference> list = preferencesPerTarget.get(targetablePreference.getTarget());
                 if (list == null) {
                     list = new ArrayList<>();
@@ -83,9 +81,9 @@ public abstract class AbstractDocumentNotificationPreferenceProvider implements 
     protected void savePreferences(List<NotificationPreference> preferences, EntityReference target)
             throws NotificationException
     {
-        if (target instanceof DocumentReference) {
+        if (target instanceof DocumentReference documentReference) {
             cachedNotificationPreferenceModelBridge
-                .saveNotificationsPreferences((DocumentReference) target, preferences);
+                .saveNotificationsPreferences(documentReference, preferences);
         } else {
             logger.warn("Preference's target [{}] is not a document reference. The corresponding preference will not"
                     + " be saved.");

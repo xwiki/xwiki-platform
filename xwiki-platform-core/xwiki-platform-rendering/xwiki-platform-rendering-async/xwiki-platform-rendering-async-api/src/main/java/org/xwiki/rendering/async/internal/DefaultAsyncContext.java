@@ -125,12 +125,12 @@ public class DefaultAsyncContext implements AsyncContext
                 return true;
             }
 
-            if (obj instanceof RightEntry) {
+            if (obj instanceof RightEntry rightEntry) {
                 EqualsBuilder builder = new EqualsBuilder();
 
-                builder.append(this.right, ((RightEntry) obj).right);
-                builder.append(this.userReference, ((RightEntry) obj).userReference);
-                builder.append(this.entityReference, ((RightEntry) obj).entityReference);
+                builder.append(this.right, rightEntry.right);
+                builder.append(this.userReference, rightEntry.userReference);
+                builder.append(this.entityReference, rightEntry.entityReference);
 
                 return builder.build();
             }
@@ -351,7 +351,8 @@ public class DefaultAsyncContext implements AsyncContext
         ContextUse contextUse = getContextUse();
 
         if (contextUse != null) {
-            contextUse.rights.add(new RightEntry(right, userReference, entityReference, allowed));
+            contextUse.rights.add(new RightEntry(right, this.factory.getReference(userReference),
+                this.factory.getReference(entityReference), allowed));
         }
     }
 

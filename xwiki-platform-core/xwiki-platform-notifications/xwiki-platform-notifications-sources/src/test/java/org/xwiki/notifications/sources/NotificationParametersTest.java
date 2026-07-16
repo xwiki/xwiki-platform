@@ -19,9 +19,8 @@
  */
 package org.xwiki.notifications.sources;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,10 +38,10 @@ import static org.mockito.Mockito.mock;
  *
  * @version $Id$
  */
-public class NotificationParametersTest
+class NotificationParametersTest
 {
     @Test
-    public void equals()
+    void equals()
     {
         NotificationParameters parameters1 = new NotificationParameters();
         NotificationParameters parameters2 = new NotificationParameters();
@@ -57,13 +56,13 @@ public class NotificationParametersTest
         parameters1.user = new DocumentReference("xwiki", "XWiki", "Foo");
         parameters1.onlyUnread = true;
         parameters1.format = NotificationFormat.ALERT;
-        parameters1.blackList = Arrays.asList("foo", "bar");
+        parameters1.blackList = List.of("foo", "bar");
         parameters1.fromDate = new Date(4242);
         parameters1.endDate = new Date(4343);
         parameters1.expectedCount = 888;
-        parameters1.filterPreferences = Collections.singletonList(filterPref1);
-        parameters1.filters = Collections.singletonList(filter1);
-        parameters1.preferences = Collections.singletonList(pref1);
+        parameters1.filterPreferences = List.of(filterPref1);
+        parameters1.filters = List.of(filter1);
+        parameters1.preferences = List.of(pref1);
 
         assertNotEquals(parameters1, parameters2);
         assertNotEquals(parameters1.hashCode(), parameters2.hashCode());
@@ -80,7 +79,7 @@ public class NotificationParametersTest
         assertNotEquals(parameters1, parameters2);
         assertNotEquals(parameters1.hashCode(), parameters2.hashCode());
 
-        parameters2.blackList = Arrays.asList("foo", "bar");
+        parameters2.blackList = List.of("foo", "bar");
         assertNotEquals(parameters1, parameters2);
         assertNotEquals(parameters1.hashCode(), parameters2.hashCode());
 
@@ -96,15 +95,15 @@ public class NotificationParametersTest
         assertNotEquals(parameters1, parameters2);
         assertNotEquals(parameters1.hashCode(), parameters2.hashCode());
 
-        parameters2.filterPreferences = Collections.singletonList(filterPref1);
+        parameters2.filterPreferences = List.of(filterPref1);
         assertNotEquals(parameters1, parameters2);
         assertNotEquals(parameters1.hashCode(), parameters2.hashCode());
 
-        parameters2.filters = Collections.singletonList(filter1);
+        parameters2.filters = List.of(filter1);
         assertNotEquals(parameters1, parameters2);
         assertNotEquals(parameters1.hashCode(), parameters2.hashCode());
 
-        parameters2.preferences = Collections.singletonList(pref1);
+        parameters2.preferences = List.of(pref1);
         assertEquals(parameters1, parameters2);
         assertEquals(parameters1.hashCode(), parameters2.hashCode());
     }

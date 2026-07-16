@@ -49,7 +49,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.SOURCE_NAME_FIELD;
 import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.TARGET_LOCATION_FIELD;
 import static org.xwiki.attachment.internal.RedirectAttachmentClassDocumentInitializer.TARGET_NAME_FIELD;
@@ -145,9 +145,10 @@ public class MoveAttachmentJob
     private void moveAttachment(EntityReference source, AttachmentReference destination, boolean autoRedirect,
         XWiki wiki)
     {
+        XWikiContext context = this.xcontextProvider.get();
         try {
-            XWikiDocument sourceDocument = wiki.getDocument(source.getParent(), this.xcontextProvider.get());
-            XWikiDocument targetDocument = wiki.getDocument(destination.getParent(), this.xcontextProvider.get());
+            XWikiDocument sourceDocument = wiki.getDocument(source.getParent(), context).clone();
+            XWikiDocument targetDocument = wiki.getDocument(destination.getParent(), context).clone();
             XWikiAttachment sourceAttachment = sourceDocument.getExactAttachment(source.getName());
 
             // Update the author of the source and target documents.
@@ -172,8 +173,7 @@ public class MoveAttachmentJob
             if (Objects.equals(source.getParent(), destination.getParent())) {
                 wiki.saveDocument(sourceDocument,
                     this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.inPlace",
-                        source.getName(), destination.getName()),
-                    this.xcontextProvider.get());
+                        source.getName(), destination.getName()), context);
             } else {
                 transactionalMove(wiki, sourceDocument, targetDocument, sourceAttachment.getFilename(),
                     destination.getName());

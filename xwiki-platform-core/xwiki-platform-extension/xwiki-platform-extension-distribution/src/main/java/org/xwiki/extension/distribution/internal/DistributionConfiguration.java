@@ -39,7 +39,7 @@ public class DistributionConfiguration
     private ConfigurationSource configurationSource;
 
     /**
-     * @return if the automatic launch of DW is enabled on main wiki
+     * @return true if the automatic launch of DW is enabled on main wiki
      */
     public boolean isAutoDistributionWizardEnabledForMainWiki()
     {
@@ -47,10 +47,28 @@ public class DistributionConfiguration
     }
 
     /**
-     * @return if the automatic launch of DW is enabled on wiki
+     * @return true if the automatic launch of DW is enabled on wiki
      */
     public boolean isAutoDistributionWizardEnabledForWiki()
     {
         return configurationSource.getProperty("distribution.automaticStartOnWiki", true);
+    }
+
+    /**
+     * @return true if the distribution wizard is interactive on main wiki
+     * @since 17.4.0RC1
+     */
+    public boolean isInteractiveDistributionWizardEnabledForMainWiki()
+    {
+        return configurationSource.getProperty("distribution.job.interactive", true);
+    }
+
+    /**
+     * @return true if the distribution wizard is interactive on subwikis
+     * @since 17.4.0RC1
+     */
+    public boolean isInteractiveDistributionWizardEnabledForWiki()
+    {
+        return configurationSource.getProperty("distribution.job.interactive.wiki", true);
     }
 }

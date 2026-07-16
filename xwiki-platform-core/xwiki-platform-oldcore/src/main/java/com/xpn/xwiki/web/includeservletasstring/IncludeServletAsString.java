@@ -66,9 +66,7 @@ public class IncludeServletAsString
             LOGGER.debug("Buffer returned with " + buffer.length + " bytes.");
         }
 
-        String bufferString = new String(buffer, servletResponse.getCharacterEncoding());
-
-        return bufferString;
+        return new String(buffer, servletResponse.getCharacterEncoding());
     }
 
 }

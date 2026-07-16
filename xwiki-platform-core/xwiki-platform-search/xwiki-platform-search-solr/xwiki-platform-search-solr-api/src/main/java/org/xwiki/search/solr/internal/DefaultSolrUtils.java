@@ -194,8 +194,8 @@ public class DefaultSolrUtils implements SolrUtils
             return typeName;
         }
 
-        if (value instanceof Collection) {
-            typeName = getTypeName((Collection) value);
+        if (value instanceof Collection collection) {
+            typeName = getTypeName(collection);
         } else if (value.getClass().isArray()) {
             typeName = getTypeName(value.getClass().getComponentType());
             if (typeName != null) {
@@ -270,12 +270,12 @@ public class DefaultSolrUtils implements SolrUtils
     private static String getTypeName(Type type)
     {
         if (type != null) {
-            if (type instanceof Class) {
-                return getTypeName((Class) type);
-            } else if (type instanceof ParameterizedType) {
-                Type rawType = ((ParameterizedType) type).getRawType();
+            if (type instanceof Class clazz) {
+                return getTypeName(clazz);
+            } else if (type instanceof ParameterizedType parameterizedType) {
+                Type rawType = parameterizedType.getRawType();
 
-                if (rawType instanceof Class && Iterable.class.isAssignableFrom((Class) rawType)) {
+                if (rawType instanceof Class rawClass && Iterable.class.isAssignableFrom(rawClass)) {
                     Map<TypeVariable<?>, Type> variables = TypeUtils.getTypeArguments(type, Iterable.class);
 
                     return getIterableTypeName(variables.get(ITERABLE_PARAMETER));
@@ -365,11 +365,11 @@ public class DefaultSolrUtils implements SolrUtils
 
                 if (typeName != null) {
                     document.setField(getMapFieldName(key, mapFieldName, typeName), value);
-                } else if (value instanceof Iterable) {
-                    typeName = getTypeName((Iterable) value);
+                } else if (value instanceof Iterable iterable) {
+                    typeName = getTypeName(iterable);
 
                     if (typeName != null) {
-                        for (Object element : (Iterable) value) {
+                        for (Object element : iterable) {
                             document.addField(getMapFieldName(key, mapFieldName, typeName), element);
                         }
                     }
@@ -488,8 +488,8 @@ public class DefaultSolrUtils implements SolrUtils
         }
 
         String str;
-        if (value instanceof String) {
-            str = (String) value;
+        if (value instanceof String string) {
+            str = string;
         } else if (CLASS_SUFFIX_MAPPING.containsKey(fieldValue.getClass())) {
             str = value.toString();
         } else {
@@ -506,8 +506,8 @@ public class DefaultSolrUtils implements SolrUtils
         }
 
         String str;
-        if (fieldValue instanceof String) {
-            str = (String) fieldValue;
+        if (fieldValue instanceof String string) {
+            str = string;
         } else if (CLASS_SUFFIX_MAPPING.containsKey(fieldValue.getClass())) {
             str = fieldValue.toString();
         } else {
@@ -535,8 +535,8 @@ public class DefaultSolrUtils implements SolrUtils
         }
 
         String str;
-        if (fieldValue instanceof Date) {
-            str = ((Date) fieldValue).toInstant().toString();
+        if (fieldValue instanceof Date date) {
+            str = date.toInstant().toString();
         } else {
             str = toFilterQueryString(toString(fieldValue));
         }
@@ -557,8 +557,8 @@ public class DefaultSolrUtils implements SolrUtils
         }
 
         String str;
-        if (value instanceof Date) {
-            str = ((Date) value).toInstant().toString();
+        if (value instanceof Date date) {
+            str = date.toInstant().toString();
         } else {
             str = toFilterQueryString(toString(value, valueType));
         }
@@ -598,7 +598,7 @@ public class DefaultSolrUtils implements SolrUtils
 
     private <T> T toValue(Object storedValue, Type targetType)
     {
-        if (storedValue == null && (!(targetType instanceof Class) || !((Class) targetType).isPrimitive())) {
+        if (storedValue == null && (!(targetType instanceof Class clazz) || !clazz.isPrimitive())) {
             return null;
         }
 
@@ -626,7 +626,7 @@ public class DefaultSolrUtils implements SolrUtils
             return null;
         }
 
-        List<T> collection = new ArrayList<T>(solrCollection.size());
+        List<T> collection = new ArrayList<>(solrCollection.size());
 
         solrCollection.forEach(e -> collection.add(toValue(e, targetType)));
 

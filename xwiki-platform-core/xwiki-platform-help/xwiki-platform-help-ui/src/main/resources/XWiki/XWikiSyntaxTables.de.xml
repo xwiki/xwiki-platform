@@ -31,7 +31,7 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>XWikiSyntaxTables</title>
+  <title>XWiki Syntax Tabellen</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -92,7 +92,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 &lt;/table&gt;
 }}}
 
-{{info}}Für verbesserte Funktionen siehe das [[Live-Table Makro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
+{{info}}Für verbesserte Funktionen siehe das [[LiveData Makro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Live%20Data%20Macro/]].{{/info}}
 )))|(((
 {{velocity}}
 $xwiki.ssfx.use("js/xwiki/table/table.css")
@@ -142,7 +142,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 |Cell 21|Cell 22
 }}}
 
-{{info}}Für verbesserte Funktionen siehe das [[Live-Table Makro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
+{{info}}Für verbesserte Funktionen siehe das [[LiveData Makro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Live%20Data%20Macro/]].{{/info}}
 )))|(((
 {{velocity}}
 $xwiki.ssfx.use("js/xwiki/table/table.css")

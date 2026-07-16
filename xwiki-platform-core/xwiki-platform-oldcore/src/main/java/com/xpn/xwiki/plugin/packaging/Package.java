@@ -78,8 +78,6 @@ import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
 
-import net.sf.json.JSONObject;
-
 /**
  * @version $Id$
  * @deprecated since 5.2, use Filter framework instead
@@ -100,6 +98,22 @@ public class Package
     public static final String DefaultPluginName = "package";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Package.class);
+
+    private static final String INFOS = "infos";
+
+    private static final String DESCRIPTION = "description";
+
+    private static final String LICENCE = "licence";
+
+    private static final String AUTHOR = "author";
+
+    private static final String VERSION = "version";
+
+    private static final String FILES = "files";
+
+    private static final String LANGUAGE = "language";
+
+    private static final String DEFAULT_ACTION = "defaultAction";
 
     private String name = "My package";
 
@@ -130,7 +144,7 @@ public class Package
 
     private boolean withVersions = true;
 
-    private List<DocumentFilter> documentFilters = new ArrayList<DocumentFilter>();
+    private List<DocumentFilter> documentFilters = new ArrayList<>();
 
     public String getName()
     {
@@ -321,9 +335,9 @@ public class Package
 
     public Package()
     {
-        this.files = new ArrayList<DocumentInfo>();
-        this.customMappingFiles = new ArrayList<DocumentInfo>();
-        this.classFiles = new ArrayList<DocumentInfo>();
+        this.files = new ArrayList<>();
+        this.customMappingFiles = new ArrayList<>();
+        this.classFiles = new ArrayList<>();
     }
 
     public boolean add(XWikiDocument doc, int defaultAction, XWikiContext context) throws XWikiException
@@ -355,7 +369,7 @@ public class Package
             docinfo.setAction(defaultAction);
             this.files.add(docinfo);
             BaseClass bclass = doc.getXClass();
-            if (bclass.getFieldList().size() > 0) {
+            if (!bclass.getFieldList().isEmpty()) {
                 this.classFiles.add(docinfo);
             }
             if (bclass.getCustomMapping() != null) {
@@ -387,7 +401,7 @@ public class Package
         add(doc, DefaultAction, context);
         List<String> languages = doc.getTranslationList(context);
         for (String language : languages) {
-            if (!((language == null) || (language.equals("")) || (language.equals(doc.getDefaultLanguage())))) {
+            if (!((language == null) || (language.isEmpty()) || (doc.getDefaultLanguage().equals(language)))) {
                 add(doc.getTranslatedDocument(language, context), DefaultAction, context);
             }
         }
@@ -399,7 +413,7 @@ public class Package
         throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
-        if ((language == null) || (language.equals(""))) {
+        if ((language == null) || (language.isEmpty())) {
             add(doc, DefaultAction, context);
         } else {
             add(doc.getTranslatedDocument(language, context), DefaultAction, context);
@@ -427,7 +441,7 @@ public class Package
 
     public String export(OutputStream os, XWikiContext context) throws IOException, XWikiException
     {
-        if (this.files.size() == 0) {
+        if (this.files.isEmpty()) {
             return "No Selected file";
         }
 
@@ -452,13 +466,11 @@ public class Package
 
     public String exportToDir(File dir, XWikiContext context) throws IOException, XWikiException
     {
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                Object[] args = new Object[1];
-                args[0] = dir.toString();
-                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
-                    "Error creating directory {0}", null, args);
-            }
+        if (!dir.exists() && !dir.mkdirs()) {
+            Object[] args = new Object[1];
+            args[0] = dir.toString();
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
+                "Error creating directory {0}", null, args);
         }
 
         for (int i = 0; i < this.files.size(); i++) {
@@ -482,7 +494,7 @@ public class Package
      * @throws IOException while reading the ZipFile
      * @throws XWikiException when package content is broken
      */
-    public String Import(byte file[], XWikiContext context) throws IOException, XWikiException
+    public String Import(byte[] file, XWikiContext context) throws IOException, XWikiException
     {
         return Import(new ByteArrayInputStream(file), context);
     }
@@ -506,7 +518,7 @@ public class Package
         try {
             zis = new ZipArchiveInputStream(file, XAR_FILENAME_ENCODING, false);
 
-            List<XWikiDocument> docsToLoad = new LinkedList<XWikiDocument>();
+            List<XWikiDocument> docsToLoad = new LinkedList<>();
             /*
              * Loop 1: Cycle through the zip input stream and load out all of the documents, when we find the
              * package.xml file we put it aside to so that we only include documents which are in the file.
@@ -528,7 +540,7 @@ public class Package
                             "Failed to parse document [{}] from XML during import, thus it will not be installed. "
                                 + "The error was: " + ExceptionUtils.getRootCauseMessage(e));
                         // It will be listed in the "failed documents" section after the import.
-                        addToErrors(entry.getName().replaceAll("/", "."), context);
+                        addToErrors(entry.getName().replace("/", "."), context);
 
                         continue;
                     }
@@ -574,7 +586,7 @@ public class Package
     private boolean documentExistInPackageFile(String docName, String language, Document xml)
     {
         Element docFiles = xml.getRootElement();
-        Element infosFiles = docFiles.element("files");
+        Element infosFiles = docFiles.element(FILES);
 
         @SuppressWarnings("unchecked")
         List<Element> fileList = infosFiles.elements("file");
@@ -584,7 +596,7 @@ public class Package
             if (tmpDocName.compareTo(docName) != 0) {
                 continue;
             }
-            String tmpLanguage = el.attributeValue("language");
+            String tmpLanguage = el.attributeValue(LANGUAGE);
             if (tmpLanguage == null) {
                 tmpLanguage = "";
             }
@@ -599,13 +611,13 @@ public class Package
     private void updateFileInfos(Document xml)
     {
         Element docFiles = xml.getRootElement();
-        Element infosFiles = docFiles.element("files");
+        Element infosFiles = docFiles.element(FILES);
 
         @SuppressWarnings("unchecked")
         List<Element> fileList = infosFiles.elements("file");
         for (Element el : fileList) {
-            String defaultAction = el.attributeValue("defaultAction");
-            String language = el.attributeValue("language");
+            String defaultAction = el.attributeValue(DEFAULT_ACTION);
+            String language = el.attributeValue(LANGUAGE);
             if (language == null) {
                 language = "";
             }
@@ -636,7 +648,7 @@ public class Package
 
         int result = DocumentInfo.INSTALL_IMPOSSIBLE;
         try {
-            if (this.files.size() == 0) {
+            if (this.files.isEmpty()) {
                 return result;
             }
 
@@ -701,10 +713,9 @@ public class Package
 
             // Install the remaining documents (without class definitions).
             for (DocumentInfo docInfo : this.files) {
-                if (!this.classFiles.contains(docInfo)) {
-                    if (installDocument(docInfo, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
-                        status = DocumentInfo.INSTALL_ERROR;
-                    }
+                if (!this.classFiles.contains(docInfo)
+                    && installDocument(docInfo, isAdmin, backup, context) == DocumentInfo.INSTALL_ERROR) {
+                    status = DocumentInfo.INSTALL_ERROR;
                 }
             }
             setStatus(status, context);
@@ -912,12 +923,11 @@ public class Package
                 context.getWiki().saveDocument(doc.getDoc(), saveMessage, context);
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 
-                if ((this.withVersions && packageHasHistory) || conserveExistingHistory) {
-                    // we need to force the saving the document archive.
-                    if (doc.getDoc().getDocumentArchive() != null) {
-                        context.getWiki().getVersioningStore()
-                            .saveXWikiDocArchive(doc.getDoc().getDocumentArchive(context), true, context);
-                    }
+                // we need to force the saving the document archive.
+                if (((this.withVersions && packageHasHistory) || conserveExistingHistory)
+                    && doc.getDoc().getDocumentArchive() != null) {
+                    context.getWiki().getVersioningStore()
+                        .saveXWikiDocArchive(doc.getDoc().getDocumentArchive(context), true, context);
                 }
 
                 if (shouldResetToInitialVersion) {
@@ -944,7 +954,7 @@ public class Package
     private boolean documentContainsHistory(DocumentInfo doc)
     {
         if ((doc.getDoc().getDocumentArchive() == null) || (doc.getDoc().getDocumentArchive().getNodes() == null)
-            || (doc.getDoc().getDocumentArchive().getNodes().size() == 0)) {
+            || doc.getDoc().getDocumentArchive().getNodes().isEmpty()) {
             return false;
         }
         return true;
@@ -956,7 +966,7 @@ public class Package
         List<String> list = (List<String>) context.get(name);
 
         if (list == null) {
-            list = new ArrayList<String>();
+            list = new ArrayList<>();
             context.put(name, list);
         }
 
@@ -1053,12 +1063,14 @@ public class Package
     }
 
     /**
-     * You should prefer {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter)}. If an error occurs, a stacktrace is dump
-     * to logs, and an empty String is returned.
+     * Serialize the package descriptor to an XML string. If an error occurs, a stacktrace is dumped to logs, and an
+     * empty String is returned.
      *
-     * @return a package.xml file for the this package
+     * @param context the current XWiki context
+     * @return a package.xml file for this package as a String
+     * @since 18.5.0RC1
      */
-    public String toXml(XWikiContext context)
+    public String toXMLString(XWikiContext context)
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -1082,26 +1094,26 @@ public class Package
         Element docel = new DOMElement("package");
         wr.writeOpen(docel);
 
-        Element elInfos = new DOMElement("infos");
+        Element elInfos = new DOMElement(INFOS);
         wr.write(elInfos);
 
         Element el = new DOMElement("name");
         el.addText(this.name);
         wr.write(el);
 
-        el = new DOMElement("description");
+        el = new DOMElement(DESCRIPTION);
         el.addText(this.description);
         wr.write(el);
 
-        el = new DOMElement("licence");
+        el = new DOMElement(LICENCE);
         el.addText(this.licence);
         wr.write(el);
 
-        el = new DOMElement("author");
+        el = new DOMElement(AUTHOR);
         el.addText(this.authorName);
         wr.write(el);
 
-        el = new DOMElement("version");
+        el = new DOMElement(VERSION);
         el.addText(this.version);
         wr.write(el);
 
@@ -1113,13 +1125,13 @@ public class Package
         el.addText(new Boolean(this.preserveVersion).toString());
         wr.write(el);
 
-        Element elfiles = new DOMElement("files");
+        Element elfiles = new DOMElement(FILES);
         wr.writeOpen(elfiles);
 
         for (DocumentInfo docInfo : this.files) {
             Element elfile = new DOMElement("file");
-            elfile.addAttribute("defaultAction", String.valueOf(docInfo.getAction()));
-            elfile.addAttribute("language", String.valueOf(docInfo.getLanguage()));
+            elfile.addAttribute(DEFAULT_ACTION, String.valueOf(docInfo.getAction()));
+            elfile.addAttribute(LANGUAGE, String.valueOf(docInfo.getLanguage()));
             elfile.addText(docInfo.getFullName());
             wr.write(elfile);
         }
@@ -1185,7 +1197,7 @@ public class Package
 
         // Add language
         String language = doc.getLanguage();
-        if ((language != null) && (!language.equals(""))) {
+        if ((language != null) && (!language.isEmpty())) {
             fileName.append(".");
             fileName.append(language);
         }
@@ -1259,13 +1271,11 @@ public class Package
         try {
             filter(doc, context);
             File spacedir = new File(dir, getDirectoryForDocument(doc));
-            if (!spacedir.exists()) {
-                if (!spacedir.mkdirs()) {
-                    Object[] args = new Object[1];
-                    args[0] = dir.toString();
-                    throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
-                        "Error creating directory {0}", null, args);
-                }
+            if (!spacedir.exists() && !spacedir.mkdirs()) {
+                Object[] args = new Object[1];
+                args[0] = dir.toString();
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR,
+                    "Error creating directory {0}", null, args);
             }
             String filename = getFileNameFromDocument(doc, context);
             File file = new File(spacedir, filename);
@@ -1321,14 +1331,14 @@ public class Package
 
         Element docEl = domdoc.getRootElement();
 
-        Element infosEl = docEl.element("infos");
+        Element infosEl = docEl.element(INFOS);
 
         this.name = getElementText(infosEl, "name");
-        this.description = getElementText(infosEl, "description");
-        this.licence = getElementText(infosEl, "licence");
-        this.authorName = getElementText(infosEl, "author");
+        this.description = getElementText(infosEl, DESCRIPTION);
+        this.licence = getElementText(infosEl, LICENCE);
+        this.authorName = getElementText(infosEl, AUTHOR);
         this.extensionId = getElementText(infosEl, "extensionId", null);
-        this.version = getElementText(infosEl, "version");
+        this.version = getElementText(infosEl, VERSION);
         this.backupPack = new Boolean(getElementText(infosEl, "backupPack")).booleanValue();
         this.preserveVersion = new Boolean(getElementText(infosEl, "preserveVersion")).booleanValue();
 
@@ -1453,36 +1463,35 @@ public class Package
     }
 
     /**
-     * Outputs the content of this package in the JSON format
+     * Outputs the content of this package in the JSON format.
      *
      * @param wikiContext the XWiki context
-     * @return a representation of this package under the JSON format
-     * @since 2.2M1
+     * @return a representation of this package that can be easily serialized in the JSON format
+     * @since 17.6.0RC1
      */
-    public JSONObject toJSON(XWikiContext wikiContext)
+    public Object toJSON(XWikiContext wikiContext)
     {
-        Map<String, Object> json = new HashMap<String, Object>();
+        Map<String, Object> json = new HashMap<>();
 
-        Map<String, Object> infos = new HashMap<String, Object>();
+        Map<String, Object> infos = new HashMap<>();
         infos.put("name", this.name);
-        infos.put("description", this.description);
-        infos.put("licence", this.licence);
-        infos.put("author", this.authorName);
-        infos.put("version", this.version);
+        infos.put(DESCRIPTION, this.description);
+        infos.put(LICENCE, this.licence);
+        infos.put(AUTHOR, this.authorName);
+        infos.put(VERSION, this.version);
         infos.put("backup", this.isBackupPack());
 
-        Map<String, Map<String, List<Map<String, String>>>> files =
-            new HashMap<String, Map<String, List<Map<String, String>>>>();
+        Map<String, Map<String, List<Map<String, String>>>> files = new HashMap<>();
 
         for (DocumentInfo docInfo : this.files) {
-            Map<String, String> fileInfos = new HashMap<String, String>();
-            fileInfos.put("defaultAction", String.valueOf(docInfo.getAction()));
-            fileInfos.put("language", String.valueOf(docInfo.getLanguage()));
+            Map<String, String> fileInfos = new HashMap<>();
+            fileInfos.put(DEFAULT_ACTION, String.valueOf(docInfo.getAction()));
+            fileInfos.put(LANGUAGE, String.valueOf(docInfo.getLanguage()));
             fileInfos.put("fullName", docInfo.getFullName());
 
             // If the space does not exist in the map of spaces, we create it.
             if (files.get(docInfo.getDoc().getSpace()) == null) {
-                files.put(docInfo.getDoc().getSpace(), new HashMap<String, List<Map<String, String>>>());
+                files.put(docInfo.getDoc().getSpace(), new HashMap<>());
             }
 
             // If the document name does not exist in the space map of docs, we create it.
@@ -1496,12 +1505,10 @@ public class Package
             files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()).add(fileInfos);
         }
 
-        json.put("infos", infos);
-        json.put("files", files);
+        json.put(INFOS, infos);
+        json.put(FILES, files);
 
-        JSONObject jsonObject = JSONObject.fromObject(json);
-
-        return jsonObject;
+        return json;
     }
 
     private SAXReader getSAXReader()

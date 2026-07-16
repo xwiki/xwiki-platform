@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class ScriptXWikiServletRequestTest
+class ScriptXWikiServletRequestTest
 {
     private final ContextualAuthorizationManager authorization = mock(ContextualAuthorizationManager.class);
 
@@ -145,6 +145,18 @@ public class ScriptXWikiServletRequestTest
         setProgramingRight(false);
 
         assertSame(this.scriptRequest, this.scriptRequest.getHttpServletRequest());
+    }
+
+    @Test
+    void getRequest()
+    {
+        setProgramingRight(true);
+
+        assertSame(this.request, this.scriptRequest.getRequest());
+
+        setProgramingRight(false);
+
+        assertNull(this.scriptRequest.getRequest());
     }
 
     @Test

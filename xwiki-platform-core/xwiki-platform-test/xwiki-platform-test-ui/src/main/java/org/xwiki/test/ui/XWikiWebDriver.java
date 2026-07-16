@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
@@ -49,6 +50,8 @@ import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wraps a {@link org.openqa.selenium.WebDriver} instance and adds new APIs useful for XWiki tests.
@@ -58,6 +61,16 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  */
 public class XWikiWebDriver extends RemoteWebDriver
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiWebDriver.class);
+
+    /**
+     * Number of times {@link #findElement(By)} re-locates an element when it goes stale during the scroll-into-view
+     * that follows the lookup. A DOM re-render (e.g. an async save rebuilding a form) can detach the element between
+     * locating it and scrolling to it; a couple of attempts absorb that transient, while a persistently-stale element
+     * still surfaces as a real failure.
+     */
+    private static final int FIND_SCROLL_ATTEMPTS = 3;
+
     private RemoteWebDriver wrappedDriver;
 
     /**
@@ -436,7 +449,7 @@ public class XWikiWebDriver extends RemoteWebDriver
         waitUntilCondition(driver -> {
             try {
                 WebElement element = driver.findElement(locator);
-                return !element.getAttribute(attributeName).isEmpty();
+                return StringUtils.isNotEmpty(element.getAttribute(attributeName));
             } catch (NotFoundException e) {
                 return false;
             } catch (StaleElementReferenceException e) {
@@ -667,14 +680,21 @@ public class XWikiWebDriver extends RemoteWebDriver
     @Override
     public List<WebElement> findElements(By by)
     {
-        return this.wrappedDriver.findElements(by);
+        long startTime = System.currentTimeMillis();
+        List<WebElement> elements = this.wrappedDriver.findElements(by);
+        // When no element matches, findElements() doesn't throw but returns an empty list only after having waited for
+        // the full implicit-wait timeout. If that's what happened then the test wastefully waited (see XWIKI-12558).
+        if (elements.isEmpty()) {
+            warnIfWastefulWait(by, System.currentTimeMillis() - startTime);
+        }
+        return elements;
     }
 
     // Make sure the element is visible by scrolling it into view. Otherwise it's possible for example  that the
     // visible floating save bar would hide the element.
     public WebElement scrollTo(WebElement element)
     {
-        executeScript("arguments[0].scrollIntoView();", element);
+        executeScript("arguments[0].scrollIntoView({behavior: 'instant'});", element);
         return element;
     }
 
@@ -709,10 +729,82 @@ public class XWikiWebDriver extends RemoteWebDriver
      * implement your own {@link ExpectedCondition} using {@link #findElementWithoutScrolling(By)}.
      */
     @Override
+    // Ignore Sonar false positive: stale cannot be null after the loop because if it was null, then the method would
+    // have returned already.
+    @SuppressWarnings("java:S2259")
     public WebElement findElement(By by)
     {
-        WebElement element = this.wrappedDriver.findElement(by);
-        return this.scrollTo(element);
+        long startTime = System.currentTimeMillis();
+        StaleElementReferenceException stale = null;
+        for (int attempt = 0; attempt < FIND_SCROLL_ATTEMPTS; attempt++) {
+            WebElement element;
+            try {
+                element = this.wrappedDriver.findElement(by);
+            } catch (NoSuchElementException e) {
+                // The element wasn't found. If the lookup consumed the full implicit-wait timeout then the test
+                // wastefully waited for something that isn't there (see XWIKI-12558).
+                warnIfWastefulWait(by, System.currentTimeMillis() - startTime);
+                throw e;
+            }
+            try {
+                return this.scrollTo(element);
+            } catch (StaleElementReferenceException e) {
+                // The element went stale between being located and scrolled into view; re-locate and retry.
+                stale = e;
+            }
+        }
+        throw stale;
+    }
+
+    /**
+     * Logs a WARN when a wrapped {@code findElement()}/{@code findElements()} lookup found nothing after having
+     * consumed (at least) the full implicit-wait timeout. This is the wasteful-wait anti-pattern described in
+     * <a href="https://jira.xwiki.org/browse/XWIKI-12558">XWIKI-12558</a>: the test looked for an element that isn't
+     * there while the driver was configured to wait, thus incurring the full timeout for nothing. Such tests should
+     * instead look for elements that are expected to be present, and when they really need to check for absence or to
+     * avoid waiting they should use {@link #findElementWithoutWaiting(By)}, {@link #hasElementWithoutWaiting(By)} or
+     * {@link #waitUntilElementDisappears(By)}.
+     * <p>
+     * This only reports the "not found after a full wait" case on purpose: reporting slow-but-successful lookups was
+     * tried in the past and produced non-deterministic false positives.
+     * <p>
+     * Note: this method is package-private (rather than private) only so that its decision logic can be unit-tested in
+     * isolation, decoupled from the real timing of a Selenium call.
+     *
+     * @param by the locator that was being looked up
+     * @param elapsedMillis how long the (unsuccessful) lookup took, in milliseconds
+     */
+    void warnIfWastefulWait(By by, long elapsedMillis)
+    {
+        if (elapsedMillis >= getTimeout() * 1000L) {
+            Exception locationException =
+                new Exception("Stack trace to help locate the wasteful findElement()/findElements() call");
+            // Trim the noise below the offending test code (Selenium, JUnit, JDK reflection, etc.).
+            locationException.setStackTrace(truncateToLastXWikiFrame(locationException.getStackTrace()));
+            LOGGER.warn("The currently running test wasted [{}] ms waiting for element [{}] which was not found. "
+                + "Tests should look for elements that are expected to be present; to check for the absence of an "
+                + "element or to avoid waiting, use findElementWithoutWaiting(), hasElementWithoutWaiting() or "
+                + "waitUntilElementDisappears() instead.", elapsedMillis, by, locationException);
+        }
+    }
+
+    /**
+     * Keeps the passed stack trace only up to (and including) the last {@code org.xwiki.*} frame. Frames located after
+     * it (Selenium, JUnit, JDK reflection, etc.) are just noise for locating the offending test code, so they're
+     * dropped. Non-{@code org.xwiki.*} frames appearing in-between two {@code org.xwiki.*} frames are kept.
+     *
+     * @param stackTrace the full stack trace to truncate
+     * @return the truncated stack trace, or the passed one unchanged if it contains no {@code org.xwiki.*} frame
+     */
+    static StackTraceElement[] truncateToLastXWikiFrame(StackTraceElement[] stackTrace)
+    {
+        int lastXWikiIndex = -1;
+        for (int i = 0; i < stackTrace.length; i++) {
+            if (stackTrace[i].getClassName().startsWith("org.xwiki.")) {
+                lastXWikiIndex = i;
+            }
+        }
+        return lastXWikiIndex < 0 ? stackTrace : Arrays.copyOfRange(stackTrace, 0, lastXWikiIndex + 1);
     }
 
     @Override
@@ -901,7 +993,15 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public WebElement findElementWithoutScrolling(By by)
     {
-        return this.wrappedDriver.findElement(by);
+        long startTime = System.currentTimeMillis();
+        try {
+            return this.wrappedDriver.findElement(by);
+        } catch (NoSuchElementException e) {
+            // The element wasn't found. If the lookup consumed the full implicit-wait timeout then the test wastefully
+            // waited for something that isn't there (see XWIKI-12558).
+            warnIfWastefulWait(by, System.currentTimeMillis() - startTime);
+            throw e;
+        }
     }
 
     /**
@@ -971,5 +1071,47 @@ public class XWikiWebDriver extends RemoteWebDriver
                 return false;
             }
         });
+    }
+
+    /**
+     * @param element the element to check if it is visible
+     * @param xOffset the horizontal offset from the element's left border
+     * @param yOffset the vertical offset from the element's top border
+     * @return {@code true} if the specified point inside the given element is visible (inside the viewport),
+     *         {@code false} otherwise
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public boolean isVisible(WebElement element, int xOffset, int yOffset)
+    {
+        StringBuilder script = new StringBuilder();
+        script.append("const element = arguments[0];\n");
+        script.append("const xOffset = arguments[1];\n");
+        script.append("const yOffset = arguments[2];\n");
+        script.append("const box = element.getBoundingClientRect();\n");
+        script.append("const x = box.left + xOffset;\n");
+        script.append("const y = box.top + yOffset;\n");
+        script.append("let target = document.elementFromPoint(x, y);\n");
+        script.append("for (; target; target = target.parentElement) {\n");
+        script.append("  if (target === element) {\n");
+        script.append("    return true;\n");
+        script.append("  }\n");
+        script.append("}\n");
+        script.append("return false;\n");
+        return (boolean) executeScript(script.toString(), element, xOffset, yOffset);
+    }
+
+    /**
+     * See https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation .
+     * 
+     * @return {@code true} if the given element meets the validation constraints, {@code false} otherwise
+     * @since 18.1.0RC1
+     * @since 17.10.4
+     * @since 17.4.9
+     * @since 16.10.17
+     */
+    public boolean isValid(WebElement element)
+    {
+        return Boolean.TRUE.equals(executeScript("return arguments[0]?.validity?.valid", element));
     }
 }

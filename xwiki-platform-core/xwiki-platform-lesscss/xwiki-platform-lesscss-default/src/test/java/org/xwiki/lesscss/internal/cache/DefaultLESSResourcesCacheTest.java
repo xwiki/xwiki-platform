@@ -19,9 +19,8 @@
  */
 package org.xwiki.lesscss.internal.cache;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
@@ -29,193 +28,199 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.lesscss.internal.colortheme.NamedColorThemeReference;
 import org.xwiki.lesscss.internal.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.internal.skin.FSSkinReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.AfterComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * Test class for {@link DefaultLESSResourcesCache}.
  *
- * @since 6.1M2
  * @version $Id$
+ * @since 6.1M2
  */
-public class DefaultLESSResourcesCacheTest
+@ComponentTest
+class DefaultLESSResourcesCacheTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultLESSResourcesCache> mocker =
-            new MockitoComponentMockingRule<>(DefaultLESSResourcesCache.class);
+    @InjectMockComponents
+    private DefaultLESSResourcesCache defaultLESSResourcesCache;
 
+    @MockComponent
     private CacheManager cacheManager;
+
+    @MockComponent
+    private CacheKeyFactory cacheKeyFactory;
 
     private Cache<String> cache;
 
-    private CacheKeyFactory cacheKeyFactory;
-
-    @Before
-    public void setUp() throws Exception
+    @AfterComponent
+    void afterComponents() throws Exception
     {
-        cacheManager = mocker.getInstance(CacheManager.class);
-        cache = mock(Cache.class);
+        this.cache = mock(Cache.class);
         CacheFactory cacheFactory = mock(CacheFactory.class);
-        when(cacheManager.getCacheFactory()).thenReturn(cacheFactory);
+        when(this.cacheManager.getCacheFactory()).thenReturn(cacheFactory);
         CacheConfiguration configuration = new CacheConfiguration("lesscss.skinfiles.cache");
-        when(cacheFactory.<String>newCache(eq(configuration))).thenReturn(cache);
-        cacheKeyFactory = mocker.getInstance(CacheKeyFactory.class);
-
-        LESSSkinFileResourceReference lessSkinFileResourceReference = 
-                new LESSSkinFileResourceReference("lessResource", null, null);
-        when(cacheKeyFactory.getCacheKey(eq(lessSkinFileResourceReference), eq(new FSSkinReference("skin")),
-            eq(new NamedColorThemeReference("colorTheme")), eq(true))).thenReturn("12_lessResource_4_skin_10_colorTheme");
+        when(cacheFactory.<String>newCache(configuration)).thenReturn(this.cache);
     }
-    
+
+    @BeforeEach
+    void setUp()
+    {
+        LESSSkinFileResourceReference lessSkinFileResourceReference =
+            new LESSSkinFileResourceReference("lessResource", null, null);
+        when(this.cacheKeyFactory.getCacheKey(lessSkinFileResourceReference, new FSSkinReference("skin"),
+            new NamedColorThemeReference("colorTheme"), true)).thenReturn(
+            "12_lessResource_4_skin_10_colorTheme");
+    }
+
     private LESSSkinFileResourceReference createLESSSkinFileResourceReference(String fileName)
     {
         return new LESSSkinFileResourceReference(fileName, null, null);
     }
 
     @Test
-    public void get() throws Exception
+    void get()
     {
         // Mock
-        when(cache.get("12_lessResource_4_skin_10_colorTheme")).thenReturn("Expected output");
+        when(this.cache.get("12_lessResource_4_skin_10_colorTheme")).thenReturn("Expected output");
 
         // Test
-        String result = mocker.getComponentUnderTest().get(new LESSSkinFileResourceReference("lessResource", null, null),
-            new FSSkinReference("skin"), new NamedColorThemeReference("colorTheme"));
+        String result =
+            this.defaultLESSResourcesCache.get(new LESSSkinFileResourceReference("lessResource", null, null),
+                new FSSkinReference("skin"), new NamedColorThemeReference("colorTheme"));
 
         // Verify
         assertEquals("Expected output", result);
     }
 
     @Test
-    public void set() throws Exception
+    void set()
     {
         // Test
-        mocker.getComponentUnderTest().set(
+        this.defaultLESSResourcesCache.set(
             new LESSSkinFileResourceReference("lessResource", null, null), new FSSkinReference("skin"),
             new NamedColorThemeReference("colorTheme"), "css");
 
         // Verify
-        verify(cache).set(eq("12_lessResource_4_skin_10_colorTheme"), eq("css"));
+        verify(this.cache).set("12_lessResource_4_skin_10_colorTheme", "css");
     }
 
     @Test
-    public void clear() throws Exception
+    void clear()
     {
         // Test
-        mocker.getComponentUnderTest().clear();
+        this.defaultLESSResourcesCache.clear();
 
         // Verify
-        verify(cache).removeAll();
+        verify(this.cache).removeAll();
     }
 
     @Test
-    public void clearFromSkin() throws Exception
-    {
-        // Mocks
-        LESSSkinFileResourceReference file1 = createLESSSkinFileResourceReference("file1");
-        LESSSkinFileResourceReference file2 = createLESSSkinFileResourceReference("file2");
-        when(cacheKeyFactory.getCacheKey(eq(file1), eq(new FSSkinReference("skin1")),
-                eq(new NamedColorThemeReference("colorTheme")), eq(true))).thenReturn("k1");
-        when(cacheKeyFactory.getCacheKey(eq(file1), eq(new FSSkinReference("skin2")),
-            eq(new NamedColorThemeReference("colorTheme")), eq(true))).thenReturn("k3");
-        when(cacheKeyFactory.getCacheKey(eq(file2), eq(new FSSkinReference("skin1")),
-                eq(new NamedColorThemeReference("colorTheme")), eq(true))).thenReturn("k4");
-
-        // Add the first one twice
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
-                new NamedColorThemeReference("colorTheme"), "css1");
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
-                new NamedColorThemeReference("colorTheme"), "css1");
-
-        // Others
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin2"),
-                new NamedColorThemeReference("colorTheme"), "css2");
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin1"),
-                new NamedColorThemeReference("colorTheme"), "css3");
-
-        // Test
-        mocker.getComponentUnderTest().clearFromSkin(new FSSkinReference("skin1"));
-
-        // Verify
-        verify(cache, times(1)).remove("k1");
-        verify(cache).remove("k4");
-        verify(cache, never()).remove("k3");
-    }
-
-    @Test
-    public void clearFromColorTheme() throws Exception
+    void clearFromSkin()
     {
         // Mocks
         LESSSkinFileResourceReference file1 = createLESSSkinFileResourceReference("file1");
         LESSSkinFileResourceReference file2 = createLESSSkinFileResourceReference("file2");
+        when(this.cacheKeyFactory.getCacheKey(file1, new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme"), true)).thenReturn("k1");
+        when(this.cacheKeyFactory.getCacheKey(file1, new FSSkinReference("skin2"),
+            new NamedColorThemeReference("colorTheme"), true)).thenReturn("k3");
+        when(this.cacheKeyFactory.getCacheKey(file2, new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme"), true)).thenReturn("k4");
 
-        when(cacheKeyFactory.getCacheKey(eq(file1), eq(new FSSkinReference("skin1")),
-                eq(new NamedColorThemeReference("colorTheme1")), eq(true))).thenReturn("k1");
-        when(cacheKeyFactory.getCacheKey(eq(file1), eq(new FSSkinReference("skin1")),
-                eq(new NamedColorThemeReference("colorTheme2")), eq(true))).thenReturn("k3");
-        when(cacheKeyFactory.getCacheKey(eq(file2), eq(new FSSkinReference("skin2")),
-                eq(new NamedColorThemeReference("colorTheme1")), eq(true))).thenReturn("k4");
         // Add the first one twice
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
-                new NamedColorThemeReference("colorTheme1"), "css1");
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
-                new NamedColorThemeReference("colorTheme1"), "css1");
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme"), "css1");
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme"), "css1");
 
         // Others
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
-                new NamedColorThemeReference("colorTheme2"), "css2");
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin2"),
-                new NamedColorThemeReference("colorTheme1"), "css3");
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin2"),
+            new NamedColorThemeReference("colorTheme"), "css2");
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme"), "css3");
 
         // Test
-        mocker.getComponentUnderTest().clearFromColorTheme(new NamedColorThemeReference("colorTheme1"));
+        this.defaultLESSResourcesCache.clearFromSkin(new FSSkinReference("skin1"));
 
         // Verify
-        verify(cache, times(1)).remove("k1");
-        verify(cache).remove("k4");
-        verify(cache, never()).remove("k3");
+        verify(this.cache).remove("k1");
+        verify(this.cache).remove("k4");
+        verify(this.cache, never()).remove("k3");
     }
 
     @Test
-    public void clearFromLESSResource() throws Exception
+    void clearFromColorTheme()
     {
         // Mocks
         LESSSkinFileResourceReference file1 = createLESSSkinFileResourceReference("file1");
         LESSSkinFileResourceReference file2 = createLESSSkinFileResourceReference("file2");
 
-        when(cacheKeyFactory.getCacheKey(eq(file1), eq(new FSSkinReference("skin1")),
-                eq(new NamedColorThemeReference("colorTheme1")), eq(true))).thenReturn("k1");
-        when(cacheKeyFactory.getCacheKey(eq(file2), eq(new FSSkinReference("skin1")),
-                eq(new NamedColorThemeReference("colorTheme1")), eq(true))).thenReturn("k3");
-        when(cacheKeyFactory.getCacheKey(eq(file1), eq(new FSSkinReference("skin2")),
-                eq(new NamedColorThemeReference("colorTheme1")), eq(true))).thenReturn("k4");
-
+        when(this.cacheKeyFactory.getCacheKey(file1, new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme1"), true)).thenReturn("k1");
+        when(this.cacheKeyFactory.getCacheKey(file1, new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme2"), true)).thenReturn("k3");
+        when(this.cacheKeyFactory.getCacheKey(file2, new FSSkinReference("skin2"),
+            new NamedColorThemeReference("colorTheme1"), true)).thenReturn("k4");
         // Add the first one twice
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
-                new NamedColorThemeReference("colorTheme1"), "css1");
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
-                new NamedColorThemeReference("colorTheme1"), "css1");
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme1"), "css1");
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme1"), "css1");
 
         // Others
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin1"),
-                new NamedColorThemeReference("colorTheme1"), "css");
-        mocker.getComponentUnderTest().set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin2"),
-                new NamedColorThemeReference("colorTheme1"), "css3");
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme2"), "css2");
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin2"),
+            new NamedColorThemeReference("colorTheme1"), "css3");
 
         // Test
-        mocker.getComponentUnderTest().clearFromLESSResource(createLESSSkinFileResourceReference("file1"));
+        this.defaultLESSResourcesCache.clearFromColorTheme(new NamedColorThemeReference("colorTheme1"));
 
         // Verify
-        verify(cache, times(1)).remove("k1");
-        verify(cache).remove("k4");
-        verify(cache, never()).remove("k3");
+        verify(this.cache).remove("k1");
+        verify(this.cache).remove("k4");
+        verify(this.cache, never()).remove("k3");
     }
 
+    @Test
+    void clearFromLESSResource()
+    {
+        // Mocks
+        LESSSkinFileResourceReference file1 = createLESSSkinFileResourceReference("file1");
+        LESSSkinFileResourceReference file2 = createLESSSkinFileResourceReference("file2");
+
+        when(this.cacheKeyFactory.getCacheKey(file1, new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme1"), true)).thenReturn("k1");
+        when(this.cacheKeyFactory.getCacheKey(file2, new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme1"), true)).thenReturn("k3");
+        when(this.cacheKeyFactory.getCacheKey(file1, new FSSkinReference("skin2"),
+            new NamedColorThemeReference("colorTheme1"), true)).thenReturn("k4");
+
+        // Add the first one twice
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme1"), "css1");
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme1"), "css1");
+
+        // Others
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file2"), new FSSkinReference("skin1"),
+            new NamedColorThemeReference("colorTheme1"), "css");
+        this.defaultLESSResourcesCache.set(createLESSSkinFileResourceReference("file1"), new FSSkinReference("skin2"),
+            new NamedColorThemeReference("colorTheme1"), "css3");
+
+        // Test
+        this.defaultLESSResourcesCache.clearFromLESSResource(createLESSSkinFileResourceReference("file1"));
+
+        // Verify
+        verify(this.cache).remove("k1");
+        verify(this.cache).remove("k4");
+        verify(this.cache, never()).remove("k3");
+    }
 }

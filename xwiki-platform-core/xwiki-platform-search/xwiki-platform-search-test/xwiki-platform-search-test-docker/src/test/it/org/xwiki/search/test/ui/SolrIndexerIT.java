@@ -22,13 +22,13 @@ package org.xwiki.search.test.ui;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.search.solr.internal.job.DiffDocumentIterator;
-import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -48,11 +48,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(properties = {
     // Exclude the Groovy script below from the PR checker.
-    // Increase the indexer batch size to speed up indexing.
-    """
-        xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*Test\\.Execute\\..*
-        solr.indexer.batch.maxLength=10000000
-        solr.indexer.batch.size=200"""
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*Test\\.Execute\\..*"
+}, extraJARs = {
+    // Solr initialization isn't reliable when it's not part of the WAR.
+    "org.xwiki.platform:xwiki-platform-search-solr-query"
 })
 class SolrIndexerIT
 {
@@ -67,12 +66,13 @@ class SolrIndexerIT
         import org.xwiki.search.solr.internal.job.DiffDocumentIterator
         import org.xwiki.search.solr.internal.job.DocumentIterator
         import org.xwiki.velocity.tools.JSONTool
-        
+        import org.xwiki.search.solr.internal.job.AbstractDocumentIterator.DocumentIteratorEntry;
+
         if (xcontext.action == "get") {
             ParameterizedType documentIterator =
-                new DefaultParameterizedType(null, DocumentIterator.class, String.class)
-            DocumentIterator<String> databaseIterator = services.component.getInstance(documentIterator, "database")
-            DocumentIterator<String> solrIterator = services.component.getInstance(documentIterator, "solr")
+                new DefaultParameterizedType(null, DocumentIterator.class, DocumentIteratorEntry.class)
+            DocumentIterator<DocumentIteratorEntry> databaseIterator = services.component.getInstance(documentIterator, "database")
+            DocumentIterator<DocumentIteratorEntry> solrIterator = services.component.getInstance(documentIterator, "solr")
         
             // Store both iterators converted to list for the output.
             def outputData = [
@@ -107,8 +107,8 @@ class SolrIndexerIT
             while (iterator.hasNext()) {
                 def pair = iterator.next()
                 int comparison = -1
-                if (previous != null) {
-                    comparison = comparator.compare(previous.getLeft(), pair.getLeft())
+                if (previous != null && previous.getRight() instanceof DocumentIteratorEntry) {
+                    comparison = comparator.compare(previous.getRight(), pair.getRight())
                 }
                 previous = pair
                 list.add([pair.getLeft().toString(), pair.getRight().toString(), String.valueOf(comparison)])
@@ -121,7 +121,8 @@ class SolrIndexerIT
     private static final String WEB_HOME = "WebHome";
 
     @Test
-    void sortOrder(TestReference testReference, TestUtils testUtils, TestConfiguration testConfiguration)
+    @Order(1)
+    void sortOrder(TestReference testReference, TestUtils testUtils)
         throws Exception
     {
         testUtils.loginAsSuperAdmin();
@@ -147,7 +148,7 @@ class SolrIndexerIT
         testUtils.rest().savePage(new DocumentReference(WEB_HOME, new SpaceReference("A-b", testSpace)));
         testUtils.rest().savePage(new DocumentReference(WEB_HOME, new SpaceReference("AAb", testSpace)));
 
-        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        new SolrTestUtils(testUtils).waitEmptyQueue();
 
         // Get the output from the test script.
         String jsonContent = testUtils.executeWiki(TEST_SCRIPT, Syntax.XWIKI_2_1);

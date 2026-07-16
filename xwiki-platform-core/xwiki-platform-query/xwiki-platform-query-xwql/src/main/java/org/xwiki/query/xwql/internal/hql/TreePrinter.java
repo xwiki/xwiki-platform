@@ -65,8 +65,7 @@ public class TreePrinter extends DepthFirstAdapter
     @Override
     public void defaultCase(Node node)
     {
-        if (node instanceof Token) {
-            Token token = (Token) node;
+        if (node instanceof Token token) {
             builder.append(' ')
                 .append(token.getText());
         }
@@ -102,7 +101,7 @@ public class TreePrinter extends DepthFirstAdapter
             from = "XWikiDocument";
         } else if (getContext().getObject(alias) != null) {
             from = "BaseObject";
-        } else if (from.equals("Space")) {
+        } else if ("Space".equals(from)) {
             from = "XWikiSpace";
         }
         builder.append(' ').append(from)

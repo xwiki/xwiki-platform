@@ -93,9 +93,6 @@ public class DeleteAttachmentAction extends XWikiAction
         if (context.getMode() == XWikiContext.MODE_PORTLET) {
             filename = request.getParameter("filename");
         } else {
-            // Note: We use getRequestURI() because the spec says the server doesn't decode it, as
-            // we want to use our own decoding.
-            String requestUri = request.getRequestURI();
             filename = getFileName();
         }
 
@@ -132,9 +129,9 @@ public class DeleteAttachmentAction extends XWikiAction
         // Set "deleted attachment" as the version comment.
         String comment;
         if (attachment.isImage(context)) {
-            comment = localizePlainOrKey("core.comment.deleteImageComment", filename);
+            comment = localizePlainOrReturnKey("core.comment.deleteImageComment", filename);
         } else {
-            comment = localizePlainOrKey("core.comment.deleteAttachmentComment", filename);
+            comment = localizePlainOrReturnKey("core.comment.deleteAttachmentComment", filename);
         }
 
         try {

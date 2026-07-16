@@ -62,7 +62,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
      * beginAnnotation was signaled but not endAnnotation). Used for correctly nesting the annotations markers with
      * other XHTML elements. <br>
      */
-    private List<Annotation> renderedAnnotations = new LinkedList<Annotation>();
+    private List<Annotation> renderedAnnotations = new LinkedList<>();
 
     /**
      * Builds an XHTML markers annotations printer which uses the underlying wiki printer.
@@ -121,7 +121,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
      */
     private void printAnnotationStartMarker(Annotation annotation)
     {
-        Map<String, String> attributes = new LinkedHashMap<String, String>();
+        Map<String, String> attributes = new LinkedHashMap<>();
 
         attributes.put("class", "annotation ID" + annotation.getId());
         printXMLStartElement(ANNOTATION_MARKER, attributes);
@@ -186,7 +186,8 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
         // iterate through the indexes of annotations events, print the chunks in between and then handle the annotation
         // events
         int previous = 0;
-        for (int index : annotations.keySet()) {
+        for (Map.Entry<Integer, List<AnnotationEvent>> entry : annotations.entrySet()) {
+            int index = entry.getKey();
             // create the current chunk
             String currentChunk = text.substring(previous, index);
             // print the current chunk
@@ -194,7 +195,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
                 printXML(currentChunk);
             }
             // handle all annotations at this position
-            for (AnnotationEvent evt : annotations.get(index)) {
+            for (AnnotationEvent evt : entry.getValue()) {
                 switch (evt.getType()) {
                     case START:
                         beginAnnotation(evt.getAnnotation());

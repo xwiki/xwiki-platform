@@ -31,7 +31,6 @@ import javax.inject.Provider;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.PDFPrinter;
-import org.xwiki.export.pdf.internal.RequiredSkinExtensionsRecorder;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobStatus.DocumentRenderingResult;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,6 +38,7 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.skinx.RequiredSkinExtensionsRecorder;
 
 /**
  * The PDF export job.
@@ -76,6 +76,22 @@ public class PDFExportJob extends AbstractPDFExportJob
 
     @Override
     protected void runInternal() throws Exception
+    {
+        try {
+            exportAsPDF();
+        } finally {
+            cleanup();
+        }
+    }
+
+    private void cleanup()
+    {
+        // Avoid saving sensitive information along with the PDF export job status. This information is not needed
+        // anymore after the PDF export job is done (whether the PDF is generated client-side or server-side).
+        getRequest().getContext().keySet().removeAll(List.of("request.session", "request.headers", "request.cookies"));
+    }
+
+    private void exportAsPDF() throws Exception
     {
         if (!this.request.getDocuments().isEmpty()) {
             this.requiredSkinExtensionsRecorder.start();
@@ -160,7 +176,8 @@ public class PDFExportJob extends AbstractPDFExportJob
     private void saveAsPDF() throws IOException
     {
         URL printPreviewURL = this.printPreviewURLBuilder.getPrintPreviewURL(this.request);
-        try (InputStream pdfContent = this.pdfPrinterProvider.get().print(printPreviewURL)) {
+        try (InputStream pdfContent =
+            this.pdfPrinterProvider.get().print(printPreviewURL, () -> this.status.isCanceled())) {
             if (!this.status.isCanceled()) {
                 this.temporaryResourceStore.createTemporaryFile(this.status.getPDFFileReference(), pdfContent);
             }

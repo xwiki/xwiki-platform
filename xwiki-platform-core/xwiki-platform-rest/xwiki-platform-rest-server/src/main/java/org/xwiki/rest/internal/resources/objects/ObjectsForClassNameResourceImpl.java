@@ -54,8 +54,7 @@ public class ObjectsForClassNameResourceImpl extends BaseObjectsResource impleme
 
             List<com.xpn.xwiki.objects.BaseObject> objectList = getBaseObjects(doc, className);
 
-            RangeIterable<com.xpn.xwiki.objects.BaseObject> ri =
-                    new RangeIterable<com.xpn.xwiki.objects.BaseObject>(objectList, start, number);
+            RangeIterable<com.xpn.xwiki.objects.BaseObject> ri = new RangeIterable<>(objectList, start, number);
 
             for (com.xpn.xwiki.objects.BaseObject object : ri) {
                 // By deleting objects, some of them might become null, so we must check for this

@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -42,6 +43,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.search.solr.SolrException;
+import org.xwiki.search.solr.XWikiSolrCore;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
 /**
@@ -95,7 +97,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         String searchCoreURL = this.configuration.getInstanceConfiguration(TYPE, "url", null);
         if (searchCoreURL != null) {
             this.cores.put(SolrClientInstance.CORE_NAME, new DefaultXWikiSolrCore(SolrClientInstance.CORE_NAME,
-                toSolrCoreName(SolrClientInstance.CORE_NAME), new HttpSolrClient.Builder(searchCoreURL).build()));
+                toSolrCoreName(SolrClientInstance.CORE_NAME), new HttpSolrClient.Builder(searchCoreURL).build(), -1));
 
             // If the base URL is not provided try to guess it from the search core URL
             if (baseURL == null) {
@@ -134,6 +136,18 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         }
     }
 
+    @Override
+    public void dispose()
+    {
+        super.dispose();
+
+        try {
+            this.rootClient.close();
+        } catch (IOException e) {
+            this.logger.error("Failed to close Solr client", e);
+        }
+    }
+
     private Set<String> getCores() throws SolrServerException, IOException
     {
         CoreAdminRequest request = new CoreAdminRequest();
@@ -154,25 +168,29 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     }
 
     @Override
-    protected int getSolrMajorVersion()
+    public int getSolrMajorVersion()
     {
         return this.solrMajorVersion;
     }
 
     @Override
-    protected SolrClient getInternalSolrClient(String solrCoreName) throws SolrException
+    protected XWikiSolrCore getCore(String xwikiCoreName, int solrMajorVersion) throws SolrException
     {
+        String solrCoreName = toSolrCoreName(xwikiCoreName, solrMajorVersion);
+
         // Check if the core exists
         try {
-            if (getCores().contains(solrCoreName)) {
-                return new HttpSolrClient.Builder(getRootClient().getBaseURL() + '/' + solrCoreName).build();
+            // Try to find a core designed for the current Solr version
+            if (!getCores().contains(solrCoreName)) {
+                return null;
             }
         } catch (Exception e) {
             throw new SolrException("Failed to get the list of cores", e);
         }
 
-        // If not, return null
-        return null;
+        // Create the client core handler
+        SolrClient solrClient = new HttpSolrClient.Builder(getRootClient().getBaseURL() + '/' + solrCoreName).build();
+        return new DefaultXWikiSolrCore(xwikiCoreName, solrCoreName, solrClient, getSolrMajorVersion());
     }
 
     private String getCorePrefix()
@@ -203,22 +221,6 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     {
         String prefixedCoreName = super.toXWikiCoreName(solrCoreName);
 
-        return StringUtils.removeStart(prefixedCoreName, getCorePrefix());
-    }
-
-    @Override
-    protected SolrClient createSolrClient(String solrCoreName, boolean isCache) throws SolrException
-    {
-        CoreAdminRequest coreAdminRequest = new CoreAdminRequest.Create();
-
-        coreAdminRequest.setCoreName(solrCoreName);
-
-        try {
-            coreAdminRequest.process(getRootClient());
-        } catch (Exception e) {
-            throw new SolrException("Failed to create a new core", e);
-        }
-
-        return getInternalSolrClient(solrCoreName);
+        return Strings.CS.removeStart(prefixedCoreName, getCorePrefix());
     }
 }

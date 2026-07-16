@@ -34,9 +34,9 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.livedata.AbstractLiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
-import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataMeta;
 import org.xwiki.livedata.LiveDataPropertyDescriptor;
@@ -45,7 +45,6 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
-import org.xwiki.livedata.internal.JSONMerge;
 import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
@@ -58,7 +57,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 @Component
 @Named("liveTable")
 @Singleton
-public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurationResolver<LiveDataConfiguration>
+public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfigurationResolver
 {
     /**
      * Used to translate the live data property names using the translation prefix specified by the live date source.
@@ -78,20 +77,10 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     @Named("liveTable")
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
-    /**
-     * Used to merge the default configuration with the provided configuration.
-     */
-    private final JSONMerge jsonMerge = new JSONMerge();
-
     @Override
     public LiveDataConfiguration resolve(LiveDataConfiguration config) throws LiveDataException
     {
-        LiveDataConfiguration defaultConfig = getDefaultConfiguration(config);
-
-        // Make sure both configurations have the same id so that they are properly merged.
-        defaultConfig.setId(config.getId());
-
-        LiveDataConfiguration mergedConfig = this.jsonMerge.merge(defaultConfig, config);
+        LiveDataConfiguration mergedConfig = super.resolve(config);
 
         // We don't set the default sort on the default configuration (before the merge) because the sort is not easy to
         // merge automatically (the sort entry doesn't have an "id" property). We need to do the merge manually because
@@ -103,7 +92,8 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         return translate(mergedConfig, config);
     }
 
-    private LiveDataConfiguration getDefaultConfiguration(LiveDataConfiguration config) throws LiveDataException
+    @Override
+    protected LiveDataConfiguration getDefaultConfiguration(LiveDataConfiguration config) throws LiveDataException
     {
         LiveDataConfiguration defaultConfig = this.defaultConfigProvider.get();
 
@@ -124,8 +114,8 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     private LiveDataPropertyDescriptorStore getPropertyStore(Source sourceConfig)
     {
         LiveDataPropertyDescriptorStore propertyStore = this.propertyStoreProvider.get();
-        if (propertyStore instanceof WithParameters && sourceConfig != null) {
-            ((WithParameters) propertyStore).getParameters().putAll(sourceConfig.getParameters());
+        if (propertyStore instanceof WithParameters withParameters && sourceConfig != null) {
+            withParameters.getParameters().putAll(sourceConfig.getParameters());
         }
         return propertyStore;
     }
@@ -157,7 +147,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         if (query.getSort() != null) {
             // Remove the sort entry if we couldn't find a default sort property.
             query.setSort(query.getSort().stream().filter(Objects::nonNull)
-                .filter(sortEntry -> !StringUtils.isEmpty(sortEntry.getProperty())).collect(Collectors.toList()));
+                .filter(sortEntry -> !StringUtils.isEmpty(sortEntry.getProperty())).toList());
         }
     }
 
@@ -184,7 +174,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
             .map(LiveDataPropertyDescriptor::getId).collect(Collectors.toSet());
         List<LiveDataPropertyDescriptor> missingDescriptors =
             properties.stream().filter(property -> !propertiesWithDescriptor.contains(property))
-                .map(this::getDefaultPropertyDescriptor).collect(Collectors.toList());
+                .map(this::getDefaultPropertyDescriptor).toList();
         if (!missingDescriptors.isEmpty()) {
             propertyDescriptors = new ArrayList<>(propertyDescriptors);
             propertyDescriptors.addAll(missingDescriptors);

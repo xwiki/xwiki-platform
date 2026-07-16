@@ -163,13 +163,12 @@ public class ActionFilter implements Filter
         // We need to also get rid of the wiki name in case of a XWiki instance in path-based mode.
         ConfigurationSource configuration =
             Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
-        if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))) {
-            if (servletPath
-                .equals(PATH_SEPARATOR + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki"))) {
-                // Move the wiki name together with the servlet path
-                servletPath += path.substring(0, index);
-                index = path.indexOf(PATH_SEPARATOR, index + 1);
-            }
+        if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))
+            && (PATH_SEPARATOR + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki")).equals(
+                servletPath)) {
+            // Move the wiki name together with the servlet path
+            servletPath += path.substring(0, index);
+            index = path.indexOf(PATH_SEPARATOR, index + 1);
         }
 
         String document = path.substring(index);

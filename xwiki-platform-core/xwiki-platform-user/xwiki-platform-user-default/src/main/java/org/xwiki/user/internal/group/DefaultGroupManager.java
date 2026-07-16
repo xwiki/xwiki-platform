@@ -22,8 +22,10 @@ package org.xwiki.user.internal.group;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -58,10 +60,13 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 public class DefaultGroupManager implements GroupManager
 {
     @Inject
-    private GroupsCache groupsCache;
+    private MemberGroupsCache memberGroupsCache;
 
     @Inject
-    private MembersCache membersCache;
+    private GroupMembersCache groupMembersCache;
+
+    @Inject
+    private WikiGroupCache wikiGroupCache;
 
     @Inject
     private WikiDescriptorManager wikis;
@@ -117,10 +122,10 @@ public class DefaultGroupManager implements GroupManager
         Collection<String> searchWikis = new TreeSet<>();
 
         for (Object wiki : wikiTarget) {
-            if (wiki instanceof String) {
-                searchWikis.add((String) wiki);
-            } else if (wiki instanceof WikiReference) {
-                searchWikis.add(((WikiReference) wiki).getName());
+            if (wiki instanceof String string) {
+                searchWikis.add(string);
+            } else if (wiki instanceof WikiReference wikiReference) {
+                searchWikis.add(wikiReference.getName());
             } else if (wiki instanceof WikiTarget) {
                 searchWikis.addAll(getSearchWikis(reference, wikiTarget, resolve));
             }
@@ -134,14 +139,14 @@ public class DefaultGroupManager implements GroupManager
     {
         Collection<String> cacheWikis;
 
-        if (wikiTarget instanceof WikiTarget) {
-            cacheWikis = getSearchWikis(reference, (WikiTarget) wikiTarget, resolve);
-        } else if (wikiTarget instanceof String) {
-            cacheWikis = Collections.singleton((String) wikiTarget);
-        } else if (wikiTarget instanceof WikiReference) {
-            cacheWikis = Collections.singleton(((WikiReference) wikiTarget).getName());
-        } else if (wikiTarget instanceof Collection && !((Collection) wikiTarget).isEmpty()) {
-            cacheWikis = getSearchWikis(reference, (Collection) wikiTarget, resolve);
+        if (wikiTarget instanceof WikiTarget wikiTargetValue) {
+            cacheWikis = getSearchWikis(reference, wikiTargetValue, resolve);
+        } else if (wikiTarget instanceof String string) {
+            cacheWikis = Collections.singleton(string);
+        } else if (wikiTarget instanceof WikiReference wikiReference) {
+            cacheWikis = Collections.singleton(wikiReference.getName());
+        } else if (wikiTarget instanceof Collection collection && !collection.isEmpty()) {
+            cacheWikis = getSearchWikis(reference, collection, resolve);
         } else if (wikiTarget == null) {
             cacheWikis = getSearchWikis(reference, WikiTarget.ALL, resolve);
         } else {
@@ -169,7 +174,7 @@ public class DefaultGroupManager implements GroupManager
         Collection<String> cacheWikis = getSearchWikis(reference, wikiTarget, false);
 
         // Try in the cache
-        GroupCacheEntry entry = this.groupsCache.getCacheEntry(reference, cacheWikis, true);
+        GroupCacheEntry entry = this.memberGroupsCache.getCacheEntry(reference, cacheWikis, true);
 
         Collection<DocumentReference> groups = get(entry, recurse);
         if (groups != null) {
@@ -298,6 +303,55 @@ public class DefaultGroupManager implements GroupManager
     }
 
     @Override
+    public Set<DocumentReference> getGroups(WikiReference wikiReference) throws GroupException
+    {
+        Set<DocumentReference> groups = this.wikiGroupCache.get(wikiReference.getName());
+
+        if (groups == null) {
+            synchronized (this.wikiGroupCache) {
+                groups = this.wikiGroupCache.get(wikiReference.getName());
+
+                if (groups == null) {
+                    XWikiContext xcontext = this.xcontextProvider.get();
+
+                    XWikiGroupService groupService = getXWikiGroupService(xcontext);
+
+                    WikiReference currentWiki = xcontext.getWikiReference();
+                    try {
+                        xcontext.setWikiReference(wikiReference);
+
+                        List<String> groupNames =
+                            (List<String>) groupService.getAllMatchedGroups(null, false, 0, 0, null, xcontext);
+
+                        groups = groupNames.stream()
+                            .map(groupName -> this.referenceFactory
+                                .getReference(this.resolver.resolve(groupName, wikiReference)))
+                            .collect(Collectors.toSet());
+                    } catch (XWikiException e) {
+                        throw new GroupException("Failed to get groups for wiki [" + wikiReference.getName() + "]", e);
+                    } finally {
+                        xcontext.setWikiReference(currentWiki);
+                    }
+
+                    this.wikiGroupCache.set(wikiReference.getName(), groups);
+                }
+            }
+        }
+
+        return groups;
+    }
+
+    @Override
+    public boolean isGroup(DocumentReference reference) throws GroupException
+    {
+        // Get all the groups of the wiki
+        Set<DocumentReference> wikiGroup = getGroups(reference.getWikiReference());
+
+        // Check if the reference is part of those groups
+        return wikiGroup.contains(reference);
+    }
+
+    @Override
     public Collection<DocumentReference> getMembers(DocumentReference reference, boolean recurse) throws GroupException
     {
         return getMembers(reference, recurse, null);
@@ -306,8 +360,13 @@ public class DefaultGroupManager implements GroupManager
     private Collection<DocumentReference> getMembers(DocumentReference reference, boolean recurse,
         Set<DocumentReference> rootMembers) throws GroupException
     {
+        // Make sure the reference is a group
+        if (!isGroup(reference)) {
+            return Collections.emptyList();
+        }
+
         // Try in the cache
-        GroupCacheEntry entry = this.membersCache.getCacheEntry(reference, true);
+        GroupCacheEntry entry = this.groupMembersCache.getCacheEntry(reference, true);
 
         Collection<DocumentReference> members = get(entry, recurse);
         if (members != null) {

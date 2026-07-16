@@ -19,8 +19,12 @@
  */
 package com.xpn.xwiki.notify;
 
-import org.jmock.Mock;
-import org.jmock.core.constraint.IsEqual;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+
+import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -28,28 +32,34 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import org.xwiki.model.reference.DocumentReference;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * Tests the {@link PropertyChangedRule} in the notification mechanism. <br>
  * The tests are done for the {@link DocChangeRule#verify(XWikiDocument, XWikiDocument, XWikiContext)} function and,
  * since this function should be symmetric with respect to its two document parameters, all the tests are done symmetric
- * too: each test function contains two asserttions, one for the result of {@code verify(newdoc, olddoc, context)}
+ * too: each test function contains two assertions, one for the result of {@code verify(newdoc, olddoc, context)}
  * and the other one for {@code verify(olddoc, newdoc, context)}; some tests cases might be duplicated by the
  * symmetric call in another test function.
  */
 @Deprecated
-public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCase
-    implements XWikiDocChangeNotificationInterface
+@OldcoreTest
+@AllComponents
+class PropertyChangedRuleTest implements XWikiDocChangeNotificationInterface
 {
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
     private PropertyChangedRule rule;
 
     private XWikiDocument classDoc;
 
     private String testClassName = "Test.TestClass";
-
-    private DocumentReference testClassReference = new DocumentReference("Test", "Test", "TestClass");
 
     private BaseClass testClass;
 
@@ -57,13 +67,9 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
     private String otherClassName = "Test.OtherClass";
 
-    private DocumentReference testOtherClassReference = new DocumentReference("Test", "Test", "OtherClass");
-
     private String testPropertyName = "field";
 
     private XWikiContext context;
-
-    private Mock mockXWiki;
 
     private boolean passed;
 
@@ -72,23 +78,17 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
      * to be able to test behaviour when the document contains more than one type of objects. Creates a xwiki mock that
      * only returns the above mentioned classes on {@link XWiki#getClass(String, XWikiContext)}.
      */
-    protected void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
-        super.setUp();
+        this.context = this.oldcore.getXWikiContext();
 
-        this.context = new XWikiContext();
-
-        this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("getXClass").with(new IsEqual(testClassReference), new IsEqual(this.context))
-            .will(returnValue(this.testClass));
-        this.mockXWiki.stubs().method("getXClass").with(new IsEqual(testOtherClassReference), new IsEqual(this.context))
-            .will(returnValue(this.otherClass));
-
-        this.context.setWiki((XWiki) this.mockXWiki.proxy());
+        XWiki mockXWiki = mock(XWiki.class);
+        this.context.setWiki(mockXWiki);
 
         this.classDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestClass"));
         this.testClass = this.classDoc.getXClass();
-        testClass.addTextField(this.testPropertyName, this.testPropertyName, 10);
+        this.testClass.addTextField(this.testPropertyName, this.testPropertyName, 10);
 
         XWikiDocument otherClassDoc = new XWikiDocument(new DocumentReference("Test", "Test", "OtherClass"));
         this.otherClass = otherClassDoc.getXClass();
@@ -98,7 +98,8 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
         this.rule = new PropertyChangedRule(this, this.testClassName, this.testPropertyName);
     }
 
-    public void testVerifySingleObjectNotChanged() throws XWikiException
+    @Test
+    void verifySingleObjectNotChanged() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -111,15 +112,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
 
         // The rule should be symmetric. Do the inverse test too
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
     }
 
-    public void testVerifySingleObjectChanged() throws XWikiException
+    @Test
+    void verifySingleObjectChanged() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -132,15 +134,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
-    public void testVerifySingleObjectXWikiClassNotChanged() throws XWikiException
+    @Test
+    void verifySingleObjectXWikiClassNotChanged() throws XWikiException
     {
         XWikiDocument newDoc = this.classDoc.clone();
         XWikiDocument oldDoc = this.classDoc.clone();
@@ -153,15 +156,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
     }
 
-    public void testVerifyMultipleObjectsXWikiClassNotChanged() throws XWikiException
+    @Test
+    void verifyMultipleObjectsXWikiClassNotChanged() throws XWikiException
     {
         XWikiDocument newDoc = this.classDoc.clone();
         XWikiDocument oldDoc = this.classDoc.clone();
@@ -178,15 +182,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
     }
 
-    public void testVerifyMultipleObjectsXWikiClassChanged() throws XWikiException
+    @Test
+    void verifyMultipleObjectsXWikiClassChanged() throws XWikiException
     {
         XWikiDocument newDoc = this.classDoc.clone();
         XWikiDocument oldDoc = this.classDoc.clone();
@@ -203,15 +208,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
-    public void testVerifySingleObjectXWikiClassChanged() throws XWikiException
+    @Test
+    void verifySingleObjectXWikiClassChanged() throws XWikiException
     {
         XWikiDocument newDoc = this.classDoc.clone();
         XWikiDocument oldDoc = this.classDoc.clone();
@@ -224,15 +230,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
-    public void testVerifyMultipleObjectsMultipleXWikiClassChanged() throws XWikiException
+    @Test
+    void verifyMultipleObjectsMultipleXWikiClassChanged() throws XWikiException
     {
         XWikiDocument newDoc = this.classDoc.clone();
         XWikiDocument oldDoc = this.classDoc.clone();
@@ -253,15 +260,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
-    public void testVerifyMultipleObjectsMultipleXWikiClassNotChanged() throws XWikiException
+    @Test
+    void verifyMultipleObjectsMultipleXWikiClassNotChanged() throws XWikiException
     {
         XWikiDocument newDoc = this.classDoc.clone();
         XWikiDocument oldDoc = this.classDoc.clone();
@@ -282,15 +290,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
     }
 
-    public void testVerifyObjectAdded() throws XWikiException
+    @Test
+    void verifyObjectAdded() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -301,15 +310,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
-    public void testVerifyObjectDeleted() throws XWikiException
+    @Test
+    void verifyObjectDeleted() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -320,15 +330,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
-    public void testVerifyNoObjectOfClassObjectDeleted() throws XWikiException
+    @Test
+    void verifyNoObjectOfClassObjectDeleted() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -341,15 +352,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
-    public void testVerifyNoObjectOfClass() throws XWikiException
+    @Test
+    void verifyNoObjectOfClass() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -362,15 +374,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
     }
 
-    public void testVerifyMultipleObjectsPropertyNotChanged() throws XWikiException
+    @Test
+    void verifyMultipleObjectsPropertyNotChanged() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -387,15 +400,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
     }
 
-    public void testVerifyMultipleObjectsPropertyChanged() throws XWikiException
+    @Test
+    void verifyMultipleObjectsPropertyChanged() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -412,15 +426,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
-    public void testVerifyMultipleObjectsOtherObjectAdded() throws XWikiException
+    @Test
+    void verifyMultipleObjectsOtherObjectAdded() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -439,15 +454,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
     }
 
-    public void testVerifyMultipleObjectsOtherObjectDeleted() throws XWikiException
+    @Test
+    void verifyMultipleObjectsOtherObjectDeleted() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -466,15 +482,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertFalse("My notification should not have been called", this.passed);
+        assertFalse(this.passed, "My notification should not have been called");
     }
 
-    public void testVerifyMultipleObjectsObjectAdded() throws XWikiException
+    @Test
+    void verifyMultipleObjectsObjectAdded() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -489,15 +506,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
-    public void testVerifyMultipleObjectsObjectDeleted() throws XWikiException
+    @Test
+    void verifyMultipleObjectsObjectDeleted() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -512,15 +530,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
-    public void testVerifyMultipleObjectsOtherObjectAddedPropertyChanged() throws XWikiException
+    @Test
+    void verifyMultipleObjectsOtherObjectAddedPropertyChanged() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -539,15 +558,16 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
-    public void testVerifyMultipleObjectsClassChanged() throws XWikiException
+    @Test
+    void verifyMultipleObjectsClassChanged() throws XWikiException
     {
         XWikiDocument newDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
         XWikiDocument oldDoc = new XWikiDocument(new DocumentReference("Test", "Test", "TestDoc"));
@@ -564,14 +584,15 @@ public class PropertyChangedRuleTest extends AbstractBridgedXWikiComponentTestCa
 
         this.passed = false;
         this.rule.verify(newDoc, oldDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
 
         // The rule should be symmetric. Do the inverse test too.
         this.passed = false;
         this.rule.verify(oldDoc, newDoc, this.context);
-        assertTrue("My notification should have been called", this.passed);
+        assertTrue(this.passed, "My notification should have been called");
     }
 
+    @Override
     public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
         XWikiContext context)
     {

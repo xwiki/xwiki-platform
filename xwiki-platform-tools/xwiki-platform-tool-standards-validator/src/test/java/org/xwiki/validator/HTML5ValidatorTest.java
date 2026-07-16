@@ -21,63 +21,58 @@ package org.xwiki.validator;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link org.xwiki.validator.HTML5Validator}.
  *
- * @since 6.0RC1
  * @version $Id$
+ * @since 6.0RC1
  */
-public class HTML5ValidatorTest
+class HTML5ValidatorTest
 {
     private HTML5Validator validator;
 
-    @Before
-    public void setUp()
+    @BeforeEach
+    void setUp()
     {
-        validator = new HTML5Validator();
+        this.validator = new HTML5Validator();
     }
 
     @Test
-    public void testValid()
+    void valid()
     {
-        validator.setDocument(getClass().getResourceAsStream("/html5-valid.html"));
-        List<ValidationError> errors = validator.validate();
+        this.validator.setDocument(getClass().getResourceAsStream("/html5-valid.html"));
+        List<ValidationError> errors = this.validator.validate();
         assertTrue(errors.isEmpty());
     }
 
     @Test
-    public void testInvalid()
+    void invalid()
     {
-        validator.setDocument(getClass().getResourceAsStream("/html5-invalid.html"));
-        List<ValidationError> errors = validator.validate();
-        assertEquals(errors, validator.getErrors());
-        assertEquals(5, errors.size());
-        validator.clear();
-        assertTrue(validator.getErrors().isEmpty());
+        this.validator.setDocument(getClass().getResourceAsStream("/html5-invalid.html"));
+        List<ValidationError> errors = this.validator.validate();
+        assertEquals(errors, this.validator.getErrors());
+        assertEquals(6, errors.size());
+        this.validator.clear();
+        assertTrue(this.validator.getErrors().isEmpty());
     }
 
     @Test
-    public void testWhenException()
+    void whenException()
     {
-        validator.setDocument(null);
-        boolean exceptionCaught = false;
-        try {
-            validator.validate();
-        } catch(RuntimeException e) {
-            exceptionCaught = true;
-        }
-        assertTrue(exceptionCaught);
+        this.validator.setDocument(null);
+        assertThrows(RuntimeException.class, () -> this.validator.validate());
     }
 
     @Test
-    public void testName()
+    void name()
     {
-        assertEquals("HTML5", validator.getName());
+        assertEquals("HTML5", this.validator.getName());
     }
 }

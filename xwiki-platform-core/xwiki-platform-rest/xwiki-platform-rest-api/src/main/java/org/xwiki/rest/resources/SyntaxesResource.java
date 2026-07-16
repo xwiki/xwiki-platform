@@ -30,5 +30,11 @@ import org.xwiki.rest.model.jaxb.Syntaxes;
 @Path("/syntaxes")
 public interface SyntaxesResource
 {
+    /**
+     * Returns the list of syntaxes configured for the wiki, that is the syntaxes in which content can be written.
+     *
+     * @return the configured syntaxes, each given as its syntax identifier string (for example {@code xwiki/2.1} or
+     *  {@code markdown/1.2})
+     */
     @GET Syntaxes getSyntaxes();
 }

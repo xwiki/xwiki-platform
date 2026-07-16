@@ -70,6 +70,7 @@ ExtensionCode.ExtensionSupporterClass_active=Активний
 ## Support plans
 repository.supportplan.sheet.description=Ця сторінка керує тим, як сторінки ExtensionSupportPlan відображаються як у режимі перегляду, так і в режимі редагування.
 repository.supportplan.sheet.noObject=На поточній сторінці відсутній очікуваний об'єкт ExtensionSupportPlan.
+repository.supportplan.sheet.supportedExtensions=Підтримувані розширення
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ExtensionCode.ExtensionSupportPlanClass_doc.title=Назва
 ExtensionCode.ExtensionSupportPlanClass_supporter=Підтримка
@@ -78,5 +79,66 @@ ExtensionCode.ExtensionSupportPlanClass_url=URL
 ExtensionCode.ExtensionSupportPlanClass_content=Подробиці
 ExtensionCode.ExtensionSupportPlanClass_active=Активний
 ExtensionCode.ExtensionSupportPlanClass_paying=Платна
+
+## Extension sheet
+repository.extension.sheet.name=Назва
+repository.extension.sheet.project=Проєкт
+repository.extension.sheet.type=Тип
+repository.extension.sheet.category=Категорія
+repository.extension.sheet.summary=Стислий опис
+repository.extension.sheet.authors=Автори
+repository.extension.sheet.rating=Рейтинг
+repository.extension.sheet.title=Аркуш розширення
+repository.extension.sheet.imported=Розширення імпортовано з репозиторію
+repository.extension.sheet.updateExtension=Оновити розширення
+repository.extension.sheet.developedBy=Розроблено
+repository.extension.sheet.unknown=Невідомо
+repository.extension.sheet.support=Підтримка
+repository.extension.sheet.activeInstalls=Активні встановлення
+repository.extension.sheet.license=Ліцензія
+repository.extension.sheet.installable=Можна встановити за допомогою Менеджера розширень
+repository.extension.sheet.documentation=Документація
+repository.extension.sheet.sources=Вихідний код
+repository.extension.sheet.issues=Відомі вади
+repository.extension.sheet.download=Завантажити v{0}
+repository.extension.sheet.toc=Зміст
+repository.extension.sheet.documentationHelp=Довідка з документації
+repository.extension.sheet.rulesIntro=Ось кілька правил, яких слід дотримуватися, пропонуючи розширення:
+repository.extension.sheet.ruleSummary=Використовуйте короткий стислий опис. Він буде відображатися в динамічний таблиці розширень і в ідеалі не повинен займати більше ніж 1 рядок у цій таблиці.
+repository.extension.sheet.ruleImported=Коли розширення імпортується, усе з джерела має пріоритет над тим, що міститься на цій сторінці. Тому переконайтеся, що ви правильно налаштували pom.xml або будь-який інший формат, з якого ви імпортуєте, або вимкніть автоматичне оновлення, щоб ви могли вибирати, коли оновлювати та змінювати імпортовану інформацію
+repository.extension.sheet.autoSync=Автоматично синхронізувати інформацію про розширення
+repository.extension.sheet.source=Джерело
+repository.extension.sheet.iconLocation=Розташування піктограми відображення
+repository.extension.sheet.iconLocationSyntax=Синтаксис:
+repository.extension.sheet.iconLocationLinkText=назва піктограми
+repository.extension.sheet.showActiveInstalls=Показати активні встановлення
+repository.extension.sheet.supportPlans=Плани підтримки
+repository.extension.sheet.description=Опис
+repository.extension.sheet.prerequisites=Попередні вимоги та інструкції зі встановлення
+repository.extension.sheet.customInstallationOnly=Тільки нестандартне встановлення
+repository.extension.sheet.standardInstallationInstructions=Стандартні інструкції зі встановлення
+repository.extension.sheet.customInstallationInstructions=Нестандартні інструкції зі встановлення
+repository.extension.sheet.versions=Версії
+repository.extension.sheet.releaseNotes=Примітки до версії
+repository.extension.sheet.dependencies=Залежності
+repository.extension.sheet.dependenciesIntro=Залежності для цього розширення ({0}):
+repository.extension.sheet.currentDownloads=Поточні завантаження
+repository.extension.sheet.addDownloads=Додати завантаження
+repository.extension.sheet.addDownloadsSaveFirst=Щоб додати інформацію про завантаження для цього розширення, спочатку збережіть цю сторінку, а потім знову відредагуйте її.
+repository.extension.sheet.addDownloadsWarning=Якщо ви внесли зміни в цю форму, обов'язково збережіть сторінку, перш ніж переходити за посиланнями нижче, інакше ви втратите введену інформацію.
+repository.extension.sheet.addDownloadsProcess=У нас ще немає зручного інтерфейсу для додавання нових або редагування наявних версій для завантаження, тому наразі це двоетапний процес:
+## Sentences that contain a link keep the whole sentence in a single key (so translators stay free
+## to reorder words and reposition the link). The link markup boundaries ([[ and &gt;&gt;target]]) are
+## passed as parameters {0}/{1} built by the sheet (trusted code) following the standard XWiki
+## pattern, and any untrusted data injected into the markup is escaped by the sheet.
+repository.extension.sheet.addDownloadsAttach=Якщо ви надаєте нове завантаження, {0}прикріпіть нову версію до цієї сторінки{1} і поверніться сюди. Переконайтеся, що ви вказали версію в назві файлу (наприклад, ubercoolmacro-1.0.xar).
+repository.extension.sheet.addDownloadsInfo=Додайте інформацію про завантаження для нового вкладення, заповнивши нову {0}версію розширення{1}. Переконайтеся, що ви заповнили дані, особливо версію та посилання на вкладення. Щоб посилатися на вкладення, ви можете використовувати {2}.
+repository.extension.sheet.currentDependencies=Поточні залежності
+repository.extension.sheet.addDependencies=Додати залежності
+repository.extension.sheet.addDependenciesIntro=Ви також можете пов''язати залежності з кожною версією, вказавши наступну інформацію в новій {0}залежності{1}:
+repository.extension.sheet.addDependenciesVersion=Версія розширення — це версія, якій призначено цю залежність
+repository.extension.sheet.addDependenciesId=ID залежності — це ідентифікатор розширення-залежності в репозиторії, де воно розташоване
+repository.extension.sheet.addDependenciesConstraint=Обмеження версії залежності — це інформація про версію залежності. Це може бути конкретна версія (наприклад, 1.0) або один чи кілька діапазонів версій на основі стандартного синтаксису Maven (наприклад, [1.0,), що означає «не нижче 1.0»)
+repository.extension.sheet.wrongObject=Цей аркуш класу має застосовуватися до документа, що містить об'єкт ExtensionCode.ExtensionClass
 </content>
 </xwikidoc>

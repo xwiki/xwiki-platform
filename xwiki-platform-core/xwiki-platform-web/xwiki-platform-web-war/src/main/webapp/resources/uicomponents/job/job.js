@@ -239,7 +239,8 @@ require([
           if (typeof data === 'function') {
             return data();
           } else {
-            var answerURL = XWiki.contextPath + '/job/question/' + jobId.map(encodeURIComponent).join('/');
+            const encodedJobId = jobId.map(encodeURIComponent).join('/');
+            const answerURL = XWiki.contextPath + '/job/wiki/' + xm.wiki + '/question/' + encodedJobId;
 
             return {
               url: answerURL,

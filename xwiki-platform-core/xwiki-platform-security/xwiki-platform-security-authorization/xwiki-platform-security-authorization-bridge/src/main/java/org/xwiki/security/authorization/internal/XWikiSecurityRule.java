@@ -52,10 +52,10 @@ import com.xpn.xwiki.objects.classes.UsersClass;
 public final class XWikiSecurityRule implements SecurityRule
 {
     /** The set of users. */
-    private final Set<DocumentReference> users = new HashSet<DocumentReference>();
+    private final Set<DocumentReference> users = new HashSet<>();
 
     /** The set of groups. */
-    private final Set<DocumentReference> groups = new HashSet<DocumentReference>();
+    private final Set<DocumentReference> groups = new HashSet<>();
 
     /** The set of right levels. */
     private final RightSet rights = new RightSet();
@@ -108,7 +108,7 @@ public final class XWikiSecurityRule implements SecurityRule
         }
 
         // No need to computes users when no right will match.
-        if (rights.size() > 0) {
+        if (!rights.isEmpty()) {
             for (String user : UsersClass.getListFromString(obj.getStringValue(XWikiConstants.USERS_FIELD_NAME))) {
                 DocumentReference ref = resolver.resolve(user, wikiReference);
                 if (XWikiConstants.GUEST_USER.equals(ref.getName())) {
@@ -144,11 +144,11 @@ public final class XWikiSecurityRule implements SecurityRule
     {
         XWikiSecurityRule rule = new XWikiSecurityRule(obj, resolver, wikiReference, disableEditRight);
 
-        if (rule.rights.size() == 0) {
+        if (rule.rights.isEmpty()) {
             throw new IllegalArgumentException("No rights to build this rule.");
         }
 
-        if (rule.users.size() == 0 && rule.groups.size() == 0) {
+        if (rule.users.isEmpty() && rule.groups.isEmpty()) {
             throw new IllegalArgumentException("No user/group to build this rule.");
         }
 

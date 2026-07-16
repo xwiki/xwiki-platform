@@ -44,8 +44,9 @@
  *
  *###
 ##
-## These are used when this page is accessed directly but are useless when the page is pulled in with ajax using 
-## bin/view/Space/Page?xpage=xpart&vm=commentsinline.vm
+## Support skin extensions for ajax requests.
+#template('display_macros.vm')
+#initRequiredSkinExtensions()
 $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
@@ -142,7 +143,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #foreach($commentID in $thread)
       <li class="reply">
       #displayComment($doc.getObject($xCommentClass, $commentID), $commentDoc)
-      <div class="commentthread">
+      <div id="comment-thread-${escapetool.xml($commentID)}" class="commentthread collapse">
         #displayThread($commentID, $commentThreads, $commentDoc)
       </div>
       </li>
@@ -165,46 +166,56 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   ## This variable should be true only for an authenticate user that matches the comment author.
   ## We don't allow guests to be edit or delete comments because we can't know if they are the comment author.
   #set ($isUserComment = $commentAuthor != '' && $services.model.resolveDocument($commentAuthor, 'user') == $xcontext.userReference)
-  <div id="xwikicomment_${comment.number}" class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
+  <div id="xwikicomment_${comment.number}" #if("$!comment.replyto" != '')data-replyto="$comment.replyto"#end class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
     <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($commentAuthor)#{else}#mediumUserAvatar($commentAuthor)#end</div>
     <div class="commentheader">
       <div>
       <span class="commentauthor">$!xwiki.getUserName($commentAuthor)</span>##
       #set($date = $comment.getProperty('date').value)
-## Don't indent, otherwise the comma will be misplaced
-#if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
+#if($date) <span class="commentdate">$!xwiki.formatDate($date)</span>#end
       </div>
-      <div class="btn-group commenttools">
-      #if($xwiki.hasAccessLevel('comment'))
-        <a class="commentreply btn btn-default btn-xs" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$services.icon.renderHTML('comment')</a></span>
-        #if($hasAdmin || $isUserComment)
-          <a class="edit btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.edit')">$services.icon.renderHTML('pencil')</a>
-        #end
-      #end
-      <a class="permalink btn btn-default btn-xs" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
-        href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}"
-        title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
-      #if ($hasAdmin || ($hasEdit && $isUserComment))
-        ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
-        ## By providing an anchor this behavior is stoped, without altering the URL functionality.
-        #set ($queryString = $escapetool.url({
-          'form_token': $services.csrf.token,
-          'classname': $xCommentClass,
-          'classid': $comment.number,
-          'xredirect': $doc.getURL('view')
-        }))
-        #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${comment.number}"))
-        <a class="delete btn btn-default btn-xs " data-toggle="modal" data-target="#deleteModal" rel="nofollow"
-          href="$deleteURL" title="$services.localization.render('core.viewers.comments.delete')">
-          $services.icon.renderHTML('trash')
-        </a>
-       #end
-      </div>## btn-group
     </div>## commentheader
     #if ($isAnnotation)
       <a href="#ID$comment.number"><blockquote class="annotatedText">$!escapetool.xml($commentSelection)</blockquote></a>
     #end
     <div class="commentcontent#if($isAnnotation) annotationText#end">$commentDoc.getRenderedContentRestricted($comment.getProperty('comment').getValue(), $doc.getSyntax().toIdString())</div>
+    <div class="commenttools">
+#set($threadCount = $commentThreads.get("$!commentID").size())
+## We always add this button to the DOM, because the user can respond and create a thread without reloading the page.
+## When there's no thread to show, we hide it with CSS.
+<button class="thread-toggle btn btn-default" data-toggle="collapse" data-target="#comment-thread-${escapetool.xml($commentID)}" aria-expanded="false" aria-controls="comment-thread-${escapetool.xml($commentID)}">
+$services.icon.renderHTML('caret-right') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
+</button>##
+#if($xwiki.hasAccessLevel('comment'))
+<a class="commentreply btn btn-default" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>##
+$services.icon.renderHTML('comment') $!escapetool.xml($services.localization.render('core.viewers.comments.reply'))
+</a>##
+#end
+<a class="permalink btn btn-default" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
+href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}">##
+$services.icon.renderHTML('link') $!escapetool.xml($services.localization.render('core.viewers.comments.share'))
+</a>##
+#if($xwiki.hasAccessLevel('comment') && ($hasAdmin || $isUserComment))
+<a class="edit btn btn-default" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$doc.getURL('view')")">##
+$services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
+</a>##
+#end
+#if ($hasAdmin || ($hasEdit && $isUserComment))
+## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
+## By providing an anchor this behavior is stoped, without altering the URL functionality.
+#set ($queryString = $escapetool.url({
+  'form_token': $services.csrf.token,
+  'classname': $xCommentClass,
+  'classid': $comment.number,
+  'xredirect': $doc.getURL('view')
+}))
+#set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${comment.number}"))
+<a class="delete btn btn-default" data-toggle="modal" data-target="#deleteModal" rel="nofollow"
+   href="$deleteURL">##
+  $services.icon.renderHTML('cross') $services.localization.render('core.viewers.comments.delete')
+</a>##
+#end
+    </div>## btn-group
   </div>## xwikicomment
 #end
 ##
@@ -272,11 +283,6 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         $services.captcha.default.display()
       </div>
     </div>
-    ## We only want to hide the captcha if we're sure the user has javascript, if this is an ajax call then it's a safe bet.
-    #if($hideCaptcha)
-      ## Since each CAPTCHA displayer can have its own JS+CSS, we need to make sure that, when comments are shown with AJAX, those resources are also included.
-      #skinExtensionHooks()
-    #end
     #if($captchaAnswerWrong)
       <span style="color:#C00; font-weight:bold; margin:0 0 0 5px;">$services.localization.render('core.captcha.captchaAnswerIsWrong')</span>
     #end
@@ -398,10 +404,41 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #error($services.localization.render('core.viewers.comments.edit.notFound'))
   #end
 #else
+#set ($comments = $doc.getComments())
+
+## Build a map on the form Date -> List<Comment object>
+## We also keep the set of keys when we have multiple comments at same date just to order them later (it should be a
+## very rare case but let's ensure we keep a deterministic order)
+#set ($commentMap = $collectiontool.getSortedMap())
+#set ($keysWithMultipleComments = $collectiontool.getSet())
+#foreach ($comment in $comments)
+  #set ($key = $comment.getValue('date'))
+  #if ($commentMap.containsKey($key))
+    #set ($discard = $commentMap.get($key).add($comment))
+    #set ($discard = $keysWithMultipleComments.add($key))
+  #else
+    #set ($discard = $commentMap.put($key, [$comment]))
+  #end
+#end
+
+## We perform an ascending ordering of the keys
 #if($xwiki.getSpacePreferenceAsInt('commentsorder', 1) == 1)
-  #set($comments = $doc.getComments())
+  #set ($orderSuffix = ':asc')
 #else
-  #set($comments = $doc.getComments(false))
+  #set ($orderSuffix = ':desc')
+  #set ($commentMap = $commentMap.descendingMap())
+#end
+
+## Ensure to order list with multiple entries if needed
+#foreach ($keyMultipleComment in $keysWithMultipleComments)
+  #set ($reorderedList = $collectiontool.sort($commentMap.get($keyMultipleComment), "number$orderSuffix"))
+  #set ($discard = $commentMap.put($keyMultipleComment, $reorderedList))
+#end
+
+## Finally obtained an ordered list
+#set ($comments = $collectiontool.getLinkedList())
+#foreach ($commentList in $commentMap.values())
+  #set ($discard = $comments.addAll($commentList))
 #end
 ##
 ##
@@ -441,3 +478,4 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #showDeleteModal
 </div> ## commentscontent
 #end ## comment == ''
+#sendRequiredSkinExtensions()

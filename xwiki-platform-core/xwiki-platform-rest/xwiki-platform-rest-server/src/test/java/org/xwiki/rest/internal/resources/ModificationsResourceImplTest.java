@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.ws.rs.core.UriInfo;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.suigeneris.jrcs.rcs.Version;
@@ -44,6 +45,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.rest.model.jaxb.History;
 import org.xwiki.rest.model.jaxb.HistorySummary;
 import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.security.SecurityConfiguration;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -99,6 +101,9 @@ class ModificationsResourceImplTest
     private Provider<XWikiContext> xcontextProvider;
 
     @MockComponent
+    private SecurityConfiguration securityConfiguration;
+
+    @MockComponent
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
@@ -117,6 +122,12 @@ class ModificationsResourceImplTest
         this.xcontext = mock(XWikiContext.class);
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
+    }
+
+    @BeforeEach
+    void setUp()
+    {
+        when(this.securityConfiguration.getQueryItemsLimit()).thenReturn(1000);
     }
 
     @Test

@@ -54,9 +54,9 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.xwiki.annotation.Annotation.SELECTION_FIELD;
 import static org.xwiki.mentions.MentionLocation.ANNOTATION;
-import static org.xwiki.mentions.MentionLocation.TEXT_FIELD;
 import static org.xwiki.mentions.MentionLocation.COMMENT;
 import static org.xwiki.mentions.MentionLocation.DOCUMENT;
+import static org.xwiki.mentions.MentionLocation.TEXT_FIELD;
 
 /**
  * Analyzes the new mentions on updated documents.
@@ -143,9 +143,9 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
 
             // Notify with an empty anchorId if there's new mentions without an anchor.
             if (newEmptyAnchorsNumber > oldEmptyAnchorsNumber) {
-                DisplayStyle displayStyle = findDisplayStyle(newMentions, reference, "");
-                addNewMention(ret, null,
-                    new MentionNotificationParameter(reference, "", displayStyle));
+                DisplayStyle displayStyle = findDisplayStyle(newMentions, reference, null);
+                addNewMention(ret, type,
+                    new MentionNotificationParameter(reference, null, displayStyle));
             }
 
             // Notify all new mentions with new anchors.
@@ -201,12 +201,12 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
     {
         List<MentionNotificationParameters> mentionNotificationParametersList = new ArrayList<>();
         if (baseObject != null) {
-            Optional<BaseObject> oldBaseObject = ofNullable(oldEntry).flatMap(
-                optOldEntries -> optOldEntries
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .filter(it -> it.getId() == baseObject.getId())
-                    .findAny());
+            Optional<BaseObject> oldBaseObject;
+            if (oldEntry != null && oldEntry.size() > baseObject.getNumber()) {
+                oldBaseObject = Optional.ofNullable(oldEntry.get(baseObject.getNumber()));
+            } else {
+                oldBaseObject = Optional.empty();
+            }
 
             // Special treatment on comment objects to analyse only the comment field.
             if (Objects.equals(baseObject
@@ -224,8 +224,8 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
                     });
             } else {
                 for (Object o : baseObject.getProperties()) {
-                    if (o instanceof LargeStringProperty) {
-                        handleProperty(oldBaseObject, (LargeStringProperty) o, version, TEXT_FIELD, authorReference,
+                    if (o instanceof LargeStringProperty largeStringProperty) {
+                        handleProperty(oldBaseObject, largeStringProperty, version, TEXT_FIELD, authorReference,
                             syntax).ifPresent(mentionNotificationParametersList::add);
                     }
                 }
@@ -251,7 +251,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
         String version, MentionLocation location, String authorReference, Syntax syntax)
     {
         Optional<XDOM> oldDom = oldBaseObject.flatMap(it -> ofNullable(it.getField(largeStringProperty.getName())))
-            .filter(it -> it instanceof LargeStringProperty)
+            .filter(LargeStringProperty.class::isInstance)
             .flatMap(it -> this.xdomService.parse(((LargeStringProperty) it).getValue(), syntax));
         return this.xdomService.parse(largeStringProperty.getValue(), syntax).flatMap(xdom -> {
             EntityReference entityReference = largeStringProperty.getReference();

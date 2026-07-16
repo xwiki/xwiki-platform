@@ -36,6 +36,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.PropertyValues;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.user.UserScope;
 import org.xwiki.wiki.user.WikiUserManager;
 
@@ -94,19 +95,22 @@ public class GroupsClassPropertyValuesProvider extends AbstractUsersAndGroupsCla
     {
         Map<String, Object> icon = new HashMap<>();
         XWikiContext xcontext = this.xcontextProvider.get();
-        try {
-            XWikiDocument groupProfileDocument = xcontext.getWiki().getDocument(groupReference, xcontext);
-            XWikiAttachment avatarAttachment = getFirstImageAttachment(groupProfileDocument, xcontext);
-            if (avatarAttachment != null) {
-                icon.put(IconManager.META_DATA_URL, xcontext.getWiki().getURL(avatarAttachment.getReference(),
-                    "download", "width=30&height=30&keepAspectRatio=true", null, xcontext));
-                icon.put(IconManager.META_DATA_ICON_SET_TYPE, IconType.IMAGE.name());
+        if (this.contextualAuthorizationManager.hasAccess(Right.VIEW, groupReference)) {
+            try {
+                XWikiDocument groupProfileDocument = xcontext.getWiki().getDocument(groupReference, xcontext);
+                XWikiAttachment avatarAttachment = getFirstImageAttachment(groupProfileDocument, xcontext);
+                if (avatarAttachment != null) {
+                    icon.put(IconManager.META_DATA_URL, xcontext.getWiki().getURL(avatarAttachment.getReference(),
+                        "download", "width=30&height=30&keepAspectRatio=true", null, xcontext));
+                    icon.put(IconManager.META_DATA_ICON_SET_TYPE, IconType.IMAGE.name());
+                }
+            } catch (XWikiException e) {
+                this.logger.warn(
+                    "Failed to read the avatar of group [{}]. Root cause is [{}]. Using the default avatar instead.",
+                    groupReference.getName(), ExceptionUtils.getRootCauseMessage(e));
             }
-        } catch (XWikiException e) {
-            this.logger.warn(
-                "Failed to read the avatar of group [{}]. Root cause is [{}]. Using the default avatar instead.",
-                groupReference.getName(), ExceptionUtils.getRootCauseMessage(e));
         }
+
         if (!icon.containsKey(IconManager.META_DATA_URL)) {
             try {
                 icon = this.iconManager.getMetaData(DEFAULT_ICON_NAME);
@@ -132,14 +136,17 @@ public class GroupsClassPropertyValuesProvider extends AbstractUsersAndGroupsCla
     @Override
     protected String getLabel(DocumentReference groupReference, Object currentLabel)
     {
-        try {
-            XWikiContext xcontext = this.xcontextProvider.get();
-            return xcontext.getWiki().getDocument(groupReference, xcontext).getRenderedTitle(Syntax.PLAIN_1_0,
-                xcontext);
-        } catch (XWikiException e) {
-            this.logger.warn("Failed to get the title of group [{}]. Root cause is [{}].",
-                this.entityReferenceSerializer.serialize(groupReference), ExceptionUtils.getRootCauseMessage(e));
-            return super.getLabel(groupReference, currentLabel);
+        if (this.contextualAuthorizationManager.hasAccess(Right.VIEW, groupReference)) {
+            try {
+                XWikiContext xcontext = this.xcontextProvider.get();
+                return xcontext.getWiki().getDocument(groupReference, xcontext).getRenderedTitle(Syntax.PLAIN_1_0,
+                    xcontext);
+            } catch (XWikiException e) {
+                this.logger.warn("Failed to get the title of group [{}]. Root cause is [{}].",
+                    this.entityReferenceSerializer.serialize(groupReference), ExceptionUtils.getRootCauseMessage(e));
+            }
         }
+
+        return super.getLabel(groupReference, currentLabel);
     }
 }

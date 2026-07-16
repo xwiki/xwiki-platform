@@ -25,7 +25,7 @@ import java.io.StringWriter;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -65,15 +65,14 @@ public class DefaultVelocityEvaluator implements VelocityEvaluator
         try {
             // Switch current namespace if needed
             String currentNamespace = renderingContext.getTransformationId();
-            if (namespace != null && !StringUtils.equals(namespace, currentNamespace)) {
-                if (renderingContext instanceof MutableRenderingContext) {
-                    // Make the current velocity template id available
-                    ((MutableRenderingContext) renderingContext).push(renderingContext.getTransformation(),
-                        renderingContext.getXDOM(), renderingContext.getDefaultSyntax(), namespace,
-                        renderingContext.isRestricted(), renderingContext.getTargetSyntax());
+            if (namespace != null && !Strings.CS.equals(namespace, currentNamespace)
+                && renderingContext instanceof MutableRenderingContext) {
+                // Make the current velocity template id available
+                ((MutableRenderingContext) renderingContext).push(renderingContext.getTransformation(),
+                    renderingContext.getXDOM(), renderingContext.getDefaultSyntax(), namespace,
+                    renderingContext.isRestricted(), renderingContext.getTargetSyntax());
 
-                    renderingContextPushed = true;
-                }
+                renderingContextPushed = true;
             }
 
             velocityManager.getVelocityEngine().evaluate(vcontext, writer, namespace, content);

@@ -95,7 +95,7 @@ public class SecurityReference extends EntityReference
      */
     public Deque<SecurityReference> getReversedSecurityReferenceChain()
     {
-        Deque<SecurityReference> referenceList = new LinkedList<SecurityReference>();
+        Deque<SecurityReference> referenceList = new LinkedList<>();
         SecurityReference reference = this;
         do {
             referenceList.push(reference);
@@ -143,8 +143,8 @@ public class SecurityReference extends EntityReference
     public WikiReference getOriginalWikiReference()
     {
         return (this.getType() == EntityType.WIKI)
-            ? (this.originalReference instanceof WikiReference)
-                ? (WikiReference) this.originalReference
+            ? (this.originalReference instanceof WikiReference wikiReference)
+                ? wikiReference
                 : new WikiReference(this.originalReference)
             : null;
     }
@@ -156,8 +156,8 @@ public class SecurityReference extends EntityReference
     public SpaceReference getOriginalSpaceReference()
     {
         return (this.getType() == EntityType.SPACE)
-            ? (this.originalReference instanceof SpaceReference)
-                ? (SpaceReference) this.originalReference
+            ? (this.originalReference instanceof SpaceReference spaceReference)
+                ? spaceReference
                 : new SpaceReference(this.originalReference)
             : null;
     }
@@ -169,8 +169,8 @@ public class SecurityReference extends EntityReference
     public DocumentReference getOriginalDocumentReference()
     {
         return (this.getType() == EntityType.DOCUMENT)
-            ? (this.originalReference instanceof DocumentReference)
-                ? (DocumentReference) this.originalReference
+            ? (this.originalReference instanceof DocumentReference documentReference)
+                ? documentReference
                 : new DocumentReference(this.originalReference)
             : null;
     }

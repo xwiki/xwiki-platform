@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.6" reference="XWiki.SearchConfigClass" locale="">
   <web>XWiki</web>
   <name>SearchConfigClass</name>
   <language/>
@@ -48,8 +48,33 @@
     <nameField/>
     <validationScript/>
     <engine>
-      <customDisplay/>
+      <customDisplay>{{velocity}}
+{{html clean="false"}}
+#if ($type == 'edit' || $type == 'search')
+  #set ($id = $escapetool.xml("${prefix}${name}"))
+  #set ($disabled = $field.getProperty('disabled').value == 1)
+  &lt;select id="$id" name="$id"#if ($disabled) disabled#end&gt;
+    #set ($availableSearchExtensions = $services.uix.getExtensions('org.xwiki.platform.search', {'sortById' : ''}))
+    #foreach ($availableSearchExtension in $availableSearchExtensions)
+      &lt;option value="$escapetool.xml($availableSearchExtension.id)"
+        #if ($availableSearchExtension.id == $value) selected#end
+      &gt;$escapetool.xml($availableSearchExtension.parameters.label)&lt;/option&gt;
+    #end
+  &lt;/select&gt;
+#elseif ($type == 'view' || $type == 'rendered')
+$!escapetool.xml($value)##
+#elseif ($type == 'hidden')
+  #set ($id = $escapetool.xml("${prefix}${name}"))
+  &lt;input type="hidden" id="$!id" name="$!id" value="$!escapetool.xml" /&gt;
+#else
+  ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
+  ## mode must not be empty. Let's output something.
+  Unknown display mode.
+#end
+{{/html}}
+{{/velocity}}</customDisplay>
       <disabled>0</disabled>
+      <hint>search.admin.configuration.seexwikicfg</hint>
       <name>engine</name>
       <number>1</number>
       <picker>0</picker>
@@ -60,7 +85,79 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </engine>
+    <exclusions>
+      <cache>0</cache>
+      <classname/>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayType>input</displayType>
+      <freeText/>
+      <hint>The pages to exclude from the search (along with their child pages)</hint>
+      <idField/>
+      <largeStorage>0</largeStorage>
+      <multiSelect>1</multiSelect>
+      <name>exclusions</name>
+      <number>2</number>
+      <picker>1</picker>
+      <prettyName>Search exclusions</prettyName>
+      <relationalStorage>1</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <size>1</size>
+      <sort/>
+      <sql/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <valueField/>
+      <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+    </exclusions>
   </class>
+  <object>
+    <name>XWiki.SearchConfigClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>432d09de-eba3-4b01-8909-2361e1b0c50d</guid>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Sheet</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>SearchConfigSheet</sheet>
+    </property>
+  </object>
   <object>
     <name>XWiki.SearchConfigClass</name>
     <number>0</number>
@@ -88,10 +185,10 @@
         <number>1</number>
         <picker>1</picker>
         <prettyName>Sheet</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>

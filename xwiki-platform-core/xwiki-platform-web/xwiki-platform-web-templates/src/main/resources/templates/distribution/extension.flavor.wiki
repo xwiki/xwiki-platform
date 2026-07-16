@@ -95,7 +95,13 @@
         {{translation key="platform.extension.distributionWizard.flavorStepInvalidCurrentFlavorUpgradeKnownHint"/}}
 
         #set ($knownFlavorExtension = $services.extension.resolve($knownFlavorId.id, $knownFlavorId.version))
-        {{html}}#displayExtension($knownFlavorExtension){{/html}}
+        #if ($knownFlavorExtension)
+          {{html}}#displayExtension($knownFlavorExtension){{/html}}
+        #else
+          {{error}}
+            {{translation key="platform.extension.distributionWizard.flavorStepCannotFindKnownUpgrade" parameters="'$services.rendering.escape($knownFlavorId, 'xwiki/2.1')'"/}}
+          {{/error}}
+        #end
       )))
     #else
       (% id="no-flavor" %)

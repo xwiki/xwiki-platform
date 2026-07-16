@@ -39,6 +39,8 @@ public class AnnotatableViewPage extends BaseElement
     private static final String XWIKI_SYNTAX_1_WARNING =
         "Annotations are not available for pages written in XWiki/1.0 syntax.";
 
+    private static final String ANNOTATIONSLINK = "Annotationslink";
+
     private AnnotationsPane annotationsPane;
 
     private AnnotationsWindow annotationsWindow;
@@ -221,7 +223,7 @@ public class AnnotatableViewPage extends BaseElement
      */
     public void waitForAnnotationsDisplayed()
     {
-        getDriver().waitUntilElementIsVisible(By.className("annotation-marker"));
+        getDriver().waitUntilElementIsVisible(By.className("annotation-highlight"));
     }
 
     // Un-checks the "Show Annotations" check box.
@@ -238,7 +240,7 @@ public class AnnotatableViewPage extends BaseElement
      */
     public int getAnnotationCount()
     {
-        return getDriver().findElementsWithoutWaiting(By.className("annotation-marker")).size();
+        return getDriver().findElementsWithoutWaiting(By.className("annotation-highlight")).size();
     }
 
     /**
@@ -266,13 +268,12 @@ public class AnnotatableViewPage extends BaseElement
 
     public void simulateCTRL_M()
     {
+        // The annotation shortcut is registered as "Meta+M". The Keypress library resolves the "meta" key to the
+        // actual Command key only when the browser runs on macOS; on any other platform it resolves to the Control
+        // key. Since the browser always runs in a Linux Docker container, the shortcut is effectively "Ctrl+M" there,
+        // regardless of the operating system running these tests. We therefore always send Ctrl+M.
         WebElement body = getDriver().findElement(By.id("body"));
-        String os = System.getProperty("os.name");
-        if (os.equals("Mac OS X")) {
-            body.sendKeys(Keys.chord(Keys.COMMAND, "m"));
-        } else {
-            body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
-        }
+        body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
     }
 
     /**
@@ -285,7 +286,7 @@ public class AnnotatableViewPage extends BaseElement
 
     public boolean checkIfAnnotationsAreDisabled()
     {
-        if (getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).size() > 0) {
+        if (!getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).isEmpty()) {
             return false;
         } else {
             return true;
@@ -321,6 +322,17 @@ public class AnnotatableViewPage extends BaseElement
      */
     public WebElement getAnnotationTextById(int id)
     {
-        return getDriver().findElement(By.cssSelector(String.format("span.annotation.ID%d", id)));
+        return getDriver().findElement(By.cssSelector(String.format("mark.annotation.ID%d", id)));
+    }
+
+    /**
+     * @return if the annotations doc extra pane is available
+     * @since 17.7.0RC1
+     * @since 17.4.3
+     * @since 16.10.10
+     */
+    public boolean isAnnotationsDocExtraPaneAvailable()
+    {
+        return getDriver().hasElementWithoutWaiting(By.id(ANNOTATIONSLINK));
     }
 }

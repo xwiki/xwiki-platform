@@ -320,14 +320,15 @@ define('xwiki-selectize', [
     // Tom Select sets input.tabIndex (see above) AFTER firing its own 'destroy' event, so a 'destroy' listener runs
     // too early to fix this up (it would get overwritten right after). Wrap destroy() itself so our fix runs
     // strictly after Tom Select's own tabIndex restoration.
-    const originalDestroy = tomSelect.destroy.bind(tomSelect);
-    tomSelect.destroy = function() {
-      originalDestroy();
+    const originalDestroy = tomSelect.destroy;
+    tomSelect.destroy = function(...args) {
+      const result = originalDestroy.apply(tomSelect, args);
       if (hadTabIndex) {
         input.setAttribute('tabindex', originalTabIndex);
       } else {
         input.removeAttribute('tabindex');
       }
+      return result;
     };
 
     // We expose the TomSelect instance through the 'selectize' property / data on the target input / select that is

@@ -21,7 +21,8 @@ define('xwiki-tree-finder-icons', [], {
   icons: ['search']
 });
 
-define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
+define(['jquery', 'xwiki-icon!xwiki-tree-finder-icons', 'jsTree', 'xwiki-events-bridge'],
+    function($, icons) {
   'use strict';
 
   // jsTree uses the underscore notation for its API, instead of camel case.
@@ -44,10 +45,7 @@ define(['jquery', 'jsTree', 'xwiki-events-bridge'], function($) {
   var createSuggestInput = function(options) {
     let container = document.createElement('div');
     container.classList.add('xtree-finder-container');
-    // Load the search icon asynchronously, after the finder input is already in the page.
-    require(['xwiki-icon!xwiki-tree-finder-icons'], function(icons) {
-      container.insertBefore(icons.search.render(), container.firstChild);
-    });
+    container.appendChild(icons.search.render());
     let input = document.createElement('input');
     input.type = 'text';
     input.className = 'xtree-finder';

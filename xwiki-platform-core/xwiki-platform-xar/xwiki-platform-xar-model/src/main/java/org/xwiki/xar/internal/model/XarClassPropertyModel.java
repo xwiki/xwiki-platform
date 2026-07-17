@@ -34,10 +34,10 @@ public class XarClassPropertyModel
     public static final String ELEMENT_NAME = "name";
 
     /**
-     * Utility class, so it should not be instantiated.
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
      */
-    private XarClassPropertyModel()
+    protected XarClassPropertyModel()
     {
-        // Utility class
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
     }
 }

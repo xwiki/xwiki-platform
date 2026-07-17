@@ -30,10 +30,10 @@ public class XarObjectPropertyModel
     public static final String ATTRIBUTE_TYPE = "type";
 
     /**
-     * Utility class, so it should not be instantiated.
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
      */
-    private XarObjectPropertyModel()
+    protected XarObjectPropertyModel()
     {
-        // Utility class
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
     }
 }

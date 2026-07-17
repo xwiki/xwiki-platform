@@ -36,10 +36,10 @@ public class XarObjectModel
     public static final String ELEMENT_GUID = "guid";
 
     /**
-     * Utility class, so it should not be instantiated.
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
      */
-    private XarObjectModel()
+    protected XarObjectModel()
     {
-        // Utility class
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
     }
 }

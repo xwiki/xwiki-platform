@@ -189,10 +189,10 @@ public class XarDocumentModel
     public static final String ELEMENT_REVISIONS = "versions";
 
     /**
-     * Utility class, so it should not be instantiated.
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
      */
-    private XarDocumentModel()
+    protected XarDocumentModel()
     {
-        // Utility class
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
     }
 }

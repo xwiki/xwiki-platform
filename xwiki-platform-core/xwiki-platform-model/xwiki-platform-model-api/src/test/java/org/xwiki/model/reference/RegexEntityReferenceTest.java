@@ -32,6 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  * 
  * @version $Id$
  */
+// RegexEntityReference.equals() is an asymmetric matcher: it runs the regex only when the regex
+// reference is the receiver. JUnit evaluates assertEquals(expected, actual) as
+// expected.equals(actual), so the regex reference must stay the first argument. Swapping to
+// expected-first order (as SonarQube's S3415 suggests) would call the concrete reference's
+// equals() and skip regex matching, breaking the tests.
+@SuppressWarnings("java:S3415")
 class RegexEntityReferenceTest
 {
     private static final DocumentReference REFERENCETOMATCH = new DocumentReference("wiki", "space", "page");

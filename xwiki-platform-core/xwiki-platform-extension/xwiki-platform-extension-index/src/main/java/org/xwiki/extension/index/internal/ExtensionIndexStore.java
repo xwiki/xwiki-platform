@@ -373,15 +373,15 @@ public class ExtensionIndexStore implements Initializable, Disposable
         }
         Stream<String> cveIds =
             result.getSecurityVulnerabilities().stream().map(SecurityVulnerabilityDescriptor::getId);
-        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_ID, cveIds.collect(Collectors.toList()),
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_ID, cveIds.toList(),
             doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_LINK,
             result.getSecurityVulnerabilities().stream().map(SecurityVulnerabilityDescriptor::getURL)
-                .collect(Collectors.toList()),
+                .toList(),
             doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, SECURITY_CVE_CVSS,
             result.getSecurityVulnerabilities().stream().map(SecurityVulnerabilityDescriptor::getScore)
-                .collect(Collectors.toList()),
+                .toList(),
             doc);
         String fixVersion =
             result.getSecurityVulnerabilities().stream().map(SecurityVulnerabilityDescriptor::getFixVersion)
@@ -392,10 +392,10 @@ public class ExtensionIndexStore implements Initializable, Disposable
             result.getSecurityVulnerabilities().size(), doc);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_CORE_EXTENSION, result.isCoreExtension(), doc);
         List<Boolean> safeMapping = result.getSecurityVulnerabilities().stream()
-            .map(SecurityVulnerabilityDescriptor::isSafe).collect(Collectors.toList());
+            .map(SecurityVulnerabilityDescriptor::isSafe).toList();
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_REVIEWED_SAFE, safeMapping, doc);
         List<String> reviewExplanations = result.getSecurityVulnerabilities().stream()
-            .map(SecurityVulnerabilityDescriptor::getReviews).collect(Collectors.toList());
+            .map(SecurityVulnerabilityDescriptor::getReviews).toList();
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, IS_SAFE_EXPLANATIONS, reviewExplanations, doc);
 
         add(doc);
@@ -599,7 +599,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
 
         this.utils.setString(Extension.FIELD_AUTHORS, extension.getAuthors(), ExtensionAuthor.class, document);
         this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_AUTHORS_INDEX,
-            extension.getAuthors().stream().map(ExtensionAuthor::getName).collect(Collectors.toList()), document);
+            extension.getAuthors().stream().map(ExtensionAuthor::getName).toList(), document);
 
         this.utils.setString(Extension.FIELD_COMPONENTS, extension.getComponents(), ExtensionComponent.class, document);
         for (ExtensionComponent component : extension.getComponents()) {
@@ -1038,7 +1038,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         }
 
         return documents.stream().map(d -> this.utils.<Version>get(Extension.FIELD_VERSION, d, Version.class))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**

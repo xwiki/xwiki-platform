@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
@@ -163,6 +164,27 @@ public class RealtimeEditToolbar extends BaseElement
     {
         return getDriver().findElements(By.cssSelector(".realtime-edit-toolbar .realtime-users .realtime-user"))
             .stream().map(CoeditorElement::new).toList();
+    }
+
+    /**
+     * @return the avatar hints of the coeditors listed on the toolbar, in the order they are displayed
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.11
+     * @since 16.10.19
+     */
+    public List<String> getVisibleCoeditorAvatarHints()
+    {
+        // Coeditor elements are fully rebuild when the list changes, leading to staled element.
+        // The listing is retried until all avatar hints are resolved without an element going staled.
+        return getDriver().waitUntilCondition(driver -> {
+            try {
+                return getVisibleCoeditors().stream().map(CoeditorElement::getAvatarHint).toList();
+            } catch (StaleElementReferenceException e) {
+                // The coeditor list was rebuilt while we were reading it, retry.
+                return null;
+            }
+        });
     }
 
     /**

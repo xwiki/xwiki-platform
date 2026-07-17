@@ -49,9 +49,7 @@ public class AllDocsPage extends ViewPage
 
     @FindBy(xpath = "//li[@id='xwikideletedAttachments']/a")
     private WebElement deletedAttachmentsTab;
-
-    // We can't simply match any direct child div of the tab panes container because the tree finder also inserts a
-    // sibling div (the search input and its icon) right before the tree root, which would otherwise also match.
+    
     @FindBy(xpath = "//div[contains(@class, 'xwikitabpanescontainer')]/div[contains(@class, 'jstree')]")
     private WebElement treeElement;
 

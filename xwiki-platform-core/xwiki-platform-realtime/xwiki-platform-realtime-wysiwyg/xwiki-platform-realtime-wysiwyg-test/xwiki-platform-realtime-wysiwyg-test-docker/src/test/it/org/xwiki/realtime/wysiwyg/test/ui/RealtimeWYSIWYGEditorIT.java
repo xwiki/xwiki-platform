@@ -1444,8 +1444,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.waitUntilTextContains("Deutsch");
         assertEquals("Deutsch content", firstTextArea.getText());
 
-        assertEquals("John, superadmin", firstEditPage.getToolbar().getVisibleCoeditors().stream()
-            .map(CoeditorElement::getAvatarHint).reduce((a, b) -> a + ", " + b).get());
+        assertEquals(List.of("John", "superadmin"), firstEditPage.getToolbar().getVisibleCoeditorAvatarHints());
     }
 
     @Test

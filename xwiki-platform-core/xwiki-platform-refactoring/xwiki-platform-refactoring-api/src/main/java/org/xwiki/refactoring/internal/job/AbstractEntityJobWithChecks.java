@@ -174,11 +174,10 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
     protected EntitySelection getConcernedEntitiesEntitySelection(EntityReference reference)
     {
         EntitySelection entitySelection = this.concernedEntities.get(reference);
-        if (entitySelection == null && reference instanceof DocumentReference documentReference) {
-            if (Locale.ROOT.equals(documentReference.getLocale())) {
-                entitySelection = this.concernedEntities.get(
-                    new DocumentReference(documentReference.withoutLocale(), (Locale) null));
-            }
+        if (entitySelection == null && reference instanceof DocumentReference documentReference
+            && Locale.ROOT.equals(documentReference.getLocale())) {
+            entitySelection = this.concernedEntities.get(
+                new DocumentReference(documentReference.withoutLocale(), (Locale) null));
         }
         return entitySelection;
     }

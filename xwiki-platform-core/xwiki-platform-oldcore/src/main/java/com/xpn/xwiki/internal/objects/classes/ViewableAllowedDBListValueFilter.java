@@ -69,14 +69,13 @@ public class ViewableAllowedDBListValueFilter implements QueryFilter
                 if (this.authorization.hasAccess(Right.VIEW, documentReference)) {
                     filteredResults.add(result);
                 }
-            } else if (result instanceof Object[] row) {
-                if (row.length > 0 && row[0] instanceof String documentFullName) {
-                    DocumentReference documentReference = this.documentReferenceResolver.resolve(documentFullName);
-                    if (this.authorization.hasAccess(Right.VIEW, documentReference)) {
-                        // The document full name column was added just to be able to check view right. We can discard
-                        // it now and return only the relevant columns.
-                        filteredResults.add(row.length > 1 ? Arrays.copyOfRange(row, 1, row.length) : row);
-                    }
+            } else if (result instanceof Object[] row && row.length > 0
+                && row[0] instanceof String documentFullName) {
+                DocumentReference documentReference = this.documentReferenceResolver.resolve(documentFullName);
+                if (this.authorization.hasAccess(Right.VIEW, documentReference)) {
+                    // The document full name column was added just to be able to check view right. We can discard
+                    // it now and return only the relevant columns.
+                    filteredResults.add(row.length > 1 ? Arrays.copyOfRange(row, 1, row.length) : row);
                 }
             }
         }

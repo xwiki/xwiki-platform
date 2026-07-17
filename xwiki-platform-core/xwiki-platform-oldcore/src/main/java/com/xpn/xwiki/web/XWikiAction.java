@@ -807,7 +807,7 @@ public abstract class XWikiAction implements LegacyAction
     {
         RenderingContext renderingContext = Utils.getComponent(RenderingContext.class);
         MutableRenderingContext mutableRenderingContext =
-            renderingContext instanceof MutableRenderingContext ? (MutableRenderingContext) renderingContext : null;
+            renderingContext instanceof MutableRenderingContext mutableContext ? mutableContext : null;
 
         if (mutableRenderingContext != null) {
             mutableRenderingContext.push(renderingContext.getTransformation(), renderingContext.getXDOM(),
@@ -1320,8 +1320,8 @@ public abstract class XWikiAction implements LegacyAction
                 LOGGER.error(logMessage, exception);
             }
         } else {
-            if (exception instanceof XWikiException) {
-                throw (XWikiException) exception;
+            if (exception instanceof XWikiException xwikiException) {
+                throw xwikiException;
             } else {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
                     "Uncaught exception", exception);

@@ -714,8 +714,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     fillObjectIdConversion(session, objs);
 
                     // Retrieve custom mapped classes
-                    if (getStore() instanceof XWikiHibernateStore) {
-                        fillCustomMappingMap((XWikiHibernateStore) getStore(), getXWikiContext());
+                    if (getStore() instanceof XWikiHibernateStore xwikiHibernateStore) {
+                        fillCustomMappingMap(xwikiHibernateStore, getXWikiContext());
                     }
 
                     // Retrieve statistics ID conversion

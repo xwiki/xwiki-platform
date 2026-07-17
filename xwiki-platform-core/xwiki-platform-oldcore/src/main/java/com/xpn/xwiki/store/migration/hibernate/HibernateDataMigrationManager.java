@@ -230,8 +230,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         // Execute migrations
         if (migrations != null) {
             for (XWikiMigration migration : migrations) {
-                if (migration.dataMigration instanceof HibernateDataMigration) {
-                    liquibaseUpdate((HibernateDataMigration) migration.dataMigration, preHibernate, database);
+                if (migration.dataMigration instanceof HibernateDataMigration hibernateDataMigration) {
+                    liquibaseUpdate(hibernateDataMigration, preHibernate, database);
                 }
             }
         }

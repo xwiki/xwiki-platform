@@ -272,8 +272,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     public void safeput(String name, PropertyInterface property)
     {
         addField(name, property);
-        if (property instanceof BaseProperty) {
-            ((BaseProperty) property).setName(name);
+        if (property instanceof BaseProperty baseProperty) {
+            baseProperty.setName(name);
         }
     }
 
@@ -1011,8 +1011,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
             for (String propertyName : getPropertyList()) {
                 PropertyInterface property = getField(propertyName);
-                if (property instanceof BaseElement) {
-                    ((BaseElement) property).setOwnerDocument(ownerDocument);
+                if (property instanceof BaseElement baseElement) {
+                    baseElement.setOwnerDocument(ownerDocument);
                 }
             }
         }

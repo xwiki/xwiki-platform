@@ -326,8 +326,8 @@ public class Package
 
     public void addDocumentFilter(Object filter) throws PackageException
     {
-        if (filter instanceof DocumentFilter) {
-            this.documentFilters.add((DocumentFilter) filter);
+        if (filter instanceof DocumentFilter documentFilter) {
+            this.documentFilters.add(documentFilter);
         } else {
             throw new PackageException(PackageException.ERROR_PACKAGE_INVALID_FILTER, "Invalid Document Filter");
         }

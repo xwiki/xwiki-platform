@@ -412,8 +412,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             Object formvalues = map.get(name);
             if (formvalues != null) {
                 BaseProperty objprop;
-                if (formvalues instanceof String[]) {
-                    objprop = property.fromStringArray(((String[]) formvalues));
+                if (formvalues instanceof String[] stringArray) {
+                    objprop = property.fromStringArray(stringArray);
                 } else if (formvalues instanceof String) {
                     objprop = property.fromString(formvalues.toString());
                 } else {
@@ -811,8 +811,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
         TextAreaClass textAreaClass;
         PropertyInterface field = get(fieldName);
-        if (field instanceof TextAreaClass) {
-            textAreaClass = (TextAreaClass) field;
+        if (field instanceof TextAreaClass existingTextAreaClass) {
+            textAreaClass = existingTextAreaClass;
         } else {
             // Remove the field if it already exist
             if (field != null) {

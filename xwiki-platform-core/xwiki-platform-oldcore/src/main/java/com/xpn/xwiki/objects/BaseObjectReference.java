@@ -176,8 +176,8 @@ public class BaseObjectReference extends ObjectReference
 
     private DocumentReference resolveClassReference(EntityReference classReference)
     {
-        if (classReference instanceof DocumentReference) {
-            return (DocumentReference) classReference;
+        if (classReference instanceof DocumentReference documentReference) {
+            return documentReference;
         }
 
         return Utils.<DocumentReferenceResolver<EntityReference>>getComponent(DocumentReferenceResolver.TYPE_REFERENCE)

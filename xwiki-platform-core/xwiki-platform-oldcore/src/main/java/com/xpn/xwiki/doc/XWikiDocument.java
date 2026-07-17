@@ -299,8 +299,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         @Override
         public boolean equals(Object obj)
         {
-            if (obj instanceof XWikiAttachmentToRemove) {
-                return this.attachment.equals(((XWikiAttachmentToRemove) obj).getAttachment());
+            if (obj instanceof XWikiAttachmentToRemove attachmentToRemove) {
+                return this.attachment.equals(attachmentToRemove.getAttachment());
             }
 
             return false;
@@ -599,7 +599,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         public List<BaseObject> put(DocumentReference key, List<BaseObject> value)
         {
             // Makes sure to always insert BaseObjects
-            return xObjects.put(key, value instanceof BaseObjects ? (BaseObjects) value : new BaseObjects(value));
+            return xObjects.put(key, value instanceof BaseObjects baseObjects ? baseObjects : new BaseObjects(value));
         }
 
         @Override
@@ -3090,8 +3090,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(EntityReference reference)
     {
-        if (reference instanceof DocumentReference) {
-            return getXObject((DocumentReference) reference);
+        if (reference instanceof DocumentReference documentReference) {
+            return getXObject(documentReference);
         } else if (reference.getType() == EntityType.DOCUMENT) {
             // class reference
             return getXObject(
@@ -3170,8 +3170,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private BaseObjectReference getBaseObjectReference(ObjectReference objectReference)
     {
-        if (objectReference instanceof BaseObjectReference) {
-            return (BaseObjectReference) objectReference;
+        if (objectReference instanceof BaseObjectReference baseObjectReference) {
+            return baseObjectReference;
         } else {
             return new BaseObjectReference(objectReference);
         }
@@ -5919,13 +5919,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         for (Object fieldClass : xclass.getProperties()) {
             // Wiki content stored in xobjects
-            if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
-                TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
+            if (fieldClass instanceof TextAreaClass textAreaClass && textAreaClass.isWikiContent()) {
                 PropertyInterface field = xobject.getField(textAreaClass.getName());
 
                 // Make sure the field is the right type (might happen while a document is being migrated)
-                if (field instanceof LargeStringProperty) {
-                    LargeStringProperty largeField = (LargeStringProperty) field;
+                if (field instanceof LargeStringProperty largeField) {
 
                     try {
                         XDOM dom = parseContent(getSyntax(), largeField.getValue(), getDocumentReference());
@@ -8464,8 +8462,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 if (currentBlock instanceof SectionBlock) {
                     // The next children block is a HeaderBlock but we check to be on the safe side...
                     Block nextChildrenBlock = currentBlock.getChildren().get(0);
-                    if (nextChildrenBlock instanceof HeaderBlock) {
-                        HeaderBlock headerBlock = (HeaderBlock) nextChildrenBlock;
+                    if (nextChildrenBlock instanceof HeaderBlock headerBlock) {
                         if (headerBlock.getLevel().getAsInt() <= sectionDepth) {
                             filteredHeaders.add(headerBlock);
                         }
@@ -9091,13 +9088,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 if (bobject != null) {
                     BaseClass bclass = bobject.getXClass(context);
                     for (Object fieldClass : bclass.getProperties()) {
-                        if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
-                            TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
+                        if (fieldClass instanceof TextAreaClass textAreaClass && textAreaClass.isWikiContent()) {
                             PropertyInterface field = bobject.getField(textAreaClass.getName());
 
                             // Make sure the field is the right type (might happen while a document is being migrated)
-                            if (field instanceof LargeStringProperty) {
-                                LargeStringProperty largeField = (LargeStringProperty) field;
+                            if (field instanceof LargeStringProperty largeField) {
 
                                 largeField.setValue(performSyntaxConversion(largeField.getValue(),
                                     getDocumentReference(), getSyntax(), targetSyntax));
@@ -9351,8 +9346,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                         + "replacing it.", classReference, getDocumentReference());
             }
             return relativeXClassReference;
-        } else if (reference instanceof LocalDocumentReference) {
-            return new DocumentReference((LocalDocumentReference) reference, getDocumentReference().getWikiReference());
+        } else if (reference instanceof LocalDocumentReference localDocumentReference) {
+            return new DocumentReference(localDocumentReference, getDocumentReference().getWikiReference());
         } else {
             DocumentReference defaultReference =
                 new DocumentReference(getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,

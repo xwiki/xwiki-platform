@@ -192,9 +192,9 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         XWikiDocument origDoc = new XWikiDocument(docReference, origLocale);
 
         // Force invalidating the cache to be sure it returns (and keep) the right document
-        if (xcontext.getWiki().getStore() instanceof XWikiCacheStore) {
-            ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(document);
-            ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(origDoc);
+        if (xcontext.getWiki().getStore() instanceof XWikiCacheStore cacheStore) {
+            cacheStore.invalidate(document);
+            cacheStore.invalidate(origDoc);
         }
 
         String version = (String) remoteDataMap.get(DOC_VERSION);

@@ -91,8 +91,8 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
         // Clean the document cache to make sure the new properties we just added directly to the database are not lost
         // during next save before a version of the document without those properties was already in the cache
         XWikiStoreInterface store = xcontext.getWiki().getStore();
-        if (store instanceof XWikiCacheStoreInterface) {
-            ((XWikiCacheStoreInterface) store).flushCache();
+        if (store instanceof XWikiCacheStoreInterface cacheStore) {
+            cacheStore.flushCache();
         }
     }
 

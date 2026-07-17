@@ -167,8 +167,8 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             for (String pluginName : pluginManager.getPlugins()) {
                 XWikiPluginInterface plugin = pluginManager.getPlugin(pluginName);
 
-                if (plugin instanceof RenderingCacheAware) {
-                    this.legacyRenderingCacheAware.add((RenderingCacheAware) plugin);
+                if (plugin instanceof RenderingCacheAware renderingCacheAware) {
+                    this.legacyRenderingCacheAware.add(renderingCacheAware);
                 }
             }
         }

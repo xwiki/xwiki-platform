@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -69,8 +68,6 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 @Singleton
 public class QueryExpressionGenerator
 {
-    private static final LocalDocumentReference USER_CLASS = new LocalDocumentReference("XWiki", "XWikiUsers");
-
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 

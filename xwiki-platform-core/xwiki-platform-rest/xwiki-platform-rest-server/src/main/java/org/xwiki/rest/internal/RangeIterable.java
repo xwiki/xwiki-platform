@@ -100,11 +100,7 @@ public class RangeIterable<T> implements Iterable<T>
             @Override
             public boolean hasNext()
             {
-                if (i < number && i + start < list.size()) {
-                    return true;
-                }
-
-                return false;
+                return i < number && i + start < list.size();
             }
 
             @Override

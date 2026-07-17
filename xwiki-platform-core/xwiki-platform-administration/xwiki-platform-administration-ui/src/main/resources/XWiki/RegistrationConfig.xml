@@ -539,7 +539,7 @@
 &lt;/small&gt;
 #end
 #end
-#set($headline = $headline.replaceFirst('__headlinesmall__',$!headlineSmall))
+#set($headline = $headline.replaceFirst('__headlinesmall__', $!headlineSmall))
 
 {{html}}
 &lt;div class="registration-success-headline"&gt;

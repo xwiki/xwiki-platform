@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import "./macro.css";
 import { applyXWikiParameters } from "./parameters";
 import { invocationToMacroCall, macroCallToInvocation } from "./utils";
 import { MacrosContext } from "../contexts";
@@ -61,6 +62,25 @@ function valueToInlineContent(value: unknown): RawBlock[] {
 }
 
 /**
+ * Looks up a macro-call parameter value by name, case-insensitively. The `xwikiEditable` marker carries the macro
+ * descriptor's (canonical) parameter name, whereas the macro call stores parameters under the case the user actually
+ * wrote, so an exact-case lookup would miss (this mirrors the server's case-insensitive matching).
+ */
+function lookupParameter(
+  parameters: MacroCall["parameters"],
+  name: string,
+): unknown {
+  if (name in parameters) {
+    return parameters[name];
+  }
+  const lowerName = name.toLowerCase();
+  const key = Object.keys(parameters).find(
+    (k) => k.toLowerCase() === lowerName,
+  );
+  return key === undefined ? undefined : parameters[key];
+}
+
+/**
  * Recursively replaces `xwikiEditable` markers in the macro output with the corresponding parameter/content value from
  * the macro call. The marker is replaced with the value converted through the provided `toValue` function (blocks for a
  * block macro output, inline content for an inline macro output).
@@ -73,7 +93,11 @@ function substituteEditables(
   return blocks.flatMap((block) => {
     if (block.type === "xwikiEditable") {
       // Replace the editable marker with the corresponding parameter/content value.
-      return toValue(block.name ? call.parameters[block.name] : call.content);
+      return toValue(
+        block.name
+          ? lookupParameter(call.parameters, block.name)
+          : call.content,
+      );
     } else if (Array.isArray(block.children) && block.children.length) {
       // Transform the children recursively.
       return [
@@ -416,6 +440,7 @@ const XWikiMacroBlock = createReactBlockSpec(
           <div
             className="xwiki-macro-block"
             data-macro-name={call.name}
+            title={"macro:" + call.name}
             onDoubleClick={onDoubleClick}
             dangerouslySetInnerHTML={{ __html: html }}
           />
@@ -425,6 +450,7 @@ const XWikiMacroBlock = createReactBlockSpec(
           <div
             className="xwiki-macro-block xwiki-macro-placeholder"
             data-macro-name={call.name}
+            title={"macro:" + call.name}
             onDoubleClick={onDoubleClick}
           >
             macro:{call.name}
@@ -479,6 +505,7 @@ const XWikiInlineMacro = createReactInlineContentSpec(
           <span
             className="xwiki-macro-inline"
             data-macro-name={call.name}
+            title={"macro:" + call.name}
             onDoubleClick={onDoubleClick}
             dangerouslySetInnerHTML={{ __html: html }}
           />
@@ -488,6 +515,7 @@ const XWikiInlineMacro = createReactInlineContentSpec(
           <span
             className="xwiki-macro-inline xwiki-macro-placeholder"
             data-macro-name={call.name}
+            title={"macro:" + call.name}
             onDoubleClick={onDoubleClick}
           >
             macro:{call.name}

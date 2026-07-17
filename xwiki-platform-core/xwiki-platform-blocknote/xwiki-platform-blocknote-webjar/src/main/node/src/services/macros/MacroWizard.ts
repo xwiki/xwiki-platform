@@ -238,22 +238,24 @@ export class DefaultBlockNoteMacroWizard implements BlockNoteMacroWizard {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .filter(([key, value]) => typeof value !== "string")
         .map(([key, value]) => [
-          key,
+          key.toLowerCase(),
           this.serializeInlineParameterValue(value),
         ]),
     );
 
-    if (macroInvocation.body) {
+    if (
+      macroInvocation.body.type === "inlineContents" ||
+      macroInvocation.body.type === "inlineContent"
+    ) {
       inlineParameters.$content = this.serializeInlineParameterValue(
-        macroInvocation.body,
+        macroInvocation.body.content,
       );
     }
     return inlineParameters;
   }
 
   private serializeInlineParameterValue(value: unknown): string {
-    const blocks = Array.isArray(value) ? value : [value];
-    return JSON.stringify({ blocks });
+    return JSON.stringify(Array.isArray(value) ? value : [value]);
   }
 
   private getMacroCall(

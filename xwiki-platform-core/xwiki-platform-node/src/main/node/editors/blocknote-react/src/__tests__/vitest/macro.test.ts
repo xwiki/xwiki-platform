@@ -149,6 +149,21 @@ describe("blockOutputToHTML (mixed inline/block group content)", () => {
     expect(span).not.toBeNull();
     expect(span!.textContent).toBe("label");
   });
+
+  test("substitutes an editable parameter marker matched case-insensitively", () => {
+    // The xwikiEditable marker carries the descriptor's canonical parameter name ("title") while the macro call keeps
+    // the case the user wrote ("tiTle"); the substitution must still find the value.
+    const output = [
+      { type: "xwikiEditable", name: "title" },
+    ] as unknown as Parameters<typeof blockOutputToHTML>[1];
+
+    const html = blockOutputToHTML(editor, output, {
+      name: "info",
+      parameters: { tiTle: "Hello" },
+    });
+
+    expect(html).toContain("Hello");
+  });
 });
 
 describe("XWikiParametersStyle", () => {

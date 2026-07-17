@@ -637,8 +637,9 @@ function macroToInvocation(
 /**
  * A server-side macro call, as stored (JSON-serialized) in the `call` prop of the {@link macro.tsx} `xwikiMacroBlock` /
  * `xwikiInlineMacro` specs and produced/consumed by the server-side BlockNote syntax: the macro name, its parameters
- * and an optional raw body. Whether the macro is inline or block-level is carried by the block/inline-content type, not
- * by this object.
+ * and an optional body. Whether the macro is inline or block-level is carried by the block/inline-content type, not by
+ * this object. A parameter value and the body can each be either a plain string or a BlockNote fragment (an array of
+ * blocks or inline content) when the macro output uses it verbatim (so it can be edited in-place).
  *
  * @since 18.6.0RC1
  * @beta
@@ -657,8 +658,15 @@ function invocationToMacroCall(
     name: invocation.id,
     parameters: invocation.params,
   };
-  if (invocation.body.type === "raw") {
-    call.content = invocation.body.content;
+  const body = invocation.body;
+  // A raw body is a string; an inline(Contents) body is a BlockNote fragment. Both are carried verbatim into the call
+  // content; a "none" body leaves the content unset.
+  if (
+    body.type === "raw" ||
+    body.type === "inlineContents" ||
+    body.type === "inlineContent"
+  ) {
+    call.content = body.content;
   }
   return call;
 }
@@ -669,13 +677,28 @@ function macroCallToInvocation(
   kind: "block" | "inline",
 ): MacroBlockInvocation | InlineMacroInvocation {
   const params = (call.parameters ?? {}) as MacroCallParams;
-  const body =
-    call.content !== undefined && call.content !== null && call.content !== ""
-      ? ({ type: "raw", content: String(call.content) } as const)
-      : ({ type: "none" } as const);
-  return kind === "block"
-    ? { kind: "block", id: call.name, params, body }
-    : { kind: "inline", id: call.name, params, body };
+  const { content } = call;
+  const hasContent =
+    content !== undefined && content !== null && content !== "";
+
+  if (kind === "block") {
+    const body: MacroBlockInvocation["body"] = !hasContent
+      ? { type: "none" }
+      : typeof content === "string"
+        ? { type: "raw", content }
+        : // A fragment content is carried verbatim (it may be a block or inline-content array).
+          { type: "inlineContents", content: content as InlineContentType[] };
+    return { kind: "block", id: call.name, params, body };
+  }
+
+  const body: InlineMacroInvocation["body"] = !hasContent
+    ? { type: "none" }
+    : typeof content === "string"
+      ? { type: "raw", content }
+      : // A fragment content is carried verbatim. NOTE: the inline body currently holds a single inline content (see
+        // InlineMacroInvocation), but the server fragment can be an array; it is preserved as-is and round-trips.
+        { type: "inlineContent", content: content as InlineContentType };
+  return { kind: "inline", id: call.name, params, body };
 }
 
 /**

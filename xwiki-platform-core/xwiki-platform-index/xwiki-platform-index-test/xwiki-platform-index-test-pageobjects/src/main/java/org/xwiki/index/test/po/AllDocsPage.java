@@ -49,7 +49,7 @@ public class AllDocsPage extends ViewPage
 
     @FindBy(xpath = "//li[@id='xwikideletedAttachments']/a")
     private WebElement deletedAttachmentsTab;
-    
+
     @FindBy(xpath = "//div[contains(@class, 'xwikitabpanescontainer')]/div[contains(@class, 'jstree')]")
     private WebElement treeElement;
 

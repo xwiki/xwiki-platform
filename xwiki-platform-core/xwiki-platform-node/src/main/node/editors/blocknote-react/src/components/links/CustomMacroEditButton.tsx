@@ -17,22 +17,79 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { MACRO_NAME_PREFIX } from "../../blocknote/utils";
+import {
+  MACRO_NAME_PREFIX,
+  invocationToMacroCall,
+  macroCallToInvocation,
+} from "../../blocknote/utils";
 import { useEditor } from "../../hooks";
 import { useComponentsContext } from "@blocknote/react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { RiPencilFill } from "react-icons/ri";
-import type { ContextForMacros } from "../../blocknote/utils";
-import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+import type {
+  ContextForMacros,
+  InlineMacroInvocation,
+  MacroBlockInvocation,
+  MacroCall,
+  MacroCallParams,
+} from "../../blocknote/utils";
 
 export type CustomMacroEditButtonProps = {
-  macrosList: MacroWithUnknownParamsType[];
   ctxForMacros: ContextForMacros;
 };
 
+/** The invocation to edit for a selected macro block, and the writer that applies the wizard's result back to it. */
+type MacroEdit = {
+  invocation: MacroBlockInvocation | InlineMacroInvocation;
+  writeBack: (updated: MacroBlockInvocation | InlineMacroInvocation) => void;
+};
+
+/**
+ * Resolve the given selected block into a macro edit: a server-rendered `xwikiMacroBlock` (its call stored in the
+ * `call` prop) or a client-rendered `Macro_<id>` block (its parameters stored directly in the props). Returns null for
+ * any other block.
+ */
+function resolveMacroEdit(
+  editor: ReturnType<typeof useEditor>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  macroBlock: any,
+): MacroEdit | null {
+  const type: string = macroBlock.type;
+  const props = macroBlock.props;
+  if (type === "xwikiMacroBlock") {
+    return {
+      invocation: macroCallToInvocation(
+        JSON.parse(props.call) as MacroCall,
+        "block",
+      ),
+      writeBack: (updated) =>
+        editor.updateBlock(macroBlock.id, {
+          props: {
+            call: JSON.stringify(invocationToMacroCall(updated)),
+            output: "[]",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any,
+        }),
+    };
+  }
+  if (type.startsWith(MACRO_NAME_PREFIX)) {
+    return {
+      invocation: {
+        kind: "block",
+        id: type.slice(MACRO_NAME_PREFIX.length),
+        params: props as MacroCallParams,
+        body: { type: "none" },
+      },
+      writeBack: (updated) =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        editor.updateBlock(macroBlock.id, { props: updated.params as any }),
+    };
+  }
+  return null;
+}
+
 export const CustomMacroEditButton: React.FC<CustomMacroEditButtonProps> = ({
-  macrosList,
   ctxForMacros,
 }) => {
   const Components = useComponentsContext()!;
@@ -46,34 +103,17 @@ export const CustomMacroEditButton: React.FC<CustomMacroEditButtonProps> = ({
     // Hide the edit action when no params editor is available.
     const openParamsEditor = ctxForMacros.openParamsEditor;
 
-    if (
-      !openParamsEditor ||
-      !selection ||
-      selection.blocks.length !== 1 ||
-      !selection.blocks[0].type.startsWith(MACRO_NAME_PREFIX)
-    ) {
+    if (!openParamsEditor || !selection || selection.blocks.length !== 1) {
       return null;
     }
 
-    const macroBlock = selection.blocks[0];
-
-    const macro = macrosList.find(
-      (macro) =>
-        macro.infos.id === macroBlock.type.replace(MACRO_NAME_PREFIX, ""),
-    );
-
-    if (!macro) {
-      throw new Error(
-        "Internal error: macro not found for block: " + macroBlock.type,
-      );
+    const edit = resolveMacroEdit(editor, selection.blocks[0]);
+    if (!edit) {
+      return null;
     }
 
-    return () => {
-      openParamsEditor(macro, macroBlock.props, (newProps) =>
-        editor.updateBlock(macroBlock.id, { props: newProps }),
-      );
-    };
-  }, [selection, macrosList, ctxForMacros, editor]);
+    return () => openParamsEditor(edit.invocation, edit.writeBack);
+  }, [selection, ctxForMacros, editor]);
 
   return (
     openMacroEditor && (

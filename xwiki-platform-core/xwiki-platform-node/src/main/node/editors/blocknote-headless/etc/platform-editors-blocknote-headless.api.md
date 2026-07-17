@@ -20,7 +20,7 @@ import { PublicProps } from 'vue';
 export const BlocknoteEditor: DefineComponent<    {
 editorProps: Omit<BlockNoteViewWrapperProps, "depsContainer" | "content" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
 macros: {
-list: MacroWithUnknownParamsType[];
+list?: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
 editorContent: BlockType[];
@@ -34,7 +34,7 @@ getContent: () => BlockType[];
 }, string, PublicProps, Readonly<{
 editorProps: Omit<BlockNoteViewWrapperProps, "depsContainer" | "content" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
 macros: {
-list: MacroWithUnknownParamsType[];
+list?: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
 editorContent: BlockType[];

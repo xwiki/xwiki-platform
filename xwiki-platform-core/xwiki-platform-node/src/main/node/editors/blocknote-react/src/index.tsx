@@ -92,6 +92,8 @@ export type {
   ContextForMacros,
   InlineMacroInvocation,
   MacroBlockInvocation,
+  MacroCall,
+  MacroCallParams,
   MacroInsertionEditorPrefillData,
 } from "./blocknote/utils";
 

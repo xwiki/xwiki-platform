@@ -27,8 +27,6 @@ import { DefaultImageWizard } from "./image/DefaultImageWizard";
 import { DefaultLinkSuggestServiceProvider } from "./link/DefaultLinkSuggestServiceProvider";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
 import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
-import { XWikiInlineMacro } from "./macros/XWikiInlineMacro";
-import { XWikiMacroBlock } from "./macros/XWikiMacroBlock";
 import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
 import { DefaultModelReferenceParserProvider } from "./model/reference/DefaultModelReferenceParserProvider";
 import { DefaultModelReferenceSerializerProvider } from "./model/reference/DefaultModelReferenceSerializerProvider";
@@ -47,7 +45,6 @@ import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platfor
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
 import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
-import { ComponentInit as MacroServiceComponentList } from "@xwiki/platform-macros-service";
 import { ComponentInit as MarkdownSyntaxConfig } from "@xwiki/platform-markdown-syntax-config";
 import { ComponentInit as MinimalSyntaxConfig } from "@xwiki/platform-minimal-syntax-config";
 import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
@@ -86,7 +83,6 @@ DefaultSkinManager.bind(container);
 DefaultStorageProvider.bind(container);
 XWikiStorage.bind(container);
 new DefaultAttachmentsComponentInit(container);
-new MacroServiceComponentList(container);
 
 new CollaborationComponentList(container);
 new XWikiCollaborationComponentList(container);
@@ -94,8 +90,6 @@ new LinkSuggestXWikiComponentList(container);
 
 DefaultBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);
-XWikiMacroBlock.bind(container);
-XWikiInlineMacro.bind(container);
 
 DefaultImageWizard.bind(container);
 DefaultMacroWizard.bind(container);

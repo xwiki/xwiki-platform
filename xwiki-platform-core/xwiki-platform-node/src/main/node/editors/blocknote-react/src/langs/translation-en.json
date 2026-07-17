@@ -8,6 +8,8 @@
   "blocknote.linkToolbar.macros.edit.tooltip": "Open the macro editor",
   "blocknote.toolbar.unknownBlockType": "Unknown block type",
   "blocknote.toolbar.buttons.insertMacro": "Insert a macro",
+  "blocknote.slashMenu.macro.title": "Macro",
+  "blocknote.slashMenu.macro.subtext": "Insert an XWiki macro",
   "blocknote.toolbar.subscript": "Subscript",
   "blocknote.toolbar.superscript": "Superscript",
   "blocknote.imageSelector.uploadButton": "Upload",

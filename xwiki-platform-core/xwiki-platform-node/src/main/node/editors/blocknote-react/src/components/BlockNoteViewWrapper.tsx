@@ -211,7 +211,7 @@ type BlockNoteViewWrapperProps = {
 /**
  * BlockNote editor wrapper
  */
-// eslint-disable-next-line max-statements
+
 const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   blockNoteOptions,
   name = "content",
@@ -227,6 +227,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   label,
   syntax,
   refs: { setEditor } = {},
+  // eslint-disable-next-line max-statements
 }: BlockNoteViewWrapperProps) => {
   const builtMacros: BlockNoteConcreteMacro[] = [];
 

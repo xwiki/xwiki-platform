@@ -22,10 +22,10 @@ import { FULL_SYNTAX } from "./syntax.mock";
 import { expect, test } from "@playwright/experimental-ct-vue";
 import type { UniAst } from "@xwiki/platform-uniast-api";
 
-// eslint-disable-next-line max-statements
 test("Editing the title of a link keeps the rest of the line intact", async ({
   mount,
   page,
+  // eslint-disable-next-line max-statements
 }) => {
   const component = await mountBlockNoteHeadless(mount, {
     editorContent: buildParagraphWithLink("https://xwiki.org"),

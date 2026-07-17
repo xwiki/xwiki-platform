@@ -22,10 +22,10 @@ import { FULL_SYNTAX } from "./syntax.mock";
 import { buildParagraphs, pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-vue";
 
-// eslint-disable-next-line max-statements
 test("Creating a link on a word in the middle of a line keeps the text intact", async ({
   mount,
   page,
+  // eslint-disable-next-line max-statements
 }) => {
   const component = await mountBlockNoteHeadless(mount, {
     editorContent: buildParagraphs(["First second third fourth"]),

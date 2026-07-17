@@ -58,10 +58,10 @@ export type ImageSelectorProps = {
   onSelected: (url: string) => void;
 };
 
-// eslint-disable-next-line max-statements
 export const ImageSelector: React.FC<ImageSelectorProps> = ({
   currentSelection,
   onSelected,
+  // eslint-disable-next-line max-statements
 }) => {
   const depsContainer = useContext(DepsContainerContext)!;
 

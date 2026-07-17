@@ -89,7 +89,6 @@ type LinkSuggestion = {
  *
  * @see SearchBoxProps
  */
-// eslint-disable-next-line max-statements
 export const SearchBox: React.FC<SearchBoxProps> = ({
   initialValue,
   placeholder,
@@ -97,6 +96,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   renderSuggestion,
   onSelect,
   onSubmit,
+  // eslint-disable-next-line max-statements
 }) => {
   const depsContainer = useContext(DepsContainerContext);
 

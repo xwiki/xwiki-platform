@@ -28,7 +28,7 @@ import {
   VerbatimStyle,
   XWikiParametersStyle,
 } from "./styles";
-import { MACRO_NAME_PREFIX } from "./utils";
+import { MACRO_NAME_PREFIX, insertMacroInvocation } from "./utils";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -42,7 +42,9 @@ import { filterSuggestionItems } from "@blocknote/core/extensions";
 import * as locales from "@blocknote/core/locales";
 import { getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
-import type { BlockNoteConcreteMacro } from "./utils";
+import { createElement } from "react";
+import { RiFileList3Fill } from "react-icons/ri";
+import type { BlockNoteConcreteMacro, ContextForMacros } from "./utils";
 import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
@@ -148,9 +150,36 @@ function querySuggestionsMenuItems(
   macros: BlockNoteConcreteMacro[],
   syntax: SyntaxConfig,
   lang: EditorLanguage,
+  t: (key: string) => string,
+  openInsertionEditor?: ContextForMacros["openInsertionEditor"],
 ): DefaultReactSuggestionItem[] {
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
     syntax.features;
+
+  // A single generic "Macro" entry that opens the macro wizard. It is used to insert the server-rendered
+  // xwikiMacroBlock / xwikiInlineMacro (the per-macro entries below only exist for client-rendered macros).
+  const genericMacroItem: DefaultReactSuggestionItem[] =
+    openInsertionEditor && (blocksSupport.macros || inlineSupport.macros)
+      ? [
+          {
+            title: t("blocknote.slashMenu.macro.title"),
+            subtext: t("blocknote.slashMenu.macro.subtext"),
+            aliases: ["macro"],
+            group: "Macros",
+            icon: createElement(RiFileList3Fill),
+            onItemClick: () =>
+              openInsertionEditor(
+                {
+                  kind: "block",
+                  id: null,
+                  params: null,
+                  body: { type: "none" },
+                },
+                (invocation) => insertMacroInvocation(editor, invocation),
+              ),
+          },
+        ]
+      : [];
 
   let items = filterSuggestionItems(
     combineByGroup(
@@ -174,6 +203,8 @@ function querySuggestionsMenuItems(
               : null,
           )
         : [],
+
+      genericMacroItem,
     ),
     query,
   );

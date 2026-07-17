@@ -18,17 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { applyXWikiParameters } from "./parameters";
+import { invocationToMacroCall, macroCallToInvocation } from "./utils";
+import { MacrosContext } from "../contexts";
 import {
   createReactBlockSpec,
   createReactInlineContentSpec,
 } from "@blocknote/react";
+import { useContext } from "react";
+import type { MacroCall } from "./utils";
 import type { BlockNoteEditor, PartialBlock } from "@blocknote/core";
-
-type MacroCall = {
-  name: string;
-  parameters: Record<string, unknown>;
-  content?: unknown;
-};
 
 type RawBlock = {
   type: string;
@@ -400,11 +398,25 @@ const XWikiMacroBlock = createReactBlockSpec(
       const call = JSON.parse(block.props.call) as MacroCall;
       const output = JSON.parse(block.props.output) as RawBlock[];
       const html = blockOutputToHTML(editor, output, call);
+      // Double-click opens the macro params editor (when a macro context is available), editing the call in place.
+      const openParamsEditor = useContext(MacrosContext)?.openParamsEditor;
+      const onDoubleClick = openParamsEditor
+        ? () =>
+            openParamsEditor(macroCallToInvocation(call, "block"), (updated) =>
+              editor.updateBlock(block.id, {
+                props: {
+                  call: JSON.stringify(invocationToMacroCall(updated)),
+                  output: "[]",
+                },
+              }),
+            )
+        : undefined;
       if (html) {
         return (
           <div
             className="xwiki-macro-block"
             data-macro-name={call.name}
+            onDoubleClick={onDoubleClick}
             dangerouslySetInnerHTML={{ __html: html }}
           />
         );
@@ -413,6 +425,7 @@ const XWikiMacroBlock = createReactBlockSpec(
           <div
             className="xwiki-macro-block xwiki-macro-placeholder"
             data-macro-name={call.name}
+            onDoubleClick={onDoubleClick}
           >
             macro:{call.name}
           </div>
@@ -442,15 +455,31 @@ const XWikiInlineMacro = createReactInlineContentSpec(
     content: "none",
   },
   {
-    render: ({ inlineContent, editor }) => {
+    render: ({ inlineContent, editor, updateInlineContent }) => {
       const call = JSON.parse(inlineContent.props.call) as MacroCall;
       const output = JSON.parse(inlineContent.props.output) as RawBlock[];
       const html = inlineOutputToHTML(editor, output, call);
+      // Double-click opens the macro params editor (when a macro context is available), editing the call in place.
+      const openParamsEditor = useContext(MacrosContext)?.openParamsEditor;
+      const onDoubleClick = openParamsEditor
+        ? () =>
+            openParamsEditor(macroCallToInvocation(call, "inline"), (updated) =>
+              updateInlineContent({
+                type: "xwikiInlineMacro",
+                props: {
+                  call: JSON.stringify(invocationToMacroCall(updated)),
+                  output: "[]",
+                },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any),
+            )
+        : undefined;
       if (html) {
         return (
           <span
             className="xwiki-macro-inline"
             data-macro-name={call.name}
+            onDoubleClick={onDoubleClick}
             dangerouslySetInnerHTML={{ __html: html }}
           />
         );
@@ -459,6 +488,7 @@ const XWikiInlineMacro = createReactInlineContentSpec(
           <span
             className="xwiki-macro-inline xwiki-macro-placeholder"
             data-macro-name={call.name}
+            onDoubleClick={onDoubleClick}
           >
             macro:{call.name}
           </span>

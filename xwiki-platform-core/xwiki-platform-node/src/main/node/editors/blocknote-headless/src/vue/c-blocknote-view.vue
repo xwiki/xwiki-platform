@@ -49,7 +49,8 @@ type Props = {
   /** Set to `false` to disable macros entirely */
   macros:
     | {
-        list: MacroWithUnknownParamsType[];
+        /** Optional list of client-rendered macros; omit it when only the server-rendered macros are used. */
+        list?: MacroWithUnknownParamsType[];
         ctx: ContextForMacros;
       }
     | false;

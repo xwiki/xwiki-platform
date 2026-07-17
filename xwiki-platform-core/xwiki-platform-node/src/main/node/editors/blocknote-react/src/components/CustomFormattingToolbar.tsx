@@ -54,7 +54,6 @@ import type {
   BlockTypeSelectItem,
   FormattingToolbarProps,
 } from "@blocknote/react";
-import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { JSX } from "react";
 
 const BooleanStyleButton: React.FC<{
@@ -102,7 +101,7 @@ const BooleanStyleButton: React.FC<{
 type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
   additionalBlockTypes: BlockTypeSelectItem[];
-  macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false;
+  macros: { ctx: ContextForMacros } | false;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
   linkEditionHooks?: LinkEditionHooks;
 };
@@ -154,7 +153,7 @@ export const CustomFormattingToolbar: React.FC<
 
 const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
-  macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false,
+  macros: { ctx: ContextForMacros } | false,
   t: (key: string) => string,
   linkEditionHooks?: LinkEditionHooks,
 ): JSX.Element[] =>
@@ -213,7 +212,6 @@ const getDefaultFormattingToolbarItems = (
       ? [
           <CustomMacroEditButton
             key={"macroEditButton"}
-            macrosList={macros.list}
             ctxForMacros={macros.ctx}
           />,
           // Hide the insert action when no insertion editor is available.

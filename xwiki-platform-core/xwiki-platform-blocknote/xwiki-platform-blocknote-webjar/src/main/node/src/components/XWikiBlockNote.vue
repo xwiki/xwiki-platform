@@ -83,7 +83,6 @@ import {
   injectLinkId,
   stripLinkId,
 } from "../services/blocknote/linkId";
-import { MACRO_UI_PLACEHOLDER } from "../services/macros/placeholderUi";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
@@ -114,14 +113,7 @@ import type {
   BlockType,
   EditorLanguage,
   ImageEditionOverrideFn,
-  InlineMacroInvocation,
-  MacroBlockInvocation,
-  MacroInsertionEditorPrefillData,
 } from "@xwiki/platform-editors-blocknote-react";
-import type {
-  MacroWithUnknownParamsType,
-  UnknownMacroParamsType,
-} from "@xwiki/platform-macros-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
@@ -337,21 +329,18 @@ onUnmounted(() => {
   collaborationManager?.leave();
 });
 
-// This is passed to the BlockNote editor component.
+// This is passed to the BlockNote editor component. Macros are inserted / edited directly as the server-rendered
+// xwikiMacroBlock / xwikiInlineMacro blocks: the wizard operates on macro invocations, and the editor stores the
+// resulting invocation in the block. The list of client-rendered macros is left empty (they are not used here).
 const macros: BlockNoteViewWrapperProps["macros"] = {
-  list: container.getAll<MacroWithUnknownParamsType>("Macro"),
   ctx: {
-    openParamsEditor: async (
-      macro: MacroWithUnknownParamsType,
-      parameters: UnknownMacroParamsType,
-      update: (newProps: UnknownMacroParamsType) => void,
-    ) => {
+    openParamsEditor: async (invocation, update) => {
       try {
         const macroWizard: BlockNoteMacroWizard = container.get(
           "BlockNoteMacroWizard",
         );
         update(
-          await macroWizard.insertOrUpdate(macro, parameters, {
+          await macroWizard.insertOrUpdate(invocation, {
             syntax: outputSyntax,
             inlineParametersSyntax: inputSyntax,
           }),
@@ -361,39 +350,17 @@ const macros: BlockNoteViewWrapperProps["macros"] = {
       }
     },
 
-    openInsertionEditor: async (
-      prefill: MacroInsertionEditorPrefillData,
-      insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void,
-    ) => {
-      const macroWizard: BlockNoteMacroWizard = container.get(
-        "BlockNoteMacroWizard",
-      );
-
-      const call = await macroWizard.insert(prefill.kind, prefill.params);
-
-      const invocation: MacroBlockInvocation | InlineMacroInvocation = {
-        kind: call.inline ? "inline" : "block",
-        id: call.name,
-        body: call.content
-          ? { type: "raw", content: call.content }
-          : { type: "none" },
-        params: Object.fromEntries(
-          Object.entries(call.parameters).map(([key, value]) => [
-            key,
-            typeof value === "string" ? value : value.value,
-          ]),
-        ),
-      };
-
-      insert({
-        kind: call.inline ? "inline" : "block",
-        id: call.inline ? "xwikiInlineMacro" : "xwikiMacroBlock",
-        params: {
-          call: JSON.stringify(invocation),
-          output: JSON.stringify(MACRO_UI_PLACEHOLDER),
-        },
-        body: { type: "none" },
-      });
+    openInsertionEditor: async (prefill, insert) => {
+      try {
+        const macroWizard: BlockNoteMacroWizard = container.get(
+          "BlockNoteMacroWizard",
+        );
+        insert(
+          await macroWizard.insert(prefill.kind, prefill.params, prefill.body),
+        );
+      } catch (error) {
+        console.error("Failed to insert the macro", error);
+      }
     },
   },
 };

@@ -38,6 +38,11 @@ import org.xwiki.test.ui.po.BaseElement;
 public class TreeElement extends BaseElement
 {
     /**
+     * The id HTML attribute.
+     */
+    private static final String ID = "id";
+
+    /**
      * The element that represents the tree.
      */
     private WebElement element;
@@ -53,17 +58,19 @@ public class TreeElement extends BaseElement
     }
 
     /**
-     * The rendered DOM id of a node is prefixed with the tree's own id, to keep it unique when the same entity is
-     * shown by more than one tree on the same page (see tree.js). This reconstructs that rendered id from the node
-     * id.
+     * The rendered DOM id of a node's anchor is prefixed with the tree's own id, to keep it unique when the same
+     * entity is shown by more than one tree on the same page (see tree.js). The node's own {@code <li>} keeps its
+     * plain, unprefixed id (jsTree doesn't allow us to safely change that one - see tree.js). This reconstructs the
+     * anchor's rendered id from the node id.
      *
      * @param nodeId the node identifier
-     * @return the corresponding DOM id
+     * @return the corresponding anchor DOM id
      */
-    private String getRenderedNodeId(String nodeId)
+    private String getRenderedAnchorId(String nodeId)
     {
-        String prefix = this.element.getAttribute("id");
-        return (prefix == null || prefix.isEmpty()) ? nodeId : (prefix + "-" + nodeId);
+        String prefix = this.element.getAttribute(ID);
+        String anchorId = nodeId + "_anchor";
+        return (prefix == null || prefix.isEmpty()) ? anchorId : (prefix + "-" + anchorId);
     }
 
     /**
@@ -72,7 +79,7 @@ public class TreeElement extends BaseElement
      */
     public TreeNodeElement getNode(String nodeId)
     {
-        return new TreeNodeElement(this.element, By.id(getRenderedNodeId(nodeId)));
+        return new TreeNodeElement(this.element, By.id(nodeId));
     }
 
     /**
@@ -86,7 +93,7 @@ public class TreeElement extends BaseElement
         // be). Such an element id is technically invalid but the browsers are handling it fine.
         // See https://code.google.com/p/selenium/issues/detail?id=8173
         return !getDriver().findElementsWithoutWaiting(this.element,
-            By.xpath(".//*[@id = '" + getRenderedNodeId(nodeId) + "']")).isEmpty();
+            By.xpath(".//*[@id = '" + nodeId + "']")).isEmpty();
     }
 
     /**
@@ -147,8 +154,7 @@ public class TreeElement extends BaseElement
     public TreeElement waitForNodeSelected(String nodeId)
     {
         String selectedNodeXPath =
-            String.format(".//*[@id = '%s_anchor' and contains(@class, 'jstree-clicked')]",
-                getRenderedNodeId(nodeId));
+            String.format(".//*[@id = '%s' and contains(@class, 'jstree-clicked')]", getRenderedAnchorId(nodeId));
         getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));
         return this;
     }
@@ -212,7 +218,7 @@ public class TreeElement extends BaseElement
         return getDriver()
             .findElementsWithoutWaiting(this.element,
                 By.cssSelector(".jstree-container-ul > .jstree-node:not(.jstree-hidden)"))
-            .stream().map(nodeElement -> By.id(nodeElement.getAttribute("id")))
+            .stream().map(nodeElement -> By.id(nodeElement.getAttribute(ID)))
             .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).toList();
     }
 }

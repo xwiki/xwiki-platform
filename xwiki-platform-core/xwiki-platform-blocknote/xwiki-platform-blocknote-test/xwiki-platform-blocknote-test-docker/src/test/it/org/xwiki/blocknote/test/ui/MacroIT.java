@@ -121,14 +121,12 @@ class MacroIT extends AbstractBlockNoteIT
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
             first {{success cssClass="three" title="My Inline Title"}}Done!{{/success}} line
 
             {{info cssClass="newTest" title="New title"}}
             Some information.
             {{/info}}
 
-            (% style="color:default;background-color:default;text-align:left" %)
             end""", wikiEditor.getContent());
 
         // Edit the page again to verify that we can also change the macro, not just its parameters.
@@ -193,14 +191,12 @@ class MacroIT extends AbstractBlockNoteIT
         page.save();
         wikiEditor = page.editWiki();
         assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
             first {{error cssClass="four" title="My Inline Title"}}Failed!{{/error}} line
 
             {{warning cssClass="new-test" title="New title"}}
             Some warning!
             {{/warning}}
 
-            (% style="color:default;background-color:default;text-align:left" %)
             end""", wikiEditor.getContent());
     }
 }

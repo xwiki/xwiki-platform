@@ -62,6 +62,49 @@ describe("invocationToMacroCall / macroCallToInvocation", () => {
 
     expect(macroCallToInvocation(call, "inline")).toEqual(invocation);
   });
+
+  test("a block macro call with a fragment content round-trips verbatim", () => {
+    // The macro content can be a BlockNote fragment (an array of blocks), not just a string. It must be carried as-is
+    // (not stringified) through the invocation and back.
+    const fragment = [
+      { type: "paragraph", props: {}, content: "one", children: [] },
+      { type: "bulletListItem", props: {}, content: "two", children: [] },
+    ];
+    const call = {
+      name: "info",
+      parameters: { image: "info.png" },
+      content: fragment,
+    };
+
+    const invocation = macroCallToInvocation(call, "block");
+    expect(invocation).toEqual({
+      kind: "block",
+      id: "info",
+      params: { image: "info.png" },
+      body: { type: "inlineContents", content: fragment },
+    });
+
+    // Round-trips back to the original call (fragment preserved verbatim).
+    expect(invocationToMacroCall(invocation)).toEqual(call);
+  });
+
+  test("an inline macro call with a fragment content round-trips verbatim", () => {
+    const fragment = [
+      "This ",
+      { type: "text", styles: { bold: true }, text: "works" },
+    ];
+    const call = { name: "error", parameters: {}, content: fragment };
+
+    const invocation = macroCallToInvocation(call, "inline");
+    expect(invocation).toEqual({
+      kind: "inline",
+      id: "error",
+      params: {},
+      body: { type: "inlineContent", content: fragment },
+    });
+
+    expect(invocationToMacroCall(invocation)).toEqual(call);
+  });
 });
 
 describe("insertMacroInvocation", () => {

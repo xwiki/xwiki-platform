@@ -310,7 +310,26 @@ define('xwiki-selectize', [
     // Save the width before the input is hidden.
     $(input).data('initialWidth', $(input).width());
 
+    // Remember the original tabindex attribute. Tom Select restores the tabIndex DOM property on destroy(), which
+    // defaults to 0 and gets reflected back as a tabindex="0" attribute even when the input never had one.
+    const hadTabIndex = input.hasAttribute('tabindex');
+    const originalTabIndex = input.getAttribute('tabindex');
+
     const tomSelect = new TomSelect(input, getSettings($(input), settings));
+
+    // Tom Select sets input.tabIndex (see above) AFTER firing its own 'destroy' event, so a 'destroy' listener runs
+    // too early to fix this up (it would get overwritten right after). Wrap destroy() itself so our fix runs
+    // strictly after Tom Select's own tabIndex restoration.
+    const originalDestroy = tomSelect.destroy;
+    tomSelect.destroy = function(...args) {
+      const result = originalDestroy.apply(tomSelect, args);
+      if (hadTabIndex) {
+        input.setAttribute('tabindex', originalTabIndex);
+      } else {
+        input.removeAttribute('tabindex');
+      }
+      return result;
+    };
 
     // We expose the TomSelect instance through the 'selectize' property / data on the target input / select that is
     // being enhanced, in order to preserve backwards compatibility. We can do this because TomSelect is a fork of

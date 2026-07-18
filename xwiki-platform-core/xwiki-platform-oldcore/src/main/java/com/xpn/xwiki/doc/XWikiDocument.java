@@ -239,7 +239,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private static final String PRE_END = "{/pre}";
 
-    private static final String HIDDEN = "hidden";
+    private static final String HIDDEN_PROPERTY = "hidden";
 
     private static final String XWIKIGUEST_REFERENCE_WARNING =
         "A reference to XWikiGuest user has been set instead of null. This is probably a mistake.";
@@ -3959,7 +3959,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
                     result.append(PRE_END);
                 }
-            } else if (HIDDEN.equals(type)) {
+            } else if (HIDDEN_PROPERTY.equals(type)) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
@@ -6065,7 +6065,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 .createQuery("select distinct doc.fullName from XWikiDocument doc where "
                     + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
                     Query.XWQL);
-            query.addFilter(Utils.getComponent(QueryFilter.class, HIDDEN));
+            query.addFilter(Utils.getComponent(QueryFilter.class, HIDDEN_PROPERTY));
             query.bindValue("prefixedFullName",
                 getDefaultEntityReferenceSerializer().serialize(getDocumentReference()));
             query.bindValue("fullName", LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference()));
@@ -7189,7 +7189,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         if (fromDoc.isHidden() != toDoc.isHidden()) {
-            list.add(new MetaDataDiff(HIDDEN, fromDoc.isHidden(), toDoc.isHidden()));
+            list.add(new MetaDataDiff(HIDDEN_PROPERTY, fromDoc.isHidden(), toDoc.isHidden()));
         }
 
         if (fromDoc.isEnforceRequiredRights() != toDoc.isEnforceRequiredRights()) {

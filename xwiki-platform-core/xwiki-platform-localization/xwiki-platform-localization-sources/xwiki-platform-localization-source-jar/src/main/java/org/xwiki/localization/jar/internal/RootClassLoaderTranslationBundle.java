@@ -80,9 +80,7 @@ public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationB
         DefaultLocalizedTranslationBundle localeBundle = new DefaultLocalizedTranslationBundle(this, locale);
 
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
-                String key = (String) entry.getKey();
-                String message = (String) entry.getValue();
+            if (entry.getKey() instanceof String key && entry.getValue() instanceof String message) {
 
                 TranslationMessage translationMessage = this.parser.parse(message);
 

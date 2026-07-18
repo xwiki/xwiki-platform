@@ -96,8 +96,8 @@ public class ExtendedMimeMessage extends MimeMessage
      */
     public static ExtendedMimeMessage wrap(MimeMessage message)
     {
-        if (message instanceof ExtendedMimeMessage) {
-            return (ExtendedMimeMessage) message;
+        if (message instanceof ExtendedMimeMessage extendedMimeMessage) {
+            return extendedMimeMessage;
         } else {
             try {
                 return new ExtendedMimeMessage(message);

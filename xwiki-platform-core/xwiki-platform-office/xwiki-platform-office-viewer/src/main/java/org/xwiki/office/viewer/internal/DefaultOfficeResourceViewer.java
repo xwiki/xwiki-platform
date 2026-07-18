@@ -269,7 +269,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             block.getFirstBlock(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.ANCESTOR_OR_SELF);
         if (expandedMacro != null) {
             Block parent = expandedMacro.getParent();
-            if (!(parent instanceof MetaDataBlock) || !((MetaDataBlock) parent).getMetaData().contains(MODULE_NAME)) {
+            if (!(parent instanceof MetaDataBlock metaBlock) || !metaBlock.getMetaData().contains(MODULE_NAME)) {
                 MetaDataBlock metaData = new MetaDataBlock(Collections.emptyList());
                 // Use a syntax that supports relative path resource references (we use relative paths to include the
                 // temporary files).

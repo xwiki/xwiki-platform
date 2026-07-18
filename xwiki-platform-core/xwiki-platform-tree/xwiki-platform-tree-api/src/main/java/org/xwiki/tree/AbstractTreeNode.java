@@ -126,11 +126,11 @@ public abstract class AbstractTreeNode implements TreeNode
 
     private TreeFilter getFilter(Object filter)
     {
-        if (filter instanceof TreeFilter) {
-            return (TreeFilter) filter;
-        } else if (filter instanceof String) {
+        if (filter instanceof TreeFilter treeFilter) {
+            return treeFilter;
+        } else if (filter instanceof String string) {
             try {
-                return this.contextComponentManagerProvider.get().getInstance(TreeFilter.class, (String) filter);
+                return this.contextComponentManagerProvider.get().getInstance(TreeFilter.class, string);
             } catch (ComponentLookupException e) {
                 this.logger.warn("Skipping tree filter [{}]. Root cause is [{}].", filter,
                     ExceptionUtils.getRootCauseMessage(e));

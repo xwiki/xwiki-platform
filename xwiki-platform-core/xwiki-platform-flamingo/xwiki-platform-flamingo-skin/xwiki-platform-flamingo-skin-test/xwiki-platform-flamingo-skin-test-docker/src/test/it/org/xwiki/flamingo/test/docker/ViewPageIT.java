@@ -17,12 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui;
+package org.xwiki.flamingo.test.docker;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Various tests for verifying the view mode of a page, for example to verify links displayed when a page contains
@@ -31,29 +37,28 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 4.5M1
  */
-public class ViewTest extends AbstractTest
+@UITest
+class ViewPageIT
 {
-    @Rule
-    public AdminAuthenticationRule adminAuthenticationRule = new AdminAuthenticationRule(getUtil());
-
     /**
      * See also <a href="https://jira.xwiki.org/browse/XWIKI-8725">XWIKI-8725</a>.
      */
     @Test
-    public void viewPageWhenSpecialCharactersInName() throws Exception
+    void viewPageWhenSpecialCharactersInName(TestUtils setup, TestReference testReference)
     {
-        // We test a page name containing a space and a dot
-        String pageName = getTestMethodName() + " 1.0";
+        setup.loginAsSuperAdmin();
 
-        // Delete page since we create it below and want to start the test clean
-        getUtil().rest().deletePage(getTestClassName(), pageName);
+        // We test a page name containing a space and a dot
+        String pageName = testReference.getLastSpaceReference().getName() + " 1.0";
+        SpaceReference spaceReference = (SpaceReference) testReference.getLastSpaceReference().getParent();
 
         // Create the page
-        ViewPage vp = getUtil().createPage(getTestClassName(), pageName, "", pageName);
+        ViewPage vp = setup.createPage(new DocumentReference(pageName, spaceReference), "", pageName);
 
         // Verify that the page we're on has the correct URL and name
-        String expectedURLPart = getTestClassName() + "/" + pageName.replaceAll(" ", "%20");
-        Assert.assertTrue("URL [" + vp.getPageURL() + "] doesn't contain expected part [" + expectedURLPart + "]", vp.getPageURL().contains(expectedURLPart));
-        Assert.assertEquals(pageName, vp.getMetaDataValue("page"));
+        String expectedURLPart = spaceReference.getName() + "/" + pageName.replace(" ", "%20");
+        assertTrue(vp.getPageURL().contains(expectedURLPart),
+            String.format("URL [%s] doesn't contain expected part [%s]", vp.getPageURL(), expectedURLPart));
+        assertEquals(pageName, vp.getMetaDataValue("page"));
     }
 }

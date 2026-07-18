@@ -231,4 +231,9 @@ public class AllIT
     class NestedNameStrategiesReplaceCharacterIT extends NameStrategiesReplaceCharacterIT
     {
     }
+
+    @Nested
+    class NestedViewPageIT extends ViewPageIT
+    {
+    }
 }

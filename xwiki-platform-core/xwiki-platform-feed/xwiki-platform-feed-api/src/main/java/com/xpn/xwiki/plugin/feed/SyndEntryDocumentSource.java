@@ -357,7 +357,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         String author = xwiki.getUserName(doc.getAuthor(), null, false, context);
         // the description format should be taken from a resource bundle, and thus localized
         String descFormat = "Version %1$s edited by %2$s on %3$s";
-        return String.format(descFormat, new Object[] {doc.getVersion(), author, doc.getDate()});
+        return String.format(descFormat, doc.getVersion(), author, doc.getDate());
     }
 
     protected SyndContent getDescription(Document doc, Map<String, Object> params, XWikiContext context)

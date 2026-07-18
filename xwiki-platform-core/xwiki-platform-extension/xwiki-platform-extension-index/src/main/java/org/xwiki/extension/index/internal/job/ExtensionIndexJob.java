@@ -576,17 +576,16 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
 
         // Add the extensions
         for (Extension extension : extensions) {
-            if (!this.invalidFlavors.contains(extension.getId().getId())) {
-                // TODO: support beta and snapshots versions too ?
-                if (extension.getId().getVersion().getType() == Type.STABLE
-                    && !this.indexStore.exists(extension.getId(), true)) {
-                    this.indexStore.add(extension, true);
+            // TODO: support beta and snapshots versions too ?
+            if (!this.invalidFlavors.contains(extension.getId().getId())
+                && extension.getId().getVersion().getType() == Type.STABLE
+                && !this.indexStore.exists(extension.getId(), true)) {
+                this.indexStore.add(extension, true);
 
-                    updated = true;
-                    getStatus().setExtensionAdded(true);
+                updated = true;
+                getStatus().setExtensionAdded(true);
 
-                    add(extension.getId(), indexedExtensions);
-                }
+                add(extension.getId(), indexedExtensions);
             }
         }
 

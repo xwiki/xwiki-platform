@@ -217,8 +217,6 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
                     }
                 } catch (Exception e) {
                     this.logger.error("Failed to parse extension [{}]", localExtension.getId(), e);
-
-                    continue;
                 }
             }
         }

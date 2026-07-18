@@ -256,7 +256,6 @@ public class XarExtensionJobFinishedListener implements EventListener
                     this.logger.error("Failed to load attachments", e);
                     // Lets be safe and skip removing that page
                     pages.put(reference, false);
-                    continue;
                 }
             }
 

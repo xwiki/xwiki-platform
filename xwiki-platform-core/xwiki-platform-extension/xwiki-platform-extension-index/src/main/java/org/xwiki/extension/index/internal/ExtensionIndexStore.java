@@ -333,9 +333,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RemoteExtension.FIELD_RECOMMENDED,
             remoteExtension.isRecommended(), document);
 
-        if (remoteExtension instanceof RatingExtension) {
-            RatingExtension ratingExtension = (RatingExtension) remoteExtension;
-
+        if (remoteExtension instanceof RatingExtension ratingExtension) {
             this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RatingExtension.FIELD_TOTAL_VOTES,
                 ratingExtension.getRating().getTotalVotes(), document);
             this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RatingExtension.FIELD_AVERAGE_VOTE,
@@ -869,9 +867,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         }
 
         // Indexed
-        if (query instanceof IndexedExtensionQuery) {
-            IndexedExtensionQuery indexedQuery = (IndexedExtensionQuery) query;
-
+        if (query instanceof IndexedExtensionQuery indexedQuery) {
             // Compatible
             if (indexedQuery.getCompatible() != null) {
                 StringBuilder builder = new StringBuilder();

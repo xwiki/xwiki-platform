@@ -847,8 +847,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             Constructor< ? extends SyndEntrySource> ctor = null;
             if (params != null) {
                 try {
-                    ctor = sesc.getConstructor(new Class[] {Map.class});
-                    return ctor.newInstance(new Object[] {params});
+                    ctor = sesc.getConstructor(Map.class);
+                    return ctor.newInstance(params);
                 } catch (Throwable t) {
                 }
             }

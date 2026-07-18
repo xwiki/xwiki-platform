@@ -408,8 +408,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
         List<SyndCategory> result = new ArrayList<>();
         for (Object category : categories) {
-            if (category instanceof SyndCategory) {
-                result.add((SyndCategory) category);
+            if (category instanceof SyndCategory syndCategory) {
+                result.add(syndCategory);
             } else if (category != null) {
                 SyndCategory scat = new SyndCategoryImpl();
                 scat.setName(category.toString());
@@ -496,8 +496,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
         List<String> contributors = new ArrayList<>();
         for (Object rawContributor : rawContributors) {
-            if (rawContributor instanceof String) {
-                contributors.add((String) rawContributor);
+            if (rawContributor instanceof String contributor) {
+                contributors.add(contributor);
             } else {
                 contributors.add(rawContributor.toString());
             }
@@ -765,12 +765,12 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      */
     protected Document castDocument(Object obj, XWikiContext context) throws XWikiException
     {
-        if (obj instanceof Document) {
-            return (Document) obj;
-        } else if (obj instanceof XWikiDocument) {
-            return ((XWikiDocument) obj).newDocument(context);
-        } else if (obj instanceof String) {
-            return context.getWiki().getDocument((String) obj, context).newDocument(context);
+        if (obj instanceof Document document) {
+            return document;
+        } else if (obj instanceof XWikiDocument xwikiDocument) {
+            return xwikiDocument.newDocument(context);
+        } else if (obj instanceof String string) {
+            return context.getWiki().getDocument(string, context).newDocument(context);
         } else {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, "");
         }

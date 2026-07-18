@@ -189,12 +189,12 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      */
     private static final BlockMatcher MACRO_MARKER_MATCHER = MacroMarkerBlock.class::isInstance;
 
-    private static final BlockMatcher PLACEHOLDERS_BLOCKMATCHER = testedBlock -> ((testedBlock instanceof RawBlock
-        && (((RawBlock) testedBlock).getSyntax().getType().equals(SyntaxType.XHTML)
-            || ((RawBlock) testedBlock).getSyntax().getType().equals(SyntaxType.HTML)))
+    private static final BlockMatcher PLACEHOLDERS_BLOCKMATCHER = testedBlock -> (testedBlock instanceof RawBlock raw
+        && (raw.getSyntax().getType().equals(SyntaxType.XHTML)
+            || raw.getSyntax().getType().equals(SyntaxType.HTML)))
         || (testedBlock instanceof MacroMarkerBlock macroBlock
             && (macroBlock.getId().equals(WikiMacroContentMacro.ID)
-                || macroBlock.getId().equals(WikiMacroParameterMacro.ID))));
+                || macroBlock.getId().equals(WikiMacroParameterMacro.ID)));
 
     /**
      * Match all the metadata blocks that contains wikimacrocontent=true.

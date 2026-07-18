@@ -119,8 +119,8 @@ public class UnsafeTagsSelector extends AbstractTagsSelector
         try {
             Query query = this.contextProvider.get().getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
             if (parameters != null) {
-                if (parameters instanceof Map) {
-                    query.bindValues((Map) parameters);
+                if (parameters instanceof Map map) {
+                    query.bindValues(map);
                 } else {
                     query.bindValues((List) parameters);
                 }

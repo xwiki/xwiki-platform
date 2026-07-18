@@ -121,8 +121,7 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
                     //
                     // - For other implementations, we only support instance that have their id containing a document
                     // reference.
-                    if (extension instanceof WikiComponent) {
-                        WikiComponent wikiComponent = (WikiComponent) extension;
+                    if (extension instanceof WikiComponent wikiComponent) {
                         extensionId = wikiComponent.getDocumentReference();
                     } else {
                         extensionId = resolver.resolve(extension.getId());

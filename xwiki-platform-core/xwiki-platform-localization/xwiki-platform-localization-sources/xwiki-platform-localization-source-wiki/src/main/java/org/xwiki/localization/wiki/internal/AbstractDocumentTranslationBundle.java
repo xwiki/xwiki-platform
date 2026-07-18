@@ -194,9 +194,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         TranslationMessageParser parser = getTranslationMessageParser();
 
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
-                String key = (String) entry.getKey();
-                String message = (String) entry.getValue();
+            if (entry.getKey() instanceof String key && entry.getValue() instanceof String message) {
 
                 TranslationMessage translationMessage = parser.parse(message);
 

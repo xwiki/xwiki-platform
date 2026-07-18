@@ -236,13 +236,9 @@ public class DefaultMergeManager implements MergeManager
     {
         MergeDocumentResult mergeResult = new MergeDocumentResult(currentDocument, previousDocument, newDocument);
         
-        if (previousDocument instanceof XWikiDocument 
-            && newDocument instanceof XWikiDocument 
-            && currentDocument instanceof XWikiDocument) {
-            
-            XWikiDocument previousDoc = (XWikiDocument) previousDocument;
-            XWikiDocument newDoc = (XWikiDocument) newDocument;
-            XWikiDocument currentDoc = (XWikiDocument) currentDocument;
+        if (previousDocument instanceof XWikiDocument previousDoc
+            && newDocument instanceof XWikiDocument newDoc
+            && currentDocument instanceof XWikiDocument currentDoc) {
 
             XWikiDocument mergedDocument;
 

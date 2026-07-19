@@ -117,7 +117,6 @@ public class ExtensionRatingScriptService extends AbstractExtensionScriptService
                 } catch (ResolveException e) {
                     setError(e);
                     // Keep looking. Maybe there's another repository with the same extension.
-                    continue;
                 }
             }
         }

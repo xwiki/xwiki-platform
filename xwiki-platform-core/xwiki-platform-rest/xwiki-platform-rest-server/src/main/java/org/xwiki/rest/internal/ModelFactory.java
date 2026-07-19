@@ -35,8 +35,6 @@ import java.util.Vector;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,8 +46,6 @@ import org.xwiki.job.Request;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.logging.tail.LogTail;
-import org.xwiki.mail.EmailAddressObfuscator;
-import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -172,14 +168,6 @@ public class ModelFactory
 
     @Inject
     private UserReferenceSerializer<String> userReferenceSerializer;
-
-    // Needs to be a provider because some dependencies are lacking an implementation of this component at compile time.
-    @Inject
-    private Provider<GeneralMailConfiguration> generalMailConfiguration;
-
-    // Needs to be a provider because some dependencies are lacking an implementation of this component at compile time.
-    @Inject
-    private Provider<EmailAddressObfuscator> emailAddressObfuscator;
 
     public ModelFactory()
     {
@@ -1305,30 +1293,5 @@ public class ModelFactory
         }
 
         return true;
-    }
-
-    private String cleanupBeforeMakingPublic(String type, PropertyInterface baseProperty)
-    {
-        String cleanedUpStringValue;
-        if (Objects.equals(type, PASSWORD_TYPE)) {
-            cleanedUpStringValue = null;
-        } else {
-            cleanedUpStringValue = serializePropertyValue(baseProperty);
-            // We obfuscate the email only if the obfuscation has been activated, and if the current user does not have
-            // the right to edit the document containing the base property.
-            // A user allowed to edit a document has to view the unescaped email to be able to edit it correctly.
-            if (Objects.equals(type, "Email") && this.generalMailConfiguration.get().shouldObfuscate()
-                && !this.authorizationManagerProvider.get().hasAccess(Right.EDIT, baseProperty.getReference())) {
-                try {
-                    cleanedUpStringValue =
-                        this.emailAddressObfuscator.get().obfuscate(InternetAddress.parse(cleanedUpStringValue)[0]);
-                } catch (AddressException e) {
-                    this.logger.warn("Failed to parse [{}] to an email address. Cause: [{}]", cleanedUpStringValue,
-                        getRootCauseMessage(e));
-                    cleanedUpStringValue = "";
-                }
-            }
-        }
-        return cleanedUpStringValue;
     }
 }

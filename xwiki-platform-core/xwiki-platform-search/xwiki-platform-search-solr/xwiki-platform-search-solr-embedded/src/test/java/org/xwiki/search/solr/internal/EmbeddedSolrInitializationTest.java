@@ -72,9 +72,9 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 @ComponentTest
 class EmbeddedSolrInitializationTest
 {
-    private final static String SOLRHOME_PROPERTY = String.format("%s.%s.%s", "solr", EmbeddedSolr.TYPE, "home");
+    private static final String SOLRHOME_PROPERTY = String.format("%s.%s.%s", "solr", EmbeddedSolr.TYPE, "home");
 
-    private final static String SEARCH_SOLRCORE = SolrClientInstance.CORE_NAME + '_' + Version.LATEST.major;
+    private static final String SEARCH_SOLRCORE = SolrClientInstance.CORE_NAME + '_' + Version.LATEST.major;
 
     @XWikiTempDir
     private File permanentDirectory;

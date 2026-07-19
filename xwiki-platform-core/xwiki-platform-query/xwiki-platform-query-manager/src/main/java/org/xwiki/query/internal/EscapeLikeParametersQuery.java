@@ -83,9 +83,9 @@ public class EscapeLikeParametersQuery extends WrappingQuery
             Map<T, Object> escapedMap = new LinkedHashMap<>();
             for (Map.Entry<T, Object> entry : parametersToEscape.entrySet()) {
                 // TODO: Also handle Arrays and collections in the future
-                if (modifiedParameters.contains(entry.getKey()) && entry.getValue() instanceof DefaultQueryParameter) {
+                if (modifiedParameters.contains(entry.getKey())
+                    && entry.getValue() instanceof DefaultQueryParameter queryParameter) {
                     // Join the parameter parts and escape the literal parts
-                    DefaultQueryParameter queryParameter = (DefaultQueryParameter) entry.getValue();
                     StringBuffer buffer = new StringBuffer();
                     for (ParameterPart part : queryParameter.getParts()) {
                         if (part instanceof LiteralParameterPart) {

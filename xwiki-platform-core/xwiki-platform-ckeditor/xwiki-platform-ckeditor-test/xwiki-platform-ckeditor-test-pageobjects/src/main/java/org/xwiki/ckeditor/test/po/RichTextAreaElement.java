@@ -515,6 +515,21 @@ public class RichTextAreaElement extends BaseElement
         }
     }
 
+    /**
+     * Simulates the user dropping a file on the rich text area, without waiting for the upload widget to be inserted
+     * and selected. This is meant for uploads that are expected to be rejected (e.g. because of a mimetype
+     * restriction): no upload widget stays selected in that case, so waiting for one would time out. The caller is
+     * responsible for waiting for the expected outcome (e.g. an error notification).
+     *
+     * @param filePath the path to the file to be dropped; the file must be located in the test resources directory
+     * @since 18.7.0RC1
+     * @throws URISyntaxException if the specified path is not a valid (relative) URI
+     */
+    public void dropFileWithoutWaiting(String filePath) throws URISyntaxException
+    {
+        dropFile(loadFile(filePath));
+    }
+
     private WebElement loadFile(String filePath) throws URISyntaxException
     {
         FileDetector originalFileDetector = getDriver().getFileDetector();

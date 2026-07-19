@@ -21,6 +21,7 @@ package org.xwiki.blocknote.test.ui;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.ui.TestUtils;
 
@@ -33,6 +34,12 @@ import org.xwiki.test.ui.TestUtils;
 abstract class AbstractBlockNoteIT
 {
     public static final String XWIKI_ALIAS = "xwiki-alias";
+
+    /**
+     * BlockNote is a heavy editor (large JS bundle plus a realtime WebSocket connection) so loading it in-place can
+     * occasionally take more than the default timeout under load (e.g. in the Docker test environment).
+     */
+    private static final int INPLACE_EDITOR_LOAD_TIMEOUT = 30;
 
     @BeforeAll
     static void beforeAll(TestUtils setup)
@@ -57,6 +64,16 @@ abstract class AbstractBlockNoteIT
         });
 
         multiUserSetup.closeTabs();
+    }
+
+    /**
+     * Start editing the current page in-place, waiting long enough for the (heavy) BlockNote editor to load.
+     *
+     * @return the in-place editable page
+     */
+    protected InplaceEditablePage editInPlace()
+    {
+        return new InplaceEditablePage().editInplace(INPLACE_EDITOR_LOAD_TIMEOUT);
     }
 
     protected void loginAsJohn(TestUtils setup)

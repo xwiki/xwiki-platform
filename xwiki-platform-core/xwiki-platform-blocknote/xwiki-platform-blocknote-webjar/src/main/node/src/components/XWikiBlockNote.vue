@@ -235,9 +235,18 @@ const syntaxes = container.getAll<SyntaxConfig>(
   SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
 );
 
-const syntax =
-  syntaxes.find((conf) => conf.id === outputSyntax) ??
-  syntaxes.find((conf) => conf.id === MINIMAL_SYNTAX_NAME);
+let syntax = syntaxes.find((conf) => conf.id === outputSyntax);
+
+if (!syntax) {
+  // Falling back to the minimal syntax disables most editor features (headings, tables, images,
+  // lists, macros, ...). Warn so that a missing / mismatched syntax config doesn't silently cripple
+  // the editor.
+  console.warn(
+    `No syntax configuration registered for '${outputSyntax}', falling back to the minimal ` +
+      "syntax: most editor features will be disabled.",
+  );
+  syntax = syntaxes.find((conf) => conf.id === MINIMAL_SYNTAX_NAME);
+}
 
 if (!syntax) {
   throw new Error(

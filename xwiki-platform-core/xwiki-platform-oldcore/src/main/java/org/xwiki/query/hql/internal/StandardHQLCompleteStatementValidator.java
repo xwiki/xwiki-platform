@@ -298,11 +298,9 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
                 if (!isFunctionSafe(function)) {
                     return false;
                 }
-            } else if (value instanceof PlainSelect plainSelect) {
+            } else if (value instanceof PlainSelect plainSelect && !isPlainSelectSafe(plainSelect)) {
                 // Check if the select is safe
-                if (!isPlainSelectSafe(plainSelect)) {
-                    return false;
-                }
+                return false;
             }
         }
 

@@ -659,14 +659,13 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             } else if (macroBlock.getId().equals(WikiMacroParameterMacro.ID)) {
                 return resolveMacroParameter(macroBlock);
             }
-        } else if (block instanceof RawBlock rawBlock) {
+        } else if (block instanceof RawBlock rawBlock
+            && (rawBlock.getSyntax().getType().equals(SyntaxType.XHTML)
+                || rawBlock.getSyntax().getType().equals(SyntaxType.HTML))) {
             // We need the wikimacro content and parameter to be executed in the right context so if any can be found in
             // an html raw block we need to refactor that raw block to be two raw blocks around a proper blocks to
             // execute later
-            if (rawBlock.getSyntax().getType().equals(SyntaxType.XHTML)
-                || rawBlock.getSyntax().getType().equals(SyntaxType.HTML)) {
-                return replaceHTMLPlaceHolder(rawBlock);
-            }
+            return replaceHTMLPlaceHolder(rawBlock);
         }
 
         return block;

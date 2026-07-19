@@ -533,13 +533,11 @@ public class DocumentLocaleReader extends AbstractReader
     {
         this.currentLegacyDocument = xmlReader.getElementText();
 
-        if (this.currentDocumentReference == null) {
-            // Its an old thing
-            if (this.currentLegacySpace != null) {
-                this.currentDocumentReference =
-                    new LocalDocumentReference(this.currentLegacySpace, this.currentLegacyDocument);
-                this.currentSpaceReference = this.currentDocumentReference.getParent();
-            }
+        // Its an old thing
+        if (this.currentDocumentReference == null && this.currentLegacySpace != null) {
+            this.currentDocumentReference =
+                new LocalDocumentReference(this.currentLegacySpace, this.currentLegacyDocument);
+            this.currentSpaceReference = this.currentDocumentReference.getParent();
         }
     }
 

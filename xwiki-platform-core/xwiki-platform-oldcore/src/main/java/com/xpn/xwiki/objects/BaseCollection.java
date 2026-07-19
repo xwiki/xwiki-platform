@@ -245,13 +245,11 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     public void setClassName(String name)
     {
         EntityReference xClassReference = null;
-        if (!StringUtils.isEmpty(name)) {
-            // Handle backward compatibility: In the past, for statistics objects we used to use a special class name
-            // of "internal". We now check for a null Class Reference instead wherever we were previously checking for
-            // "internal".
-            if (!"internal".equals(name)) {
-                xClassReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
-            }
+        // Handle backward compatibility: In the past, for statistics objects we used to use a special class name
+        // of "internal". We now check for a null Class Reference instead wherever we were previously checking for
+        // "internal".
+        if (!StringUtils.isEmpty(name) && !"internal".equals(name)) {
+            xClassReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
         }
         setXClassReference(xClassReference);
     }

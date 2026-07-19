@@ -852,8 +852,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 } catch (Throwable t) {
                 }
             }
-            ctor = sesc.getConstructor(new Class[] {});
-            return ctor.newInstance(new Object[] {});
+            ctor = sesc.getConstructor();
+            return ctor.newInstance();
         } catch (Throwable t) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "", t);
         }

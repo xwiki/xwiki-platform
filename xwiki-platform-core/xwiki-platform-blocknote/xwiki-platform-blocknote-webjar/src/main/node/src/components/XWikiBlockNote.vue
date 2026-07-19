@@ -346,7 +346,9 @@ const macros: BlockNoteViewWrapperProps["macros"] = {
           }),
         );
       } catch (error) {
-        console.error("Failed to edit the macro", error);
+        if (error) {
+          console.error("Failed to edit the macro", error);
+        }
       }
     },
 
@@ -359,7 +361,9 @@ const macros: BlockNoteViewWrapperProps["macros"] = {
           await macroWizard.insert(prefill.kind, prefill.params, prefill.body),
         );
       } catch (error) {
-        console.error("Failed to insert the macro", error);
+        if (error) {
+          console.error("Failed to insert the macro", error);
+        }
       }
     },
   },

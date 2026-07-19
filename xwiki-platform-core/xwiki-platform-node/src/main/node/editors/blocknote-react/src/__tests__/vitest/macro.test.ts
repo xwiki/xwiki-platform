@@ -20,33 +20,31 @@
 // @vitest-environment jsdom
 
 import { createBlockNoteSchema } from "../../blocknote";
-import { blockOutputToHTML, inlineOutputToHTML } from "../../blocknote/macro";
+import { MacroOutput } from "../../blocknote/macroOutput";
 import { BlockNoteEditor } from "@blocknote/core";
+import { createElement } from "react";
+import { flushSync } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { beforeAll, describe, expect, test } from "vitest";
+import type { MacroCall } from "../../blocknote/utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyEditor = BlockNoteEditor<any, any, any>;
+type Nodes = any[];
 
-/** Parses an HTML fragment and returns the container element for structural assertions. */
-function parse(html: string): HTMLElement {
+/** Renders a macro output through {@link MacroOutput} into a detached container and returns it for DOM assertions. */
+function render(nodes: Nodes, call: MacroCall, inline = false): HTMLElement {
   const container = document.createElement("div");
-  container.innerHTML = html;
+  const root = createRoot(container);
+  flushSync(() => {
+    root.render(createElement(MacroOutput, { nodes, call, inline }));
+  });
   return container;
 }
 
-describe("blockOutputToHTML (mixed inline/block group content)", () => {
-  let editor: AnyEditor;
-
-  beforeAll(() => {
-    editor = BlockNoteEditor.create({
-      schema: createBlockNoteSchema([]),
-    }) as AnyEditor;
-  });
-
+describe("MacroOutput (mixed inline/block group content)", () => {
   test("renders an {{info}}-like box with mixed inline and block children without crashing", () => {
     // A group (the info box) whose children mix a block, bare-string and styled-text inline content, and a nested
-    // group: the structure BlockNote's schema rejects (inline as a sibling of blocks) and that used to crash
-    // blocksToHTMLLossy.
+    // group: the structure BlockNote's schema rejects (inline as a sibling of blocks), which React renders freely.
     const output = [
       {
         type: "xwikiGroup",
@@ -71,32 +69,24 @@ describe("blockOutputToHTML (mixed inline/block group content)", () => {
       },
     ];
 
-    const html = blockOutputToHTML(editor, output, {
-      name: "info",
-      parameters: {},
-    });
+    const container = render(output, { name: "info", parameters: {} });
 
-    // The box and its nested groups are rendered as plain DIVs carrying their xwikiParameters (the box class that the
-    // group block spec otherwise drops).
-    const box = parse(html).querySelector<HTMLElement>("div.box.infomessage");
+    // The box and its nested groups are rendered as plain DIVs carrying their xwikiParameters (the box class).
+    const box = container.querySelector<HTMLElement>("div.box.infomessage");
     expect(box).not.toBeNull();
     expect(box!.querySelector("div.box-title")).not.toBeNull();
-    expect(html).toContain("Information");
+    expect(container.textContent).toContain("Information");
 
-    // Zero wrapper: the inline run ("Information") is a direct text child of the box, not wrapped in a <p>, and no
-    // .xwiki-raw container leaked into the output.
+    // Zero wrapper: the inline run ("Information") is a direct text child of the box, not wrapped in a <p>.
     const inlineText = Array.from(box!.childNodes).some(
       (node) =>
         node.nodeType === node.TEXT_NODE &&
         node.textContent?.includes("Information"),
     );
     expect(inlineText).toBe(true);
-    expect(html).not.toContain("xwiki-raw");
   });
 
-  test("renders a group trapped inside a plain block (list item) with no wrapper", () => {
-    // A group nested inside a list item is swept through blocksToHTMLLossy as part of the list item; the sanitize +
-    // unwrap fallback must still produce a wrapper-free group DIV.
+  test("renders a group nested inside a plain block (list item)", () => {
     const output = [
       {
         type: "bulletListItem",
@@ -114,18 +104,14 @@ describe("blockOutputToHTML (mixed inline/block group content)", () => {
       },
     ];
 
-    const html = blockOutputToHTML(editor, output, {
-      name: "html",
-      parameters: {},
-    });
+    const container = render(output, { name: "html", parameters: {} });
 
-    expect(parse(html).querySelector("div.nested-box")).not.toBeNull();
-    expect(html).toContain("deep");
-    expect(html).not.toContain("xwiki-raw");
+    expect(container.querySelector("ul")).not.toBeNull();
+    expect(container.querySelector("div.nested-box")).not.toBeNull();
+    expect(container.textContent).toContain("deep");
   });
 
   test("applies xwikiParameters (object form) of a styled text inside macro output", () => {
-    // Inside macro output the processor never serializes the text style, so xwikiParameters is a raw object.
     const output = [
       {
         type: "xwikiGroup",
@@ -140,12 +126,9 @@ describe("blockOutputToHTML (mixed inline/block group content)", () => {
       },
     ];
 
-    const html = blockOutputToHTML(editor, output, {
-      name: "info",
-      parameters: {},
-    });
+    const container = render(output, { name: "info", parameters: {} });
 
-    const span = parse(html).querySelector<HTMLElement>("span.sr-only");
+    const span = container.querySelector<HTMLElement>("span.sr-only");
     expect(span).not.toBeNull();
     expect(span!.textContent).toBe("label");
   });
@@ -153,30 +136,196 @@ describe("blockOutputToHTML (mixed inline/block group content)", () => {
   test("substitutes an editable parameter marker matched case-insensitively", () => {
     // The xwikiEditable marker carries the descriptor's canonical parameter name ("title") while the macro call keeps
     // the case the user wrote ("tiTle"); the substitution must still find the value.
-    const output = [
-      { type: "xwikiEditable", name: "title" },
-    ] as unknown as Parameters<typeof blockOutputToHTML>[1];
+    const output = [{ type: "xwikiEditable", name: "title" }];
 
-    const html = blockOutputToHTML(editor, output, {
+    const container = render(output, {
       name: "info",
       parameters: { tiTle: "Hello" },
     });
 
-    expect(html).toContain("Hello");
+    expect(container.textContent).toContain("Hello");
+  });
+
+  test("groups consecutive numbered list items into an ordered list", () => {
+    const output = [
+      { type: "numberedListItem", props: {}, content: "one", children: [] },
+      { type: "numberedListItem", props: {}, content: "two", children: [] },
+    ];
+
+    const container = render(output, { name: "x", parameters: {} });
+
+    const list = container.querySelector("ol");
+    expect(list).not.toBeNull();
+    expect(list!.querySelectorAll("li")).toHaveLength(2);
+  });
+});
+
+describe("MacroOutput (inline output with non-inline nodes)", () => {
+  test("renders inline output that mixes an xwikiRaw image with styled text (no placeholder)", () => {
+    const output = [
+      {
+        type: "xwikiRaw",
+        props: {
+          syntax: "html/5.0",
+          text: '<img src="accept.png" alt="Icon" />',
+        },
+      },
+      {
+        type: "text",
+        text: "Success",
+        styles: { xwikiParameters: { class: "box successmessage one" } },
+      },
+      { type: "xwikiEditable" },
+    ];
+
+    const container = render(
+      output,
+      { name: "success", parameters: {}, content: "body" },
+      true,
+    );
+
+    expect(container.querySelector("img")).not.toBeNull();
+    const span = container.querySelector<HTMLElement>("span.successmessage");
+    expect(span).not.toBeNull();
+    expect(span!.textContent).toBe("Success");
+    expect(container.textContent).toContain("body");
+  });
+
+  test("renders plain all-inline output", () => {
+    const output = [{ type: "text", text: "hello", styles: {} }];
+
+    const container = render(output, { name: "x", parameters: {} }, true);
+
+    expect(container.textContent).toContain("hello");
+    expect(container.querySelector("img")).toBeNull();
+  });
+});
+
+describe("MacroOutput (nested macros)", () => {
+  test("renders a nested block macro inside a verbatim macro content", () => {
+    // An {{info}} box whose content is a nested {{error}} macro: the inner macro carries its own call + output and must
+    // render (its output's own xwikiEditable substituted against its own call), not blank.
+    const errorMacro = {
+      type: "xwikiMacroBlock",
+      props: {
+        call: {
+          name: "error",
+          parameters: {},
+          content: [{ type: "paragraph", props: {}, content: "test" }],
+        },
+        output: [
+          {
+            type: "xwikiGroup",
+            props: { xwikiParameters: { class: "box errormessage" } },
+            children: [{ type: "xwikiEditable" }],
+          },
+        ],
+      },
+    };
+    const output = [
+      {
+        type: "xwikiGroup",
+        props: { xwikiParameters: { class: "box infomessage" } },
+        children: [{ type: "xwikiEditable" }],
+      },
+    ];
+    const call: MacroCall = {
+      name: "info",
+      parameters: {},
+      content: [
+        { type: "paragraph", props: {}, content: "before" },
+        errorMacro,
+        { type: "paragraph", props: {}, content: "after" },
+      ],
+    };
+
+    const container = render(output, call);
+
+    const infoBox = container.querySelector<HTMLElement>("div.box.infomessage");
+    expect(infoBox).not.toBeNull();
+    // The nested error box renders inside the info box, with its own content substituted.
+    expect(infoBox!.querySelector("div.box.errormessage")).not.toBeNull();
+    expect(container.textContent).toContain("before");
+    expect(container.textContent).toContain("after");
+    expect(container.textContent).toContain("test");
+  });
+
+  test("renders a nested inline macro inside a paragraph's content", () => {
+    const inlineMacro = {
+      type: "xwikiInlineMacro",
+      props: {
+        call: { name: "color", parameters: { c: "red" }, content: "x" },
+        output: [
+          { type: "text", text: "E:", styles: {} },
+          { type: "xwikiEditable" },
+        ],
+      },
+    };
+    const call: MacroCall = {
+      name: "box",
+      parameters: {},
+      content: [
+        {
+          type: "paragraph",
+          props: {},
+          content: ["some ", inlineMacro, " end"],
+        },
+      ],
+    };
+    const output = [{ type: "xwikiEditable" }];
+
+    const container = render(output, call);
+
+    const nested = container.querySelector<HTMLElement>(
+      '[data-macro-name="color"]',
+    );
+    expect(nested).not.toBeNull();
+    expect(nested!.textContent).toBe("E:x");
+    expect(container.textContent).toContain("some ");
+    expect(container.textContent).toContain("end");
+  });
+
+  test("stops recursing at the nesting limit instead of overflowing the stack", () => {
+    // Build a chain of macros nested through their content deeper than MAX_NESTING (100).
+    let content: unknown = [
+      { type: "paragraph", props: {}, content: "deepest" },
+    ];
+    for (let i = 0; i < 150; i++) {
+      content = [
+        {
+          type: "xwikiMacroBlock",
+          props: {
+            call: { name: `m${i}`, parameters: {}, content },
+            output: [
+              {
+                type: "xwikiGroup",
+                props: {},
+                children: [{ type: "xwikiEditable" }],
+              },
+            ],
+          },
+        },
+      ];
+    }
+    const call: MacroCall = { name: "root", parameters: {}, content };
+    const output = [{ type: "xwikiEditable" }];
+
+    expect(() => render(output, call)).not.toThrow();
   });
 });
 
 describe("XWikiParametersStyle", () => {
-  let editor: AnyEditor;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let editor: BlockNoteEditor<any, any, any>;
 
   beforeAll(() => {
     editor = BlockNoteEditor.create({
       schema: createBlockNoteSchema([]),
-    }) as AnyEditor;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as BlockNoteEditor<any, any, any>;
   });
 
   test("applies xwikiParameters (JSON string form) as span attributes on export", () => {
-    // In the top-level document the processor serializes the text style value to a JSON string.
     const html = editor.blocksToHTMLLossy([
       {
         type: "paragraph",
@@ -192,67 +341,10 @@ describe("XWikiParametersStyle", () => {
       } as any,
     ]);
 
-    const span = parse(html).querySelector<HTMLElement>("span.foo");
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    const span = container.querySelector<HTMLElement>("span.foo");
     expect(span).not.toBeNull();
     expect(span!.textContent).toBe("x");
-  });
-});
-
-describe("inlineOutputToHTML (inline output with non-inline nodes)", () => {
-  let editor: AnyEditor;
-
-  beforeAll(() => {
-    editor = BlockNoteEditor.create({
-      schema: createBlockNoteSchema([]),
-    }) as AnyEditor;
-  });
-
-  test("renders inline output that mixes an xwikiRaw image with styled text (no placeholder)", () => {
-    // Inline output can carry an xwikiRaw node (an inline image rendered as raw HTML); it must not be treated as
-    // inline content wholesale (which crashes blocksToHTMLLossy and yields the macro placeholder).
-    const output = [
-      {
-        type: "xwikiRaw",
-        props: {
-          syntax: "html/5.0",
-          text: '<img src="accept.png" alt="Icon" />',
-        },
-      },
-      {
-        type: "text",
-        text: "Success",
-        styles: { xwikiParameters: { class: "box successmessage one" } },
-      },
-      { type: "xwikiEditable" },
-    ] as unknown as Parameters<typeof inlineOutputToHTML>[1];
-
-    const html = inlineOutputToHTML(editor, output, {
-      name: "success",
-      parameters: {},
-      content: "body",
-    });
-
-    expect(html).not.toBe("");
-    const root = parse(html);
-    expect(root.querySelector("img")).not.toBeNull();
-    const span = root.querySelector<HTMLElement>("span.successmessage");
-    expect(span).not.toBeNull();
-    expect(span!.textContent).toBe("Success");
-    expect(html).toContain("body");
-    expect(html).not.toContain("xwiki-raw");
-  });
-
-  test("renders plain all-inline output", () => {
-    const output = [
-      { type: "text", text: "hello", styles: {} },
-    ] as unknown as Parameters<typeof inlineOutputToHTML>[1];
-
-    const html = inlineOutputToHTML(editor, output, {
-      name: "x",
-      parameters: {},
-    });
-
-    expect(html).toContain("hello");
-    expect(parse(html).querySelector("img")).toBeNull();
   });
 });

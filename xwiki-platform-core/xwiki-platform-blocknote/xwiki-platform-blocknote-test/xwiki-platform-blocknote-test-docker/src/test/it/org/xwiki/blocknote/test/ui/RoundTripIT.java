@@ -298,6 +298,18 @@ class RoundTripIT extends AbstractBlockNoteIT
 
             {{include reference="Missing.Page"/}}
 
+            {{info Title="My title" cssClass="test"}}
+            My content.
+
+            {{error}}
+            Some error
+
+            {{warning title="Final warning"}}
+            and a warning.
+            {{/warning}}
+            {{/error}}
+            {{/info}}
+
             after""");
     }
 

@@ -74,9 +74,6 @@ public class SxDocumentSource implements SxSource
     /** The document containing the extension. */
     private XWikiDocument document;
 
-    /** The current XWikiContext. */
-    private XWikiContext context;
-
     /** The type of Extension for getting the right kind of object from the document. */
     private Extension extension;
 
@@ -88,7 +85,6 @@ public class SxDocumentSource implements SxSource
      */
     public SxDocumentSource(XWikiContext context, Extension extension)
     {
-        this.context = context;
         this.document = context.getDoc();
         this.extension = extension;
     }

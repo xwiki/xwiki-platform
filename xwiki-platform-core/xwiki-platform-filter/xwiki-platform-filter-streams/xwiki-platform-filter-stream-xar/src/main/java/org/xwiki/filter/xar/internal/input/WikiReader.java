@@ -142,7 +142,6 @@ public class WikiReader
             if (entry.isDirectory() || entry.getName().startsWith("META-INF")) {
                 // The entry is either a directory or is something inside of the META-INF dir.
                 // (we use that directory to put meta data such as LICENSE/NOTICE files.)
-                continue;
             } else if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
                 readPackage(zis, entry);
             } else {

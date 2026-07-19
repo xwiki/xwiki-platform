@@ -258,15 +258,6 @@ public class DefaultSolrUtils implements SolrUtils
         return null;
     }
 
-    private static boolean isList(Class<?> clazz)
-    {
-        if (clazz != null && !CLASS_SUFFIX_MAPPING.containsKey(clazz)) {
-            return Iterable.class.isAssignableFrom(clazz) || clazz.isArray();
-        }
-
-        return false;
-    }
-
     private static String getTypeName(Type type)
     {
         if (type != null) {

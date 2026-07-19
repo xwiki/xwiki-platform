@@ -308,10 +308,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
 
         for (Locale locale : availableLocales) {
             // Add locale only if there is no explicit translation for it
-            if (!documentLocales.contains(locale)) {
-                if (entityLocale == null || locale.toString().startsWith(entityLocaleString)) {
-                    locales.add(locale);
-                }
+            if (!documentLocales.contains(locale)
+                && (entityLocale == null || locale.toString().startsWith(entityLocaleString))) {
+                locales.add(locale);
             }
         }
 

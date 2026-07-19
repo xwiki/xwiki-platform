@@ -440,9 +440,14 @@ public class TestUtils
             } else {
                 getDriver().get(getURLToNonExistentPage());
             }
-
-            setDefaultCredentials(username, password);
         }
+
+        // Always synchronize the REST client credentials with the requested user, even when the browser was already
+        // logged in as that user and thus skipped the browser login above. The browser session and the REST client
+        // credentials are independent states: a previous forceGuestUser() clears the REST credentials while the browser
+        // may still appear logged in, so synchronizing only inside the branch above would leave the REST client
+        // unauthenticated and make later REST calls fail with a 401.
+        setDefaultCredentials(username, password);
     }
 
     /**

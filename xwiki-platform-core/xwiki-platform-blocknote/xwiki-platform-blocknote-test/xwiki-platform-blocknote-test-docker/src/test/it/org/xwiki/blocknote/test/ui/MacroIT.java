@@ -67,10 +67,18 @@ class MacroIT extends AbstractBlockNoteIT
         // Start fresh.
         setup.deletePage(testReference);
         setup.createPage(testReference, """
-            first {{success cSSclaSS="one" tiTle="inline"}}done{{/success}} line
+            first {{success cSSclaSS="one" tiTle="inline"}}red {{info foo="bar"}}green{{/info}} blue{{/success}} line
 
             {{info TItle="My title"}}
             My content.
+
+            {{error}}
+            Some error
+
+            {{warning title="Final warning"}}
+            and a warning.
+            {{/warning}}
+            {{/error}}
             {{/info}}
 
             end""");
@@ -85,16 +93,25 @@ class MacroIT extends AbstractBlockNoteIT
         assertEquals("Success Message", macroEditModal.getMacroName());
         assertEquals("inline", macroEditModal.getMacroParameter("title"));
         assertEquals("one", macroEditModal.getMacroParameter("cssClass"));
-        assertEquals("done", macroEditModal.getMacroContent());
+        assertEquals("red {{info foo=\"bar\"}}green{{/info}} blue", macroEditModal.getMacroContent());
 
         macroEditModal.setMacroParameter("title", "Inline title").setMacroParameter("cssClass", "two")
-            .setMacroContent("Done!").clickSubmit();
+            .setMacroContent("Red {{error}}Green{{/error}} Blue").clickSubmit();
 
         // Edit the block macro.
         macroEditModal = textArea.doubleClickMacro(1);
         assertEquals("Info Message", macroEditModal.getMacroName());
         assertEquals("My title", macroEditModal.getMacroParameter("title"));
-        assertEquals("My content.", macroEditModal.getMacroContent());
+        assertEquals("""
+            My content.
+
+            {{error}}
+            Some error
+
+            {{warning title="Final warning"}}
+            and a warning.
+            {{/warning}}
+            {{/error}}""", macroEditModal.getMacroContent());
 
         macroEditModal.setMacroParameter("title", "New title").setMacroParameter("cssClass", "test")
             .setMacroContent("New content.").clickSubmit();
@@ -104,7 +121,7 @@ class MacroIT extends AbstractBlockNoteIT
         assertEquals("Success Message", macroEditModal.getMacroName());
         assertEquals("Inline title", macroEditModal.getMacroParameter("title"));
         assertEquals("two", macroEditModal.getMacroParameter("cssClass"));
-        assertEquals("Done!", macroEditModal.getMacroContent());
+        assertEquals("Red {{error}}Green{{/error}} Blue", macroEditModal.getMacroContent());
 
         macroEditModal.setMacroParameter("title", "My Inline Title").setMacroParameter("cssClass", "three")
             .clickSubmit();
@@ -116,15 +133,16 @@ class MacroIT extends AbstractBlockNoteIT
         assertEquals("test", macroEditModal.getMacroParameter("cssClass"));
         assertEquals("New content.", macroEditModal.getMacroContent());
 
-        macroEditModal.setMacroParameter("cssClass", "newTest").setMacroContent("Some information.").clickSubmit();
+        macroEditModal.setMacroParameter("cssClass", "newTest")
+            .setMacroContent("//Some// {{success}}information{{/success}}.").clickSubmit();
 
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("""
-            first {{success cssClass="three" title="My Inline Title"}}Done!{{/success}} line
+            first {{success cssClass="three" title="My Inline Title"}}Red {{error}}Green{{/error}} Blue{{/success}} line
 
             {{info cssClass="newTest" title="New title"}}
-            Some information.
+            //Some// {{success}}information{{/success}}.
             {{/info}}
 
             end""", wikiEditor.getContent());
@@ -141,7 +159,7 @@ class MacroIT extends AbstractBlockNoteIT
         assertEquals("Success Message", macroEditModal.getMacroName());
         assertEquals("My Inline Title", macroEditModal.getMacroParameter("title"));
         assertEquals("three", macroEditModal.getMacroParameter("cssClass"));
-        assertEquals("Done!", macroEditModal.getMacroContent());
+        assertEquals("Red {{error}}Green{{/error}} Blue", macroEditModal.getMacroContent());
 
         MacroDialogSelectModal macroSelectModal = macroEditModal.clickChangeMacro();
         macroSelectModal.filterByText("error", 1).getFirstMacro().orElseThrow().click();
@@ -151,15 +169,15 @@ class MacroIT extends AbstractBlockNoteIT
         // Values of parameters that are not editable in-place seem to be lost when changing the macro. This is not
         // specific to BlockNote.
         assertEquals("", macroEditModal.getMacroParameter("cssClass"));
-        assertEquals("Done!", macroEditModal.getMacroContent());
-        macroEditModal.setMacroParameter("cssClass", "four").setMacroContent("Failed!").clickSubmit();
+        assertEquals("Red {{error}}Green{{/error}} Blue", macroEditModal.getMacroContent());
+        macroEditModal.setMacroParameter("cssClass", "four").setMacroContent("**Failed**!").clickSubmit();
 
         // Change the block macro from info to warning.
         macroEditModal = textArea.doubleClickMacro(1);
         assertEquals("Info Message", macroEditModal.getMacroName());
         assertEquals("New title", macroEditModal.getMacroParameter("title"));
         assertEquals("newTest", macroEditModal.getMacroParameter("cssClass"));
-        assertEquals("Some information.", macroEditModal.getMacroContent());
+        assertEquals("//Some// {{success}}information{{/success}}.", macroEditModal.getMacroContent());
 
         macroSelectModal = macroEditModal.clickChangeMacro();
         macroSelectModal.filterByText("warning", 1).getFirstMacro().orElseThrow().click();
@@ -169,15 +187,18 @@ class MacroIT extends AbstractBlockNoteIT
         // Values of parameters that are not editable in-place seem to be lost when changing the macro. This is not
         // specific to BlockNote.
         assertEquals("", macroEditModal.getMacroParameter("cssClass"));
-        assertEquals("Some information.", macroEditModal.getMacroContent());
-        macroEditModal.setMacroParameter("cssClass", "new-test").setMacroContent("Some warning!").clickSubmit();
+        assertEquals("//Some// {{success}}information{{/success}}.", macroEditModal.getMacroContent());
+        macroEditModal.setMacroParameter("cssClass", "new-test").setMacroContent("""
+            //Some//
+
+            {{box}}warning{{/box}}!""").clickSubmit();
 
         // Edit again the inline macro.
         macroEditModal = textArea.doubleClickMacro(0);
         assertEquals("Error Message", macroEditModal.getMacroName());
         assertEquals("My Inline Title", macroEditModal.getMacroParameter("title"));
         assertEquals("four", macroEditModal.getMacroParameter("cssClass"));
-        assertEquals("Failed!", macroEditModal.getMacroContent());
+        assertEquals("**Failed**!", macroEditModal.getMacroContent());
         macroEditModal.clickCancel();
 
         // Edit again the block macro.
@@ -185,16 +206,21 @@ class MacroIT extends AbstractBlockNoteIT
         assertEquals("Warning Message", macroEditModal.getMacroName());
         assertEquals("New title", macroEditModal.getMacroParameter("title"));
         assertEquals("new-test", macroEditModal.getMacroParameter("cssClass"));
-        assertEquals("Some warning!", macroEditModal.getMacroContent());
+        assertEquals("""
+            //Some//
+
+            {{box}}warning{{/box}}!""", macroEditModal.getMacroContent());
         macroEditModal.clickCancel();
 
         page.save();
         wikiEditor = page.editWiki();
         assertEquals("""
-            first {{error cssClass="four" title="My Inline Title"}}Failed!{{/error}} line
+            first {{error cssClass="four" title="My Inline Title"}}**Failed**!{{/error}} line
 
             {{warning cssClass="new-test" title="New title"}}
-            Some warning!
+            //Some//
+
+            {{box}}warning{{/box}}!
             {{/warning}}
 
             end""", wikiEditor.getContent());

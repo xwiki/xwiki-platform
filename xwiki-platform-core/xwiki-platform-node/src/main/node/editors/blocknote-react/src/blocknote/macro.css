@@ -41,8 +41,9 @@
 /* Editing affordance: outline the macro island on hover to signal that double-click opens the parameters editor. */
 .xwiki-macro-block:hover,
 .xwiki-macro-inline:hover {
-  outline: 1px dashed var(--bn-colors-border, #ccc);
+  outline: 1px dashed var(--bn-colors-highlights-gray-text, #ccc);
   outline-offset: 2px;
+  border-radius: var(--bn-border-radius);
 }
 
 /* Fallback shown when the macro has produced no output yet. */

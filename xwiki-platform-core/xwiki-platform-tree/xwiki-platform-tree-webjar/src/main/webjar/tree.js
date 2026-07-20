@@ -87,20 +87,8 @@ define([
     return $.post(new URL('?', url), $.param($.extend(urlParams, data), true));
   };
 
-  // jsTree renders the node id as-is as the DOM id of the node's anchor (appending '_anchor'), which causes
-  // duplicate DOM ids when the same entity is shown by more than one tree on the same page. We prefix the rendered
-  // anchor id with the tree's own (unique) container id.
-  //
-  // Note this only fixes the anchor, not the <li> itself: jsTree hard-codes the <li>'s DOM id to the node's raw
-  // internal id (li_attr.id is explicitly ignored when rendering) and separately relies on being able to
-  // re-locate a node's own <li> (and its parent's) by that same raw id via live DOM '#id' queries whenever it
-  // redraws a node - e.g. to find where to insert a child. Overriding the <li>'s rendered id after the fact (which
-  // we tried) breaks that lookup for any node whose ancestor has already been relabeled, silently aborting the
-  // redraw of deeper nodes. Properly deduplicating the <li> id would require changing jsTree's own internal id for
-  // the node (used by get_node/select_node/openTo/drag-and-drop), cascading through every caller that currently
-  // passes a raw entity id into those APIs - out of scope here. The <li> keeps its original, potentially
-  // page-wide-duplicated id.
-  var treeCounter = 0;
+  // Prefix each node's rendered anchor id with the tree's own container id, to avoid duplicate DOM ids when the same
+  // entity is shown by more than one tree on the same page.
 
   var getTreePrefix = function(tree) {
     var prefix = tree.element.attr('id');

@@ -1,7 +1,7 @@
 {
   "name": "@xwiki/platform-uniast-markdown-xwiki",
-  "version": "18.6.0-SNAPSHOT",
-  "license": "LGPL 2.1",
+  "version": "18.7.0-SNAPSHOT",
+  "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
@@ -42,7 +42,7 @@
     "@xwiki/platform-uniast-markdown": "workspace:*"
   },
   "peerDependencies": {
-    "inversify": "7.x"
+    "inversify": "8.x"
   },
   "devDependencies": {
     "@xwiki/platform-dev-config": "workspace:*",

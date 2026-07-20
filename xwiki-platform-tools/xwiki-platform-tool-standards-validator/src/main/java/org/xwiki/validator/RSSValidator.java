@@ -50,8 +50,7 @@ public class RSSValidator extends AbstractXMLValidator
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
         } catch (FeedException e) {
-            if (e instanceof ParsingFeedException) {
-                ParsingFeedException pfe = (ParsingFeedException) e;
+            if (e instanceof ParsingFeedException pfe) {
                 addError(Type.ERROR, pfe.getLineNumber(), pfe.getColumnNumber(), e.getMessage());
             } else {
                 addError(Type.ERROR, -1, -1, e.getMessage());

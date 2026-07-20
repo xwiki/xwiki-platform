@@ -96,4 +96,28 @@ public class BlockNoteToolBar extends BaseElement
         clickButton("changeimage");
         return new ImageDialogEditModal();
     }
+
+    /**
+     * Clicks the button to create a link from the current selection. This opens the link modal.
+     *
+     * @return the link modal
+     * @since 18.6.0RC1
+     */
+    public BlockNoteLinkModal createLink()
+    {
+        clickButton("createLink");
+        return new BlockNoteLinkModal();
+    }
+
+    /**
+     * Clicks the button to edit the selected link. This opens the link modal.
+     *
+     * @return the link modal
+     * @since 18.6.0RC1
+     */
+    public BlockNoteLinkModal editLink()
+    {
+        clickButton("editLink");
+        return new BlockNoteLinkModal();
+    }
 }

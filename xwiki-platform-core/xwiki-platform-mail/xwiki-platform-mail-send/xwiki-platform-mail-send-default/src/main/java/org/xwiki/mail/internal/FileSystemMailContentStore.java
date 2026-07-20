@@ -147,8 +147,7 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
         List<File> temporaryFiles = new ArrayList<>();
         try {
             Object content = message.getContent();
-            if (content instanceof Multipart) {
-                Multipart multipart = (Multipart) content;
+            if (content instanceof Multipart multipart) {
                 for (int i = 0; i < multipart.getCount(); i++) {
                     Part part = multipart.getBodyPart(i);
                     String[] temporaryFileLocations =
@@ -171,8 +170,7 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
 
     private File getBatchDirectory(String batchId)
     {
-        File batchDirectory = new File(rootDirectory, getURLEncoded(batchId));
-        return batchDirectory;
+        return new File(rootDirectory, getURLEncoded(batchId));
     }
 
     private File getMessageFile(String batchId, String uniqueMessageId)

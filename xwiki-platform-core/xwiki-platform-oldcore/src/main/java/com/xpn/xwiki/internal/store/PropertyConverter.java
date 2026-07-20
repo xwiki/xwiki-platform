@@ -108,10 +108,10 @@ public class PropertyConverter
 
     private Object convertPropertyValue(Object storedValue, PropertyClass modifiedPropertyClass)
     {
-        if (modifiedPropertyClass instanceof ListClass) {
-            return convertPropertyValue(storedValue, (ListClass) modifiedPropertyClass);
-        } else if (modifiedPropertyClass instanceof NumberClass) {
-            return convertPropertyValue(storedValue, (NumberClass) modifiedPropertyClass);
+        if (modifiedPropertyClass instanceof ListClass listClass) {
+            return convertPropertyValue(storedValue, listClass);
+        } else if (modifiedPropertyClass instanceof NumberClass numberClass) {
+            return convertPropertyValue(storedValue, numberClass);
         } else {
             // Return the stored value if no specific converter has been found. We will attempt to convert the stored
             // value through string deserialization later.
@@ -137,9 +137,8 @@ public class PropertyConverter
     private Object convertPropertyValue(Object storedValue, NumberClass modifiedNumberClass)
     {
         Object newValue = storedValue;
-        if (storedValue instanceof Number) {
+        if (storedValue instanceof Number storedNumber) {
             // Convert the stored value to the new number type.
-            Number storedNumber = (Number) storedValue;
             String newNumberType = modifiedNumberClass.getNumberType();
             if ("integer".equals(newNumberType)) {
                 newValue = Integer.valueOf(storedNumber.intValue());

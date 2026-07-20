@@ -69,8 +69,8 @@ public abstract class AbstractSpacesConfigurationSource extends AbstractComposit
 
             SpaceReference next = this.reference;
             // Move reference to parent
-            if (this.reference.getParent() instanceof SpaceReference) {
-                this.reference = (SpaceReference) this.reference.getParent();
+            if (this.reference.getParent() instanceof SpaceReference spaceReference) {
+                this.reference = spaceReference;
             } else {
                 this.reference = null;
             }

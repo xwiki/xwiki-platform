@@ -110,7 +110,7 @@ class EntityCodeMacroSourceFactoryTest
     private MacroTransformationContext macroContext;
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         this.macroContext = new MacroTransformationContext();
 

@@ -66,8 +66,8 @@ public class TaskApplicationReadyListener extends AbstractEventListener implemen
     public void onEvent(Event event, Object source, Object data)
     {
         // In case of ApplicationReadyEvent (when the wiki starts) and the implementation of type DefaultTasksManager.
-        if (this.taskManager instanceof DefaultTasksManager) {
-            ((DefaultTasksManager) this.taskManager).startThread();
+        if (this.taskManager instanceof DefaultTasksManager tasksManager) {
+            tasksManager.startThread();
         }
     }
 
@@ -76,8 +76,8 @@ public class TaskApplicationReadyListener extends AbstractEventListener implemen
     {
         // If the application is already initialized we start the threads immediately (e.g. in case of extension
         // install) and the implementation of type DefaultTasksManager.
-        if (this.contextProvider.get() != null && this.taskManager instanceof DefaultTasksManager) {
-            ((DefaultTasksManager) this.taskManager).startThread();
+        if (this.contextProvider.get() != null && this.taskManager instanceof DefaultTasksManager tasksManager) {
+            tasksManager.startThread();
         }
     }
 }

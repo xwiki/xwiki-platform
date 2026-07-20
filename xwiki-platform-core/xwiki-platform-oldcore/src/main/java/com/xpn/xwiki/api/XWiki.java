@@ -48,7 +48,6 @@ import org.xwiki.query.hql.internal.HQLStatementValidator;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationException;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.user.CurrentUserReference;
 
@@ -71,6 +70,9 @@ public class XWiki extends Api
 {
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
+
+    /** Value returned when Groovy parsing is denied because of missing programming rights. */
+    private static final String GROOVY_MISSINGRIGHTS = "groovy_missingrights";
 
     /** The internal object wrapped by this API. */
     private com.xpn.xwiki.XWiki xwiki;
@@ -101,11 +103,7 @@ public class XWiki extends Api
      */
     private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer;
 
-    private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
-
     private DocumentRevisionProvider documentRevisionProvider;
-
-    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     private HQLStatementValidator hqlValidator;
 
@@ -132,16 +130,6 @@ public class XWiki extends Api
         }
 
         return this.currentMixedDocumentReferenceResolver;
-    }
-
-    private DocumentReferenceResolver<EntityReference> getCurrentgetdocumentResolver()
-    {
-        if (this.currentgetdocumentResolver == null) {
-            this.currentgetdocumentResolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
-        }
-
-        return this.currentgetdocumentResolver;
     }
 
     private DocumentReferenceResolver<String> getDefaultDocumentReferenceResolver()
@@ -410,8 +398,7 @@ public class XWiki extends Api
     public List<DeletedDocument> getDeletedDocuments(String fullname, String locale) throws XWikiException
     {
         XWikiDeletedDocument[] deletedDocuments = this.xwiki.getDeletedDocuments(fullname, locale, this.context);
-        List<DeletedDocument> result = wrapDeletedDocuments(deletedDocuments);
-        return result;
+        return wrapDeletedDocuments(deletedDocuments);
     }
 
     /**
@@ -424,8 +411,7 @@ public class XWiki extends Api
     public List<DeletedDocument> getDeletedDocuments(String batchId) throws XWikiException
     {
         XWikiDeletedDocument[] deletedDocuments = this.xwiki.getDeletedDocuments(batchId, this.context);
-        List<DeletedDocument> result = wrapDeletedDocuments(deletedDocuments);
-        return result;
+        return wrapDeletedDocuments(deletedDocuments);
     }
 
     private List<DeletedDocument> wrapDeletedDocuments(XWikiDeletedDocument[] deletedDocuments)
@@ -625,8 +611,8 @@ public class XWiki extends Api
     public Document getDocument(String space, String fullname) throws XWikiException
     {
         XWikiDocument doc = this.xwiki.getDocument(space, fullname, getXWikiContext());
-        if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
-            getXWikiContext()) == false) {
+        if (!this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(),
+            getXWikiContext())) {
             return null;
         }
 
@@ -1004,12 +990,11 @@ public class XWiki extends Api
         if (docs != null) {
             for (java.lang.Object obj : docs) {
                 try {
-                    if (obj instanceof XWikiDocument) {
-                        XWikiDocument doc = (XWikiDocument) obj;
+                    if (obj instanceof XWikiDocument doc) {
                         Document wrappedDoc = doc.newDocument(getXWikiContext());
                         result.add(wrappedDoc);
-                    } else if (obj instanceof Document) {
-                        result.add((Document) obj);
+                    } else if (obj instanceof Document document) {
+                        result.add(document);
                     } else if (obj instanceof String) {
                         Document doc = getDocument(obj.toString());
                         if (doc != null) {
@@ -2691,7 +2676,7 @@ public class XWiki extends Api
         if (hasProgrammingRights()) {
             return this.xwiki.parseGroovyFromString(script, getXWikiContext());
         }
-        return "groovy_missingrights";
+        return GROOVY_MISSINGRIGHTS;
     }
 
     /**
@@ -2708,7 +2693,7 @@ public class XWiki extends Api
         if (this.xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext())) {
             return this.xwiki.parseGroovyFromString(doc.getContent(), jarWikiPage, getXWikiContext());
         }
-        return "groovy_missingrights";
+        return GROOVY_MISSINGRIGHTS;
     }
 
     /**
@@ -2725,7 +2710,7 @@ public class XWiki extends Api
         if (this.xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext())) {
             return this.xwiki.parseGroovyFromString(doc.getContent(), getXWikiContext());
         }
-        return "groovy_missingrights";
+        return GROOVY_MISSINGRIGHTS;
     }
 
     /**

@@ -67,8 +67,8 @@ public class BaseStringProperty extends BaseProperty
     {
         // Convert the value to a String, whatever its type.
         String stringValue;
-        if (value instanceof String) {
-            stringValue = (String) value;
+        if (value instanceof String string) {
+            stringValue = string;
         } else {
             stringValue = getConverterManager().convert(String.class, value);
         }

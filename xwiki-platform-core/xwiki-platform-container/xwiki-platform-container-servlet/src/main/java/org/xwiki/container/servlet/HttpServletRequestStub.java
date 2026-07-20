@@ -297,7 +297,7 @@ public class HttpServletRequestStub implements HttpServletRequest
         }
 
         return headers.entrySet().stream().filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
-            .map(entry -> Map.entry(entry.getKey(), entry.getValue().stream().collect(Collectors.toList())))
+            .map(entry -> Map.entry(entry.getKey(), entry.getValue().stream().toList()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (left, right) -> right,
                 () -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER)));
     }

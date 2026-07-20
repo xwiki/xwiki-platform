@@ -65,8 +65,7 @@ public class TreePrinter extends DepthFirstAdapter
     @Override
     public void defaultCase(Node node)
     {
-        if (node instanceof Token) {
-            Token token = (Token) node;
+        if (node instanceof Token token) {
             builder.append(' ')
                 .append(token.getText());
         }

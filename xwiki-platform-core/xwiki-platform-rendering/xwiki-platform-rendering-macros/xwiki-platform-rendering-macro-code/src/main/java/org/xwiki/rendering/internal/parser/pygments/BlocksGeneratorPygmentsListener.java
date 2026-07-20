@@ -198,10 +198,8 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
     {
         Object obj = styles.get(pyName);
 
-        if (obj != null && !(obj instanceof PyNone)) {
-            if (((Boolean) obj)) {
-                styleOut.append(cssValue);
-            }
+        if (obj != null && !(obj instanceof PyNone) && ((Boolean) obj)) {
+            styleOut.append(cssValue);
         }
     }
 }

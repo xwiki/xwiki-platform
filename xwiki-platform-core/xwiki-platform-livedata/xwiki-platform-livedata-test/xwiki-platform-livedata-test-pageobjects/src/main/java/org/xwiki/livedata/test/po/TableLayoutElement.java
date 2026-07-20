@@ -821,7 +821,7 @@ public class TableLayoutElement extends BaseElement
      * Check if the table has an "Actions" column.
      *
      * @return {@code true} if the actions column is present, {@code false} otherwise
-     * @since 18.6.0RC1
+     * @since 18.7.0RC1
      */
     public boolean hasEditModeActionsColumn()
     {
@@ -833,7 +833,7 @@ public class TableLayoutElement extends BaseElement
      * Check if the table has an "Add entry" row creation button.
      *
      * @return {@code true} if the "Add entry" row is displayed at the bottom of the table, {@code false} otherwise
-     * @since 18.6.0RC1
+     * @since 18.7.0RC1
      */
     public boolean canAddEntry()
     {
@@ -843,7 +843,7 @@ public class TableLayoutElement extends BaseElement
     /**
      * Create a new draft entry without saving it.
      *
-     * @since 18.6.0RC1
+     * @since 18.7.0RC1
      */
     public void startNewEntry()
     {
@@ -865,7 +865,7 @@ public class TableLayoutElement extends BaseElement
      * @param columnLabel the label of the column to fill
      * @param fieldName the name of the field to fill (i.e., the corresponding XClass property)
      * @param value the value to set
-     * @since 18.6.0RC1
+     * @since 18.7.0RC1
      */
     public void setNewEntryCell(String columnLabel, String fieldName, String value)
     {
@@ -875,7 +875,7 @@ public class TableLayoutElement extends BaseElement
     /**
      * Save the current draft entry, then wait for the Live Data to be reloaded.
      *
-     * @since 18.6.0RC1
+     * @since 18.7.0RC1
      */
     public void saveNewEntry()
     {
@@ -888,7 +888,7 @@ public class TableLayoutElement extends BaseElement
     /**
      * Cancel the current draft entry.
      *
-     * @since 18.6.0RC1
+     * @since 18.7.0RC1
      */
     public void cancelNewEntry()
     {

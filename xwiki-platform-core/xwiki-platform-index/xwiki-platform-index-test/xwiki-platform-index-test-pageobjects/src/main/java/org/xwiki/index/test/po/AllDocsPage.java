@@ -50,7 +50,7 @@ public class AllDocsPage extends ViewPage
     @FindBy(xpath = "//li[@id='xwikideletedAttachments']/a")
     private WebElement deletedAttachmentsTab;
 
-    @FindBy(xpath = "//div[contains(@class, 'xwikitabpanescontainer')]/div")
+    @FindBy(xpath = "//div[contains(@class, 'xwikitabpanescontainer')]/div[contains(@class, 'jstree')]")
     private WebElement treeElement;
 
     public static AllDocsPage gotoPage()
@@ -96,12 +96,12 @@ public class AllDocsPage extends ViewPage
 
     public boolean hasDeletedDocsTab()
     {
-        return getDriver().findElementsWithoutWaiting(By.xpath("//li[@id='xwikideletedDocs']/a")).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(By.xpath("//li[@id='xwikideletedDocs']/a")).isEmpty();
     }
 
     public boolean hasDeletedAttachmentsTab()
     {
-        return getDriver().findElementsWithoutWaiting(By.xpath("//li[@id='xwikideletedAttachments']/a")).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(By.xpath("//li[@id='xwikideletedAttachments']/a")).isEmpty();
     }
 
     public LiveTableElement clickDeletedDocsTab()

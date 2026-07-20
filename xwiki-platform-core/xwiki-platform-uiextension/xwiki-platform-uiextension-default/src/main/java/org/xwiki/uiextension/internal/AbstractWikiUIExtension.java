@@ -137,8 +137,8 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
         executorConfiguration.setTargetSyntax(this.renderingContext.getTargetSyntax());
 
         // Add decorator
-        if (this instanceof BlockAsyncRendererDecorator) {
-            executorConfiguration.setDecorator((BlockAsyncRendererDecorator) this);
+        if (this instanceof BlockAsyncRendererDecorator decorator) {
+            executorConfiguration.setDecorator(decorator);
         }
 
         // Indicate if asynchronous execution is enabled for this UI extension

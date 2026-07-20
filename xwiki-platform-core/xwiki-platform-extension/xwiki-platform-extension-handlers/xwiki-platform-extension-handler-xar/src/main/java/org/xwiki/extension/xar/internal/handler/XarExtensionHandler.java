@@ -116,8 +116,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         Object obj = request.getProperty(property);
 
-        if (obj instanceof DocumentReference) {
-            return (DocumentReference) obj;
+        if (obj instanceof DocumentReference documentReference) {
+            return documentReference;
         }
 
         return null;

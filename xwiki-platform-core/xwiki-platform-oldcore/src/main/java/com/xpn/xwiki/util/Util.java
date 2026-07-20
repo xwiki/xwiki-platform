@@ -75,6 +75,8 @@ public class Util
      */
     private static final String URL_ENCODING = "UTF-8";
 
+    private static final String NEWLINE_PLACEHOLDER = "%_N_%";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Util.class);
 
     private static PatternCache patterns = new PatternCacheLRU(200);
@@ -143,11 +145,11 @@ public class Util
 
     public static String cleanValue(String value)
     {
-        value = StringUtils.replace(value, "\r\r\n", "%_N_%");
-        value = StringUtils.replace(value, "\r\n", "%_N_%");
-        value = StringUtils.replace(value, "\n\r", "%_N_%");
+        value = StringUtils.replace(value, "\r\r\n", NEWLINE_PLACEHOLDER);
+        value = StringUtils.replace(value, "\r\n", NEWLINE_PLACEHOLDER);
+        value = StringUtils.replace(value, "\n\r", NEWLINE_PLACEHOLDER);
         value = StringUtils.replace(value, "\r", "\n");
-        value = StringUtils.replace(value, "\n", "%_N_%");
+        value = StringUtils.replace(value, "\n", NEWLINE_PLACEHOLDER);
         value = StringUtils.replace(value, "\"", "%_Q_%");
 
         return value;
@@ -155,7 +157,7 @@ public class Util
 
     public static String restoreValue(String value)
     {
-        value = StringUtils.replace(value, "%_N_%", "\n");
+        value = StringUtils.replace(value, NEWLINE_PLACEHOLDER, "\n");
         value = StringUtils.replace(value, "%_Q_%", "\"");
 
         return value;
@@ -204,12 +206,13 @@ public class Util
     public static <T> Map<String, T> getSubMap(Map<String, T> map, String prefix)
     {
         Map<String, T> result = new HashMap<>();
-        for (String name : map.keySet()) {
+        for (Map.Entry<String, T> entry : map.entrySet()) {
+            String name = entry.getKey();
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);
-                result.put(newname, map.get(name));
+                result.put(newname, entry.getValue());
             } else if (name.equals(prefix)) {
-                result.put("", map.get(name));
+                result.put("", entry.getValue());
             }
         }
 
@@ -724,12 +727,8 @@ public class Util
      */
     public static boolean isValidXMLElementName(String elementName)
     {
-        if (elementName == null || elementName.isEmpty() || elementName.matches("(?i)^(xml).*")
-            || !elementName.matches("(^[a-zA-Z\\_]+[\\w\\.\\-]*$)")) {
-            return false;
-        }
-
-        return true;
+        return elementName != null && !elementName.isEmpty() && !elementName.matches("(?i)^(xml).*")
+            && elementName.matches("(^[a-zA-Z\\_]+[\\w\\.\\-]*$)");
     }
 
     /**

@@ -62,8 +62,6 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
     private static final String SUBMIT_BUTTONS = StringUtils.join(Arrays.asList("button[type='submit']",
         "button:not([type])", "input[type='submit']", "input[type='image'][alt]:not([alt=''])"), ", ");
 
-    private static final String DOCTYPE_ATT_NAME = "name";
-
     /**
      * Message resources.
      */
@@ -690,8 +688,8 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
         for (Element link : getElements(ELEM_LINK)) {
 
             // Look for images in the link.
-            boolean hasImages = link.select("img").size() > 0;
-            boolean hasImagesWithoutAlt = link.select("img[alt=''], img:not([alt])").size() > 0;
+            boolean hasImages = !link.select("img").isEmpty();
+            boolean hasImagesWithoutAlt = !link.select("img[alt=''], img:not([alt])").isEmpty();
 
             // Look for text in the link.
             boolean hasText = false;

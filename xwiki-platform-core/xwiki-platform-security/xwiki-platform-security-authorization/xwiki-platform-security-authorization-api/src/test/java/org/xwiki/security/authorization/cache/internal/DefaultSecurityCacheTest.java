@@ -191,11 +191,10 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         if (groupUserRefs.contains(entry.getReference())) {
             final List<GroupSecurityReference> groups = new ArrayList<>();
             for (GroupSecurityReference group : groupRefs.keySet()) {
-                if (groupRefs.get(group).contains(entry.getReference())) {
-                    if (group.getOriginalReference().getWikiReference()
+                if (groupRefs.get(group).contains(entry.getReference())
+                    && group.getOriginalReference().getWikiReference()
                         .equals(entry.getReference().getOriginalDocumentReference().getWikiReference())) {
-                        groups.add(group);
-                    }
+                    groups.add(group);
                 }
             }
             AddUserEntry(entry, groups);
@@ -213,13 +212,11 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         if (groupUserRefs.contains(user.getReference())) {
             final List<GroupSecurityReference> groups = new ArrayList<>();
             for (GroupSecurityReference group : groupRefs.keySet()) {
-                if (groupRefs.get(group).contains(user.getReference())) {
-                    if (group.getOriginalReference().getWikiReference()
+                if (groupRefs.get(group).contains(user.getReference())
+                    && (group.getOriginalReference().getWikiReference()
                         .equals(user.getWikiReference().getOriginalWikiReference())
-                        || group.isGlobal())
-                    {
-                        groups.add(group);
-                    }
+                        || group.isGlobal())) {
+                    groups.add(group);
                 }
             }
             securityCache.add(user, groups, securityCache.getInvalidationCounter());
@@ -425,11 +422,13 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(docRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return entry.getReference() != docRef;
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return entry.getReference() != docRef;
@@ -440,11 +439,13 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(anotherWikiUserRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return entry.getReference() != anotherWikiUserRef;
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return entry.getUserReference() != anotherWikiUserRef;
@@ -455,16 +456,19 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(anotherGroupXUserRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return entry.getReference() != anotherGroupXUserRef;
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return entry.getUserReference() != anotherGroupXUserRef;
             }
 
+            @Override
             public boolean keepShadow(SecurityShadowEntry entry)
             {
                 return entry.getReference() != anotherGroupXUserRef;
@@ -475,6 +479,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(groupRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return (entry.getReference() != groupRef && (!groupRefs.get(groupRef).contains(entry.getReference())
@@ -482,12 +487,14 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
                         .getOriginalWikiReference()));
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return (!groupRefs.get(groupRef).contains(entry.getUserReference()) || entry.getReference()
                     .getOriginalReference().extractReference(EntityType.WIKI) != wikiRef.getOriginalWikiReference());
             }
 
+            @Override
             public boolean keepShadow(SecurityShadowEntry entry)
             {
                 return (!groupRefs.get(groupRef).contains(entry.getReference()) || entry.getWikiReference() != wikiRef);
@@ -498,12 +505,14 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(spaceRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return (entry.getReference().getOriginalReference().extractReference(EntityType.SPACE) != spaceRef
                     .getOriginalSpaceReference());
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return (entry.getReference().getOriginalReference().extractReference(EntityType.SPACE) != spaceRef
@@ -515,18 +524,21 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(wikiRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return (entry.getReference().getOriginalReference().extractReference(EntityType.WIKI) != wikiRef
                     .getOriginalWikiReference());
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return (entry.getReference().getOriginalReference().extractReference(EntityType.WIKI) != wikiRef
                     .getOriginalWikiReference());
             }
 
+            @Override
             public boolean keepShadow(SecurityShadowEntry entry)
             {
                 return (entry.getWikiReference() != wikiRef);
@@ -538,16 +550,19 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         remover.remove(xwikiRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepRule(SecurityRuleEntry entry)
             {
                 return false;
             }
 
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return false;
             }
 
+            @Override
             public boolean keepShadow(SecurityShadowEntry entry)
             {
                 return false;
@@ -712,7 +727,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
     }
 
     @Test
-    public void testAddSecurityAccessEntry() throws Exception
+    void testAddSecurityAccessEntry() throws Exception
     {
         InsertUsers();
         InsertEntities();
@@ -834,6 +849,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return entry.getReference() != docRef || entry.getUserReference() != userRef;
@@ -853,6 +869,7 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         securityCache.remove(userRef, docRef);
         checkEntries(entries, new Keeper()
         {
+            @Override
             public boolean keepAccess(SecurityAccessEntry entry)
             {
                 return entry.getReference() != docRef || entry.getUserReference() != userRef;

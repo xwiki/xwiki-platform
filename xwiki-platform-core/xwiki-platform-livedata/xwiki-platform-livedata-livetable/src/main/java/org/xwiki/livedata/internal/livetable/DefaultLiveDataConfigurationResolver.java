@@ -141,8 +141,8 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     private LiveDataPropertyDescriptorStore getPropertyStore(Source sourceConfig)
     {
         LiveDataPropertyDescriptorStore propertyStore = this.propertyStoreProvider.get();
-        if (propertyStore instanceof WithParameters && sourceConfig != null) {
-            ((WithParameters) propertyStore).getParameters().putAll(sourceConfig.getParameters());
+        if (propertyStore instanceof WithParameters withParameters && sourceConfig != null) {
+            withParameters.getParameters().putAll(sourceConfig.getParameters());
         }
         return propertyStore;
     }
@@ -174,7 +174,7 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         if (query.getSort() != null) {
             // Remove the sort entry if we couldn't find a default sort property.
             query.setSort(query.getSort().stream().filter(Objects::nonNull)
-                .filter(sortEntry -> !StringUtils.isEmpty(sortEntry.getProperty())).collect(Collectors.toList()));
+                .filter(sortEntry -> !StringUtils.isEmpty(sortEntry.getProperty())).toList());
         }
     }
 
@@ -201,7 +201,7 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
             .map(LiveDataPropertyDescriptor::getId).collect(Collectors.toSet());
         List<LiveDataPropertyDescriptor> missingDescriptors =
             properties.stream().filter(property -> !propertiesWithDescriptor.contains(property))
-                .map(this::getDefaultPropertyDescriptor).collect(Collectors.toList());
+                .map(this::getDefaultPropertyDescriptor).toList();
         if (!missingDescriptors.isEmpty()) {
             propertyDescriptors = new ArrayList<>(propertyDescriptors);
             propertyDescriptors.addAll(missingDescriptors);

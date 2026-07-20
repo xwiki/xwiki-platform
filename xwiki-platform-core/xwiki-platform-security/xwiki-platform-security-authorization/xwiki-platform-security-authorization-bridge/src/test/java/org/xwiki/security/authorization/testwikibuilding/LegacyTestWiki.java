@@ -462,8 +462,7 @@ public class LegacyTestWiki extends AbstractTestWiki
         TestSpace getTestSpace(String spaceName)
         {
             if (this.spaces.containsKey(spaceName)) {
-                TestSpace space = mockSpace(spaceName);
-                return space;
+                return mockSpace(spaceName);
             }
 
             return null;
@@ -1132,7 +1131,7 @@ public class LegacyTestWiki extends AbstractTestWiki
                 }
             }
 
-            return this.mockedObjects.size() == 0 ? null : new Vector<>(this.mockedObjects);
+            return this.mockedObjects.isEmpty() ? null : new Vector<>(this.mockedObjects);
         }
 
         private BaseObject mockRightBaseObject(final String name, final String type, final boolean isUser,

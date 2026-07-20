@@ -63,8 +63,13 @@ import com.xpn.xwiki.objects.BaseObject;
  * 
  * @version $Id$
  */
-public class DomainObjectFactory
+public final class DomainObjectFactory
 {
+    private DomainObjectFactory()
+    {
+        // Utility class, no instantiation.
+    }
+
     public static ModelFactory getModelFactory()
     {
         return com.xpn.xwiki.web.Utils.getComponent(ModelFactory.class);

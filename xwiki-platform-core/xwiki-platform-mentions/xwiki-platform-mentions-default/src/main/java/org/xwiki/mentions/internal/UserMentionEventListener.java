@@ -194,9 +194,9 @@ public class UserMentionEventListener implements EventListener
                 String name = entityReference.getName();
                 PropertyInterface field =
                     doc.getXObject(entityReference.extractReference(EntityType.OBJECT)).getField(name);
-                if (field instanceof BaseStringProperty) {
+                if (field instanceof BaseStringProperty baseStringProperty) {
                     xdom =
-                        this.xdomService.parse(((BaseStringProperty) field).getValue(), doc.getSyntax()).orElse(null);
+                        this.xdomService.parse(baseStringProperty.getValue(), doc.getSyntax()).orElse(null);
                 } else {
                     xdom = null;
                 }

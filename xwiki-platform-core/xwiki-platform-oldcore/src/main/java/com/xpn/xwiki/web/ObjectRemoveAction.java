@@ -41,6 +41,8 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class ObjectRemoveAction extends XWikiAction
 {
+    private static final String MESSAGE = "message";
+
     @Override
     protected Class<? extends XWikiForm> getFormClass()
     {
@@ -55,16 +57,16 @@ public class ObjectRemoveAction extends XWikiAction
         String className = form.getClassName();
         int classId = form.getClassId();
         if (StringUtils.isBlank(className)) {
-            getCurrentScriptContext().setAttribute("message",
+            getCurrentScriptContext().setAttribute(MESSAGE,
                 localizePlainOrKey("platform.core.action.objectRemove.noClassnameSpecified"),
                 ScriptContext.ENGINE_SCOPE);
         } else if (classId < 0) {
-            getCurrentScriptContext().setAttribute("message",
+            getCurrentScriptContext().setAttribute(MESSAGE,
                 localizePlainOrKey("platform.core.action.objectRemove.noObjectSpecified"), ScriptContext.ENGINE_SCOPE);
         } else {
             obj = doc.getObject(className, classId);
             if (obj == null) {
-                getCurrentScriptContext().setAttribute("message",
+                getCurrentScriptContext().setAttribute(MESSAGE,
                     localizePlainOrKey("platform.core.action.objectRemove.invalidObject"), ScriptContext.ENGINE_SCOPE);
             }
         }

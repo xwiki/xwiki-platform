@@ -65,7 +65,7 @@ class ListPropertyTest
     {
         ListProperty p = new ListProperty();
 
-        List<String> pList = p.getList();
+        p.getList();
 
         p.setValueDirty(false);
 

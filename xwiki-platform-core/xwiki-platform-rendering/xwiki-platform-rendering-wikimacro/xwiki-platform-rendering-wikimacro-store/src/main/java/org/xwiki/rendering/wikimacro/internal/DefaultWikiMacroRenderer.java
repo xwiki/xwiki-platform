@@ -115,6 +115,11 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     private static final String MACRO_BINDING = "wikimacro";
 
     /**
+     * The name of the metadata flagging a block as containing wiki macro content.
+     */
+    private static final String WIKIMACROCONTENT = "wikimacrocontent";
+
+    /**
      * The key under which macro body will be available inside macro context.
      * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
@@ -182,32 +187,32 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     /**
      * Match all the macro marker blocks.
      */
-    private static final BlockMatcher MACRO_MARKER_MATCHER = testedBlock -> (testedBlock instanceof MacroMarkerBlock);
+    private static final BlockMatcher MACRO_MARKER_MATCHER = MacroMarkerBlock.class::isInstance;
 
-    private static final BlockMatcher PLACEHOLDERS_BLOCKMATCHER = testedBlock -> ((testedBlock instanceof RawBlock
-        && (((RawBlock) testedBlock).getSyntax().getType().equals(SyntaxType.XHTML)
-            || ((RawBlock) testedBlock).getSyntax().getType().equals(SyntaxType.HTML)))
-        || (testedBlock instanceof MacroMarkerBlock
-            && (((MacroMarkerBlock) testedBlock).getId().equals(WikiMacroContentMacro.ID)
-                || ((MacroMarkerBlock) testedBlock).getId().equals(WikiMacroParameterMacro.ID))));
+    private static final BlockMatcher PLACEHOLDERS_BLOCKMATCHER = testedBlock -> (testedBlock instanceof RawBlock raw
+        && (raw.getSyntax().getType().equals(SyntaxType.XHTML)
+            || raw.getSyntax().getType().equals(SyntaxType.HTML)))
+        || (testedBlock instanceof MacroMarkerBlock macroBlock
+            && (macroBlock.getId().equals(WikiMacroContentMacro.ID)
+                || macroBlock.getId().equals(WikiMacroParameterMacro.ID)));
 
     /**
      * Match all the metadata blocks that contains wikimacrocontent=true.
      */
     private static final BlockMatcher MACROCONTENT_METADATA_MATCHER =
-        testedBlock -> (testedBlock instanceof MetaDataBlock)
-            && "true".equals(((MetaDataBlock) testedBlock).getMetaData().getMetaData("wikimacrocontent"));
+        testedBlock -> (testedBlock instanceof MetaDataBlock metaDataBlock)
+            && "true".equals(metaDataBlock.getMetaData().getMetaData(WIKIMACROCONTENT));
 
     /**
      * Match all the metadata blocks that contains a non-generated-content metadata.
      */
     private static final BlockMatcher NON_GENERATED_CONTENT_METADATA_MATCHER =
-        testedBlock -> (testedBlock instanceof MetaDataBlock)
-            && ((MetaDataBlock) testedBlock).getMetaData().getMetaData(MetaData.NON_GENERATED_CONTENT) != null;
+        testedBlock -> (testedBlock instanceof MetaDataBlock metaDataBlock)
+            && metaDataBlock.getMetaData().getMetaData(MetaData.NON_GENERATED_CONTENT) != null;
 
     private static final Pattern HTML_PLACEHOLDER_PATTERN =
         Pattern.compile("<(span|div) data-wikimacro-id=(?:[\"'])([^\"']+)(?:[\"'])"
-            + "(?: name=(?:[\"'])([^\"']+)(?:[\"']))?(?:\\/>|><\\/(?:span|div)>)");
+            + "(?: data-wikimacro-parameter-name=(?:[\"'])([^\"']+)(?:[\"']))?(?:\\/>|><\\/(?:span|div)>)");
 
     @Inject
     private AsyncContext asyncContext;
@@ -349,8 +354,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         Block result;
         if (resultObject instanceof List) {
             result = new CompositeBlock((List<Block>) resultObject);
-        } else if (resultObject instanceof Block) {
-            result = (Block) resultObject;
+        } else if (resultObject instanceof Block resultBlock) {
+            result = resultBlock;
         } else {
             if (!async) {
                 // If synchronized the top level block is a temporary macro marker so we need to get rid of it
@@ -384,8 +389,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         // blocks to behave as inline macros if the wiki macro is used inline.
         if (this.inline) {
             List<Block> children = xdom.getChildren();
-            if (!children.isEmpty() && children.get(0) instanceof MacroBlock) {
-                MacroBlock old = (MacroBlock) children.get(0);
+            if (!children.isEmpty() && children.get(0) instanceof MacroBlock old) {
                 MacroBlock replacement = new MacroBlock(old.getId(), old.getParameters(), old.getContent(), true);
                 xdom.replaceChild(replacement, old);
             }
@@ -649,24 +653,19 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     private Block replacePlaceHolder(Block block)
     {
-        if (block instanceof MacroMarkerBlock) {
-            MacroMarkerBlock macroBlock = (MacroMarkerBlock) block;
-
+        if (block instanceof MacroMarkerBlock macroBlock) {
             if (macroBlock.getId().equals(WikiMacroContentMacro.ID)) {
                 return resolveMacroContent(macroBlock);
             } else if (macroBlock.getId().equals(WikiMacroParameterMacro.ID)) {
                 return resolveMacroParameter(macroBlock);
             }
-        } else if (block instanceof RawBlock) {
+        } else if (block instanceof RawBlock rawBlock
+            && (rawBlock.getSyntax().getType().equals(SyntaxType.XHTML)
+                || rawBlock.getSyntax().getType().equals(SyntaxType.HTML))) {
             // We need the wikimacro content and parameter to be executed in the right context so if any can be found in
             // an html raw block we need to refactor that raw block to be two raw blocks around a proper blocks to
             // execute later
-            RawBlock rawBlock = (RawBlock) block;
-
-            if (rawBlock.getSyntax().getType().equals(SyntaxType.XHTML)
-                || rawBlock.getSyntax().getType().equals(SyntaxType.HTML)) {
-                return replaceHTMLPlaceHolder(rawBlock);
-            }
+            return replaceHTMLPlaceHolder(rawBlock);
         }
 
         return block;
@@ -712,7 +711,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     {
         if (this.wikimacro.getDescriptor().getContentDescriptor() != null && this.macroContent != null) {
             MetaData nonGeneratedContentMetaData = getNonGeneratedContentMetaData();
-            nonGeneratedContentMetaData.addMetaData("wikimacrocontent", "true");
+            nonGeneratedContentMetaData.addMetaData(WIKIMACROCONTENT, "true");
 
             List<Block> blocks;
             try {
@@ -760,14 +759,14 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
         Object parameterValue = this.originalParameters.get(parameterName);
 
-        if (parameterValue instanceof String) {
+        if (parameterValue instanceof String stringValue) {
             MetaData nonGeneratedContentMetaData = getNonGeneratedParameterMetaData(parameterName);
-            nonGeneratedContentMetaData.addMetaData("wikimacrocontent", "true");
+            nonGeneratedContentMetaData.addMetaData(WIKIMACROCONTENT, "true");
 
             List<Block> blocks;
             try {
                 blocks =
-                    parseParameterValue((String) parameterValue, parameterName, macroBlock.isInline()).getChildren();
+                    parseParameterValue(stringValue, parameterName, macroBlock.isInline()).getChildren();
             } catch (Exception e) {
                 blocks = this.errorBlockGenerator.generateErrorBlocks(macroBlock.isInline(),
                     TM_FAILEDRESOLVEPARAMETERPLACEHOLDER, "Failed to resolve macro parameter placeholder", null, e);

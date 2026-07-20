@@ -101,8 +101,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         if (repositoryId != null) {
             response =
                 downloadRemoteExtension(new ExtensionResourceReference(extensionId, extensionVersion, repositoryId));
-        } else if (repositoryType != null && repositoryURI != null
-            && this.repositoryConfiguration.isAllowedCustomRepository()) {
+        } else if (repositoryType != null && repositoryURI != null && isAllowedRepository(repositoryURI)) {
             response = downloadRemoteExtension(
                 new ExtensionResourceReference(extensionId, extensionVersion, repositoryType, new URI(repositoryURI)));
         } else {
@@ -110,6 +109,34 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
         }
 
         return response.build();
+    }
+
+    private boolean isAllowedRepository(URI repositoryURI) throws XWikiException
+    {
+        return isAllowedRepository(repositoryURI != null ? repositoryURI.toString() : null);
+    }
+
+    private boolean isAllowedRepository(String repositoryURI) throws XWikiException
+    {
+        // No much point checking anything if the configuration allows any custom repository, so let's just return true
+        // in that case.
+        // Null or empty repositoryURI is also safe, dealing with that use case is not that method's role
+        if (this.repositoryConfiguration.isAllowedCustomRepository() || repositoryURI == null
+            || repositoryURI.isEmpty()) {
+            return true;
+        }
+
+        // Check if the URI matches one of the registered repositories
+        for (ExtensionRepository repository : this.extensionRepositoryManager.getRepositories()) {
+            ExtensionRepositoryDescriptor descriptor = repository.getDescriptor();
+            if (descriptor != null && descriptor.getURI() != null
+                && repositoryURI.startsWith(descriptor.getURI().toString())) {
+                return true;
+            }
+        }
+
+        // False if no standard repository matches the URI
+        return false;
     }
 
     private ResponseBuilder downloadLocalExtension(String extensionId, String extensionVersion)
@@ -140,7 +167,17 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
             response = getAttachmentResponse(xwikiAttachment);
         } else if (ResourceType.URL.equals(resourceReference.getType())) {
-            // It's an URL
+            // It's a custom URL
+
+            // Protect against downloading from a custom repository if the configuration does not allow it
+            if (!isAllowedRepository(resourceReference.getReference())) {
+                getLogger().warn(
+                    "Download from a custom repository is not allowed, extension [{}] will not be downloaded from [{}]",
+                    extensionId, resourceReference.getReference());
+
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
+
             URL url = new URL(resourceReference.getReference());
 
             DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -193,7 +230,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
     }
 
     private ResponseBuilder downloadRemoteExtension(ExtensionResourceReference extensionResource)
-        throws ResolveException, IOException
+        throws ResolveException, IOException, XWikiException
     {
         ExtensionRepository repository = null;
         if (extensionResource.getRepositoryId() != null) {
@@ -202,16 +239,22 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
 
         if (repository == null && extensionResource.getRepositoryType() != null
             && extensionResource.getRepositoryURI() != null) {
-            ExtensionRepositoryDescriptor repositoryDescriptor = new DefaultExtensionRepositoryDescriptor("tmp",
-                extensionResource.getRepositoryType(), extensionResource.getRepositoryURI());
-            try {
-                ExtensionRepositoryFactory repositoryFactory =
-                    this.componentManager.getInstance(ExtensionRepositoryFactory.class, repositoryDescriptor.getType());
+            if (!isAllowedRepository(extensionResource.getRepositoryURI())) {
+                // The indicated repository is not allowed, ignoring it
+                getLogger().warn("The custom repository [{}] configured for extension [{}] is not allowed, ignoring it",
+                    extensionResource.getRepositoryURI().toString(), extensionResource.getExtensionId());
+            } else {
+                ExtensionRepositoryDescriptor repositoryDescriptor = new DefaultExtensionRepositoryDescriptor("tmp",
+                    extensionResource.getRepositoryType(), extensionResource.getRepositoryURI());
+                try {
+                    ExtensionRepositoryFactory repositoryFactory = this.componentManager
+                        .getInstance(ExtensionRepositoryFactory.class, repositoryDescriptor.getType());
 
-                repository = repositoryFactory.createRepository(repositoryDescriptor);
-            } catch (Exception e) {
-                // Ignore invalid repository
-                getLogger().warn("Invalid repository in download link [{}]", extensionResource);
+                    repository = repositoryFactory.createRepository(repositoryDescriptor);
+                } catch (Exception e) {
+                    // Ignore invalid repository
+                    getLogger().warn("Invalid repository in download link [{}]", extensionResource);
+                }
             }
 
         }

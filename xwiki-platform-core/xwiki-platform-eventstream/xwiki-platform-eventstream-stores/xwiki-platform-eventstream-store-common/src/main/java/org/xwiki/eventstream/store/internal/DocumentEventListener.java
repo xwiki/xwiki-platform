@@ -78,7 +78,7 @@ public class DocumentEventListener extends AbstractEventListener
         new AnnotationUpdatedEvent()
     );
 
-    private static final BeginFoldEvent IGNORED_EVENTS = otherEvent -> otherEvent instanceof BeginFoldEvent;
+    private static final BeginFoldEvent IGNORED_EVENTS = BeginFoldEvent.class::isInstance;
 
     @Inject
     private RemoteObservationManagerContext remoteObservationManagerContext;

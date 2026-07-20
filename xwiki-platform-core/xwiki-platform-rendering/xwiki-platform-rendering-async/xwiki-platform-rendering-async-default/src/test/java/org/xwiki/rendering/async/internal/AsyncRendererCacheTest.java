@@ -80,7 +80,7 @@ class AsyncRendererCacheTest
     }
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         this.renderer = mock(AsyncRenderer.class);
 

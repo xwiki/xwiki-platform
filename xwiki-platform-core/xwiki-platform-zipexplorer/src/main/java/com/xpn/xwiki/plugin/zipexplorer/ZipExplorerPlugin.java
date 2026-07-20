@@ -128,10 +128,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         newAttachment.setAuthorReference(attachment.getAuthorReference());
         newAttachment.setDate(attachment.getDate());
 
-        InputStream stream = null;
-        try {
-            stream = new BufferedInputStream(attachment.getContentInputStream(context));
-
+        try (InputStream stream = new BufferedInputStream(attachment.getContentInputStream(context))) {
             if (!isZipFile(stream)) {
                 return attachment;
             }
@@ -158,12 +155,8 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                     break;
                 }
             }
-        } catch (XWikiException e) {
+        } catch (XWikiException | IOException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            IOUtils.closeQuietly(stream);
         }
         return newAttachment;
     }
@@ -192,9 +185,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                     zipList.add(entry.getName());
                 }
             }
-        } catch (XWikiException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (XWikiException | IOException e) {
             e.printStackTrace();
         }
         return zipList;

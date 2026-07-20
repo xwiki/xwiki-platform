@@ -23,7 +23,7 @@ import XWikiBlockNote from "../components/XWikiBlockNote.vue";
 import { createPinia } from "pinia";
 import { createApp, reactive } from "vue";
 import { createI18n } from "vue-i18n";
-import type { SkinManager } from "@xwiki/platform-api";
+import type { DesignSystemLoader, SkinManager } from "@xwiki/platform-api";
 import type { App } from "vue";
 import type { I18n } from "vue-i18n";
 
@@ -46,7 +46,10 @@ export class Logic {
   private readonly _root: InstanceType<typeof XWikiBlockNote>;
 
   // eslint-disable-next-line max-statements
-  constructor(host: HTMLElement) {
+  constructor(
+    host: HTMLElement,
+    { designSystemLoader }: { designSystemLoader: DesignSystemLoader },
+  ) {
     this._host = host;
     this._name = host.getAttribute("name") ?? host.id ?? host.dataset.name;
     this._data = reactive(this.parseDataFromHost());
@@ -54,6 +57,15 @@ export class Logic {
     this._ready = new Promise((resolve) => {
       this._resolveReady = resolve;
     });
+
+    // TODO: Until all the components are moved to the new client-side component manager, the design system loader
+    // is resolved on the component manager side, then passed as a constant value to the Blocknote container. This
+    // is working as long as the graph of components from the component manager does not need to inject components
+    // from Blocknote's container.
+    container
+      .bind("DesignSystemLoader")
+      .toConstantValue(designSystemLoader)
+      .whenNamed("xwiki");
 
     const skinManager: SkinManager = container.get("SkinManager");
 

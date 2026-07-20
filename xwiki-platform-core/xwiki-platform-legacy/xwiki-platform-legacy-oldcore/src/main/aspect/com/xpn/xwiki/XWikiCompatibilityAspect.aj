@@ -727,7 +727,7 @@ public privileged aspect XWikiCompatibilityAspect
             segments.add(Util.decodeURI(segment, context));
         }
         // Remove the first segment if it's empty to cater for cases when the path starts with "/"
-        if (segments.size() > 0 && segments.get(0).length() == 0) {
+        if (!segments.isEmpty() && segments.get(0).length() == 0) {
             segments.remove(0);
         }
 

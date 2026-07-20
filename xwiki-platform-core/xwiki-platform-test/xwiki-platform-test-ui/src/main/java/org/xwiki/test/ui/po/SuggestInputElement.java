@@ -196,9 +196,13 @@ public class SuggestInputElement extends BaseElement
     {
         WebElement textInput = getTextInput();
         if (!textInput.isDisplayed()) {
-            // The text input is not visible when the widget is not focused and single selection is enabled. We need to
-            // focus the widget first.
+            // The text input is not visible when the widget is not focused and single selection is enabled (Tom Select
+            // hides it off-screen). We need to focus the widget first. Focusing is asynchronous though (Tom Select
+            // defers the actual focus handling with a timeout), so we wait for the input to become visible before
+            // clearing it, otherwise clearing fails because the input is still hidden off-screen and can't be scrolled
+            // into view.
             click();
+            getDriver().waitUntilCondition(driver -> textInput.isDisplayed());
         }
         textInput.clear();
         this.shouldWaitForRemoteSuggestions = false;
@@ -263,13 +267,20 @@ public class SuggestInputElement extends BaseElement
     private void waitForDropdownReload(boolean remote)
     {
         if (remote) {
-            // Wait for remote suggestions to be fetched.
-            getDriver().waitUntilCondition(driver -> isLoading());
-        } else {
-            // Wait for cached suggestions.
-            getDriver().waitUntilCondition(ExpectedConditions.numberOfElementsToBe(
-                By.cssSelector(".ts-dropdown.active .xwiki-selectize-dropdown-reload-marker"), 0));
+            // Wait for the remote suggestions for the current input value to be fetched. We check TomSelect's
+            // loadedSearches cache (a monotonic signal) rather than observing the transient "loading" CSS class,
+            // which can be added and removed between two Selenium polls (or skipped entirely for cached queries),
+            // causing spurious timeouts.
+            getDriver().waitUntilCondition(driver -> Boolean.TRUE.equals(getDriver().executeScript("""
+                const selectize = arguments[0].selectize;
+                return !!selectize && selectize.loadedSearches.hasOwnProperty(selectize.get$('control_input').val());
+                """, this.originalInput)));
         }
+        // Wait for the dropdown content to be reloaded. The reload marker inserted before typing is removed when the
+        // content is cleared and re-rendered, even if the new content is identical to the previous one. When no marker
+        // was inserted (the dropdown wasn't open before typing) the count is already 0 and this passes instantly.
+        getDriver().waitUntilCondition(ExpectedConditions.numberOfElementsToBe(
+            By.cssSelector(".ts-dropdown.active .xwiki-selectize-dropdown-reload-marker"), 0));
         this.shouldWaitForRemoteSuggestions = false;
     }
 

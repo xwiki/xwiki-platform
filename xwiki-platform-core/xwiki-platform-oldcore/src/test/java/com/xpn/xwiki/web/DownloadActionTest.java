@@ -429,7 +429,7 @@ class DownloadActionTest
     void downloadWhenNameWithSpacesEncodedWithPercent() throws XWikiException, IOException
     {
         Date d = new Date();
-        XWikiAttachment attachment = createAttachment(d, "file name.txt");
+        createAttachment(d, "file name.txt");
         when(this.engineContext.getMimeType("file name.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file%20name.txt", null, "1", null, -1l, "file name.txt");
         assertNull(this.action.render(this.oldcore.getXWikiContext()));
@@ -443,7 +443,7 @@ class DownloadActionTest
     void downloadWhenNameWithNonAsciiChars() throws XWikiException, IOException
     {
         Date d = new Date();
-        XWikiAttachment attachment = createAttachment(d, "file\u021B.txt");
+        createAttachment(d, "file\u021B.txt");
 
         when(this.engineContext.getMimeType("file\u021B.txt")).thenReturn("text/plain");
         setRequestExpectations("/xwiki/bin/download/space/page/file%C8%9B.txt", null, "1", null, -1l, "file\u021B.txt");
@@ -792,7 +792,7 @@ class DownloadActionTest
         ExecutionContextManager ecm = this.oldcore.getMocker().registerMockComponent(ExecutionContextManager.class);
         ExecutionContext ec = this.oldcore.getExecutionContext();
         when(ecm.clone(ec)).thenReturn(ec);
-        VelocityManager vm = this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
+        this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
 
         // Set the Plugin Manager
         XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);

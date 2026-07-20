@@ -507,10 +507,8 @@ public class XWikiAttachment implements Cloneable
             this.doc = doc;
             this.reference = null;
 
-            if (updateDirty) {
-                if (isMetaDataDirty() && doc != null) {
-                    doc.setMetaDataDirty(true);
-                }
+            if (updateDirty && isMetaDataDirty() && doc != null) {
+                doc.setMetaDataDirty(true);
             }
         }
     }
@@ -572,10 +570,8 @@ public class XWikiAttachment implements Cloneable
     {
         setMetaDataDirty(dirty);
 
-        if (deep) {
-            if (this.content != null) {
-                this.content.setContentDirty(dirty);
-            }
+        if (deep && this.content != null) {
+            this.content.setContentDirty(dirty);
         }
     }
 
@@ -1041,7 +1037,7 @@ public class XWikiAttachment implements Cloneable
             return getAttachment_archive().getVersions();
         } catch (Exception ex) {
             LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: {}",
-                new Object[] {getFilename(), getDoc().getDocumentReference(), ex.getMessage()});
+                getFilename(), getDoc().getDocumentReference(), ex.getMessage());
             return new Version[] {new Version(this.getVersion())};
         }
     }
@@ -1308,11 +1304,7 @@ public class XWikiAttachment implements Cloneable
     public boolean isImage(XWikiContext context)
     {
         String contenttype = getMimeType(context);
-        if (contenttype.startsWith("image/")) {
-            return true;
-        } else {
-            return false;
-        }
+        return contenttype.startsWith("image/");
     }
 
     public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException

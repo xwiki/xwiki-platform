@@ -307,7 +307,7 @@ public class XWikiUser
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     EMAIL_CHECKED_PROPERTY, checkedFlag);
                 context.getWiki().saveDocument(userdoc, localizePlainOrKey(
-                    "core.users." + (checked ? "email_checked" : "email_unchecked") + ".saveComment"), context);
+                    "core.users." + (checked ? EMAIL_CHECKED_PROPERTY : "email_unchecked") + ".saveComment"), context);
             } catch (XWikiException e) {
                 this.logger.error("Error while setting email_checked status of user [{}]", getUser(), e);
             }
@@ -459,9 +459,7 @@ public class XWikiUser
         }
 
         boolean equals;
-        if (obj instanceof XWikiUser) {
-            XWikiUser otherUser = (XWikiUser) obj;
-
+        if (obj instanceof XWikiUser otherUser) {
             equals = otherUser.main == this.main && Objects.equals(getUserReference(), otherUser.getUserReference());
         } else {
             equals = false;

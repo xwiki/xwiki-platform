@@ -65,9 +65,8 @@ public class UsersMimeMessageFactory extends AbstractIteratorMimeMessageFactory
 
         MimeMessageFactory factory = getInternalMimeMessageFactory(factoryHint);
 
-        UsersMimeMessageIterator iterator = new UsersMimeMessageIterator(userReferences, factory, parameters,
+        return new UsersMimeMessageIterator(userReferences, factory, parameters,
             this.componentManagerProvider.get());
-        return iterator;
     }
 
 }

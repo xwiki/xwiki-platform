@@ -152,10 +152,10 @@ public class LiveTableLiveDataEntryStore extends WithParameters implements LiveD
             Object template = query.getSource().getParameters().get(LiveTableRequestHandler.TEMPLATE);
             Object resultPage = query.getSource().getParameters().get(LiveTableRequestHandler.RESULT_PAGE);
             String liveTableResultsJSON;
-            if (template instanceof String) {
-                liveTableResultsJSON = this.resultsRenderer.getLiveTableResultsFromTemplate((String) template, query);
-            } else if (resultPage instanceof String) {
-                liveTableResultsJSON = this.resultsRenderer.getLiveTableResultsFromPage((String) resultPage, query);
+            if (template instanceof String templateString) {
+                liveTableResultsJSON = this.resultsRenderer.getLiveTableResultsFromTemplate(templateString, query);
+            } else if (resultPage instanceof String resultPageString) {
+                liveTableResultsJSON = this.resultsRenderer.getLiveTableResultsFromPage(resultPageString, query);
             } else {
                 liveTableResultsJSON =
                     this.resultsRenderer.getLiveTableResultsFromPage("XWiki.LiveTableResults", query);

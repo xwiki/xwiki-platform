@@ -24,7 +24,7 @@
 # This is the main old XWiki configuration file. Commented parameters show the default value, although some features
 # might be disabled. To customize, uncomment and put your own value instead.
 # 
-# This file come from one of those locations (in this order):
+# This file comes from one of those locations (in this order):
 # * [since 9.3] /etc/xwiki/xwiki.cfg
 # * /WEB-INF/xwiki.cfg in the web application resources
 
@@ -38,7 +38,7 @@
 #-# [Since 1.6RC1] The list of supported syntaxes is defined as an xobject in the Rendering.RenderingConfig page
 #-# and you can change it using the Admin UI of XWiki. When the Rendering.RenderingConfig page doesn't exist, the list
 #-# of supported syntaxes is taken from this property. And if there's no syntax listed, then the default syntax is
-#-# supported by defaut (this default syntax is defined in xwiki.properties using the core.defaultDocumentSyntax
+#-# supported by default (this default syntax is defined in xwiki.properties using the core.defaultDocumentSyntax
 #-# property).
 #-# Example of syntaxes:
 #-#    xwiki/2.0, xwiki/2.1, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0,
@@ -62,8 +62,8 @@
 #-# Uncomment if you want to ignore requests for unmapped actions, and simply display the document
 # xwiki.unknownActionResponse=view
 
-#-# The encoding to use when transformin strings to and from byte arrays. This causes the jvm encoding to be ignored,
-#-# since we want to be independend of the underlying system.
+#-# The encoding to use when transforming strings to and from byte arrays. This causes the jvm encoding to be ignored,
+#-# since we want to be independent of the underlying system.
 xwiki.encoding=$xwikiCfgEncoding
 
 #-# This parameter will activate the sectional editing.
@@ -356,7 +356,7 @@ xwiki.authentication.logoutpage=(/|/[^/]+/|/wiki/[^/]+/)logout/*
 #-# (Deprecated) The authorization management class.
 #-# [Since 5.0M2] The default right service is now org.xwiki.security.authorization.internal.XWikiCachingRightService
 #-# which is a bridge to the new security authorization component. It provides increased security and performance, but
-#-# its right policies differ sightly from the old Right Service implementation. In rare situation, you may want to
+#-# its right policies differ slightly from the old Right Service implementation. In rare situation, you may want to
 #-# switch back to the old unmaintained implementation by uncommenting the following line. However, only old
 #-# implementation, still using a bridged RightService will be impacted by this parameter. Customization of the new
 #-# security authorization component should be done in the new xwiki.properties configuration (security.*).

@@ -86,7 +86,7 @@ class NotificationRSSServicePageTest extends PageTest
     private HighlightParser highlightParser;
 
     @BeforeEach
-    public void setUp(MockitoComponentManager componentManager) throws Exception
+    void setUp(MockitoComponentManager componentManager) throws Exception
     {
         NotificationScriptService notificationScriptService =
             componentManager.registerMockComponent(ScriptService.class, "notification",

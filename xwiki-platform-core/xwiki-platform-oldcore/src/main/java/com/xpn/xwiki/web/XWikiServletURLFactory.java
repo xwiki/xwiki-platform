@@ -63,6 +63,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletURLFactory.class);
 
+    private static final String HTML_AMPERSAND = "&amp;";
+
+    private static final String UTF8 = "UTF-8";
+
     private EntityReferenceResolver<String> relativeEntityReferenceResolver;
 
     private EntityReferenceResolver<String> currentEntityReferenceResolver;
@@ -126,8 +130,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         // Check if the request is a deamon thread request
         XWikiRequest request = context.getRequest();
-        this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub
-            && ((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon();
+        this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub stub
+            && stub.isDaemon();
 
         // Remember initial request base URL for path for last resort
         if (homepageConfigration != null && context.isMainWiki()) {
@@ -326,7 +330,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
         }
 
         if (!StringUtils.isEmpty(anchor)) {
@@ -450,7 +454,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         String encodedName;
         try {
-            encodedName = URLEncoder.encode(name, "UTF-8");
+            encodedName = URLEncoder.encode(name, UTF8);
         } catch (Exception e) {
             // Should not happen (UTF-8 is always available)
             throw new RuntimeException("Missing charset [UTF-8]", e);
@@ -460,29 +464,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         encodedName = encodedName.replace("+", "%20");
 
         return encodedName;
-    }
-
-    /**
-     * Same rationale as {@link #encodeWithinPath(String, XWikiContext)}. Note that we also encode spaces as {@code %20}
-     * even though we could also have encoded them as {@code +}. We do this for consistency (it allows to have the same
-     * implementation for both URL paths and query string).
-     *
-     * @param name the query string part to encode
-     * @return the URL-encoded query string part
-     */
-    private String encodeWithinQuery(String name)
-    {
-        // Note: Ideally the following would have been the correct way of writing this method but it causes the issues
-        // mentioned in the javadoc of this method
-        // String encodedName;
-        // try {
-        // encodedName = URIUtil.encodeWithinQuery(name, "UTF-8");
-        // } catch (URIException e) {
-        // throw new RuntimeException("Missing charset [UTF-8]", e);
-        // }
-        // return encodedName;
-
-        return encodeWithinPath(name);
     }
 
     /**
@@ -523,10 +504,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     private void appendQueryParameter(String key, Object paramValue, StringBuilder stringBuilder)
         throws UnsupportedEncodingException
     {
-        if (paramValue instanceof String) {
-            stringBuilder.append(URLEncoder.encode(key, "UTF-8"));
+        if (paramValue instanceof String stringValue) {
+            stringBuilder.append(URLEncoder.encode(key, UTF8));
             stringBuilder.append('=');
-            stringBuilder.append(URLEncoder.encode((String) paramValue, "UTF-8"));
+            stringBuilder.append(URLEncoder.encode(stringValue, UTF8));
         } else if (paramValue.getClass().isArray()) {
             Class ofArray = paramValue.getClass().getComponentType();
             if (ofArray.isPrimitive()) {
@@ -547,8 +528,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     }
                 }
             }
-        } else if (paramValue instanceof Collection) {
-            Collection zeCollection = (Collection) paramValue;
+        } else if (paramValue instanceof Collection zeCollection) {
             int index = 0;
             for (Object paramValueElement : zeCollection) {
                 appendQueryParameter(key, paramValueElement.toString(), stringBuilder);
@@ -761,7 +741,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
         }
 
         try {
@@ -864,7 +844,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     String querystring = url.getQuery();
                     if (!StringUtils.isEmpty(querystring)) {
                         relativeURLBuilder.append("?")
-                            .append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+                            .append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
                     }
 
                     String anchor = url.getRef();

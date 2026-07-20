@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 
  * @version $Id$
  */
-public class HqlQueryUtilsTest
+class HqlQueryUtilsTest
 {
     @Test
-    public void replaceLegacyQueryParameters()
+    void replaceLegacyQueryParameters()
     {
         assertEquals("select column from table where table.column = ?1",
             HqlQueryUtils.replaceLegacyQueryParameters("select column from table where table.column = ?"));
@@ -54,7 +54,7 @@ public class HqlQueryUtilsTest
     }
 
     @Test
-    public void toCompleteStatement()
+    void toCompleteStatement()
     {
         assertEquals("from table", HqlQueryUtils.toCompleteStatement("from table"));
         assertEquals("select * from table", HqlQueryUtils.toCompleteStatement("select * from table"));
@@ -68,7 +68,7 @@ public class HqlQueryUtilsTest
     }
 
     @Test
-    public void getValidQueryOrder()
+    void getValidQueryOrder()
     {
         assertEquals("asc", HqlQueryUtils.getValidQueryOrder("asc", "desc"));
         assertEquals("desc", HqlQueryUtils.getValidQueryOrder("desc", "asc"));

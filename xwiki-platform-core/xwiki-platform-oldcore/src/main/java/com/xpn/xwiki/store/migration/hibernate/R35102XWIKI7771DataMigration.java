@@ -80,9 +80,7 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
             shouldExecute = (startupVersion.getVersion() > 0
                 && getStore().getDatabaseProductName() == DatabaseProduct.POSTGRESQL);
             getStore().endTransaction(getXWikiContext(), false);
-        } catch (XWikiException ex) {
-            // Shouldn't happen, ignore
-        } catch (DataMigrationException ex) {
+        } catch (XWikiException | DataMigrationException ex) {
             // Shouldn't happen, ignore
         }
         return shouldExecute;

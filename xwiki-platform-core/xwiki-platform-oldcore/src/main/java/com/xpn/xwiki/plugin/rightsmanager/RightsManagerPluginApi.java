@@ -153,7 +153,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      */
     static Object[][] createOrderTable(List<?> list)
     {
-        if (list == null || list.size() == 0) {
+        if (list == null || list.isEmpty()) {
             return null;
         }
 
@@ -212,7 +212,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
         try {
             memberList = RightsManager.getInstance().getAllGroupsNamesForMember(member, 0, 0, this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to get all groups containing user [{0}]", new Object[] { member }), e);
+            logError(MessageFormat.format("Try to get all groups containing user [{0}]", member), e);
 
             memberList = Collections.emptyList();
         }
@@ -272,7 +272,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
                 RightsManager.getInstance().getAllMatchedMembersNamesForGroup(group, matchField, nb, start, orderAsc,
                     this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to get all matched member of group [{0}]", new Object[] { group }), e);
+            logError(MessageFormat.format("Try to get all matched member of group [{0}]", group), e);
 
             memberList = Collections.emptyList();
         }

@@ -211,7 +211,7 @@ class SyndEntryDocumentSourceTest
      * Tests if two successive calls of the source method with the same argument have the same result.
      */
     @Test
-    public void testSourceConsistency()
+    void testSourceConsistency()
     {
         assertEquals(source(this.doc), source(this.doc), INCONSISTENCY);
     }
@@ -221,7 +221,7 @@ class SyndEntryDocumentSourceTest
      * document, irrespective of its type: {@link XWikiDocument}, {@link Document}, and {@link String}.
      */
     @Test
-    public void testSourcePolymorphism()
+    void testSourcePolymorphism()
     {
         SyndEntryImpl fromXDoc = source(this.doc);
         SyndEntryImpl fromDoc = source(this.doc.newDocument(this.oldcore.getXWikiContext()));
@@ -237,7 +237,7 @@ class SyndEntryDocumentSourceTest
      * @throws XWikiException
      */
     @Test
-    public void testSourceAccessRights() throws XWikiException
+    void testSourceAccessRights() throws XWikiException
     {
         // odd user name length implies no access rights
         this.oldcore.getXWikiContext().setUser("XWiki.Albatross");
@@ -258,7 +258,7 @@ class SyndEntryDocumentSourceTest
      * Tests if {@link SyndEntryDocumentSource#CONTENT_TYPE} parameter is used correctly.
      */
     @Test
-    public void testSourceContentType()
+    void testSourceContentType()
     {
         Map instanceParams = new HashMap();
         instanceParams.put(SyndEntryDocumentSource.CONTENT_TYPE, SVG_MIME_TYPE);
@@ -276,7 +276,7 @@ class SyndEntryDocumentSourceTest
      * {@link SyndEntryDocumentSource#CONTENT_TYPE} is <i>text/plain</i>.
      */
     @Test
-    public void testArticleSourcePlainContentLength()
+    void testArticleSourcePlainContentLength()
     {
         int maxLength = 15;
         Map params = new HashMap();
@@ -295,7 +295,7 @@ class SyndEntryDocumentSourceTest
      * {@link SyndEntryDocumentSource#CONTENT_TYPE} is <i>text/html</i>.
      */
     @Test
-    public void testArticleSourceHTMLContentLength()
+    void testArticleSourceHTMLContentLength()
     {
         int maxLength = 16;
         Map params = new HashMap();
@@ -311,7 +311,7 @@ class SyndEntryDocumentSourceTest
     }
 
     @Test
-    public void testArticleSourceXMLContentLength()
+    void testArticleSourceXMLContentLength()
     {
         int maxLength = 17;
         Map params = new HashMap();
@@ -327,7 +327,7 @@ class SyndEntryDocumentSourceTest
     }
 
     @Test
-    public void testPreviewContentEncoding()
+    void testPreviewContentEncoding()
     {
         String snippet = "<p>Test ê</p>";
         String transformedHTML = SyndEntryDocumentSource.getHTMLPreview(snippet, 10);

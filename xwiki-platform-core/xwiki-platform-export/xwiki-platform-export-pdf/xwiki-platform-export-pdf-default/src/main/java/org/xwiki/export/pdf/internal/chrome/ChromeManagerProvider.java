@@ -60,7 +60,7 @@ public class ChromeManagerProvider implements Provider<BrowserManager>, Disposab
     @Override
     public BrowserManager get()
     {
-        return this.instances.computeIfAbsent(this.wikiDescriptorManager.getCurrentWikiId(), (wikiId) -> {
+        return this.instances.computeIfAbsent(this.wikiDescriptorManager.getCurrentWikiId(), wikiId -> {
             return this.chromeManagerManagerProvider.get();
         }).get();
     }

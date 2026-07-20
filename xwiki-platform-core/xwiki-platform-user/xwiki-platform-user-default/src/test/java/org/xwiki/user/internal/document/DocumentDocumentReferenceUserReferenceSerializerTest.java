@@ -41,7 +41,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
-public class DocumentDocumentReferenceUserReferenceSerializerTest
+class DocumentDocumentReferenceUserReferenceSerializerTest
 {
     @InjectMockComponents
     private DocumentDocumentReferenceUserReferenceSerializer serializer;

@@ -71,9 +71,7 @@ public abstract class AbstractEntityQueryCondition extends QueryCondition
             return true;
         }
 
-        if (obj instanceof AbstractEntityQueryCondition) {
-            AbstractEntityQueryCondition status = (AbstractEntityQueryCondition) obj;
-
+        if (obj instanceof AbstractEntityQueryCondition status) {
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.appendSuper(super.equals(obj));

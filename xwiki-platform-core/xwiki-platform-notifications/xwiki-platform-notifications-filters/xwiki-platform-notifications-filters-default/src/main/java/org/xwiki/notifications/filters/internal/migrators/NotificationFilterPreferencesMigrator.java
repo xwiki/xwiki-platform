@@ -84,8 +84,6 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
 
     private static final String FIELD_IS_ENABLED = "isEnabled";
 
-    private static final String FIELD_IS_ACTIVE = "isActive";
-
     private static final String FIELD_APPLICATIONS = "applications";
 
     private static final String FIELD_EVENT_TYPES = "eventTypes";

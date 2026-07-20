@@ -67,6 +67,8 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 @Singleton
 public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 {
+    private static final String FAILED_TO_GET_PROPERTY = "Failed to get property";
+
     private static final LocalDocumentReference USERCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
 
     @Inject
@@ -165,8 +167,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
 
-        if (document instanceof XWikiDocument) {
-            return ((XWikiDocument) document).getTranslatedDocument(xcontext);
+        if (document instanceof XWikiDocument xwikiDocument) {
+            return xwikiDocument.getTranslatedDocument(xcontext);
         } else {
             return getTranslatedDocumentInstance(document.getDocumentReference());
         }
@@ -399,7 +401,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;
@@ -424,7 +426,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;
@@ -450,7 +452,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;
@@ -476,7 +478,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;
@@ -502,7 +504,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;
@@ -527,7 +529,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to get property", e);
+            this.logger.error(FAILED_TO_GET_PROPERTY, e);
         }
 
         return value;

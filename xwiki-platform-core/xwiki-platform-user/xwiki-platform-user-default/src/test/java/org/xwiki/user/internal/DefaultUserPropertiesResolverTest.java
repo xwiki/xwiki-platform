@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultUserPropertiesResolverTest
+class DefaultUserPropertiesResolverTest
 {
     @InjectMockComponents
     private DefaultUserPropertiesResolver resolver;

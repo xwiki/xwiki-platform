@@ -21,6 +21,7 @@
 import { CustomImageToolbar } from "./images/CustomImageToolbar";
 import { CustomCreateLinkButton } from "./links/CustomCreateLinkButton";
 import { CustomInsertMacroButton } from "./links/CustomInsertMacroButton";
+import { CustomMacroEditButton } from "./links/CustomMacroEditButton";
 import { useEditor } from "../hooks";
 import {
   AddCommentButton,
@@ -44,17 +45,20 @@ import {
 } from "@blocknote/react";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { ContextForMacros } from "../blocknote/utils";
+import type { LinkEditionHandler } from "./links/linkEdition";
 import type {
   BlockTypeSelectItem,
   FormattingToolbarProps,
 } from "@blocknote/react";
+import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type { JSX } from "react";
 
 type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
   additionalBlockTypes: BlockTypeSelectItem[];
+  macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false;
+  linkEditionHandler: LinkEditionHandler;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
-  ctxForMacros: ContextForMacros | false;
 };
 
 export const CustomFormattingToolbar: React.FC<
@@ -63,7 +67,8 @@ export const CustomFormattingToolbar: React.FC<
   formattingToolbarProps,
   additionalBlockTypes,
   imageEditionOverrideFn,
-  ctxForMacros,
+  macros,
+  linkEditionHandler,
 }) => {
   const Components = useComponentsContext()!;
   const dict = useDictionary();
@@ -91,7 +96,8 @@ export const CustomFormattingToolbar: React.FC<
         // For others, simply show the "normal", default toolbar
         getDefaultFormattingToolbarItems(
           combinedBlockTypeSelectItems,
-          ctxForMacros,
+          macros,
+          linkEditionHandler,
         )
       )}
     </Components.FormattingToolbar.Root>
@@ -100,7 +106,8 @@ export const CustomFormattingToolbar: React.FC<
 
 const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
-  ctxForMacros: ContextForMacros | false,
+  macros: { list: MacroWithUnknownParamsType[]; ctx: ContextForMacros } | false,
+  linkEditorHandler: LinkEditionHandler,
 ): JSX.Element[] =>
   // NOTE: This should return **exactly** the same items as BlockNote's default toolbar
   // So, when BlockNote updates theirs, we should update ours
@@ -134,16 +141,29 @@ const getDefaultFormattingToolbarItems = (
     <UnnestBlockButton key={"unnestBlockButton"} />,
     // This button has the exact same appearance as the default creation link button
     // But brings a custom popover to support XWiki references
-    <CustomCreateLinkButton key={"createLinkButton"} />,
+    <CustomCreateLinkButton
+      key={"createLinkButton"}
+      linkEditionHandler={linkEditorHandler}
+    />,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
   ].concat(
-    ctxForMacros
+    macros
       ? [
-          <CustomInsertMacroButton
-            key={"insertMacroButton"}
-            openEditor={ctxForMacros.openInsertionEditor}
+          <CustomMacroEditButton
+            key={"macroEditButton"}
+            macrosList={macros.list}
+            ctxForMacros={macros.ctx}
           />,
+          // Hide the insert action when no insertion editor is available.
+          ...(macros.ctx.openInsertionEditor
+            ? [
+                <CustomInsertMacroButton
+                  key={"insertMacroButton"}
+                  openEditor={macros.ctx.openInsertionEditor}
+                />,
+              ]
+            : []),
         ]
       : [],
   );

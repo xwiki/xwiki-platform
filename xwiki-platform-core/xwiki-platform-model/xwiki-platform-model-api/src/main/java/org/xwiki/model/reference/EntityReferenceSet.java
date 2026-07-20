@@ -151,12 +151,11 @@ public class EntityReferenceSet
             for (Map.Entry<EntityType, EntityReferenceEntryChildren> entry : this.children.entrySet()) {
                 EntityReferenceEntryChildren typedChilrendEntry = entry.getValue();
 
-                if (typedChilrendEntry.childrenType.isAllowedAncestor(entityType)) {
-                    // Only return a potential child of the passed type
-                    if (typedChildren == null
-                        || typedChildren.childrenType.isAllowedAncestor(typedChilrendEntry.childrenType)) {
-                        typedChildren = typedChilrendEntry;
-                    }
+                // Only return a potential child of the passed type
+                if (typedChilrendEntry.childrenType.isAllowedAncestor(entityType)
+                    && (typedChildren == null
+                        || typedChildren.childrenType.isAllowedAncestor(typedChilrendEntry.childrenType))) {
+                    typedChildren = typedChilrendEntry;
                 }
             }
 
@@ -205,10 +204,9 @@ public class EntityReferenceSet
         private boolean matches(Map<String, Serializable> referenceParameters, Map<String, Serializable> map)
         {
             for (Map.Entry<String, Serializable> entry : map.entrySet()) {
-                if (referenceParameters.containsKey(entry.getKey())) {
-                    if (!Objects.equals(entry.getValue(), referenceParameters.get(entry.getKey()))) {
-                        return false;
-                    }
+                if (referenceParameters.containsKey(entry.getKey())
+                    && !Objects.equals(entry.getValue(), referenceParameters.get(entry.getKey()))) {
+                    return false;
                 }
             }
 

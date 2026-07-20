@@ -43,7 +43,7 @@ import com.xpn.xwiki.XWikiException;
  * {@link LiveTableNewRowNamingStrategy} that generates a page in a configured location, named using a UUID.
  *
  * @version $Id$
- * @since 18.6.0RC1
+ * @since 18.7.0RC1
  */
 @Component
 @Named("uuid")

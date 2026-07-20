@@ -151,7 +151,7 @@ public class RightsManagerUsersApi extends Api
                 RightsManager.getInstance().countAllWikiUsersOrGroups(true, wikiName,
                     RightsManagerPluginApi.createMatchingTable(matchFields), this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to count all users in wiki [{0}]", new Object[] { wikiName }), e);
+            logError(MessageFormat.format("Try to count all users in wiki [{0}]", wikiName), e);
         }
 
         return count;

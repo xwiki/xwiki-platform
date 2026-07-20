@@ -439,9 +439,14 @@ public class TestUtils
             } else {
                 getDriver().get(getURLToNonExistentPage());
             }
-
-            setDefaultCredentials(username, password);
         }
+
+        // Always synchronize the REST client credentials with the requested user, even when the browser was already
+        // logged in as that user and thus skipped the browser login above. The browser session and the REST client
+        // credentials are independent states: a previous forceGuestUser() clears the REST credentials while the browser
+        // may still appear logged in, so synchronizing only inside the branch above would leave the REST client
+        // unauthenticated and make later REST calls fail with a 401.
+        setDefaultCredentials(username, password);
     }
 
     /**
@@ -609,8 +614,10 @@ public class TestUtils
         userPage.setObjects(new org.xwiki.rest.model.jaxb.Objects());
         org.xwiki.rest.model.jaxb.Object userObject = RestTestUtils.object("XWiki.XWikiUsers");
 
-        // Set password
+        // Set password and mark the user active (a real Admin user is active), so that queries filtering
+        // on active users (e.g. the user suggestion query) return this user.
         userObject.getProperties().add(RestTestUtils.property("password", password));
+        userObject.getProperties().add(RestTestUtils.property("active", "1"));
         userPage.getObjects().getObjectSummaries().add(userObject);
 
         // Save the user page
@@ -1643,14 +1650,12 @@ public class TestUtils
 
     public boolean isInWYSIWYGEditMode()
     {
-        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wysiwyg')]"))
-            .size() > 0;
+        return !getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wysiwyg')]")).isEmpty();
     }
 
     public boolean isInWikiEditMode()
     {
-        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]"))
-            .size() > 0;
+        return !getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]")).isEmpty();
     }
 
     public boolean isInViewMode()

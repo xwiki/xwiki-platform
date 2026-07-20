@@ -63,7 +63,7 @@ public class MapAdapter extends XmlAdapter<Map, java.util.Map<String, java.lang.
             return null;
         } else {
             java.util.Map<String, java.lang.Object> output = new HashMap<>();
-            input.getEntries().forEach((entry) -> output.put(entry.getKey(), entry.getValue()));
+            input.getEntries().forEach(entry -> output.put(entry.getKey(), entry.getValue()));
             return output;
         }
     }

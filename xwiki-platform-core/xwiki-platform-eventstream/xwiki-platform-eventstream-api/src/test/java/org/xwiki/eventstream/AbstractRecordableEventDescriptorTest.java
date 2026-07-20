@@ -36,9 +36,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -52,7 +50,7 @@ import static org.mockito.Mockito.when;
  * @since 9.11.6
  */
 @ComponentTest
-public class AbstractRecordableEventDescriptorTest
+class AbstractRecordableEventDescriptorTest
 {
     @InjectMockComponents
     private FakeRecordableEventDescriptor fakeRecordableEventDescriptor;
@@ -112,7 +110,7 @@ public class AbstractRecordableEventDescriptorTest
     }
 
     @Test
-    public void getDescriptionAndApplicationWithExceptionTest() throws Exception
+    void getDescriptionAndApplicationWithExceptionTest() throws Exception
     {
         // Mocks
         Exception e = new Exception("some error");
@@ -185,7 +183,7 @@ public class AbstractRecordableEventDescriptorTest
     }
 
     @Test
-    public void equalsAndHashCodeTest()
+    void equalsAndHashCodeTest()
     {
         OtherFakeRecordableEventDescriptor descriptor1 = new OtherFakeRecordableEventDescriptor(
                 "app1",  "type1");
@@ -197,11 +195,11 @@ public class AbstractRecordableEventDescriptorTest
                 "app1", "type2");
 
 
-        assertTrue(descriptor1.equals(descriptor1));
-        assertTrue(descriptor1.equals(descriptor2));
-        assertFalse(descriptor1.equals(descriptor3));
-        assertFalse(descriptor1.equals(descriptor4));
-        assertFalse(descriptor1.equals(new Object()));
+        assertEquals(descriptor1, descriptor1);
+        assertEquals(descriptor1, descriptor2);
+        assertNotEquals(descriptor1, descriptor3);
+        assertNotEquals(descriptor1, descriptor4);
+        assertNotEquals(descriptor1, new Object());
 
         assertEquals(descriptor1.hashCode(), descriptor1.hashCode());
         assertEquals(descriptor1.hashCode(), descriptor2.hashCode());

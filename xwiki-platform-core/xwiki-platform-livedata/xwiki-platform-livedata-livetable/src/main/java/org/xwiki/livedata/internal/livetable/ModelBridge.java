@@ -375,7 +375,7 @@ public class ModelBridge
      * @param documentReference the reference of the document to check
      * @return true if the document already exists
      * @throws XWikiException if there was a problem during lookup
-     * @since 18.6.0RC1
+     * @since 18.7.0RC1
      */
     public boolean exists(DocumentReference documentReference) throws XWikiException
     {

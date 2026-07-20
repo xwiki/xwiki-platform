@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @ComponentList(DefaultEntityReferenceProvider.class)
-public class CurrentReferenceEntityReferenceResolverTest
+class CurrentReferenceEntityReferenceResolverTest
 {
     private static final String CURRENT_WIKI = "currentwiki";
 
@@ -102,7 +102,7 @@ public class CurrentReferenceEntityReferenceResolverTest
     private CurrentReferenceEntityReferenceResolver resolver;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         when(this.currentProvider.getDefaultReference(EntityType.WIKI)).thenReturn(CURRENT_WIKI_REFERENCE);
         when(this.currentProvider.getDefaultReference(EntityType.SPACE)).thenReturn(CURRENT_SPACE_REFERENCE);
@@ -128,7 +128,7 @@ public class CurrentReferenceEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveAttachmentReferenceWhenMissingParents()
+    void testResolveAttachmentReferenceWhenMissingParents()
     {
         EntityReference reference =
             resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
@@ -142,7 +142,7 @@ public class CurrentReferenceEntityReferenceResolverTest
     }
 
     @Test
-    public void resolvePageReferenceWhenTypeIsDocument()
+    void resolvePageReferenceWhenTypeIsDocument()
     {
         EntityReference reference =
             this.resolver.resolve(new EntityReference("document", EntityType.DOCUMENT), EntityType.PAGE);
@@ -155,7 +155,7 @@ public class CurrentReferenceEntityReferenceResolverTest
     }
 
     @Test
-    public void resolvePageReferenceWhenTypeIsSpace()
+    void resolvePageReferenceWhenTypeIsSpace()
     {
         EntityReference reference =
             this.resolver.resolve(new EntityReference("space", EntityType.SPACE), EntityType.PAGE);
@@ -164,7 +164,7 @@ public class CurrentReferenceEntityReferenceResolverTest
     }
 
     @Test
-    public void resolveDocumentReferenceWhenTypeIsPage()
+    void resolveDocumentReferenceWhenTypeIsPage()
     {
         EntityReference reference =
             this.resolver.resolve(new EntityReference("page", EntityType.PAGE), EntityType.DOCUMENT);
@@ -179,7 +179,7 @@ public class CurrentReferenceEntityReferenceResolverTest
     }
 
     @Test
-    public void resolveSpaceReferenceWhenTypeIsPage()
+    void resolveSpaceReferenceWhenTypeIsPage()
     {
         EntityReference reference =
             this.resolver.resolve(new EntityReference("page", EntityType.PAGE), EntityType.SPACE);

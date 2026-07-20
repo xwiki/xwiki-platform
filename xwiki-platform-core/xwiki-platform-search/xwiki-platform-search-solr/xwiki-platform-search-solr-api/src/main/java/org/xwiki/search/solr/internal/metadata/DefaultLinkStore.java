@@ -126,8 +126,8 @@ public class DefaultLinkStore implements LinkStore
         Collection<Object> links = solrDocument.getFieldValues(FieldUtils.LINKS);
         Set<EntityReference> entities = new HashSet<>(links.size());
         for (Object link : links) {
-            if (link instanceof String) {
-                EntityReference entityLink = this.linkSerializer.unserialize((String) link);
+            if (link instanceof String linkString) {
+                EntityReference entityLink = this.linkSerializer.unserialize(linkString);
 
                 if (entityLink != null) {
                     // Make sure to resolve the reference as a DOCUMENT based references and not a PAGE one
@@ -213,8 +213,8 @@ public class DefaultLinkStore implements LinkStore
         }
 
         if (entityReference.getType() == EntityType.PAGE) {
-            return this.currentDocumentResolver.resolve(pageReference instanceof PageReference
-                ? (PageReference) pageReference : new PageReference(pageReference));
+            return this.currentDocumentResolver.resolve(pageReference instanceof PageReference pageRef
+                ? pageRef : new PageReference(pageReference));
         }
 
         EntityType documentBasedType =
@@ -225,7 +225,7 @@ public class DefaultLinkStore implements LinkStore
 
         // Find the right DOCUMENT reference
         DocumentReference documentReference = this.currentDocumentResolver.resolve(
-            pageReference instanceof PageReference ? (PageReference) pageReference : new PageReference(pageReference));
+            pageReference instanceof PageReference pageRef ? pageRef : new PageReference(pageReference));
 
         // Switch the parent
         return documentBasedReference.replaceParent(documentBasedReference.extractReference(EntityType.DOCUMENT),

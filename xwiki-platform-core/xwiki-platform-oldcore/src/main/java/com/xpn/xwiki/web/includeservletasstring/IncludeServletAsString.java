@@ -40,7 +40,7 @@ public class IncludeServletAsString
     {
     }
 
-    static public String invokeServletAndReturnAsString(String url, HttpServletRequest servletRequest,
+    public static String invokeServletAndReturnAsString(String url, HttpServletRequest servletRequest,
         HttpServletResponse servletResponse) throws IOException, ServletException
     {
 
@@ -66,9 +66,7 @@ public class IncludeServletAsString
             LOGGER.debug("Buffer returned with " + buffer.length + " bytes.");
         }
 
-        String bufferString = new String(buffer, servletResponse.getCharacterEncoding());
-
-        return bufferString;
+        return new String(buffer, servletResponse.getCharacterEncoding());
     }
 
 }

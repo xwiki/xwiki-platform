@@ -75,22 +75,14 @@ public abstract class AbstractImportMojo extends AbstractOldCoreMojo
      */
     protected void importDependencies(Importer importer, String databaseName, File hibernateConfig) throws Exception
     {
-        // We need to distinguish between extensions installed explicitly and their transitive dependencies.
-        // We have to create our own Set because Maven changes the fields from the dependency Artifacts (e.g. resolves
-        // their version) after they are added to the Set of dependencies and this causes the hash code to change. As a
-        // result the #contains(Artifact) method doesn't work as expected because it uses the new hash code.
-        Set<Artifact> directDependencies = new HashSet<>(this.project.getDependencyArtifacts());
-
         // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an ordered
         // LinkedHashSet behind the scene)
         List<Artifact> dependenciesFirstArtifacts = new ArrayList<>(this.project.getArtifacts());
         Collections.reverse(dependenciesFirstArtifacts);
 
         for (Artifact artifact : dependenciesFirstArtifacts) {
-            if (!artifact.isOptional()) {
-                if ("xar".equals(artifact.getType())) {
-                    installXAR(artifact, importer, this.oldCoreHelper.getXWikiContext());
-                }
+            if (!artifact.isOptional() && "xar".equals(artifact.getType())) {
+                installXAR(artifact, importer, this.oldCoreHelper.getXWikiContext());
             }
         }
     }

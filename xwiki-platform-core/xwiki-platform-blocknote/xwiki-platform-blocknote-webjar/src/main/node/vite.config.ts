@@ -41,6 +41,7 @@ export default defineConfig({
         "vue",
         "vue-i18n",
         "xwiki-platform-localization-webjar",
+        "@xwiki/platform-component-manager-default",
       ],
       output: {
         globals: {

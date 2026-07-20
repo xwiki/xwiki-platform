@@ -166,12 +166,13 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
         }
 
         // Once we have created the mapping, save all the preferences using their correct providers
-        for (String providerHint : preferencesMapping.keySet()) {
+        for (Map.Entry<String, List<NotificationPreference>> entry : preferencesMapping.entrySet()) {
+            String providerHint = entry.getKey();
             try {
                 NotificationPreferenceProvider provider =
                         componentManager.getInstance(NotificationPreferenceProvider.class, providerHint);
 
-                provider.savePreferences(preferencesMapping.get(providerHint));
+                provider.savePreferences(entry.getValue());
 
             } catch (ComponentLookupException e) {
                 logger.error("Unable to retrieve the notification preference provide for hint {}: {}",

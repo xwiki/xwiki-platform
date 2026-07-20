@@ -23,6 +23,8 @@ import org.xwiki.query.xwql.internal.QueryContext.ObjectInfo;
 
 public class ObjectPrinter
 {
+    private static final String AND = " and ";
+
     void print(ObjectInfo obj, Printer printer) throws Exception
     {
         if (obj.alias == null) {
@@ -31,18 +33,18 @@ public class ObjectPrinter
             printer.from.append(", BaseObject as ").append(obj.alias);
         }
         // join with the document
-        printer.where.append(" and ")
+        printer.where.append(AND)
             .append(obj.docAlias).append(".fullName=").append(obj.alias).append(".name");
         // className constraint
         if (obj.isCustomMapped()) {
             obj.customMappingAlias = printer.getContext().getAliasGenerator().generate(obj.alias + "CM");
             printer.from.append(", ")
                 .append(obj.className).append(" as ").append(obj.customMappingAlias);
-            printer.where.append(" and ")
+            printer.where.append(AND)
                 .append(obj.alias).append(".id=").append(obj.customMappingAlias).append(".id");
         } else {
             // main case
-            printer.where.append(" and ")
+            printer.where.append(AND)
                 .append(obj.alias).append(".className=").append("'").append(obj.className).append("'");
         }
     }

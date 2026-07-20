@@ -32,7 +32,7 @@ import com.xpn.xwiki.XWikiException;
  * Strategy to generate the document reference of a new livetable entry.
  *
  * @version $Id$
- * @since 18.6.0RC1
+ * @since 18.7.0RC1
  */
 @Role
 @Unstable

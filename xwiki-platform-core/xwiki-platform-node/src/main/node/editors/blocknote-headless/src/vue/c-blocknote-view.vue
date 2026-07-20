@@ -23,11 +23,13 @@ import messages from "../translations";
 import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
 import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
+import { LinkModal, parseLinkTarget } from "@xwiki/platform-link-modal-ui";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
   onBeforeUnmount,
   onMounted,
+  onUnmounted,
   ref,
   shallowRef,
   toRaw,
@@ -39,15 +41,25 @@ import type {
   BlockNoteViewWrapperProps,
   ContextForMacros,
   EditorType,
+  LinkEditionHandlerProps,
 } from "@xwiki/platform-editors-blocknote-react";
+import type { LinkData } from "@xwiki/platform-link-modal-ui";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 import type { UniAst } from "@xwiki/platform-uniast-api";
 
 type Props = {
   /** Main properties for the BlockNote editor */
   editorProps: Omit<
     BlockNoteViewWrapperProps,
-    "content" | "macros" | "depsContainer"
+    | "depsContainer"
+    | "content"
+    | "linkEditionHandler"
+    | "macroAstToReactJsxConverter"
+    | "macros"
   >;
 
   /** Set to `false` to disable macros entirely */
@@ -91,6 +103,14 @@ defineExpose({
   // Get the editor's content
   getContent: (): UniAst | Error => extractEditorContent(),
 });
+
+const remoteURLParser = depsContainer
+  .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+  .get()!;
+
+const remoteURLSerializer = depsContainer
+  .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+  .get()!;
 
 /**
  * Extract the editor's content and convert it to UniAst
@@ -137,6 +157,30 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
     },
   },
   depsContainer,
+  linkEditionHandler: (props) => {
+    editingLink.value = props;
+  },
+};
+
+const submitEditedLink = ({
+  displayText,
+  target: { type, config },
+}: LinkData) => {
+  // TODO: support
+
+  const url =
+    type === "url"
+      ? config.url
+      : type === "email"
+        ? `mailto:${config.address}`
+        : remoteURLSerializer.serialize(config.ref!)!;
+
+  editingLink.value?.onSubmit({
+    title: displayText,
+    url,
+  });
+
+  editingLink.value = null;
 };
 
 const blockNoteToUniAst = new BlockNoteToUniAstConverter(
@@ -152,8 +196,21 @@ const content =
     : uniAstToBlockNote.uniAstToBlockNote(uniAst);
 
 const blockNoteContainer = useTemplateRef<HTMLElement>("blocknote-container");
+const linkModalContainer = useTemplateRef<HTMLElement>("link-modal-container");
 
 const mountedBlockNote = ref<{ unmount: () => void }>();
+
+const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
+
+function handleLinkEditorOutsideClick(e: MouseEvent) {
+  if (!editingLink.value || !linkModalContainer.value) {
+    return;
+  }
+
+  if (!e.composedPath().includes(linkModalContainer.value)) {
+    editingLink.value = null;
+  }
+}
 
 onMounted(() => {
   if (content instanceof Error) {
@@ -168,6 +225,8 @@ onMounted(() => {
     ...initializedEditorProps,
     content,
   });
+
+  window.addEventListener("mousedown", handleLinkEditorOutsideClick);
 });
 
 onBeforeUnmount(() => {
@@ -177,6 +236,10 @@ onBeforeUnmount(() => {
 
   mountedBlockNote.value.unmount();
 });
+
+onUnmounted(() => {
+  window.removeEventListener("mousedown", handleLinkEditorOutsideClick);
+});
 </script>
 
 <template>
@@ -185,6 +248,18 @@ onBeforeUnmount(() => {
   </h1>
 
   <div ref="blocknote-container" />
+
+  <div ref="link-modal-container" v-if="editingLink">
+    <LinkModal
+      :current="{
+        displayText: editingLink.current.title,
+        target: parseLinkTarget(editingLink.current.url, remoteURLParser),
+      }"
+      :deps-container="depsContainer"
+      @submit="submitEditedLink"
+      @cancel="editingLink = null"
+    />
+  </div>
 </template>
 
 <style scoped>

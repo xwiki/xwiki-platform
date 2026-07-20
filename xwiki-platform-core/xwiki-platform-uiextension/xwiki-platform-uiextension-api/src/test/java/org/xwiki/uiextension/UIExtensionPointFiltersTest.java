@@ -44,19 +44,19 @@ import static org.xwiki.uiextension.UIExtensions.TestUix7value2;
 
 class UIExtensionPointFiltersTest
 {
-    private final static UIExtension TEST_UIX_1_VALUE_Z = new TestUix1valueZ();
+    private static final UIExtension TEST_UIX_1_VALUE_Z = new TestUix1valueZ();
 
-    private final static UIExtension TEST_UIX_2_VALUE_Y = new TestUix2valueY();
+    private static final UIExtension TEST_UIX_2_VALUE_Y = new TestUix2valueY();
 
-    private final static UIExtension TEST_UIX_3_VALUE_X = new TestUix3valueX();
+    private static final UIExtension TEST_UIX_3_VALUE_X = new TestUix3valueX();
 
-    private final static UIExtension TEST_UIX_4_VALUE_W = new TestUix4valueW();
+    private static final UIExtension TEST_UIX_4_VALUE_W = new TestUix4valueW();
 
-    private final static UIExtension TEST_UIX_5_VALUE_1 = new TestUix5value1();
+    private static final UIExtension TEST_UIX_5_VALUE_1 = new TestUix5value1();
 
-    private final static UIExtension TEST_UIX_6_VALUE_11 = new TestUix6value11();
+    private static final UIExtension TEST_UIX_6_VALUE_11 = new TestUix6value11();
 
-    private final static UIExtension TEST_UIX_7_VALUE_2 = new TestUix7value2();
+    private static final UIExtension TEST_UIX_7_VALUE_2 = new TestUix7value2();
 
     public static Stream<Arguments> filterSource()
     {

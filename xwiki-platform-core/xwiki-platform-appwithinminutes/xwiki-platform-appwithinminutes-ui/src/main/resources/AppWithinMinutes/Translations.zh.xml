@@ -191,7 +191,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=更新动态列表
 platform.appwithinminutes.liveTableEditorMoveColumnHint=拖放以更改顺序
 ### Missing: platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
 platform.appwithinminutes.liveTableEditorAddColumnHint=添加选中的列
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=一些列已失效，可能是因为相应的应用字段已被删除。要删除这些列吗？ &lt;a href=""&gt;是&lt;/a&gt; / &lt;a href=""&gt;否&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=一些列已失效，可能是因为相应的应用字段已被删除。要删除这些列吗？
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=应用图标。你可以直接选择一个，或者引用附件中的图像。
 
@@ -269,5 +269,8 @@ platform.appwithinminutes.wizardStep3Description=自定义应用主页
 platform.appwithinminutes.appsLiveTable.doc.space=应用名称
 ### Missing: appWithinMinutes.classEditor.title={0} Structure
 appWithinMinutes.templateProviderEditor.title={0} 个条目
-</content>
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=一些列已失效，可能是因为相应的应用字段已被删除。要删除这些列吗？ &lt;a href=""&gt;是&lt;/a&gt; / &lt;a href=""&gt;否&lt;/a&gt;</content>
 </xwikidoc>

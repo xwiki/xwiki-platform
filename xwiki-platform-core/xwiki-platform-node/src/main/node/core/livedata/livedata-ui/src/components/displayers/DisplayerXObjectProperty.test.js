@@ -48,6 +48,9 @@ describe("DisplayerXObjectProperty.vue", () => {
           color: "<strong>some content</strong>",
         },
       },
+      logic: {
+        isEditMode: () => false,
+      },
     });
     expect(wrapper.find(".html-wrapper").html()).toBe(
       '<div class="html-wrapper"><strong>some content</strong></div>',
@@ -65,6 +68,7 @@ describe("DisplayerXObjectProperty.vue", () => {
         getEntryId() {
           return "testProperty";
         },
+        isEditMode: () => false,
         data: {
           query: {
             source: {

@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
  * @since 12.7RC1
  */
 @ComponentTest
-public class DefaultLikeConfigurationTest
+class DefaultLikeConfigurationTest
 {
     @InjectMockComponents
     private DefaultLikeConfiguration defaultLikeConfiguration;

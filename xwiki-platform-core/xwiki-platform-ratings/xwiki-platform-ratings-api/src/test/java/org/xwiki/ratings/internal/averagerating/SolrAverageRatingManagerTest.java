@@ -117,7 +117,6 @@ class SolrAverageRatingManagerTest
         doAnswer(invocationOnMock -> {
             String fieldName = invocationOnMock.getArgument(0);
             Object fieldValue = invocationOnMock.getArgument(1);
-            Type type = invocationOnMock.getArgument(2);
             SolrInputDocument inputDocument = invocationOnMock.getArgument(3);
             inputDocument.setField(fieldName, fieldValue);
             return null;

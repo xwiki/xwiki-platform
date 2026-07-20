@@ -1,7 +1,7 @@
 {
   "name": "@xwiki/platform-editors-blocknote-react",
-  "version": "18.6.0-SNAPSHOT",
-  "license": "LGPL 2.1",
+  "version": "18.7.0-SNAPSHOT",
+  "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
@@ -38,8 +38,8 @@
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "test": "pnpm test:unit && pnpm test:ui",
-    "test:unit": "vitest --run",
     "test:ui": "playwright install chromium; cross-env NODE_OPTIONS=--max-old-space-size=4096 playwright test -c playwright-ct.config.ts",
+    "test:unit": "vitest --run",
     "typecheck": "tsc"
   },
   "types": "./dist/index.d.ts",
@@ -60,6 +60,7 @@
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
+    "@xwiki/platform-rendering-api": "workspace:*",
     "@xwiki/platform-syntaxes-config": "workspace:*",
     "@xwiki/platform-uniast-api": "workspace:*",
     "@xwiki/platform-uniast-markdown": "workspace:*",
@@ -70,6 +71,9 @@
     "react-dom": "catalog:",
     "react-i18next": "catalog:",
     "react-icons": "catalog:"
+  },
+  "peerDependencies": {
+    "inversify": "8.x"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
@@ -84,17 +88,15 @@
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "cross-env": "catalog:",
     "eslint": "catalog:",
+    "jsdom": "catalog:",
     "postcss": "catalog:",
     "postcss-preset-mantine": "catalog:",
     "postcss-simple-vars": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest-mock-extended": "catalog:",
     "vitest": "catalog:",
+    "vitest-mock-extended": "catalog:",
     "vue-tsc": "catalog:"
-  },
-  "peerDependencies": {
-    "inversify": "7.x"
   },
   "publishConfig": {
     "exports": {

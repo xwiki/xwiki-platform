@@ -195,8 +195,6 @@ public class InternalSkinManager implements Initializable
             skin = (String) xcontext.get(CKEY_SKIN);
             if (StringUtils.isNotEmpty(skin)) {
                 return skin;
-            } else {
-                skin = null;
             }
 
             // Try to get it from URL
@@ -204,8 +202,6 @@ public class InternalSkinManager implements Initializable
                 skin = xcontext.getRequest().getParameter("skin");
                 if (StringUtils.isNotEmpty(skin)) {
                     return skin;
-                } else {
-                    skin = null;
                 }
             }
 
@@ -224,13 +220,11 @@ public class InternalSkinManager implements Initializable
             // TODO: shouldn't we make sure anyone see the skin whatever right he have ?
             if (testRights) {
                 XWikiDocument document = this.wikiSkinUtils.getSkinDocument(skin);
-                if (document != null) {
-                    if (!this.authorization.hasAccess(Right.VIEW, document.getDocumentReference())) {
-                        this.logger.debug(
-                            "Cannot access configured wiki skin [{}] due to access rights, using the default skin.",
-                            skin);
-                        skin = getDefaultSkinId();
-                    }
+                if (document != null && !this.authorization.hasAccess(Right.VIEW, document.getDocumentReference())) {
+                    this.logger.debug(
+                        "Cannot access configured wiki skin [{}] due to access rights, using the default skin.",
+                        skin);
+                    skin = getDefaultSkinId();
                 }
             }
 
@@ -287,13 +281,11 @@ public class InternalSkinManager implements Initializable
             // TODO: shouldn't we make sure anyone see the skin whatever right he have ?
             if (testRights) {
                 XWikiDocument document = this.wikiSkinUtils.getSkinDocument(baseSkin);
-                if (document != null) {
-                    if (!this.authorization.hasAccess(Right.VIEW, document.getDocumentReference())) {
-                        this.logger.debug(
-                            "Cannot access configured wiki skin [{}] due to access rights, using the default skin.",
-                            baseSkin);
-                        baseSkin = getDefaultParentSkinId();
-                    }
+                if (document != null && !this.authorization.hasAccess(Right.VIEW, document.getDocumentReference())) {
+                    this.logger.debug(
+                        "Cannot access configured wiki skin [{}] due to access rights, using the default skin.",
+                        baseSkin);
+                    baseSkin = getDefaultParentSkinId();
                 }
             }
 

@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
@@ -56,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @since 15.5RC1
  */
 @ComponentTest
-public class LegacyDefaultNotificationFilterManagerTest
+class LegacyDefaultNotificationFilterManagerTest
 {
     @InjectMockComponents
     private LegacyDefaultNotificationFilterManager filterManager;
@@ -159,7 +158,7 @@ public class LegacyDefaultNotificationFilterManagerTest
         filterActivations.put(SystemUserNotificationFilter.FILTER_NAME, false);
 
         Collection<NotificationFilter> filters = this.filterManager.getEnabledFilters(
-                this.filterManager.getAllFilters(testUser, true), filterActivations).collect(Collectors.toList());
+                this.filterManager.getAllFilters(testUser, true), filterActivations).toList();
 
         assertEquals(0, filters.size());
     }
@@ -174,7 +173,7 @@ public class LegacyDefaultNotificationFilterManagerTest
         when(fakeFilter1.matchesPreference(preference)).thenReturn(true);
 
         Collection<NotificationFilter> filters = this.filterManager.getFiltersRelatedToNotificationPreference(
-                Arrays.asList(fakeFilter1), preference).collect(Collectors.toList());
+                Arrays.asList(fakeFilter1), preference).toList();
 
         assertEquals(1, filters.size());
         assertTrue(filters.contains(fakeFilter1));
@@ -191,7 +190,7 @@ public class LegacyDefaultNotificationFilterManagerTest
 
         Collection<NotificationFilter> filters = this.filterManager
             .getFiltersRelatedToNotificationPreference(Arrays.asList(fakeFilter1), preference)
-            .collect(Collectors.toList());
+            .toList();
 
         assertEquals(0, filters.size());
     }

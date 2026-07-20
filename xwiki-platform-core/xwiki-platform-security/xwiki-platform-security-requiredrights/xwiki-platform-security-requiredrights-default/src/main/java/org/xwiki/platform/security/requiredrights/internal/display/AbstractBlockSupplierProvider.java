@@ -22,7 +22,6 @@ package org.xwiki.platform.security.requiredrights.internal.display;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -65,7 +64,7 @@ public abstract class AbstractBlockSupplierProvider<T> implements BlockSupplierP
     {
         List<Block> propertyBlocks = propertyNamesHintsValues.stream()
             .flatMap(this::renderProperty)
-            .collect(Collectors.toList());
+            .toList();
         // Add the xform class such that hints work.
         return new DefinitionListBlock(propertyBlocks, Map.of(CLASS_ATTRIBUTE, "xform"));
     }

@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -149,15 +149,109 @@
               </differences>
             </revapi.differences>
             -->
-            
-            
+            <revapi.differences>
+              <justification>
+                The serial version UID changed because new fields needed to be added, but it shouldn't be a real
+                breakage as the SavedRequest should never be persisted.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.field.serialVersionUIDChanged</code>
+                  <old>field org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest.serialVersionUID</old>
+                  <new>field org.xwiki.container.servlet.filters.SavedRequestManager.SavedRequest.serialVersionUID</new>
+                  <oldSerialVersionUID>8779129900717599986</oldSerialVersionUID>
+                  <newSerialVersionUID>4295744004102683007</newSerialVersionUID>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
+                Adding @Produces("application/rss+xml") only forces the media type of the RSS response so that browsers
+                and feed readers recognize it as a feed instead of rendering it as HTML. It doesn't change the Java
+                signature nor the REST contract (the endpoint already only ever returned RSS).
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method java.lang.String org.xwiki.notifications.rest.NotificationsResource::getNotificationsRSS(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                  <new>method java.lang.String org.xwiki.notifications.rest.NotificationsResource::getNotificationsRSS(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
+                  <annotation>@javax.ws.rs.Produces({"application/rss+xml"})</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
+                The REST API shouldn't be called directly from Java but through HTTP requests. Adding a new query string
+                parameter to an existing REST resource doesn't break existing code that calls this resource through HTTP.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void org.xwiki.rest.resources.pages.PageResource::deletePage(java.lang.String, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method void org.xwiki.rest.resources.pages.PageResource::deletePage(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method void org.xwiki.rest.resources.pages.PageTranslationResource::deletePageTranslation(java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException</old>
+                  <new>method void org.xwiki.rest.resources.pages.PageTranslationResource::deletePageTranslation(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException</new>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
+                These utility classes (only static members) had their implicit public constructor made private to
+                follow SonarQube rule java:S1118 (utility classes should not be instantiable). Instantiating them was
+                never useful, but this is technically a real breakage since existing code calling the constructor will
+                fail at runtime.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.XWikiConstant::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.XWikiConstant::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.i18n.i18n::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.i18n.i18n::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.util.TOCGenerator::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.util.TOCGenerator::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.web.Utils::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.web.Utils::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-importmap-plugin</artifactId>
-        <version>18.6.0-SNAPSHOT</version>
+        <version>18.7.0-SNAPSHOT</version>
         <executions>
           <!-- Make sure declared importmap are valid. -->
           <execution>

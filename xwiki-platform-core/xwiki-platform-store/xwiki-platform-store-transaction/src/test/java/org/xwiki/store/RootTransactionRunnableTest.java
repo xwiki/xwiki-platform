@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  * @since 3.0M2
  */
-public class RootTransactionRunnableTest
+class RootTransactionRunnableTest
 {
     @Test
     void runInTest()

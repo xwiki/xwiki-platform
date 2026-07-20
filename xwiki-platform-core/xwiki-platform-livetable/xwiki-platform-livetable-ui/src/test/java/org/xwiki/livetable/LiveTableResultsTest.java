@@ -117,7 +117,7 @@ class LiveTableResultsTest extends PageTest
 
     @BeforeEach
     @SuppressWarnings("deprecation")
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         // The LiveTableResultsMacros page expects that the HTTP query is done with the "get" action and asking for
         // plain output.

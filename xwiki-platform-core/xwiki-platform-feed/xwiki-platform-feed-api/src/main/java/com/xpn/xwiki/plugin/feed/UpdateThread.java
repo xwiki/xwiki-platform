@@ -80,7 +80,7 @@ public class UpdateThread extends AbstractXWikiRunnable
     public void update()
     {
         if (!stopUpdate) {
-            if (updateInProgress == false) {
+            if (!updateInProgress) {
                 updateInProgress = true;
                 nbLoadedFeeds = 0;
                 nbLoadedFeedsErrors = 0;
@@ -103,7 +103,7 @@ public class UpdateThread extends AbstractXWikiRunnable
                     context.getWiki().getStore().cleanUp(context);
                 }
                 // an update has been schedule..
-                if ((forceUpdate == true) && (stopUpdate == false)) {
+                if (forceUpdate && !stopUpdate) {
                     forceUpdate = false;
                     update();
                 }

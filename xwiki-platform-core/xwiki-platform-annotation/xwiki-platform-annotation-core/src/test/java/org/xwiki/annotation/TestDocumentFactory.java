@@ -133,7 +133,7 @@ public class TestDocumentFactory
             doc.set(key, currentValue);
             doc.set(key + "Syntax", syntax);
         } else {
-            doc.set(currentKey, currentValue.toString());
+            doc.set(currentKey, currentValue);
         }
     }
 

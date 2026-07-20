@@ -36,7 +36,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -133,9 +132,9 @@ class ExtendedURLTest
         assertNotEquals(extendedURL1, extendedURL4);
         assertNotEquals(extendedURL3, extendedURL4);
 
-        assertFalse(extendedURL1.equals(null));
-        assertTrue(extendedURL1.equals(extendedURL1));
-        assertFalse(extendedURL1.equals(extendedURL1.getWrappedURL()));
+        assertNotEquals(extendedURL1, null);
+        assertEquals(extendedURL1, extendedURL1);
+        assertNotEquals(extendedURL1, extendedURL1.getWrappedURL());
     }
 
     @Test

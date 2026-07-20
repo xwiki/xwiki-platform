@@ -359,8 +359,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         {
             Collection<SecurityCacheEntry> result = new ArrayList<>(groups.size());
             for (GroupSecurityReference group : groups) {
-                SecurityCacheEntry parent = (entry instanceof SecurityShadowEntry && group.isGlobal())
-                    ? DefaultSecurityCache.this.getShadowEntry(group, ((SecurityShadowEntry) entry).getWikiReference())
+                SecurityCacheEntry parent = entry instanceof SecurityShadowEntry securityShadowEntry && group.isGlobal()
+                    ? DefaultSecurityCache.this.getShadowEntry(group, securityShadowEntry.getWikiReference())
                     : DefaultSecurityCache.this.getEntry(group);
                 if (parent == null) {
                     throw new ParentEntryEvictedException(String
@@ -608,10 +608,10 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private String getEntryKey(SecurityEntry entry)
     {
-        if (entry instanceof SecurityAccessEntry) {
-            return getEntryKey((SecurityAccessEntry) entry);
-        } else if (entry instanceof SecurityRuleEntry) {
-            return getEntryKey((SecurityRuleEntry) entry);
+        if (entry instanceof SecurityAccessEntry securityAccessEntry) {
+            return getEntryKey(securityAccessEntry);
+        } else if (entry instanceof SecurityRuleEntry securityRuleEntry) {
+            return getEntryKey(securityRuleEntry);
         } else {
             return getEntryKey((SecurityShadowEntry) entry);
         }
@@ -883,9 +883,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
     private SecurityCacheEntry newSecurityCacheEntry(SecurityEntry entry, Collection<GroupSecurityReference> groups)
         throws ParentEntryEvictedException
     {
-        if (entry instanceof SecurityRuleEntry) {
-            return (groups == null) ? new SecurityCacheEntry((SecurityRuleEntry) entry)
-                : new SecurityCacheEntry((SecurityRuleEntry) entry, groups);
+        if (entry instanceof SecurityRuleEntry securityRuleEntry) {
+            return (groups == null) ? new SecurityCacheEntry(securityRuleEntry)
+                : new SecurityCacheEntry(securityRuleEntry, groups);
         } else {
             return (groups == null) ? new SecurityCacheEntry((SecurityShadowEntry) entry)
                 : new SecurityCacheEntry((SecurityShadowEntry) entry, groups);
@@ -1047,8 +1047,8 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             for (SecurityCacheEntry parent : userEntry.parents) {
                 // Add the parent group (if we have not already seen it)
                 SecurityReference parentRef = parent.getEntry().getReference();
-                if (parentRef instanceof GroupSecurityReference) {
-                    groups.add((GroupSecurityReference) parentRef);
+                if (parentRef instanceof GroupSecurityReference groupSecurityReference) {
+                    groups.add(groupSecurityReference);
                 }
             }
         }

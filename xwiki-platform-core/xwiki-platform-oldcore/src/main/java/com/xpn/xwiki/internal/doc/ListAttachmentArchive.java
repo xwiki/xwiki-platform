@@ -201,8 +201,8 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         try {
             return this.toRCS(context).toByteArray();
         } catch (Exception e) {
-            if (e instanceof XWikiException) {
-                throw (XWikiException) e;
+            if (e instanceof XWikiException xwikiException) {
+                throw xwikiException;
             }
             Object[] args = {getAttachment().getFilename()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -221,8 +221,8 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
                 final Archive rcsArchive = new Archive(getAttachment().getFilename(), is);
                 super.setRCSArchive(rcsArchive);
             } catch (Exception e) {
-                if (e instanceof XWikiException) {
-                    throw (XWikiException) e;
+                if (e instanceof XWikiException xwikiException) {
+                    throw xwikiException;
                 }
                 Object[] args = {getAttachment().getFilename()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,

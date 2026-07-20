@@ -595,6 +595,10 @@ class PageTemplatesIT
         String visibilitySpace = testSpace + ".VisibilitySpace";
         String creationSpace = testSpace + ".CreationSpace";
 
+        // Make sure there is an icon theme selected, otherwise we can't use the icon picker.
+        // See XWIKI-24557: The icon picker fails to load the icons if the wiki has no default icon theme selected
+        setup.setWikiPreference("iconTheme", "IconThemes.Silk");
+
         TemplatesAdministrationSectionPage sectionPage = TemplatesAdministrationSectionPage.gotoPage();
         TemplateProviderInlinePage templateProviderInline =
             sectionPage.createTemplateProvider(templateProviderReference);
@@ -658,6 +662,70 @@ class PageTemplatesIT
         createPageInVisibilitySpace.clickCreate(false);
         assertEquals(currentURL, setup.getDriver().getCurrentUrl());
         createPageInVisibilitySpace.waitForFieldErrorMessage();
+    }
+
+    /**
+     * Verifies the "recommended template" behavior (see XWIKI-14310): a template provider whose creation restrictions
+     * match the current location is not only usable there but is also promoted and selected by default in the create
+     * page UI, and it is selected by default <em>only</em> in a matching location. This complements
+     * {@link #createTemplateProviderWithIconAndRestrictions} which checks that the creation restrictions are
+     * <em>enforced</em>, but not that the matching template is <em>recommended</em> (pre-selected).
+     */
+    @Test
+    @Order(9)
+    void recommendedTemplateSelectedByDefaultOnlyInRestrictedSpace(TestUtils setup, TestReference testReference)
+        throws Exception
+    {
+        cleanUp(setup, testReference);
+
+        SpaceReference testSpaceReference = testReference.getLastSpaceReference();
+        EntityReference testLocalParent = testReference.getLocalDocumentReference().getParent();
+
+        // Two sibling spaces. The template will have a creation restriction on the "recommended" space only.
+        SpaceReference recommendedSpaceReference = new SpaceReference("RecommendedSpace", testSpaceReference);
+        SpaceReference otherSpaceReference = new SpaceReference("OtherSpace", testSpaceReference);
+        setup.rest().savePage(new DocumentReference("WebHome", recommendedSpaceReference), "", "Recommended Space");
+        setup.rest().savePage(new DocumentReference("WebHome", otherSpaceReference), "", "Other Space");
+
+        // Create the template page.
+        String templateContent = "Recommended template content";
+        LocalDocumentReference templateReference = new LocalDocumentReference(TEMPLATE_NAME, testLocalParent);
+        setup.rest().savePage(templateReference, templateContent, "Recommended Template");
+
+        // Create the template provider with a creation restriction on the recommended space, and without any
+        // visibility restriction so that it stays available (visible) in both spaces. This lets us verify that it is
+        // only *recommended* (selected by default) in the restricted space, and not merely absent from the others.
+        LocalDocumentReference templateProviderReference =
+            new LocalDocumentReference("RecommendedProvider", testLocalParent);
+        String templateProviderFullName = setup.serializeReference(templateProviderReference);
+        String testSpace = setup.serializeReference(templateProviderReference.getParent());
+        String recommendedSpace = testSpace + ".RecommendedSpace";
+
+        TemplatesAdministrationSectionPage sectionPage = TemplatesAdministrationSectionPage.gotoPage();
+        TemplateProviderInlinePage templateProviderInline =
+            sectionPage.createTemplateProvider(templateProviderReference);
+        templateProviderInline.setTemplateName("Recommended Template");
+        templateProviderInline.setTemplate(setup.serializeReference(templateReference));
+        templateProviderInline.setCreationRestrictions(List.of(recommendedSpace));
+        templateProviderInline.clickSaveAndView();
+
+        // In the restricted location the provider is available and selected by default (recommended).
+        CreatePagePage createInRecommendedSpace =
+            setup.gotoPage(new DocumentReference("WebHome", recommendedSpaceReference)).createPage();
+        assertTrue(setup.isInCreateMode());
+        assertTrue(createInRecommendedSpace.getAvailableTemplates().contains(templateProviderFullName));
+        assertEquals(templateProviderFullName, createInRecommendedSpace.getSelectedTemplate(),
+            "The template whose creation restriction matches the current location should be selected by default.");
+
+        // In another location the provider is still available (no visibility restriction) but NOT selected by
+        // default: the blank page option is selected instead, since the creation restriction does not match here.
+        CreatePagePage createInOtherSpace =
+            setup.gotoPage(new DocumentReference("WebHome", otherSpaceReference)).createPage();
+        assertTrue(setup.isInCreateMode());
+        assertTrue(createInOtherSpace.getAvailableTemplates().contains(templateProviderFullName));
+        assertEquals("blank", createInOtherSpace.getSelectedTemplate(),
+            "The template should be recommended (selected by default) only in the location matching its creation "
+                + "restriction.");
     }
 
     /**

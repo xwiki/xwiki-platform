@@ -31,7 +31,7 @@ import type {
  */
 @injectable()
 export class XWikiSyntaxConfig implements SyntaxConfig {
-  id = "xwiki/1.2";
+  id = "xwiki/2.1";
 
   features: SyntaxAllowedFeatures = {
     blocks: {

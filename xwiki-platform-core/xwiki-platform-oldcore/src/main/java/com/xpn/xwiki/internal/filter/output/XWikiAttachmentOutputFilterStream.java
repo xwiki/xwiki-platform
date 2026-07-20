@@ -171,8 +171,8 @@ public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilte
         throws FilterException
     {
         if (source != null) {
-            if (source instanceof InputStreamInputSource) {
-                try (InputStreamInputSource streamSource = (InputStreamInputSource) source) {
+            if (source instanceof InputStreamInputSource streamSource) {
+                try (streamSource) {
                     attachment.setContent(streamSource.getInputStream());
                 } catch (IOException e) {
                     throw new FilterException("Failed to set attachment content", e);

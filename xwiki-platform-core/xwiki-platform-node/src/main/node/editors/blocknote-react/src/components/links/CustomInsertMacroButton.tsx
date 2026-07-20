@@ -17,22 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { MACRO_NAME_PREFIX, buildMacroRawContent } from "../../blocknote/utils";
+import { insertMacroInvocation } from "../../blocknote/utils";
 import { useEditor } from "../../hooks";
-import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
 import { useComponentsContext } from "@blocknote/react";
-import { assertUnreachable } from "@xwiki/platform-fn-utils";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import type { BlockType, InlineContentType } from "../../blocknote";
-import type {
-  ContextForMacros,
-  InlineMacroInvocation,
-  MacroBlockInvocation,
-} from "../../blocknote/utils";
+import type { ContextForMacros } from "../../blocknote/utils";
 
 export type CustomInsertMacroButtonProps = {
-  openEditor: ContextForMacros["openInsertionEditor"];
+  openEditor: NonNullable<ContextForMacros["openInsertionEditor"]>;
 };
 
 export const CustomInsertMacroButton: React.FC<
@@ -62,90 +55,11 @@ export const CustomInsertMacroButton: React.FC<
               }
             : { type: "none" },
       },
-      insertMacro,
+      // Materialize the selected macro as a server-rendered xwikiMacroBlock / xwikiInlineMacro, replacing the
+      // currently selected block (for a block macro).
+      (invocation) => insertMacroInvocation(editor, invocation, selectedBlock),
     );
-  }, [openEditor, selectedBlock]);
-
-  const insertMacro = useCallback(
-    // eslint-disable-next-line max-statements
-    (call: MacroBlockInvocation | InlineMacroInvocation) => {
-      switch (call.kind) {
-        case "block": {
-          const block: BlockType = {
-            // @ts-expect-error: AST is dynamically typed
-            type: MACRO_NAME_PREFIX + call.id,
-            id: Math.random().toString(),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            props: call.params as any,
-          };
-
-          switch (call.body.type) {
-            case "inlineContents":
-              block.content = call.body.content;
-              break;
-
-            case "raw":
-              block.content = [buildMacroRawContent(call.body.content)];
-              break;
-
-            case "none":
-              break;
-
-            default:
-              assertUnreachable(call.body);
-          }
-
-          if (selectedBlock) {
-            editor.replaceBlocks([selectedBlock], [block]);
-          } else {
-            insertOrUpdateBlockForSlashMenu(editor, block);
-          }
-
-          break;
-        }
-
-        case "inline": {
-          const inlineContent: InlineContentType = {
-            // @ts-expect-error: AST is dynamically typed
-            type: `${MACRO_NAME_PREFIX}${call.id}`,
-            props: call.params,
-          };
-
-          switch (call.body.type) {
-            case "inlineContent":
-              // NOTE: AST is dynamically typed
-              (
-                inlineContent as unknown as { content: InlineContentType }
-              ).content = call.body.content;
-              break;
-
-            case "raw":
-              // NOTE: AST is dynamically typed
-              (
-                inlineContent as unknown as { content: InlineContentType }
-              ).content = buildMacroRawContent(call.body.content);
-              break;
-
-            case "none":
-              break;
-
-            default:
-              assertUnreachable(call.body);
-          }
-
-          editor.insertInlineContent([inlineContent], {
-            updateSelection: true,
-          });
-
-          break;
-        }
-
-        default:
-          assertUnreachable(call);
-      }
-    },
-    [editor],
-  );
+  }, [openEditor, selectedBlock, editor]);
 
   if (!selectedBlock) {
     return <></>;

@@ -22,11 +22,10 @@ package com.xpn.xwiki.objects;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link NumberProperty}.
@@ -51,7 +50,7 @@ class NumberPropertyTest
         assertNotNull(notNullValueProperty.getValue());
 
         // Should not throw a NPE.
-        assertFalse(nullValueProperty.equals(notNullValueProperty));
+        assertNotEquals(nullValueProperty, notNullValueProperty);
     }
 
     /**
@@ -70,7 +69,7 @@ class NumberPropertyTest
         assertNull(notNullValueProperty.getValue());
 
         // Should not throw a NPE.
-        assertFalse(nullValueProperty.equals(notNullValueProperty));
+        assertNotEquals(nullValueProperty, notNullValueProperty);
     }
 
     /**
@@ -89,7 +88,7 @@ class NumberPropertyTest
         assertNull(nullValueProperty2.getValue());
 
         // Should not throw a NPE.
-        assertTrue(nullValueProperty1.equals(nullValueProperty2));
+        assertEquals(nullValueProperty1, nullValueProperty2);
     }
 
     /**
@@ -104,7 +103,7 @@ class NumberPropertyTest
         IntegerProperty notNullValueProperty = new IntegerProperty();
         notNullValueProperty.setValue(1);
 
-        assertTrue(nullValueProperty.equals(notNullValueProperty));
+        assertEquals(nullValueProperty, notNullValueProperty);
     }
 
     /**
@@ -119,7 +118,7 @@ class NumberPropertyTest
         IntegerProperty notNullValueProperty = new IntegerProperty();
         notNullValueProperty.setValue(1);
 
-        assertFalse(nullValueProperty.equals(notNullValueProperty));
+        assertNotEquals(nullValueProperty, notNullValueProperty);
     }
 
     @Test

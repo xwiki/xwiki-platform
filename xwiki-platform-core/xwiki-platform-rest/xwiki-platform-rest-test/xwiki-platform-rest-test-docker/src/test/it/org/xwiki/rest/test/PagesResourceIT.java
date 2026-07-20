@@ -47,7 +47,7 @@ class PagesResourceIT extends AbstractHttpIT
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(wikis.getWikis().size() > 0);
+        assertTrue(!wikis.getWikis().isEmpty());
 
         Wiki wiki = wikis.getWikis().get(0);
         Link link = getFirstLinkByRelation(wiki, Relations.SPACES);
@@ -57,7 +57,7 @@ class PagesResourceIT extends AbstractHttpIT
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Spaces spaces = (Spaces) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(spaces.getSpaces().size() > 0);
+        assertTrue(!spaces.getSpaces().isEmpty());
 
         Space space = spaces.getSpaces().get(0);
         link = getFirstLinkByRelation(space, Relations.PAGES);
@@ -67,7 +67,7 @@ class PagesResourceIT extends AbstractHttpIT
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Pages pages = (Pages) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(pages.getPageSummaries().size() > 0);
+        assertTrue(!pages.getPageSummaries().isEmpty());
 
         checkLinks(pages);
     }

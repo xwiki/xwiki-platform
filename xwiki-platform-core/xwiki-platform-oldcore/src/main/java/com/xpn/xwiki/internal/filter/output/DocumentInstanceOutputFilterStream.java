@@ -177,8 +177,6 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             return;
         }
 
-        boolean hasJRCSHistory = inputDocument.getDocumentArchive() != null;
-
         XWikiContext xcontext = this.xcontextProvider.get();
 
         try {

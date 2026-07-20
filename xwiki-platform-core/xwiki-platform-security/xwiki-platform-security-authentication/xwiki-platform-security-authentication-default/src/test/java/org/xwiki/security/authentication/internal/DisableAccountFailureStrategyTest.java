@@ -60,7 +60,7 @@ class DisableAccountFailureStrategyTest
     private XWikiDocument updatedDocument;
 
     @BeforeEach
-    public void configure()
+    void configure()
     {
         DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
 

@@ -46,4 +46,9 @@ class AllIT
     class NestedInplaceEditWithAnnotationsIT extends InplaceEditWithAnnotationsIT
     {
     }
+
+    @Nested
+    class NestedTextAreaImageUploadIT extends TextAreaImageUploadIT
+    {
+    }
 }

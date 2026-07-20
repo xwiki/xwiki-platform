@@ -223,10 +223,10 @@ public class R160300000XWIKI17243DataMigration extends AbstractHibernateDataMigr
         List<String> values;
         PropertyInterface objProperty = obj.safeget(fieldName);
         // Support both pre and post 7.0 type of watchlist objects
-        if (objProperty instanceof ListProperty) {
-            values = ((ListProperty) objProperty).getList();
-        } else if (objProperty instanceof LargeStringProperty) {
-            values = ListClass.getListFromString(((LargeStringProperty) objProperty).getValue(), ",", false);
+        if (objProperty instanceof ListProperty listProperty) {
+            values = listProperty.getList();
+        } else if (objProperty instanceof LargeStringProperty largeStringProperty) {
+            values = ListClass.getListFromString(largeStringProperty.getValue(), ",", false);
         } else {
             values = Collections.emptyList();
         }

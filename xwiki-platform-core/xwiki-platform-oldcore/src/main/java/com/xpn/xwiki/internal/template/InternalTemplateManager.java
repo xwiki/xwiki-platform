@@ -253,13 +253,13 @@ public class InternalTemplateManager implements Initializable, Disposable
             try (InputSource source = this.resource.getInputSource()) {
                 if (source instanceof StringInputSource) {
                     strinContent = source.toString();
-                } else if (source instanceof ReaderInputSource) {
-                    strinContent = IOUtils.toString(((ReaderInputSource) source).getReader());
-                } else if (source instanceof InputStreamInputSource) {
+                } else if (source instanceof ReaderInputSource readerInputSource) {
+                    strinContent = IOUtils.toString(readerInputSource.getReader());
+                } else if (source instanceof InputStreamInputSource inputStreamInputSource) {
                     // It's impossible to know the real attachment encoding, but let's assume that they respect the
                     // standard and use UTF-8 (which is required for the files located on the filesystem)
                     strinContent =
-                        IOUtils.toString(((InputStreamInputSource) source).getInputStream(), StandardCharsets.UTF_8);
+                        IOUtils.toString(inputStreamInputSource.getInputStream(), StandardCharsets.UTF_8);
                 } else {
                     return null;
                 }
@@ -1016,8 +1016,8 @@ public class InternalTemplateManager implements Initializable, Disposable
         Template template = getCachedTemplate(resource.getId(), null, resource::getInstant);
 
         if (template == null) {
-            if (resource instanceof AbstractSkinResource) {
-                template = new EnvironmentTemplate((AbstractSkinResource) resource);
+            if (resource instanceof AbstractSkinResource skinResource) {
+                template = new EnvironmentTemplate(skinResource);
             } else {
                 template = new DefaultTemplate(resource);
             }

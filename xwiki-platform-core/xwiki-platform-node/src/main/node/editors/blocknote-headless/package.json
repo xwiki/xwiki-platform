@@ -1,7 +1,7 @@
 {
   "name": "@xwiki/platform-editors-blocknote-headless",
-  "version": "18.6.0-SNAPSHOT",
-  "license": "LGPL 2.1",
+  "version": "18.7.0-SNAPSHOT",
+  "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
@@ -33,7 +33,9 @@
     "build": "vite build",
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "test": "vitest --run",
+    "test": "pnpm test:unit && pnpm test:ui",
+    "test:unit": "vitest --run",
+    "test:ui": "playwright install chromium; cross-env NODE_OPTIONS=--max-old-space-size=4096 playwright test -c playwright-ct.config.ts",
     "typecheck": "vue-tsc"
   },
   "types": "./dist/index.d.ts",
@@ -56,26 +58,31 @@
     "vue-i18n": "catalog:"
   },
   "peerDependencies": {
-    "inversify": "7.x",
+    "inversify": "8.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
+    "@playwright/experimental-ct-vue": "catalog:",
     "@types/lodash-es": "catalog:",
+    "@vue/compiler-dom": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-link-modal-ui": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
+    "@xwiki/platform-syntaxes-config": "workspace:*",
+    "cross-env": "catalog:",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:",
     "vitest-mock-extended": "catalog:",
-    "vue": "catalog:",
-    "vue-tsc": "catalog:"
+    "vitest": "catalog:",
+    "vue-tsc": "catalog:",
+    "vue": "catalog:"
   },
   "publishConfig": {
     "exports": {

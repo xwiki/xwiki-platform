@@ -258,7 +258,7 @@ public class ExtensionHistoryScriptService extends AbstractExtensionScriptServic
             if (!preserveUsers) {
                 setRightsProperties((AbstractRequest) record.getRequest());
             }
-            if (record.getRequest().hasNamespaces() && namespaces != null && namespaces.size() > 0) {
+            if (record.getRequest().hasNamespaces() && namespaces != null && !namespaces.isEmpty()) {
                 ((AbstractRequest) record.getRequest()).setProperty("namespaces", namespaces);
             }
         }

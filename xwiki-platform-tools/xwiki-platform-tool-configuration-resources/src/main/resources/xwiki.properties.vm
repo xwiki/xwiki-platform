@@ -23,7 +23,7 @@
 # As time progresses more and more component will get their configurations from
 # this file.
 # 
-# This file come from one of those locations (in this order):
+# This file comes from one of those locations (in this order):
 # * [since 9.3] /etc/xwiki/xwiki.properties
 # * /WEB-INF/xwiki.properties in the web application resources
 
@@ -62,7 +62,7 @@
 #-# [Since 7.2M2]
 #-# Define which hierarchy is used between pages (for example inside the breadcrumb).
 #-# Possible values are "reference" (default) or "parentchild".
-#-# If "parentchild" is used, the hierachy is based on the parent/child relationship, which means that any document
+#-# If "parentchild" is used, the hierarchy is based on the parent/child relationship, which means that any document
 #-# could be defined as the parent of an other document.
 #-# If "reference" is used, then the children of a document must be placed inside this document. It's less flexible but
 #-# more clear.
@@ -81,7 +81,7 @@
 #-#
 #-# You can set:
 #-# * an absolute path (recommended)
-#-# * a relative path (not recommended at all)but in this case the directory will be relative to where the XWiki server
+#-# * a relative path (not recommended at all) but in this case the directory will be relative to where the XWiki server
 #-#   is started and thus the user under which XWiki is started will need write permissions for the current directory
 #-#
 #-# Note if the system property xwiki.data.dir is set then this property is not used.
@@ -654,7 +654,7 @@ extension.oldflavors=$oldFlavor.trim()
 #end
 
 #-# [Since 8.3]
-#-# Indicate if XWiki should try to find more informations about the core extension in the repositories.
+#-# Indicate if XWiki should try to find more information about the core extension in the repositories.
 #-#
 #-# The default is:
 # extension.core.resolve=true
@@ -688,7 +688,7 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # extension.versioncheck.environment.interval=3600
 #-#
 #-# Indicate a pattern that will be used to filter which version should be considered as a new version.
-#-# By default, no pattern is given an the pattern is not applied.
+#-# By default, no pattern is given and the pattern is not applied.
 #-# Example:
 # extension.versioncheck.environment.allowedVersions=9.*
 
@@ -1390,7 +1390,7 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 
 #-# [Since 6.4.1, 7.0M1]
 #-# When using the Database Mail Listener, whether mail statuses for mails that have been sent successfully must be
-#-# discarded or not. They could be kept for tracability purpose for example.
+#-# discarded or not. They could be kept for traceability purpose for example.
 #-# The default is:
 # mail.sender.database.discardSuccessStatuses = true
 
@@ -1456,9 +1456,9 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 
 #-# [Since 11.3.2, 11.6RC1]
 #-# Indicate if the mechanism to detect and handle edition conflicts should be enabled or not.
-#-# If disabled, it means that in case of edition conflicts, the latest save will be always take into account, and
+#-# If disabled, it means that in case of edition conflicts, the latest save will always be taken into account, and
 #-# erase previous data (which can always be recovered in the history of the document).
-#-# This option is provided because the feature is still experimental and it could be useful is some specific usecases
+#-# This option is provided because the feature is still experimental and it could be useful in some specific usecases
 #-# to switch it off. However it is not recommended to do so.
 #-#
 #-# The default is:
@@ -1493,7 +1493,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# [Since 9.6RC1]
 #-# Indicate the grace time used when sending live email notifications.
 #-# When an event is triggered in the wiki (for example, a document update), the platform will wait X minutes
-#-# before sending live notifications emails. During this time, if events of the same kind are recieved, they will
+#-# before sending live notifications emails. During this time, if events of the same kind are received, they will
 #-# be grouped in the same email.
 #-#
 #-# The grace time define the period (in minutes) for which the platform should wait before sending a notification
@@ -1528,7 +1528,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# [Since 11.2]
 #-# The search for notifications in the REST API is done trough a thread pool to limit the impact on the rest of the
 #-# XWiki instance.
-#-# This properties controls the size of this pool. Any number lower than 1 disable the thread pool system.
+#-# This property controls the size of this pool. Any number lower than 1 disables the thread pool system.
 #-# 
 #-# The default is :
 # notifications.rest.poolSize = 2
@@ -1543,7 +1543,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# [Since 12.5RC1]
 #-# The async notifications renderer is using a dedicated thread pool to limit the impact on the rest of the XWiki
 #-# instance.
-#-# This properties controls the size of this pool.
+#-# This property controls the size of this pool.
 #-#
 #-# The default is :
 # notifications.async.poolSize = 2
@@ -1563,7 +1563,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# [Since 12.6]
 #-# The detection and notification for the user mentions in created or edited content is done asynchronously 
 #-# by a pool of consumers.
-#-# This properties controls the size of this pool.
+#-# This property controls the size of this pool.
 #-#
 #-# The default is :
 # mentions.poolSize = 1
@@ -1592,7 +1592,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-------------------------------------------------------------------------------------
 
 #-# [Since 12.0RC1]
-#-# Indicate of logging about the use of deprecated APIs/feature should be enabled.
+#-# Indicate if logging about the use of deprecated APIs/feature should be enabled.
 #-# 
 #-# The default is:
 # logging.deprecated.enabled = true
@@ -1642,7 +1642,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 
 #-# [Since 14.10.12]
 #-# [Since 15.5RC1]
-#-# When displaying an user in a compact mode we usually rely only on the user avatar and their full name. If this is
+#-# When displaying a user in a compact mode we usually rely only on the user avatar and their full name. If this is
 #-# not enough to properly identify the user then this configuration can be used to display additional information.
 #-#
 #-# The name of the user property to be used as qualifier (hint) when displaying the user in a compact mode. This
@@ -1744,7 +1744,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # export.pdf.pageReadyTimeout = 60
 
 #-# [Since 14.10]
-#-# The maximum content size, in kilobytes (KB), an user is allowed to export to PDF. In order to compute the content
+#-# The maximum content size, in kilobytes (KB), a user is allowed to export to PDF. In order to compute the content
 #-# size we sum the size of the HTML rendering for each of the XWiki documents included in the export. The size of
 #-# external resources, such as images, style sheets, JavaScript code is not taken into account. 0 means no limit.
 # export.pdf.maxContentSize = 5000
@@ -1894,5 +1894,17 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# case-insensitive sorting. Possible values depend on the used database engine and its configuration, a possible
 #-# value for MariaDB is utf8mb4_general_ci. By default, no collation is configured.
 # index.sortCollation=
+
+#-------------------------------------------------------------------------------------
+# Chart
+#-------------------------------------------------------------------------------------
+
+#-# [Since 18.6.0RC1, 18.4.3, 17.10.10]
+#-# Define the maximum authorized height of a chart in pixels. By default the value is configured at 2048 pixels.
+# chart.height.max=2048
+
+#-# [Since 18.6.0RC1, 18.4.3, 17.10.10]
+#-# Define the maximum authorized width of a chart in pixels. By default the value is configured at 2048 pixels.
+# chart.width.max=2048
 
 $!xwikiPropertiesAdditionalProperties

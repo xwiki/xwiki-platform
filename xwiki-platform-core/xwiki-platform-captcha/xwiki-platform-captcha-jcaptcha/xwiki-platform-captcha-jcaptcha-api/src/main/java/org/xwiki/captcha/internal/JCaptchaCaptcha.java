@@ -19,7 +19,6 @@
  */
 package org.xwiki.captcha.internal;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,15 +48,47 @@ import com.xpn.xwiki.web.XWikiRequest;
 @Singleton
 public class JCaptchaCaptcha extends AbstractCaptcha
 {
-    private static final List<String> JCAPTCHA_SPACE_LIST = Arrays.asList(XWiki.SYSTEM_SPACE, "Captcha", "JCaptcha");
+    /**
+     * Space where JCaptcha docs are stored.
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    public static final List<String> JCAPTCHA_SPACE_LIST = List.of(XWiki.SYSTEM_SPACE, "Captcha", "JCaptcha");
 
-    private static final String ENGINE = "engine";
-
-    private static final LocalDocumentReference CONFIGURATION_DOCUMENT_REFERENCE =
+    /**
+     * Reference of the configuration document for jcaptcha.
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    public static final LocalDocumentReference CONFIGURATION_DOCUMENT_REFERENCE =
         new LocalDocumentReference(JCAPTCHA_SPACE_LIST, "Configuration");
 
-    private static final LocalDocumentReference CONFIGURATION_CLASS_REFERENCE =
+    /**
+     * Reference of the configuration class for jcaptcha.
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    public static final LocalDocumentReference CONFIGURATION_CLASS_REFERENCE =
         new LocalDocumentReference(JCAPTCHA_SPACE_LIST, "ConfigurationClass");
+
+    /**
+     * Default engine.
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    public static final String DEFAULT_ENGINE = "com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine";
+
+    /**
+     * Parameter name for the engine.
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    public static final String ENGINE = "engine";
 
     private static final LocalDocumentReference DISPLAYER_DOCUMENT_REFERENCE =
         new LocalDocumentReference(JCAPTCHA_SPACE_LIST, "Displayer");
@@ -65,7 +96,7 @@ public class JCaptchaCaptcha extends AbstractCaptcha
     private static final Map<String, Object> DEFAULT_PARAMETERS = new HashMap<>();
     {
         DEFAULT_PARAMETERS.put("type", "image");
-        DEFAULT_PARAMETERS.put(ENGINE, "com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine");
+        DEFAULT_PARAMETERS.put(ENGINE, DEFAULT_ENGINE);
     }
 
     @Inject
@@ -101,8 +132,7 @@ public class JCaptchaCaptcha extends AbstractCaptcha
         XWikiRequest request = getContext().getRequest();
 
         // Use the parameters to instantiate the correct CAPTCHA factory.
-        CaptchaService captchaService =
-            captchaServiceManager.getCaptchaService((String) captchaParameters.get(ENGINE));
+        CaptchaService captchaService = captchaServiceManager.getCaptchaService();
 
         // Use the Session ID as CAPTCHA ID. The consequence is that one user can have only 1 CAPTCHA at a time,
         // i.e. getting a new CAPTCHA in one tab will invalidate the CAPTCHA in the previous tabs.
@@ -110,7 +140,6 @@ public class JCaptchaCaptcha extends AbstractCaptcha
 
         String answer = request.getParameter("captchaAnswer");
 
-        boolean result = captchaService.validateResponseForID(id, answer);
-        return result;
+        return captchaService.validateResponseForID(id, answer);
     }
 }

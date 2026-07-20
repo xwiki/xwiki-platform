@@ -33,8 +33,20 @@ import org.xwiki.rest.XWikiRestException;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history/{version}/attachments/{attachmentName}")
 public interface AttachmentAtPageVersionResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Returns the content of an attachment as it was at a specific version of the page holding it.
+     *
+     * @param wikiName the identifier of the wiki containing the page, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) containing the page; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param pageName the name of the page holding the attachment, for example {@code WebHome}
+     * @param version the page revision at which to read the attachment, for example {@code 3.1} (as listed by the
+     *  page history)
+     * @param attachmentName the file name of the attachment, for example {@code photo.png}
+     * @return a response streaming the attachment's binary content as of the given page version, with its media type
+     * @throws XWikiRestException if the attachment cannot be retrieved, for example the page version or the attachment
+     *  does not exist
+     */
     @GET Response getAttachment(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

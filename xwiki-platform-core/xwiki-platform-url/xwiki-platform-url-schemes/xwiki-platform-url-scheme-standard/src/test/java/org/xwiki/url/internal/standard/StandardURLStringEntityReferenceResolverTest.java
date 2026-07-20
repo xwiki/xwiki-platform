@@ -90,7 +90,7 @@ class StandardURLStringEntityReferenceResolverTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
-    public void configure(MockitoComponentManager componentManager) throws Exception
+    void configure(MockitoComponentManager componentManager) throws Exception
     {
         XWikiRequest request = mock(XWikiRequest.class);
         when(request.getContextPath()).thenReturn("/xwiki");

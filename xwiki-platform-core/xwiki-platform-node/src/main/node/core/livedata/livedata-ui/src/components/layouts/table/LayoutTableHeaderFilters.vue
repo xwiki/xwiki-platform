@@ -47,6 +47,8 @@
       />
       <span v-else class="sr-only">{{ property.name }}</span>
     </th>
+    <!-- Spacer for the actions column in edit mode -->
+    <th v-if="logic.isEditMode()"></th>
   </tr>
 </template>
 

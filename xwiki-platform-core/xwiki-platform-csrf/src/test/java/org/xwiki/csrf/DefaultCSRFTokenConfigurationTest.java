@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultCSRFTokenConfigurationTest
+class DefaultCSRFTokenConfigurationTest
 {
     @InjectMockComponents
     private DefaultCSRFTokenConfiguration defaultCSRFTokenConfiguration;

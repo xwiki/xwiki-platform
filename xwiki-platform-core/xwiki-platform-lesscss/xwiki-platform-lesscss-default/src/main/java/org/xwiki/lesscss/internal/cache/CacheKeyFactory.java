@@ -82,8 +82,8 @@ public class CacheKeyFactory
             Request request = container.getRequest();
             List<String> excludes = Arrays.asList("skin", "colorTheme", "colorThemeVersion", "language", "docVersion",
                 XWiki.CACHE_VERSION);
-            if (request instanceof ServletRequest) {
-                Map<String, String[]> parameters = ((ServletRequest) request).getHttpServletRequest().getParameterMap();
+            if (request instanceof ServletRequest servletRequest) {
+                Map<String, String[]> parameters = servletRequest.getHttpServletRequest().getParameterMap();
                 for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
                     if (!excludes.contains(entry.getKey())) {
                         String[] values = entry.getValue();

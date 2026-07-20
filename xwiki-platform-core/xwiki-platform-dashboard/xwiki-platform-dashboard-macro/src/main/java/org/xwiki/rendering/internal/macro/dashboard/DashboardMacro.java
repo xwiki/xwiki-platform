@@ -256,10 +256,8 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         ExecutionContext ec = this.execution.getContext();
         if (ec != null) {
             Integer dashboardCalls = (Integer) ec.getProperty(DASHBOARD_MACRO_CALLS);
-            if (dashboardCalls != null) {
-                if (dashboardCalls > 0) {
-                    ec.setProperty(DASHBOARD_MACRO_CALLS, dashboardCalls - 1);
-                }
+            if (dashboardCalls != null && dashboardCalls > 0) {
+                ec.setProperty(DASHBOARD_MACRO_CALLS, dashboardCalls - 1);
             }
         }
     }

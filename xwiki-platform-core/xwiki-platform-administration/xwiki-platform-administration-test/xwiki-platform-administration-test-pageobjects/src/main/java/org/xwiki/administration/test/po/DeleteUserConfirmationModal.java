@@ -19,8 +19,11 @@
  */
 package org.xwiki.administration.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.ConfirmationModal;
 
@@ -55,6 +58,18 @@ public class DeleteUserConfirmationModal extends ConfirmationModal
     public String getScriptRightUserErrorMessageHrefValue()
     {
         return this.container.findElement(By.cssSelector(".errormessage.xform a")).getDomAttribute("href");
+    }
+
+    /**
+     * @return the text of the warning displayed when the user being deleted has Script or Programming Rights and is
+     *         the last author of one or more pages, or an empty string when no such warning is displayed
+     * @since 18.7.0RC1
+     */
+    public String getWarningMessage()
+    {
+        List<WebElement> warnings =
+            getDriver().findElementsWithoutWaiting(this.container, By.cssSelector(".errormessage.xform"));
+        return warnings.isEmpty() ? "" : warnings.get(0).getText();
     }
 
     /**

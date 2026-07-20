@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mail-test</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mail-test-docker</artifactId>
   <name>XWiki Platform - Mail - Tests - Functional Tests</name>
@@ -34,6 +34,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Mail - Tests - Functional Tests in Docker</description>
   <properties>
+    <!-- We must specify a value as otherwise 1.00 is expected because we have some class in src/main/java -->
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->

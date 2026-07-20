@@ -101,8 +101,8 @@ public class WikiReader
         InputStream stream;
 
         InputSource source = this.properties.getSource();
-        if (source instanceof InputStreamInputSource) {
-            stream = ((InputStreamInputSource) source).getInputStream();
+        if (source instanceof InputStreamInputSource inputStreamInputSource) {
+            stream = inputStreamInputSource.getInputStream();
         } else {
             throw new FilterException("Unsupported source type [" + source.getClass() + "]");
         }
@@ -142,7 +142,6 @@ public class WikiReader
             if (entry.isDirectory() || entry.getName().startsWith("META-INF")) {
                 // The entry is either a directory or is something inside of the META-INF dir.
                 // (we use that directory to put meta data such as LICENSE/NOTICE files.)
-                continue;
             } else if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
                 readPackage(zis, entry);
             } else {

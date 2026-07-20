@@ -368,7 +368,7 @@ public class HtmlPackager
             attachmentDir.mkdirs();
 
             // Create and initialize a custom URL factory
-            ExportURLFactory urlf = new ExportURLFactory();
+            ExportURLFactory urlf = new ExportURLFactory(true);
             Provider<FilesystemExportContext> exportContextProvider =
                 Utils.getComponent(new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
             // Note that the following line will set a FilesystemExportContext instance in the Execution Context
@@ -480,7 +480,7 @@ public class HtmlPackager
 
             // Don't include vm and LESS files by default
             FileFilter filter =
-                new NotFileFilter(new SuffixFileFilter(new String[]{ ".vm", ".less", "skin.properties" }));
+                new NotFileFilter(new SuffixFileFilter(".vm", ".less", "skin.properties"));
 
             addDirToZip(file, filter, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR,
                 exportedSkinFiles);

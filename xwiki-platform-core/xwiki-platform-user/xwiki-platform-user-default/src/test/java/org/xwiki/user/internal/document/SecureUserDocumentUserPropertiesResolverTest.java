@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
  * @since 12.4RC1
  */
 @ComponentTest
-public class SecureUserDocumentUserPropertiesResolverTest
+class SecureUserDocumentUserPropertiesResolverTest
 {
     @InjectMockComponents
     private SecureUserDocumentUserPropertiesResolver resolver;

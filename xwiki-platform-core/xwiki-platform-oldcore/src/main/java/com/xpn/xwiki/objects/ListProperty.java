@@ -146,11 +146,11 @@ public class ListProperty extends BaseProperty implements Cloneable
 
         // If the collection was not yet initialized by Hibernate
         // Let's use the super result..
-        if ((list1 instanceof PersistentCollection) && (!((PersistentCollection) list1).wasInitialized())) {
+        if (list1 instanceof PersistentCollection persistentCollection && !persistentCollection.wasInitialized()) {
             return true;
         }
 
-        if ((list2 instanceof PersistentCollection) && (!((PersistentCollection) list2).wasInitialized())) {
+        if (list2 instanceof PersistentCollection persistentCollection && !persistentCollection.wasInitialized()) {
             return true;
         }
 
@@ -252,7 +252,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     public String toString()
     {
-        if ((getList() instanceof PersistentCollection) && (!((PersistentCollection) getList()).wasInitialized())) {
+        if (getList() instanceof PersistentCollection persistentCollection && !persistentCollection.wasInitialized()) {
             return "";
         }
 

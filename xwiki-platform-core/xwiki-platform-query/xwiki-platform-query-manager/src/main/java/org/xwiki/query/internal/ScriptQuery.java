@@ -282,7 +282,7 @@ public class ScriptQuery implements SecureQuery
     @Override
     public boolean isCurrentAuthorChecked()
     {
-        return this.query instanceof SecureQuery ? ((SecureQuery) this.query).isCurrentAuthorChecked() : true;
+        return !(this.query instanceof SecureQuery secureQuery) || secureQuery.isCurrentAuthorChecked();
     }
 
     /**
@@ -329,14 +329,14 @@ public class ScriptQuery implements SecureQuery
     @Override
     public boolean isCurrentUserChecked()
     {
-        return this.query instanceof SecureQuery ? ((SecureQuery) this.query).isCurrentAuthorChecked() : false;
+        return this.query instanceof SecureQuery secureQuery && secureQuery.isCurrentAuthorChecked();
     }
 
     @Override
     public SecureQuery checkCurrentUser(boolean checkCurrentUser)
     {
-        if (this.query instanceof SecureQuery) {
-            ((SecureQuery) this.query).isCurrentAuthorChecked();
+        if (this.query instanceof SecureQuery secureQuery) {
+            secureQuery.isCurrentAuthorChecked();
         }
 
         return this;

@@ -80,9 +80,7 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
             // Run this migration if the database isn't new
             shouldExecute = getStore().getDatabaseProductName() == DatabaseProduct.ORACLE;
             getStore().endTransaction(getXWikiContext(), false);
-        } catch (XWikiException ex) {
-            // Shouldn't happen, ignore
-        } catch (DataMigrationException ex) {
+        } catch (XWikiException | DataMigrationException ex) {
             // Shouldn't happen, ignore
         }
         return shouldExecute;

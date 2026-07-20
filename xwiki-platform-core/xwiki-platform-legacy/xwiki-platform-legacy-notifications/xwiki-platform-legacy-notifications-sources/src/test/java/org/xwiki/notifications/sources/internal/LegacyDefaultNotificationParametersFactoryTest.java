@@ -137,7 +137,7 @@ class LegacyDefaultNotificationParametersFactoryTest
     private List<NotificationFilterPreference> filterPreferenceList;
 
     @BeforeEach
-    public void setup(MockitoComponentManager componentManager) throws Exception
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
         when(this.stringDocumentReferenceResolver.resolve(USER_SERIALIZED_REFERENCE)).thenReturn(USER_REFERENCE);
 

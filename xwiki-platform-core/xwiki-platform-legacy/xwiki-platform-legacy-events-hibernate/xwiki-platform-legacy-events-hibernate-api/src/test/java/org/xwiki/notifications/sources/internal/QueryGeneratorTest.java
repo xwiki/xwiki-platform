@@ -75,6 +75,7 @@ class QueryGeneratorTest extends AbstractQueryGeneratorTest
     private String pref1StartDateParamName;
 
     @BeforeEach
+    @Override
     void beforeEach() throws Exception
     {
         super.beforeEach();

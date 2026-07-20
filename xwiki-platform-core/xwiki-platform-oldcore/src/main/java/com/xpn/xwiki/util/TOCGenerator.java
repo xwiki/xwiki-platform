@@ -37,6 +37,14 @@ public class TOCGenerator
 
     public static final String TOC_DATA_TEXT = "text";
 
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private TOCGenerator()
+    {
+        // Utility class
+    }
+
     public static Map<String, Map<String, Object>> generateTOC(String content, int init, int max, boolean numbered,
         XWikiContext context)
     {
@@ -44,7 +52,7 @@ public class TOCGenerator
 
         LinkedHashMap<String, Map<String, Object>> tocData = new LinkedHashMap<>();
 
-        int previousNumbers[] = { 0, 0, 0, 0, 0, 0, 0 };
+        int[] previousNumbers = { 0, 0, 0, 0, 0, 0, 0 };
 
         Pattern pattern = Pattern.compile("(?-s)^[ \\t]*+(1(\\.1){0,5}+)[ \\t]++(.++)$", Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(content);

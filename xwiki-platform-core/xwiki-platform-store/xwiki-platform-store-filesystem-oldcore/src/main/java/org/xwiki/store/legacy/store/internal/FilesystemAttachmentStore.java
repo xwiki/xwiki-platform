@@ -468,8 +468,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             // If the store supports deleting in the same transaction then do it.
             final AttachmentVersioningStore avs = context.getWiki().getDefaultAttachmentArchiveStore();
 
-            if (avs instanceof FilesystemAttachmentVersioningStore) {
-                final FilesystemAttachmentVersioningStore favs = (FilesystemAttachmentVersioningStore) avs;
+            if (avs instanceof FilesystemAttachmentVersioningStore favs) {
                 favs.getArchiveDeleteRunnable(attachment.loadArchive(context)).runIn(this);
             } else {
                 new TransactionRunnable<HibernateTransaction>()

@@ -21,7 +21,6 @@ package org.xwiki.rest.internal.resources;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -56,7 +55,7 @@ public abstract class AbstractPagesResource extends XWikiResource
         return this.objectFactory.createPages().withPageSummaries(documentReferences.stream()
             .filter(documentReference -> this.contextualAuthorizationManager.hasAccess(Right.VIEW, documentReference))
             .map(documentReference -> getPageSummary(documentReference, withPrettyNames)).filter(Objects::nonNull)
-            .collect(Collectors.toList()));
+            .toList());
     }
 
     protected PageSummary getPageSummary(DocumentReference documentReference, boolean withPrettyNames)

@@ -456,16 +456,14 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
                 // If the deleted property was "annotation" (from AnnotationClass), then use the new
                 // property "comment" for (XWikiComments).
                 newProperty.setName("comment");
-            } else if ("replyto".equals(deletedProperty.getName())) {
+            } else if ("replyto".equals(deletedProperty.getName()) && deletedProperty.getValue() != null) {
                 // XWIKI-7745: We need to handle the fact that the "replyto" property needs to point to the new object
                 // number of the comment it was previously assigned to, since the comment can now have a new number
                 // assigned to it.
-                if (deletedProperty.getValue() != null) {
-                    int oldValue = (Integer) deletedProperty.getValue();
-                    int newValue = this.oldToNewCommentNumberMap.get(oldValue);
+                int oldValue = (Integer) deletedProperty.getValue();
+                int newValue = this.oldToNewCommentNumberMap.get(oldValue);
 
-                    newProperty.setValue(newValue);
-                }
+                newProperty.setValue(newValue);
             }
             return newProperty;
         }

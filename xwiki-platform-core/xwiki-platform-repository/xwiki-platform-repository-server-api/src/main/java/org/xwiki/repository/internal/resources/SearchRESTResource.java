@@ -112,9 +112,9 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         // Rights
         // /////////////////
 
-        if (query instanceof SecureQuery) {
+        if (query instanceof SecureQuery secureQuery) {
             // Show only what the current user has the right to see
-            ((SecureQuery) query).checkCurrentUser(true);
+            secureQuery.checkCurrentUser(true);
         }
 
         // /////////////////

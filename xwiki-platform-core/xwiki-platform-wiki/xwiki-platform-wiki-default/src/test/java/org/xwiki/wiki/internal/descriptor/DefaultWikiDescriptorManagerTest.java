@@ -22,7 +22,6 @@ package org.xwiki.wiki.internal.descriptor;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -224,7 +223,7 @@ class DefaultWikiDescriptorManagerTest
 
         // The descriptors should be sorted by pretty name (with a fallback to wiki id).
         assertEquals(Arrays.asList("wikiid3", "dev_wikiid1", "wikiid2", "xwiki"),
-            descriptors.stream().map(WikiDescriptor::getId).collect(Collectors.toList()));
+            descriptors.stream().map(WikiDescriptor::getId).toList());
 
         // Verify that XWiki.XWikiServerWikiid3 has not be loaded
         verify(this.descriptorDocumentHelper, never()).getDocumentFromWikiId("wikiid3");

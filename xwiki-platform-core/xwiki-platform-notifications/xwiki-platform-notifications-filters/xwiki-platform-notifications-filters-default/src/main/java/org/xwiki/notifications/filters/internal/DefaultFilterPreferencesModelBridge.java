@@ -216,8 +216,8 @@ public class DefaultFilterPreferencesModelBridge implements FilterPreferencesMod
         }
 
         for (NotificationFilterPreference preference : preferences) {
-            if (preference instanceof DefaultNotificationFilterPreference) {
-                ((DefaultNotificationFilterPreference) preference).setStartingDate(startDate);
+            if (preference instanceof DefaultNotificationFilterPreference defaultPreference) {
+                defaultPreference.setStartingDate(startDate);
             }
         }
 

@@ -27,7 +27,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -209,7 +208,7 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
                 .setLimit(BATCH_SIZE);
             List<String> usersList = query.execute();
 
-            return usersList.stream().map(this.documentReferenceResolver::resolve).collect(Collectors.toList());
+            return usersList.stream().map(this.documentReferenceResolver::resolve).toList();
         } catch (QueryException e) {
             throw new DataMigrationException("Error while querying the list of users", e);
         }

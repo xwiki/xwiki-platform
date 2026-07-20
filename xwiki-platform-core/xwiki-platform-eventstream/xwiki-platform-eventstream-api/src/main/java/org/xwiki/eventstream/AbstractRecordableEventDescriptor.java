@@ -83,8 +83,7 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
      */
     protected String getLocalizedMessage(String key)
     {
-        if (componentManager instanceof NamespacedComponentManager) {
-            NamespacedComponentManager namespacedComponentManager = (NamespacedComponentManager) componentManager;
+        if (componentManager instanceof NamespacedComponentManager namespacedComponentManager) {
             String namespaceOfTheDescriptor = namespacedComponentManager.getNamespace();
 
             if (namespaceOfTheDescriptor != null) {
@@ -126,8 +125,7 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
             return true;
         }
 
-        if (o instanceof RecordableEventDescriptor) {
-            RecordableEventDescriptor other = (RecordableEventDescriptor) o;
+        if (o instanceof RecordableEventDescriptor other) {
             EqualsBuilder equalsBuilder = new EqualsBuilder();
             equalsBuilder.append(other.getApplicationId(), this.getApplicationId());
             equalsBuilder.append(other.getEventType(), this.getEventType());

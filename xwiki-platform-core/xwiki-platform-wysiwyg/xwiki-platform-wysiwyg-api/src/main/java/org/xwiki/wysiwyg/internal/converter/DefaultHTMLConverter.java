@@ -252,10 +252,10 @@ public class DefaultHTMLConverter implements HTMLConverter
 
     private boolean maybeSetRenderingContextSyntax(Syntax syntax)
     {
-        if (this.renderingContext instanceof MutableRenderingContext) {
+        if (this.renderingContext instanceof MutableRenderingContext mutableRenderingContext) {
             // Make sure we set the default syntax and the target syntax on the rendering context. This is needed
             // for instance when the content of a macro that was edited in-line is converted to wiki syntax.
-            ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
+            mutableRenderingContext.push(this.renderingContext.getTransformation(),
                 this.renderingContext.getXDOM(), syntax, this.renderingContext.getTransformationId(),
                 this.renderingContext.isRestricted(), syntax);
             return true;
@@ -276,8 +276,8 @@ public class DefaultHTMLConverter implements HTMLConverter
         // in the first one...
         txContext.setId(TRANSFORMATION_ID);
 
-        if (this.renderingContext instanceof MutableRenderingContext) {
-            ((MutableRenderingContext) this.renderingContext).transformInContext(this.macroTransformation, txContext,
+        if (this.renderingContext instanceof MutableRenderingContext mutableRenderingContext) {
+            mutableRenderingContext.transformInContext(this.macroTransformation, txContext,
                 xdom);
         }
     }

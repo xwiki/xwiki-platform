@@ -49,8 +49,8 @@ public class CategoriesConverter extends AbstractConverter<Set<NewsCategory>>
             return Collections.emptySet();
         }
 
-        if (value instanceof Set) {
-            return (Set) value;
+        if (value instanceof Set set) {
+            return set;
         }
 
         Set<NewsCategory> categories = new LinkedHashSet<>();

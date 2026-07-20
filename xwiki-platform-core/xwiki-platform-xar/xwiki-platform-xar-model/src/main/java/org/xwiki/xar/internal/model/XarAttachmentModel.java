@@ -73,4 +73,12 @@ public class XarAttachmentModel
      * @since 12.0RC1
      */
     public static final String ELEMENT_REVISIONS = "revisions";
+
+    /**
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
+     */
+    protected XarAttachmentModel()
+    {
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
+    }
 }

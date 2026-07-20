@@ -29,8 +29,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Component;
@@ -117,8 +115,7 @@ public class DeprecatedMailStorageScriptService extends AbstractMailScriptServic
     {
         try {
             MailStatusResult statusResult = this.mailResender.resendAsynchronously(batchId, uniqueMessageId);
-            ScriptMailResult scriptMailResult = new ScriptMailResult(new DefaultMailResult(batchId), statusResult);
-            return scriptMailResult;
+            return new ScriptMailResult(new DefaultMailResult(batchId), statusResult);
         } catch (MailStoreException e) {
             // Save the exception for reporting through the script services's getLastError() API
             setError(e);
@@ -307,12 +304,6 @@ public class DeprecatedMailStorageScriptService extends AbstractMailScriptServic
             normalizedMap.put("wiki", xwikiContext.getWikiId());
         }
         return normalizedMap;
-    }
-
-    private MimeMessage loadMessage(Session session, String batchId, String mailId) throws MailStoreException
-    {
-        MimeMessage message = this.mailContentStore.load(session, batchId, mailId);
-        return message;
     }
 
     @Override

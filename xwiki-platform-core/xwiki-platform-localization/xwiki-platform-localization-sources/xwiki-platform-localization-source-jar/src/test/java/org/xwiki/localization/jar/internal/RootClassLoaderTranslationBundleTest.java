@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
     ContextComponentManagerProvider.class, DefaultLocalizationManager.class, DefaultTranslationBundleContext.class,
     DefaultExecution.class, DefaultModelContext.class, RootClassLoaderTranslationBundle.class})
 @ComponentTest
-public class RootClassLoaderTranslationBundleTest
+class RootClassLoaderTranslationBundleTest
 {
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -61,7 +61,7 @@ public class RootClassLoaderTranslationBundleTest
     private LocalizationManager localizationManager;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         // Components
 

@@ -68,6 +68,18 @@ public class PageTypePicker extends XWikiSelectWidget
         return availableTemplates;
     }
 
+    /**
+     * @return the value of the option currently selected by default in the picker: a template provider's local
+     *         reference when a recommended template is pre-selected based on the current location, or {@code blank}
+     *         when the blank page option is selected by default; {@code null} if no option is selected
+     * @since 18.7.0RC1
+     */
+    public String getSelectedTemplate()
+    {
+        return getOptionInputsStream().filter(WebElement::isSelected).map(input -> input.getAttribute("value"))
+            .findFirst().orElse(null);
+    }
+
     public void selectTemplateByValue(String template)
     {
         List<WebElement> templates = getAvailableTemplateInputs();
@@ -87,7 +99,6 @@ public class PageTypePicker extends XWikiSelectWidget
      * @param template the value of the template option
      * @return the icon name displayed for the specified template option, extracted from the {@code <img>} element's
      *         {@code src} attribute, or an empty string if no icon is displayed
-     * @since 18.3.0RC1
      */
     public String getTemplateIcon(String template)
     {
@@ -105,7 +116,6 @@ public class PageTypePicker extends XWikiSelectWidget
     /**
      * @param template the value of the template option
      * @return the description text displayed for the specified template option, or an empty string if none
-     * @since 18.3.0RC1
      */
     public String getTemplateDescription(String template)
     {

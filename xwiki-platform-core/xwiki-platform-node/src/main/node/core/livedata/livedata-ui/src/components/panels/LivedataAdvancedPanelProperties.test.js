@@ -18,10 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import LivedataAdvancedPanelProperties from "./LivedataAdvancedPanelProperties.vue";
-import { mount } from "@vue/test-utils";
-import { runTest } from "@xwiki/platform-test-accessibility";
+import { mountHelper, runTest } from "@xwiki/platform-test-accessibility";
 import _ from "lodash-es";
-import { describe, expect, it } from "vitest";
+import { describe, expect } from "vitest";
 import { nextTick } from "vue";
 
 /**
@@ -30,11 +29,12 @@ import { nextTick } from "vue";
  * @param provide - (optional) an object that is merged on top of the default provide parameter.
  * @returns a wrapper for the LiveDataAdvancedPanelProperties component
  */
+const accessibilityMount = mountHelper(LivedataAdvancedPanelProperties);
+
 function initWrapper({ provide } = {}) {
   global.XWiki = { contextPath: "http://localhost/" };
   let propertyIsVisible = true;
-  return mount(LivedataAdvancedPanelProperties, {
-    attachTo: document.body,
+  return accessibilityMount({
     props: {
       panel: {
         id: "propertiesPanel",
@@ -94,30 +94,23 @@ function initWrapper({ provide } = {}) {
 }
 
 describe("LivedataAdvancedPanelProperties.vue", () => {
-  it("Displays the title and the icon", async () => {
-    const wrapper = initWrapper();
+  runTest("Displays the title and the icon", initWrapper(), (wrapper) => {
     expect(wrapper.find(".panel-heading .title").text()).toBe(
       "list-bullets Properties",
     );
   });
 
-  it("Displays the properties", async () => {
-    const wrapper = initWrapper();
+  runTest("Displays the properties", initWrapper(), (wrapper) => {
     expect(wrapper.find(".property .property-name").text()).toBe(
       "Property Name",
     );
   });
 
-  it("Toggles the visibility on click", async () => {
-    const wrapper = initWrapper();
+  runTest("Toggles the visibility on click", initWrapper(), async (wrapper) => {
     expect(wrapper.find("input[type = checkbox]").element.checked).toBe(true);
     await wrapper.find(".visibility input").setChecked(false);
     expect(wrapper.vm.logic.isPropertyVisible("id")).toBeFalsy();
     await nextTick();
     expect(wrapper.find("input[type = checkbox]").element.checked).toBe(false);
-  });
-
-  runTest("Is accessible", initWrapper(), () => {
-    // Assertions are performed by the axe-core check ran after this test.
   });
 });

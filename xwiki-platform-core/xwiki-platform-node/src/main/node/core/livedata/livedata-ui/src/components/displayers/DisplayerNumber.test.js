@@ -37,6 +37,9 @@ describe("DisplayerNumber.vue", () => {
           quantity: 42,
         },
       },
+      logic: {
+        isEditMode: () => false,
+      },
     });
     expect(wrapper.text()).toMatch("42");
   });
@@ -48,6 +51,9 @@ describe("DisplayerNumber.vue", () => {
         entry: {
           quantity: 42,
         },
+      },
+      logic: {
+        isEditMode: () => false,
       },
     });
 

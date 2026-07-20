@@ -45,13 +45,21 @@ describe("DisplayerDate.vue", () => {
   });
 
   it("Renders an entry in view mode", async () => {
-    const wrapper = initWrapper(DisplayerDate, {});
+    const wrapper = initWrapper(DisplayerDate, {
+      logic: {
+        isEditMode: () => false,
+      },
+    });
     await flushPromises();
     expect(wrapper.text()).toMatch("formatted date");
   });
 
   it("Switch to edit mode", async () => {
-    const wrapper = initWrapper(DisplayerDate, {});
+    const wrapper = initWrapper(DisplayerDate, {
+      logic: {
+        isEditMode: () => false,
+      },
+    });
     await flushPromises();
     await wrapper.setProps({ isView: false });
 

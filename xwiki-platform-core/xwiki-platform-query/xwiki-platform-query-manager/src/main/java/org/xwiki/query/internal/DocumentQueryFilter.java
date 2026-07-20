@@ -60,10 +60,8 @@ public class DocumentQueryFilter implements QueryFilter
             Object result = results.get(i);
             if (result instanceof String resultString) {
                 results.set(i, this.documentReferenceResolver.resolve(resultString));
-            } else if (result instanceof Object[] row) {
-                if (row.length > 0 && row[0] instanceof String rowString) {
-                    row[0] = this.documentReferenceResolver.resolve(rowString);
-                }
+            } else if (result instanceof Object[] row && row.length > 0 && row[0] instanceof String rowString) {
+                row[0] = this.documentReferenceResolver.resolve(rowString);
             }
         }
         return results;

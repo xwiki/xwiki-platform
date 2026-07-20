@@ -20,13 +20,13 @@
 package org.xwiki.rest.internal.representations.tags;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.rest.JAXRSUtils;
+import org.xwiki.rest.model.jaxb.Tag;
 import org.xwiki.rest.model.jaxb.Tags;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -61,7 +61,7 @@ class FormUrlEncodedTagsReaderTest
         Tags tags = this.reader.readFrom(Tags.class, null, null, null, null, null);
 
         List<String> names =
-            tags.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toList());
+            tags.getTags().stream().map(Tag::getName).toList();
         assertEquals(List.of("a", "b", "c", "d", "x", "y"), names);
     }
 

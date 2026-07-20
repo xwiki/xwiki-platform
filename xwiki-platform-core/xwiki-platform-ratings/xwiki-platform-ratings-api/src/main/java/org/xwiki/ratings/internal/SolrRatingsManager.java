@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -201,7 +200,7 @@ public class SolrRatingsManager implements RatingsManager
     private List<Rating> getRatingsFromQueryResult(SolrDocumentList documents)
     {
         if (documents != null) {
-            return documents.stream().map(this::getRatingFromSolrDocument).collect(Collectors.toList());
+            return documents.stream().map(this::getRatingFromSolrDocument).toList();
         } else {
             return Collections.emptyList();
         }

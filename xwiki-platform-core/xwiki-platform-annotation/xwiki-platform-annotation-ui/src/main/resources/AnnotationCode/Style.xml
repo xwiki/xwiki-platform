@@ -375,11 +375,10 @@ mark.annotation:not(.annotation-highlight) {
     --padding-base-horizontal: 12px;
     background: transparent;
     border: none;
-    /* We use a negative margin so that the first button in this list can be aligned with the text of the annotation. */
+    /* Align first button with the annotation text. */
     margin-left: calc(-1 * var(--padding-base-horizontal));
 
-    /* These buttons have no background, so Bootstrap's default inset active box-shadow has nothing to sit on top of
-       and just looks like a stray smudge. Drop it, following the same convention as .btn-link. */
+    /* No background to cast a shadow on, drop it (like .btn-link). */
     &amp;:active, &amp;.active {
       box-shadow: none;
     }

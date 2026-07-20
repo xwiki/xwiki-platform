@@ -120,15 +120,7 @@ public class BaseElement
     }
 
     /**
-     * Confirms a {@code XWiki.widgets.ConfirmationBox} dialog (or a subclass, e.g.
-     * {@code XWiki.widgets.ConfirmedAjaxRequest}) by clicking its "Yes" button, which is the first
-     * {@code input[type=button]} in the dialog's {@code .buttons} container.
-     * <p>
-     * Note that the dialog's buttons are rendered as {@code <input type="button">} elements (see
-     * {@code XWiki.widgets.ModalPopup#createButton} in {@code modalPopup.js}), not {@code <button>} elements, and the
-     * selector is scoped to {@code .xdialog-box-confirmation} (the class added by
-     * {@code XWiki.widgets.ConfirmationBox}) so that it doesn't accidentally match an unrelated {@code .buttons}
-     * container elsewhere on the page.
+     * Confirms a {@code XWiki.widgets.ConfirmationBox} dialog by clicking its "Yes" button.
      *
      * @since 18.6.0RC1
      */

@@ -81,7 +81,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "First second third fourth");
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
@@ -112,7 +112,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "First [[second>>https://xwiki.org]] third fourth");
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
@@ -147,7 +147,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "First second third fourth");
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
@@ -181,7 +181,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "First [[second>>https://xwiki.org]] third fourth");
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
@@ -224,7 +224,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "First second third fourth");
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
@@ -267,7 +267,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "First second third fourth");
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
@@ -301,7 +301,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "First second third fourth");
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
@@ -332,7 +332,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "First [[second>>https://xwiki.org]] third fourth");
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
@@ -366,7 +366,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "First [[second>>https://xwiki.org]] third fourth");
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
@@ -414,7 +414,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.createPage(testReference,
             "First [[second>>doc:%s]] third fourth".formatted(setup.serializeReference(oldTargetPage)));
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
@@ -467,7 +467,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.createPage(testReference,
             "First [[second>>attach:%s@%s]] third fourth".formatted(setup.serializeReference(oldTargetPage), attachmentName));
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
@@ -504,7 +504,7 @@ class LinkIT extends AbstractBlockNoteIT
         setup.deletePage(testReference);
         setup.createPage(testReference, "First [[second>>mailto:second@xwiki.org]] third fourth");
 
-        InplaceEditablePage page = editInPlace();
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();

@@ -53,21 +53,6 @@ public class InplaceEditablePage extends ViewPage
     }
 
     /**
-     * Click on the Edit button and wait, up to the specified timeout, for the in-place editor to load. Use this instead
-     * of {@link #editInplace()} when loading the in-place editor can take longer than the default timeout (e.g. when
-     * using a heavy editor under load).
-     *
-     * @param timeout the number of seconds to wait for the in-place editor to load
-     * @return this page object
-     * @since 18.7.0RC1
-     */
-    public InplaceEditablePage editInplace(int timeout)
-    {
-        edit();
-        return waitForInplaceEditor(timeout);
-    }
-
-    /**
      * Clicks on the edit link for the specified section and waits for the in-place editor to be load.
      * 
      * @param sectionNumber indicates the section to edit
@@ -104,26 +89,6 @@ public class InplaceEditablePage extends ViewPage
         getDriver().waitUntilElementsAreVisible(
             new By[] {By.cssSelector(".xcontent.form"), By.cssSelector("#xwikicontent:not(.loading)")}, true);
         return this;
-    }
-
-    /**
-     * Wait, up to the specified timeout, until the user can interact with the in-place editor. Use this instead of
-     * {@link #waitForInplaceEditor()} when loading the in-place editor can take longer than the default timeout (e.g.
-     * when using a heavy editor under load).
-     *
-     * @param timeout the number of seconds to wait for the in-place editor to load
-     * @return this page object
-     * @since 18.7.0RC1
-     */
-    public InplaceEditablePage waitForInplaceEditor(int timeout)
-    {
-        int currentTimeout = getDriver().getTimeout();
-        try {
-            getDriver().setTimeout(timeout);
-            return waitForInplaceEditor();
-        } finally {
-            getDriver().setTimeout(currentTimeout);
-        }
     }
 
     /**

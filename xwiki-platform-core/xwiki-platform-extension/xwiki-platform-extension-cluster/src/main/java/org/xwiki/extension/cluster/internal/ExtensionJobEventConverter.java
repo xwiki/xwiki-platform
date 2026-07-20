@@ -73,22 +73,21 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
     @Override
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
-        if (remoteEvent.getEvent() instanceof JobStartedEvent jobStartedEvent) {
-            if (JOBS.contains(jobStartedEvent.getJobType())) {
-                Request request = jobStartedEvent.getRequest();
+        if (remoteEvent.getEvent() instanceof JobStartedEvent jobStartedEvent
+            && JOBS.contains(jobStartedEvent.getJobType())) {
+            Request request = jobStartedEvent.getRequest();
 
-                // Indicate the job has been triggered by a remote event
-                if (!(request instanceof AbstractRequest)) {
-                    request = new DefaultRequest(request);
-                }
-                ((AbstractRequest) request).setRemote(true);
-
-                // We don't want to directly simulate a new JobStartedEvent event but we want to start a new job
-                // which will generate a new JobStartedEvent
-                localEvent.setEvent(new RemoteExtensionJobStartedEvent(jobStartedEvent.getJobType(), request));
-
-                return true;
+            // Indicate the job has been triggered by a remote event
+            if (!(request instanceof AbstractRequest)) {
+                request = new DefaultRequest(request);
             }
+            ((AbstractRequest) request).setRemote(true);
+
+            // We don't want to directly simulate a new JobStartedEvent event but we want to start a new job
+            // which will generate a new JobStartedEvent
+            localEvent.setEvent(new RemoteExtensionJobStartedEvent(jobStartedEvent.getJobType(), request));
+
+            return true;
         }
 
         return false;

@@ -59,10 +59,9 @@ public class LocalizedStringEntityReferenceSerializer extends DefaultStringEntit
             if (documentReference.getLocale() != null) {
                 representation.append('(').append(documentReference.getLocale()).append(')');
             }
-        } else if (currentReference instanceof LocalDocumentReference documentReference) {
-            if (documentReference.getLocale() != null) {
-                representation.append('(').append(documentReference.getLocale()).append(')');
-            }
+        } else if (currentReference instanceof LocalDocumentReference documentReference
+            && documentReference.getLocale() != null) {
+            representation.append('(').append(documentReference.getLocale()).append(')');
         }
     }
 }

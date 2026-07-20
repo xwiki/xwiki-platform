@@ -23,9 +23,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.rest.model.jaxb.Tag;
 import org.xwiki.rest.model.jaxb.Tags;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,7 +50,7 @@ class TextPlainTagsReaderTest
         Tags tags = this.reader.readFrom(Tags.class, null, null, null, null, utf8("a b,c|d\ne"));
 
         List<String> names =
-            tags.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toList());
+            tags.getTags().stream().map(Tag::getName).toList();
         assertEquals(List.of("a", "b", "c", "d", "e"), names);
     }
 

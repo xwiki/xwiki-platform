@@ -72,13 +72,13 @@ import static org.openqa.selenium.Keys.chord;
 import static org.xwiki.livedata.test.po.TableLayoutElement.FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS;
 
 /**
- * Tests of the Live Data macro, in view and edit modes.
+ * Tests of the Live Data macro with the {@code liveTable} source, in view and edit modes.
  *
  * @version $Id$
  * @since 13.4RC1
  */
 @UITest
-class LiveDataIT
+class LiveTableLiveDataIT
 {
     private static final String NAME_COLUMN = "name";
 

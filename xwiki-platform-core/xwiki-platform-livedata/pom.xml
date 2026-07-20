@@ -32,10 +32,12 @@
   <packaging>pom</packaging>
   <description>Display dynamic lists of data</description>
   <modules>
+  <!-- Sorted alphabetically -->
     <module>xwiki-platform-livedata-api</module>
     <module>xwiki-platform-livedata-livetable</module>
     <module>xwiki-platform-livedata-macro</module>
     <module>xwiki-platform-livedata-rest</module>
+    <module>xwiki-platform-livedata-solr</module>
     <module>xwiki-platform-livedata-war</module>
     <module>xwiki-platform-livedata-webjar</module>
     <module>xwiki-platform-livedata-node</module>

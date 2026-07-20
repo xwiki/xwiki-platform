@@ -1,0 +1,12 @@
+{
+  "query": {
+    "source": {
+      "id": "solr"
+    }
+  },
+  "meta": {
+    "entryDescriptor": {
+      "idProperty": "doc.id"
+    }
+  }
+}

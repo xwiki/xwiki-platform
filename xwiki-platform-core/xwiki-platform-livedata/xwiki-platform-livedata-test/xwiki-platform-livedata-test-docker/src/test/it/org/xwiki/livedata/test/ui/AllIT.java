@@ -33,7 +33,12 @@ import org.xwiki.test.docker.junit5.UITest;
 class AllIT
 {
     @Nested
-    class NestedLiveDataIT extends LiveDataIT
+    class NestedLiveTableLiveDataIT extends LiveTableLiveDataIT
+    {
+    }
+
+    @Nested
+    class NestedSolrLiveDataIT extends SolrLiveDataIT
     {
     }
 }

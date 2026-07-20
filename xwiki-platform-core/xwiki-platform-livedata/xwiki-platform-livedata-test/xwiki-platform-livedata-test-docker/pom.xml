@@ -51,6 +51,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Used by SolrLiveDataIT to wait for the documents to be indexed in Solr. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-test-utils</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Runtime dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -61,6 +68,15 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-livedata-livetable</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- The Solr Live Data source connector, used by SolrLiveDataIT. Declared as a runtime dependency so that the
+         docker test framework installs it as a regular extension (via the Extension Manager) in the running XWiki,
+         rather than bundling it in WEB-INF/lib. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-solr</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

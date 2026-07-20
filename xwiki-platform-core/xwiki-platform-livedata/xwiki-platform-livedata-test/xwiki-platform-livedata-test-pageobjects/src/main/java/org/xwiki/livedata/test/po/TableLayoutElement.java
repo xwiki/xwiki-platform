@@ -613,6 +613,17 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Navigate to the next page of results and wait for the data to load.
+     *
+     * @since 18.6.0RC1
+     */
+    public void goToNextPage()
+    {
+        getRoot().findElement(By.cssSelector(".livedata-pagination .next-page")).click();
+        waitUntilReady();
+    }
+
+    /**
      * Return the current values of the filter of a given column. We return a list of values because some filters can
      * have several values (e.g., a selectized field).
      *

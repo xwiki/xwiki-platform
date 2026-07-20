@@ -58,10 +58,7 @@ public class TreeElement extends BaseElement
     }
 
     /**
-     * The rendered DOM id of a node's anchor is prefixed with the tree's own id, to keep it unique when the same
-     * entity is shown by more than one tree on the same page (see tree.js). The node's own {@code <li>} keeps its
-     * plain, unprefixed id (jsTree doesn't allow us to safely change that one - see tree.js). This reconstructs the
-     * anchor's rendered id from the node id.
+     * Reconstructs an anchor's rendered id from its node id.
      *
      * @param nodeId the node identifier
      * @return the corresponding anchor DOM id

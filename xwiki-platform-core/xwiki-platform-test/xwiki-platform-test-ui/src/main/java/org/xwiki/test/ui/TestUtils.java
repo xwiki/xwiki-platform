@@ -629,14 +629,16 @@ public class TestUtils
 
         // Add the user to XWikiAllGroup
         try {
-            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member",
+                serializeReference(userReference));
         } catch (Exception e) {
             fail("Failed to add the user in the XWikiAllGroup group", e);
         }
 
         // Add the user to XWikiAdminGroup group (before we login as the user does not have admin right at first)
         try {
-            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member",
+                serializeReference(userReference));
         } catch (Exception e) {
             fail("Failed to add the user in the XWikiAdminGroup group", e);
         }

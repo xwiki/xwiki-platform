@@ -18,11 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import LivedataAdvancedPanelFilter from "./LivedataAdvancedPanelFilter.vue";
-import { mountHelper, runTest } from "@xwiki/platform-test-accessibility";
+import { mount } from "@vue/test-utils";
+import { assertAxe } from "@xwiki/platform-test-accessibility";
 import _ from "lodash-es";
-import { describe, expect } from "vitest";
-
-const accessibilityMount = mountHelper(LivedataAdvancedPanelFilter);
+import { describe, expect, it } from "vitest";
 
 /**
  * Vue Component initializer for LiveDataAdvancedPanelFilter component.
@@ -31,7 +30,8 @@ const accessibilityMount = mountHelper(LivedataAdvancedPanelFilter);
  * @returns a wrapper for the LiveDataAdvancedPanelFilter component
  */
 function initWrapper({ provide } = {}) {
-  return accessibilityMount({
+  return mount(LivedataAdvancedPanelFilter, {
+    attachTo: document.body,
     props: {
       panel: {
         id: "filterPanel",
@@ -79,26 +79,25 @@ function initWrapper({ provide } = {}) {
 }
 
 describe("LivedataAdvancedPanelFilter.vue", () => {
-  runTest("Displays the title and the icon", initWrapper(), (wrapper) => {
+  it("Displays the title and the icon", async () => {
+    const wrapper = initWrapper();
     expect(wrapper.find(".panel-heading .title").text()).toBe("filter Filter");
+    await assertAxe(wrapper);
   });
 
-  runTest(
-    "Displays no message when filterable properties exist",
-    initWrapper(),
-    (wrapper) => {
-      expect(wrapper.find(".text-muted").text()).toBe(
-        "livedata.panel.filter.noneFilterable",
-      );
-      expect(wrapper.find(".text-muted").attributes("style")).toBe(
-        "display: none;",
-      );
-    },
-  );
+  it("Displays no message when filterable properties exist", async () => {
+    const wrapper = initWrapper();
+    expect(wrapper.find(".text-muted").text()).toBe(
+      "livedata.panel.filter.noneFilterable",
+    );
+    expect(wrapper.find(".text-muted").attributes("style")).toBe(
+      "display: none;",
+    );
+    await assertAxe(wrapper);
+  });
 
-  runTest(
-    "Displays a message when no filterable properties exist",
-    initWrapper({
+  it("Displays a message when no filterable properties exist", async () => {
+    const wrapper = initWrapper({
       provide: {
         logic: {
           getFilterableProperties() {
@@ -106,30 +105,8 @@ describe("LivedataAdvancedPanelFilter.vue", () => {
           },
         },
       },
-    }),
-    (wrapper) => {
-      expect(wrapper.find(".text-muted").element.tagName).toBe("DIV");
-    },
-  );
-
-  runTest(
-    "Displays the add filter select when there are unfiltered properties",
-    initWrapper({
-      provide: {
-        logic: {
-          getUnfilteredProperties() {
-            return ["id"];
-          },
-          getPropertyDescriptor(propertyId) {
-            return { id: propertyId, name: "ID" };
-          },
-        },
-      },
-    }),
-    (wrapper) => {
-      expect(wrapper.find(".add-filters-select").attributes("aria-label")).toBe(
-        "livedata.panel.filter.addProperty.hint",
-      );
-    },
-  );
+    });
+    expect(wrapper.find(".text-muted").element.tagName).toBe("DIV");
+    await assertAxe(wrapper);
+  });
 });

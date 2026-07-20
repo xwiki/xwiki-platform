@@ -19,6 +19,7 @@
  */
 import LivedataAdvancedPanelFilter from "./LivedataAdvancedPanelFilter.vue";
 import { mount } from "@vue/test-utils";
+import { runTest } from "@xwiki/platform-test-accessibility";
 import _ from "lodash-es";
 import { describe, expect, it } from "vitest";
 
@@ -30,6 +31,7 @@ import { describe, expect, it } from "vitest";
  */
 function initWrapper({ provide } = {}) {
   return mount(LivedataAdvancedPanelFilter, {
+    attachTo: document.body,
     props: {
       panel: {
         id: "filterPanel",
@@ -104,4 +106,23 @@ describe("LivedataAdvancedPanelFilter.vue", () => {
     });
     expect(wrapper.find(".text-muted").element.tagName).toBe("DIV");
   });
+
+  runTest(
+    "Is accessible",
+    initWrapper({
+      provide: {
+        logic: {
+          getUnfilteredProperties() {
+            return ["id"];
+          },
+          getPropertyDescriptor(propertyId) {
+            return { id: propertyId, name: "ID" };
+          },
+        },
+      },
+    }),
+    () => {
+      // Assertions are performed by the axe-core check ran after this test.
+    },
+  );
 });

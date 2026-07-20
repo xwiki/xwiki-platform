@@ -20,6 +20,7 @@
 
 import LivedataPagination from "./LivedataPagination.vue";
 import { mount } from "@vue/test-utils";
+import { runTest } from "@xwiki/platform-test-accessibility";
 import _ from "lodash-es";
 import { describe, expect, it } from "vitest";
 
@@ -68,6 +69,7 @@ import { describe, expect, it } from "vitest";
  */
 function initWrapper({ provide } = {}) {
   return mount(LivedataPagination, {
+    attachTo: document.body,
     global: {
       provide: _.merge(
         {
@@ -188,5 +190,9 @@ describe("LivedataPagination.vue", () => {
     expect(pageNavs.at(2).text()).toContain(
       "livedata.pagination.loadPageByNumber",
     );
+  });
+
+  runTest("Is accessible", initWrapper(), () => {
+    // Assertions are performed by the axe-core check ran after this test.
   });
 });

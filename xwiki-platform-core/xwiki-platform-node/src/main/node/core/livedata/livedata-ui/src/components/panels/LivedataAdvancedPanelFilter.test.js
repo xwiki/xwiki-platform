@@ -22,14 +22,14 @@ import { mountHelper, runTest } from "@xwiki/platform-test-accessibility";
 import _ from "lodash-es";
 import { describe, expect } from "vitest";
 
+const accessibilityMount = mountHelper(LivedataAdvancedPanelFilter);
+
 /**
  * Vue Component initializer for LiveDataAdvancedPanelFilter component.
  *
  * @param provide - (optional) an object that is merged on top of the default provide parameter.
  * @returns a wrapper for the LiveDataAdvancedPanelFilter component
  */
-const accessibilityMount = mountHelper(LivedataAdvancedPanelFilter);
-
 function initWrapper({ provide } = {}) {
   return accessibilityMount({
     props: {

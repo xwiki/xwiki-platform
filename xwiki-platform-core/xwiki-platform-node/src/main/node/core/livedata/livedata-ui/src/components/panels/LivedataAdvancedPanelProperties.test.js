@@ -23,14 +23,14 @@ import _ from "lodash-es";
 import { describe, expect } from "vitest";
 import { nextTick } from "vue";
 
+const accessibilityMount = mountHelper(LivedataAdvancedPanelProperties);
+
 /**
  * Vue Component initializer for LiveDataAdvancedPanelProperties component.
  *
  * @param provide - (optional) an object that is merged on top of the default provide parameter.
  * @returns a wrapper for the LiveDataAdvancedPanelProperties component
  */
-const accessibilityMount = mountHelper(LivedataAdvancedPanelProperties);
-
 function initWrapper({ provide } = {}) {
   global.XWiki = { contextPath: "http://localhost/" };
   let propertyIsVisible = true;

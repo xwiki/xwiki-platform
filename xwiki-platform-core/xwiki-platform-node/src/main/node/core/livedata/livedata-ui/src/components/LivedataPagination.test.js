@@ -23,6 +23,8 @@ import { mountHelper, runTest } from "@xwiki/platform-test-accessibility";
 import _ from "lodash-es";
 import { describe, expect } from "vitest";
 
+const accessibilityMount = mountHelper(LivedataPagination);
+
 /**
  * Vue component initializer for the LivedataPagination component. Calls `mount()` from
  * `@vue/test-utils` with preconfigured values.
@@ -66,8 +68,6 @@ import { describe, expect } from "vitest";
  * @param provide - (optional) an object that is merged on top of the default provide parameter.
  * @returns a wrapper for the LivedataPagination component
  */
-const accessibilityMount = mountHelper(LivedataPagination);
-
 function initWrapper({ provide } = {}) {
   return accessibilityMount({
     global: {

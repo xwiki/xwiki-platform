@@ -19,9 +19,6 @@
  */
 package org.xwiki.blocknote.test.ui;
 
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
@@ -29,14 +26,12 @@ import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteLinkModal;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -239,10 +234,8 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("""
-            (%% style="color:default;background-color:default;text-align:left" %%)
-            First [[second>>doc:%s]] third fourth"""
-            .formatted(setup.serializeReference(targetPage)), wikiEditor.getContent());
+        assertEquals("First [[second>>doc:%s]] third fourth".formatted(setup.serializeReference(targetPage)),
+            wikiEditor.getContent());
     }
 
     @Test
@@ -283,10 +276,8 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("""
-            (%% style="color:default;background-color:default;text-align:left" %%)
-            First [[second>>attach:%s@%s]] third fourth"""
-            .formatted(setup.serializeReference(targetPage), attachmentName), wikiEditor.getContent());
+        assertEquals("First [[second>>attach:%s@%s]] third fourth".formatted(setup.serializeReference(targetPage),
+            attachmentName), wikiEditor.getContent());
     }
 
     @Test
@@ -315,9 +306,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
-            First [[second>>mailto:second@xwiki.org]] third fourth""", wikiEditor.getContent());
+        assertEquals("First [[second>>mailto:second@xwiki.org]] third fourth", wikiEditor.getContent());
     }
 
     @Test
@@ -349,9 +338,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
-            First [[second>>mailto:second@xwiki.org]] third fourth""", wikiEditor.getContent());
+        assertEquals("First [[second>>mailto:second@xwiki.org]] third fourth", wikiEditor.getContent());
     }
 
     @Test
@@ -383,9 +370,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
-            First [[second>>https://example.org]] third fourth""", wikiEditor.getContent());
+        assertEquals("First [[second>>https://example.org]] third fourth", wikiEditor.getContent());
     }
 
     @Test
@@ -432,10 +417,8 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("""
-            (%% style="color:default;background-color:default;text-align:left" %%)
-            First [[second>>doc:%s]] third fourth"""
-            .formatted(setup.serializeReference(newTargetPage)), wikiEditor.getContent());
+        assertEquals("First [[second>>doc:%s]] third fourth".formatted(setup.serializeReference(newTargetPage)),
+            wikiEditor.getContent());
     }
 
     @Test
@@ -486,10 +469,8 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("""
-            (%% style="color:default;background-color:default;text-align:left" %%)
-            First [[second>>attach:%s@%s]] third fourth"""
-            .formatted(setup.serializeReference(newTargetPage), attachmentName), wikiEditor.getContent());
+        assertEquals("First [[second>>attach:%s@%s]] third fourth".formatted(setup.serializeReference(newTargetPage),
+            attachmentName), wikiEditor.getContent());
     }
 
     @Test
@@ -521,9 +502,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
-            First [[second>>mailto:other@xwiki.org]] third fourth""", wikiEditor.getContent());
+        assertEquals("First [[second>>mailto:other@xwiki.org]] third fourth", wikiEditor.getContent());
     }
 
     /**

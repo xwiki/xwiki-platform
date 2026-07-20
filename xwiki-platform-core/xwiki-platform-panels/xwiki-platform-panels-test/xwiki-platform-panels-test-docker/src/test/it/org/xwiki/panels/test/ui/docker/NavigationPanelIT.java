@@ -110,8 +110,6 @@ class NavigationPanelIT
 
     /**
      * Show the Navigation Panel in both columns so the same document nodes end up rendered by two independent trees.
-     * Verify this doesn't produce duplicate anchor DOM ids (the {@code <li>} itself intentionally keeps its
-     * original, potentially shared id - see tree.js).
      */
     @Test
     void noDuplicateIds(TestUtils setup, TestReference testReference)
@@ -120,9 +118,6 @@ class NavigationPanelIT
         setup.setWikiPreference("showLeftPanels", "1");
         setup.setWikiPreference("leftPanels", "Panels.Navigation");
 
-        // Use a flat (single-level space) page rather than testReference directly: testReference is nested (it uses
-        // the test class and method names as space names) and the Navigation Panel's automatic open-to-current-doc
-        // doesn't reliably expand more than one level deep (a pre-existing limitation, unrelated to this test).
         String[] documentPath = {testReference.getLastSpaceReference().getName() + "NoDuplicateIds", "WebHome"};
         setup.createPage(new LocalDocumentReference(documentPath[0], documentPath[1]), "Some content");
 
@@ -132,12 +127,7 @@ class NavigationPanelIT
         NavigationTreeElement rightTree = new NavigationTreeElement(
             setup.getDriver().findElement(By.cssSelector("#rightPanels .panel.Navigation .xtree")));
         rightTree.waitForIt();
-
-        // The panel opens to the current document asynchronously, which can still be in progress after waitForIt()
-        // returns (that only waits for the tree's own initial load). Wait for the document itself to appear, with a
-        // longer timeout than the default, since this involves an extra round-trip beyond the tree's initial load.
-        // Sanity check: both trees actually render the current document (i.e. we're really exercising the
-        // duplicate-id scenario and not just looking at two empty trees).
+        
         setup.getDriver().waitUntilCondition(driver -> leftTree.hasDocument(documentPath), 30);
         setup.getDriver().waitUntilCondition(driver -> rightTree.hasDocument(documentPath), 30);
 
@@ -146,8 +136,7 @@ class NavigationPanelIT
 
     private List<String> getDuplicateAnchorDOMIds(TestUtils setup)
     {
-        // Scoped to the tree nodes' anchors (a); the <li> itself intentionally still shares its id with other trees
-        // showing the same entity (see tree.js), so it's excluded here.
+        // Scoped to the tree nodes' anchors
         Map<String, Long> idCounts = setup.getDriver().findElements(By.cssSelector(".xtree a[id]")).stream()
             .map(element -> element.getAttribute("id"))
             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));

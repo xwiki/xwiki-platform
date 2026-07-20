@@ -99,7 +99,7 @@ define([
     return prefix;
   };
 
-  var namespaceAnchorAttributes = function(node, tree) {
+  var prefixAnchorAttributes = function(node, tree) {
     if (node && typeof node.id !== 'undefined') {
       var prefix = getTreePrefix(tree);
       node.a_attr = $.extend({}, node.a_attr, {id: prefix + '-' + node.id + '_anchor'});
@@ -114,7 +114,7 @@ define([
     // Wrap the callback from jsTree so that every fetched child's anchor gets a page-wide unique rendered id.
     callback = function(children) {
       (children || []).forEach(function(child) {
-        namespaceAnchorAttributes(child, tree);
+        prefixAnchorAttributes(child, tree);
       });
       boundCallback(children);
     };

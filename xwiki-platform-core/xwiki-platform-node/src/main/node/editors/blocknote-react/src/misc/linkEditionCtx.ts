@@ -17,13 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 import type { AttachmentsService } from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
-import type {
-  LinkSuggestService,
-  LinkType,
-} from "@xwiki/platform-link-suggest-api";
+import type { LinkSuggestService } from "@xwiki/platform-link-suggest-api";
 import type {
   ModelReferenceHandler,
   ModelReferenceParser,
@@ -49,4 +45,5 @@ type LinkEditionContext = {
   documentService: DocumentService;
 };
 
-export type { LinkEditionContext, LinkType };
+export type { LinkEditionContext };
+export { LinkType } from "@xwiki/platform-link-suggest-api";

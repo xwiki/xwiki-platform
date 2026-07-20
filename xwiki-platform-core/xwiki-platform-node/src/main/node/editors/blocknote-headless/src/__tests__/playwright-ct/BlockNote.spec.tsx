@@ -24,7 +24,7 @@ import { expect, test } from "@playwright/experimental-ct-vue";
 
 test("BlockNote Headless mounts properly", async ({ mount }) => {
   const component = await mountBlockNoteHeadless(mount, {
-    editorContent: { blocks: [] },
+    editorContent: [],
     editorProps: {
       syntax: FULL_SYNTAX,
     },

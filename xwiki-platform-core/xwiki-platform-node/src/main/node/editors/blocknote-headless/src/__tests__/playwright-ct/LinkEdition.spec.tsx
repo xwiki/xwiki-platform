@@ -20,7 +20,7 @@
 import { mountBlockNoteHeadless } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { expect, test } from "@playwright/experimental-ct-vue";
-import type { UniAst } from "@xwiki/platform-uniast-api";
+import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
 
 test("Editing the title of a link keeps the rest of the line intact", async ({
   mount,
@@ -60,22 +60,26 @@ test("Editing the title of a link keeps the rest of the line intact", async ({
   await expect(editorEl).toHaveText("First 2nd third fourth");
 });
 
-function buildParagraphWithLink(url: string): UniAst {
-  return {
-    blocks: [
-      {
-        type: "paragraph",
-        content: [
-          { type: "text", content: "First ", styles: {} },
-          {
-            type: "link",
-            target: { type: "external", url },
-            content: [{ type: "text", content: "second", styles: {} }],
-          },
-          { type: "text", content: " third fourth", styles: {} },
-        ],
-        styles: {},
+function buildParagraphWithLink(url: string): BlockType[] {
+  return [
+    {
+      id: Math.random().toString(),
+      type: "paragraph",
+      props: {
+        backgroundColor: "default",
+        textAlignment: "left",
+        textColor: "default",
       },
-    ],
-  };
+      content: [
+        { type: "text", text: "First ", styles: {} },
+        {
+          type: "link",
+          href: url,
+          content: [{ type: "text", text: "second", styles: {} }],
+        },
+        { type: "text", text: " third fourth", styles: {} },
+      ],
+      children: [],
+    },
+  ];
 }

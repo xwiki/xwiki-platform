@@ -190,13 +190,6 @@ type BlockNoteViewWrapperProps = {
      * Intercept image edition mechanism (i.e. clicking on the edition icon in images' toolbar)
      */
     imageEdition?: ImageEditionOverrideFn;
-
-    /**
-     * Hooks to intercept the link creation / edition flow.
-     *
-     * @since 18.6.0RC1
-     */
-    linkEdition?: LinkEditionHooks;
   };
 
   /**
@@ -383,7 +376,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
               <FormattingToolbar>
                 <CustomLinkToolbar
                   linkToolbarProps={props}
-                  linkEditionHandler={linkEditionHandler}
+                  linkEditionFn={linkEditionHandler}
                 />
               </FormattingToolbar>
             )}

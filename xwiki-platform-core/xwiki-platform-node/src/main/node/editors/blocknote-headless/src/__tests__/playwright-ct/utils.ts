@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Block, UniAst } from "@xwiki/platform-uniast-api";
+import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
 
 interface PageWithKeyboard {
   keyboard: { press(key: string): Promise<void> };
@@ -48,22 +48,24 @@ async function pressKeySettled(
   );
 }
 
-function buildParagraphs(blocks: string[]): UniAst {
-  return {
-    blocks: blocks.map(
-      (blockText): Block => ({
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            content: blockText,
-            styles: {},
-          },
-        ],
+function buildParagraphs(blocks: string[]): BlockType[] {
+  return blocks.map((blockText) => ({
+    id: Math.random().toString(),
+    type: "paragraph",
+    props: {
+      backgroundColor: "default",
+      textAlignment: "left",
+      textColor: "default",
+    },
+    content: [
+      {
+        type: "text",
+        text: blockText,
         styles: {},
-      }),
-    ),
-  };
+      },
+    ],
+    children: [],
+  }));
 }
 
 export { buildParagraphs, pressKeySettled };

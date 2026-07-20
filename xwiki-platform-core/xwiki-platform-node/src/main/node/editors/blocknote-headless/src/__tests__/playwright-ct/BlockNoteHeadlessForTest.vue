@@ -24,10 +24,10 @@ import { useTemplateRef } from "vue";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type {
   BlockNoteViewWrapperProps,
+  BlockType,
   ContextForMacros,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type { UniAst } from "@xwiki/platform-uniast-api";
 
 defineProps<{
   editorProps: Omit<
@@ -46,14 +46,14 @@ defineProps<{
       }
     | false;
 
-  editorContent: UniAst | Error;
+  editorContent: BlockType[];
 
   collaboration?: Collaboration;
 }>();
 
 defineEmits<{
   "instant-change": [];
-  "debounced-change": [content: UniAst];
+  "debounced-change": [content: BlockType[]];
 }>();
 
 // The mocked container must be created here, in the browser, rather than in
@@ -65,7 +65,7 @@ const depsContainer = depsContainerMock();
 const innerRef = useTemplateRef<InstanceType<typeof CBlockNoteView>>("inner");
 
 defineExpose({
-  getContent: (): UniAst | Error => innerRef.value!.getContent(),
+  getContent: (): BlockType[] => innerRef.value!.getContent(),
 });
 </script>
 

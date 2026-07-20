@@ -46,7 +46,7 @@ depsContainer: Container;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
 'link-modal-container': HTMLDivElement;
-}, HTMLDivElement>;
+}, any>;
 
 export { ContextForMacros }
 

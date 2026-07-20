@@ -20,8 +20,6 @@
 package org.xwiki.repository.internal.resources;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -37,14 +35,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.util.Timeout;
@@ -152,16 +149,19 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 .setConnectTimeout(Timeout.ofSeconds(10))
                 .build();
 
+            // useSystemProperties() makes the client honor the JVM proxy settings (http.proxyHost, etc.),
+            // which is why no explicit route planner is needed. A custom User-Agent is still required because
+            // some upstream servers (e.g. nexus.xwiki.org) reject requests that don't set one.
             final CloseableHttpClient httpClient = HttpClients.custom()
+                .useSystemProperties()
                 .setUserAgent("XWikiExtensionRepository")
                 .setDefaultRequestConfig(requestConfig)
-                .setRoutePlanner(new SystemDefaultRoutePlanner(ProxySelector.getDefault()))
                 .build();
 
-            // Stream the entity content back to the caller without buffering it in memory.
-            // Ownership of httpClient and subResponse is transferred to the returned InputStream:
-            // when JAX-RS closes the stream after writing the response, both are closed too.
-            // If anything fails before that handoff, the finally block releases them.
+            // Execute eagerly so the upstream status and content type are available when building the JAX-RS
+            // response, then stream the body back through a StreamingOutput without buffering it in memory. The
+            // client and response are handed over to the StreamingOutput, which closes both once the body has been
+            // fully written. If anything fails before that handoff, the finally block releases them.
             boolean handoffSucceeded = false;
             ClassicHttpResponse subResponse = null;
             try {
@@ -185,22 +185,16 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 String extensionType =
                     this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
 
-                final ClassicHttpResponse responseToClose = subResponse;
-                InputStream baseStream = entity != null ? entity.getContent() : InputStream.nullInputStream();
-                InputStream contentStream = new ProxyInputStream(baseStream)
-                {
-                    @Override
-                    public void close() throws IOException
-                    {
-                        try {
-                            super.close();
-                        } finally {
-                            IOUtils.closeQuietly(responseToClose, httpClient);
+                final ClassicHttpResponse responseToStream = subResponse;
+                StreamingOutput content = output -> {
+                    try (httpClient; responseToStream) {
+                        if (entity != null) {
+                            entity.writeTo(output);
                         }
                     }
                 };
 
-                response.entity(contentStream);
+                response.entity(content);
                 response.header("Content-Disposition",
                     "attachment; filename=\"" + extensionId + '-' + extensionVersion + '.' + extensionType + "\"");
 

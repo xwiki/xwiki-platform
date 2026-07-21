@@ -22,6 +22,7 @@ package org.xwiki.blocknote.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
 import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
 
 /**
@@ -119,5 +120,17 @@ public class BlockNoteToolBar extends BaseElement
     {
         clickButton("editLink");
         return new BlockNoteLinkPopover();
+    }
+
+    /**
+     * Clicks the button to insert a new macro call. This opens the macro selector modal.
+     *
+     * @return the macro selector modal
+     * @since 18.6.0
+     */
+    public MacroDialogSelectModal insertMacro()
+    {
+        clickButton("insertMacro");
+        return new MacroDialogSelectModal();
     }
 }

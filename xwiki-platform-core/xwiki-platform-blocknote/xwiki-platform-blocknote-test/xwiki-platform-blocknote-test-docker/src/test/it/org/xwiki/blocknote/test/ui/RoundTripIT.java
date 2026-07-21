@@ -214,10 +214,16 @@ class RoundTripIT extends AbstractBlockNoteIT
     void table(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
+            |(% rowspan="2" %)one|two|three
+            |(% colspan="2" %)four
+
             (% data-sortable="true" %)
             |=(% data-foo="bar" %)|=One|=Two
             |=Three|1.3|2.3
-            |=Four|1.4|(% data-type="number" %)2.4""",
+            |=Four|1.4|(% data-type="number" %)2.4
+
+            |=Color|(% style="background-color:green;width:64px;padding:6px" %)green
+            |=Shape|circle""",
             // The content is modified on save:
             // * table cell parameters are lost (because the editor doesn't treat table cell as blocks, so there's no
             // clean way to attach metadata)
@@ -225,10 +231,16 @@ class RoundTripIT extends AbstractBlockNoteIT
             // Note also that table cells currently accept only inline content. We'll have to update the test when this
             // is fixed.
             """
+                |(% rowspan="2" %)one|two|three
+                |(% colspan="2" %)four
+
                 (% data-sortable="true" %)
                 |=|=One|=Two
                 |=Three|1.3|2.3
-                |=Four|1.4|2.4""");
+                |=Four|1.4|2.4
+
+                |=Color|(% style="background-color:green;width:64px" %)green
+                |=Shape|circle""");
     }
 
     @Test

@@ -57,14 +57,13 @@ public class ExtensionJobEventConverter extends AbstractEventConverter
     @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        if (localEvent.getEvent() instanceof JobStartedEvent jobStartedEvent) {
-            // Share only specific jobs
-            // Don't send back remote jobs
-            if (JOBS.contains(jobStartedEvent.getJobType()) && !jobStartedEvent.getRequest().isRemote()) {
-                remoteEvent.setEvent(jobStartedEvent);
+        // Share only specific jobs
+        // Don't send back remote jobs
+        if (localEvent.getEvent() instanceof JobStartedEvent jobStartedEvent
+            && JOBS.contains(jobStartedEvent.getJobType()) && !jobStartedEvent.getRequest().isRemote()) {
+            remoteEvent.setEvent(jobStartedEvent);
 
-                return true;
-            }
+            return true;
         }
 
         return false;

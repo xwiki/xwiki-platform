@@ -281,7 +281,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
         this.syncContext = syncContext;
 
-        this.id = createId("rendering", "wikimacro", wikimacro.getId(),
+        this.id = createId("rendering", MACRO_BINDING, wikimacro.getId(),
             wikimacro.getBlockId(syncContext.getCurrentMacroBlock()));
         try {
             this.parameters = convertParameters(parameters);

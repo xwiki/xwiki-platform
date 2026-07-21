@@ -24,7 +24,6 @@ import java.util.UUID;
 
 import javax.inject.Named;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.xwiki.livedata.LiveDataException;

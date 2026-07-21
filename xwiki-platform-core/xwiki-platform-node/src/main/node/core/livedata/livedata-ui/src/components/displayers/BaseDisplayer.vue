@@ -88,6 +88,7 @@
       <div
         @keydown.esc.capture="cancelEdit"
         @focusout="onDisplayerBlur"
+        @focusin="editorFocused = true"
         v-if="!isView && !isLoading"
         ref="editBlock"
       >
@@ -160,6 +161,7 @@ export default {
   data() {
     return {
       duringEditing: false,
+      editorFocused: false,
       href: undefined,
     };
   },
@@ -211,6 +213,7 @@ export default {
     // Switches the displayer to edit mode.
     setEdit() {
       if (this.isEditable && this.isView) {
+        this.editorFocused = false;
         this.$emit("update:isView", false);
         this.logic.getEditBus().start(this.entry, this.propertyId);
       }
@@ -297,6 +300,13 @@ export default {
     async onDisplayerBlur(evt) {
       if (!this.isView) {
         const editBlock = this.$refs["editBlock"];
+
+        // The editor has not been focused yet, so this focusout comes from the action
+        // popover closing right after it opened the editor, and not from the user leaving
+        // the cell: keep editing.
+        if (!this.editorFocused) {
+          return;
+        }
 
         // Focus moved to another element of this cell: keep editing.
         if (evt.relatedTarget && this.$el.contains(evt.relatedTarget)) {

@@ -1144,10 +1144,25 @@ public class TableLayoutElement extends BaseElement
         // Waits for the text input to be displayed.
         getDriver().waitUntilElementIsVisible(element, selector);
 
-        // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements
-        // displayed in the live data (they are the same as the one of the inline edit mode).
-        new FormContainerElement(By.cssSelector(".livedata-displayer .edit"))
-            .setFieldValue(element.findElement(selector), newValue);
+        WebElement field = element.findElement(selector);
+        if (isPlainTextField(field)) {
+            // Do not clear the field with FormContainerElement#setFieldValue here: it uses WebElement#clear(), which
+            // releases the focus of the field, and the Live Data cell editor saves and closes as soon as it is
+            // blurred, destroying the input before the new value can be typed. We instead clear the field with the
+            // keyboard.
+            new Actions(getDriver().getWrappedDriver())
+                .sendKeys(field, Keys.END)
+                .keyDown(Keys.SHIFT)
+                .sendKeys(Keys.HOME)
+                .keyUp(Keys.SHIFT)
+                .sendKeys(Keys.BACK_SPACE)
+                .sendKeys(newValue)
+                .perform();
+        } else {
+            // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements
+            // displayed in the live data (they are the same as the one of the inline edit mode).
+            new FormContainerElement(By.cssSelector(".livedata-displayer .edit")).setFieldValue(field, newValue);
+        }
 
         if (save) {
             // Clicks somewhere outside the edited cell. We use the h1 tag because it is present on all pages.
@@ -1179,6 +1194,13 @@ public class TableLayoutElement extends BaseElement
     private String[] getClasses(WebElement element)
     {
         return StringUtils.defaultString(element.getAttribute(ATTRIBUTE_CLASS)).split("\\s+");
+    }
+
+    private boolean isPlainTextField(WebElement field)
+    {
+        return !"checkbox".equals(field.getAttribute("type"))
+            && !"select".equals(field.getTagName())
+            && !Arrays.asList(getClasses(field)).contains("datetime");
     }
 
     private String urlWithoutFormToken(EntityReference entityReference, String action)

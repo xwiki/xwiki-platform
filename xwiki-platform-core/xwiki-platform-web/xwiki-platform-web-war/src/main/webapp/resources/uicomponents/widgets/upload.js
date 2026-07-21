@@ -66,7 +66,7 @@ var XWiki = (function(XWiki) {
     bytesToSize : function (bytes) {
       var sizes = ['b', 'Kb', 'Mb'];
       if (bytes == 0) return 'n/a';
-      var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+      var i = Number.parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
       if (i >= sizes.length) {
         i = sizes.length - 1;
       }

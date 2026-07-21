@@ -117,6 +117,10 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     {
         try {
             Map<String, File> usedFiles = getFileMapping(context);
+            if (usedFiles == null) {
+                // No PDF export file mapping in the context, just return a http:// URL.
+                return super.createSkinURL(filename, skin, context);
+            }
             String key = getSkinfileKey(filename, skin);
             if (!usedFiles.containsKey(key)
                 && !copyResource("/skins/" + skin + '/' + filename, key, usedFiles, context)) {
@@ -135,6 +139,10 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     {
         try {
             Map<String, File> usedFiles = getFileMapping(context);
+            if (usedFiles == null) {
+                // No PDF export file mapping in the context, just return a http:// URL.
+                return super.createResourceURL(filename, forceSkinAction, context);
+            }
             String key = getResourceKey(filename);
             if (!usedFiles.containsKey(key) && !copyResource("/resources/" + filename, key, usedFiles, context)) {
                 return super.createResourceURL(filename, forceSkinAction, context);

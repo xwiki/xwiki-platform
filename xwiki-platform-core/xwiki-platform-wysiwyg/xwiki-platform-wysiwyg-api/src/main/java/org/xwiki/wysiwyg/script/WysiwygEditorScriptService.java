@@ -302,7 +302,13 @@ public class WysiwygEditorScriptService implements ScriptService
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
         XWikiContext xwikiContext = this.xcontextProvider.get();
-        return toAnnotatedXHTML(source, getSyntax(syntaxId), xwikiContext.getDoc().getDocumentReference());
+        XWikiDocument currentDocument = xwikiContext.getDoc();
+        if (currentDocument == null) {
+            // No current document to resolve the source reference from: return the source unchanged, as done when the
+            // conversion fails.
+            return source;
+        }
+        return toAnnotatedXHTML(source, getSyntax(syntaxId), currentDocument.getDocumentReference());
     }
 
     /**

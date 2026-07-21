@@ -192,6 +192,14 @@
               <linkTarget>/var/lib/xwiki/tmp</linkTarget>
             </data>
 
+            <!-- Redirect work to /var/lib/xwiki/work -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki-jetty/work</linkName>
+              <linkTarget>/var/lib/xwiki/work</linkTarget>
+            </data>
+
             <!-- Be more explicit about which configuration file is used by XJetty -->
             <data>
               <type>link</type>

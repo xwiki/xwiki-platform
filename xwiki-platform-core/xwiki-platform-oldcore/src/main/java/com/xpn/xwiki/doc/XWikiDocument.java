@@ -5493,7 +5493,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         DocumentInstanceOutputProperties documentProperties = new DocumentInstanceOutputProperties();
         XWikiContext xcontext = getXWikiContext();
         if (xcontext != null) {
-            documentProperties.setDefaultReference(getXWikiContext().getWikiReference());
+            documentProperties.setDefaultReference(xcontext.getWikiReference());
         }
 
         // Input

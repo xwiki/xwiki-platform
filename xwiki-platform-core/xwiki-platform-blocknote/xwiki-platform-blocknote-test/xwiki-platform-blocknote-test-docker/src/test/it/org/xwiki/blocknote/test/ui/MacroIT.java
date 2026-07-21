@@ -21,16 +21,21 @@ package org.xwiki.blocknote.test.ui;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
+import org.xwiki.blocknote.test.po.SlashMenu;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -88,6 +93,11 @@ class MacroIT extends AbstractBlockNoteIT
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
+        // Verify the macro output is rendered.
+        String text = textArea.getText();
+        assertThat(text, containsString("green"));
+        assertThat(text, containsString("and a warning."));
+
         // Edit the inline macro.
         MacroDialogEditModal macroEditModal = textArea.doubleClickMacro(0);
         assertEquals("Success Message", macroEditModal.getMacroName());
@@ -97,6 +107,10 @@ class MacroIT extends AbstractBlockNoteIT
 
         macroEditModal.setMacroParameter("title", "Inline title").setMacroParameter("cssClass", "two")
             .setMacroContent("Red {{error}}Green{{/error}} Blue").clickSubmit();
+
+        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
+        // show the macro placeholder.
+        assertThat(textArea.getText(), containsString("macro:success"));
 
         // Edit the block macro.
         macroEditModal = textArea.doubleClickMacro(1);
@@ -116,6 +130,13 @@ class MacroIT extends AbstractBlockNoteIT
         macroEditModal.setMacroParameter("title", "New title").setMacroParameter("cssClass", "test")
             .setMacroContent("New content.").clickSubmit();
 
+        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
+        // show the macro placeholder.
+        assertEquals("""
+            first macro:success line
+            macro:info
+            end""", textArea.getText());
+
         // Edit again the inline macro.
         macroEditModal = textArea.doubleClickMacro(0);
         assertEquals("Success Message", macroEditModal.getMacroName());
@@ -125,7 +146,7 @@ class MacroIT extends AbstractBlockNoteIT
 
         macroEditModal.setMacroParameter("title", "My Inline Title").setMacroParameter("cssClass", "three")
             .clickSubmit();
-        
+
         // Edit again the block macro.
         macroEditModal = textArea.doubleClickMacro(1);
         assertEquals("Info Message", macroEditModal.getMacroName());
@@ -224,5 +245,72 @@ class MacroIT extends AbstractBlockNoteIT
             {{/warning}}
 
             end""", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(2)
+    void insertMacroUsingSlashMenu(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "", "");
+
+        WYSIWYGEditPage page = WYSIWYGEditPage.gotoPage(testReference);
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Insert a macro using the slash menu.
+        textArea.click().sendKeys("/").sendKeys("macro");
+        SlashMenu slashMenu = new SlashMenu().waitForItemSelected("Macro");
+        textArea.sendKeys(Keys.ENTER);
+        slashMenu.waitForItemSubmitted();
+
+        MacroDialogSelectModal macroSelectModal = new MacroDialogSelectModal();
+        macroSelectModal.filterByText("info", 1).getFirstMacro().orElseThrow().click();
+        MacroDialogEditModal macroEditModal = macroSelectModal.clickSelect();
+        macroEditModal.setMacroContent("foo").setMacroParameter("title", "bar").clickSubmit();
+
+        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
+        // show the macro placeholder.
+        assertEquals("macro:info", textArea.getText());
+
+        page.clickSaveAndView();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            {{info title="bar"}}
+            foo
+            {{/info}}""", wikiEditor.getContent());
+    }
+
+    @Test
+    @Order(3)
+    void insertMacroUsingToolbar(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "", "");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Insert a macro using the toolbar. We need to select some text in order to get the toolbar.
+        textArea.click().sendKeys("text").sendKeys(Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.LEFT));
+
+        MacroDialogSelectModal macroSelectModal = editor.getToolBar().insertMacro();
+        macroSelectModal.filterByText("success", 1).getFirstMacro().orElseThrow().click();
+        MacroDialogEditModal macroEditModal = macroSelectModal.clickSelect();
+        macroEditModal.setMacroContent("foo").setMacroParameter("title", "bar").clickSubmit();
+
+        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
+        // show the macro placeholder.
+        assertEquals("macro:success", textArea.getText());
+
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("""
+            {{success title="bar"}}
+            foo
+            {{/success}}""", wikiEditor.getContent());
     }
 }

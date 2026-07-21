@@ -505,6 +505,32 @@ class LinkIT extends AbstractBlockNoteIT
         assertEquals("First [[second>>mailto:other@xwiki.org]] third fourth", wikiEditor.getContent());
     }
 
+    @Test
+    @Order(14)
+    void editGeneratedLinkLabel(TestUtils setup, TestReference testReference)
+    {
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        // Create a page with two links having generated labels. We'll edit only one of them to verify that generated
+        // labels that are not modified are not persisted.
+        setup.createPage(testReference, "one [[Users.Alice]] two [[Users.Bob]] three");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Place the caret after the first link.
+        textArea.click().sendKeys(Keys.HOME).sendKeys(Keys.chord(Keys.CONTROL, Keys.RIGHT, Keys.RIGHT));
+
+        // Change the generated link label
+        textArea.sendKeys(Keys.LEFT, Keys.BACK_SPACE, "z");
+
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("one [[Alize>>Users.Alice]] two [[Users.Bob]] three", wikiEditor.getContent());
+    }
+
     /**
      * Selects a word with the keyboard, assuming the caret is at the start of the line.
      *

@@ -175,10 +175,22 @@ public class BlockNoteRichTextArea extends BaseElement
     public BlockNoteRichTextArea clickImage(int index)
     {
         // The image might not be loaded yet, so wait until it's clickable before clicking on it.
-        WebElement image = this.container.findElements(By.tagName("img")).get(index);
+        WebElement image = getImage(index);
         getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(image));
         image.click();
         return this;
+    }
+
+    /**
+     * Returns the image with the specified index in the rich text area.
+     *
+     * @param index the index of the image to return, starting from 0
+     * @return the image element
+     * @since 18.6.0
+     */
+    public WebElement getImage(int index)
+    {
+        return this.container.findElements(By.tagName("img")).get(index);
     }
 
     /**

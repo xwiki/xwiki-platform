@@ -272,7 +272,7 @@
   #set($hasEdit = $services.security.authorization.hasAccess('edit', $docRef))
   #if ($annotationClassDocName == 'XWiki.XWikiComments')
     #set($annoDoc = $xwiki.getDocument($docRef))
-    #set($repliesList = $annoDoc.getObjects('XWiki.XWikiComments', 'replyto', $ann.id))
+    #set($repliesList = $annoDoc.getObjects($annotationClassDocName, 'replyto', $ann.id))
     #set($threadCount = $repliesList.size())
     ## Sanitize the xredirect parameter. Fall back to the annotated document view URL when the provided
     ## redirect is missing or unsafe.
@@ -301,7 +301,7 @@
     #if ("$!ann.selection" != '' &amp;&amp; ($hasAdmin || ($hasEdit &amp;&amp; $isUserComment)))
       ## Converts the annotation into a plain comment by blanking its anchoring fields, the same way Delete uses a
       ## plain core action (objectremove) rather than the annotation module's own service layer.
-      #set ($commentClassPrefix = "XWiki.XWikiComments_${ann.id}")
+      #set ($commentClassPrefix = "${annotationClassDocName}_${ann.id}")
       #set ($solveQueryString = "form_token=${escapetool.url($services.csrf.token)}&amp;xredirect=${escapetool.url($doc.getURL('view'))}&amp;${commentClassPrefix}_target=&amp;${commentClassPrefix}_selection=&amp;${commentClassPrefix}_selectionLeftContext=&amp;${commentClassPrefix}_selectionRightContext=&amp;${commentClassPrefix}_originalSelection=&amp;${commentClassPrefix}_state=")
       #set ($solveURL = $xwiki.getURL($doc.fullName, 'save', $solveQueryString, "xwikicomment_${ann.id}"))
       &lt;a class="solve btn btn-default infomessage" rel="nofollow" href="$solveURL"
@@ -312,7 +312,7 @@
     #if ($hasAdmin || ($hasEdit &amp;&amp; $isUserComment))
       #set ($queryString = $escapetool.url({
         'form_token': $services.csrf.token,
-        'classname': 'XWiki.XWikiComments',
+        'classname': $annotationClassDocName,
         'classid': $ann.id,
         'xredirect': $doc.getURL('view')}))
       #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${ann.id}"))

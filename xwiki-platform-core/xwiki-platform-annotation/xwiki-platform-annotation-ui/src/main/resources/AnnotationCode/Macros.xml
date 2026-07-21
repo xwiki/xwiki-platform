@@ -284,7 +284,7 @@
       &lt;/button&gt;##
     #end
     #if($xwiki.hasAccessLevel('comment'))
-      &lt;a class="commentreply btn btn-default infomessage" rel="nofollow" href="$xredirect.replaceAll('&amp;?replyto=\d++', '')}&amp;replyto=${ann.id}#xwikicomment_${ann.id}"#if("$!replyTo" == "${ann.id}") style="display: none;"#end&gt;##
+      &lt;a class="commentreply btn btn-default infomessage" rel="nofollow" href="$xredirect.replaceAll('&amp;?replyto=\d++', '')&amp;replyto=${ann.id}#xwikicomment_${ann.id}"#if("$!replyTo" == "${ann.id}") style="display: none;"#end&gt;##
       $services.icon.renderHTML('comment') $!escapetool.xml($services.localization.render('core.viewers.comments.reply'))
       &lt;/a&gt;##
     #end

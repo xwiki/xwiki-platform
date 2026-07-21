@@ -384,7 +384,7 @@ public class MockitoOldcore
         // Make sure to provide a EntityReferenceFactory
         if (!getMocker().hasComponent(EntityReferenceFactory.class)) {
             EntityReferenceFactory factory = getMocker().registerMockComponent(EntityReferenceFactory.class);
-            when(factory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
+            when(factory.getReference(any())).thenAnswer(invocation -> invocation.getArgument(0));
         }
 
         // Make sure a default ConfigurationSource is available

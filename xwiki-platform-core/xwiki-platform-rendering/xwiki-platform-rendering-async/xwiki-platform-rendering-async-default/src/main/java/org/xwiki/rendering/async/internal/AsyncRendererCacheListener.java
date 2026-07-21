@@ -123,7 +123,9 @@ public class AsyncRendererCacheListener extends AbstractEventListener
                 obj = document.getXObject(objectEvent.getReference());
             }
 
-            this.cache.cleanCache(obj.getXClassReference());
+            if (obj != null) {
+                this.cache.cleanCache(obj.getXClassReference());
+            }
         }
     }
 }

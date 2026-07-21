@@ -168,8 +168,8 @@ public class HqlQueryExecutor extends AbstractQueryExecutor implements Initializ
     protected void checkAllowed(final Query query) throws QueryException
     {
         // Check if the query needs to be validated according to the current author
-        if (query instanceof SecureQuery) {
-            checkAllowed((SecureQuery) query);
+        if (query instanceof SecureQuery secureQuery) {
+            checkAllowed(secureQuery);
         }
     }
 

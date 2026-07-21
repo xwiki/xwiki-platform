@@ -179,12 +179,6 @@ public class LazyXWikiDocument extends XWikiDocument
     }
 
     @Override
-    public DocumentReference getCreatorReference()
-    {
-        return super.getCreatorReference();
-    }
-
-    @Override
     public Date getDate()
     {
         return getDocument().getDate();

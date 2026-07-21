@@ -85,7 +85,6 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.cache.CacheControl;
 import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -142,7 +141,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.internal.parser.LinkParser;
-import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
@@ -189,7 +187,6 @@ import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.internal.doc.BaseObjects;
 import com.xpn.xwiki.internal.doc.XWikiAttachmentList;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
-import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
 import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -242,7 +239,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private static final String PRE_END = "{/pre}";
 
-    private static final String HIDDEN = "hidden";
+    private static final String HIDDEN_PROPERTY = "hidden";
 
     private static final String XWIKIGUEST_REFERENCE_WARNING =
         "A reference to XWikiGuest user has been set instead of null. This is probably a mistake.";
@@ -302,8 +299,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         @Override
         public boolean equals(Object obj)
         {
-            if (obj instanceof XWikiAttachmentToRemove) {
-                return this.attachment.equals(((XWikiAttachmentToRemove) obj).getAttachment());
+            if (obj instanceof XWikiAttachmentToRemove attachmentToRemove) {
+                return this.attachment.equals(attachmentToRemove.getAttachment());
             }
 
             return false;
@@ -371,15 +368,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     private static DocumentReferenceResolver<String> getCurrentDocumentReferenceResolver()
     {
         return Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT);
-    }
-
-    /**
-     * Used to resolve a ResourceReference into a proper Entity Reference using the current document to fill the blanks.
-     */
-    private static EntityReferenceResolver<ResourceReference> getResourceReferenceEntityReferenceResolver()
-    {
-        return Utils
-            .getComponent(new DefaultParameterizedType(null, EntityReferenceResolver.class, ResourceReference.class));
     }
 
     private static EntityReferenceResolver<String> getXClassEntityReferenceResolver()
@@ -611,7 +599,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         public List<BaseObject> put(DocumentReference key, List<BaseObject> value)
         {
             // Makes sure to always insert BaseObjects
-            return xObjects.put(key, value instanceof BaseObjects ? (BaseObjects) value : new BaseObjects(value));
+            return xObjects.put(key, value instanceof BaseObjects baseObjects ? baseObjects : new BaseObjects(value));
         }
 
         @Override
@@ -753,11 +741,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private EntityReferenceSerializer<String> uidStringEntityReferenceSerializer;
 
-    private Provider<OldRendering> oldRenderingProvider;
-
     private JobProgressManager progress;
-
-    private ContextualLocalizationManager localization;
 
     private VelocityContextFactory velocityContextFactory;
 
@@ -950,24 +934,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         return this.uidStringEntityReferenceSerializer;
     }
 
-    private ContextualLocalizationManager getLocalization()
-    {
-        if (this.localization == null) {
-            this.localization = Utils.getComponent(ContextualLocalizationManager.class);
-        }
-
-        return this.localization;
-    }
-
-    private OldRendering getOldRendering()
-    {
-        if (this.oldRenderingProvider == null) {
-            this.oldRenderingProvider = Utils.getComponent(OldRendering.TYPE_PROVIDER);
-        }
-
-        return this.oldRenderingProvider.get();
-    }
-
     private JobProgressManager getProgress()
     {
         if (this.progress == null) {
@@ -1004,11 +970,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         EntityReferenceFactory factory = getEntityReferenceFactory();
 
         return factory != null ? factory.getReference(reference) : reference;
-    }
-
-    private String localizePlainOrKey(String key, Object... parameters)
-    {
-        return Objects.toString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     private UserReferenceSerializer<DocumentReference> getUserReferenceDocumentReferenceSerializer()
@@ -3129,8 +3090,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public BaseObject getXObject(EntityReference reference)
     {
-        if (reference instanceof DocumentReference) {
-            return getXObject((DocumentReference) reference);
+        if (reference instanceof DocumentReference documentReference) {
+            return getXObject(documentReference);
         } else if (reference.getType() == EntityType.DOCUMENT) {
             // class reference
             return getXObject(
@@ -3209,8 +3170,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private BaseObjectReference getBaseObjectReference(ObjectReference objectReference)
     {
-        if (objectReference instanceof BaseObjectReference) {
-            return (BaseObjectReference) objectReference;
+        if (objectReference instanceof BaseObjectReference baseObjectReference) {
+            return baseObjectReference;
         } else {
             return new BaseObjectReference(objectReference);
         }
@@ -3998,7 +3959,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 if (is10Syntax(wrappingSyntaxId) && isInRenderingEngine) {
                     result.append(PRE_END);
                 }
-            } else if (HIDDEN.equals(type)) {
+            } else if (HIDDEN_PROPERTY.equals(type)) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
@@ -5018,15 +4979,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         // Datas
 
-        if (!equalsData(doc)) {
-            return false;
-        }
-
         // We consider that 2 documents are still equal even when they have different original
         // documents (see getOriginalDocument() for more details as to what is an original
         // document).
 
-        return true;
+        return equalsData(doc);
     }
 
     /**
@@ -5493,7 +5450,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         DocumentInstanceOutputProperties documentProperties = new DocumentInstanceOutputProperties();
         XWikiContext xcontext = getXWikiContext();
         if (xcontext != null) {
-            documentProperties.setDefaultReference(getXWikiContext().getWikiReference());
+            documentProperties.setDefaultReference(xcontext.getWikiReference());
         }
 
         // Input
@@ -5962,13 +5919,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         for (Object fieldClass : xclass.getProperties()) {
             // Wiki content stored in xobjects
-            if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
-                TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
+            if (fieldClass instanceof TextAreaClass textAreaClass && textAreaClass.isWikiContent()) {
                 PropertyInterface field = xobject.getField(textAreaClass.getName());
 
                 // Make sure the field is the right type (might happen while a document is being migrated)
-                if (field instanceof LargeStringProperty) {
-                    LargeStringProperty largeField = (LargeStringProperty) field;
+                if (field instanceof LargeStringProperty largeField) {
 
                     try {
                         XDOM dom = parseContent(getSyntax(), largeField.getValue(), getDocumentReference());
@@ -5988,19 +5943,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         Set<EntityReference> uniqueLinkedEntityReferences =
             getLinkParser().getUniqueLinkedEntityReferences(dom, entityTypes, getDocumentReference());
         references.addAll(uniqueLinkedEntityReferences);
-    }
-
-    private Set<DocumentReference> toDocumentReferenceSet(Collection<? extends EntityReference> entityReferences,
-        DocumentReference baseReference)
-    {
-        Set<DocumentReference> documentReferences = new LinkedHashSet<>(entityReferences.size());
-
-        for (EntityReference entityRefefence : entityReferences) {
-            documentReferences.add(getCurrentReferenceDocumentReferenceResolver().resolve(entityRefefence,
-                EntityType.DOCUMENT, baseReference));
-        }
-
-        return documentReferences;
     }
 
     /**
@@ -6123,7 +6065,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 .createQuery("select distinct doc.fullName from XWikiDocument doc where "
                     + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
                     Query.XWQL);
-            query.addFilter(Utils.getComponent(QueryFilter.class, HIDDEN));
+            query.addFilter(Utils.getComponent(QueryFilter.class, HIDDEN_PROPERTY));
             query.bindValue("prefixedFullName",
                 getDefaultEntityReferenceSerializer().serialize(getDocumentReference()));
             query.bindValue("fullName", LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference()));
@@ -7247,7 +7189,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         if (fromDoc.isHidden() != toDoc.isHidden()) {
-            list.add(new MetaDataDiff(HIDDEN, fromDoc.isHidden(), toDoc.isHidden()));
+            list.add(new MetaDataDiff(HIDDEN_PROPERTY, fromDoc.isHidden(), toDoc.isHidden()));
         }
 
         if (fromDoc.isEnforceRequiredRights() != toDoc.isEnforceRequiredRights()) {
@@ -8281,11 +8223,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             }
         }
 
-        if (HTML_TAG_PATTERN.matcher(content2).find()) {
-            return true;
-        }
-
-        return false;
+        return HTML_TAG_PATTERN.matcher(content2).find();
     }
 
     public boolean isProgrammaticContent()
@@ -8524,8 +8462,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 if (currentBlock instanceof SectionBlock) {
                     // The next children block is a HeaderBlock but we check to be on the safe side...
                     Block nextChildrenBlock = currentBlock.getChildren().get(0);
-                    if (nextChildrenBlock instanceof HeaderBlock) {
-                        HeaderBlock headerBlock = (HeaderBlock) nextChildrenBlock;
+                    if (nextChildrenBlock instanceof HeaderBlock headerBlock) {
                         if (headerBlock.getLevel().getAsInt() <= sectionDepth) {
                             filteredHeaders.add(headerBlock);
                         }
@@ -9151,13 +9088,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 if (bobject != null) {
                     BaseClass bclass = bobject.getXClass(context);
                     for (Object fieldClass : bclass.getProperties()) {
-                        if (fieldClass instanceof TextAreaClass && ((TextAreaClass) fieldClass).isWikiContent()) {
-                            TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
+                        if (fieldClass instanceof TextAreaClass textAreaClass && textAreaClass.isWikiContent()) {
                             PropertyInterface field = bobject.getField(textAreaClass.getName());
 
                             // Make sure the field is the right type (might happen while a document is being migrated)
-                            if (field instanceof LargeStringProperty) {
-                                LargeStringProperty largeField = (LargeStringProperty) field;
+                            if (field instanceof LargeStringProperty largeField) {
 
                                 largeField.setValue(performSyntaxConversion(largeField.getValue(),
                                     getDocumentReference(), getSyntax(), targetSyntax));
@@ -9411,8 +9346,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                         + "replacing it.", classReference, getDocumentReference());
             }
             return relativeXClassReference;
-        } else if (reference instanceof LocalDocumentReference) {
-            return new DocumentReference((LocalDocumentReference) reference, getDocumentReference().getWikiReference());
+        } else if (reference instanceof LocalDocumentReference localDocumentReference) {
+            return new DocumentReference(localDocumentReference, getDocumentReference().getWikiReference());
         } else {
             DocumentReference defaultReference =
                 new DocumentReference(getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,

@@ -137,7 +137,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         spec.idField = StringUtils.defaultString(dbListClass.getIdField());
         spec.valueField = StringUtils.defaultString(dbListClass.getValueField());
         spec.parentField =
-            dbListClass instanceof DBTreeListClass ? ((DBTreeListClass) dbListClass).getParentField() : "";
+            dbListClass instanceof DBTreeListClass dbTreeListClass ? dbTreeListClass.getParentField() : "";
 
         spec.hasClassName = !StringUtils.isBlank(spec.className);
         spec.hasIdField = !StringUtils.isBlank(spec.idField);

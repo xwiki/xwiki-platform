@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
@@ -154,7 +153,7 @@ class DefaultNotificationFilterManagerTest
         filterActivations.put(SystemUserNotificationFilter.FILTER_NAME, false);
 
         Collection<NotificationFilter> filters = this.filterManager.getEnabledFilters(
-            this.filterManager.getAllFilters(this.testUser, true), filterActivations).collect(Collectors.toList());
+            this.filterManager.getAllFilters(this.testUser, true), filterActivations).toList();
 
         assertEquals(0, filters.size());
     }
@@ -169,7 +168,7 @@ class DefaultNotificationFilterManagerTest
         when(fakeFilter1.matchesPreference(preference)).thenReturn(true);
 
         Collection<NotificationFilter> filters = this.filterManager.getFiltersRelatedToNotificationPreference(
-            List.of(fakeFilter1), preference).collect(Collectors.toList());
+            List.of(fakeFilter1), preference).toList();
 
         assertEquals(1, filters.size());
         assertTrue(filters.contains(fakeFilter1));
@@ -186,7 +185,7 @@ class DefaultNotificationFilterManagerTest
 
         Collection<NotificationFilter> filters = this.filterManager
             .getFiltersRelatedToNotificationPreference(List.of(fakeFilter1), preference)
-            .collect(Collectors.toList());
+            .toList();
 
         assertEquals(0, filters.size());
     }

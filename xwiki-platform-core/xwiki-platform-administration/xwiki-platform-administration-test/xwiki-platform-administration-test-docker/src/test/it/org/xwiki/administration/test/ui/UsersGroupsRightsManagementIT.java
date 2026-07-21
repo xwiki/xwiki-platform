@@ -55,8 +55,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest(properties = {
     // Add the RightsManagerPlugin needed by the test
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin",
-    // Programming rights are required to disable/enable user profiles (cf. XWIKI-21238)
-    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.XWikiUserProfileSheet",
+    // XWikiUserProfileSheet: programming rights are required to disable/enable user profiles (cf. XWIKI-21238).
+    // AdminUsersSheet: the delete-user confirmation modal checks whether the deleted user has programming right
+    // (to decide which warning to show), which the PR checker would otherwise block since the check originates from
+    // that wiki page (cf. deleteUserWithProgrammingRights).
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
+        + ".*:XWiki\\.(XWikiUserProfileSheet|AdminUsersSheet)",
     "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
@@ -432,6 +436,12 @@ class UsersGroupsRightsManagementIT
         groupEditPage.getMembersTable().assertRow("Member", userName);
     }
 
+    /**
+     * Verify that when an administrator is about to delete a user who has Script Rights and is the last author of one
+     * or more pages, the delete confirmation modal warns about it, states that the user is the last author of the
+     * affected pages and links to them. This automates the "Delete user with Script or Programming Rights" manual
+     * test for the Script Rights case.
+     */
     @Test
     @Order(8)
     void deleteUserWithScriptRights(TestUtils setup, TestReference testReference)
@@ -440,22 +450,66 @@ class UsersGroupsRightsManagementIT
         String scriptUserName = testReference.getLastSpaceReference().getName();
         String scriptUserPassword = "password";
         setup.createUser(scriptUserName, scriptUserPassword, "");
-        setup.setGlobalRights( "", "XWiki.%s".formatted(scriptUserName), "script", true);
+        String userFullName = "XWiki.%s".formatted(scriptUserName);
+
+        // Grant Script Right to the user and make them the last author of a page.
+        setup.setGlobalRights("", userFullName, "script", true);
         setup.login(scriptUserName, scriptUserPassword);
         setup.createPage(testReference, "");
         setup.loginAsSuperAdmin();
         UsersAdministrationSectionPage usersPage = UsersAdministrationSectionPage.gotoPage();
         usersPage.getUsersLiveData().getTableLayout().filterColumn("User", scriptUserName);
         usersPage.disableUser(1);
+
+        // The confirmation modal must warn about the Script Right, mention that the user is the last author of the
+        // page and link to the pages last authored by the user.
         DeleteUserConfirmationModal deleteUserConfirmationModal = usersPage.clickDeleteUser(1);
-        assertEquals("/xwiki/bin/view/Main/AllDocs?doc.author=XWiki.%s".formatted(scriptUserName),
+        String warning = deleteUserConfirmationModal.getWarningMessage();
+        assertTrue(warning.contains("Script Rights"), "Unexpected warning message: " + warning);
+        assertTrue(warning.contains("last author of 1 page"), "Unexpected warning message: " + warning);
+        assertEquals("/xwiki/bin/view/Main/AllDocs?doc.author=%s".formatted(userFullName),
             deleteUserConfirmationModal.getScriptRightUserErrorMessageHrefValue());
+
+        deleteUserConfirmationModal.clickOk();
+        assertEquals(0, usersPage.getUsersLiveData().getTableLayout().countRows());
+    }
+
+    @Test
+    @Order(9)
+    void deleteUserWithProgrammingRights(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        String programmingUserName = testReference.getLastSpaceReference().getName();
+        String programmingUserPassword = "password";
+        setup.createUser(programmingUserName, programmingUserPassword, "");
+        String userFullName = "XWiki.%s".formatted(programmingUserName);
+
+        // Grant Programming Right to the user and make them the last author of a page. Programming Right implies
+        // Script Right, but since the confirmation modal checks Programming Right before Script Right, the modal must
+        // warn about the Programming Right.
+        setup.setGlobalRights("", userFullName, "programming", true);
+        setup.login(programmingUserName, programmingUserPassword);
+        setup.createPage(testReference, "");
+        setup.loginAsSuperAdmin();
+        UsersAdministrationSectionPage usersPage = UsersAdministrationSectionPage.gotoPage();
+        usersPage.getUsersLiveData().getTableLayout().filterColumn("User", programmingUserName);
+        usersPage.disableUser(1);
+
+        // The confirmation modal must warn about the Programming Right, mention that the user is the last author of
+        // the page and link to the pages last authored by the user.
+        DeleteUserConfirmationModal deleteUserConfirmationModal = usersPage.clickDeleteUser(1);
+        String warning = deleteUserConfirmationModal.getWarningMessage();
+        assertTrue(warning.contains("Programming Rights"), "Unexpected warning message: " + warning);
+        assertTrue(warning.contains("last author of 1 page"), "Unexpected warning message: " + warning);
+        assertEquals("/xwiki/bin/view/Main/AllDocs?doc.author=%s".formatted(userFullName),
+            deleteUserConfirmationModal.getScriptRightUserErrorMessageHrefValue());
+
         deleteUserConfirmationModal.clickOk();
         assertEquals(0, usersPage.getUsersLiveData().getTableLayout().countRows());
     }
 
     @ParameterizedTest
-    @Order(9)
+    @Order(10)
     @WikisSource(extensions = { "org.xwiki.platform:xwiki-platform-administration-ui" })
     void renameUserUpdatesGroupAndRights(WikiReference wiki, TestUtils setup)
     {
@@ -524,7 +578,7 @@ class UsersGroupsRightsManagementIT
     }
 
     @ParameterizedTest
-    @Order(10)
+    @Order(11)
     @WikisSource(extensions = { "org.xwiki.platform:xwiki-platform-administration-ui" })
     void renameGroupUpdatesGroupsAndRights(WikiReference wiki, TestUtils setup)
     {
@@ -597,7 +651,7 @@ class UsersGroupsRightsManagementIT
      * </ul>
      */
     @Test
-    @Order(11)
+    @Order(12)
     void setExtensionRightsForPageAndChildren(TestUtils setup, TestReference testReference)
     {
         // Reuse a user created above instead of creating a new one, so that the user appears on the first page of the
@@ -666,7 +720,7 @@ class UsersGroupsRightsManagementIT
      * </ul>
      */
     @Test
-    @Order(12)
+    @Order(13)
     void setExtensionRightsForPageOnly(TestUtils setup, TestReference testReference)
     {
         // Reuse a user created above instead of creating a new one, so that the user appears on the first page of the
@@ -732,7 +786,7 @@ class UsersGroupsRightsManagementIT
      * XWIKI-23066).
      */
     @Test
-    @Order(13)
+    @Order(14)
     void rightsShowUsersAndGroups(TestUtils setup, TestReference testReference)
     {
         // Ensure the space exists so it has a Page Administration with a Rights: Page section.

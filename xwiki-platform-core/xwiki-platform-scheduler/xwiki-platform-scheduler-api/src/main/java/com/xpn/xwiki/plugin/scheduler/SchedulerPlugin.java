@@ -373,6 +373,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 
     private void register(BaseObject jobObj, XWikiContext context) throws SchedulerPluginException
     {
+        if (jobObj == null) {
+            return;
+        }
+
         String status = jobObj.getStringValue(STATUS);
         if (status.equals(JobState.STATE_NORMAL) || status.equals(JobState.STATE_PAUSED)) {
             scheduleJob(jobObj, context);

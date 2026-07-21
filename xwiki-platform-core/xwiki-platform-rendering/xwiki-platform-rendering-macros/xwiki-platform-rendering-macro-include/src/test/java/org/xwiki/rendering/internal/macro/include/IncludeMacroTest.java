@@ -103,9 +103,9 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
 @AllComponents(excludes = {CurrentMacroEntityReferenceResolver.class, DefaultAuthorizationManager.class})
 class IncludeMacroTest
 {
-    private final static DocumentReference INCLUDER_AUTHOR = new DocumentReference("wiki", "XWiki", "includer");
+    private static final DocumentReference INCLUDER_AUTHOR = new DocumentReference("wiki", "XWiki", "includer");
 
-    private final static DocumentReference INCLUDED_AUTHOR = new DocumentReference("wiki", "XWiki", "included");
+    private static final DocumentReference INCLUDED_AUTHOR = new DocumentReference("wiki", "XWiki", "included");
 
     private static final DocumentReference INCLUDED_PAGE = new DocumentReference("wiki", "Space", "IncludedPage");
 

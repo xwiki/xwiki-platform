@@ -52,15 +52,12 @@ public class XWikiRestExceptionMapper implements ExceptionMapper<XWikiRestExcept
     {
         Throwable cause = exception.getCause();
 
-        if (cause instanceof XWikiException) {
-            XWikiException xwikiException = (XWikiException) cause;
+        if (cause instanceof XWikiException xwikiException) {
             if (xwikiException.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
                 return Response.status(Status.UNAUTHORIZED).entity(exception.getMessage())
                     .type(MediaType.TEXT_PLAIN_TYPE).build();
             }
-        } else if (cause instanceof QueryException) {
-            QueryException queryException = (QueryException) cause;
-
+        } else if (cause instanceof QueryException queryException) {
             return Response.serverError().entity(
                 String.format("%s\n%s\n", exception.getMessage(), ExceptionUtils.getRootCauseMessage(queryException)))
                 .type(MediaType.TEXT_PLAIN_TYPE).build();

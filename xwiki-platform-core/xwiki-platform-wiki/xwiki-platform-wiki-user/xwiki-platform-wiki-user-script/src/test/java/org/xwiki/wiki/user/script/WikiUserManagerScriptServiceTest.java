@@ -629,6 +629,20 @@ class WikiUserManagerScriptServiceTest
     }
 
     @Test
+    void getCandidacyWhenItDoesNotExist() throws Exception
+    {
+        // The candidacy does not exist anymore (e.g. a canceled invitation whose id is still requested on a form
+        // resubmission): the manager returns null and the script service must not run the rights check on it (which
+        // would throw a NullPointerException). See XWIKI-17062.
+        when(this.wikiUserManager.getCandidacy("subwiki", 42)).thenReturn(null);
+
+        MemberCandidacy result = this.wikiUserManagerScriptService.getCandidacy("subwiki", 42);
+
+        assertNull(result);
+        assertNull(this.wikiUserManagerScriptService.getLastError());
+    }
+
+    @Test
     void getAllInvitations() throws Exception
     {
         ArrayList<MemberCandidacy> candidacies = new ArrayList<>();

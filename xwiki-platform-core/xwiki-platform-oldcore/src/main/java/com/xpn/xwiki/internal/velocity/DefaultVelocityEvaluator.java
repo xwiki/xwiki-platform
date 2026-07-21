@@ -66,9 +66,9 @@ public class DefaultVelocityEvaluator implements VelocityEvaluator
             // Switch current namespace if needed
             String currentNamespace = renderingContext.getTransformationId();
             if (namespace != null && !Strings.CS.equals(namespace, currentNamespace)
-                && renderingContext instanceof MutableRenderingContext) {
+                && renderingContext instanceof MutableRenderingContext mutableRenderingContext) {
                 // Make the current velocity template id available
-                ((MutableRenderingContext) renderingContext).push(renderingContext.getTransformation(),
+                mutableRenderingContext.push(renderingContext.getTransformation(),
                     renderingContext.getXDOM(), renderingContext.getDefaultSyntax(), namespace,
                     renderingContext.isRestricted(), renderingContext.getTargetSyntax());
 

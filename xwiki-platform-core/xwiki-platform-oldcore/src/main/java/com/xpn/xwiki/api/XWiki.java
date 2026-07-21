@@ -103,8 +103,6 @@ public class XWiki extends Api
      */
     private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer;
 
-    private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
-
     private DocumentRevisionProvider documentRevisionProvider;
 
     private HQLStatementValidator hqlValidator;
@@ -132,16 +130,6 @@ public class XWiki extends Api
         }
 
         return this.currentMixedDocumentReferenceResolver;
-    }
-
-    private DocumentReferenceResolver<EntityReference> getCurrentgetdocumentResolver()
-    {
-        if (this.currentgetdocumentResolver == null) {
-            this.currentgetdocumentResolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
-        }
-
-        return this.currentgetdocumentResolver;
     }
 
     private DocumentReferenceResolver<String> getDefaultDocumentReferenceResolver()
@@ -1002,12 +990,11 @@ public class XWiki extends Api
         if (docs != null) {
             for (java.lang.Object obj : docs) {
                 try {
-                    if (obj instanceof XWikiDocument) {
-                        XWikiDocument doc = (XWikiDocument) obj;
+                    if (obj instanceof XWikiDocument doc) {
                         Document wrappedDoc = doc.newDocument(getXWikiContext());
                         result.add(wrappedDoc);
-                    } else if (obj instanceof Document) {
-                        result.add((Document) obj);
+                    } else if (obj instanceof Document document) {
+                        result.add(document);
                     } else if (obj instanceof String) {
                         Document doc = getDocument(obj.toString());
                         if (doc != null) {

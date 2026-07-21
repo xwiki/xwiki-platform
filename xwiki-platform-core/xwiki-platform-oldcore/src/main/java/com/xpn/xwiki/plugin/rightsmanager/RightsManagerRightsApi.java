@@ -98,7 +98,7 @@ public class RightsManagerRightsApi extends Api
             parent = convert(xdoc);
         } catch (RightsManagerException e) {
             logError(
-                MessageFormat.format("Try to get parent rights preference for [{0}]", new Object[] { spaceOrPage }), e);
+                MessageFormat.format("Try to get parent rights preference for [{0}]", spaceOrPage), e);
         }
 
         return parent;

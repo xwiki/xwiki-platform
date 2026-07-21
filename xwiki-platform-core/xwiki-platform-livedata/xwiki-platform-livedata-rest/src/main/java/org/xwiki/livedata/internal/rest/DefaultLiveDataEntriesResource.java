@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -113,7 +112,7 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
     {
         LiveDataQuery query = new LiveDataQuery();
         query.setSource(getLiveDataQuerySource(sourceId));
-        query.setProperties(properties.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList()));
+        query.setProperties(properties.stream().filter(StringUtils::isNotEmpty).toList());
         query.setFilters(getFilters(matchAll));
         query.setSort(getSort(sort, descending));
         query.setOffset(offset);
@@ -177,7 +176,7 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
 
         List<Entry> entries = liveData.getEntries().stream()
             .map(values -> this.createEntry(values, values.get(idProperty), source, namespace))
-            .collect(Collectors.toList());
+            .toList();
         return (Entries) new Entries().withEntries(entries).withCount(liveData.getCount()).withLinks(self, parent);
     }
 
@@ -186,10 +185,10 @@ public class DefaultLiveDataEntriesResource extends AbstractLiveDataResource imp
     {
         // Workaround for https://github.com/restlet/restlet-framework-java/issues/922 (JaxRs multivalue
         // query-params gives list with null element).
-        List<String> actualProperties = properties.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<String> actualMatchAll = matchAll.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<String> actualSort = sort.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        List<Boolean> actualDescending = descending.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<String> actualProperties = properties.stream().filter(Objects::nonNull).toList();
+        List<String> actualMatchAll = matchAll.stream().filter(Objects::nonNull).toList();
+        List<String> actualSort = sort.stream().filter(Objects::nonNull).toList();
+        List<Boolean> actualDescending = descending.stream().filter(Objects::nonNull).toList();
         return getConfig(sourceId, actualProperties, actualMatchAll, actualSort, actualDescending, offset, limit);
     }
 

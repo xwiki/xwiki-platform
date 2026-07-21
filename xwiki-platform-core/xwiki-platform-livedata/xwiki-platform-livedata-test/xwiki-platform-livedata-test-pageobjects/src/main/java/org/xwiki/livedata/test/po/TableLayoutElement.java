@@ -818,6 +818,111 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Check if the table has an "Actions" column.
+     *
+     * @return {@code true} if the actions column is present, {@code false} otherwise
+     * @since 18.7.0RC1
+     */
+    public boolean hasEditModeActionsColumn()
+    {
+        return getRoot().findElements(By.cssSelector(".column-header-names > th")).stream()
+            .anyMatch(th -> "Actions".equals(th.getText().trim()));
+    }
+
+    /**
+     * Check if the table has an "Add entry" row creation button.
+     *
+     * @return {@code true} if the "Add entry" row is displayed at the bottom of the table, {@code false} otherwise
+     * @since 18.7.0RC1
+     */
+    public boolean canAddEntry()
+    {
+        return !getRoot().findElements(By.cssSelector("tr.layout-table-new-row")).isEmpty();
+    }
+
+    /**
+     * Create a new draft entry without saving it.
+     *
+     * @since 18.7.0RC1
+     */
+    public void startNewEntry()
+    {
+        getRoot().findElement(By.cssSelector("tr.layout-table-new-row a")).click();
+        // Wait for the draft row to be ready (by checking there is a save button).
+        getDriver().waitUntilElementIsVisible(getRoot(), getNewEntrySaveButtonSelector());
+        // The first editable cell is automatically focused, we blur it to keep a consistent state for the other
+        // helpers.
+        By editorInput = By.cssSelector("tbody tr td.cell input");
+        getDriver().waitUntilElementIsVisible(getRoot(), editorInput);
+        getRoot().findElement(editorInput).sendKeys(Keys.ESCAPE);
+        getDriver().waitUntilCondition(
+            driver -> getDriver().findElementsWithoutWaiting(getRoot(), editorInput).isEmpty());
+    }
+
+    /**
+     * Fill a field of the current draft entry without saving it.
+     *
+     * @param columnLabel the label of the column to fill
+     * @param fieldName the name of the field to fill (i.e., the corresponding XClass property)
+     * @param value the value to set
+     * @since 18.7.0RC1
+     */
+    public void setNewEntryCell(String columnLabel, String fieldName, String value)
+    {
+        setNewEntryCell(countRows(), columnLabel, fieldName, value);
+    }
+
+    /**
+     * Save the current draft entry, then wait for the Live Data to be reloaded.
+     *
+     * @since 18.7.0RC1
+     */
+    public void saveNewEntry()
+    {
+        WebElement saveButton = getRoot().findElement(getNewEntrySaveButtonSelector());
+        saveButton.click();
+        getDriver().waitUntilCondition(ExpectedConditions.stalenessOf(saveButton));
+        waitUntilReady();
+    }
+
+    /**
+     * Cancel the current draft entry.
+     *
+     * @since 18.7.0RC1
+     */
+    public void cancelNewEntry()
+    {
+        // Only the draft row holds action buttons, so the cancel button uniquely identifies it.
+        WebElement cancelButton = getRoot().findElement(getNewEntryCancelButtonSelector());
+        cancelButton.click();
+        getDriver().waitUntilCondition(ExpectedConditions.stalenessOf(cancelButton));
+    }
+
+    private WebElement setNewEntryCell(int rowNumber, String columnLabel, String fieldName, String value)
+    {
+        int columnIndex = getColumnIndex(columnLabel);
+        WebElement cell = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+        cell.click();
+        By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
+        getDriver().waitUntilElementIsVisible(cell, selector);
+        WebElement input = cell.findElement(selector);
+        new FormContainerElement(By.cssSelector(".livedata-displayer .edit")).setFieldValue(input, value);
+        return input;
+    }
+
+    private By getNewEntrySaveButtonSelector()
+    {
+        // Only the draft row holds action buttons, so the save button uniquely identifies it.
+        return By.cssSelector("tbody tr td button[title='Save']");
+    }
+
+    private By getNewEntryCancelButtonSelector()
+    {
+        // Only the draft row holds action buttons, so the cancel button uniquely identifies it.
+        return By.cssSelector("tbody tr td button[title='Cancel']");
+    }
+
+    /**
      * Returns a single {@link WebElement} found by passing {@code by} to {@link WebElement#findElement(By)} on the
      * {@link WebElement} of the requested row.
      *

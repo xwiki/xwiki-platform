@@ -439,9 +439,14 @@ public class TestUtils
             } else {
                 getDriver().get(getURLToNonExistentPage());
             }
-
-            setDefaultCredentials(username, password);
         }
+
+        // Always synchronize the REST client credentials with the requested user, even when the browser was already
+        // logged in as that user and thus skipped the browser login above. The browser session and the REST client
+        // credentials are independent states: a previous forceGuestUser() clears the REST credentials while the browser
+        // may still appear logged in, so synchronizing only inside the branch above would leave the REST client
+        // unauthenticated and make later REST calls fail with a 401.
+        setDefaultCredentials(username, password);
     }
 
     /**
@@ -624,14 +629,16 @@ public class TestUtils
 
         // Add the user to XWikiAllGroup
         try {
-            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member",
+                serializeReference(userReference));
         } catch (Exception e) {
             fail("Failed to add the user in the XWikiAllGroup group", e);
         }
 
         // Add the user to XWikiAdminGroup group (before we login as the user does not have admin right at first)
         try {
-            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member",
+                serializeReference(userReference));
         } catch (Exception e) {
             fail("Failed to add the user in the XWikiAdminGroup group", e);
         }

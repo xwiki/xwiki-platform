@@ -228,15 +228,40 @@
     // which are the new attachments.
     editor.on('fileUploadResponse', function (event) {
       if (editor.config['xwiki-upload'].isTemporaryAttachmentSupported) {
-        var input = $('<input>').attr({
-          'type': 'hidden',
-          'name': 'uploadedFiles',
-          'value': JSON.parse(event.data.fileLoader.xhr.responseText).fileName
-        });
-        if (editor.config.formId) {
-          input.attr('form', editor.config.formId);
+        var response;
+        try {
+          response = JSON.parse(event.data.fileLoader.xhr.responseText);
+        } catch (e) {
+          // The response cannot be parsed: let CKEditor's default listener report the failure.
+          return;
         }
-        input.insertAfter($(editor.element.$));
+        // The temporary attachment upload endpoint always returns a 200 HTTP status for the filetools
+        // plugin (setting an error status makes the plugin display a generic message instead of the one
+        // from the response), so the failure has to be detected from the response body. Without this the
+        // upload would be reported as successful even when it was rejected (e.g. because of a mimetype
+        // restriction).
+        if (response.uploaded) {
+          var input = $('<input>').attr({
+            'type': 'hidden',
+            'name': 'uploadedFiles',
+            'value': response.fileName
+          });
+          if (editor.config.formId) {
+            input.attr('form', editor.config.formId);
+          }
+          input.insertAfter($(editor.element.$));
+        } else {
+          // Display the error message from the response (e.g. the mimetype restriction message) and cancel
+          // the event so that the upload is reported as failed rather than successful.
+          event.data.message = response.error && response.error.message;
+          event.cancel();
+          // The upload widget's notification aggregator considers the upload finished (and reports a success
+          // notification) as soon as the file bytes have been sent, before the server response is known. When
+          // the server rejects the upload with an HTTP 200 status (as the temporary attachment endpoint does),
+          // that success notification has already been shown by the time we get here, so we hide it. The error
+          // message above is displayed instead as a separate warning notification.
+          editor._.uploadWidgetNotificaionAggregator?.notification?.hide();
+        }
       }
     });
   };

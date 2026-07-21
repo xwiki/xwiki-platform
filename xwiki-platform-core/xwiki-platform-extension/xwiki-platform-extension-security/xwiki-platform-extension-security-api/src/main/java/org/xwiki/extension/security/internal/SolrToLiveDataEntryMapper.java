@@ -28,7 +28,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.inject.Inject;
@@ -160,7 +159,7 @@ public class SolrToLiveDataEntryMapper
         return Optional.ofNullable(doc.getFieldValues(IS_REVIEWED_SAFE))
             .map(values -> values.stream()
                 .map(it -> (boolean) it)
-                .collect(Collectors.toList()))
+                .toList())
             .orElse(List.of());
     }
 
@@ -170,7 +169,7 @@ public class SolrToLiveDataEntryMapper
         return IntStream.range(0, mapToStrings(doc, SECURITY_CVE_ID).size())
             .filter(((IntPredicate) safe::get).negate())
             .boxed()
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private static List<Integer> getSafeCVEsIndex(SolrDocument doc, List<Boolean> safe)
@@ -178,7 +177,7 @@ public class SolrToLiveDataEntryMapper
         return IntStream.range(0, mapToStrings(doc, SECURITY_CVE_ID).size())
             .filter(safe::get)
             .boxed()
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private static List<String> mapToStrings(SolrDocument doc, String name)
@@ -187,7 +186,7 @@ public class SolrToLiveDataEntryMapper
         if (fieldValues == null) {
             return List.of();
         }
-        return fieldValues.stream().map(String::valueOf).collect(Collectors.toList());
+        return fieldValues.stream().map(String::valueOf).toList();
     }
 
     private String buildAdvice(SolrDocument doc)

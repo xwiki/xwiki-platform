@@ -459,9 +459,7 @@ public class XWikiUser
         }
 
         boolean equals;
-        if (obj instanceof XWikiUser) {
-            XWikiUser otherUser = (XWikiUser) obj;
-
+        if (obj instanceof XWikiUser otherUser) {
             equals = otherUser.main == this.main && Objects.equals(getUserReference(), otherUser.getUserReference());
         } else {
             equals = false;

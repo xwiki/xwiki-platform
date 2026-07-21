@@ -85,7 +85,7 @@ public class DefaultLiveDataEntryResource extends AbstractLiveDataResource imple
                     values = entryStore.get(updatedEntryId.get());
                 } catch (UnsupportedOperationException e) {
                     // Returns a success response without an entity when the entry store does not implement the get
-                    // operation (for instance the liveTable source).
+                    // operation.
                     return Response.status(Status.ACCEPTED).build();
                 }
                 if (values.isPresent()) {

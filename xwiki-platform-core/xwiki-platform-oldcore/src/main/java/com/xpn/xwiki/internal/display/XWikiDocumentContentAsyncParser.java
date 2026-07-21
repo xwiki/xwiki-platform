@@ -46,9 +46,7 @@ public class XWikiDocumentContentAsyncParser implements DocumentContentAsyncPars
     @Override
     public AsyncProperties getAsyncProperties(DocumentModelBridge document)
     {
-        if (document instanceof XWikiDocument) {
-            XWikiDocument xdocument = (XWikiDocument) document;
-
+        if (document instanceof XWikiDocument xdocument) {
             BaseObject asyncObject = xdocument.getXObject(DocumentAsyncClassDocumentInitializer.CLASS_REFERENCE);
             if (asyncObject != null) {
                 boolean asyncAllowed =

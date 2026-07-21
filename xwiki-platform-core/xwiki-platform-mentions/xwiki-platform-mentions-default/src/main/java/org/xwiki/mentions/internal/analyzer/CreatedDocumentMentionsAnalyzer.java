@@ -160,8 +160,7 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
     {
         List<MentionNotificationParameters> mentionNotificationParametersList = new ArrayList<>();
         for (Object o : baseObject.getProperties()) {
-            if (o instanceof LargeStringProperty) {
-                LargeStringProperty largeStringProperty = (LargeStringProperty) o;
+            if (o instanceof LargeStringProperty largeStringProperty) {
                 String content = largeStringProperty.getValue();
                 this.xdomService
                     .parse(content, syntax)

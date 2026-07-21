@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
@@ -409,7 +408,6 @@ public abstract class ListClass extends PropertyClass
                     previousWasSeparator = false;
                 }
                 previousSeparator = currentChar;
-                continue;
             // if we are finding a separator and we are not in escape mode, then we finished to parse one value
             // we are adding the value to the result, and start a new value to parse
             } else if (StringUtils.containsAny(separators, currentChar) && !inEscape) {
@@ -1041,7 +1039,7 @@ public abstract class ListClass extends PropertyClass
         } else {
             List<String> actualList;
             if (filterEmptyValues && list != null) {
-                actualList = list.stream().filter(item -> !StringUtils.isEmpty(item)).collect(Collectors.toList());
+                actualList = list.stream().filter(item -> !StringUtils.isEmpty(item)).toList();
             } else {
                 actualList = list;
             }
@@ -1104,7 +1102,5 @@ public abstract class ListClass extends PropertyClass
         }
 
         fromList(currentProperty, currentList);
-
-        return;
     }
 }

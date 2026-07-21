@@ -83,9 +83,9 @@ public class EscapeLikeParametersQuery extends WrappingQuery
             Map<T, Object> escapedMap = new LinkedHashMap<>();
             for (Map.Entry<T, Object> entry : parametersToEscape.entrySet()) {
                 // TODO: Also handle Arrays and collections in the future
-                if (modifiedParameters.contains(entry.getKey()) && entry.getValue() instanceof DefaultQueryParameter) {
+                if (modifiedParameters.contains(entry.getKey())
+                    && entry.getValue() instanceof DefaultQueryParameter queryParameter) {
                     // Join the parameter parts and escape the literal parts
-                    DefaultQueryParameter queryParameter = (DefaultQueryParameter) entry.getValue();
                     StringBuffer buffer = new StringBuffer();
                     for (ParameterPart part : queryParameter.getParts()) {
                         if (part instanceof LiteralParameterPart) {
@@ -142,11 +142,9 @@ public class EscapeLikeParametersQuery extends WrappingQuery
     private String modifyStatement(String statementString) throws JSQLParserException
     {
         Statement statement = CCJSqlParserUtil.parse(statementString);
-        if (statement instanceof Select) {
-            Select select = (Select) statement;
+        if (statement instanceof Select select) {
             SelectBody selectBody = select.getSelectBody();
-            if (selectBody instanceof PlainSelect) {
-                PlainSelect plainSelect = (PlainSelect) selectBody;
+            if (selectBody instanceof PlainSelect plainSelect) {
                 Expression where = plainSelect.getWhere();
                 where.accept(new XWikiExpressionVisitor());
             }

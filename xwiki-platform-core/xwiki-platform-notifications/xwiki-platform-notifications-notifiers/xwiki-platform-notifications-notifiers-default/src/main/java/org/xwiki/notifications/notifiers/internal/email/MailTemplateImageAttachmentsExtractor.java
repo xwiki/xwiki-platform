@@ -20,7 +20,6 @@
 package org.xwiki.notifications.notifiers.internal.email;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -57,6 +56,6 @@ public class MailTemplateImageAttachmentsExtractor
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
         Document document = new Document(xwiki.getDocument(documentReference, context), context);
-        return document.getAttachmentList().stream().filter(Attachment::isImage).collect(Collectors.toList());
+        return document.getAttachmentList().stream().filter(Attachment::isImage).toList();
     }
 }

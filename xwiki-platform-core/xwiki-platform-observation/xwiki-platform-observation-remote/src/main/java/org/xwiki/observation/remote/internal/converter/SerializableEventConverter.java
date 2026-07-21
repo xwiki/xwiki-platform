@@ -51,8 +51,8 @@ public class SerializableEventConverter extends AbstractEventConverter
     @Override
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
-        if (remoteEvent.getEvent() instanceof Event) {
-            localEvent.setEvent((Event) remoteEvent.getEvent());
+        if (remoteEvent.getEvent() instanceof Event event) {
+            localEvent.setEvent(event);
 
             if (remoteEvent.getSource() != null) {
                 localEvent.setSource(remoteEvent.getSource());

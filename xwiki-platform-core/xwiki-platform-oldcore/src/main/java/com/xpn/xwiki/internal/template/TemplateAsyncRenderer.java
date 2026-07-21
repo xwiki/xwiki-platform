@@ -194,7 +194,7 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
     private void transform(Block block) throws TransformationException
     {
         TransformationContext transformationContext =
-            new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)),
+            new TransformationContext(block instanceof XDOM xdom ? xdom : new XDOM(Arrays.asList(block)),
                 this.renderingContext.getDefaultSyntax(), this.renderingContext.isRestricted());
 
         // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally

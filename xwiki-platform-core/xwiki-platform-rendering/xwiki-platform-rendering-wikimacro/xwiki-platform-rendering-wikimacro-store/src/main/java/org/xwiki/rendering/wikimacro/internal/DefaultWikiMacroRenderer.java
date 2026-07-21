@@ -115,6 +115,11 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     private static final String MACRO_BINDING = "wikimacro";
 
     /**
+     * The id component identifying a wiki macro rendering, whose value matches {@link #MACRO_BINDING}.
+     */
+    private static final String MACRO_ASYNC_ID = MACRO_BINDING;
+
+    /**
      * The name of the metadata flagging a block as containing wiki macro content.
      */
     private static final String WIKIMACROCONTENT = "wikimacrocontent";
@@ -189,12 +194,12 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      */
     private static final BlockMatcher MACRO_MARKER_MATCHER = MacroMarkerBlock.class::isInstance;
 
-    private static final BlockMatcher PLACEHOLDERS_BLOCKMATCHER = testedBlock -> ((testedBlock instanceof RawBlock
-        && (((RawBlock) testedBlock).getSyntax().getType().equals(SyntaxType.XHTML)
-            || ((RawBlock) testedBlock).getSyntax().getType().equals(SyntaxType.HTML)))
+    private static final BlockMatcher PLACEHOLDERS_BLOCKMATCHER = testedBlock -> (testedBlock instanceof RawBlock raw
+        && (raw.getSyntax().getType().equals(SyntaxType.XHTML)
+            || raw.getSyntax().getType().equals(SyntaxType.HTML)))
         || (testedBlock instanceof MacroMarkerBlock macroBlock
             && (macroBlock.getId().equals(WikiMacroContentMacro.ID)
-                || macroBlock.getId().equals(WikiMacroParameterMacro.ID))));
+                || macroBlock.getId().equals(WikiMacroParameterMacro.ID)));
 
     /**
      * Match all the metadata blocks that contains wikimacrocontent=true.
@@ -281,7 +286,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
         this.syncContext = syncContext;
 
-        this.id = createId("rendering", "wikimacro", wikimacro.getId(),
+        this.id = createId("rendering", MACRO_ASYNC_ID, wikimacro.getId(),
             wikimacro.getBlockId(syncContext.getCurrentMacroBlock()));
         try {
             this.parameters = convertParameters(parameters);
@@ -659,14 +664,13 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             } else if (macroBlock.getId().equals(WikiMacroParameterMacro.ID)) {
                 return resolveMacroParameter(macroBlock);
             }
-        } else if (block instanceof RawBlock rawBlock) {
+        } else if (block instanceof RawBlock rawBlock
+            && (rawBlock.getSyntax().getType().equals(SyntaxType.XHTML)
+                || rawBlock.getSyntax().getType().equals(SyntaxType.HTML))) {
             // We need the wikimacro content and parameter to be executed in the right context so if any can be found in
             // an html raw block we need to refactor that raw block to be two raw blocks around a proper blocks to
             // execute later
-            if (rawBlock.getSyntax().getType().equals(SyntaxType.XHTML)
-                || rawBlock.getSyntax().getType().equals(SyntaxType.HTML)) {
-                return replaceHTMLPlaceHolder(rawBlock);
-            }
+            return replaceHTMLPlaceHolder(rawBlock);
         }
 
         return block;

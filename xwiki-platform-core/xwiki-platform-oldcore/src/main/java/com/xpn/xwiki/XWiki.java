@@ -630,8 +630,8 @@ public class XWiki implements EventListener
 
     private MutableRenderingContext getMutableRenderingContext()
     {
-        return getRenderingContext() instanceof MutableRenderingContext
-            ? (MutableRenderingContext) getRenderingContext() : null;
+        return getRenderingContext() instanceof MutableRenderingContext mutableRenderingContext
+            ? mutableRenderingContext : null;
     }
 
     private VelocityEvaluator getVelocityEvaluator()
@@ -1166,7 +1166,7 @@ public class XWiki implements EventListener
             ResourceReference reference =
                 resourceResolver.resolve(extendedURL, type, Collections.<String, Object>emptyMap());
             entityResourceReference =
-                reference instanceof EntityResourceReference ? (EntityResourceReference) reference : null;
+                reference instanceof EntityResourceReference entityReference ? entityReference : null;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
                 String.format("Failed to extract Entity Resource Reference from URL [%s]", url), e);
@@ -1491,8 +1491,8 @@ public class XWiki implements EventListener
     public XWikiStoreInterface getNotCacheStore()
     {
         XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiCacheStoreInterface) {
-            store = ((XWikiCacheStoreInterface) store).getStore();
+        if (store instanceof XWikiCacheStoreInterface cacheStore) {
+            store = cacheStore.getStore();
         }
         return store;
     }
@@ -1500,12 +1500,12 @@ public class XWiki implements EventListener
     public XWikiHibernateStore getHibernateStore()
     {
         XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiHibernateStore) {
-            return (XWikiHibernateStore) store;
-        } else if (store instanceof XWikiCacheStoreInterface) {
-            store = ((XWikiCacheStoreInterface) store).getStore();
-            if (store instanceof XWikiHibernateStore) {
-                return (XWikiHibernateStore) store;
+        if (store instanceof XWikiHibernateStore hibernateStore) {
+            return hibernateStore;
+        } else if (store instanceof XWikiCacheStoreInterface cacheStore) {
+            store = cacheStore.getStore();
+            if (store instanceof XWikiHibernateStore hibernateStore) {
+                return hibernateStore;
             } else {
                 return null;
             }
@@ -1650,8 +1650,8 @@ public class XWiki implements EventListener
             return Class.forName(storeclass).getConstructor(classes).newInstance(args);
         } catch (Exception e) {
             Throwable ecause = e;
-            if (e instanceof InvocationTargetException) {
-                ecause = ((InvocationTargetException) e).getTargetException();
+            if (e instanceof InvocationTargetException invocationTargetException) {
+                ecause = invocationTargetException.getTargetException();
             }
             Object[] args = { param, storeclass };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -3040,9 +3040,8 @@ public class XWiki implements EventListener
             if (StringUtils.isEmpty(result)) {
                 if (spaceReference == null) {
                     result = getXWikiPreference(preferenceKey, defaultValue, context);
-                } else if (spaceReference.getParent() instanceof SpaceReference) {
-                    result = getSpacePreference(preferenceKey, (SpaceReference) spaceReference.getParent(),
-                        defaultValue, context);
+                } else if (spaceReference.getParent() instanceof SpaceReference parentSpaceReference) {
+                    result = getSpacePreference(preferenceKey, parentSpaceReference, defaultValue, context);
                 } else if (spaceReference.getParent() instanceof WikiReference) {
                     result =
                         getXWikiPreference(preferenceKey, spaceReference.getParent().getName(), defaultValue, context);
@@ -3905,8 +3904,8 @@ public class XWiki implements EventListener
             PropertyInterface validationKeyClass =
                 getClass(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING, context)
                     .get(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
-            if (validationKeyClass instanceof PasswordClass) {
-                validationKey = ((PasswordClass) validationKeyClass).getEquivalentPassword(storedKey, validationKey);
+            if (validationKeyClass instanceof PasswordClass passwordClass) {
+                validationKey = passwordClass.getEquivalentPassword(storedKey, validationKey);
             }
 
             // Compare the two keys
@@ -4043,11 +4042,7 @@ public class XWiki implements EventListener
         map.put(XWikiUser.ACTIVE_PROPERTY, "1");
         map.put(XWikiUsersDocumentInitializer.FIRST_NAME_FIELD, xwikiname);
 
-        if (createUser(xwikiname, map, userRights, context) == 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return createUser(xwikiname, map, userRights, context) == 1;
     }
 
     public void sendConfirmationEmail(String xwikiname, String password, String email, String message,
@@ -4994,8 +4989,8 @@ public class XWiki implements EventListener
 
         Map<EntityReference, EntityReference> updatedReferences =
             Map.of(sourceDoc.getDocumentReference(), newDocumentReference);
-        if (currentJob instanceof AbstractCopyOrMoveJob) {
-            updatedReferences = ((AbstractCopyOrMoveJob) currentJob).getSelectedEntities();
+        if (currentJob instanceof AbstractCopyOrMoveJob copyOrMoveJob) {
+            updatedReferences = copyOrMoveJob.getSelectedEntities();
         }
         // Step 1: Refactor the relative links contained in the document to make sure they are relative to the new
         // document's location.
@@ -5050,31 +5045,11 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
-     * wiki).
-     */
-    private static EntityReferenceSerializer<String> getCompactWikiEntityReferenceSerializer()
-    {
-        return Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-    }
-
-    /**
      * Used to convert a proper Document Reference to string (compact form).
      */
     private static EntityReferenceSerializer<String> getCompactEntityReferenceSerializer()
     {
         return Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compact");
-    }
-
-    /**
-     * Used to resolve a ResourceReference into a proper Entity Reference using the current document to fill the blanks.
-     */
-    private static EntityReferenceResolver<org.xwiki.rendering.listener.reference.ResourceReference>
-        getResourceReferenceEntityReferenceResolver()
-    {
-        return Utils
-            .getComponent(new DefaultParameterizedType(null, EntityReferenceResolver.class,
-                org.xwiki.rendering.listener.reference.ResourceReference.class));
     }
 
     /**
@@ -5380,8 +5355,8 @@ public class XWiki implements EventListener
 
     private boolean isDaemon(XWikiRequest request)
     {
-        return request.getHttpServletRequest() instanceof XWikiServletRequestStub
-            && ((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon();
+        return request.getHttpServletRequest() instanceof XWikiServletRequestStub servletRequestStub
+            && servletRequestStub.isDaemon();
     }
 
     private String getWikiProtocol(WikiDescriptor wikiDescriptor)
@@ -6204,7 +6179,7 @@ public class XWiki implements EventListener
                     LOGGER.debug("Using custom URLFactory Service Class [{}]", urlFactoryServiceClass);
                 }
                 factoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
-                    .getConstructor(new Class<?>[] { XWiki.class }).newInstance(new Object[] { this });
+                    .getConstructor(XWiki.class).newInstance(this);
             } catch (Exception e) {
                 LOGGER.warn("Failed to initialize URLFactory Service [{}]", urlFactoryServiceClass, e);
             }
@@ -7825,15 +7800,15 @@ public class XWiki implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof JobFinishedEvent) {
+        if (event instanceof JobFinishedEvent jobFinishedEvent) {
             // An extension just been initialized (after an install or upgrade for example)
-            onJobFinished((JobFinishedEvent) event);
-        } else if (event instanceof WikiDeletedEvent) {
+            onJobFinished(jobFinishedEvent);
+        } else if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
             // A wiki has been deleted
-            onWikiDeletedEvent((WikiDeletedEvent) event);
-        } else if (event instanceof ComponentDescriptorAddedEvent) {
+            onWikiDeletedEvent(wikiDeletedEvent);
+        } else if (event instanceof ComponentDescriptorAddedEvent componentDescriptorAddedEvent) {
             // A new mandatory document initializer has been installed
-            onMandatoryDocumentInitializerAdded((ComponentDescriptorAddedEvent) event, (ComponentManager) source);
+            onMandatoryDocumentInitializerAdded(componentDescriptorAddedEvent, (ComponentManager) source);
         } else {
             // Document modifications
 
@@ -7888,8 +7863,8 @@ public class XWiki implements EventListener
         ComponentManager componentManager)
     {
         String namespace;
-        if (componentManager instanceof NamespacedComponentManager) {
-            namespace = ((NamespacedComponentManager) componentManager).getNamespace();
+        if (componentManager instanceof NamespacedComponentManager namespacedComponentManager) {
+            namespace = namespacedComponentManager.getNamespace();
         } else {
             namespace = null;
         }
@@ -8122,8 +8097,8 @@ public class XWiki implements EventListener
     {
         ConfigurationSource configuration = getConfiguration();
 
-        if (configuration instanceof XWikiCfgConfigurationSource) {
-            ((XWikiCfgConfigurationSource) configuration).set(config);
+        if (configuration instanceof XWikiCfgConfigurationSource cfgConfigurationSource) {
+            cfgConfigurationSource.set(config);
         }
     }
 

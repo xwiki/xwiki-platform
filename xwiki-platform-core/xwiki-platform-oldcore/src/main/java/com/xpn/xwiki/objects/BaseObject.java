@@ -341,11 +341,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
             return false;
         }
 
-        if (getNumber() != ((BaseObject) obj).getNumber()) {
-            return false;
-        }
-
-        return true;
+        return getNumber() == ((BaseObject) obj).getNumber();
     }
 
     @Override
@@ -511,8 +507,8 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
         BaseProperty prop = (BaseProperty) safeget(fieldname);
         boolean createProp = false;
-        if ((value instanceof String) && (pclass != null)) {
-            BaseProperty newProp = pclass.fromString((String) value);
+        if ((value instanceof String stringValue) && (pclass != null)) {
+            BaseProperty newProp = pclass.fromString(stringValue);
             if (prop == null) {
                 prop = newProp;
                 createProp = true;

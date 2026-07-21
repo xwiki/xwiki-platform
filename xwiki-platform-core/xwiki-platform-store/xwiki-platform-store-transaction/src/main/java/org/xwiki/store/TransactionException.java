@@ -100,9 +100,7 @@ public class TransactionException extends Exception
 
         int total = 0;
         for (Throwable cause : this.causes) {
-            if (cause instanceof TransactionException) {
-                final TransactionException teCause = (TransactionException) cause;
-
+            if (cause instanceof TransactionException teCause) {
                 total += teCause.exceptionCount();
                 if (teCause.isNonRecoverable()) {
                     nonRecoverable = true;

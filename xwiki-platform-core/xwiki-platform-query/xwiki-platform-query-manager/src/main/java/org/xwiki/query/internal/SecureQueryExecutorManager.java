@@ -56,8 +56,7 @@ public class SecureQueryExecutorManager implements QueryExecutorManager
     @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
-        if (query instanceof SecureQuery) {
-            SecureQuery secureQuery = (SecureQuery) query;
+        if (query instanceof SecureQuery secureQuery) {
             // Force checking current author rights
             secureQuery.checkCurrentAuthor(true);
         } else if (!this.authorization.hasAccess(Right.PROGRAM)) {

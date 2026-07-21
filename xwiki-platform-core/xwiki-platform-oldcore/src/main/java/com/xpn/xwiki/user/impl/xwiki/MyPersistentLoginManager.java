@@ -227,7 +227,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 }
             }
         }
-        return;
     }
 
     /**
@@ -393,7 +392,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         removeCookie(request, response, getCookiePrefix() + COOKIE_PASSWORD);
         removeCookie(request, response, getCookiePrefix() + COOKIE_REMEMBERME);
         removeCookie(request, response, getCookiePrefix() + COOKIE_VALIDATION);
-        return;
     }
 
     /**
@@ -547,11 +545,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     @Override
     public boolean rememberingLogin(HttpServletRequest request)
     {
-        if ("true".equals(getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_REMEMBERME, DEFAULT_VALUE))) {
-            return true;
-        } else {
-            return false;
-        }
+        return "true".equals(
+            getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_REMEMBERME, DEFAULT_VALUE));
     }
 
     /**

@@ -39,7 +39,6 @@ import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.event.DocumentRenamingEvent;
 import org.xwiki.refactoring.event.EntitiesRenamedEvent;
 import org.xwiki.refactoring.event.EntitiesRenamingEvent;
-import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.OverwriteQuestion;
 import org.xwiki.refactoring.job.RefactoringJobs;

@@ -82,9 +82,9 @@ public class DocumentDeletedListener implements EventListener
         ComponentManager componentManager =
             this.componentManagerManager.getComponentManager(new DocumentNamespace(document).serialize(), false);
 
-        if (componentManager instanceof Disposable) {
+        if (componentManager instanceof Disposable disposable) {
             try {
-                ((Disposable) componentManager).dispose();
+                disposable.dispose();
             } catch (ComponentLifecycleException e) {
                 this.logger.error(String.format("Failed to dispose component manager for document [%s]", document), e);
             }

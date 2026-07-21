@@ -202,6 +202,49 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>
+                These utility classes (only static members) had their implicit public constructor made private to
+                follow SonarQube rule java:S1118 (utility classes should not be instantiable). Instantiating them was
+                never useful, but this is technically a real breakage since existing code calling the constructor will
+                fail at runtime.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.XWikiConstant::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.XWikiConstant::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.i18n.i18n::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.i18n.i18n::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.util.TOCGenerator::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.util.TOCGenerator::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.web.Utils::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.web.Utils::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

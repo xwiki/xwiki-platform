@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Role;
@@ -117,7 +116,7 @@ public interface XWikiVersioningStoreInterface
     {
         return filterVersions(getXWikiDocumentArchive(doc, context), criteria).stream()
             .map(Version::new)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**

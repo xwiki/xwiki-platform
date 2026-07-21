@@ -29,8 +29,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Component;
@@ -306,11 +304,6 @@ public class DeprecatedMailStorageScriptService extends AbstractMailScriptServic
             normalizedMap.put("wiki", xwikiContext.getWikiId());
         }
         return normalizedMap;
-    }
-
-    private MimeMessage loadMessage(Session session, String batchId, String mailId) throws MailStoreException
-    {
-        return this.mailContentStore.load(session, batchId, mailId);
     }
 
     @Override

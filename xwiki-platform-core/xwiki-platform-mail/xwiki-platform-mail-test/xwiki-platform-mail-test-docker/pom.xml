@@ -34,6 +34,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Mail - Tests - Functional Tests in Docker</description>
   <properties>
+    <!-- We must specify a value as otherwise 1.00 is expected because we have some class in src/main/java -->
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->

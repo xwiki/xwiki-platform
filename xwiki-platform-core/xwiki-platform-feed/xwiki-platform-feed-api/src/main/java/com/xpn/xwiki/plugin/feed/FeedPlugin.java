@@ -847,13 +847,13 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             Constructor< ? extends SyndEntrySource> ctor = null;
             if (params != null) {
                 try {
-                    ctor = sesc.getConstructor(new Class[] {Map.class});
-                    return ctor.newInstance(new Object[] {params});
+                    ctor = sesc.getConstructor(Map.class);
+                    return ctor.newInstance(params);
                 } catch (Throwable t) {
                 }
             }
-            ctor = sesc.getConstructor(new Class[] {});
-            return ctor.newInstance(new Object[] {});
+            ctor = sesc.getConstructor();
+            return ctor.newInstance();
         } catch (Throwable t) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "", t);
         }

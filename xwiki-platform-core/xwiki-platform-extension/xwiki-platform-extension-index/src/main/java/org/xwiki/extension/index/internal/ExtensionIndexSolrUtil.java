@@ -22,7 +22,6 @@ package org.xwiki.extension.index.internal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -78,7 +77,7 @@ public class ExtensionIndexSolrUtil
                 installedNamespaces = Collections.singletonList(toStoredNamespace((String) null));
             } else {
                 installedNamespaces = installedExtension.getNamespaces().stream().map(this::toStoredNamespace)
-                    .collect(Collectors.toList());
+                    .toList();
             }
             this.utils.setAtomic(ATOMIC_UPDATE_MODIFIER_SET, FIELD_INSTALLED_NAMESPACES,
                 installedNamespaces, document);
@@ -135,7 +134,7 @@ public class ExtensionIndexSolrUtil
 
         return solrNamespaces.stream()
             .map(this::fromStoredNamespace)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**

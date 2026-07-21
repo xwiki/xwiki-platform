@@ -29,13 +29,21 @@ describe("BaseDisplayer.vue", () => {
   });
 
   it("Renders an entry in view mode", () => {
-    const wrapper = initWrapper(BaseDisplayer, {});
+    const wrapper = initWrapper(BaseDisplayer, {
+      logic: {
+        isEditMode: () => false,
+      },
+    });
 
     expect(wrapper.text()).toMatch("red");
   });
 
   it("Switch to edit mode", () => {
-    const wrapper = initWrapper(BaseDisplayer, {});
+    const wrapper = initWrapper(BaseDisplayer, {
+      logic: {
+        isEditMode: () => false,
+      },
+    });
 
     // Manuelly triggers setEdit until we find a way to simulate the hovering of the displayer and
     // get access the popover content.
@@ -49,6 +57,9 @@ describe("BaseDisplayer.vue", () => {
       props: {
         isView: false,
       },
+      logic: {
+        isEditMode: () => false,
+      },
     });
 
     const inputElement = wrapper.find("input").element;
@@ -60,6 +71,9 @@ describe("BaseDisplayer.vue", () => {
     const wrapper = initWrapper(BaseDisplayer, {
       props: {
         isView: false,
+      },
+      logic: {
+        isEditMode: () => false,
       },
     });
 
@@ -85,6 +99,7 @@ describe("BaseDisplayer.vue", () => {
         isActionAllowed() {
           return false;
         },
+        isEditMode: () => false,
       },
     });
 
@@ -100,6 +115,9 @@ describe("BaseDisplayer.vue", () => {
           color: undefined,
         },
       },
+      logic: {
+        isEditMode: () => false,
+      },
     });
 
     expect(wrapper.find("div .view > div").text()).toBe("");
@@ -112,6 +130,9 @@ describe("BaseDisplayer.vue", () => {
           color: undefined,
         },
         isEmpty: false,
+      },
+      logic: {
+        isEditMode: () => false,
       },
     });
 

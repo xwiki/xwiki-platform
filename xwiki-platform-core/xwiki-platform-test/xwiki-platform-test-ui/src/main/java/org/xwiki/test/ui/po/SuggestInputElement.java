@@ -196,9 +196,13 @@ public class SuggestInputElement extends BaseElement
     {
         WebElement textInput = getTextInput();
         if (!textInput.isDisplayed()) {
-            // The text input is not visible when the widget is not focused and single selection is enabled. We need to
-            // focus the widget first.
+            // The text input is not visible when the widget is not focused and single selection is enabled (Tom Select
+            // hides it off-screen). We need to focus the widget first. Focusing is asynchronous though (Tom Select
+            // defers the actual focus handling with a timeout), so we wait for the input to become visible before
+            // clearing it, otherwise clearing fails because the input is still hidden off-screen and can't be scrolled
+            // into view.
             click();
+            getDriver().waitUntilCondition(driver -> textInput.isDisplayed());
         }
         textInput.clear();
         this.shouldWaitForRemoteSuggestions = false;

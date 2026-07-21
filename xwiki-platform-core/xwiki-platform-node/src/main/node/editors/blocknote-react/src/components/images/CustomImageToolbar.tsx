@@ -37,7 +37,7 @@ type CustomImageToolbarProps = {
  * @beta
  */
 type ImageEditionOverrideFn = (
-  image: BlockOfType<"image">["props"],
+  block: BlockOfType<"image">,
   update: (updateResult: ImageUpdateResult) => void,
 ) => void;
 
@@ -82,7 +82,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
 
   const openEditor = useCallback(() => {
     if (imageEditionOverrideFn) {
-      imageEditionOverrideFn(currentBlock.props, updateImageProps);
+      imageEditionOverrideFn(currentBlock, updateImageProps);
     } else {
       setShowImageEditor(true);
     }

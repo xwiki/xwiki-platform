@@ -1813,10 +1813,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     session.load(property, (Serializable) property);
                     // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all,
                     // it is safe to assume that a retrieved NULL value should actually be an empty string.
-                    if (property instanceof BaseStringProperty stringProperty) {
-                        if (stringProperty.getValue() == null) {
-                            stringProperty.setValue("");
-                        }
+                    if (property instanceof BaseStringProperty stringProperty && stringProperty.getValue() == null) {
+                        stringProperty.setValue("");
                     }
                     ((BaseProperty) property).setDirty(false);
                 } catch (ObjectNotFoundException e) {

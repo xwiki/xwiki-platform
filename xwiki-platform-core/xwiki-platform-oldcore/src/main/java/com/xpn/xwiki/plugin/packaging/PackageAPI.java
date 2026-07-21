@@ -240,10 +240,7 @@ public class PackageAPI extends Api
         try {
             this.pack.Import(data, getXWikiContext());
             return true;
-        } catch (XWikiException e) {
-            getXWikiContext().put("import_error", e.getMessage());
-            return false;
-        } catch (IOException e) {
+        } catch (XWikiException | IOException e) {
             getXWikiContext().put("import_error", e.getMessage());
             return false;
         }

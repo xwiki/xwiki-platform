@@ -108,6 +108,16 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Provides the attachment mimetype validation step (and its mandatory XClass initializer) so that we can test
+      that uploads rejected because of a mimetype restriction are reported correctly by the editor. It is declared here
+      so that its version can be resolved for the extraJARs entry in ImageIT (which puts it in WEB-INF/lib as a core
+      extension rather than an installed extension). -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-attachment-validation-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

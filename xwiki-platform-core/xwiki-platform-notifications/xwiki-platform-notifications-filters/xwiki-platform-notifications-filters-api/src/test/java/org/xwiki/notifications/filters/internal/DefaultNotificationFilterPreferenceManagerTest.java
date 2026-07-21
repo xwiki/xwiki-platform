@@ -22,7 +22,6 @@ package org.xwiki.notifications.filters.internal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
@@ -100,7 +99,7 @@ class DefaultNotificationFilterPreferenceManagerTest
         when(fakeFilter.getName()).thenReturn("fakeFilter");
 
         Collection<NotificationFilterPreference> resultSet = this.filterPreferenceManager
-            .getFilterPreferences(filterPreferences, fakeFilter).collect(Collectors.toList());
+            .getFilterPreferences(filterPreferences, fakeFilter).toList();
 
         assertTrue(resultSet.contains(filterPreference2));
         assertEquals(1, resultSet.size());
@@ -130,7 +129,7 @@ class DefaultNotificationFilterPreferenceManagerTest
 
         Collection<NotificationFilterPreference> resultSet = this.filterPreferenceManager
             .getFilterPreferences(filterPreferences, fakeFilter, NotificationFilterType.INCLUSIVE)
-            .collect(Collectors.toList());
+            .toList();
 
         assertTrue(resultSet.contains(filterPreference4));
         assertEquals(1, resultSet.size());

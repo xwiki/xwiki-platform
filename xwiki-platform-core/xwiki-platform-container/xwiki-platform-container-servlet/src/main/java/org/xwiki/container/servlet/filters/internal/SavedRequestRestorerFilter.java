@@ -228,12 +228,12 @@ public class SavedRequestRestorerFilter implements Filter
     {
         ServletRequest filteredRequest = request;
         // This filter works only for HTTP requests, because they are the only ones with a session.
-        if (request instanceof HttpServletRequest
+        if (request instanceof HttpServletRequest httpRequest
             && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_APPLIED))) {
             // Get the saved request, if any (returns null if not applicable)
-            SavedRequest savedRequest = getSavedRequest((HttpServletRequest) request);
+            SavedRequest savedRequest = getSavedRequest(httpRequest);
             // Merge the new and the saved request
-            filteredRequest = new SavedRequestWrapper((HttpServletRequest) request, savedRequest);
+            filteredRequest = new SavedRequestWrapper(httpRequest, savedRequest);
             filteredRequest.setAttribute(ATTRIBUTE_APPLIED, "true");
         }
         // Forward the request

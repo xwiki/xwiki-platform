@@ -142,8 +142,8 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         doc.setOriginalDocument(origDoc);
 
         // Force invalidating the cache to be sure it return (and keep) the right document
-        if (xcontext.getWiki().getStore() instanceof XWikiCacheStore) {
-            ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(doc);
+        if (xcontext.getWiki().getStore() instanceof XWikiCacheStore cacheStore) {
+            cacheStore.invalidate(doc);
         }
 
         return doc;

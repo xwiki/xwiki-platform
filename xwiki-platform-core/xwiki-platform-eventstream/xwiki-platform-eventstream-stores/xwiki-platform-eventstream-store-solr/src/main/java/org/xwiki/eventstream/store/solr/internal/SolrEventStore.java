@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -435,7 +434,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         SolrQuery solrQuery = new SolrQuery();
 
         solrQuery.addFilterQuery(serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_ID,
-            events.stream().map(Event::getId).collect(Collectors.toList())));
+            events.stream().map(Event::getId).toList()));
 
         solrQuery.addFilterQuery(serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS, entityIds)
             + SOLR_OR + serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS, entityIds));

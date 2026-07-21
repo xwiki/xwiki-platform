@@ -71,8 +71,8 @@ test("Image insertion UI can be overriden", async ({ mount, page }) => {
       macros={false}
       overrides={{
         // Unfortunately we can't call the "update" image handler here as functions don't cross Playwright's headless browser's boundaries
-        imageEdition: (image) => {
-          overrideFnCalledWithUrl = image.url;
+        imageEdition: (block) => {
+          overrideFnCalledWithUrl = block.props.url;
         },
       }}
       syntax={FULL_SYNTAX}
@@ -129,10 +129,10 @@ test("Allowed syntax features should be available", async ({ mount, page }) => {
   expect(menuItemsText).toContain("Quote");
 });
 
-// eslint-disable-next-line max-statements
 test("Disallowed syntax features should be unavailable", async ({
   mount,
   page,
+  // eslint-disable-next-line max-statements
 }) => {
   const syntax = structuredClone(FULL_SYNTAX);
   syntax.features.blocks.tables.basicTables = false;

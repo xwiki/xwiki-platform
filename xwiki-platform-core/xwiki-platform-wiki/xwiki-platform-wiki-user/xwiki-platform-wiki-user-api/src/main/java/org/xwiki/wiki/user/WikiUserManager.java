@@ -164,7 +164,8 @@ public interface WikiUserManager
      *
      * @param wikiId Od of the request concerned by the candidacy
      * @param candidacyId Id of the candidacy to get
-     * @return the candidacy
+     * @return the candidacy, or {@code null} if no candidacy with the given id exists (e.g. because it has been
+     *         removed in the meantime)
      * @throws WikiUserManagerException if problems occur
      */
     MemberCandidacy getCandidacy(String wikiId, int candidacyId) throws WikiUserManagerException;

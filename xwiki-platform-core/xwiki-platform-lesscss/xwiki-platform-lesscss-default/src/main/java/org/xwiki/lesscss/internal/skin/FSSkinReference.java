@@ -49,8 +49,7 @@ public class FSSkinReference implements SkinReference
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof FSSkinReference) {
-            FSSkinReference fsSkinReference = (FSSkinReference) o;
+        if (o instanceof FSSkinReference fsSkinReference) {
             return skinName.equals(fsSkinReference.skinName);
         }
         return false;

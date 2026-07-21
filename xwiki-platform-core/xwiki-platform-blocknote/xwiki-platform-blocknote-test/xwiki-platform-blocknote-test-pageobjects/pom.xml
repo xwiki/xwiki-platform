@@ -43,5 +43,11 @@
       <artifactId>xwiki-platform-wysiwyg-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Used to wait for the Solr indexing to complete before searching for link suggestions. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-test-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

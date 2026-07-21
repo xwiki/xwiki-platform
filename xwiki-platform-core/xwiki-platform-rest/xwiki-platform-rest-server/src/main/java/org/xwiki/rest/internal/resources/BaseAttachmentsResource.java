@@ -337,7 +337,7 @@ public class BaseAttachmentsResource extends XWikiResource
         // * the media type is stored (which means it was already filtered at the query level) or
         // * the file name matches the filter or
         // * the computed media type matches the filter
-        return (attachment) -> acceptedMediaTypes.isEmpty() || !StringUtils.isEmpty(attachment.getMimeType())
+        return attachment -> acceptedMediaTypes.isEmpty() || !StringUtils.isEmpty(attachment.getMimeType())
             || hasAcceptedFileNameExtension(attachment, acceptedFileNameExtensions)
             || hasAcceptedMediaType(attachment, acceptedMediaTypes);
     }

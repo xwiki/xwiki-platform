@@ -17,19 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { ImageUploadButton } from "./ImageUploadButton";
 import { DepsContainerContext } from "../../contexts";
 import { SearchBox } from "../SearchBox";
-import {
-  Box,
-  Breadcrumbs,
-  Button,
-  FileInput,
-  Flex,
-  Space,
-  Stack,
-  Text,
-  VisuallyHidden,
-} from "@mantine/core";
+import { Box, Breadcrumbs, Flex, Space, Stack, Text } from "@mantine/core";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import {
@@ -37,21 +28,16 @@ import {
   DocumentReference,
   EntityType,
 } from "@xwiki/platform-model-api";
-import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import { useCallback, useContext, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { RiAttachmentLine } from "react-icons/ri";
 import type { LinkSuggestion } from "../SearchBox";
-import type { AttachmentsService } from "@xwiki/platform-attachments-api";
-import type { DocumentService } from "@xwiki/platform-document-api";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
   ModelReferenceHandlerProvider,
   ModelReferenceParserProvider,
 } from "@xwiki/platform-model-reference-api";
-import type {
-  RemoteURLParserProvider,
-  RemoteURLSerializerProvider,
-} from "@xwiki/platform-model-remote-url-api";
+import type { RemoteURLParserProvider } from "@xwiki/platform-model-remote-url-api";
 
 export type ImageSelectorProps = {
   currentSelection?: string;
@@ -61,7 +47,6 @@ export type ImageSelectorProps = {
 export const ImageSelector: React.FC<ImageSelectorProps> = ({
   currentSelection,
   onSelected,
-  // eslint-disable-next-line max-statements
 }) => {
   const depsContainer = useContext(DepsContainerContext)!;
 
@@ -76,15 +61,6 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
   const modelReferenceParser = depsContainer
     .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
     .get()!;
-
-  const remoteURLSerializer = depsContainer
-    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-    .get()!;
-
-  const documentService = depsContainer.get<DocumentService>("DocumentService");
-
-  const attachmentsService =
-    depsContainer.get<AttachmentsService>("AttachmentsService")!;
 
   const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
     "LinkSuggestServiceProvider",
@@ -114,42 +90,6 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
   }, [currentSelection]);
 
   const { t } = useTranslation();
-
-  const fileUploadRef = useRef<HTMLButtonElement>(null);
-
-  const triggerUpload = useCallback(() => {
-    fileUploadRef?.current?.click();
-  }, [fileUploadRef]);
-
-  const fileSelected = useCallback(
-    async (file: File) => {
-      const currentPageName =
-        documentService.getCurrentDocumentReferenceString().value ?? "";
-
-      const uploadedFilesUrls = await attachmentsService.upload(
-        currentPageName,
-        [file],
-      );
-
-      let url: string | undefined;
-      if (uploadedFilesUrls && uploadedFilesUrls[0]) {
-        url = uploadedFilesUrls[0];
-      } else {
-        const parser = modelReferenceParser?.parse(currentPageName, {
-          relative: false,
-        });
-
-        url = remoteURLSerializer?.serialize(
-          new AttachmentReference(file.name, parser as DocumentReference),
-        );
-      }
-
-      if (url) {
-        onSelected(url);
-      }
-    },
-    [onSelected],
-  );
 
   const searchAttachments = useCallback(
     async (query: string) => {
@@ -195,19 +135,9 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
 
   return (
     <Box>
-      <Button variant="default" onClick={triggerUpload}>
-        {t("blocknote.imageSelector.uploadButton")}
-      </Button>
+      <ImageUploadButton onUploaded={onSelected} />
 
       <Space h="sm" />
-
-      <VisuallyHidden>
-        <FileInput
-          ref={fileUploadRef}
-          accept="image/*"
-          onChange={(file) => file && fileSelected(file)}
-        />
-      </VisuallyHidden>
 
       <SearchBox
         placeholder={t("blocknote.imageSelector.placeholder")}

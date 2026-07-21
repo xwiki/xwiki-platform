@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-component</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.6.0-rc-1</version>
   </parent>
   <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-component-webjar</artifactId>

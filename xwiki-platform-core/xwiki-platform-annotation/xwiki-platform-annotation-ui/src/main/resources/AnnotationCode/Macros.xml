@@ -280,7 +280,7 @@
     #getSanitizedURLAttributeValue('a', 'href', "$!request.get('xredirect')", $replyFallbackURL, $xredirect)
     #set($isUserComment = "$!ann.get('author')" != '' &amp;&amp; $services.model.resolveDocument("$!ann.get('author')", 'user') == $xcontext.userReference)
     #if($threadCount &gt; 0)
-      &lt;button class="thread-toggle btn btn-default infomessage" data-toggle="collapse" data-target="#comment-thread-${ann.id}" aria-expanded="false" aria-controls="comment-thread-${ann.id}"&gt;
+      &lt;button class="thread-toggle btn btn-default infomessage"&gt;
         $services.icon.renderHTML('comments') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
       &lt;/button&gt;##
     #end

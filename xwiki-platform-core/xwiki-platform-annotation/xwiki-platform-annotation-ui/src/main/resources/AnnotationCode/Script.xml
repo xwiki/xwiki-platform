@@ -1630,6 +1630,22 @@ XWiki.Annotation = Class.create({
     if (closeButton &amp;&amp; inBubble) {
       closeButton.observe('click', () => this.hideBubble(container));
     }
+    // Forward the click to the button in the comment tab instead of handling it in the bubble.
+    var threadToggleButton = container.down('.thread-toggle');
+    if (threadToggleButton) {
+      var threadToggleInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' .thread-toggle')[0];
+      if (!threadToggleInTab) {
+        threadToggleButton.hide();
+      } else {
+        threadToggleButton.observe('click', function(event) {
+          event.stop();
+          threadToggleInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' .thread-toggle')[0];
+          threadToggleInTab.click();
+          threadToggleInTab.scrollIntoView();
+          container.blur();
+        });
+      }
+    }
     // Annotations can have a reply button when they are merged with comments (and thus stored as comments). Custom annotations will not have this button displayed.
     var replyButton = container.down('a.reply');
     if (replyButton) {

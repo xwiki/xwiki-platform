@@ -408,7 +408,7 @@ require(['jquery'], function($) {
         failureMessage: l10n['core.validation.spacevalidation.message.invalidreference'],
         against: function(value) {
           if (typeof value === 'string') {
-            let separatorsOnly = value.strip().replace(/\\\\/g, 'x').replace(/\\./g, 'x');
+            let separatorsOnly = value.strip().replaceAll(/\\\\/g, 'x').replaceAll(/\\./g, 'x');
             return separatorsOnly.search(dotRegex) === -1;
           } else {
             return true;

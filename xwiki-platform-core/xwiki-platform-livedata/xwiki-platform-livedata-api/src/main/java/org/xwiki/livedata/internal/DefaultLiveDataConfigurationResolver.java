@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -183,10 +184,18 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
 
     private LiveDataConfiguration translate(LiveDataConfiguration config)
     {
-        config.getMeta().getLayouts().stream().filter(Objects::nonNull).forEach(this::translate);
-        config.getMeta().getFilters().stream().filter(Objects::nonNull).forEach(this::translate);
-        config.getMeta().getActions().stream().filter(Objects::nonNull).forEach(this::translate);
+        LiveDataMeta meta = config.getMeta();
+        if (meta != null) {
+            streamNonNull(meta.getLayouts()).forEach(this::translate);
+            streamNonNull(meta.getFilters()).forEach(this::translate);
+            streamNonNull(meta.getActions()).forEach(this::translate);
+        }
         return config;
+    }
+
+    private <T> Stream<T> streamNonNull(Collection<T> collection)
+    {
+        return collection == null ? Stream.empty() : collection.stream().filter(Objects::nonNull);
     }
 
     private void translate(LiveDataLayoutDescriptor layout)

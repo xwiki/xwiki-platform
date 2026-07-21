@@ -34,8 +34,8 @@
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "test": "pnpm test:unit && pnpm test:ui",
-    "test:unit": "vitest --run",
     "test:ui": "playwright install chromium; cross-env NODE_OPTIONS=--max-old-space-size=4096 playwright test -c playwright-ct.config.ts",
+    "test:unit": "vitest --run",
     "typecheck": "vue-tsc"
   },
   "types": "./dist/index.d.ts",
@@ -69,20 +69,20 @@
     "@vue/compiler-dom": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-link-modal-ui": "workspace:*",
+    "@xwiki/platform-syntaxes-config": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
-    "@xwiki/platform-syntaxes-config": "workspace:*",
     "cross-env": "catalog:",
     "eslint": "catalog:",
     "inversify": "catalog:",
     "reflect-metadata": "catalog:",
     "vite": "catalog:",
-    "vitest-mock-extended": "catalog:",
     "vitest": "catalog:",
-    "vue-tsc": "catalog:",
-    "vue": "catalog:"
+    "vitest-mock-extended": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "publishConfig": {
     "exports": {

@@ -115,6 +115,11 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     private static final String MACRO_BINDING = "wikimacro";
 
     /**
+     * The id component identifying a wiki macro rendering, whose value matches {@link #MACRO_BINDING}.
+     */
+    private static final String MACRO_ASYNC_ID = MACRO_BINDING;
+
+    /**
      * The name of the metadata flagging a block as containing wiki macro content.
      */
     private static final String WIKIMACROCONTENT = "wikimacrocontent";
@@ -281,7 +286,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
         this.syncContext = syncContext;
 
-        this.id = createId("rendering", "wikimacro", wikimacro.getId(),
+        this.id = createId("rendering", MACRO_ASYNC_ID, wikimacro.getId(),
             wikimacro.getBlockId(syncContext.getCurrentMacroBlock()));
         try {
             this.parameters = convertParameters(parameters);

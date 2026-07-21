@@ -84,7 +84,14 @@ function generateWebjarNodeConfig(
 ): UserConfig {
   const WEBJAR_NODE_OUT_DIR = "../../../target/node-dist";
   const __dirname = dirname(fileURLToPath(path));
+  // Oxc injects imports of its own helpers, for instance when transforming legacy decorators. They are resolved from
+  // the package declaring @oxc-project/runtime and must be bundled.
+  const bundled = ["@oxc-project/runtime", ...toBundle];
   return defineConfig({
+    // Report AMD as unavailable to force package to take their CommonJS branch, as expected for bundled code.
+    define: {
+      "define.amd": "false",
+    },
     build: {
       outDir: WEBJAR_NODE_OUT_DIR,
       lib: {
@@ -96,7 +103,7 @@ function generateWebjarNodeConfig(
       rollupOptions: {
         external: (id) => {
           // Force the inclusion of direct or transitive dependencies to keep bundled.
-          if (toBundle.some((s) => id === s || id.startsWith(`${s}/`))) {
+          if (bundled.some((s) => id === s || id.startsWith(`${s}/`))) {
             return false;
           }
 
@@ -151,6 +158,14 @@ function generateConfig(
   const libFileName = (format: string) => `index.${format}.js`;
 
   return defineConfig({
+    // The component system relies on TypeScript's legacy decorators (including parameter decorators), which Oxc only
+    // accepts when explicitly enabled.
+    oxc: {
+      decorator: {
+        legacy: true,
+        emitDecoratorMetadata: true,
+      },
+    },
     build: {
       sourcemap: true,
       lib: {

@@ -82,6 +82,7 @@ catalog:
   "@mantine/core": 9.4.1
   "@mantine/hooks": 9.4.1
   "@microsoft/api-extractor": 7.58.9
+  "@oxc-project/runtime": 0.139.0
   "@playwright/experimental-ct-react": 1.61.1
   "@playwright/experimental-ct-vue": 1.61.1
   "@playwright/test": 1.61.1
@@ -95,7 +96,7 @@ catalog:
   "@types/react-dom": 19.2.3
   "@types/requirejs": 2.1.37
   "@types/sinon": 21.0.1
-  "@vitejs/plugin-react": 5.2.0
+  "@vitejs/plugin-react": 6.0.3
   "@vitejs/plugin-vue": 6.0.8
   "@vitest/eslint-plugin": 1.6.23
   "@vue/compiler-dom": 3.5.38
@@ -156,7 +157,7 @@ catalog:
   u-node: 0.0.8
   unified: 11.0.5
   utility-types: 3.11.0
-  vite: 7.3.5
+  vite: 8.1.5
   vite-plugin-css-injected-by-js: 4.0.1
   vite-plugin-dts: 4.5.4
   vitest: 4.1.6

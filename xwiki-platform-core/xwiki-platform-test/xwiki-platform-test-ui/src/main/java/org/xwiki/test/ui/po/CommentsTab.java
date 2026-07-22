@@ -287,7 +287,7 @@ public class CommentsTab extends BaseElement
      *
      * @param id the comment id
      * @return the opened permalink modal
-     * @since 18.6.0RC1
+     * @since 18.7.0RC1
      */
     public PermalinkModal openPermalinkModalByID(int id)
     {

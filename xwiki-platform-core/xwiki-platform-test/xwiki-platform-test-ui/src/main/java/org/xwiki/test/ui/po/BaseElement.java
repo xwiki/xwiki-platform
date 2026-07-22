@@ -112,7 +112,7 @@ public class BaseElement
     }
 
     /**
-     * @since 18.6.0RC1
+     * @since 18.7.0RC1
      */
     public void waitForNotificationInfoMessage(String message)
     {
@@ -122,7 +122,7 @@ public class BaseElement
     /**
      * Confirms a {@code XWiki.widgets.ConfirmationBox} dialog by clicking its "Yes" button.
      *
-     * @since 18.6.0RC1
+     * @since 18.7.0RC1
      */
     public void confirmAction()
     {

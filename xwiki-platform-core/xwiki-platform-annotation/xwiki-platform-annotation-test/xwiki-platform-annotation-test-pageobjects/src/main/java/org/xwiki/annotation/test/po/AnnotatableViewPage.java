@@ -330,7 +330,7 @@ public class AnnotatableViewPage extends BaseElement
      * plain comment and is no longer anchored/highlighted on the page.
      *
      * @param id the annotation id (e.g. {@code "ID0"}, as returned by {@link #getAnnotationIdByText(String)})
-     * @since 18.6.0RC1
+     * @since 18.7.0RC1
      */
     public void markAnnotationAsSolvedById(String id)
     {

@@ -26,7 +26,7 @@ import org.openqa.selenium.By;
  * direct link to a comment or annotation.
  *
  * @version $Id$
- * @since 18.6.0RC1
+ * @since 18.7.0RC1
  */
 public class PermalinkModal extends BaseModal
 {

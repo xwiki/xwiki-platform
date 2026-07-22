@@ -19,6 +19,8 @@
  */
 package org.xwiki.annotation.io.internal.migration.hibernate;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
@@ -65,6 +67,7 @@ class AnnotationInternalTargetFixTaskConsumerTest
     private AnnotationInternalTargetFixTaskConsumer consumer;
 
     @MockComponent
+    @Named("current")
     private TypedStringEntityReferenceResolver referenceResolver;
 
     @InjectMockitoOldcore

@@ -231,10 +231,9 @@ public class DefaultIOService implements IOService
             for (BaseObject object : objects) {
                 // Use the object number as annotation id
                 if (object != null) {
-                    String targetField = object.getStringValue(Annotation.TARGET_FIELD);
                     // The legacy behavior is to have a non-empty target, which can lead to issues when the document
                     // is moved. Now, we consider an object with an empty target as related to the containing document.
-                    if (matchesTarget(targetField, localTargetId, isDocumentType)) {
+                    if (matchesTarget(object, localTargetId, isDocumentType)) {
                         result.add(loadAnnotationFromObject(object, localTargetId));
                     }
                 }
@@ -273,8 +272,7 @@ public class DefaultIOService implements IOService
             BaseObject object =
                 document.getXObject(this.configuration.getAnnotationClassReference(),
                     Integer.valueOf(annotationID));
-            String targetField = object == null ? null : object.getStringValue(Annotation.TARGET_FIELD);
-            if (object == null || !matchesTarget(targetField, localTargetId, isDocumentType)) {
+            if (object == null || !matchesTarget(object, localTargetId, isDocumentType)) {
                 return null;
             }
             // use the object number as annotation id
@@ -329,10 +327,7 @@ public class DefaultIOService implements IOService
                     Integer.valueOf(annotationID));
 
             // if object exists and its target matches the requested target, delete it
-            if (annotationObject != null
-                && matchesTarget(annotationObject.getStringValue(Annotation.TARGET_FIELD), localTargetId,
-                    isDocumentType))
-            {
+            if (annotationObject != null && matchesTarget(annotationObject, localTargetId, isDocumentType)) {
                 document.removeObject(annotationObject);
                 document.setAuthor(deprecatedContext.getUser());
                 deprecatedContext.getWiki().saveDocument(document, "Deleted annotation " + annotationID,
@@ -529,7 +524,7 @@ public class DefaultIOService implements IOService
     }
 
     /**
-     * @param targetField the target stored on the annotation object
+     * @param object the object to test
      * @param localTargetId the serialized reference of the requested target
      * @param isDocumentType {@code true} if the requested target is a document (i.e. its content)
      * @return {@code true} if the object holds an annotation for the requested target. This is the case either when the
@@ -537,8 +532,22 @@ public class DefaultIOService implements IOService
      *     document: a blank target is the representation of an annotation on the document content, which stays valid
      *     when the document is moved (unlike a target storing the document reference explicitly)
      */
-    private boolean matchesTarget(String targetField, String localTargetId, boolean isDocumentType)
+    private boolean matchesTarget(BaseObject object, String localTargetId, boolean isDocumentType)
     {
-        return Objects.equals(localTargetId, targetField) || (StringUtils.isBlank(targetField) && isDocumentType);
+        String targetField = object.getStringValue(Annotation.TARGET_FIELD);
+        return Objects.equals(localTargetId, targetField)
+            || (StringUtils.isBlank(targetField) && isDocumentType && isAnnotation(object));
+    }
+
+    /**
+     * @param object the object to test
+     * @return {@code true} if the object is an annotation rather than an ordinary comment
+     */
+    private boolean isAnnotation(BaseObject object)
+    {
+        // The annotation class also holds ordinary comments, which are told apart by having no selection. Both leave
+        // the target blank, so matching on a blank target alone would load every comment as an annotation of the
+        // document holding it.
+        return StringUtils.isNotBlank(object.getStringValue(Annotation.SELECTION_FIELD));
     }
 }

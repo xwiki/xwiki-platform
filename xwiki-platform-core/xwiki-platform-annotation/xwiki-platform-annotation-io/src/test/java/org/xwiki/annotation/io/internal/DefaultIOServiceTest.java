@@ -19,6 +19,7 @@
  */
 package org.xwiki.annotation.io.internal;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Named;
@@ -72,6 +73,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.annotation.Annotation.AUTHOR_FIELD;
 import static org.xwiki.annotation.Annotation.DATE_FIELD;
+import static org.xwiki.annotation.Annotation.SELECTION_FIELD;
 import static org.xwiki.annotation.Annotation.STATE_FIELD;
 import static org.xwiki.annotation.Annotation.TARGET_FIELD;
 
@@ -247,6 +249,7 @@ class DefaultIOServiceTest
         // An annotation on the document content is stored with a blank target: it matches a document-type target.
         BaseObject blankTargetObject = document.newXObject(this.annotationClassReference, context);
         blankTargetObject.setStringValue(TARGET_FIELD, "");
+        blankTargetObject.setStringValue(SELECTION_FIELD, "annotated text");
         blankTargetObject.setStringValue(STATE_FIELD, "SAFE");
 
         BaseObject matchingObject = document.newXObject(this.annotationClassReference, context);
@@ -259,6 +262,30 @@ class DefaultIOServiceTest
         this.oldcore.getSpyXWiki().saveDocument(document, context);
 
         assertEquals(2, this.ioService.getAnnotations(TARGET).size());
+    }
+
+    @Test
+    void getAnnotationsIgnoresOrdinaryComments() throws Exception
+    {
+        XWikiContext context = this.oldcore.getXWikiContext();
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
+
+        // An ordinary comment: it is stored in the annotation class too, and also leaves the target blank, but it has
+        // no selection and no state. Returning it would both list comments among the annotations and fail to
+        // deserialize its empty state.
+        BaseObject comment = document.newXObject(this.annotationClassReference, context);
+        comment.setStringValue(TARGET_FIELD, "");
+
+        BaseObject annotation = document.newXObject(this.annotationClassReference, context);
+        annotation.setStringValue(TARGET_FIELD, "");
+        annotation.setStringValue(SELECTION_FIELD, "annotated text");
+        annotation.setStringValue(STATE_FIELD, "SAFE");
+
+        this.oldcore.getSpyXWiki().saveDocument(document, context);
+
+        Collection<Annotation> annotations = this.ioService.getAnnotations(TARGET);
+        assertEquals(1, annotations.size());
+        assertEquals("annotated text", annotations.iterator().next().getSelection());
     }
 
     @Test
@@ -309,6 +336,7 @@ class DefaultIOServiceTest
         document.newXObject(this.annotationClassReference, context);
         BaseObject object = document.newXObject(this.annotationClassReference, context);
         object.setStringValue(TARGET_FIELD, xObjectTarget);
+        object.setStringValue(SELECTION_FIELD, "annotated text");
         object.setStringValue(STATE_FIELD, "SAFE");
         this.oldcore.getSpyXWiki().saveDocument(document, context);
 
@@ -331,6 +359,7 @@ class DefaultIOServiceTest
         // target must still delete the object.
         BaseObject object = document.newXObject(this.annotationClassReference, context);
         object.setStringValue(TARGET_FIELD, "");
+        object.setStringValue(SELECTION_FIELD, "annotated text");
         this.oldcore.getSpyXWiki().saveDocument(document, context);
 
         this.ioService.removeAnnotation(TARGET, "1");

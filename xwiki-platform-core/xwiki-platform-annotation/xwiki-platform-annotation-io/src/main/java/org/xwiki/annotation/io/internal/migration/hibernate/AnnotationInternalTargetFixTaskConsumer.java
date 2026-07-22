@@ -65,7 +65,11 @@ public class AnnotationInternalTargetFixTaskConsumer implements TaskConsumer
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    /**
+     * Resolves against the wiki of the document being processed, which the task executor sets as the current one.
+     */
     @Inject
+    @Named("current")
     private TypedStringEntityReferenceResolver referenceResolver;
 
     @Inject

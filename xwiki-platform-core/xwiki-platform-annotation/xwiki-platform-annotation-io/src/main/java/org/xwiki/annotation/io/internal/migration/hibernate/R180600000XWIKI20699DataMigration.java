@@ -88,7 +88,10 @@ public class R180600000XWIKI20699DataMigration extends AbstractDocumentsMigratio
                 .setWiki(context.getWikiId())
                 .execute()
                 .stream()
-                .flatMap(fullName -> resolveDocumentReference(String.valueOf(fullName), null).stream())
+                // XObjects are only held by the original document, never by its translations, so the locale is
+                // always the root one. It must be passed as the empty string: a null locale resolves to no
+                // reference at all, silently discarding every selected document.
+                .flatMap(fullName -> resolveDocumentReference(String.valueOf(fullName), "").stream())
                 .collect(Collectors.toList());
         } catch (QueryException e) {
             throw new DataMigrationException(

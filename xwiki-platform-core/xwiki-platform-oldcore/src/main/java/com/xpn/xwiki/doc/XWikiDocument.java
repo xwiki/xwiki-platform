@@ -7734,6 +7734,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
         String language = "";
         XWikiDocument tdoc = (XWikiDocument) context.get(CKEY_TDOC);
+        // Fall back to this document when no translated document is set in the context.
+        if (tdoc == null) {
+            tdoc = this;
+        }
         String realLang = tdoc.getRealLanguage(context);
         if (xwiki.isMultiLingual(context) && (!"".equals(realLang))) {
             language = realLang;

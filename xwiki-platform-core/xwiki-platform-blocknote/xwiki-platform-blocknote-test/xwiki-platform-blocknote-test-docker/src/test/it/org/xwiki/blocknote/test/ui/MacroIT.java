@@ -284,7 +284,7 @@ class MacroIT extends AbstractBlockNoteIT
 
     @Test
     @Order(3)
-    void insertMacroUsingToolbar(TestUtils setup, TestReference testReference)
+    void insertAndEditMacroUsingToolbar(TestUtils setup, TestReference testReference)
     {
         // Start fresh.
         setup.deletePage(testReference);
@@ -310,6 +310,33 @@ class MacroIT extends AbstractBlockNoteIT
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("""
             {{success title="bar"}}
+            foo
+            {{/success}}""", wikiEditor.getContent());
+
+        // Now edit the macro using the toolbar: select the (server-rendered) block macro with a single click and click
+        // the edit button that shows up in the toolbar.
+        wikiEditor.clickCancel();
+        page.editInplace();
+
+        editor = new BlockNoteEditor("content");
+        textArea = editor.getRichTextArea();
+
+        textArea.selectMacro(0);
+        macroEditModal = editor.getToolBar().editMacro();
+        assertEquals("Success Message", macroEditModal.getMacroName());
+        assertEquals("bar", macroEditModal.getMacroParameter("title"));
+        assertEquals("foo", macroEditModal.getMacroContent());
+
+        macroEditModal.setMacroParameter("title", "baz").clickSubmit();
+
+        // The content is currently not reloaded after a macro is updated. Instead of showing the old macro output we
+        // show the macro placeholder.
+        assertEquals("macro:success", textArea.getText());
+
+        page.save();
+        wikiEditor = page.editWiki();
+        assertEquals("""
+            {{success title="baz"}}
             foo
             {{/success}}""", wikiEditor.getContent());
     }

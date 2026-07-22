@@ -97,29 +97,32 @@ export const CustomMacroEditButton: React.FC<CustomMacroEditButtonProps> = ({
 
   const editor = useEditor();
 
-  const selection = editor.getSelection();
+  // A block macro is edited when it is node-selected (clicked) or the text cursor is inside it.
+  // getSelection() returns undefined for a node selection, so resolve the block from the text cursor
+  // position instead — the same approach the image toolbar uses to detect a selected image block.
+  const block = editor.getTextCursorPosition().block;
 
   const openMacroEditor = useMemo(() => {
     // Hide the edit action when no params editor is available.
     const openParamsEditor = ctxForMacros.openParamsEditor;
 
-    if (!openParamsEditor || !selection || selection.blocks.length !== 1) {
+    if (!openParamsEditor) {
       return null;
     }
 
-    const edit = resolveMacroEdit(editor, selection.blocks[0]);
+    const edit = resolveMacroEdit(editor, block);
     if (!edit) {
       return null;
     }
 
     return () => openParamsEditor(edit.invocation, edit.writeBack);
-  }, [selection, ctxForMacros, editor]);
+  }, [block, ctxForMacros, editor]);
 
   return (
     openMacroEditor && (
       <Components.FormattingToolbar.Button
         className={"bn-button"}
-        data-test="insertMacroButton"
+        data-test="editMacro"
         label={t("blocknote.linkToolbar.macros.edit.label")}
         mainTooltip={t("blocknote.linkToolbar.macros.edit.tooltip")}
         icon={<RiPencilFill />}

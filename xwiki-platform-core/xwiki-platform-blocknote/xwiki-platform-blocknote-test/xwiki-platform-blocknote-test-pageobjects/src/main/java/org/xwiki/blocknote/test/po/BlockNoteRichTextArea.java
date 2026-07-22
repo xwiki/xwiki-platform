@@ -202,14 +202,32 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public MacroDialogEditModal doubleClickMacro(int index)
     {
-        // The double click event listener is registered on the macro output wrapper which is the first child of the
-        // block content.
-        WebElement macro = this.container.findElements(By.cssSelector("""
-            .bn-block-content[data-content-type="xwikiMacroBlock"] > :first-child,
-            .bn-inline-content-section[data-inline-content-type="xwikiInlineMacro"] > :first-child"""))
-            .get(index);
+        WebElement macro = getMacro(index);
         getDriver().createActions().doubleClick(macro).perform();
         return new MacroDialogEditModal().waitUntilReady();
+    }
+
+    /**
+     * Single clicks on the macro with the specified index in the rich text area to select it (node selection). This is
+     * what makes the macro toolbar (e.g. the edit macro button) show up.
+     *
+     * @param index the index of the macro to select, starting from 0
+     * @return this rich text area instance
+     * @since 18.6.0
+     */
+    public BlockNoteRichTextArea selectMacro(int index)
+    {
+        getMacro(index).click();
+        return this;
+    }
+
+    private WebElement getMacro(int index)
+    {
+        // The double click event listener is registered on the macro output wrapper which is the first child of the
+        // block content.
+        return this.container.findElements(By.cssSelector("""
+            .bn-block-content[data-content-type="xwikiMacroBlock"] > :first-child,
+            .bn-inline-content-section[data-inline-content-type="xwikiInlineMacro"] > :first-child""")).get(index);
     }
 
     /**

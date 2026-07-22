@@ -55,6 +55,8 @@ public class PackageConfiguration implements Cloneable
 
     private XarEntry xarEntry;
 
+    private boolean forceOverwrite;
+
     public PackageConfiguration()
     {
         // Default behavior
@@ -199,5 +201,23 @@ public class PackageConfiguration implements Cloneable
     public XarEntry getXarEntry()
     {
         return xarEntry;
+    }
+
+    /**
+     * @return true if the install should overwrite existing documents without 3-way merge (used for reinstall)
+     * @since 18.3.0RC1
+     */
+    public boolean isForceOverwrite()
+    {
+        return this.forceOverwrite;
+    }
+
+    /**
+     * @param forceOverwrite true to skip the 3-way merge and overwrite existing documents with the new version
+     * @since 18.3.0RC1
+     */
+    public void setForceOverwrite(boolean forceOverwrite)
+    {
+        this.forceOverwrite = forceOverwrite;
     }
 }

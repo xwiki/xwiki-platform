@@ -326,6 +326,28 @@ public class AnnotatableViewPage extends BaseElement
     }
 
     /**
+     * Opens the annotation bubble for the annotation identified by {@code id} and marks it as solved: it becomes a
+     * plain comment and is no longer anchored/highlighted on the page.
+     *
+     * @param id the annotation id (e.g. {@code "ID0"}, as returned by {@link #getAnnotationIdByText(String)})
+     * @since 18.7.0RC1
+     */
+    public void markAnnotationAsSolvedById(String id)
+    {
+        // The toggle button is visually hidden (sr-only, for accessibility), so it has no on-screen position for a
+        // native WebDriver click to scroll to - dispatch the click directly via JavaScript instead.
+        getDriver().executeJavascript("arguments[0].click();", getDriver().findElement(By.id(id)));
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".annotation-bubble a.solve"));
+        getDriver().findElement(By.cssSelector(".annotation-bubble a.solve")).click();
+        // "Mark as solved" is a plain link to the "save" action, confirmed via the same XWiki.widgets.ConfirmationBox
+        // dialog as Delete (see AnnotationsLabel#deleteAnnotationById), not a native browser confirm().
+        confirmAction();
+        // The action navigates back to the same page (via xredirect); the toggle button for this annotation id no
+        // longer exists once the reloaded page no longer treats it as an annotation.
+        getDriver().waitUntilElementDisappears(By.id(id));
+    }
+
+    /**
      * @return if the annotations doc extra pane is available
      * @since 17.7.0RC1
      * @since 17.4.3

@@ -679,6 +679,14 @@ require(['jquery'], function($) {
   $(document).on('click', '#permalinkModal input.btn-primary', function() {
     window.location = $('#permalinkModal').find('.form-control').val();
   });
+  /**
+   * Copy the permalink to the clipboard.
+   */
+  $(document).on('click', '#permalink-copy-button', function() {
+    $('#permalinkModal').find('.form-control').select();
+    document.execCommand('copy');
+    new XWiki.widgets.Notification($(this).data('copiedMessage'), 'info');
+  });
 });
 
 /**

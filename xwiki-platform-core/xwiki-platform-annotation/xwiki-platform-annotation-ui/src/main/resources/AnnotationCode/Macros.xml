@@ -88,7 +88,6 @@
       #end
     &lt;/div&gt;
     #displayAnnotationFromReference($annData, 'create', $docRef)
-    #displayAnnotationBoxButtons('create')
   &lt;/form&gt;
 &lt;/div&gt;
 #end
@@ -117,7 +116,6 @@
       #set($editURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=PUT&amp;media=json")
       &lt;form method='POST' action="${editURL}"&gt;
         #displayAnnotationFromReference($ann, 'edit', $docRef)
-        #displayAnnotationBoxButtons('edit')
       &lt;/form&gt;
     #else
       #info($services.localization.render('annotations.action.edit.error.notfound'))
@@ -166,9 +164,9 @@
  * @param $mode 'create' or 'edit'
  *#
 #macro(displayAnnotationBoxButtons $mode)
-  &lt;div class="buttons"&gt;
-    &lt;span class='buttonwrapper'&gt;&lt;input type="submit" class='button' value='$!{escapetool.xml($services.localization.render("annotations.action.${mode}.submit.text"))}'/&gt;&lt;/span&gt;
-    &lt;span class='buttonwrapper'&gt;&lt;input type="reset" class='button secondary' value='$!{escapetool.xml($services.localization.render("annotations.action.${mode}.cancel.text"))}'/&gt;&lt;/span&gt;
+  &lt;div class="annotation-bubble-edit-tools"&gt;
+    &lt;button class='btn btn-primary tool-submit' type='button'&gt;$escapetool.xml($services.localization.render("annotations.action.${mode}.submit.text")) &lt;/button&gt;
+    &lt;button class='btn btn-secondary tool-cancel' type='reset'&gt;$escapetool.xml($services.localization.render("annotations.action.${mode}.cancel.text"))&lt;/button&gt;
   &lt;/div&gt;
 #end
 ##
@@ -199,21 +197,28 @@
     #set($mode = 'view')
   #end
   &lt;div class="annotation $!{ann.state}" id="annotation_${mode}_$!{ann.id}"&gt;
-    &lt;div class="annotationAvatar"&gt;#mediumUserAvatar($ann.author)&lt;/div&gt;
-    &lt;div class="annotationHeader"&gt;
+    &lt;div class="annotation-bubble-avatar"&gt;
+      #smallUserAvatar($ann.author)
+    &lt;/div&gt;
+    &lt;div class="annotation-bubble-header"&gt;
       #displayAnnotationTitle($ann)
+    &lt;/div&gt;
+    &lt;div class="annotation-bubble-close"&gt;
+      &lt;button class="btn btn-default btn-xs"  type="button"
+        title="$services.localization.render('annotations.annotated.bubble.toggle.hint')"&gt;
+        $services.icon.renderHTML('cross')
+        &lt;span class="sr-only"&gt;
+          $escapetool.xml($services.localization.render('annotations.annotated.bubble.toggle.hint'))
+        &lt;/span&gt;
+      &lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="annotation-bubble-content"&gt;
+      #displayAnnotationBody($ann $mode $docRef)
+    &lt;/div&gt;
+    &lt;div class="annotation-bubble-tools"&gt;
       #displayAnnotationToolboxFromReference($ann $mode $docRef)
     &lt;/div&gt;
-    &lt;div class="annotationContent"&gt;
-      #displayAnnotationBody($ann $mode $docRef)
-      #if ($mode == 'view' &amp;&amp; $annotationClassDocName == 'XWiki.XWikiComments')
-        #set($annoDoc = $xwiki.getDocument($docRef))
-        #set($repliesList = $annoDoc.getObjects('XWiki.XWikiComments', 'replyto', $ann.id))
-        #if($repliesList.size() &gt; 0)
-          &lt;a href="#xwikicomment_${ann.id}"&gt;$services.localization.render('annotations.action.view.thread')&lt;/a&gt;
-        #end
-      #end
-    &lt;/div&gt;
+    #if (($mode == 'edit') || ($mode == 'create'))#displayAnnotationBoxButtons($mode)#end
   &lt;/div&gt;
 #end
 ##
@@ -224,12 +229,10 @@
  * @param $ann the annotation object
  *#
 #macro(displayAnnotationTitle $ann)
-  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'dd/MM/yyyy'))
-  &lt;div class="annotationTitle"&gt;
-    &lt;span class="annotationAuthor"&gt;$!xwiki.getUserName($ann.author)&lt;/span&gt;##
+  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'dd/MM/yyyy hh:mm'))
+  $!xwiki.getUserName($ann.author)
 ## Do not indent this, or the comma will be misplaced
-#if("$!{ann.date}" != '')&lt;span class="sep"&gt;, &lt;/span&gt;&lt;span class="annotationDate"&gt;$xwiki.formatDate($ann.date, $dateFormat)&lt;/span&gt;#end
-  &lt;/div&gt;
+#if("$!{ann.date}" != '')&lt;span class="annotationDate"&gt;$xwiki.formatDate($ann.date, $dateFormat)&lt;/span&gt;#end
 #end
 ##
 ##
@@ -259,46 +262,93 @@
  * @param $docRef the reference of the annotated document
  *#
 #macro(displayAnnotationToolboxFromReference $ann $mode $docRef)
-  &lt;span class="annotationTools btn-group"&gt;
-    #if($mode != 'create' &amp;&amp; $services.annotations.canEditAnnotation($ann.id, $docRef))
+  #if ($mode == 'view')
+  ## $hasAdmin/$hasEdit are normally bound by the calling template (xwikivars.vm) - true when this macro is
+  ## reached from the Comments tab, but NOT when the annotation bubble fetches its own content via
+  ## AnnotationCode.DisplayForm (rendered through the lightweight "get" action, which never runs that template).
+  ## Compute them locally so the Edit/Delete/Solve actions are gated correctly regardless of which caller reached
+  ## this macro.
+  #set($hasAdmin = $services.security.authorization.hasAccess('admin', $docRef))
+  #set($hasEdit = $services.security.authorization.hasAccess('edit', $docRef))
+  #if ($annotationClassDocName == 'XWiki.XWikiComments')
+    #set($annoDoc = $xwiki.getDocument($docRef))
+    #set($repliesList = $annoDoc.getObjects($annotationClassDocName, 'replyto', $ann.id))
+    #set($threadCount = $repliesList.size())
+    ## Sanitize the xredirect parameter. Fall back to the annotated document view URL when the provided
+    ## redirect is missing or unsafe.
+    #set($replyFallbackURL = "$xwiki.getURL($docRef, 'view', $!{request.queryString})")
+    #getSanitizedURLAttributeValue('a', 'href', "$!request.get('xredirect')", $replyFallbackURL, $xredirect)
+    #set($isUserComment = "$!ann.get('author')" != '' &amp;&amp; $services.model.resolveDocument("$!ann.get('author')", 'user') == $xcontext.userReference)
+    #if($threadCount &gt; 0)
+      &lt;button class="thread-toggle btn btn-default infomessage"&gt;
+        $services.icon.renderHTML('comments') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
+      &lt;/button&gt;##
+    #end
+    #if($xwiki.hasAccessLevel('comment'))
+      &lt;a class="commentreply btn btn-default infomessage" rel="nofollow" href="$xredirect.replaceAll('&amp;?replyto=\d++', '')&amp;replyto=${ann.id}#xwikicomment_${ann.id}"#if("$!replyTo" == "${ann.id}") style="display: none;"#end&gt;##
+      $services.icon.renderHTML('comment') $!escapetool.xml($services.localization.render('core.viewers.comments.reply'))
+      &lt;/a&gt;##
+    #end
+    &lt;a class="permalink btn btn-default infomessage" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
+      href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${ann.id}"&gt;##
+      $services.icon.renderHTML('link') $!escapetool.xml($services.localization.render('core.viewers.comments.share'))
+    &lt;/a&gt;##
+    #if($xwiki.hasAccessLevel('comment') &amp;&amp; ($hasAdmin || $isUserComment))
+      &lt;a class="edit btn btn-default infomessage" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${ann.id}&amp;xredirect=$doc.getURL('view')")"&gt;##
+      $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
+      &lt;/a&gt;##
+    #end
+    #if ("$!ann.selection" != '' &amp;&amp; ($hasAdmin || ($hasEdit &amp;&amp; $isUserComment)))
+      ## Converts the annotation into a plain comment by blanking its anchoring fields, the same way Delete uses a
+      ## plain core action (objectremove) rather than the annotation module's own service layer.
+      #set ($commentClassPrefix = "${annotationClassDocName}_${ann.id}")
+      #set ($solveQueryString = "form_token=${escapetool.url($services.csrf.token)}&amp;xredirect=${escapetool.url($doc.getURL('view'))}&amp;${commentClassPrefix}_target=&amp;${commentClassPrefix}_selection=&amp;${commentClassPrefix}_selectionLeftContext=&amp;${commentClassPrefix}_selectionRightContext=&amp;${commentClassPrefix}_originalSelection=&amp;${commentClassPrefix}_state=")
+      #set ($solveURL = $xwiki.getURL($doc.fullName, 'save', $solveQueryString, "xwikicomment_${ann.id}"))
+      &lt;a class="solve btn btn-default infomessage" rel="nofollow" href="$solveURL"
+        title="$services.localization.render('annotations.action.solve.tooltip')"&gt;
+        $services.icon.renderHTML('check') $!escapetool.xml($services.localization.render('annotations.action.solve.text'))
+      &lt;/a&gt;##
+    #end
+    #if ($hasAdmin || ($hasEdit &amp;&amp; $isUserComment))
+      #set ($queryString = $escapetool.url({
+        'form_token': $services.csrf.token,
+        'classname': $annotationClassDocName,
+        'classid': $ann.id,
+        'xredirect': $doc.getURL('view')}))
+      #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${ann.id}"))
+      &lt;a class="delete btn btn-default errormessage" data-toggle="modal" data-target="#deleteModal" rel="nofollow"
+      href="$deleteURL" title="$services.localization.render('core.viewers.comments.delete')"&gt;
+      $services.icon.renderHTML('trash') $!escapetool.xml($services.localization.render('core.viewers.comments.delete'))
+      &lt;/a&gt;
+    #end
+  #else
+    ## Wikis can configure a different backing class for annotations (AnnotationCode.AnnotationConfig,
+    ## 'annotationClass'). The actions above assume the XWiki.XWikiComments schema and don't apply here, but
+    ## Edit/Delete/Validate must keep working for any configured class, as they did before this toolbox was
+    ## redesigned around Comments.
+    #if($services.annotations.canEditAnnotation($ann.id, $docRef))
       #set($isUserComment = $services.model.resolveDocument("$!ann.get('author')", 'user') == $xcontext.userReference)
       #set($editURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=PUT&amp;media=json")
       #if ("$!{ann.state}" == 'UPDATED')
-        &lt;a class='btn btn-default btn-xs validate' href="${editURL}"
+        &lt;a class="validate btn btn-default infomessage" href="${editURL}"
           title="$services.localization.render('annotations.action.validate.tooltip')"&gt;
           $services.icon.renderHTML('check')
-        &lt;/a&gt;
+        &lt;/a&gt;##
       #end
-      #if ($mode != 'edit')
-        ## Comment reply button only for default annotations.
-        #if ("$!annotationClassDocName" == 'XWiki.XWikiComments')
-          ## Sanitize the xredirect parameter. Fall back to the annotated document view URL when the provided
-          ## redirect is missing or unsafe.
-          #set($replyFallbackURL = "$xwiki.getURL($docRef, 'view', $!{request.queryString})")
-          #getSanitizedURLAttributeValue('a', 'href', "$!request.get('xredirect')", $replyFallbackURL, $xredirect)
-          ## add "comment reply" button
-          &lt;a class='btn btn-default btn-xs reply' href="${xredirect}#xwikicomment_${ann.id}"
-            title="$services.localization.render('core.viewers.comments.reply')"&gt;
-            $services.icon.renderHTML('comment')
-          &lt;/a&gt;
-        #end
-        #if($hasAdmin || $isUserComment)
-          ## use an edit url just for the fanciness of it, it won't really be used in this case. An edit form will be loaded
-          &lt;a class='edit btn btn-default btn-xs' href="${editURL}"
-            title="$services.localization.render('annotations.action.edit.tooltip')"&gt;
-            $services.icon.renderHTML('pencil')
-          &lt;/a&gt;
-        #end
-      #end
-      #if($hasAdmin || $isUserComment)
+      #if ($hasAdmin || $isUserComment)
+        &lt;a class="edit btn btn-default infomessage" href="${editURL}"
+          title="$services.localization.render('annotations.action.edit.tooltip')"&gt;
+          $services.icon.renderHTML('pencil')
+        &lt;/a&gt;##
         #set($deleteURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=DELETE&amp;media=json")
-        &lt;a class='delete btn btn-default btn-xs' href="${deleteURL}"
+        &lt;a class="delete btn btn-default infomessage" href="${deleteURL}"
           title="$services.localization.render('annotations.action.delete.tooltip')"&gt;
           $services.icon.renderHTML('cross')
         &lt;/a&gt;
       #end
     #end
-  &lt;/span&gt;
+  #end
+  #end
 #end
 ##
 ##

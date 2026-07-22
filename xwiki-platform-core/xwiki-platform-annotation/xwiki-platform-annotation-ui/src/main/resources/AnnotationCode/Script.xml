@@ -1316,6 +1316,27 @@ XWiki.Annotation = Class.create({
     }.bindAsEventListener(this));
   },
 
+  // Solving an annotation is a plain link to the core "save" action (like Delete's plain link to "objectremove"),
+  // so it needs only a confirm step, not an AJAX round-trip: on confirm, the browser navigates there normally and
+  // the action itself redirects back to the current page via xredirect. Reuse the same styled confirmation dialog
+  // as Delete (XWiki.widgets.ConfirmedAjaxRequest is built on top of XWiki.widgets.ConfirmationBox), instead of the
+  // native browser confirm(), for a consistent look between the two destructive actions.
+  addSolveListener : function(item) {
+    item.observe('click', function(event) {
+      event.stop();
+      new XWiki.widgets.ConfirmationBox(
+        {
+          onYes : function() {
+            window.location = item.href;
+          }
+        },
+        {
+          confirmationText : "$services.localization.render('annotations.action.solve.confirm')"
+        }
+      );
+    });
+  },
+
   addValidateListener : function(item, id, container, inBubble) {
     item.observe('click', function(event) {
       item.blur();
@@ -1504,8 +1525,8 @@ XWiki.Annotation = Class.create({
     }
     container.down('form').focusFirstElement();
     // and add the button listeners
-    container.down('input[type=submit]').observe('click', this.onAnnotationEdit.bindAsEventListener(this, container, annotationId, inBubble));
-    container.down('input[type=reset]').observe('click', function(event) {
+    container.down('button.tool-submit').observe('click', this.onAnnotationEdit.bindAsEventListener(this, container, annotationId, inBubble));
+    container.down('button.tool-cancel').observe('click', function(event) {
       if (inBubble) {
         // close this bubble.
         this.hideBubble(container);
@@ -1588,14 +1609,6 @@ XWiki.Annotation = Class.create({
     if (!this.safeUpdate(container, content)) {
       return;
     }
-    // and add the button observers
-    /*
-    No hide button ftm
-    bubble.down('a.annotation-view-hide').observe('click', function(event, bubble) {
-      event.stop();
-      this.hideBubble(bubble);
-    }.bindAsEventListener(this, bubble));
-    */
     // add the delete listener to the delete button
     var deleteButton = container.down('a.delete');
     if (deleteButton) {
@@ -1608,6 +1621,30 @@ XWiki.Annotation = Class.create({
     var editButton = container.down('a.edit');
     if (editButton) {
       this.addEditListener(editButton, annotationId, container, inBubble);
+    }
+    var solveButton = container.down('a.solve');
+    if (solveButton) {
+      this.addSolveListener(solveButton);
+    }
+    let closeButton = container.down('.annotation-bubble-close button');
+    if (closeButton &amp;&amp; inBubble) {
+      closeButton.observe('click', () => this.hideBubble(container));
+    }
+    // Forward the click to the button in the comment tab instead of handling it in the bubble.
+    var threadToggleButton = container.down('.thread-toggle');
+    if (threadToggleButton) {
+      var threadToggleInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' .thread-toggle')[0];
+      if (!threadToggleInTab) {
+        threadToggleButton.hide();
+      } else {
+        threadToggleButton.observe('click', function(event) {
+          event.stop();
+          threadToggleInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' .thread-toggle')[0];
+          threadToggleInTab.click();
+          threadToggleInTab.scrollIntoView();
+          container.blur();
+        });
+      }
     }
     // Annotations can have a reply button when they are merged with comments (and thus stored as comments). Custom annotations will not have this button displayed.
     var replyButton = container.down('a.reply');
@@ -1799,8 +1836,8 @@ XWiki.Annotation = Class.create({
     // Set the focus in the first element of type input, useful when not using the WYSIWYG editor CKEditor.
     this.createPanel.select('form').first().focusFirstElement();
     // and add the button observers
-    this.createPanel.down('input[type=submit]').observe('click', this.onAnnotationAdd.bindAsEventListener(this));
-    this.createPanel.down('input[type=reset]').observe('click', function() {
+    this.createPanel.down('button.tool-submit').observe('click', this.onAnnotationAdd.bindAsEventListener(this));
+    this.createPanel.down('button.tool-cancel').observe('click', function() {
       this.hideAnnotationCreationForm();
     }.bind(this));
   },

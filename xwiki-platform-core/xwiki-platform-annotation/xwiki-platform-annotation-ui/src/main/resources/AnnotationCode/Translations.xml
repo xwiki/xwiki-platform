@@ -52,6 +52,7 @@ annotations.annotated.loaderror.wrongresponse=Wrongly formatted server response
 annotations.annotated.error.noannotatedelement=Annotations could not be loaded because the content is not available.
 annotations.annotated.error.wrongsyntax=Annotations are not available for pages written in XWiki/1.0 syntax.
 annotations.annotated.highlight.toggle.hint=Open the annotation about this text.
+annotations.annotated.bubble.toggle.hint=Close the annotation bubble.
 
 annotations.action.edit.text=[Edit]
 annotations.action.edit.tooltip=Edit annotation
@@ -67,6 +68,10 @@ annotations.action.delete.confirm=Are you sure you want to delete this annotatio
 annotations.action.delete.inProgress=Deleting annotation...
 annotations.action.delete.done=Annotation deleted
 annotations.action.delete.failed=Failed to delete annotation:
+
+annotations.action.solve.text=Mark as solved
+annotations.action.solve.tooltip=Mark this annotation as solved (converts it to a plain comment)
+annotations.action.solve.confirm=Are you sure you want to mark this annotation as solved? It will become a regular comment and will no longer be anchored to the selected text.
 
 annotations.action.create.submit.text=Add annotation
 annotations.action.create.cancel.text=Cancel

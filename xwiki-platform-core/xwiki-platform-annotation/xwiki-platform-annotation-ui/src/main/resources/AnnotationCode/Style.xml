@@ -314,11 +314,11 @@ mark.annotation:not(.annotation-highlight) {
 /* Annotation boxes */
 .annotation-bubble {
   background: $theme.backgroundSecondaryColor;
-  border: 1px dotted $theme.borderColor;
+  border: 1px solid $theme.borderColor;
   width: 560px;
   position: absolute;
-  border-radius: 0 10px 10px 10px;
-  box-shadow: 0 2px 4px -1px $theme.linkColor;
+  border-radius: 0 var(--border-radius-large) var(--border-radius-large) var(--border-radius-large);
+  box-shadow: 0 2px 4px -1px;
   margin: 0 10px;
   z-index: 2;
 }
@@ -364,8 +364,48 @@ mark.annotation:not(.annotation-highlight) {
   }
 }
 
-.annotation-box {
+.annotation-box .annotation {
   padding: 6px 12px;
+  display: grid;
+  gap: .5em;
+  grid-template-columns: min-content auto min-content;
+  width: 100%;
+
+  .annotation-bubble-tools .btn, .annotation-bubble-close .btn {
+    --padding-base-horizontal: 12px;
+    background: transparent;
+    border: none;
+    /* Align first button with the annotation text. */
+    margin-left: calc(-1 * var(--padding-base-horizontal));
+
+    /* No background to cast a shadow on, drop it (like .btn-link). */
+    &amp;:active, &amp;.active {
+      box-shadow: none;
+    }
+  }
+
+  .annotation-bubble-avatar {
+    grid-area: 1 / 1 / 3 / 2;
+  }
+
+  .annotation-bubble-header {
+    grid-area: 1 / 2 / 2 / 3;
+  }
+
+  .annotation-bubble-close {
+    grid-area: 1 / 3 / 3 / 4;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+  }
+
+  .annotation-bubble-content {
+    grid-area: 2 / 2 / 3 / 4;
+  }
+
+  .annotation-bubble-tools, .annotation-bubble-edit-tools {
+    grid-area: 3 / 2 / 4 / 4;
+  }
 }
 
 .annotation-bubble .loading {
@@ -396,13 +436,12 @@ mark.annotation:not(.annotation-highlight) {
 #allAnnotations .annotationTitle * {
   line-height: 1.4em;
 }
-.annotation-box .annotationAuthor {
-  border-bottom: 1px dotted $theme.borderColor;
-  display: block;
+
+.annotation-bubble-header {
+  display: flex;
+  gap: .5em;
 }
-.annotation-box .sep {
-  display: none;
-}
+
 .annotation-box .annotationDate {
   padding-top: 3px;
   margin-right: 51px;

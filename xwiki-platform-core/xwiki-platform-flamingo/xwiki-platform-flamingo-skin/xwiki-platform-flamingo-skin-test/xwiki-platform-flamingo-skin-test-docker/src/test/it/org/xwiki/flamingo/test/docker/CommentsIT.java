@@ -38,6 +38,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CommentElement;
 import org.xwiki.test.ui.po.CommentForm;
 import org.xwiki.test.ui.po.CommentsTab;
+import org.xwiki.test.ui.po.PermalinkModal;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -386,5 +387,26 @@ class CommentsIT
     {
         setup.loginAsSuperAdmin();
         setup.setPropertyInXWikiPreferences("dateformat", "String", "");
+    }
+
+    @Test
+    @Order(5)
+    void shareCommentPermalink(TestUtils setup, TestReference reference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.deletePage(reference);
+        setup.createAdminUser();
+        setup.loginAsAdmin();
+
+        CommentsTab commentsTab = setup.createPage(reference, "").openCommentsDocExtraPane();
+        int commentId = commentsTab.postComment(COMMENT_CONTENT, true);
+
+        PermalinkModal permalinkModal = commentsTab.openPermalinkModalByID(commentId);
+        assertTrue(permalinkModal.getPermalinkValue().endsWith("#xwikicomment_" + commentId),
+            () -> String.format("Expected the permalink to end with [#xwikicomment_%d], got [%s] instead.", commentId,
+                permalinkModal.getPermalinkValue()));
+
+        permalinkModal.clickCopyToClipboard();
+        permalinkModal.waitForNotificationInfoMessage("Link copied to clipboard");
     }
 }

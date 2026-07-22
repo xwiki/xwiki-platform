@@ -175,9 +175,36 @@ class AnnotationsIT
         assertTrue(annotatableViewPage.getAnnotationTextById(0).isDisplayed());
     }
 
-    // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
     @Test
     @Order(4)
+    void markAnnotationAsSolved(TestUtils setup, TestReference testReference)
+    {
+        // "Mark as solved" shares its permission gate with Edit/Delete, which the @BeforeEach's default logged-in
+        // user (the annotation's own author) already satisfies - see addEditAndDeleteAnnotations above.
+        AnnotatableViewPage annotatableViewPage =
+            new AnnotatableViewPage(setup.createPage(testReference, CONTENT, null));
+        CommentsTab commentsTab = annotatableViewPage.getWrappedViewPage().openCommentsDocExtraPane();
+
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
+        String annotationId = annotatableViewPage.getAnnotationIdByText(ANNOTATED_TEXT_1);
+        int commentId = annotatableViewPage.getCommentId(annotationId);
+
+        annotatableViewPage.markAnnotationAsSolvedById(annotationId);
+
+        // The comment survives, unchanged, as a plain comment.
+        commentsTab = new ViewPage().openCommentsDocExtraPane();
+        assertEquals(ANNOTATION_TEXT_1, commentsTab.getCommentContentByID(commentId));
+
+        // But it's no longer anchored to the text: reload the page, ask to display annotations, and confirm there's
+        // nothing left to highlight.
+        annotatableViewPage = new AnnotatableViewPage(setup.gotoPage(testReference));
+        annotatableViewPage.toggleAnnotationDisplayUsingShortcutKey(false);
+        assertEquals(0, annotatableViewPage.getAnnotationCount());
+    }
+
+    // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
+    @Test
+    @Order(5)
     void addAnnotationTranslation(TestUtils setup, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {

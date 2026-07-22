@@ -33,6 +33,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CommentsTab;
+import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -79,8 +80,7 @@ class AnnotationsIT
 
         setup.deletePage(testReference);
 
-        setup.createUser(USER_NAME, USER_PASS, "", "");
-        setup.login(USER_NAME, USER_PASS);
+        setup.createUserAndLogin(USER_NAME, USER_PASS);
     }
 
     /**
@@ -175,9 +175,36 @@ class AnnotationsIT
         assertTrue(annotatableViewPage.getAnnotationTextById(0).isDisplayed());
     }
 
-    // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
+    /**
+     * Ensure that annotations are still displayed after the annotated page has been moved (renamed). This is a
+     * regression test for the case where annotation targets used to point to the old document reference.
+     */
     @Test
     @Order(4)
+    void annotationsSurvivePageMove(TestUtils setup, TestReference testReference)
+    {
+        AnnotatableViewPage annotatableViewPage =
+            new AnnotatableViewPage(setup.createPage(testReference, CONTENT, null));
+
+        annotatableViewPage.addAnnotation(ANNOTATED_TEXT_1, ANNOTATION_TEXT_1);
+
+        // Move the page to check that the annotations are still displayed afterward.
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = annotatableViewPage
+            .getWrappedViewPage()
+            .rename()
+            .setNewTitle("NewName")
+            .clickRenameButton()
+            .waitUntilFinished();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+        renameStatusPage.gotoNewPage();
+
+        annotatableViewPage.showAnnotationsPane().clickShowAnnotations();
+        assertEquals(1, annotatableViewPage.getAnnotationCount());
+    }
+
+    // TODO: This test must currently be last. We can get back to a more natural order once XWIKI-9759 is fixed
+    @Test
+    @Order(5)
     void addAnnotationTranslation(TestUtils setup, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {

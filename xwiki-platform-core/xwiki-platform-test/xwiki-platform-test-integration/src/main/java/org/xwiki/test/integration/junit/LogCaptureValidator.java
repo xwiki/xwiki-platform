@@ -42,11 +42,11 @@ public class LogCaptureValidator
     private static final String NL = "\n";
 
     /**
-     * For now we only check for Velocity deprecations. In the future we should put back validations for:
+     * For now, we only check for Velocity deprecations. In the future we should put back validations for:
      * <ul>
      *     <li>ERROR</li>
      *     <li>WARN</li>
-     *     <li>JavaScript erro</li>
+     *     <li>JavaScript errors</li>
      * </ul>
      * See <a href=" https://forum.xwiki.org/t/remove-log-validation-for-functional-tests/6026">this forum thread</a>
      * for why these checks were removed.
@@ -54,7 +54,11 @@ public class LogCaptureValidator
      * kept specific checks in the functional tests for the same reason. In the future we'll need to assess is the
      * strategy can work (i.e. not be swamped by false positives).
      */
-    private static final List<String> SEARCH_STRINGS = Arrays.asList("Deprecated usage of");
+    private static final List<String> SEARCH_STRINGS = Arrays.asList(
+        "Deprecated usage of",
+        // Tomcat emits this WARN when its resource cache (cacheMaxSize in the WAR's META-INF/context.xml) is too small
+        // to hold all XWiki static resources. Fail the build so we raise cacheMaxSize.
+        "because there was insufficient free space available after evicting expired cache entries");
 
     private static final List<Line> GLOBAL_EXCLUDES = Arrays.asList(
         // See https://jira.xwiki.org/browse/XCOMMONS-1627

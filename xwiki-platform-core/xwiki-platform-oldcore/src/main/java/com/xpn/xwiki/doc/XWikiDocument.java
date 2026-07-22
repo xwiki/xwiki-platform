@@ -8462,10 +8462,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 if (currentBlock instanceof SectionBlock) {
                     // The next children block is a HeaderBlock but we check to be on the safe side...
                     Block nextChildrenBlock = currentBlock.getChildren().get(0);
-                    if (nextChildrenBlock instanceof HeaderBlock headerBlock) {
-                        if (headerBlock.getLevel().getAsInt() <= sectionDepth) {
-                            filteredHeaders.add(headerBlock);
-                        }
+                    if (nextChildrenBlock instanceof HeaderBlock headerBlock
+                        && headerBlock.getLevel().getAsInt() <= sectionDepth) {
+                        filteredHeaders.add(headerBlock);
                     }
                     currentBlock = nextChildrenBlock;
                 } else {

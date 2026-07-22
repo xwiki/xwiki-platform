@@ -20,18 +20,15 @@
 package org.xwiki.test.docker.internal.junit5;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.output.OutputFrame;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -42,29 +39,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class XWikiSlf4jLogConsumerTest
 {
-    private Logger logbackLogger;
-
-    private ListAppender<ILoggingEvent> appender;
-
-    @BeforeEach
-    void setUp()
-    {
-        this.logbackLogger = (Logger) LoggerFactory.getLogger(XWikiSlf4jLogConsumerTest.class);
-        this.logbackLogger.setLevel(Level.INFO);
-        // Only send events to our own appender and not to the console appenders inherited from the root logger, since
-        // the tests assert on the captured events and any console output would fail CaptureConsoleExtension.
-        this.logbackLogger.setAdditive(false);
-        this.appender = new ListAppender<>();
-        this.appender.start();
-        this.logbackLogger.addAppender(this.appender);
-    }
-
-    @AfterEach
-    void tearDown()
-    {
-        this.logbackLogger.detachAppender(this.appender);
-        this.logbackLogger.setAdditive(true);
-    }
+    /**
+     * Captures the logs propagated by the consumer.
+     */
+    @RegisterExtension
+    LogCaptureExtension logCapture =
+        new LogCaptureExtension(LogLevel.INFO, XWikiSlf4jLogConsumerTest.class.getName());
 
     /**
      * Feeds each passed line (as a separate STDOUT frame, as the containers do) to the consumer and returns the log
@@ -73,15 +53,17 @@ class XWikiSlf4jLogConsumerTest
      */
     private List<String> consume(boolean verbose, String... lines)
     {
-        XWikiSlf4jLogConsumer consumer = new XWikiSlf4jLogConsumer(this.logbackLogger, verbose);
+        XWikiSlf4jLogConsumer consumer =
+            new XWikiSlf4jLogConsumer(LoggerFactory.getLogger(XWikiSlf4jLogConsumerTest.class), verbose);
         for (String line : lines) {
             consumer.accept(new OutputFrame(OutputFrame.OutputType.STDOUT,
                 (line + "\n").getBytes(StandardCharsets.UTF_8)));
         }
-        return this.appender.list.stream()
-            .map(ILoggingEvent::getFormattedMessage)
-            .map(message -> message.substring("STDOUT: ".length()))
-            .toList();
+        List<String> messages = new ArrayList<>();
+        for (int i = 0; i < this.logCapture.size(); i++) {
+            messages.add(this.logCapture.getMessage(i).substring("STDOUT: ".length()));
+        }
+        return messages;
     }
 
     @Test
@@ -142,10 +124,10 @@ class XWikiSlf4jLogConsumerTest
     }
 
     @Test
-    void acceptWithoutVerboseStopsAtNextLogMessageWithVariousTimestampFormats()
+    void acceptWithoutVerboseStopsAtNextTomcatFormatLogMessage()
     {
-        // The next INFO messages use, respectively, the Tomcat/java.util.logging format, the MySQL ISO-8601 format and
-        // the logback format. Each of them must be recognized as a new log message that ends the propagation.
+        // The next INFO message uses the Tomcat/java.util.logging format, which must be recognized as a new log message
+        // that ends the propagation. The non-timestamped continuation line is kept as part of the warning.
         assertEquals(
             List.of("2024-01-15 10:23:45,002 [main] WARN  o.x.Foo - A warning with details:",
                 "some non-timestamped continuation line"),
@@ -153,8 +135,13 @@ class XWikiSlf4jLogConsumerTest
                 "2024-01-15 10:23:45,002 [main] WARN  o.x.Foo - A warning with details:",
                 "some non-timestamped continuation line",
                 "15-Jan-2024 10:23:45.003 INFO [main] o.a.catalina.startup.Catalina.start Server startup"));
+    }
 
-        this.appender.list.clear();
+    @Test
+    void acceptWithoutVerboseStopsAtNextMysqlFormatLogMessage()
+    {
+        // The next line uses the MySQL ISO-8601 format, which must be recognized as a new log message that ends the
+        // propagation.
         assertEquals(
             List.of("2024-01-15 10:23:45,002 [main] WARN  o.x.Foo - A warning"),
             consume(false,

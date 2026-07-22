@@ -113,12 +113,7 @@ class CommentsIT
     void commentAsLoggedInUser(TestUtils setup, TestReference reference)
     {
         setup.deletePage(reference);
-        // The @BeforeEach logs in as superadmin, so create the user and then perform an explicit login that verifies
-        // the session was actually switched to that user before commenting. createUserAndLogin() chains the
-        // registration and the login in a single unverified redirect, which can silently leave the session as
-        // superadmin and cause the posted comment to be authored by superadmin instead.
-        setup.createUser(USER_NAME, USER_PASSWORD, null);
-        setup.login(USER_NAME, USER_PASSWORD);
+        setup.createUserAndLogin(USER_NAME, USER_PASSWORD);
         CommentsTab commentsTab = setup.createPage(reference, "").openCommentsDocExtraPane();
         commentsTab.openCommentForm();
         assertTrue(commentsTab.isCommentFormShown());

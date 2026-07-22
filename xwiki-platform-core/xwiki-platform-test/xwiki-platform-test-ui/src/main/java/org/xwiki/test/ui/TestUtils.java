@@ -443,9 +443,10 @@ public class TestUtils
 
         // Always synchronize the REST client credentials with the requested user, even when the browser was already
         // logged in as that user and thus skipped the browser login above. The browser session and the REST client
-        // credentials are independent states: a previous forceGuestUser() clears the REST credentials while the browser
-        // may still appear logged in, so synchronizing only inside the branch above would leave the REST client
-        // unauthenticated and make later REST calls fail with a 401.
+        // credentials are independent states, so if the synchronization were done only inside the branch above the
+        // REST client could stay authenticated as a different user than the browser: e.g. createUserAndLogin() can
+        // leave the browser logged in as the previous user (typically superadmin) while switching the REST user, and a
+        // subsequent login as that same browser user would then skip the branch and keep the wrong REST credentials.
         setDefaultCredentials(username, password);
     }
 

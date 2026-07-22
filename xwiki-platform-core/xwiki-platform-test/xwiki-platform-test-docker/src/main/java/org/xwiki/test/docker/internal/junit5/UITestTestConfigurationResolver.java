@@ -219,14 +219,7 @@ public class UITestTestConfigurationResolver
 
     private boolean resolveVerbose(boolean verbose)
     {
-        boolean isVerbose;
-        // Always display verbose logs for debugging when inside a container.
-        if (DockerTestUtils.isInAContainer()) {
-            isVerbose = true;
-        } else {
-            isVerbose = resolve(verbose, VERBOSE_PROPERTY);
-        }
-        return isVerbose;
+        return resolve(verbose, VERBOSE_PROPERTY);
     }
 
     private boolean resolveDebug(boolean debug)

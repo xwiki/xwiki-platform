@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
+import org.xwiki.blocknote.test.po.BlockNoteToolBar;
 import org.xwiki.blocknote.test.po.SlashMenu;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -37,6 +38,7 @@ import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Verify macro related features of the BlockNote editor integration.
@@ -322,7 +324,9 @@ class MacroIT extends AbstractBlockNoteIT
         textArea = editor.getRichTextArea();
 
         textArea.selectMacro(0);
-        macroEditModal = editor.getToolBar().editMacro();
+        BlockNoteToolBar toolBar = editor.getToolBar();
+        assertFalse(toolBar.hasCreateLinkButton());
+        macroEditModal = toolBar.editMacro();
         assertEquals("Success Message", macroEditModal.getMacroName());
         assertEquals("bar", macroEditModal.getMacroParameter("title"));
         assertEquals("foo", macroEditModal.getMacroContent());

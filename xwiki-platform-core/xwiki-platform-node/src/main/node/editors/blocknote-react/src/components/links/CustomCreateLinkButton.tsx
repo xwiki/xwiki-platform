@@ -19,6 +19,7 @@
  */
 import { LinkEditor } from "./LinkEditor";
 import { useEditor } from "../../hooks";
+import { selectionHasInlineContent } from "../../selection";
 import { formatKeyboardShortcut } from "@blocknote/core";
 import { useComponentsContext, useDictionary } from "@blocknote/react";
 import { useCallback, useState } from "react";
@@ -56,6 +57,13 @@ export const CustomCreateLinkButton: React.FC<CustomCreateLinkButtonProps> = ({
 
   // TODO: check if we need to update in realtime when the selection change?
   const selected = editor.getSelectedText();
+
+  // Links are inline content, so they can only wrap editable inline content. Hide the button when the
+  // selection has no such content (e.g. a block-level macro or other content-less block is selected),
+  // mirroring BlockNote's default Create Link button.
+  if (!selectionHasInlineContent(editor)) {
+    return null;
+  }
 
   return (
     <Components.Generic.Popover.Root open={opened}>

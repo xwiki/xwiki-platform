@@ -19,6 +19,7 @@
  */
 package org.xwiki.blocknote.test.po;
 
+import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
@@ -52,7 +53,7 @@ public class BlockNoteToolBar extends BaseElement
      */
     public WebElement getButton(String action)
     {
-        return this.container.findElement(By.cssSelector("button[data-test='" + action + "']"));
+        return this.container.findElement(getButtonSelector(action));
     }
 
     /**
@@ -63,6 +64,23 @@ public class BlockNoteToolBar extends BaseElement
     public void clickButton(String action)
     {
         getButton(action).click();
+    }
+
+    /**
+     * Checks if the button associated with the specified action is present in the toolbar.
+     *
+     * @param action the action associated with the button to check
+     * @return {@code true} if the button is present, {@code false} otherwise
+     * @since 18.6.0
+     */
+    public boolean hasButton(String action)
+    {
+        return !getDriver().findElementsWithoutWaiting(this.container, getButtonSelector(action)).isEmpty();
+    }
+
+    private @NonNull By getButtonSelector(String action)
+    {
+        return By.cssSelector("button[data-test='" + action + "']");
     }
 
     /**
@@ -109,6 +127,17 @@ public class BlockNoteToolBar extends BaseElement
     {
         clickButton("createLink");
         return new BlockNoteLinkPopover();
+    }
+
+    /**
+     * Checks if the button to create a link is present in the toolbar.
+     *
+     * @return {@code true} if the button is present, {@code false} otherwise
+     * @since 18.6.0
+     */
+    public boolean hasCreateLinkButton()
+    {
+        return hasButton("createLink");
     }
 
     /**

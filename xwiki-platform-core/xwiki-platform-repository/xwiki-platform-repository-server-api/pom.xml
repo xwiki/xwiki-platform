@@ -76,6 +76,17 @@
       <artifactId>xwiki-commons-cache-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Used by the XIP export. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-resource-temporary</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-repository-maven</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>

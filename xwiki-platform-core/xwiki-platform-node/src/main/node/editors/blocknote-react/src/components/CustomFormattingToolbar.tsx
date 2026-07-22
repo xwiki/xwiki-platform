@@ -23,6 +23,7 @@ import { CustomCreateLinkButton } from "./links/CustomCreateLinkButton";
 import { CustomInsertMacroButton } from "./links/CustomInsertMacroButton";
 import { CustomMacroEditButton } from "./links/CustomMacroEditButton";
 import { useEditor } from "../hooks";
+import { selectionHasInlineContent } from "../selection";
 import {
   AddCommentButton,
   AddTiptapCommentButton,
@@ -69,10 +70,7 @@ const BooleanStyleButton: React.FC<{
       if (!editor.isEditable) {
         return undefined;
       }
-      const hasContent = (
-        editor.getSelection()?.blocks || [editor.getTextCursorPosition().block]
-      ).some((b) => b.content !== undefined);
-      if (!hasContent) {
+      if (!selectionHasInlineContent(editor)) {
         return undefined;
       }
       return { active: style in editor.getActiveStyles() };

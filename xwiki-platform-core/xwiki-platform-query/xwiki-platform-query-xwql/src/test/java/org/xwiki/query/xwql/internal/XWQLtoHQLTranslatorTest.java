@@ -71,9 +71,11 @@ class XWQLtoHQLTranslatorTest
             String e = i < exp.length ? exp[i] : null;
             String a = i < actual.length ? actual[i] : null;
             if (!StringUtils.equalsIgnoreCase(e, a)) {
-                fail(String.format(
-                    "translate assertion. input = [%s]\n expected output = [%s]\n actual output = [%s]\n"
-                        + " first mismatch: [%s]!=[%s]",
+                fail(String.format("""
+                    translate assertion. input = [%s]
+                     expected output = [%s]
+                     actual output = [%s]
+                     first mismatch: [%s]!=[%s]""",
                     input, expectedOutput, output, e, a));
             }
         }

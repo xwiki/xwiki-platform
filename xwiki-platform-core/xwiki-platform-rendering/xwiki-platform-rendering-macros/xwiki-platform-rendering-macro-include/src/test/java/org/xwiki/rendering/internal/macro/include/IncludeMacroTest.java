@@ -180,15 +180,14 @@ class IncludeMacroTest
     @Test
     void executeWithPRAuthors() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "beginParagraph\n"
-            + "onWord [word]\n"
-            + "endParagraph\n"
-            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            beginParagraph
+            onWord [word]
+            endParagraph
+            endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         when(this.authorizationManager.hasAccess(Right.PROGRAM, null, INCLUDED_AUTHOR, INCLUDED_PAGE)).thenReturn(true);
 
@@ -200,15 +199,14 @@ class IncludeMacroTest
     @Test
     void executeWithCURRENTAuthor() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "beginParagraph\n"
-            + "onWord [word]\n"
-            + "endParagraph\n"
-            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            beginParagraph
+            onWord [word]
+            endParagraph
+            endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         List<Block> blocks = runIncludeMacro(Context.CURRENT, Author.CURRENT, "word", false);
 
@@ -218,15 +216,14 @@ class IncludeMacroTest
     @Test
     void executeWithNoPRAuthor() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "beginParagraph\n"
-            + "onWord [word]\n"
-            + "endParagraph\n"
-            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            beginParagraph
+            onWord [word]
+            endParagraph
+            endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         List<Block> blocks = runIncludeMacro(Context.CURRENT, Author.AUTO, "word", false);
 
@@ -236,15 +233,14 @@ class IncludeMacroTest
     @Test
     void executeWithTARGETAuthor() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "beginParagraph\n"
-            + "onWord [word]\n"
-            + "endParagraph\n"
-            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            beginParagraph
+            onWord [word]
+            endParagraph
+            endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         List<Block> blocks = runIncludeMacro(Context.CURRENT, Author.TARGET, "word", false);
 
@@ -275,18 +271,17 @@ class IncludeMacroTest
     @Test
     void executeWithNewContextShowsVelocityMacrosAreIsolated() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n"
-            + "beginParagraph\n"
-            + "onSpecialSymbol [#]\n"
-            + "onWord [testmacro]\n"
-            + "endParagraph\n"
-            + "endMacroMarkerStandalone [velocity] [] [#testmacro]\n"
-            + "endMetaData [[base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            beginMacroMarkerStandalone [velocity] [] [#testmacro]
+            beginParagraph
+            onSpecialSymbol [#]
+            onWord [testmacro]
+            endParagraph
+            endMacroMarkerStandalone [velocity] [] [#testmacro]
+            endMetaData [[base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         // We verify that a Velocity macro set in the including page is not seen in the included page.
         List<Block> blocks =
@@ -322,13 +317,12 @@ class IncludeMacroTest
     @Test
     void executeWithCurrentContextShowsVelocityMacrosAreShared() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "onMacroStandalone [velocity] [] [#testmacro]\n"
-            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            onMacroStandalone [velocity] [] [#testmacro]
+            endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         when(this.authorizationManager.hasAccess(Right.PROGRAM, null, INCLUDED_AUTHOR, INCLUDED_PAGE)).thenReturn(true);
 
@@ -528,15 +522,14 @@ class IncludeMacroTest
     @Test
     void executeInsideSourceMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
-            + "beginParagraph\n"
-            + "onWord [content]\n"
-            + "endParagraph\n"
-            + "endMetaData [[source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]
+            beginParagraph
+            onWord [content]
+            endParagraph
+            endMetaData [[source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("relativePage");
@@ -559,18 +552,17 @@ class IncludeMacroTest
     @Test
     void executeWhenSectionSpecified() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "beginHeader [1, Hsection]\n"
-            + "onWord [section]\n"
-            + "endHeader [1, Hsection]\n"
-            + "beginParagraph\n"
-            + "onWord [content2]\n"
-            + "endParagraph\n"
-            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            beginHeader [1, Hsection]
+            onWord [section]
+            endHeader [1, Hsection]
+            beginParagraph
+            onWord [content2]
+            endParagraph
+            endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("document");
@@ -607,15 +599,14 @@ class IncludeMacroTest
     @Test
     void executeWhenExcludeFirstHeadingTrueAndSectionIsFirstBlock() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "beginParagraph\n"
-            + "onWord [content]\n"
-            + "endParagraph\n"
-            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            beginParagraph
+            onWord [content]
+            endParagraph
+            endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("document");
@@ -636,15 +627,14 @@ class IncludeMacroTest
     @Test
     void executeWhenExcludeFirstHeadingTrueAndSectionSpecifiedAndHeadingIsFirstBlock() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "beginParagraph\n"
-            + "onWord [content]\n"
-            + "endParagraph\n"
-            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            beginParagraph
+            onWord [content]
+            endParagraph
+            endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("document");
@@ -668,17 +658,16 @@ class IncludeMacroTest
     @Test
     void executeWhenExcludeFirstHeadingFalseAndSectionIsFirstBlock() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "beginSection\n"
-            + "beginHeader [1, Hcontent]\n"
-            + "onWord [content]\n"
-            + "endHeader [1, Hcontent]\n"
-            + "endSection\n"
-            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            beginSection
+            beginHeader [1, Hcontent]
+            onWord [content]
+            endHeader [1, Hcontent]
+            endSection
+            endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("document");
@@ -699,19 +688,18 @@ class IncludeMacroTest
     @Test
     void executeWhenExcludeFirstHeadingTrueAndSectionIsNotFirstBlock() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "beginGroup\n"
-            + "beginSection\n"
-            + "beginHeader [1, Hcontent]\n"
-            + "onWord [content]\n"
-            + "endHeader [1, Hcontent]\n"
-            + "endSection\n"
-            + "endGroup\n"
-            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            beginGroup
+            beginSection
+            beginHeader [1, Hcontent]
+            onWord [content]
+            endHeader [1, Hcontent]
+            endSection
+            endGroup
+            endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("document");

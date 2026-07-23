@@ -493,12 +493,12 @@ class DefaultWikiMacroTest
     {
         //@formatter:off
         registerWikiMacro("wikimacro",
-            "{{groovy}}"
-            + "println xcontext.macro.context.getCurrentMacroBlock().id\n"
-            + "println xcontext.macro.context.getCurrentMacroBlock().parent.class\n"
-            + "println xcontext.macro.context.getCurrentMacroBlock().nextSibling.children[0].word\n"
-            + "println xcontext.macro.context.getCurrentMacroBlock().previousSibling.children[0].word\n"
-            + "{{/groovy}}",
+            """
+            {{groovy}}println xcontext.macro.context.getCurrentMacroBlock().id
+            println xcontext.macro.context.getCurrentMacroBlock().parent.class
+            println xcontext.macro.context.getCurrentMacroBlock().nextSibling.children[0].word
+            println xcontext.macro.context.getCurrentMacroBlock().previousSibling.children[0].word
+            {{/groovy}}""",
             Syntax.XWIKI_2_0, Collections.emptyList());
         //@formatter:on
 
@@ -508,8 +508,15 @@ class DefaultWikiMacroTest
         converter.convert(new StringReader("before\n\n{{wikimacro/}}\n\nafter"), Syntax.XWIKI_2_0, Syntax.PLAIN_1_0,
             printer);
 
-        assertEquals("before" + "\n\n" + "wikimacro\n" + "class org.xwiki.rendering.block.XDOM\n" + "after\n" + "before"
-            + "\n\n" + "after", printer.toString());
+        assertEquals("""
+            before
+
+            wikimacro
+            class org.xwiki.rendering.block.XDOM
+            after
+            before
+
+            after""", printer.toString());
     }
 
     @Test
@@ -517,12 +524,12 @@ class DefaultWikiMacroTest
     {
         //@formatter:off
         registerWikiMacro("wikimacrobindings",
-            "{{groovy}}"
-            + "println xcontext.macro.doc\n"
-            + "println xcontext.macro.doc.class\n"
-            + "println wikimacro.doc\n"
-            + "println wikimacro.doc.class\n"
-            + "{{/groovy}}");
+            """
+            {{groovy}}println xcontext.macro.doc
+            println xcontext.macro.doc.class
+            println wikimacro.doc
+            println wikimacro.doc.class
+            {{/groovy}}""");
         //@formatter:on
 
         Converter converter = this.componentManager.getInstance(Converter.class);
@@ -586,14 +593,15 @@ class DefaultWikiMacroTest
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         converter.convert(new StringReader("{{wikimacro/}}"), Syntax.XWIKI_2_1, Syntax.EVENT_1_0, printer);
 
-        String expect = "beginDocument [[syntax]=[XWiki 2.1]]\n"
-            + "beginMacroMarkerStandalone [wikimacro] []\n"
-            + "beginMacroMarkerStandalone [wikimacrocontent] []\n"
-            + "beginGroup [[data-wikimacro-id]=[wikimacrocontent]]\n"
-            + "endGroup [[data-wikimacro-id]=[wikimacrocontent]]\n"
-            + "endMacroMarkerStandalone [wikimacrocontent] []\n"
-            + "endMacroMarkerStandalone [wikimacro] []\n"
-            + "endDocument [[syntax]=[XWiki 2.1]]";
+        String expect = """
+            beginDocument [[syntax]=[XWiki 2.1]]
+            beginMacroMarkerStandalone [wikimacro] []
+            beginMacroMarkerStandalone [wikimacrocontent] []
+            beginGroup [[data-wikimacro-id]=[wikimacrocontent]]
+            endGroup [[data-wikimacro-id]=[wikimacrocontent]]
+            endMacroMarkerStandalone [wikimacrocontent] []
+            endMacroMarkerStandalone [wikimacro] []
+            endDocument [[syntax]=[XWiki 2.1]]""";
 
         assertEquals(expect, printer.toString());
     }

@@ -149,11 +149,12 @@ class WikiUIExtensionParametersTest
     @Test
     void getParametersWithCommentAloneOnLine() throws Exception
     {
-        String paramsStr = "# a = 1\n"
-            + "x=1\n"
-            + "y=2\n"
-            + "# ...\n"
-            + "z=3";
+        String paramsStr = """
+            # a = 1
+            x=1
+            y=2
+            # ...
+            z=3""";
         BaseObject mockUIX = constructMockUIXObject(paramsStr);
         WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
         parameters.get();
@@ -166,9 +167,11 @@ class WikiUIExtensionParametersTest
     @Test
     void getParametersWithCommentEndOfLine() throws Exception
     {
-        String paramsStr = "x=1##b\n"
-            + "y=2####x\n"
-            + "z=3 ## xyz\n";
+        String paramsStr = """
+            x=1##b
+            y=2####x
+            z=3 ## xyz
+            """;
         BaseObject mockUIX = constructMockUIXObject(paramsStr);
         WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
         parameters.get();

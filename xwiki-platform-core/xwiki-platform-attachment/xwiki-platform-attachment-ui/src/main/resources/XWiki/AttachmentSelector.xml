@@ -777,6 +777,14 @@ $xwiki.jsx.use($attachmentPickerDocName)
   // reference XWiki.AttachmentPicker directly.
   XWiki.AttachmentPicker = AttachmentPicker;
 
+  /* Bootstrap modals are meant to be a direct child of &lt;body&gt;, both to avoid z-index/stacking
+     context issues and so CSS scoped to the picker's surrounding container (e.g. an ID-scoped
+     selector on the page embedding the picker) doesn't unintentionally bleed into the gallery
+     dialog. Move any inline-rendered modal there once the DOM is ready. */
+  $(function() {
+    $('.attachment-selector-modal').appendTo(document.body);
+  });
+
   /* The modal is opened natively by Bootstrap, triggered by the data-toggle="modal"/data-target
      attributes set on the ".attachment-picker-start" buttons; load the gallery via AJAX once the
      modal is visible. Delegating the listener on the document also covers pickers added to the
@@ -1472,7 +1480,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
       &lt;button type="button" class="close" data-dismiss="modal"&gt;
       &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
       &lt;/button&gt;
-      &lt;h4 class="modal-title"&gt;&lt;/h4&gt;
+      &lt;h4 class="modal-title"&gt;$escapetool.xml($services.localization.render('xe.attachmentSelector.gallery.title'))&lt;/h4&gt;
       &lt;/div&gt;
       &lt;div class="modal-body"&gt;&lt;/div&gt;
     &lt;/div&gt;

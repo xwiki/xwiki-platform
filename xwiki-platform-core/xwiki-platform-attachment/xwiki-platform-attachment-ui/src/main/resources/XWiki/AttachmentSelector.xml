@@ -540,7 +540,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
      * @param property the property being edited, as the containing div with class="attachment-picker"
      * @param dialog the modal dialog where the gallery was loaded
      */
-    initialize(property, modal) {
+    constructor(property, modal) {
       this.property = property;
       this.modal = modal;
       this.gallery = modal.find('.modal-body');

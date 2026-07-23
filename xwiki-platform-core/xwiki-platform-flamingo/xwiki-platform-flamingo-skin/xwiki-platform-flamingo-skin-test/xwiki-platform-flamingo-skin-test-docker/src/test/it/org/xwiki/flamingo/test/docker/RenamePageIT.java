@@ -519,6 +519,12 @@ class RenamePageIT
 
         newPage = setup.rest().get(new LocalDocumentReference(newSpace, newName, Locale.FRENCH));
         assertEquals("fr [[OtherPage]]", newPage.getContent());
+
+        // Make sure both the original page and its translation were moved away from the old location: since the
+        // rename is done without auto-redirect (unchecked by default), neither the default-locale page nor its
+        // French translation must exist anymore at the source reference.
+        assertFalse(setup.rest().exists(reference));
+        assertFalse(setup.rest().exists(new LocalDocumentReference(reference, Locale.FRENCH)));
     }
 
     @Order(6)

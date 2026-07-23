@@ -165,21 +165,17 @@ class DisplayMacroTest
     @Test
     void executeShowsVelocityMacrosAreIsolated() throws Exception
     {
-        // @formatter:off
-        String expected =
-            "beginDocument\n"
-                + "beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
-                + "[syntax]=[XWiki 2.0]]\n"
-                + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n"
-                + "beginParagraph\n"
-                + "onSpecialSymbol [#]\n"
-                + "onWord [testmacro]\n"
-                + "endParagraph\n"
-                + "endMacroMarkerStandalone [velocity] [] [#testmacro]\n"
-                + "endMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
-                + "[syntax]=[XWiki 2.0]]\n"
-                + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage][syntax]=[XWiki 2.0]]
+            beginMacroMarkerStandalone [velocity] [] [#testmacro]
+            beginParagraph
+            onSpecialSymbol [#]
+            onWord [testmacro]
+            endParagraph
+            endMacroMarkerStandalone [velocity] [] [#testmacro]
+            endMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         // We verify that a Velocity macro set in the page doing the display is not seen in the displayed page.
         List<Block> blocks =
@@ -284,15 +280,14 @@ class DisplayMacroTest
     @Test
     void executeInsideBaseMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[base]=[wiki:space.relativePage][source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
-            + "beginParagraph\n"
-            + "onWord [content]\n"
-            + "endParagraph\n"
-            + "endMetaData [[base]=[wiki:space.relativePage][source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[base]=[wiki:space.relativePage][source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]
+            beginParagraph
+            onWord [content]
+            endParagraph
+            endMetaData [[base]=[wiki:space.relativePage][source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setReference("relativePage");
@@ -353,21 +348,17 @@ class DisplayMacroTest
     @Test
     void executeWhenSectionSpecified() throws Exception
     {
-        // @formatter:off
-        String expected =
-            "beginDocument\n"
-                + "beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
-                + "[syntax]=[XWiki 2.0]]\n"
-                + "beginHeader [1, Hsection]\n"
-                + "onWord [section]\n"
-                + "endHeader [1, Hsection]\n"
-                + "beginParagraph\n"
-                + "onWord [content2]\n"
-                + "endParagraph\n"
-                + "endMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
-                + "[syntax]=[XWiki 2.0]]\n"
-                + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage][syntax]=[XWiki 2.0]]
+            beginHeader [1, Hsection]
+            onWord [section]
+            endHeader [1, Hsection]
+            beginParagraph
+            onWord [content2]
+            endParagraph
+            endMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setSection("Hsection");
@@ -391,15 +382,14 @@ class DisplayMacroTest
     @Test
     void executeWhenExcludeFirstHeadingTrueAndHeadingIsFirstBlock() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "beginParagraph\n"
-            + "onWord [content]\n"
-            + "endParagraph\n"
-            + "endMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            beginParagraph
+            onWord [content]
+            endParagraph
+            endMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setReference("document");
@@ -419,17 +409,16 @@ class DisplayMacroTest
     @Test
     void executeWhenExcludeFirstHeadingFalseAndHeadingIsFirstBlock() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "beginSection\n"
-            + "beginHeader [1, Hcontent]\n"
-            + "onWord [content]\n"
-            + "endHeader [1, Hcontent]\n"
-            + "endSection\n"
-            + "endMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            beginSection
+            beginHeader [1, Hcontent]
+            onWord [content]
+            endHeader [1, Hcontent]
+            endSection
+            endMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setReference("document");
@@ -449,19 +438,18 @@ class DisplayMacroTest
     @Test
     void executeWhenExcludeFirstHeadingTrueAndHeadingIsNotFirstBlock() throws Exception
     {
-        // @formatter:off
-        String expected = "beginDocument\n"
-            + "beginMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "beginGroup\n"
-            + "beginSection\n"
-            + "beginHeader [1, Hcontent]\n"
-            + "onWord [content]\n"
-            + "endHeader [1, Hcontent]\n"
-            + "endSection\n"
-            + "endGroup\n"
-            + "endMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-            + "endDocument";
-        // @formatter:on
+        String expected = """
+            beginDocument
+            beginMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            beginGroup
+            beginSection
+            beginHeader [1, Hcontent]
+            onWord [content]
+            endHeader [1, Hcontent]
+            endSection
+            endGroup
+            endMetaData [[base]=[wiki:space.document][source]=[wiki:space.document][syntax]=[XWiki 2.0]]
+            endDocument""";
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setReference("document");

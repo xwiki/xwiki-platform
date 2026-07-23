@@ -937,7 +937,6 @@ $xwiki.jsx.use($attachmentPickerDocName)
 #set ($uploadBoxSize = $mathtool.add(2, $mathtool.add($mathtool.mul($boxSize, 2), $mathtool.mul($boxMargin, 2))))
 #set ($imgSize = $mathtool.sub($boxSize, $mathtool.mul($boxPadding, 2)))
 #set ($actionsHeight = 20)
-#set ($actionsWidth = 16)
 /*--------------------------------------------------------*/
 /* Attachment picker layout fixes                              */
 .attachment-picker p {
@@ -1079,8 +1078,12 @@ $xwiki.jsx.use($attachmentPickerDocName)
   right: 3px;
 }
 .gallery_attachmenttitle p {
+  ## The actions (select/delete) live in their own grid column (see ".gallery_actions p" above),
+  ## not overlapping this one, so there's no need to reserve space for them here.
   text-align: left;
-  margin-right: ${mathtool.add($mathtool.mul(2, $actionsWidth), $boxPadding)}px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /* ------------------------------------ */
 /* Cancel button                        */

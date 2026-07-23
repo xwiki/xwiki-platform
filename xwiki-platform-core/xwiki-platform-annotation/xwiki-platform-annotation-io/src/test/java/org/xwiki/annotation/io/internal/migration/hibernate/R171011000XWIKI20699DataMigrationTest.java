@@ -60,13 +60,13 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Test of {@link R180403000XWIKI20699DataMigration}.
+ * Test of {@link R171011000XWIKI20699DataMigration}.
  *
  * @version $Id$
- * @since 18.4.3
+ * @since 17.10.11
  */
 @ComponentTest
-class R180403000XWIKI20699DataMigrationTest
+class R171011000XWIKI20699DataMigrationTest
 {
     private static final String TASK_TYPE = "internal-annotation-target-fix";
 
@@ -80,7 +80,7 @@ class R180403000XWIKI20699DataMigrationTest
         + "and length(prop.value) > 0";
 
     @InjectMockComponents(role = HibernateDataMigration.class)
-    private R180403000XWIKI20699DataMigration migration;
+    private R171011000XWIKI20699DataMigration migration;
 
     @Mock
     private QueryManager queryManager;
@@ -128,7 +128,7 @@ class R180403000XWIKI20699DataMigrationTest
     @Test
     void getVersion()
     {
-        assertEquals(180403000, this.migration.getVersion().getVersion());
+        assertEquals(171011000, this.migration.getVersion().getVersion());
     }
 
     @Test
@@ -175,7 +175,7 @@ class R180403000XWIKI20699DataMigrationTest
 
         DataMigrationException exception = assertThrows(DataMigrationException.class, () -> this.migration.migrate());
 
-        assertEquals("Data migration R180403000XWIKI20699 failed", exception.getMessage());
+        assertEquals("Data migration R171011000XWIKI20699 failed", exception.getMessage());
         assertEquals("Failed retrieve the list of all the documents with annotations for wiki [wiki1].",
             exception.getCause().getMessage());
         assertEquals(QueryException.class, exception.getCause().getCause().getClass());

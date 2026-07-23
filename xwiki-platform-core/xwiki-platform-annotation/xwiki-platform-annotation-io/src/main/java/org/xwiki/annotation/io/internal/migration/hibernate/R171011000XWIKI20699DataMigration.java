@@ -42,12 +42,12 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * string, implicitly targeting the document holding the annotation XObject.
  *
  * @version $Id$
- * @since 18.4.3
+ * @since 17.10.11
  */
 @Component
-@Named("R180403000XWIKI20699")
+@Named("R171011000XWIKI20699")
 @Singleton
-public class R180403000XWIKI20699DataMigration extends AbstractDocumentsMigration
+public class R171011000XWIKI20699DataMigration extends AbstractDocumentsMigration
 {
     @Override
     public String getDescription()
@@ -58,7 +58,7 @@ public class R180403000XWIKI20699DataMigration extends AbstractDocumentsMigratio
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(180403000);
+        return new XWikiDBVersion(171011000);
     }
 
     @Override

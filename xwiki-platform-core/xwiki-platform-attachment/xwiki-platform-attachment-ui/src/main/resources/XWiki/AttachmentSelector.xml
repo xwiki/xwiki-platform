@@ -790,7 +790,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     }
     url += "&amp;xpage=plain";
     var modalBody = modal.down('.modal-body');
-    modalBody.update("&lt;img src=\"$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')\" class=\"imgcenter\"/&gt;");
+    modalBody.update();
     new Ajax.Updater(modalBody, url, {
       onComplete : function() {
         // Play nice with the Lightbox widget

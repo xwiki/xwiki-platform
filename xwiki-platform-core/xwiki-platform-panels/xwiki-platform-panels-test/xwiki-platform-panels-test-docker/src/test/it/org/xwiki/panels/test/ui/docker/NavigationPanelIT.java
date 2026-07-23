@@ -19,18 +19,26 @@
  */
 package org.xwiki.panels.test.ui.docker;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.xwiki.appwithinminutes.test.po.AppWithinMinutesHomePage;
 import org.xwiki.appwithinminutes.test.po.ApplicationCreatePage;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.panels.test.po.NavigationPanel;
 import org.xwiki.panels.test.po.NavigationPanelAdministrationPage;
+import org.xwiki.panels.test.po.NavigationTreeElement;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
@@ -98,5 +106,43 @@ class NavigationPanelIT
         ApplicationCreatePage appCreatePage = AppWithinMinutesHomePage.gotoPage().clickCreateApplication();
         appCreatePage.setApplicationName(appName);
         return appCreatePage.clickNextStep().clickNextStep().clickNextStep().clickFinish();
+    }
+
+    /**
+     * Show the Navigation Panel in both columns so the same document nodes end up rendered by two independent trees.
+     */
+    @Test
+    void noDuplicateIds(TestUtils setup, TestReference testReference)
+        throws Exception
+    {
+        setup.setWikiPreference("showLeftPanels", "1");
+        setup.setWikiPreference("leftPanels", "Panels.Navigation");
+
+        String[] documentPath = {testReference.getLastSpaceReference().getName() + "NoDuplicateIds", "WebHome"};
+        setup.createPage(new LocalDocumentReference(documentPath[0], documentPath[1]), "Some content");
+
+        NavigationTreeElement leftTree = new NavigationTreeElement(
+            setup.getDriver().findElement(By.cssSelector("#leftPanels .panel.Navigation .xtree")));
+        leftTree.waitForIt();
+        NavigationTreeElement rightTree = new NavigationTreeElement(
+            setup.getDriver().findElement(By.cssSelector("#rightPanels .panel.Navigation .xtree")));
+        rightTree.waitForIt();
+        
+        setup.getDriver().waitUntilCondition(driver -> leftTree.hasDocument(documentPath), 30);
+        setup.getDriver().waitUntilCondition(driver -> rightTree.hasDocument(documentPath), 30);
+
+        assertEquals(List.of(), getDuplicateAnchorDOMIds(setup), "Found duplicate anchor DOM ids on the page");
+    }
+
+    private List<String> getDuplicateAnchorDOMIds(TestUtils setup)
+    {
+        // Scoped to the tree nodes' anchors
+        Map<String, Long> idCounts = setup.getDriver().findElements(By.cssSelector(".xtree a[id]")).stream()
+            .map(element -> element.getAttribute("id"))
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        return idCounts.entrySet().stream()
+            .filter(entry -> entry.getValue() > 1)
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
     }
 }

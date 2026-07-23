@@ -87,9 +87,37 @@ define([
     return $.post(new URL('?', url), $.param($.extend(urlParams, data), true));
   };
 
+  // Prefix each node's rendered anchor id with the tree's own container id, to avoid duplicate DOM ids when the same
+  // entity is shown by more than one tree on the same page.
+
+  var getTreePrefix = function(tree) {
+    var prefix = tree.element.attr('id');
+    if (!prefix) {
+      prefix = 'xtree-' + (treeCounter++);
+      tree.element.attr('id', prefix);
+    }
+    return prefix;
+  };
+
+  var prefixAnchorAttributes = function(node, tree) {
+    if (node && typeof node.id !== 'undefined') {
+      var prefix = getTreePrefix(tree);
+      node.a_attr = $.extend({}, node.a_attr, {id: prefix + '-' + node.id + '_anchor'});
+    }
+    return node;
+  };
+
   var getChildren = function(node, callback, parameters) {
     // 'this' is the tree instance.
-    callback = callback.bind(this);
+    var tree = this;
+    var boundCallback = callback.bind(this);
+    // Wrap the callback from jsTree so that every fetched child's anchor gets a page-wide unique rendered id.
+    callback = function(children) {
+      (children || []).forEach(function(child) {
+        prefixAnchorAttributes(child, tree);
+      });
+      boundCallback(children);
+    };
     if (node.id === $.jstree.root && !node.data) {
       // Take the root node data from the tree container element.
       node.data = this.get_container().data('root') || {};

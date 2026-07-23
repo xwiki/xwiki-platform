@@ -38,6 +38,11 @@ import org.xwiki.test.ui.po.BaseElement;
 public class TreeElement extends BaseElement
 {
     /**
+     * The id HTML attribute.
+     */
+    private static final String ID = "id";
+
+    /**
      * The element that represents the tree.
      */
     private WebElement element;
@@ -50,6 +55,19 @@ public class TreeElement extends BaseElement
     public TreeElement(WebElement element)
     {
         this.element = element;
+    }
+
+    /**
+     * Reconstructs an anchor's rendered id from its node id.
+     *
+     * @param nodeId the node identifier
+     * @return the corresponding anchor DOM id
+     */
+    private String getRenderedAnchorId(String nodeId)
+    {
+        String prefix = this.element.getAttribute(ID);
+        String anchorId = nodeId + "_anchor";
+        return (prefix == null || prefix.isEmpty()) ? anchorId : (prefix + "-" + anchorId);
     }
 
     /**
@@ -133,7 +151,7 @@ public class TreeElement extends BaseElement
     public TreeElement waitForNodeSelected(String nodeId)
     {
         String selectedNodeXPath =
-            String.format(".//*[@id = '%s_anchor' and contains(@class, 'jstree-clicked')]", nodeId);
+            String.format(".//*[@id = '%s' and contains(@class, 'jstree-clicked')]", getRenderedAnchorId(nodeId));
         getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));
         return this;
     }
@@ -197,7 +215,7 @@ public class TreeElement extends BaseElement
         return getDriver()
             .findElementsWithoutWaiting(this.element,
                 By.cssSelector(".jstree-container-ul > .jstree-node:not(.jstree-hidden)"))
-            .stream().map(nodeElement -> By.id(nodeElement.getAttribute("id")))
+            .stream().map(nodeElement -> By.id(nodeElement.getAttribute(ID)))
             .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).toList();
     }
 }

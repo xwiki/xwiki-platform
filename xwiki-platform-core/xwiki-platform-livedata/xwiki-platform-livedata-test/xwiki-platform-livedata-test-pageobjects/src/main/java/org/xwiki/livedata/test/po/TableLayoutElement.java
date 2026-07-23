@@ -799,10 +799,11 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
         By editButton = By.cssSelector(".displayer-action-list span[title='Edit']");
-        // Hover on the property and click on the edit button on the displayed popover (see internalEdit for the
-        // rationale behind the two moves). We first move the mouse away from the cell so that moving back onto it
-        // reliably triggers the popover, in particular when re-editing a cell right after closing an edit
-        // confirmation modal (the mouse might still be over the cell from the previous attempt).
+        // Hover on the property and click on the edit button on the displayed popover. We first move the mouse away
+        // from the cell so that moving back onto it reliably triggers the popover, in particular when re-editing a
+        // cell right after closing an edit confirmation modal (the mouse might still be over the cell from the
+        // previous attempt). We then move slightly at the right of the center of the targeted element and back towards
+        // the center, simulating the mouse trajectory of a real user hovering the cell above the one to edit.
         new Actions(getDriver().getWrappedDriver())
             .moveToElement(getRoot())
             .moveToElement(element, 50, 0)
@@ -1026,15 +1027,8 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
 
-        // Hover on the property and click on the edit button on the displayed popover. We move slightly at the right of
-        // the center of the targeted element, then slightly to the left, towards the center of the element. This
-        // simulates the mouse trajectory of a real user hovering the cell above the one he/she wants to edit.
-        new Actions(getDriver().getWrappedDriver())
-            .moveToElement(element, 50, 0)
-            .moveToElement(element, 0, 0)
-            .perform();
-
-        element.findElement(By.cssSelector(".displayer-action-list span[title='Edit']")).click();
+        // Hover on the property and click on the edit button on the displayed popover.
+        clickEditCell(columnLabel, rowNumber);
 
         // Selector of the edited field.
         By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));

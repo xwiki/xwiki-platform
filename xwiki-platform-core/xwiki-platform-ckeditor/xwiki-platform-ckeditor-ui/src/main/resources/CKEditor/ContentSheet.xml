@@ -233,6 +233,7 @@ a[data-linktype="create"]::after {
   /* Show the value of the focused line placeholder attribute */
   position: absolute;
   color: var(--text-muted);
+  font-style: italic;
   content: attr(data-xwiki-focusedplaceholder);
 }
 

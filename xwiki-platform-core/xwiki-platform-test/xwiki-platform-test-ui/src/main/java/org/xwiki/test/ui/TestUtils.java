@@ -191,6 +191,8 @@ public class TestUtils
 
     private static final String MAIN_WIKI_NAME = "xwiki";
 
+    private static final String USER_CLASS_NAME = "XWiki.XWikiUsers";
+
     private static PersistentTestContext context;
 
     private static ComponentManager componentManager;
@@ -571,8 +573,8 @@ public class TestUtils
         // On a failed login, loginsubmit responds with 401 and does not redirect, so the browser stays on the
         // loginsubmit URL instead of reaching loginDestURL. Fail fast with a helpful message rather than silently
         // continuing as guest, which would otherwise surface as a confusing, unrelated failure later in the test.
-        if (!getDriver().getCurrentUrl().startsWith(loginDestURL)) {
-            throw new RuntimeException(String.format(
+        if (!Strings.CS.startsWith(getDriver().getCurrentUrl(), loginDestURL)) {
+            throw new IllegalStateException(String.format(
                 "Failed to create and log in user [%s]. Was expecting to be on URL [%s] but was on [%s]. Page source "
                     + "is [%s].", username, loginDestURL, getDriver().getCurrentUrl(), getDriver().getPageSource()));
         }
@@ -582,7 +584,7 @@ public class TestUtils
         recacheSecretTokenWhenOnRegisterPage();
 
         if (properties.length > 0) {
-            updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
+            updateObject("XWiki", username, USER_CLASS_NAME, 0, properties);
         }
 
         setDefaultCredentials(username, password);
@@ -597,7 +599,7 @@ public class TestUtils
         registerUser(username, password, redirectURL);
         recacheSecretToken();
         if (properties.length > 0) {
-            updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
+            updateObject("XWiki", username, USER_CLASS_NAME, 0, properties);
         }
     }
 
@@ -642,7 +644,7 @@ public class TestUtils
         LocalDocumentReference userReference = new LocalDocumentReference("XWiki", username);
         Page userPage = rest().page(userReference);
         userPage.setObjects(new org.xwiki.rest.model.jaxb.Objects());
-        org.xwiki.rest.model.jaxb.Object userObject = RestTestUtils.object("XWiki.XWikiUsers");
+        org.xwiki.rest.model.jaxb.Object userObject = RestTestUtils.object(USER_CLASS_NAME);
 
         // Set password
         userObject.getProperties().add(RestTestUtils.property("password", password));

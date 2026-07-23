@@ -558,18 +558,58 @@ public class TestUtils
 
     public void createUserAndLogin(final String username, final String password, Object... properties)
     {
-        createUserAndLoginWithRedirect(username, password, getURLToNonExistentPage(), properties);
+        // Don't navigate to any page after logging in: the login redirect already lands on the Register page (see
+        // createUserAndLoginWithRedirect) which is a fully-skinned, meaningful page for screenshots and screen
+        // recordings, and callers navigate to the page they actually want to test right afterwards anyway. Loading a
+        // throw-away page here would only add a page load and, being a blank xpage=plain page, would hide the login
+        // state from screen recordings.
+        createUserAndLoginWithRedirect(username, password, null, properties);
     }
 
     public void createUserAndLoginWithRedirect(final String username, final String password, String url,
         Object... properties)
     {
-        createUser(username, password, getURLToLoginAndGotoPage(username, password, url), properties);
+        // Register the user and, in the same server-side redirect chain (register -> loginsubmit -> destination), log
+        // in. We land on the Register page rather than on a throw-away page for two reasons: it lets us verify below
+        // that the login actually succeeded (loginsubmit only redirects to its destination on success) and it lets us
+        // re-cache the CSRF token for the new user's session in place, without any extra page load.
+        String loginDestURL = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
+        registerUser(username, password, getURLToLoginAndGotoPage(username, password, loginDestURL));
+
+        // On a failed login, loginsubmit responds with 401 and does not redirect, so the browser stays on the
+        // loginsubmit URL instead of reaching loginDestURL. Fail fast with a helpful message rather than silently
+        // continuing as guest, which would otherwise surface as a confusing, unrelated failure later in the test.
+        if (!getDriver().getCurrentUrl().startsWith(loginDestURL)) {
+            throw new RuntimeException(String.format(
+                "Failed to create and log in user [%s]. Was expecting to be on URL [%s] but was on [%s]. Page source "
+                    + "is [%s].", username, loginDestURL, getDriver().getCurrentUrl(), getDriver().getPageSource()));
+        }
+
+        // We're on the Register page: re-cache the CSRF token for the new user's session (the token cached for the
+        // previous user is no longer valid) before it's used e.g. by updateObject below.
+        recacheSecretTokenWhenOnRegisterPage();
+
+        if (properties.length > 0) {
+            updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
+        }
 
         setDefaultCredentials(username, password);
+
+        if (url != null) {
+            getDriver().get(url);
+        }
     }
 
     public void createUser(final String username, final String password, String redirectURL, Object... properties)
+    {
+        registerUser(username, password, redirectURL);
+        recacheSecretToken();
+        if (properties.length > 0) {
+            updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
+        }
+    }
+
+    private void registerUser(final String username, final String password, String redirectURL)
     {
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("register", "1");
@@ -582,10 +622,6 @@ public class TestUtils
         }
         parameters.put("form_token", getSecretToken());
         getDriver().get(getURL("XWiki", "Register", "register", parameters));
-        recacheSecretToken();
-        if (properties.length > 0) {
-            updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
-        }
     }
 
     /**

@@ -770,9 +770,12 @@ $xwiki.jsx.use($attachmentPickerDocName)
         this.gallery.down('.current .tool.select').addClassName('hidden');
       }
     }
-    
-    
+
+
   };
+  // Keep exposing the class on the XWiki namespace for backwards compatibility, since extensions may
+  // reference XWiki.AttachmentPicker directly.
+  XWiki.AttachmentPicker = AttachmentPicker;
 
   var loading = new Element('div', {'class' : 'imgcenter'}).update("&lt;img src=\"$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')\"/&gt;");
   var dialog;

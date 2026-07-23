@@ -126,6 +126,9 @@ class AnnotationCodeMacrosPageTest extends PageTest
         commentsClass.getXClass().addTextField("author", "Author", 30);
         commentsClass.getXClass().addPageField(Annotation.TARGET_FIELD, "Target", 30);
         commentsClass.getXClass().addTextField(Annotation.STATE_FIELD, "State", 30);
+        // The selection field is required for the annotation to be recognized as such (rather than an ordinary
+        // comment) when its target is blank, which is how annotations on the document content are now stored.
+        commentsClass.getXClass().addTextAreaField(Annotation.SELECTION_FIELD, "Selection", 40, 5);
         this.xwiki.saveDocument(commentsClass, this.context);
 
         // The annotated document.

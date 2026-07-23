@@ -24,6 +24,7 @@ import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.annotation.internal.AnnotationClassDocumentInitializer;
 import org.xwiki.annotation.internal.AnnotationConfigurationSource;
 import org.xwiki.annotation.internal.DefaultAnnotationConfiguration;
 import org.xwiki.annotation.internal.DefaultAnnotationService;
@@ -53,6 +54,7 @@ import org.xwiki.url.internal.DefaultURLSecurityManager;
 import org.xwiki.url.script.URLSecurityScriptService;
 import org.xwiki.xml.html.script.HTMLScriptService;
 
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -87,6 +89,7 @@ import static org.xwiki.test.LogLevel.INFO;
     DefaultIOTargetService.class,
     XWikiAnnotationRightService.class,
     AnnotationConfigurationSource.class,
+    AnnotationClassDocumentInitializer.class,
     // Annotations script service end
     // URL Security script server start
     URLSecurityScriptService.class,
@@ -120,26 +123,22 @@ class AnnotationCodeMacrosPageTest extends PageTest
     @BeforeEach
     void setUp() throws Exception
     {
-        // The annotation class referenced by the configuration, with the fields the Annotation Application requires
-        // in addition to the standard comment fields (see AnnotationClassDocumentInitializer).
+        // The configuration provides the annotation class reference (XWiki.XWikiComments), so that the reply button
+        // (which is only rendered for default comment annotations) is displayed. Its presence also marks the
+        // Annotation Application as installed, which AnnotationClassDocumentInitializer requires before it will
+        // populate the annotation class below.
+        loadPage(ANNOTATION_CONFIG);
+        loadPage(MACROS);
+
         XWikiDocument commentsClass = this.xwiki.getDocument(COMMENTS_CLASS, this.context);
-        commentsClass.getXClass().addTextField("author", "Author", 30);
-        commentsClass.getXClass().addPageField(Annotation.TARGET_FIELD, "Target", 30);
-        commentsClass.getXClass().addTextField(Annotation.STATE_FIELD, "State", 30);
-        // The selection field is required for the annotation to be recognized as such (rather than an ordinary
-        // comment) when its target is blank, which is how annotations on the document content are now stored.
-        commentsClass.getXClass().addTextAreaField(Annotation.SELECTION_FIELD, "Selection", 40, 5);
+        this.componentManager.<MandatoryDocumentInitializer>getInstance(MandatoryDocumentInitializer.class,
+            "annotationclass").updateDocument(commentsClass);
         this.xwiki.saveDocument(commentsClass, this.context);
 
         // The annotated document.
         XWikiDocument target = this.xwiki.getDocument(TARGET, this.context);
         target.setSyntax(XWIKI_2_0);
         this.xwiki.saveDocument(target, this.context);
-
-        // The configuration provides the annotation class reference (XWiki.XWikiComments), so that the reply button
-        // (which is only rendered for default comment annotations) is displayed.
-        loadPage(ANNOTATION_CONFIG);
-        loadPage(MACROS);
 
         // The rights service backing the toolbox goes through the real AuthorizationManager, which PageTest only
         // provides as an unstubbed mock: grant view/edit on the annotated document so the toolbox is displayed.

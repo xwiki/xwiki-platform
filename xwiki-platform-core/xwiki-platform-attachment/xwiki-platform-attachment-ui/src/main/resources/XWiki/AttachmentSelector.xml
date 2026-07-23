@@ -513,7 +513,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
           .prop('value', response.fileName))
         propertyReferenceInput.value = response.fileName;
         this.updateAttachment(response.fileName, response.url);
-        this.dialog.closeDialog();
+        $(this.modal).modal('hide');
       }.bind(this)).fail(function  () {
         #set ($errorMessage = $escapetool.javascript($services.localization.render('attachment.attachmentSelector.temporaryUpload.failure')))notification.replace(new XWiki.widgets.Notification("$errorMessage", 'error'));
       });
@@ -538,12 +538,12 @@ $xwiki.jsx.use($attachmentPickerDocName)
      * Constructor.
      *
      * @param property the property being edited, as the containing div with class="attachment-picker"
-     * @param dialog the modal dialog where the gallery was loaded
+     * @param modal the modal dialog where the gallery was loaded
      */
     constructor(property, modal) {
       this.property = property;
       this.modal = modal;
-      this.gallery = modal.find('.modal-body');
+      this.gallery = modal.down('.modal-body');
       if (!this.property.down('input')) {
         this.directSave = true;
       }
@@ -704,7 +704,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
               targetElement._x_notif.hide();
               // on success, update image
               this.updateAttachment(attachmentName, imageSource);
-              this.dialog.closeDialog();
+              $(this.modal).modal('hide');
             }.bindAsEventListener(this),
             onFailure : function(response) {
               var failureReason = response.statusText || 'Server not responding';
@@ -725,7 +725,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
       } else {
         this.updateAttachment(attachmentName, imageSource);
         this.property.down('input').value = attachmentName;
-        this.dialog.closeDialog();
+        $(this.modal).modal('hide');
       }
     }
 
@@ -777,30 +777,28 @@ $xwiki.jsx.use($attachmentPickerDocName)
   // reference XWiki.AttachmentPicker directly.
   XWiki.AttachmentPicker = AttachmentPicker;
 
-  var loading = new Element('div', {'class' : 'imgcenter'}).update("&lt;img src=\"$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')\"/&gt;");
-  var dialog;
-
-  /* Hook onto the picker buttons so that the gallery is loaded via AJAX in a modal dialog. */
-  document.observe('xwiki:dom:loaded', function() {
-    $$('.attachment-picker-start').invoke('observe', 'click', function(event) {
-      event.stop();
-      let modal = $$('.attachment-selector-modal').modal();
-      var targetElement = event.element();
-      var url = targetElement.href;
-      if (url.indexOf('?') &lt; 0) {
-        url += '?';
-      }
-      url += "&amp;xpage=plain";
-      modal.modal('show');
-      new Ajax.Updater(loading.up(), url, {
-        onComplete : function() {
-          // Play nice with the Lightbox widget
-          if (window.gallery_lb) {
-            window.gallery_lb.updateImageList();
-          }
-          new AttachmentPicker(targetElement.up('.attachment-picker'), modal);
+  /* The modal is opened natively by Bootstrap, triggered by the data-toggle="modal"/data-target
+     attributes set on the ".attachment-picker-start" buttons; load the gallery via AJAX once the
+     modal is visible. Delegating the listener on the document also covers pickers added to the
+     page after this script runs. */
+  $(document).on('shown.bs.modal', '.attachment-selector-modal', function(event) {
+    var modal = this;
+    var targetElement = event.relatedTarget;
+    var url = targetElement.href;
+    if (url.indexOf('?') &lt; 0) {
+      url += '?';
+    }
+    url += "&amp;xpage=plain";
+    var modalBody = modal.down('.modal-body');
+    modalBody.update("&lt;img src=\"$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')\" class=\"imgcenter\"/&gt;");
+    new Ajax.Updater(modalBody, url, {
+      onComplete : function() {
+        // Play nice with the Lightbox widget
+        if (window.gallery_lb) {
+          window.gallery_lb.updateImageList();
         }
-      });
+        new AttachmentPicker(targetElement.up('.attachment-picker'), modal);
+      }
     });
   });
 });</code>
@@ -1458,7 +1456,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     #end
     #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
     (% class="buttonwrapper"%)##
-     [[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)" class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')" data-target=".attachment-selector-modal" data-toggle="modal"]](%%)##
+     [[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)" class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')" data-target=".attachment-selector-modal" data-toggle="modal" data-remote="false"]](%%)##
   #end
 #end
 

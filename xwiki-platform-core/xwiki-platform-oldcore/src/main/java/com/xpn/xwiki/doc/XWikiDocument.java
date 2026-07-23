@@ -9660,6 +9660,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      *
      * @return the serialization of the displayed author reference.
      */
+    // This method is not unused; it's used by hibernate as can be seen in the xwiki.hbml.xml mapping:
+    //     <property name="originalMetadataAuthorReference">
+    @SuppressWarnings("java:S1144")
     private String getOriginalMetadataAuthorReference()
     {
         if (this.getAuthors().getOriginalMetadataAuthor() == null
@@ -9676,6 +9679,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      *
      * @param serializedUserReference the serialization of the displayed author reference.
      */
+    // This method is not unused; it's used by hibernate as can be seen in the xwiki.hbml.xml mapping:
+    //     <property name="originalMetadataAuthorReference">
+    @SuppressWarnings("java:S1144")
     private void setOriginalMetadataAuthorReference(String serializedUserReference)
     {
         if (!StringUtils.isEmpty(serializedUserReference)) {

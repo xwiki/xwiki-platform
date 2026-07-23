@@ -82,7 +82,7 @@ class MoveAttachmentIT
         sourceAttachmentsPane.waitForUploadToFinish(SOURCE_FILENAME);
 
         // Switch to a second user U2 and come back to the attachment pane of the source page.
-        setup.createUserAndLogin("U1", "pU2");
+        setup.createUserAndLogin("U2", "pU2");
         setup.gotoPage(sourcePage);
         new AttachmentsViewPage().openAttachmentsDocExtraPane();
 
@@ -96,10 +96,11 @@ class MoveAttachmentIT
 
         ViewPage viewTargetPage = setup.gotoPage(targetPage);
 
-        // Validate the history pane first because we'll move to the attachment history page when validating the 
+        // Validate the history pane first because we'll move to the attachment history page when validating the
         // attachment pane.
-        // Verify that the author is correct in the history.
-        assertEquals("U1", viewTargetPage.openHistoryDocExtraPane().getCurrentAuthor());
+        // The document was modified by the move (attachment added and content refactored), so its current author is
+        // the user who performed the move (U2), not the original attachment author (U1).
+        assertEquals("U2", viewTargetPage.openHistoryDocExtraPane().getCurrentAuthor());
 
         // Validate the attachments pane.
         AttachmentsPane attachmentsPaneTarget = new AttachmentsViewPage().openAttachmentsDocExtraPane();

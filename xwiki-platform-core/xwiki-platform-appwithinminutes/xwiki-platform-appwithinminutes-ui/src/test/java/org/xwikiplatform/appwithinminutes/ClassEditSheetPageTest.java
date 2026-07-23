@@ -118,11 +118,13 @@ class ClassEditSheetPageTest extends PageTest
         XWikiDocument xwikiDocument =
             this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Page"), this.context);
 
-        xwikiDocument.setContent("{{include reference=\"AppWithinMinutes.ClassEditSheet\" /}}\n"
-            + "\n"
-            + "{{velocity}}\n"
-            + "#displayFieldPalette()\n"
-            + "{{/velocity}}\n");
+        xwikiDocument.setContent("""
+            {{include reference="AppWithinMinutes.ClassEditSheet" /}}
+
+            {{velocity}}
+            #displayFieldPalette()
+            {{/velocity}}
+            """);
         xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
         this.xwiki.saveDocument(xwikiDocument, this.context);
 

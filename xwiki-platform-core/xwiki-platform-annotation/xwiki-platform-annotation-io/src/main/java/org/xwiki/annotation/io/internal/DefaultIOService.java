@@ -230,12 +230,10 @@ public class DefaultIOService implements IOService
             }
             for (BaseObject object : objects) {
                 // Use the object number as annotation id
-                if (object != null) {
-                    // The legacy behavior is to have a non-empty target, which can lead to issues when the document
-                    // is moved. Now, we consider an object with an empty target as related to the containing document.
-                    if (matchesTarget(object, localTargetId, isDocumentType)) {
-                        result.add(loadAnnotationFromObject(object, localTargetId));
-                    }
+                // The legacy behavior is to have a non-empty target, which can lead to issues when the document
+                // is moved. Now, we consider an object with an empty target as related to the containing document.
+                if (object != null && matchesTarget(object, localTargetId, isDocumentType)) {
+                    result.add(loadAnnotationFromObject(object, localTargetId));
                 }
             }
             return result;

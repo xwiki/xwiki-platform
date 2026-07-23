@@ -71,6 +71,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Keys;
@@ -581,7 +582,7 @@ public class TestUtils
         // On a failed login, loginsubmit responds with 401 and does not redirect, so the browser stays on the
         // loginsubmit URL instead of reaching loginDestURL. Fail fast with a helpful message rather than silently
         // continuing as guest, which would otherwise surface as a confusing, unrelated failure later in the test.
-        if (!StringUtils.startsWith(getDriver().getCurrentUrl(), loginDestURL)) {
+        if (!Strings.CS.startsWith(getDriver().getCurrentUrl(), loginDestURL)) {
             throw new IllegalStateException(String.format(
                 "Failed to create and log in user [%s]. Was expecting to be on URL [%s] but was on [%s]. Page source "
                     + "is [%s].", username, loginDestURL, getDriver().getCurrentUrl(), getDriver().getPageSource()));

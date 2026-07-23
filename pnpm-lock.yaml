@@ -2482,6 +2482,9 @@ importers:
       '@xwiki/platform-tool-tsdocconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsdocconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-viteconfig
       eslint:
         specifier: 'catalog:'
         version: 10.4.0(jiti@2.7.0)
@@ -2497,6 +2500,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
         version: 4.1.6(@types/node@24.12.4)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0))
@@ -2521,7 +2527,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
@@ -2561,7 +2567,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
@@ -2592,7 +2598,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-apiextractorconfig
@@ -2635,7 +2641,7 @@ importers:
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
-        version: 7.58.7(@types/node@24.12.4)
+        version: 7.58.9(@types/node@24.12.4)
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-tsconfig
@@ -2917,9 +2923,6 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-headless:
     dependencies:
-      '@blocknote/core':
-        specifier: 'catalog:'
-        version: 0.51.4(@types/hast@3.0.4)
       '@xwiki/platform-attachments-api':
         specifier: workspace:*
         version: link:../../core/attachments/attachments-api
@@ -2935,30 +2938,12 @@ importers:
       '@xwiki/platform-editors-blocknote-react':
         specifier: workspace:*
         version: link:../blocknote-react
-      '@xwiki/platform-fn-utils':
-        specifier: workspace:*
-        version: link:../../core/fn-utils
       '@xwiki/platform-icons':
         specifier: workspace:*
         version: link:../../core/icons
-      '@xwiki/platform-link-suggest-api':
-        specifier: workspace:*
-        version: link:../../core/link-suggest/link-suggest-api
       '@xwiki/platform-macros-api':
         specifier: workspace:*
         version: link:../../core/macros/macros-api
-      '@xwiki/platform-model-api':
-        specifier: workspace:*
-        version: link:../../core/model/model-api
-      '@xwiki/platform-model-reference-api':
-        specifier: workspace:*
-        version: link:../../core/model/model-reference/model-reference-api
-      '@xwiki/platform-model-remote-url-api':
-        specifier: workspace:*
-        version: link:../../core/model/model-remote-url/model-remote-url-api
-      '@xwiki/platform-uniast-api':
-        specifier: workspace:*
-        version: link:../../core/uniast/uniast-api
       lodash-es:
         specifier: 'catalog:'
         version: 4.18.1
@@ -2999,12 +2984,6 @@ importers:
       vite:
         specifier: 'catalog:'
         version: 7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0)
-      vitest:
-        specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.12.4)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0))
-      vitest-mock-extended:
-        specifier: 'catalog:'
-        version: 4.0.0(typescript@5.9.3)(vitest@4.1.6(@types/node@24.12.4)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@7.3.5(@types/node@24.12.4)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.15))(yaml@2.9.0)))
       vue:
         specifier: 'catalog:'
         version: 3.5.38(typescript@5.9.3)

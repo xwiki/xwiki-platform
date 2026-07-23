@@ -20,7 +20,6 @@
 package org.xwiki.annotation.io.internal.migration.hibernate;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -92,7 +91,7 @@ public class R180600000XWIKI20699DataMigration extends AbstractDocumentsMigratio
                 // always the root one. It must be passed as the empty string: a null locale resolves to no
                 // reference at all, silently discarding every selected document.
                 .flatMap(fullName -> resolveDocumentReference(String.valueOf(fullName), "").stream())
-                .collect(Collectors.toList());
+                .toList();
         } catch (QueryException e) {
             throw new DataMigrationException(
                 String.format("Failed retrieve the list of all the documents with annotations for wiki [%s].",

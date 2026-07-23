@@ -842,6 +842,7 @@ public privileged aspect XWikiCompatibilityAspect
             URL requestURL = context.getURL();
             host = requestURL.getHost();
         } catch (Exception e) {
+            LOGGER.debug("Failed to extract the host name from the request URL. Assuming an empty host name.", e);
         }
 
         // In path-based multi-wiki, the wiki name is an element of the request path.

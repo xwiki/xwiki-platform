@@ -296,6 +296,7 @@ privileged public aspect XWikiDocumentCompatibilityAspect
             }
         } catch (Exception e) {
             // Don't stop when there's a problem rendering the title.
+            LOGGER.debug("Failed to render the document title. Ignoring and returning an empty title.", e);
         }
 
         return title;
@@ -613,7 +614,7 @@ privileged public aspect XWikiDocumentCompatibilityAspect
                     result = context.getWiki().addTooltip(img, tooltip, context);
                 }
             } catch (Exception e) {
-
+                LOGGER.debug("Failed to display the tooltip for field [{}]. Ignoring.", fieldname, e);
             }
 
             return result;

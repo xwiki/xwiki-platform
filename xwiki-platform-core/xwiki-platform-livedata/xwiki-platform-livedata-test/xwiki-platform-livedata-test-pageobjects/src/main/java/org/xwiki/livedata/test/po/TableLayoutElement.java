@@ -792,19 +792,23 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
         By editActionSelector = By.cssSelector(".displayer-action-list span[title='Edit']");
-        // Hover on the property and click on the edit button on the displayed popover (see internalEdit for the
-        // rationale behind the two moves). We first move the mouse away from the cell so that moving back onto it
-        // reliably triggers the popover, in particular when re-editing a cell right after closing an edit
-        // confirmation modal (the mouse might still be over the cell from the previous attempt).
+        // Hover on the property and click on the edit button on the displayed popover. We first move the mouse away
+        // from the cell so that moving back onto it reliably triggers the popover, in particular when re-editing a
+        // cell right after closing an edit confirmation modal (the mouse might still be over the cell from the
+        // previous attempt). We then move slightly at the right of the center of the targeted element and back towards
+        // the center, simulating the mouse trajectory of a real user hovering the cell above the one to edit.
         new Actions(getDriver().getWrappedDriver())
             .moveToElement(getRoot())
             .moveToElement(element, 50, 0)
             .moveToElement(element, 0, 0)
             .perform();
         // The popover actions are appended at the end of the document (not inside the cell) and displayed
-        // asynchronously after hovering, so wait for the edit action to appear and click the last one, which is the one
-        // of the targeted property (see internalEdit for the rationale). We don't wait for the editor afterwards
-        // because clicking the edit button may trigger an edit confirmation modal instead of showing the editor.
+        // asynchronously after hovering, so wait for the edit action to appear and click the last one. While it does
+        // not seem to be possible in normal conditions, using selenium and moveToElement, several popovers can be
+        // visible at the same time (especially on Chrome). We select the latest edit action, which is the one of the
+        // targeted property because the popover actions are appended at the end of the document. We don't wait for the
+        // editor afterwards because clicking the edit button may trigger an edit confirmation modal instead of showing
+        // the editor.
         getDriver().waitUntilCondition(input -> !getDriver().findElementsWithoutWaiting(editActionSelector).isEmpty());
         List<WebElement> popoverActions = getDriver().findElements(editActionSelector);
         popoverActions.get(popoverActions.size() - 1).click();
@@ -1022,24 +1026,9 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
 
-        // Hover on the property and click on the edit button on the displayed popover. We move slightly at the right of
-        // the center of the targeted element, then slightly to the left, towards the center of the element. This
-        // simulates the mouse trajectory of a real user hovering the cell above the one he/she wants to edit.
-        new Actions(getDriver().getWrappedDriver())
-            .moveToElement(element, 50, 0)
-            .moveToElement(element, 0, 0)
-            .perform();
-        By editActionSelector = By.cssSelector(".displayer-action-list span[title='Edit']");
-        // Waits to have at least one popover visible and click on the edit action of the last one. While it does not
-        // seem to be possible in normal conditions, using selenium and moveToElement, several popover can be visible
-        // at the same time (especially on Chrome). We select the latest edit action, which is the one of the targeted
-        // property because the popover actions are appended at the end of the document.
-        getDriver().waitUntilCondition(input -> !getDriver().findElementsWithoutWaiting(editActionSelector).isEmpty());
-        // Does not use findElementsWithoutWaiting to let a chance for the cursor to move to the targeted cell, and for
-        // its edit action popover to be displayed.
-        List<WebElement> popoverActions = getDriver().findElements(editActionSelector);
-        popoverActions.get(popoverActions.size() - 1).click();
-        
+        // Hover on the property and click on the edit button on the displayed popover.
+        clickEditCell(columnLabel, rowNumber);
+
         // Selector of the edited field.
         By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
 

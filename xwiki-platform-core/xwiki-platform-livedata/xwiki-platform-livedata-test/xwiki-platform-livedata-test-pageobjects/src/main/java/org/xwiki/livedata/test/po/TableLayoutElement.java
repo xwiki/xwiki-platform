@@ -1194,7 +1194,7 @@ public class TableLayoutElement extends BaseElement
     {
         return !"checkbox".equals(field.getAttribute("type"))
             && !"select".equals(field.getTagName())
-            && !Arrays.asList(getClasses(field)).contains("datetime");
+            && !List.of(getClasses(field)).contains("datetime");
     }
 
     private String urlWithoutFormToken(EntityReference entityReference, String action)

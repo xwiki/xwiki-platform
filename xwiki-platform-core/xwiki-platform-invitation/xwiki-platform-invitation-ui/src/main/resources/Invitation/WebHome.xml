@@ -322,7 +322,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     #set($invalid = [])
     #validateAddressFormat($recipients, $emailRegex, $invalid)
     #set($discard = $sendTo.removeAll($invalid))
-    #set($messageGroupID = $mathtool.getRandom())
+    #set($messageGroupID = $stringtool.nextAlphanumeric(5))
   #else
     ## If we're just doing a test run, no recipients but we still want to generate a message.
     #set($sendTo = [''])
@@ -334,10 +334,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
     $message.set('sentDate', '')##
     $message.set('messageGroupID', $messageGroupID)##
     $message.set('recipient', $recipient)##
-    ## Set the message id to a random number string, set it to $messageID variable so it can be used by the template.
-    #set($messageID = "$mathtool.getRandom().toString().replaceAll('\.','')##
-                       $mathtool.getRandom().toString().replaceAll('\.','')##
-                       $mathtool.getRandom().toString().replaceAll('\.','')")
+    #set($messageID = $stringtool.nextAlphanumeric(10))
     $message.set('messageID', $messageID)##
     ##
     ## Need to make $subjectLine and $messageBody available to $doc.getRenderedContent.

@@ -121,15 +121,13 @@ class LiveDataXObjectEditConfirmationIT
 
     private void createLiveDataPage(TestUtils setup, DocumentReference liveDataReference) throws Exception
     {
-        String content = "{{velocity}}\n"
-            + "{{liveData\n"
+        String content = "{{liveData\n"
             + "  id=\"" + LIVE_DATA_ID + "\"\n"
             + "  properties=\"" + NAME_COLUMN + "\"\n"
             + "  source=\"liveTable\"\n"
             + "  sourceParameters=\"translationPrefix=&className=" + setup.serializeReference(
             liveDataReference.getLocalDocumentReference()) + "\"\n"
-            + "}}{{/liveData}}\n"
-            + "{{/velocity}}";
+            + "}}{{/liveData}}";
         setup.rest().savePage(liveDataReference, content, "");
     }
 }

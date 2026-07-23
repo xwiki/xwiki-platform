@@ -232,8 +232,7 @@ a[data-linktype="create"]::after {
 [contenteditable="true"] [data-xwiki-focusedplaceholder]::before {
   /* Show the value of the focused line placeholder attribute */
   position: absolute;
-  opacity: .8;
-  color: #aaa;
+  color: var(--text-muted);
   content: attr(data-xwiki-focusedplaceholder);
 }
 

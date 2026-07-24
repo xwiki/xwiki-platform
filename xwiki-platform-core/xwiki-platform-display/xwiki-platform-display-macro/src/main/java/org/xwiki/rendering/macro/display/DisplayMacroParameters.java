@@ -28,6 +28,7 @@ import org.xwiki.properties.annotation.PropertyDisplayHidden;
 import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyGroup;
+import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
 
 /**
@@ -66,6 +67,7 @@ public class DisplayMacroParameters
     @PropertyGroup("stringReference")
     @PropertyFeature(value = "reference", mandatory = true)
     @PropertyDisplayType(EntityReferenceString.class)
+    @PropertyMandatory
     public void setReference(String reference)
     {
         this.reference = reference;

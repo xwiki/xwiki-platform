@@ -19,6 +19,7 @@
  */
 import LivedataAdvancedPanelFilter from "./LivedataAdvancedPanelFilter.vue";
 import { mount } from "@vue/test-utils";
+import { assertAxe } from "@xwiki/platform-test-accessibility";
 import _ from "lodash-es";
 import { describe, expect, it } from "vitest";
 
@@ -30,6 +31,7 @@ import { describe, expect, it } from "vitest";
  */
 function initWrapper({ provide } = {}) {
   return mount(LivedataAdvancedPanelFilter, {
+    attachTo: document.body,
     props: {
       panel: {
         id: "filterPanel",
@@ -80,6 +82,7 @@ describe("LivedataAdvancedPanelFilter.vue", () => {
   it("Displays the title and the icon", async () => {
     const wrapper = initWrapper();
     expect(wrapper.find(".panel-heading .title").text()).toBe("filter Filter");
+    await assertAxe(wrapper);
   });
 
   it("Displays no message when filterable properties exist", async () => {
@@ -90,6 +93,7 @@ describe("LivedataAdvancedPanelFilter.vue", () => {
     expect(wrapper.find(".text-muted").attributes("style")).toBe(
       "display: none;",
     );
+    await assertAxe(wrapper);
   });
 
   it("Displays a message when no filterable properties exist", async () => {
@@ -103,5 +107,6 @@ describe("LivedataAdvancedPanelFilter.vue", () => {
       },
     });
     expect(wrapper.find(".text-muted").element.tagName).toBe("DIV");
+    await assertAxe(wrapper);
   });
 });

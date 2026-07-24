@@ -20,6 +20,7 @@
 
 import LivedataPagination from "./LivedataPagination.vue";
 import { mount } from "@vue/test-utils";
+import { assertAxe } from "@xwiki/platform-test-accessibility";
 import _ from "lodash-es";
 import { describe, expect, it } from "vitest";
 
@@ -68,6 +69,7 @@ import { describe, expect, it } from "vitest";
  */
 function initWrapper({ provide } = {}) {
   return mount(LivedataPagination, {
+    attachTo: document.body,
     global: {
       provide: _.merge(
         {
@@ -108,7 +110,7 @@ function initWrapper({ provide } = {}) {
 }
 
 describe("LivedataPagination.vue", () => {
-  it("Displays the pagination when the limit is an existing page size", () => {
+  it("Displays the pagination when the limit is an existing page size", async () => {
     const wrapper = initWrapper();
     const select = wrapper.find("select");
     expect(select.attributes("title")).toContain(
@@ -121,9 +123,10 @@ describe("LivedataPagination.vue", () => {
     );
     expect(options.at(2).html()).toBe('<option value="30">30</option>');
     expect(options.at(3).html()).toBe('<option value="100">100</option>');
+    await assertAxe(wrapper);
   });
 
-  it("Displays the pagination when the limit is not an existing page size", () => {
+  it("Displays the pagination when the limit is not an existing page size", async () => {
     const wrapper = initWrapper({
       provide: {
         logic: {
@@ -145,9 +148,10 @@ describe("LivedataPagination.vue", () => {
     );
     expect(options.at(3).html()).toBe('<option value="30">30</option>');
     expect(options.at(4).html()).toBe('<option value="100">100</option>');
+    await assertAxe(wrapper);
   });
 
-  it("Displays the pagination indexes when there is no entries", () => {
+  it("Displays the pagination indexes when there is no entries", async () => {
     const wrapper = initWrapper({
       provide: {
         logic: {
@@ -162,9 +166,10 @@ describe("LivedataPagination.vue", () => {
     );
     expect(wrapper.findAll(".pagination-indexes .page-nav").length).toBe(1);
     expect(wrapper.find(".pagination-indexes .page-nav").text()).toContain("1");
+    await assertAxe(wrapper);
   });
 
-  it("Displays the pagination indexes when there is some entries", () => {
+  it("Displays the pagination indexes when there is some entries", async () => {
     const wrapper = initWrapper({
       provide: {
         logic: {
@@ -188,5 +193,6 @@ describe("LivedataPagination.vue", () => {
     expect(pageNavs.at(2).text()).toContain(
       "livedata.pagination.loadPageByNumber",
     );
+    await assertAxe(wrapper);
   });
 });

@@ -30,7 +30,9 @@
       so that it align well with the entries selectors of the rows
       and the select-all entries in the header
     -->
-    <th v-if="isSelectionEnabled" class="entry-selector"></th>
+    <th v-if="isSelectionEnabled" class="entry-selector">
+      <span class="sr-only">{{ $t("livedata.table.entrySelector.hint") }}</span>
+    </th>
 
     <!-- The filters cells -->
     <th
@@ -43,6 +45,7 @@
         :property-id="property.id"
         :index="0"
       />
+      <span v-else class="sr-only">{{ property.name }}</span>
     </th>
     <!-- Spacer for the actions column in edit mode -->
     <th v-if="logic.isEditMode()"></th>

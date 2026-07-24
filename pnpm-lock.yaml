@@ -1997,6 +1997,9 @@ importers:
       '@xwiki/platform-livedata-componentstore':
         specifier: workspace:*
         version: link:../livedata-componentstore
+      '@xwiki/platform-test-accessibility':
+        specifier: workspace:*
+        version: link:../../test/accessibility
       '@xwiki/platform-tool-apiextractorconfig':
         specifier: workspace:*
         version: link:../../../tools/tool-apiextractorconfig

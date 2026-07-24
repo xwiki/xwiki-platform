@@ -29,20 +29,36 @@
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-security</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Security</name>
-  <packaging>pom</packaging>
+  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
+       see https://jira.xwiki.org/browse/XWIKI-7683 -->
+  <packaging>jar</packaging>
   <description>Security oriented functional tests of the default Flavor.</description>
+  <properties>
+    <!-- Functional tests are allowed to output content to the console -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- The banned xar dependency type protects JAR extensions from pulling XAR extensions at runtime. This module is a
+         functional test module: it is never installed as an extension, and it needs the XAR below to provision the
+         feature under test. -->
+    <xwiki.enforcer.banneddependencytype-xar.skip>true</xwiki.enforcer.banneddependencytype-xar.skip>
+  </properties>
   <dependencies>
-    <!-- Provided dependencies -->
-    <!-- xwiki-platform-extension-security-ui is installed using rest during the test execution as it is not 
-         bundled by default. -->
+    <!-- Runtime dependencies: the extension security UI is not bundled by the standard flavor nor by the WAR's core
+         extensions, so it must be provisioned. Declaring it in a non-test scope makes the Docker test framework install
+         it in the test instance at startup. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-security-ui</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
+      <scope>runtime</scope>
       <type>xar</type>
     </dependency>
     <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-security-test-pageobjects</artifactId>
@@ -55,47 +71,43 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-rest</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.servlet</groupId>
-      <artifactId>jakarta.servlet-api</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
+    <testSourceDirectory>src/test/it</testSourceDirectory>
     <plugins>
-      <!-- Step 1: Compile the JUnit Selenium Tests -->
+      <!-- We need to explicitly include the failsafe plugin since it's not part of the default maven lifecycle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-      <!-- Step 2: Process the test resources -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-      </plugin>
-      <!-- Step 3: Unpack the application -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-      </plugin>
-      <!-- Step 4: Execute the tests (they start/stop XE) -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <systemPropertyVariables>
-            <!-- Use a custom log configuration that sets the log level to INFO for tests. We need this for a TestRule
-              that logs debugging information on test failure. -->
-            <logback.configurationFile>logback.xml</logback.configurationFile>
-          </systemPropertyVariables>
-        </configuration>
+        <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>clover</id>
+      <!-- Add the Clover JAR to the WAR so that it's available at runtime when XWiki executes.
+           It's needed because instrumented jars in the WAR will call Clover APIs at runtime when they execute. -->
+      <dependencies>
+        <dependency>
+          <groupId>org.openclover</groupId>
+          <artifactId>clover</artifactId>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <!-- Tell the Docker-based test to activate the Clover profile so that the Clover JAR is added to
+                     WEB-INF/lib -->
+                <xwiki.test.ui.profiles>clover</xwiki.test.ui.profiles>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

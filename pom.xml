@@ -310,7 +310,7 @@
       <dependency>
         <groupId>com.github.junrar</groupId>
         <artifactId>junrar</artifactId>
-        <version>7.6.0</version>
+        <version>7.6.1</version>
       </dependency>
 
       <dependency>

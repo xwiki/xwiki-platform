@@ -19,7 +19,7 @@
  */
 package org.xwiki.store.merge;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -141,7 +141,7 @@ public class MergeDocumentResult extends MergeManagerResult<DocumentModelBridge,
         this.currentDocument = currentDocument;
         this.previousDocument = previousDocument;
         this.nextDocument = nextDocument;
-        this.mergeResults = new HashMap<>();
+        this.mergeResults = new EnumMap<>(DocumentPart.class);
     }
 
     /**

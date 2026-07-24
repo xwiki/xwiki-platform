@@ -19,7 +19,7 @@
  */
 package org.xwiki.notifications.preferences.script;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -106,7 +106,7 @@ class NotificationPreferenceScriptServiceTest
         private NotificationPreferenceImpl(boolean isNotificationEnabled, NotificationFormat format,
                 String eventType)
         {
-            super(isNotificationEnabled, format, null, null, null, new HashMap<>());
+            super(isNotificationEnabled, format, null, null, null, new EnumMap<>(NotificationPreferenceProperty.class));
             properties.put(NotificationPreferenceProperty.EVENT_TYPE, eventType);
         }
     }
@@ -162,12 +162,12 @@ class NotificationPreferenceScriptServiceTest
         NotificationPreference pref2 = mock(NotificationPreference.class);
 
         when(pref1.getFormat()).thenReturn(NotificationFormat.EMAIL);
-        Map<NotificationPreferenceProperty, Object> properties1 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties1 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties1.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref1.getProperties()).thenReturn(properties1);
 
         when(pref2.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties2 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties2 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties2.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref2.getProperties()).thenReturn(properties2);
         when(pref2.isNotificationEnabled()).thenReturn(true);
@@ -215,12 +215,12 @@ class NotificationPreferenceScriptServiceTest
         NotificationPreference pref2 = mock(NotificationPreference.class);
 
         when(pref1.getFormat()).thenReturn(NotificationFormat.EMAIL);
-        Map<NotificationPreferenceProperty, Object> properties1 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties1 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties1.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref1.getProperties()).thenReturn(properties1);
 
         when(pref2.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties2 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties2 = new EnumMap<>(NotificationPreferenceProperty.class);
         properties2.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(pref2.getProperties()).thenReturn(properties2);
         when(pref2.isNotificationEnabled()).thenReturn(true);

@@ -54,21 +54,16 @@ public class CssExtension implements Extension
     @Override
     public SxCompressor getCompressor()
     {
-        return new SxCompressor()
-        {
-            @Override
-            public String compress(String source)
-            {
-                try {
-                    CssCompressor compressor = new CssCompressor(new StringReader(source));
-                    StringWriter out = new StringWriter();
-                    compressor.compress(out, -1);
-                    return out.toString();
-                } catch (IOException ex) {
-                    LOGGER.warn("Exception compressing SSX code", ex);
-                }
-                return source;
+        return source -> {
+            try {
+                CssCompressor compressor = new CssCompressor(new StringReader(source));
+                StringWriter out = new StringWriter();
+                compressor.compress(out, -1);
+                return out.toString();
+            } catch (IOException ex) {
+                LOGGER.warn("Exception compressing SSX code", ex);
             }
+            return source;
         };
     }
 

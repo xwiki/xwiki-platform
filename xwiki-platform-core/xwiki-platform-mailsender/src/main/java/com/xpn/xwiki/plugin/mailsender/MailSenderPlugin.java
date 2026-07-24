@@ -421,10 +421,12 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 String header = m.group(1);
                 String value = m.group(2);
                 line = input.readLine();
+                StringBuilder valueBuilder = new StringBuilder(value);
                 while (line != null && (line.startsWith(" ") || line.startsWith("\t"))) {
-                    value += line;
+                    valueBuilder.append(line);
                     line = input.readLine();
                 }
+                value = valueBuilder.toString();
                 if (SUBJECT.equals(header)) {
                     toMail.setSubject(value);
                 } else if (FROM.equals(header)) {

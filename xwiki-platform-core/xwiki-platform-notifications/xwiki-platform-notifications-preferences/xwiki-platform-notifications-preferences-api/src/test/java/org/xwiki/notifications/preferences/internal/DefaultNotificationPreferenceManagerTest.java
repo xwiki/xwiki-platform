@@ -20,7 +20,7 @@
 package org.xwiki.notifications.preferences.internal;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -88,9 +88,9 @@ class DefaultNotificationPreferenceManagerTest
     @BeforeEach
     void setUp()
     {
-        Map<NotificationPreferenceProperty, Object> map1 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> map1 = new EnumMap<>(NotificationPreferenceProperty.class);
         map1.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
-        Map<NotificationPreferenceProperty, Object> map2 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> map2 = new EnumMap<>(NotificationPreferenceProperty.class);
         map1.put(NotificationPreferenceProperty.EVENT_TYPE, "addComment");
         this.mockPreference11 = new NotificationPreferenceImplementation(true, NotificationFormat.ALERT,
                 NotificationPreferenceCategory.DEFAULT, null, "1", map1);

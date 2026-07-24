@@ -20,7 +20,7 @@
 package org.xwiki.ratings.script;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -114,7 +114,8 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
     public List<Rating> getRatings(EntityReference reference, int offset, int limit, boolean asc)
     {
         try {
-            Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
+            Map<RatingsManager.RatingQueryField, Object> queryParameters =
+                new EnumMap<>(RatingsManager.RatingQueryField.class);
             queryParameters.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, reference);
             return this.ratingsManager.getRatings(queryParameters, offset, limit,
                 RatingsManager.RatingQueryField.UPDATED_DATE, asc);
@@ -158,7 +159,8 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
     public Optional<Rating> getRating(EntityReference reference, UserReference author)
     {
         Optional<Rating> result = Optional.empty();
-        Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
+        Map<RatingsManager.RatingQueryField, Object> queryParameters =
+            new EnumMap<>(RatingsManager.RatingQueryField.class);
         queryParameters.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, reference);
         queryParameters.put(RatingsManager.RatingQueryField.USER_REFERENCE, author);
         try {
@@ -178,7 +180,8 @@ public abstract class AbstractScriptRatingsManager implements RatingsScriptServi
     public List<Rating> getCurrentUserRatings(int offset, int limit, boolean asc)
     {
         List<Rating> result;
-        Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
+        Map<RatingsManager.RatingQueryField, Object> queryParameters =
+            new EnumMap<>(RatingsManager.RatingQueryField.class);
         queryParameters.put(RatingsManager.RatingQueryField.USER_REFERENCE, this.getCurrentUserReference());
         try {
             result = this.ratingsManager.getRatings(queryParameters, offset, limit,

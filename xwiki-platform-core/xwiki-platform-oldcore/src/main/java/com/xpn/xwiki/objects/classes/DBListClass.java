@@ -460,11 +460,13 @@ public class DBListClass extends ListClass
 
                 if (words.get(comma).compareTo("(") == 0) {
                     int i = comma + 1;
+                    StringBuilder secondColBuilder = new StringBuilder(secondCol);
                     while (words.get(i).compareTo(")") != 0) {
-                        secondCol += words.get(i);
+                        secondColBuilder.append(words.get(i));
                         i++;
                     }
-                    secondCol += ")";
+                    secondColBuilder.append(")");
+                    secondCol = secondColBuilder.toString();
                 } else {
                     secondCol = words.get(comma).trim();
                 }

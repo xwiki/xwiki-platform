@@ -782,9 +782,12 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 "select distinct obj.number, obj.name from BaseObject as obj, StringProperty as prop , LargeStringProperty as lprop "
                     + "where obj.className='XWiki.FeedEntryClass' and obj.id=prop.id.id and obj.id=lprop.id.id ";
 
+            StringBuilder sqlBuilder = new StringBuilder(sql);
             for (int i = 0; i < queryTab.length; i++) {
-                sql += " and (prop.value LIKE '%" + queryTab[i] + "%' or lprop.value LIKE '%" + queryTab[i] + "%')";
+                sqlBuilder.append(" and (prop.value LIKE '%").append(queryTab[i])
+                    .append("%' or lprop.value LIKE '%").append(queryTab[i]).append("%')");
             }
+            sql = sqlBuilder.toString();
             List<Object[]> res = context.getWiki().search(sql, context);
 
             if (res == null) {

@@ -21,7 +21,6 @@ package org.xwiki.annotation.io.internal.migration.hibernate;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -350,14 +349,8 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
             session.clear();
 
             // Sort the objects by date. The objects were removed from the session but are still available in-memory.
-            Collections.sort(datedObjects, new Comparator<Entry<Date, BaseObject>>()
-            {
-                @Override
-                public int compare(Entry<Date, BaseObject> datedObject1, Entry<Date, BaseObject> datedObject2)
-                {
-                    return datedObject1.getKey().compareTo(datedObject2.getKey());
-                }
-            });
+            Collections.sort(datedObjects,
+                (datedObject1, datedObject2) -> datedObject1.getKey().compareTo(datedObject2.getKey()));
 
             // Reassign object numbers and convert annotations for the current document, based on the previous sorting.
             for (int newObjectNumber = 0; newObjectNumber < datedObjects.size(); newObjectNumber++) {

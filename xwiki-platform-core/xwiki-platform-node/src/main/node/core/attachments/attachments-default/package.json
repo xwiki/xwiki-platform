@@ -47,7 +47,7 @@
   },
   "peerDependencies": {
     "inversify": "8.x",
-    "pinia": "3.x",
+    "pinia": "3.x || 4.x",
     "reflect-metadata": "0.x",
     "vue": "3.x"
   },

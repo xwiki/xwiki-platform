@@ -98,7 +98,7 @@ catalog:
   "@types/sinon": 21.0.1
   "@vitejs/plugin-react": 6.0.4
   "@vitejs/plugin-vue": 6.0.8
-  "@vitest/eslint-plugin": 1.6.23
+  "@vitest/eslint-plugin": 1.6.24
   "@vue/compiler-dom": 3.5.38
   "@vue/eslint-config-prettier": 10.2.0
   "@vue/eslint-config-typescript": 14.9.0

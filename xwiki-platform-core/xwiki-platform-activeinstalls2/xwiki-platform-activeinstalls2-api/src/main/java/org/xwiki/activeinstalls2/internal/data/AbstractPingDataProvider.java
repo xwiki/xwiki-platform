@@ -23,13 +23,14 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.activeinstalls2.internal.PingDataProvider;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.indices.IndexSettings;
 import co.elastic.clients.util.ObjectBuilder;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * To be extended by {@link PingDataProvider} implementations to simplify the code.
@@ -57,7 +58,9 @@ public abstract class AbstractPingDataProvider implements PingDataProvider
 
     protected void logWarning(String explanation, Throwable e)
     {
-        this.logger.warn("{}. This information has not been added to the Active Installs ping data. Reason [{}]",
-            explanation, ExceptionUtils.getRootCauseMessage(e));
+        this.logger.atWarn()
+            .addArgument(explanation)
+            .addArgument(() -> getRootCauseMessage(e))
+            .log("{}. This information has not been added to the Active Installs ping data. Reason [{}]");
     }
 }

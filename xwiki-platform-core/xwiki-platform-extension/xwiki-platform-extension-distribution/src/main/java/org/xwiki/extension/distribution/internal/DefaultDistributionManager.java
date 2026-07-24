@@ -213,23 +213,18 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             request.setUserReference(xcontext.getUserReference());
             request.setInteractive(this.distributionConfiguration.isInteractiveDistributionWizardEnabledForMainWiki());
 
-            Thread distributionJobThread = new Thread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    // Create a clean Execution Context
-                    ExecutionContext context = new ExecutionContext();
+            Thread distributionJobThread = new Thread(() -> {
+                // Create a clean Execution Context
+                ExecutionContext context = new ExecutionContext();
 
-                    try {
-                        executionContextManager.initialize(context);
-                    } catch (ExecutionContextException e) {
-                        throw new RuntimeException("Failed to initialize farm distribution job execution context", e);
-                    }
-
-                    farmDistributionJob.initialize(request);
-                    farmDistributionJob.run();
+                try {
+                    executionContextManager.initialize(context);
+                } catch (ExecutionContextException e) {
+                    throw new RuntimeException("Failed to initialize farm distribution job execution context", e);
                 }
+
+                farmDistributionJob.initialize(request);
+                farmDistributionJob.run();
             });
 
             distributionJobThread.setDaemon(true);
@@ -266,25 +261,20 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                 DistributionJob wikiJob = this.componentManager.getInstance(Job.class, DefaultDistributionJob.HINT);
                 this.wikiDistributionJobs.put(wiki, wikiJob);
 
-                Thread distributionJobThread = new Thread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        // Create a clean Execution Context
-                        ExecutionContext context = new ExecutionContext();
+                Thread distributionJobThread = new Thread(() -> {
+                    // Create a clean Execution Context
+                    ExecutionContext context = new ExecutionContext();
 
-                        try {
-                            executionContextManager.initialize(context);
-                        } catch (ExecutionContextException e) {
-                            throw new RuntimeException("Failed to initialize wiki distribution job execution context",
-                                e);
-                        }
-
-                        DistributionJob job = wikiDistributionJobs.get(request.getWiki());
-                        job.initialize(request);
-                        job.run();
+                    try {
+                        executionContextManager.initialize(context);
+                    } catch (ExecutionContextException e) {
+                        throw new RuntimeException("Failed to initialize wiki distribution job execution context",
+                            e);
                     }
+
+                    DistributionJob job = wikiDistributionJobs.get(request.getWiki());
+                    job.initialize(request);
+                    job.run();
                 });
 
                 distributionJobThread.setDaemon(true);

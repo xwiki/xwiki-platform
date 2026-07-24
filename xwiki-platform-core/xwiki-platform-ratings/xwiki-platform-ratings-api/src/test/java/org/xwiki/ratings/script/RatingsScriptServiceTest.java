@@ -21,7 +21,7 @@ package org.xwiki.ratings.script;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -193,7 +193,8 @@ class RatingsScriptServiceTest
         EntityReference reference = mock(EntityReference.class);
         int offset = 12;
         int limit = 17;
-        Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
+        Map<RatingsManager.RatingQueryField, Object> queryParameters =
+            new EnumMap<>(RatingsManager.RatingQueryField.class);
         queryParameters.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, reference);
 
         List<Rating> expectedResult = Arrays.asList(mock(Rating.class), mock(Rating.class));
@@ -208,7 +209,8 @@ class RatingsScriptServiceTest
         EntityReference reference = mock(EntityReference.class);
         int offset = 23;
         int limit = 3;
-        Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
+        Map<RatingsManager.RatingQueryField, Object> queryParameters =
+            new EnumMap<>(RatingsManager.RatingQueryField.class);
         queryParameters.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, reference);
 
         List<Rating> expectedResult = Arrays.asList(mock(Rating.class), mock(Rating.class));
@@ -232,7 +234,8 @@ class RatingsScriptServiceTest
     {
         EntityReference reference = mock(EntityReference.class);
         UserReference userReference = mock(UserReference.class);
-        Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
+        Map<RatingsManager.RatingQueryField, Object> queryParameters =
+            new EnumMap<>(RatingsManager.RatingQueryField.class);
         queryParameters.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, reference);
         queryParameters.put(RatingsManager.RatingQueryField.USER_REFERENCE, userReference);
         Rating expectedRating = mock(Rating.class);
@@ -248,7 +251,8 @@ class RatingsScriptServiceTest
     {
         EntityReference reference = mock(EntityReference.class);
         UserReference userReference = mock(UserReference.class);
-        Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
+        Map<RatingsManager.RatingQueryField, Object> queryParameters =
+            new EnumMap<>(RatingsManager.RatingQueryField.class);
         queryParameters.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, reference);
         queryParameters.put(RatingsManager.RatingQueryField.USER_REFERENCE, userReference);
 
@@ -267,7 +271,8 @@ class RatingsScriptServiceTest
 
         List<Rating> expectedResult = Arrays.asList(mock(Rating.class), mock(Rating.class));
 
-        Map<RatingsManager.RatingQueryField, Object> queryParameters = new HashMap<>();
+        Map<RatingsManager.RatingQueryField, Object> queryParameters =
+            new EnumMap<>(RatingsManager.RatingQueryField.class);
         queryParameters.put(RatingsManager.RatingQueryField.USER_REFERENCE, this.currentUser);
         when(this.defaultManager.getRatings(queryParameters, offset, limit,
             RatingsManager.RatingQueryField.UPDATED_DATE, asc)).thenReturn(expectedResult);

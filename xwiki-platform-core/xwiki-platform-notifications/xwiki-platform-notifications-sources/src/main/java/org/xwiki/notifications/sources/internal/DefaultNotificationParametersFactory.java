@@ -22,7 +22,7 @@ package org.xwiki.notifications.sources.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -294,7 +294,7 @@ public class DefaultNotificationParametersFactory
     public NotificationParameters createNotificationParametersWithStringMap(Map<String, String> parameters)
         throws NotificationException
     {
-        Map<ParametersKey, String> keyStringMap = new HashMap<>();
+        Map<ParametersKey, String> keyStringMap = new EnumMap<>(ParametersKey.class);
 
         for (Map.Entry<String, String> parameterPair : parameters.entrySet()) {
             String parameterKey = parameterPair.getKey();

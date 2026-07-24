@@ -22,6 +22,7 @@ package org.xwiki.model.reference;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -116,7 +117,7 @@ public class EntityReferenceSet
                     return null;
                 }
 
-                this.children = new HashMap<>();
+                this.children = new EnumMap<>(EntityType.class);
             }
 
             EntityReferenceEntryChildren child = this.children.get(entityType);

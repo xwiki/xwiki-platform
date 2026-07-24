@@ -21,7 +21,7 @@ package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -163,7 +163,7 @@ class ScopeNotificationFilterTest
         // Mock α
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties = new EnumMap<>(NotificationPreferenceProperty.class);
         properties.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(preference.getProperties()).thenReturn(properties);
 
@@ -253,7 +253,7 @@ class ScopeNotificationFilterTest
         // Mock α
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties = new EnumMap<>(NotificationPreferenceProperty.class);
         properties.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(preference.getProperties()).thenReturn(properties);
 
@@ -326,8 +326,8 @@ class ScopeNotificationFilterTest
     {
         NotificationPreference pref1 = mock(NotificationPreference.class);
         NotificationPreference pref2 = mock(NotificationPreference.class);
-        Map<NotificationPreferenceProperty, Object> properties1 = new HashMap<>();
-        Map<NotificationPreferenceProperty, Object> properties2 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties1 = new EnumMap<>(NotificationPreferenceProperty.class);
+        Map<NotificationPreferenceProperty, Object> properties2 = new EnumMap<>(NotificationPreferenceProperty.class);
         when(pref1.getProperties()).thenReturn(properties1);
         when(pref2.getProperties()).thenReturn(properties2);
         properties1.put(NotificationPreferenceProperty.EVENT_TYPE, "type1");
@@ -392,7 +392,7 @@ class ScopeNotificationFilterTest
         // Mock α
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties = new EnumMap<>(NotificationPreferenceProperty.class);
         properties.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(preference.getProperties()).thenReturn(properties);
 

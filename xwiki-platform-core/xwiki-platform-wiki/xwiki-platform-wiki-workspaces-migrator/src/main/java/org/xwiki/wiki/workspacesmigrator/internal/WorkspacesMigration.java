@@ -200,17 +200,17 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
 
         // If the list is empty, the job is done
         if (!documentsToRestore.isEmpty()) {
-            String documentsToRestoreAsString = new String();
+            StringBuilder documentsToRestoreAsString = new StringBuilder();
             int counter = 0;
             for (DocumentReference d : documentsToRestore) {
                 if (counter++ > 0) {
-                    documentsToRestoreAsString += ", ";
+                    documentsToRestoreAsString.append(", ");
                 }
-                documentsToRestoreAsString += d;
+                documentsToRestoreAsString.append(d);
             }
             logger.warn("Failed to restore some documents: [{}]. You should import manually "
                     + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
-                    + " wiki, to restore these documents.", documentsToRestoreAsString);
+                    + " wiki, to restore these documents.", documentsToRestoreAsString.toString());
         }
     }
 

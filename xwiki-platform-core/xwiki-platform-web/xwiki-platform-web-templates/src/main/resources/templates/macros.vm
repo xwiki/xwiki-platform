@@ -3292,15 +3292,32 @@ Recursive title display detected!##
 ##                    $urlValue or of $fallbackUrl, or it will contain an empty value, if neither URLs are safe there
 ## Note: We don't use any indentation on purpose to avoid any character to be inserted when calling this macro.
 ##       The idea is to remain as close as possible to a call to #set() in velocity.
+## Note: parseToSafeURI() throws URISyntaxException (in addition to returning null) for some malformed values (e.g.
+##       an opaque-looking URI such as "javascript:alert(1)//"), so each call is wrapped in #try/#end and treated the
+##       same as an unsafe URL, instead of letting the exception abort the whole macro/page rendering. It is logged at
+##       debug level only, since it is triggered by (potentially user-provided) content and a higher level would flood
+##       the logs, while the detail remains available for diagnosis.
 ## @since 14.10.5
 ## @since 15.1RC1
 #macro (getSanitizedURLAttributeValue $htmlElement $attributeName $urlValue $fallbackUrl $resultValue)
 #set ($useSafeURI = false)
+#set ($safeURI = $NULL)
+#try('uriException')
 #set ($safeURI = $services.security.url.parseToSafeURI($urlValue))
+#end
+#if ("$!uriException" != '')
+$!services.logging.getLogger('macros.vm').debug("Cannot parse [{}] into a URI.", $urlValue, $uriException)##
+#end
 #if ("$!safeURI" != '' && $services.html.isAttributeSafe($htmlElement,$attributeName,$safeURI.toString()))
 #set ($useSafeURI = true)
 #elseif ("$!fallbackUrl" != '')
+#set ($safeURI = $NULL)
+#try('uriException')
 #set ($safeURI = $services.security.url.parseToSafeURI($fallbackUrl))
+#end
+#if ("$!uriException" != '')
+$!services.logging.getLogger('macros.vm').debug("Cannot parse [{}] into a URI.", $fallbackUrl, $uriException)##
+#end
 #if ("$!safeURI" != '' && $services.html.isAttributeSafe($htmlElement,$attributeName,$safeURI.toString()))
 #set ($useSafeURI = true)
 #end

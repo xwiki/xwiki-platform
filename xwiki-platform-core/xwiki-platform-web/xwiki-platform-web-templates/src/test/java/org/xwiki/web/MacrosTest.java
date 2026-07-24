@@ -22,6 +22,7 @@ package org.xwiki.web;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -416,6 +417,43 @@ class MacrosTest extends PageTest
         out = new StringWriter();
         this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
         assertEquals("", velocityContext.get("sanitizedResult"));
+    }
+
+    @Test
+    void getSanitizedURLAttributeValueWhenParseToSafeURIThrowsURISyntaxException() throws Exception
+    {
+        HTMLScriptService htmlScriptService = mock(HTMLScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "html", htmlScriptService);
+        SecurityScriptService securityScriptService = mock(SecurityScriptService.class);
+        this.oldcore.getMocker().registerComponent(ScriptService.class, "security", securityScriptService);
+        URLSecurityScriptService urlSecurityScriptService = mock(URLSecurityScriptService.class);
+        when(securityScriptService.get("url")).thenReturn(urlSecurityScriptService);
+
+        String htmlElement = "form";
+        String attributeName = "action";
+        String url = "1http://foo";
+        String fallbackUrl = "xwiki/bin/view/Sandbox";
+        String script = "#getSanitizedURLAttributeValue($myHtmlElement,$myAttributeName,$myUrl,$myFallback,"
+            + "$sanitizedResult)";
+
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        velocityContext.put("myHtmlElement", htmlElement);
+        velocityContext.put("myAttributeName", attributeName);
+        velocityContext.put("myUrl", url);
+        velocityContext.put("myFallback", fallbackUrl);
+
+        URI fallBackUri = new URI(fallbackUrl);
+
+        // parseToSafeURI() throws URISyntaxException (e.g. for an opaque-looking URI such as "1http://foo") instead of
+        // returning null; this must be treated the same as an unsafe URL rather than aborting the whole macro.
+        when(urlSecurityScriptService.parseToSafeURI(url)).thenThrow(new URISyntaxException(url, "not a valid URI"));
+        when(urlSecurityScriptService.parseToSafeURI(fallbackUrl)).thenReturn(fallBackUri);
+        when(htmlScriptService.isAttributeSafe(htmlElement, attributeName, fallBackUri.toString())).thenReturn(true);
+        StringWriter out = new StringWriter();
+        this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
+        assertEquals(fallbackUrl, velocityContext.get("sanitizedResult"));
+        // Logging the caught exception must not insert any character in the macro's (otherwise empty) output.
+        assertEquals("", out.toString());
     }
 
     @Test

@@ -1,8 +1,9 @@
 //
 // New variables provided by XWiki
 // --------------------------------------------------
-// This variable declaration is kept here because we don't have a 1 to 1 equivalent in CSS
-@loginFormMaxWidth:                 450px;
+// Deprecated: kept as an alias for backwards compatibility.
+// The canonical declaration now lives in variablelist.vm as @login-form-max-width.
+@loginFormMaxWidth:               @login-form-max-width;
 // We create a guarded mixin to change the background color alternative differently depending on the
 // initial color. The simple 'if' syntax didn't compile.
 ._menubackground-alt(@a) when (lightness(@a) < 50%) {

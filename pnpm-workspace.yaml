@@ -73,9 +73,9 @@ ignoredBuiltDependencies:
 onlyBuiltDependencies:
   - nx
 catalog:
-  "@blocknote/core": 0.51.4
-  "@blocknote/mantine": 0.51.4
-  "@blocknote/react": 0.51.4
+  "@blocknote/core": 0.52.1
+  "@blocknote/mantine": 0.52.1
+  "@blocknote/react": 0.52.1
   "@eslint/config-helpers": 0.6.0
   "@eslint/js": 10.0.1
   "@jridgewell/remapping": 2.3.5

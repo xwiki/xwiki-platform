@@ -69,7 +69,7 @@
     <!-- Used for CVSS score calculation -->
     <metaeffekt.version>0.156.5</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
-    <solr.version>9.4.1</solr.version>
+    <solr.version>9.10.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
     <solr.minimum.java.version>11</solr.minimum.java.version>
     <jersey.version>2.48</jersey.version>

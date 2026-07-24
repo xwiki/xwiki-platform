@@ -58,6 +58,7 @@
                     <exclude>org.xwiki.commons:xwiki-platform-distribution-war-dependencies:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-component-api:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-velocity:*:jar:*</exclude>
+                    <exclude>org.xwiki.commons:xwiki-commons-properties:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-job-api:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-job-default:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-api:*:jar:*</exclude>
@@ -104,6 +105,10 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-velocity</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-properties</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.xwiki.commons</groupId>

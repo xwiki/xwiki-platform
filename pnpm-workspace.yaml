@@ -79,7 +79,7 @@ catalog:
   "@eslint/config-helpers": 0.6.0
   "@eslint/js": 10.0.1
   "@jridgewell/remapping": 2.3.5
-  "@mantine/core": 9.4.1
+  "@mantine/core": 9.4.2
   "@mantine/hooks": 9.4.1
   "@microsoft/api-extractor": 7.58.9
   "@oxc-project/runtime": 0.139.0

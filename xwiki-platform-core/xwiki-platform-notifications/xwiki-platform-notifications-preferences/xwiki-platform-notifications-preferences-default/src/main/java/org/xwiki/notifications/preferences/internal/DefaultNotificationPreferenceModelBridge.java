@@ -22,7 +22,7 @@ package org.xwiki.notifications.preferences.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -181,7 +181,7 @@ public class DefaultNotificationPreferenceModelBridge implements NotificationPre
 
     private Map<NotificationPreferenceProperty, Object> extractNotificationPreferenceProperties(BaseObject object)
     {
-        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties = new EnumMap<>(NotificationPreferenceProperty.class);
 
         String eventType = object.getStringValue(EVENT_TYPE_FIELD);
         if (StringUtils.isNotBlank(eventType)) {

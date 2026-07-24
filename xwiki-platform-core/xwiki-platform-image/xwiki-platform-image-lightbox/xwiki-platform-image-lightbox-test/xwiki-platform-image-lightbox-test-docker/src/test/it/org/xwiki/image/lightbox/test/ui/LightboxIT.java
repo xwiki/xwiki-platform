@@ -453,6 +453,23 @@ class LightboxIT
         assertEquals(lastUploadDate, lightbox.getDate());
     }
 
+    @Test
+    @Order(15)
+    void testEscapingInCaption(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+    {
+        String htmlCaption = "<b id=html-caption>HTMLCaption</b>";
+        enableLightbox(testUtils, true);
+
+        testUtils.createPage(testReference, this.getImageWithAlt(IMAGES.get(0), htmlCaption));
+        LightboxPage lightboxPage = new LightboxPage();
+
+        // Make sure that the images are displayed.
+        lightboxPage.reloadPage();
+        Lightbox lightbox = lightboxPage.openLightboxAtImage(0);
+
+        assertEquals(htmlCaption, lightbox.getCaption());
+    }
+
     private void setTimezone(TestUtils testUtils, String timezoneValue) throws Exception
     {
         Object userObject = testUtils.rest().object(new LocalDocumentReference("XWiki", USER_NAME), "XWiki.XWikiUsers");
@@ -479,11 +496,18 @@ class LightboxIT
 
     private String getImageWithAlt(String image)
     {
+        return getImageWithAlt(image, "Alternative text");
+    }
+
+    private String getImageWithAlt(String image, String alt)
+    {
         StringBuilder sb = new StringBuilder();
 
         sb.append("[[image:");
         sb.append(image);
-        sb.append("||alt=\"Alternative text\" width=120 height=120]]\n\n");
+        sb.append("||alt=\"");
+        sb.append(alt);
+        sb.append("\" width=120 height=120]]\n\n");
 
         return sb.toString();
     }

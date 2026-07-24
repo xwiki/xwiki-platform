@@ -32,7 +32,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
-import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
  * Open Office server creates a new paragraph element for every line break (enter) in the original office document. For
@@ -79,14 +78,8 @@ public class ParagraphFilter extends AbstractHTMLFilter
     private List<Node> findEmptyLineParagraphSequences(Document document)
     {
         List<Element> emptyLineParagraphs =
-            filterDescendants(document.getDocumentElement(), new String[] {TAG_P}, new ElementSelector()
-            {
-                @Override
-                public boolean isSelected(Element element)
-                {
-                    return isEmptyLineParagraph(element);
-                }
-            });
+            filterDescendants(document.getDocumentElement(), new String[] {TAG_P},
+                element -> isEmptyLineParagraph(element));
         List<Node> sequences = new ArrayList<>();
         for (Element emptyLineParagraph : emptyLineParagraphs) {
             Node prev = emptyLineParagraph.getPreviousSibling();

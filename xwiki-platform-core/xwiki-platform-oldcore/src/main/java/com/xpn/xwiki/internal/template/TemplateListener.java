@@ -74,8 +74,8 @@ public class TemplateListener extends AbstractEventListener
 
         // Is this a skin document
         if (document.getXObject(WikiSkinUtils.SKINCLASS_REFERENCE) != null) {
-            if (event instanceof AbstractAttachmentEvent) {
-                AttachmentReference attachment = new AttachmentReference(((AbstractAttachmentEvent) event).getName(),
+            if (event instanceof AbstractAttachmentEvent attachmentEvent) {
+                AttachmentReference attachment = new AttachmentReference(attachmentEvent.getName(),
                     document.getDocumentReference());
                 String id = this.referenceSerializer.serialize(attachment);
                 if (event instanceof AttachmentDeletedEvent) {
@@ -83,8 +83,8 @@ public class TemplateListener extends AbstractEventListener
                 } else if (event instanceof AttachmentUpdatedEvent) {
                     this.observation.notify(new TemplateUpdatedEvent(id), this);
                 }
-            } else if (event instanceof XObjectPropertyEvent) {
-                String id = this.referenceSerializer.serialize(((XObjectPropertyEvent) event).getReference());
+            } else if (event instanceof XObjectPropertyEvent propertyEvent) {
+                String id = this.referenceSerializer.serialize(propertyEvent.getReference());
                 if (event instanceof XObjectPropertyDeletedEvent) {
                     this.observation.notify(new TemplateDeletedEvent(id), this);
                 } else if (event instanceof XObjectPropertyUpdatedEvent) {

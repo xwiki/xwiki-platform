@@ -29,7 +29,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
-import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
  * This filter is used to rip-off or modify HTML tables so that they can be rendered properly.
@@ -55,14 +54,8 @@ public class TableFilter extends AbstractHTMLFilter
         }
         // Strip off empty table rows. See https://jira.xwiki.org/browse/XWIKI-3136.
         List<Element> emptyRows =
-            filterDescendants(document.getDocumentElement(), new String[] {TAG_TR}, new ElementSelector()
-            {
-                @Override
-                public boolean isSelected(Element element)
-                {
-                    return element.getChildNodes().getLength() == 0;
-                }
-            });
+            filterDescendants(document.getDocumentElement(), new String[] {TAG_TR},
+                element -> element.getChildNodes().getLength() == 0);
         for (Element emptyRow : emptyRows) {
             emptyRow.getParentNode().removeChild(emptyRow);
         }

@@ -19,9 +19,12 @@
  */
 package org.xwiki.blocknote.test.po;
 
+import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
+import org.xwiki.wysiwyg.test.po.MacroDialogSelectModal;
 import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
 
 /**
@@ -50,7 +53,7 @@ public class BlockNoteToolBar extends BaseElement
      */
     public WebElement getButton(String action)
     {
-        return this.container.findElement(By.cssSelector("button[data-test='" + action + "']"));
+        return this.container.findElement(getButtonSelector(action));
     }
 
     /**
@@ -61,6 +64,23 @@ public class BlockNoteToolBar extends BaseElement
     public void clickButton(String action)
     {
         getButton(action).click();
+    }
+
+    /**
+     * Checks if the button associated with the specified action is present in the toolbar.
+     *
+     * @param action the action associated with the button to check
+     * @return {@code true} if the button is present, {@code false} otherwise
+     * @since 18.6.0
+     */
+    public boolean hasButton(String action)
+    {
+        return !getDriver().findElementsWithoutWaiting(this.container, getButtonSelector(action)).isEmpty();
+    }
+
+    private @NonNull By getButtonSelector(String action)
+    {
+        return By.cssSelector("button[data-test='" + action + "']");
     }
 
     /**
@@ -98,26 +118,61 @@ public class BlockNoteToolBar extends BaseElement
     }
 
     /**
-     * Clicks the button to create a link from the current selection. This opens the link popover.
+     * Clicks the button to create a link from the current selection. This opens the link modal.
      *
-     * @return the link popover
+     * @return the link modal
      * @since 18.6.0RC1
      */
-    public BlockNoteLinkPopover createLink()
+    public BlockNoteLinkModal createLink()
     {
         clickButton("createLink");
-        return new BlockNoteLinkPopover();
+        return new BlockNoteLinkModal();
     }
 
     /**
-     * Clicks the button to edit the selected link. This opens the link popover.
+     * Checks if the button to create a link is present in the toolbar.
      *
-     * @return the link popover
+     * @return {@code true} if the button is present, {@code false} otherwise
+     * @since 18.6.0
+     */
+    public boolean hasCreateLinkButton()
+    {
+        return hasButton("createLink");
+    }
+
+    /**
+     * Clicks the button to edit the selected link. This opens the link modal.
+     *
+     * @return the link modal
      * @since 18.6.0RC1
      */
-    public BlockNoteLinkPopover editLink()
+    public BlockNoteLinkModal editLink()
     {
         clickButton("editLink");
-        return new BlockNoteLinkPopover();
+        return new BlockNoteLinkModal();
+    }
+
+    /**
+     * Clicks the button to insert a new macro call. This opens the macro selector modal.
+     *
+     * @return the macro selector modal
+     * @since 18.6.0
+     */
+    public MacroDialogSelectModal insertMacro()
+    {
+        clickButton("insertMacro");
+        return new MacroDialogSelectModal().waitUntilReady();
+    }
+
+    /**
+     * Clicks the button to edit the selected macro. This opens the macro edit modal.
+     *
+     * @return the macro edit modal
+     * @since 18.6.0
+     */
+    public MacroDialogEditModal editMacro()
+    {
+        clickButton("editMacro");
+        return new MacroDialogEditModal().waitUntilReady();
     }
 }

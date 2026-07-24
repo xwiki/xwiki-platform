@@ -22,6 +22,7 @@ package org.xwiki.livedata.internal.livetable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -34,6 +35,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.livedata.AbstractLiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataActionDescriptor;
 import org.xwiki.livedata.LiveDataConfiguration;
@@ -45,6 +48,7 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.SortEntry;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.livedata.WithParameters;
+import org.xwiki.livedata.livetable.LiveTableNewRowNamingStrategy;
 import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
@@ -77,6 +81,9 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     @Named("liveTable")
     private Provider<LiveDataConfiguration> defaultConfigProvider;
 
+    @Inject
+    private ComponentManager componentManager;
+
     @Override
     public LiveDataConfiguration resolve(LiveDataConfiguration config) throws LiveDataException
     {
@@ -87,6 +94,26 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         // the given configuration can have a sort entry that specifies only the sort order and not the sort property
         // (e.g. when you want to sort on the default property using a specified sort order).
         setDefaultSort(mergedConfig);
+
+        // We only enable the ability to add an entry if there is a naming strategy explicitly set and the current user
+        // has the rights to create a page.
+        Map<String, Object> sourceParams = mergedConfig.getQuery().getSource().getParameters();
+        String namingStrategy = (String) sourceParams.get("newRowNamingStrategy");
+        if (namingStrategy != null
+            && this.componentManager.hasComponent(LiveTableNewRowNamingStrategy.class, namingStrategy)) {
+            try {
+                LiveTableNewRowNamingStrategy strategy =
+                    this.componentManager.getInstance(LiveTableNewRowNamingStrategy.class, namingStrategy);
+                if (strategy.isCreationAllowed(sourceParams)) {
+                    LiveDataActionDescriptor addEntry = new LiveDataActionDescriptor();
+                    addEntry.setId("addEntry");
+                    mergedConfig.getMeta().getActions().add(addEntry);
+                }
+            } catch (ComponentLookupException e) {
+                throw new LiveDataException(
+                    String.format("Failed to load the row naming strategy [%s].", namingStrategy), e);
+            }
+        }
 
         // Translate using the context locale.
         return translate(mergedConfig, config);
@@ -114,8 +141,8 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
     private LiveDataPropertyDescriptorStore getPropertyStore(Source sourceConfig)
     {
         LiveDataPropertyDescriptorStore propertyStore = this.propertyStoreProvider.get();
-        if (propertyStore instanceof WithParameters && sourceConfig != null) {
-            ((WithParameters) propertyStore).getParameters().putAll(sourceConfig.getParameters());
+        if (propertyStore instanceof WithParameters withParameters && sourceConfig != null) {
+            withParameters.getParameters().putAll(sourceConfig.getParameters());
         }
         return propertyStore;
     }
@@ -147,7 +174,7 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
         if (query.getSort() != null) {
             // Remove the sort entry if we couldn't find a default sort property.
             query.setSort(query.getSort().stream().filter(Objects::nonNull)
-                .filter(sortEntry -> !StringUtils.isEmpty(sortEntry.getProperty())).collect(Collectors.toList()));
+                .filter(sortEntry -> !StringUtils.isEmpty(sortEntry.getProperty())).toList());
         }
     }
 
@@ -174,7 +201,7 @@ public class DefaultLiveDataConfigurationResolver extends AbstractLiveDataConfig
             .map(LiveDataPropertyDescriptor::getId).collect(Collectors.toSet());
         List<LiveDataPropertyDescriptor> missingDescriptors =
             properties.stream().filter(property -> !propertiesWithDescriptor.contains(property))
-                .map(this::getDefaultPropertyDescriptor).collect(Collectors.toList());
+                .map(this::getDefaultPropertyDescriptor).toList();
         if (!missingDescriptors.isEmpty()) {
             propertyDescriptors = new ArrayList<>(propertyDescriptors);
             propertyDescriptors.addAll(missingDescriptors);

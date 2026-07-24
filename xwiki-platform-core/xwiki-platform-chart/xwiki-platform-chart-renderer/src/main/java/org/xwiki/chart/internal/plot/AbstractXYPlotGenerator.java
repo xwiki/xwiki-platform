@@ -44,20 +44,20 @@ public abstract class AbstractXYPlotGenerator implements PlotGenerator
         ValueAxis domainAxis;
         ValueAxis rangeAxis;
 
-        if (model.getDataset() instanceof XYDataset) {
-            dataset = (XYDataset) model.getDataset();
+        if (model.getDataset() instanceof XYDataset xyDataset) {
+            dataset = xyDataset;
         } else {
             throw new PlotGeneratorException("Incompatible dataset for xy plot.");
         }
 
-        if (model.getAxis(0) instanceof ValueAxis) {
-            domainAxis = (ValueAxis) model.getAxis(0);
+        if (model.getAxis(0) instanceof ValueAxis domainValueAxis) {
+            domainAxis = domainValueAxis;
         } else {
             throw new PlotGeneratorException("Incompatible axis 0 for xy plot.");
         }
 
-        if (model.getAxis(1) instanceof ValueAxis) {
-            rangeAxis = (ValueAxis) model.getAxis(1);
+        if (model.getAxis(1) instanceof ValueAxis rangeValueAxis) {
+            rangeAxis = rangeValueAxis;
         } else {
             throw new PlotGeneratorException("Incompatible axis 1 for xy plot.");
         }

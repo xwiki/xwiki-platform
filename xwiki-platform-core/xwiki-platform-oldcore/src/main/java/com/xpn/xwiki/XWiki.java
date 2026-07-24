@@ -287,7 +287,7 @@ public class XWiki implements EventListener
      * 
      * @since 13.2RC1
      */
-    public static final EntityReference SYSTEM_SPACE_REFERENCE = new EntityReference("XWiki", EntityType.SPACE);
+    public static final EntityReference SYSTEM_SPACE_REFERENCE = new EntityReference(SYSTEM_SPACE, EntityType.SPACE);
 
     /** Name of the default space homepage. */
     public static final String DEFAULT_SPACE_HOMEPAGE = "WebHome";
@@ -316,11 +316,17 @@ public class XWiki implements EventListener
     /** Represents no value (ie the default value will be used) in xproperties */
     private static final String NO_VALUE = "---";
 
+    private static final String DEFAULT = "default";
+
+    private static final String BACKLINKS = "backlinks";
+
     private static final String LANGUAGE = "language";
 
     private static final String DEFAULT_LANGUAGE = "default_language";
 
     private static final String INTERFACE_LANGUAGE = "interfacelanguage";
+
+    private static final int LANGUAGE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 10;
 
     private static final String XWIKINAME = "xwikiname";
 
@@ -624,8 +630,8 @@ public class XWiki implements EventListener
 
     private MutableRenderingContext getMutableRenderingContext()
     {
-        return getRenderingContext() instanceof MutableRenderingContext
-            ? (MutableRenderingContext) getRenderingContext() : null;
+        return getRenderingContext() instanceof MutableRenderingContext mutableRenderingContext
+            ? mutableRenderingContext : null;
     }
 
     private VelocityEvaluator getVelocityEvaluator()
@@ -1160,7 +1166,7 @@ public class XWiki implements EventListener
             ResourceReference reference =
                 resourceResolver.resolve(extendedURL, type, Collections.<String, Object>emptyMap());
             entityResourceReference =
-                reference instanceof EntityResourceReference ? (EntityResourceReference) reference : null;
+                reference instanceof EntityResourceReference entityReference ? entityReference : null;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
                 String.format("Failed to extract Entity Resource Reference from URL [%s]", url), e);
@@ -1485,8 +1491,8 @@ public class XWiki implements EventListener
     public XWikiStoreInterface getNotCacheStore()
     {
         XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiCacheStoreInterface) {
-            store = ((XWikiCacheStoreInterface) store).getStore();
+        if (store instanceof XWikiCacheStoreInterface cacheStore) {
+            store = cacheStore.getStore();
         }
         return store;
     }
@@ -1494,12 +1500,12 @@ public class XWiki implements EventListener
     public XWikiHibernateStore getHibernateStore()
     {
         XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiHibernateStore) {
-            return (XWikiHibernateStore) store;
-        } else if (store instanceof XWikiCacheStoreInterface) {
-            store = ((XWikiCacheStoreInterface) store).getStore();
-            if (store instanceof XWikiHibernateStore) {
-                return (XWikiHibernateStore) store;
+        if (store instanceof XWikiHibernateStore hibernateStore) {
+            return hibernateStore;
+        } else if (store instanceof XWikiCacheStoreInterface cacheStore) {
+            store = cacheStore.getStore();
+            if (store instanceof XWikiHibernateStore hibernateStore) {
+                return hibernateStore;
             } else {
                 return null;
             }
@@ -1641,12 +1647,11 @@ public class XWiki implements EventListener
         try {
             Class<?>[] classes = new Class<?>[] { XWikiContext.class };
             Object[] args = new Object[] { context };
-            Object result = Class.forName(storeclass).getConstructor(classes).newInstance(args);
-            return result;
+            return Class.forName(storeclass).getConstructor(classes).newInstance(args);
         } catch (Exception e) {
             Throwable ecause = e;
-            if (e instanceof InvocationTargetException) {
-                ecause = ((InvocationTargetException) e).getTargetException();
+            if (e instanceof InvocationTargetException invocationTargetException) {
+                ecause = invocationTargetException.getTargetException();
             }
             Object[] args = { param, storeclass };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -3035,9 +3040,8 @@ public class XWiki implements EventListener
             if (StringUtils.isEmpty(result)) {
                 if (spaceReference == null) {
                     result = getXWikiPreference(preferenceKey, defaultValue, context);
-                } else if (spaceReference.getParent() instanceof SpaceReference) {
-                    result = getSpacePreference(preferenceKey, (SpaceReference) spaceReference.getParent(),
-                        defaultValue, context);
+                } else if (spaceReference.getParent() instanceof SpaceReference parentSpaceReference) {
+                    result = getSpacePreference(preferenceKey, parentSpaceReference, defaultValue, context);
                 } else if (spaceReference.getParent() instanceof WikiReference) {
                     result =
                         getXWikiPreference(preferenceKey, spaceReference.getParent().getName(), defaultValue, context);
@@ -3170,22 +3174,16 @@ public class XWiki implements EventListener
         try {
             String language = Util.normalizeLanguage(context.getRequest().getParameter(LANGUAGE));
             if (language != null) {
-                if ("default".equals(language)) {
+                if (DEFAULT.equals(language)) {
                     // forgetting language cookie
-                    Cookie cookie = new Cookie(LANGUAGE, "");
-                    cookie.setMaxAge(0);
-                    cookie.setPath("/");
-                    context.getResponse().addCookie(cookie);
+                    addLanguageCookie(LANGUAGE, "", 0, context);
                     context.setLocale(defaultLocale);
                     return defaultLocale;
                 } else {
                     locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
                     if (LocaleUtils.isAvailableLocale(locale)) {
                         // setting language cookie
-                        Cookie cookie = new Cookie(LANGUAGE, context.getLocale().toString());
-                        cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-                        cookie.setPath("/");
-                        context.getResponse().addCookie(cookie);
+                        addLanguageCookie(LANGUAGE, context.getLocale().toString(), LANGUAGE_COOKIE_MAX_AGE, context);
                         return locale;
                     }
                 }
@@ -3230,6 +3228,18 @@ public class XWiki implements EventListener
         // Finally, use the default language from the global preferences.
         context.setLocale(defaultLocale);
         return defaultLocale;
+    }
+
+    // The language/interface-language cookie stores only a validated, non-sensitive locale identifier
+    // (see Util.normalizeLanguage), so it doesn't require the HttpOnly/Secure flags that XWiki applies
+    // to sensitive cookies such as authentication cookies (see MyPersistentLoginManager).
+    @SuppressWarnings({"java:S3330", "java:S2092"})
+    private void addLanguageCookie(String cookieName, String value, int maxAge, XWikiContext context)
+    {
+        Cookie cookie = new Cookie(cookieName, value);
+        cookie.setMaxAge(maxAge);
+        cookie.setPath("/");
+        context.getResponse().addCookie(cookie);
     }
 
     /**
@@ -3413,15 +3423,12 @@ public class XWiki implements EventListener
         // Determine which language to use
         // First we get the language from the request
         if (StringUtils.isNotEmpty(requestLanguage)) {
-            if ("default".equals(requestLanguage)) {
+            if (DEFAULT.equals(requestLanguage)) {
                 setCookie = true;
             } else {
                 language = requestLanguage;
                 context.setLanguage(language);
-                Cookie cookie = new Cookie(LANGUAGE, language);
-                cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-                cookie.setPath("/");
-                context.getResponse().addCookie(cookie);
+                addLanguageCookie(LANGUAGE, language, LANGUAGE_COOKIE_MAX_AGE, context);
                 return language;
             }
         }
@@ -3439,10 +3446,7 @@ public class XWiki implements EventListener
         }
         context.setLanguage(language);
         if (setCookie) {
-            Cookie cookie = new Cookie(LANGUAGE, language);
-            cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-            cookie.setPath("/");
-            context.getResponse().addCookie(cookie);
+            addLanguageCookie(LANGUAGE, language, LANGUAGE_COOKIE_MAX_AGE, context);
         }
         return language;
     }
@@ -3516,15 +3520,12 @@ public class XWiki implements EventListener
         // Determine which language to use
         // First we get the language from the request
         if ((requestLanguage != null) && (!requestLanguage.isEmpty())) {
-            if ("default".equals(requestLanguage)) {
+            if (DEFAULT.equals(requestLanguage)) {
                 setCookie = true;
             } else {
                 language = requestLanguage;
                 context.setLanguage(language);
-                Cookie cookie = new Cookie(INTERFACE_LANGUAGE, language);
-                cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-                cookie.setPath("/");
-                context.getResponse().addCookie(cookie);
+                addLanguageCookie(INTERFACE_LANGUAGE, language, LANGUAGE_COOKIE_MAX_AGE, context);
                 return language;
             }
         }
@@ -3546,10 +3547,7 @@ public class XWiki implements EventListener
         }
         context.setLanguage(language);
         if (setCookie) {
-            Cookie cookie = new Cookie(INTERFACE_LANGUAGE, language);
-            cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-            cookie.setPath("/");
-            context.getResponse().addCookie(cookie);
+            addLanguageCookie(INTERFACE_LANGUAGE, language, LANGUAGE_COOKIE_MAX_AGE, context);
         }
         return language;
     }
@@ -3906,8 +3904,8 @@ public class XWiki implements EventListener
             PropertyInterface validationKeyClass =
                 getClass(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING, context)
                     .get(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
-            if (validationKeyClass instanceof PasswordClass) {
-                validationKey = ((PasswordClass) validationKeyClass).getEquivalentPassword(storedKey, validationKey);
+            if (validationKeyClass instanceof PasswordClass passwordClass) {
+                validationKey = passwordClass.getEquivalentPassword(storedKey, validationKey);
             }
 
             // Compare the two keys
@@ -4044,11 +4042,7 @@ public class XWiki implements EventListener
         map.put(XWikiUser.ACTIVE_PROPERTY, "1");
         map.put(XWikiUsersDocumentInitializer.FIRST_NAME_FIELD, xwikiname);
 
-        if (createUser(xwikiname, map, userRights, context) == 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return createUser(xwikiname, map, userRights, context) == 1;
     }
 
     public void sendConfirmationEmail(String xwikiname, String password, String email, String message,
@@ -4228,7 +4222,8 @@ public class XWiki implements EventListener
 
         try {
             // TODO: Verify existing user
-            XWikiDocument doc = getDocument(new DocumentReference(context.getWikiId(), "XWiki", userName), context);
+            XWikiDocument doc =
+                getDocument(new DocumentReference(context.getWikiId(), SYSTEM_SPACE, userName), context);
 
             if (!doc.isNew()) {
                 // TODO: throws Exception
@@ -4370,8 +4365,7 @@ public class XWiki implements EventListener
     public User getUser(String username, XWikiContext context)
     {
         XWikiUser xwikiUser = new XWikiUser(username);
-        User user = new User(xwikiUser, context);
-        return user;
+        return new User(xwikiUser, context);
     }
 
     /**
@@ -4385,8 +4379,7 @@ public class XWiki implements EventListener
     public User getUser(DocumentReference userReference, XWikiContext context)
     {
         XWikiUser xwikiUser = new XWikiUser(userReference);
-        User user = new User(xwikiUser, context);
-        return user;
+        return new User(xwikiUser, context);
     }
 
     /**
@@ -4497,7 +4490,7 @@ public class XWiki implements EventListener
                     getCurrentMixedDocumentReferenceResolver().resolve(localTopic);
                 doc = getDocument(targetDocumentReference, context);
 
-                if (checkAccess("view", doc, context) == false) {
+                if (!checkAccess("view", doc, context)) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                         XWikiException.ERROR_XWIKI_ACCESS_DENIED, "Access to this document is denied: " + doc);
                 }
@@ -4546,20 +4539,14 @@ public class XWiki implements EventListener
                 context.setWikiId(database);
             }
 
-            if (currentAPIdoc != null) {
-                if (scontext != null) {
-                    scontext.setAttribute("doc", currentAPIdoc, ScriptContext.ENGINE_SCOPE);
-                }
+            if (currentAPIdoc != null && scontext != null) {
+                scontext.setAttribute("doc", currentAPIdoc, ScriptContext.ENGINE_SCOPE);
             }
-            if (currentAPIcdoc != null) {
-                if (scontext != null) {
-                    scontext.setAttribute("cdoc", currentAPIcdoc, ScriptContext.ENGINE_SCOPE);
-                }
+            if (currentAPIcdoc != null && scontext != null) {
+                scontext.setAttribute("cdoc", currentAPIcdoc, ScriptContext.ENGINE_SCOPE);
             }
-            if (currentAPItdoc != null) {
-                if (scontext != null) {
-                    scontext.setAttribute("tdoc", currentAPItdoc, ScriptContext.ENGINE_SCOPE);
-                }
+            if (currentAPItdoc != null && scontext != null) {
+                scontext.setAttribute("tdoc", currentAPItdoc, ScriptContext.ENGINE_SCOPE);
             }
         }
     }
@@ -5002,8 +4989,8 @@ public class XWiki implements EventListener
 
         Map<EntityReference, EntityReference> updatedReferences =
             Map.of(sourceDoc.getDocumentReference(), newDocumentReference);
-        if (currentJob instanceof AbstractCopyOrMoveJob) {
-            updatedReferences = ((AbstractCopyOrMoveJob) currentJob).getSelectedEntities();
+        if (currentJob instanceof AbstractCopyOrMoveJob copyOrMoveJob) {
+            updatedReferences = copyOrMoveJob.getSelectedEntities();
         }
         // Step 1: Refactor the relative links contained in the document to make sure they are relative to the new
         // document's location.
@@ -5058,31 +5045,11 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
-     * wiki).
-     */
-    private static EntityReferenceSerializer<String> getCompactWikiEntityReferenceSerializer()
-    {
-        return Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-    }
-
-    /**
      * Used to convert a proper Document Reference to string (compact form).
      */
     private static EntityReferenceSerializer<String> getCompactEntityReferenceSerializer()
     {
         return Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compact");
-    }
-
-    /**
-     * Used to resolve a ResourceReference into a proper Entity Reference using the current document to fill the blanks.
-     */
-    private static EntityReferenceResolver<org.xwiki.rendering.listener.reference.ResourceReference>
-        getResourceReferenceEntityReferenceResolver()
-    {
-        return Utils
-            .getComponent(new DefaultParameterizedType(null, EntityReferenceResolver.class,
-                org.xwiki.rendering.listener.reference.ResourceReference.class));
     }
 
     /**
@@ -5327,7 +5294,7 @@ public class XWiki implements EventListener
 
     public String getEncoding()
     {
-        return getConfiguration().getProperty("xwiki.encoding", "UTF-8");
+        return getConfiguration().getProperty("xwiki.encoding", DEFAULT_ENCODING);
     }
 
     public URL getServerURL(String wikiId, XWikiContext xcontext) throws MalformedURLException
@@ -5388,8 +5355,8 @@ public class XWiki implements EventListener
 
     private boolean isDaemon(XWikiRequest request)
     {
-        return request.getHttpServletRequest() instanceof XWikiServletRequestStub
-            && ((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon();
+        return request.getHttpServletRequest() instanceof XWikiServletRequestStub servletRequestStub
+            && servletRequestStub.isDaemon();
     }
 
     private String getWikiProtocol(WikiDescriptor wikiDescriptor)
@@ -5458,14 +5425,12 @@ public class XWiki implements EventListener
 
         String servletPath = getConfiguration().getProperty("xwiki.servletpath", "");
 
-        if (context.getRequest() != null) {
-            if (StringUtils.isEmpty(servletPath)) {
-                String currentServletpath = context.getRequest().getServletPath();
-                if (currentServletpath != null && currentServletpath.startsWith("/bin")) {
-                    servletPath = "bin/";
-                } else {
-                    servletPath = getConfiguration().getProperty("xwiki.defaultservletpath", "bin/");
-                }
+        if (context.getRequest() != null && StringUtils.isEmpty(servletPath)) {
+            String currentServletpath = context.getRequest().getServletPath();
+            if (currentServletpath != null && currentServletpath.startsWith("/bin")) {
+                servletPath = "bin/";
+            } else {
+                servletPath = getConfiguration().getProperty("xwiki.defaultservletpath", "bin/");
             }
         }
 
@@ -6178,20 +6143,18 @@ public class XWiki implements EventListener
     public XWikiStatsService getStatsService(XWikiContext context)
     {
         synchronized (this.STATS_SERVICE_LOCK) {
-            if (this.statsService == null) {
-                if ("1".equals(getConfiguration().getProperty("xwiki.stats", "1"))) {
-                    String storeClass = getConfiguration().getProperty("xwiki.stats.class",
-                        "com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl");
-                    try {
-                        this.statsService = (XWikiStatsService) Class.forName(storeClass).newInstance();
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
+            if (this.statsService == null && "1".equals(getConfiguration().getProperty("xwiki.stats", "1"))) {
+                String storeClass = getConfiguration().getProperty("xwiki.stats.class",
+                    "com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl");
+                try {
+                    this.statsService = (XWikiStatsService) Class.forName(storeClass).newInstance();
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
 
-                        this.statsService = new XWikiStatsServiceImpl();
-                    }
-
-                    this.statsService.init(context);
+                    this.statsService = new XWikiStatsServiceImpl();
                 }
+
+                this.statsService.init(context);
             }
 
             return this.statsService;
@@ -6216,7 +6179,7 @@ public class XWiki implements EventListener
                     LOGGER.debug("Using custom URLFactory Service Class [{}]", urlFactoryServiceClass);
                 }
                 factoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
-                    .getConstructor(new Class<?>[] { XWiki.class }).newInstance(new Object[] { this });
+                    .getConstructor(XWiki.class).newInstance(this);
             } catch (Exception e) {
                 LOGGER.warn("Failed to initialize URLFactory Service [{}]", urlFactoryServiceClass, e);
             }
@@ -6904,7 +6867,7 @@ public class XWiki implements EventListener
     public boolean hasBacklinks(XWikiContext context)
     {
         if (this.hasBacklinks == null) {
-            this.hasBacklinks = "1".equals(getXWikiPreference("backlinks", "xwiki.backlinks", "0", context));
+            this.hasBacklinks = "1".equals(getXWikiPreference(BACKLINKS, "xwiki.backlinks", "0", context));
         }
         return this.hasBacklinks;
     }
@@ -7181,9 +7144,7 @@ public class XWiki implements EventListener
     {
         Map<String, String[]> map = Util.getObject(context.getRequest(), className);
         BaseClass bclass = context.getWiki().getClass(className, context);
-        BaseObject newobject = (BaseObject) bclass.fromMap(map, context);
-
-        return newobject;
+        return (BaseObject) bclass.fromMap(map, context);
     }
 
     public String getConvertingUserNameType(XWikiContext context)
@@ -7839,15 +7800,15 @@ public class XWiki implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof JobFinishedEvent) {
+        if (event instanceof JobFinishedEvent jobFinishedEvent) {
             // An extension just been initialized (after an install or upgrade for example)
-            onJobFinished((JobFinishedEvent) event);
-        } else if (event instanceof WikiDeletedEvent) {
+            onJobFinished(jobFinishedEvent);
+        } else if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
             // A wiki has been deleted
-            onWikiDeletedEvent((WikiDeletedEvent) event);
-        } else if (event instanceof ComponentDescriptorAddedEvent) {
+            onWikiDeletedEvent(wikiDeletedEvent);
+        } else if (event instanceof ComponentDescriptorAddedEvent componentDescriptorAddedEvent) {
             // A new mandatory document initializer has been installed
-            onMandatoryDocumentInitializerAdded((ComponentDescriptorAddedEvent) event, (ComponentManager) source);
+            onMandatoryDocumentInitializerAdded(componentDescriptorAddedEvent, (ComponentManager) source);
         } else {
             // Document modifications
 
@@ -7856,8 +7817,8 @@ public class XWiki implements EventListener
             if (event instanceof XObjectPropertyEvent xObjectPropertyEvent) {
                 EntityReference reference = xObjectPropertyEvent.getReference();
                 String modifiedProperty = reference.getName();
-                if ("backlinks".equals(modifiedProperty)) {
-                    this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
+                if (BACKLINKS.equals(modifiedProperty)) {
+                    this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent()).getIntValue(BACKLINKS,
                         getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
                 }
             }
@@ -7902,8 +7863,8 @@ public class XWiki implements EventListener
         ComponentManager componentManager)
     {
         String namespace;
-        if (componentManager instanceof NamespacedComponentManager) {
-            namespace = ((NamespacedComponentManager) componentManager).getNamespace();
+        if (componentManager instanceof NamespacedComponentManager namespacedComponentManager) {
+            namespace = namespacedComponentManager.getNamespace();
         } else {
             namespace = null;
         }
@@ -8019,11 +7980,9 @@ public class XWiki implements EventListener
             String fullName = entry.getKey();
 
             XWikiDocument doc = getDocument(fullName, context);
-            if (checkRight) {
-                if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(),
-                    context)) {
-                    continue;
-                }
+            if (checkRight && !context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
+                doc.getFullName(), context)) {
+                continue;
             }
             List<String> returnedAttachmentNames = entry.getValue();
             for (XWikiAttachment attach : doc.getAttachmentList()) {
@@ -8138,8 +8097,8 @@ public class XWiki implements EventListener
     {
         ConfigurationSource configuration = getConfiguration();
 
-        if (configuration instanceof XWikiCfgConfigurationSource) {
-            ((XWikiCfgConfigurationSource) configuration).set(config);
+        if (configuration instanceof XWikiCfgConfigurationSource cfgConfigurationSource) {
+            cfgConfigurationSource.set(config);
         }
     }
 

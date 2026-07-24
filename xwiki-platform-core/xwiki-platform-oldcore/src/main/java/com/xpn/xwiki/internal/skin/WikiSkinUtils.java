@@ -180,7 +180,7 @@ public class WikiSkinUtils
 
             if (resourceProperty != null) {
                 Object value = resourceProperty.getValue();
-                if (value instanceof String && StringUtils.isNotEmpty((String) value)) {
+                if (value instanceof String stringValue && StringUtils.isNotEmpty(stringValue)) {
                     return resourceProperty;
                 }
             }

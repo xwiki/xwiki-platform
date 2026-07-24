@@ -103,9 +103,8 @@ public class LegacyEventDeleter
 
             hibernateStore.executeWrite(context, session -> {
                 // Make sure to delete all associated statuses first
-                if (this.statusManager instanceof LegacyEventStatusManager) {
-                    ((LegacyEventStatusManager) this.statusManager).deleteAllForEventInStore(session,
-                        event.getEventId());
+                if (this.statusManager instanceof LegacyEventStatusManager manager) {
+                    manager.deleteAllForEventInStore(session, event.getEventId());
                 }
 
                 session.delete(event);

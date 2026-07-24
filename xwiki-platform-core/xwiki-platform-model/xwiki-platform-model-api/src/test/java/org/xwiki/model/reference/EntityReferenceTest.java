@@ -36,6 +36,7 @@ import org.xwiki.model.EntityType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -49,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @version $Id$
  * @since 2.2M1
  */
-public class EntityReferenceTest
+class EntityReferenceTest
 {
     private static final String SPACE_NAME = "space";
 
@@ -77,7 +78,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void extractReference()
+    void extractReference()
     {
         EntityReference wiki = new EntityReference(WIKI_NAME, EntityType.WIKI);
         EntityReference space1 = new EntityReference("space1", EntityType.SPACE, wiki);
@@ -91,7 +92,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void extractFirstReference()
+    void extractFirstReference()
     {
         EntityReference wiki = new EntityReference(WIKI_NAME, EntityType.WIKI);
         EntityReference space1 = new EntityReference("space1", EntityType.SPACE, wiki);
@@ -105,7 +106,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void getRoot()
+    void getRoot()
     {
         EntityReference wiki = new EntityReference(WIKI_NAME, EntityType.WIKI);
         EntityReference reference =
@@ -114,7 +115,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void getReversedReferenceChain()
+    void getReversedReferenceChain()
     {
         EntityReference wiki = new EntityReference(WIKI_NAME, EntityType.WIKI);
         EntityReference space = new EntityReference(SPACE_NAME, EntityType.SPACE, wiki);
@@ -129,7 +130,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void copyConstructor()
+    void copyConstructor()
     {
         Map<String, Serializable> map1 = getParamMap(3);
         Map<String, Serializable> map2 = getParamMap(1);
@@ -147,7 +148,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void validateEquals()
+    void validateEquals()
     {
         EntityReference reference1 = new EntityReference(PAGE_NAME, EntityType.DOCUMENT,
             new EntityReference(SPACE_NAME, EntityType.SPACE, new EntityReference(WIKI_NAME, EntityType.WIKI)));
@@ -179,23 +180,23 @@ public class EntityReferenceTest
         EntityReference reference10 = new EntityReference(PAGE_NAME, EntityType.DOCUMENT,
             new EntityReference(SPACE_NAME, EntityType.SPACE, new EntityReference(WIKI_NAME, EntityType.WIKI, null, map)));
 
-        assertTrue(reference1.equals(reference1));
-        assertTrue(reference1.equals(reference2));
-        assertFalse(reference1.equals(reference3));
-        assertFalse(reference1.equals(reference4));
-        assertFalse(reference1.equals(reference5));
-        assertFalse(reference1.equals(reference6));
+        assertEquals(reference1, reference1);
+        assertEquals(reference2, reference1);
+        assertNotEquals(reference3, reference1);
+        assertNotEquals(reference4, reference1);
+        assertNotEquals(reference5, reference1);
+        assertNotEquals(reference6, reference1);
         assertEquals(reference6, new EntityReference(PAGE_NAME, EntityType.DOCUMENT));
-        assertFalse(reference1.equals(reference7));
-        assertTrue(reference7.equals(reference8));
-        assertFalse(reference1.equals(reference9));
-        assertFalse(reference7.equals(reference9));
-        assertFalse(reference1.equals(reference10));
-        assertFalse(reference7.equals(reference10));
+        assertNotEquals(reference7, reference1);
+        assertEquals(reference8, reference7);
+        assertNotEquals(reference9, reference1);
+        assertNotEquals(reference9, reference7);
+        assertNotEquals(reference10, reference1);
+        assertNotEquals(reference10, reference7);
     }
 
     @Test
-    public void equalsTo()
+    void equalsTo()
     {
         EntityReference documentReference = new EntityReference(PAGE_NAME, EntityType.DOCUMENT,
             new EntityReference(SPACE_NAME, EntityType.SPACE, new EntityReference(WIKI_NAME, EntityType.WIKI)));
@@ -213,7 +214,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void equalsFromTo()
+    void equalsFromTo()
     {
         EntityReference documentReference = new EntityReference("page1", EntityType.DOCUMENT,
             new EntityReference(SPACE_NAME, EntityType.SPACE, new EntityReference(WIKI_NAME, EntityType.WIKI)));
@@ -229,7 +230,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void equalsNonRecursive()
+    void equalsNonRecursive()
     {
         EntityReference documentReference1 = new EntityReference(PAGE_NAME, EntityType.DOCUMENT,
             new EntityReference(SPACE_NAME, EntityType.SPACE, new EntityReference(WIKI_NAME, EntityType.WIKI)));
@@ -242,7 +243,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void validateHashCode()
+    void validateHashCode()
     {
         EntityReference reference1 = new EntityReference(PAGE_NAME, EntityType.DOCUMENT,
             new EntityReference(SPACE_NAME, EntityType.SPACE, new EntityReference(WIKI_NAME, EntityType.WIKI)));
@@ -276,21 +277,21 @@ public class EntityReferenceTest
 
         assertEquals(reference1.hashCode(), reference1.hashCode());
         assertEquals(reference1.hashCode(), reference2.hashCode());
-        assertFalse(reference1.hashCode() == reference3.hashCode());
-        assertFalse(reference1.hashCode() == reference4.hashCode());
-        assertFalse(reference1.hashCode() == reference5.hashCode());
-        assertFalse(reference1.hashCode() == reference6.hashCode());
+        assertNotEquals(reference1.hashCode(), reference3.hashCode());
+        assertNotEquals(reference1.hashCode(), reference4.hashCode());
+        assertNotEquals(reference1.hashCode(), reference5.hashCode());
+        assertNotEquals(reference1.hashCode(), reference6.hashCode());
         assertEquals(reference6.hashCode(), new EntityReference(PAGE_NAME, EntityType.DOCUMENT).hashCode());
-        assertFalse(reference1.hashCode() == reference7.hashCode());
+        assertNotEquals(reference1.hashCode(), reference7.hashCode());
         assertEquals(reference7.hashCode(), reference8.hashCode());
-        assertFalse(reference1.hashCode() == reference9.hashCode());
-        assertFalse(reference7.hashCode() == reference9.hashCode());
-        assertFalse(reference1.hashCode() == reference10.hashCode());
-        assertFalse(reference7.hashCode() == reference10.hashCode());
+        assertNotEquals(reference1.hashCode(), reference9.hashCode());
+        assertNotEquals(reference7.hashCode(), reference9.hashCode());
+        assertNotEquals(reference1.hashCode(), reference10.hashCode());
+        assertNotEquals(reference7.hashCode(), reference10.hashCode());
     }
 
     @Test
-    public void compareTo()
+    void compareTo()
     {
         EntityReference reference = new EntityReference("f", EntityType.DOCUMENT,
             new EntityReference("e", EntityType.SPACE, new EntityReference("d", EntityType.WIKI)));
@@ -360,7 +361,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void nullTypeInConstructor()
+    void nullTypeInConstructor()
     {
         try {
             new EntityReference("name", null);
@@ -371,7 +372,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void nullNameInConstructor()
+    void nullNameInConstructor()
     {
         try {
             new EntityReference(null, EntityType.WIKI);
@@ -382,7 +383,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void emptyNameInConstructor()
+    void emptyNameInConstructor()
     {
         try {
             new EntityReference("", EntityType.WIKI);
@@ -393,7 +394,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testReplaceParent1()
+    void testReplaceParent1()
     {
         Map<String, Serializable> map1 = getParamMap(3);
         Map<String, Serializable> map2 = getParamMap(2);
@@ -416,7 +417,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void replaceParent2()
+    void replaceParent2()
     {
         Map<String, Serializable> map1 = getParamMap(3);
         Map<String, Serializable> map2 = getParamMap(2);
@@ -447,7 +448,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void replaceUnknownParent2()
+    void replaceUnknownParent2()
     {
         EntityReference wiki = new EntityReference(WIKI_NAME, EntityType.WIKI);
         EntityReference wiki2 = new EntityReference("wiki2", EntityType.WIKI);
@@ -463,7 +464,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void constructorCloneNullReference()
+    void constructorCloneNullReference()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new EntityReference(null,
             new EntityReference(WIKI_NAME, EntityType.WIKI), new EntityReference("wiki2", EntityType.WIKI)));
@@ -472,7 +473,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void appendParent()
+    void appendParent()
     {
         Map<String, Serializable> map1 = getParamMap(3);
         Map<String, Serializable> map2 = getParamMap(2);
@@ -496,7 +497,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void removeParent()
+    void removeParent()
     {
         Map<String, Serializable> map1 = getParamMap(3);
         Map<String, Serializable> map2 = getParamMap(2);
@@ -519,7 +520,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void hasParent()
+    void hasParent()
     {
         EntityReference wiki = new EntityReference(WIKI_NAME, EntityType.WIKI);
         EntityReference alice = new EntityReference("alice", EntityType.SPACE, wiki);
@@ -550,7 +551,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void entityReferenceSerialization() throws Exception
+    void entityReferenceSerialization() throws Exception
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -572,7 +573,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void validateToString()
+    void validateToString()
     {
         EntityReference reference1 = new EntityReference(PAGE_NAME, EntityType.DOCUMENT,
             new EntityReference(SPACE_NAME, EntityType.SPACE, new EntityReference(WIKI_NAME, EntityType.WIKI)));

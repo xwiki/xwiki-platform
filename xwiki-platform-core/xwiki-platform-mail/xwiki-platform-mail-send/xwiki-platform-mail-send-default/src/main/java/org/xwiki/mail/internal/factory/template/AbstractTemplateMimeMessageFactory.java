@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal.factory.template;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -91,7 +92,8 @@ public abstract class AbstractTemplateMimeMessageFactory extends AbstractMimeMes
         Map<String, Object> velocityVariables = (Map<String, Object>) parameters.get("velocityVariables");
         Object localeValue = parameters.get("language");
         String subject = getTemplateManager().evaluate(templateReference, "subject", velocityVariables, localeValue);
-        message.setSubject(subject);
+        // Set the subject with an explicit UTF-8 charset (otherwise the JVM default charset is used)
+        message.setSubject(subject, StandardCharsets.UTF_8.name());
 
         // Add a default body part taken from the template.
         Multipart multipart = new MimeMultipart("mixed");

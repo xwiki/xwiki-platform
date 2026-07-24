@@ -169,8 +169,8 @@ public class SolrIndexEventListener implements EventListener
             } else if (event instanceof GeneralMailConfigurationUpdatedEvent) {
                 // Refresh the index when the mail configuration is changed because the mail configuration is used to
                 // decide if emails shall be indexed or not.
-                if (source instanceof String) {
-                    this.solrIndexer.get().index(new WikiReference((String) source), true);
+                if (source instanceof String sourceString) {
+                    this.solrIndexer.get().index(new WikiReference(sourceString), true);
                 } else {
                     this.solrIndexer.get().index(null, true);
                 }

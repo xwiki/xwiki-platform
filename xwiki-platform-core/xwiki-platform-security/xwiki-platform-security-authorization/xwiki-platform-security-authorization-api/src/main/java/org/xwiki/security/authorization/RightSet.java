@@ -181,7 +181,7 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
     @Override
     public boolean contains(Object o)
     {
-        return o != null && o instanceof Right && (rights & (1L << ((Right) o).ordinal())) != 0;
+        return o != null && o instanceof Right right && (rights & (1L << right.ordinal())) != 0;
     }
 
     @Override

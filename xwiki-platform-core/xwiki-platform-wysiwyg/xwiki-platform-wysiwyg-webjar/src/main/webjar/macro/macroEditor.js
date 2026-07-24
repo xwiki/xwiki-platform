@@ -641,7 +641,7 @@ define('xwiki-wysiwyg-macro-editor', [
         // Convert inline parameter values, if needed, and load the macro descriptor.
         try {
           const parameters = showInlineParameters ? await macroService.convertMacroParameters(macroId,
-            inlineParameters, sourceDocumentReference, inlineParametersSyntax) : {};
+            inlineParameters, sourceDocumentReference, inlineParametersSyntax, syntaxId) : {};
           try {
              const descriptor = await macroService.getMacroDescriptor(macroId, sourceDocumentReference);
              try {

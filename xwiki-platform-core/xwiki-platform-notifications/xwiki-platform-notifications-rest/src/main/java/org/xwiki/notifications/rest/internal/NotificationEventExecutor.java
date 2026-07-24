@@ -371,8 +371,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
             this.shortCache.remove(asyncId);
         }
 
-        if (result instanceof Throwable) {
-            throw new NotificationException("Asynchronous notifications gathering failed", (Throwable) result);
+        if (result instanceof Throwable throwable) {
+            throw new NotificationException("Asynchronous notifications gathering failed", throwable);
         }
 
         return result;

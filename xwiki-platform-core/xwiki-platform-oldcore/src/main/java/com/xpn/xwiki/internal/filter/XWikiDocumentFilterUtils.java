@@ -176,8 +176,8 @@ public class XWikiDocumentFilterUtils
             .getInstance(new DefaultParameterizedType(null, EntityOutputFilterStream.class, entityClass));
         filterStream.setProperties(documentProperties);
         filterStream.setEntity(entity);
-        if (filterStream instanceof XWikiDocumentOutputFilterStream) {
-            ((XWikiDocumentOutputFilterStream) filterStream).disableRenderingEvents();
+        if (filterStream instanceof XWikiDocumentOutputFilterStream documentFilterStream) {
+            documentFilterStream.disableRenderingEvents();
         }
 
         // Input
@@ -320,15 +320,15 @@ public class XWikiDocumentFilterUtils
             // Spaces and document events
             FilterEventParameters documentParameters = null;
             DocumentReference documentReference = null;
-            if (entity instanceof XWikiDocument) {
-                documentReference = ((XWikiDocument) entity).getDocumentReference();
+            if (entity instanceof XWikiDocument document) {
+                documentReference = document.getDocumentReference();
                 for (SpaceReference spaceReference : documentReference.getSpaceReferences()) {
                     filter.beginWikiSpace(spaceReference.getName(), FilterEventParameters.EMPTY);
                 }
 
                 documentParameters = new FilterEventParameters();
                 documentParameters.put(WikiDocumentFilter.PARAMETER_LOCALE,
-                    ((XWikiDocument) entity).getDefaultLocale());
+                    document.getDefaultLocale());
                 filter.beginWikiDocument(documentReference.getName(), documentParameters);
             }
 

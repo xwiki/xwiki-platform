@@ -86,7 +86,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
         return new FileUploader(input[0], {
           'responseContainer' : document.createElement('div'),
           'responseURL' : '',
-          'maxFilesize' : parseInt(input.attr('data-max-file-size'))
+          'maxFilesize' : Number.parseInt(input.attr('data-max-file-size'))
         });
       }
       return false;

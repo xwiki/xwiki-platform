@@ -74,11 +74,6 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     private static final Pattern URI_PATTERN =
         Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
 
-    private static final String ERROR_TRANSFORMING_URI_LOG =
-        "Error while transforming redirect to [{}] to proper URI: [{}]";
-
-    private static final String FULL_STACK_TRACE = "Full stack trace:";
-
     @Inject
     private URLConfiguration urlConfiguration;
 

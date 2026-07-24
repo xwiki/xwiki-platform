@@ -312,7 +312,7 @@ public class ViewPage extends BasePage
 
     public boolean isInlinePage()
     {
-        return getDriver().findElements(By.xpath("//form[@id = 'inline']")).size() > 0;
+        return !getDriver().findElements(By.xpath("//form[@id = 'inline']")).isEmpty();
     }
 
     /**

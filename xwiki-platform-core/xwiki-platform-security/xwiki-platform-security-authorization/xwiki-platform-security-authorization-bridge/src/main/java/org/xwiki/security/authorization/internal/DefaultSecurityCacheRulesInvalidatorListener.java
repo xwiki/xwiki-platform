@@ -121,7 +121,7 @@ public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventL
         DocumentReference groupClass = resolver.resolve(XWikiConstants.GROUP_CLASS, docRef);
         List<BaseObject> objects = document.getXObjects(groupClass);
 
-        return objects != null && objects.size() > 0;
+        return objects != null && !objects.isEmpty();
     }
 
     private void invalidateNewGroupMembers(XWikiDocument document)

@@ -55,8 +55,8 @@ public abstract class AbstractScriptingStore
 
     protected void checkAccess(Right right) throws AccessDeniedException
     {
-        if (storeReference instanceof WikiStoreReference) {
-            contextualAuthorizationManager.checkAccess(right, ((WikiStoreReference) storeReference).getReference());
+        if (storeReference instanceof WikiStoreReference wikiStoreReference) {
+            contextualAuthorizationManager.checkAccess(right, wikiStoreReference.getReference());
         } else {
             contextualAuthorizationManager.checkAccess(Right.PROGRAM);
         }

@@ -286,7 +286,7 @@ public class AnnotatableViewPage extends BaseElement
 
     public boolean checkIfAnnotationsAreDisabled()
     {
-        if (getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).size() > 0) {
+        if (!getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).isEmpty()) {
             return false;
         } else {
             return true;

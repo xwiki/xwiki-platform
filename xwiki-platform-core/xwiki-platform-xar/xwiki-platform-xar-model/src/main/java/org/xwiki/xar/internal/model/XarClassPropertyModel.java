@@ -32,4 +32,12 @@ public class XarClassPropertyModel
      * @since 10.11RC1
      */
     public static final String ELEMENT_NAME = "name";
+
+    /**
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
+     */
+    protected XarClassPropertyModel()
+    {
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
+    }
 }

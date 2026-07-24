@@ -17,18 +17,21 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-#macro (getEditConfirmation)
+#macro (getEditConfirmation $skipHints)
   #set ($editConfirmation = $NULL)
-  
+  ## Default the skip hints to an empty list so that callers can invoke the macro without any argument.
+  #if ("$!skipHints" == '')
+    #set ($skipHints = [])
+  #end
   ## Persist the results of the last analysis, and they will be ignored during the next check.
   #set ($forced = "$!request.get('force')" != '' && $services.csrf.isTokenValid($!request.get('force_token')))
   #if ($forced)
     $services.modelvalidation.edit.force()
   #end
   ##
-  ## Calls the pre-edit checkers.
+  ## Calls the pre-edit checkers, skipping the ones whose hints are in $skipHints.
   ##
-  #set ($checkResult = $services.modelvalidation.edit.check())
+  #set ($checkResult = $services.modelvalidation.edit.check($skipHints))
 
   #if (!$checkResult.errorMessages.isEmpty() || (!$forced && !$checkResult.warningMessages.isEmpty()))
     #set ($editConfirmation = {})

@@ -727,7 +727,7 @@ public privileged aspect XWikiCompatibilityAspect
             segments.add(Util.decodeURI(segment, context));
         }
         // Remove the first segment if it's empty to cater for cases when the path starts with "/"
-        if (segments.size() > 0 && segments.get(0).length() == 0) {
+        if (!segments.isEmpty() && segments.get(0).length() == 0) {
             segments.remove(0);
         }
 
@@ -842,6 +842,7 @@ public privileged aspect XWikiCompatibilityAspect
             URL requestURL = context.getURL();
             host = requestURL.getHost();
         } catch (Exception e) {
+            LOGGER.debug("Failed to extract the host name from the request URL. Assuming an empty host name.", e);
         }
 
         // In path-based multi-wiki, the wiki name is an element of the request path.

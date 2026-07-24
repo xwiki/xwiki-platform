@@ -116,26 +116,24 @@ public class WikiMacroEventListener implements EventListener
         DocumentReference documentReference = document.getDocumentReference();
 
         // Unregister any existing macro registered under this document.
-        if (unregisterMacro(documentReference)) {
-            // Check whether the given document has a wiki macro defined in it.
-            if (this.macroFactory.containsWikiMacro(document)) {
-                // Attempt to create a wiki macro.
-                WikiMacro wikiMacro;
-                try {
-                    wikiMacro = this.macroFactory.createWikiMacro(documentReference);
-                } catch (WikiMacroException e) {
-                    this.logger.error(String.format("Failed to create wiki macro [%s]", documentReference), e);
-                    return;
-                }
-                if (wikiMacro != null) {
+        // Check whether the given document has a wiki macro defined in it.
+        if (unregisterMacro(documentReference) && this.macroFactory.containsWikiMacro(document)) {
+            // Attempt to create a wiki macro.
+            WikiMacro wikiMacro;
+            try {
+                wikiMacro = this.macroFactory.createWikiMacro(documentReference);
+            } catch (WikiMacroException e) {
+                this.logger.error(String.format("Failed to create wiki macro [%s]", documentReference), e);
+                return;
+            }
+            if (wikiMacro != null) {
 
-                    // Register the macro.
-                    registerMacro(documentReference, wikiMacro);
-                } else {
-                    // This should only occur when creating a new WikiMacro object from object editor.
-                    this.logger.debug("Macro from document [{}] cannot be registered because its id is null.",
-                        documentReference);
-                }
+                // Register the macro.
+                registerMacro(documentReference, wikiMacro);
+            } else {
+                // This should only occur when creating a new WikiMacro object from object editor.
+                this.logger.debug("Macro from document [{}] cannot be registered because its id is null.",
+                    documentReference);
             }
         }
     }

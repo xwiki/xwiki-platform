@@ -56,6 +56,9 @@ describe("DisplayerBoolean.vue", () => {
   it("Renders a true entry in view mode", () => {
     const wrapper = initWrapper(DisplayerBoolean, {
       mocks: { $t: defaultTranslationsMock },
+      logic: {
+        isEditMode: () => false,
+      },
     });
     expect(wrapper.text()).toMatch("True");
   });
@@ -64,6 +67,9 @@ describe("DisplayerBoolean.vue", () => {
     const wrapper = initWrapper(DisplayerBoolean, {
       props: { entry: { color: false } },
       mocks: { $t: defaultTranslationsMock },
+      logic: {
+        isEditMode: () => false,
+      },
     });
     expect(wrapper.text()).toMatch("False");
   });
@@ -75,6 +81,9 @@ describe("DisplayerBoolean.vue", () => {
         entry: {
           color: true,
         },
+      },
+      logic: {
+        isEditMode: () => false,
       },
     });
 
@@ -89,6 +98,9 @@ describe("DisplayerBoolean.vue", () => {
   it("Renders a false entry in edit mode", async () => {
     const wrapper = initWrapper(DisplayerBoolean, {
       props: { entry: { color: false } },
+      logic: {
+        isEditMode: () => false,
+      },
     });
 
     await wrapper.setProps({ isView: false });
@@ -106,6 +118,9 @@ describe("DisplayerBoolean.vue", () => {
         save(entry, propertyId, v) {
           values.push({ [propertyId]: v });
         },
+      },
+      logic: {
+        isEditMode: () => false,
       },
     });
 

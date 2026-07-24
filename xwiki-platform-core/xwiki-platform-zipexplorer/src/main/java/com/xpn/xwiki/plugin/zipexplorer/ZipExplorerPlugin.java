@@ -155,9 +155,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                     break;
                 }
             }
-        } catch (XWikiException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (XWikiException | IOException e) {
             e.printStackTrace();
         }
         return newAttachment;
@@ -187,9 +185,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                     zipList.add(entry.getName());
                 }
             }
-        } catch (XWikiException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (XWikiException | IOException e) {
             e.printStackTrace();
         }
         return zipList;

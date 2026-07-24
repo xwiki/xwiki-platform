@@ -337,7 +337,7 @@ public class BaseAttachmentsResource extends XWikiResource
         // * the media type is stored (which means it was already filtered at the query level) or
         // * the file name matches the filter or
         // * the computed media type matches the filter
-        return (attachment) -> acceptedMediaTypes.isEmpty() || !StringUtils.isEmpty(attachment.getMimeType())
+        return attachment -> acceptedMediaTypes.isEmpty() || !StringUtils.isEmpty(attachment.getMimeType())
             || hasAcceptedFileNameExtension(attachment, acceptedFileNameExtensions)
             || hasAcceptedMediaType(attachment, acceptedMediaTypes);
     }
@@ -346,14 +346,14 @@ public class BaseAttachmentsResource extends XWikiResource
     {
         String fileName = attachment.getFilename().toUpperCase();
         return acceptedFileNameExtensions.stream()
-            .anyMatch(acceptedFileNamedExtension -> fileName.endsWith(acceptedFileNamedExtension));
+            .anyMatch(fileName::endsWith);
     }
 
     private boolean hasAcceptedMediaType(XWikiAttachment attachment, Set<String> acceptedMediaTypes)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         String detectedMediaType = attachment.getMimeType(xcontext).toUpperCase();
-        return acceptedMediaTypes.stream().anyMatch(acceptedMediaType -> detectedMediaType.contains(acceptedMediaType));
+        return acceptedMediaTypes.stream().anyMatch(detectedMediaType::contains);
     }
 
     private Attachment toRestAttachment(XWikiAttachment xwikiAttachment, Boolean withPrettyNames)

@@ -70,8 +70,8 @@ public class DocumentReferenceConverter extends AbstractConverter<DocumentRefere
         DocumentReference result;
         if (value == null) {
             result = null;
-        } else if (value instanceof EntityReference) {
-            result = this.referenceResolver.resolve((EntityReference) value);
+        } else if (value instanceof EntityReference entityReference) {
+            result = this.referenceResolver.resolve(entityReference);
         } else {
             Converter<Object> converter = this.converterManager.getConverter(value.getClass());
 

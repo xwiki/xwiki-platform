@@ -74,7 +74,7 @@ class AttachmentReferenceConverterTest
     private EntityReferenceSerializer<String> mockSerialier;
 
     @BeforeEach
-    public void setup(MockitoComponentManager componentManager) throws ComponentLookupException
+    void setup(MockitoComponentManager componentManager) throws ComponentLookupException
     {
         this.converterManager = componentManager.getInstance(ConverterManager.class);
     }

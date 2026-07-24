@@ -50,6 +50,14 @@ public class XWikiConfigurationService
 
     private static XWikiConfig config;
 
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private XWikiConfigurationService()
+    {
+        // Utility class
+    }
+
     public static synchronized String getProperty(String propertyKey, String defaultValue, ServletContext context)
     {
         if (config == null) {

@@ -40,7 +40,6 @@ import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
-import org.xwiki.rendering.block.BlockFilter;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.IdBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -146,18 +145,13 @@ public class DefaultDocumentSplitter implements DocumentSplitter
         if (firstBlock instanceof HeaderBlock) {
             DocumentResourceReference reference = new DocumentResourceReference(target);
             // Clone the header block and remove any unwanted stuff
-            Block clonedHeaderBlock = firstBlock.clone(new BlockFilter()
-            {
-                @Override
-                public List<Block> filter(Block block)
-                {
-                    List<Block> blocks = new ArrayList<>();
-                    if (block instanceof WordBlock || block instanceof SpaceBlock
-                        || block instanceof SpecialSymbolBlock) {
-                        blocks.add(block);
-                    }
-                    return blocks;
+            Block clonedHeaderBlock = firstBlock.clone(child -> {
+                List<Block> blocks = new ArrayList<>();
+                if (child instanceof WordBlock || child instanceof SpaceBlock
+                    || child instanceof SpecialSymbolBlock) {
+                    blocks.add(child);
                 }
+                return blocks;
             });
             return new LinkBlock(clonedHeaderBlock.getChildren(), reference, false);
         } else if (firstBlock instanceof SectionBlock) {

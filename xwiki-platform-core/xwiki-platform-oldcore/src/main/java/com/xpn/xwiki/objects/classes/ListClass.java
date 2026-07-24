@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
@@ -409,7 +408,6 @@ public abstract class ListClass extends PropertyClass
                     previousWasSeparator = false;
                 }
                 previousSeparator = currentChar;
-                continue;
             // if we are finding a separator and we are not in escape mode, then we finished to parse one value
             // we are adding the value to the result, and start a new value to parse
             } else if (StringUtils.containsAny(separators, currentChar) && !inEscape) {
@@ -470,7 +468,7 @@ public abstract class ListClass extends PropertyClass
      */
     public static String getStringFromList(List<String> list, String separators)
     {
-        if ((list instanceof PersistentCollection) && (!((PersistentCollection) list).wasInitialized())) {
+        if ((list instanceof PersistentCollection persistentCollection) && (!persistentCollection.wasInitialized())) {
             return "";
         }
 
@@ -560,8 +558,7 @@ public abstract class ListClass extends PropertyClass
     public String toFormString(BaseProperty property)
     {
         String result;
-        if (property instanceof ListProperty) {
-            ListProperty listProperty = (ListProperty) property;
+        if (property instanceof ListProperty listProperty) {
             result = ListClass.getStringFromList(listProperty.getList(), getSeparators());
         } else {
             result = property.toText();
@@ -651,8 +648,8 @@ public abstract class ListClass extends PropertyClass
         List<Element> elist = ppcel.elements(ListXarObjectPropertySerializer.ELEMENT_VALUE);
         BaseProperty lprop = newProperty();
 
-        if (lprop instanceof ListProperty) {
-            List<String> llist = ((ListProperty) lprop).getList();
+        if (lprop instanceof ListProperty listProperty) {
+            List<String> llist = listProperty.getList();
             for (int i = 0; i < elist.size(); i++) {
                 Element el = elist.get(i);
                 llist.add(el.getText());
@@ -735,8 +732,8 @@ public abstract class ListClass extends PropertyClass
         if (rawvalue == null) {
             return "";
         }
-        if (rawvalue instanceof Object[]) {
-            return ((Object[]) rawvalue)[1].toString();
+        if (rawvalue instanceof Object[] objectArray) {
+            return objectArray[1].toString();
         }
         return getDisplayValue(rawvalue.toString(), name, map, context);
     }
@@ -753,8 +750,8 @@ public abstract class ListClass extends PropertyClass
         if (rawvalue == null) {
             return "";
         }
-        if (rawvalue instanceof Object[]) {
-            return ((Object[]) rawvalue)[0].toString();
+        if (rawvalue instanceof Object[] objectArray) {
+            return objectArray[0].toString();
         }
         return rawvalue.toString();
     }
@@ -1006,8 +1003,8 @@ public abstract class ListClass extends PropertyClass
 
         if (property == null) {
             list = Collections.emptyList();
-        } else if (property instanceof ListProperty) {
-            list = ((ListProperty) property).getList();
+        } else if (property instanceof ListProperty listProperty) {
+            list = listProperty.getList();
         } else {
             list = Arrays.asList(String.valueOf(property.getValue()));
         }
@@ -1042,13 +1039,13 @@ public abstract class ListClass extends PropertyClass
         } else {
             List<String> actualList;
             if (filterEmptyValues && list != null) {
-                actualList = list.stream().filter(item -> !StringUtils.isEmpty(item)).collect(Collectors.toList());
+                actualList = list.stream().filter(item -> !StringUtils.isEmpty(item)).toList();
             } else {
                 actualList = list;
             }
 
-            if (property instanceof ListProperty) {
-                ((ListProperty) property).setList(actualList);
+            if (property instanceof ListProperty listProperty) {
+                listProperty.setList(actualList);
             } else if (isMultiSelect()) {
                 property.setValue(getStringFromList(actualList, getFirstSeparator()));
             } else {
@@ -1063,14 +1060,13 @@ public abstract class ListClass extends PropertyClass
         XWikiContext context, MergeResult mergeResult)
     {
         // If it's not a multiselect then we don't have any special merge to do. We keep default StringProperty behavior
-        if (isMultiSelect()) {
-            // If not a free input assume it's not an ordered list
-            if (!DISPLAYTYPE_INPUT.equals(getDisplayType()) && currentProperty instanceof ListProperty) {
-                mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, context,
-                    mergeResult);
+        // If not a free input assume it's not an ordered list
+        if (isMultiSelect() && !DISPLAYTYPE_INPUT.equals(getDisplayType())
+            && currentProperty instanceof ListProperty) {
+            mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, context,
+                mergeResult);
 
-                return;
-            }
+            return;
         }
 
         // Fallback on default ListProperty merging
@@ -1098,17 +1094,13 @@ public abstract class ListClass extends PropertyClass
         // Add missing elements
         if (newList != null) {
             for (String element : newList) {
-                if ((previousList == null || !previousList.contains(element))) {
-                    if (!currentList.contains(element)) {
-                        currentList.add(element);
-                        mergeResult.setModified(true);
-                    }
+                if ((previousList == null || !previousList.contains(element)) && !currentList.contains(element)) {
+                    currentList.add(element);
+                    mergeResult.setModified(true);
                 }
             }
         }
 
         fromList(currentProperty, currentList);
-
-        return;
     }
 }

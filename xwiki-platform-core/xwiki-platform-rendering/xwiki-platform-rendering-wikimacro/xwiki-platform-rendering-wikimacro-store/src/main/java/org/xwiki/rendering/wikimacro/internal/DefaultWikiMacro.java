@@ -230,10 +230,9 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         }
 
         // Verify the a macro content is not empty if it was declared mandatory.
-        if (getDescriptor().getContentDescriptor() != null && getDescriptor().getContentDescriptor().isMandatory()) {
-            if (macroContent == null || macroContent.length() == 0) {
-                throw new MacroExecutionException("Missing macro content: this macro requires content (a body)");
-            }
+        if (getDescriptor().getContentDescriptor() != null && getDescriptor().getContentDescriptor().isMandatory()
+            && (macroContent == null || macroContent.length() == 0)) {
+            throw new MacroExecutionException("Missing macro content: this macro requires content (a body)");
         }
     }
 

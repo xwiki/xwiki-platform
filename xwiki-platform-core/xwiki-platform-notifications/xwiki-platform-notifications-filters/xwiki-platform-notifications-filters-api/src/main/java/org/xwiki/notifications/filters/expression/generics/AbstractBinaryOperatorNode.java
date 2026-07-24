@@ -68,9 +68,9 @@ public abstract class AbstractBinaryOperatorNode extends AbstractOperatorNode
     @Override
     public boolean equals(Object o)
     {
-        return (o instanceof AbstractBinaryOperatorNode
-                && leftOperand.equals(((AbstractBinaryOperatorNode) o).leftOperand)
-                && rightOperand.equals(((AbstractBinaryOperatorNode) o).rightOperand));
+        return (o instanceof AbstractBinaryOperatorNode abstractBinaryOperatorNode
+                && leftOperand.equals(abstractBinaryOperatorNode.leftOperand)
+                && rightOperand.equals(abstractBinaryOperatorNode.rightOperand));
     }
 
     @Override

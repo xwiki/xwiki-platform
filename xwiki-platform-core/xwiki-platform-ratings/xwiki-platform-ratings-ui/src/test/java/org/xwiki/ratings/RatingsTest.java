@@ -71,9 +71,10 @@ class RatingsTest extends PageTest
         loadPage(new DocumentReference("xwiki", Arrays.asList("XWiki", "Ratings"), "RatingsMacros"));
 
         // Call the displayFullRating macro with a name with a double quote to test that it is properly escaped.
-        String script = "{{include reference=\"XWiki.Ratings.RatingsMacros\"/}}\n"
-            + "{{velocity}}#set($tdoc = $services.model.createDocumentReference('a', 'b', 'c\"d'))\n"
-            + "#displayFullRating($tdoc){{/velocity}}";
+        String script = """
+            {{include reference="XWiki.Ratings.RatingsMacros"/}}
+            {{velocity}}#set($tdoc = $services.model.createDocumentReference('a', 'b', 'c"d'))
+            #displayFullRating($tdoc){{/velocity}}""";
 
         XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "Test"));
         document.setSyntax(Syntax.XWIKI_2_0);

@@ -171,7 +171,7 @@ public abstract class AbstractValueNode<T> extends AbstractNode
      */
     public InNode inStrings(Collection<String> values)
     {
-        return in(values.stream().map(s -> new StringValueNode(s)).collect(Collectors.toList()));
+        return in(values.stream().map(StringValueNode::new).collect(Collectors.toList()));
     }
 
     /**
@@ -216,8 +216,8 @@ public abstract class AbstractValueNode<T> extends AbstractNode
     @Override
     public boolean equals(Object o)
     {
-        return (o instanceof AbstractValueNode
-                && content.equals(((AbstractValueNode) o).content));
+        return (o instanceof AbstractValueNode abstractValueNode
+                && content.equals(abstractValueNode.content));
     }
 
     @Override

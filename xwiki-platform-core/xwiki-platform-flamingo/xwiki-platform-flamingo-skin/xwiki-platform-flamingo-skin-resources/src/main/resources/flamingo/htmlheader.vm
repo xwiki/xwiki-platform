@@ -33,10 +33,12 @@
 ## Compute all the meta attributes to add to the HTML tag.
 ## ---------------------------------------------------------------------------------------------------------------
 #set ($metaAttributes = [])
-## Target the paper paged media by default when using the print feature provided by the web browser.
+## Target the screen paged media by default when using the print feature provided by the web browser. The users that
+## want to target the paper media have to set 'pagedMedia=paper' in the URL query string before opening the print
+## preview. See https://forum.xwiki.org/t/should-print-preview-target-screen-or-paper-paged-media/18654
 #set ($pagedMedia = "$!request.pagedMedia")
 #if ($pagedMedia == '')
-  #set ($pagedMedia = 'paper')
+  #set ($pagedMedia = 'screen')
 #end
 #addMetaAttribute($metaAttributes, 'paged-media', $pagedMedia)
 #if("$!doc" != "" && "$!tdoc" != "")

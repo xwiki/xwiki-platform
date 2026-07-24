@@ -656,11 +656,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             currentReference2 = currentReference2.getParent();
         }
 
-        if (currentReference2 == null || to.isAllowedAncestor(currentReference2.getType())) {
-            return true;
-        }
-
-        return false;
+        return currentReference2 == null || to.isAllowedAncestor(currentReference2.getType());
     }
 
     /**
@@ -809,8 +805,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
                 return 1;
             }
 
-            if (value.getClass() == otherValue.getClass() && value instanceof Comparable) {
-                return ((Comparable) value).compareTo(otherValue);
+            if (value.getClass() == otherValue.getClass() && value instanceof Comparable comparable) {
+                return comparable.compareTo(otherValue);
             }
 
             if (!value.equals(otherValue)) {

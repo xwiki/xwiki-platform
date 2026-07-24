@@ -140,9 +140,8 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
     protected EntityReference resolveDefaultReference(EntityType type, Object... parameters)
     {
         EntityReference resolvedDefaultReference = null;
-        if (parameters.length > 0 && parameters[0] instanceof EntityReference) {
+        if (parameters.length > 0 && parameters[0] instanceof EntityReference referenceParameter) {
             // Try to extract the type from the passed parameter.
-            EntityReference referenceParameter = (EntityReference) parameters[0];
             EntityReference extractedReference = referenceParameter.extractReference(type);
             if (extractedReference != null) {
                 resolvedDefaultReference = extractedReference;

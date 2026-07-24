@@ -370,8 +370,8 @@ public class DocumentSelectionResolver
     {
         Set<DocumentReference> excludedDocumentReferences = new LinkedHashSet<>();
         exclusions.forEach(excludedEntityReference -> {
-            if (excludedEntityReference instanceof DocumentReference) {
-                excludedDocumentReferences.add((DocumentReference) excludedEntityReference);
+            if (excludedEntityReference instanceof DocumentReference documentReference) {
+                excludedDocumentReferences.add(documentReference);
             }
         });
         return excludedDocumentReferences;

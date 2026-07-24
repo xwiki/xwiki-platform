@@ -63,10 +63,4 @@ public class GroupMessageDescriptor extends AbstractMessageDescriptor
     {
         return "group";
     }
-
-    @Override
-    public boolean isEnabled(String wikiId)
-    {
-        return super.isEnabled(wikiId);
-    }
 }

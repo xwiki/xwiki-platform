@@ -147,6 +147,12 @@ administration.section.groups.deleteUserFromGroup.loading=Mitglied aus der Grupp
 administration.section.groups.deleteUserFromGroup.success=Mitglied erfolgreich aus der Gruppe entfernt
 administration.section.groups.deleteUserFromGroup.failure=Das Mitglied konnte nicht aus der Gruppe entfernt werden
 
+# Rights for page section
+administration.section.pagerights.hint=Diese Rechte gelten ausschließlich für diese Seite. Sie haben keine Auswirkungen auf die {0}Unterseiten{1}.
+
+# Rights for page and children section
+administration.section.pageandchildrenrights.hint=Diese Rechte gelten für diese Seite und {0}alle ihre Unterseiten{1}.
+
 # Other Category
 admin.other=Andere
 admin.other.description=Verschiedene Konfigurationen für Erweiterungen.

@@ -101,6 +101,11 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     private static final String EMAIL_ENCODING = "UTF-8";
 
     /**
+     * Error message logged when a {@link MessagingException} occurs while sending emails.
+     */
+    private static final String MESSAGING_EXCEPTION_ERROR = "MessagingException has occured.";
+
+    /**
      * Error code signaling that the mail template requested for
      * {@link #sendMailFromTemplate(String, String, String, String, String, String, VelocityContext, XWikiContext)} was
      * not found.
@@ -416,10 +421,12 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 String header = m.group(1);
                 String value = m.group(2);
                 line = input.readLine();
+                StringBuilder valueBuilder = new StringBuilder(value);
                 while (line != null && (line.startsWith(" ") || line.startsWith("\t"))) {
-                    value += line;
+                    valueBuilder.append(line);
                     line = input.readLine();
                 }
+                value = valueBuilder.toString();
                 if (SUBJECT.equals(header)) {
                     toMail.setSubject(value);
                 } else if (FROM.equals(header)) {
@@ -673,7 +680,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                                 transport.close();
                             }
                         } catch (MessagingException ex) {
-                            LOGGER.error("MessagingException has occured.", ex);
+                            LOGGER.error(MESSAGING_EXCEPTION_ERROR, ex);
                         }
                         transport = null;
                         session = null;
@@ -689,7 +696,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                         throw ex;
                     }
                 } catch (MessagingException mex) {
-                    LOGGER.error("MessagingException has occured.", mex);
+                    LOGGER.error(MESSAGING_EXCEPTION_ERROR, mex);
                     LOGGER.error("Detailed email information" + mail.toString());
                     if (emailCount == 1) {
                         throw mex;
@@ -706,7 +713,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                     transport.close();
                 }
             } catch (MessagingException ex) {
-                LOGGER.error("MessagingException has occured.", ex);
+                LOGGER.error(MESSAGING_EXCEPTION_ERROR, ex);
             }
 
             LOGGER.info("sendEmails: Email count = " + emailCount + " sent count = " + count);

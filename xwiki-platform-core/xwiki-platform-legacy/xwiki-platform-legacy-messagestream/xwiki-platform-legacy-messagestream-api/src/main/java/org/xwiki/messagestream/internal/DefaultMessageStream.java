@@ -22,7 +22,6 @@ package org.xwiki.messagestream.internal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -189,7 +188,7 @@ public class DefaultMessageStream implements MessageStream
             SimpleEventQuery query = createEventQuery(PersonalMessageDescriptor.EVENT_TYPE, limit, offset);
             query.eq(Event.FIELD_USER, author);
 
-            result = this.eventStore.search(query).stream().collect(Collectors.toList());
+            result = this.eventStore.search(query).stream().toList();
         } catch (EventStreamException ex) {
             this.logger.warn("Failed to search personal messages: {}", ex.getMessage());
         }
@@ -210,7 +209,7 @@ public class DefaultMessageStream implements MessageStream
             SimpleEventQuery query = createEventQuery(DirectMessageDescriptor.EVENT_TYPE, limit, offset);
             query.eq(Event.FIELD_STREAM, this.bridge.getCurrentUserReference());
 
-            result = this.eventStore.search(query).stream().collect(Collectors.toList());
+            result = this.eventStore.search(query).stream().toList();
         } catch (EventStreamException ex) {
             this.logger.warn("Failed to search direct messages: {}", ex.getMessage());
         }
@@ -231,7 +230,7 @@ public class DefaultMessageStream implements MessageStream
             SimpleEventQuery query = createEventQuery(GroupMessageDescriptor.EVENT_TYPE, limit, offset);
             query.eq(Event.FIELD_STREAM, group);
 
-            result = this.eventStore.search(query).stream().collect(Collectors.toList());
+            result = this.eventStore.search(query).stream().toList();
         } catch (EventStreamException ex) {
             this.logger.warn("Failed to search group messages: {}", ex.getMessage());
         }

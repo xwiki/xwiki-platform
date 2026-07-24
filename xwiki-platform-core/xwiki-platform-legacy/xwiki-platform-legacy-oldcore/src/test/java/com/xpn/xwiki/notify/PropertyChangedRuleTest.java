@@ -61,15 +61,11 @@ class PropertyChangedRuleTest implements XWikiDocChangeNotificationInterface
 
     private String testClassName = "Test.TestClass";
 
-    private DocumentReference testClassReference = new DocumentReference("Test", "Test", "TestClass");
-
     private BaseClass testClass;
 
     private BaseClass otherClass;
 
     private String otherClassName = "Test.OtherClass";
-
-    private DocumentReference testOtherClassReference = new DocumentReference("Test", "Test", "OtherClass");
 
     private String testPropertyName = "field";
 

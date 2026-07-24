@@ -355,18 +355,17 @@ public abstract class XWikiAction implements LegacyAction
     protected boolean isEntityReferenceNameValid(EntityReference entityReference)
     {
         if (this.getEntityNameValidationManager().getEntityReferenceNameStrategy() != null
-            && this.getEntityNameValidationConfiguration().useValidation()) {
-            if (!this.getEntityNameValidationManager().getEntityReferenceNameStrategy().isValid(entityReference)) {
-                Object[] args = {getLocalSerializer().serialize(entityReference)};
-                XWikiException invalidNameException = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_APP_DOCUMENT_NAME_INVALID,
-                    "Cannot create document {0} because its name does not respect the name strategy of the wiki.", null,
-                    args);
-                ScriptContext scontext = getCurrentScriptContext();
-                scontext.setAttribute("invalidNameReference", entityReference, ScriptContext.ENGINE_SCOPE);
-                scontext.setAttribute("createException", invalidNameException, ScriptContext.ENGINE_SCOPE);
-                return false;
-            }
+            && this.getEntityNameValidationConfiguration().useValidation()
+            && !this.getEntityNameValidationManager().getEntityReferenceNameStrategy().isValid(entityReference)) {
+            Object[] args = {getLocalSerializer().serialize(entityReference)};
+            XWikiException invalidNameException = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_APP_DOCUMENT_NAME_INVALID,
+                "Cannot create document {0} because its name does not respect the name strategy of the wiki.", null,
+                args);
+            ScriptContext scontext = getCurrentScriptContext();
+            scontext.setAttribute("invalidNameReference", entityReference, ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("createException", invalidNameException, ScriptContext.ENGINE_SCOPE);
+            return false;
         }
         return true;
     }
@@ -450,7 +449,7 @@ public abstract class XWikiAction implements LegacyAction
                     // that we
                     // are parsing below.
                     VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-                    VelocityContext vcontext = velocityManager.getVelocityContext();
+                    velocityManager.getVelocityContext();
 
                     if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context)) {
                         // Starting XWiki 5.0M2, 'xwiki.virtual.redirect' was removed. Warn users still using it.
@@ -808,7 +807,7 @@ public abstract class XWikiAction implements LegacyAction
     {
         RenderingContext renderingContext = Utils.getComponent(RenderingContext.class);
         MutableRenderingContext mutableRenderingContext =
-            renderingContext instanceof MutableRenderingContext ? (MutableRenderingContext) renderingContext : null;
+            renderingContext instanceof MutableRenderingContext mutableContext ? mutableContext : null;
 
         if (mutableRenderingContext != null) {
             mutableRenderingContext.push(renderingContext.getTransformation(), renderingContext.getXDOM(),
@@ -1321,8 +1320,8 @@ public abstract class XWikiAction implements LegacyAction
                 LOGGER.error(logMessage, exception);
             }
         } else {
-            if (exception instanceof XWikiException) {
-                throw (XWikiException) exception;
+            if (exception instanceof XWikiException xwikiException) {
+                throw xwikiException;
             } else {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
                     "Uncaught exception", exception);

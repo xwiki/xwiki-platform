@@ -50,7 +50,7 @@ import com.xpn.xwiki.XWikiContext;
 public abstract class AbstractTestWiki
 {
     /** The subdirectory in the classpath were the test wiki definitions will be found. */
-    private final static String TEST_WIKI_DEFINITIONS_DIRECTORY = "testwikis";
+    private static final String TEST_WIKI_DEFINITIONS_DIRECTORY = "testwikis";
 
     /** The wiki description that is currently being parsed and built. */
     private HasWikiContents currentWiki;

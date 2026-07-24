@@ -178,7 +178,6 @@ class MentionPageTest extends PageTest
 
         DocumentReference page1 = new DocumentReference("design", "XWiki", "Page1");
         DocumentReference userPage1 = new DocumentReference("xwiki", "XWiki", "U1");
-        DocumentReference userPage2 = new DocumentReference("xwiki", "YWiki", "U2");
         Date eventDate = new Date();
 
         // Create and save page 1 with a title.

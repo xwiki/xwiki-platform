@@ -173,8 +173,8 @@ public class WikiObjectComponentManagerEventListenerProxy
              * the current event and build the components from it.
              */
             List<WikiComponent> wikiComponents;
-            if (componentBuilder instanceof WikiBaseObjectComponentBuilder) {
-                wikiComponents = ((WikiBaseObjectComponentBuilder) componentBuilder).buildComponents(baseObject);
+            if (componentBuilder instanceof WikiBaseObjectComponentBuilder objectComponentBuilder) {
+                wikiComponents = objectComponentBuilder.buildComponents(baseObject);
             } else {
                 wikiComponents = componentBuilder.buildComponents(objectReference);
             }

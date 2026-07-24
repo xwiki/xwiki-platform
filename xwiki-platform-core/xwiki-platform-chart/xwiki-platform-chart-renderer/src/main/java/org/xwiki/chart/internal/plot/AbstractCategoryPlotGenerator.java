@@ -45,20 +45,20 @@ public abstract class AbstractCategoryPlotGenerator implements PlotGenerator
         CategoryAxis domainAxis;
         ValueAxis rangeAxis;
 
-        if (model.getDataset() instanceof CategoryDataset) {
-            dataset = (CategoryDataset) model.getDataset();
+        if (model.getDataset() instanceof CategoryDataset categoryDataset) {
+            dataset = categoryDataset;
         } else {
             throw new PlotGeneratorException("Incompatible dataset for category plot.");
         }
 
-        if (model.getAxis(0) instanceof CategoryAxis) {
-            domainAxis = (CategoryAxis) model.getAxis(0);
+        if (model.getAxis(0) instanceof CategoryAxis categoryAxis) {
+            domainAxis = categoryAxis;
         } else {
             throw new PlotGeneratorException("Incompatible axis 0 for category plot.");
         }
 
-        if (model.getAxis(1) instanceof ValueAxis) {
-            rangeAxis = (ValueAxis) model.getAxis(1);
+        if (model.getAxis(1) instanceof ValueAxis valueAxis) {
+            rangeAxis = valueAxis;
         } else {
             throw new PlotGeneratorException("Incompatible axis 1 for category plot.");
         }

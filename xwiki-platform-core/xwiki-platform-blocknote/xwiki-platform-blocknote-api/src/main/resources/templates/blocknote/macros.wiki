@@ -33,9 +33,13 @@
   #if (!$sourceDocumentReference)
     #set ($sourceDocumentReference = $tdoc.documentReference)
   #end
+  ## The source property reference is used server-side only to determine the author whose rights are used to render the
+  ## content. We remove it from the attributes so that it's not output as an HTML attribute.
+  #set ($sourcePropertyReference = $parameters.attributes.remove('data-source-property-reference'))
   #set ($parameters.attributes.data-output-syntax = $parameters.attributes.remove('data-syntax'))
   #set ($source = {
     'documentReference': $sourceDocumentReference,
+    'sourcePropertyReference': $sourcePropertyReference,
     'syntax': $parameters.attributes.get('data-output-syntax'),
     'content': $parameters.content,
     'restricted': $parameters.attributes.data-restricted
@@ -73,19 +77,23 @@
   ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
   #set ($macro.previousDisplayMode = $xcontext.displayMode)
   #set ($discard = $xcontext.setDisplayMode('view'))
-  #set ($targetSyntax = 'uniast/1.0')
+  #set ($targetSyntax = 'blocknote/1.0')
   #set ($restricted = "$!source.restricted" == 'true')
-  #set ($xdom = $services.rendering.parse($source.content, $source.syntax))
+  ## The source reference is used to determine the author whose rights are used to render the content, using the
+  ## document author when the content is unmodified and the current user, otherwise. It's the object property reference
+  ## when editing an object property and the document reference otherwise.
+  #set ($sourceReference = $source.sourcePropertyReference)
+  #if (!$sourceReference)
+    #set ($sourceReference = $source.documentReference)
+  #end
   #set ($transformationContext = $services.rendering.createTransformationContext())
   #set ($discard = $transformationContext.setId("BlockNote:${source.documentReference}"))
-  #set ($discard = $transformationContext.setXDOM($xdom))
   #set ($discard = $transformationContext.setSyntax($source.syntax))
   #set ($discard = $transformationContext.setTargetSyntax($targetSyntax))
   #set ($discard = $transformationContext.setRestricted($restricted))
   #set ($discard = $transformationContext.setTransformationNames(['macro']))
-  #set ($discard = $transformationContext.setContentDocument($source.documentReference))
-  #set ($discard = $services.rendering.transform($xdom, $transformationContext))
-  #set ($renderedContent = $services.rendering.render($xdom, $targetSyntax))
+  #set ($discard = $transformationContext.setContentEntityReference($sourceReference))
+  #set ($renderedContent = $services.rendering.convert($source.content, $transformationContext))
   ## Restore the previous display mode.
   #set ($discard = $xcontext.setDisplayMode($macro.previousDisplayMode))
   $!renderedContent##

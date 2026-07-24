@@ -87,10 +87,10 @@ public class ScriptMacroAnalyzer extends AbstractMacroBlockRequiredRightAnalyzer
                 macro.getDescriptor().getParametersBeanClass().getDeclaredConstructor().newInstance();
             this.beanManager.populate(macroParameters, macroBlock.getParameters());
 
-            if (macroParameters instanceof ScriptMacroParameters) {
+            if (macroParameters instanceof ScriptMacroParameters scriptMacroParameters) {
                 MacroPermissionPolicy mpp =
                     this.componentManagerProvider.get().getInstance(MacroPermissionPolicy.class, macroBlock.getId());
-                requiredRight = mpp.getRequiredRight((ScriptMacroParameters) macroParameters);
+                requiredRight = mpp.getRequiredRight(scriptMacroParameters);
             }
         } catch (Exception ex) {
             if (!(macro instanceof PrivilegedScriptMacro)) {

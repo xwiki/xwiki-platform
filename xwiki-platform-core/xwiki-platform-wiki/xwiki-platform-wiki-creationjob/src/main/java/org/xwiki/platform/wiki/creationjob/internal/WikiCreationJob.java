@@ -20,7 +20,6 @@
 package org.xwiki.platform.wiki.creationjob.internal;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -80,14 +79,7 @@ public class WikiCreationJob extends AbstractJob<WikiCreationRequest, DefaultJob
             List<WikiCreationStep> wikiCreationStepList = componentManager.getInstanceList(WikiCreationStep.class);
             // Some extra steps needs to be executed AFTER some others, so we have introduce a getOrder() method in the
             // interface. We use this method to sort the list of extra steps by this order.
-            Collections.sort(wikiCreationStepList, new Comparator<WikiCreationStep>()
-            {
-                @Override
-                public int compare(WikiCreationStep o1, WikiCreationStep o2)
-                {
-                    return o1.getOrder() - o2.getOrder();
-                }
-            });
+            Collections.sort(wikiCreationStepList, (o1, o2) -> o1.getOrder() - o2.getOrder());
             // Now we can execute these extra steps
             this.progressManager.pushLevelProgress(wikiCreationStepList.size(), this);
 

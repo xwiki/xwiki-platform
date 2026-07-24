@@ -347,8 +347,6 @@ class DefaultResetPasswordManagerTest
         when(xObject.getDateValue(ResetPasswordRequestClassDocumentInitializer.REQUEST_DATE_FIELD))
             .thenReturn(Date.from(Instant.now().minus(17, ChronoUnit.MINUTES)));
 
-        DefaultResetPasswordRequestResponse expected =
-            new DefaultResetPasswordRequestResponse(this.userReference);
 
         String saveComment = "Removed expired token";
         when(this.localizationManager

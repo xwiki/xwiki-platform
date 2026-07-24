@@ -117,7 +117,7 @@ class ContextMacroTest
     private BlockAsyncRendererExecutor executor;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         // Macro Descriptor set up
         BeanDescriptor descriptor = mock(BeanDescriptor.class);

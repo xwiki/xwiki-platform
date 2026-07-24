@@ -84,7 +84,13 @@ import static org.junit.jupiter.api.Assertions.fail;
         // core extension so we need to make the extension index also core.
         "org.xwiki.platform:xwiki-platform-extension-index",
         // Solr search is used to get suggestions for the link quick action.
-        "org.xwiki.platform:xwiki-platform-search-solr-query"
+        "org.xwiki.platform:xwiki-platform-search-solr-query",
+        // Provides the attachment mimetype validation step (and its mandatory XClass initializer) so that we can test
+        // that uploads rejected because of a mimetype restriction are reported correctly by the editor. It must be a
+        // core extension (WEB-INF/lib) rather than an installed extension because the temporary attachment upload used
+        // by drag & drop resolves the AttachmentValidator through the root component manager (see
+        // DefaultTemporaryAttachmentSessionsManager), which does not see components installed on a wiki namespace.
+        "org.xwiki.platform:xwiki-platform-attachment-validation-default"
     },
     resolveExtraJARs = true
 )
@@ -1181,6 +1187,46 @@ class ImageIT extends AbstractCKEditorIT
         editPage.clickSaveAndView();
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(0, attachmentsPane.getNumberOfAttachments());
+    }
+
+    @Test
+    @Order(26)
+    void dropFileWithRestrictedMimetype(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        // Restrict the allowed mimetypes to plain text only so that dropping an image is rejected by the server because
+        // of the mimetype restriction. The restriction is set at the wiki level (XWiki.XWikiPreferences) rather than on
+        // the edited space: the temporary attachment upload used by drag & drop is served by the
+        // XWiki.WYSIWYG.FileUploader page, so the "current document" seen by the attachment validator is that page and
+        // a restriction defined on the edited page's space would be ignored. Only the wiki-level restriction, which
+        // does not depend on the current document, is taken into account on this path.
+        setup.addObject("XWiki", "XWikiPreferences",
+            "XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass", "allowedMimetypes", "text/plain");
+        try {
+            WYSIWYGEditPage editPage = edit(setup, testReference);
+
+            // Drag & drop an image, which is rejected because only plain text is allowed. Don't wait for the upload
+            // widget to be selected since the upload is expected to fail (no widget stays selected in that case).
+            this.textArea.dropFileWithoutWaiting("/image.gif");
+
+            // The user must only see the mimetype restriction error (XWIKI-24567): the drag & drop path used to report
+            // a spurious success followed by a generic error instead of the actual mimetype restriction message.
+            this.textArea.waitForOwnNotificationWarningMessage("mimetype restriction");
+            assertTrue(
+                setup.getDriver().findElementsWithoutWaiting(By.cssSelector(".cke_notification_success")).isEmpty(),
+                "The rejected upload must not report a success notification.");
+
+            // The rejected upload must not save any attachment.
+            this.textArea.waitForUploadsToFinish();
+            editPage.clickSaveAndView();
+            AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+            assertEquals(0, attachmentsPane.getNumberOfAttachments());
+        } finally {
+            // Remove the wiki-level restriction so that it does not affect the other tests sharing the same instance.
+            setup.deleteObject("XWiki", "XWikiPreferences",
+                "XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass", 0);
+        }
     }
 
     /**

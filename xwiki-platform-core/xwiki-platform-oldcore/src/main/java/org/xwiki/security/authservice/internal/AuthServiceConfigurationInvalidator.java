@@ -72,8 +72,8 @@ public class AuthServiceConfigurationInvalidator extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof WikiDeletedEvent) {
-            this.configuration.invalidate(((WikiDeletedEvent) event).getWikiId());
+        if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
+            this.configuration.invalidate(wikiDeletedEvent.getWikiId());
         } else {
             this.configuration
                 .invalidate(((EntityEvent) event).getReference().extractReference(EntityType.WIKI).getName());

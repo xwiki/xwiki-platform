@@ -56,10 +56,7 @@
   'sound' : [
     'com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine',
     'com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine'
-    ],
-  'text' : [
-    'org.xwiki.captcha.internal.SimpleMathCaptchaEngine'
-    ]
+  ]
 })
 ## Add contributed engines, through UIXs.
 #set ($engineUIXs = $services.uix.getExtensions('org.xwiki.captcha.jcaptcha.engine'))

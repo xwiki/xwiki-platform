@@ -72,14 +72,13 @@ public class DefaultRecordableEventConverter implements RecordableEventConverter
         convertedEvent.setDate(new Date());
         convertedEvent.setUser(context.getUserReference());
         convertedEvent.setWiki(context.getWikiReference());
-        if (recordableEvent instanceof TargetableEvent) {
-            convertedEvent.setTarget(((TargetableEvent) recordableEvent).getTarget());
+        if (recordableEvent instanceof TargetableEvent targetableEvent) {
+            convertedEvent.setTarget(targetableEvent.getTarget());
         }
 
-        if (data instanceof String) {
-            convertedEvent.setBody((String) data);
-        } else if (data instanceof XWikiDocument) {
-            XWikiDocument document = (XWikiDocument) data;
+        if (data instanceof String stringData) {
+            convertedEvent.setBody(stringData);
+        } else if (data instanceof XWikiDocument document) {
             convertedEvent.setDocument(document.getDocumentReference());
             convertedEvent.setDocumentVersion(document.getVersion());
             convertedEvent.setDocumentTitle(document.getRenderedTitle(context));

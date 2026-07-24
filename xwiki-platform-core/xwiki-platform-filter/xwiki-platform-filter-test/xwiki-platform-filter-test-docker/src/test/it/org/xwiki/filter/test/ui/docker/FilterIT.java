@@ -20,8 +20,6 @@
 package org.xwiki.filter.test.ui.docker;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -34,7 +32,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -48,6 +45,7 @@ import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.ObjectSummary;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
+import org.xwiki.test.docker.junit5.ServletEngineFileManager;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -61,11 +59,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class FilterIT
 {
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z");
-
-    // Generate temporary files under the module's "target" directory so that they don't leak outside the build
-    // workspace (@TempDir is rooted at java.io.tmpdir, which the build redirects to "target").
-    @TempDir
-    private File temporaryFolder;
 
     @BeforeEach
     void setUp(TestUtils setup)
@@ -100,38 +93,39 @@ class FilterIT
     }
 
     @Test
-    void testConvertXMLURL() throws IOException
+    void testConvertXMLURL(ServletEngineFileManager fileManager) throws Exception
     {
         ApplicationFilterHomePage page = ApplicationFilterHomePage.gotoPage();
 
-        URL url = getClass().getResource("/xml/document1.xml");
-
-        // Set input
+        // Make the source file readable by the XWiki instance (which may run in a container that can't see the test
+        // runner's filesystem) and set it as input. Use the "url:" source type (with a "file:" URL pointing to the
+        // server-side copy) to exercise the URL-based input source, as the test name implies.
+        File source = new File(getClass().getResource("/xml/document1.xml").toURI());
         page.setInputFilter("filter+xml");
-        page.setSource("url:" + url.toString());
+        page.setSource("url:file:" + fileManager.copyFileToServer(source));
 
-        // Set output
+        // Set output to a file the XWiki instance can write and that we can then retrieve back to the host.
         page.setOutputFilter("filter+xml");
-        File tmp = new File(this.temporaryFolder, "result.xml");
-        page.setTarget("file:" + tmp.getAbsolutePath());
+        String target = fileManager.getServerFilePath("result.xml");
+        page.setTarget("file:" + target);
 
         // Start conversion
         page.convert();
 
         assertEquals(IOUtils.toString(getClass().getResource("/xml/document1.xml"), StandardCharsets.UTF_8),
-            FileUtils.readFileToString(tmp, StandardCharsets.UTF_8));
+            FileUtils.readFileToString(fileManager.copyFileFromServer(target), StandardCharsets.UTF_8));
     }
 
     @Test
-    void testImportDocument(TestUtils setup) throws Exception
+    void testImportDocument(TestUtils setup, ServletEngineFileManager fileManager) throws Exception
     {
         ApplicationFilterHomePage filterApp = ApplicationFilterHomePage.gotoPage();
 
-        URL url = getClass().getResource("/xml/document2.xml");
+        File source = new File(getClass().getResource("/xml/document2.xml").toURI());
 
         // Set input
         filterApp.setInputFilter("filter+xml");
-        filterApp.setSource("url:" + url.toString());
+        filterApp.setSource("file:" + fileManager.copyFileToServer(source));
 
         // Set output
         filterApp.setOutputFilter("xwiki+instance");
@@ -168,15 +162,15 @@ class FilterIT
     }
 
     @Test
-    void testImportDocumentWithoutXClassInfo(TestUtils setup) throws Exception
+    void testImportDocumentWithoutXClassInfo(TestUtils setup, ServletEngineFileManager fileManager) throws Exception
     {
         ApplicationFilterHomePage filterApp = ApplicationFilterHomePage.gotoPage();
 
-        URL url = getClass().getResource("/xml/document1.xml");
+        File source = new File(getClass().getResource("/xml/document1.xml").toURI());
 
         // Set input
         filterApp.setInputFilter("filter+xml");
-        filterApp.setSource("url:" + url.toString());
+        filterApp.setSource("file:" + fileManager.copyFileToServer(source));
 
         // Set output
         filterApp.setOutputFilter("xwiki+instance");

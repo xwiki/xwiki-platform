@@ -22,7 +22,6 @@ package org.xwiki.image.style.rest.internal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -84,7 +83,7 @@ public class DefaultImageStylesResource implements ImageStylesResource, XWikiRes
 
     private List<Style> convert(Set<ImageStyle> imageStyles)
     {
-        return imageStyles.stream().map(this::convert).collect(Collectors.toList());
+        return imageStyles.stream().map(this::convert).toList();
     }
 
     private Style convert(ImageStyle imageStyle)

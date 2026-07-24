@@ -60,6 +60,17 @@
               {{ $t("livedata.action.refresh") }}
             </a>
           </li>
+          <!-- Edit mode toggle. -->
+          <li class="livedata-action-edit-mode" v-show="logic.hasEditMode()">
+            <a href="#" @click.stop.prevent="toggleEditMode">
+              <input
+                type="checkbox"
+                :checked="isEditMode"
+                @click.stop="toggleEditMode"
+              />
+              {{ $t("livedata.action.editMode") }}
+            </a>
+          </li>
         </ul>
       </li>
 
@@ -120,6 +131,17 @@ export default {
 
   inject: ["logic"],
 
+  data() {
+    return {
+      isEditMode: false,
+    };
+  },
+
+  async beforeUnmount() {
+    this.logic.disableEditMode();
+    await this.logic.updateEntries();
+  },
+
   computed: {
     data() {
       return this.logic.data;
@@ -134,6 +156,20 @@ export default {
       if (!this.isCurrentLayout(layoutId)) {
         this.logic.changeLayout(layoutId);
       }
+    },
+    toggleEditMode() {
+      this.isEditMode = !this.isEditMode;
+    },
+  },
+
+  watch: {
+    async isEditMode(value) {
+      if (value) {
+        this.logic.enableEditMode();
+      } else {
+        this.logic.disableEditMode();
+      }
+      await this.logic.updateEntries();
     },
   },
 };
@@ -188,6 +224,15 @@ export default {
 
   li:has(> ul):has(+ li > ul) {
     margin-bottom: calc(0.5lh - 1px);
+  }
+}
+
+#xwikicontent ul li.livedata-action-edit-mode {
+  a {
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
   }
 }
 </style>

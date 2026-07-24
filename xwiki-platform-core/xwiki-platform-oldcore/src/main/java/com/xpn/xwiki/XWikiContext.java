@@ -71,6 +71,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 public class XWikiContext extends Hashtable<Object, Object>
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Type instance for {@code Provider<XWikiContext>}.
      *

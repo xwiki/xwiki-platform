@@ -107,7 +107,7 @@ class DefaultWikiCreatorTest
         // Verify that the descriptor document has been saved
         verify(this.wikiDescriptorBuilder).save(eq(descriptor));
         // Verify that the descriptor has been reloaded after being saved
-        assertTrue(descriptor == newWikiDescriptor);
+        assertSame(descriptor, newWikiDescriptor);
     }
 
     @Test

@@ -57,8 +57,7 @@ public class DocumentSkinReference implements SkinReference
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof DocumentSkinReference) {
-            DocumentSkinReference documentSkinReference = (DocumentSkinReference) o;
+        if (o instanceof DocumentSkinReference documentSkinReference) {
             return skinDocument.equals(documentSkinReference.skinDocument);
         }
         return false;

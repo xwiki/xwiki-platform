@@ -73,7 +73,7 @@ public class XWikiRCSArchive extends Archive
         super(new Object[0], "");
         this.nodes.clear();
         this.head = null;
-        if (nodeInfos.size() > 0) {
+        if (!nodeInfos.isEmpty()) {
             for (XWikiRCSNodeInfo nodeInfo : nodeInfos) {
                 XWikiJRCSNode node = new XWikiJRCSNode(nodeInfo.getId().getVersion(), null);
                 node.setAuthor(nodeInfo.getAuthor());
@@ -285,7 +285,7 @@ public class XWikiRCSArchive extends Archive
             result.add(content);
         }
         // Ensure that the latest revision is set set to have the full content and not a diff.
-        if (result.size() > 0) {
+        if (!result.isEmpty()) {
             ((XWikiRCSNodeInfo) ((ArrayList) result).get(0)).setDiff(false);
             ((XWikiRCSNodeContent) ((ArrayList) result).get(1)).getPatch().setDiff(false);
         }

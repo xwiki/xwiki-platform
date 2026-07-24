@@ -42,7 +42,7 @@ import org.xwiki.model.reference.RegexEntityReference;
 
 import com.xpn.xwiki.objects.BaseObjectReference;
 
-public class XWikiRepositoryModel
+public final class XWikiRepositoryModel
 {
     // References
 
@@ -468,6 +468,11 @@ public class XWikiRepositoryModel
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRepositoryModel.class);
+
+    private XWikiRepositoryModel()
+    {
+        // Utility class, no instantiation.
+    }
 
     public static String toExtensionClassSolrPropertyName(String propertyName)
     {

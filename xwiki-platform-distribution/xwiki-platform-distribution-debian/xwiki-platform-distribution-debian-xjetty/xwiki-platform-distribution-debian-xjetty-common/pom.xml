@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-xjetty</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-xjetty-common</artifactId>
   <name>XWiki Platform - Distribution - Debian - XJetty - Common</name>
@@ -36,19 +36,24 @@
 
     <jetty.filter.path>${project.build.directory}/jetty-filter</jetty.filter.path>
     <jetty.path>${project.build.directory}/jetty</jetty.path>
+
+    <debian.jetty.path>/usr/lib/xwiki-jetty</debian.jetty.path>
+    <debian.jetty.log.path>/var/log/xwiki</debian.jetty.log.path>
+    <debian.jetty.tmp.path>${debian.xwiki.var}/tmp</debian.jetty.tmp.path>
+    <debian.jetty.work.path>${debian.xwiki.var}/work</debian.jetty.work.path>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
-      <version>18.6.0-SNAPSHOT</version>
+      <version>18.7.0-SNAPSHOT</version>
       <type>war</type>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
-      <version>18.6.0-SNAPSHOT</version>
+      <version>18.7.0-SNAPSHOT</version>
       <type>zip</type>
       <optional>true</optional>
     </dependency>
@@ -164,7 +169,7 @@
               <type>directory</type>
               <mapper>
                 <type>perm</type>
-                <prefix>/usr/lib/xwiki-jetty</prefix>
+                <prefix>${debian.jetty.path}</prefix>
               </mapper>
             </data>
 
@@ -172,32 +177,40 @@
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki-jetty/webapps/xwiki</linkName>
-              <linkTarget>/usr/lib/xwiki</linkTarget>
+              <linkName>${debian.jetty.path}/webapps/xwiki</linkName>
+              <linkTarget>${debian.xwiki.path}</linkTarget>
             </data>
 
             <!-- Redirect log to /var/log/xwiki -->
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki-jetty/logs</linkName>
-              <linkTarget>/var/log/xwiki</linkTarget>
+              <linkName>${debian.jetty.path}/logs</linkName>
+              <linkTarget>${debian.jetty.log.path}</linkTarget>
             </data>
 
             <!-- Redirect tmp to /var/lib/xwiki/tmp -->
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki-jetty/tmp</linkName>
-              <linkTarget>/var/lib/xwiki/tmp</linkTarget>
+              <linkName>${debian.jetty.path}/tmp</linkName>
+              <linkTarget>${debian.jetty.tmp.path}</linkTarget>
+            </data>
+
+            <!-- Redirect work to /var/lib/xwiki/work -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>${debian.jetty.path}/work</linkName>
+              <linkTarget>${debian.jetty.work.path}</linkTarget>
             </data>
 
             <!-- Be more explicit about which configuration file is used by XJetty -->
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/etc/xwiki/xjetty-web.xml</linkName>
-              <linkTarget>/etc/xwiki/jetty-ee11-web.xml</linkTarget>
+              <linkName>${debian.xwiki.etc.path}/xjetty-web.xml</linkName>
+              <linkTarget>${debian.xwiki.etc.path}/jetty-ee11-web.xml</linkTarget>
             </data>
           </dataSet>
         </configuration>

@@ -107,7 +107,7 @@ class XWikiDocumentTest
     private BaseObject baseObject;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         XWikiVersioningStoreInterface mockXWikiVersioningStore =
             this.componentManager.registerMockComponent(XWikiVersioningStoreInterface.class);
@@ -231,29 +231,49 @@ class XWikiDocumentTest
     {
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
-        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = header 1=
+            header 1 content
+            == header 2==
+            header 2 content""");
 
         assertEquals("header 1", this.document.extractTitle());
 
-        this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = **header 1**=
+            header 1 content
+            == header 2==
+            header 2 content""");
 
         assertEquals("<strong>header 1</strong>", this.document.extractTitle());
 
-        this.document.setContent("content not in section\n" + "= [[Space.Page]]=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = [[Space.Page]]=
+            header 1 content
+            == header 2==
+            header 2 content""");
 
         assertEquals("<span class=\"wikiexternallink\"><a href=\"Space.Page\"><span class=\"wikigeneratedlinkcontent\">"
             + "Space.Page" + "</span></a></span>", this.document.extractTitle());
 
-        this.document.setContent("content not in section\n" + "= #set($var ~= \"value\")=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = #set($var ~= "value")=
+            header 1 content
+            == header 2==
+            header 2 content""");
 
         assertEquals("#set($var = \"value\")", this.document.extractTitle());
 
-        this.document.setContent("content not in section\n"
-            + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+        this.document.setContent("""
+            content not in section
+            = {{groovy}}print "value"{{/groovy}}=
+            header 1 content
+            == header 2==
+            header 2 content""");
 
         assertEquals("value", this.document.extractTitle());
 

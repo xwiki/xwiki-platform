@@ -63,8 +63,8 @@ public class ExtensionIndexInitializerListener extends AbstractEventListener
     {
         if (event instanceof ApplicationReadyEvent) {
             this.scheduler.start();
-        } else if (event instanceof WikiReadyEvent) {
-            this.scheduler.initialize(new WikiNamespace(((WikiReadyEvent) event).getWikiId()));
+        } else if (event instanceof WikiReadyEvent wikiReadyEvent) {
+            this.scheduler.initialize(new WikiNamespace(wikiReadyEvent.getWikiId()));
         }
     }
 }

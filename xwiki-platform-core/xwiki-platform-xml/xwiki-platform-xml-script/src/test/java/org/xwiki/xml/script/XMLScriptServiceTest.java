@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @since 2.7RC1
  */
 @ComponentTest
-public class XMLScriptServiceTest
+class XMLScriptServiceTest
 {
     @InjectMockComponents
     private XMLScriptService xml;

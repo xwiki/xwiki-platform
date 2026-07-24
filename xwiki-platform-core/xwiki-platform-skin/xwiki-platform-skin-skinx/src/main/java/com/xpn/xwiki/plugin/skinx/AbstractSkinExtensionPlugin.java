@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -418,14 +418,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      */
     protected String sanitize(String value)
     {
-        String result = value;
-        try {
-            result = URLEncoder.encode(value, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            // Should never happen since the UTF-8 encoding is always available in the platform,
-            // see http://java.sun.com/j2se/1.5.0/docs/api/java/nio/charset/Charset.html
-        }
-        return result;
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
     /**
@@ -443,8 +436,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
         // Using an XML comment is pretty safe, as extensions probably wouldn't work in other type
         // of documents, like RTF, CSV or JSON.
         String hook = "<!-- " + this.getClass().getCanonicalName() + " -->";
-        String result = content.replaceFirst(hook, getImportString(context));
-        return result;
+        return content.replaceFirst(hook, getImportString(context));
     }
 
     @Override

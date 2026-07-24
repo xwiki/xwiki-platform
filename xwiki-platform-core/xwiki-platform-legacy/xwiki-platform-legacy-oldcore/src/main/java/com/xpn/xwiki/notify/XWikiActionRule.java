@@ -79,7 +79,7 @@ public class XWikiActionRule implements XWikiNotificationRule
         } catch (Throwable e) {
             // protect from bad listeners
             LOGGER.error("Failed to notify target [{}] for event [{}], doc = [{}], action = [{}]",
-                new Object[] {getTarget(), this, doc, action, e});
+                getTarget(), this, doc, action, e);
         }
     }
 
@@ -92,7 +92,7 @@ public class XWikiActionRule implements XWikiNotificationRule
         } catch (Throwable e) {
             // protect from bad listeners
             LOGGER.error("Failed to notify target [{}] for pre event [{}], doc = [{}], action = [{}]",
-                new Object[] {getTarget(), this, doc, action, e});
+                getTarget(), this, doc, action, e);
         }
     }
 

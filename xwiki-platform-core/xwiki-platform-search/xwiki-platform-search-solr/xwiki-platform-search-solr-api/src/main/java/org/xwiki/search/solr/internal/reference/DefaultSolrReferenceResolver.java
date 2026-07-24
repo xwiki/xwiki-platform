@@ -169,14 +169,7 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
                 throw new SolrIndexerException("Failed to get the list of available wikis.", e);
             }
 
-            return new Iterable<EntityReference>()
-            {
-                @Override
-                public Iterator<EntityReference> iterator()
-                {
-                    return new FarmIterator(wikis);
-                }
-            };
+            return () -> new FarmIterator(wikis);
         }
     }
 

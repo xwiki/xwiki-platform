@@ -155,7 +155,7 @@ public class OutdatedExtensionsDistributionStep extends AbstractExtensionDistrib
         ExtensionPlan plan = createRepairPlan(invalidExtension, namespace);
 
         // Install valid extension version
-        if (plan.getTree().size() > 0) {
+        if (!plan.getTree().isEmpty()) {
             ExtensionPlanAction action = plan.getTree().iterator().next().getAction();
             install(action.getExtension().getId(), namespace, false);
         }

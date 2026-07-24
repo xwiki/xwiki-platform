@@ -55,8 +55,7 @@ public class WikiCreationException extends Exception
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof WikiCreationException) {
-            WikiCreationException other = (WikiCreationException) o;
+        if (o instanceof WikiCreationException other) {
             return new EqualsBuilder().append(getMessage(), other.getMessage()).append(getCause(), other.getCause())
                     .isEquals();
         }

@@ -975,94 +975,118 @@ $html
   </${blockTag}>
 #end
 
-## Display a block warning message with the content $text.
-#macro(warning $text)
+## Display a block warning message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(warning $text $extraClass)
 #set( $parameters = {
 'text': $text,
 'classAffix': 'warning',
 'iconName': 'warning',
-'prettyNameKey': 'warning'
+'prettyNameKey': 'warning',
+'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display an inline warning message with the content $text.
-#macro(inlineWarning $text)
+## Display an inline warning message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(inlineWarning $text $extraClass)
 #set( $parameters = {
   'text': $text,
   'classAffix': 'warning',
   'iconName': 'warning',
   'prettyNameKey': 'warning',
-  'isInline': true
+  'isInline': true,
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display a block error message with the content $text.  
-#macro(error $text)
-#set( $parameters = {
-  'text': $text,
-  'classAffix': 'error',
-  'iconName': 'exclamation',
-  'prettyNameKey': 'error'
-})
-#_genericMessage($parameters)
-#end
-
-## Display an inline error message with the content $text.
-#macro(inlineError $text)
+## Display a block error message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(error $text $extraClass)
 #set( $parameters = {
   'text': $text,
   'classAffix': 'error',
   'iconName': 'exclamation',
   'prettyNameKey': 'error',
-  'isInline': true
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display a block info message with the content $text.  
-#macro(info $text)
+## Display an inline error message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(inlineError $text $extraClass)
 #set( $parameters = {
   'text': $text,
-  'classAffix': 'info',
-  'iconName': 'info',
-  'prettyNameKey': 'info'
+  'classAffix': 'error',
+  'iconName': 'exclamation',
+  'prettyNameKey': 'error',
+  'isInline': true,
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display an inline info message with the content $text.
-#macro(inlineInfo $text)
+## Display a block info message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(info $text $extraClass)
 #set( $parameters = {
   'text': $text,
   'classAffix': 'info',
   'iconName': 'info',
   'prettyNameKey': 'info',
-  'isInline': true
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display a block success message with the content $text.  
-#macro(success $text)
+## Display an inline info message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(inlineInfo $text $extraClass)
 #set( $parameters = {
   'text': $text,
-  'classAffix': 'success',
-  'iconName': 'check',
-  'prettyNameKey': 'success'
+  'classAffix': 'info',
+  'iconName': 'info',
+  'prettyNameKey': 'info',
+  'isInline': true,
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display an inline success message with the content $text.
-#macro(inlineSuccess $text)
+## Display a block success message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(success $text $extraClass)
 #set( $parameters = {
   'text': $text,
   'classAffix': 'success',
   'iconName': 'check',
   'prettyNameKey': 'success',
-  'isInline': true
+  'extraClass': "$!extraClass"
+})
+#_genericMessage($parameters)
+#end
+
+## Display an inline success message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(inlineSuccess $text $extraClass)
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'success',
+  'iconName': 'check',
+  'prettyNameKey': 'success',
+  'isInline': true,
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end

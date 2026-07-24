@@ -39,7 +39,9 @@
     class="displayer-actions-popover"
     :interactive="true"
     :trigger="
-      isEditable && !duringEditing ? 'mouseenter focus manual' : 'manual'
+      isEditable && !duringEditing && !isEditMode
+        ? 'mouseenter focus manual'
+        : 'manual'
     "
     theme="light-border"
     follow-cursor="horizontal"
@@ -47,14 +49,16 @@
     ref="tippy"
     :ignore-attributes="true"
     :z-index="99999"
-    tabindex="0"
+    :tabindex="isView ? 0 : -1"
     :aria="{ expanded: false }"
     tag="div"
+    @focusin="onDisplayerFocus"
   >
     <div
       :class="{ view: isView, edit: !isView, editable: isEditable }"
       ref="displayerRoot"
-      @keydown.self.enter="setEdit"
+      @keydown.enter.exact="onEnter(false)"
+      @keydown.enter.ctrl="onEnter(true)"
       v-touch:tap="touchHandler"
     >
       <!--
@@ -82,8 +86,8 @@
 
       <!-- The slot containing the displayer Editor widget -->
       <div
-        @keydown.enter="applyEdit"
         @keydown.esc.capture="cancelEdit"
+        @focusout="onDisplayerBlur"
         v-if="!isView && !isLoading"
         ref="editBlock"
       >
@@ -196,6 +200,9 @@ export default {
       }
       return isViewable;
     },
+    isEditMode() {
+      return this.logic.isEditMode();
+    },
   },
 
   // The following methods are only used by the BaseDisplayer component
@@ -255,23 +262,67 @@ export default {
         }
       }
     },
-  },
-  mounted() {
-    // Monitors clicks outside of the current cell. We switch back to view mode whenever a click is done outside of
-    // the current cell.
+    onDisplayerFocus() {
+      // In edit mode, focusing an editable cell should make it editable.
+      if (this.logic.isEditMode()) {
+        const editBus = this.logic.getEditBus();
+
+        // If another cell is currently being saved, that save will then
+        // refresh the table and re-render this cell. Opening the editor now
+        // would just lock the edit bus before the editor gets destroyed.
+        if (editBus.hasPendingSave()) {
+          editBus.requestEdit(
+            this.logic.getEntryId(this.entry),
+            this.propertyId,
+          );
+        } else {
+          this.setEdit();
+        }
+      }
+    },
+    // Resume an edit that was requested on this cell.
+    resumeRequestedEdit() {
+      if (
+        this.logic.isEditMode() &&
+        this.logic
+          .getEditBus()
+          .enablePendingEdit(this.logic.getEntryId(this.entry), this.propertyId)
+      ) {
+        this.setEdit();
+      }
+    },
+    // Monitors focus switching outside of the current cell.
+    // We switch back to view mode whenever focus of the current cell is lost.
     // eslint-disable-next-line max-statements
-    const listener = (evt) => {
+    async onDisplayerBlur(evt) {
       if (!this.isView) {
         const editBlock = this.$refs["editBlock"];
 
-        if (editBlock.contains(evt.target)) {
+        // The edit block is not rendered while the editor is still loading (e.g. while an edit confirmation modal is
+        // displayed), so there is nothing to switch away from yet and clicks (such as on the modal buttons) must be
+        // ignored.
+        // Focus moved to another element of this cell: keep editing.
+        if (
+          !editBlock ||
+          (evt.relatedTarget && this.$el.contains(evt.relatedTarget))
+        ) {
           return;
         }
 
-        // Wait a little before switching back to view mode, otherwise the change can cause a column
-        // width change// and make the user click on the wrong column. For instance, when trying to
-        // edit the next column by double clicking on it.
-        setTimeout(() => this.applyEdit(), 200);
+        // In some cases, a focusout without a related target can be caused by
+        // a focus bounce. So we wait for the focus to settle and we skip the
+        // event if it actually landed back inside this cell.
+        if (!evt.relatedTarget) {
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          if (
+            editBlock !== this.$refs["editBlock"] ||
+            this.$el.contains(document.activeElement)
+          ) {
+            return;
+          }
+        }
+
+        await this.applyEdit();
       } else {
         const displayerElement = this.$refs["displayerRoot"];
 
@@ -279,22 +330,46 @@ export default {
           return;
         }
 
-        if (displayerElement.contains(evt.target)) {
+        if (evt.relatedTarget && displayerElement.contains(evt.relatedTarget)) {
           return;
         }
+
         this.closePopover();
       }
-    };
-    document.addEventListener("click", listener);
-    if (this.interceptTouch) {
-      // When activated, we also listen to touch events outside of the current displayer.
-      document.addEventListener("touchstart", listener);
-    }
-
+    },
+    async onEnter(addNewEntry) {
+      await this.applyEdit();
+      if (this.entry?._new) {
+        await this.logic.saveNewEntry();
+        if (addNewEntry) {
+          this.logic.addEntry();
+        }
+      }
+    },
+  },
+  mounted() {
     // We need to listen on the edit bus event because isEditable is not reactive.
     this.logic.getEditBus().onAnyEvent(() => {
       this.duringEditing = !this.logic.getEditBus().isEditable();
     });
+    // This cell might have been re-created by a refresh following a save,
+    // so we try to resume any edit that could have been requested on it.
+    this.resumeRequestedEdit();
+  },
+  watch: {
+    // The disable prop behaves weirdly, so we handle that manually instead.
+    isEditMode(newValue) {
+      if (newValue) {
+        this.$refs.tippy.tippy.disable();
+      } else {
+        this.$refs.tippy.tippy.enable();
+      }
+    },
+    // This cell might have been re-used as-is by a refresh following a save,
+    // so we try to resume any edit that could have been requested on it.
+    entry() {
+      this.resumeRequestedEdit();
+    },
   },
 };
 </script>

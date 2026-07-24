@@ -99,6 +99,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     @Deprecated
     public static final String XWIKI_JOB_CLASS = "XWiki.SchedulerJobClass";
 
+    private static final String JOB_NAME = "jobName";
+
+    private static final String STATUS = "status";
+
+    private static final String PAUSED = "Paused";
+
+    private static final String NORMAL = "Normal";
+
     /**
      * Local reference of the XWiki Scheduler Job Class representing a job that can be scheduled by this plugin.
      */
@@ -142,14 +150,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         this.schedulersClassLoaderManager.setSchedulerPlugin(this);
 
         if (this.enabled) {
-            Thread thread = new Thread(new ExecutionContextRunnable(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    initAsync();
-                }
-            }, Utils.getComponentManager()));
+            Thread thread = new Thread(new ExecutionContextRunnable(() -> initAsync(),
+                Utils.getComponentManager()));
             thread.setName("XWiki Scheduler initialization");
             thread.setDaemon(true);
 
@@ -272,7 +274,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             } catch (XWikiException e) {
                 throw new SchedulerPluginException(
                     SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_PREPARE_JOB_CONTEXT,
-                    "Failed to prepare context for job with job name " + job.getStringValue("jobName"), e);
+                    "Failed to prepare context for job with job name " + job.getStringValue(JOB_NAME), e);
             } finally {
                 context.setWikiId(iDb);
             }
@@ -318,7 +320,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         } catch (Exception e) {
             throw new SchedulerPluginException(
                 SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_PREPARE_JOB_CONTEXT,
-                "Failed to prepare context for job with job name " + job.getStringValue("jobName"), e);
+                "Failed to prepare context for job with job name " + job.getStringValue(JOB_NAME), e);
         }
 
         return scontext;
@@ -365,7 +367,11 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 
     private void register(BaseObject jobObj, XWikiContext context) throws SchedulerPluginException
     {
-        String status = jobObj.getStringValue("status");
+        if (jobObj == null) {
+            return;
+        }
+
+        String status = jobObj.getStringValue(STATUS);
         if (status.equals(JobState.STATE_NORMAL) || status.equals(JobState.STATE_PAUSED)) {
             scheduleJob(jobObj, context);
         }
@@ -496,33 +502,33 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                     break;
                 case NORMAL:
                     if (getTrigger(object).compareTo(trigger) != 0) {
-                        LOGGER.debug("Reschedule Job: [{}]", object.getStringValue("jobName"));
+                        LOGGER.debug("Reschedule Job: [{}]", object.getStringValue(JOB_NAME));
                     }
                     getScheduler().rescheduleJob(trigger.getKey(), trigger);
                     break;
                 case NONE:
-                    LOGGER.debug("Schedule Job: [{}]", object.getStringValue("jobName"));
+                    LOGGER.debug("Schedule Job: [{}]", object.getStringValue(JOB_NAME));
                     getScheduler().scheduleJob(trigger);
-                    LOGGER.info("XWiki Job Status: [{}]", object.getStringValue("status"));
-                    if ("Paused".equals(object.getStringValue("status"))) {
+                    LOGGER.info("XWiki Job Status: [{}]", object.getStringValue(STATUS));
+                    if (PAUSED.equals(object.getStringValue(STATUS))) {
                         getScheduler().pauseJob(new JobKey(jobID));
-                        saveStatus("Paused", object, context);
+                        saveStatus(PAUSED, object, context);
                     } else {
-                        saveStatus("Normal", object, context);
+                        saveStatus(NORMAL, object, context);
                     }
                     break;
                 default:
-                    LOGGER.debug("Schedule Job: [{}]", object.getStringValue("jobName"));
+                    LOGGER.debug("Schedule Job: [{}]", object.getStringValue(JOB_NAME));
                     getScheduler().scheduleJob(trigger);
-                    saveStatus("Normal", object, context);
+                    saveStatus(NORMAL, object, context);
                     break;
             }
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SCHEDULE_JOB,
-                "Error while scheduling job " + object.getStringValue("jobName"), e);
+                "Error while scheduling job " + object.getStringValue(JOB_NAME), e);
         } catch (XWikiException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
-                "Error while saving job status for job : " + object.getStringValue("jobName"), e);
+                "Error while saving job status for job : " + object.getStringValue(JOB_NAME), e);
         }
 
         return scheduled;
@@ -541,13 +547,13 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         try {
             getScheduler().pauseJob(new JobKey(job));
 
-            saveStatus("Paused", object, context);
+            saveStatus(PAUSED, object, context);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                "Error occured while trying to pause job " + object.getStringValue("jobName"), e);
+                "Error occured while trying to pause job " + object.getStringValue(JOB_NAME), e);
         } catch (XWikiException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                "Error occured while trying to save status of job " + object.getStringValue("jobName"), e);
+                "Error occured while trying to save status of job " + object.getStringValue(JOB_NAME), e);
         }
     }
 
@@ -564,13 +570,13 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         try {
             getScheduler().resumeJob(new JobKey(job));
 
-            saveStatus("Normal", object, context);
+            saveStatus(NORMAL, object, context);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_JOB,
-                "Error occured while trying to resume job " + object.getStringValue("jobName"), e);
+                "Error occured while trying to resume job " + object.getStringValue(JOB_NAME), e);
         } catch (XWikiException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_JOB,
-                "Error occured while trying to save status of job " + object.getStringValue("jobName"), e);
+                "Error occured while trying to save status of job " + object.getStringValue(JOB_NAME), e);
         }
     }
 
@@ -589,7 +595,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             getScheduler().triggerJob(new JobKey(job));
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_TRIGGER_JOB,
-                "Error occured while trying to trigger job " + object.getStringValue("jobName"), e);
+                "Error occured while trying to trigger job " + object.getStringValue(JOB_NAME), e);
         }
     }
 
@@ -608,7 +614,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             saveStatus("None", object, context);
         } catch (XWikiException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
-                "Error while saving status of job " + object.getStringValue("jobName"), e);
+                "Error while saving status of job " + object.getStringValue(JOB_NAME), e);
         }
     }
 
@@ -619,7 +625,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             getScheduler().deleteJob(new JobKey(job));
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                "Error occured while trying to pause job " + object.getStringValue("jobName"), e);
+                "Error occured while trying to pause job " + object.getStringValue(JOB_NAME), e);
         }
         this.schedulersClassLoaderManager.removeScheduler(object.getReference());
     }
@@ -815,7 +821,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         jobHolder = jobHolder.clone();
 
         BaseObject job = jobHolder.getXObject(XWIKI_JOB_CLASSREFERENCE);
-        job.setStringValue("status", status);
+        job.setStringValue(STATUS, status);
         jobHolder.setMinorEdit(true);
         context.getWiki().saveDocument(jobHolder, context);
     }

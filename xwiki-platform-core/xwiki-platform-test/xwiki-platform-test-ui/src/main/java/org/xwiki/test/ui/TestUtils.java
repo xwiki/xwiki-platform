@@ -198,6 +198,8 @@ public class TestUtils
 
     private static final String MAIN_WIKI_NAME = "xwiki";
 
+    private static final String USER_CLASS_NAME = "XWiki.XWikiUsers";
+
     private static PersistentTestContext context;
 
     private static ComponentManager componentManager;
@@ -439,9 +441,15 @@ public class TestUtils
             } else {
                 getDriver().get(getURLToNonExistentPage());
             }
-
-            setDefaultCredentials(username, password);
         }
+
+        // Always synchronize the REST client credentials with the requested user, even when the browser was already
+        // logged in as that user and thus skipped the browser login above. The browser session and the REST client
+        // credentials are independent states, so if the synchronization were done only inside the branch above the
+        // REST client could stay authenticated as a different user than the browser: e.g. createUserAndLogin() can
+        // leave the browser logged in as the previous user (typically superadmin) while switching the REST user, and a
+        // subsequent login as that same browser user would then skip the branch and keep the wrong REST credentials.
+        setDefaultCredentials(username, password);
     }
 
     /**
@@ -551,18 +559,58 @@ public class TestUtils
 
     public void createUserAndLogin(final String username, final String password, Object... properties)
     {
-        createUserAndLoginWithRedirect(username, password, getURLToNonExistentPage(), properties);
+        // Don't navigate to any page after logging in: the login redirect already lands on the Register page (see
+        // createUserAndLoginWithRedirect) which is a fully-skinned, meaningful page for screenshots and screen
+        // recordings, and callers navigate to the page they actually want to test right afterwards anyway. Loading a
+        // throw-away page here would only add a page load and, being a blank xpage=plain page, would hide the login
+        // state from screen recordings.
+        createUserAndLoginWithRedirect(username, password, null, properties);
     }
 
     public void createUserAndLoginWithRedirect(final String username, final String password, String url,
         Object... properties)
     {
-        createUser(username, password, getURLToLoginAndGotoPage(username, password, url), properties);
+        // Register the user and, in the same server-side redirect chain (register -> loginsubmit -> destination), log
+        // in. We land on the Register page rather than on a throw-away page for two reasons: it lets us verify below
+        // that the login actually succeeded (loginsubmit only redirects to its destination on success) and it lets us
+        // re-cache the CSRF token for the new user's session in place, without any extra page load.
+        String loginDestURL = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
+        registerUser(username, password, getURLToLoginAndGotoPage(username, password, loginDestURL));
+
+        // On a failed login, loginsubmit responds with 401 and does not redirect, so the browser stays on the
+        // loginsubmit URL instead of reaching loginDestURL. Fail fast with a helpful message rather than silently
+        // continuing as guest, which would otherwise surface as a confusing, unrelated failure later in the test.
+        if (!Strings.CS.startsWith(getDriver().getCurrentUrl(), loginDestURL)) {
+            throw new IllegalStateException(String.format(
+                "Failed to create and log in user [%s]. Was expecting to be on URL [%s] but was on [%s]. Page source "
+                    + "is [%s].", username, loginDestURL, getDriver().getCurrentUrl(), getDriver().getPageSource()));
+        }
+
+        // We're on the Register page: re-cache the CSRF token for the new user's session (the token cached for the
+        // previous user is no longer valid) before it's used e.g. by updateObject below.
+        recacheSecretTokenWhenOnRegisterPage();
+
+        if (properties.length > 0) {
+            updateObject("XWiki", username, USER_CLASS_NAME, 0, properties);
+        }
 
         setDefaultCredentials(username, password);
+
+        if (url != null) {
+            getDriver().get(url);
+        }
     }
 
     public void createUser(final String username, final String password, String redirectURL, Object... properties)
+    {
+        registerUser(username, password, redirectURL);
+        recacheSecretToken();
+        if (properties.length > 0) {
+            updateObject("XWiki", username, USER_CLASS_NAME, 0, properties);
+        }
+    }
+
+    private void registerUser(final String username, final String password, String redirectURL)
     {
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("register", "1");
@@ -575,10 +623,6 @@ public class TestUtils
         }
         parameters.put("form_token", getSecretToken());
         getDriver().get(getURL("XWiki", "Register", "register", parameters));
-        recacheSecretToken();
-        if (properties.length > 0) {
-            updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
-        }
     }
 
     /**
@@ -607,7 +651,7 @@ public class TestUtils
         LocalDocumentReference userReference = new LocalDocumentReference("XWiki", username);
         Page userPage = rest().page(userReference);
         userPage.setObjects(new org.xwiki.rest.model.jaxb.Objects());
-        org.xwiki.rest.model.jaxb.Object userObject = RestTestUtils.object("XWiki.XWikiUsers");
+        org.xwiki.rest.model.jaxb.Object userObject = RestTestUtils.object(USER_CLASS_NAME);
 
         // Set password and mark the user active (a real Admin user is active), so that queries filtering
         // on active users (e.g. the user suggestion query) return this user.
@@ -624,14 +668,16 @@ public class TestUtils
 
         // Add the user to XWikiAllGroup
         try {
-            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member",
+                serializeReference(userReference));
         } catch (Exception e) {
             fail("Failed to add the user in the XWikiAllGroup group", e);
         }
 
         // Add the user to XWikiAdminGroup group (before we login as the user does not have admin right at first)
         try {
-            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member",
+                serializeReference(userReference));
         } catch (Exception e) {
             fail("Failed to add the user in the XWikiAdminGroup group", e);
         }
@@ -1645,14 +1691,12 @@ public class TestUtils
 
     public boolean isInWYSIWYGEditMode()
     {
-        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wysiwyg')]"))
-            .size() > 0;
+        return !getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wysiwyg')]")).isEmpty();
     }
 
     public boolean isInWikiEditMode()
     {
-        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]"))
-            .size() > 0;
+        return !getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]")).isEmpty();
     }
 
     public boolean isInViewMode()

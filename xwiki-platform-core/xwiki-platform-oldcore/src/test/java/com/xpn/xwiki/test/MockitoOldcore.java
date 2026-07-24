@@ -384,7 +384,7 @@ public class MockitoOldcore
         // Make sure to provide a EntityReferenceFactory
         if (!getMocker().hasComponent(EntityReferenceFactory.class)) {
             EntityReferenceFactory factory = getMocker().registerMockComponent(EntityReferenceFactory.class);
-            when(factory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
+            when(factory.getReference(any())).thenAnswer(invocation -> invocation.getArgument(0));
         }
 
         // Make sure a default ConfigurationSource is available
@@ -1474,11 +1474,9 @@ public class MockitoOldcore
      */
     public WikiDescriptorManager getWikiDescriptorManager() throws ComponentLookupException
     {
-        if (this.wikiDescriptorManager == null) {
-            // Avoid initializing it if not needed
-            if (this.componentManager.hasComponent(WikiDescriptorManager.class)) {
-                this.wikiDescriptorManager = this.componentManager.getInstance(WikiDescriptorManager.class);
-            }
+        // Avoid initializing it if not needed
+        if (this.wikiDescriptorManager == null && this.componentManager.hasComponent(WikiDescriptorManager.class)) {
+            this.wikiDescriptorManager = this.componentManager.getInstance(WikiDescriptorManager.class);
         }
 
         return this.wikiDescriptorManager;

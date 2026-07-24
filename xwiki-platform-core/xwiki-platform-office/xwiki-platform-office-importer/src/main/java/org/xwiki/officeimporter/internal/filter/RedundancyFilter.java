@@ -29,7 +29,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
-import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
  * This filter is used to remove those tags that doesn't play any role with the representation of information. This type
@@ -61,26 +60,14 @@ public class RedundancyFilter extends AbstractHTMLFilter
     public void filter(Document document, Map<String, String> cleaningParams)
     {
         List<Element> elementsWithNoAttributes =
-            filterDescendants(document.getDocumentElement(), FILTERED_IF_NO_ATTRIBUTES_TAGS, new ElementSelector()
-            {
-                @Override
-                public boolean isSelected(Element element)
-                {
-                    return !element.hasAttributes();
-                }
-            });
+            filterDescendants(document.getDocumentElement(), FILTERED_IF_NO_ATTRIBUTES_TAGS,
+                element -> !element.hasAttributes());
         for (Element element : elementsWithNoAttributes) {
             replaceWithChildren(element);
         }
         List<Element> elementsWithNoContent =
-            filterDescendants(document.getDocumentElement(), FILTERED_IF_NO_CONTENT_TAGS, new ElementSelector()
-            {
-                @Override
-                public boolean isSelected(Element element)
-                {
-                    return "".equals(element.getTextContent().trim());
-                }
-            });
+            filterDescendants(document.getDocumentElement(), FILTERED_IF_NO_CONTENT_TAGS,
+                element -> "".equals(element.getTextContent().trim()));
         for (Element element : elementsWithNoContent) {
             String textContent = element.getTextContent();
             if ("".equals(textContent)) {

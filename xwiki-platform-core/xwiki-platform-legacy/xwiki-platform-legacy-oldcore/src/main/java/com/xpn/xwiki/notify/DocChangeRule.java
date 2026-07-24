@@ -74,7 +74,7 @@ public class DocChangeRule implements XWikiNotificationRule
         } catch (Exception e) {
             // protect from bad listeners
             LOGGER.error("Failed to notify target [{}] for event [{}], newdoc = [{}], olddoc = [{}]",
-                new Object[] {getTarget(), this, newdoc, olddoc, e});
+                getTarget(), this, newdoc, olddoc, e);
         }
     }
 
@@ -90,7 +90,7 @@ public class DocChangeRule implements XWikiNotificationRule
         } catch (Exception e) {
             // protect from bad listeners
             LOGGER.error("Failed to notify target [{}] for pre event [{}], newdoc = [{}], olddoc = [{}]",
-                new Object[] {getTarget(), this, newdoc, olddoc, e});
+                getTarget(), this, newdoc, olddoc, e);
         }
     }
 

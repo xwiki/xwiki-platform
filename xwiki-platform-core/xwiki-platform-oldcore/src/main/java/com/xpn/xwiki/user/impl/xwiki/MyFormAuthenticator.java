@@ -100,8 +100,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         }
         response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + this.loginPage + "?"
             + sridParameter + "&xredirect=" + URLEncoder.encode(redirectBack.toString(), "UTF-8")));
-
-        return;
     }
 
     @Override
@@ -292,10 +290,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         HttpServletResponse httpServletResponse, URLPatternMatcher urlPatternMatcher) throws Exception
     {
         boolean result = super.processLogout(securityRequestWrapper, httpServletResponse, urlPatternMatcher);
-        if (result == true) {
-            if (this.persistentLoginManager != null) {
-                this.persistentLoginManager.forgetLogin(securityRequestWrapper, httpServletResponse);
-            }
+        if (result && this.persistentLoginManager != null) {
+            this.persistentLoginManager.forgetLogin(securityRequestWrapper, httpServletResponse);
         }
         return result;
     }

@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ComponentList(value = { CurrentEntityReferenceProvider.class, CurrentStringEntityReferenceResolver.class,
 DefaultModelConfiguration.class, DefaultSymbolScheme.class, ExplicitReferencePageReferenceResolver.class,
 ExplicitReferenceEntityReferenceResolver.class })
-public class CurrentStringEntityReferenceResolverTest
+class CurrentStringEntityReferenceResolverTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
@@ -71,13 +71,13 @@ public class CurrentStringEntityReferenceResolverTest
     private CurrentStringEntityReferenceResolver resolver;
 
     @BeforeEach
-    public void beforeEach() throws Exception
+    void beforeEach() throws Exception
     {
         this.oldcore.getXWikiContext().setWikiId(CURRENT_WIKI);
     }
 
     @Test
-    public void testResolveDocumentReferenceWhenNoContextWiki() throws Exception
+    void testResolveDocumentReferenceWhenNoContextWiki() throws Exception
     {
         this.oldcore.getXWikiContext().setWikiId(null);
 
@@ -89,7 +89,7 @@ public class CurrentStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveDocumentReferenceWhenNoContextDocument() throws Exception
+    void testResolveDocumentReferenceWhenNoContextDocument() throws Exception
     {
         this.oldcore.getXWikiContext().setWikiId(null);
         this.oldcore.getXWikiContext().setDoc(null);
@@ -102,7 +102,7 @@ public class CurrentStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveDocumentReferenceWhenContextDocument() throws Exception
+    void testResolveDocumentReferenceWhenContextDocument() throws Exception
     {
         this.oldcore.getXWikiContext()
             .setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_DOCUMENT)));
@@ -115,7 +115,7 @@ public class CurrentStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveAttachmentReference() throws Exception
+    void testResolveAttachmentReference() throws Exception
     {
         this.oldcore.getXWikiContext()
             .setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_DOCUMENT)));
@@ -129,7 +129,7 @@ public class CurrentStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveAttachmentReferenceWhenMissingParentsAndNoContextDocument()
+    void testResolveAttachmentReferenceWhenMissingParentsAndNoContextDocument()
     {
         EntityReference reference = resolver.resolve("filename", EntityType.ATTACHMENT);
 
@@ -142,7 +142,7 @@ public class CurrentStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
+    void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
         this.oldcore.getXWikiContext()
             .setDoc(new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_DOCUMENT)));
@@ -158,7 +158,7 @@ public class CurrentStringEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolvePageReferenceKeywords() throws Exception
+    void testResolvePageReferenceKeywords() throws Exception
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_PAGE));
         FieldUtils.writeDeclaredField(document, "pageReferenceCache",

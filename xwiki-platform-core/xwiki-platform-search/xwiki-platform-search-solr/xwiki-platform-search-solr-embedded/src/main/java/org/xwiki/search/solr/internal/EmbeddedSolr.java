@@ -381,12 +381,9 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
         // Check the version of the schema
         File schemaFile = this.solrSearchCorePath.resolve(SCHEMA_PATH).toFile();
-        if (!schemaFile.exists() || SEARCH_CORE_MAJOR_VERSION > getCoreVersion(schemaFile)) {
-            return false;
-        }
 
         // Everything seems to have as expected
-        return true;
+        return schemaFile.exists() && SEARCH_CORE_MAJOR_VERSION <= getCoreVersion(schemaFile);
     }
 
     private void recreateSearchCore() throws IOException
@@ -518,8 +515,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
     private File getCacheCorePropertiesFile(Path corePath)
     {
-        File corePropertiesFile = corePath.resolve(CORE_PROPERTIES_FILENAME).toFile();
-        return corePropertiesFile;
+        return corePath.resolve(CORE_PROPERTIES_FILENAME).toFile();
     }
 
     private void createCacheCore(Path corePath, String solrCoreName) throws IOException

@@ -199,8 +199,8 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
                 }
             }
 
-            if (writableConfiguration instanceof DefaultConfiguration) {
-                extendConfiguration((DefaultConfiguration) writableConfiguration);
+            if (writableConfiguration instanceof DefaultConfiguration defaultConfiguration) {
+                extendConfiguration(defaultConfiguration);
             }
         }
 

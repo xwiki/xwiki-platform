@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class AttachmentURLStreamHandlerTest
+class AttachmentURLStreamHandlerTest
 {
     @InjectMockComponents
     private AttachmentURLStreamHandler handler;

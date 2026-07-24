@@ -75,7 +75,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     private XWikiSecurityAccess denyAllAccess;
 
     @BeforeEach
-    public void configure() throws Exception
+    void configure() throws Exception
     {
         defaultAccess = XWikiSecurityAccess.getDefaultAccess();
         denyAllAccess = new XWikiSecurityAccess();
@@ -107,7 +107,7 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
 
             when(entry.getReference()).thenReturn(ref);
             when(entry.getRules()).thenReturn(rules);
-            when(entry.isEmpty()).thenReturn(rules.size() == 0);
+            when(entry.isEmpty()).thenReturn(rules.isEmpty());
 
             ref = ref.getParentSecurityReference();
             i++;
@@ -630,8 +630,6 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
                 getMockedSecurityRuleEntries("denyAccessDAF", docRef,
                     Arrays.asList(Arrays.asList(denyImpliedDAF)))));
 
-        SecurityRule allowAllTestRightsUserAndAnotherGroup = getMockedSecurityRule("allowAllTestRightsUserAndAnotherGroup",
-            Arrays.asList(userRef), Arrays.asList(anotherGroupRef), allTestRights, ALLOW);
         SecurityRule denyAllTestRightsUserAndAnotherGroup = getMockedSecurityRule("denyAllTestRightsUserAndAnotherGroup",
             Arrays.asList(userRef), Arrays.asList(anotherGroupRef), allTestRights, DENY);
         SecurityRule denyAllTestRightsAnotherUserAndGroup = getMockedSecurityRule("denyAllTestRightsAnotherUserAndGroup",

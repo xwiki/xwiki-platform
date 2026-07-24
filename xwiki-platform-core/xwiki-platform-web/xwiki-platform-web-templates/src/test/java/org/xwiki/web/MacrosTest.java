@@ -452,6 +452,8 @@ class MacrosTest extends PageTest
         StringWriter out = new StringWriter();
         this.velocityManager.evaluate(out, "getSanitizedURLAttributeValue", new StringReader(script));
         assertEquals(fallbackUrl, velocityContext.get("sanitizedResult"));
+        // Logging the caught exception must not insert any character in the macro's (otherwise empty) output.
+        assertEquals("", out.toString());
     }
 
     @Test

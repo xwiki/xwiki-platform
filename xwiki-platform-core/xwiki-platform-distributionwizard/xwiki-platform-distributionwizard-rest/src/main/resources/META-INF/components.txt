@@ -1,0 +1,4 @@
+org.xwiki.distributionwizard.rest.internal.DefaultDistributionWizardStepResources
+org.xwiki.distributionwizard.rest.internal.DefaultDistributionWizardStepsResources
+org.xwiki.distributionwizard.rest.internal.DefaultDistributionWizardStepStatusResources
+org.xwiki.distributionwizard.rest.internal.StepResourceHelper

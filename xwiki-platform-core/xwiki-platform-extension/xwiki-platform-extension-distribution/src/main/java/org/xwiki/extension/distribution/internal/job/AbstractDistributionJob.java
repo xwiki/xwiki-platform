@@ -164,6 +164,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
 
         this.progressManager.pushLevelProgress(steps.size(), this);
 
+        // FIXME
         // Initialize steps
         WelcomeDistributionStep welcomeStep = (WelcomeDistributionStep) getStep(steps, WelcomeDistributionStep.ID);
         ReportDistributionStep reportStep = (ReportDistributionStep) getStep(steps, ReportDistributionStep.ID);

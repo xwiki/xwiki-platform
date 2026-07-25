@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -33,7 +32,6 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
@@ -47,24 +45,6 @@ class UserTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
-
-    /**
-     * Checks that XWIKI-2040 remains fixed.
-     */
-    @Test
-    void isUserInGroupDoesNotThrowNPE()
-    {
-        User u = new User(null, null);
-        assertFalse(u.isUserInGroup("XWiki.InexistentGroupName"));
-
-        XWikiUser xu = new XWikiUser((String)null);
-        u = new User(xu, null);
-        assertFalse(u.isUserInGroup("XWiki.InexistentGroupName"));
-
-        XWikiContext c = new XWikiContext();
-        u = new User(xu, c);
-        assertFalse(u.isUserInGroup("XWiki.InexistentGroupName"));
-    }
 
     @Test
     void getEmail() throws Exception

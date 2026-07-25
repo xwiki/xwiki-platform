@@ -52,11 +52,15 @@ public class VulnObject
     private List<String> aliases;
 
     /**
-     * @return the affected field
+     * @return the affected field, or an empty list when the vulnerability has none (the field is optional in the OSV
+     *     schema)
      * @see <a href="https://ossf.github.io/osv-schema/#affected-fields">affected doc</a>
      */
     public List<AffectObject> getAffected()
     {
+        if (this.affected == null) {
+            return List.of();
+        }
         return this.affected;
     }
 
@@ -86,10 +90,14 @@ public class VulnObject
     }
 
     /**
-     * @return the references field
+     * @return the references field, or an empty list when the vulnerability has none (the field is optional in the OSV
+     *     schema)
      */
     public List<VulnReferenceObject> getReferences()
     {
+        if (this.references == null) {
+            return List.of();
+        }
         return this.references;
     }
 
@@ -123,7 +131,7 @@ public class VulnObject
      */
     public String getMainURL()
     {
-        return this.references.stream()
+        return getReferences().stream()
             .filter(reference -> Objects.equals(reference.getType(), "WEB"))
             .findFirst()
             .map(VulnReferenceObject::getUrl)
@@ -168,7 +176,7 @@ public class VulnObject
      */
     public Optional<Version> getMaxFixVersion(Version currentVersion)
     {
-        return this.affected.stream()
+        return getAffected().stream()
             .flatMap(affect -> affect.getRanges().stream())
             .flatMap(range -> range.getEvents().stream())
             .map(EventObject::getFixed)

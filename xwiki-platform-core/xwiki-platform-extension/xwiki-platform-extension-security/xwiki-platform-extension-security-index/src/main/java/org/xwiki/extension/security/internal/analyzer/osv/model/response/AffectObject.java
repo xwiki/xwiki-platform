@@ -54,10 +54,14 @@ public class AffectObject
     }
 
     /**
-     * @return the ranges
+     * @return the ranges, or an empty list when the affected entry has no ranges (the field is optional in the OSV
+     *     schema, an affected entry can instead enumerate the affected versions)
      */
     public List<RangeObject> getRanges()
     {
+        if (this.ranges == null) {
+            return List.of();
+        }
         return this.ranges;
     }
 

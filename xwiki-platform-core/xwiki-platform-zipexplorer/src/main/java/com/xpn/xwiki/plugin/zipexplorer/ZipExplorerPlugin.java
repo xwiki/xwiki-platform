@@ -330,7 +330,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
 
             // TODO: Ideally we should also check to see if the URL points to a file and not to
             // a directory.
-            if (filenameInZip.length() > 0) {
+            if (!filenameInZip.isEmpty()) {
                 isValidZipURL = true;
             }
         } catch (Exception e) {

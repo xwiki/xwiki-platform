@@ -152,7 +152,7 @@ public final class XarUtils
                     } else if (XarDocumentModel.ELEMENT_LOCALE.equals(elementName)) {
                         if (locale == null) {
                             String value = xmlReader.getElementText();
-                            if (value.length() == 0) {
+                            if (value.isEmpty()) {
                                 locale = Locale.ROOT;
                             } else {
                                 locale = LocaleUtils.toLocale(value);

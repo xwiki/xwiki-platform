@@ -208,7 +208,7 @@ public abstract class AbstractAnnotationMaintainer implements AnnotationMaintain
         // map spaceless annotation (in context) on the spaceless version of the content
         int cStart = spacelessPreviousContent.getContent().toString().indexOf(spacelessContext);
 
-        if (spacelessContext.length() == 0 || cStart < 0) {
+        if (spacelessContext.isEmpty() || cStart < 0) {
             // annotation context does not exist or could not be found in the previous rendered content, it must be
             // somewhere in the generated content or something like that, skip it
             return updated;

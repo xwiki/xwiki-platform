@@ -195,10 +195,10 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
                     this.logger.error("Failed to get HTML head for handler type [{}]", entry.getKey(), e);
                 }
             }
-            if (head.length() > 0) {
+            if (!head.isEmpty()) {
                 servletResponse.getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
             }
-            if (scripts.length() > 0) {
+            if (!scripts.isEmpty()) {
                 servletResponse.getHttpServletResponse().addHeader("X-XWIKI-HTML-SCRIPTS",
                     scripts.toString());
             }

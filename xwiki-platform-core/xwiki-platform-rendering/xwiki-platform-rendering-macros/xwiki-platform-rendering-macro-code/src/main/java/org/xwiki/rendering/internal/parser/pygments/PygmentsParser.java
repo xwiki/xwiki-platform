@@ -165,7 +165,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
             throw new ParseException("Failed to read source", e);
         }
 
-        if (code.length() == 0) {
+        if (code.isEmpty()) {
             return Collections.emptyList();
         }
 

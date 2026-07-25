@@ -409,7 +409,7 @@ public class DefaultIOService implements IOService
         Annotation annotation = new Annotation(String.valueOf(object.getNumber()));
         annotation.setState(AnnotationState.valueOf(object.getStringValue(Annotation.STATE_FIELD)));
         String originalSelection = object.getStringValue(Annotation.ORIGINAL_SELECTION_FIELD);
-        if (originalSelection != null && originalSelection.length() > 0) {
+        if (originalSelection != null && !originalSelection.isEmpty()) {
             annotation.setOriginalSelection(originalSelection);
         }
 

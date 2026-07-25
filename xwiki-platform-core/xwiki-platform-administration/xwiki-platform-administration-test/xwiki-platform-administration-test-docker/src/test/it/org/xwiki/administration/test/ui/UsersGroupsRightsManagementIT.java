@@ -619,6 +619,81 @@ class UsersGroupsRightsManagementIT
         assertRightsTableShowsUsersAndGroups(new EditRightsPane());
     }
 
+    /**
+     * Verify that rights granted to a group at page level take precedence over a right denied at wiki level to a user
+     * member of that group: the user has no Edit option on the pages of the wiki but has one on the page for which the
+     * group is granted the "edit" right.
+     */
+    @Test
+    @Order(15)
+    void allowGroupRightsAtPageLevelWhenUserRightDeniedAtWikiLevel(TestUtils setup, TestReference testReference)
+    {
+        String userName = "userDeniedAtWikiLevel";
+        String groupName = "groupAllowedAtPageLevel";
+
+        // A page located outside of the tested space, and thus on which only the wiki level rights apply.
+        DocumentReference otherPage = new DocumentReference("xwiki",
+            testReference.getLastSpaceReference().getName() + "Other", "WebHome");
+
+        // Make sure the user, the group and the pages don't exist yet.
+        setup.deletePage("XWiki", userName);
+        setup.deletePage("XWiki", groupName);
+        setup.deletePage(testReference);
+        setup.deletePage(otherPage);
+
+        // Create a new user, a new group and add the user to the group.
+        setup.createUser(userName, userName, "");
+        GroupsPage groupsPage = GroupsPage.gotoPage();
+        groupsPage = groupsPage.addNewGroup(groupName);
+        groupsPage.clickEditGroup(groupName).addMember(userName, true).close();
+
+        // Deny the "edit" right to the user, from Administer Wiki > Users & Rights > Rights > Users.
+        EditRightsPane wikiRightsPane = AdministrationPage.gotoPage().clickGlobalRightsSection().getEditRightsPane();
+        wikiRightsPane.switchToUsers();
+        wikiRightsPane.getRightsTable().filterColumn("name", userName);
+        assertTrue(wikiRightsPane.hasEntity(userName));
+        wikiRightsPane.setRight(userName, EditRightsPane.Right.EDIT, EditRightsPane.State.DENY);
+
+        // Create the page on which the group is granted rights, and the page on which it isn't.
+        setup.createPage(testReference, "Group allowed content", "Group Allowed Page");
+        setup.createPage(otherPage, "Wiki level content", "Wiki Level Page");
+
+        // Give the "view", "comment" and "edit" rights to the group, from Administer Page > Users & Rights >
+        // Rights: Page & Children.
+        AdministrationPage pageAdministrationPage =
+            AdministrationPage.gotoSpaceAdministrationPage(testReference.getLastSpaceReference());
+        pageAdministrationPage.clickSection("Users & Rights", "Rights: Page & Children");
+        EditRightsPane pageRightsPane = new EditRightsPane();
+        pageRightsPane.switchToGroups();
+        pageRightsPane.getRightsTable().filterColumn("name", groupName);
+        assertTrue(pageRightsPane.hasEntity(groupName));
+        pageRightsPane.setRight(groupName, EditRightsPane.Right.VIEW, EditRightsPane.State.ALLOW);
+        pageRightsPane.setRight(groupName, EditRightsPane.Right.COMMENT, EditRightsPane.State.ALLOW);
+        pageRightsPane.setRight(groupName, EditRightsPane.Right.EDIT, EditRightsPane.State.ALLOW);
+
+        setup.login(userName, userName);
+
+        // The user can access the wiki but the wiki level deny removes the Edit option.
+        ViewPage viewPage = setup.gotoPage(otherPage);
+        assertEquals("Wiki level content", viewPage.getContent());
+        assertFalse(viewPage.isEditAvailable(),
+            "The Edit option should not be available since \"edit\" is denied to the user at wiki level");
+
+        // The user can access the page granted to the group and, since the page level rights take precedence over
+        // the wiki level ones, the Edit option is available there.
+        viewPage = setup.gotoPage(testReference);
+        assertEquals("Group allowed content", viewPage.getContent());
+        assertTrue(viewPage.isEditAvailable(),
+            "The Edit option should be available since \"edit\" is allowed to the user's group at page level");
+
+        // Reset the wiki level right to avoid interference with other tests.
+        setup.loginAsSuperAdmin();
+        wikiRightsPane = AdministrationPage.gotoPage().clickGlobalRightsSection().getEditRightsPane();
+        wikiRightsPane.switchToUsers();
+        wikiRightsPane.getRightsTable().filterColumn("name", userName);
+        wikiRightsPane.setRight(userName, EditRightsPane.Right.EDIT, EditRightsPane.State.NONE);
+    }
+
     private void assertRightsTableShowsUsersAndGroups(EditRightsPane editRightsPane)
     {
         // Select Users: the user listing is displayed (default Admin user present).

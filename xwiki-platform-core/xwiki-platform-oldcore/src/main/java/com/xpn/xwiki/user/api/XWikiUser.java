@@ -19,10 +19,8 @@
  */
 package com.xpn.xwiki.user.api;
 
-import java.util.Collection;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -400,34 +398,6 @@ public class XWikiUser
 
         this.userReference = null;
         this.userReferenceSet = false;
-    }
-
-    /**
-     * Check if the user belongs to a group or not. This method only check direct membership (no recursive checking) in
-     * the current wiki.
-     *
-     * @param groupName The group to check.
-     * @param context The current {@link XWikiContext context}.
-     * @return {@code true} if the user does belong to the specified group, false otherwise or if an exception occurs.
-     * @throws XWikiException If an error occurs when checking the groups.
-     * @since 1.3
-     */
-    public boolean isUserInGroup(String groupName, XWikiContext context) throws XWikiException
-    {
-        if (!StringUtils.isEmpty(getUser())) {
-            XWikiGroupService groupService = context.getWiki().getGroupService(context);
-
-            DocumentReference groupReference = getCurrentMixedDocumentReferenceResolver().resolve(groupName);
-
-            Collection<DocumentReference> groups =
-                groupService.getAllGroupsReferencesForMember(getUserReference(), 0, 0, context);
-
-            if (groups.contains(groupReference)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

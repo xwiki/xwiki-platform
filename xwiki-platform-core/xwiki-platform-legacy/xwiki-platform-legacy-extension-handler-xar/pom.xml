@@ -45,6 +45,12 @@
       <artifactId>xwiki-platform-extension-handler-xar</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-oldcore</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -52,6 +58,20 @@
       <version>${project.version}</version>
       <!-- We don't want to draw this dependency since we're wrapping it. -->
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-oldcore</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- Used in place of xwiki-platform-oldcore, so that the deprecated APIs that only the legacy version provides
+         are the ones seen by this module. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-oldcore</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- Needed for backward compatibility Aspects -->
@@ -88,6 +108,35 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+        <configuration>
+          <analysisConfiguration combine.children="append">
+            <revapi.differences>
+              <justification>
+                This module depends on xwiki-platform-legacy-oldcore while the previous version it is compared against
+                depended on xwiki-platform-oldcore. The compared APIs thus differ by the deprecated APIs that the
+                legacy module weaves back in, which are not new APIs. These entries can be dropped once the compared
+                version also depends on xwiki-platform-legacy-oldcore.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method void com.xpn.xwiki.objects.classes.PropertyClassInterface::displaySearch(java.lang.StringBuffer, java.lang.String, java.lang.String, com.xpn.xwiki.plugin.query.XWikiCriteria, com.xpn.xwiki.XWikiContext)</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method com.xpn.xwiki.objects.classes.BaseClass com.xpn.xwiki.objects.CompatibilityObjectInterface::getxWikiClass(com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException @ com.xpn.xwiki.objects.classes.PropertyClassInterface</new>
+                </item>
+              </differences>
+            </revapi.differences>
+          </analysisConfiguration>
+        </configuration>
       </plugin>
     </plugins>
   </build>

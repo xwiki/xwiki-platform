@@ -734,6 +734,41 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             getWiki("wikiGroupUserDenyAllowNoAdmin"));
     }
 
+    /**
+     * Check that rights granted to a group at space level take precedence over a right denied at wiki level to a user
+     * member of that group. Contrary to {@link #tieResolutionPolicy()}, where the user rule wins over the group rule
+     * because both are defined at the same level, here the group rule wins because it is defined at a lower level.
+     */
+    @Test
+    void groupRightsAtSpaceLevelVersusUserDenyAtWikiLevel() throws Exception
+    {
+        initialiseWikiMock("groupRightsAtSpaceLevelVersusUserDenyAtWikiLevel");
+
+        // Where no lower level rule grants the edit right back, the wiki level deny applies to userA. The other
+        // rights are left untouched.
+        assertAccessTrue("userA should have view access on a document of a space without rules", VIEW,
+            getXUser("userA"), getXDoc("any document", "any space"));
+        assertAccessTrue("userA should have comment access on a document of a space without rules", COMMENT,
+            getXUser("userA"), getXDoc("any document", "any space"));
+        assertAccessFalse("userA should not have edit access on a document of a space without rules", EDIT,
+            getXUser("userA"), getXDoc("any document", "any space"));
+
+        // The space level rules granted to groupA take precedence over the wiki level deny for userA.
+        assertAccessTrue("userA should have view access on a document of the space allowed to its group", VIEW,
+            getXUser("userA"), getXDoc("any document", "spaceAllowGroupA"));
+        assertAccessTrue("userA should have comment access on a document of the space allowed to its group", COMMENT,
+            getXUser("userA"), getXDoc("any document", "spaceAllowGroupA"));
+        assertAccessTrue("userA should have edit access on a document of the space allowed to its group", EDIT,
+            getXUser("userA"), getXDoc("any document", "spaceAllowGroupA"));
+
+        // Granting the rights to groupA at space level restricts them to that group: userB, which is not a member,
+        // loses them even though no rule denies them to it.
+        assertAccessTrue("userB should have edit access on a document of a space without rules", EDIT,
+            getXUser("userB"), getXDoc("any document", "any space"));
+        assertAccessFalse("userB should not have edit access on a document of the space allowed to groupA", EDIT,
+            getXUser("userB"), getXDoc("any document", "spaceAllowGroupA"));
+    }
+
     @Test
     void documentCreator() throws Exception
     {

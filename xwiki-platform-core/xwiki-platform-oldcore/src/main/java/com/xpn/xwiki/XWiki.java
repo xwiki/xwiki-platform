@@ -2620,10 +2620,13 @@ public class XWiki implements EventListener
     {
         MutableRenderingContext mutableRenderingContext = getMutableRenderingContext();
 
-        Syntax currentTargetSyntax = mutableRenderingContext.getTargetSyntax();
+        Syntax currentTargetSyntax =
+            mutableRenderingContext != null ? mutableRenderingContext.getTargetSyntax() : null;
         try {
-            // Force rendering with XHTML 1.0 syntax for retro-compatibility
-            mutableRenderingContext.setTargetSyntax(Syntax.XHTML_1_0);
+            if (mutableRenderingContext != null) {
+                // Force rendering with XHTML 1.0 syntax for retro-compatibility
+                mutableRenderingContext.setTargetSyntax(Syntax.XHTML_1_0);
+            }
 
             Skin skin = getInternalSkinManager().getSkin(skinId);
             return getTemplateManager().renderFromSkin(template, skin);
@@ -2637,7 +2640,9 @@ public class XWiki implements EventListener
 
             return Util.getHTMLExceptionMessage(xe, context);
         } finally {
-            mutableRenderingContext.setTargetSyntax(currentTargetSyntax);
+            if (mutableRenderingContext != null) {
+                mutableRenderingContext.setTargetSyntax(currentTargetSyntax);
+            }
         }
     }
 

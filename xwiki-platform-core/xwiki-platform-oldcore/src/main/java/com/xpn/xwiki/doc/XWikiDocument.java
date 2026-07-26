@@ -73,6 +73,7 @@ import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.io.DocumentResult;
 import org.dom4j.io.OutputFormat;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.Diff;
@@ -4876,12 +4877,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private void copyAttachment(XWikiAttachment attachment, boolean reset) throws XWikiException
     {
-        XWikiAttachment newAttachment = attachment.cloneWithActualContent(getXWikiContext());
+        XWikiContext xcontext = getXWikiContext();
+        XWikiAttachment newAttachment = attachment.cloneWithActualContent(xcontext);
 
         if (reset) {
             // Reset the meta data that is specific to the original attachment (version, author, date).
             newAttachment.setRCSVersion(null);
-            newAttachment.setAuthorReference(getXWikiContext().getUserReference());
+            newAttachment.setAuthorReference(xcontext == null ? null : xcontext.getUserReference());
             newAttachment.setDate(new Date());
         }
 
@@ -5484,7 +5486,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         DocumentInstanceOutputProperties documentProperties = new DocumentInstanceOutputProperties();
         XWikiContext xcontext = getXWikiContext();
         if (xcontext != null) {
-            documentProperties.setDefaultReference(getXWikiContext().getWikiReference());
+            documentProperties.setDefaultReference(xcontext.getWikiReference());
         }
 
         // Input
@@ -7737,6 +7739,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
         String language = "";
         XWikiDocument tdoc = (XWikiDocument) context.get(CKEY_TDOC);
+        // Fall back to this document when no translated document is set in the context.
+        if (tdoc == null) {
+            tdoc = this;
+        }
         String realLang = tdoc.getRealLanguage(context);
         if ((xwiki.isMultiLingual(context) == true) && (!realLang.equals(""))) {
             language = realLang;
@@ -8457,6 +8463,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      *
      * @return the XWiki context for the current thread
      */
+    @Nullable
     private XWikiContext getXWikiContext()
     {
         Provider<XWikiContext> xcontextProvider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
@@ -9006,6 +9013,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     public static void backupContext(Map<String, Object> backup, XWikiContext context)
     {
+        // There's nothing to back up without a context and all the data below is read from it.
+        Objects.requireNonNull(context);
+
         // The XWiki Context isn't recreated when the Execution Context is cloned so we have to backup some of its data.
         // Backup the current document on the XWiki Context.
         backup.put("doc", context.getDoc());

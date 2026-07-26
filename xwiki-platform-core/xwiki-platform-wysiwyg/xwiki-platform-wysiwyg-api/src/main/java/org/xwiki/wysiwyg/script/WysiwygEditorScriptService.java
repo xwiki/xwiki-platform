@@ -301,8 +301,11 @@ public class WysiwygEditorScriptService implements ScriptService
     @Deprecated
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
-        XWikiContext xwikiContext = this.xcontextProvider.get();
-        return toAnnotatedXHTML(source, getSyntax(syntaxId), xwikiContext.getDoc().getDocumentReference());
+        XWikiDocument currentDocument = this.xcontextProvider.get().getDoc();
+        // Pass a null source reference when there's no current document and let the overload below handle it, so that
+        // the null case is handled in a single place.
+        EntityReference sourceReference = currentDocument == null ? null : currentDocument.getDocumentReference();
+        return toAnnotatedXHTML(source, getSyntax(syntaxId), sourceReference);
     }
 
     /**
@@ -336,6 +339,12 @@ public class WysiwygEditorScriptService implements ScriptService
      */
     public String toAnnotatedXHTML(String source, Syntax syntax, EntityReference sourceReference, boolean restricted)
     {
+        if (sourceReference == null) {
+            // Without a source reference, we can't resolve either the author to execute as, or the document to convert
+            // against. Thus we return the source unchanged, as is also done when the conversion fails below.
+            return source;
+        }
+
         XWikiDocument securityDocument = createSecurityDocument();
         XWikiDocument originalSecurityDocument = setSecurityDocument(securityDocument);
 

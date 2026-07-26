@@ -245,7 +245,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             // If the parameter is the refresh parameter then ignore it
             if (!entry.getKey().equals(PARAMETER_REFRESH)) {
                 for (String value : entry.getValue()) {
-                    if (sb.length() > 0) {
+                    if (!sb.isEmpty()) {
                         sb.append('&');
                     }
                     try {

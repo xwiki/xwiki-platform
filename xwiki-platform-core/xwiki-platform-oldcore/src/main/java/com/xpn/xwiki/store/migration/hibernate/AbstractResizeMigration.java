@@ -275,7 +275,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
             throw new DataMigrationException("Error while extracting metadata", e);
         }
 
-        if (builder.length() > 0) {
+        if (!builder.isEmpty()) {
             String script = String.format("<changeSet author=\"xwiki\" id=\"R%s\">%s</changeSet>",
                 getVersion().getVersion(), builder.toString());
 

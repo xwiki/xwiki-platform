@@ -751,7 +751,7 @@ public final class RightsManager
                 }
             } else if (currentPreference.getName().equals(SPACE_PREFERENCES)) {
                 String parentspace = currentPreference.getStringValue(WIKI_PREFERENCES, "parent");
-                if (parentspace.trim().length() > 0) {
+                if (!parentspace.trim().isEmpty()) {
                     parentPreferences =
                         context.getWiki().getDocument(parentspace + SPACEPAGENAME_SEP + SPACE_PREFERENCES, context);
                 } else {
@@ -981,8 +981,8 @@ public final class RightsManager
                 needUpdate |=
                     removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
 
-                if (needUpdate && bobj.getLargeStringValue(RIGHTSFIELD_USERS).trim().length() == 0
-                    && bobj.getLargeStringValue(RIGHTSFIELD_GROUPS).trim().length() == 0) {
+                if (needUpdate && bobj.getLargeStringValue(RIGHTSFIELD_USERS).trim().isEmpty()
+                    && bobj.getLargeStringValue(RIGHTSFIELD_GROUPS).trim().isEmpty()) {
                     rightsDocument.removeXObject(bobj);
                 }
             }

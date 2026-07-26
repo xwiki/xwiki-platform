@@ -259,7 +259,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             liquibaseChangeLogs = migration.getLiquibaseChangeLog();
         }
 
-        if (liquibaseChangeLogs == null || liquibaseChangeLogs.length() == 0) {
+        if (liquibaseChangeLogs == null || liquibaseChangeLogs.isEmpty()) {
             return;
         }
 

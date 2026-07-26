@@ -1250,7 +1250,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean isCustomMappingValid(String custommapping, XWikiContext context) throws XWikiException
     {
-        if ((custommapping != null) && (custommapping.trim().length() > 0)) {
+        if ((custommapping != null) && (!custommapping.trim().isEmpty())) {
             return context.getWiki().getStore().isCustomMappingValid(this, custommapping, context);
         } else {
             return true;
@@ -1260,7 +1260,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public List<String> getCustomMappingPropertyList(XWikiContext context)
     {
         String custommapping1 = getCustomMapping();
-        if ((custommapping1 != null) && (custommapping1.trim().length() > 0)) {
+        if ((custommapping1 != null) && (!custommapping1.trim().isEmpty())) {
             return context.getWiki().getStore().getCustomMappingPropertyList(this);
         } else {
             return new ArrayList<>();

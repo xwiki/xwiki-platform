@@ -326,7 +326,7 @@ public class XWikiMessageTool
     {
         List<XWikiDocument> list = new ArrayList<>();
 
-        if (documentName.length() != 0) {
+        if (!documentName.isEmpty()) {
             try {
                 XWikiContext context = getXWikiContext();
 

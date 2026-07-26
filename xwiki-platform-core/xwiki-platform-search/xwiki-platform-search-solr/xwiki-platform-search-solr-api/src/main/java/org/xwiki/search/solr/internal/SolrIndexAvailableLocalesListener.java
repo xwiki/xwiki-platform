@@ -149,7 +149,7 @@ public class SolrIndexAvailableLocalesListener implements EventListener
 
                     for (Locale newLocale : newLocales) {
                         for (Locale locale : getParentLocales(newLocale)) {
-                            if (builder.length() > 0) {
+                            if (!builder.isEmpty()) {
                                 builder.append(" OR ");
                             }
                             builder.append(FieldUtils.DOCUMENT_LOCALE);

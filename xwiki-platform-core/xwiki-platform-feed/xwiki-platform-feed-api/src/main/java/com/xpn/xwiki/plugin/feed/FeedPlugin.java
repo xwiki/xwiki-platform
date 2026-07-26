@@ -691,7 +691,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         StringBuffer categs = new StringBuffer("");
         if (categList != null) {
             for (SyndCategory categ : categList) {
-                if (categs.length() != 0) {
+                if (!categs.isEmpty()) {
                     categs.append(", ");
                 }
                 categs.append(categ.getName());
@@ -706,7 +706,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         List<SyndContent> contentList = entry.getContents();
         if (contentList != null && !contentList.isEmpty()) {
             for (SyndContent content : contentList) {
-                if (contents.length() != 0) {
+                if (!contents.isEmpty()) {
                     contents.append("\n");
                 }
                 contents.append(content.getValue());

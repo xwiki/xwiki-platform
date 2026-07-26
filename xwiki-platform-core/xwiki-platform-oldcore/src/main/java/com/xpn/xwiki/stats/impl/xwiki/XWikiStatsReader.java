@@ -131,7 +131,7 @@ public class XWikiStatsReader
      */
     private String getHqlValidDomain(String domain)
     {
-        if (domain == null || domain.trim().length() == 0) {
+        if (domain == null || domain.trim().isEmpty()) {
             return "%";
         }
 
@@ -426,7 +426,7 @@ public class XWikiStatsReader
         StringBuilder userListWhere = new StringBuilder();
         try {
             for (DocumentReference user : StatsUtil.getRequestFilteredUsers(context)) {
-                if (userListWhere.length() > 0) {
+                if (!userListWhere.isEmpty()) {
                     userListWhere.append(", ");
                 }
 
@@ -437,7 +437,7 @@ public class XWikiStatsReader
             LOGGER.error("Faild to get filter users list", e);
         }
 
-        if (userListWhere.length() > 0) {
+        if (!userListWhere.isEmpty()) {
             query.append(" name NOT IN (");
             query.append(userListWhere);
             query.append(") and ");

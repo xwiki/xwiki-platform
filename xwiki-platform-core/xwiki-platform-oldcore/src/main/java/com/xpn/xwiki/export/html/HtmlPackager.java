@@ -224,7 +224,7 @@ public class HtmlPackager
         // otherwise on some OS we wouldn't be able to unzip if there are pages having a path longer than 255 chars...
         String zipname = "pages/" + this.pathEntityReferenceSerializer.serialize(pageReference);
         String language = doc.getLanguage();
-        if (language != null && language.length() != 0) {
+        if (language != null && !language.isEmpty()) {
             zipname += POINT + language;
         }
         zipname += ".html";

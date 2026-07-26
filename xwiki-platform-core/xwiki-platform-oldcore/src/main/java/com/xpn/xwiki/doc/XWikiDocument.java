@@ -4192,7 +4192,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     String data = display(propertyName, object, context);
                     data = data.trim();
                     data = data.replace("\n", " ");
-                    if (data.length() == 0) {
+                    if (data.isEmpty()) {
                         result.append("&nbsp;");
                     } else {
                         result.append(data);

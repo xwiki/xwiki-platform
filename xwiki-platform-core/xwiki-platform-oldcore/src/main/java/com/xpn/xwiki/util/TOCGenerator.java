@@ -97,7 +97,7 @@ public class TOCGenerator
 
                         // construct the string representation of the number
                         if (i <= level) {
-                            if ((number.length()) == 0) {
+                            if (number.isEmpty()) {
                                 // start new number
                                 number = num + number;
                                 currentNumber = num;

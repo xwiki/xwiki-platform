@@ -294,7 +294,7 @@ public class DBTreeListClass extends DBListClass
     {
         for (ListItem tmpItem : treeList) {
             if (item.equals(tmpItem.getId())) {
-                if (tmpItem.getParent().length() > 0) {
+                if (!tmpItem.getParent().isEmpty()) {
                     getItemPath(tmpItem.getParent(), treeList, resList);
                 }
                 resList.add(tmpItem);

@@ -133,7 +133,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                         // In some weird cases it can happen that the XWD_ARCHIVE field is empty
                         // (that shouldn't happen but we've seen it happening).
                         // In this case just ignore the archive...
-                        if (sArchive.trim().length() != 0) {
+                        if (!sArchive.trim().isEmpty()) {
                             XWikiDocumentArchive docArchive =
                                 new XWikiDocumentArchive(context.getWikiReference(), docId);
                             try {

@@ -210,7 +210,7 @@ public class DocumentSelectionResolver
 
             List<String> constraints = extendQuery(entry.getKey(), entry.getValue(), parameters);
             if (!constraints.isEmpty()) {
-                statement.append(statement.length() == 0 ? "where (" : " or (");
+                statement.append(statement.isEmpty() ? "where (" : " or (");
                 statement.append(StringUtils.join(constraints, " and "));
                 statement.append(')');
             }

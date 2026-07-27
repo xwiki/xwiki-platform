@@ -27,8 +27,6 @@
   </parent>
   <artifactId>xwiki-platform-like-test-docker</artifactId>
   <name>XWiki Platform - Like - Test - Functional Docker Tests</name>
-  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>Functional docker tests for the Like Application.</description>
   <properties>

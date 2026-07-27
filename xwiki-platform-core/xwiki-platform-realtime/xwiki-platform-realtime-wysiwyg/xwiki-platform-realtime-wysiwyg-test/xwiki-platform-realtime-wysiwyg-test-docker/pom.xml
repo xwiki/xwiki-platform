@@ -29,8 +29,6 @@
   </parent>
   <artifactId>xwiki-platform-realtime-wysiwyg-test-docker</artifactId>
   <name>XWiki Platform - Realtime - WYSIWYG - Test - Functional Tests in Docker</name>
-  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>Functional Docker-based tests for the Realtime WYSIWYG Editor</description>
   <properties>

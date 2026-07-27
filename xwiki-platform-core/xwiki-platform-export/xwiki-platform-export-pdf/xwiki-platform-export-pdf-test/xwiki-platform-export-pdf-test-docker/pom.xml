@@ -29,8 +29,6 @@
   </parent>
   <artifactId>xwiki-platform-export-pdf-test-docker</artifactId>
   <name>XWiki Platform - Export - PDF - Test - Functional Tests in Docker</name>
-  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>Functional Docker-based tests for PDF Export</description>
   <properties>

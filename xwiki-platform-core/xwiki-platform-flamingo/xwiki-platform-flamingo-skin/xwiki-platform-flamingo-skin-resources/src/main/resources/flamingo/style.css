@@ -1,5 +1,4 @@
 /*!
-#set($css = "#template('css/style.css.vm')")
 ## Get the compiled LESS code
 #set($cssFromLess = $services.lesscss.compileSkinFile('style.less.vm'))
 ## Remove the useless part
@@ -9,6 +8,6 @@
 #end
 ## Display the CSS
  */
-$!css
+#template('css/converted.min.css')
 /* Start of the LESS styles.*/
 $!cssFromLess

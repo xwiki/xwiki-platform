@@ -29,8 +29,6 @@
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-security</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Security</name>
-  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>Security oriented functional tests of the default Flavor.</description>
   <properties>

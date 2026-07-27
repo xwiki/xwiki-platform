@@ -78,9 +78,12 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.opentest4j.AssertionFailedError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
@@ -195,6 +198,8 @@ public class TestUtils
      * @since 9.5RC1
      */
     public static final int[] STATUS_ACCEPTED = new int[] { Status.ACCEPTED.getStatusCode() };
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestUtils.class);
 
     private static final String MAIN_WIKI_NAME = "xwiki";
 
@@ -418,12 +423,18 @@ public class TestUtils
      */
     public void loginAndGotoPage(String username, String password, String pageURL, boolean checkLoginSuccess)
     {
+        // Get rid of the currently displayed page before switching the user, see unloadCurrentPage().
+        unloadCurrentPage();
+
         // ensure to be on a wiki page before performing check on the username.
         getDriver().get(getURL("XWiki", "Register", "register", "_=" + new Date().getTime()));
         if (!username.equals(getLoggedInUserName())) {
-            // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
-            // going to the home page for example.
-            // Also recache the CSRF token
+            // The Register page loaded above is now the page we're leaving behind, so unload it in turn before
+            // actually switching the user.
+            unloadCurrentPage();
+
+            // Log in and direct to the Register page again, so that we can check below that the login succeeded and
+            // re-cache the CSRF token without any extra page load.
             String destUrl = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
             getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
 
@@ -434,14 +445,23 @@ public class TestUtils
                         getDriver().getCurrentUrl(), getDriver().getPageSource()));
 
             }
-            recacheSecretTokenWhenOnRegisterPage();
-            if (pageURL != null) {
-                // Go to the page asked
-                getDriver().get(pageURL);
-            } else {
-                getDriver().get(getURLToNonExistentPage());
-            }
         }
+
+        // Whether we logged in or not, a Register page is displayed (the one loaded above or the one the login
+        // redirected to), so re-cache the CSRF token for the current user without any extra page load. Doing this also
+        // when no login was performed is important because the cached token may belong to a different user, in which
+        // case the server rejects it: e.g. createUserAndLogin() caches the token of the user it creates, so a
+        // subsequent login as the user that was logged in before it would otherwise keep using that token.
+        recacheSecretTokenWhenOnRegisterPage();
+
+        if (pageURL != null) {
+            // Go to the page asked, whether a login was needed or not: callers of this method expect to end up on that
+            // page in both cases.
+            getDriver().get(pageURL);
+        }
+
+        // When no page is asked we stay on the Register page: it's already loaded, it's cheap and, being fully skinned,
+        // it shows the login state on screenshots and screen recordings, unlike a blank xpage=plain page.
 
         // Always synchronize the REST client credentials with the requested user, even when the browser was already
         // logged in as that user and thus skipped the browser login above. The browser session and the REST client
@@ -450,6 +470,37 @@ public class TestUtils
         // leave the browser logged in as the previous user (typically superadmin) while switching the REST user, and a
         // subsequent login as that same browser user would then skip the branch and keep the wrong REST credentials.
         setDefaultCredentials(username, password);
+    }
+
+    /**
+     * Unload the currently displayed page, making sure that none of the requests it triggered can still be in flight
+     * when the authenticated user changes.
+     * <p>
+     * Such a request reaches the server carrying the cookies of the previous user. If it arrives after the login
+     * invalidated that user's session (which XWiki does whenever the user changes), it gets a brand new session, is
+     * re-authenticated as the previous user from the persistent login cookies it carries, and the session cookie sent
+     * back with its response silently reverts the whole browser to the previous user. The symptoms are then confusing
+     * and unrelated: the CSRF token cached for the new user no longer matches, and modifications performed through the
+     * browser are silently dropped.
+     * <p>
+     * Navigating away cancels the pending requests of the unloaded page, but requests sent through
+     * {@code navigator.sendBeacon()} are designed to outlive the page that sent them (XWiki uses them to release
+     * document locks when leaving an edit page), so they are neutralized before the page is unloaded. This means that
+     * the locks held by the unloaded page are not released, which is acceptable since we're leaving that page for good
+     * and locks expire on their own.
+     */
+    private void unloadCurrentPage()
+    {
+        try {
+            getDriver().executeScript("navigator.sendBeacon = function () { return true; };");
+        } catch (WebDriverException e) {
+            // Failing to neutralize the beacons is not a reason to fail the test: unloading the page below still
+            // cancels all the other pending requests.
+            LOGGER.warn("Failed to disable beacon requests, some tests might be flaky.", e);
+        }
+
+        // Navigating to a blank page unloads the current page without triggering any request of its own.
+        getDriver().get("about:blank");
     }
 
     /**
@@ -570,6 +621,9 @@ public class TestUtils
     public void createUserAndLoginWithRedirect(final String username, final String password, String url,
         Object... properties)
     {
+        // Get rid of the currently displayed page before switching the user below, see unloadCurrentPage().
+        unloadCurrentPage();
+
         // Register the user and, in the same server-side redirect chain (register -> loginsubmit -> destination), log
         // in. We land on the Register page rather than on a throw-away page for two reasons: it lets us verify below
         // that the login actually succeeded (loginsubmit only redirects to its destination on success) and it lets us
@@ -592,6 +646,19 @@ public class TestUtils
 
         if (properties.length > 0) {
             updateObject("XWiki", username, USER_CLASS_NAME, 0, properties);
+
+            // The properties are applied through the browser, using the CSRF token cached above, and a failed CSRF
+            // check isn't reported as an error: the save action just redirects to the resubmit template and the
+            // properties are silently not applied. Fail fast rather than letting the test run with a user that lacks
+            // the properties it asked for, which would surface as a confusing, unrelated failure later on.
+            String currentURL = getDriver().getCurrentUrl();
+            if (Strings.CS.contains(currentURL, "xpage=resubmit")) {
+                throw new IllegalStateException(String.format(
+                    "Failed to set the properties %s of the user [%s]: the CSRF check of the save request failed and "
+                        + "the browser was redirected to [%s]. This usually means that the browser isn't authenticated "
+                        + "as [%s] anymore, in which case the CSRF token cached for that user is rejected.",
+                    Arrays.toString(properties), username, currentURL, username));
+            }
         }
 
         setDefaultCredentials(username, password);
@@ -1570,8 +1637,7 @@ public class TestUtils
             this.secretToken = htmlElement.getDomAttribute("data-xwiki-form-token");
         } catch (NoSuchElementException exception) {
             // Something is really wrong if this happens.
-            System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");
-            exception.printStackTrace();
+            LOGGER.warn("Failed to cache anti-CSRF secret token, some tests might fail!", exception);
         }
     }
 
@@ -1584,8 +1650,8 @@ public class TestUtils
     public String getSecretToken()
     {
         if (this.secretToken == null) {
-            System.out.println("Warning: No cached anti-CSRF token found. "
-                + "Make sure to call recacheSecretToken() before getSecretToken(), otherwise this test might fail.");
+            LOGGER.warn("No cached anti-CSRF token found. Make sure to call recacheSecretToken() before "
+                + "getSecretToken(), otherwise this test might fail.");
             return "";
         }
         return this.secretToken;

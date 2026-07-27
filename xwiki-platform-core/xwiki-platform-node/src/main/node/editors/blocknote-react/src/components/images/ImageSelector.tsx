@@ -17,10 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { ImageUploadButton } from "./ImageUploadButton";
 import { DepsContainerContext } from "../../contexts";
+import { uploadFile } from "../../misc/fileUpload";
 import { SearchBox } from "../SearchBox";
-import { Box, Breadcrumbs, Flex, Space, Stack, Text } from "@mantine/core";
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  FileInput,
+  Flex,
+  Space,
+  Stack,
+  Text,
+  VisuallyHidden,
+} from "@mantine/core";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import {
@@ -28,7 +38,7 @@ import {
   DocumentReference,
   EntityType,
 } from "@xwiki/platform-model-api";
-import { useCallback, useContext, useEffect, useMemo } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { RiAttachmentLine } from "react-icons/ri";
 import type { LinkSuggestion } from "../SearchBox";
@@ -47,6 +57,7 @@ export type ImageSelectorProps = {
 export const ImageSelector: React.FC<ImageSelectorProps> = ({
   currentSelection,
   onSelected,
+  // eslint-disable-next-line max-statements
 }) => {
   const depsContainer = useContext(DepsContainerContext)!;
 
@@ -133,9 +144,29 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
     searchAttachments(initialQuery);
   }, []);
 
+  const triggerUpload = useCallback(
+    async (file: File) => {
+      const url = await uploadFile(file, depsContainer);
+      onSelected(url);
+    },
+    [depsContainer, onSelected],
+  );
+
+  const fileUploadRef = useRef<HTMLButtonElement>(null);
+
   return (
     <Box>
-      <ImageUploadButton onUploaded={onSelected} />
+      <Button variant="default" onClick={() => fileUploadRef.current?.click()}>
+        {t("blocknote.imageSelector.uploadButton")}
+      </Button>
+
+      <VisuallyHidden>
+        <FileInput
+          ref={fileUploadRef}
+          accept="image/*"
+          onChange={(file) => file && triggerUpload(file)}
+        />
+      </VisuallyHidden>
 
       <Space h="sm" />
 

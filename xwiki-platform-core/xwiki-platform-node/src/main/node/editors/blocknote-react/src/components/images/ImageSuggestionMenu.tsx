@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { ImageUploadButton } from "./ImageUploadButton";
 import { useEditor } from "../../hooks";
 import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
 import { useCallback } from "react";
@@ -40,8 +39,6 @@ const IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER = "#imageSuggestionHack";
 //
 // In order to access all items' URL to render them, they *must* be provided
 // through the items' `subtext` property.
-//
-// The items' `onItemClick` property is also ignored.
 
 function ImageSuggestionMenu(
   props: SuggestionMenuProps<DefaultReactSuggestionItem>,
@@ -81,15 +78,18 @@ function ImageSuggestionMenu(
 
   return (
     <div className="slash-menu">
-      <div className="slash-menu-upload">
-        <ImageUploadButton onUploaded={onSelected} />
+      <div
+        className={`slash-menu-item ${props.selectedIndex === 0 ? "selected" : ""}`}
+      >
+        TODO
+        {/* <ImageUploadButton onUploaded={onSelected} /> */}
       </div>
 
-      {props.items.slice(1, 5).map((item, index) => (
+      {props.items.slice(1).map((item, index) => (
         <div
           key={item.title}
           className={`slash-menu-item ${
-            props.selectedIndex === index ? "selected" : ""
+            props.selectedIndex === index + 1 ? "selected" : ""
           }`}
           onClick={() => {
             onSelected(item.subtext!);

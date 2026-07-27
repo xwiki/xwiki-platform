@@ -17,26 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DepsContainerContext } from "../../contexts";
-import { Button, FileInput, VisuallyHidden } from "@mantine/core";
 import {
   AttachmentReference,
   DocumentReference,
 } from "@xwiki/platform-model-api";
-import { useCallback, useContext, useRef } from "react";
-import { useTranslation } from "react-i18next";
 import type { AttachmentsService } from "@xwiki/platform-attachments-api";
 import type { DocumentService } from "@xwiki/platform-document-api";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
+import type { Container } from "inversify";
 
-export type ImageUploadButtonProps = {
-  onUploaded: (url: string) => void;
-};
-
-export function ImageUploadButton({ onUploaded }: ImageUploadButtonProps) {
-  const depsContainer = useContext(DepsContainerContext)!;
-
+// eslint-disable-next-line max-statements
+export async function uploadFile(
+  file: File,
+  depsContainer: Container,
+): Promise<string> {
   const remoteURLSerializer = depsContainer
     .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
     .get()!;
@@ -50,57 +45,28 @@ export function ImageUploadButton({ onUploaded }: ImageUploadButtonProps) {
   const attachmentsService =
     depsContainer.get<AttachmentsService>("AttachmentsService")!;
 
-  const fileUploadRef = useRef<HTMLButtonElement>(null);
+  const currentPageName =
+    documentService.getCurrentDocumentReferenceString().value ?? "";
 
-  const { t } = useTranslation();
+  const uploadedFilesUrls = await attachmentsService.upload(currentPageName, [
+    file,
+  ]);
 
-  const triggerUpload = useCallback(() => {
-    fileUploadRef?.current?.click();
-  }, [fileUploadRef]);
+  if (uploadedFilesUrls && uploadedFilesUrls[0]) {
+    return uploadedFilesUrls[0];
+  }
 
-  const fileSelected = useCallback(
-    async (file: File) => {
-      const currentPageName =
-        documentService.getCurrentDocumentReferenceString().value ?? "";
+  const parser = modelReferenceParser?.parse(currentPageName, {
+    relative: false,
+  });
 
-      const uploadedFilesUrls = await attachmentsService.upload(
-        currentPageName,
-        [file],
-      );
-
-      let url: string | undefined;
-      if (uploadedFilesUrls && uploadedFilesUrls[0]) {
-        url = uploadedFilesUrls[0];
-      } else {
-        const parser = modelReferenceParser?.parse(currentPageName, {
-          relative: false,
-        });
-
-        url = remoteURLSerializer?.serialize(
-          new AttachmentReference(file.name, parser as DocumentReference),
-        );
-      }
-
-      if (url) {
-        onUploaded(url);
-      }
-    },
-    [onUploaded],
+  const url = remoteURLSerializer?.serialize(
+    new AttachmentReference(file.name, parser as DocumentReference),
   );
 
-  return (
-    <>
-      <Button variant="default" onClick={triggerUpload}>
-        {t("blocknote.imageSelector.uploadButton")}
-      </Button>
+  if (!url) {
+    throw new Error("Internal error: could not get URL for uploaded file");
+  }
 
-      <VisuallyHidden>
-        <FileInput
-          ref={fileUploadRef}
-          accept="image/*"
-          onChange={(file) => file && fileSelected(file)}
-        />
-      </VisuallyHidden>
-    </>
-  );
+  return url;
 }

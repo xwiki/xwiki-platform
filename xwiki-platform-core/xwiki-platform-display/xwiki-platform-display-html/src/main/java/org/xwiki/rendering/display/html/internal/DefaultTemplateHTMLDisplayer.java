@@ -21,12 +21,15 @@ package org.xwiki.rendering.display.html.internal;
 
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -183,6 +186,14 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
             if (aClass.isEnum()) {
                 typeNames.add("enum");
             }
+        } else if (type instanceof ParameterizedType ptype) {
+            StringBuilder typeName = new StringBuilder();
+            typeName.append(((Class<?>) ptype.getRawType()).getSimpleName().toLowerCase());
+            typeName.append('(');
+            typeName.append(Arrays.stream(ptype.getActualTypeArguments()).map(t -> ((Class<?>) t).getSimpleName())
+                .collect(Collectors.joining(",")).toLowerCase());
+            typeName.append(')');
+            typeNames.add(typeName.toString());
         } else if (type != null) {
             typeNames.add(ReflectionUtils.serializeType(type).toLowerCase());
         }

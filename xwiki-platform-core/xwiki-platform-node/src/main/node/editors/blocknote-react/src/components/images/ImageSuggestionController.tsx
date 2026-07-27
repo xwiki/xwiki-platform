@@ -22,10 +22,13 @@ import {
   ImageSuggestionMenu,
 } from "./ImageSuggestionMenu";
 import { DepsContainerContext } from "../../contexts";
+import { useEditor } from "../../hooks";
+import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
 import { SuggestionMenuController } from "@blocknote/react";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { useCallback, useContext } from "react";
 import { useTranslation } from "react-i18next";
+import type { EditorType } from "../../blocknote";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type {
   LinkSuggestService,
@@ -57,7 +60,13 @@ import type {
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-export const ImageSuggestionsController = () => {
+export type ImageSuggestionControllerProps = {
+  maxSuggestions?: number;
+};
+
+export function ImageSuggestionController({
+  maxSuggestions,
+}: ImageSuggestionControllerProps) {
   const depsContainer = useContext(DepsContainerContext)!;
 
   const linkSuggestService = depsContainer.get<LinkSuggestServiceProvider>(
@@ -68,24 +77,31 @@ export const ImageSuggestionsController = () => {
     .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
     .get()!;
 
+  const editor = useEditor();
+
   const { t } = useTranslation();
 
   const searchImages = useCallback(
-    async (query: string) =>
-      fetchImageSuggestions(
+    async (query: string) => {
+      const suggestions = await fetchImageSuggestions(
         query,
         linkSuggestService,
         modelReferenceParser,
+        editor,
         t,
-      ).then((suggestions) => [
-        // HACK: placeholder for the upload button (see the `ImageSuggestionMenu` component for more info.)
-        {
-          title: IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER,
-          onItemClick() {},
-        },
-        ...suggestions,
-      ]),
-    [t, linkSuggestService, modelReferenceParser],
+      );
+
+      // HACK: placeholder for the upload button (see the `ImageSuggestionMenu` component for more info.)
+      suggestions.unshift({
+        title: IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER,
+        onItemClick() {},
+      });
+
+      return maxSuggestions
+        ? suggestions.slice(0, maxSuggestions + 1) // account for the placeholder item
+        : suggestions;
+    },
+    [t, linkSuggestService, modelReferenceParser, maxSuggestions],
   );
 
   return (
@@ -95,12 +111,13 @@ export const ImageSuggestionsController = () => {
       suggestionMenuComponent={ImageSuggestionMenu}
     />
   );
-};
+}
 
 async function fetchImageSuggestions(
   query: string,
   linkSuggestService: LinkSuggestService | undefined,
   modelReferenceParser: ModelReferenceParser,
+  editor: EditorType,
   t: ReturnType<typeof useTranslation>["t"],
 ): Promise<DefaultReactSuggestionItem[]> {
   if (!linkSuggestService) {
@@ -134,7 +151,10 @@ async function fetchImageSuggestions(
       title: link.label,
       subtext: link.url,
       onItemClick() {
-        // NOTE: ignored by the images suggestion menu
+        insertOrUpdateBlockForSlashMenu(editor, {
+          type: "image",
+          props: { url: link.url },
+        });
       },
     };
   });

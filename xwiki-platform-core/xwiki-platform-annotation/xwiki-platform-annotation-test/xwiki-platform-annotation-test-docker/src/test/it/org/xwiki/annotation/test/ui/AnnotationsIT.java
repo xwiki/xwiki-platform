@@ -225,6 +225,7 @@ class AnnotationsIT
         renameStatusPage.gotoNewPage();
 
         annotatableViewPage.showAnnotationsPane().clickShowAnnotations();
+        annotatableViewPage.waitForAnnotationsDisplayed();
         assertEquals(1, annotatableViewPage.getAnnotationCount());
     }
 }

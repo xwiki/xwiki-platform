@@ -2766,6 +2766,53 @@ $string##
 #end
 
 #**
+ * Moves the 'freeText' option, if any, to the data attribute the picker widgets read it from. It has to be removed from
+ * the parameters because everything left in there is displayed as an HTML attribute.
+ *#
+#macro (picker_freeText $parameters)
+  #set ($macro.freeText = "$!parameters.remove('freeText')")
+  #if ($macro.freeText != '')
+    #set ($discard = $parameters.put('data-freeText', $macro.freeText))
+  #end
+#end
+
+#macro (tagPicker $parameters)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestTags.js'))
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-tags"))
+  #if ($parameters.get('multiple') == 'multiple')
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.tagPicker.multi.title')))
+  #else
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.tagPicker.single.title')))
+  #end
+  #picker_freeText($parameters)
+  #suggestInput($parameters)
+#end
+
+#macro (wikiPicker $parameters)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestWikis.js'))
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-wikis"))
+  #if ($parameters.get('multiple') == 'multiple')
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.wikiPicker.multi.title')))
+  #else
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.wikiPicker.single.title')))
+  #end
+  #picker_freeText($parameters)
+  #suggestInput($parameters)
+#end
+
+#**
  * Displays the given title (i.e. the title of the sheet) if the condition is true. Otherwise displays the title of the
  * current document (i.e. the document the sheet is applied to). If the condition is not specified then it checks if the
  * current document is a sheet by looking for an object of type 'XWiki.SheetDescriptorClass'. You can pass a translation

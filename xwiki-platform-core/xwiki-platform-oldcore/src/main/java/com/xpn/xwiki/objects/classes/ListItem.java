@@ -32,7 +32,7 @@ public class ListItem
 {
     /** Comparator that orders two strings in their natural order, keeping nulls at the end. */
     private static final Comparator<String> BASE_COMPARATOR =
-        ComparatorUtils.nullHighComparator((o1, o2) -> o1.compareToIgnoreCase(o2));
+        ComparatorUtils.nullHighComparator(String::compareToIgnoreCase);
 
     /** Comparator that orders list items on their identifiers, keeping null items at the end. */
     protected static final Comparator<ListItem> ID_COMPARATOR =

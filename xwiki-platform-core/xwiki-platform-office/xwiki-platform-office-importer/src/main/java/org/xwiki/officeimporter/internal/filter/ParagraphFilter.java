@@ -78,8 +78,7 @@ public class ParagraphFilter extends AbstractHTMLFilter
     private List<Node> findEmptyLineParagraphSequences(Document document)
     {
         List<Element> emptyLineParagraphs =
-            filterDescendants(document.getDocumentElement(), new String[] {TAG_P},
-                element -> isEmptyLineParagraph(element));
+            filterDescendants(document.getDocumentElement(), new String[] {TAG_P}, this::isEmptyLineParagraph);
         List<Node> sequences = new ArrayList<>();
         for (Element emptyLineParagraph : emptyLineParagraphs) {
             Node prev = emptyLineParagraph.getPreviousSibling();

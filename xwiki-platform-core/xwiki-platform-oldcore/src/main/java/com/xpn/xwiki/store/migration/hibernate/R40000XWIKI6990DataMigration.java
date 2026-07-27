@@ -926,13 +926,11 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         // database itself. We need to retrieve that name from the schema.
         if (this.isMSSQL) {
             try {
-                pkName = getStore().failSafeExecuteRead(getXWikiContext(), session -> {
-                    // Retrieve the constraint name from the database
-                    return (String) session
-                        .createSQLQuery("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS"
-                            + " WHERE TABLE_NAME = :tableName AND CONSTRAINT_TYPE = 'PRIMARY KEY'")
-                        .setParameter("tableName", tableName).uniqueResult();
-                });
+                // Retrieve the constraint name from the database
+                pkName = getStore().failSafeExecuteRead(getXWikiContext(), session -> (String) session
+                    .createSQLQuery("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS"
+                        + " WHERE TABLE_NAME = :tableName AND CONSTRAINT_TYPE = 'PRIMARY KEY'")
+                    .setParameter("tableName", tableName).uniqueResult());
             } catch (Exception e) {
                 // ignored since it is really unlikely to happen
                 this.logger.debug("Fail retrieving the primary key constraints name", e);

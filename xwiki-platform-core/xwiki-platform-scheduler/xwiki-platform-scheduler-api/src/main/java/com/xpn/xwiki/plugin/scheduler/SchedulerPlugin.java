@@ -150,7 +150,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         this.schedulersClassLoaderManager.setSchedulerPlugin(this);
 
         if (this.enabled) {
-            Thread thread = new Thread(new ExecutionContextRunnable(() -> initAsync(),
+            Thread thread = new Thread(new ExecutionContextRunnable(this::initAsync,
                 Utils.getComponentManager()));
             thread.setName("XWiki Scheduler initialization");
             thread.setDaemon(true);

@@ -10,6 +10,8 @@
   "blocknote.toolbar.buttons.insertMacro": "Insert a macro",
   "blocknote.slashMenu.macro.title": "Macro",
   "blocknote.slashMenu.macro.subtext": "Insert an XWiki macro",
+  "blocknote.slashMenu.link.title": "Link",
+  "blocknote.slashMenu.link.subtext": "Insert a link",
   "blocknote.toolbar.subscript": "Subscript",
   "blocknote.toolbar.superscript": "Superscript",
   "blocknote.imageSelector.uploadButton": "Upload",

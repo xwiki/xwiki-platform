@@ -43,11 +43,13 @@ import * as locales from "@blocknote/core/locales";
 import { getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
 import { createElement } from "react";
-import { RiFileList3Fill } from "react-icons/ri";
+import { RiFileList3Fill, RiLink } from "react-icons/ri";
 import type { BlockNoteConcreteMacro, ContextForMacros } from "./utils";
+import type { LinkEditionHandler } from "../components/links/linkEdition";
 import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
+import type { useTranslation } from "react-i18next";
 
 /**
  * Create the BlockNote editor's schema
@@ -137,6 +139,28 @@ function createDictionary(lang: EditorLanguage) {
 type EditorLanguage = keyof typeof locales & keyof typeof translations;
 
 /**
+ * Parameters used for generating the slash menu
+ */
+type SuggestionMenuItemsParams = {
+  /** The query to filter the suggestions by */
+  query: string;
+  /** Instance of the BlockNote editor */
+  editor: EditorType;
+  /** The list of all available macros */
+  macros: BlockNoteConcreteMacro[];
+  /** Syntax of the current document */
+  syntax: SyntaxConfig;
+  /** Language to translate the items as */
+  lang: EditorLanguage;
+  /** `t` property from `react-i18n`'s useTranslation() return value */
+  t: ReturnType<typeof useTranslation>["t"];
+  /** Handler for link editions, same as provided to `BlockNoteViewWrapper` */
+  linkEditionHandler: LinkEditionHandler;
+  /** Macro insertion editor, same as provided to `BlockNoteViewWrapper` */
+  openMacroInsertionEditor?: ContextForMacros["openInsertionEditor"];
+};
+
+/**
  * Suggests a set of suggestion from the menu items.
  *
  * @param editor - the editor type
@@ -144,22 +168,44 @@ type EditorLanguage = keyof typeof locales & keyof typeof translations;
  * @param macros - the available macros
  */
 // eslint-disable-next-line max-statements
-function querySuggestionsMenuItems(
-  editor: EditorType,
-  query: string,
-  macros: BlockNoteConcreteMacro[],
-  syntax: SyntaxConfig,
-  lang: EditorLanguage,
-  t: (key: string) => string,
-  openInsertionEditor?: ContextForMacros["openInsertionEditor"],
-): DefaultReactSuggestionItem[] {
+function querySuggestionsMenuItems({
+  editor,
+  query,
+  macros,
+  syntax,
+  lang,
+  t,
+  linkEditionHandler,
+  openMacroInsertionEditor,
+}: SuggestionMenuItemsParams): DefaultReactSuggestionItem[] {
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
     syntax.features;
+
+  // A single generic "Link" entry that opens the link wizard.
+  const genericLinkItem: DefaultReactSuggestionItem[] = [
+    {
+      title: t("blocknote.slashMenu.link.title"),
+      subtext: t("blocknote.slashMenu.link.subtext"),
+      aliases: ["link"],
+      group: "Links",
+      icon: createElement(RiLink),
+      onItemClick() {
+        linkEditionHandler({
+          mode: "createNew",
+          current: { title: "", url: "" },
+          onSubmit({ title, url }) {
+            editor.createLink(url, title);
+            editor.focus();
+          },
+        });
+      },
+    },
+  ];
 
   // A single generic "Macro" entry that opens the macro wizard. It is used to insert the server-rendered
   // xwikiMacroBlock / xwikiInlineMacro (the per-macro entries below only exist for client-rendered macros).
   const genericMacroItem: DefaultReactSuggestionItem[] =
-    openInsertionEditor && (blocksSupport.macros || inlineSupport.macros)
+    openMacroInsertionEditor && (blocksSupport.macros || inlineSupport.macros)
       ? [
           {
             title: t("blocknote.slashMenu.macro.title"),
@@ -168,7 +214,7 @@ function querySuggestionsMenuItems(
             group: "Macros",
             icon: createElement(RiFileList3Fill),
             onItemClick: () =>
-              openInsertionEditor(
+              openMacroInsertionEditor(
                 {
                   kind: "block",
                   id: null,
@@ -204,6 +250,7 @@ function querySuggestionsMenuItems(
           )
         : [],
 
+      genericLinkItem,
       genericMacroItem,
     ),
     query,

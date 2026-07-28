@@ -232,7 +232,7 @@ class MacroIT extends AbstractCKEditorIT
         parameterTypes.put("spaces", "java.util.List<org.xwiki.model.reference.SpaceReference>");
         parameterTypes.put("pages", "java.util.List<org.xwiki.model.reference.DocumentReference>");
         parameterTypes.put("users", "java.util.List<org.xwiki.user.UserReference>");
-        parameterTypes.put("tags", "java.util.List<org.xwiki.rest.resources.tags.TagsResource>");
+        parameterTypes.put("tags", "java.util.List<org.xwiki.tag.Tag>");
 
         // Only a user with script rights can define a wiki macro.
         setup.loginAsSuperAdmin();

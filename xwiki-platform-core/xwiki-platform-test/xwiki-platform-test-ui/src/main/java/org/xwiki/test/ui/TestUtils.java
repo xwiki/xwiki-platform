@@ -480,20 +480,46 @@ public class TestUtils
      * and unrelated: the CSRF token cached for the new user no longer matches, and modifications performed through the
      * browser are silently dropped.
      * <p>
-     * Navigating away cancels the pending requests of the unloaded page, but requests sent through
-     * {@code navigator.sendBeacon()} are designed to outlive the page that sent them (XWiki uses them to release
-     * document locks when leaving an edit page), so they are neutralized before the page is unloaded. This means that
-     * the locks held by the unloaded page are not released, which is acceptable since we're leaving that page for good
-     * and locks expire on their own.
+     * Navigating away cancels the pending requests of the unloaded page, but the requests that the page sends
+     * <em>because</em> it is being left (XWiki releases the document lock and restores the UI locale that way) are sent
+     * through {@code navigator.sendBeacon()}, i.e. as requests that are designed to outlive the page that sent them.
+     * Those requests must still reach the server, otherwise stale document locks and locales are left behind and later
+     * tests fail on a page that is "currently locked by" the previous user or that is displayed in the wrong language.
+     * So instead of letting the navigation below trigger them, we send them ourselves and wait for them while the page
+     * is still alive, which guarantees both that they reach the server and that they do so before the authenticated
+     * user changes.
      */
     private void unloadCurrentPage()
     {
         try {
-            getDriver().executeScript("navigator.sendBeacon = function () { return true; };");
+            // Replace the beacons, which we cannot wait for, by regular requests that we can wait for, then fire the
+            // events that the page-leave handlers listen to (see lock.js and XWiki.InplaceEditing) ourselves. The page
+            // is still alive at this point, so this is an ordinary request context: nothing is cut short and the
+            // browser doesn't block us like it does for requests sent while a page is being dismissed.
+            Object sentRequests = getDriver().executeAsyncScript("""
+                const done = arguments[arguments.length - 1];
+                const requests = [];
+                navigator.sendBeacon = (url, data) => {
+                  requests.push(fetch(url, {method: 'POST', body: data, credentials: 'same-origin', keepalive: true})
+                    .then(response => url + ' -> ' + response.status, error => url + ' -> ' + error));
+                  return true;
+                };
+                // Only 'pagehide' is fired, not 'unload': Firefox destroys the execution context of this script when
+                // an 'unload' event is dispatched, and all the page-leave handlers listen to both events anyway.
+                window.dispatchEvent(new Event('pagehide'));
+                // Never wait longer than the script timeout, a beacon request isn't worth failing a test for.
+                const timeout = new Promise(resolve => setTimeout(() => resolve(['<timeout>']), 10000));
+                Promise.race([Promise.all(requests), timeout]).then(results => {
+                  // The page is really unloaded below, and beacons sent from that point on cannot be waited for
+                  // anymore, so drop them rather than leaving a request in flight while the user changes.
+                  navigator.sendBeacon = () => true;
+                  done(results);
+                });
+                """);
+            LOGGER.debug("Sent the requests of the page being unloaded: {}", sentRequests);
         } catch (WebDriverException e) {
-            // Failing to neutralize the beacons is not a reason to fail the test: unloading the page below still
-            // cancels all the other pending requests.
-            LOGGER.warn("Failed to disable beacon requests, some tests might be flaky.", e);
+            // Not a reason to fail the test: unloading the page below still cancels all the other pending requests.
+            LOGGER.warn("Failed to send the requests of the page being unloaded, some tests might be flaky.", e);
         }
 
         // Navigating to a blank page unloads the current page without triggering any request of its own.

@@ -43,7 +43,8 @@ import {
 } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
 import { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import type {
   BlockType,
   EditorBlockSchema,
@@ -338,6 +339,8 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     }
   }
 
+  const { t } = useTranslation();
+
   // Renders the editor instance using a React component.
   return (
     <DepsContainerContext.Provider value={depsContainer}>
@@ -354,7 +357,15 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
         <SuggestionMenuController
           triggerCharacter={"/"}
           getItems={async (query) =>
-            querySuggestionsMenuItems(editor, query, builtMacros, syntax, lang)
+            querySuggestionsMenuItems(
+              editor,
+              query,
+              builtMacros,
+              syntax,
+              lang,
+              t,
+              macros ? macros.ctx.openInsertionEditor : undefined,
+            )
           }
         />
 

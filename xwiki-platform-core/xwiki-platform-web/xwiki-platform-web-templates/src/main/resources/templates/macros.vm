@@ -2717,14 +2717,14 @@ $string##
 #**
 * Pulls all the JavaScript and CSS resources needed by the space picker.
 *#
-#macro (spacePicker_import)
+#macro (_spacePicker_import)
   #picker_import
   #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestSpaces.js',
     {'forceSkinAction': true, 'language': $xcontext.locale}))
 #end
 
 #macro (spacePicker $parameters)
-  #spacePicker_import
+  #_spacePicker_import
   #if ("$!parameters" == "")
     #set ($parameters = {})
   #end

@@ -90,9 +90,9 @@
  * list of serialized space references, separated by a comma.
  *
  * @param $options the picker options:
- *          'name' the name of the form field holding the value;
- *          'value' the initially selected locations, either a serialized list or a collection of references;
- *          plus the options accepted by #documentTree for the tree used to browse the locations.
+ *   'name' the name of the form field holding the value;
+ *   'value' the initially selected locations, either a serialized list or a collection of references;
+ *   + the options accepted by #documentTree for the tree used to browse the locations.
  *#
 #macro (multiLocationPicker $options)
   #set ($discard = $xwiki.get('jsfx').use('uicomponents/widgets/multiLocationPicker.js', true))
@@ -105,14 +105,14 @@
   #if ($isDocumentTreeAvailable)
     <div class="location-picker-multi">
       #spacePicker($macro.parameters)
-      #multiLocationPickerBrowser($options)
+      #_multiLocationPickerBrowser($options)
     </div>
   #else
     #spacePicker($macro.parameters)
   #end
 #end
 
-#macro (multiLocationPickerBrowser $options)
+#macro (_multiLocationPickerBrowser $options)
   #set ($macro.browseLabel = $escapetool.xml($services.localization.render(
     'core.widgets.multiLocationPicker.browse')))
   <div class="location-picker-browse dropdown">
@@ -123,9 +123,6 @@
     <div class="dropdown-menu dropdown-menu-right">
       #set ($macro.showWikis = $displayWikiFields)
       #set ($macro.filterHiddenDocuments = $options.filterHiddenDocuments != false)
-      ## Only the pages backing a space can be picked as a location, hence showTerminalDocuments is false. Checking a
-      ## location must not check the ones nested inside it, hence three_state and cascade. And the checkbox state must
-      ## be independent of the node selection, so that clicking a node label doesn't pick it, hence tie_selection.
       #documentTree({
         'class': 'location-tree',
         'checkboxes': true,

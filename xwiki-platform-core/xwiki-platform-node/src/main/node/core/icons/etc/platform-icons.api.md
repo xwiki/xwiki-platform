@@ -22,7 +22,7 @@ size?: Size;
 onClick?: ((event: MouseEvent) => any) | undefined;
 }>, {
 size: Size;
-}, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLSpanElement>;
+}, {}, {}, {}, string, ComponentProvideOptions, false, {}, any>;
 
 // @beta (undocumented)
 export enum Size {

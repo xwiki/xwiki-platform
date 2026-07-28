@@ -43,10 +43,7 @@ depsContainer: Container;
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;
 "onDebounced-change"?: ((content: BlockType[]) => any) | undefined;
-}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
-'blocknote-container': HTMLDivElement;
-'link-modal-container': HTMLDivElement;
-}, any>;
+}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, any>;
 
 export { ContextForMacros }
 

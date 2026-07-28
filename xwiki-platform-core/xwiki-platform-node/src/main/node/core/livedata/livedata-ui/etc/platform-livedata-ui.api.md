@@ -28,12 +28,10 @@ export { populateStore }
 
 export { XWikiIcon }
 
-// Warning: (ae-forgotten-export) The symbol "__VLS_Props" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "__VLS_export" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const XWikiLivedata: DefineComponent<__VLS_Props, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, PublicProps, Readonly<__VLS_Props> & Readonly<{}>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
-rootElement: HTMLDivElement;
-}, HTMLDivElement>;
+export const XWikiLivedata: typeof __VLS_export;
 
 // (No @packageDocumentation comment for this package)
 

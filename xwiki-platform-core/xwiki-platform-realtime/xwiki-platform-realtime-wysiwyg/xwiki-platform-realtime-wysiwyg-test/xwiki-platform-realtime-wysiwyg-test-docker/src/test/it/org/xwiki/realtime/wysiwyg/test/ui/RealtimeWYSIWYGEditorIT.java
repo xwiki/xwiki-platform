@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
@@ -115,6 +116,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 {
     public static final String XWIKI_ALIAS = "xwiki-alias";
+
+    /**
+     * Whether the wiki was made multilingual by the current test, in which case the localization settings have to be
+     * restored after the test.
+     */
+    private boolean multiLingual;
+
+    @AfterEach
+    void restoreLocalizationSettings(TestUtils setup) throws Exception
+    {
+        if (this.multiLingual) {
+            this.multiLingual = false;
+            // Make the wiki monolingual again, otherwise the following tests would use the locale remembered by the
+            // language cookie (set when a page is accessed with the language parameter) and thus a translated user
+            // interface. We don't have to remove that cookie, from all the browser tabs and domains where it may have
+            // been set, because the remembered locale is ignored when the wiki is not multilingual. Note also that we
+            // restore the settings after each test, rather than at the end of the test that changes them, so that they
+            // are restored even when that test fails.
+            setup.setWikiPreference("multilingual", "false");
+            setup.setWikiPreference("languages", "en");
+        }
+    }
 
     @Test
     @Order(1)
@@ -2929,6 +2952,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
     private void setMultiLingual(TestUtils setup, boolean isMultiLingual, String... supportedLanguages)
     {
+        // Remember that the localization settings have to be restored after the test.
+        this.multiLingual = isMultiLingual;
+
         AdministrationPage adminPage = AdministrationPage.gotoPage();
         LocalizationAdministrationSectionPage sectionPage = adminPage.clickLocalizationSection();
         sectionPage.setMultiLingual(isMultiLingual);

@@ -1336,8 +1336,8 @@ public class Package
         this.authorName = getElementText(infosEl, AUTHOR_PROPERTY);
         this.extensionId = getElementText(infosEl, "extensionId", null);
         this.version = getElementText(infosEl, VERSION_PROPERTY);
-        this.backupPack = new Boolean(getElementText(infosEl, "backupPack")).booleanValue();
-        this.preserveVersion = new Boolean(getElementText(infosEl, "preserveVersion")).booleanValue();
+        this.backupPack = Boolean.parseBoolean(getElementText(infosEl, "backupPack"));
+        this.preserveVersion = Boolean.parseBoolean(getElementText(infosEl, "preserveVersion"));
 
         return domdoc;
     }

@@ -108,7 +108,7 @@ public class ImageFilter extends AbstractHTMLFilter
         DocumentReference targetDocumentReference =
             targetDocumentName == null ? null : this.stringDocumentReferenceResolver.resolve(targetDocumentName);
 
-        boolean attachEmbeddedImages = Boolean.valueOf(cleaningParams.get("attachEmbeddedImages"));
+        boolean attachEmbeddedImages = Boolean.parseBoolean(cleaningParams.get("attachEmbeddedImages"));
         if (attachEmbeddedImages) {
             htmlDocument.setUserData(EMBEDDED_IMAGES, new HashMap<String, byte[]>(), null);
         }

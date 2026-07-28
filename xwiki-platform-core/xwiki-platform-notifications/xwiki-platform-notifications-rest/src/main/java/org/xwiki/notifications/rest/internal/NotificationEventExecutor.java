@@ -221,7 +221,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
                 }
 
                 // Notify the waiting client that the execution is done
-                this.asyncIds.stream().forEach(asyncId -> shortCache.set(asyncId, result));
+                this.asyncIds.forEach(asyncId -> shortCache.set(asyncId, result));
             }
         }
 

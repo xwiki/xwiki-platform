@@ -120,7 +120,7 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
         } else if (event instanceof XarExtensionUninstalledEvent) {
             removeExtensionDocuments((ExtensionEvent) event, (InstalledExtension) source);
         } else if (event instanceof XarExtensionUpgradedEvent) {
-            ((Collection<InstalledExtension>) data).stream().forEach(
+            ((Collection<InstalledExtension>) data).forEach(
                 oldInstalledExtension -> removeExtensionDocuments((ExtensionEvent) event, oldInstalledExtension));
             addExtensionDocuments((ExtensionEvent) event, (InstalledExtension) source);
         }
@@ -136,7 +136,7 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
     {
         // Add extension documents from the XAR extensions installed on the specified wiki.
         String namespace = "wiki:" + wiki;
-        this.xarRepositoryProvider.get().getInstalledExtensions(namespace).stream()
+        this.xarRepositoryProvider.get().getInstalledExtensions(namespace)
             .forEach(installedExtension -> addExtensionDocuments(
                 new XarExtensionInstalledEvent(new ExtensionInstalledEvent(installedExtension.getId(), namespace)),
                 installedExtension));
@@ -162,7 +162,7 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
         Consumer<DocumentReference> action)
     {
         if (extensionEvent.hasNamespace() && installedExtension instanceof XarInstalledExtension xarExtension) {
-            getExtensionDocuments(xarExtension, extensionEvent.getNamespace()).stream()
+            getExtensionDocuments(xarExtension, extensionEvent.getNamespace())
                 .forEach(action);
         }
     }

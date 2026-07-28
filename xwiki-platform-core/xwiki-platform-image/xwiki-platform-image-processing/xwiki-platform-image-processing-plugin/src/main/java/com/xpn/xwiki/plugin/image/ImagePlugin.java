@@ -249,7 +249,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     {
         initCache(context);
 
-        boolean keepAspectRatio = Boolean.valueOf(context.getRequest().getParameter("keepAspectRatio"));
+        boolean keepAspectRatio = Boolean.parseBoolean(context.getRequest().getParameter("keepAspectRatio"));
 
         XWikiAttachment thumbnail = (this.imageCache == null)
             ? shrinkImage(image, width, height, keepAspectRatio, quality, context)

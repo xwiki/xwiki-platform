@@ -131,7 +131,6 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
                 }
             }
 
-            ///////////////////////////////////////
             // Transformations
 
             resultBlock = tranform(xdom, block);

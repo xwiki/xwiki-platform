@@ -412,7 +412,6 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         // Parse the wiki macro content.
         XDOM macroXDOM = prepareWikiMacroContent();
 
-        ///////////////////////////////////////
         // Transform
 
         return transform(macroXDOM, async, cached);

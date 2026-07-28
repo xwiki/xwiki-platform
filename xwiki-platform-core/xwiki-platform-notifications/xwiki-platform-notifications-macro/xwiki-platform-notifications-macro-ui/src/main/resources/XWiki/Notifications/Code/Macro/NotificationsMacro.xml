@@ -1879,7 +1879,7 @@ $notifs
       <name>wikis</name>
     </property>
     <property>
-      <type>java.util.List&lt;org.xwiki.rest.model.jaxb.Wiki&gt;</type>
+      <type>java.util.List&lt;org.xwiki.model.reference.WikiReference&gt;</type>
     </property>
   </object>
   <object>

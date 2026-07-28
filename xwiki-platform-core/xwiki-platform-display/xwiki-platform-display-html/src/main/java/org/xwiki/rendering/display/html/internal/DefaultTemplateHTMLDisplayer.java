@@ -190,7 +190,8 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
             StringBuilder typeName = new StringBuilder();
             typeName.append(((Class<?>) ptype.getRawType()).getSimpleName().toLowerCase());
             typeName.append('(');
-            typeName.append(Arrays.stream(ptype.getActualTypeArguments()).map(t -> ((Class<?>) t).getSimpleName())
+            typeName.append(Arrays.stream(ptype.getActualTypeArguments())
+                .map(t -> t instanceof Class ? ((Class<?>) t).getSimpleName() : ReflectionUtils.serializeType(t))
                 .collect(Collectors.joining(",")).toLowerCase());
             typeName.append(')');
             typeNames.add(typeName.toString());

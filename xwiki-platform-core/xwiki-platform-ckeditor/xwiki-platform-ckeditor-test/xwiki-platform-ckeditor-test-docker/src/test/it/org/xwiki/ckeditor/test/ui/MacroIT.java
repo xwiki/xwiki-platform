@@ -228,7 +228,7 @@ class MacroIT extends AbstractCKEditorIT
         // One parameter per type that has a picker, in order to check that each type selects the expected displayer
         // template.
         Map<String, String> parameterTypes = new LinkedHashMap<>();
-        parameterTypes.put("wikis", "java.util.List<org.xwiki.rest.model.jaxb.Wiki>");
+        parameterTypes.put("wikis", "java.util.List<org.xwiki.model.reference.WikiReference>");
         parameterTypes.put("spaces", "java.util.List<org.xwiki.model.reference.SpaceReference>");
         parameterTypes.put("pages", "java.util.List<org.xwiki.model.reference.DocumentReference>");
         parameterTypes.put("users", "java.util.List<org.xwiki.user.UserReference>");
@@ -253,10 +253,13 @@ class MacroIT extends AbstractCKEditorIT
                 "name", parameterType.getKey(),
                 "type", parameterType.getValue());
         }
-        // The space we're going to select with the picker.
+        // The space and page we're going to select with the pickers.
         SpaceReference targetSpace = new SpaceReference("Target", testReference.getLastSpaceReference());
         String targetSpaceValue = setup.serializeLocalReference(targetSpace);
         setup.createPage(new DocumentReference("WebHome", targetSpace), "", "Target Space");
+        DocumentReference targetPage = new DocumentReference("TargetPage", testReference.getLastSpaceReference());
+        String targetPageValue = setup.serializeLocalReference(targetPage);
+        setup.createPage(targetPage, "", "Target Page");
 
         loginStandardUser(setup);
         edit(setup, testReference, true);
@@ -278,12 +281,16 @@ class MacroIT extends AbstractCKEditorIT
         assertEquals(List.of("Main.WebHome"), macroEditModal.getMacroParameterPicker("pages").getValues());
         assertEquals(List.of(), macroEditModal.getMacroParameterPicker("tags").getValues());
 
-        // Select an additional space with the picker and check that it ends up in the macro call.
+        // Select an additional space and an additional page with their pickers and check that they end up in the
+        // macro call, so that the save round-trip is verified for more than just the 'spaces' picker.
         macroEditModal.getMacroParameterPicker("spaces").sendKeys("Target Space").waitForNonTypedSuggestions()
             .selectByValue(targetSpaceValue);
+        macroEditModal.getMacroParameterPicker("pages").sendKeys("Target Page").waitForNonTypedSuggestions()
+            .selectByValue(targetPageValue);
         macroEditModal.clickSubmit();
         this.textArea.waitForContentRefresh();
 
         assertSourceContains(String.format("spaces=\"Main,%s\"", targetSpaceValue));
+        assertSourceContains(String.format("pages=\"Main.WebHome,%s\"", targetPageValue));
     }
 }

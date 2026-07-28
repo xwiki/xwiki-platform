@@ -141,6 +141,18 @@ class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
+    void getTemplateWithNestedParameterizedTypeTest() throws Exception
+    {
+        // A type argument that isn't a plain Class (here, List<Block> nested inside another List) must not be cast
+        // directly to Class, but fall back to serializing its type name.
+        this.defaultTemplateHTMLDisplayer.display(
+            new DefaultParameterizedType(null, List.class, new DefaultParameterizedType(null, List.class,
+                Block.class)), null);
+        verify(this.templateManager).getTemplate("html_displayer/list(java.util.list(org.xwiki.rendering.block."
+            + "block))/view.vm");
+    }
+
+    @Test
     void getTemplateWithNullTypeAndNullValueTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(null, null);

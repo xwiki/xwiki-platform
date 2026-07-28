@@ -121,7 +121,7 @@
     <pgsql.version>42.7.13</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc17</oracle.artifactId>
-    <oracle.version>23.26.2.0.0</oracle.version>
+    <oracle.version>23.26.3.0.0</oracle.version>
 
     <!-- npm registries configuration -->
     <xwiki.npm.snapshot.registry>https://nexus-snapshots.xwiki.org/repository/npmhosted/</xwiki.npm.snapshot.registry>

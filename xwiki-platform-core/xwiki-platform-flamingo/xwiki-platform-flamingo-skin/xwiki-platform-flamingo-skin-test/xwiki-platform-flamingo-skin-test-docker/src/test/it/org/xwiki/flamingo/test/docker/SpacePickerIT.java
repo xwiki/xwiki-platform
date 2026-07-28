@@ -165,7 +165,7 @@ class SpacePickerIT
         SuggestInputElement picker = displayPicker(setup, reference);
 
         List<SuggestionElement> suggestions =
-            picker.sendKeys(searchedText).waitForNonTypedSuggestions().getSuggestions();
+            picker.sendKeys(searchedText).waitForSuggestionsLoaded().getSuggestions();
         assertEquals(0, suggestions.size());
     }
 

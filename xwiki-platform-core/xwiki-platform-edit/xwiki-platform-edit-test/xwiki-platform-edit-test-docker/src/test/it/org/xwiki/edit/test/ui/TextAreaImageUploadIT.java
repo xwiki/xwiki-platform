@@ -70,20 +70,24 @@ class TextAreaImageUploadIT
 
     private static final String IMAGE_NAME = "image.gif";
 
+    private static final String USER_NAME = "TextAreaImageUploadUser";
+
     @BeforeAll
     void beforeAll(TestUtils testUtils) throws Exception
     {
-        // Use superadmin.
+        // Create a class with a TextArea property, using superadmin.
         testUtils.loginAsSuperAdmin();
-
-        // Make WYSIWYG the default editor so that the TextArea property, the comment and the annotation are edited with
-        // CKEditor.
-        testUtils.setPropertyInXWikiPreferences("editor", "String", "Wysiwyg");
-
-        // Create a class with a TextArea property.
         testUtils.rest().delete(CLASS_REFERENCE);
         testUtils.createPage(CLASS_REFERENCE, "", "TextAreaClass");
         testUtils.addClassProperty(CLASS_REFERENCE, PROPERTY_NAME, "TextArea");
+
+        // Run the tests with a user that prefers the WYSIWYG editor, so that the TextArea property, the comment and the
+        // annotation are edited with CKEditor. We don't make WYSIWYG the default editor of the wiki because that
+        // preference would be left behind for the other tests sharing the same wiki (see AllIT).
+        // The script right is needed because one of the tests saves a page that displays the TextArea property with a
+        // Velocity script.
+        testUtils.setGlobalRights("", "XWiki." + USER_NAME, "script", true);
+        testUtils.createUserAndLogin(USER_NAME, "pa$$word", "editor", "Wysiwyg");
     }
 
     /**

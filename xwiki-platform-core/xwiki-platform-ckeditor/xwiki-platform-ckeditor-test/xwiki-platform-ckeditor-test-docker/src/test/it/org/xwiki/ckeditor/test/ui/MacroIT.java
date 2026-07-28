@@ -256,7 +256,7 @@ class MacroIT extends AbstractCKEditorIT
         // The space we're going to select with the picker.
         SpaceReference targetSpace = new SpaceReference("Target", testReference.getLastSpaceReference());
         String targetSpaceValue = setup.serializeLocalReference(targetSpace);
-        setup.createPage(new LocalDocumentReference("WebHome", targetSpace), "", "Target Space");
+        setup.createPage(new DocumentReference("WebHome", targetSpace), "", "Target Space");
 
         loginStandardUser(setup);
         edit(setup, testReference, true);

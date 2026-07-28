@@ -479,10 +479,20 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                                 + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
                                 + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
                                 + "libxml2-dev libxslt1-dev")
-                            // Download the LibreOffice deb packages
-                            .run("wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
-                                + "mkdir /tmp/libreoffice && "
-                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz")
+                            // Download and extract the LibreOffice deb packages.
+                            // The download URL points to a mirror redirector: each request is redirected to one of
+                            // the mirrors, and some of them are unreachable or serve a truncated archive. Thus we
+                            // retry the whole download several times, each attempt going back to the redirector and
+                            // thus having a chance to be served by a healthy mirror. The extraction is part of the
+                            // retried command so that a truncated archive leads to a new download too.
+                            .run("for i in 1 2 3 4 5; do "
+                                + "wget --no-verbose --timeout=60 --tries=2 --retry-connrefused "
+                                + "-O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL "
+                                + "&& tar -C /tmp/ -xf /tmp/libreoffice.tar.gz && exit 0; "
+                                + "echo \"Attempt $i to get LibreOffice from $LIBREOFFICE_DOWNLOAD_URL failed\"; "
+                                + "sleep 10; "
+                                + "done; "
+                                + "exit 1")
                             // Install the LibreOffice deb packages and create a symlink to have a consistent path to
                             // the LibreOffice installation directory
                             .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "

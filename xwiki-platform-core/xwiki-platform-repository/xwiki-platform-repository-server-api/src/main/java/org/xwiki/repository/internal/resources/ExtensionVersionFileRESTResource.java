@@ -152,7 +152,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
             // useSystemProperties() makes the client honor the JVM proxy settings (http.proxyHost, etc.),
             // which is why no explicit route planner is needed. A custom User-Agent is still required because
             // some upstream servers (e.g. nexus.xwiki.org) reject requests that don't set one.
-            final CloseableHttpClient httpClient = HttpClients.custom()
+            CloseableHttpClient httpClient = HttpClients.custom()
                 .useSystemProperties()
                 .setUserAgent("XWikiExtensionRepository")
                 .setDefaultRequestConfig(requestConfig)
@@ -185,7 +185,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 String extensionType =
                     this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE);
 
-                final ClassicHttpResponse responseToStream = subResponse;
+                ClassicHttpResponse responseToStream = subResponse;
                 StreamingOutput content = output -> {
                     try (httpClient; responseToStream) {
                         if (entity != null) {

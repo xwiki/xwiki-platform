@@ -59,7 +59,7 @@ class SpacePickerIT
      */
     @Test
     @Order(1)
-    void suggestsSpaceByTheTitleOfItsHomePage(TestUtils setup, TestReference reference) throws Exception
+    void suggestsSpaceByHomepageTitle(TestUtils setup, TestReference reference) throws Exception
     {
         setup.loginAsSuperAdmin();
         // The name of the space doesn't contain the searched text, so that we know the suggestion was matched on the

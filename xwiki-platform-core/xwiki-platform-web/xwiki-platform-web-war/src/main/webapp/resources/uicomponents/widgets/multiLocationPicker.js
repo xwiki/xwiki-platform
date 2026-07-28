@@ -25,9 +25,8 @@
   "use strict";
 
 /**
- * Lets the user browse a document tree in order to feed the space suggestion input it is attached to. The suggestion
- * input remains the single source of truth for the value: the tree only adds and removes items, it doesn't hold any
- * value of its own.
+ * Lets the user browse a document tree in order to feed the space suggestion input it is attached to. 
+ * The tree only adds and removes items, it does not hold a state itself.
  */
 define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tree'], function($, suggestSpaces) {
   webHome = webHome || 'WebHome';
@@ -50,11 +49,7 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
     var treeElement = menu.find('.location-tree');
     // Set while we update the tree to match the input, so that we don't then update the input back.
     var updatingTree = false;
-
-    /**
-     * The suggestion input is enhanced asynchronously, so we can only look for the widget when the user actually
-     * interacts with the tree.
-     */
+    
     var getSuggestInput = function() {
       return select[0] && select[0].selectize;
     };
@@ -89,8 +84,8 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
     };
 
     /**
-     * @return the suggestion matching the given tree node, in the exact format the suggestion input uses for the
-     *   locations it suggests itself, or null if the node is not a location
+     * @return the suggestion matching the given tree node, in the format of the suggestion input, 
+     *   or null if the node is not a location
      */
     var toSuggestion = function(suggestInput, tree, node) {
       var location = toLocation(tree, node);
@@ -150,7 +145,7 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
     };
 
     /**
-     * Hides the check box of the nodes that are not locations (e.g. the wiki nodes), so that it's clear what can be
+     * Hides the checkbox of the nodes that are not locations (e.g. the wiki nodes), so that it's clear what can be
      * picked.
      */
     var hideCheckboxOfNonLocations = function(tree) {
@@ -163,14 +158,9 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
     };
 
     /**
-     * The drop down is placed right below the button by the style sheet, which is always correct because it is
+     * The dropdown is placed right below the button by the style sheet, which is always correct because it is
      * positioned relative to the button. We only flip it above the button when there isn't enough room below, which
      * easily happens when the picker is displayed near the bottom of a dialog.
-     *
-     * Note that we deliberately toggle a class instead of computing the position of the drop down ourselves: any
-     * ancestor can establish a containing block (the dialog of the macro editor, for instance, is translated, which
-     * makes both absolute and fixed positioning resolve against it rather than against the viewport) and no amount of
-     * coordinate arithmetic is reliable in the face of that.
      */
     var flipIfNeeded = function() {
       browser.removeClass('dropup');

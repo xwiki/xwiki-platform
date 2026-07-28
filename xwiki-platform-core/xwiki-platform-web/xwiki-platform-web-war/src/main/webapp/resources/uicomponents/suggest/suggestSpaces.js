@@ -81,13 +81,7 @@ define('xwiki-suggestSpaces', ['jquery', 'xwiki-selectize'], function($) {
 
   /**
    * Looks for spaces matching the given text using two complementary search sources, because neither of them is enough
-   * on its own:
-   * <ul>
-   *   <li>searching for pages matches the title of the space home page (i.e. the name the space is displayed with) but
-   *     not the technical space name, because the name of the page backing a space is always "WebHome";</li>
-   *   <li>searching for spaces matches the technical space name but returns neither the pretty names nor the
-   *     hierarchy.</li>
-   * </ul>
+   * on its own.
    */
   var loadSpaces = function(text, options) {
     return $.when(loadSpacesFromPages(text, options), loadSpacesFromSpaces(text, options))

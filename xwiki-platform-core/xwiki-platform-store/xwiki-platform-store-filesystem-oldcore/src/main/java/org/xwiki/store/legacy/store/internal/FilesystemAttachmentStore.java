@@ -336,7 +336,6 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         {
             boolean link = false;
 
-            //////////////////
             // ARCHIVE
 
             // If the versioning store supports TransactionRunnable then use it, otherwise don't.
@@ -374,7 +373,6 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                 }.runIn(this);
             }
 
-            //////////////////
             // CURRENT
 
             Blob linkAttachFile = StoreFileUtils.getLinkBlob(attachFile);
@@ -407,7 +405,6 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
                 FilesystemAttachmentStore.this.fileTools.getTempFile(otherAttachFile),
                 FilesystemAttachmentStore.this.fileTools.getLockForFile(otherAttachFile.getPath())).runIn(this);
 
-            //////////////////
             // DOCUMENT
 
             // If updating of the parent document is required then add a TransactionRunnable to do that.

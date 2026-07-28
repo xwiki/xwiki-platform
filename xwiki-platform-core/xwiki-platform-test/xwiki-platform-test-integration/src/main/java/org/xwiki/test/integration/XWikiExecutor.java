@@ -59,7 +59,7 @@ public class XWikiExecutor
      * allows the build to start XWiki (this is the case for example when running functional tests with Docker).
      */
     private static final boolean SHOULD_START_XWIKI =
-        Boolean.valueOf(System.getProperty("xwiki.test.startXWiki", "true"));
+        Boolean.parseBoolean(System.getProperty("xwiki.test.startXWiki", "true"));
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutor.class);
 
@@ -102,7 +102,7 @@ public class XWikiExecutor
     private static final long PROCESS_FINISH_TIMEOUT = 5 * 60L * 1000L;
 
     private static final int VERIFY_RUNNING_XWIKI_AT_START_TIMEOUT =
-        Integer.valueOf(System.getProperty("xwiki.test.verifyRunningXWikiAtStartTimeout", "15"));
+        Integer.parseInt(System.getProperty("xwiki.test.verifyRunningXWikiAtStartTimeout", "15"));
 
     private static final int DEBUG_PORT = 5005;
 
@@ -144,7 +144,7 @@ public class XWikiExecutor
 
     private XWikiWatchdog watchdog = new XWikiWatchdog();
 
-    private long startTimeout = Long.valueOf(System.getProperty("xwikiExecutionStartTimeout", "120"));
+    private long startTimeout = Long.parseLong(System.getProperty("xwikiExecutionStartTimeout", "120"));
 
     private int debugPort ;
 

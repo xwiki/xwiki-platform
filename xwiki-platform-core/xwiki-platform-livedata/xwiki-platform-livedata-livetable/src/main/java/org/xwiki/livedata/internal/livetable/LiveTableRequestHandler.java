@@ -175,7 +175,7 @@ public class LiveTableRequestHandler
 
         // Add the filters.
         if (query.getFilters() != null) {
-            query.getFilters().stream().forEach(filter -> addFilterRequestParameters(filter, requestParams));
+            query.getFilters().forEach(filter -> addFilterRequestParameters(filter, requestParams));
         }
 
         // Add offset and limit. Note that the default live table results expects the offset to start from 1.

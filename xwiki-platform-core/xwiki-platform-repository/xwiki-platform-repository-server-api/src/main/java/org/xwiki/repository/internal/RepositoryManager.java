@@ -982,7 +982,6 @@ public class RepositoryManager
             needSave = true;
         }
 
-        /////////////////////////////////////////////
         // Update main project page
 
         needSave |= updateProject(project, projectObject, xcontext);
@@ -1021,7 +1020,6 @@ public class RepositoryManager
 
         DocumentReference projectReference = projectDocument.getDocumentReference();
 
-        /////////////////////////////////////////////
         // Update project's extensions
 
         // Search for extensions

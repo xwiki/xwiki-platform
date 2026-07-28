@@ -5898,8 +5898,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
                 // XObjects
                 for (List<BaseObject> xobjects : getXObjects().values()) {
-                    xobjects.stream()
-                        .forEach(xobject -> getUniqueLinkedEntityReferences(xobject, entityTypes, references, context));
+                    xobjects.forEach(
+                        xobject -> getUniqueLinkedEntityReferences(xobject, entityTypes, references, context));
                 }
             }
         } finally {

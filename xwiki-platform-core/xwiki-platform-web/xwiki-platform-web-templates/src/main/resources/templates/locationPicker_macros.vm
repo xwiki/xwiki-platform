@@ -84,6 +84,67 @@
   </dl>
 #end
 
+#**
+ * Picker for a list of locations (i.e. spaces). The locations are selected as you type, in a suggestion input, and can
+ * also be browsed for in a document tree, displayed in a drop down next to the input. The value of the picker is the
+ * list of serialized space references, separated by a comma.
+ *
+ * @param $options the picker options:
+ *          'name' the name of the form field holding the value;
+ *          'value' the initially selected locations, either a serialized list or a collection of references;
+ *          plus the options accepted by #documentTree for the tree used to browse the locations.
+ *#
+#macro (multiLocationPicker $options)
+  #set ($discard = $xwiki.get('jsfx').use('uicomponents/widgets/multiLocationPicker.js', true))
+  #set ($discard = $xwiki.get('ssfx').use('uicomponents/widgets/multiLocationPicker.css', true))
+  #set ($macro.parameters = {})
+  #set ($discard = $macro.parameters.putAll($options))
+  #set ($discard = $macro.parameters.put('multiple', 'multiple'))
+  ## The tree is only an alternative way of feeding the suggestion input: the input remains the single source of truth
+  ## for the value, which is why it doesn't need to know anything about the tree.
+  #if ($isDocumentTreeAvailable)
+    <div class="location-picker-multi">
+      #spacePicker($macro.parameters)
+      #multiLocationPickerBrowser($options)
+    </div>
+  #else
+    #spacePicker($macro.parameters)
+  #end
+#end
+
+#macro (multiLocationPickerBrowser $options)
+  #set ($macro.browseLabel = $escapetool.xml($services.localization.render(
+    'core.widgets.multiLocationPicker.browse')))
+  <div class="location-picker-browse dropdown">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false" title="$macro.browseLabel" aria-label="$macro.browseLabel">
+      $services.icon.renderHTML('chart-organisation')
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+      #set ($macro.showWikis = $displayWikiFields)
+      #set ($macro.filterHiddenDocuments = $options.filterHiddenDocuments != false)
+      ## Only the pages backing a space can be picked as a location, hence showTerminalDocuments is false. Checking a
+      ## location must not check the ones nested inside it, hence three_state and cascade. And the checkbox state must
+      ## be independent of the node selection, so that clicking a node label doesn't pick it, hence tie_selection.
+      #documentTree({
+        'class': 'location-tree',
+        'checkboxes': true,
+        'finder': true,
+        'showAttachments': false,
+        'showRoot': false,
+        'showTerminalDocuments': false,
+        'showTranslations': false,
+        'showWikis': $macro.showWikis,
+        'exclusions': "$!options.exclusions",
+        'root': "$!options.root",
+        'filterHiddenDocuments': $macro.filterHiddenDocuments,
+        'sortDocumentsBy': "$!options.sortDocumentsBy",
+        'config': {'checkbox': {'tie_selection': false, 'three_state': false, 'cascade': ''}}
+      })
+    </div>
+  </div>
+#end
+
 #macro (locationPickerActions $options)
   #set ($isTreePickerAvailable = $isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
   <div class="location-actions btn-group">

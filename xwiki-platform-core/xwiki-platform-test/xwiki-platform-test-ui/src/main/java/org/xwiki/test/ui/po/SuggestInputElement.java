@@ -341,6 +341,36 @@ public class SuggestInputElement extends BaseElement
     }
 
     /**
+     * Waits until the suggestions have been loaded, whether or not any suggestion actually matched the current input.
+     * Unlike {@link #waitForSuggestions()} and {@link #waitForNonTypedSuggestions()}, this doesn't require any
+     * suggestion to be displayed, so it can be used when the search is expected to return no results.
+     *
+     * @return the current suggest input element
+     * @since 18.7.0RC1
+     */
+    public SuggestInputElement waitForSuggestionsLoaded()
+    {
+        return waitForSuggestionsLoaded(this.shouldWaitForRemoteSuggestions);
+    }
+
+    /**
+     * Waits until the suggestions have been loaded, whether or not any suggestion actually matched the current input.
+     * Unlike {@link #waitForSuggestions(boolean)} and {@link #waitForNonTypedSuggestions(boolean)}, this doesn't
+     * require any suggestion to be displayed, so it can be used when the search is expected to return no results.
+     *
+     * @param remote whether the suggestions are loaded from a remote source or not, which can be used to adjust the
+     *            waiting
+     * @return the current suggest input element
+     * @since 18.7.0RC1
+     */
+    public SuggestInputElement waitForSuggestionsLoaded(boolean remote)
+    {
+        waitForDropdownReload(remote);
+        getDriver().waitUntilCondition(driver -> !isLoading());
+        return this;
+    }
+
+    /**
      * Waits until the suggestions have disappeared.
      *
      * @return the current suggest input element

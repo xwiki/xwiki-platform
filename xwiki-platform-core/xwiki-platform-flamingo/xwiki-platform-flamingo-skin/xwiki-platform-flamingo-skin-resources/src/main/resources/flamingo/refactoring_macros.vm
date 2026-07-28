@@ -80,6 +80,15 @@
           $services.localization.render($options.hint, ["<a href='$childrenURL'>", $childCount, '</a>'])
         </span>
       </dd>
+    #else
+      ## If the space is empty we still consider that the request is deep by default, to allow refactoring of
+      ## references in that subspace even if the pages don't exists
+      #if (!$request.deep)
+        #set ($isDeep = 'true')
+      #else
+        #set ($isDeep = $request.deep)
+      #end
+      <input type="hidden" name="deep" value="$isDeep" />
     #end
   #end
 #end

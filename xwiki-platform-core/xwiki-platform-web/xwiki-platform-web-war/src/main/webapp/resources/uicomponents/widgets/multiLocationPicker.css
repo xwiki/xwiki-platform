@@ -1,0 +1,51 @@
+/**
+ * CSS for the multiple location picker: a space suggestion input plus a document tree to browse for locations.
+ */
+#template('colorThemeInit.vm')
+
+.location-picker-multi {
+  /* Lay the suggestion input and the browse button out in a row, like an input group. */
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.location-picker-multi > .ts-wrapper,
+.location-picker-multi > select.suggest-spaces {
+  /* The suggestion input takes all the space the browse button doesn't need. Note that the widget replaces the SELECT
+     with a wrapper of its own, so both have to grow. */
+  flex-grow: 1;
+}
+
+.location-picker-multi > .ts-wrapper > .ts-control,
+.location-picker-multi > select.suggest-spaces {
+  /* Combine with the browse button. The rounded border actually lives on the SELECT itself before it is enhanced, and
+     on its Tom Select generated .ts-control child afterwards, not on the wrapping .ts-wrapper. */
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.location-picker-multi > .location-picker-browse > .dropdown-toggle {
+  /* Combine with the suggestion input. Match its border color too: .btn-default's own border color doesn't line up
+     with the suggestion input's, which would otherwise show as a color seam where the two meet. */
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: none;
+  border-color: var(--input-border);
+}
+
+.location-picker-multi > .location-picker-browse > .dropdown-menu {
+  /* Leave enough room for a deep hierarchy, but keep the drop down short enough to fit below the button in most cases:
+     a deeper tree scrolls inside the drop down rather than making it taller. Bootstrap positions the drop down relative
+     to the button; the only thing we do from JavaScript is flip it above the button when it doesn't fit below. */
+  min-width: 20em;
+  max-width: calc(100vw - 2em);
+  max-height: 20em;
+  overflow: auto;
+  padding: .5em;
+}
+
+.location-picker-multi > .location-picker-browse > .dropdown-menu > .location-tree {
+  /* The tree scrolls with the drop down, it doesn't need a scroll bar of its own. */
+  margin: 0;
+}

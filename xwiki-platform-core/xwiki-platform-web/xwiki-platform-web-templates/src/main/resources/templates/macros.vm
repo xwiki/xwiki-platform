@@ -2660,7 +2660,7 @@ $string##
  *#
 #macro (userPicker_import)
   #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestUsersAndGroups.js'))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestValues.js'))
 #end
 
 #macro (userPicker_input $multiSelect $parameters)
@@ -2778,7 +2778,7 @@ $string##
 
 #macro (tagPicker $parameters)
   #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestTags.js'))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestValues.js'))
   #if ("$!parameters" == "")
     #set ($parameters = {})
   #end
@@ -2796,7 +2796,7 @@ $string##
 
 #macro (wikiPicker $parameters)
   #picker_import
-  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestWikis.js'))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestValues.js'))
   #if ("$!parameters" == "")
     #set ($parameters = {})
   #end

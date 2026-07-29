@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -311,16 +310,26 @@ class RightMapTest
     }
 
     @Test
+    // This method verifies the equals() contract itself, so the assertion deliberately calls equals()
+    // explicitly: the boolean form is what makes visible which map is the receiver and which argument it
+    // gets. Using assertNotEquals() would move that into JUnit's internals and would invite a later
+    // SonarQube S3415 "swap these arguments" change that silently stops testing the contract.
+    @SuppressWarnings("java:S5785")
     void equalsWhenDifferent()
     {
         RightMap<Object> other = new RightMap<>();
         for (Right key : POPULATED_KEYS) {
             other.put(key, newValue());
         }
-        assertNotEquals(populatedMap, other);
+        assertFalse(populatedMap.equals(other));
     }
 
     @Test
+    // This method verifies the equals() contract itself, so the assertion deliberately calls equals()
+    // explicitly: the boolean form is what makes visible which map is the receiver and which argument it
+    // gets. Using assertNotEquals() would move that into JUnit's internals and would invite a later
+    // SonarQube S3415 "swap these arguments" change that silently stops testing the contract.
+    @SuppressWarnings("java:S5785")
     void equalsForLargerMap()
     {
         RightMap<Object> largerMap = new RightMap<>();
@@ -328,17 +337,22 @@ class RightMapTest
             largerMap.put(key, populatedMap.get(key));
         }
         largerMap.put(Right.PROGRAM, newValue());
-        assertNotEquals(populatedMap, largerMap);
+        assertFalse(populatedMap.equals(largerMap));
     }
 
     @Test
+    // This method verifies the equals() contract itself, so the assertion deliberately calls equals()
+    // explicitly: the boolean form is what makes visible which map is the receiver and which argument it
+    // gets. Using assertNotEquals() would move that into JUnit's internals and would invite a later
+    // SonarQube S3415 "swap these arguments" change that silently stops testing the contract.
+    @SuppressWarnings("java:S5785")
     void equalsForSmallerMap()
     {
         RightMap<Object> smallerMap = new RightMap<>();
         for (int i = 0; i < POPULATED_KEYS.length - 1; i++) {
             smallerMap.put(POPULATED_KEYS[i], populatedMap.get(POPULATED_KEYS[i]));
         }
-        assertNotEquals(populatedMap, smallerMap);
+        assertFalse(populatedMap.equals(smallerMap));
     }
 
     @Test

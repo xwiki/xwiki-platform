@@ -23,6 +23,7 @@ import {
 } from "./ImageSuggestionMenu";
 import { DepsContainerContext } from "../../contexts";
 import { useEditor } from "../../hooks";
+import { useImageUploader } from "../../misc/fileUpload";
 import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
 import { SuggestionMenuController } from "@blocknote/react";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
@@ -78,13 +79,14 @@ export function ImageSuggestionController({
     .get()!;
 
   const editor = useEditor();
+  const uploadImage = useImageUploader(editor, depsContainer);
 
   const { t } = useTranslation();
 
   const searchImages = useCallback(
     async (query: string) => {
       const suggestions = await fetchImageSuggestions(
-        query,
+        query || "a",
         linkSuggestService,
         modelReferenceParser,
         editor,
@@ -94,7 +96,7 @@ export function ImageSuggestionController({
       // HACK: placeholder for the upload button (see the `ImageSuggestionMenu` component for more info.)
       suggestions.unshift({
         title: IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER,
-        onItemClick() {},
+        onItemClick: uploadImage,
       });
 
       return maxSuggestions

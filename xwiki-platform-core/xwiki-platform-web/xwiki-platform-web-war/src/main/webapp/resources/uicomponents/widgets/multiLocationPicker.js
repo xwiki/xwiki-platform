@@ -192,6 +192,12 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
       flipIfNeeded();
     });
 
+    browser.on('hide.bs.dropdown', function() {
+      // The drop down can be closed without the toggle button getting focus back which would otherwise drop 
+      // the focus to the body.
+      toggle.trigger('focus');
+    });
+
     menu.on('click', function(event) {
       // Browsing the tree must not close the drop down.
       event.stopPropagation();

@@ -25,7 +25,7 @@
   "use strict";
 
 /**
- * Lets the user browse a document tree in order to feed the space suggestion input it is attached to. 
+ * Lets the user browse a document tree in order to feed the space suggestion input it is attached to.
  * The tree only adds and removes items, it does not hold a state itself.
  */
 define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tree'], function($, suggestSpaces) {
@@ -49,7 +49,7 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
     var treeElement = menu.find('.location-tree');
     // Set while we update the tree to match the input, so that we don't then update the input back.
     var updatingTree = false;
-    
+
     var getSuggestInput = function() {
       return select[0] && select[0].selectize;
     };
@@ -84,7 +84,7 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
     };
 
     /**
-     * @return the suggestion matching the given tree node, in the format of the suggestion input, 
+     * @return the suggestion matching the given tree node, in the format of the suggestion input,
      *   or null if the node is not a location
      */
     var toSuggestion = function(suggestInput, tree, node) {
@@ -193,7 +193,7 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
     });
 
     browser.on('hide.bs.dropdown', function() {
-      // The drop down can be closed without the toggle button getting focus back which would otherwise drop 
+      // The drop down can be closed without the toggle button getting focus back which would otherwise drop
       // the focus to the body.
       toggle.trigger('focus');
     });
@@ -206,7 +206,7 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
     menu.on('keydown', function(event) {
       // Same for typing in the tree finder, but let the Escape key through so that the drop down can still be closed
       // from the keyboard.
-      if (event.which !== 27) {
+      if (event.key !== 'Escape') {
         event.stopPropagation();
       }
     });
@@ -222,8 +222,7 @@ define('xwiki-multiLocationPicker', ['jquery', 'xwiki-suggestSpaces', 'xwiki-tre
 require(['jquery', 'xwiki-multiLocationPicker', 'xwiki-events-bridge'], function($) {
   var init = function(event, data) {
     var elements = $((data && data.elements) || document);
-    elements.filter('.location-picker-multi').multiLocationPicker();
-    elements.find('.location-picker-multi').multiLocationPicker();
+    elements.filter('.location-picker-multi').add(elements.find('.location-picker-multi')).multiLocationPicker();
   };
 
   $(document).on('xwiki:dom:loaded xwiki:dom:updated', init);

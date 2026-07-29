@@ -23,20 +23,26 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.Event;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Deprecated
 class ActionExecutionEventTest
 {
     @Test
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which object is the receiver and which argument
+    // it gets. Using assertEquals()/assertNotEquals() would move that into JUnit's internals and would
+    // invite a later SonarQube S3415 "swap these arguments" change that silently stops testing the
+    // contract.
+    @SuppressWarnings("java:S5785")
     void actionExecutionEventEquals()
     {
         Event e1 = new ActionExecutionEvent("test");
         Event e2 = new ActionExecutionEvent("test");
         Event e3 = new ActionExecutionEvent("different");
-        assertEquals(e1, e1);
-        assertEquals(e1, e2);
-        assertNotEquals(e1, e3);
+        assertTrue(e1.equals(e1));
+        assertTrue(e1.equals(e2));
+        assertFalse(e1.equals(e3));
     }
 }

@@ -22,16 +22,23 @@ package com.xpn.xwiki.objects;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link NumberProperty}.
  *
  * @version $Id$
  */
+// The equals() tests below verify that contract itself, so their assertions deliberately call equals()
+// explicitly: the boolean form is what makes visible which object is the receiver and which argument it
+// gets, which matters here because the null-valued and non-null-valued sides are not interchangeable.
+// Using assertEquals()/assertNotEquals() would move that into JUnit's internals and would invite a later
+// SonarQube S3415 "swap these arguments" change that silently stops testing the contract. That is why
+// those methods, and only those, carry @SuppressWarnings("java:S5785").
 class NumberPropertyTest
 {
     /**
@@ -39,6 +46,7 @@ class NumberPropertyTest
      * NPE (<a href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
+    @SuppressWarnings("java:S5785")
     void nullValueEqualsWithOtherNumberProperty()
     {
         IntegerProperty nullValueProperty = new IntegerProperty();
@@ -50,7 +58,7 @@ class NumberPropertyTest
         assertNotNull(notNullValueProperty.getValue());
 
         // Should not throw a NPE.
-        assertNotEquals(nullValueProperty, notNullValueProperty);
+        assertFalse(nullValueProperty.equals(notNullValueProperty));
     }
 
     /**
@@ -58,6 +66,7 @@ class NumberPropertyTest
      * NPE (<a href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
+    @SuppressWarnings("java:S5785")
     void notNullValueEqualsWithOtherNullNumberProperty()
     {
         IntegerProperty nullValueProperty = new IntegerProperty();
@@ -69,7 +78,7 @@ class NumberPropertyTest
         assertNull(notNullValueProperty.getValue());
 
         // Should not throw a NPE.
-        assertNotEquals(nullValueProperty, notNullValueProperty);
+        assertFalse(nullValueProperty.equals(notNullValueProperty));
     }
 
     /**
@@ -77,6 +86,7 @@ class NumberPropertyTest
      * (<a href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
+    @SuppressWarnings("java:S5785")
     void equalNullValueEquals()
     {
         IntegerProperty nullValueProperty1 = new IntegerProperty();
@@ -88,13 +98,14 @@ class NumberPropertyTest
         assertNull(nullValueProperty2.getValue());
 
         // Should not throw a NPE.
-        assertEquals(nullValueProperty1, nullValueProperty2);
+        assertTrue(nullValueProperty1.equals(nullValueProperty2));
     }
 
     /**
      * Two equal non-null values.
      */
     @Test
+    @SuppressWarnings("java:S5785")
     void equalNotNullValues()
     {
         IntegerProperty nullValueProperty = new IntegerProperty();
@@ -103,13 +114,14 @@ class NumberPropertyTest
         IntegerProperty notNullValueProperty = new IntegerProperty();
         notNullValueProperty.setValue(1);
 
-        assertEquals(nullValueProperty, notNullValueProperty);
+        assertTrue(nullValueProperty.equals(notNullValueProperty));
     }
 
     /**
      * Two not equal non-null values.
      */
     @Test
+    @SuppressWarnings("java:S5785")
     void notEqualNonNullValues()
     {
         IntegerProperty nullValueProperty = new IntegerProperty();
@@ -118,7 +130,7 @@ class NumberPropertyTest
         IntegerProperty notNullValueProperty = new IntegerProperty();
         notNullValueProperty.setValue(1);
 
-        assertNotEquals(nullValueProperty, notNullValueProperty);
+        assertFalse(nullValueProperty.equals(notNullValueProperty));
     }
 
     @Test

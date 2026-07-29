@@ -30,7 +30,6 @@ import javax.script.ScriptContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.xwiki.eventstream.Event;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.Translation;
@@ -113,7 +112,7 @@ class DefaultNotificationRSSRendererTest
             when(this.contextualLocalizationManager.getTranslation("EventTitle")).thenReturn(null);
         }
 
-        when(this.templateManager.getTemplate(ArgumentMatchers.any())).thenReturn(Mockito.mock(Template.class));
+        when(this.templateManager.getTemplate(ArgumentMatchers.any())).thenReturn(mock(Template.class));
 
         CompositeEvent testCompositeEvent = mock(CompositeEvent.class);
         when(testCompositeEvent.getEvents()).thenReturn(Arrays.asList(testEvent1));
@@ -133,7 +132,7 @@ class DefaultNotificationRSSRendererTest
     @Test
     void renderNotification() throws Exception
     {
-        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(Mockito.mock(ScriptContext.class));
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(mock(ScriptContext.class));
 
         CompositeEvent testCompositeEvent = this.mockEvent(false, false, false, false);
         SyndEntry resultEntry = this.defaultNotificationRSSRenderer.renderNotification(testCompositeEvent);
@@ -211,8 +210,8 @@ class DefaultNotificationRSSRendererTest
     @Test
     void renderNotificationUsesEventMatchingCompositeType() throws Exception
     {
-        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(Mockito.mock(ScriptContext.class));
-        when(this.templateManager.getTemplate(ArgumentMatchers.any())).thenReturn(Mockito.mock(Template.class));
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(mock(ScriptContext.class));
+        when(this.templateManager.getTemplate(ArgumentMatchers.any())).thenReturn(mock(Template.class));
 
         // Technical update event triggered by the comment save: it shares the comment date and can end up first in
         // the composite.

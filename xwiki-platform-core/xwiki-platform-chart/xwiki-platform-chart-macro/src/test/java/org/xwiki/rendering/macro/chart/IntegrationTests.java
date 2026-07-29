@@ -21,7 +21,6 @@ package org.xwiki.rendering.macro.chart;
 
 import java.io.InputStreamReader;
 
-import org.mockito.Mockito;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.display.internal.DocumentDisplayer;
@@ -44,6 +43,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -74,7 +74,7 @@ public class IntegrationTests extends RenderingTest
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         DocumentReference currentDocumentReference =
             new DocumentReference("currentwiki", "currentspace", "currentpage");
-        DocumentModelBridge document = Mockito.mock(DocumentModelBridge.class);
+        DocumentModelBridge document = mock(DocumentModelBridge.class);
         when(dab.getDocumentURL(new DocumentReference("currentWiki", "space", "page"), "temp", null, null))
             .thenReturn("temppath");
         when(dab.getCurrentDocumentReference()).thenReturn(currentDocumentReference);

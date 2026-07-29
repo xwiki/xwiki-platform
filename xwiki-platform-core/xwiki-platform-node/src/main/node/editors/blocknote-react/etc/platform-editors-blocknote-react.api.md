@@ -48,7 +48,7 @@ export type BlockNoteViewWrapperProps = {
     label: string;
     content: BlockType[];
     macros: {
-        list?: MacroWithUnknownParamsType[];
+        list: MacroWithUnknownParamsType[];
         ctx: ContextForMacros;
     } | false;
     collaboration?: Collaboration;

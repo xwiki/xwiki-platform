@@ -19,11 +19,14 @@
  */
 import { useEditor } from "../../hooks";
 import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
+import { Button } from "@mantine/core";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import type {
   DefaultReactSuggestionItem,
   SuggestionMenuProps,
 } from "@blocknote/react";
+
 import "./ImageSuggestionMenu.css";
 
 // HACK: the first item is actually a placeholder for the upload button, in order to make it selectable with the keyboard
@@ -40,10 +43,13 @@ const IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER = "#imageSuggestionHack";
 // In order to access all items' URL to render them, they *must* be provided
 // through the items' `subtext` property.
 
+// eslint-disable-next-line max-statements
 function ImageSuggestionMenu(
   props: SuggestionMenuProps<DefaultReactSuggestionItem>,
 ) {
   const editor = useEditor();
+
+  const { t } = useTranslation();
 
   const onSelected = useCallback(
     (url: string) => {
@@ -66,10 +72,12 @@ function ImageSuggestionMenu(
     );
   }
 
+  const [uploadItem, ...suggestionItems] = props.items;
+
   if (
-    props.items
-      .slice(1)
-      .find((item) => !item.subtext || !item.subtext.startsWith("http"))
+    suggestionItems.find(
+      (item) => !item.subtext || !item.subtext.startsWith("http"),
+    )
   ) {
     throw new Error(
       "Expected all image suggestion items to have URLs as subtexts",
@@ -81,11 +89,12 @@ function ImageSuggestionMenu(
       <div
         className={`slash-menu-item ${props.selectedIndex === 0 ? "selected" : ""}`}
       >
-        TODO
-        {/* <ImageUploadButton onUploaded={onSelected} /> */}
+        <Button variant="default" onClick={() => uploadItem.onItemClick()}>
+          {t("blocknote.imageSelector.uploadButton")}
+        </Button>
       </div>
 
-      {props.items.slice(1).map((item, index) => (
+      {suggestionItems.map((item, index) => (
         <div
           key={item.title}
           className={`slash-menu-item ${

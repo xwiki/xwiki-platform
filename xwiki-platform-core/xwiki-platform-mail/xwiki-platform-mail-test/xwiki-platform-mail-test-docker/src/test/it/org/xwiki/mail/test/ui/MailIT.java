@@ -42,6 +42,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.scheduler.test.po.SchedulerHomePage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.UseWikiDescriptorTarget;
+import org.xwiki.test.docker.junit5.WikiDescriptorTarget;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
@@ -84,6 +86,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-scheduler-api"
     }
 )
+// The mail templates are evaluated in the thread of the request that sends the mail, and thus the URLs they generate
+// come from that request and not from the wiki descriptor. Make the descriptor target the HTTP client, that is a
+// host/port the browser doesn't use, so that the assertions on those URLs actually verify that.
+@UseWikiDescriptorTarget(WikiDescriptorTarget.HTTP_CLIENT)
 class MailIT
 {
     private GreenMail mail;
@@ -204,7 +210,8 @@ class MailIT
         // - "$request"
         // Note: We also use the $name and $doc bindings to show that the user can add new bindings ($doc is not bound
         // by default since there isn't always a notion of current doc in all places where mail sending is done).
-        // Note: We use $xwiki.getURL() in the content to verify that we generate full external URLs.
+        // Note: We use $xwiki.getURL() in the content to verify that we generate full external URLs, based on
+        // the request that sends the mail.
         String velocityContent = "Hello $name from $escapetool.xml($services.model.resolveDocument("
             + "$xcontext.getUser()).getName()) - Served from $request.getRequestURL().toString() - "
             + "url: $xwiki.getURL('Main.WebHome')";
@@ -408,7 +415,7 @@ class MailIT
             "\\QSubject: Status for John on " + this.testClassName + ".SendMail\\E",
             "\\QHello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMail\\E",
             "\\Q<strong>Hello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMail - "
-                + "url: http://\\E.*\\Q/Main/</strong>\\E",
+                + "url: " + requestURLPrefix + "/Main/</strong>\\E",
             "\\QX-MailType: Test\\E",
             "\\QContent-Type: text/plain; name=something.txt\\E",
             "\\QContent-ID: <something.txt>\\E",
@@ -466,7 +473,7 @@ class MailIT
         assertReceivedMessages(2,
             "\\QSubject: Status for John on " + this.testClassName + ".SendMailGroupAndUsers\\E",
             "\\QHello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMailGroupAndUsers - "
-                + "url: http://\\E.*\\Q/Main/\\E");
+                + "url: " + requestURLPrefix + "/Main/\\E");
         this.mail.purgeEmailFromAllMailboxes();
     }
 

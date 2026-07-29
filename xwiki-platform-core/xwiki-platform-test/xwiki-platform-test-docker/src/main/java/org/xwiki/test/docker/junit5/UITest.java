@@ -50,7 +50,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Documented
 @Retention(RUNTIME)
-@Target({ TYPE, METHOD, ANNOTATION_TYPE })
+@Target({TYPE, METHOD, ANNOTATION_TYPE})
 @ExtendWith(ValidateConsoleExtension.class)
 @ExtendWith(XWikiDockerExtension.class)
 @ExtendWith(TestReferenceParameterResolver.class)
@@ -91,8 +91,8 @@ public @interface UITest
 
     /**
      * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in your
-     * local repository). False by default to avoid developer problems but should be set to true in the CI to improve
-     * performance of functional tests
+     *         local repository). False by default to avoid developer problems but should be set to true in the CI to
+     *         improve performance of functional tests
      * @since 10.10RC1
      */
     boolean offline() default false;
@@ -163,20 +163,21 @@ public @interface UITest
 
     /**
      * @return true if the specified extra JAR versions must be resolved (when they're not specified), by checking the
-     *     transitive list of dependencies in the current POM. Note that there are 2 limitations: resolving takes time
-     *     and SNAPSHOT versions will be resolved to the latest published SNAPSHOT. This is why it's off by default.
-     *     When false the current POM version will be used for the missing extra JAR versions. The main use case for
-     *     using true is in contrib extensions where the current POM version usually don't match extra JARs versions and
-     *     you may not want to hardcode the version and thus you can let the docker test framework find it for you.
+     *         transitive list of dependencies in the current POM. Note that there are 2 limitations: resolving takes
+     *         time and SNAPSHOT versions will be resolved to the latest published SNAPSHOT. This is why it's off by
+     *         default. When false the current POM version will be used for the missing extra JAR versions. The main use
+     *         case for using true is in contrib extensions where the current POM version usually don't match extra JARs
+     *         versions and you may not want to hardcode the version and thus you can let the docker test framework find
+     *         it for you.
      * @since 12.5RC1
      */
     boolean resolveExtraJARs() default false;
 
     /**
-     * @return the list of ports that should be SSH-forwarded when connecting from a Docker container to the
-     *         host (i.e. when using the {@code host.testcontainers.internal} host name). This is in addition to port
-     *         {@code 8080} which is always added. For example if you need XWiki to send a mail to a SMTP server
-     *         running on port 3025 on the host, you should add port 3025 to the list.
+     * @return the list of ports that should be SSH-forwarded when connecting from a Docker container to the host (i.e.
+     *         when using the {@code host.testcontainers.internal} host name). This is in addition to port {@code 8080}
+     *         which is always added. For example if you need XWiki to send a mail to a SMTP server running on port 3025
+     *         on the host, you should add port 3025 to the list.
      * @since 10.11RC1
      */
     int[] sshPorts() default {};
@@ -197,13 +198,13 @@ public @interface UITest
     boolean office() default false;
 
     /**
-     * @return true to make the test instance equivalent to an XWiki installed from the standard flavor
-     *         distribution. When true, two things happen: (1) the generated WAR contains the full set of core
-     *         extensions of the standard XWiki distribution WAR (i.e. the {@code WEB-INF/lib} JARs resolved from
+     * @return true to make the test instance equivalent to an XWiki installed from the standard flavor distribution.
+     *         When true, two things happen: (1) the generated WAR contains the full set of core extensions of the
+     *         standard XWiki distribution WAR (i.e. the {@code WEB-INF/lib} JARs resolved from
      *         {@code xwiki-platform-distribution-war-dependencies}) instead of the minimal set (resolved from
      *         {@code xwiki-platform-minimaldependencies}); and (2) the standard flavor
-     *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically, so the test does
-     *         not need to declare it as a dependency. False by default.
+     *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically, so the test does not
+     *         need to declare it as a dependency. False by default.
      * @since 18.6.0RC1
      */
     boolean standardFlavor() default false;
@@ -282,4 +283,16 @@ public @interface UITest
      * @since 18.3.0RC1
      */
     XWikiInstances xwikiInstances() default @XWikiInstances;
+
+    /**
+     * @return the host/port to set as the default one in the wiki descriptor, and which is thus used to generate
+     *         external URLs from background threads, that is when no request is available to get the host/port from.
+     *         This is the value used by all the tests of the XWiki instance, unless they override it with
+     *         {@link UseWikiDescriptorTarget}.
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.4
+     * @since 18.7.0RC1
+     */
+    WikiDescriptorTarget wikiDescriptorTarget() default WikiDescriptorTarget.HTTP_CLIENT;
 }

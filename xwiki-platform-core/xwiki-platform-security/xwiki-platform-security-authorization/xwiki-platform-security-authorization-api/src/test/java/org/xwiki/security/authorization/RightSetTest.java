@@ -26,7 +26,7 @@ import org.apache.commons.collections4.set.AbstractSetTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Test Set interface of RightSet.
@@ -85,6 +85,11 @@ class RightSetTest extends AbstractSetTest<Right>
      */
     @Test
     @Override
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which set is the receiver and which argument it
+    // gets. Using assertNotEquals() would move that into JUnit's internals and would invite a later
+    // SonarQube S3415 "swap these arguments" change that silently stops testing the contract.
+    @SuppressWarnings("java:S5785")
     public void testSetEquals()
     {
         resetEmpty();
@@ -94,7 +99,7 @@ class RightSetTest extends AbstractSetTest<Right>
         final Set<Right> set2 = makeConfirmedCollection();
         // CUSTOM: the standard #testSetEquals add a String here, which does not make any sense for RightSet
         set2.add(Right.VIEW);
-        assertNotEquals(getCollection(), set2, "Empty set shouldn't equal nonempty set");
+        assertFalse(getCollection().equals(set2), "Empty set shouldn't equal nonempty set");
 
         resetFull();
         assertEquals(getCollection(), getConfirmed(), "Full sets should be equal");
@@ -102,6 +107,6 @@ class RightSetTest extends AbstractSetTest<Right>
 
         set2.clear();
         set2.addAll(Arrays.asList(getOtherElements()));
-        assertNotEquals(getCollection(), set2, "Sets with different contents shouldn't be equal");
+        assertFalse(getCollection().equals(set2), "Sets with different contents shouldn't be equal");
     }
 }

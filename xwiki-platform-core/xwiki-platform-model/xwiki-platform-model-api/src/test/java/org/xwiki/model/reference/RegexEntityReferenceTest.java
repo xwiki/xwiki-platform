@@ -24,19 +24,26 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link RegexEntityReference} class.
  * 
  * @version $Id$
  */
+// RegexEntityReference.equals() is an asymmetric matcher: it runs the regex only when the regex
+// reference is the receiver. The assertions below therefore call equals() explicitly, so that the
+// receiver is visible at the call site. Using assertEquals()/assertNotEquals() would move the call into
+// JUnit's internals and would invite a later SonarQube S3415 "swap these arguments" change, which would
+// call the concrete reference's equals() instead and skip regex matching altogether. That is why those
+// methods carry @SuppressWarnings("java:S5785").
 class RegexEntityReferenceTest
 {
     private static final DocumentReference REFERENCETOMATCH = new DocumentReference("wiki", "space", "page");
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWhenExact()
     {
         EntityReference wikiReference =
@@ -49,51 +56,56 @@ class RegexEntityReferenceTest
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getName(), Pattern.LITERAL), EntityType.DOCUMENT,
                 spaceReference);
 
-        assertEquals(reference, REFERENCETOMATCH);
+        assertTrue(reference.equals(REFERENCETOMATCH));
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWithOnlyPage()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getName(), Pattern.LITERAL), EntityType.DOCUMENT);
 
-        assertEquals(reference, REFERENCETOMATCH);
+        assertTrue(reference.equals(REFERENCETOMATCH));
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWithOnlyWiki()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getWikiReference().getName(), Pattern.LITERAL),
                 EntityType.WIKI);
 
-        assertEquals(reference, REFERENCETOMATCH);
+        assertTrue(reference.equals(REFERENCETOMATCH));
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWithPattern()
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("p.*"), EntityType.DOCUMENT);
 
-        assertEquals(reference, REFERENCETOMATCH);
+        assertTrue(reference.equals(REFERENCETOMATCH));
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWhenPatternNotMatching()
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("space"), EntityType.DOCUMENT);
 
-        assertNotEquals(reference, REFERENCETOMATCH);
+        assertFalse(reference.equals(REFERENCETOMATCH));
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWhenNonRegexParent()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile("space"), EntityType.SPACE, new EntityReference("wiki",
                 EntityType.WIKI));
 
-        assertEquals(reference, REFERENCETOMATCH);
+        assertTrue(reference.equals(REFERENCETOMATCH));
     }
 }

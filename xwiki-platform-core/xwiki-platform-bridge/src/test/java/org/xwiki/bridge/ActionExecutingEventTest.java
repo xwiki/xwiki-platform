@@ -25,7 +25,6 @@ import org.xwiki.bridge.event.ActionExecutingEvent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,6 +33,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
+// The equals() and hashCode() tests below verify those contracts themselves, so their assertions
+// deliberately call equals() (or compare hashCode() values) explicitly: the boolean form is what makes
+// visible which object is the receiver and which argument it gets, including null and an instance of a
+// foreign class. Using assertEquals()/assertNotEquals() would move that into JUnit's internals and would
+// invite a later SonarQube S3415 "swap these arguments" change that silently stops testing the contract.
+// That is why those methods, and only those, carry @SuppressWarnings("java:S5785").
 class ActionExecutingEventTest
 {
     // Tests for constructors
@@ -151,102 +156,116 @@ class ActionExecutingEventTest
     // Tests for equals(Object)
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsSameObject()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
-        assertEquals(event, event, "Same object wasn't equal!");
+        assertTrue(event.equals(event), "Same object wasn't equal!");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsSameAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
-        assertEquals(event, new ActionExecutingEvent("something"), "Same action wasn't equal!");
+        assertTrue(event.equals(new ActionExecutingEvent("something")), "Same action wasn't equal!");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWithNull()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
-        assertNotEquals(event, null, "null was equal!");
+        assertFalse(event.equals(null), "null was equal!");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void doesntEqualWildcardAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
-        assertNotEquals(event, new ActionExecutingEvent(), "Wildcard action was equal!");
+        assertFalse(event.equals(new ActionExecutingEvent()), "Wildcard action was equal!");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void doesntEqualDifferentAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
-        assertNotEquals(event, new ActionExecutingEvent("else"), "A different action was equal!");
+        assertFalse(event.equals(new ActionExecutingEvent("else")), "A different action was equal!");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void doesntEqualDifferentCaseAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
-        assertNotEquals(event, new ActionExecutingEvent("SomeThing"),
+        assertFalse(event.equals(new ActionExecutingEvent("SomeThing")),
             "Action equals comparison was case insensitive!");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void doesntEqualDifferentTypeOfAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
-        assertNotEquals(event, new ActionExecutedEvent("something"), "Same object isn't matched!");
+        assertFalse(event.equals(new ActionExecutedEvent("something")), "Same object isn't matched!");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void wildcardActionDoesntEqualOtherActions()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
-        assertNotEquals(new ActionExecutingEvent(), event, "Wildcard action equals another action!");
+        assertFalse(new ActionExecutingEvent().equals(event), "Wildcard action equals another action!");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void wildcardActionDoesntEqualEmptyAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("");
-        assertNotEquals(new ActionExecutingEvent(), event, "Wildcard action equals another action!");
+        assertFalse(new ActionExecutingEvent().equals(event), "Wildcard action equals another action!");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void wildcardActionEqualsWildcardAction()
     {
-        assertEquals(new ActionExecutingEvent(), new ActionExecutingEvent(),
+        assertTrue(new ActionExecutingEvent().equals(new ActionExecutingEvent()),
             "Wildcard action isn't equal to another wildcard action");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void wildcardActionDoesntEqualNull()
     {
-        assertNotEquals(new ActionExecutingEvent(), null, "Wildcard action equals null!");
+        assertFalse(new ActionExecutingEvent().equals(null), "Wildcard action equals null!");
     }
 
     // Tests for hashCode()
 
     @Test
+    @SuppressWarnings("java:S5785")
     void verifyHashCode()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
-        assertNotEquals(0, event.hashCode(), "Hashcode was zero!");
+        assertTrue(event.hashCode() != 0, "Hashcode was zero!");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void hashCodeWithEmptyAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("");
-        assertEquals(0, event.hashCode(), "Hashcode for empty string action wasn't zero!");
+        assertTrue(event.hashCode() == 0, "Hashcode for empty string action wasn't zero!");
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void hashCodeForWildcardAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent();
-        assertEquals(0, event.hashCode(), "Hashcode for wildcard action wasn't zero!");
+        assertTrue(event.hashCode() == 0, "Hashcode for wildcard action wasn't zero!");
     }
 }

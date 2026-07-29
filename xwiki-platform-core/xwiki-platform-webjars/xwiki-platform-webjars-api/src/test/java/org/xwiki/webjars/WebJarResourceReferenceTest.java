@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.webjars.internal.WebJarsResourceReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Unit tests for {@link org.xwiki.webjars.internal.WebJarsResourceReference}.
@@ -36,6 +36,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class WebJarResourceReferenceTest
 {
     @Test
+    // This method verifies the equals() and hashCode() contracts themselves, so the assertions
+    // deliberately call equals() (or compare hashCode() values) explicitly: the boolean form is what makes
+    // visible which object is the receiver and which argument it gets. Using
+    // assertEquals()/assertNotEquals() would move that into JUnit's internals and would invite a later
+    // SonarQube S3415 "swap these arguments" change that silently stops testing the contract.
+    @SuppressWarnings("java:S5785")
     void equalsAndHashCode()
     {
         WebJarsResourceReference reference1 = new WebJarsResourceReference("namespace", List.of("one", "two"));
@@ -53,10 +59,10 @@ class WebJarResourceReferenceTest
         assertEquals(reference2, reference1);
         assertEquals(reference2.hashCode(), reference1.hashCode());
 
-        assertNotEquals(reference3, reference1);
-        assertNotEquals(reference3.hashCode(), reference1.hashCode());
+        assertFalse(reference3.equals(reference1));
+        assertFalse(reference3.hashCode() == reference1.hashCode());
 
-        assertNotEquals(reference4, reference3);
-        assertNotEquals(reference4.hashCode(), reference3.hashCode());
+        assertFalse(reference4.equals(reference3));
+        assertFalse(reference4.hashCode() == reference3.hashCode());
     }
 }

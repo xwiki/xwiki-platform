@@ -22,7 +22,7 @@ package com.xpn.xwiki.doc;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Unit tests for the {@link XWikiLink} class.
@@ -32,6 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class XWikiLinkTest
 {
     @Test
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which object is the receiver and which argument
+    // it gets, including null. Using assertEquals()/assertNotEquals() would move that into JUnit's
+    // internals and would invite a later SonarQube S3415 "swap these arguments" change that silently stops
+    // testing the contract.
+    @SuppressWarnings("java:S5785")
     void testXWikiLinkEquals()
     {
         final long docId = 101;
@@ -55,7 +61,7 @@ class XWikiLinkTest
         assertEquals(l1, l3);
 
         // equals null == false
-        assertNotEquals(l1, null);
+        assertFalse(l1.equals(null));
     }
 
     @Test

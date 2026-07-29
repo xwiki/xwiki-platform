@@ -36,6 +36,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -119,6 +120,12 @@ class ExtendedURLTest
     }
 
     @Test
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which object is the receiver and which argument
+    // it gets, including null and an instance of a foreign class. Using assertEquals()/assertNotEquals()
+    // would move that into JUnit's internals and would invite a later SonarQube S3415 "swap these
+    // arguments" change that silently stops testing the contract.
+    @SuppressWarnings("java:S5785")
     void equality() throws Exception
     {
         ExtendedURL extendedURL1 = new ExtendedURL(new URL("http://localhost:8080/some/path"), null);
@@ -132,9 +139,9 @@ class ExtendedURLTest
         assertNotEquals(extendedURL1, extendedURL4);
         assertNotEquals(extendedURL3, extendedURL4);
 
-        assertNotEquals(extendedURL1, null);
-        assertEquals(extendedURL1, extendedURL1);
-        assertNotEquals(extendedURL1, extendedURL1.getWrappedURL());
+        assertFalse(extendedURL1.equals(null));
+        assertTrue(extendedURL1.equals(extendedURL1));
+        assertFalse(extendedURL1.equals(extendedURL1.getWrappedURL()));
     }
 
     @Test

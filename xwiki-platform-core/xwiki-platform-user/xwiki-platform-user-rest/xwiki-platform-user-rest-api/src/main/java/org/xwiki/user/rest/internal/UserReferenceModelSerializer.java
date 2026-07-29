@@ -47,7 +47,7 @@ public interface UserReferenceModelSerializer
      * @return a user summary
      * @throws XWikiException if there was a problem during serialization
      * @since 18.4.3
-     * @since 18.7RC1
+     * @since 18.7.0RC1
      */
     UserSummary toRestUserSummary(URI baseUri, UserReference userReference) throws XWikiException;
 
@@ -60,7 +60,7 @@ public interface UserReferenceModelSerializer
      * @return a user
      * @throws XWikiException if there was a problem during serialization
      * @since 18.4.3
-     * @since 18.7RC1
+     * @since 18.7.0RC1
      */
     User toRestUser(URI baseUri, UserReference userReference, boolean preferences) throws XWikiException;
 }

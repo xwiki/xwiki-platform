@@ -33,7 +33,7 @@ import org.xwiki.user.rest.model.jaxb.UserPreferences;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Abstract implementation of {@link UserReferenceModelSerializer} to handle pseudo-users, like Guest.
+ * Abstract implementation of {@link UserReferenceModelSerializer}, providing some common helpers.
  *
  * @since 18.2.0RC1
  * @version $Id$

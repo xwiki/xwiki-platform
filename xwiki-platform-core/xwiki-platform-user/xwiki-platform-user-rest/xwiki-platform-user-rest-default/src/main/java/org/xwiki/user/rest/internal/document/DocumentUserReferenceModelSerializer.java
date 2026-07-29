@@ -65,7 +65,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceModelSerializer
 {
     @Inject
-    private UserReferenceSerializer<DocumentReference> userReferenceResolver;
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     @Inject
     private UserReferenceSerializer<String> stringUserReferenceSerializer;
@@ -85,7 +85,9 @@ public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceM
         userSummary.setLastName(userProperties.getLastName());
 
         XWikiContext xcontext = this.xcontextProvider.get();
+
         String avatarFileName = null;
+        // The DocumentReference might be null (guest user)
         if (userReference != null) {
             XWikiDocument xwikiDocument = xcontext.getWiki().getDocument(userReference, xcontext);
             avatarFileName = userProperties.getProperty("avatar");
@@ -125,7 +127,7 @@ public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceM
     @Override
     public UserSummary toRestUserSummary(URI baseUri, UserReference userReference) throws XWikiException
     {
-        DocumentReference documentUserReference = this.userReferenceResolver.serialize(userReference);
+        DocumentReference documentUserReference = this.userReferenceSerializer.serialize(userReference);
         String userId = this.stringUserReferenceSerializer.serialize(userReference);
 
         UserProperties userProperties = this.userPropertiesResolver.resolve(userReference);
@@ -133,6 +135,7 @@ public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceM
         toRestUserSummary(baseUri, userSummary, userId, documentUserReference, userReference.isGlobal(),
             userProperties);
 
+        // The DocumentReference might be null (guest user)
         if (documentUserReference != null) {
             String historyUri =
                 Utils.createURI(baseUri, UserResource.class, documentUserReference.getWikiReference().getName(), userId)
@@ -154,7 +157,7 @@ public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceM
             throw new NotFoundException();
         }
 
-        DocumentReference documentUserReference = this.userReferenceResolver.serialize(userReference);
+        DocumentReference documentUserReference = this.userReferenceSerializer.serialize(userReference);
         String userId = this.stringUserReferenceSerializer.serialize(userReference);
 
         User user = this.userObjectFactory.createUser();
@@ -166,6 +169,7 @@ public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceM
         String oldWikiId = xcontext.getWikiId();
 
         try {
+            // The DocumentReference might be null (guest user)
             if (documentUserReference != null) {
                 // We switch the context's wiki to the fetched user's to access wiki-specific preferences.
                 xcontext.setWikiId(documentUserReference.getWikiReference().getName());

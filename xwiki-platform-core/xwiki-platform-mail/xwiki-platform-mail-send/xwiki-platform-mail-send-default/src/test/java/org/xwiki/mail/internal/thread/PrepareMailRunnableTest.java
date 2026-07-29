@@ -33,7 +33,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.ExtendedMimeMessage;
@@ -110,7 +109,7 @@ class PrepareMailRunnableTest
     @BeforeEach
     void setUp()
     {
-        when(this.xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+        when(this.xwikiContextProvider.get()).thenReturn(mock(XWikiContext.class));
     }
 
     @Test

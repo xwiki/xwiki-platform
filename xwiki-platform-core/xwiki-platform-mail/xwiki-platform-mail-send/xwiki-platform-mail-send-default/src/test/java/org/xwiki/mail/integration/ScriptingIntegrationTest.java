@@ -34,7 +34,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mockito;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.phase.Disposable;
@@ -140,11 +139,11 @@ class ScriptingIntegrationTest extends AbstractMailIntegrationTest
 
         // Set the current wiki in the Context
         ModelContext modelContext = this.componentManager.registerMockComponent(ModelContext.class);
-        Mockito.when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
+        when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
 
         Provider<XWikiContext> xwikiContextProvider =
             this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+        when(xwikiContextProvider.get()).thenReturn(mock(XWikiContext.class));
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
         this.componentManager.registerMockComponent(new DefaultParameterizedType(null, Copier.class,

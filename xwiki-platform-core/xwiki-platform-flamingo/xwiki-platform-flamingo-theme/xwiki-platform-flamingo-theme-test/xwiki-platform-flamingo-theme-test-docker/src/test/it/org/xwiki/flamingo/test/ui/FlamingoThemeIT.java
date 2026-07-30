@@ -207,6 +207,37 @@ class FlamingoThemeIT
         assertColor(255, 255, 255, vp.getPageBackgroundColor());
     }
 
+    /**
+     * Verify that setting only the "Font Family Sans Serif" variable (and leaving "Font Family Base" empty) is
+     * enough for the custom font to be applied, since Bootstrap LESS makes {@code @font-family-base} fall back to
+     * {@code @font-family-sans-serif} by default.
+     */
+    @Test
+    void validateFontFamilySansSerifFallback(TestUtils setup, TestInfo info)
+    {
+        setup.loginAsSuperAdmin();
+
+        String testMethodName = info.getTestMethod().get().getName();
+        setup.deletePage("FlamingoThemes", testMethodName);
+
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        ThemesAdministrationSectionPage presentationAdministrationSectionPage =
+            administrationPage.clickThemesSection();
+        presentationAdministrationSectionPage.manageColorThemes();
+        ThemeApplicationWebHomePage themeApplicationWebHomePage = new ThemeApplicationWebHomePage();
+
+        EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme(testMethodName);
+        editThemePage.setAutoRefresh(false);
+        editThemePage.selectVariableCategory("Typography");
+        editThemePage.setVariableValue("font-family-sans-serif", "math");
+        editThemePage.refreshPreview();
+
+        PreviewBox previewBox = editThemePage.getPreviewBox();
+        assertFalse(previewBox.hasError());
+        assertEquals("math", previewBox.getTitleFontFamily().toLowerCase());
+        previewBox.switchToDefaultContent();
+    }
+
     private void assertCustomThemeColors(ViewPage page)
     {
         // FIXME: The following should be put back when https://github.com/SeleniumHQ/selenium/issues/7697 will be fixed

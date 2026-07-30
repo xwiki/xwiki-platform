@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.test;
 
+import java.util.List;
+
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Assert;
@@ -26,6 +28,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Pages;
 import org.xwiki.rest.model.jaxb.Space;
 import org.xwiki.rest.model.jaxb.Spaces;
@@ -116,5 +119,34 @@ public class PagesResourceIT extends AbstractHttpIT
             this.testUtils.rest().delete(ref1);
             this.testUtils.rest().delete(ref2);
         }
+    }
+
+    /**
+     * Check that the pages of a space are returned when they are ordered by date. On Oracle, the empty string is
+     * stored as null, so the locale condition of the query needs to accept null, too, or the result is always empty.
+     */
+    @Test
+    void testPagesResourceOrderedByDate() throws Exception
+    {
+        DocumentReference reference = new DocumentReference(getWiki(), getTestClassName(), getTestMethodName());
+        try {
+            getUtil().rest().delete(reference);
+            getUtil().rest().savePage(reference, "content", "title");
+
+            List<String> names = getPageNames("order=date&number=100");
+            assertTrue(names.contains(reference.getName()), names.toString());
+        } finally {
+            getUtil().rest().delete(reference);
+        }
+    }
+
+    private List<String> getPageNames(String queryString) throws Exception
+    {
+        GetMethod getMethod = executeGet("%s?%s".formatted(
+            buildURI(org.xwiki.rest.resources.pages.PagesResource.class, getWiki(), getTestClassName()), queryString));
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+        return pages.getPageSummaries().stream().map(PageSummary::getName).toList();
     }
 }

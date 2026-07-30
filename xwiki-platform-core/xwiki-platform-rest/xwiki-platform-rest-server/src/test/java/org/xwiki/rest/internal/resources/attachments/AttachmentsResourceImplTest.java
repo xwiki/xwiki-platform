@@ -134,7 +134,8 @@ class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
             + "where attachment.docId = doc.id and doc.fullName = :localDocumentReference and"
             + " upper(attachment.author) like :author and upper(attachment.filename) like :name and"
             + " (attachment.mimeType is null or attachment.mimeType = '' or upper(attachment.mimeType) like :mediaType0"
-            + " or upper(attachment.filename) like :extension0)", Query.HQL)).thenReturn(query);
+            + " or upper(attachment.filename) like :extension0)"
+            + " order by doc.fullName asc, doc.language asc, attachment.filename asc", Query.HQL)).thenReturn(query);
         mockContainsQueryParam(query, "author", "MFLOREA");
         mockContainsQueryParam(query, "name", "LOGO");
         mockContainsQueryParam(query, "mediaType0", "VIDEO/");

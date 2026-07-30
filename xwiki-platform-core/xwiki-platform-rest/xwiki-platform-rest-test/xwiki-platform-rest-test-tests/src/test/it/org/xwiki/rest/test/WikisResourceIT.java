@@ -566,7 +566,7 @@ public class WikisResourceIT extends AbstractHttpIT
      * number/start stable.
      */
     @Test
-    void testPagesOrder() throws Exception
+    public void testPagesOrder() throws Exception
     {
         // Names whose order differs between a binary and a locale-aware collation, see also SolrIndexerIT#sortOrder:
         // XWiki requires a binary collation in all databases, also for consistency with Solr.
@@ -578,24 +578,25 @@ public class WikisResourceIT extends AbstractHttpIT
         List<String> createdOrdered = suffixes.stream().map(suffix -> this.fullName + suffix).sorted().toList();
         try {
             for (DocumentReference reference : references) {
-                getUtil().rest().savePage(reference, "content", "title");
+                this.testUtils.rest().savePage(reference, "content", "title");
             }
 
             GetMethod getMethod =
                 executeGet(String.format("%s?number=1000", buildURI(WikiPagesResource.class, getWiki())));
-            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
             Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
             List<String> fullNames = pages.getPageSummaries().stream().map(PageSummary::getFullName).toList();
             // The whole result must be ordered by full name, translations of the same document compare equal.
-            assertEquals("", describeInversions(fullNames, Comparator.naturalOrder()),
-                "The pages aren't ordered by full name.");
+            Assert.assertEquals("The pages aren't ordered by full name.", "",
+                describeInversions(fullNames, Comparator.naturalOrder()));
             // Check the pages created by this test explicitly, so that the assertion above cannot pass just because
             // no page exercised the ordering.
-            assertEquals(createdOrdered, fullNames.stream().filter(createdOrdered::contains).distinct().toList());
+            Assert.assertEquals(createdOrdered,
+                fullNames.stream().filter(createdOrdered::contains).distinct().toList());
         } finally {
             for (DocumentReference reference : references) {
-                getUtil().rest().delete(reference);
+                this.testUtils.rest().delete(reference);
             }
         }
     }
@@ -605,9 +606,9 @@ public class WikisResourceIT extends AbstractHttpIT
      * with number/start stable.
      */
     @Test
-    void testAttachmentsOrder() throws Exception
+    public void testAttachmentsOrder() throws Exception
     {
-        getUtil().rest().delete(this.reference);
+        this.testUtils.rest().delete(this.reference);
 
         // Names whose order differs between a binary and a locale-aware collation, see also SolrIndexerIT#sortOrder:
         // XWiki requires a binary collation in all databases, also for consistency with Solr.
@@ -618,13 +619,13 @@ public class WikisResourceIT extends AbstractHttpIT
         List<String> createdOrdered = fileNames.stream().sorted().toList();
         try {
             for (String fileName : fileNames) {
-                getUtil().rest().attachFile(new AttachmentReference(fileName, this.reference),
+                this.testUtils.rest().attachFile(new AttachmentReference(fileName, this.reference),
                     new ByteArrayInputStream(fileName.getBytes(StandardCharsets.UTF_8)), true);
             }
 
             GetMethod getMethod =
                 executeGet(String.format("%s?number=1000", buildURI(WikiAttachmentsResource.class, getWiki())));
-            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
             Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
             // The whole result must be ordered by page and then file name.
@@ -633,16 +634,16 @@ public class WikisResourceIT extends AbstractHttpIT
                 .toList();
             Comparator<List<String>> keyComparator =
                 Comparator.<List<String>, String>comparing(key -> key.get(0)).thenComparing(key -> key.get(1));
-            assertEquals("", describeInversions(keys, keyComparator),
-                "The attachments aren't ordered by page and file name.");
+            Assert.assertEquals("The attachments aren't ordered by page and file name.", "",
+                describeInversions(keys, keyComparator));
             // Check the attachments created by this test explicitly, so that the assertion above cannot pass just
             // because no attachment exercised the ordering.
-            assertEquals(createdOrdered, attachments.getAttachments().stream()
+            Assert.assertEquals(createdOrdered, attachments.getAttachments().stream()
                 .map(Attachment::getName)
                 .filter(createdOrdered::contains)
                 .toList());
         } finally {
-            getUtil().rest().delete(this.reference);
+            this.testUtils.rest().delete(this.reference);
         }
     }
 

@@ -125,7 +125,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
 
         List<Object[]> results = query.list();
 
-        Map<String, String> rowFormats = new HashMap<>(results.size());
+        Map<String, String> rowFormats = HashMap.newHashMap(results.size());
         for (Object[] entry : results) {
             String completeName = (String) entry[0];
             String tableName = completeName.substring(completeName.indexOf('/') + 1);

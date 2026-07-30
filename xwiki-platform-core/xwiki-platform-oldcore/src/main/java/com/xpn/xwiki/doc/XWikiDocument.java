@@ -5707,7 +5707,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             throw new XWikiException("Failed to load backlinks for reference [" + getDocumentReference() + "]", e);
         }
 
-        Set<DocumentReference> documentReferences = new HashSet<>(references.size());
+        Set<DocumentReference> documentReferences = HashSet.newHashSet(references.size());
         for (EntityReference entityReference : references) {
             // Resolve the DOCUMENT reference
             DocumentReference linkReference = context.getWiki().getDocumentReference(entityReference, context);
@@ -5767,7 +5767,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             links = new LinkedHashSet<>(getStore(context).loadLinks(getId(), context, true));
         } else {
             Set<String> linkedPages = getUniqueLinkedPages(context);
-            links = new LinkedHashSet<>(linkedPages.size());
+            links = LinkedHashSet.newLinkedHashSet(linkedPages.size());
             for (String linkedPage : linkedPages) {
                 XWikiLink wikiLink = new XWikiLink();
 
@@ -5796,7 +5796,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         try {
             List<String> list = context.getUtil().getUniqueMatches(getContent(), "\\[(.*?)\\]", 1);
-            pageNames = new HashSet<>(list.size());
+            pageNames = HashSet.newHashSet(list.size());
 
             DocumentReference currentDocumentReference = getDocumentReference();
             for (String name : list) {
@@ -5961,7 +5961,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         Set<EntityReference> references = getUniqueLinkedEntityReferences(context,
             Map.of(EntityType.DOCUMENT, Set.of(ResourceType.SPACE, ResourceType.DOCUMENT, ResourceType.ATTACHMENT),
                 EntityType.PAGE, Set.of(ResourceType.PAGE, ResourceType.PAGE_ATTACHMENT)));
-        Set<String> documentNames = new LinkedHashSet<>(references.size());
+        Set<String> documentNames = LinkedHashSet.newLinkedHashSet(references.size());
 
         XWikiDocument contextDoc = context.getDoc();
         String contextWiki = context.getWikiId();

@@ -219,7 +219,7 @@ public class XWikiStatsReader
     {
         List<DocumentStats> documentStatsList;
 
-        Map<String, Object> params = new HashMap<>(4);
+        Map<String, Object> params = HashMap.newHashMap(4);
 
         String nameFilter = getHqlNameFilterFromScope(scope, params);
 
@@ -293,7 +293,7 @@ public class XWikiStatsReader
     {
         List<DocumentStats> documentStatsList;
 
-        Map<String, Object> params = new HashMap<>(4);
+        Map<String, Object> params = HashMap.newHashMap(4);
 
         String nameFilter = getHqlNameFilterFromScope(scope, params);
 
@@ -342,7 +342,7 @@ public class XWikiStatsReader
     {
         List<RefererStats> refererList;
 
-        Map<String, Object> params = new HashMap<>(4);
+        Map<String, Object> params = HashMap.newHashMap(4);
 
         String nameFilter = getHqlNameFilterFromScope(scope, params);
 

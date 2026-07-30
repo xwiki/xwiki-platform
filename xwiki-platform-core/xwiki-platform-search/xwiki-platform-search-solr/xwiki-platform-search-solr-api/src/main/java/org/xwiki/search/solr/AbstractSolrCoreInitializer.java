@@ -273,9 +273,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
         // because they are required for things located in solrconfig.xml which is unfortunately impossible to
         // update at runtime
 
-        //////////
         // TYPES
-        //////////
 
         addFieldType(DefaultSolrUtils.SOLR_TYPE_STRINGS, SolrSchemaUtils.SOLR_FIELD_CLASS_STR,
             SOLR_FIELD_SORTMISSINGLAST, true, SOLR_FIELD_MULTIVALUED, true, SOLR_FIELD_DOCVALUES, true);
@@ -325,9 +323,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     private void migrateBaseSchema(long xversion) throws SolrException
     {
         if (xversion < SCHEMA_VERSION_12_10) {
-            //////////
             // TYPES
-            //////////
 
             addTextGeneralFieldType(DefaultSolrUtils.SOLR_TYPE_TEXT_GENERAL, false);
             addTextGeneralFieldType(DefaultSolrUtils.SOLR_TYPE_TEXT_GENERALS, true);

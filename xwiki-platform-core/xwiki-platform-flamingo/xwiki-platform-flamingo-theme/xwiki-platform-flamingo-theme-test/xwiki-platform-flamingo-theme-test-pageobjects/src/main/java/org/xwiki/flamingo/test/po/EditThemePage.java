@@ -84,6 +84,37 @@ public class EditThemePage extends EditPage
     }
 
     /**
+     * Set the value of an image variable (e.g. {@code logo}) by uploading a new image with the attachment picker.
+     * The uploaded image is only attached to the theme document when the theme is saved.
+     *
+     * @param variableName the name of the image variable to set
+     * @param filePath the absolute path of the image to upload, as seen by the browser
+     * @since 18.7.0RC1
+     */
+    public void setImageVariableValue(String variableName, String filePath)
+    {
+        getDriver().findElement(By.cssSelector("#var-" + variableName + " .attachment-picker-start")).click();
+        // The picker is loaded in a modal dialog with an AJAX request.
+        getDriver().waitUntilElementIsVisible(By.id("uploadAttachment"));
+        getDriver().findElement(By.id("attachfile")).sendKeys(filePath);
+        getDriver().findElement(By.cssSelector("#uploadAttachment input[type='submit']")).click();
+        // The picker closes the dialog once the image has been uploaded and selected.
+        getDriver().waitUntilElementDisappears(By.id("uploadAttachment"));
+    }
+
+    /**
+     * @param variableName the name of the image variable
+     * @return the file name of the image currently selected for the passed variable
+     * @since 18.7.0RC1
+     */
+    public String getImageVariableValue(String variableName)
+    {
+        return getDriver()
+            .findElementWithoutWaiting(By.cssSelector("#var-" + variableName + " input.property-reference"))
+            .getAttribute("value");
+    }
+
+    /**
      * @since 6.3RC1
      */
     public void setTextareaValue(String variableName, String value)

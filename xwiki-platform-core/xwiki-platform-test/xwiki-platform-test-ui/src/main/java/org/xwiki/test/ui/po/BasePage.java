@@ -117,7 +117,8 @@ public class BasePage extends BaseElement
     private WebElement notificationsMenu;
 
     /**
-     * Used to scroll the page to the top before accessing the floating menu.
+     * The wiki logo displayed in the page header. Also used to scroll the page to the top before accessing the
+     * floating menu.
      */
     @FindBy(id = "companylogo")
     protected WebElement logo;
@@ -539,6 +540,15 @@ public class BasePage extends BaseElement
     public String getDocumentTitle()
     {
         return this.documentTitle.getText();
+    }
+
+    /**
+     * @return the URL of the image displayed as the wiki logo in the page header
+     * @since 18.7.0RC1
+     */
+    public String getLogoImageURL()
+    {
+        return this.logo.findElement(By.tagName("img")).getAttribute("src");
     }
 
     /**

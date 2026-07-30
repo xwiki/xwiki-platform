@@ -37,6 +37,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -101,7 +102,7 @@ class FlamingoThemeIT
         validateViewAndSetThemeFromThemeHomePage(testMethodName);
 
         // Validate setting a color theme from the wiki Admin UI
-        validateSetThemeFromWikiAdminUI(testMethodName);
+        validateSetThemeFromWikiAdminUI(testMethodName, setup);
 
         // Validate setting a color theme from the page Admin UI for the page and its children
         validateSetThemeFromPageAdminUI(testMethodName, setup, info);
@@ -144,7 +145,7 @@ class FlamingoThemeIT
         themeApplicationWebHomePage.useTheme("Charcoal");
     }
 
-    private void validateSetThemeFromWikiAdminUI(String testMethodName)
+    private void validateSetThemeFromWikiAdminUI(String testMethodName, TestUtils setup)
     {
         // Go back to the Theme Admin UI to verify we can set the new theme from there too (using the select control)
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
@@ -163,6 +164,14 @@ class FlamingoThemeIT
         EditThemePage editThemePage = new EditThemePage();
         assertFalse(editThemePage.getPreviewBox().hasError(true));
         editThemePage.clickSaveAndView();
+
+        // Verify that the default button background defined by the theme is applied on a wiki page, the "Cancel"
+        // button of the editor being one of the buttons using that style.
+        // Note: the skin doesn't use the @btn-default-bg value as-is, it lightens it by 5% (see buttons.less), which
+        // turns the #99ccff set on the theme into #b3d9ff.
+        WikiEditPage wikiEditPage = WikiEditPage.gotoPage("Main", "WebHome");
+        assertColor(179, 217, 255, wikiEditPage.getCancelButtonBackgroundColor());
+        wikiEditPage.clickCancel();
 
         // Switch back to Charcoal
         // TODO: Replace this with a setup.updateObject() call since we don't need to test the useTheme() UI as it's
@@ -271,6 +280,10 @@ class FlamingoThemeIT
         // Again...
         editThemePage.selectVariableCategory("Typography");
         editThemePage.setVariableValue("font-family-base", "Monospace");
+        // Change the background of the buttons using the default style. It's light enough to keep a proper contrast
+        // with the button text color.
+        editThemePage.selectVariableCategory("Buttons");
+        editThemePage.setVariableValue("btn-default-bg", "#99ccff");
         // Test that the @lessCode variable is handled too!
         editThemePage.selectVariableCategory("Advanced");
         editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; }");

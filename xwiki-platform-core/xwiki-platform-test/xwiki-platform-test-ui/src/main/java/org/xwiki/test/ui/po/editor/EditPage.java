@@ -244,6 +244,17 @@ public class EditPage extends BasePage
     }
 
     /**
+     * @return the background color of the "Cancel" button, which uses the default button style
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.7.0RC1
+     */
+    public String getCancelButtonBackgroundColor()
+    {
+        return this.cancel.getCssValue("background-color");
+    }
+
+    /**
      * @return the editor being used on this page
      */
     public Editor getEditor()

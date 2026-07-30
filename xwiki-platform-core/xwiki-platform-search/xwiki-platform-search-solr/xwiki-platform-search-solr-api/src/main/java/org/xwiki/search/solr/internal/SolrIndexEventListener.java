@@ -199,7 +199,7 @@ public class SolrIndexEventListener implements EventListener
 
         try {
             // Index the rest of the available translations.
-            document.getTranslationLocales(xcontext).stream()
+            document.getTranslationLocales(xcontext)
                 .forEach(locale -> indexer.index(new DocumentReference(documentReferenceWithoutLocale, locale), false));
         } catch (XWikiException e) {
             this.logger.warn("Failed to index the translations of [{}]. Root cause is [{}].",

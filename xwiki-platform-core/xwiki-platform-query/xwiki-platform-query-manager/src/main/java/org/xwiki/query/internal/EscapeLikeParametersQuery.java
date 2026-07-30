@@ -100,7 +100,7 @@ public class EscapeLikeParametersQuery extends WrappingQuery
                             buffer.append(part.getValue().replaceAll("([%_!])", ESCAPED_REPLACEMENT));
                         } else if (part instanceof LikeParameterPart) {
                             // Escape the escape character
-                            buffer.append(part.getValue().replaceAll("([!])", ESCAPED_REPLACEMENT));
+                            buffer.append(part.getValue().replaceAll("(!)", ESCAPED_REPLACEMENT));
                         } else {
                             buffer.append(part.getValue());
                         }

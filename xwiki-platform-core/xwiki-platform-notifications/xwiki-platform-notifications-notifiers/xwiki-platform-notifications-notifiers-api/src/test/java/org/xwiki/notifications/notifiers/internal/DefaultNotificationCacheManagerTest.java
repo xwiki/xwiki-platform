@@ -120,16 +120,42 @@ class DefaultNotificationCacheManagerTest
     {
         List<Object> events = Arrays.asList(mock(Event.class), mock(Event.class),
             mock(Event.class));
-        this.defaultNotificationCacheManager.setInCache("mykey", events, false, false);
+        long epoch = this.defaultNotificationCacheManager.getEpoch();
+
+        this.defaultNotificationCacheManager.setInCache("mykey", events, false, false, epoch);
         verify(this.longEventCache).set("mykey", events);
         verify(this.longCountCache, never()).set("mykey", events);
 
-        this.defaultNotificationCacheManager.setInCache("anotherkey", events, true, false);
+        this.defaultNotificationCacheManager.setInCache("anotherkey", events, true, false, epoch);
         verify(this.longEventCache, never()).set("anotherkey", 3);
         verify(this.longCountCache).set("anotherkey", 3);
 
         // 2 for the method setInCache + 1 for the initialize
         verify(this.configuration, times(3)).isRestCacheEnabled();
+    }
+
+    @Test
+    void setInCacheAfterFlush()
+    {
+        List<Object> events = Arrays.asList(mock(Event.class), mock(Event.class));
+        long epoch = this.defaultNotificationCacheManager.getEpoch();
+
+        this.defaultNotificationCacheManager.flushLongCache();
+
+        this.defaultNotificationCacheManager.setInCache("mykey", events, false, true, epoch);
+        this.defaultNotificationCacheManager.setInCache("mykey", events, true, true, epoch);
+        this.defaultNotificationCacheManager.setInCache("mykey", events, false, false, epoch);
+        this.defaultNotificationCacheManager.setInCache("mykey", events, true, false, epoch);
+
+        verify(this.longCompositeEventCache, never()).set(any(), any());
+        verify(this.longCompositeEventCountCache, never()).set(any(), any());
+        verify(this.longEventCache, never()).set(any(), any());
+        verify(this.longCountCache, never()).set(any(), any());
+
+        // The results computed before the flush are refused, but the ones computed after it are accepted.
+        this.defaultNotificationCacheManager.setInCache("mykey", events, false, true,
+            this.defaultNotificationCacheManager.getEpoch());
+        verify(this.longCompositeEventCache).set("mykey", events);
     }
 
     @Test

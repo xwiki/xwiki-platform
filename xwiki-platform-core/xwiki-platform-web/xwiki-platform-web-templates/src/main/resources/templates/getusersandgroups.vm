@@ -177,8 +177,11 @@ $response.setContentType("application/json")
     #set($discard = $row.put("userDisplayer",
       "#displayGroup($user.documentReference, {'displayLink': $isLocalUser, 'showAlias': true})"))
   #end
-  #if ($uorg == "groups")
-    #set($discard = $row.put("isuseringroup", $xwiki.getUser().isUserInGroup($user.fullName)))
+  ## Only direct members are considered, so that a user listed as a member of a sub-group of this group is not reported
+  ## as a member of this group.
+  #if ($uorg == "groups" && $xcontext.userReference)
+    #set($discard = $row.put("isuseringroup",
+      $services.user.group.getMembers($user.documentReference, false).contains($xcontext.userReference)))
   #else
     #set($discard = $row.put("isuseringroup", false))
   #end

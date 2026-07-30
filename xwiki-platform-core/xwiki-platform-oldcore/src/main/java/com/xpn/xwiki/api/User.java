@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.api;
 
-import java.text.MessageFormat;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
@@ -104,29 +102,6 @@ public class User extends Api
     public boolean isDisabled()
     {
         return this.user.isDisabled(getXWikiContext());
-    }
-
-    /**
-     * Check if the user belongs to a group or not. This method only check direct membership (no recursive checking) in
-     * the current wiki.
-     *
-     * @param groupName The group to check.
-     * @return {@code true} if the user does belong to the specified group, false otherwise or if an exception occurs.
-     */
-    public boolean isUserInGroup(String groupName)
-    {
-        boolean result = false;
-        try {
-            if (this.user == null) {
-                LOGGER.warn("User considered not part of group [{}] since user is null", groupName);
-            } else {
-                result = this.user.isUserInGroup(groupName, getXWikiContext());
-            }
-        } catch (Exception ex) {
-            LOGGER.warn(new MessageFormat("Unhandled exception while checking if user {0}"
-                + " belongs to group {1}").format(new java.lang.Object[] { this.user, groupName }), ex);
-        }
-        return result;
     }
 
     /**

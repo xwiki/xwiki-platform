@@ -218,12 +218,11 @@ class FlamingoThemeIT
 
     private void assertCustomThemeColors(ViewPage page)
     {
-        // FIXME: The following should be put back when https://github.com/SeleniumHQ/selenium/issues/7697 will be fixed
-        // for now we get rgb value with Firefox and rgba value with Chrome
-        //assertEquals("rgb(255, 0, 0)", page.getPageBackgroundColor());
-        // Test 'lessCode' is correctly handled
-        //assertEquals("rgb(0, 0, 255)", page.getTextColor());
         assertColor(255, 218, 218, page.getPageBackgroundColor());
+        // The text color set by the theme is inherited from the "body" element. Note that we cannot assert it on the
+        // page content since the 'lessCode' variable set by this test colors the whole ".main" block in blue.
+        assertColor(102, 51, 0, page.getTextColor());
+        // Test 'lessCode' is correctly handled, the title being inside the ".main" block it colors.
         assertColor(0, 0, 255, page.getTitleColor());
         assertEquals("monospace", page.getTitleFontFamily().toLowerCase());
     }
@@ -277,6 +276,8 @@ class FlamingoThemeIT
         editThemePage.setVariableValue("link-color", "#2c699c");
         // Change another value. We don't deactivate all WCAG checks, so we need to take care about contrast.
         editThemePage.setVariableValue("xwiki-page-content-bg", "#ffdada");
+        // Change the color of the page's text. It's dark enough to keep a proper contrast with the page backgrounds.
+        editThemePage.setVariableValue("text-color", "#663300");
         // Again...
         editThemePage.selectVariableCategory("Typography");
         editThemePage.setVariableValue("font-family-base", "Monospace");

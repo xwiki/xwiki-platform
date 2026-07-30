@@ -145,7 +145,7 @@ public class PagesResourceIT extends AbstractHttpIT
      * change between queries with different limit/offset values.
      */
     @Test
-    void testPagesResourcePaginationOrderedByDate() throws Exception
+    public void testPagesResourcePaginationOrderedByDate() throws Exception
     {
         String spaceName = getTestClassName();
         DocumentReference ref1 = new DocumentReference(getWiki(), spaceName, getTestMethodName() + "A");
@@ -157,11 +157,11 @@ public class PagesResourceIT extends AbstractHttpIT
             getUtil().rest().savePage(ref2, "content2", "title2");
 
             List<String> allNames = getPageNames("order=date&number=100");
-            assertTrue(allNames.containsAll(List.of(ref1.getName(), ref2.getName())), allNames.toString());
+            Assert.assertTrue(allNames.toString(), allNames.containsAll(List.of(ref1.getName(), ref2.getName())));
 
             // Fetching the pages one by one must return them in the same order as fetching them all at once.
             for (int i = 0; i < allNames.size(); ++i) {
-                assertEquals(List.of(allNames.get(i)), getPageNames("order=date&number=1&start=" + i));
+                Assert.assertEquals(List.of(allNames.get(i)), getPageNames("order=date&number=1&start=" + i));
             }
         } finally {
             getUtil().rest().delete(ref1);

@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
@@ -48,6 +47,9 @@ public class RealtimeEditToolbar extends BaseElement
     private static final By DONE_ACTION = By.cssSelector(".realtime-edit-toolbar .realtime-action-done");
 
     private static final String ATTRIBUTE_VALUE = "value";
+
+    private static final By VISIBLE_COEDITORS =
+        By.cssSelector(".realtime-edit-toolbar .realtime-users .realtime-user");
 
     /**
      * Waits until the user is connected to the realtime editing session.
@@ -158,12 +160,27 @@ public class RealtimeEditToolbar extends BaseElement
     }
 
     /**
-     * @return the list of coeditors listed directly on the toolbar
+     * @return the number of coeditors listed directly on the toolbar
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     * @since 17.10.12
+     * @since 16.10.19
      */
-    public List<CoeditorElement> getVisibleCoeditors()
+    public int getVisibleCoeditorCount()
     {
-        return getDriver().findElements(By.cssSelector(".realtime-edit-toolbar .realtime-users .realtime-user"))
-            .stream().map(CoeditorElement::new).toList();
+        return getDriver().findElements(VISIBLE_COEDITORS).size();
+    }
+
+    /**
+     * @return the identifiers of the coeditors listed directly on the toolbar, in the order they are displayed
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     * @since 17.10.12
+     * @since 16.10.19
+     */
+    public List<String> getVisibleCoeditorIds()
+    {
+        return CoeditorElement.readCoeditors(getDriver(), VISIBLE_COEDITORS, CoeditorElement::getId);
     }
 
     /**
@@ -175,16 +192,7 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public List<String> getVisibleCoeditorAvatarHints()
     {
-        // Coeditor elements are fully rebuild when the list changes, leading to staled element.
-        // The listing is retried until all avatar hints are resolved without an element going staled.
-        return getDriver().waitUntilCondition(driver -> {
-            try {
-                return getVisibleCoeditors().stream().map(CoeditorElement::getAvatarHint).toList();
-            } catch (StaleElementReferenceException e) {
-                // The coeditor list was rebuilt while we were reading it, retry.
-                return null;
-            }
-        });
+        return CoeditorElement.readCoeditors(getDriver(), VISIBLE_COEDITORS, CoeditorElement::getAvatarHint);
     }
 
     /**
@@ -197,9 +205,8 @@ public class RealtimeEditToolbar extends BaseElement
     {
         By coeditorSelector = By.cssSelector(".realtime-edit-toolbar .realtime-user[data-id='" + coeditorId + "']");
         // The coeditor can be either displayed directly on the toolbar or hidden in the dropdown.
-        WebElement coeditorElement =
-            getDriver().waitUntilCondition(driver -> getDriver().findElementWithoutScrolling(coeditorSelector));
-        return new CoeditorElement(coeditorElement);
+        getDriver().waitUntilCondition(driver -> getDriver().findElementWithoutScrolling(coeditorSelector));
+        return new CoeditorElement(() -> getDriver().findElementWithoutScrolling(coeditorSelector));
     }
 
     /**
@@ -208,8 +215,8 @@ public class RealtimeEditToolbar extends BaseElement
      */
     public boolean isEditingAlone()
     {
-        List<CoeditorElement> visibleCoeditors = getVisibleCoeditors();
-        return visibleCoeditors.size() == 1 && visibleCoeditors.get(0).getId().equals(getUserId());
+        List<String> visibleCoeditorIds = getVisibleCoeditorIds();
+        return visibleCoeditorIds.size() == 1 && visibleCoeditorIds.get(0).equals(getUserId());
     }
 
     /**

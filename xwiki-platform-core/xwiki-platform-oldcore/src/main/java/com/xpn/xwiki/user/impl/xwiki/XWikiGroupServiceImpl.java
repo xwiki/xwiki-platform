@@ -802,7 +802,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
 
-        groupReferences = new HashSet<>(groupNames.size());
+        groupReferences = HashSet.newHashSet(groupNames.size());
         for (String groupName : groupNames) {
             groupReferences.add(this.currentMixedDocumentReferenceResolver.resolve(groupName));
         }

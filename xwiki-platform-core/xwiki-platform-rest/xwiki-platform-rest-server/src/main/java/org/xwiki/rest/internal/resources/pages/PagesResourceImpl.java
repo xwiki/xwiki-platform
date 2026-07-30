@@ -58,8 +58,11 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
         try {
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
+            // The locale condition accepts null as Oracle stores the empty string as null, so a plain
+            // "language = ''" matches no document at all there.
             Query query = ("date".equals(order)) ? queryManager.createQuery(
-                    "select doc.name from Document doc where doc.space=:space and language='' order by doc.date desc",
+                    "select doc.name from Document doc where doc.space=:space"
+                        + " and (doc.language = '' or doc.language is null) order by doc.date desc",
                     "xwql") : queryManager.getNamedQuery("getSpaceDocsName");
 
             /* Use an explicit query to improve performance */

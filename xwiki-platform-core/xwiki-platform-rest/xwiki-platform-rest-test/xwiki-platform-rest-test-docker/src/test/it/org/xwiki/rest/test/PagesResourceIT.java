@@ -143,6 +143,35 @@ class PagesResourceIT extends AbstractHttpIT
         }
     }
 
+    /**
+     * Check that paginating the pages ordered by date returns each page exactly once, i.e., that the order doesn't
+     * change between queries with different limit/offset values.
+     */
+    @Test
+    void testPagesResourcePaginationOrderedByDate() throws Exception
+    {
+        String spaceName = getTestClassName();
+        DocumentReference ref1 = new DocumentReference(getWiki(), spaceName, getTestMethodName() + "A");
+        DocumentReference ref2 = new DocumentReference(getWiki(), spaceName, getTestMethodName() + "B");
+        try {
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "content1", "title1");
+            getUtil().rest().savePage(ref2, "content2", "title2");
+
+            List<String> allNames = getPageNames("order=date&number=100");
+            assertTrue(allNames.containsAll(List.of(ref1.getName(), ref2.getName())), allNames.toString());
+
+            // Fetching the pages one by one must return them in the same order as fetching them all at once.
+            for (int i = 0; i < allNames.size(); ++i) {
+                assertEquals(List.of(allNames.get(i)), getPageNames("order=date&number=1&start=" + i));
+            }
+        } finally {
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+        }
+    }
+
     private List<String> getPageNames(String queryString) throws Exception
     {
         GetMethod getMethod = executeGet("%s?%s".formatted(

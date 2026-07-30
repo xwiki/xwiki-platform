@@ -7231,10 +7231,10 @@ public class XWiki implements EventListener
         temp = temp.replaceAll("[\u0125\u0127\u021f]", "h");
         temp = temp.replaceAll("[\u00cc\u00cd\u00ce\u00cf\u0128\u012a\u012c\u012e\u0130\u01cf\u0208\u020a]", "I");
         temp = temp.replaceAll("[\u00ec\u00ed\u00ee\u00ef\u0129\u012b\u012d\u012f\u0131\u01d0\u0209\u020b]", "i");
-        temp = temp.replaceAll("\u0132", "IJ");
-        temp = temp.replaceAll("\u0133", "ij");
-        temp = temp.replaceAll("\u0134", "J");
-        temp = temp.replaceAll("\u0135", "j");
+        temp = temp.replace("\u0132", "IJ");
+        temp = temp.replace("\u0133", "ij");
+        temp = temp.replace("\u0134", "J");
+        temp = temp.replace("\u0135", "j");
         temp = temp.replaceAll("[\u0136\u01e8]", "K");
         temp = temp.replaceAll("[\u0137\u0138\u01e9]", "k");
         temp = temp.replaceAll("[\u0139\u013b\u013d\u013f\u0141]", "L");
@@ -7261,20 +7261,20 @@ public class XWiki implements EventListener
         temp = temp.replaceAll(
             "[\u00f9\u00fa\u00fb\u00fc\u0169\u016b\u016d\u016f\u0171\u0173\u01d4\u01d6\u01d8\u01da\u01dc\u0215\u0217]",
             "u");
-        temp = temp.replaceAll("\u0174", "W");
-        temp = temp.replaceAll("\u0175", "w");
+        temp = temp.replace("\u0174", "W");
+        temp = temp.replace("\u0175", "w");
         temp = temp.replaceAll("[\u00dd\u0176\u0178\u0232]", "Y");
         temp = temp.replaceAll("[\u00fd\u00ff\u0177\u0233]", "y");
         temp = temp.replaceAll("[\u0179\u017b\u017d]", "Z");
         temp = temp.replaceAll("[\u017a\u017c\u017e]", "z");
-        temp = temp.replaceAll("\u00df", "SS");
+        temp = temp.replace("\u00df", "SS");
         temp = temp.replaceAll("[_':,;\\\\/]", " ");
         name = temp;
         name = name.replaceAll("\\s+", "");
         name = name.replaceAll("[\\(\\)]", " ");
 
         if (stripDots) {
-            name = name.replaceAll("\\.", "");
+            name = name.replace(".", "");
         }
 
         if (ascii) {

@@ -355,14 +355,14 @@ public final class XWikiRepositoryModel
 
     // Solr
 
-    public static final String SOLRPROP_EXTENSION_VALIDEXTENSION =
-        toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, "boolean");
-
     public static final String SOLR_STRING = "string";
 
     public static final String SOLR_INTEGER = "int";
 
     public static final String SOLR_BOOLEAN = "boolean";
+
+    public static final String SOLRPROP_EXTENSION_VALIDEXTENSION =
+        toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, SOLR_BOOLEAN);
 
     public static final Map<String, SolrField> SOLR_FIELDS = new HashMap<>();
 

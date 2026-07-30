@@ -262,8 +262,8 @@ catalogs:
       specifier: 8.1.5
       version: 8.1.5
     vite-plugin-css-injected-by-js:
-      specifier: 4.0.1
-      version: 4.0.1
+      specifier: 5.0.2
+      version: 5.0.2
     vite-plugin-dts:
       specifier: 4.5.4
       version: 4.5.4
@@ -756,9 +756,6 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.58.9(@types/node@24.12.4)
-      '@vitejs/plugin-vue':
-        specifier: 'catalog:'
-        version: 6.0.8(vite@8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))(vue@3.5.38(typescript@5.9.3))
       '@xwiki/platform-tool-eslintconfig':
         specifier: workspace:*
         version: link:tools/tool-eslintconfig
@@ -777,12 +774,6 @@ importers:
       vite:
         specifier: 'catalog:'
         version: 8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)
-      vite-plugin-css-injected-by-js:
-        specifier: 'catalog:'
-        version: 4.0.1(vite@8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))
-      vite-plugin-dts:
-        specifier: 'catalog:'
-        version: 4.5.4(@types/node@24.12.4)(rollup@4.55.1)(supports-color@8.1.1)(typescript@5.9.3)(vite@8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))
       vitest:
         specifier: 'catalog:'
         version: 4.1.6(@types/node@24.12.4)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))
@@ -3348,9 +3339,18 @@ importers:
       '@jridgewell/remapping':
         specifier: 'catalog:'
         version: 2.3.5
+      '@vitejs/plugin-vue':
+        specifier: 'catalog:'
+        version: 6.0.8(vite@8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))(vue@3.5.38(typescript@5.9.3))
       vite:
         specifier: 'catalog:'
         version: 8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)
+      vite-plugin-css-injected-by-js:
+        specifier: 'catalog:'
+        version: 5.0.2(vite@8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))
+      vite-plugin-dts:
+        specifier: 'catalog:'
+        version: 4.5.4(@types/node@24.12.4)(rollup@4.55.1)(supports-color@8.1.1)(typescript@5.9.3)(vite@8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))
     devDependencies:
       '@xwiki/platform-tool-tsconfig':
         specifier: workspace:*
@@ -7860,10 +7860,10 @@ packages:
   vfile@6.0.3:
     resolution: {integrity: sha512-KzIbH/9tXat2u30jf+smMwFCsno4wHVdNmzFyL+T/L3UGqqk6JKfVqOFOZEpZSHADH1k40ab6NUIXZq422ov3Q==}
 
-  vite-plugin-css-injected-by-js@4.0.1:
-    resolution: {integrity: sha512-WfyRojojQyAO/KzWf+efcXpTPv6zJPXaRmr9EYq5a4v5I3PWCR7kR01hiri2lW6+rHm3a57kpwsf+iahIJi1Qw==}
+  vite-plugin-css-injected-by-js@5.0.2:
+    resolution: {integrity: sha512-Hvg48QfYsCL53ju9T5zTC0Ofg90XLa8t5zhhKmPYbayoMQieNcQDkkRX8pv4TAcKPZwVisLFiwDy5uBjOn+3Ow==}
     peerDependencies:
-      vite: '>2.0.0-0'
+      vite: '>8.0.0-0'
 
   vite-plugin-dts@4.5.4:
     resolution: {integrity: sha512-d4sOM8M/8z7vRXHHq/ebbblfaxENjogAAekcfcDCCwAyvGqnPrc7f4NZbvItS+g4WTgerW0xDwSz5qz11JT3vg==}
@@ -12991,7 +12991,7 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite-plugin-css-injected-by-js@4.0.1(vite@8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)):
+  vite-plugin-css-injected-by-js@5.0.2(vite@8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)):
     dependencies:
       vite: 8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)
 

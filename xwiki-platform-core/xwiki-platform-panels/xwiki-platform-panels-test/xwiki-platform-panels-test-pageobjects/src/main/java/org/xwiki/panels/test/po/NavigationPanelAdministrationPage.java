@@ -19,6 +19,7 @@
  */
 package org.xwiki.panels.test.po;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,11 @@ public class NavigationPanelAdministrationPage extends ViewPage
         }
         if (source != null) {
             getDriver().dragAndDrop(source, this.excludedPagesPane);
+            // The drop is handled by synchronous client-side JavaScript (no server round-trip), but the resulting DOM
+            // mutation (hiding the tree nodes, toggling the "No pages found" placeholder) may not be reflected yet by
+            // the time the drag-and-drop Selenium command returns. Wait for it explicitly so callers don't read the
+            // tree state mid-mutation.
+            waitUntilTopLevelPagesState(Arrays.asList(pages), false);
         }
     }
 
@@ -133,7 +139,24 @@ public class NavigationPanelAdministrationPage extends ViewPage
         }
         if (source != null) {
             getDriver().dragAndDrop(source, this.treeElement);
+            // See the comment in #exclude(String...) about why we need to wait for the drop to be fully processed.
+            waitUntilTopLevelPagesState(Arrays.asList(pages), true);
         }
+    }
+
+    /**
+     * Wait until the given pages are (or aren't) part of the visible top level pages of the navigation tree.
+     *
+     * @param pages the pages to check
+     * @param visible {@code true} to wait until the pages are visible top level pages, {@code false} to wait until
+     *     they aren't anymore
+     */
+    private void waitUntilTopLevelPagesState(List<String> pages, boolean visible)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            List<String> topLevelPages = getNavigationTree().getTopLevelPages();
+            return pages.stream().allMatch(page -> topLevelPages.contains(page) == visible);
+        });
     }
 
     public boolean isExcludingTopLevelExtensionPages()
@@ -169,6 +192,9 @@ public class NavigationPanelAdministrationPage extends ViewPage
 
     private WebElement getPageByTitle(String pageTitle)
     {
+        // Make sure the tree has finished (re)loading before looking up a node in it, otherwise we might race with
+        // its initial AJAX load, e.g. right after the page was reloaded.
+        getNavigationTree();
         return getDriver().findElementWithoutWaiting(this.treeElement,
             By.xpath("(.//li[contains(@class, 'jstree-node')]/a[. = '" + pageTitle + "'])"));
     }

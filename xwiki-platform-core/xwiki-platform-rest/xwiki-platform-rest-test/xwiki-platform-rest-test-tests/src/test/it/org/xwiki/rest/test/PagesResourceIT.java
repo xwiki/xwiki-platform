@@ -126,7 +126,7 @@ public class PagesResourceIT extends AbstractHttpIT
      * stored as null, so the locale condition of the query needs to accept null, too, or the result is always empty.
      */
     @Test
-    void testPagesResourceOrderedByDate() throws Exception
+    public void testPagesResourceOrderedByDate() throws Exception
     {
         DocumentReference reference = new DocumentReference(getWiki(), getTestClassName(), getTestMethodName());
         try {
@@ -134,7 +134,7 @@ public class PagesResourceIT extends AbstractHttpIT
             getUtil().rest().savePage(reference, "content", "title");
 
             List<String> names = getPageNames("order=date&number=100");
-            assertTrue(names.contains(reference.getName()), names.toString());
+            Assert.assertTrue(names.toString(), names.contains(reference.getName()));
         } finally {
             getUtil().rest().delete(reference);
         }
@@ -173,7 +173,7 @@ public class PagesResourceIT extends AbstractHttpIT
     {
         GetMethod getMethod = executeGet("%s?%s".formatted(
             buildURI(org.xwiki.rest.resources.pages.PagesResource.class, getWiki(), getTestClassName()), queryString));
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
         Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         return pages.getPageSummaries().stream().map(PageSummary::getName).toList();

@@ -178,6 +178,10 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
         private Object execute() throws Exception
         {
+            // Get the epoch before the events are retrieved below, so that the result is not cached if the events
+            // change in the meantime.
+            long epoch = notificationCacheManager.getEpoch();
+
             // Check if the result is already in the event cache
             Object result = notificationCacheManager.getFromCache(this.cacheKey, this.count, this.composite);
             if (result != null) {
@@ -194,7 +198,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
                 // Execute the callable
                 List events = this.callable.call();
-                notificationCacheManager.setInCache(this.cacheKey, events, this.count, this.composite);
+                notificationCacheManager.setInCache(this.cacheKey, events, this.count, this.composite, epoch);
 
                 if (this.count) {
                     result = events.size();

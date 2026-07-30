@@ -20,6 +20,7 @@
 package org.xwiki.notifications.notifiers.internal;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -86,6 +87,12 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
      * notification is created).
      */
     private Cache<Integer> longCompositeEventCountCache;
+
+    /**
+     * Number of times the caches have been flushed. It allows to detect that the events have changed while a result
+     * was being computed, so that this result is not stored in the caches.
+     */
+    private final AtomicLong epoch = new AtomicLong();
 
     @Override
     public void initialize() throws InitializationException
@@ -176,14 +183,31 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
     }
 
     /**
-     * Record in cache the events and their number.
+     * @return the current epoch, to be given back to {@link #setInCache(String, List, boolean, boolean, long)} along
+     *         with a result computed from the events as they are now
+     */
+    public long getEpoch()
+    {
+        return this.epoch.get();
+    }
+
+    /**
+     * Record in cache the events and their number, unless the caches have been flushed since the given epoch was
+     * obtained.
      * @param cacheKey the key to store the given events.
      * @param count if {@code true} only store the number of events; else store the objects.
      * @param events the events to store in cache. Their size will be stored too.
      * @param composite {@code true} if the value to store is about composite events or individual events
+     * @param epoch the epoch obtained from {@link #getEpoch()} before the events were retrieved
      */
-    public void setInCache(String cacheKey, List<Object> events, boolean count, boolean composite)
+    public void setInCache(String cacheKey, List<Object> events, boolean count, boolean composite, long epoch)
     {
+        // The events changed while this result was being computed, so it does not reflect them anymore: storing it
+        // would serve an outdated value until the next flush or the eviction of the entry.
+        if (this.epoch.get() != epoch) {
+            return;
+        }
+
         if (this.configuration.isRestCacheEnabled()) {
             if (count && composite) {
                 this.longCompositeEventCountCache.set(cacheKey, events.size());
@@ -203,6 +227,10 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
     public void flushLongCache()
     {
         if (this.configuration.isRestCacheEnabled()) {
+            // Change the epoch before emptying the caches, so that a result computed from the events before this flush
+            // is never stored after it.
+            this.epoch.incrementAndGet();
+
             this.longEventCache.removeAll();
             this.longIndividualEventCountCache.removeAll();
             this.longCompositeEventCache.removeAll();

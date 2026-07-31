@@ -298,6 +298,7 @@ export default {
     // We switch back to view mode whenever focus of the current cell is lost.
     // eslint-disable-next-line max-statements
     async onDisplayerBlur(evt) {
+      const displayerElement = this.$refs["displayerRoot"];
       if (!this.isView) {
         const editBlock = this.$refs["editBlock"];
 
@@ -309,7 +310,7 @@ export default {
         }
 
         // Focus moved to another element of this cell: keep editing.
-        if (evt.relatedTarget && this.$el.contains(evt.relatedTarget)) {
+        if (evt.relatedTarget && displayerElement.contains(evt.relatedTarget)) {
           return;
         }
 
@@ -320,7 +321,7 @@ export default {
           await new Promise((resolve) => requestAnimationFrame(resolve));
           if (
             editBlock !== this.$refs["editBlock"] ||
-            this.$el.contains(document.activeElement)
+            displayerElement.contains(document.activeElement)
           ) {
             return;
           }
@@ -328,8 +329,6 @@ export default {
 
         await this.applyEdit();
       } else {
-        const displayerElement = this.$refs["displayerRoot"];
-
         if (!displayerElement) {
           return;
         }

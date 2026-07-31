@@ -1235,9 +1235,12 @@ public class TableLayoutElement extends BaseElement
 
     private boolean isPlainTextField(WebElement field)
     {
-        return !"checkbox".equals(field.getAttribute("type"))
-            && !"select".equals(field.getTagName())
-            && !Arrays.asList(getClasses(field)).contains("datetime");
+        if ("input".equals(field.getTagName())) {
+            String type = field.getAttribute("type");
+            return type == null
+                || List.of("text", "email", "password", "number", "tel", "search", "url").contains(type);
+        }
+        return false;
     }
 
     private String urlWithoutFormToken(EntityReference entityReference, String action)

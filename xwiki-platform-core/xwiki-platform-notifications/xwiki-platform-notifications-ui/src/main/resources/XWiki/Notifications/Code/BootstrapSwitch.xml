@@ -168,7 +168,15 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
       // The caller wants to set multiple options, including the label.
       option.labelText = fixLabel(option.labelText);
     }
-    return this.bootstrapSwitchOrig.apply(this, arguments);
+    var result = this.bootstrapSwitchOrig.apply(this, arguments);
+    // The handle and label spans only duplicate the state already carried by the underlying (still focusable)
+    // checkbox/radio input, so screen readers shouldn't announce them as separate interactive elements.
+    this.each(function() {
+      $(this).parent().find(
+        '.bootstrap-switch-handle-on, .bootstrap-switch-handle-off, .bootstrap-switch-label'
+      ).attr('aria-hidden', 'true');
+    });
+    return result;
   };
 
   // Copy data (such as default configuration, constructor) from the original Bootstrap Switch function.
@@ -309,6 +317,14 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
     displays the switch badly when inside a table with .hyphenate style. Moreover, the standard Bootstrap Switch styles
     add a zero-width-space before all descendant SPANs (why?) which increases the height of the switch in Firefox. */
   white-space: nowrap;
+}
+
+/* Bootstrap Switch hides the real checkbox/radio input with "visibility: hidden", which also removes it from the
+  tab order and the accessibility tree. Restore its visibility (it stays invisible thanks to the opacity and
+  z-index rules) so that it remains keyboard and screen-reader accessible. */
+.bootstrap-switch input[type='radio'],
+.bootstrap-switch input[type='checkbox'] {
+  visibility: visible;
 }</code>
     </property>
     <property>

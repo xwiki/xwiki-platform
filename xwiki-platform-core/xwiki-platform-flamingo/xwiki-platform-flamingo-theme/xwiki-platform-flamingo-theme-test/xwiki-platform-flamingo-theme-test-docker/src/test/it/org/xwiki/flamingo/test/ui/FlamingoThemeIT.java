@@ -107,37 +107,6 @@ class FlamingoThemeIT
         validateSetThemeFromPageAdminUI(testMethodName, setup, info);
     }
 
-    /**
-     * Verify that setting only the "Font Family Sans Serif" variable (and leaving "Font Family Base" empty) is
-     * enough for the custom font to be applied, since Bootstrap LESS makes {@code @font-family-base} fall back to
-     * {@code @font-family-sans-serif} by default (see: https://jira.xwiki.org/browse/XWIKI-24593).
-     */
-    @Test
-    void validateFontFamilySansSerifFallback(TestUtils setup, TestInfo info)
-    {
-        setup.loginAsSuperAdmin();
-
-        String testMethodName = info.getTestMethod().get().getName();
-        setup.deletePage("FlamingoThemes", testMethodName);
-
-        AdministrationPage administrationPage = AdministrationPage.gotoPage();
-        ThemesAdministrationSectionPage presentationAdministrationSectionPage =
-            administrationPage.clickThemesSection();
-        presentationAdministrationSectionPage.manageColorThemes();
-        ThemeApplicationWebHomePage themeApplicationWebHomePage = new ThemeApplicationWebHomePage();
-
-        EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme(testMethodName);
-        editThemePage.setAutoRefresh(false);
-        editThemePage.selectVariableCategory("Typography");
-        editThemePage.setVariableValue("font-family-sans-serif", "math");
-        editThemePage.refreshPreview();
-
-        PreviewBox previewBox = editThemePage.getPreviewBox();
-        assertFalse(previewBox.hasError());
-        assertEquals("math", previewBox.getTitleFontFamily().toLowerCase());
-        previewBox.switchToDefaultContent();
-    }
-
     private void validateThemeCreation(ThemeApplicationWebHomePage themeApplicationWebHomePage, String testMethodName)
     {
         EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme(testMethodName);
@@ -301,6 +270,20 @@ class FlamingoThemeIT
         editThemePage.setVariableValue("xwiki-page-content-bg", "#ffdada");
         // Again...
         editThemePage.selectVariableCategory("Typography");
+        // Verify that setting only "Font Family Sans Serif" (and leaving "Font Family Base" empty) is enough for
+        // the custom font to be applied, since Bootstrap LESS makes @font-family-base fall back to
+        // @font-family-sans-serif by default (see: https://jira.xwiki.org/browse/XWIKI-24593).
+        editThemePage.setVariableValue("font-family-sans-serif", "math");
+        try {
+            editThemePage.refreshPreview();
+        } catch (TimeoutException e) {
+            editThemePage.refreshPreview();
+        }
+        previewBox = editThemePage.getPreviewBox();
+        assertFalse(previewBox.hasError());
+        assertEquals("math", previewBox.getTitleFontFamily().toLowerCase());
+        previewBox.switchToDefaultContent();
+
         editThemePage.setVariableValue("font-family-base", "Monospace");
         // Test that the @lessCode variable is handled too!
         editThemePage.selectVariableCategory("Advanced");

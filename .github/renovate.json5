@@ -51,6 +51,13 @@
       "assignees": ["manuelleduc"]
     },
 
+    // Wait for released packages to be 1 day old before proposing them. This aligns with pnpm's default while staying
+    // package manager independent. See https://docs.renovatebot.com/configuration-options/#minimumreleaseage
+    {
+      "matchDatasources": ["npm"],
+      "minimumReleaseAge": "1 day"
+    },
+
     // Automatically assign webjars packages to @mflorea
     {
       "matchDatasources": ["maven"],

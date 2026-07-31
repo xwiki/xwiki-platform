@@ -585,9 +585,14 @@ var XWiki = (function(XWiki){
             sourceContainer.addClassName('hidden').addClassName('loading');
           }
 
-          if (typeof source.icon != 'undefined') {
-            // If there is an icon for this source group, set it as background image
-            // TODO: Replace with the use of the icon theme (see XWIKI-24323).
+          if (source.iconHTML) {
+            // Use the icon theme currently configured on the wiki to display the source group icon.
+            sourceHeader.insert({top: source.iconHTML});
+            sourceHeader.addClassName('withIcon');
+          } else if (source.icon) {
+            // Fallback for sources that specify a plain icon URL (e.g. for backward compatibility): set it as
+            // background image. Note that an empty icon (e.g. because the icon theme lookup failed) must not reach
+            // this branch, otherwise the empty src would make the browser fetch the current page as an "image".
             var iconImage = new Image();
             iconImage.onload = function(){
               this.sourceHeader.setStyle({

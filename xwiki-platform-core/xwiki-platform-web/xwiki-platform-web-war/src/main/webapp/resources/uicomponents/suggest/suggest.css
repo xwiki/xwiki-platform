@@ -125,6 +125,12 @@ div.resultContainer div.sourceName {
   padding: 5px 0;
 }
 
+div.resultContainer div.sourceName.withIcon {
+  align-items: center;
+  display: flex;
+  gap: 5px;
+}
+
 ul.xlist li.showAllResults {
   border-top: 1px solid var(--xwiki-border-color);
 }

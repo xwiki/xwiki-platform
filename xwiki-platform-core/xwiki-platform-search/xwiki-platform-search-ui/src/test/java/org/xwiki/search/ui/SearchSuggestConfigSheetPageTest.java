@@ -27,6 +27,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.evaluation.internal.DefaultObjectEvaluator;
 import org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator;
+import org.xwiki.icon.IconManager;
+import org.xwiki.icon.IconManagerScriptService;
+import org.xwiki.icon.IconRenderer;
+import org.xwiki.icon.IconSetManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
@@ -63,6 +67,7 @@ import static org.mockito.Mockito.when;
     VelocityObjectPropertyEvaluator.class,
     SearchSuggestSourceObjectEvaluator.class,
     TestNoScriptMacro.class,
+    IconManagerScriptService.class,
 })
 class SearchSuggestConfigSheetPageTest extends PageTest
 {
@@ -74,6 +79,9 @@ class SearchSuggestConfigSheetPageTest extends PageTest
     private static final DocumentReference SEARCH_SUGGEST_SOURCE_CLASS =
         new DocumentReference(WIKI_NAME, "XWiki", "SearchSuggestSourceClass");
 
+    private static final DocumentReference SEARCH_SUGGEST_MACROS =
+        new DocumentReference(WIKI_NAME, "XWiki", "SearchSuggestMacros");
+
     private static final DocumentReference TEST_PAGE =
         new DocumentReference(WIKI_NAME, "Test", "TestDocument");
 
@@ -81,6 +89,8 @@ class SearchSuggestConfigSheetPageTest extends PageTest
         new DocumentReference(WIKI_NAME, "XWiki", "TestUser");
 
     private AuthorExecutor authorExecutor;
+
+    private IconManager iconManager;
 
     private VelocityEngine velocityEngine;
 
@@ -95,8 +105,14 @@ class SearchSuggestConfigSheetPageTest extends PageTest
     @BeforeEach
     void setUp() throws Exception
     {
+        // Minimal icon environment: only IconManager#renderHTML() is actually exercised by these tests.
+        this.componentManager.registerMockComponent(IconSetManager.class);
+        this.componentManager.registerMockComponent(IconRenderer.class);
+        this.iconManager = this.componentManager.registerMockComponent(IconManager.class);
+
         this.xwiki.initializeMandatoryDocuments(this.context);
         loadPage(SEARCH_SUGGEST_SOURCE_CLASS);
+        loadPage(SEARCH_SUGGEST_MACROS);
         loadPage(SEARCH_SUGGEST_CONFIG_SHEET);
 
         this.testString = "$doc.getDocumentReference().getName(){{/html}}{{noscript /}}";
@@ -137,6 +153,14 @@ class SearchSuggestConfigSheetPageTest extends PageTest
         when(this.oldcore.getMockDocumentAuthorizationManager()
             .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE, TEST_PAGE)).thenReturn(false);
 
+        // Use an icon theme icon rather than the escaping test string, to exercise the icon theme rendering
+        // ($services.icon.renderHTML() in SearchSuggestConfigSheet.xml), which bypasses Velocity evaluation and
+        // thus doesn't require script rights.
+        this.testPageDocument.getXObject(SEARCH_SUGGEST_SOURCE_CLASS).setStringValue("icon", "icon:user");
+        this.xwiki.saveDocument(this.testPageDocument, this.context);
+        String iconHTML = "<span class=\"fa fa-user\"></span>";
+        when(this.iconManager.renderHTML("user")).thenReturn(iconHTML);
+
         this.context.setDoc(this.testPageDocument);
         Document result = renderHTMLPage(this.searchSuggestConfigSheetDocument);
 
@@ -153,9 +177,12 @@ class SearchSuggestConfigSheetPageTest extends PageTest
         assertEquals(this.testString + "SearchSuggestSources", result.getElementsByClass("tab-pane").get(0).attr("id"));
         assertEquals(this.testString, result.getElementsByClass("limit").text());
 
-        // These should not be evaluated.
-        assertEquals(this.testString, result.getElementsByClass("icon").get(0).attr("src"));
+        // This should not be evaluated.
         assertEquals(this.testString, result.getElementsByClass("name").text());
+
+        // The icon theme icon is rendered directly and no longer goes through the legacy "icon" image markup.
+        assertEquals(0, result.getElementsByClass("icon").size());
+        assertEquals(1, result.getElementsByClass("fa-user").size());
     }
 
     @Test

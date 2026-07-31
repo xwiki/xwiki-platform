@@ -190,13 +190,6 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
         }
       };
       syncIndeterminateAria();
-      // The user directly interacting with the input (click/keyboard) also clears "indeterminate" natively, but
-      // bypasses this wrapper entirely, so keep aria-checked in sync with that path too. Listen for
-      // switchChange.bootstrapSwitch rather than change.bootstrapSwitch: Bootstrap Switch's own internal
-      // change.bootstrapSwitch handler calls stopImmediatePropagation(), which would silently swallow a listener
-      // bound afterwards on that same event; switchChange.bootstrapSwitch is a separate event it re-triggers once
-      // its own handling is done, so it isn't affected. Bound once per input, under the same namespace Bootstrap
-      // Switch itself uses so it's cleaned up together on destroy().
       if (!$input.data('xwikiIndeterminateAriaBound')) {
         $input.data('xwikiIndeterminateAriaBound', true);
         $input.on('switchChange.bootstrapSwitch', syncIndeterminateAria);

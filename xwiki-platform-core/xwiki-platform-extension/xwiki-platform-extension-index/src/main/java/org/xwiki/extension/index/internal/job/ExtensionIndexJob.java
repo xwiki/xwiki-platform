@@ -256,7 +256,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     {
         SolrQuery solrQuery = new SolrQuery();
         Set<ExtensionId> extensionIds = this.indexStore.searchExtensionIds(solrQuery);
-        Map<String, SortedSet<Version>> extensions = new HashMap<>(extensionIds.size());
+        Map<String, SortedSet<Version>> extensions = HashMap.newHashMap(extensionIds.size());
         for (ExtensionId extensionId : extensionIds) {
             add(extensionId, extensions);
         }

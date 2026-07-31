@@ -124,7 +124,7 @@ public class DefaultLinkStore implements LinkStore
 
         // Get the links from the solr document
         Collection<Object> links = solrDocument.getFieldValues(FieldUtils.LINKS);
-        Set<EntityReference> entities = new HashSet<>(links.size());
+        Set<EntityReference> entities = HashSet.newHashSet(links.size());
         for (Object link : links) {
             if (link instanceof String linkString) {
                 EntityReference entityLink = this.linkSerializer.unserialize(linkString);

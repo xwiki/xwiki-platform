@@ -176,6 +176,32 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
         '.bootstrap-switch-handle-on, .bootstrap-switch-handle-off, .bootstrap-switch-label'
       ).attr('aria-hidden', 'true');
     });
+    // Bootstrap Switch supports a third, "indeterminate" state (bootstrapSwitch('indeterminate', true)), backed by
+    // the native input's "indeterminate" DOM property. That property alone isn't exposed to the accessibility tree,
+    // so screen readers never learn about it; expose it explicitly via aria-checked="mixed" instead, which is the
+    // standard way to convey a mixed/tri-state checkbox (native checked/unchecked semantics are used otherwise).
+    this.each(function() {
+      var $input = $(this);
+      var syncIndeterminateAria = function() {
+        if ($input.prop('indeterminate')) {
+          $input.attr('aria-checked', 'mixed');
+        } else {
+          $input.removeAttr('aria-checked');
+        }
+      };
+      syncIndeterminateAria();
+      // The user directly interacting with the input (click/keyboard) also clears "indeterminate" natively, but
+      // bypasses this wrapper entirely, so keep aria-checked in sync with that path too. Listen for
+      // switchChange.bootstrapSwitch rather than change.bootstrapSwitch: Bootstrap Switch's own internal
+      // change.bootstrapSwitch handler calls stopImmediatePropagation(), which would silently swallow a listener
+      // bound afterwards on that same event; switchChange.bootstrapSwitch is a separate event it re-triggers once
+      // its own handling is done, so it isn't affected. Bound once per input, under the same namespace Bootstrap
+      // Switch itself uses so it's cleaned up together on destroy().
+      if (!$input.data('xwikiIndeterminateAriaBound')) {
+        $input.data('xwikiIndeterminateAriaBound', true);
+        $input.on('switchChange.bootstrapSwitch', syncIndeterminateAria);
+      }
+    });
     return result;
   };
 

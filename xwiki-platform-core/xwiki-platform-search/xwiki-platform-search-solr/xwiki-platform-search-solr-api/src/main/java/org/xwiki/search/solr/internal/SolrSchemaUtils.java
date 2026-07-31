@@ -162,7 +162,7 @@ public class SolrSchemaUtils
                 throw new SolrException("Failed to get the list of field types", e);
             }
 
-            Map<String, FieldTypeRepresentation> map = new HashMap<>(response.getFieldTypes().size());
+            Map<String, FieldTypeRepresentation> map = HashMap.newHashMap(response.getFieldTypes().size());
             response.getFieldTypes().forEach(t -> map.put((String) t.getAttributes().get(SOLR_FIELD_NAME), t));
             schema.types = map;
         }
@@ -759,7 +759,7 @@ public class SolrSchemaUtils
     public void setFieldType(XWikiSolrCore core, String name, String solrClass, Boolean add, Object... attributes)
         throws SolrException
     {
-        Map<String, Object> attributesMap = new HashMap<>(2 + (attributes.length > 0 ? attributes.length / 2 : 0));
+        Map<String, Object> attributesMap = HashMap.newHashMap(2 + (attributes.length > 0 ? attributes.length / 2 : 0));
 
         attributesMap.put(SOLR_FIELD_NAME, name);
         attributesMap.put(SOLR_FIELD_CLASS, solrClass);

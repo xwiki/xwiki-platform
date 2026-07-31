@@ -312,7 +312,7 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         XWikiContext xcontext = this.xcontextProvider.get();
-        Set<DocumentReference> documentReferences = new HashSet<>(references.size());
+        Set<DocumentReference> documentReferences = HashSet.newHashSet(references.size());
         for (EntityReference entityReference : references) {
             documentReferences.add(this.documentReferenceResolver.resolve(entityReference, xcontext));
         }

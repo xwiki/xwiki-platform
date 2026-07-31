@@ -183,7 +183,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         EntityReferenceSerializer<String> serializer = getDefaultEntityReferenceSerializer();
         Set<DocumentReference> references = getAlwaysUsedExtensions();
-        Set<String> names = new HashSet<>(references.size());
+        Set<String> names = HashSet.newHashSet(references.size());
         for (DocumentReference reference : references) {
             names.add(serializer.serialize(reference));
         }

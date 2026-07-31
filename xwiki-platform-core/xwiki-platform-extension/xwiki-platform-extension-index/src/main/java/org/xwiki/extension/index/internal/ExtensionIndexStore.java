@@ -990,7 +990,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
 
         SolrDocumentList documents = response.getResults();
 
-        Set<ExtensionId> extensionId = new LinkedHashSet<>(documents.size());
+        Set<ExtensionId> extensionId = LinkedHashSet.newLinkedHashSet(documents.size());
         for (SolrDocument document : documents) {
             extensionId.add(this.extensionIndexSolrUtil.fromSolrId(this.utils.getId(document)));
         }

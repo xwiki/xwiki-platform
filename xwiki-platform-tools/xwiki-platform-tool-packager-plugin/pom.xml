@@ -157,7 +157,7 @@
       <artifactId>jakarta.servlet-api</artifactId>
       <scope>runtime</scope>
     </dependency>
-    <!-- Required by the blog store -->
+    <!-- Required by the blob store -->
     <dependency>
       <groupId>org.glassfish.expressly</groupId>
       <artifactId>expressly</artifactId>

@@ -254,8 +254,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
                         // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
                         temporaryFiles.add(tempFile);
                     } catch (Exception ex) {
-                        String message = "Error while processing artifact image [%s].";
-                        this.logger.error(String.format(message, imageReference), ex);
+                        this.logger.error("Error while processing artifact image [{}].", imageReference, ex);
                     }
                 }
             }

@@ -154,7 +154,7 @@ public class ChromeManager implements BrowserManager, Initializable, Disposable
                 return getWithTimeout(() -> this.chromeService.getVersion());
             } catch (Exception e) {
                 exception = e;
-                this.logger.debug("Chrome remote debugging not available. Root cause: [{}]. Retrying in {}s.",
+                this.logger.debug("Chrome remote debugging not available. Root cause: [{}]. Retrying in [{}] seconds.",
                     ExceptionUtils.getRootCauseMessage(e), retryIntervalSeconds);
                 try {
                     Thread.sleep(retryIntervalSeconds * 1000L);

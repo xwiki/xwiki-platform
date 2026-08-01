@@ -284,7 +284,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
             // In case of error we log the error and continue with the undecoded URL.
             // TODO: Ideally this should rather fail fast but we have no exception handling
             // framework for scripting code. Change this when we have one.
-            LOG.error("Failed to decode URL path [" + path + "]", e);
+            LOG.error("Failed to decode URL path [{}]", path, e);
         }
 
         return path;

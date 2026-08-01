@@ -238,7 +238,8 @@ public class DefaultModelBridge implements ModelBridge
             return true;
         } catch (Exception e) {
             // Just warn, since it's a recoverable situation.
-            this.logger.warn("Failed to unlock document [{}].", reference, e);
+            this.logger.warn("Failed to unlock document [{}]. Root cause is [{}]", reference,
+                ExceptionUtils.getRootCauseMessage(e));
             return false;
         }
     }

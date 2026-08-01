@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -152,7 +153,8 @@ public class DefaultSheetManager implements SheetManager
             classDocument = documentAccessBridge.getTranslatedDocumentInstance(classReference);
         } catch (Exception e) {
             String classStringReference = defaultEntityReferenceSerializer.serialize(classReference);
-            logger.warn("Failed to get class sheets for [{}]. Reason: [{}]", classStringReference, e.getMessage());
+            logger.warn("Failed to get class sheets for [{}]. Reason: [{}]", classStringReference,
+                ExceptionUtils.getRootCauseMessage(e));
             return Collections.emptyList();
         }
         List<DocumentReference> sheetReferences = new ArrayList<>();

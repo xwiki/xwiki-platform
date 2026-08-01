@@ -523,8 +523,8 @@ public class TestUtils
             LOGGER.debug("Sent the requests of the page being unloaded: {}", sentRequests);
         } catch (WebDriverException e) {
             // Not a reason to fail the test: unloading the page below still cancels all the other pending requests.
-            LOGGER.warn("Failed to send the requests of the page being unloaded, some tests might be flaky. Root "
-                + "cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to send the requests of the page being unloaded, some tests might be flaky. Call "
+                + "stack is [{}]", ExceptionUtils.getStackTrace(e));
         }
 
         // Navigating to a blank page unloads the current page without triggering any request of its own.
@@ -1669,8 +1669,8 @@ public class TestUtils
             this.secretToken = htmlElement.getDomAttribute("data-xwiki-form-token");
         } catch (NoSuchElementException exception) {
             // Something is really wrong if this happens.
-            LOGGER.warn("Failed to cache anti-CSRF secret token, some tests might fail! Root cause is [{}]",
-                ExceptionUtils.getRootCauseMessage(exception));
+            LOGGER.warn("Failed to cache anti-CSRF secret token, some tests might fail! Call stack is [{}]",
+                ExceptionUtils.getStackTrace(exception));
         }
     }
 

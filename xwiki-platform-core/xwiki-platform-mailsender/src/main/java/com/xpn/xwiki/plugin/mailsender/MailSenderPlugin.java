@@ -103,7 +103,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     /**
      * Error message logged when a {@link MessagingException} occurs while sending emails.
      */
-    private static final String MESSAGING_EXCEPTION_ERROR = "MessagingException has occured.";
+    private static final String MESSAGING_EXCEPTION_ERROR = "MessagingException has occurred.";
 
     /**
      * Error code signaling that the mail template requested for
@@ -687,8 +687,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                     }
                 } catch (SendFailedException ex) {
                     sendFailedCount++;
-                    LOGGER.error("SendFailedException has occured.", ex);
-                    LOGGER.error("Detailed email information" + mail.toString());
+                    LOGGER.error("SendFailedException has occurred.", ex);
+                    LOGGER.error("Detailed email information: [{}]", mail);
                     if (emailCount == 1) {
                         throw ex;
                     }
@@ -697,14 +697,14 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                     }
                 } catch (MessagingException mex) {
                     LOGGER.error(MESSAGING_EXCEPTION_ERROR, mex);
-                    LOGGER.error("Detailed email information" + mail.toString());
+                    LOGGER.error("Detailed email information: [{}]", mail);
                     if (emailCount == 1) {
                         throw mex;
                     }
                 } catch (XWikiException e) {
-                    LOGGER.error("XWikiException has occured.", e);
+                    LOGGER.error("XWikiException has occurred.", e);
                 } catch (IOException e) {
-                    LOGGER.error("IOException has occured.", e);
+                    LOGGER.error("IOException has occurred.", e);
                 }
             }
         } finally {

@@ -229,7 +229,7 @@ public class XWikiVelocityManager extends DefaultVelocityManager implements Init
             try {
                 injectBaseMacros(velocityEngine, skinMacrosTemplate);
             } catch (Exception e) {
-                this.logger.warn("Failed to load global macros for engine with key [{}]: {}", cacheKey,
+                this.logger.warn("Failed to load global macros for engine with key [{}]: [{}]", cacheKey,
                     ExceptionUtils.getRootCauseMessage(e));
             }
 

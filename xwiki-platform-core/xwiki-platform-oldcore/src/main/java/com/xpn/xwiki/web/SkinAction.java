@@ -455,7 +455,7 @@ public class SkinAction extends XWikiAction
                 .call(() -> context.getWiki().evaluateVelocity(content, namespace), author, sourceDocument);
         } catch (Exception e) {
             // Should not happen since there is nothing in the call() method throwing an exception.
-            LOGGER.error("Failed to evaluate velocity content for namespace {} with the rights of the user {}",
+            LOGGER.error("Failed to evaluate velocity content for namespace [{}] with the rights of the user [{}]",
                 namespace, author, e);
         }
 

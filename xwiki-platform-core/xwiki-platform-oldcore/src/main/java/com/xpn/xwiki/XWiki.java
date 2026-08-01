@@ -1683,8 +1683,8 @@ public class XWiki implements EventListener
                 }
             } catch (Exception e) {
                 // Failed to retrieve the version, log a warning
-                LOGGER.warn("Failed to retrieve XWiki's version from [{}], using the [{}] property.", VERSION_FILE,
-                    VERSION_FILE_PROPERTY, e);
+                LOGGER.warn("Failed to retrieve XWiki's version from [{}], using the [{}] property. Root cause is "
+                    + "[{}]", VERSION_FILE, VERSION_FILE_PROPERTY, ExceptionUtils.getRootCauseMessage(e));
             }
 
             if (this.version == null) {
@@ -1731,7 +1731,8 @@ public class XWiki implements EventListener
             }
         } catch (Exception ex) {
             // Probably a SecurityException or the file is not accessible (inside a war)
-            LOGGER.info("Failed to get file modification date: {}", ex.getMessage());
+            LOGGER.info("Failed to get the modification date of resource [{}]. Root cause is [{}]", name,
+                ExceptionUtils.getRootCauseMessage(ex));
         }
         return new Date();
     }
@@ -3972,7 +3973,8 @@ public class XWiki implements EventListener
                     return -4;
                 }
             } catch (RuntimeException ex) {
-                LOGGER.warn("Invalid regular expression for xwiki.validusername", ex);
+                LOGGER.warn("Invalid regular expression for the [xwiki.validusername] property. Falling back on the "
+                    + "default one. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(ex));
                 if (!context.getUtil().match(defaultValidationRegex, xwikiname)) {
                     return -4;
                 }
@@ -4012,7 +4014,8 @@ public class XWiki implements EventListener
                 try {
                     sendValidationEmail(xwikiname, password, email, validkey, "validation_email_content", context);
                 } catch (XWikiException e) {
-                    LOGGER.warn("User created. Failed to send the mail to the created user.", e);
+                    LOGGER.warn("User [{}] created but failed to send the validation mail to them. Root cause is "
+                        + "[{}]", xwikiname, ExceptionUtils.getRootCauseMessage(e));
                     return -11;
                 }
 
@@ -4473,7 +4476,7 @@ public class XWiki implements EventListener
 
             XWikiDocument doc = null;
             try {
-                LOGGER.debug("Including Topic {}", topic);
+                LOGGER.debug("Including topic [{}]", topic);
                 try {
                     @SuppressWarnings("unchecked")
                     Set<String> includedDocs = (Set<String>) context.get(INCLUDED_DOCS);
@@ -4483,7 +4486,7 @@ public class XWiki implements EventListener
                     }
 
                     if (includedDocs.contains(prefixedTopic) || currentDocName.equals(prefixedTopic)) {
-                        LOGGER.warn("Error on too many recursive includes for topic {}", topic);
+                        LOGGER.warn("Too many recursive includes for topic [{}]", topic);
                         return "Cannot make recursive include";
                     }
                     includedDocs.add(prefixedTopic);
@@ -4500,7 +4503,8 @@ public class XWiki implements EventListener
                         XWikiException.ERROR_XWIKI_ACCESS_DENIED, "Access to this document is denied: " + doc);
                 }
             } catch (XWikiException e) {
-                LOGGER.warn("Exception Including Topic {}", topic, e);
+                LOGGER.warn("Failed to include topic [{}]. Root cause is [{}]", topic,
+                    ExceptionUtils.getRootCauseMessage(e));
                 return "Topic " + topic + " does not exist";
             }
 
@@ -5316,7 +5320,7 @@ public class XWiki implements EventListener
                 try {
                     return new URL(homepage);
                 } catch (MalformedURLException e) {
-                    LOGGER.warn("Invalid main wiki home page URL [{}] configured: {}", homepage,
+                    LOGGER.warn("Invalid main wiki home page URL [{}] configured. Root cause is [{}]", homepage,
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
@@ -6044,9 +6048,7 @@ public class XWiki implements EventListener
 
                     this.authService = new XWikiAuthServiceImpl();
 
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Initialized AuthService {} using 'new'.", this.authService.getClass().getName());
-                    }
+                    LOGGER.debug("Initialized AuthService [{}] using 'new'.", this.authService.getClass().getName());
                 }
             }
 
@@ -6067,22 +6069,18 @@ public class XWiki implements EventListener
     private void setAuthService(Class<? extends XWikiAuthService> authClass)
     {
         try {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Using AuthClass {}", authClass.getName());
-            }
+            LOGGER.debug("Using AuthClass [{}]", authClass.getName());
 
             this.authService = authClass.newInstance();
 
             LOGGER.debug("Initialized AuthService using Reflection.");
         } catch (Exception e) {
-            LOGGER.warn("Failed to initialize the AuthService from class [{}], fallbacking on standard authenticator",
-                authClass.getName(), e);
+            LOGGER.warn("Failed to initialize the AuthService from class [{}], falling back on the standard "
+                + "authenticator. Root cause is [{}]", authClass.getName(), ExceptionUtils.getRootCauseMessage(e));
 
             this.authService = new XWikiAuthServiceImpl();
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Initialized AuthService {} using 'new'.", this.authService.getClass().getName());
-            }
+            LOGGER.debug("Initialized AuthService [{}] using 'new'.", this.authService.getClass().getName());
         }
     }
 
@@ -6114,10 +6112,9 @@ public class XWiki implements EventListener
                     Exception lastException = e;
 
                     if (!DEFAULT_RIGHT_SERVICE_CLASS.equals(rightsClass)) {
-                        LOGGER.warn(String.format(
-                            "Failed to initialize custom RightService [%s]"
-                                + " by Reflection, using default implementation [%s].",
-                            rightsClass, DEFAULT_RIGHT_SERVICE_CLASS), e);
+                        LOGGER.warn("Failed to initialize custom RightService [{}] by Reflection, using default "
+                            + "implementation [{}]. Root cause is [{}]", rightsClass, DEFAULT_RIGHT_SERVICE_CLASS,
+                            ExceptionUtils.getRootCauseMessage(e));
                         rightsClass = DEFAULT_RIGHT_SERVICE_CLASS;
                         try {
                             this.rightService = (XWikiRightService) Class.forName(rightsClass).newInstance();
@@ -6128,16 +6125,15 @@ public class XWiki implements EventListener
                     }
 
                     if (this.rightService == null) {
-                        LOGGER.warn("Failed to initialize RightService [{}] by Reflection, "
-                            + "using OLD implementation [{}] with 'new'.", rightsClass,
-                            XWikiRightServiceImpl.class.getCanonicalName(), lastException);
+                        LOGGER.warn("Failed to initialize RightService [{}] by Reflection, using OLD implementation "
+                            + "[{}] with 'new'. Root cause is [{}]", rightsClass,
+                            XWikiRightServiceImpl.class.getCanonicalName(),
+                            ExceptionUtils.getRootCauseMessage(lastException));
 
                         this.rightService = new XWikiRightServiceImpl();
 
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Initialized old RightService implementation {} using 'new'.",
-                                this.rightService.getClass().getName());
-                        }
+                        LOGGER.debug("Initialized old RightService implementation [{}] using 'new'.",
+                            this.rightService.getClass().getName());
                     }
                 }
             }
@@ -6154,7 +6150,8 @@ public class XWiki implements EventListener
                 try {
                     this.statsService = (XWikiStatsService) Class.forName(storeClass).newInstance();
                 } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
+                    LOGGER.error("Failed to initialize the statistics service from class [{}], falling back on the "
+                        + "default implementation", storeClass, e);
 
                     this.statsService = new XWikiStatsServiceImpl();
                 }
@@ -6186,7 +6183,8 @@ public class XWiki implements EventListener
                 factoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
                     .getConstructor(XWiki.class).newInstance(this);
             } catch (Exception e) {
-                LOGGER.warn("Failed to initialize URLFactory Service [{}]", urlFactoryServiceClass, e);
+                LOGGER.warn("Failed to initialize URLFactory Service [{}]. Root cause is [{}]", urlFactoryServiceClass,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
         if (factoryService == null) {
@@ -6524,7 +6522,8 @@ public class XWiki implements EventListener
 
             return sdf.format(date);
         } catch (Exception e) {
-            LOGGER.info("Failed to format date [{}] with pattern [{}]: {}", date, xformat, e.getMessage());
+            LOGGER.info("Failed to format date [{}] with pattern [{}]. Root cause is [{}]", date, xformat,
+                ExceptionUtils.getRootCauseMessage(e));
             if (format == null) {
                 if (xformat.equals(defaultFormat)) {
                     return date.toString();
@@ -7854,8 +7853,8 @@ public class XWiki implements EventListener
                 setAuthService(authClass);
             }
         } catch (ClassNotFoundException e) {
-            LOGGER.warn("Failed to get the class of the configured authenticator ({}), keeping current authenticator.",
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to get the class of the configured authenticator, keeping the current authenticator. "
+                + "Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

@@ -825,7 +825,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             this.logger.info("The following data migration(s) will be applied for wiki [{}] currently in version [{}]:",
                 database, curversion);
             for (XWikiMigration migration : neededMigrations) {
-                this.logger.info("  {} - {}{}", migration.dataMigration.getName(),
+                this.logger.info("  [{}] - [{}]{}", migration.dataMigration.getName(),
                     migration.dataMigration.getDescription(), (migration.isForced ? " (forced)" : ""));
             }
         } else {

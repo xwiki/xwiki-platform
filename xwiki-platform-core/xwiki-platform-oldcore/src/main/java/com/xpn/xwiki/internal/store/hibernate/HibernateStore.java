@@ -725,7 +725,7 @@ public class HibernateStore implements Disposable, Initializable
         // XWiki uses a new Session for a new Transaction so we need to keep both in sync and thus we check if that's
         // the case. If it isn't it means some code is faulty somewhere.
         if (((session == null) && (transaction != null)) || ((transaction == null) && (session != null))) {
-            this.logger.warn("Incompatible session ({}) and transaction ({}) status", session, transaction);
+            this.logger.warn("Incompatible session [{}] and transaction [{}] status", session, transaction);
 
             // TODO: Fix this problem, don't ignore it!
             return false;
@@ -1040,7 +1040,7 @@ public class HibernateStore implements Disposable, Initializable
                 }
             } catch (Exception e) {
                 this.logger.warn(
-                    "Failed to get the sequences of the schema [{}] ({}). Trying to create hibernate_sequence anyway.",
+                    "Failed to get the sequences of the schema [{}]: [{}]. Trying to create hibernate_sequence anyway.",
                     schemaName, ExceptionUtils.getRootCauseMessage(e));
 
                 // Ignore errors in the log during the creation of the sequence since we know it can fail and we

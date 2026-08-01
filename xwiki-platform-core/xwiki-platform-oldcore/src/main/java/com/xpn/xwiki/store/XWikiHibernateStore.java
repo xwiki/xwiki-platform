@@ -768,10 +768,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 if (this.logger.isDebugEnabled()) {
                                     this.logger.debug("saveXWikiDoc:");
                                     this.logger.debug("    - document: [{}]", doc.getDocumentReferenceWithLocale());
-                                    this.logger.debug(
-                                        "    - optimizedObjects: {} (doc.isNew: {} doc.isChangeTracked: {}, isClassOptimized: {})",
-                                        optimizedObjects, doc.isNew(), doc.isChangeTracked(),
-                                        isClassOptimized(entry.getKey()));
+                                    this.logger.debug("    - optimizedObjects: [{}] (doc.isNew: [{}], "
+                                        + "doc.isChangeTracked: [{}], isClassOptimized: [{}])", optimizedObjects,
+                                        doc.isNew(), doc.isChangeTracked(), isClassOptimized(entry.getKey()));
                                     this.logger.debug("    - saved xobjects: [{}]", count);
                                 }
                             }

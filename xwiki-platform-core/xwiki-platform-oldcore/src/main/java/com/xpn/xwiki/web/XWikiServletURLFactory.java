@@ -153,7 +153,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     defaultWikiURL =
                         new URL(protocolConfiguration, this.originalURL.getHost(), this.originalURL.getPort(), "");
                 } catch (MalformedURLException e) {
-                    LOGGER.warn("The configured protocol [{}] produce an invalid URL: {}", protocolConfiguration,
+                    LOGGER.warn("The configured protocol [{}] produces an invalid URL: [{}]", protocolConfiguration,
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
@@ -172,7 +172,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             try {
                 url = xcontext.getWiki().getServerURL(xcontext.getWikiId(), xcontext);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Can't get the standard URL for wiki [{}]: {}", xcontext.getWikiId(),
+                LOGGER.warn("Can't get the standard URL for wiki [{}]: [{}]", xcontext.getWikiId(),
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
@@ -234,7 +234,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             try {
                 return normalizeURL(surl, context);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter: {}. Ignoring parameter.", surl);
+                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter [{}]. Ignoring parameter.", surl);
             }
         }
 

@@ -157,7 +157,7 @@ public class RegisterAction extends XWikiAction
                     return false;
                 }
             } catch (Exception e) {
-                LOGGER.warn("Cannot verify answer for CAPTCHA of type [{}]: {}", defaultCaptchaName,
+                LOGGER.warn("Cannot verify answer for CAPTCHA of type [{}]: [{}]", defaultCaptchaName,
                     ExceptionUtils.getRootCauseMessage(e));
                 return false;
             }

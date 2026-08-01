@@ -114,7 +114,7 @@ public class ConfigurationFilesGenerator
                     String fileName = entry.getName().replace(VM_EXTENSION, "");
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
                     if (this.testConfiguration.isVerbose()) {
-                        LOGGER.info("... Generating: {}", outputFile);
+                        LOGGER.info("... Generating: [{}]", outputFile);
                     }
                     // Note: Init is done once even if this method is called several times...
                     Velocity.init();
@@ -142,7 +142,7 @@ public class ConfigurationFilesGenerator
         File outputDirectory = new File(configurationFileTargetDirectory, "classes");
         File outputFile = new File(outputDirectory, LOGBACK_FILE);
         if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... Generating logging configuration: {}", outputFile);
+            LOGGER.info("... Generating logging configuration: [{}]", outputFile);
         }
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
             // Allows modules to override the default logback config by providing a LOGBACK_OVERRIDE_FILE file in

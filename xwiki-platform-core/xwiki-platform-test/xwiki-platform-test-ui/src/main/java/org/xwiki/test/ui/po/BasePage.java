@@ -737,7 +737,7 @@ public class BasePage extends BaseElement
             if (wcagContext.shouldWCAGStopOnError()) {
                 throw e;
             } else {
-                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
+                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag:", e);
             }
         }
     }

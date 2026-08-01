@@ -195,7 +195,7 @@ public class DefaultSheetManager implements SheetManager
                 return false;
             }
         } catch (Exception e) {
-            this.logger.error("Failed to check for the existance of the sheet with reference [{}]", sheetReference, e);
+            this.logger.error("Failed to check for the existence of the sheet with reference [{}]", sheetReference, e);
 
             return false;
         }

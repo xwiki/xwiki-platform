@@ -148,7 +148,7 @@ public class DefaultExtensionIndex extends AbstractAdvancedSearchableExtensionRe
         try {
             return this.store.exists(extensionId);
         } catch (Exception e) {
-            this.logger.error("Failed to check existance of extension [{}]", extensionId, e);
+            this.logger.error("Failed to check existence of extension [{}]", extensionId, e);
 
             return false;
         }

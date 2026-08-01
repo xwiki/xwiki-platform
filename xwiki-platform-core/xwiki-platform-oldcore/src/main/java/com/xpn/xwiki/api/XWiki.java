@@ -666,7 +666,7 @@ public class XWiki extends Api
             LOGGER.info("Access denied for loading revision [{}] of document [{}]: [{}]", revision, reference,
                 ExceptionUtils.getRootCauseMessage(e));
         } catch (Exception e) {
-            LOGGER.error("Failed to access revision [{}] of document {}", revision, reference, e);
+            LOGGER.error("Failed to access revision [{}] of document [{}]", revision, reference, e);
         }
 
         return null;

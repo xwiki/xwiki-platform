@@ -102,7 +102,7 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     {
         String rowFormat = rowFormats.get(tableName);
 
-        this.logger.debug("Row format for table [{}]: {}", tableName, rowFormat);
+        this.logger.debug("Row format for table [{}]: [{}]", tableName, rowFormat);
 
         String expectedRowFormat = compressed ? getCompressedRowFormat() : getDefaultRowFormat();
 

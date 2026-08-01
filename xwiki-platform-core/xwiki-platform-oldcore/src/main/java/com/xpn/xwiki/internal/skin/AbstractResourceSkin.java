@@ -114,7 +114,7 @@ public abstract class AbstractResourceSkin extends AbstractSkin
                 try {
                     this.properties = new Configurations().properties(url);
                 } catch (ConfigurationException e) {
-                    LOGGER.error("Failed to load skin [{}] properties file ({})", this.id, url, e);
+                    LOGGER.error("Failed to load skin [{}] properties file [{}]", this.id, url, e);
 
                     this.properties = new BaseConfiguration();
                 }

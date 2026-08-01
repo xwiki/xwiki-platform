@@ -542,7 +542,7 @@ public final class XWikiRepositoryModel
             try {
                 reposiories.add(toRepositoryDescriptor(stringRepository, factory));
             } catch (URISyntaxException e) {
-                LOGGER.warn("Failed to parse repository descriptor [{}]", stringRepository,
+                LOGGER.warn("Failed to parse repository descriptor [{}]. Root cause is [{}]", stringRepository,
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }

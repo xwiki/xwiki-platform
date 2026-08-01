@@ -915,7 +915,7 @@ public class XWikiAttachment implements Cloneable
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    LOGGER.warn("Failed to close attachment content input stream: {}",
+                    LOGGER.warn("Failed to close attachment content input stream: [{}]",
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }

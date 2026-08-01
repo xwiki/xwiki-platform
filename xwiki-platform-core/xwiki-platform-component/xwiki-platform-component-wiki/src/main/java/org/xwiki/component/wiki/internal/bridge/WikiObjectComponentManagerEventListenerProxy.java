@@ -101,7 +101,8 @@ public class WikiObjectComponentManagerEventListenerProxy
                 wikiObjectsList.add(componentBuilder.getClassReference());
             }
         } catch (ComponentLookupException e) {
-            logger.warn("Unable to collect a list of wiki objects components: %s", e);
+            logger.warn("Unable to collect a list of wiki objects components. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         return wikiObjectsList;

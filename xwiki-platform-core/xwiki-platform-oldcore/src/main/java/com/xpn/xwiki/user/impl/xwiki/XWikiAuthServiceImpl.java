@@ -231,8 +231,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
             return null;
         } finally {
-            LOGGER.debug("XWikiAuthServiceImpl.checkAuth(XWikiContext) took " + (System.currentTimeMillis() - time)
-                + " milliseconds to run.");
+            LOGGER.debug("XWikiAuthServiceImpl.checkAuth(XWikiContext) took [{}] milliseconds to run.",
+                System.currentTimeMillis() - time);
         }
     }
 
@@ -451,14 +451,12 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 result = new PasswordClass().getEquivalentPassword(stored, password).equals(stored);
             }
 
-            if (LOGGER.isDebugEnabled()) {
-                if (result) {
-                    LOGGER.debug("Password check for user " + username + " successful");
-                } else {
-                    LOGGER.debug("Password check for user " + username + " failed");
-                }
-                LOGGER.debug((System.currentTimeMillis() - time) + " milliseconds spent validating password.");
+            if (result) {
+                LOGGER.debug("Password check for user [{}] successful", username);
+            } else {
+                LOGGER.debug("Password check for user [{}] failed", username);
             }
+            LOGGER.debug("Spent [{}] milliseconds validating the password.", System.currentTimeMillis() - time);
 
             return result;
         } catch (Throwable e) {
@@ -494,30 +492,22 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     {
         String createuser = getParam("auth_createuser", context);
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Create user param is " + createuser);
-        }
+        LOGGER.debug("Create user param is [{}]", createuser);
 
         if (createuser != null) {
             String wikiname = context.getWiki().clearName(user, true, true, context);
             XWikiDocument userdoc =
                 context.getWiki().getDocument(new DocumentReference(context.getWikiId(), XWiki.SYSTEM_SPACE, wikiname), context);
             if (userdoc.isNew()) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("User page does not exist for user " + user);
-                }
+                LOGGER.debug("User page does not exist for user [{}]", user);
 
                 if ("empty".equals(createuser)) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Creating emptry user for user " + user);
-                    }
+                    LOGGER.debug("Creating empty user for user [{}]", user);
 
                     context.getWiki().createEmptyUser(wikiname, "edit", context);
                 }
             } else {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("User page already exists for user " + user);
-                }
+                LOGGER.debug("User page already exists for user [{}]", user);
             }
 
             return wikiname;

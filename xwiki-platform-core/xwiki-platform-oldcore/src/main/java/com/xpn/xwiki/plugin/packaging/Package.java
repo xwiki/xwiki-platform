@@ -377,7 +377,7 @@ public class Package
             }
             return true;
         } catch (ExcludeDocumentException e) {
-            LOGGER.info("Skip the document " + doc.getDocumentReference());
+            LOGGER.info("Skip the document [{}]", doc.getDocumentReference());
 
             return false;
         }
@@ -536,9 +536,9 @@ public class Package
                     try {
                         doc = readFromXML(new CloseShieldInputStream(zis));
                     } catch (Throwable e) {
-                        LOGGER.warn(
-                            "Failed to parse document [{}] from XML during import, thus it will not be installed. "
-                                + "The error was: " + ExceptionUtils.getRootCauseMessage(e));
+                        LOGGER.warn("Failed to parse document [{}] from XML during import, thus it will not be "
+                            + "installed. Root cause is [{}]", entry.getName(),
+                            ExceptionUtils.getRootCauseMessage(e));
                         // It will be listed in the "failed documents" section after the import.
                         addToErrors(entry.getName().replace("/", "."), context);
 
@@ -551,7 +551,7 @@ public class Package
                         this.filter(doc, context);
                         docsToLoad.add(doc);
                     } catch (ExcludeDocumentException e) {
-                        LOGGER.info("Skip the document '" + doc.getDocumentReference() + "'");
+                        LOGGER.info("Skip the document [{}]", doc.getDocumentReference());
                     }
                 }
             }
@@ -567,8 +567,8 @@ public class Package
                 if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description)) {
                     this.add(doc, context);
                 } else {
-                    LOGGER.warn("document " + doc.getDocumentReference() + " does not exist in package definition."
-                        + " It will not be installed.");
+                    LOGGER.warn("Document [{}] does not exist in the package definition. It will not be installed.",
+                        doc.getDocumentReference());
                     // It will be listed in the "skipped documents" section after the
                     // import.
                     addToSkipped(doc.getFullName(), context);
@@ -662,9 +662,7 @@ public class Package
 
             return result;
         } finally {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Package test install result " + result);
-            }
+            LOGGER.debug("Package test install result [{}]", result);
         }
     }
 
@@ -818,9 +816,7 @@ public class Package
 
         int result = DocumentInfo.INSTALL_OK;
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Package installing document " + doc.getFullName() + " " + doc.getLanguage());
-        }
+        LOGGER.debug("Package installing document [{}] for language [{}]", doc.getFullName(), doc.getLanguage());
 
         if (doc.getAction() == DocumentInfo.ACTION_SKIP) {
             addToSkipped(doc.getFullName() + ":" + doc.getLanguage(), context);
@@ -852,12 +848,7 @@ public class Package
                         // let's log the error but not stop
                         result = DocumentInfo.INSTALL_ERROR;
                         addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
-                        if (LOGGER.isErrorEnabled()) {
-                            LOGGER.error("Failed to delete document " + previousdoc.getDocumentReference());
-                        }
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Failed to delete document " + previousdoc.getDocumentReference(), e);
-                        }
+                        LOGGER.error("Failed to delete document [{}]", previousdoc.getDocumentReference(), e);
                     }
                 } else if (previousdoc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
                     // We conserve the old attachments in the new documents
@@ -939,9 +930,7 @@ public class Package
 
             } catch (XWikiException e) {
                 addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Failed to save document " + doc.getFullName(), e);
-                }
+                LOGGER.error("Failed to save document [{}]", doc.getFullName(), e);
                 result = DocumentInfo.INSTALL_ERROR;
             }
         }
@@ -1281,7 +1270,7 @@ public class Package
             fos.flush();
             fos.close();
         } catch (ExcludeDocumentException e) {
-            LOGGER.info("Skip the document " + doc.getDocumentReference());
+            LOGGER.info("Skip the document [{}]", doc.getDocumentReference());
         } catch (Exception e) {
             Object[] args = new Object[1];
             args[0] = doc.getDocumentReference();
@@ -1415,10 +1404,10 @@ public class Package
                                 "document " + doc.getDocumentReference() + " does not exist in package definition");
                         }
                     } catch (ExcludeDocumentException e) {
-                        LOGGER.info("Skip the document '" + doc.getDocumentReference() + "'");
+                        LOGGER.info("Skip the document [{}]", doc.getDocumentReference());
                     }
                 } else if (!file.getName().equals(DefaultPackageFileName)) {
-                    LOGGER.info(file.getAbsolutePath() + " is not a valid wiki document");
+                    LOGGER.info("File [{}] is not a valid wiki document", file.getAbsolutePath());
                 }
             }
         }
@@ -1454,7 +1443,7 @@ public class Package
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Error when reading the XML");
         }
 
-        LOGGER.info("Package read " + count + " documents");
+        LOGGER.info("Package read [{}] documents", count);
 
         return "";
     }

@@ -4890,7 +4890,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             try {
                 attachment.loadAttachmentContent(context);
             } catch (XWikiException e) {
-                LOGGER.warn("Failed to load attachment [{}]: {}", attachment.getReference(),
+                LOGGER.warn("Failed to load attachment [{}]: [{}]", attachment.getReference(),
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
@@ -5931,7 +5931,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                         XDOM dom = parseContent(getSyntax(), largeField.getValue(), getDocumentReference());
                         getUniqueLinkedEntityReferences(dom, entityTypes, references);
                     } catch (XWikiException e) {
-                        LOGGER.warn("Failed to extract links from xobject property [{}], skipping it. Error: {}",
+                        LOGGER.warn("Failed to extract links from xobject property [{}], skipping it. Error: [{}]",
                             largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
                     }
                 }
@@ -6953,7 +6953,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     return tdoc;
                 }
             } catch (Exception e) {
-                LOGGER.error("Error when loading document {} for locale {}", getDocumentReference(), locale, e);
+                LOGGER.error("Error when loading document [{}] for locale [{}]", getDocumentReference(), locale, e);
             }
 
             tdoc = getTranslatedDocument(LocaleUtils.getParentLocale(locale), context);

@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
 
 public class MonitorData
 {
-    private static final String MONITOR_PREFIX = "MONITOR ";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MonitorData.class);
 
     private URL url;
@@ -146,9 +144,7 @@ public class MonitorData
         MonitorTimer timer;
         timer = this.timers.get(timername);
         if (timer != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("MONITOR: error recursive timers for " + timername);
-            }
+            LOGGER.debug("MONITOR: error recursive timers for [{}]", timername);
         } else {
             timer = new MonitorTimer(timername, details);
             timer.setStartDate();
@@ -166,9 +162,7 @@ public class MonitorData
         MonitorTimer timer;
         timer = this.timers.get(timername);
         if (timer == null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("MONITOR: could not find timer for " + timername);
-            }
+            LOGGER.debug("MONITOR: could not find timer for [{}]", timername);
         } else {
             timer.setDetails(details);
         }
@@ -183,9 +177,7 @@ public class MonitorData
         MonitorTimer timer;
         timer = this.timers.get(timername);
         if (timer == null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("MONITOR: could not find timer for " + timername);
-            }
+            LOGGER.debug("MONITOR: could not find timer for [{}]", timername);
         } else {
             timer.setEndDate();
             if (timer.getDetails() != null) {
@@ -198,10 +190,8 @@ public class MonitorData
                 this.timerSummaries.put(timername, tsummary);
             }
             tsummary.addTimer(timer.getDuration());
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(MONITOR_PREFIX + this.wikiPage + " " + this.action + " " + timer.getName() + ": "
-                    + timer.getDuration() + "ms " + timer.getDetails());
-            }
+            LOGGER.debug("MONITOR page [{}], action [{}], timer [{}]: [{}]ms, details [{}]", this.wikiPage,
+                this.action, timer.getName(), timer.getDuration(), timer.getDetails());
         }
     }
 
@@ -217,14 +207,12 @@ public class MonitorData
 
     public void log()
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MONITOR_PREFIX + this.wikiPage + ": " + getDuration() + "ms");
-            Iterator<MonitorTimerSummary> it = this.timerSummaries.values().iterator();
-            while (it.hasNext()) {
-                MonitorTimerSummary tsummary = it.next();
-                LOGGER.debug(MONITOR_PREFIX + this.wikiPage + " " + this.action + " " + tsummary.getName() + ": "
-                    + tsummary.getDuration() + "ms " + tsummary.getNbCalls());
-            }
+        LOGGER.debug("MONITOR page [{}]: [{}]ms", this.wikiPage, getDuration());
+        Iterator<MonitorTimerSummary> it = this.timerSummaries.values().iterator();
+        while (it.hasNext()) {
+            MonitorTimerSummary tsummary = it.next();
+            LOGGER.debug("MONITOR page [{}], action [{}], timer [{}]: [{}]ms in [{}] calls", this.wikiPage,
+                this.action, tsummary.getName(), tsummary.getDuration(), tsummary.getNbCalls());
         }
     }
 

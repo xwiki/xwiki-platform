@@ -461,7 +461,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 }
             } catch (XWikiRightNotFoundException e) {
             } catch (Exception e) {
-                LOGGER.error("Failed to check right [{}] for group [{}] on document [¶}]", accessLevel, group,
+                LOGGER.error("Failed to check right [{}] for group [{}] on document [{}]", accessLevel, group,
                     doc.getPrefixedFullName(), e);
             }
         }

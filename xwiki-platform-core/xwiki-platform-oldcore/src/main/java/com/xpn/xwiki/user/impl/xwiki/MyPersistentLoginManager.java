@@ -186,9 +186,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             protectedUsername = encryptText(protectedUsername);
             protectedPassword = encryptText(protectedPassword);
             if (protectedUsername == null || protectedPassword == null) {
-                LOGGER.error("ERROR!!");
-                LOGGER.error("There was a problem encrypting the username or password!!");
-                LOGGER.error("Remember Me function will be disabled!!");
+                LOGGER.error("Failed to encrypt the username or password for protection [{}]. The Remember Me "
+                    + "function is disabled.", this.protection);
                 return;
             }
         }
@@ -219,12 +218,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 Cookie validationCookie = new Cookie(getCookiePrefix() + COOKIE_VALIDATION, validationHash);
                 setupCookie(validationCookie, sessionCookie, secureCookie, cookieDomain, response);
             } else {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("WARNING!!! WARNING!!!");
-                    LOGGER.error("PROTECTION=ALL or PROTECTION=VALIDATION was specified");
-                    LOGGER.error("but Validation Hash could NOT be generated");
-                    LOGGER.error("Validation has been disabled!!!!");
-                }
+                LOGGER.error("Protection [{}] was specified but the validation hash could not be generated. "
+                    + "Validation is disabled.", this.protection);
             }
         }
     }
@@ -240,9 +235,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         try {
             cookie.setMaxAge(Math.round(60 * 60 * 24 * Float.parseFloat(this.cookieLife)));
         } catch (Exception e) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Failed setting cookie Max age with duration " + this.cookieLife);
-            }
+            LOGGER.error("Failed to set the cookie max age with duration [{}]", this.cookieLife, e);
         }
     }
 
@@ -254,10 +247,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     private void addCookie(HttpServletResponse response, Cookie cookie)
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Adding cookie: " + cookie.getDomain() + cookie.getPath() + " " + cookie.getName() + "="
-                + cookie.getValue());
-        }
+        LOGGER.debug("Adding cookie [{}] with value [{}] for domain [{}] and path [{}]", cookie.getName(),
+            cookie.getValue(), cookie.getDomain(), cookie.getPath());
         response.addCookie(cookie);
     }
 
@@ -281,9 +272,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 }
             }
         }
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Cookie domain is:" + cookieDomain);
-        }
+        LOGGER.debug("Cookie domain is [{}]", cookieDomain);
         return cookieDomain;
     }
 
@@ -300,10 +289,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private String getValidationHash(String username, String password, String clientIP)
     {
         if (this.validationKey == null) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("ERROR! >> validationKey not specified...");
-                LOGGER.error("you are REQUIRED to specify the validatonkey in xwiki.cfg");
-            }
+            LOGGER.error("No validation key specified. The [xwiki.authentication.validationKey] property is "
+                + "required in xwiki.cfg.");
             return null;
         }
         MessageDigest md5 = null;
@@ -336,7 +323,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             }
             this.valueAfterMD5 = sb.toString();
         } catch (Exception e) {
-            LOGGER.error("Failed to get [" + MessageDigest.class.getName() + "] instance", e);
+            LOGGER.error("Failed to get a [{}] instance", MessageDigest.class.getName(), e);
         }
 
         return this.valueAfterMD5;
@@ -366,14 +353,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 // See XWIKI-2211
                 return encryptedEncodedText.replace("=", "_");
             }
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("ERROR! >> SecretKey not generated...");
-                LOGGER.error("you are REQUIRED to specify the encryptionKey in xwiki.cfg");
-            }
+            LOGGER.error("No secret key generated. The [xwiki.authentication.encryptionKey] property is required "
+                + "in xwiki.cfg.");
         } catch (Exception e) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Failed to encrypt text: " + clearText, e);
-            }
+            // The text being encrypted is a username or a password, so it must never reach the logs.
+            LOGGER.error("Failed to encrypt the authentication cookie value", e);
         }
         return null;
     }
@@ -570,7 +554,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             byte[] decryptedText = c1.doFinal(decodedEncryptedText);
             return new String(decryptedText);
         } catch (Exception e) {
-            LOGGER.error("Error decypting text: " + encryptedText, e);
+            // The decrypted text is a username or a password, so the encrypted form must not reach the logs either.
+            LOGGER.error("Failed to decrypt the authentication cookie value", e);
             return null;
         }
     }

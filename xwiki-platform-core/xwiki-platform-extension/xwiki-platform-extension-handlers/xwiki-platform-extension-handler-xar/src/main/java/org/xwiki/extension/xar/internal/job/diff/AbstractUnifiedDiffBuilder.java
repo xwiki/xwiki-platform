@@ -109,7 +109,7 @@ public abstract class AbstractUnifiedDiffBuilder
             return this.unifiedDiffDisplayer.display(diffResult, config);
         } catch (DiffException e) {
             this.logger
-                .warn("Failed to compute the differences. Root cause: {}", ExceptionUtils.getRootCauseMessage(e));
+                .warn("Failed to compute the differences. Root cause: [{}]", ExceptionUtils.getRootCauseMessage(e));
             return Collections.emptyList();
         }
     }

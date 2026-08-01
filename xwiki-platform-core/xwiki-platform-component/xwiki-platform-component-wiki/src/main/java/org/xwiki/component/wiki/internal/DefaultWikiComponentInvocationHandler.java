@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.descriptor.ComponentDescriptor;
@@ -122,9 +123,9 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
                     componentDependency = componentManager.getInstance(cd.getRoleType(), cd.getRoleHint());
                 }
             } catch (ComponentLookupException e) {
-                this.logger.warn(String.format(
-                    "No component found for role [%s] with hint [%s], declared as dependency for wiki component [%s]",
-                    cd.getRoleType().toString(), cd.getRoleHint(), this.wikiComponent.getDocumentReference()));
+                this.logger.warn("No component found for role [{}] with hint [{}], declared as dependency for wiki "
+                    + "component [{}]. Root cause is [{}]", cd.getRoleType(), cd.getRoleHint(),
+                    this.wikiComponent.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
             }
             methodContext.put(dependency.getKey(), componentDependency);
         }

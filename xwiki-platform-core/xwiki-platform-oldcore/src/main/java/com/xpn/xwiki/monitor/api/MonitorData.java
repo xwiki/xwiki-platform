@@ -23,7 +23,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -207,12 +206,12 @@ public class MonitorData
 
     public void log()
     {
-        LOGGER.debug("MONITOR page [{}]: [{}]ms", this.wikiPage, getDuration());
-        Iterator<MonitorTimerSummary> it = this.timerSummaries.values().iterator();
-        while (it.hasNext()) {
-            MonitorTimerSummary tsummary = it.next();
-            LOGGER.debug("MONITOR page [{}], action [{}], timer [{}]: [{}]ms in [{}] calls", this.wikiPage,
-                this.action, tsummary.getName(), tsummary.getDuration(), tsummary.getNbCalls());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("MONITOR page [{}]: [{}]ms", this.wikiPage, getDuration());
+            for (MonitorTimerSummary tsummary : this.timerSummaries.values()) {
+                LOGGER.debug("MONITOR page [{}], action [{}], timer [{}]: [{}]ms in [{}] calls", this.wikiPage,
+                    this.action, tsummary.getName(), tsummary.getDuration(), tsummary.getNbCalls());
+            }
         }
     }
 

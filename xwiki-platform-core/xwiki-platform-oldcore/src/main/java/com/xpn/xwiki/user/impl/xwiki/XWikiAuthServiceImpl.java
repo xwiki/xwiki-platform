@@ -451,12 +451,14 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 result = new PasswordClass().getEquivalentPassword(stored, password).equals(stored);
             }
 
-            if (result) {
-                LOGGER.debug("Password check for user [{}] successful", username);
-            } else {
-                LOGGER.debug("Password check for user [{}] failed", username);
+            if (LOGGER.isDebugEnabled()) {
+                if (result) {
+                    LOGGER.debug("Password check for user [{}] successful", username);
+                } else {
+                    LOGGER.debug("Password check for user [{}] failed", username);
+                }
+                LOGGER.debug("Spent [{}] milliseconds validating the password.", System.currentTimeMillis() - time);
             }
-            LOGGER.debug("Spent [{}] milliseconds validating the password.", System.currentTimeMillis() - time);
 
             return result;
         } catch (Throwable e) {

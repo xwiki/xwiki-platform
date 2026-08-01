@@ -404,8 +404,8 @@ public class XWikiAttachment implements Cloneable
 
         // Log this since it's probably a mistake so that we find who is doing bad things
         if (this.authorReference != null && this.authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                new Exception("See stack trace"));
+            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake. "
+                + "Call stack is [{}]", ExceptionUtils.getStackTrace(new Exception()));
         }
     }
 
@@ -1036,8 +1036,8 @@ public class XWikiAttachment implements Cloneable
         try {
             return getAttachment_archive().getVersions();
         } catch (Exception ex) {
-            LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: {}",
-                getFilename(), getDoc().getDocumentReference(), ex.getMessage());
+            LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: [{}]",
+                getFilename(), getDoc().getDocumentReference(), ExceptionUtils.getRootCauseMessage(ex));
             return new Version[] {new Version(this.getVersion())};
         }
     }
@@ -1177,8 +1177,9 @@ public class XWikiAttachment implements Cloneable
                 } catch (Exception e) {
                     LOGGER.warn(
                         "Failed to load archive for attachment [{}@{}]. "
-                            + "This attachment is broken, please consider re-uploading it",
-                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
+                            + "This attachment is broken, please consider re-uploading it. Root cause is [{}]",
+                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(),
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
             } finally {
                 if (currentWiki != null) {

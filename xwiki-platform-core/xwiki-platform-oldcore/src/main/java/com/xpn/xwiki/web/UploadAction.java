@@ -137,14 +137,15 @@ public class UploadAction extends XWikiAction
             try {
                 uploadAttachment(file.getValue(), file.getKey(), fileupload, doc, context);
             } catch (Exception ex) {
-                LOGGER.warn("Saving uploaded file failed", ex);
+                LOGGER.warn("Failed to save uploaded file [{}]. Root cause is [{}]", file.getKey(),
+                    ExceptionUtils.getRootCauseMessage(ex));
                 failedFiles.put(file.getKey(), ExceptionUtils.getRootCauseMessage(ex));
             }
         }
 
-        LOGGER.debug("Found files to upload: " + fileNames);
-        LOGGER.debug("Failed attachments: " + failedFiles);
-        LOGGER.debug("Wrong attachment names: " + wrongFileNames);
+        LOGGER.debug("Found files to upload: {}", fileNames);
+        LOGGER.debug("Failed attachments: {}", failedFiles);
+        LOGGER.debug("Wrong attachment names: {}", wrongFileNames);
         if (ajax) {
             try {
                 response.getOutputStream().println("ok");

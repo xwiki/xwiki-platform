@@ -174,7 +174,8 @@ public class PdfExportImpl implements PdfExport
                 FileUtils.deleteDirectory(tempdir);
             } catch (IOException ex) {
                 // Should not happen, but it's nothing serious, just that temporary files are left on the disk.
-                LOGGER.warn("Failed to cleanup temporary files after a PDF export", ex);
+                LOGGER.warn("Failed to cleanup temporary files after a PDF export. Root cause is [{}]",
+                    ExceptionUtils.getRootCauseMessage(ex));
             }
         }
     }
@@ -377,7 +378,8 @@ public class PdfExportImpl implements PdfExport
             LOGGER.debug("HTML with CSS applied [{}]", result);
             return result;
         } catch (Exception e) {
-            LOGGER.warn("Failed to apply CSS [{}] to HTML [{}]", css, html, e);
+            LOGGER.warn("Failed to apply CSS [{}] to HTML [{}]. Root cause is [{}]", css, html,
+                ExceptionUtils.getRootCauseMessage(e));
             return html;
         }
     }

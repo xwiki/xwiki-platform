@@ -137,7 +137,7 @@ public class DefaultOldRendering implements OldRendering
                 return writer.toString();
             }
         } catch (XWikiVelocityException e) {
-            this.logger.error("Faield to parse content [" + content + "]", e);
+            this.logger.error("Failed to parse content [{}]", content, e);
         }
 
         return "";

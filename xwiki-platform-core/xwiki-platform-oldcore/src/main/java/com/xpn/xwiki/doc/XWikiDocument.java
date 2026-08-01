@@ -1649,7 +1649,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         } catch (ParseException e) {
             // Failed to render for some reason. This method should normally throw an exception but this
             // requires changing the signature of calling methods too.
-            LOGGER.warn("Failed to render content [{}]", text, e);
+            LOGGER.warn("Failed to render content [{}]. Root cause is [{}]", text,
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         return "";
@@ -1738,7 +1739,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         } catch (Exception e) {
             // Failed to render for some reason. This method should normally throw an exception but this
             // requires changing the signature of calling methods too.
-            LOGGER.warn("Failed to render content [{}]", text, e);
+            LOGGER.warn("Failed to render content [{}]. Root cause is [{}]", text,
+                ExceptionUtils.getRootCauseMessage(e));
         } finally {
             if (backup != null) {
                 restoreContext(backup, context);
@@ -2737,7 +2739,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             // may be null (tests)
             // To maintain the behavior of this method we can't throw an exception.
             // Formerly, null was returned if there was no SoftReference.
-            LOGGER.warn("Could not get document archive", e);
+            LOGGER.warn("Failed to get the archive of document [{}]. Root cause is [{}]", getDocumentReference(),
+                ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }
@@ -3328,8 +3331,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 return getXObject(resolvedClassReference);
             }
 
-            LOGGER.warn("Exception while accessing objects for document [{}]: {}", getDocumentReference(),
-                e.getMessage(), e);
+            LOGGER.warn("Failed to access the objects of document [{}]. Root cause is [{}]", getDocumentReference(),
+                ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }
@@ -3674,8 +3677,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
             result = display(fieldname, object, context);
         } catch (Exception e) {
-            LOGGER.error("Failed to display field [" + fieldname + "] of document ["
-                + getDefaultEntityReferenceSerializer().serialize(getDocumentReference()) + "]", e);
+            LOGGER.error("Failed to display field [{}] of document [{}]", fieldname,
+                getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), e);
         }
 
         return result;
@@ -4025,8 +4028,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         } catch (Exception ex) {
             // TODO: It would better to check if the field exists rather than catching an exception
             // raised by a NPE as this is currently the case here...
-            LOGGER.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object of Class ["
-                + getDefaultEntityReferenceSerializer().serialize(obj.getDocumentReference()) + "]", ex);
+            LOGGER.warn("Failed to display field [{}] in [{}] mode for Object of Class [{}]. Root cause is [{}]",
+                fieldname, type, getDefaultEntityReferenceSerializer().serialize(obj.getDocumentReference()),
+                ExceptionUtils.getRootCauseMessage(ex));
             return "";
         } finally {
             if (!backup.isEmpty()) {
@@ -4316,8 +4320,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             syntax = getSyntaxRegistry().resolveSyntax(syntaxId);
         } catch (ParseException e) {
             syntax = getDefaultDocumentSyntax();
-            LOGGER.warn("Failed to set syntax [{}] for [{}], setting syntax [{}] instead.", syntaxId,
-                getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), syntax.toIdString(), e);
+            LOGGER.warn("Failed to set syntax [{}] for [{}], setting syntax [{}] instead. Root cause is [{}]", syntaxId,
+                getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), syntax.toIdString(),
+                ExceptionUtils.getRootCauseMessage(e));
         }
         return syntax;
     }
@@ -6291,7 +6296,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
             return list;
         } catch (Exception e) {
-            LOGGER.error("Failed to extract include target from provided content [" + content + "]", e);
+            LOGGER.error("Failed to extract include target from provided content [{}]", content, e);
 
             return null;
         }
@@ -9615,7 +9620,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             try {
                 return Utils.getContextComponentManager().getInstance(XWikiAttachmentStoreInterface.class, storeType);
             } catch (ComponentLookupException e) {
-                LOGGER.warn("Can't find attachment content store for type [{}]", storeType, e);
+                LOGGER.warn("Can't find attachment content store for type [{}]. Root cause is [{}]", storeType,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

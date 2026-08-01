@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
@@ -93,8 +94,8 @@ public class DefaultCoreConfiguration implements CoreConfiguration
         try {
             syntax = Syntax.valueOf(syntaxId);
         } catch (ParseException e) {
-            this.logger.warn("Invalid default document Syntax [{}], defaulting to [{}] instead", syntaxId,
-                Syntax.XWIKI_2_1.toIdString(),  e);
+            this.logger.warn("Invalid default document Syntax [{}], defaulting to [{}] instead. Root cause is [{}]",
+                syntaxId, Syntax.XWIKI_2_1.toIdString(), ExceptionUtils.getRootCauseMessage(e));
             syntax = Syntax.XWIKI_2_1;
         }
 

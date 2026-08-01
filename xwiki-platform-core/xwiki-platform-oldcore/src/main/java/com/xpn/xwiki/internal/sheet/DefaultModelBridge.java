@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -88,7 +89,8 @@ public class DefaultModelBridge implements ModelBridge
             } catch (XWikiException e) {
                 String stringReference =
                     this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
-                this.logger.warn("Failed to load the default translation of [{}].", stringReference, e);
+                this.logger.warn("Failed to load the default translation of [{}]. Root cause is [{}]", stringReference,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
         return document;

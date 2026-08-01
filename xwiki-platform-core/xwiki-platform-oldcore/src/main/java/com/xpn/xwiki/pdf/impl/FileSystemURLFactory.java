@@ -34,6 +34,7 @@ import java.util.Objects;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.AttachmentReference;
@@ -99,7 +100,8 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             return getURL(wiki, spaces, name, filename, null, context);
         } catch (Exception ex) {
-            LOGGER.warn("Failed to save image for PDF export", ex);
+            LOGGER.warn("Failed to save image for PDF export. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(ex));
             return super.createAttachmentURL(filename, spaces, name, action, null, wiki, context);
         }
     }
@@ -111,7 +113,8 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             return getURL(wiki, spaces, name, filename, revision, context);
         } catch (Exception ex) {
-            LOGGER.warn("Failed to save image for PDF export: " + ex.getMessage());
+            LOGGER.warn("Failed to save image for PDF export. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(ex));
             return super.createAttachmentRevisionURL(filename, spaces, name, revision, wiki, context);
         }
     }

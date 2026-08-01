@@ -32,6 +32,7 @@ import javax.inject.Provider;
 
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -583,8 +584,8 @@ public class XWikiContext extends Hashtable<Object, Object>
 
             // Log this since it's probably a mistake so that we find who is doing bad things
             if (this.userReference.getName().equals(XWikiRightService.GUEST_USER)) {
-                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
-                    new Exception("See stack trace"));
+                LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake. "
+                    + "Call stack is [{}]", ExceptionUtils.getStackTrace(new Exception()));
             }
         }
 

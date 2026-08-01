@@ -71,10 +71,8 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
             if (context.getWiki().getRightService().hasProgrammingRights(doc, context)) {
                 return (XWikiAuthService) context.getWiki().parseGroovyFromString(doc.getContent(), context);
             } else {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Auth service implementation page " + authservicepage
-                        + " missing programming rights, requires ownership by authorized user.");
-                }
+                LOGGER.error("Auth service implementation page [{}] missing programming rights, requires ownership "
+                    + "by authorized user.", authservicepage);
                 return null;
             }
         } catch (XWikiException e) {

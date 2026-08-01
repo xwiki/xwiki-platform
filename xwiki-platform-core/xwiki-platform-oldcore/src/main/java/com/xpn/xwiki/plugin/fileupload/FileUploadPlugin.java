@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.poi.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,7 +169,8 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
                 try {
                     item.delete();
                 } catch (Exception ex) {
-                    LOGGER.warn("Exception cleaning uploaded files", ex);
+                    LOGGER.warn("Failed to clean uploaded file [{}]. Root cause is [{}]", item.getName(),
+                        ExceptionUtils.getRootCauseMessage(ex));
                 }
             }
             context.remove(FILE_LIST_KEY);
@@ -405,7 +407,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      */
     public FileItem getFile(String formfieldName, XWikiContext context)
     {
-        LOGGER.debug("Searching file uploaded for field " + formfieldName);
+        LOGGER.debug("Searching file uploaded for field [{}]", formfieldName);
 
         List<FileItem> fileuploadlist = getFileItems(context);
         if (fileuploadlist == null) {

@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.ExecutionContext;
@@ -68,7 +69,8 @@ public abstract class AbstractXWikiStore
 
         if (inputxcontext != null && xcontext != inputxcontext) {
             LOGGER.warn("ExecutionContext and passed XWikiContext argument mismatched, for data safety,"
-                + " the XWikiContext from the ExecutionContext has been used.", new Exception("Stack trace"));
+                + " the XWikiContext from the ExecutionContext has been used. Call stack is [{}]",
+                ExceptionUtils.getStackTrace(new Exception()));
 
             // Make sure to use the wiki expected by the called for the API
             if (savewiki && !Objects.equals(inputxcontext.getWikiReference(), xcontext.getWikiReference())) {

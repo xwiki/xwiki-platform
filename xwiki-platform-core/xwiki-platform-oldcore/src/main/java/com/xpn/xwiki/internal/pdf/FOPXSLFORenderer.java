@@ -162,10 +162,11 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
             @SuppressWarnings("unchecked")
             List<PageSequenceResults> pageSequences = foResults.getPageSequences();
             for (PageSequenceResults pageSequenceResults : pageSequences) {
-                this.logger.debug("PageSequence " + StringUtils.defaultIfEmpty(pageSequenceResults.getID(), "<no id>")
-                    + " generated " + pageSequenceResults.getPageCount() + " pages.");
+                this.logger.debug("PageSequence [{}] generated [{}] pages.",
+                    StringUtils.defaultIfEmpty(pageSequenceResults.getID(), "<no id>"),
+                    pageSequenceResults.getPageCount());
             }
-            this.logger.debug("Generated " + foResults.getPageCount() + " pages in total.");
+            this.logger.debug("Generated [{}] pages in total.", foResults.getPageCount());
         }
     }
 
@@ -177,7 +178,7 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
                 configuration = new DefaultConfigurationBuilder().build(fopConfigurationFile);
             }
         } catch (Exception e) {
-            this.logger.warn("Wrong FOP configuration: " + ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Wrong FOP configuration: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
 
         configuration = maybeExtendConfiguration(configuration);

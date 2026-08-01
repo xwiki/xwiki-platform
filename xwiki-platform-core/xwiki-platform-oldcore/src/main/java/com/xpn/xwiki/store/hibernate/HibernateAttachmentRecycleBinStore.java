@@ -32,6 +32,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -280,7 +281,8 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
             try {
                 return this.componentManager.getInstance(AttachmentRecycleBinContentStore.class, storeType);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Can't find attachment recycle bin content store for type [{}]", storeType, e);
+                this.logger.warn("Can't find attachment recycle bin content store for type [{}]. Root cause is [{}]",
+                    storeType, ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

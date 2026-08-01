@@ -452,12 +452,12 @@ public class Document extends Api
         try {
             return this.doc.getRenderedTitle(Syntax.valueOf(syntaxId), getXWikiContext());
         } catch (ParseException e) {
-            LOGGER.error("Failed to parse provided syntax identifier [" + syntaxId + "]", e);
+            LOGGER.error("Failed to parse provided syntax identifier [{}]", syntaxId, e);
 
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to parse syntax identifier [" + syntaxId + "]", e);
         } catch (Exception e) {
-            LOGGER.error("Failed to render document [" + getPrefixedFullName() + "] title content", e);
+            LOGGER.error("Failed to render document [{}] title content", getPrefixedFullName(), e);
 
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to render document [" + getPrefixedFullName() + "] content title", e);
@@ -3488,8 +3488,7 @@ public class Document extends Api
         try {
             getDoc().convertSyntax(targetSyntaxId, this.context);
         } catch (Exception ex) {
-            LOGGER.error(
-                "Failed to convert document [" + getPrefixedFullName() + "] to syntax [" + targetSyntaxId + "]", ex);
+            LOGGER.error("Failed to convert document [{}] to syntax [{}]", getPrefixedFullName(), targetSyntaxId, ex);
 
             return false;
         } finally {

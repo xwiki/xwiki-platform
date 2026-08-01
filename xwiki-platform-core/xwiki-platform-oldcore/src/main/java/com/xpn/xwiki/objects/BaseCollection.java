@@ -299,7 +299,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             try {
                 baseClass = context.getWiki().getXClass(classReference, context);
             } catch (Exception e) {
-                LOGGER.error("Failed to get class [" + classReference + "]", e);
+                LOGGER.error("Failed to get class [{}]", classReference, e);
             }
         }
 

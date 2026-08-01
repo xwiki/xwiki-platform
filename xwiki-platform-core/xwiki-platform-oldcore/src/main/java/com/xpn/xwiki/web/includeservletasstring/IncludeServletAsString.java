@@ -44,9 +44,7 @@ public class IncludeServletAsString
         HttpServletResponse servletResponse) throws IOException, ServletException
     {
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Including url \"" + url + "\"...");
-        }
+        LOGGER.debug("Including url [{}]...", url);
 
         RequestDispatcher requestDispatcher = servletRequest.getRequestDispatcher(url);
 
@@ -62,9 +60,7 @@ public class IncludeServletAsString
         requestDispatcher.include(servletRequest, bufferedResponse);
 
         byte[] buffer = bufferedResponse.getBufferAsByteArray();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Buffer returned with " + buffer.length + " bytes.");
-        }
+        LOGGER.debug("Buffer returned with [{}] bytes.", buffer.length);
 
         return new String(buffer, servletResponse.getCharacterEncoding());
     }

@@ -22,6 +22,7 @@ package com.xpn.xwiki.api;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +131,8 @@ public class DeletedAttachment extends Api
                 return new Attachment(doc, attachment, this.context);
             }
         } catch (XWikiException ex) {
-            LOGGER.warn("Failed to parse deleted attachment", ex);
+            LOGGER.warn("Failed to restore deleted attachment [{}] of document [{}]. Root cause is [{}]",
+                getFilename(), getDocName(), ExceptionUtils.getRootCauseMessage(ex));
         }
 
         return null;
@@ -194,7 +196,8 @@ public class DeletedAttachment extends Api
             return cal.before(Calendar.getInstance());
         } catch (Exception ex) {
             // Public APIs should not throw exceptions
-            LOGGER.warn("Exception while checking if entry [" + getId() + "] can be removed from the recycle bin", ex);
+            LOGGER.warn("Failed to check if entry [{}] can be removed from the recycle bin. Root cause is [{}]",
+                getId(), ExceptionUtils.getRootCauseMessage(ex));
             return false;
         }
     }
@@ -212,7 +215,8 @@ public class DeletedAttachment extends Api
             try {
                 this.context.getWiki().getAttachmentRecycleBinStore().deleteFromRecycleBin(getId(), this.context, true);
             } catch (Exception ex) {
-                LOGGER.warn("Failed to purge deleted attachment", ex);
+                LOGGER.warn("Failed to purge deleted attachment [{}] of document [{}]. Root cause is [{}]",
+                    getFilename(), getDocName(), ExceptionUtils.getRootCauseMessage(ex));
             }
         } else {
             java.lang.Object[] args = { this.getFilename(), this.getDocName() };

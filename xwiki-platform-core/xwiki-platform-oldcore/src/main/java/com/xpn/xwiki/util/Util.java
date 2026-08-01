@@ -841,7 +841,7 @@ public class Util
             l.getISO3Language();
             return result;
         } catch (MissingResourceException ex) {
-            LOGGER.warn("Invalid language: " + languageCode);
+            LOGGER.warn("Invalid language: [{}]", languageCode);
         }
         return defaultLanguage;
     }

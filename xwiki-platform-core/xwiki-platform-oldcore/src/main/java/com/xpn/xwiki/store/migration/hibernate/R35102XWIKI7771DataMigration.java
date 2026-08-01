@@ -179,8 +179,7 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
                             // way of getting back the missing bytes, we can just empty the value set in this row.
                             // Start a new transaction
                             connection.rollback();
-                            this.logger.warn(this.dataType + " [{}] cannot be recovered",
-                                lob.getValue());
+                            this.logger.warn("[{}] [{}] cannot be recovered", this.dataType, lob.getValue());
                             emptyLob.setString(1, lob.getKey());
                             emptyLob.executeUpdate();
                             removeLob.setLong(1, Long.valueOf(lob.getKey()));

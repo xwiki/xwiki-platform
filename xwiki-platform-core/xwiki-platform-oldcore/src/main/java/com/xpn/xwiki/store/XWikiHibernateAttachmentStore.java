@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.Session;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -418,7 +419,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             try {
                 return this.componentManager.getInstance(AttachmentVersioningStore.class, storeType);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Can't find attachment versionning store for type [{}]", storeType, e);
+                this.logger.warn("Can't find attachment versioning store for type [{}]. Root cause is [{}]", storeType,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

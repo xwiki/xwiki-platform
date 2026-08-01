@@ -25,6 +25,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.ScriptContextInitializer;
@@ -105,7 +106,8 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
                     tdoc = doc.getTranslatedDocument(xcontext);
                 } catch (XWikiException e) {
                     this.logger.warn("Failed to retrieve the translated document for [{}]. "
-                        + "Continue using the default translation.", doc.getDocumentReference(), e);
+                        + "Continue using the default translation. Root cause is [{}]", doc.getDocumentReference(),
+                        ExceptionUtils.getRootCauseMessage(e));
                     tdoc = doc;
                 }
             }

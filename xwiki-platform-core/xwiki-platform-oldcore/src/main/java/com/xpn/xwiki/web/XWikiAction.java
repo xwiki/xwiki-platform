@@ -454,8 +454,8 @@ public abstract class XWikiAction implements LegacyAction
                     if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context)) {
                         // Starting XWiki 5.0M2, 'xwiki.virtual.redirect' was removed. Warn users still using it.
                         if (!StringUtils.isEmpty(context.getWiki().Param("xwiki.virtual.redirect"))) {
-                            LOGGER.warn(String.format("%s %s", "'xwiki.virtual.redirect' is no longer supported.",
-                                "Please update your configuration and/or see XWIKI-8914 for more details."));
+                            LOGGER.warn("'xwiki.virtual.redirect' is no longer supported. Please update your "
+                                + "configuration and/or see XWIKI-8914 for more details.");
                         }
 
                         // Display the error template only for actions that are not ignored
@@ -582,8 +582,8 @@ public abstract class XWikiAction implements LegacyAction
                         return;
                     }
                 } catch (Throwable ex) {
-                    LOGGER.error("Cannot send action notifications for document [" + context.getDoc()
-                        + " using action [" + context.getAction() + "]", ex);
+                    LOGGER.error("Cannot send action notifications for document [{}] using action [{}]",
+                        context.getDoc(), context.getAction(), ex);
                 }
 
                 if (monitor != null) {
@@ -707,7 +707,8 @@ public abstract class XWikiAction implements LegacyAction
                         if ("IOException: Broken pipe".equals(ExceptionUtils.getRootCauseMessage(e))) {
                             return;
                         }
-                        LOGGER.warn("Uncaught exception: " + e.getMessage(), e);
+                        LOGGER.warn("Uncaught exception. Root cause is [{}]",
+                            ExceptionUtils.getRootCauseMessage(e));
                     }
                     // If the request is an AJAX request, we don't return a whole HTML page, but just the exception
                     // inline.
@@ -720,8 +721,8 @@ public abstract class XWikiAction implements LegacyAction
                     }
                 } catch (Exception e2) {
                     // I hope this never happens
-                    LOGGER.error("Uncaught exceptions (inner): ", e);
-                    LOGGER.error("Uncaught exceptions (outer): ", e2);
+                    LOGGER.error("Uncaught exceptions (inner):", e);
+                    LOGGER.error("Uncaught exceptions (outer):", e2);
                 }
                 return;
             } finally {
@@ -745,8 +746,8 @@ public abstract class XWikiAction implements LegacyAction
                     try {
                         this.observation.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
                     } catch (Throwable ex) {
-                        LOGGER.error("Cannot send action notifications for document [" + docName + " using action ["
-                            + context.getAction() + "]", ex);
+                        LOGGER.error("Cannot send action notifications for document [{}] using action [{}]", docName,
+                            context.getAction(), ex);
                     }
                 }
 

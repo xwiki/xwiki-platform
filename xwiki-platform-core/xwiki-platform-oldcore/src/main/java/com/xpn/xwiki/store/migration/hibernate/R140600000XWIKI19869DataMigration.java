@@ -193,7 +193,8 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
             // We don't throw an exception because it might be only a problem with the count
             // and this is only used for log purpose.
             // In case of real issue on the query, it will throw an exception when actually getting the users
-            this.logger.warn("Error while trying to count the number of users", e);
+            this.logger.warn("Error while trying to count the number of users. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
         }
         return result;
     }

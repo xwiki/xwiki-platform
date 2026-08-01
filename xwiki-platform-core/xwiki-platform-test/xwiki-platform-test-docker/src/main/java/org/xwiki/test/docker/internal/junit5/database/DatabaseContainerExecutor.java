@@ -169,8 +169,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
                         + "with return code [%d] and console logs [%s]", DBUSERNAME, result.getExitCode(),
                         errorMessage));
                 } else {
-                    LOGGER.info("Failed to set MySQL permissions, retrying ({}/{})... Error: [{}]", i + 1, maxRetries,
-                        errorMessage);
+                    LOGGER.info("Failed to set MySQL permissions, retrying ([{}]/[{}])... Error: [{}]", i + 1,
+                        maxRetries, errorMessage);
                     // Wait longer at each retry to slightly increase the chance that the retry will work.
                     Thread.sleep(5000L * (i + 1));
                 }

@@ -432,7 +432,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private GenericContainer<?> createServletContainer() throws Exception
     {
         String baseImageName = getBaseImageName();
-        LOGGER.info("Get base image name: {}", baseImageName);
+        LOGGER.info("Get base image name: [{}]", baseImageName);
         GenericContainer<?> container;
 
         if (this.testConfiguration.isOffice()) {

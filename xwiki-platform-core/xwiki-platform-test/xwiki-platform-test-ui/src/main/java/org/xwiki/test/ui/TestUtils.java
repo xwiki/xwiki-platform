@@ -72,6 +72,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.hc.core5.net.URIBuilder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -522,7 +523,8 @@ public class TestUtils
             LOGGER.debug("Sent the requests of the page being unloaded: {}", sentRequests);
         } catch (WebDriverException e) {
             // Not a reason to fail the test: unloading the page below still cancels all the other pending requests.
-            LOGGER.warn("Failed to send the requests of the page being unloaded, some tests might be flaky.", e);
+            LOGGER.warn("Failed to send the requests of the page being unloaded, some tests might be flaky. Call "
+                + "stack is [{}]", ExceptionUtils.getStackTrace(e));
         }
 
         // Navigating to a blank page unloads the current page without triggering any request of its own.
@@ -1667,7 +1669,8 @@ public class TestUtils
             this.secretToken = htmlElement.getDomAttribute("data-xwiki-form-token");
         } catch (NoSuchElementException exception) {
             // Something is really wrong if this happens.
-            LOGGER.warn("Failed to cache anti-CSRF secret token, some tests might fail!", exception);
+            LOGGER.warn("Failed to cache anti-CSRF secret token, some tests might fail! Call stack is [{}]",
+                ExceptionUtils.getStackTrace(exception));
         }
     }
 

@@ -66,7 +66,7 @@ public class WikiComponentManagerEventListenerHelper
             try {
                 this.wikiComponentManager.registerWikiComponent(component);
             } catch (WikiComponentException e) {
-                this.logger.warn("Unable to register component(s) from document [{}]: {}",
+                this.logger.warn("Unable to register component(s) from document [{}]: [{}]",
                         component.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
@@ -82,7 +82,7 @@ public class WikiComponentManagerEventListenerHelper
         try {
             this.wikiComponentManager.unregisterWikiComponents(entityReference);
         } catch (WikiComponentException e) {
-            this.logger.warn("Unable to unregister component(s) from the entity [{}]: {}", entityReference,
+            this.logger.warn("Unable to unregister component(s) from the entity [{}]: [{}]", entityReference,
                     ExceptionUtils.getRootCauseMessage(e));
         }
     }

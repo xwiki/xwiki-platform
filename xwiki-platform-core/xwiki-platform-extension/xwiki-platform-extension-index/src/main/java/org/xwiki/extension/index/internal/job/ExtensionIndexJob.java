@@ -579,7 +579,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
                 try {
                     updated |= addRemoteExtensions(searchableRepository, indexedExtensions);
                 } catch (Exception e) {
-                    this.logger.warn("Failed to get remote extension from repository [{}]: {}",
+                    this.logger.warn("Failed to get remote extension from repository [{}]: [{}]",
                         repository.getDescriptor(), ExceptionUtils.getRootCauseMessage(e));
                 }
             }

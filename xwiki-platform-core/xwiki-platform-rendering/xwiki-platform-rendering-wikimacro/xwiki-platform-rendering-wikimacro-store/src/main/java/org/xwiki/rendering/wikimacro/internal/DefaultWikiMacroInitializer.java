@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -184,7 +185,8 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
                 registerMacro(wikiMacroDocumentReference, (String) wikiMacroDocumentData[2], xcontext);
             }
         } catch (Exception ex) {
-            this.logger.warn("Failed to register macros for wiki [{}]: {}", wikiName, ex.getMessage());
+            this.logger.warn("Failed to register macros for wiki [{}]: [{}]", wikiName,
+                ExceptionUtils.getRootCauseMessage(ex));
         }
     }
 

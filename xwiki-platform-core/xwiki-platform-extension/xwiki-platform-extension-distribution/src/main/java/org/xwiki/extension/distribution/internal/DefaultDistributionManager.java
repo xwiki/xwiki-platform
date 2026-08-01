@@ -289,7 +289,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                 return (DistributionJob) this.jobExecutor.execute(DefaultDistributionJob.HINT, request);
             }
         } catch (Exception e) {
-            this.logger.error("Failed to create distribution job for wiki [" + wiki + "]", e);
+            this.logger.error("Failed to create distribution job for wiki [{}]", wiki, e);
         }
 
         return null;

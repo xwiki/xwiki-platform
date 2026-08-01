@@ -138,7 +138,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
                 this.failureStrategyList
                     .add(this.componentManager.getInstance(AuthenticationFailureStrategy.class, failureStrategyName));
             } catch (ComponentLookupException e) {
-                logger.error("Error while getting authentication failure strategy [{}]. ", failureStrategyName, e);
+                logger.error("Error while getting authentication failure strategy [{}].", failureStrategyName, e);
             }
         }
     }

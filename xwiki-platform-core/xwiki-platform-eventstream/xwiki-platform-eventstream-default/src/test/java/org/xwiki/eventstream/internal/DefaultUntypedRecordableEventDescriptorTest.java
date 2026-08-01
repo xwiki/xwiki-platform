@@ -181,7 +181,8 @@ class DefaultUntypedRecordableEventDescriptorTest
             .thenThrow(new Exception("Some error"));
         assertEquals("applicationName", this.descriptor.getApplicationName());
         assertEquals("Failed to render the translation key [applicationName] in the namespace "
-            + "[wiki:someWiki] for the event descriptor of [eventType].", this.logCapture.getMessage(0));
+            + "[wiki:someWiki] for the event descriptor of [eventType]. Root cause is [Exception: Some error]",
+            this.logCapture.getMessage(0));
     }
 
     @Test
@@ -194,6 +195,7 @@ class DefaultUntypedRecordableEventDescriptorTest
         when(this.namespaceContextExecutor.execute(any(Namespace.class), any(Callable.class))).thenThrow(e);
         assertEquals("eventDescription", this.descriptor.getDescription());
         assertEquals("Failed to render the translation key [eventDescription] in the namespace "
-            + "[wiki:someWiki] for the event descriptor of [eventType].", this.logCapture.getMessage(0));
+            + "[wiki:someWiki] for the event descriptor of [eventType]. Root cause is [Exception: Some error]",
+            this.logCapture.getMessage(0));
     }
 }

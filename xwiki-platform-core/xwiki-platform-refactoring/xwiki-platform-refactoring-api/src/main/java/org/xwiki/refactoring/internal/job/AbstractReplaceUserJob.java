@@ -32,7 +32,6 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -114,8 +113,7 @@ public abstract class AbstractReplaceUserJob
             return getDocumentsToUpdateQuery(entityReference).<Object[]>execute().stream()
                 .map(this.resolveDocumentReferenceWithLocale(entityReference)).toList();
         } catch (QueryException e) {
-            this.logger.error("Failed to retrieve the list of documents to update from [{}]. Root cause is [{}].",
-                entityReference, ExceptionUtils.getRootCauseMessage(e));
+            this.logger.error("Failed to retrieve the list of documents to update from [{}].", entityReference, e);
             return Collections.emptyList();
         }
     }

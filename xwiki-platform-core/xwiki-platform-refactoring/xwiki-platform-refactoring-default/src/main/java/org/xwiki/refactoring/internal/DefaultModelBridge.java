@@ -581,7 +581,7 @@ public class DefaultModelBridge implements ModelBridge
                 result.add(deletedDocument.getId());
             }
         } catch (Exception e) {
-            logger.error("Failed to get deleted document IDs for batch [{}]", batchId);
+            logger.error("Failed to get deleted document IDs for batch [{}]", batchId, e);
         }
 
         return result;

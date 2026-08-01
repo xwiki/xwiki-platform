@@ -131,7 +131,7 @@ public class AuthenticationScriptService implements ScriptService
         try {
             return this.componentManager.getInstanceMap(AuthenticationFailureStrategy.class).keySet();
         } catch (ComponentLookupException e) {
-            logger.error("Error while getting the list of available authentication strategies.");
+            logger.error("Error while getting the list of available authentication strategies.", e);
             return Collections.emptySet();
         }
     }

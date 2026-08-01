@@ -115,7 +115,7 @@ public class InstalledExtensionSynchronizer extends AbstractEventListener
                 getXarRepository().pagesAdded(extensionEvent.getExtensionId(), extensionEvent.getNamespace());
             }
         } catch (UnsupportedNamespaceException e) {
-            logger.error("Failed to extract wiki from namespace [{}]", extensionEvent.getNamespace());
+            logger.error("Failed to extract wiki from namespace [{}]", extensionEvent.getNamespace(), e);
         }
 
         // Trigger the corresponding XAR extension event after the XAR extension repository has been synchronized.

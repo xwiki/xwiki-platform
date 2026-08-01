@@ -79,7 +79,7 @@ public class DefaultTagsSelector implements TagsSelector, Initializable
                 this.tagsSelector = this.componentManager.getInstance(TagsSelector.class, hint);
             } catch (ComponentLookupException e) {
                 this.logger.error("Failed to get component [{}] with hint [{}]. Falling back to [{}].",
-                    TagsSelector.class, hint, HINT);
+                    TagsSelector.class, hint, HINT, e);
                 this.tagsSelector = this.exhaustiveTagsSelector;
             }
         }

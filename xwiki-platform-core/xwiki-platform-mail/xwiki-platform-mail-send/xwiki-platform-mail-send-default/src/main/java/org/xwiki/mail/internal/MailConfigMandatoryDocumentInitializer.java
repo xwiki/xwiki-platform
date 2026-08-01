@@ -189,9 +189,8 @@ public class MailConfigMandatoryDocumentInitializer implements MandatoryDocument
                 }
                 needsUpdate = true;
             } catch (XWikiException e) {
-                this.logger.error(
-                    String.format("Error adding a [%s] object to the document [%s]",
-                        classReference.toString(), document.getDocumentReference().toString()));
+                this.logger.error("Error adding a [{}] object to the document [{}]", classReference,
+                    document.getDocumentReference(), e);
             }
         }
 

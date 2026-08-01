@@ -130,7 +130,7 @@ class AbstractPanelsUIExtensionManagerTest
 
         // Verify the log (both message and parameter)
         ILoggingEvent logEvent = logCapture.getLogEvent(0);
-        assertEquals("Failed to lookup Panels instances, error: [{}]", logEvent.getMessage());
+        assertEquals("Failed to lookup Panels instances", logEvent.getMessage());
         assertEquals("error!", logEvent.getThrowableProxy().getMessage());
     }
 }

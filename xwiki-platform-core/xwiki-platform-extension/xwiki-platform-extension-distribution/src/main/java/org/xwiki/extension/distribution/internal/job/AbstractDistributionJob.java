@@ -110,7 +110,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
 
                 steps.add(0, welcomeStep);
             } catch (ComponentLookupException e1) {
-                this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID);
+                this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID, e1);
             }
 
             // Add the Report step.
@@ -121,7 +121,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
 
                 steps.add(welcomeStep);
             } catch (ComponentLookupException e1) {
-                this.logger.error("Failed to get step instance for id [{}]", ReportDistributionStep.ID);
+                this.logger.error("Failed to get step instance for id [{}]", ReportDistributionStep.ID, e1);
             }
         }
 

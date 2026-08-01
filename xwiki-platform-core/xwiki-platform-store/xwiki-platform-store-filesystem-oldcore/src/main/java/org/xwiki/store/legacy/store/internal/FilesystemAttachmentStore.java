@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -531,7 +532,8 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
             try {
                 return this.componentManager.getInstance(AttachmentVersioningStore.class, storeType);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Can't find attachment versionning store for type [{}]", storeType, e);
+                this.logger.warn("Can't find attachment versioning store for type [{}]. Root cause is [{}]", storeType,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

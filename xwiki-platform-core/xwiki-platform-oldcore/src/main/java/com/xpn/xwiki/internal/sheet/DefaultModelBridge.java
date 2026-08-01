@@ -71,8 +71,9 @@ public class DefaultModelBridge implements ModelBridge
         try {
             return ((XWikiDocument) document).getDefaultEditMode(this.xcontextProvider.get());
         } catch (XWikiException e) {
-            this.logger.warn("Failed to get the default edit mode for [{}].",
-                this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference()));
+            this.logger.warn("Failed to get the default edit mode for [{}]. Root cause is [{}]",
+                this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference()),
+                ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }

@@ -34,6 +34,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
@@ -179,7 +180,8 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
                             // way of getting back the missing bytes, we can just empty the value set in this row.
                             // Start a new transaction
                             connection.rollback();
-                            this.logger.warn("[{}] [{}] cannot be recovered", this.dataType, lob.getValue());
+                            this.logger.warn("[{}] [{}] cannot be recovered. Root cause is [{}]", this.dataType,
+                                lob.getValue(), ExceptionUtils.getRootCauseMessage(ex));
                             emptyLob.setString(1, lob.getKey());
                             emptyLob.executeUpdate();
                             removeLob.setLong(1, Long.valueOf(lob.getKey()));

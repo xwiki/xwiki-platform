@@ -234,7 +234,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             try {
                 return normalizeURL(surl, context);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter [{}]. Ignoring parameter.", surl);
+                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter [{}]. Ignoring parameter. "
+                    + "Root cause is [{}]", surl, ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

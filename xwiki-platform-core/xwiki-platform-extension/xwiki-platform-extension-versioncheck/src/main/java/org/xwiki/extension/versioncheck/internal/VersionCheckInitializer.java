@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
@@ -70,7 +71,8 @@ public class VersionCheckInitializer extends AbstractEventListener
             try {
                 environmentVersionCheckTimer.initialize();
             } catch (InitializationException e) {
-                logger.warn("Failed to initialize timer for checking new environment versions: [{}]", e);
+                logger.warn("Failed to initialize timer for checking new environment versions. Root cause is [{}]",
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

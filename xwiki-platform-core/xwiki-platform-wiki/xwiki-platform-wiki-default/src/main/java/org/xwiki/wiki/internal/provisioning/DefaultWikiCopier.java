@@ -115,11 +115,11 @@ public class DefaultWikiCopier implements WikiCopier
         } catch (QueryException e) {
             WikiManagerException thrownException =
                 new WikiManagerException("Unable to get the list of wiki documents to copy.", e);
-            logger.error(thrownException.getMessage(), thrownException);
+            logger.error("Unable to get the list of wiki documents to copy", thrownException);
             throw thrownException;
         } catch (XWikiException e) {
             WikiManagerException thrownException = new WikiManagerException("Failed to copy documents.", e);
-            logger.error(thrownException.getMessage(), thrownException);
+            logger.error("Failed to copy documents", thrownException);
             throw thrownException;
         } finally {
             this.progress.popLevelProgress(this);

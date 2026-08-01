@@ -1098,7 +1098,8 @@ public class InternalTemplateManager implements Initializable, Disposable
         try {
             url = ClassLoaderUtils.getResource(classloader, prefixPath, templateName);
         } catch (IllegalArgumentException e) {
-            this.logger.warn("The template name [{}] is trying to execute a path traversal attack!", templateName);
+            this.logger.warn("The template name [{}] is trying to execute a path traversal attack! Root cause is [{}]",
+                templateName, ExceptionUtils.getRootCauseMessage(e));
 
             return null;
         }

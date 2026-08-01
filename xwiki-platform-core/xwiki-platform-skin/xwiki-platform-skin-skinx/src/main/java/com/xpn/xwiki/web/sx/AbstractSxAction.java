@@ -24,6 +24,7 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 
 import com.xpn.xwiki.XWikiContext;
@@ -114,7 +115,7 @@ public abstract class AbstractSxAction extends XWikiAction
             response.setContentLength(extensionContent.getBytes(RESPONSE_CHARACTER_SET).length);
             response.getOutputStream().write(extensionContent.getBytes(RESPONSE_CHARACTER_SET));
         } catch (IOException ex) {
-            getLogger().warn("Failed to send SX content: [{}]", ex.getMessage());
+            getLogger().warn("Failed to send SX content. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(ex));
         }
     }
 

@@ -501,7 +501,8 @@ public class PdfExportImpl implements PdfExport
                  this.dab.getDocumentInstance(templateReference).getAuthors().getEffectiveMetadataAuthor());
         } catch (Exception e) {
             LOGGER.warn("Error fetching the author of template [{}] during PDF conversion. Using the [{}] property of "
-                + "the document's value without applying Velocity.", templateName, propertyName);
+                + "the document's value without applying Velocity. Root cause is [{}]", templateName, propertyName,
+                ExceptionUtils.getRootCauseMessage(e));
             return result;
         }
 

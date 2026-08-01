@@ -82,9 +82,8 @@ public class IndexingUserConfigurationInitializer extends AbstractMandatoryDocum
                 document.newXObject(DefaultIndexingUserConfig.CONFIG_CLASS, context);
                 needsUpdate = true;
             } catch (XWikiException e) {
-                // using String.format here so the exception is logged with stack trace
-                logger.error(String.format("Error adding the [%s] object to the document [%s]",
-                    DefaultIndexingUserConfig.CONFIG_CLASS, document.getDocumentReference()), e);
+                logger.error("Error adding the [{}] object to the document [{}]",
+                    DefaultIndexingUserConfig.CONFIG_CLASS, document.getDocumentReference(), e);
             }
         }
         return needsUpdate;

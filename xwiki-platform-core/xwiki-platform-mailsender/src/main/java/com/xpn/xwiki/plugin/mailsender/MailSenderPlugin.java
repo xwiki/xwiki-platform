@@ -649,7 +649,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 count++;
 
                 Mail mail = emailIt.next();
-                LOGGER.info("Sending email: " + mail.toString());
+                LOGGER.info("Sending email [{}]", mail);
 
                 if ((transport == null) || (session == null)) {
                     // initialize JavaMail Session and Transport
@@ -716,7 +716,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 LOGGER.error(MESSAGING_EXCEPTION_ERROR, ex);
             }
 
-            LOGGER.info("sendEmails: Email count = " + emailCount + " sent count = " + count);
+            LOGGER.info("sendEmails: email count is [{}], sent count is [{}]", emailCount, count);
         }
         return true;
     }
@@ -753,7 +753,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", "en");
             }
             if (obj == null) {
-                LOGGER.error("No mail object found in the document " + templateDocFullName);
+                LOGGER.error("No mail object found in the document [{}]", templateDocFullName);
                 return ERROR_TEMPLATE_EMAIL_OBJECT_NOT_FOUND;
             }
             String subjectContent = obj.getStringValue("subject");
@@ -778,7 +778,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 sendMail(mail, context);
                 return 0;
             } catch (Exception e) {
-                LOGGER.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: " + updatedVelocityContext, e);
+                LOGGER.error("sendEmailFromTemplate: [{}] vcontext: [{}]", templateDocFullName,
+                    updatedVelocityContext, e);
                 return ERROR;
             }
         } finally {

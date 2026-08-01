@@ -27,6 +27,7 @@ import java.util.Date;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jodconverter.core.document.JsonDocumentFormatRegistry;
 import org.jodconverter.core.office.OfficeManager;
 import org.jodconverter.local.LocalConverter;
@@ -154,12 +155,12 @@ public class DefaultOfficeServer implements OfficeServer
                     .formatRegistry(JsonDocumentFormatRegistry.create(input))
                     .filterChain(new LinkedImagesEmbedderFilter()).build();
             } else {
-                this.logger.debug("{} is missing. The default document format registry will be used instead.",
+                this.logger.debug("[{}] is missing. The default document format registry will be used instead.",
                     DOCUMENT_FORMATS_PATH);
             }
         } catch (Exception e) {
-            this.logger.warn("Failed to parse {} . The default document format registry will be used instead.",
-                DOCUMENT_FORMATS_PATH, e);
+            this.logger.warn("Failed to parse [{}]. The default document format registry will be used instead. "
+                + "Root cause is [{}]", DOCUMENT_FORMATS_PATH, ExceptionUtils.getRootCauseMessage(e));
         }
 
         if (this.jodConverter == null) {

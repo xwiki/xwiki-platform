@@ -260,7 +260,7 @@ public class ExtensionStore implements Initializable, Disposable
             try {
                 url = new URL(urlString);
             } catch (MalformedURLException e) {
-                this.logger.warn("The format of the URL property [{}] is wrong ({})", property.getReference(),
+                this.logger.warn("The format of the URL property [{}] is wrong: [{}]", property.getReference(),
                     urlString);
             }
         }
@@ -375,7 +375,7 @@ public class ExtensionStore implements Initializable, Disposable
                     }
                 }
             } catch (Exception e) {
-                this.logger.error("Failed to resolve the support plan with id [{}]: {}", supportPlanId,
+                this.logger.error("Failed to resolve the support plan with id [{}]: [{}]", supportPlanId,
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }

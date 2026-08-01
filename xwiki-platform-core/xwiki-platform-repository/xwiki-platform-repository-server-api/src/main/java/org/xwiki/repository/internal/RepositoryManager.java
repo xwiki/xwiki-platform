@@ -398,7 +398,7 @@ public class RepositoryManager
             try {
                 resourceReference = getDownloadReference(document, extensionVersion);
             } catch (Exception e) {
-                logger.debug("Cannot obtain download source reference for version [({})]", extensionVersion);
+                logger.debug("Cannot obtain download source reference for version [{}]", extensionVersion);
 
                 return false;
             }
@@ -438,7 +438,7 @@ public class RepositoryManager
             } else {
                 valid = false;
 
-                this.logger.debug("No actual download provided for version [({})]", extensionVersion);
+                this.logger.debug("No actual download provided for version [{}]", extensionVersion);
             }
         }
 
@@ -1132,8 +1132,8 @@ public class RepositoryManager
             // Update version related informations
             return updateExtensionVersion(versionExtension, extensionDocument, index);
         } catch (Exception e) {
-            this.logger.error("Failed to resolve extension with id [" + id + "] and version [" + version
-                + "] on repository [" + repository + "]", e);
+            this.logger.error("Failed to resolve extension with id [{}] and version [{}] on repository [{}]", id,
+                version, repository, e);
         }
 
         return false;
@@ -1153,8 +1153,8 @@ public class RepositoryManager
             // Update version related informations
             return updateProjectVersion(versionExtension, projectDocument, index);
         } catch (Exception e) {
-            this.logger.error("Failed to resolve project with id [" + id + "] and version [" + version
-                + "] on repository [" + repository + "]", e);
+            this.logger.error("Failed to resolve project with id [{}] and version [{}] on repository [{}]", id, version,
+                repository, e);
         }
 
         return false;

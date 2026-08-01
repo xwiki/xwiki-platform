@@ -179,7 +179,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             if (e.getMessage() != null) {
                 this.context.put(ERROR_KEY, e.getMessage());
             }
-            LOGGER.error("Failed to send email [" + mail.toString() + "]", e);
+            LOGGER.error("Failed to send email [{}]", mail, e);
             result = -1;
         }
 
@@ -203,8 +203,7 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             if (e.getMessage() != null) {
                 this.context.put(ERROR_KEY, e.getMessage());
             }
-            LOGGER.error("Failed to send email [" + mail.toString() + "] using mail configuration ["
-                + mailConfiguration.toString() + "]", e);
+            LOGGER.error("Failed to send email [{}] using mail configuration [{}]", mail, mailConfiguration, e);
             result = -1;
         }
 

@@ -238,7 +238,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
                         userReference,
                         this.interval,
                         ExceptionUtils.getRootCauseMessage(e));
-                this.logger.debug("Root cause of the error was: ", e);
+                this.logger.debug("Root cause of the error was:", e);
             }
         } else {
             this.logger.warn("Cannot find a NotificationEmailGroupingStrategy with hint [{}] for user [{}] "
@@ -350,7 +350,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         try {
             getAttachments().add(this.logoAttachmentExtractor.getLogo());
         } catch (Exception e) {
-            this.logger.warn("Failed to get the logo.", e);
+            this.logger.warn("Failed to get the logo. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
     }
 
@@ -378,7 +378,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
             try {
                 attachments.add(userAvatarAttachmentExtractor.getUserAvatar(userAvatar, 32));
             } catch (Exception e) {
-                this.logger.warn("Failed to add the avatar of [{}] in the email.", userAvatar, e);
+                this.logger.warn("Failed to add the avatar of [{}] in the email. Root cause is [{}]", userAvatar,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

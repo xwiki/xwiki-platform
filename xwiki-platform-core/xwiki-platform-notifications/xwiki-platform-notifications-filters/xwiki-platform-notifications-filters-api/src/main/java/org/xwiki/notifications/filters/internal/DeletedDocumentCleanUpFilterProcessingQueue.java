@@ -29,6 +29,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -135,7 +136,8 @@ public class DeletedDocumentCleanUpFilterProcessingQueue implements Initializabl
             try {
                 cleanUpFilterData = this.cleanupQueue.take();
             } catch (InterruptedException e) {
-                this.logger.warn("The thread handling filter clean up has been interrupted", e);
+                this.logger.warn("The thread handling filter clean up has been interrupted. Root cause is [{}]",
+                    ExceptionUtils.getRootCauseMessage(e));
                 Thread.currentThread().interrupt();
                 break;
             }

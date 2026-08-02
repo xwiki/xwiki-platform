@@ -1144,8 +1144,9 @@ class XWikiTest
         String expectedResult = "2024/06/20 12:45";
         this.oldcore.getMockWikiConfigurationSource().setProperty("default_language", "fr_CA");
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.timezone", "BRT");
+        UserProperties userPropertiesMock = mock(UserProperties.class);
         when(this.oldcore.getMockAllUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE))
-            .thenReturn(mock(UserProperties.class));
+            .thenReturn(userPropertiesMock);
         assertEquals(expectedResult, this.xwiki.formatDate(date, null, this.oldcore.getXWikiContext()));
 
         String format = "EEEE dd MMMM YYYY HH:mm:ss";

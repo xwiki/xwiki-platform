@@ -86,7 +86,8 @@ class SendMailRunnableTest
     {
         Provider<XWikiContext> xwikiContextProvider =
             this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xwikiContextProvider.get()).thenReturn(mock(XWikiContext.class));
+        XWikiContext xWikiContextMock = mock(XWikiContext.class);
+        when(xwikiContextProvider.get()).thenReturn(xWikiContextMock);
     }
 
     @Test

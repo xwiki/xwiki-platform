@@ -270,7 +270,8 @@ class PageResourceImplTest
         when(testPageDoc.getRCSVersion()).thenReturn(new Version(1, 0));
         when(testPageDoc.getCreationDate()).thenReturn(new Date(0));
         when(testPageDoc.getContentUpdateDate()).thenReturn(new Date(0));
-        when(testPageDoc.getAuthors()).thenReturn(mock(DocumentAuthors.class));
+        DocumentAuthors documentAuthorsMock = mock(DocumentAuthors.class);
+        when(testPageDoc.getAuthors()).thenReturn(documentAuthorsMock);
         when(testPageDoc.getContent()).thenReturn("XWiki content.");
         when(testPageDoc.displayDocument()).thenReturn("Rendered content.");
 

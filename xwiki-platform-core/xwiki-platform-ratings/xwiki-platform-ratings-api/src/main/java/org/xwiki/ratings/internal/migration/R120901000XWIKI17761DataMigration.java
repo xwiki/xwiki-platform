@@ -114,7 +114,7 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
                 numberOfPagesToHandle, totalNumberOfXObjectsMigrated);
             if (!this.pagesWithNotMigratedRatings.isEmpty()) {
                 logger.info("Some ratings xobject have not been migrated because of the ratings configuration. "
-                    + "Here's the list of pages with ratings values not migrated: ");
+                    + "Here's the list of pages with ratings values not migrated:");
                 for (Map.Entry<String, Pair<Integer, Integer>> entry : pagesWithNotMigratedRatings.entrySet()) {
                     logger.info("Page: [{}]. Migrated: [{}]. Not migrated: [{}]", entry.getKey(),
                         entry.getValue().getLeft(), entry.getValue().getRight());

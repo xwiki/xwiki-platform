@@ -154,9 +154,9 @@ public class ImagePlugin extends XWikiDefaultPlugin
                 try {
                     this.capacity = Integer.parseInt(capacityParam.trim());
                 } catch (NumberFormatException e) {
-                    LOG.warn(String.format(
-                        "Failed to parse xwiki.plugin.image.cache.capacity configuration parameter. "
-                            + "Using %s as the cache capacity.", this.capacity), e);
+                    LOG.warn("Failed to parse the [xwiki.plugin.image.cache.capacity] configuration parameter. "
+                        + "Using [{}] as the cache capacity. Root cause is [{}]", this.capacity,
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
             }
             lru.setMaxEntries(this.capacity);
@@ -224,7 +224,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
                     LOG.warn("Failed to transform image attachment [{}] for scaling, falling back to original "
                         + "attachment. Root error: [{}]", attachment.getFilename(),
                         ExceptionUtils.getRootCauseMessage(e));
-                    LOG.debug("Full stack trace for image attachment scaling error: ", e);
+                    LOG.debug("Full stack trace for image attachment scaling error:", e);
                 }
             }
         }

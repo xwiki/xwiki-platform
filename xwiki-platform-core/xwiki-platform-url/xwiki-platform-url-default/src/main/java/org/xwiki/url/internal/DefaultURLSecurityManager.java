@@ -225,12 +225,12 @@ public class DefaultURLSecurityManager implements URLSecurityManager
             } catch (MalformedURLException e) {
                 logger.error("Error while transforming URI [{}] to URL: [{}]", uri,
                     ExceptionUtils.getRootCauseMessage(e));
-                this.logger.debug("Full error stack trace of the URL resolution: ", e);
+                this.logger.debug("Full error stack trace of the URL resolution:", e);
                 result = false;
             } catch (URISyntaxException e) {
                 logger.error("Error while transforming URI [{}] to absolute URI with http scheme: [{}]", uri,
                     ExceptionUtils.getRootCauseMessage(e));
-                this.logger.debug("Full error stack trace of the URI resolution: ", e);
+                this.logger.debug("Full error stack trace of the URI resolution:", e);
             }
         }
         return result;

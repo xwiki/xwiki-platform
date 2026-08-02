@@ -70,7 +70,7 @@ public class ImagePluginAPI extends PluginApi<ImagePlugin>
         try {
             return getProtectedPlugin().getHeight(getAttachment(pageName, attachmentName), getXWikiContext());
         } catch (Exception e) {
-            LOG.error(String.format("Failed to detect the height of %s attached to %s.", attachmentName, pageName), e);
+            LOG.error("Failed to detect the height of [{}] attached to [{}].", attachmentName, pageName, e);
             return -1;
         }
     }
@@ -87,7 +87,7 @@ public class ImagePluginAPI extends PluginApi<ImagePlugin>
         try {
             return getProtectedPlugin().getWidth(getAttachment(pageName, attachmentName), getXWikiContext());
         } catch (Exception e) {
-            LOG.error(String.format("Failed to detect the width of %s attached to %s.", attachmentName, pageName), e);
+            LOG.error("Failed to detect the width of [{}] attached to [{}].", attachmentName, pageName, e);
             return -1;
         }
     }

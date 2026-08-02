@@ -295,7 +295,7 @@ public class DocumentContentAsyncExecutor
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
                 // continue since it's not absolutely critical.
                 this.logger.warn("Failed to notify Velocity Macro cache for closing the [{}] namespace. Reason = [{}]",
-                    this.transformationId, e.getMessage());
+                    this.transformationId, ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

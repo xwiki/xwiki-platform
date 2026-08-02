@@ -318,7 +318,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         } catch (XWikiException e) {
             LOGGER.error("Error while loading [{}] for checking script right: [{}]", documentReference,
                 ExceptionUtils.getRootCauseMessage(e));
-            LOGGER.debug("Original error stack trace: ", e);
+            LOGGER.debug("Original error stack trace:", e);
             return false;
         }
     }

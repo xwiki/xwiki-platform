@@ -908,7 +908,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                 try {
                     unregister(originalJobObj);
                 } catch (SchedulerPluginException e) {
-                    LOGGER.warn("Failed to register job in document [{}]: {}", document.getDocumentReference(),
+                    LOGGER.warn("Failed to unregister job in document [{}]: [{}]", document.getDocumentReference(),
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
@@ -922,7 +922,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 
                     register(jobObject, xcontext);
                 } catch (Exception e) {
-                    LOGGER.warn("Failed to register job in document [{}]: {}", document.getDocumentReference(),
+                    LOGGER.warn("Failed to register job in document [{}]: [{}]", document.getDocumentReference(),
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }

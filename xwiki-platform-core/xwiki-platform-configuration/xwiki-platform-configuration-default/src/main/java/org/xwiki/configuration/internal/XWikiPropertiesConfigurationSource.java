@@ -32,6 +32,7 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
@@ -87,7 +88,8 @@ public class XWikiPropertiesConfigurationSource extends AbstractCommonsConfigura
             } catch (Exception e) {
                 // Note: if we cannot read the configuration file for any reason we log a warning but continue since
                 // XWiki will use default values for all configurable elements.
-                this.logger.warn("Failed to load configuration file [{}]: {}", file, e.getMessage());
+                this.logger.warn("Failed to load configuration file [{}]: [{}]", file,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
@@ -114,7 +116,7 @@ public class XWikiPropertiesConfigurationSource extends AbstractCommonsConfigura
             // will use default values for all configurable elements.
             this.logger.warn(
                 "Failed to load configuration file [{}]. Using default configuration values. Internal error [{}]",
-                XWIKI_PROPERTIES_WARPATH, e.getMessage());
+                XWIKI_PROPERTIES_WARPATH, ExceptionUtils.getRootCauseMessage(e));
         }
 
         // If no Commons Properties Configuration has been set, use a default empty Commons Configuration

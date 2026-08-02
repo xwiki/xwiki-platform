@@ -78,7 +78,7 @@ public abstract class AbstractMailListener implements MailListener
     @Override
     public void onPrepareFatalError(Exception exception, Map<String, Object> parameters)
     {
-        logger.debug("Failure during preparation phase of thread [" + batchId + "]");
+        logger.debug("Failure during preparation phase of thread [{}]", batchId, exception);
     }
 
     @Override

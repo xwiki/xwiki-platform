@@ -1203,7 +1203,7 @@ public class ModelFactory
             try {
                 status.setLog(toRestJobLog(jobStatus.getLogTail(), self, null, logFromLevel));
             } catch (IOException e) {
-                this.logger.error("Failed to access the log of job {}", jobStatus.getRequest().getId(), e);
+                this.logger.error("Failed to access the log of job [{}]", jobStatus.getRequest().getId(), e);
             }
         }
 

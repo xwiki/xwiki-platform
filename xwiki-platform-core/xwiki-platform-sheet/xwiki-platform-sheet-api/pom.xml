@@ -32,8 +32,8 @@
   <description>The sheet API used by XWiki platform. Provides the SheetManager interface which can be used to retrieve
     class and document sheets.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
-    </properties>
+    <xwiki.jacoco.instructionRatio>0.97</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

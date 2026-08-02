@@ -353,8 +353,8 @@ define('xwiki-ckeditor-realtime-adapter', [
       // Widget#setData() checks if the data has changed before firing the data event, but unfortunately the code
       // expects the data values to be primitives, which is not the case for macro widget data where the parameters data
       // is an object and this makes the check always return false. The problem with this is that when the data event is
-      // fired the scroll postion is updated, making it hard to scroll the content while remote changes are applied (the
-      // scroll bar jumps). So we have to check ourselves if the data has changed.
+      // fired the scroll position is updated, making it hard to scroll the content while remote changes are applied
+      // (the scroll bar jumps). So we have to check ourselves if the data has changed.
       if (widgetData !== this._serializeWidgetData(widget)) {
         widgetData = JSON.parse(widgetData);
         widget.setData(widgetData);
@@ -392,7 +392,7 @@ define('xwiki-ckeditor-realtime-adapter', [
       if (widget.name === 'xwiki-macro') {
         // Whether a macro widget is inline or block depends on the macro output, which is not synchronized and thus is
         // missing from the new content that we want to apply to the editor. When the macro widgets from the new content
-        // are initialized the inline flag is set (in the absence of the macro outut) based on the siblings and the
+        // are initialized the inline flag is set (in the absence of the macro output) based on the siblings and the
         // parent of the macro widget. But there are cases where the macro can be both inline and block in the same
         // context (parent and siblings) so we don't know for sure if the original macro widget was inline or block
         // (e.g. an info box can technically be both inline and block inside a table cell because a table cell accepts
@@ -438,9 +438,9 @@ define('xwiki-ckeditor-realtime-adapter', [
             }
           });
         }
-        // Most of the macro parametes are kept on the macro wrapper, so if the macro wrapper was updated then it's very
-        // likely that the macro parameters were also updated. Some macro parameters are edited in-place using nested
-        // editables. We need to re-render the macro if a new nested editable is added.
+        // Most of the macro parameters are kept on the macro wrapper, so if the macro wrapper was updated then it's
+        // very likely that the macro parameters were also updated. Some macro parameters are edited in-place using
+        // nested editables. We need to re-render the macro if a new nested editable is added.
         shouldRefreshContent = shouldRefreshContent ||
           updatedNode.tagName.toLowerCase() === 'xwiki-widget-xwiki-macro' ||
           (updatedNode.tagName.toLowerCase() === 'xwiki-editable' && widget?.name === 'xwiki-macro' &&

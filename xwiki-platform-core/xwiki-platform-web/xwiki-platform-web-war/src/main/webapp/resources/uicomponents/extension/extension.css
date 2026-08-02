@@ -448,7 +448,7 @@ ul.document-tree {
   margin: 0;
 }
 .document-tree ul {
-  /* Reduce the default identation. */
+  /* Reduce the default indentation. */
   margin-left: 1.3em;
   padding: 0;
 }

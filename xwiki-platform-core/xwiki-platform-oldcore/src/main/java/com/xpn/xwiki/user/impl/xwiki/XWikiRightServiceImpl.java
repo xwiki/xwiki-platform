@@ -266,8 +266,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             }
         } catch (Exception e) {
             // This should not happen..
-            logDeny(username, doc.getFullName(), action, "access manager exception " + e.getMessage());
-            e.printStackTrace();
+            logDeny(username, doc.getFullName(), action, "access manager exception", e);
 
             return false;
         }
@@ -774,7 +773,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         } catch (XWikiException e) {
             logDeny(userOrGroupName, entityReference, accessLevel, "global level (exception)", e);
-            e.printStackTrace();
 
             return false;
         } finally {

@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.doc;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -26,6 +29,8 @@ import org.xml.sax.SAXParseException;
 @Deprecated(since = "14.10")
 public class DocumentErrorHandler implements ErrorHandler
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentErrorHandler.class);
+
     /**
      * Receive notification of a recoverable error.
      * <p>
@@ -46,9 +51,7 @@ public class DocumentErrorHandler implements ErrorHandler
     @Override
     public void error(SAXParseException exception) throws SAXException
     {
-        System.out.println("Error: ");
-        exception.printStackTrace();
-        // To change body of implemented methods use File | Settings | File Templates.
+        LOGGER.error("Error while parsing the XML document", exception);
     }
 
     /**
@@ -68,9 +71,7 @@ public class DocumentErrorHandler implements ErrorHandler
     @Override
     public void fatalError(SAXParseException exception) throws SAXException
     {
-        System.out.println("Fatal Error: ");
-        exception.printStackTrace();
-        // To change body of implemented methods use File | Settings | File Templates.
+        LOGGER.error("Fatal error while parsing the XML document", exception);
     }
 
     /**
@@ -91,8 +92,7 @@ public class DocumentErrorHandler implements ErrorHandler
     @Override
     public void warning(SAXParseException exception) throws SAXException
     {
-        System.out.println("Warning: ");
-        exception.printStackTrace();
-        // To change body of implemented methods use File | Settings | File Templates.
+        LOGGER.warn("Warning while parsing the XML document. Root cause is [{}]",
+            ExceptionUtils.getRootCauseMessage(exception));
     }
 }

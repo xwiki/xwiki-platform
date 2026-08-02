@@ -26,6 +26,7 @@ import java.io.InputStream;
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
@@ -89,7 +90,8 @@ public class XWikiConfigurationService
             // Error loading the file. Most likely, the Security Manager prevented it.
             // We'll try loading it as a resource below.
             LOGGER.debug("Failed to load the file [{}] using direct file access. The error was [{}]. Trying to load "
-                + "it as a resource using the Servlet Context...", configurationLocation, e.getMessage());
+                + "it as a resource using the Servlet Context...", configurationLocation,
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         // Second, try loading it as a resource using the Servlet Context

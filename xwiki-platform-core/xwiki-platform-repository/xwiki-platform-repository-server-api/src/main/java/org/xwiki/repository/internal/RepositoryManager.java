@@ -398,7 +398,7 @@ public class RepositoryManager
             try {
                 resourceReference = getDownloadReference(document, extensionVersion);
             } catch (Exception e) {
-                logger.debug("Cannot obtain download source reference for version [{}]", extensionVersion);
+                logger.debug("Cannot obtain download source reference for version [{}]", extensionVersion, e);
 
                 return false;
             }

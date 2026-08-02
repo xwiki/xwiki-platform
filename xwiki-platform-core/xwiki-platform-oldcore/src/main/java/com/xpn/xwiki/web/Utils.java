@@ -209,7 +209,8 @@ public class Utils
                 try {
                     response.setContentLength(content.getBytes(context.getWiki().getEncoding()).length);
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Failed to compute the content length using encoding [{}]",
+                        context.getWiki().getEncoding(), e);
                 }
             }
 

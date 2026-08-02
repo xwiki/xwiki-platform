@@ -289,8 +289,8 @@ catalogs:
       specifier: 6.7.1
       version: 6.7.1
     vue-tsc:
-      specifier: 3.3.7
-      version: 3.3.7
+      specifier: 3.3.9
+      version: 3.3.9
     vue3-touch-events:
       specifier: 5.0.15
       version: 5.0.15
@@ -455,7 +455,7 @@ importers:
         version: 3.5.38(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.3.7(typescript@5.9.3)
+        version: 3.3.9(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-bootstrap/src/main/node:
     devDependencies:
@@ -580,7 +580,7 @@ importers:
         version: 3.5.38(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.3.7(typescript@5.9.3)
+        version: 3.3.9(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-node/xwiki-platform-livedata-node-componentstore/src/main/node:
     dependencies:
@@ -703,7 +703,7 @@ importers:
         version: 3.5.38(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.3.7(typescript@5.9.3)
+        version: 3.3.9(typescript@5.9.3)
       xwiki-platform-localization-webjar:
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-localization/xwiki-platform-localization-webjar/src/main/node
@@ -831,7 +831,7 @@ importers:
         version: 3.5.38(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.3.7(typescript@5.9.3)
+        version: 3.3.9(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/attachments/attachments-api:
     dependencies:
@@ -1674,7 +1674,7 @@ importers:
         version: 3.5.38(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.3.7(typescript@5.9.3)
+        version: 3.3.9(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui:
     dependencies:
@@ -1762,7 +1762,7 @@ importers:
         version: 3.5.38(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.3.7(typescript@5.9.3)
+        version: 3.3.9(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-api:
     dependencies:
@@ -2032,7 +2032,7 @@ importers:
         version: 11.4.4(vue@3.5.38(typescript@5.9.3))
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.3.7(typescript@5.9.3)
+        version: 3.3.9(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/livedata/livedata-xwiki:
     dependencies:
@@ -3125,7 +3125,7 @@ importers:
         version: 3.5.38(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.3.7(typescript@5.9.3)
+        version: 3.3.9(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-react:
     dependencies:
@@ -3273,7 +3273,7 @@ importers:
         version: 5.1.0(typescript@5.9.3)(vitest@4.1.6(@types/node@24.12.4)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.1.5(@types/node@24.12.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)))
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.3.7(typescript@5.9.3)
+        version: 3.3.9(typescript@5.9.3)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-apiextractorconfig: {}
 
@@ -3418,7 +3418,7 @@ importers:
         version: 3.5.38(typescript@5.9.3)
       vue-tsc:
         specifier: 'catalog:'
-        version: 3.3.7(typescript@5.9.3)
+        version: 3.3.9(typescript@5.9.3)
 
 packages:
 
@@ -5102,8 +5102,8 @@ packages:
       typescript:
         optional: true
 
-  '@vue/language-core@3.3.7':
-    resolution: {integrity: sha512-LzmkKinXAMMoh8Jfi/jMUSDUjuPdv8mynH5WJGKfXyZtDw3hQ6GBaoI6Bcnl/Xqlu32q/0Z6i/trp4VXykzyLw==}
+  '@vue/language-core@3.3.9':
+    resolution: {integrity: sha512-in/68oAa4BCtVY6n/nkuhLIkV8DHYd2UivedJ6cMZ6UYtlq9jaoaSNUBHYCVO44z3nKg7MdE5OBoHKt5SxeBKQ==}
 
   '@vue/reactivity@3.5.38':
     resolution: {integrity: sha512-pG6LV/NDNRbKizcUjFFLAfjaL8mcv4DmR9avNcUw2gDHBzZneuS2TWCmp633ynzxz9YYKNeEPK2I8Wraqy2HUQ==}
@@ -5321,10 +5321,6 @@ packages:
 
   brace-expansion@2.0.2:
     resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
-
-  brace-expansion@5.0.6:
-    resolution: {integrity: sha512-kLpxurY4Z4r9sgMsyG0Z9uzsBlgiU/EFKhj/h91/8yHu0edo7XuixOIH3VcJ8kkxs6/jPzoI6U9Vj3WqbMQ94g==}
-    engines: {node: 18 || 20 || >=22}
 
   brace-expansion@5.0.8:
     resolution: {integrity: sha512-JZyDyq3D4AUifKTPOB7DELf6XsB3WdPuNxCtob1vFXPsSXhdAiHBWJ/tJ8HAc9aH84BK+5JFZLNkJKx3G9kzQg==}
@@ -8070,8 +8066,8 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
-  vue-tsc@3.3.7:
-    resolution: {integrity: sha512-+C+rgD49wAQ5bUTl2sp5a8Bzg4YoldMNXM+g7CFe604MYcQ8PrZPMQhIjJSzKXtPBCa+C5ayMipqjbA7splekQ==}
+  vue-tsc@3.3.9:
+    resolution: {integrity: sha512-TS3Y1ux/IRoE8OCP2PpACAeOseuIs0UvWrcr7u+w3PmfY+SlCfEf8zjrBgnQksHUgLpthi5vHlffcQTQTdPBZA==}
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
@@ -9900,7 +9896,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  '@vue/language-core@3.3.7':
+  '@vue/language-core@3.3.9':
     dependencies:
       '@volar/language-core': 2.4.28
       '@vue/compiler-dom': 3.5.38
@@ -10115,10 +10111,6 @@ snapshots:
   brace-expansion@2.0.2:
     dependencies:
       balanced-match: 1.0.2
-
-  brace-expansion@5.0.6:
-    dependencies:
-      balanced-match: 4.0.4
 
   brace-expansion@5.0.8:
     dependencies:
@@ -11680,11 +11672,11 @@ snapshots:
 
   minimatch@10.2.3:
     dependencies:
-      brace-expansion: 5.0.6
+      brace-expansion: 5.0.8
 
   minimatch@10.2.5:
     dependencies:
-      brace-expansion: 5.0.6
+      brace-expansion: 5.0.8
 
   minimatch@3.1.5:
     dependencies:
@@ -13196,10 +13188,10 @@ snapshots:
       tippy.js: 6.3.7
       vue: 3.5.38(typescript@5.9.3)
 
-  vue-tsc@3.3.7(typescript@5.9.3):
+  vue-tsc@3.3.9(typescript@5.9.3):
     dependencies:
       '@volar/typescript': 2.4.28
-      '@vue/language-core': 3.3.7
+      '@vue/language-core': 3.3.9
       typescript: 5.9.3
 
   vue3-touch-events@5.0.15(vue@3.5.38(typescript@5.9.3)):

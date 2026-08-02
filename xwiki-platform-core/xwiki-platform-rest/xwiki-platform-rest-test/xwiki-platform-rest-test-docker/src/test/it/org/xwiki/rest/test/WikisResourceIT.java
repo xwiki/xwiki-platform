@@ -435,7 +435,8 @@ class WikisResourceIT extends AbstractHttpIT
         }
 
         // Verify we can search for all attachments in a given space (sandbox)
-        // Also verify that a space can be looked up independtly of its case ("sandbox" will match the "Sandbox" space)
+        // Also verify that a space can be looked up independently of its case ("sandbox" will match the "Sandbox"
+        // space)
         getMethod = executeGet(
             String.format("%s?space=" + getTestClassName(), buildURI(WikiAttachmentsResource.class, getWiki())));
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));

@@ -227,7 +227,7 @@ public abstract class AbstractExtensionScriptService implements ScriptService
 
     /**
      * Call the passed callable but try/catch and return null in case of exception (and update the last error). A safe
-     * verison of the result is returned.
+     * version of the result is returned.
      * 
      * @param <R> the result type of method {@code call}
      * @param callable a task that returns a result and may throw an exception

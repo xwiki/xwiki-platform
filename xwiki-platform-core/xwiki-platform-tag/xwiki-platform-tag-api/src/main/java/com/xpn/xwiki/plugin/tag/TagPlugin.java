@@ -200,7 +200,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * Get cardinality map of tags within the wiki.
      * 
      * @param context XWiki context.
-     * @return map of tags (alphabetical order) with their occurences counts.
+     * @return map of tags (alphabetical order) with their occurrences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      */
     public Map<String, Integer> getTagCount(XWikiContext context) throws XWikiException
@@ -237,7 +237,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * 
      * @param spaces the list of space to get tags in, as a comma separated, quoted space references strings.
      * @param context XWiki context.
-     * @return map of tags with their occurences counts
+     * @return map of tags with their occurrences counts
      * @throws XWikiException if search query fails (possible failures: space list parse error, DB problems, etc).
      * @since 8.2M1
      */

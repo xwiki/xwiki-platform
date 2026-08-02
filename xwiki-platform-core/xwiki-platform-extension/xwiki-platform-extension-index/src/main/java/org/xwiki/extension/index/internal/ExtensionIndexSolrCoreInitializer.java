@@ -123,7 +123,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
     /**
      * The values of the individual CVEs known for an extension.
      *
-     * @see #SECURITY_MAX_CVSS stores the maxium value of this collection
+     * @see #SECURITY_MAX_CVSS stores the maximum value of this collection
      */
     public static final String SECURITY_CVE_CVSS = "security_cveCVSS";
 

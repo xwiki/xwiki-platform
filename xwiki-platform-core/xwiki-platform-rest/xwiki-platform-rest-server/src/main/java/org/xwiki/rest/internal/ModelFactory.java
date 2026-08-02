@@ -1074,7 +1074,7 @@ public class ModelFactory
      * {@link ComputedFieldClass}, the serialized value is the computed property value.
      *
      * @param property an XObject property
-     * @param propertyClass the PropertyClass of that XObject proprety
+     * @param propertyClass the PropertyClass of that XObject property
      * @param context the XWikiContext
      * @return the String representation of the property value
      */
@@ -1083,7 +1083,7 @@ public class ModelFactory
     {
         String result;
         if (propertyClass instanceof ComputedFieldClass computedFieldClass) {
-            // TODO: the XWikiDocument needs to be explicitely set in the context, otherwise method
+            // TODO: the XWikiDocument needs to be explicitly set in the context, otherwise method
             // PropertyClass.renderInContext fires a null pointer exception: bug?
             XWikiDocument document = context.getDoc();
             try {

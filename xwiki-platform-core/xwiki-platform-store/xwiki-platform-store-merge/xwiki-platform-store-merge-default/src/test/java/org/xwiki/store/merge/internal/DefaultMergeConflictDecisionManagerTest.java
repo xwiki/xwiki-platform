@@ -113,7 +113,7 @@ class DefaultMergeConflictDecisionManagerTest
         assertEquals("Cannot find a conflict with reference [unexisting] for document identifier [null_null]",
             logCapture.getMessage(0));
         assertTrue(mergeConflictDecisionsManager.recordDecision(documentReference, userReference, "conflict2",
-            ConflictDecision.DecisionType.CUSTOM, Arrays.asList("Someting", "Custom")));
+            ConflictDecision.DecisionType.CUSTOM, Arrays.asList("Something", "Custom")));
 
         List<ConflictDecision> conflictDecisionList =
             mergeConflictDecisionsManager.getConflictDecisionList(documentReference, userReference);
@@ -128,7 +128,7 @@ class DefaultMergeConflictDecisionManagerTest
         assertEquals(Arrays.asList("some", "elements"), conflictDecisionList.get(0).getChunk().getElements());
 
         assertEquals(42, conflictDecisionList.get(1).getChunk().getIndex());
-        assertEquals(Arrays.asList("Someting", "Custom"), conflictDecisionList.get(1).getChunk().getElements());
+        assertEquals(Arrays.asList("Something", "Custom"), conflictDecisionList.get(1).getChunk().getElements());
 
         mergeConflictDecisionsManager.removeConflictDecisionList(documentReference, userReference);
         assertNull(mergeConflictDecisionsManager.getConflictDecisionList(documentReference, userReference));

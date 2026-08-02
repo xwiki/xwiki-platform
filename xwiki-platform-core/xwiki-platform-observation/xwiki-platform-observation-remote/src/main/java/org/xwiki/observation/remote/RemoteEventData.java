@@ -22,7 +22,7 @@ package org.xwiki.observation.remote;
 import java.io.Serializable;
 
 /**
- * Represents a remote event with all its datas.
+ * Represents a remote event with all its data.
  *
  * @version $Id$
  * @since 2.0M3

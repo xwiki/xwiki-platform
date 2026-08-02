@@ -48,7 +48,7 @@ public class LegacyEvent
     protected String stream;
 
     /**
-     * Date the event occured.
+     * Date the event occurred.
      */
     protected Date date;
 
@@ -108,7 +108,7 @@ public class LegacyEvent
     protected String body = "";
 
     /**
-     * Version of the document at the time the event occured.
+     * Version of the document at the time the event occurred.
      */
     protected String version = "";
 

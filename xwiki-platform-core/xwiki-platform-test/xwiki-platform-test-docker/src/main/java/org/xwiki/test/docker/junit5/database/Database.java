@@ -38,7 +38,7 @@ public enum Database
     MARIADB("mariadb"),
 
     /**
-     * Represents the HyperSQL database, running outside of a Docker contaier.
+     * Represents the HyperSQL database, running outside of a Docker container.
      */
     HSQLDB_EMBEDDED("hsqldb"),
 

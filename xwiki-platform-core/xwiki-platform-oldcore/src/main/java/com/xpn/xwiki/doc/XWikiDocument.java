@@ -4998,7 +4998,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * <p>
      * The goal being to compare two versions of the same document this method skip every version/reference/author
      * related information. For example it allows to compare a document coming from a another wiki and easily check if
-     * thoses actually are the same thing whatever the plumbing differences.
+     * those actually are the same thing whatever the plumbing differences.
      *
      * @param otherDocument the document to compare
      * @return true if bith documents have the same data
@@ -7027,7 +7027,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      *
      * @param context the XWiki context
      * @return the locales of the translations
-     * @throws XWikiException if retriving the translations from the database failed
+     * @throws XWikiException if retrieving the translations from the database failed
      */
     public List<Locale> getTranslationLocales(XWikiContext context) throws XWikiException
     {
@@ -9422,7 +9422,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param newDocument the next version of the document
      * @param configuration the configuration of the merge indicates how to deal with some conflicts use cases, etc.
      * @param context the XWiki context
-     * @return a repport of what happen during the merge (errors, etc.)
+     * @return a report of what happen during the merge (errors, etc.)
      * @since 3.2M1
      * @deprecated use
      *             {@link MergeManager#mergeDocument(DocumentModelBridge, DocumentModelBridge, DocumentModelBridge, MergeConfiguration)}

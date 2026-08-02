@@ -71,7 +71,7 @@ class AbstractPanelsUIExtensionManagerTest
     @Test
     void get() throws Exception
     {
-        // We create a mock of the component manager to control the order on which the extensions will be retreived.
+        // We create a mock of the component manager to control the order on which the extensions will be retrieved.
         WikiUIExtension wikiUIExtensionMenu1 = mock(WikiUIExtension.class);
         UIExtension fooExtension = mock(UIExtension.class);
         UIExtension barUIExtension = mock(UIExtension.class);

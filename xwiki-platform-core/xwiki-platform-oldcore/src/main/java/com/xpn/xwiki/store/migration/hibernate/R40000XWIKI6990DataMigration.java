@@ -450,7 +450,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      *
      * @param map the conversion map
      * @param callback the callback implementing the hibernate actions
-     * @throws XWikiException if an error occurs during convertion
+     * @throws XWikiException if an error occurs during conversion
      */
     private void convertDbId(final Map<Long, Long> map, IdConversionHibernateCallback callback) throws XWikiException
     {

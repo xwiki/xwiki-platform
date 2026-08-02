@@ -47,7 +47,7 @@ import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
  * <dd>Whether or not the authentication information should be preserved across sessions</dd>
  * <dt>validation</dt>
  * <dd>Token used for validating the cookie information. It contains hashed information about the other cookies and a
- * secret paramete, optionally binding with the current IP of the user (so that the cookie cannot be reused on another
+ * secret parameter, optionally binding with the current IP of the user (so that the cookie cannot be reused on another
  * computer). This binding is enabled by the parameter xwiki.authentication.useip . The secret parameter is specified in
  * xwiki.authentication.validationKey</dd>
  * </dl>

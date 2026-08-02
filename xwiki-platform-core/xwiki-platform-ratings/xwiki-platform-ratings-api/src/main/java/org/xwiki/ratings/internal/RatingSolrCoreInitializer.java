@@ -32,7 +32,7 @@ import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 
 /**
- * Solr core initializer for the rating informations.
+ * Solr core initializer for the rating information.
  *
  * @version $Id$
  * @since 12.9RC1

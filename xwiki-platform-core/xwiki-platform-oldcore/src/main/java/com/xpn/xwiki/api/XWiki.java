@@ -1652,7 +1652,7 @@ public class XWiki extends Api
      *
      * @param docname source document
      * @param targetdocname target document
-     * @return true if the copy was sucessfull
+     * @return true if the copy was successful
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname) throws XWikiException
@@ -1666,7 +1666,7 @@ public class XWiki extends Api
      * @param docname source document
      * @param targetdocname target document
      * @param wikilocale locale to copy
-     * @return true if the copy was sucessfull
+     * @return true if the copy was successful
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname, String wikilocale) throws XWikiException
@@ -1681,7 +1681,7 @@ public class XWiki extends Api
      * @param sourceWiki source wiki
      * @param targetWiki target wiki
      * @param wikilocale locale to copy
-     * @return true if the copy was sucessfull
+     * @return true if the copy was successful
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String sourceWiki, String targetWiki, String wikilocale)
@@ -1699,7 +1699,7 @@ public class XWiki extends Api
      * @param targetWiki target wiki
      * @param wikilocale locale to copy
      * @param reset true to reset versions
-     * @return true if the copy was sucessfull
+     * @return true if the copy was successful
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
@@ -1719,7 +1719,7 @@ public class XWiki extends Api
      * @param wikilocale locale to copy
      * @param reset true to reset versions
      * @param force true to overwrite the previous document
-     * @return true if the copy was sucessfull
+     * @return true if the copy was successful
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
@@ -1749,7 +1749,7 @@ public class XWiki extends Api
      * @param wikilocale locale to copy
      * @param resetHistory {@code true} to reset versions
      * @param overwrite {@code true} to overwrite the previous document
-     * @return {@code true} if the copy was sucessful
+     * @return {@code true} if the copy was successful
      * @throws XWikiException if the document was not copied properly
      * @since 3.0M3
      */
@@ -2707,7 +2707,7 @@ public class XWiki extends Api
      * cached
      *
      * @param fullname // script containing a Groovy class definition (public class MyClass { ... })
-     * @return An object instanciating this class
+     * @return An object instantiating this class
      * @throws XWikiException
      */
     public java.lang.Object parseGroovyFromPage(String fullname) throws XWikiException
@@ -2894,7 +2894,7 @@ public class XWiki extends Api
     /**
      * Check authentication from request and set according persistent login information If it fails user is unlogged
      *
-     * @return null if failed, non null XWikiUser if sucess
+     * @return null if failed, non null XWikiUser if success
      * @throws XWikiException
      */
     public XWikiUser checkAuth() throws XWikiException
@@ -2908,8 +2908,8 @@ public class XWiki extends Api
      *
      * @param username username to check
      * @param password password to check
-     * @param rememberme "1" if you want to remember the login accross navigator restart
-     * @return null if failed, non null XWikiUser if sucess
+     * @param rememberme "1" if you want to remember the login across navigator restart
+     * @return null if failed, non null XWikiUser if success
      * @throws XWikiException
      */
     public XWikiUser checkAuth(String username, String password, String rememberme) throws XWikiException

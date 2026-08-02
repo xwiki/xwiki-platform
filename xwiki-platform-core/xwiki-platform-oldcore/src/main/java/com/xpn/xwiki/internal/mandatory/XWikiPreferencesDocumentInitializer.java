@@ -197,7 +197,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryClassI
         // Only used by LDAP authentication service
 
         xclass.addBooleanField("ldap", "Ldap", YESNO);
-        xclass.addTextField("ldap_server", "Ldap server adress", 60);
+        xclass.addTextField("ldap_server", "Ldap server address", 60);
         xclass.addTextField("ldap_port", "Ldap server port", 60);
         xclass.addTextField("ldap_bind_DN", "Ldap login matching", 60);
         xclass.addPasswordField("ldap_bind_pass", "Ldap password matching", 60, PasswordMetaClass.CLEAR);

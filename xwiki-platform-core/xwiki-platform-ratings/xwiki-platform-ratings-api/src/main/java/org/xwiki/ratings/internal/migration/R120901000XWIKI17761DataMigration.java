@@ -277,7 +277,7 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
             } catch (RatingsException e) {
                 throw new DataMigrationException("Cannot migrate old rating xobject to new storage system.", e);
             } catch (SolrException e) {
-                throw new DataMigrationException("Error while migrating Like informations.", e);
+                throw new DataMigrationException("Error while migrating Like information.", e);
             }
         }
     }

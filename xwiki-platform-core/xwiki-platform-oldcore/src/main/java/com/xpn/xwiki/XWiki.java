@@ -1571,8 +1571,8 @@ public class XWiki implements EventListener
      *         contain the main wiki.
      *         <p>
      *         Note: the wiki name is commonly also the name of the database where the wiki's data is stored. However,
-     *         if configured accordingly, the database can be diferent from the wiki name, like for example when setting
-     *         a wiki database prefix.
+     *         if configured accordingly, the database can be different from the wiki name, like for example when
+     *         setting a wiki database prefix.
      * @deprecated since 5.3, use {@link WikiDescriptorManager#getAllIds()} instead
      */
     @Deprecated
@@ -3127,7 +3127,7 @@ public class XWiki implements EventListener
      * The algorithm to find the locale to use is the following, in this order:
      *
      * <ul>
-     *   <li>Try to find the current locale in use from the XWiki contex</li>
+     *   <li>Try to find the current locale in use from the XWiki context</li>
      *   <li>If the wiki is not multilingual use the wiki default locale ({@code default_language} xproperty in
      *   {@code XWikiPreferences} xobject or English if not found)</li>
      *   <li>If the wiki is multilingual<ul>
@@ -5529,7 +5529,7 @@ public class XWiki implements EventListener
             if (StringUtils.isEmpty(queryString)) {
                 actualQueryString = localeQueryString;
             } else {
-                // Note: if the locale is already specified on the given query string then it won't be overwriten
+                // Note: if the locale is already specified on the given query string then it won't be overwritten
                 // because the first parameter value is taken into account.
                 actualQueryString += '&' + localeQueryString;
             }

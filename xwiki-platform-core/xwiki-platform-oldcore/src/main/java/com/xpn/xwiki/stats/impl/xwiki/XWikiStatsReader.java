@@ -434,7 +434,7 @@ public class XWikiStatsReader
                 userListWhere.append("?" + paramList.size());
             }
         } catch (Exception e) {
-            LOGGER.error("Faild to get filter users list", e);
+            LOGGER.error("Failed to get filter users list", e);
         }
 
         if (!userListWhere.isEmpty()) {
@@ -497,7 +497,7 @@ public class XWikiStatsReader
                 Collections.reverse(visiStatList);
             }
         } catch (XWikiException e) {
-            LOGGER.error("Faild to search for vist statistics", e);
+            LOGGER.error("Failed to search for visit statistics", e);
 
             visiStatList = Collections.emptyList();
         }

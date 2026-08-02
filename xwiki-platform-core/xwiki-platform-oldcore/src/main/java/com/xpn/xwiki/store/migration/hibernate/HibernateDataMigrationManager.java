@@ -207,10 +207,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
      */
     private void hibernateShemaUpdate() throws DataMigrationException
     {
-        if (this.logger.isInfoEnabled()) {
-            this.logger.info("Checking Hibernate mapping and updating schema if needed for wiki [{}]",
-                getXWikiContext().getWikiId());
-        }
+        this.logger.info("Checking Hibernate mapping and updating schema if needed for wiki [{}]",
+            getXWikiContext().getWikiId());
         getBaseStore().updateSchema(getXWikiContext(), true);
     }
 

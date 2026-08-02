@@ -306,7 +306,7 @@ public class HibernateStore implements Disposable, Initializable
                 return StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
                     URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
             } catch (UnsupportedEncodingException e) {
-                this.logger.error("Failedd to encode the current timezone id", e);
+                this.logger.error("Failed to encode the current timezone id", e);
             }
         }
 

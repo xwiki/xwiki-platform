@@ -294,7 +294,7 @@ public class DefaultQuery implements SecureQuery
         if (!this.filters.contains(filter)) {
             this.filters.add(filter);
         } else {
-            LOGGER.warn("QueryFilter [{}] already added to the query [{}]", filter.toString(), this.getStatement());
+            LOGGER.warn("QueryFilter [{}] already added to the query [{}]", filter, this.getStatement());
         }
 
         return this;

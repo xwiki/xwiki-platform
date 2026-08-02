@@ -777,7 +777,7 @@ public class Package
                 Utils.getComponent(ObservationManager.class)
                     .notify(new ExtensionInstalledEvent(installedExtension.getId(), namespace), installedExtension);
             } catch (Exception e) {
-                LOGGER.error("Failed to register extenion [{}] from the XAR", extensionId, e);
+                LOGGER.error("Failed to register extension [{}] from the XAR", extensionId, e);
             }
         }
     }

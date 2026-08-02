@@ -35,7 +35,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
 import org.xwiki.internal.attachment.XWikiAttachmentSecurityManager;
@@ -74,9 +73,6 @@ import com.xpn.xwiki.util.Util;
 public class SkinAction extends XWikiAction
 {
 
-    /** Logging helper. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SkinAction.class);
-
     /** Path delimiter. */
     private static final String DELIMITER = "/";
 
@@ -87,6 +83,10 @@ public class SkinAction extends XWikiAction
     private static final String RESOURCES_DIRECTORY = "resources";
 
     private static final String DOCDOESNOTEXIST = "docdoesnotexist";
+
+    /** Logging helper. */
+    @Inject
+    private Logger logger;
 
     @Inject
     private Environment environment;
@@ -146,7 +146,7 @@ public class SkinAction extends XWikiAction
         // The default base skin is always a filesystem directory.
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
 
-        LOGGER.debug("document: [{}] ; baseskin: [{}] ; defaultbaseskin: [{}]",
+        this.logger.debug("document: [{}] ; baseskin: [{}] ; defaultbaseskin: [{}]",
             doc.getDocumentReference(), baseskin, defaultbaseskin);
 
         // Since we don't know exactly what does the URL point at, meaning that we don't know where the skin identifier
@@ -156,7 +156,7 @@ public class SkinAction extends XWikiAction
         while (idx > 0) {
             try {
                 String filename = Util.decodeURI(path.substring(idx + 1), context);
-                LOGGER.debug("Trying [{}]", filename);
+                this.logger.debug("Trying [{}]", filename);
 
                 // Try on the current skin document.
                 if (renderSkin(filename, doc, context)) {
@@ -192,7 +192,7 @@ public class SkinAction extends XWikiAction
                     // successfully found. Signal this further, and stop trying to render.
                     throw ex;
                 }
-                LOGGER.debug(String.valueOf(idx), ex);
+                this.logger.debug(String.valueOf(idx), ex);
             }
             idx = path.lastIndexOf(DELIMITER, idx - 1);
         }
@@ -218,7 +218,7 @@ public class SkinAction extends XWikiAction
         String path = URI.create(getSkinPath(skin) + filename).normalize().toString();
         // Test to prevent someone from using "../" in the filename!
         if (!path.startsWith(DELIMITER + SKINS_DIRECTORY)) {
-            LOGGER.warn("Illegal access, tried to use file [{}] as a skin. Possible break-in attempt!", path);
+            this.logger.warn("Illegal access, tried to use file [{}] as a skin. Possible break-in attempt!", path);
             throw new IOException("Invalid filename: '" + filename + "' for skin '" + skin + "'");
         }
         return path;
@@ -248,7 +248,7 @@ public class SkinAction extends XWikiAction
         String path = URI.create(getResourcePath() + filename).normalize().toString();
         // Test to prevent someone from using "../" in the filename!
         if (!path.startsWith(DELIMITER + RESOURCES_DIRECTORY)) {
-            LOGGER.warn("Illegal access, tried to use file [{}] as a resource. Possible break-in attempt!", path);
+            this.logger.warn("Illegal access, tried to use file [{}] as a resource. Possible break-in attempt!", path);
             throw new IOException("Invalid filename: '" + filename + "'");
         }
         return path;
@@ -274,10 +274,10 @@ public class SkinAction extends XWikiAction
     private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context)
         throws XWikiException, IOException
     {
-        LOGGER.debug("Rendering file [{}] within the [{}] document", filename, doc.getDocumentReference());
+        this.logger.debug("Rendering file [{}] within the [{}] document", filename, doc.getDocumentReference());
         try {
             if (doc.isNew()) {
-                LOGGER.debug("[{}] is not a document", doc.getDocumentReference().getName());
+                this.logger.debug("[{}] is not a document", doc.getDocumentReference().getName());
             } else {
                 return renderFileFromObjectField(filename, doc, context)
                     || renderFileFromAttachment(filename, doc, context) || (SKINS_DIRECTORY.equals(doc.getSpace())
@@ -302,11 +302,11 @@ public class SkinAction extends XWikiAction
      */
     private boolean renderSkinFileFromResource(String skinName, String path, XWikiContext context) throws XWikiException
     {
-        LOGGER.debug("Rendering filesystem file from path [{}] in skin [{}]", path, skinName);
+        this.logger.debug("Rendering filesystem file from path [{}] in skin [{}]", path, skinName);
 
         // Make sure the skin exist
         if (this.environment.getResource(SKINS_DIRECTORY, skinName + "/") == null) {
-            LOGGER.debug("No filesystem skin with name [{}] can be found in resources", skinName);
+            this.logger.debug("No filesystem skin with name [{}] can be found in resources", skinName);
 
             return false;
         }
@@ -377,7 +377,7 @@ public class SkinAction extends XWikiAction
                 }
             }
         } catch (IOException ex) {
-            LOGGER.info("Skin file [{}] does not exist or cannot be accessed. Root cause is [{}]", path,
+            this.logger.info("Skin file [{}] does not exist or cannot be accessed. Root cause is [{}]", path,
                 ExceptionUtils.getRootCauseMessage(ex));
         }
 
@@ -397,7 +397,7 @@ public class SkinAction extends XWikiAction
     public boolean renderFileFromObjectField(String filename, XWikiDocument doc, final XWikiContext context)
         throws IOException
     {
-        LOGGER.debug("... as object property");
+        this.logger.debug("... as object property");
 
         BaseObject object = doc.getObject("XWiki.XWikiSkins");
         String content = null;
@@ -432,7 +432,7 @@ public class SkinAction extends XWikiAction
 
             return true;
         } else {
-            LOGGER.debug("Object field not found or empty");
+            this.logger.debug("Object field not found or empty");
         }
 
         return false;
@@ -457,7 +457,7 @@ public class SkinAction extends XWikiAction
                 .call(() -> context.getWiki().evaluateVelocity(content, namespace), author, sourceDocument);
         } catch (Exception e) {
             // Should not happen since there is nothing in the call() method throwing an exception.
-            LOGGER.error("Failed to evaluate velocity content for namespace [{}] with the rights of the user [{}]",
+            this.logger.error("Failed to evaluate velocity content for namespace [{}] with the rights of the user [{}]",
                 namespace, author, e);
         }
 
@@ -477,7 +477,7 @@ public class SkinAction extends XWikiAction
     public boolean renderFileFromAttachment(String filename, XWikiDocument doc, XWikiContext context)
         throws IOException, XWikiException
     {
-        LOGGER.debug("... as attachment");
+        this.logger.debug("... as attachment");
 
         XWikiAttachment attachment = doc.getAttachment(filename);
         if (attachment != null) {
@@ -518,7 +518,7 @@ public class SkinAction extends XWikiAction
 
             return true;
         } else {
-            LOGGER.debug("Attachment not found");
+            this.logger.debug("Attachment not found");
         }
 
         return false;

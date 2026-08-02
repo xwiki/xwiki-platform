@@ -163,9 +163,7 @@ public class XWikiWebappResourceLoader extends ResourceLoader
             } catch (Exception e) {
                 // Remember the first exception
                 if (exception == null) {
-                    if (this.log.isDebugEnabled()) {
-                        this.log.debug("Could not load [{}]", path, e);
-                    }
+                    this.log.debug("Could not load [{}]", path, e);
 
                     exception = e;
                 }

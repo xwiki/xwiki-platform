@@ -195,7 +195,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         if (renderer == null) {
             String message = "Could not find dashboard renderer " + parameters.getLayout();
             // log and throw further
-            this.logger.error(message);
+            this.logger.error("Could not find dashboard renderer [{}]", parameters.getLayout());
             throw new MacroExecutionException(message);
         }
 
@@ -208,7 +208,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         } catch (Exception e) {
             String message = "Could not render the gadgets for layout " + parameters.getLayout();
             // log and throw further
-            this.logger.error(message, e);
+            this.logger.error("Could not render the gadgets for layout [{}]", parameters.getLayout(), e);
             throw new MacroExecutionException(message, e);
         }
 

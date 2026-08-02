@@ -145,7 +145,7 @@ public class ConflictQuestion
         ASK
     }
 
-    // Question datas
+    // Question data
 
     private final ConflictType type;
 
@@ -159,7 +159,7 @@ public class ConflictQuestion
 
     private List<Conflict<?>> documentConflicts;
 
-    // Answer datas
+    // Answer data
 
     private GlobalAction globalAction;
 
@@ -245,7 +245,7 @@ public class ConflictQuestion
 
     /**
      * @since 11.8RC1
-     * @return the conflicts occured during the merge of documents.
+     * @return the conflicts occurred during the merge of documents.
      */
     public List<Conflict<?>> getDocumentConflicts()
     {

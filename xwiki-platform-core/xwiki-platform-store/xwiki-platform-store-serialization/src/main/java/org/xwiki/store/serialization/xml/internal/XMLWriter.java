@@ -62,7 +62,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     private static final int BASE64_WIDTH = 80;
 
     /**
-     * Platform dependent line seperator.
+     * Platform dependent line separator.
      */
     private static final byte[] NEWLINE;
 

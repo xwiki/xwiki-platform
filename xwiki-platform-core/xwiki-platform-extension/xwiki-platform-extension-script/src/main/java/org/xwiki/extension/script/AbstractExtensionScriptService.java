@@ -176,7 +176,7 @@ public abstract class AbstractExtensionScriptService implements ScriptService
      */
     public void contextualize(AbstractRequest request)
     {
-        // Provide informations on what started the job
+        // Provide information on what started the job
         request.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
         request.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
     }

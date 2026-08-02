@@ -138,7 +138,7 @@ public class SaveAction extends EditAction
      * @param context The current request {@link XWikiContext context}.
      * @return <code>true</code> if there was an error and the response needs to render an error page,
      *         <code>false</code> if the document was correctly saved.
-     * @throws XWikiException If an error occured: cannot communicate with the storage module, or cannot update the
+     * @throws XWikiException If an error occurred: cannot communicate with the storage module, or cannot update the
      *             document because the request contains invalid parameters.
      */
     public boolean save(XWikiContext context) throws XWikiException

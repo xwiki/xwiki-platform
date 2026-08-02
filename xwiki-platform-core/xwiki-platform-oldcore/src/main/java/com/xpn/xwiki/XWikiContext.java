@@ -597,7 +597,7 @@ public class XWikiContext extends Hashtable<Object, Object>
             setUserReference(null);
         } else if (user.endsWith(XWikiRightService.GUEST_USER_FULLNAME) || user.equals(XWikiRightService.GUEST_USER)) {
             setUserReference(null);
-            // retro-compatibilty hack: some code does not give the same meaning to null XWikiUser and XWikiUser
+            // retro-compatibility hack: some code does not give the same meaning to null XWikiUser and XWikiUser
             // containing guest user
             put(USER_KEY, new XWikiUser(user, main));
         } else {

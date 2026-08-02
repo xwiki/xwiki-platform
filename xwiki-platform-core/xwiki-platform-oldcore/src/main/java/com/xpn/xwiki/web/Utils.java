@@ -523,7 +523,7 @@ public class Utils
     }
 
     /**
-     * Convert a byte character value to the corresponding hexidecimal digit value.
+     * Convert a byte character value to the corresponding hexadecimal digit value.
      * <p>
      * Code borrowed from Apache Tomcat 5.0
      * </p>

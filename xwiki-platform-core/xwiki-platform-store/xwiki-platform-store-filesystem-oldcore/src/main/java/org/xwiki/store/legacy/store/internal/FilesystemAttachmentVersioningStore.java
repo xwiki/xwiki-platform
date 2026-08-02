@@ -68,7 +68,7 @@ public class FilesystemAttachmentVersioningStore implements AttachmentVersioning
     private FilesystemStoreTools fileTools;
 
     /**
-     * A serializer for the list of attachment metdata.
+     * A serializer for the list of attachment metadata.
      */
     @Inject
     @Named("attachment-list-meta/1.0")

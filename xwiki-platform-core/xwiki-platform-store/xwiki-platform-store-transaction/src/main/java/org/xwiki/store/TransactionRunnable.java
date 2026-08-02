@@ -145,7 +145,7 @@ public class TransactionRunnable<T>
                 // Casting the provided context to T is safe because T be what it provides and to add it
                 // as a ProvidingTR, what it provides (P) must extend T, and adding it as a plain
                 // TransactionRunnable, what it requires must extend T and what it provides must extend
-                // what it requires so this.parent.getProvidedContext() is guarenteed to extend T.
+                // what it requires so this.parent.getProvidedContext() is guaranteed to extend T.
                 return (T) ((ProvidingTransactionRunnable) this.parent).getProvidedContext();
             }
             return this.parent.getContext();

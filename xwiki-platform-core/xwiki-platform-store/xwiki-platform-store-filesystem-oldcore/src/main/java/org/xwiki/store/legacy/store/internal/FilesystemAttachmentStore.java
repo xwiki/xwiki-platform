@@ -488,7 +488,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         protected void onRun() throws Exception
         {
             // TODO: When the rest of storage is rewritten using TransactionRunnable,
-            // this method should be disolved.
+            // this method should be dissolved.
 
             final Session session = this.context.getWiki().getHibernateStore().getSession(this.context);
 

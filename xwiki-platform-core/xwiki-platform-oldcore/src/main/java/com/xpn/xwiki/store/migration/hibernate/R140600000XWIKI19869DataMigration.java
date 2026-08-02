@@ -289,7 +289,7 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
                     }
                 } catch (XWikiException e) {
                     // Note: this should never happen since it's a standard string field.
-                    this.logger.error("Error while reseting password field for user [{}]", userDoc, e);
+                    this.logger.error("Error while resetting password field for user [{}]", userDoc, e);
                 }
                 result = true;
             } else if (isMain) {

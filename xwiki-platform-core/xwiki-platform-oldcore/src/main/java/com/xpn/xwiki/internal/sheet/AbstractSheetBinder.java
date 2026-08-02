@@ -195,7 +195,8 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
             String docStringReference =
                 this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
 
-            this.logger.warn("Failed to bind sheet [{}] to document [{}].", sheetReferenceString, docStringReference);
+            this.logger.warn("Failed to bind sheet [{}] to document [{}]. Root cause is [{}]", sheetReferenceString,
+                docStringReference, ExceptionUtils.getRootCauseMessage(e));
 
             return false;
         }

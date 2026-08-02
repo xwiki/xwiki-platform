@@ -258,7 +258,8 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
             this.logger.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
                 + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
                 + "FOP cannot access this directory. If this is an upgrade from a previous version, "
-                + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
+                + "make sure you also copy the WEB-INF/fonts directory from the new distribution package. "
+                + "Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

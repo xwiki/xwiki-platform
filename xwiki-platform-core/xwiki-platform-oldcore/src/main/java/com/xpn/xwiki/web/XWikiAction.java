@@ -717,7 +717,9 @@ public abstract class XWikiAction implements LegacyAction
                     return;
                 } catch (XWikiException ex) {
                     if (ex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
-                        LOGGER.error("Connection aborted");
+                        // No stack trace here: an aborted connection is a client-side event, and the surrounding
+                        // code already suppresses traces for it.
+                        LOGGER.error("Connection aborted. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(ex));
                     }
                 } catch (Exception e2) {
                     // I hope this never happens

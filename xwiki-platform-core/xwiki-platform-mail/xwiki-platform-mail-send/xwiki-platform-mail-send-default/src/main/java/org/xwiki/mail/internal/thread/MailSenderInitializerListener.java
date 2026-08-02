@@ -120,7 +120,7 @@ public class MailSenderInitializerListener implements EventListener, Disposable
             this.sendMailThread.interrupt();
             // Wait till the thread goes away
             this.sendMailThread.join();
-            SHUTDOWN_LOGGER.debug(String.format("Mail Prepare Thread has been stopped"));
+            SHUTDOWN_LOGGER.debug("Mail Sender Thread has been stopped");
         }
 
         // Step 2: Stop the Mail Prepare Thread
@@ -131,7 +131,7 @@ public class MailSenderInitializerListener implements EventListener, Disposable
             this.prepareMailThread.interrupt();
             // Wait till the thread goes away
             this.prepareMailThread.join();
-            SHUTDOWN_LOGGER.debug(String.format("Mail Sender Thread has been stopped"));
+            SHUTDOWN_LOGGER.debug("Mail Prepare Thread has been stopped");
         }
     }
 

@@ -25,6 +25,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 
@@ -87,8 +88,9 @@ public class PropertyConverter
                     try {
                         newProperty = modifiedPropertyClass.fromString(storedProperty.toText());
                     } catch (XWikiException ex) {
-                        this.logger.warn(errorLog,
-                            modifiedPropertyClass.getName(), modifiedPropertyClass.getClassName(), ex);
+                        this.logger.warn("Incompatible data migration when changing field [{}] of class [{}]. Root "
+                            + "cause is [{}]", modifiedPropertyClass.getName(), modifiedPropertyClass.getClassName(),
+                            ExceptionUtils.getRootCauseMessage(ex));
                     }
                 }
                 if (newProperty != null) {

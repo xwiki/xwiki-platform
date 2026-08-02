@@ -3317,7 +3317,8 @@ public class XWiki implements EventListener
             try {
                 defaultLocale = LocaleUtils.toLocale(Util.normalizeLanguage(defaultLanguage));
             } catch (Exception e) {
-                LOGGER.warn("Invalid locale [{}] set as default locale in the preferences", defaultLanguage);
+                LOGGER.warn("Invalid locale [{}] set as default locale in the preferences. Root cause is [{}]",
+                    defaultLanguage, ExceptionUtils.getRootCauseMessage(e));
                 defaultLocale = Locale.ENGLISH;
             }
         }
@@ -3343,7 +3344,8 @@ public class XWiki implements EventListener
                 try {
                     locales.add(LocaleUtils.toLocale(language));
                 } catch (Exception e) {
-                    LOGGER.warn("Invalid locale [{}] listed as available in the preferences", language);
+                    LOGGER.warn("Invalid locale [{}] listed as available in the preferences. Root cause is [{}]",
+                        language, ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         }
@@ -6402,8 +6404,8 @@ public class XWiki implements EventListener
         try {
             return getVelocityEvaluator().evaluateVelocity(content, namespace, vcontext);
         } catch (XWikiException xe) {
-            LOGGER.error("Error while parsing velocity template namespace [{}] with content:\n[{}]", namespace, content,
-                xe.getCause());
+            LOGGER.error("Error while parsing velocity template namespace [{}] with content [{}]", namespace, content,
+                xe);
             return Util.getHTMLExceptionMessage(xe, null);
         }
     }

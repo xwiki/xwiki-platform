@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
@@ -84,7 +85,8 @@ public class RequestInitializer
             try {
                 url = xcontext.getWiki().getServerURL(requestWiki, xcontext);
             } catch (MalformedURLException e) {
-                this.logger.warn("Failed to get the URL for stored context wiki [{}]", requestWiki);
+                this.logger.warn("Failed to get the URL for stored context wiki [{}]. Root cause is [{}]", requestWiki,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
 
             // Assume we always want to behave as a HTTP request when the wiki request is provided

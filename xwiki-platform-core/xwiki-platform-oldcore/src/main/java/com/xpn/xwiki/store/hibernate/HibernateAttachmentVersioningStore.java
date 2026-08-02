@@ -22,10 +22,11 @@ package com.xpn.xwiki.store.hibernate;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
 import org.hibernate.ObjectNotFoundException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
@@ -47,7 +48,8 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore implements AttachmentVersioningStore
 {
     /** logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateAttachmentVersioningStore.class);
+    @Inject
+    private Logger logger;
 
     /**
      * @param context the current context.
@@ -116,7 +118,7 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
                 return null;
             });
         } catch (Exception e) {
-            LOGGER.warn("Error deleting attachment archive [{}] of doc [{}]. Root cause is [{}]",
+            this.logger.warn("Error deleting attachment archive [{}] of doc [{}]. Root cause is [{}]",
                 attachment.getFilename(), attachment.getDoc().getDocumentReference(),
                 ExceptionUtils.getRootCauseMessage(e));
         }

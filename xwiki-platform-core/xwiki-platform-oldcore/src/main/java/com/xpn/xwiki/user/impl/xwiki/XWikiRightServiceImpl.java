@@ -356,9 +356,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         List<BaseObject> rightObjects = doc.getXObjects(rightClassReference);
         if (rightObjects != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Checking objects [{}]", rightObjects.size());
-            }
+            LOGGER.debug("Checking objects [{}]", rightObjects.size());
 
             for (int i = 0; i < rightObjects.size(); i++) {
                 LOGGER.debug("Checking object [{}]", i);
@@ -446,9 +444,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 userOrGroupDocumentReference, grouplist, context);
         }
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Searching for matching rights for [{}] groups: [{}]", grouplist.size(), grouplist);
-        }
+        LOGGER.debug("Searching for matching rights for [{}] groups: [{}]", grouplist.size(), grouplist);
 
         for (String group : grouplist) {
             try {

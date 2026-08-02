@@ -1385,9 +1385,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         logProgress("%d schema updates required.", this.logCount);
-        if (this.logger.isDebugEnabled()) {
-            this.logger.debug("About to execute this Liquibase XML: [{}]", sb);
-        }
+        this.logger.debug("About to execute this Liquibase XML: [{}]", sb);
         return sb.toString();
     }
 }

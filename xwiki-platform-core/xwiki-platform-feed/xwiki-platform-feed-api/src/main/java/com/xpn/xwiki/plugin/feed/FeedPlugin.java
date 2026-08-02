@@ -999,7 +999,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             writer.close();
             return writer.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to serialize the feed to the [{}] format", type, e);
             return "";
         }
     }

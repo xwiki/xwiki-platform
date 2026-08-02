@@ -50,7 +50,7 @@ public class StringMap extends HashMap<String, Object>
      */
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = LoggerFactory.getLogger(StringMap.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StringMap.class);
 
     /**
      * Parses the given JSON representation of a string map.

@@ -55,7 +55,7 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
     /**
      * The logger to log.
      */
-    private final Logger logger = LoggerFactory.getLogger(DefaultWikiComponentInvocationHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultWikiComponentInvocationHandler.class);
 
     /**
      * Our component manager.
@@ -123,7 +123,7 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
                     componentDependency = componentManager.getInstance(cd.getRoleType(), cd.getRoleHint());
                 }
             } catch (ComponentLookupException e) {
-                this.logger.warn("No component found for role [{}] with hint [{}], declared as dependency for wiki "
+                LOGGER.warn("No component found for role [{}] with hint [{}], declared as dependency for wiki "
                     + "component [{}]. Root cause is [{}]", cd.getRoleType(), cd.getRoleHint(),
                     this.wikiComponent.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
             }

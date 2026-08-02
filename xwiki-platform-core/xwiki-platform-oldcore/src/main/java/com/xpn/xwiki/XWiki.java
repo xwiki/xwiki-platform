@@ -2763,9 +2763,7 @@ public class XWiki implements EventListener
                 return urlFactory.getURL(url, context);
             }
         } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Exception while getting skin file [{}] from skin [{}]", fileName, skinId, e);
-            }
+            LOGGER.debug("Exception while getting skin file [{}] from skin [{}]", fileName, skinId, e);
         }
 
         return null;
@@ -6097,14 +6095,10 @@ public class XWiki implements EventListener
 
                 String rightsClass = getConfiguration().getProperty("xwiki.authentication.rightsclass");
                 if (rightsClass != null && !DEFAULT_RIGHT_SERVICE_CLASS.equals(rightsClass)) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.warn("Using custom Right Service [{}].", rightsClass);
-                    }
+                    LOGGER.warn("Using custom Right Service [{}].", rightsClass);
                 } else {
                     rightsClass = DEFAULT_RIGHT_SERVICE_CLASS;
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Using default Right Service [{}].", rightsClass);
-                    }
+                    LOGGER.debug("Using default Right Service [{}].", rightsClass);
                 }
 
                 try {
@@ -6179,9 +6173,7 @@ public class XWiki implements EventListener
         String urlFactoryServiceClass = getConfiguration().getProperty("xwiki.urlfactory.serviceclass");
         if (urlFactoryServiceClass != null) {
             try {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Using custom URLFactory Service Class [{}]", urlFactoryServiceClass);
-                }
+                LOGGER.debug("Using custom URLFactory Service Class [{}]", urlFactoryServiceClass);
                 factoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
                     .getConstructor(XWiki.class).newInstance(this);
             } catch (Exception e) {
@@ -6190,9 +6182,7 @@ public class XWiki implements EventListener
             }
         }
         if (factoryService == null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Using default URLFactory Service Class [{}]", urlFactoryServiceClass);
-            }
+            LOGGER.debug("Using default URLFactory Service Class [{}]", urlFactoryServiceClass);
             factoryService = new XWikiURLFactoryServiceImpl(this);
         }
 

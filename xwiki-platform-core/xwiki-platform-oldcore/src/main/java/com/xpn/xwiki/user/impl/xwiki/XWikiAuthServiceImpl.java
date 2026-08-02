@@ -209,9 +209,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
             // Process logout (this only works with Forms)
             if (auth.processLogout(wrappedRequest, response, new URLPatternMatcher())) {
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("User [{}] has been logged-out", context.getUser());
-                }
+                LOGGER.info("User [{}] has been logged-out", context.getUser());
                 wrappedRequest.setUserPrincipal(null);
                 return null;
             }

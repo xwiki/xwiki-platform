@@ -637,9 +637,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
         try {
             Session session = this.store.getCurrentSession();
             if (session != null) {
-                if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("Cleanup of session was needed: [{}]", session);
-                }
+                LOGGER.warn("Cleanup of session was needed: [{}]", session);
 
                 this.store.endTransaction(false);
             }

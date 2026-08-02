@@ -60,19 +60,15 @@ public abstract class AbstractMailListener implements MailListener
     @Override
     public void onPrepareMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
     {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Mail preparation succeed for message [{}] of batch [{}].",
-                message.getUniqueMessageId(), batchId);
-        }
+        logger.debug("Mail preparation succeed for message [{}] of batch [{}].",
+            message.getUniqueMessageId(), batchId);
     }
 
     @Override
     public void onPrepareMessageError(ExtendedMimeMessage message, Exception exception, Map<String, Object> parameters)
     {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Mail preparation failed for message [{}] of batch [{}].",
-                message.getUniqueMessageId(), batchId, exception);
-        }
+        logger.debug("Mail preparation failed for message [{}] of batch [{}].",
+            message.getUniqueMessageId(), batchId, exception);
     }
 
     @Override
@@ -90,19 +86,15 @@ public abstract class AbstractMailListener implements MailListener
     @Override
     public void onSendMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
     {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Mail sent successfully for message [{}] of batch [{}].",
-                message.getUniqueMessageId(), batchId);
-        }
+        logger.debug("Mail sent successfully for message [{}] of batch [{}].",
+            message.getUniqueMessageId(), batchId);
     }
 
     @Override
     public void onSendMessageError(ExtendedMimeMessage message, Exception exception, Map<String, Object> parameters)
     {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Mail sending failed for message [{}] of batch [{}].",
-                message.getUniqueMessageId(), batchId, exception);
-        }
+        logger.debug("Mail sending failed for message [{}] of batch [{}].",
+            message.getUniqueMessageId(), batchId, exception);
     }
 
     @Override

@@ -74,9 +74,7 @@ public class UserAuthenticatedEventNotifier
      */
     private void notify(UserAuthenticatedEvent event)
     {
-        if (this.logger.isDebugEnabled()) {
-            this.logger.debug("User authenticated for [{}]", event.getUserReference());
-        }
+        this.logger.debug("User authenticated for [{}]", event.getUserReference());
         this.observationManager.notify(event, null);
     }
 }

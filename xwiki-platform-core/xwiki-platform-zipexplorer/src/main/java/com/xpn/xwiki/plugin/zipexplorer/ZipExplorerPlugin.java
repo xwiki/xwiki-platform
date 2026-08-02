@@ -56,7 +56,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     /**
      * Log object to log messages in this class.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(ZipExplorerPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipExplorerPlugin.class);
 
     /**
      * Path separators for URL.
@@ -156,7 +156,8 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                 }
             }
         } catch (XWikiException | IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to extract file [{}] from the ZIP attachment [{}]", filename,
+                attachment.getReference(), e);
         }
         return newAttachment;
     }
@@ -186,7 +187,8 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                 }
             }
         } catch (XWikiException | IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to list the entries of the ZIP attachment [{}] of document [{}]", attachmentName,
+                document.getPrefixedFullName(), e);
         }
         return zipList;
     }
@@ -284,7 +286,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
             // In case of error we log the error and continue with the undecoded URL.
             // TODO: Ideally this should rather fail fast but we have no exception handling
             // framework for scripting code. Change this when we have one.
-            LOG.error("Failed to decode URL path [{}]", path, e);
+            LOGGER.error("Failed to decode URL path [{}]", path, e);
         }
 
         return path;
@@ -309,7 +311,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
             try {
                 filecontent.reset();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to reset the file content stream after checking for a ZIP header", e);
             }
         }
         return false;

@@ -57,7 +57,7 @@ public class TableElement extends BaseElement
         }
     }
 
-    /** @return true if there are no colums or no rows in the table. True if the table only contains headings. */
+    /** @return true if there are no columns or no rows in the table. True if the table only contains headings. */
     public boolean isEmpty()
     {
         if (empty == -1) {

@@ -62,7 +62,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * Migration of old Ratings XObjects to Solr store.
  *
  * This migration performs the following operations:
- *   1. it queries in database all the references of document containings a Rating xobjects
+ *   1. it queries in database all the references of document containing a Rating xobjects
  *   2. it iterates over all those documents and all the rating xobjects in them, check if the voted document matches
  *      the configuration (i.e. if the Rating App was configured to use separate documents, then the xobjects to
  *      consider should not be located in the same page as the voted page), and migrate them if its the case and store
@@ -393,7 +393,7 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
                 .setReference(ratedPage)
                 .setCreatedAt(date)
                 .setUpdatedAt(date)
-                // We explicitely don't retrieve scale from config here since the previous ratings
+                // We explicitly don't retrieve scale from config here since the previous ratings
                 // were done with a scale of 5.
                 .setScaleUpperBound(5)
                 .setVote(vote);

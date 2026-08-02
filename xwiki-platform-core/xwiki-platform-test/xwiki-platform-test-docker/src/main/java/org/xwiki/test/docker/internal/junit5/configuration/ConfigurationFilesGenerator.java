@@ -379,7 +379,7 @@ public class ConfigurationFilesGenerator
         // DB connections. compared  to in the past. When the tests succeed, xwiki starts in about 1mn20s. When they
         // fail xwiki takes over 5mn to start, showing how slow the machine is. When it succeeds the connection cool
         // is used up to 40 connections (out of 50) so already close to the max. When it fails, it goes quickly to 50.
-        // Basically the connections are not released fast enough becauase the SQL queries take longer to execute.
+        // Basically the connections are not released fast enough because the SQL queries take longer to execute.
         // Thus trying with 300 max connections to see if that's the problem.
         props.setProperty("xwikiDbDbcpMaxTotal", "300");
 

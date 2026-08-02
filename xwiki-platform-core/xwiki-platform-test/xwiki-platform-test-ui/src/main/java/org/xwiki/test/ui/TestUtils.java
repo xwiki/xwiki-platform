@@ -3263,7 +3263,7 @@ public class TestUtils
             ResourceAPI resource = RESOURCES_MAP.get(reference.getType());
 
             if (resource == null) {
-                throw new Exception("Unsuported type [" + reference.getType() + "]");
+                throw new Exception("Unsupported type [" + reference.getType() + "]");
             }
 
             return getLocale(reference) != null ? resource.localeAPI : resource.api;

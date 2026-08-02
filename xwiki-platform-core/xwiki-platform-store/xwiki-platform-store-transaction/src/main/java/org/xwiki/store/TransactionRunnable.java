@@ -249,7 +249,7 @@ public class TransactionRunnable<T>
     /**
      * PreRun this and all of the chained runnables.
      * Run in the order as they were registered in a deep first tree walk.
-     * If an exception occures, call onComplete on each runnable in the reverse order preRun was called.
+     * If an exception occurs, call onComplete on each runnable in the reverse order preRun was called.
      *
      * @throws TransactionException if an exception is thrown by this or one of the chained runnables'
      * onPreRun() functions, also may contain exceptions thrown by one or more
@@ -308,7 +308,7 @@ public class TransactionRunnable<T>
      *
      * @throws TransactionException made by grouping together whatever is thrown by this or one of the
      * chained runnables' onRun() functions and whatever might be thrown by
-     * onRollback() or onComplete() which are called if somethign goes wrong.
+     * onRollback() or onComplete() which are called if something goes wrong.
      */
     protected final void run() throws TransactionException
     {
@@ -430,7 +430,7 @@ public class TransactionRunnable<T>
             });
         }
         doAllAndCollectThrowables(list, "Failure in onComplete() the storage engine should be "
-            + "consistant although it may contain uncollected garbage.",
+            + "consistent although it may contain uncollected garbage.",
             false);
     }
 

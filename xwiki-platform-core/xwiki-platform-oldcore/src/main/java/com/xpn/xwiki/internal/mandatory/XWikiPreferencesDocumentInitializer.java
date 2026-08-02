@@ -39,7 +39,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 import com.xpn.xwiki.objects.meta.PasswordMetaClass;
 
 /**
- * Update XWiki.XWikiPreferences document with all required informations.
+ * Update XWiki.XWikiPreferences document with all required information.
  *
  * @version $Id$
  * @since 4.3M1

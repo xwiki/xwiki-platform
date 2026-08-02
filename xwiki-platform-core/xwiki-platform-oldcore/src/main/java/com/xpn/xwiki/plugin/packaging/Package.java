@@ -836,7 +836,7 @@ public class Package
                     previousdoc = previousdoc.getTranslatedDocument(doc.getLanguage(), context);
                 }
                 // we should only delete the previous document
-                // if we are overridding the versions and/or if this is a backup pack
+                // if we are overriding the versions and/or if this is a backup pack
                 if (!this.preserveVersion || this.withVersions) {
                     try {
                         // This is not a real document delete, it's a upgrade. To be sure to not

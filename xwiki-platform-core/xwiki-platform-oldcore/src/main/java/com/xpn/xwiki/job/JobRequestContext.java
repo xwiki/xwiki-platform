@@ -88,7 +88,7 @@ public class JobRequestContext implements Serializable
     }
 
     /**
-     * @param xcontext the XWiki context to extract informations from
+     * @param xcontext the XWiki context to extract information from
      */
     public JobRequestContext(XWikiContext xcontext)
     {
@@ -276,7 +276,7 @@ public class JobRequestContext implements Serializable
     }
 
     /**
-     * @return true if the request informations have been set
+     * @return true if the request information has been set
      * @since 8.4RC1
      */
     public boolean isRequestSet()

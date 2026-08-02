@@ -509,7 +509,7 @@ public class EditForm extends XWikiForm
                 try {
                     classNumber = Integer.parseInt(classNumberAsString);
                 } catch (NumberFormatException e) {
-                    // If the numner isn't valid, skip the property update
+                    // If the number isn't valid, skip the property update
                     LOGGER.warn("Invalid xobject number [{}], ignoring property update [{}].", classNumberAsString,
                         parameter.getKey());
                     continue;

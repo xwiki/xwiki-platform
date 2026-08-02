@@ -655,7 +655,7 @@ public class XWikiAttachment implements Cloneable
      * @param out the output where to write the XML
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
      * @param bWithVersions if true, all archive version is also included
-     * @param format true if the XML should be formated
+     * @param format true if the XML should be formatted
      * @param context current XWikiContext
      * @throws IOException when an error occurs during streaming operation
      * @throws XWikiException when an error occurs during xwiki operation
@@ -673,7 +673,7 @@ public class XWikiAttachment implements Cloneable
      * @param out the output where to write the XML
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
      * @param bWithVersions if true, all archive version is also included
-     * @param format true if the XML should be formated
+     * @param format true if the XML should be formatted
      * @param encoding the encoding to use when serializing XML
      * @throws XWikiException when an error occurs during xwiki operation
      * @since 9.10RC1
@@ -1320,7 +1320,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * Apply the provided attachment so that the current one contains the same informations and indicate if it was
+     * Apply the provided attachment so that the current one contains the same information and indicate if it was
      * necessary to modify it in any way.
      *
      * @param attachment the attachment to apply

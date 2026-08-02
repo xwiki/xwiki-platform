@@ -774,7 +774,7 @@ public class Document extends Api
     }
 
     /**
-     * @return the tranlated Document if the wiki is multilingual, the locale is first checked in the URL, the cookie,
+     * @return the translated Document if the wiki is multilingual, the locale is first checked in the URL, the cookie,
      *         the user profile and finally the wiki configuration if not, the locale is the one on the wiki
      *         configuration.
      */

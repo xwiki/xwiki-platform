@@ -453,7 +453,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      *            <li>asc : a Boolean, if true the order is ascendent</li>
      *            </ul>
      * @param parameterValues the list of values to fill for use with HQL named request.
-     * @return the formated HQL named request.
+     * @return the formatted HQL named request.
      */
     protected String createMatchUserOrGroupWhereClause(boolean user, Object[][] matchFields, Object[][] order,
         List<Object> parameterValues)

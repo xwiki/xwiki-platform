@@ -805,7 +805,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API allowing to search for documents allowing to have mutliple entries per locale
+     * API allowing to search for documents allowing to have multiple entries per locale
      *
      * @param wheresql query to use similar to searchDocuments(wheresql)
      * @param distinctbylocale true to return multiple rows per locale
@@ -1846,7 +1846,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to execute a form in the context of an including topic, optionnaly surrounding the content with {pre}{/pre}
+     * API to execute a form in the context of an including topic, optionally surrounding the content with {pre}{/pre}
      * to avoid future wiki rendering The rendering is evaluated in the context of the including topic All velocity
      * variables are the one of the including topic This api is usually called using #includeForm in a page, which
      * modifies the behavior of "Edit this page" button to direct for Form mode (inline).
@@ -2166,7 +2166,7 @@ public class XWiki extends Api
 
     /**
      * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
-     * wiki where the user is registered. The formating is done using the format parameter which can contain velocity
+     * wiki where the user is registered. The formatting is done using the format parameter which can contain velocity
      * scripting and access all properties of the User profile using variables ($first_name $last_name $email $city)
      *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
@@ -2196,7 +2196,7 @@ public class XWiki extends Api
 
     /**
      * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
-     * local wiki even if the user is registered on a different wiki. The formating is done using the format parameter
+     * local wiki even if the user is registered on a different wiki. The formatting is done using the format parameter
      * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
      * $last_name $email $city)
      *
@@ -2230,7 +2230,7 @@ public class XWiki extends Api
     /**
      * API to retrieve a text representing the user with a custom view With the link param set to false it will not link
      * to the user page. With the link param set to true, the link will link to the page on the wiki where the user was
-     * registered. The formating is done using the format parameter which can contain velocity scripting and access all
+     * registered. The formatting is done using the format parameter which can contain velocity scripting and access all
      * properties of the User profile using variables ($first_name $last_name $email $city)
      *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
@@ -2262,10 +2262,11 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view. The formating is done using the format parameter
-     * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
-     * $last_name $email $city). With the link param set to false it will not link to the user page. With the link param
-     * set to true, the link will link to the page on the local wiki even if the user is registered on a different wiki.
+     * API to retrieve a text representing the user with a custom view. The formatting is done using the format
+     * parameter which can contain velocity scripting and access all properties of the User profile using variables
+     * ($first_name $last_name $email $city). With the link param set to false it will not link to the user page. With
+     * the link param set to true, the link will link to the page on the local wiki even if the user is registered on
+     * a different wiki.
      *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -2308,7 +2309,7 @@ public class XWiki extends Api
      * 'dateformat' parameter of the XWiki Preferences
      *
      * @param date date object to format
-     * @return A string with the date formating from the default Wiki setting
+     * @return A string with the date formatting from the default Wiki setting
      */
     public String formatDate(Date date)
     {
@@ -2562,7 +2563,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledge API to regenerate the links/backlinks table Normally links and backlinks are stored when a page is
+     * Privilege API to regenerate the links/backlinks table Normally links and backlinks are stored when a page is
      * modified This function will regenerate all the backlinks This function can be long to run
      *
      * @throws XWikiException exception if the generation fails
@@ -2702,7 +2703,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to retrieve an object instanciated from groovy code in a String Groovy scripts compilation is
+     * Privileged API to retrieve an object instantiated from groovy code in a String Groovy scripts compilation is
      * cached
      *
      * @param fullname // script containing a Groovy class definition (public class MyClass { ... })
@@ -2891,7 +2892,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Check authentication from request and set according persitent login information If it fails user is unlogged
+     * Check authentication from request and set according persistent login information If it fails user is unlogged
      *
      * @return null if failed, non null XWikiUser if sucess
      * @throws XWikiException
@@ -2902,8 +2903,8 @@ public class XWiki extends Api
     }
 
     /**
-     * Check authentication from username and password and set according persitent login information If it fails user is
-     * unlogged
+     * Check authentication from username and password and set according persistent login information If it fails user
+     * is unlogged
      *
      * @param username username to check
      * @param password password to check
@@ -3010,7 +3011,7 @@ public class XWiki extends Api
                         break;
                     }
                 } else {
-                    // TODO: improve version comparaison since it does not work when comparing 2.0 and 10.0 for example.
+                    // TODO: improve version comparison since it does not work when comparing 2.0 and 10.0 for example.
                     // We
                     // should have a Version which implements Comparable like we have SyntaxId in Syntax
                     if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)

@@ -25,7 +25,7 @@ import java.util.concurrent.locks.Condition;
 
 /**
  * A fake lock.
- * Used for cases when a lock is demanded by the code but the perticular operation does not require one.
+ * Used for cases when a lock is demanded by the code but the particular operation does not require one.
  * Also useful for disabling locking.
  *
  * @version $Id$

@@ -489,7 +489,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         // Note that we're loosing conflicts information about prettyname, but it's probably ok, at least it's not a
         // regression since we were not getting that info in the past.
         // Now it might not be a good idea to mix those info with the conflicts related to the value of the element
-        // we might need improvment in the design here...
+        // we might need improvement in the design here...
         mergeManagerResult.setLog(mergePrettyNameResult.getLog());
         if (mergePrettyNameResult.isModified()) {
             mergeManagerResult.setModified(true);
@@ -607,7 +607,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-     * @param format true if the XML should be formated
+     * @param format true if the XML should be formatted
      * @return the XML as a String
      * @since 9.0RC1
      */

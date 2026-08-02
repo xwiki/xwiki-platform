@@ -271,7 +271,7 @@ public class ExtensionIndexSolrCoreInitializer extends AbstractSolrCoreInitializ
         String cannonicalType = DefaultExtensionComponent.toCanonicalComponentType(componentType);
 
         // It's a pity but I cannot find any way to escape < > and , in a Solr query so replacing them
-        // Conflict is theorically possible but highly unlikely, especially since it's only about component roles
+        // Conflict is theoretically possible but highly unlikely, especially since it's only about component roles
         cannonicalType = COMPONENT_SPECIAL_CHARS.matcher(cannonicalType).replaceAll("_");
 
         return Extension.FIELD_COMPONENTS + "__" + cannonicalType;

@@ -176,7 +176,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                     new ExtensionId(this.mainUIExtensionId.getId(), this.distributionExtension.getId().getVersion());
             }
 
-            // Subwikis defualt UI
+            // Subwikis default UI
             if (this.wikiUIExtensionId == null) {
                 String wikiUIId = this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui");
 

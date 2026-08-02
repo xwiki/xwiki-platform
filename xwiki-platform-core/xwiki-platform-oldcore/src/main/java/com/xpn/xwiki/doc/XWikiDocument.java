@@ -4984,7 +4984,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             return false;
         }
 
-        // Datas
+        // Data
 
         // We consider that 2 documents are still equal even when they have different original
         // documents (see getOriginalDocument() for more details as to what is an original
@@ -4994,14 +4994,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * Same as {@link #equals(Object)} but only for actual datas of the document.
+     * Same as {@link #equals(Object)} but only for actual data of the document.
      * <p>
      * The goal being to compare two versions of the same document this method skip every version/reference/author
      * related information. For example it allows to compare a document coming from a another wiki and easily check if
      * thoses actually are the same thing whatever the plumbing differences.
      *
      * @param otherDocument the document to compare
-     * @return true if bith documents have the same datas
+     * @return true if bith documents have the same data
      * @since 4.1.1
      */
     public boolean equalsData(XWikiDocument otherDocument)
@@ -5336,7 +5336,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param bWithRendering include the rendered content
      * @param bWithAttachmentContent include attachments content
      * @param bWithVersions include archived versions
-     * @param format true if the XML should be formated
+     * @param format true if the XML should be formatted
      * @param encoding the encoding to use to write the XML
      * @throws XWikiException when an errors occurs during wiki operations
      * @since 9.0RC1
@@ -9450,7 +9450,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     /**
      * Apply modification coming from provided document.
      * <p>
-     * Thid method does not take into account versions and author related informations and the provided document should
+     * This method does not take into account versions and author related information and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
      * this method is dealing with "real" data and should not change anything related to version management and document
      * identifier.
@@ -9470,7 +9470,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     /**
      * Apply modification coming from provided document.
      * <p>
-     * Thid method does not take into account versions and author related informations and the provided document should
+     * This method does not take into account versions and author related information and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
      * this method is dealing with "real" data and should not change everything related to version management and
      * document identifier.

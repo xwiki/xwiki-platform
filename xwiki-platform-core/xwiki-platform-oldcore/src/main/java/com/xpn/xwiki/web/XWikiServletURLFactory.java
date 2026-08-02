@@ -128,7 +128,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // Set the configured home URL for the main wiki
         setDefaultURL(null, homepageConfigration);
 
-        // Check if the request is a deamon thread request
+        // Check if the request is a daemon thread request
         XWikiRequest request = context.getRequest();
         this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub stub
             && stub.isDaemon();

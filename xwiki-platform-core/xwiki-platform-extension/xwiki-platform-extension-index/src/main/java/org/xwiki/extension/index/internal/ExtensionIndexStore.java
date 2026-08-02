@@ -313,7 +313,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     }
 
     /**
-     * Update variable informations (support plans, ratings, etc.).
+     * Update variable information (support plans, ratings, etc.).
      *
      * @param extensionId the identifier of the extension to update
      * @param remoteExtension the remote extension from which to extract variable information
@@ -401,7 +401,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     }
 
     /**
-     * Update variable informations (support plans, ratings, etc.) by copying it from another version.
+     * Update variable information (support plans, ratings, etc.) by copying it from another version.
      *
      * @param extensionId the identifier of the extension to update
      * @param copyVersion the version of the extension to copy

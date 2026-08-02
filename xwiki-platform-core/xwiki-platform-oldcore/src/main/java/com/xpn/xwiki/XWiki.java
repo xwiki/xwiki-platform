@@ -1539,7 +1539,7 @@ public class XWiki implements EventListener
 
     /**
      * @param wikiId the id of the wiki
-     * @param force if the update of the databse should be forced
+     * @param force if the update of the database should be forced
      * @param initDocuments if mandatory document and plugin should be initialized for passed wiki
      * @param context see {@link XWikiContext}
      * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean, XWikiContext)} instead
@@ -4035,7 +4035,7 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Method allows to create an empty user with no password (he won't be able to login) This method is usefull for
+     * Method allows to create an empty user with no password (he won't be able to login) This method is useful for
      * authentication like LDAP or App Server trusted
      *
      * @param xwikiname
@@ -4145,7 +4145,7 @@ public class XWiki implements EventListener
      * Create a new user.
      *
      * @param userName the name of the user (without the space)
-     * @param map extra datas to add to user profile object
+     * @param map extra data to add to user profile object
      * @param context see {@link XWikiContext}
      * @return
      *         <ul>
@@ -4163,7 +4163,7 @@ public class XWiki implements EventListener
      * Create a new user.
      *
      * @param userName the name of the user (without the space)
-     * @param map extra datas to add to user profile object
+     * @param map extra data to add to user profile object
      * @param userRights the right of the user on his own profile page
      * @param context see {@link XWikiContext}
      * @return
@@ -4210,7 +4210,7 @@ public class XWiki implements EventListener
      * Create a new user.
      *
      * @param userName the name of the user (without the space)
-     * @param map extra datas to add to user profile object
+     * @param map extra data to add to user profile object
      * @param parentReference the parent of the user profile
      * @param content the content of the user profile
      * @param syntax the syntax of the provided content
@@ -4262,7 +4262,7 @@ public class XWiki implements EventListener
             // The information from the user profile needs to be indexed using the proper locale. If multilingual is
             // enabled then the user can choose the desired locale (from the list of supported locales) before
             // registering. An administrator registering users can do the same. Otherwise, if there is only one locale
-            // supported then that langage will be used.
+            // supported then that language will be used.
             doc.setDefaultLocale(context.getLocale());
 
             protectUserPage(doc.getFullName(), userRights, doc, context);
@@ -5678,7 +5678,7 @@ public class XWiki implements EventListener
         return getAttachmentURL(attachmentReference, queryString, context);
     }
 
-    // Usefull date functions
+    // Useful date functions
 
     public int getTimeDelta(long time)
     {

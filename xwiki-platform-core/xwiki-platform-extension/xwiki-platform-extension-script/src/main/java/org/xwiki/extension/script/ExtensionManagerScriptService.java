@@ -461,7 +461,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         // Indicate if it's allowed to do modification on root namespace
         installRequest.setRootModificationsAllowed(namespace == null || xcontext.isMainWiki(toWikiId(namespace)));
 
-        // Allow overwritting a few things in extensions descriptors
+        // Allow overwriting a few things in extensions descriptors
         installRequest.setRewriter(new ScriptExtensionRewriter());
 
         contextualize(installRequest);

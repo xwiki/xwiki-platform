@@ -266,7 +266,8 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest>
                 distributionJobThread.setName("Wikis non-interfactive distribution jobs");
                 distributionJobThread.start();
             } catch (WikiManagerException e) {
-                this.logger.error("Failed to get the list of wikis. Sub-wikis ditribution jobs won't be triggered.", e);
+                this.logger.error("Failed to get the list of wikis. Sub-wikis distribution jobs won't be triggered.",
+                    e);
             }
         }
     }

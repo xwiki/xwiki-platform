@@ -100,7 +100,7 @@ public class SkinAction extends XWikiAction
         // Disallow template override with xpage parameter.
         if (!DOCDOESNOTEXIST.equals(Utils.getPage(context.getRequest(), DOCDOESNOTEXIST))) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Template may not be overriden with 'xpage' in [skin] action.");
+                "Template may not be overridden with 'xpage' in [skin] action.");
         }
 
         return super.action(context);

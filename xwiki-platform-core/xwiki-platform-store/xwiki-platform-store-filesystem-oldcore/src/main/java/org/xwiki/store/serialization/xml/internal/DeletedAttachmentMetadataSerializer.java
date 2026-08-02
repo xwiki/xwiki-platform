@@ -49,7 +49,7 @@ public class DeletedAttachmentMetadataSerializer extends AbstractXMLSerializer<X
     private static final String ROOT_ELEMENT_NAME = "deletedattachment";
 
     /**
-     * Root node paramter which must be present in order to attempt parsing.
+     * Root node parameter which must be present in order to attempt parsing.
      */
     private static final String SERIALIZER_PARAM = "serializer";
 

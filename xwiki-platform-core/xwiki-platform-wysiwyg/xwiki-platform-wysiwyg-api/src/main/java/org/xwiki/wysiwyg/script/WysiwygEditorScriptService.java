@@ -493,7 +493,7 @@ public class WysiwygEditorScriptService implements ScriptService
         try {
             return this.officeAttachmentImporter.toHTML(attachmentReference, parameters);
         } catch (Exception e) {
-            this.logger.warn("Failed to import office attachment [{}]. Root cause is: {}",
+            this.logger.warn("Failed to import office attachment [{}]. Root cause is [{}]",
                 this.entityReferenceSerializer.serialize(attachmentReference), ExceptionUtils.getRootCauseMessage(e));
             return null;
         }

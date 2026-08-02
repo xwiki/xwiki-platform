@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -287,7 +288,8 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         try {
             return this.componentManager.getInstance(DashboardRenderer.class, layout);
         } catch (ComponentLookupException e) {
-            this.logger.warn("Could not find the Dashboard renderer for layout \"" + layout + "\"");
+            this.logger.warn("Could not find the Dashboard renderer for layout [{}]. Root cause is [{}]", layout,
+                ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }

@@ -191,7 +191,7 @@ class GroupScriptServiceTest
     @Test
     void canAddGroupAsMemberTargetMembersError() throws Exception
     {
-        when(this.groupManager.getMembers(TARGET_GROUP, false)).thenThrow(new GroupException(""));
+        when(this.groupManager.getMembers(TARGET_GROUP, false)).thenThrow(new GroupException("target failure"));
 
         boolean actual = this.groupScriptService.canAddGroupAsMember(CANDIDATE_GROUP, TARGET_GROUP);
 
@@ -199,22 +199,22 @@ class GroupScriptServiceTest
         verify(this.groupManager, never()).getMembers(CANDIDATE_GROUP, true);
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("Failed to access the members of the target group [xwiki:XWiki.Target]",
-            this.logCapture.getMessage(0));
+        assertEquals("Failed to access the members of the target group [xwiki:XWiki.Target]. Root cause is "
+            + "[GroupException: target failure]", this.logCapture.getMessage(0));
     }
 
     @Test
     void canAddGroupAsMemberCandidateMembersError() throws Exception
     {
         when(this.groupManager.getMembers(TARGET_GROUP, false)).thenReturn(emptyList());
-        when(this.groupManager.getMembers(CANDIDATE_GROUP, true)).thenThrow(new GroupException(""));
+        when(this.groupManager.getMembers(CANDIDATE_GROUP, true)).thenThrow(new GroupException("candidate failure"));
 
         boolean actual = this.groupScriptService.canAddGroupAsMember(CANDIDATE_GROUP, TARGET_GROUP);
 
         assertFalse(actual);
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("Failed to access the members of the candidate group [xwiki:XWiki.Added]",
-            this.logCapture.getMessage(0));
+        assertEquals("Failed to access the members of the candidate group [xwiki:XWiki.Added]. Root cause is "
+            + "[GroupException: candidate failure]", this.logCapture.getMessage(0));
     }
 }

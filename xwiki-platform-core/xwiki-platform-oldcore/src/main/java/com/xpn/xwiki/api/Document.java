@@ -236,7 +236,7 @@ public class Document extends Api
 
     /**
      * Get the XWikiDocument wrapped by this API. This function is accessible only if you have the programming rights
-     * give access to the priviledged API of the Document.
+     * give access to the privileged API of the Document.
      *
      * @return The XWikiDocument wrapped by this API.
      */
@@ -2387,7 +2387,7 @@ public class Document extends Api
     /**
      * Returns data needed for a generation of Table of Content for this document.
      *
-     * @param init an intial level where the TOC generation should start at
+     * @param init an initial level where the TOC generation should start at
      * @param max maximum level TOC is generated for
      * @param numbered if should generate numbering for headings
      * @return a map where an heading (title) ID is the key and value is another map with two keys: text, level and

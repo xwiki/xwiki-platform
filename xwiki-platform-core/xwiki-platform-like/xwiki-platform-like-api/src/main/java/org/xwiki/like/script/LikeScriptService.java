@@ -45,7 +45,7 @@ import org.xwiki.user.UserReferenceResolver;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Script service for manipulating Like informations.
+ * Script service for manipulating Like information.
  *
  * @version $Id$
  * @since 12.7RC1
@@ -81,7 +81,7 @@ public class LikeScriptService implements ScriptService
 
     /**
      * Check if current user is allowed to use Like on the given reference.
-     * Note that we explicitely deny the right for guests.
+     * Note that we explicitly deny the right for guests.
      * @param entityReference the reference on which to use like.
      * @return {@code true} only if current user is not guest and has Like right on the reference.
      */

@@ -99,7 +99,7 @@ public class IntegrationTests extends RenderingTest
         XWikiDocument testDocument = new XWikiDocument(ICON_DOCUMENT_REFERENCE);
         when(documentAccessBridge.getDocumentInstance(ICON_DOCUMENT_REFERENCE)).thenReturn(testDocument);
 
-        // Mock the icon set manager as we're not in a real enviornment where icon sets can be loaded.
+        // Mock the icon set manager as we're not in a real environment where icon sets can be loaded.
         IconSetManager iconSetManager = componentManager.registerMockComponent(IconSetManager.class);
         setupIconThemes(iconSetManager);
     }

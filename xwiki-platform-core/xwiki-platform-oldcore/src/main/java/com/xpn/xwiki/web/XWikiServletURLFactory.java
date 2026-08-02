@@ -434,7 +434,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * {@code http://localhost:8080/xwiki/bin/view/A'/B}. This would generate a HTML of
      * {@code <a href='http://localhost:8080/xwiki/bin/view/A'/B'} which would generated a wrong link to
      * {@code http://localhost:8080/xwiki/bin/view/A}... Thus if we were only encoding the characters that require
-     * encoding, we would need HMTL writers to encode the received URL and right now we don't do that anywhere in our
+     * encoding, we would need HTML writers to encode the received URL and right now we don't do that anywhere in our
      * code. Thus in order to not introduce any problem and keep it safe we just handle the {@code +} character
      * specially and encode the rest.
      *

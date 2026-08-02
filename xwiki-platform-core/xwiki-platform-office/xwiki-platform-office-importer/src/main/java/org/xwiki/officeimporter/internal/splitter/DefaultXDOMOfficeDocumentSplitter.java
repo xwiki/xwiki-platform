@@ -118,7 +118,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
      * to a section. Only the artifacts from that section are copied.
      * 
      * @param sectionDoc the newly created wiki document corresponding to a section of the original office document
-     * @param officeDocument the office document being splitted into wiki documents
+     * @param officeDocument the office document being split into wiki documents
      * @return the relocated artifacts
      */
     private Map<String, OfficeDocumentArtifact> relocateArtifacts(WikiDocument sectionDoc,

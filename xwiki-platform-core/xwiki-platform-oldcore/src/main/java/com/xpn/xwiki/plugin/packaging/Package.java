@@ -1125,7 +1125,7 @@ public class Package
      * Write the package.xml file to an OutputStream
      *
      * @param out the OutputStream to write to
-     * @param context curent XWikiContext
+     * @param context current XWikiContext
      * @throws IOException when an error occurs during streaming operation
      * @since 2.3M2
      */

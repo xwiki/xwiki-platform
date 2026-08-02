@@ -145,7 +145,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                     if (entry.getSize() == -1) {
                         // Note: We're copying the content of the file in the ZIP in memory. This is
                         // potentially going to cause an error if the file's size is greater than the
-                        // maximum size of a byte[] array in Java or if there's not enough memomry.
+                        // maximum size of a byte[] array in Java or if there's not enough memory.
                         byte[] data = IOUtils.toByteArray(zis);
 
                         newAttachment.setContent(data);

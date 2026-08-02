@@ -782,7 +782,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * Define if a response has been already sent or not.
      * Note that contrary to {@link #isResponseSent()} this method will ensure that the template is executed even if the
      * result of the execution is not sent. See {@link Utils#parseTemplate(String, boolean, XWikiContext)} for details.
-     * @return {@code true} if the response has been sent and no new reponse should be sent anymore.
+     * @return {@code true} if the response has been sent and no new response should be sent anymore.
      */
     public boolean isFinished()
     {
@@ -802,7 +802,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * Define if a response has been already sent or not and if the template parsing should be done.
      * Note that contrary to {@link #isFinished()} this method will always prevent the execution of the template.
      * See {@link Utils#parseTemplate(String, boolean, XWikiContext)} for details.
-     * @return {@code true} if the response has been sent, no new reponse should be sent anymore
+     * @return {@code true} if the response has been sent, no new response should be sent anymore
      *          and the template should not be parsed.
      * @since 13.3RC1
      */
@@ -997,7 +997,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * <p>
      * Once dropped, permissions cannot be regained for the duration of the request.
      * <p>
-     * If you are interested in a more flexable sandboxing method which sandboxed code only for the remainder of the
+     * If you are interested in a more flexible sandboxing method which sandboxed code only for the remainder of the
      * rendering cycle, consider using {@link com.xpn.xwiki.api.Document#dropPermissions()}.
      *
      * @since 3.0M3

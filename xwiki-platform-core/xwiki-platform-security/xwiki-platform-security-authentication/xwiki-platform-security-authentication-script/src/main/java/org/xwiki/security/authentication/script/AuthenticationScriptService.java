@@ -228,7 +228,7 @@ public class AuthenticationScriptService implements ScriptService
      * This methods throws a {@link ResetPasswordException} if the verification code is wrong.
      *
      * @param user the user for which to reset the password.
-     * @param verificationCode the code to check before resetting the passord.
+     * @param verificationCode the code to check before resetting the password.
      * @param newPassword the new password to user.
      * @throws ResetPasswordException if the verification code is wrong, or if an error occurs.
      * @since 13.1RC1

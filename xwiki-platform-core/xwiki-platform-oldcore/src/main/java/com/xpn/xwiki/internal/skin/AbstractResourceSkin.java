@@ -51,7 +51,7 @@ public abstract class AbstractResourceSkin extends AbstractSkin
      * @param id the skin id (for instance, {@code "flamingo"})
      * @param skinManager the skin manager that instantiates this skin
      * @param configuration the skin internal configuration, used to access the default parent skin id
-     * @param logger a logger used to log warning in case of error when parsin a skin's syntax
+     * @param logger a logger used to log warning in case of error when parsing a skin's syntax
      */
     public AbstractResourceSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
         Logger logger)

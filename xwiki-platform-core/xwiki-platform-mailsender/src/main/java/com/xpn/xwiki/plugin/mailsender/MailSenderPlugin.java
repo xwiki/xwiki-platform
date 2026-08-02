@@ -179,7 +179,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
      * Filters a list of emails : removes illegal addresses
      * 
      * @param email List of emails
-     * @return An Array containing the correct adresses
+     * @return An Array containing the correct addresses
      */
     private static InternetAddress[] toInternetAddresses(String email) throws AddressException
     {
@@ -350,7 +350,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             }
 
             // Loop over the attachments of the email, add images used from the HTML to the list of attachments to be
-            // embedded with the HTML part, add the other attachements to the list of attachments to be attached to the
+            // embedded with the HTML part, add the other attachments to the list of attachments to be attached to the
             // email.
             for (Attachment attachment : rawAttachments) {
                 if (foundEmbeddedImages.contains(attachment.getFilename())) {

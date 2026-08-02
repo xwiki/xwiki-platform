@@ -110,7 +110,7 @@ public class DefaultRetrieveUsernameManager implements RetrieveUsernameManager
             this.authenticationMailSenderProvider.get().sendRetrieveUsernameEmail(email, userReferences);
         } catch (AddressException e) {
             throw new RetrieveUsernameException(
-                String.format("Error with the given email adresse: [%s]", requestEmail), e);
+                String.format("Error with the given email address: [%s]", requestEmail), e);
         }
     }
 }

@@ -86,7 +86,7 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("pdf", Right.VIEW)
             // TODO: The "undelete" action is mapped to the right "undelete" in the legacy
             // implementation.  We should check whether the "undelete" right is actually used or not and
-            // if we need to introduce it here as well for compatiblity reasons.
+            // if we need to introduce it here as well for compatibility reasons.
             .putAction("undelete", Right.EDIT)
             .putAction("reset", Right.DELETE)
             .putAction("commentadd", Right.COMMENT)

@@ -191,7 +191,7 @@ public class JGroupsNetworkChannel implements NetworkChannel, Receiver
 
         // Create the mapping between JGroups member address and XWiki observation id
         this.membersIdMap = new ConcurrentHashMap<>();
-        // Add current instance to the maping
+        // Add current instance to the mapping
         // Need to be done after starting the channel to know the address
         this.membersIdMap.put(this.jchannel.getAddress().toString(), currentMemberId);
         this.members =

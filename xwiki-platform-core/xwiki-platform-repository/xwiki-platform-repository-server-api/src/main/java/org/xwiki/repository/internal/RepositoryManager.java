@@ -1129,7 +1129,7 @@ public class RepositoryManager
                 versionExtension = repository.resolve(new ExtensionId(id, version));
             }
 
-            // Update version related informations
+            // Update version related information
             return updateExtensionVersion(versionExtension, extensionDocument, index);
         } catch (Exception e) {
             this.logger.error("Failed to resolve extension with id [{}] and version [{}] on repository [{}]", id,
@@ -1150,7 +1150,7 @@ public class RepositoryManager
                 versionExtension = repository.resolve(new ExtensionId(id, version));
             }
 
-            // Update version related informations
+            // Update version related information
             return updateProjectVersion(versionExtension, projectDocument, index);
         } catch (Exception e) {
             this.logger.error("Failed to resolve project with id [{}] and version [{}] on repository [{}]", id, version,

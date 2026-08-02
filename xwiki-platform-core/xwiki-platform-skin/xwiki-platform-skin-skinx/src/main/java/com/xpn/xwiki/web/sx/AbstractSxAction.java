@@ -142,7 +142,7 @@ public abstract class AbstractSxAction extends XWikiAction
         try {
             renderExtension(sxSource, getExtensionType(), context);
         } catch (IllegalArgumentException e) {
-            // Simply set a 404 status code and return null, so that no unneeded bytes are transfered
+            // Simply set a 404 status code and return null, so that no unneeded bytes are transferred
             context.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
         return null;

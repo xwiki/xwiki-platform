@@ -73,7 +73,7 @@ public class LegacyEvent
     protected String user;
 
     /**
-     * Wiki in which the event occured, example: "xwiki".
+     * Wiki in which the event occurred, example: "xwiki".
      */
     protected String wiki;
 

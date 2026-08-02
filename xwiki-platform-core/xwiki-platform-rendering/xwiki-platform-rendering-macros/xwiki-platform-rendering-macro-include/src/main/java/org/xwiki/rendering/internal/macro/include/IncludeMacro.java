@@ -214,7 +214,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
                         return null;
                     }, translatedDocumentBridge.getContentAuthorReference(), documentBridge.getDocumentReference());
                 } catch (Exception e) {
-                    throw new MacroExecutionException("Failed to execute tranformations for document ["
+                    throw new MacroExecutionException("Failed to execute transformations for document ["
                         + translatedDocumentBridge.getDocumentReference() + "]");
                 } finally {
                     // Put back the macro in the main XDOM (it will be replaced that the current macro transformation)

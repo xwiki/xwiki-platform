@@ -103,7 +103,7 @@ public class DefaultWikiComponentManagerEventListener extends AbstractEventListe
                 // Unregister components from the deleted document, if any
                 this.wikiComponentManagerEventListenerHelper.unregisterComponents(documentReference);
             }
-        /* If we are at application startup time, we have to instanciate every document or object that we can find
+        /* If we are at application startup time, we have to instantiate every document or object that we can find
          * in the wiki */
         } else if (event instanceof ApplicationReadyEvent || event instanceof WikiReadyEvent) {
             // These 2 events are created when the database is ready. We register all wiki components.

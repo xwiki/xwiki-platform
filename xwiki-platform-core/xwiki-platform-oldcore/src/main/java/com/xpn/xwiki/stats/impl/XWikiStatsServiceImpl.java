@@ -172,7 +172,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
                 this.statsRegister.addStats(document, action, context);
             }
         } catch (Exception e) {
-            LOGGER.error("Faild to get filter users list", e);
+            LOGGER.error("Failed to get filter users list", e);
         }
     }
 

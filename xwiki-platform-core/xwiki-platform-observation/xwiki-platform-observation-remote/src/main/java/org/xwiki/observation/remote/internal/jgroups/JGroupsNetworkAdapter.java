@@ -63,7 +63,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter, Disposable
     @Override
     public void send(RemoteEventData remoteEvent)
     {
-        this.logger.debug("Send JGroups remote event [{}]", remoteEvent.toString());
+        this.logger.debug("Send JGroups remote event [{}]", remoteEvent);
 
         // Send the message to the whole group
         // Using BytesMessage and not ObjectMessage (which would have been much better for the memory) here because it's
@@ -75,8 +75,7 @@ public class JGroupsNetworkAdapter implements NetworkAdapter, Disposable
             try {
                 entry.getValue().send(message);
             } catch (Exception e) {
-                this.logger.error("Failed to send message [{}] to the channel [{}]", remoteEvent.toString(),
-                    entry.getKey(), e);
+                this.logger.error("Failed to send message [{}] to the channel [{}]", remoteEvent, entry.getKey(), e);
             }
         }
     }

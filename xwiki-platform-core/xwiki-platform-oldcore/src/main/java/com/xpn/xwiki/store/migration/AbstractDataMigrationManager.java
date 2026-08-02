@@ -598,7 +598,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             String message =
                 String.format("The empty database %s seems to be not writable, please check your configuration!",
                     getXWikiContext().getWikiId());
-            this.logger.error(message, e);
+            this.logger.error("The empty database [{}] seems to be not writable, please check your configuration!",
+                getXWikiContext().getWikiId(), e);
             throw new DataMigrationException(message, e);
         }
     }
@@ -611,7 +612,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         } catch (DataMigrationException e) {
             String message = String.format("Database %s seems to be inaccessible, please check your configuration!",
                 getXWikiContext().getWikiId());
-            this.logger.error(message, e);
+            this.logger.error("Database [{}] seems to be inaccessible, please check your configuration!",
+                getXWikiContext().getWikiId(), e);
             throw new DataMigrationException(message, e);
         }
         return status;
@@ -718,7 +720,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
             if (errorCount > 0) {
                 String message = String.format("%s wiki database migration(s) failed.", errorCount);
-                this.logger.error(message);
+                this.logger.error("[{}] wiki database migration(s) failed.", errorCount);
                 throw new DataMigrationException(message);
             }
         } finally {
@@ -785,8 +787,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             } catch (DataMigrationException e1) {
                 // Should not happen and could be safely ignored.
             }
-            String message = String.format("Failed to migrate database [%s]...", database);
-            this.logger.error(message, e);
+            this.logger.error("Failed to migrate database [{}]...", database, e);
             return false;
         } finally {
             context.setWikiId(currentDatabase);
@@ -874,10 +875,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             for (XWikiMigration migration : migrations) {
                 this.progress.startStep(this);
 
-                if (this.logger.isInfoEnabled()) {
-                    this.logger.info("Starting data migration [{}] with version [{}] on database [{}]",
-                        migration.dataMigration.getName(), migration.dataMigration.getVersion(), database);
-                }
+                this.logger.info("Starting data migration [{}] with version [{}] on database [{}]",
+                    migration.dataMigration.getName(), migration.dataMigration.getVersion(), database);
 
                 migration.dataMigration.migrate();
 

@@ -176,7 +176,7 @@ public class SolrIndexEventListener implements EventListener
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to handle event [{}] with source [{}]", event, source.toString(), e);
+            this.logger.error("Failed to handle event [{}] with source [{}]", event, source, e);
         }
     }
 

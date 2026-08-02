@@ -223,14 +223,10 @@ public class DefaultURLSecurityManager implements URLSecurityManager
                     result = false;
                 }
             } catch (MalformedURLException e) {
-                logger.error("Error while transforming URI [{}] to URL: [{}]", uri,
-                    ExceptionUtils.getRootCauseMessage(e));
-                this.logger.debug("Full error stack trace of the URL resolution:", e);
+                this.logger.error("Error while transforming URI [{}] to URL", uri, e);
                 result = false;
             } catch (URISyntaxException e) {
-                logger.error("Error while transforming URI [{}] to absolute URI with http scheme: [{}]", uri,
-                    ExceptionUtils.getRootCauseMessage(e));
-                this.logger.debug("Full error stack trace of the URI resolution:", e);
+                this.logger.error("Error while transforming URI [{}] to absolute URI with http scheme", uri, e);
             }
         }
         return result;

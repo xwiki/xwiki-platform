@@ -97,11 +97,13 @@ class ExportActionTest
         this.oldcore.getXWikiContext().setResponse(this.response);
 
         // Register some mock filters so that the export does nothing.
-        when(this.inputFilterStreamFactory.createInputFilterStream(anyMap())).thenReturn(mock(InputFilterStream.class));
+        InputFilterStream inputFilterStreamMock = mock(InputFilterStream.class);
+        when(this.inputFilterStreamFactory.createInputFilterStream(anyMap())).thenReturn(inputFilterStreamMock);
         this.oldcore.getMocker().registerComponent(OutputFilterStreamFactory.class,
             FilterStreamType.XWIKI_XAR_CURRENT.serialize(), this.xarFilterStreamFactory);
+        BeanOutputFilterStream beanOutputFilterStreamMock = mock(BeanOutputFilterStream.class);
         when(this.xarFilterStreamFactory.createOutputFilterStream(any(XAROutputProperties.class)))
-            .thenReturn(mock(BeanOutputFilterStream.class));
+            .thenReturn(beanOutputFilterStreamMock);
     }
 
     @Test

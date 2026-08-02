@@ -300,8 +300,9 @@ class DefaultModelBridgeTest
         XWikiDocument oldDocument = mock(XWikiDocument.class);
         when(oldDocument.clone()).thenReturn(oldDocument);
         when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
+        BaseObject baseObjectMock = mock(BaseObject.class);
         when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
-            .thenReturn(mock(BaseObject.class));
+            .thenReturn(baseObjectMock);
         when(oldDocument.getAuthors()).thenReturn(mock());
         when(oldDocument.isNew()).thenReturn(true);
 
@@ -329,8 +330,9 @@ class DefaultModelBridgeTest
         XWikiDocument oldDocument = mock(XWikiDocument.class);
         when(oldDocument.clone()).thenReturn(oldDocument);
         when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
+        BaseObject baseObjectMock2 = mock(BaseObject.class);
         when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
-            .thenReturn(mock(BaseObject.class));
+            .thenReturn(baseObjectMock2);
         when(oldDocument.getAuthors()).thenReturn(mock());
         when(oldDocument.isNew()).thenReturn(false);
 
@@ -914,7 +916,8 @@ class DefaultModelBridgeTest
 
         assertFalse(this.modelBridge.canOverwriteSilently(documentReference));
 
-        when(document.getXObject(RedirectClassDocumentInitializer.REFERENCE)).thenReturn(mock(BaseObject.class));
+        BaseObject baseObjectMock3 = mock(BaseObject.class);
+        when(document.getXObject(RedirectClassDocumentInitializer.REFERENCE)).thenReturn(baseObjectMock3);
 
         assertTrue(this.modelBridge.canOverwriteSilently(documentReference));
     }

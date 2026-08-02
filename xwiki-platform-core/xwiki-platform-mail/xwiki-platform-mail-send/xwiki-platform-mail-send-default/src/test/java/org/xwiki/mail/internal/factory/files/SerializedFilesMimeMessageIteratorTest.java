@@ -45,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -94,7 +93,7 @@ class SerializedFilesMimeMessageIteratorTest
         when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
         ComponentManager componentManager = mock(ComponentManager.class);
-        when(componentManager.getInstance(eq(Environment.class))).thenReturn(environment);
+        when(componentManager.getInstance(Environment.class)).thenReturn(environment);
 
         // Create a serialized file before the iterator is initialized
         String mailID = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
@@ -134,7 +133,7 @@ class SerializedFilesMimeMessageIteratorTest
         when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
         ComponentManager componentManager = mock(ComponentManager.class);
-        when(componentManager.getInstance(eq(Environment.class))).thenReturn(environment);
+        when(componentManager.getInstance(Environment.class)).thenReturn(environment);
 
         SerializedFilesMimeMessageIterator iterator =
             new SerializedFilesMimeMessageIterator(this.batchId, parameters, componentManager);

@@ -82,7 +82,8 @@ class PrefilteringLiveNotificationEmailSenderTest
 
         when(this.sessionFactory.create(ArgumentMatchers.any())).thenReturn(null);
 
-        when(this.mailListenerProvider.get()).thenReturn(mock(MailListener.class));
+        MailListener mailListenerMock = mock(MailListener.class);
+        when(this.mailListenerProvider.get()).thenReturn(mailListenerMock);
 
         Event event1 = mock(Event.class);
         DocumentReference userReference = new DocumentReference("wiki", "XWiki", "user");

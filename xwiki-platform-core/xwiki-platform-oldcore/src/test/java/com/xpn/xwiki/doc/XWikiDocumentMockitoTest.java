@@ -909,7 +909,8 @@ class XWikiDocumentMockitoTest
         this.document.setMetaDataDirty(false);
 
         DocumentReference creator = new DocumentReference("Wiki", "XWiki", "Creator");
-        when(this.userReferenceDocumentReferenceResolver.resolve(creator)).thenReturn(mock(UserReference.class));
+        UserReference userReferenceMock = mock(UserReference.class);
+        when(this.userReferenceDocumentReferenceResolver.resolve(creator)).thenReturn(userReferenceMock);
         this.document.setCreatorReference(creator);
 
         assertEquals(true, this.document.isMetaDataDirty());
@@ -948,7 +949,8 @@ class XWikiDocumentMockitoTest
         this.document.setMetaDataDirty(false);
 
         DocumentReference author = new DocumentReference("Wiki", "XWiki", "Author");
-        when(this.userReferenceDocumentReferenceResolver.resolve(author)).thenReturn(mock(UserReference.class));
+        UserReference userReferenceMock2 = mock(UserReference.class);
+        when(this.userReferenceDocumentReferenceResolver.resolve(author)).thenReturn(userReferenceMock2);
         this.document.setAuthorReference(author);
 
         assertEquals(true, this.document.isMetaDataDirty());
@@ -990,7 +992,8 @@ class XWikiDocumentMockitoTest
         this.document.setMetaDataDirty(false);
 
         DocumentReference contentAuthor = new DocumentReference("Wiki", "XWiki", "ContentAuthor");
-        when(this.userReferenceDocumentReferenceResolver.resolve(contentAuthor)).thenReturn(mock(UserReference.class));
+        UserReference userReferenceMock3 = mock(UserReference.class);
+        when(this.userReferenceDocumentReferenceResolver.resolve(contentAuthor)).thenReturn(userReferenceMock3);
         this.document.setContentAuthorReference(contentAuthor);
 
         assertEquals(true, this.document.isMetaDataDirty());

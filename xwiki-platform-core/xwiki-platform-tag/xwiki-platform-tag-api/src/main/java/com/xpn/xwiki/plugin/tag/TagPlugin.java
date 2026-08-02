@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -173,7 +174,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             PropertyClass tagPropertyDefinition = (PropertyClass) tagClass.getField(TAG_PROPERTY);
             tagProperty = tagPropertyDefinition.newProperty();
         } catch (XWikiException ex) {
-            LOGGER.warn("Failed to properly create tag property for the tag object, creating a default one");
+            LOGGER.warn("Failed to properly create tag property for the tag object, creating a default one. Root "
+                + "cause is [{}]", ExceptionUtils.getRootCauseMessage(ex));
             tagProperty = new DBStringListProperty();
         }
         tagProperty.setName(TAG_PROPERTY);

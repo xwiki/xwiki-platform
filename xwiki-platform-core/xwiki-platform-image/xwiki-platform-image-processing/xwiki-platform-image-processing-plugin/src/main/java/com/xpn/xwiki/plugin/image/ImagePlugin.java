@@ -127,8 +127,9 @@ public class ImagePlugin extends XWikiDefaultPlugin
             try {
                 this.defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
             } catch (NumberFormatException e) {
-                LOG.warn("Failed to parse [{}] configuration parameter. Using [{}] as the default image quality.",
-                    DEFAULT_QUALITY_PARAM, this.defaultQuality);
+                LOG.warn("Failed to parse [{}] configuration parameter. Using [{}] as the default image quality. "
+                    + "Root cause is [{}].", DEFAULT_QUALITY_PARAM, this.defaultQuality,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

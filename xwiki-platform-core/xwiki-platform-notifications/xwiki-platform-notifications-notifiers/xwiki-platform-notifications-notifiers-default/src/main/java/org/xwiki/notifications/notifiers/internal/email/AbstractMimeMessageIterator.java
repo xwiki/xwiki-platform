@@ -300,7 +300,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         try {
             this.factoryParameters.put(FROM, new InternetAddress(this.mailSenderConfiguration.getFromAddress()));
         } catch (AddressException | NullPointerException e) {
-            this.logger.warn("No default email address is configured in the administration.");
+            this.logger.warn("No default email address is configured in the administration. Root cause is [{}].",
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         this.factoryParameters.put(TO, this.currentUserEmail);

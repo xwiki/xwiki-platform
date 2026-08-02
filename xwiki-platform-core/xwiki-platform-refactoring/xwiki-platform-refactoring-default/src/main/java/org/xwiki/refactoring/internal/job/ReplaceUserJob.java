@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.job.RefactoringJobs;
@@ -56,8 +55,7 @@ public class ReplaceUserJob extends AbstractReplaceUserJob
         try {
             update(xcontext.getWiki().getDocument(documentReference, xcontext));
         } catch (XWikiException e) {
-            this.logger.error("Failed to update document [{}]. Root cause is [{}].", documentReference,
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.error("Failed to update document [{}].", documentReference, e);
         }
     }
 

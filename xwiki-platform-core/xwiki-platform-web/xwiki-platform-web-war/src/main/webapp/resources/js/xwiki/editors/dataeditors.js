@@ -52,7 +52,7 @@
     class XDataEditors {
       constructor() {
         let self = this;
-        // Maintain informations about actions performed on the editor.
+        // Maintain information about actions performed on the editor.
         // Data abouts xobjects are map whom keys are xclass names and values are list of sorted xobjects ids
         this.editorStatus = {
           savedXObjects: {}, // already saved objects
@@ -709,7 +709,7 @@
         if(!startExpanded) {
           property.addClass('collapsed');
         }
-        // The click event is catched only on the icon and title to avoid breaking behaviour when using actions, 
+        // The click event is caught only on the icon and title to avoid breaking behaviour when using actions, 
         // especially the move action which is dragAndDrop.
         propertyTitle.find('.toggle-collapsable, h2').on('click', function() {
           propertyTitle.parent().toggleClass('collapsed');

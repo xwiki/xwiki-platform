@@ -111,7 +111,7 @@ var XWiki = (function(XWiki){
     });
 
     /**
-     * Helper class to request the server informations about a package via AJAX.
+     * Helper class to request the server information about a package via AJAX.
      */
     importer.PackageInformationRequest = Class.create({
 
@@ -408,7 +408,7 @@ var XWiki = (function(XWiki){
          * - The username of the author of the package (for example XWiki.Admin)
          * - Wether the package is a back up pack or not (contains revisions along with documents)
          *
-         * @param infos the array that contains the informations to build the header upon
+         * @param infos the array that contains the information to build the header upon
          */
         createPackageHeader:function(infos)
         {

@@ -34,7 +34,7 @@ var XWiki = (function(XWiki) {
   }
 
   /**
-   * Allow custom validation messages to be set on the validated field usin data attributes.
+   * Allow custom validation messages to be set on the validated field using data attributes.
    *
    * @param field the validated field
    */

@@ -206,7 +206,7 @@ public class HibernateStore implements Disposable, Initializable
             }
         } catch (Exception e) {
             // Probably running under -security, which prevents calling File.exists()
-            this.logger.debug("Failed load resource [{}] using a file path", path);
+            this.logger.debug("Failed to load resource [{}] using a file path", path, e);
         }
 
         try {
@@ -215,7 +215,7 @@ public class HibernateStore implements Disposable, Initializable
                 return res;
             }
         } catch (Exception e) {
-            this.logger.debug("Failed to load resource [{}] using the application context", path);
+            this.logger.debug("Failed to load resource [{}] using the application context", path, e);
         }
 
         URL url = Thread.currentThread().getContextClassLoader().getResource(path);

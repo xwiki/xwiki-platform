@@ -90,7 +90,7 @@ public class RefererStatsStoreItem extends AbstractStatsStoreItem
             // TODO Fix use of deprecated call.
             store.loadXWikiCollection(refererStat, this.context, true);
         } catch (XWikiException e) {
-            LOGGER.debug("Failed to load referer statistics object [{}]", getId());
+            LOGGER.debug("Failed to load referer statistics object [{}]", getId(), e);
         }
 
         // Increment counters

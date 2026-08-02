@@ -60,9 +60,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
     {
         String authservicepage = getParam("groovy_pagename", context);
         if ((authservicepage == null) || authservicepage.trim().isEmpty()) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("No page specified for auth service implementation");
-            }
+            LOGGER.error("No page specified for auth service implementation");
             return null;
         }
 
@@ -76,9 +74,7 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
                 return null;
             }
         } catch (XWikiException e) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Exception while parsing groovy authentication service code", e);
-            }
+            LOGGER.error("Exception while parsing groovy authentication service code", e);
             return null;
         }
     }

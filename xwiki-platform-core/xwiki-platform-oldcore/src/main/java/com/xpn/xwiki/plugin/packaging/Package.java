@@ -642,9 +642,7 @@ public class Package
 
     public int testInstall(boolean isAdmin, XWikiContext context)
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Package test install");
-        }
+        LOGGER.debug("Package test install");
 
         int result = DocumentInfo.INSTALL_IMPOSSIBLE;
         try {
@@ -1063,7 +1061,7 @@ public class Package
             toXML(baos, context);
             return baos.toString(context.getWiki().getEncoding());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to serialize the package descriptor of package [{}]", getName(), e);
             return "";
         }
     }
@@ -1156,7 +1154,7 @@ public class Package
             toXML(zos, context);
             zos.closeArchiveEntry();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to add the package descriptor of package [{}] to the ZIP", getName(), e);
         }
     }
 
@@ -1290,7 +1288,7 @@ public class Package
             fos.flush();
             fos.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to write the package descriptor of package [{}] to directory [{}]", getName(), dir, e);
         }
     }
 

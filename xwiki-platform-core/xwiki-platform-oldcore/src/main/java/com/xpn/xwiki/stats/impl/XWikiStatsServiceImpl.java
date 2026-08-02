@@ -106,9 +106,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
     @Override
     public void init(XWikiContext context)
     {
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Start statistics service initialization");
-        }
+        LOGGER.info("Start statistics service initialization");
 
         if (StatsUtil.isStatsEnabled(context)) {
             // Start statistics store thread

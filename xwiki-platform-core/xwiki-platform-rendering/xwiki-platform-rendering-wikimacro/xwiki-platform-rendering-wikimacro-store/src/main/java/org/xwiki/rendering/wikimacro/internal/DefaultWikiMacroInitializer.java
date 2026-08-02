@@ -235,10 +235,11 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
         } catch (InsufficientPrivilegesException ex) {
             // Just log the exception and skip to the next.
             // We only log at the debug level here as this is not really an error
-            this.logger.debug(ex.getMessage(), ex);
+            this.logger.debug("The author of the macro document [{}] is not allowed to register it.",
+                wikiMacroDocumentReference, ex);
         } catch (WikiMacroException ex) {
             // Just log the exception and skip to the next.
-            this.logger.error(ex.getMessage(), ex);
+            this.logger.error("Failed to register the macro defined in document [{}]", wikiMacroDocumentReference, ex);
         } finally {
             xcontext.setUserReference(originalAuthor);
         }

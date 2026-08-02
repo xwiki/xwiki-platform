@@ -568,7 +568,7 @@ public class XWikiStatsReader
             store.loadXWikiCollection(object, context, true);
             return object;
         } catch (XWikiException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to load the monthly statistics of document [{}] for action [{}]", docname, action, e);
             return new DocumentStats();
         }
     }

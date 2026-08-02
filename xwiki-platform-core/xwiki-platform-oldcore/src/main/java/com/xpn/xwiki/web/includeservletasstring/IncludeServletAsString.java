@@ -51,7 +51,7 @@ public class IncludeServletAsString
         if (requestDispatcher == null) {
             IllegalArgumentException iae =
                 new IllegalArgumentException("Failed to get RequestDispatcher for url: " + url);
-            LOGGER.error(iae.getMessage(), iae);
+            LOGGER.error("Failed to get the RequestDispatcher for url [{}]", url, iae);
             throw iae;
         }
 

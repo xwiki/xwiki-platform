@@ -989,7 +989,9 @@ public class XWikiAttachment implements Cloneable
 
             return latestStoredVersion != null ? latestStoredVersion.getVersion() : null;
         } catch (XWikiException e) {
-            LOGGER.warn(ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to get the latest stored version of attachment [{}] of document [{}]. "
+                + "Root cause is [{}]", this.filename, this.doc.getDocumentReference(),
+                ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }

@@ -864,9 +864,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                         try {
                             this.store.endTransaction(commit);
                         } catch (Exception e) {
-                            if (LOGGER.isErrorEnabled()) {
-                                LOGGER.error("Exception while close transaction", e);
-                            }
+                            LOGGER.error("Exception while closing the transaction", e);
                         }
                     }
                 }

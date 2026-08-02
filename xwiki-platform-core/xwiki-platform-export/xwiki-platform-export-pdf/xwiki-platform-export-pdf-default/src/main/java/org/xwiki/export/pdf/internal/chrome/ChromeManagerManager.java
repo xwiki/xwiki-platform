@@ -289,7 +289,7 @@ public class ChromeManagerManager implements Disposable
         containerManager.execInContainer(this.containerId,
             bashCommand(waitForChromeReady.formatted(localDebuggingPort)));
 
-        // Start the socat proxy and leave it runnning in the background.
+        // Start the socat proxy and leave it running in the background.
         this.logger.debug("Starting socat proxy: [0.0.0.0:{}] -> [127.0.0.1:{}]", remoteDebuggingPort,
             localDebuggingPort);
         String startSocat = "nohup socat TCP-LISTEN:%s,fork,reuseaddr TCP:127.0.0.1:%s > /dev/null 2>&1 &";

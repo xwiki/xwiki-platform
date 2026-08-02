@@ -68,7 +68,7 @@ public class XWikiQuery extends XWikiCriteria
                     bclass.get(propname), this, map);
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Failed to excute PropertyClass#fromSearchMap", e);
+                    "Failed to execute PropertyClass#fromSearchMap", e);
             }
         }
     }

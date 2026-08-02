@@ -187,7 +187,7 @@ public class OfficeAttachmentImporter implements AttachmentImporter
         }
 
         throw new OfficeImporterException(
-            String.format("Cannot find temporary uplodaded attachment [%s]", attachmentReference));
+            String.format("Cannot find temporary uploaded attachment [%s]", attachmentReference));
     }
 
     /**

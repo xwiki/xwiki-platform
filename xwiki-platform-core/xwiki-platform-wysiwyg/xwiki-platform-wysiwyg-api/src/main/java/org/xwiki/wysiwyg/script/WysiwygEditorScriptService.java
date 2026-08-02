@@ -237,7 +237,7 @@ public class WysiwygEditorScriptService implements ScriptService
             // results. We do this because the main caller of this method is the CKEditor extension and it needs to
             // work with several version of XWiki (including versions older than 11.9RC1 - in which this new method
             // signature was added) and for simplicity reasons is currently passing null.
-            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and reomve this
+            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and remove this
             // fallback.
             EntityReference resolvedSourceReference = sourceReference;
             if (resolvedSourceReference == null) {

@@ -55,7 +55,7 @@ public class DocumentDocumentReferenceUserReferenceResolver extends AbstractUser
         if (rawReference == null) {
             reference = GuestUserReference.INSTANCE;
         } else {
-            // small perf improvment to avoid keep duplicated references in memory.
+            // small perf improvement to avoid keep duplicated references in memory.
             DocumentReference documentReference = this.entityReferenceFactory.getReference(rawReference);
             reference = resolveName(documentReference.getName());
             if (reference == null) {

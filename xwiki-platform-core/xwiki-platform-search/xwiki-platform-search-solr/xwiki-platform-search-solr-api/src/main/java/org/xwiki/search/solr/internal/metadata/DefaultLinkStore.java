@@ -93,7 +93,7 @@ public class DefaultLinkStore implements LinkStore
         try {
             return this.solr.getClient(SolrClientInstance.CORE_NAME);
         } catch (SolrException e) {
-            throw new LinkException("Failed to acces Solr search core", e);
+            throw new LinkException("Failed to access Solr search core", e);
         }
     }
 

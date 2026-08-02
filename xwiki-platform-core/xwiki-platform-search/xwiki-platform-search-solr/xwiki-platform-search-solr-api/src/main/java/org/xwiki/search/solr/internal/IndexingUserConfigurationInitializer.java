@@ -43,7 +43,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("XWiki.SolrSearchAdminIndexingUser")
 @Singleton
-// initalize after the corresponding class
+// initialize after the corresponding class
 @Priority(ComponentDescriptor.DEFAULT_PRIORITY + 100)
 public class IndexingUserConfigurationInitializer extends AbstractMandatoryDocumentInitializer
 {

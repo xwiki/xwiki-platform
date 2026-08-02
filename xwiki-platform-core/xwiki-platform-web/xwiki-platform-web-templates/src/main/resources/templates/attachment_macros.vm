@@ -30,7 +30,7 @@
     ## Sort the dates descending.
     #set ($sortAttachmentsBy = 'date:desc')
   #else
-    ## Sort everthing else ascending.
+    ## Sort everything else ascending.
     #set ($sortAttachmentsBy = "$sortAttachmentsBy:asc")
   #end
   #set ($attachments = $collectiontool.sort($attachments, $sortAttachmentsBy))

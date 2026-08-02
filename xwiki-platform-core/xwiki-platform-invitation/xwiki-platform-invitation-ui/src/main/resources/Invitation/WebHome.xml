@@ -181,7 +181,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
  *
  * $config (XObject) configuration for the inviter.
  *
- * $emailContainer (Document) the document contaning the mail message.
+ * $emailContainer (Document) the document containing the mail message.
  *###
 #macro(generateAndSendMail, $config, $recipients, $messageSubject, $messageContent)
   #set($messages = [])
@@ -209,7 +209,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 
       (%id="invitation-action-message"%)(((##
       #if($errors.size() &gt; 0)
-        ## An error has occured while sending the message.
+        ## An error has occurred while sending the message.
         {{error}}$services.localization.render('xe.invitation.errorWhileSending'){{/error}}##
       #else
         ## Your message has been sent.
@@ -234,7 +234,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
  *
  * $config (XObject) configuration for the inviter.
  *
- * $emailContainer (Document) the document contaning the mail messages.
+ * $emailContainer (Document) the document containing the mail messages.
  *###
 #macro(sendMail, $messages, $config, $emailContainer)
   ##
@@ -465,7 +465,7 @@ $xwiki.get('ssx').use($config.get('commonPage'))
 ##
 #*
  * Get the list of recipients from the user input string.
- * Splits on space but is tolerent of commas.
+ * Splits on space but is tolerant of commas.
  * Each email in the list may only appear in the output once (no duplicates.)
  *
  * $recipientString (String) the String input by the user eg: "alice@example.com bob@example.com"

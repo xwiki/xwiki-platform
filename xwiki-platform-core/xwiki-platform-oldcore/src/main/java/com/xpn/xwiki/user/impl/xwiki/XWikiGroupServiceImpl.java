@@ -70,7 +70,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     public static final EntityReference GROUPCLASS_REFERENCE = new EntityReference(CLASS_SUFFIX_XWIKIGROUPS,
         EntityType.DOCUMENT, new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiGroupServiceImpl.class);
 
     /**
      * Name of the "XWiki.XWikiUsers" class without the space name.

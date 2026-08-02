@@ -32,10 +32,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
+import jakarta.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
@@ -67,7 +68,8 @@ public class UploadAction extends XWikiAction
     public static final String FILE_FIELD_NAME = "filepath";
 
     /** Logging helper object. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(UploadAction.class);
+    @Inject
+    private Logger logger;
 
     /** The prefix of the corresponding filename input field name. */
     private static final String FILENAME_FIELD_NAME = "filename";
@@ -137,20 +139,20 @@ public class UploadAction extends XWikiAction
             try {
                 uploadAttachment(file.getValue(), file.getKey(), fileupload, doc, context);
             } catch (Exception ex) {
-                LOGGER.warn("Failed to save uploaded file [{}]. Root cause is [{}]", file.getKey(),
+                this.logger.warn("Failed to save uploaded file [{}]. Root cause is [{}]", file.getKey(),
                     ExceptionUtils.getRootCauseMessage(ex));
                 failedFiles.put(file.getKey(), ExceptionUtils.getRootCauseMessage(ex));
             }
         }
 
-        LOGGER.debug("Found files to upload: {}", fileNames);
-        LOGGER.debug("Failed attachments: {}", failedFiles);
-        LOGGER.debug("Wrong attachment names: {}", wrongFileNames);
+        this.logger.debug("Found files to upload: {}", fileNames);
+        this.logger.debug("Failed attachments: {}", failedFiles);
+        this.logger.debug("Wrong attachment names: {}", wrongFileNames);
         if (ajax) {
             try {
                 response.getOutputStream().println("ok");
             } catch (IOException ex) {
-                LOGGER.error("Unhandled exception writing output:", ex);
+                this.logger.error("Unhandled exception writing output:", ex);
             }
             return false;
         }
@@ -304,7 +306,7 @@ public class UploadAction extends XWikiAction
                 context.getResponse().getOutputStream()
                     .println("error: " + localizePlainOrKey((String) context.get(MESSAGE)));
             } catch (IOException ex) {
-                LOGGER.error("Unhandled exception writing output:", ex);
+                this.logger.error("Unhandled exception writing output:", ex);
             }
             return null;
         }

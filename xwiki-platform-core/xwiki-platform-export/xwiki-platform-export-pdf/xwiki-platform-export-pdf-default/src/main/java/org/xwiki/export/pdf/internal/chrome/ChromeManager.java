@@ -278,10 +278,8 @@ public class ChromeManager implements BrowserManager, Initializable, Disposable
 
     private void handleInterruptedException(InterruptedException e)
     {
-        if (this.logger.isWarnEnabled()) {
-            this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
-                ExceptionUtils.getRootCauseMessage(e));
-        }
+        this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
+            ExceptionUtils.getRootCauseMessage(e));
         // Restore the interrupted state.
         Thread.currentThread().interrupt();
     }

@@ -29,7 +29,6 @@ import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.component.annotation.Component;
@@ -60,7 +59,8 @@ public class RegisterAction extends XWikiAction
     private static final String REG_CONSTANT = "reg";
 
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(RegisterAction.class);
+    @Inject
+    private Logger logger;
 
     /** Space where the registration config and class are stored. */
     private static final String WIKI_SPACE = "XWiki";
@@ -153,11 +153,11 @@ public class RegisterAction extends XWikiAction
                 Captcha captcha = Utils.getComponent(org.xwiki.captcha.Captcha.class, defaultCaptchaName);
 
                 if (!captcha.isValid()) {
-                    LOGGER.warn("Incorrect CAPTCHA answer");
+                    this.logger.warn("Incorrect CAPTCHA answer");
                     return false;
                 }
             } catch (Exception e) {
-                LOGGER.warn("Cannot verify answer for CAPTCHA of type [{}]: [{}]", defaultCaptchaName,
+                this.logger.warn("Cannot verify answer for CAPTCHA of type [{}]: [{}]", defaultCaptchaName,
                     ExceptionUtils.getRootCauseMessage(e));
                 return false;
             }

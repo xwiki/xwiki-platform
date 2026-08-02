@@ -31,7 +31,7 @@ import com.xpn.xwiki.pdf.impl.PdfURLFactory;
 
 public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiURLFactoryService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiURLFactoryServiceImpl.class);
 
     private Map<Integer, Class<? extends XWikiURLFactory>> factoryMap;
 

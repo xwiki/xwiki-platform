@@ -495,9 +495,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             if (children != null) {
                 for (SecurityCacheEntry child : children) {
                     if (!child.disposed) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Cascaded removal of entry [{}] from cache.", child.getKey());
-                        }
+                        logger.debug("Cascaded removal of entry [{}] from cache.", child.getKey());
                         child.dispose();
                     }
                 }
@@ -530,9 +528,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         {
             if (this.children != null) {
                 this.children.remove(entry);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Remove child [{}] from [{}].", entry.getKey(), getKey());
-                }
+                logger.debug("Remove child [{}] from [{}].", entry.getKey(), getKey());
             }
         }
 

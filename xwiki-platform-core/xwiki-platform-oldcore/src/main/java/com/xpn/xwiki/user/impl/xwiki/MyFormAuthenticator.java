@@ -160,9 +160,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 principal = authenticate(username, password, context);
 
                 if (principal != null) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("User [{}] has been authentified from cookie", principal.getName());
-                    }
+                    LOGGER.debug("User [{}] has been authentified from cookie", principal.getName());
 
                     // make sure the Principal contains wiki name information
                     if (!StringUtils.contains(principal.getName(), ':')) {
@@ -213,9 +211,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             Utils.getComponent(AuthenticationFailureManager.class);
         if (principal != null && authenticationFailureManager.validateForm(username, request)) {
             // login successful
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("User [{}] has been logged-in", principal.getName());
-            }
+            LOGGER.info("User [{}] has been logged-in", principal.getName());
 
             authenticationFailureManager.resetAuthenticationFailureCounter(username);
 
@@ -254,9 +250,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         } else {
             // login failed
             // set response status and forward to error page
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("User [{}] login has failed", username);
-            }
+            LOGGER.info("User [{}] login has failed", username);
 
             authenticationFailureManager.recordAuthenticationFailure(username, request);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

@@ -37,7 +37,7 @@ import com.xpn.xwiki.web.Utils;
 public class ImagePluginAPI extends PluginApi<ImagePlugin>
 {
     /** Logging helper object. */
-    private static final Logger LOG = LoggerFactory.getLogger(ImagePluginAPI.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImagePluginAPI.class);
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -70,7 +70,7 @@ public class ImagePluginAPI extends PluginApi<ImagePlugin>
         try {
             return getProtectedPlugin().getHeight(getAttachment(pageName, attachmentName), getXWikiContext());
         } catch (Exception e) {
-            LOG.error("Failed to detect the height of [{}] attached to [{}].", attachmentName, pageName, e);
+            LOGGER.error("Failed to detect the height of [{}] attached to [{}].", attachmentName, pageName, e);
             return -1;
         }
     }
@@ -87,7 +87,7 @@ public class ImagePluginAPI extends PluginApi<ImagePlugin>
         try {
             return getProtectedPlugin().getWidth(getAttachment(pageName, attachmentName), getXWikiContext());
         } catch (Exception e) {
-            LOG.error("Failed to detect the width of [{}] attached to [{}].", attachmentName, pageName, e);
+            LOGGER.error("Failed to detect the width of [{}] attached to [{}].", attachmentName, pageName, e);
             return -1;
         }
     }

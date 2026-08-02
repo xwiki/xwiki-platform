@@ -29,7 +29,6 @@ import javax.script.ScriptContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.component.annotation.Component;
@@ -66,7 +65,8 @@ public class CommentAddAction extends XWikiAction
     /** The name of the space where user profiles are kept. */
     private static final String USER_SPACE_PREFIX = "XWiki.";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommentAddAction.class);
+    @Inject
+    private Logger logger;
 
     @Inject
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
@@ -183,7 +183,8 @@ public class CommentAddAction extends XWikiAction
 
                 return captcha.isValid();
             } catch (Exception e) {
-                LOGGER.error("Failed to verify CAPTCHA of type [{}]. Assuming wrong answer.", defaultCaptchaName, e);
+                this.logger.error("Failed to verify CAPTCHA of type [{}]. Assuming wrong answer.",
+                    defaultCaptchaName, e);
                 return false;
             }
         } else {

@@ -136,7 +136,7 @@
    *              registration information. If you don't want a password to be passed back in html then set this true
    *              for the password fields. Used for the captcha because it makes no sense to pass back a captcha answer.
    *
-   *   doAfterRegistration - Some Velocity code which will be executed after a successfull registration.
+   *   doAfterRegistration - Some Velocity code which will be executed after a successful registration.
    *                         This is used in the favorite color example.
    *                         Remember to put the code in singel quotes ('') because you want the 'code' entry to equal the literal
    *                         code, not the output from running it.

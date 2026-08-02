@@ -72,7 +72,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
 #**
  * Displays the attachment gallery as a list of attachment boxes, starting with special boxes for uploading a new attachment and for setting a default value.
  *
- * @param $targetDocument the document to recieve the field value being modified
+ * @param $targetDocument the document to receive the field value being modified
  * @param $targetAttachDocument the document to list/save attachments to
  * @param $options generic picker options
  *#

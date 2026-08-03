@@ -37,6 +37,7 @@ import org.testcontainers.utility.DockerImageName;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.junit5.RuntimeUtils;
 
 import static org.xwiki.test.docker.junit5.database.Database.MARIADB;
@@ -63,10 +64,19 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     private static final String ORACLE_PASSWORD = ORACLE_USERNAME;
 
     /**
-     * @param testConfiguration the configuration to build (database, debug mode, etc)
-     * @throws Exception if the container fails to start
+     * The user created by default by HSQLDB in a new database.
      */
-    public void start(TestConfiguration testConfiguration) throws Exception
+    private static final String HSQLDB_USERNAME = "sa";
+
+    private static final String HSQLDB_PASSWORD = "";
+
+    /**
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @param mavenResolver the resolver to use to resolve the database artifacts
+     * @throws Exception if the container fails to start
+     * @since 18.7.0RC1
+     */
+    public void start(TestConfiguration testConfiguration, MavenResolver mavenResolver) throws Exception
     {
         switch (testConfiguration.getDatabase()) {
             case MYSQL:
@@ -81,11 +91,16 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             case ORACLE:
                 startOracleContainer(testConfiguration);
                 break;
-            case HSQLDB_EMBEDDED:
-                // We don't need a Docker image/container since HSQLDB can work in embedded mode.
-                // It's configured automatically in the custom XWiki WAR.
-                // Thus, nothing to do here!
-                testConfiguration.getDatabase().setIP("localhost");
+            case HSQLDB:
+                if (testConfiguration.isDatabaseEmbedded()) {
+                    // We don't need a Docker image/container since HSQLDB can work in embedded mode.
+                    // It's configured automatically in the custom XWiki WAR.
+                    // Thus, nothing to do here!
+                    testConfiguration.getDatabase().setIP("localhost");
+                } else {
+                    // An embedded HSQLDB cannot be shared by several XWiki instances, so start it in server mode.
+                    startHSQLDBServerContainer(testConfiguration, mavenResolver);
+                }
                 break;
             default:
                 throw new RuntimeException(String.format("Database [%s] is not yet supported!",
@@ -188,6 +203,28 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             databaseContainer = new MariaDBContainer<>("mariadb:latest");
         }
         startMySQLContainer(databaseContainer, testConfiguration, MARIADB);
+    }
+
+    private void startHSQLDBServerContainer(TestConfiguration testConfiguration, MavenResolver mavenResolver)
+        throws Exception
+    {
+        // Note: the HSQLDB version is not defined by the image tag (it's defined by the HSQLDB JAR, i.e. by the
+        // "hsqldb.version" property of the current POM or by the configured JDBC driver version). Thus, when a
+        // database tag is specified, it's used as the tag of the JRE image in which the HSQLDB server is executed.
+        String imageTag = testConfiguration.getDatabaseTag() != null ? testConfiguration.getDatabaseTag()
+            : String.format("%s-jre", mavenResolver.getPropertyFromCurrentPOM("xwiki.java.version.support"));
+        HSQLDBContainer databaseContainer =
+            new HSQLDBContainer(String.format("eclipse-temurin:%s", imageTag),
+                JDBCDriverResolver.resolve(testConfiguration, mavenResolver));
+        databaseContainer
+            .withDatabaseName(DBNAME)
+            .withUsername(HSQLDB_USERNAME)
+            .withPassword(HSQLDB_PASSWORD);
+
+        mountDatabaseDataIfNeeded(databaseContainer, "./target/hsqldb", HSQLDBContainer.DATA_DIRECTORY,
+            testConfiguration);
+
+        startDatabaseContainer(databaseContainer, HSQLDBContainer.PORT, testConfiguration);
     }
 
     private void startPostgreSQLContainer(TestConfiguration testConfiguration) throws Exception

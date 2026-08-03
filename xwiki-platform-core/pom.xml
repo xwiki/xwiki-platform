@@ -149,10 +149,36 @@
               </differences>
             </revapi.differences>
             -->
-            
-            
-            
-            
+            <revapi.differences>
+              <justification>
+                We changed the default algorithm for PasswordClass hash computation for something more robust and we
+                also changed the format of the hash for better handling in the future.
+              </justification>
+              <criticality>highlight</criticality>
+                <differences>
+                  <item>
+                    <ignore>true</ignore>
+                    <code>java.field.constantValueChanged</code>
+                    <old>field com.xpn.xwiki.objects.classes.PasswordClass.DEFAULT_HASH_ALGORITHM</old>
+                    <new>field com.xpn.xwiki.objects.classes.PasswordClass.DEFAULT_HASH_ALGORITHM</new>
+                  </item>
+                  <item>
+                    <ignore>true</ignore>
+                    <code>java.method.removed</code>
+                    <old>method java.lang.String com.xpn.xwiki.objects.classes.PasswordClass::getPasswordHash(java.lang.String, java.lang.String, java.lang.String)</old>
+                  </item>
+                  <item>
+                    <ignore>true</ignore>
+                    <code>java.method.removed</code>
+                    <old>method java.lang.String com.xpn.xwiki.objects.classes.PasswordClass::getSaltFromPassword(java.lang.String)</old>
+                  </item>
+                  <item>
+                    <ignore>true</ignore>
+                    <code>java.method.removed</code>
+                    <old>method java.lang.String com.xpn.xwiki.objects.classes.PasswordClass::randomSalt()</old>
+                  </item>
+                </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

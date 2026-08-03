@@ -267,6 +267,7 @@ com.xpn.xwiki.web.ViewAttachRevAction
 org.xwiki.internal.template.ActionTemplateRequirement
 org.xwiki.internal.migration.R150000000XWIKI20285DataMigration
 org.xwiki.internal.migration.R180100000XWIKI23827DataMigration
+org.xwiki.internal.migration.R180800000XWIKI24357DataMigration
 org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingFixer
 org.xwiki.internal.migration.InvitationInternalDocumentParameterEscapingTaskConsumer
 org.xwiki.internal.objects.DatePropertyParser

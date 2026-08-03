@@ -19,14 +19,23 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.ecs.xhtml.input;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
+import org.xwiki.security.internal.XWikiLegacyPasswordEncoder;
 import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
@@ -41,6 +50,17 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 /**
  * Define a property field to hold a password.
+ * Password hashing in that class relies on the following set of algorithms provided by Spring Security framework:
+ * <ul>
+ *     <li>argon2: Default algorithm when nothing is specified. The provided implementation is the one for Spring
+ *     Security v5.8.</li>
+ *     <li>bcrypt: Note that this algorithm has a limit of 72 characters.</li>
+ *     <li>scrypt: The provided implementation is the one for Spring Security v5.8.</li>
+ *     <li>pbkdf2: The provided implementation is the one for Spring Security v5.8.</li>
+ *     <li>SHA-1: Deprecated. Only provided for legacy purpose.</li>
+ *     <li>SHA-256: Deprecated. Only provided for legacy purpose.</li>
+ *     <li>SHA-512: Deprecated. Only provided for legacy purpose.</li>
+ * </ul>
  *
  * @version $Id$
  */
@@ -53,11 +73,87 @@ public class PasswordClass extends StringClass
     @Unstable
     public static final String PROPERTY_TYPE = "Password";
 
+    /**
+     * The key for the argon2 algorithm which is the default hashing algorithm used in the class.
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public static final String ARGON2_ALGORITHM = "argon2";
+
+    /**
+     * The key for the bcrypt hash algorithm.
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public static final String BCRYPT_ALGORITHM = "bcrypt";
+
+    /**
+     * The key for the scrypt hash algorithm.
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public static final String SCRYPT_ALGORITHM = "scrypt";
+
+    /**
+     * The key for the pbkdf2 hash algorithm.
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public static final String PBKDF2_ALGORITHM = "pbkdf2";
+
+    /**
+     * The key for the SHA-1 hash algorithm: note that this algorithm is deprecated and only provided for legacy
+     * reasons.
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public static final String SHA_1_ALGORITHM = "SHA-1";
+
+    /**
+     * The key for the SHA-256 hash algorithm: note that this algorithm is deprecated and only provided for legacy
+     * reasons.
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public static final String SHA_256_ALGORITHM = "SHA-256";
+
+    /**
+     * The key for the SHA-512 hash algorithm: note that this algorithm is deprecated and only provided for legacy
+     * reasons.
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public static final String SHA_512_ALGORITHM = "SHA-512";
+
+    /**
+     * Expose the full list of supported hash algorithms.
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public static final List<String> SUPPORTED_ALGORITHMS = List.of(
+        XWikiLegacyPasswordEncoder.ALGORITHM_ID,
+        ARGON2_ALGORITHM,
+        BCRYPT_ALGORITHM,
+        SCRYPT_ALGORITHM,
+        PBKDF2_ALGORITHM,
+        SHA_1_ALGORITHM,
+        SHA_256_ALGORITHM,
+        SHA_512_ALGORITHM
+    );
+
     protected static final Logger LOGGER = LoggerFactory.getLogger(PasswordClass.class);
 
     protected static final String DEFAULT_STORAGE = PasswordMetaClass.HASH;
 
-    protected static final String DEFAULT_HASH_ALGORITHM = "SHA-512";
+    protected static final String DEFAULT_HASH_ALGORITHM = ARGON2_ALGORITHM;
 
     protected static final String HASH_IDENTIFIER = "hash";
 
@@ -67,12 +163,37 @@ public class PasswordClass extends StringClass
 
     private static final long serialVersionUID = 1L;
 
+    private static final String ALGORITHM_ID_PATTERN_GROUP = "algorithmId";
+    private static final String PASSWORD_HASH_PATTERN_GROUP = "passwordHash";
+    private static final Pattern HASH_PATTERN = Pattern.compile(
+        String.format("^((hash:)|(\\{(?<%s>%s)}))(?<%s>.*)$",
+            ALGORITHM_ID_PATTERN_GROUP,
+            String.join("|", SUPPORTED_ALGORITHMS),
+            PASSWORD_HASH_PATTERN_GROUP
+        ));
+
     // "password" is used for both the field type and the xclass name:
     // we use a single constant to comply with checkstyle here.
     private static final String PASSWORD_FIELD_TYPE = "password";
     private static final String XCLASSNAME = PASSWORD_FIELD_TYPE;
+    private static final XWikiLegacyPasswordEncoder LEGACY_PASSWORD_ENCODER = new XWikiLegacyPasswordEncoder();
+    private static final Map<String, PasswordEncoder> ENCODERS_MAP = Map.of(
+        BCRYPT_ALGORITHM, new BCryptPasswordEncoder(),
+        PBKDF2_ALGORITHM, Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8(),
+        SCRYPT_ALGORITHM, SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8(),
+        ARGON2_ALGORITHM, Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8(),
+        SHA_1_ALGORITHM,
+        new org.springframework.security.crypto.password.MessageDigestPasswordEncoder(SHA_1_ALGORITHM),
+        SHA_256_ALGORITHM,
+        new org.springframework.security.crypto.password.MessageDigestPasswordEncoder(SHA_256_ALGORITHM),
+        SHA_512_ALGORITHM,
+        new org.springframework.security.crypto.password.MessageDigestPasswordEncoder(SHA_512_ALGORITHM),
+        XWikiLegacyPasswordEncoder.ALGORITHM_ID, LEGACY_PASSWORD_ENCODER
+    );
 
-    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final IllegalArgumentException ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT =
+        new IllegalArgumentException("The provided encoded password doesn't match any known hash "
+            + "encoded password format.");
 
     /**
      * Default constructor with a metaclass.
@@ -94,16 +215,29 @@ public class PasswordClass extends StringClass
     @Override
     public BaseProperty fromString(String value) throws XWikiException
     {
-        if (FORM_PASSWORD_PLACEHODLER.equals(value)) {
-            return null;
-        }
         BaseProperty property = newProperty();
-        if (value.isEmpty() || value.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
+        if (value.isEmpty() || isPasswordHashed(value)) {
             property.setValue(value);
         } else {
             property.setValue(getProcessedPassword(value));
         }
         return property;
+    }
+
+    /**
+     * Compute if a value is a hash password or not based only on its prefix.
+     * The method will return {@code true} either if value starts with {@code hash:} or if it starts with
+     * {@code {algorithmName}} where the provided algorithm name is a supported hash algorithm.
+     *
+     * @param value the value to check if it's a hashed password or not
+     * @return {@code true} if it's recognized as a hash.
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public static boolean isPasswordHashed(String value)
+    {
+        return value != null && value.startsWith(HASH_IDENTIFIER + SEPARATOR) || HASH_PATTERN.matcher(value).matches();
     }
 
     @Override
@@ -145,7 +279,7 @@ public class PasswordClass extends StringClass
     }
 
     /**
-     * @return One of 'Clear', 'Hash' or 'Encrypt'.
+     * @return 'Clear' or 'Hash'.
      */
     public String getStorageType()
     {
@@ -163,54 +297,12 @@ public class PasswordClass extends StringClass
     }
 
     /**
-     * @param storageType One of 'Clear', 'Hash' or 'Encrypt'
+     * @param storageType One of 'Clear' or 'Hash'
      * @since 10.7RC1
      */
     public void setStorageType(String storageType)
     {
         setStringValue(PasswordMetaClass.STORAGE_TYPE, storageType);
-    }
-
-    /**
-     * @return The hash algorithm configured for this XProperty.
-     */
-    public String getHashAlgorithm()
-    {
-        BaseProperty alg = (BaseProperty) this.getField(PasswordMetaClass.ALGORITHM_KEY);
-        if (alg != null && alg.getValue() != null && !alg.getValue().toString().trim().isEmpty()) {
-            return alg.getValue().toString();
-        }
-        return DEFAULT_HASH_ALGORITHM;
-    }
-
-    /**
-     * @param password
-     * @return The algorithm used for the given password.
-     */
-    public String getAlgorithmFromPassword(String password)
-    {
-        int beginIndex = password.indexOf(SEPARATOR) + 1;
-        if (beginIndex >= 0) {
-            int endIndex = password.indexOf(SEPARATOR, beginIndex);
-            if (endIndex >= 0) {
-                return password.substring(beginIndex, endIndex);
-            }
-        }
-        return DEFAULT_HASH_ALGORITHM;
-    }
-
-    /**
-     * @param password
-     * @return The salt used for the given password. If this is an unsalted password, let it be known by returning "".
-     */
-    public String getSaltFromPassword(String password)
-    {
-        String[] components = password.split(SEPARATOR);
-        if (components.length == 4) {
-            return components[2];
-        } else {
-            return "";
-        }
     }
 
     /**
@@ -221,22 +313,20 @@ public class PasswordClass extends StringClass
      * @param storedPassword The stored password, which gives the storage type and algorithm.
      * @param plainPassword The plain text password to be encrypted.
      * @return The input password, encrypted with the same mechanism as the stored password.
+     * @deprecated Contrarily to what the original doc says this method only returns the stored password value, if
+     * there's a match between both values, else it returns an empty string. It shouldn't be used at all anymore and
+     * instead {@link #arePasswordsMatching(String, String)} should be used.
      */
+    @Deprecated(since = "18.8.0RC1, 18.4.5")
     public String getEquivalentPassword(String storedPassword, String plainPassword)
     {
-        String result = plainPassword;
-        if (storedPassword != null && plainPassword != null
-            && storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
-            result = getPasswordHash(result, getAlgorithmFromPassword(storedPassword),
-                    getSaltFromPassword(storedPassword));
-        }
-        return result;
+        return (arePasswordsMatching(plainPassword, storedPassword)) ? storedPassword : "";
     }
 
     /**
-     * Process the given password to hash or encrypt it depending on the storage type and the defined algorithm.
-     * @param password the password to be hashed or encrypted.
-     * @return a hashed or encrypted password
+     * Process the given password depending on the storage type and the defined algorithm.
+     * @param password the password to be processed
+     * @return a hashed password
      */
     public String getProcessedPassword(String password)
     {
@@ -249,102 +339,136 @@ public class PasswordClass extends StringClass
     }
 
     /**
+     * Compute a hash for the given password based on the algorithm contained in the class property information, or
+     * based on the {@link #DEFAULT_HASH_ALGORITHM} if not provided.
+     * The returned hash is using the format {@code {algorithmKey}passwordHash}.
+     *
      * @param password the password to hash.
-     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <algorithmName>}
-     * is the default hashing algorithm (see {@link #DEFAULT_HASH_ALGORITHM}), {@code <salt>} is a random 64 character
-     * salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given hashing algorithm.
+     * @return an encoded password hash containing the name of the algorithm to use for matching.
      */
     public String getPasswordHash(String password)
     {
-        return getPasswordHash(password, getHashAlgorithm(), null);
+        return getPasswordHash(password, getHashAlgorithm());
     }
 
     /**
+     * {@return the hash algorithm configured for this XProperty}
+     */
+    public String getHashAlgorithm()
+    {
+        BaseProperty alg = (BaseProperty) this.getField(PasswordMetaClass.ALGORITHM_KEY);
+        if (alg != null && !StringUtils.isEmpty(String.valueOf(alg.getValue()))) {
+            return alg.getValue().toString();
+        }
+        return DEFAULT_HASH_ALGORITHM;
+    }
+
+    /**
+     * @param password the encoded password
+     * @return The algorithm used for the given password or {@code null} if the storage type is clear.
+     */
+    public String getAlgorithmFromPassword(String password)
+    {
+        if (PasswordMetaClass.CLEAR.equals(getStorageType())) {
+            return null;
+        } else if (password.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
+            warnAboutOutdatedAlgorithm(XWikiLegacyPasswordEncoder.ALGORITHM_ID);
+            return LEGACY_PASSWORD_ENCODER.getAlgorithmFromPassword(password);
+        } else {
+            Matcher hashMatcher = HASH_PATTERN.matcher(password);
+            if (hashMatcher.matches()) {
+                return hashMatcher.group(ALGORITHM_ID_PATTERN_GROUP);
+            } else {
+                throw ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT;
+            }
+        }
+    }
+
+    /**
+     * Compute a password hash based on the given algorithm.
+     *
      * @param password the password to hash.
-     * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
-     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <salt>} is a
-     * random 64 character salt and {@code <hexStrignHash>} is the salted hash of the given password, using the given
-     * hashing algorithm.
+     * @param algorithmName the name of the algorithm to use for performing the hash (e.g. "argon2", "scrypt", etc).
+     * @return a hash whose format is {@code {algorithmName}hash}
      */
     public String getPasswordHash(String password, String algorithmName)
     {
-        return getPasswordHash(password, algorithmName, null);
+        PasswordEncoder passwordEncoder = getPasswordEncoder(algorithmName);
+        String encodedPassword = this.ENCODERS_MAP.get(algorithmName).encode(password);
+        if (passwordEncoder.upgradeEncoding(encodedPassword)
+            || isDeprecatedEncoder(passwordEncoder.getClass())) {
+            warnAboutOutdatedAlgorithm(algorithmName);
+        }
+        return String.format("{%s}%s", algorithmName, encodedPassword);
+    }
+
+    private @NonNull PasswordEncoder getPasswordEncoder(String algorithmName)
+    {
+        if (this.ENCODERS_MAP.containsKey(algorithmName)) {
+            PasswordEncoder passwordEncoder = this.ENCODERS_MAP.get(algorithmName);
+            if (isDeprecatedEncoder(passwordEncoder.getClass())) {
+                warnAboutOutdatedAlgorithm(algorithmName);
+            }
+            return passwordEncoder;
+        } else {
+            throw new IllegalArgumentException(String.format("The algorithm [%s] is not supported for password hash.",
+                algorithmName));
+        }
     }
 
     /**
-     * @param password the password to hash.
-     * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
-     * @param providedSalt the string to pad the password with before hashing. If {@code null}, a random 64 character
-     * salt will be used. To disable salting, use an empty ({@code ""}) salt string.
-     * @return a string of the form {@code hash:<algorithmName>:<salt>:<hexStrignHash>}, where {@code <hexStrignHash>}
-     * is the salted hash of the given password, using the given hashing algorithm.
-     * @since 6.3M2
+     * Verify if the given raw passwords is matching the given encoded password.
+     * This method directly checks a case-sensitive equality of the passwords if the storage type is set to clear.
+     * Otherwise, the method will check a match with a password hash: the method still supports legacy encoded
+     * passwords (using the format {@code hash:<algorithmName>:<salt>:<hash>}) but it will warn to reencode them.
+     * In a similar way, if the provided encode passwords uses a deprecated algorithm a warning will be issued.
+     *
+     * @param rawPassword the raw password to test for a match
+     * @param encodedPassword the encoded (or not if the storage type is clear) password to match with
+     * @return {@code true} only if there's match between the passwords
+     * @since 18.8.0RC1
+     * @since 18.4.5
      */
-    public String getPasswordHash(String password, String algorithmName, String providedSalt)
+    @Unstable
+    public boolean arePasswordsMatching(String rawPassword, String encodedPassword)
     {
-        String salt = providedSalt;
-        // If no salt given, let's generate one.
-        if (salt == null) {
-            salt = randomSalt();
-        }
-
-        try {
-            LOGGER.debug("Hashing password");
-
-            String saltedPassword = salt + password;
-
-            MessageDigest hashAlgorithm = MessageDigest.getInstance(algorithmName);
-            hashAlgorithm.update(saltedPassword.getBytes());
-            byte[] digest = hashAlgorithm.digest();
-
-            // Build the result.
-            StringBuilder sb = new StringBuilder();
-            // Metadata
-            sb.append(HASH_IDENTIFIER);
-            sb.append(SEPARATOR);
-            sb.append(algorithmName);
-            sb.append(SEPARATOR);
-            // Backward compatibility concern : let's keep unsalted password the way they are.
-            if (!salt.isEmpty()) {
-                sb.append(salt);
-                sb.append(SEPARATOR);
-            }
-            // The actual password hash.
-            for (byte element : digest) {
-                int b = element & 0xFF;
-                if (b < 0x10) {
-                    sb.append('0');
+        if (PasswordMetaClass.CLEAR.equals(getStorageType())) {
+            return Strings.CS.equals(rawPassword, encodedPassword);
+        } else if (encodedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
+            warnAboutOutdatedAlgorithm(XWikiLegacyPasswordEncoder.ALGORITHM_ID);
+            return LEGACY_PASSWORD_ENCODER.matchesLegacy(rawPassword, encodedPassword);
+        } else {
+            Matcher hashMatcher = HASH_PATTERN.matcher(encodedPassword);
+            if (hashMatcher.matches()) {
+                String algorithmId = hashMatcher.group(ALGORITHM_ID_PATTERN_GROUP);
+                String passwordHash = hashMatcher.group(PASSWORD_HASH_PATTERN_GROUP);
+                PasswordEncoder passwordEncoder = getPasswordEncoder(algorithmId);
+                if (passwordEncoder.upgradeEncoding(passwordHash)) {
+                    warnAboutOutdatedAlgorithm(algorithmId);
                 }
-                sb.append(Integer.toHexString(b));
+                return passwordEncoder.matches(rawPassword, passwordHash);
+            } else {
+                throw ILLEGAL_ARGUMENT_EXCEPTION_UNKNOWN_FORMAT;
             }
-
-            return sb.toString();
-        } catch (NoSuchAlgorithmException ex) {
-            LOGGER.error("Wrong hash algorithm [{}] specified in property [{}] of class [{}]", algorithmName,
-                getName(), getXClassReference(), ex);
-        } catch (NullPointerException ex) {
-            LOGGER.error("Error hashing password", ex);
         }
-        return password;
     }
 
-    /**
-     * @return a random salt built using {@link SecureRandom}.
-     */
-    public static String randomSalt()
+    private <X extends PasswordEncoder> boolean isDeprecatedEncoder(Class<X> encoderClass)
     {
-        StringBuilder salt = new StringBuilder();
-        byte[] bytes = new byte[32];
-        RANDOM.nextBytes(bytes);
-        for (byte temp : bytes) {
-            String s = Integer.toHexString(Byte.valueOf(temp));
-            while (s.length() < 2) {
-                s = "0" + s;
-            }
-            s = s.substring(s.length() - 2);
-            salt.append(s);
+        return encoderClass.getAnnotation(Deprecated.class) != null;
+    }
+
+    private void warnAboutOutdatedAlgorithm(String algorithmName)
+    {
+        if (getObject() != null) {
+            LOGGER.warn("The password located in [{}] uses an outdated algorithm [{}] (or an outdated version of it) "
+                    + "and should be re-encoded.",
+                getReference(), algorithmName);
+        } else {
+            LOGGER.error("An outdated algorithm [{}] (or an outdated version of it) is used in a PasswordClass "
+                    + "property not yet attached to an object",
+                algorithmName, new Exception());
         }
-        return salt.toString();
     }
 
     @Override

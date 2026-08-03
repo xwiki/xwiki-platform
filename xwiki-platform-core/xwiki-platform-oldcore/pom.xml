@@ -486,6 +486,18 @@
       <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
 
+    <!-- Used for PasswordClass -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <!-- Test dependencies -->
 
     <dependency>

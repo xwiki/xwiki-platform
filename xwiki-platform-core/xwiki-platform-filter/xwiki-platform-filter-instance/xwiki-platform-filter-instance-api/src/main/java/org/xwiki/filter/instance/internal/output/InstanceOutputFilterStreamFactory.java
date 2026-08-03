@@ -55,6 +55,9 @@ import org.xwiki.filter.type.FilterStreamType;
 public class InstanceOutputFilterStreamFactory extends
     AbstractBeanOutputFilterStreamFactory<InstanceOutputProperties, Object>
 {
+    private static final String FACTORIES_LOOKUP_ERROR =
+        "Failed to get registered instance of OutputInstanceFilterStreamFactory components";
+
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
@@ -79,8 +82,7 @@ public class InstanceOutputFilterStreamFactory extends
         try {
             factories = this.componentManagerProvider.get().getInstanceList(OutputInstanceFilterStreamFactory.class);
         } catch (ComponentLookupException e) {
-            throw new InitializationException(
-                "Failed to get registered instance of OutputInstanceFilterStreamFactory components", e);
+            throw new InitializationException(FACTORIES_LOOKUP_ERROR, e);
         }
 
         FilterStreamDescriptor[] descriptors = new FilterStreamDescriptor[factories.size() + 1];
@@ -101,8 +103,7 @@ public class InstanceOutputFilterStreamFactory extends
         try {
             factories = this.componentManagerProvider.get().getInstanceList(OutputInstanceFilterStreamFactory.class);
         } catch (ComponentLookupException e) {
-            throw new FilterException(
-                "Failed to get registered instance of OutputInstanceFilterStreamFactory components", e);
+            throw new FilterException(FACTORIES_LOOKUP_ERROR, e);
         }
 
         Set<Class< ? >> filters = new HashSet<>();

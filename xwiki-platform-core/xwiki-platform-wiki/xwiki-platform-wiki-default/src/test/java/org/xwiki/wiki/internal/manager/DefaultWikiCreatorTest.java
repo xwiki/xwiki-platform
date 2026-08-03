@@ -90,7 +90,7 @@ class DefaultWikiCreatorTest
         // Other mocks
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1", "owner");
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
-        when(this.wikiDescriptorBuilder.save(eq(descriptor))).thenReturn(descriptorDocument);
+        when(this.wikiDescriptorBuilder.save(descriptor)).thenReturn(descriptorDocument);
         when(this.wikiDescriptorManager.getById("wikiid1")).thenReturn(descriptor);
         when(this.store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
 
@@ -105,7 +105,7 @@ class DefaultWikiCreatorTest
         // Verify that the wiki has been updated
         verify(this.xwiki).initializeWiki(eq("wikiid1"), eq(true), any(XWikiContext.class));
         // Verify that the descriptor document has been saved
-        verify(this.wikiDescriptorBuilder).save(eq(descriptor));
+        verify(this.wikiDescriptorBuilder).save(descriptor);
         // Verify that the descriptor has been reloaded after being saved
         assertSame(descriptor, newWikiDescriptor);
     }
@@ -118,7 +118,7 @@ class DefaultWikiCreatorTest
         // Other mocks
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1", "owner");
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
-        when(this.wikiDescriptorBuilder.save(eq(descriptor))).thenReturn(descriptorDocument);
+        when(this.wikiDescriptorBuilder.save(descriptor)).thenReturn(descriptorDocument);
         when(this.wikiDescriptorManager.getById("wikiid1")).thenReturn(descriptor);
         when(this.store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
 
@@ -133,7 +133,7 @@ class DefaultWikiCreatorTest
         // Verify that the wiki has been updated
         verify(this.xwiki).initializeWiki(eq("wikiid1"), eq(true), any(XWikiContext.class));
         // Verify that the descriptor document has been saved
-        verify(this.wikiDescriptorBuilder).save(eq(descriptor));
+        verify(this.wikiDescriptorBuilder).save(descriptor);
         // Verify that the descriptor has been reloaded after being saved
         assertSame(descriptor, newWikiDescriptor);
     }

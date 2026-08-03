@@ -22,6 +22,7 @@ package org.xwiki.eventstream.internal;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.namespace.Namespace;
@@ -304,7 +305,8 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
             );
         } catch (Exception e) {
             LOGGER.warn("Failed to render the translation key [{}] in the namespace [{}] for the event "
-                    + "descriptor of [{}].", key, namespaceOfTheDescriptor, getEventType(), e);
+                    + "descriptor of [{}]. Root cause is [{}]", key, namespaceOfTheDescriptor, getEventType(),
+                ExceptionUtils.getRootCauseMessage(e));
             return contextualLocalizationManager.getTranslationPlain(key);
         }
     }

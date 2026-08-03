@@ -162,10 +162,11 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
             @SuppressWarnings("unchecked")
             List<PageSequenceResults> pageSequences = foResults.getPageSequences();
             for (PageSequenceResults pageSequenceResults : pageSequences) {
-                this.logger.debug("PageSequence " + StringUtils.defaultIfEmpty(pageSequenceResults.getID(), "<no id>")
-                    + " generated " + pageSequenceResults.getPageCount() + " pages.");
+                this.logger.debug("PageSequence [{}] generated [{}] pages.",
+                    StringUtils.defaultIfEmpty(pageSequenceResults.getID(), "<no id>"),
+                    pageSequenceResults.getPageCount());
             }
-            this.logger.debug("Generated " + foResults.getPageCount() + " pages in total.");
+            this.logger.debug("Generated [{}] pages in total.", foResults.getPageCount());
         }
     }
 
@@ -177,7 +178,7 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
                 configuration = new DefaultConfigurationBuilder().build(fopConfigurationFile);
             }
         } catch (Exception e) {
-            this.logger.warn("Wrong FOP configuration: " + ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Wrong FOP configuration: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
 
         configuration = maybeExtendConfiguration(configuration);
@@ -257,7 +258,8 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
             this.logger.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
                 + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
                 + "FOP cannot access this directory. If this is an upgrade from a previous version, "
-                + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
+                + "make sure you also copy the WEB-INF/fonts directory from the new distribution package. "
+                + "Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

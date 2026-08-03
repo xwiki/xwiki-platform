@@ -512,7 +512,7 @@ Object.extend(XWiki.watchlist, {
   var html = $$('html')[0];
   var head = $$('head')[0];
 
-  // Function that creates a meta tag with the value taken from the new HTML data-* attrribute
+  // Function that creates a meta tag with the value taken from the new HTML data-* attribute
   var addMetaTag = function(name, value) {
     head.insert(new Element('meta', {'name': name, 'content': html.readAttribute('data-xwiki-'+value)}));
   };

@@ -30,6 +30,7 @@ import jakarta.websocket.Session;
 import jakarta.websocket.server.HandshakeRequest;
 import jakarta.websocket.server.ServerEndpointConfig;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
@@ -215,8 +216,8 @@ public class DefaultWebSocketContext implements WebSocketContext
                     xcontext.setUserReference(xwikiUser.getUserReference());
                 }
             } catch (Exception e) {
-                this.logger.warn("Failed to authenticate the user for [{}]. Root cause is:", request.getRequestURI(),
-                    e);
+                this.logger.warn("Failed to authenticate the user for [{}]. Root cause is [{}]",
+                    request.getRequestURI(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

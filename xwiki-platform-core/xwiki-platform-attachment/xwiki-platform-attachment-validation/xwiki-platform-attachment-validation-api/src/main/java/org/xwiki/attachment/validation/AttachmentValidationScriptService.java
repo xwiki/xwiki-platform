@@ -138,7 +138,7 @@ public class AttachmentValidationScriptService implements ScriptService
             return Optional.of(attachmentValidationConfiguration);
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to retrieve an instance of [{}] with hint [default].",
-                AttachmentValidationConfiguration.class.getName());
+                AttachmentValidationConfiguration.class.getName(), e);
             return Optional.empty();
         }
     }

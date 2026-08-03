@@ -136,7 +136,7 @@ public class GroupCacheInvalidationListener extends AbstractEventListener
             return Set.of();
         }
 
-        Set<DocumentReference> members = new HashSet<>(memberObjects.size());
+        Set<DocumentReference> members = HashSet.newHashSet(memberObjects.size());
         for (BaseObject memberObject : memberObjects) {
             if (memberObject != null) {
                 String memberString = memberObject.getStringValue("member");

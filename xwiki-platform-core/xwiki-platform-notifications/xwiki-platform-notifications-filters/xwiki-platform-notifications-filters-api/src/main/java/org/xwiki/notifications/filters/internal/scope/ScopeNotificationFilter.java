@@ -110,7 +110,7 @@ public class ScopeNotificationFilter implements NotificationFilter
             }
 
             case CUSTOM ->
-                this.logger.error("Filtering of event should never return custom. Event: [{}]. User: [{}] ",
+                this.logger.error("Filtering of event should never return custom. Event: [{}]. User: [{}]",
                     event, user);
 
             default -> {

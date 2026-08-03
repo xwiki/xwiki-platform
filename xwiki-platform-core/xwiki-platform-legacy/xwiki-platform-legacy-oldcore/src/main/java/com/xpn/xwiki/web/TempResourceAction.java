@@ -34,12 +34,14 @@ import java.util.regex.Pattern;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.mime.MimeTypes;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
 import org.xwiki.tika.internal.TikaUtils;
@@ -90,7 +92,8 @@ public class TempResourceAction extends XWikiAction
     /**
      * Logging support.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(TempResourceAction.class);
+    @Inject
+    private Logger logger;
 
     /**
      * Used to find the temporary dir.
@@ -117,9 +120,8 @@ public class TempResourceAction extends XWikiAction
         try {
             contentType = TikaUtils.detect(tempFile);
         } catch (IOException ex) {
-            LOGGER.warn(
-                String.format("Unable to determine mime type for temporary resource [%s]", tempFile.getAbsolutePath()),
-                ex);
+            this.logger.warn("Unable to determine mime type for temporary resource [{}]. Root cause is [{}]",
+                tempFile.getAbsolutePath(), ExceptionUtils.getRootCauseMessage(ex));
         }
         response.setContentType(contentType);
         if ("1".equals(request.getParameter("force-download"))) {

@@ -123,7 +123,7 @@ public class OfficeServerScriptService implements ScriptService
                 this.officeServer.start();
                 return true;
             } catch (OfficeServerException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error("Failed to start the office server", ex);
                 setErrorMessage(ex.getMessage());
             }
         }
@@ -146,7 +146,7 @@ public class OfficeServerScriptService implements ScriptService
                 this.officeServer.stop();
                 return true;
             } catch (OfficeServerException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error("Failed to stop the office server", ex);
                 setErrorMessage(ex.getMessage());
             }
         }

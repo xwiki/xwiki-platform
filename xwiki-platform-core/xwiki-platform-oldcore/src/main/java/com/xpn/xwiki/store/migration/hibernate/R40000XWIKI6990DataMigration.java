@@ -450,7 +450,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
      *
      * @param map the conversion map
      * @param callback the callback implementing the hibernate actions
-     * @throws XWikiException if an error occurs during convertion
+     * @throws XWikiException if an error occurs during conversion
      */
     private void convertDbId(final Map<Long, Long> map, IdConversionHibernateCallback callback) throws XWikiException
     {
@@ -852,11 +852,11 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     this.logger.debug(TIME_ELAPSED_COLLECTION_MESSAGE, coll[0], times[timer++] / 1000000);
                 }
                 for (String customMappedClass : customClassToProcess) {
-                    this.logger.debug("Time elapsed for {} custom table: {} ms", customMappedClass,
+                    this.logger.debug("Time elapsed for [{}] custom table: [{}] ms", customMappedClass,
                         times[timer++] / 1000000);
                 }
                 for (String propertyClass : classToProcess) {
-                    this.logger.debug("Time elapsed for {} property table: {} ms", propertyClass,
+                    this.logger.debug("Time elapsed for [{}] property table: [{}] ms", propertyClass,
                         times[timer++] / 1000000);
                 }
                 this.logger.debug(TIME_ELAPSED_CLASS_MESSAGE, BaseObject.class.getName(),
@@ -1385,9 +1385,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         logProgress("%d schema updates required.", this.logCount);
-        if (this.logger.isDebugEnabled()) {
-            this.logger.debug("About to execute this Liquibase XML: {}", sb.toString());
-        }
+        this.logger.debug("About to execute this Liquibase XML: [{}]", sb);
         return sb.toString();
     }
 }

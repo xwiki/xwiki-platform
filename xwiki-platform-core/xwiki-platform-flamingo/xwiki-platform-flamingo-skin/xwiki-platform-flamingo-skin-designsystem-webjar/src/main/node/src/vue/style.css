@@ -1,5 +1,5 @@
 :root {
-    --cr-sizes-max-page-width: calc(var(--max-screen-size) * 1px); /*This value controls the width of the main content. It should be 100% for spanning text along the whole width or an arbitraty value*/
+    --cr-sizes-max-page-width: calc(var(--max-screen-size) * 1px); /*This value controls the width of the main content. It should be 100% for spanning text along the whole width or an arbitrary value*/
     --cr-sizes-main-sidebar-width: var(--panel-column-left-width); /*The default width of the main sidebar*/
     --cr-sizes-main-sidebar-min-width: 0; /*The minimum width of the main sidebar*/
     --cr-base-font-size: var(--font-size-base);

@@ -104,7 +104,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     private Parser plainTextParser;
 
     /**
-     * Pygments highligh parser configuration.
+     * Pygments highlight parser configuration.
      */
     @Inject
     private PygmentsParserConfiguration configuration;

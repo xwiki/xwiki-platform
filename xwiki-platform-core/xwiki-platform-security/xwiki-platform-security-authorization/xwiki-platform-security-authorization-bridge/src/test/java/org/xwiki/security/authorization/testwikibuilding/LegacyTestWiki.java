@@ -768,9 +768,9 @@ public class LegacyTestWiki extends AbstractTestWiki
 
             this.userObject = mockUserBaseObject();
 
-            when(mockedDocument.getXObject(eq(new LocalDocumentReference("XWiki", "XWikiUsers"))))
+            when(mockedDocument.getXObject(new LocalDocumentReference("XWiki", "XWikiUsers")))
                 .thenReturn(this.userObject);
-            when(mockedDocument.getXObject(eq(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE)))
+            when(mockedDocument.getXObject(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE))
                 .thenReturn(null);
         }
 
@@ -805,7 +805,7 @@ public class LegacyTestWiki extends AbstractTestWiki
         {
             super(name, space, creator, isNew, false, alt);
 
-            when(mockedDocument.getXObjects(eq(new LocalDocumentReference("XWiki", "XWikiGroups"))))
+            when(mockedDocument.getXObjects(new LocalDocumentReference("XWiki", "XWikiGroups")))
                 .thenAnswer(invocation -> new Vector<>(memberObjects.values()));
         }
 
@@ -903,9 +903,9 @@ public class LegacyTestWiki extends AbstractTestWiki
             final DocumentReference documentReference =
                 new DocumentReference(getSpace().getWiki().getName(), getSpace().getName(), getName());
 
-            when(mockedDocument.getXObjects(eq(new LocalDocumentReference("XWiki", "XWikiRights"))))
+            when(mockedDocument.getXObjects(new LocalDocumentReference("XWiki", "XWikiRights")))
                 .thenAnswer(invocation -> getLegacyDocumentRights());
-            when(mockedDocument.getXObjects(eq(new LocalDocumentReference("XWiki", "XWikiGlobalRights"))))
+            when(mockedDocument.getXObjects(new LocalDocumentReference("XWiki", "XWikiGlobalRights")))
                 .thenAnswer(invocation -> getLegacyGlobalRights());
             when(mockedDocument.getXObjects(new DocumentReference(space.wiki.getName(), "XWiki", "XWikiRights")))
                 .thenAnswer(invocation -> getLegacyDocumentRights());
@@ -919,10 +919,10 @@ public class LegacyTestWiki extends AbstractTestWiki
             when(mockedDocument.getXObjects(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE))
                 .thenReturn(Collections.emptyList());
             when(mockedDocument.isEnforceRequiredRights()).thenReturn(enforceRequiredRights);
-            when(mockedDocument.getXObjects(eq(new LocalDocumentReference("XWiki", "RequiredRightClass"))))
+            when(mockedDocument.getXObjects(new LocalDocumentReference("XWiki", "RequiredRightClass")))
                 .thenAnswer(invocation -> getRequiredRightObjects());
             when(mockedDocument.getXObjects(
-                eq(new DocumentReference(space.wiki.getName(), "XWiki", "RequiredRightClass"))))
+                new DocumentReference(space.wiki.getName(), "XWiki", "RequiredRightClass")))
                 .thenAnswer(invocation -> getRequiredRightObjects());
             when(mockedDocument.getXObject(any(LocalDocumentReference.class)))
                 .thenReturn(null);

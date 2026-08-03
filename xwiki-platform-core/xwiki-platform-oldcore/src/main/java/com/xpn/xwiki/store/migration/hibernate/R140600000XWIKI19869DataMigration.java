@@ -193,7 +193,8 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
             // We don't throw an exception because it might be only a problem with the count
             // and this is only used for log purpose.
             // In case of real issue on the query, it will throw an exception when actually getting the users
-            this.logger.warn("Error while trying to count the number of users", e);
+            this.logger.warn("Error while trying to count the number of users. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
         }
         return result;
     }
@@ -252,8 +253,8 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
                 }
             } catch (Exception e) {
                 this.logger.warn(
-                    "Failed to handler revision [{}] for user page [{}]: {}. It's recommended to delete this version.",
-                    node.getVersion().toString(), userDoc.getDocumentReference(),
+                    "Failed to handle revision [{}] for user page [{}]: [{}]. It's recommended to delete this version.",
+                    node.getVersion(), userDoc.getDocumentReference(),
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
@@ -288,7 +289,7 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
                     }
                 } catch (XWikiException e) {
                     // Note: this should never happen since it's a standard string field.
-                    this.logger.error("Error while reseting password field for user [{}]", userDoc, e);
+                    this.logger.error("Error while resetting password field for user [{}]", userDoc, e);
                 }
                 result = true;
             } else if (isMain) {

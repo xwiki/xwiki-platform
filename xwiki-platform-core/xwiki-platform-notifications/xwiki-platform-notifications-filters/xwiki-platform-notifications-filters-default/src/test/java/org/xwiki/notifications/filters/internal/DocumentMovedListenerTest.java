@@ -136,7 +136,7 @@ class DocumentMovedListenerTest
         when(wikiDescriptorManager.getAllIds()).thenReturn(List.of("mainWiki"));
 
         session = mock(Session.class);
-        when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
+        when(hibernateStore.getSession(xwikicontext)).thenReturn(session);
         Query query = mock(Query.class);
         when(session.createQuery(
             "update DefaultNotificationFilterPreference p set p.page = :newPage " + "where p.page = :oldPage"))
@@ -177,7 +177,7 @@ class DocumentMovedListenerTest
         when(wikiDescriptorManager.getAllIds()).thenReturn(List.of("foo", "bar", "mainWiki"));
 
         session = mock(Session.class);
-        when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
+        when(hibernateStore.getSession(xwikicontext)).thenReturn(session);
         Query query = mock(Query.class);
         when(session.createQuery(
             "update DefaultNotificationFilterPreference p set p.page = :newPage " + "where p.page = :oldPage"))
@@ -221,7 +221,7 @@ class DocumentMovedListenerTest
         when(wikiDescriptorManager.getAllIds()).thenReturn(List.of("mainWiki"));
 
         session = mock(Session.class);
-        when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
+        when(hibernateStore.getSession(xwikicontext)).thenReturn(session);
         Query query = mock(Query.class);
         when(session.createQuery(
             "update DefaultNotificationFilterPreference p set p.page = :newPage " + "where p.page = :oldPage"))
@@ -260,7 +260,7 @@ class DocumentMovedListenerTest
         when(wikiDescriptorManager.getAllIds()).thenReturn(List.of("mainWiki"));
 
         session = mock(Session.class);
-        when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
+        when(hibernateStore.getSession(xwikicontext)).thenReturn(session);
         Query query = mock(Query.class);
         when(session.createQuery(
             "update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " + "where p.pageOnly = :oldPage"))

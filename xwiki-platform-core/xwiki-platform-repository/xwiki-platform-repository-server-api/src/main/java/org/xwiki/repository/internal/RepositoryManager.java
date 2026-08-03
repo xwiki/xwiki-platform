@@ -398,7 +398,7 @@ public class RepositoryManager
             try {
                 resourceReference = getDownloadReference(document, extensionVersion);
             } catch (Exception e) {
-                logger.debug("Cannot obtain download source reference for version [({})]", extensionVersion);
+                logger.debug("Cannot obtain download source reference for version [{}]", extensionVersion, e);
 
                 return false;
             }
@@ -438,7 +438,7 @@ public class RepositoryManager
             } else {
                 valid = false;
 
-                this.logger.debug("No actual download provided for version [({})]", extensionVersion);
+                this.logger.debug("No actual download provided for version [{}]", extensionVersion);
             }
         }
 
@@ -1129,11 +1129,11 @@ public class RepositoryManager
                 versionExtension = repository.resolve(new ExtensionId(id, version));
             }
 
-            // Update version related informations
+            // Update version related information
             return updateExtensionVersion(versionExtension, extensionDocument, index);
         } catch (Exception e) {
-            this.logger.error("Failed to resolve extension with id [" + id + "] and version [" + version
-                + "] on repository [" + repository + "]", e);
+            this.logger.error("Failed to resolve extension with id [{}] and version [{}] on repository [{}]", id,
+                version, repository, e);
         }
 
         return false;
@@ -1150,11 +1150,11 @@ public class RepositoryManager
                 versionExtension = repository.resolve(new ExtensionId(id, version));
             }
 
-            // Update version related informations
+            // Update version related information
             return updateProjectVersion(versionExtension, projectDocument, index);
         } catch (Exception e) {
-            this.logger.error("Failed to resolve project with id [" + id + "] and version [" + version
-                + "] on repository [" + repository + "]", e);
+            this.logger.error("Failed to resolve project with id [{}] and version [{}] on repository [{}]", id, version,
+                repository, e);
         }
 
         return false;

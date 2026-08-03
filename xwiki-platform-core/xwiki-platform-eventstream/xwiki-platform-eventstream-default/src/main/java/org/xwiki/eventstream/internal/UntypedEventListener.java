@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -201,7 +202,8 @@ public class UntypedEventListener extends AbstractEventListener
             return "true".equals(render);
 
         } catch (Exception e) {
-            logger.warn("Unable to render a notification validation template.", e);
+            logger.warn("Unable to render a notification validation template. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
             return false;
         }
     }
@@ -230,7 +232,8 @@ public class UntypedEventListener extends AbstractEventListener
             }
 
         } catch (Exception e) {
-            logger.warn("Unable to render the target template.", e);
+            logger.warn("Unable to render the target template. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         // Fallback to empty set

@@ -24,8 +24,9 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link EntitySelection}.
@@ -35,6 +36,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class EntitySelectionTest
 {
     @Test
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which object is the receiver and which argument
+    // it gets, including null and an instance of a foreign class. Using assertEquals()/assertNotEquals()
+    // would move that into JUnit's internals and would invite a later SonarQube S3415 "swap these
+    // arguments" change that silently stops testing the contract.
+    @SuppressWarnings("java:S5785")
     void equals()
     {
         EntityReference entityReference = new EntityReference("test", EntityType.PAGE);
@@ -43,11 +50,11 @@ class EntitySelectionTest
         EntitySelection unselected = new EntitySelection(entityReference);
         unselected.setSelected(false);
 
-        assertNotEquals(selected, null);
-        assertEquals(selected, selected);
-        assertNotEquals(selected, entityReference);
-        assertNotEquals(selected, unselected);
-        assertEquals(selected, new EntitySelection(entityReference));
+        assertFalse(selected.equals(null));
+        assertTrue(selected.equals(selected));
+        assertFalse(selected.equals(entityReference));
+        assertFalse(selected.equals(unselected));
+        assertTrue(selected.equals(new EntitySelection(entityReference)));
     }
 
     @Test

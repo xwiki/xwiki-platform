@@ -34,6 +34,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
@@ -109,6 +110,9 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
      */
     private static class R35102Work implements Work
     {
+        /** Logging helper object. */
+        private static final Logger LOGGER = LoggerFactory.getLogger(R35102Work.class);
+
         /** The name of the table to fix. */
         private String tableName;
 
@@ -120,9 +124,6 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
 
         /** What kind of data is corrupt when a migration fails. */
         private String dataType;
-
-        /** Logging helper object. */
-        private Logger logger = LoggerFactory.getLogger(R35102Work.class);
 
         /**
          * Constructor specifying the table and columns to fix.
@@ -179,8 +180,8 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
                             // way of getting back the missing bytes, we can just empty the value set in this row.
                             // Start a new transaction
                             connection.rollback();
-                            this.logger.warn(this.dataType + " [{}] cannot be recovered",
-                                lob.getValue());
+                            LOGGER.warn("[{}] [{}] cannot be recovered. Root cause is [{}]", this.dataType,
+                                lob.getValue(), ExceptionUtils.getRootCauseMessage(ex));
                             emptyLob.setString(1, lob.getKey());
                             emptyLob.executeUpdate();
                             removeLob.setLong(1, Long.valueOf(lob.getKey()));

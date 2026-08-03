@@ -58,7 +58,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -115,7 +114,7 @@ class ScopeNotificationFilterTest
 
         when(this.resolver.resolve(entityStringValue, resultReference.getType())).thenReturn(resultReference);
 
-        when(this.serializer.serialize(eq(resultReference))).thenReturn(entityStringValue);
+        when(this.serializer.serialize(resultReference)).thenReturn(entityStringValue);
 
         when(preference.getStartingDate()).thenReturn(new Date(0));
 

@@ -489,7 +489,7 @@ public class DefaultMergeManager implements MergeManager
                                 }
                             }
                         } else {
-                            // Object explicitely removed from the DB, it's a conflict
+                            // Object explicitly removed from the DB, it's a conflict
                             objectMergeResult.getLog().error(ERROR_COLLISION_OBJECT, previousObject.getReference());
 
                             // We put the new object only if the fallback is to take new version.

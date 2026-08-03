@@ -154,7 +154,7 @@ public class ChromeManager implements BrowserManager, Initializable, Disposable
                 return getWithTimeout(() -> this.chromeService.getVersion());
             } catch (Exception e) {
                 exception = e;
-                this.logger.debug("Chrome remote debugging not available. Root cause: [{}]. Retrying in {}s.",
+                this.logger.debug("Chrome remote debugging not available. Root cause: [{}]. Retrying in [{}] seconds.",
                     ExceptionUtils.getRootCauseMessage(e), retryIntervalSeconds);
                 try {
                     Thread.sleep(retryIntervalSeconds * 1000L);
@@ -278,10 +278,8 @@ public class ChromeManager implements BrowserManager, Initializable, Disposable
 
     private void handleInterruptedException(InterruptedException e)
     {
-        if (this.logger.isWarnEnabled()) {
-            this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
-                ExceptionUtils.getRootCauseMessage(e));
-        }
+        this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
+            ExceptionUtils.getRootCauseMessage(e));
         // Restore the interrupted state.
         Thread.currentThread().interrupt();
     }

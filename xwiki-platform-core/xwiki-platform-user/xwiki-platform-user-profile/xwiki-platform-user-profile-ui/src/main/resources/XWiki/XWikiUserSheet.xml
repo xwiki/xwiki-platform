@@ -80,7 +80,7 @@
   'children' : $categories
   }
 ])
-## Setting automaticaly url &amp; css fields of each category
+## Setting automatically url &amp; css fields of each category
 #foreach($category in $userMenu)
   #foreach($subcategory in $category.get('children'))
     #set($id = $subcategory.get('id')) 

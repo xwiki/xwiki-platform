@@ -115,9 +115,9 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         try {
             return hasSecurityAccess(right, userReference, entityReference, false);
         } catch (Exception e) {
-            this.logger.error(String.format("Failed to load rights for user [%s] on [%s].",
+            this.logger.error("Failed to load rights for user [{}] on [{}].",
                 (userReference == null) ? AuthorizationException.NULL_USER : userReference,
-                (entityReference == null) ? AuthorizationException.NULL_ENTITY : entityReference), e);
+                (entityReference == null) ? AuthorizationException.NULL_ENTITY : entityReference, e);
             return false;
         }
     }
@@ -269,7 +269,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             if (entry == null) {
                 SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
 
-                this.logger.debug("1. Loaded a new entry for user {} on {} into cache: [{}]", user, entity, access);
+                this.logger.debug("1. Loaded a new entry for user [{}] on [{}] into cache: [{}]", user, entity, access);
 
                 return access;
             }
@@ -278,13 +278,13 @@ public class DefaultAuthorizationManager implements AuthorizationManager
                 if (accessEntry == null) {
                     SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
 
-                    logger.debug("2. Loaded a new entry for user {} on {} into cache: [{}]", user, entity, access);
+                    logger.debug("2. Loaded a new entry for user [{}] on [{}] into cache: [{}]", user, entity, access);
 
                     return access;
                 } else {
                     SecurityAccess access = accessEntry.getAccess();
 
-                    logger.debug("3. Got entry for user {} on {} from cache: [{}]", user, entity, access);
+                    logger.debug("3. Got entry for user [{}] on [{}] from cache: [{}]", user, entity, access);
 
                     return access;
                 }
@@ -293,7 +293,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
 
         SecurityAccess access = securityCacheLoader.load(user, entity).getAccess();
 
-        logger.debug("4. Loaded a new default entry for user {} on {} into cache: [{}]", user, entity, access);
+        logger.debug("4. Loaded a new default entry for user [{}] on [{}] into cache: [{}]", user, entity, access);
 
         return access;
     }

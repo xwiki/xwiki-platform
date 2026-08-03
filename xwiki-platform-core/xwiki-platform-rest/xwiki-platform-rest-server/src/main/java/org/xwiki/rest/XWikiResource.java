@@ -174,7 +174,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     {
         objectFactory = new ObjectFactory();
 
-        this.slf4Jlogger.trace("Resource {} initialized. Serving user: '{}'\n", getClass().getName(),
+        this.slf4Jlogger.trace("Resource [{}] initialized. Serving user [{}]", getClass().getName(),
             this.xcontextProvider.get().getUserReference());
     }
 

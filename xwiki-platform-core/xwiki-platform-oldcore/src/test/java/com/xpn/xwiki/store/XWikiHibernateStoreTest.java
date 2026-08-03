@@ -330,8 +330,9 @@ class XWikiHibernateStoreTest
 
         // Query to check if the object exists already (save versus update).
         when(xcontext.get("hibsession")).thenReturn(session);
+        Query queryMock = mock(Query.class);
         when(session.createQuery("select obj.id from BaseObject as obj where obj.id = :id", Long.class))
-            .thenReturn(mock(Query.class));
+            .thenReturn(queryMock);
 
         // Save each object property.
         String propertyName = "query";

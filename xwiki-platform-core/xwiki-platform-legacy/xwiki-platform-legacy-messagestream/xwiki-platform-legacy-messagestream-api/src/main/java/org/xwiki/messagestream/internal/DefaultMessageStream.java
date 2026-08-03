@@ -190,7 +190,8 @@ public class DefaultMessageStream implements MessageStream
 
             result = this.eventStore.search(query).stream().toList();
         } catch (EventStreamException ex) {
-            this.logger.warn("Failed to search personal messages: {}", ex.getMessage());
+            this.logger.warn("Failed to search personal messages. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(ex));
         }
         return result;
     }
@@ -211,7 +212,8 @@ public class DefaultMessageStream implements MessageStream
 
             result = this.eventStore.search(query).stream().toList();
         } catch (EventStreamException ex) {
-            this.logger.warn("Failed to search direct messages: {}", ex.getMessage());
+            this.logger.warn("Failed to search direct messages. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(ex));
         }
         return result;
     }
@@ -232,7 +234,8 @@ public class DefaultMessageStream implements MessageStream
 
             result = this.eventStore.search(query).stream().toList();
         } catch (EventStreamException ex) {
-            this.logger.warn("Failed to search group messages: {}", ex.getMessage());
+            this.logger.warn("Failed to search group messages. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(ex));
         }
         return result;
     }
@@ -251,7 +254,7 @@ public class DefaultMessageStream implements MessageStream
                 throw new IllegalArgumentException("You are not authorized to delete this message");
             }
         } catch (Exception e) {
-            this.logger.warn("Failed to delete message: {}", ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to delete message. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

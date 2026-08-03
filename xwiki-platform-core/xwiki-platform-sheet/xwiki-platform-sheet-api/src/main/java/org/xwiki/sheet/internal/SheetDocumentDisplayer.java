@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -180,7 +181,8 @@ public class SheetDocumentDisplayer implements DocumentDisplayer
                     return applySheet(document, sheetReference, parameters);
                 } catch (Exception e) {
                     String sheetStringReference = defaultEntityReferenceSerializer.serialize(sheetReference);
-                    logger.warn("Failed to apply sheet [{}].", sheetStringReference, e);
+                    logger.warn("Failed to apply sheet [{}]. Root cause is [{}]", sheetStringReference,
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         }

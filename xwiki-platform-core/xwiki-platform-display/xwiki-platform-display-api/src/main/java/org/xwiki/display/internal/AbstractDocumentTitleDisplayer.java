@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -157,7 +158,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
 
                 return parseTitle(title);
             } catch (Exception e) {
-                logger.warn("Failed to interpret title of document [{}].", document.getDocumentReference(), e);
+                logger.warn("Failed to interpret title of document [{}]. Root cause is [{}]",
+                    document.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
@@ -169,8 +171,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                     return title;
                 }
             } catch (Exception e) {
-                logger.warn("Failed to extract title from content of document [{}].", document.getDocumentReference(),
-                    e);
+                logger.warn("Failed to extract title from content of document [{}]. Root cause is [{}]",
+                    document.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
@@ -96,11 +97,13 @@ public class RecordableEventListener extends AbstractEventListener
         try {
             this.eventStore.saveEvent(convertEvent(event, source, data)).whenComplete((e, ex) -> {
                 if (ex != null) {
-                    logger.warn("Failed to save the event [{}].", event.getClass().getCanonicalName(), ex);
+                    logger.warn("Failed to save the event [{}]. Root cause is [{}]",
+                        event.getClass().getCanonicalName(), ExceptionUtils.getRootCauseMessage(ex));
                 }
             });
         } catch (Exception e) {
-            logger.warn("Failed to convert event [{}].", event.getClass().getCanonicalName(), e);
+            logger.warn("Failed to convert event [{}]. Root cause is [{}]", event.getClass().getCanonicalName(),
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

@@ -123,7 +123,7 @@ public class ExportAction extends XWikiAction
         // down or even block the PDF export
         //
         // Ideally we should ask for a CSRF token, but this would break backwards compatibility. We can't rely on the
-        // Accept HTTP header either becuse it includes */* most of the time, even when the request originates from a
+        // Accept HTTP header either because it includes */* most of the time, even when the request originates from a
         // script or image HTML tag. The best option seems to be to rely on the Sec-Fetch-Dest header which is set by
         // modern browsers to indicate the context in which the request is made.
         // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Dest

@@ -275,8 +275,11 @@ class SolrQueryExecutorTest
         assertEquals(0, results.getNumFound());
 
         // One warning for Alice in the previous execution, two for Alice and Bob in this one.
-        assertEquals("Removing bad result: SolrDocument{}", this.logCapture.getMessage(0));
-        assertEquals("Removing bad result: SolrDocument{}", this.logCapture.getMessage(1));
-        assertEquals("Removing bad result: SolrDocument{}", this.logCapture.getMessage(2));
+        assertEquals("Removing bad result: [SolrDocument{}]. Root cause is [RuntimeException: Alice]",
+            this.logCapture.getMessage(0));
+        assertEquals("Removing bad result: [SolrDocument{}]. Root cause is [RuntimeException: Alice]",
+            this.logCapture.getMessage(1));
+        assertEquals("Removing bad result: [SolrDocument{}]. Root cause is [RuntimeException: Bob]",
+            this.logCapture.getMessage(2));
     }
 }

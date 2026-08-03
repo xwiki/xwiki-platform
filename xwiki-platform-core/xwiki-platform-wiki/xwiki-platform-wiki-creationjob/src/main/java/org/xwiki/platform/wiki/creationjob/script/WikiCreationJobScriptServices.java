@@ -25,6 +25,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -104,7 +105,7 @@ public class WikiCreationJobScriptServices implements ScriptService
             
         } catch (WikiCreationException e) {
             setLastError(e);
-            logger.warn("Failed to create a new wiki.", e);
+            logger.warn("Failed to create a new wiki. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
         } catch (AccessDeniedException e) {
             setLastError(e);
         }

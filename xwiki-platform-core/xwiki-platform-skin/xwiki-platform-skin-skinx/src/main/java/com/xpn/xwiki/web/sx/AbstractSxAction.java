@@ -24,6 +24,7 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 
 import com.xpn.xwiki.XWikiContext;
@@ -114,7 +115,7 @@ public abstract class AbstractSxAction extends XWikiAction
             response.setContentLength(extensionContent.getBytes(RESPONSE_CHARACTER_SET).length);
             response.getOutputStream().write(extensionContent.getBytes(RESPONSE_CHARACTER_SET));
         } catch (IOException ex) {
-            getLogger().warn("Failed to send SX content: [{}]", ex.getMessage());
+            getLogger().warn("Failed to send SX content. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(ex));
         }
     }
 
@@ -141,7 +142,7 @@ public abstract class AbstractSxAction extends XWikiAction
         try {
             renderExtension(sxSource, getExtensionType(), context);
         } catch (IllegalArgumentException e) {
-            // Simply set a 404 status code and return null, so that no unneeded bytes are transfered
+            // Simply set a 404 status code and return null, so that no unneeded bytes are transferred
             context.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
         return null;

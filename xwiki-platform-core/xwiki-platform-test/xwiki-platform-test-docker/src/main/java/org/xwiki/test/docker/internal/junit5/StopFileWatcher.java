@@ -28,6 +28,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,8 @@ final class StopFileWatcher
                     LOGGER.warn("Not deleting non-empty file [{}], please delete it manually.", target);
                 }
             } catch (IOException e) {
-                LOGGER.warn("Could not delete existing file [{}]", target, e);
+                LOGGER.warn("Could not delete existing file [{}]. Root cause is [{}]", target,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
@@ -109,7 +111,8 @@ final class StopFileWatcher
                 }
             }
         } catch (IOException e) {
-            LOGGER.warn("WatchService failed, falling back to blocking wait for [{}]", target.getFileName(), e);
+            LOGGER.warn("WatchService failed, falling back to blocking wait for [{}]. Root cause is [{}]",
+                target.getFileName(), ExceptionUtils.getRootCauseMessage(e));
             return false;
         } catch (InterruptedException e) {
             LOGGER.error(WAIT_FAILED_MESSAGE, target.getFileName(), e);

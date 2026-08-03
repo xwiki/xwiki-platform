@@ -85,7 +85,7 @@ public class SafeRedirectFilter implements Filter
                             + "might need to add the domain related to this request in the list of trusted domains in "
                             + "the configuration: it can be configured in xwiki.properties in url.trustedDomains.",
                         location);
-                    LOGGER.debug("Original error preventing the redirect: ", e);
+                    LOGGER.debug("Original error preventing the redirect:", e);
                 }
             }
         }

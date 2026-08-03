@@ -28,9 +28,9 @@
     <version>18.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-logging</artifactId>
-  <name>XWiki Platform - Loggging</name>
+  <name>XWiki Platform - Logging</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Loggging</description>
+  <description>XWiki Platform - Logging</description>
   <modules>
     <module>xwiki-platform-logging-script</module>
     <module>xwiki-platform-logging-ui</module>

@@ -569,7 +569,7 @@ class DefaultWikiMacroTest
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
         assertEquals("<p>" + this.wikiMacroDocument.toString() + "</p>", printer.toString());
         assertTrue(this.oldcore.getXWikiContext().hasDroppedPermissions(),
-            "Wiki macro did not properly restord persmission dropping");
+            "Wiki macro did not properly restore permission dropping");
     }
 
     @Test

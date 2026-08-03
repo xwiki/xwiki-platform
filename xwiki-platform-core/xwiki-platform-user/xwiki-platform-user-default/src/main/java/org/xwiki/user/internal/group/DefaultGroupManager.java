@@ -151,7 +151,7 @@ public class DefaultGroupManager implements GroupManager
             cacheWikis = getSearchWikis(reference, WikiTarget.ALL, resolve);
         } else {
             throw new GroupException(
-                "Unsuported wiki target [" + wikiTarget + "] with class [" + wikiTarget.getClass() + "]");
+                "Unsupported wiki target [" + wikiTarget + "] with class [" + wikiTarget.getClass() + "]");
         }
 
         return cacheWikis;

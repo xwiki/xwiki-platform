@@ -399,7 +399,7 @@ class DefaultParametrizedNotificationManagerTest
         assertTrue(results.isEmpty());
         verify(this.groupManager).getGroups(this.userReference, null, true);
 
-        // the current user is targeted explicitely by the event: we get a result.
+        // the current user is targeted explicitly by the event: we get a result.
         // We also check that we don't perform any check in groups in that case
         when(event.getTarget()).thenReturn(Set.of("Foo.bar", "XWiki.UserA"));
         results = this.defaultParametrizedNotificationManager.getEvents(parameters);
@@ -417,7 +417,7 @@ class DefaultParametrizedNotificationManagerTest
         assertEquals(1, results.size());
         verify(this.groupManager, times(2)).getGroups(this.userReference, null, true);
 
-        // the current user is targeted explicitely by the event, but also through a group: we should still get a single
+        // the current user is targeted explicitly by the event, but also through a group: we should still get a single
         // result
         // We also check that we don't perform any supplementary check in groups in that case
         when(event.getTarget()).thenReturn(Set.of("Foo.bar", "XWiki.UserA"));

@@ -32,6 +32,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -314,8 +315,8 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
             try {
                 firstTask = this.queue.take();
             } catch (InterruptedException e) {
-                this.logger.warn("The thread handling asynchronous storage for event store [{}] has been interrupted",
-                    this.descriptor.getRoleHint(), e);
+                this.logger.warn("The thread handling asynchronous storage for event store [{}] has been interrupted. "
+                    + "Root cause is [{}]", this.descriptor.getRoleHint(), ExceptionUtils.getRootCauseMessage(e));
 
                 Thread.currentThread().interrupt();
                 break;
@@ -431,7 +432,7 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
             try {
                 this.contextStore.restore(task.context);
             } catch (ComponentLookupException e) {
-                this.logger.error("Failed to restore context of the event", output, e);
+                this.logger.error("Failed to restore context of the event [{}]", output, e);
             }
         }
 
@@ -575,8 +576,8 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         try {
             this.thread.join(10000);
         } catch (InterruptedException e) {
-            this.logger.warn("The thread handling asynchronous storage for event store [{}] has been interrupted",
-                this.descriptor.getRoleHint(), e);
+            this.logger.warn("The thread handling asynchronous storage for event store [{}] has been interrupted. "
+                + "Root cause is [{}]", this.descriptor.getRoleHint(), ExceptionUtils.getRootCauseMessage(e));
 
             this.thread.interrupt();
         }

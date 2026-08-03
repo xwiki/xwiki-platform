@@ -101,6 +101,13 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DefaultModelBridgeTest
 {
+    /**
+     * The root cause reported when the recycle bin rights check fails, because this test doesn't load all the oldcore
+     * components that check needs.
+     */
+    private static final String RIGHTS_CHECK_CAUSE = "ComponentLookupException: Can't find descriptor for the component "
+        + "with type [javax.inject.Provider<org.xwiki.model.reference.DocumentReference>] and hint [default]";
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension();
 
@@ -300,8 +307,9 @@ class DefaultModelBridgeTest
         XWikiDocument oldDocument = mock(XWikiDocument.class);
         when(oldDocument.clone()).thenReturn(oldDocument);
         when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
+        BaseObject baseObjectMock = mock(BaseObject.class);
         when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
-            .thenReturn(mock(BaseObject.class));
+            .thenReturn(baseObjectMock);
         when(oldDocument.getAuthors()).thenReturn(mock());
         when(oldDocument.isNew()).thenReturn(true);
 
@@ -329,8 +337,9 @@ class DefaultModelBridgeTest
         XWikiDocument oldDocument = mock(XWikiDocument.class);
         when(oldDocument.clone()).thenReturn(oldDocument);
         when(this.xcontext.getWiki().getDocument(oldReference, this.xcontext)).thenReturn(oldDocument);
+        BaseObject baseObjectMock2 = mock(BaseObject.class);
         when(oldDocument.newXObject(RedirectClassDocumentInitializer.REFERENCE, this.xcontext))
-            .thenReturn(mock(BaseObject.class));
+            .thenReturn(baseObjectMock2);
         when(oldDocument.getAuthors()).thenReturn(mock());
         when(oldDocument.isNew()).thenReturn(false);
 
@@ -675,8 +684,9 @@ class DefaultModelBridgeTest
 
         // this could be improved later: right now we don't get the rights in the test because the components are not
         // all properly loaded from oldcore.
-        assertLog(0, Level.WARN, "Exception while checking if entry [{}] can be removed from the recycle bin",
-            deletedDocumentId);
+        assertLog(0, Level.WARN,
+            "Failed to check if entry [{}] can be removed from the recycle bin. Root cause is [{}]", deletedDocumentId,
+            RIGHTS_CHECK_CAUSE);
     }
 
     @Test
@@ -874,8 +884,9 @@ class DefaultModelBridgeTest
 
         assertFalse(this.modelBridge.permanentlyDeleteDocument(deletedDocumentId, request));
 
-        assertLog(0, Level.WARN, "Exception while checking if entry [{}] can be removed from the recycle bin",
-            deletedDocumentId);
+        assertLog(0, Level.WARN,
+            "Failed to check if entry [{}] can be removed from the recycle bin. Root cause is [{}]", deletedDocumentId,
+            RIGHTS_CHECK_CAUSE);
         assertLog(1, Level.ERROR, "You are not allowed to permanently delete document [{}] with ID [{}]",
             documentReference, deletedDocumentId);
         verify(recycleBin, never()).deleteFromRecycleBin(anyLong(), any(), anyBoolean());
@@ -914,7 +925,8 @@ class DefaultModelBridgeTest
 
         assertFalse(this.modelBridge.canOverwriteSilently(documentReference));
 
-        when(document.getXObject(RedirectClassDocumentInitializer.REFERENCE)).thenReturn(mock(BaseObject.class));
+        BaseObject baseObjectMock3 = mock(BaseObject.class);
+        when(document.getXObject(RedirectClassDocumentInitializer.REFERENCE)).thenReturn(baseObjectMock3);
 
         assertTrue(this.modelBridge.canOverwriteSilently(documentReference));
     }

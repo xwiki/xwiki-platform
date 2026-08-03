@@ -33,7 +33,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 
 /**
- * Update XWiki.WikiMacroParameterClass document with all required informations.
+ * Update XWiki.WikiMacroParameterClass document with all required information.
  * 
  * @version $Id$
  * @since 4.3M1

@@ -81,30 +81,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.revapi</groupId>
-        <artifactId>revapi-maven-plugin</artifactId>
-        <configuration>
-          <analysisConfiguration combine.children="append">
-            <revapi.differences>
-              <justification>
-                The advice of IncludeMacroCompatibilityAspect is now written in the code style instead of the
-                annotation style, so that it gets woven. The annotation style compiled the advice into a public method
-                of the aspect, while the code style compiles it into a synthetic one. Calling that method was never
-                meaningful, an aspect only exists to be woven.
-              </justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.Object org.xwiki.rendering.macro.include.IncludeMacroCompatibilityAspect::aroundExecute(org.aspectj.lang.ProceedingJoinPoint, org.xwiki.rendering.macro.include.IncludeMacroParameters) throws java.lang.Throwable</old>
-                </item>
-              </differences>
-            </revapi.differences>
-          </analysisConfiguration>
-        </configuration>
-      </plugin>
       <!-- Exclude AspectJ's builddef.lst file form the generated JAR since it's not useful there. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

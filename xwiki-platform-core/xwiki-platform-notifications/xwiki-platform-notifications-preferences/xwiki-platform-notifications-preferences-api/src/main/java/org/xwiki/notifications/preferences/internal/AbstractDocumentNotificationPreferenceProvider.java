@@ -86,7 +86,7 @@ public abstract class AbstractDocumentNotificationPreferenceProvider implements 
                 .saveNotificationsPreferences(documentReference, preferences);
         } else {
             logger.warn("Preference's target [{}] is not a document reference. The corresponding preference will not"
-                    + " be saved.");
+                    + " be saved.", target);
         }
     }
 }

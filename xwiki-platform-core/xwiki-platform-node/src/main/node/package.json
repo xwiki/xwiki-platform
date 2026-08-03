@@ -15,15 +15,12 @@
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
-    "@vitejs/plugin-vue": "catalog:",
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
     "eslint": "catalog:",
     "globals": "catalog:",
     "npm-package-json-lint": "catalog:",
     "publint": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-css-injected-by-js": "catalog:",
-    "vite-plugin-dts": "catalog:",
     "vitest": "catalog:"
   }
 }

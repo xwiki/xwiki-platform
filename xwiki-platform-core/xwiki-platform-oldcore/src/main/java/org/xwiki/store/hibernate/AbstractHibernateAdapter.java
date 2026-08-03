@@ -223,7 +223,7 @@ public abstract class AbstractHibernateAdapter implements HibernateAdapter
         if (!exceptions.isEmpty()) {
             // Print the errors
             for (Exception exception : exceptions) {
-                this.logger.error(exception.getMessage(), exception);
+                this.logger.error("Error raised while updating the database schema", exception);
             }
 
             throw new HibernateStoreException("Failed to update the database. See the previous log for all errors",

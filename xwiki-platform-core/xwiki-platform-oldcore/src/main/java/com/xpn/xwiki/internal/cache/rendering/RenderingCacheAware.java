@@ -33,7 +33,7 @@ import com.xpn.xwiki.XWikiContext;
 public interface RenderingCacheAware
 {
     /**
-     * Obtain needed resources for this compoment to successfully restore it from cache.
+     * Obtain needed resources for this component to successfully restore it from cache.
      *
      * @param context current xwiki context
      * @return resources needed for restoring this component

@@ -146,7 +146,7 @@ public class DefaultHTMLConverter implements HTMLConverter
 
             return printer.toString();
         } catch (Exception e) {
-            this.logger.error(e.getLocalizedMessage(), e);
+            this.logger.error("Failed to convert HTML to the [{}] syntax", syntaxId, e);
             throw new RuntimeException("Exception while parsing HTML", e);
         } finally {
             if (renderingContextPushed) {
@@ -183,7 +183,8 @@ public class DefaultHTMLConverter implements HTMLConverter
 
             return printer.toString();
         } catch (Exception e) {
-            this.logger.error(e.getLocalizedMessage(), e);
+            this.logger.error("Failed to convert content in the [{}] syntax with source reference [{}] to HTML",
+                syntax, sourceReference, e);
             throw new RuntimeException("Exception while rendering HTML", e);
         }
     }
@@ -232,7 +233,8 @@ public class DefaultHTMLConverter implements HTMLConverter
 
             return printer.toString();
         } catch (Exception e) {
-            this.logger.error(e.getLocalizedMessage(), e);
+            this.logger.error("Failed to parse and render HTML in the [{}] syntax with source reference [{}]", syntax,
+                sourceReference, e);
             throw new RuntimeException("Exception while refreshing HTML", e);
         } finally {
             if (renderingContextPushed) {

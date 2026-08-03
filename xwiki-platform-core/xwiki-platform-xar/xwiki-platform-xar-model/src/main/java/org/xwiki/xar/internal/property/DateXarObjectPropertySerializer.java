@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
@@ -70,13 +71,14 @@ public class DateXarObjectPropertySerializer implements XarObjectPropertySeriali
         } catch (ParseException e) {
             // I suppose this is a date format used a long time ago. DateProperty is using the above date format now.
             SimpleDateFormat sdfOld = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
-            LOGGER.warn("Failed to parse date [{}] using format [{}]. Trying again with format [{}].", source,
-                DEFAULT_FORMAT, sdfOld.toPattern());
+            LOGGER.warn("Failed to parse date [{}] using format [{}]. Trying again with format [{}]. Root cause "
+                + "is [{}].", source, DEFAULT_FORMAT, sdfOld.toPattern(), ExceptionUtils.getRootCauseMessage(e));
             try {
                 return sdfOld.parse(source);
             } catch (ParseException exception) {
-                LOGGER.warn("Failed to parse date [{}] using format [{}]. Defaulting to the current date.", source,
-                    sdfOld.toPattern());
+                LOGGER.warn("Failed to parse date [{}] using format [{}]. Defaulting to the current date. Root "
+                    + "cause is [{}].", source, sdfOld.toPattern(),
+                    ExceptionUtils.getRootCauseMessage(exception));
                 return new Date();
             }
         }

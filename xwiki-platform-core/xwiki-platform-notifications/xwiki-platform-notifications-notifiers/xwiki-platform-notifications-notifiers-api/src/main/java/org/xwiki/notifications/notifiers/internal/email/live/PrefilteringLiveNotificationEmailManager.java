@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -104,7 +105,8 @@ public class PrefilteringLiveNotificationEmailManager implements Initializable, 
             try {
                 event = this.preQueue.take();
             } catch (InterruptedException e) {
-                this.logger.warn("The thread handling live event optimization has been interrupted", e);
+                this.logger.warn("The thread handling live event optimization has been interrupted. Root cause is "
+                    + "[{}]", ExceptionUtils.getRootCauseMessage(e));
 
                 Thread.currentThread().interrupt();
                 break;

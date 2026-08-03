@@ -68,7 +68,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     protected Logger logger;
 
     /**
-     * Used to set some proper context informations.
+     * Used to set some proper context information.
      */
     @Inject
     private Execution execution;

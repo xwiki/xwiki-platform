@@ -1650,7 +1650,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
 #end
 
 #macro (isShowingExtensionDetails $extension $_showDetails)
-  ## Show the extension details if this extension has been explicitely requested.
+  ## Show the extension details if this extension has been explicitly requested.
   #set ($return = "$!request.hideExtensionDetails" != 'true' && $request.extensionId == $extension.id.id
     && $request.extensionVersion == $extension.id.version.value)
   #if (!$return)

@@ -28,7 +28,7 @@ import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Event sent whenever a {@link Rating} is updated.
- * The event is sent with the following informations:
+ * The event is sent with the following information:
  *   - source: the identifier of the {@link RatingsManager}
  *   - data: the {@link Rating} updated.
  *

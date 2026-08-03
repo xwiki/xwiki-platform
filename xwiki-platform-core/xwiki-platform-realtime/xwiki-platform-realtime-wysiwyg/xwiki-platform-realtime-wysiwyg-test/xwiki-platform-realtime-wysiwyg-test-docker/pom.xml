@@ -44,6 +44,19 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
+    <!-- The extension under test. It is already pulled in by xwiki-platform-ckeditor-ui, but only as an optional
+      dependency, which means that Maven never resolves it into the local repository. The running wiki does resolve it,
+      and since it can't find it in the local Maven repository it gets it from the remote snapshot repository instead;
+      the extensions below it in the dependency tree (xwiki-platform-realtime-ui and the realtime webjars) are then
+      resolved from that same remote repository, so the locally built ones are silently ignored. Declaring it here
+      makes Maven put it in the local repository, which keeps the whole subtree local. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-realtime-wysiwyg-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
     <!-- Used to test the integration with the in-place editing. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

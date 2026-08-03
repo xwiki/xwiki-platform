@@ -36,7 +36,9 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -136,12 +138,14 @@ class AbstractRecordableEventDescriptorTest
                 fakeRecordableEventDescriptor.getDescription());
         assertEquals(1, this.logCapture.size());
         assertEquals("Failed to render the translation key [descriptionKey] in the namespace [wiki:subwiki] "
-                + "for the event descriptor of [fake].", this.logCapture.getMessage(0));
+                + "for the event descriptor of [fake]. Root cause is [Exception: some error]",
+            this.logCapture.getMessage(0));
         assertEquals("My nice application name",
                 fakeRecordableEventDescriptor.getApplicationName());
         assertEquals(2, this.logCapture.size());
         assertEquals("Failed to render the translation key [applicationKey] in the namespace [wiki:subwiki] "
-                + "for the event descriptor of [fake].", this.logCapture.getMessage(1));
+                + "for the event descriptor of [fake]. Root cause is [Exception: some error]",
+            this.logCapture.getMessage(1));
     }
 
     private class OtherFakeRecordableEventDescriptor extends AbstractRecordableEventDescriptor
@@ -183,6 +187,12 @@ class AbstractRecordableEventDescriptorTest
     }
 
     @Test
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which object is the receiver and which argument
+    // it gets, including an instance of a foreign class. Using assertEquals()/assertNotEquals() would move
+    // that into JUnit's internals and would invite a later SonarQube S3415 "swap these arguments" change
+    // that silently stops testing the contract.
+    @SuppressWarnings("java:S5785")
     void equalsAndHashCodeTest()
     {
         OtherFakeRecordableEventDescriptor descriptor1 = new OtherFakeRecordableEventDescriptor(
@@ -195,11 +205,11 @@ class AbstractRecordableEventDescriptorTest
                 "app1", "type2");
 
 
-        assertEquals(descriptor1, descriptor1);
-        assertEquals(descriptor1, descriptor2);
-        assertNotEquals(descriptor1, descriptor3);
-        assertNotEquals(descriptor1, descriptor4);
-        assertNotEquals(descriptor1, new Object());
+        assertTrue(descriptor1.equals(descriptor1));
+        assertTrue(descriptor1.equals(descriptor2));
+        assertFalse(descriptor1.equals(descriptor3));
+        assertFalse(descriptor1.equals(descriptor4));
+        assertFalse(descriptor1.equals(new Object()));
 
         assertEquals(descriptor1.hashCode(), descriptor1.hashCode());
         assertEquals(descriptor1.hashCode(), descriptor2.hashCode());

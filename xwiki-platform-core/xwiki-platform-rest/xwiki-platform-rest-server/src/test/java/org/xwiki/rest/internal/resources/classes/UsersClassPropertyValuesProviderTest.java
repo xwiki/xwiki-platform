@@ -112,8 +112,9 @@ class UsersClassPropertyValuesProviderTest extends AbstractListClassPropertyValu
         DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
         when(this.allowedValuesQuery.execute())
             .thenReturn(Collections.singletonList(new Object[] { aliceReference, " Alice One " }));
+        XWikiDocument xWikiDocumentMock = mock(XWikiDocument.class, "alice");
         when(this.xcontext.getWiki().getDocument(aliceReference, this.xcontext))
-            .thenReturn(mock(XWikiDocument.class, "alice"));
+            .thenReturn(xWikiDocumentMock);
 
         QueryFilter documentFilter = this.componentManager.getInstance(QueryFilter.class, "document");
         QueryFilter viewableFilter = this.componentManager.getInstance(QueryFilter.class, "viewable");
@@ -201,11 +202,13 @@ class UsersClassPropertyValuesProviderTest extends AbstractListClassPropertyValu
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("chess");
 
         DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
+        XWikiDocument xWikiDocumentMock2 = mock(XWikiDocument.class, "alice");
         when(this.xcontext.getWiki().getDocument(aliceReference, this.xcontext))
-            .thenReturn(mock(XWikiDocument.class, "alice"));
+            .thenReturn(xWikiDocumentMock2);
         DocumentReference bobReference = new DocumentReference("chess", "Users", "Bob");
+        XWikiDocument xWikiDocumentMock3 = mock(XWikiDocument.class, "bob");
         when(this.xcontext.getWiki().getDocument(bobReference, this.xcontext))
-            .thenReturn(mock(XWikiDocument.class, "bob"));
+            .thenReturn(xWikiDocumentMock3);
         when(this.allowedValuesQuery.execute()).thenReturn(Collections.singletonList(bobReference),
             Collections.singletonList(aliceReference));
 

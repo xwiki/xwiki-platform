@@ -113,7 +113,7 @@ public class StatusListener implements SchedulerListener, JobListener
     @Override
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException e)
     {
-        LOGGER.info("Task [{}] executed: ", context.getJobDetail().getKey(), e);
+        LOGGER.info("Task [{}] executed", context.getJobDetail().getKey(), e);
     }
 
     @Override

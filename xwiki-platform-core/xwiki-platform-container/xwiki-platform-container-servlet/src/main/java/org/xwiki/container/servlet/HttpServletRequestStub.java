@@ -279,7 +279,7 @@ public class HttpServletRequestStub implements HttpServletRequest
     {
         Map<String, String[]> clone;
         if (map != null) {
-            clone = new LinkedHashMap<>(map.size());
+            clone = LinkedHashMap.newLinkedHashMap(map.size());
             for (Map.Entry<String, String[]> entry : map.entrySet()) {
                 clone.put(entry.getKey(), entry.getValue().clone());
             }

@@ -80,7 +80,7 @@ public class InstanceInputFilterStream extends AbstractBeanInputFilterStream<Ins
             this.eventGenerators = this.componentManager.get().getInstanceList(InstanceInputEventGenerator.class);
         } catch (ComponentLookupException e) {
             throw new FilterException(
-                "Failed to get regsitered instance of OutputInstanceFilterStreamFactory components", e);
+                "Failed to get registered instance of OutputInstanceFilterStreamFactory components", e);
         }
 
         for (InstanceInputEventGenerator eventGenerator : this.eventGenerators) {

@@ -238,7 +238,8 @@ public class DefaultModelBridge implements ModelBridge
             return true;
         } catch (Exception e) {
             // Just warn, since it's a recoverable situation.
-            this.logger.warn("Failed to unlock document [{}].", reference, e);
+            this.logger.warn("Failed to unlock document [{}]. Root cause is [{}]", reference,
+                ExceptionUtils.getRootCauseMessage(e));
             return false;
         }
     }
@@ -312,7 +313,7 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         XWikiContext xcontext = this.xcontextProvider.get();
-        Set<DocumentReference> documentReferences = new HashSet<>(references.size());
+        Set<DocumentReference> documentReferences = HashSet.newHashSet(references.size());
         for (EntityReference entityReference : references) {
             documentReferences.add(this.documentReferenceResolver.resolve(entityReference, xcontext));
         }
@@ -581,7 +582,7 @@ public class DefaultModelBridge implements ModelBridge
                 result.add(deletedDocument.getId());
             }
         } catch (Exception e) {
-            logger.error("Failed to get deleted document IDs for batch [{}]", batchId);
+            logger.error("Failed to get deleted document IDs for batch [{}]", batchId, e);
         }
 
         return result;

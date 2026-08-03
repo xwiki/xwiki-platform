@@ -141,7 +141,7 @@ public class ImageFilter extends AbstractHTMLFilter
         } catch (Exception e) {
             this.logger.warn("Failed to extract the image file name. Root cause is [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
-            this.logger.debug("Full stacktrace is: ", e);
+            this.logger.debug("Full stacktrace is:", e);
         }
         if (StringUtils.isEmpty(fileName)) {
             return;

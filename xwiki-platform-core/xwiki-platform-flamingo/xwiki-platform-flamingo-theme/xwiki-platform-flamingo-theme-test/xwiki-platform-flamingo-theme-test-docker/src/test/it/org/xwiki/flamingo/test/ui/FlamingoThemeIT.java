@@ -19,10 +19,14 @@
  */
 package org.xwiki.flamingo.test.ui;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.openqa.selenium.TimeoutException;
@@ -32,11 +36,14 @@ import org.xwiki.administration.test.po.ThemesAdministrationSectionPage;
 import org.xwiki.flamingo.test.po.EditThemePage;
 import org.xwiki.flamingo.test.po.PreviewBox;
 import org.xwiki.flamingo.test.po.ThemeApplicationWebHomePage;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -51,6 +58,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class FlamingoThemeIT
 {
+    private static final String THEMES_SPACE = "FlamingoThemes";
+
+    private static final String COLOR_THEME_PREFERENCE = "colorTheme";
+
+    private static final String LOGO_NAME = "logo.png";
+
     @AfterEach
     void verify(LogCaptureConfiguration logCaptureConfiguration)
     {
@@ -59,18 +72,19 @@ class FlamingoThemeIT
     }
 
     @Test
+    @Order(1)
     void validateColorThemeFeatures(TestUtils setup, TestInfo info)
     {
         setup.loginAsSuperAdmin();
 
         // First make sure the theme we'll create doesn't exist
         String testMethodName = info.getTestMethod().get().getName();
-        setup.deletePage("FlamingoThemes", testMethodName);
+        setup.deletePage(THEMES_SPACE, testMethodName);
 
         // Note: we don't reset the color theme before we start even though the test below could fail and thus have
         // our test theme set. We don't do that since we want to test that the default CT is Charcoal by default.
-        // The reason why it's ok is because we have only a single UI test in this module and thus there's no risk
-        // that another test would fail because it's expecting to have Charcoal defined.
+        // The reason why it's ok is that this test is executed first (see @Order) and the other tests of this class
+        // restore the color theme they set, so the default one is still in place here.
         // Only caveat is that if you run this test several times and it fails the first time then it may fail the
         // second time when we test that the default CT is Charcoal...
 
@@ -101,10 +115,50 @@ class FlamingoThemeIT
         validateViewAndSetThemeFromThemeHomePage(testMethodName);
 
         // Validate setting a color theme from the wiki Admin UI
-        validateSetThemeFromWikiAdminUI(testMethodName);
+        validateSetThemeFromWikiAdminUI(testMethodName, setup);
 
         // Validate setting a color theme from the page Admin UI for the page and its children
         validateSetThemeFromPageAdminUI(testMethodName, setup, info);
+    }
+
+    @Test
+    @Order(2)
+    void changeThemeLogo(TestUtils setup, TestConfiguration testConfiguration, TestInfo info) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        // First make sure the theme we'll create doesn't exist
+        String themeName = info.getTestMethod().get().getName();
+        DocumentReference themeReference = new DocumentReference("xwiki", THEMES_SPACE, themeName);
+        setup.deletePage(themeReference);
+
+        // Set the logo of a new theme by uploading an image with the attachment picker of the "Logos" category.
+        EditThemePage editThemePage = ThemeApplicationWebHomePage.gotoPage().createNewTheme(themeName);
+        // Disable the auto refresh of the preview because it slows down the test.
+        editThemePage.setAutoRefresh(false);
+        editThemePage.selectVariableCategory("Logos");
+        File logoFile = new File(testConfiguration.getBrowser().getTestResourcesPath(), LOGO_NAME);
+        editThemePage.setImageVariableValue("logo", logoFile.getAbsolutePath());
+        // The picker selects the image it has just uploaded, but as a temporary attachment: it's only attached to the
+        // theme when the theme is saved.
+        assertEquals(LOGO_NAME, editThemePage.getImageVariableValue("logo"));
+        editThemePage.clickSaveAndView();
+        AttachmentReference logoReference = new AttachmentReference(LOGO_NAME, themeReference);
+        assertTrue(setup.rest().exists(logoReference),
+            String.format("The [%s] image was not attached to the theme when saving it", LOGO_NAME));
+
+        // Verify that the uploaded image is displayed as the wiki logo when the theme is used, in place of the logo
+        // provided by the skin.
+        String previousColorTheme = setup.setWikiPreference(COLOR_THEME_PREFERENCE, THEMES_SPACE + '.' + themeName);
+        try {
+            ViewPage viewPage = setup.gotoPage("Main", "WebHome");
+            // The logo URL also carries the revision of the attachment, which is not relevant here.
+            assertEquals(setup.getURL(logoReference, "download", null),
+                StringUtils.substringBefore(viewPage.getLogoImageURL(), "?"));
+        } finally {
+            // Restore the color theme that was in use so that this test doesn't affect the other tests.
+            setup.setWikiPreference(COLOR_THEME_PREFERENCE, Objects.toString(previousColorTheme, ""));
+        }
     }
 
     private void validateThemeCreation(ThemeApplicationWebHomePage themeApplicationWebHomePage, String testMethodName)
@@ -144,7 +198,7 @@ class FlamingoThemeIT
         themeApplicationWebHomePage.useTheme("Charcoal");
     }
 
-    private void validateSetThemeFromWikiAdminUI(String testMethodName)
+    private void validateSetThemeFromWikiAdminUI(String testMethodName, TestUtils setup)
     {
         // Go back to the Theme Admin UI to verify we can set the new theme from there too (using the select control)
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
@@ -163,6 +217,14 @@ class FlamingoThemeIT
         EditThemePage editThemePage = new EditThemePage();
         assertFalse(editThemePage.getPreviewBox().hasError(true));
         editThemePage.clickSaveAndView();
+
+        // Verify that the default button background defined by the theme is applied on a wiki page, the "Cancel"
+        // button of the editor being one of the buttons using that style.
+        // Note: the skin doesn't use the @btn-default-bg value as-is, it lightens it by 5% (see buttons.less), which
+        // turns the #99ccff set on the theme into #b3d9ff.
+        WikiEditPage wikiEditPage = WikiEditPage.gotoPage("Main", "WebHome");
+        assertColor(179, 217, 255, wikiEditPage.getCancelButtonBackgroundColor());
+        wikiEditPage.clickCancel();
 
         // Switch back to Charcoal
         // TODO: Replace this with a setup.updateObject() call since we don't need to test the useTheme() UI as it's
@@ -209,12 +271,11 @@ class FlamingoThemeIT
 
     private void assertCustomThemeColors(ViewPage page)
     {
-        // FIXME: The following should be put back when https://github.com/SeleniumHQ/selenium/issues/7697 will be fixed
-        // for now we get rgb value with Firefox and rgba value with Chrome
-        //assertEquals("rgb(255, 0, 0)", page.getPageBackgroundColor());
-        // Test 'lessCode' is correctly handled
-        //assertEquals("rgb(0, 0, 255)", page.getTextColor());
         assertColor(255, 218, 218, page.getPageBackgroundColor());
+        // The text color set by the theme is inherited from the "body" element. Note that we cannot assert it on the
+        // page content since the 'lessCode' variable set by this test colors the whole ".main" block in blue.
+        assertColor(102, 51, 0, page.getTextColor());
+        // Test 'lessCode' is correctly handled, the title being inside the ".main" block it colors.
         assertColor(0, 0, 255, page.getTitleColor());
         assertEquals("monospace", page.getTitleFontFamily().toLowerCase());
     }
@@ -268,9 +329,15 @@ class FlamingoThemeIT
         editThemePage.setVariableValue("link-color", "#2c699c");
         // Change another value. We don't deactivate all WCAG checks, so we need to take care about contrast.
         editThemePage.setVariableValue("xwiki-page-content-bg", "#ffdada");
+        // Change the color of the page's text. It's dark enough to keep a proper contrast with the page backgrounds.
+        editThemePage.setVariableValue("text-color", "#663300");
         // Again...
         editThemePage.selectVariableCategory("Typography");
         editThemePage.setVariableValue("font-family-base", "Monospace");
+        // Change the background of the buttons using the default style. It's light enough to keep a proper contrast
+        // with the button text color.
+        editThemePage.selectVariableCategory("Buttons");
+        editThemePage.setVariableValue("btn-default-bg", "#99ccff");
         // Test that the @lessCode variable is handled too!
         editThemePage.selectVariableCategory("Advanced");
         editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; }");

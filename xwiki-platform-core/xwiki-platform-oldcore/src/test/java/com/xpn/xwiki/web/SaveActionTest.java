@@ -194,7 +194,8 @@ class SaveActionTest
     {
         when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("1.2"));
         when(mockClonedDocument.getComment()).thenReturn("My Changes");
-        when(mockClonedDocument.getLock(this.context)).thenReturn(mock(XWikiLock.class));
+        XWikiLock xWikiLockMock = mock(XWikiLock.class);
+        when(mockClonedDocument.getLock(this.context)).thenReturn(xWikiLockMock);
         when(mockForm.getTemplate()).thenReturn("");
 
         assertFalse(saveAction.save(this.context));
@@ -260,7 +261,8 @@ class SaveActionTest
         when(mockDocument.getRCSVersion()).thenReturn(new Version("1.2"));
         when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("1.2"));
         when(mockClonedDocument.getComment()).thenReturn("My Changes");
-        when(mockClonedDocument.getLock(this.context)).thenReturn(mock(XWikiLock.class));
+        XWikiLock xWikiLockMock2 = mock(XWikiLock.class);
+        when(mockClonedDocument.getLock(this.context)).thenReturn(xWikiLockMock2);
         when(mockForm.getTemplate()).thenReturn("");
         when(this.propertiesConf.getProperty("edit.conflictChecking.enabled")).thenReturn(true);
         when(mockRequest.getParameter("previousVersion")).thenReturn("1.1");
@@ -270,7 +272,8 @@ class SaveActionTest
 
         when(mockDocument.getDate()).thenReturn(new Date(42));
         when(mockRequest.getParameter("editingVersionDate")).thenReturn("43");
-        when(this.documentRevisionProvider.getRevision(mockDocument, "1.1")).thenReturn(mock(XWikiDocument.class));
+        XWikiDocument xWikiDocumentMock = mock(XWikiDocument.class);
+        when(this.documentRevisionProvider.getRevision(mockDocument, "1.1")).thenReturn(xWikiDocumentMock);
         when(mockDocument.getContentDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());
         when(mockDocument.getMetaDataDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());
         when(mockDocument.getObjectDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());

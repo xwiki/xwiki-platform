@@ -56,7 +56,7 @@
       <type>xar</type>
     </dependency>
     <dependency>
-      <!-- Used to test how floating images (with left / right aligment) are exported to PDF. -->
+      <!-- Used to test how floating images (with left / right alignment) are exported to PDF. -->
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-image-style-ui</artifactId>
       <version>${project.version}</version>

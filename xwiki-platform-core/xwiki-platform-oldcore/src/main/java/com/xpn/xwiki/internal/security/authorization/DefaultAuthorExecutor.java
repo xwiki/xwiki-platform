@@ -54,7 +54,7 @@ public class DefaultAuthorExecutor implements AuthorExecutor
     private Logger logger;
 
     /**
-     * Contain the informations to restore.
+     * Contain the information to restore.
      *
      * @version $Id$
      */

@@ -17,18 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cluster.test;
+package org.xwiki.cluster.test.ui.docker;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.xwiki.cluster.test.framework.AbstractClusterHttpIT;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.panels.internal.PanelClassDocumentInitializer;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
-import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.docker.junit5.XWikiInstances;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.xwiki.test.ui.TestUtils.RestTestUtils.object;
 import static org.xwiki.test.ui.TestUtils.RestTestUtils.property;
 
@@ -37,66 +39,66 @@ import static org.xwiki.test.ui.TestUtils.RestTestUtils.property;
  * 
  * @version $Id$
  */
-public class PanelsIT extends AbstractClusterHttpIT
+@UITest(xwikiInstances = @XWikiInstances(2))
+class PanelsIT
 {
-    private static LocalDocumentReference PANEL_REFERENCE = new LocalDocumentReference("Test", "SharedPanel");
+    private static final LocalDocumentReference PANEL_REFERENCE = new LocalDocumentReference("Test", "SharedPanel");
 
-    private static LocalDocumentReference HOME_REFERENCE = new LocalDocumentReference("Main", "WebHome");
+    private static final LocalDocumentReference HOME_REFERENCE = new LocalDocumentReference("Main", "WebHome");
 
     @Test
-    public void testModifyPanel() throws Exception
+    void testModifyPanel(TestUtils setup) throws Exception
     {
         String panelContent = "Hey I'm here !";
         String modifiedPanelContent = "Hey I'm still here !";
         String id = "testpanel";
 
         // Create panel on node 0
-        AbstractTest.getUtil().switchExecutor(0);
+        setup.switchExecutor(0);
 
-        Page panelPage = AbstractTest.getUtil().rest().page(PANEL_REFERENCE);
+        Page panelPage = setup.rest().page(PANEL_REFERENCE);
         panelPage.setObjects(new Objects());
         org.xwiki.rest.model.jaxb.Object panelObject = object(PanelClassDocumentInitializer.CLASS_REFERENCE_STRING);
         panelObject.getProperties().add(property("content", "(%id='" + id + "'%)" + panelContent));
         panelPage.getObjects().getObjectSummaries().add(panelObject);
-        AbstractTest.getUtil().rest().save(panelPage);
+        setup.rest().save(panelPage);
 
         // Add the panel to wiki right panels
-        AbstractTest.getUtil().setWikiPreference("rightPanels", "Test.SharedPanel");
+        setup.setWikiPreference("rightPanels", "Test.SharedPanel");
 
-        AbstractTest.getUtil().gotoPage(HOME_REFERENCE);
+        setup.gotoPage(HOME_REFERENCE);
 
-        Assert.assertEquals(panelContent, AbstractTest.getUtil().getDriver().findElement(By.id(id)).getText());
+        assertEquals(panelContent, setup.getDriver().findElement(By.id(id)).getText());
 
         // Display panel on node 1
-        AbstractTest.getUtil().switchExecutor(1);
+        setup.switchExecutor(1);
 
-        AbstractTest.getUtil().gotoPage(HOME_REFERENCE);
-        Assert.assertEquals(panelContent, AbstractTest.getUtil().getDriver().findElement(By.id(id)).getText());
+        setup.gotoPage(HOME_REFERENCE);
+        assertEquals(panelContent, setup.getDriver().findElement(By.id(id)).getText());
 
         // Modify panel on node 1
-        panelObject = AbstractTest.getUtil().rest().object(PANEL_REFERENCE, PanelClassDocumentInitializer.CLASS_REFERENCE_STRING);
+        panelObject = setup.rest().object(PANEL_REFERENCE, PanelClassDocumentInitializer.CLASS_REFERENCE_STRING);
         panelObject.getProperties().add(property("content", "(%id='" + id + "'%)" + modifiedPanelContent));
-        AbstractTest.getUtil().rest().update(panelObject);
+        setup.rest().update(panelObject);
 
         // Reload the page after modifying the panel
-        AbstractTest.getUtil().getDriver().navigate().refresh();
-        Assert.assertEquals(modifiedPanelContent, AbstractTest.getUtil().getDriver().findElement(By.id(id)).getText());
+        setup.getDriver().navigate().refresh();
+        assertEquals(modifiedPanelContent, setup.getDriver().findElement(By.id(id)).getText());
 
         // Verify panel rendering on node 0
         // Since it can take time for the Cluster to propagate the change, we need to wait and set up a timeout.
-        AbstractTest.getUtil().switchExecutor(0);
-        AbstractTest.getUtil().gotoPage(HOME_REFERENCE);
+        setup.switchExecutor(0);
+        setup.gotoPage(HOME_REFERENCE);
         long t1 = System.currentTimeMillis();
         long t2;
         String result;
-        while (!(result = AbstractTest.getUtil().getDriver().findElement(By.id(id)).getText())
-            .equalsIgnoreCase(modifiedPanelContent)) {
+        while (!(result = setup.getDriver().findElement(By.id(id)).getText()).equalsIgnoreCase(modifiedPanelContent)) {
             t2 = System.currentTimeMillis();
             if (t2 - t1 > 10000L) {
-                Assert.fail("Content should have been [" + modifiedPanelContent + "] but was [" + result + "]");
+                fail("Content should have been [" + modifiedPanelContent + "] but was [" + result + "]");
             }
             Thread.sleep(100);
-            AbstractTest.getUtil().getDriver().navigate().refresh();
+            setup.getDriver().navigate().refresh();
         }
     }
 }

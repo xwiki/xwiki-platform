@@ -62,7 +62,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * Migration of old Ratings XObjects to Solr store.
  *
  * This migration performs the following operations:
- *   1. it queries in database all the references of document containings a Rating xobjects
+ *   1. it queries in database all the references of document containing a Rating xobjects
  *   2. it iterates over all those documents and all the rating xobjects in them, check if the voted document matches
  *      the configuration (i.e. if the Rating App was configured to use separate documents, then the xobjects to
  *      consider should not be located in the same page as the voted page), and migrate them if its the case and store
@@ -114,7 +114,7 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
                 numberOfPagesToHandle, totalNumberOfXObjectsMigrated);
             if (!this.pagesWithNotMigratedRatings.isEmpty()) {
                 logger.info("Some ratings xobject have not been migrated because of the ratings configuration. "
-                    + "Here's the list of pages with ratings values not migrated: ");
+                    + "Here's the list of pages with ratings values not migrated:");
                 for (Map.Entry<String, Pair<Integer, Integer>> entry : pagesWithNotMigratedRatings.entrySet()) {
                     logger.info("Page: [{}]. Migrated: [{}]. Not migrated: [{}]", entry.getKey(),
                         entry.getValue().getLeft(), entry.getValue().getRight());
@@ -277,7 +277,7 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
             } catch (RatingsException e) {
                 throw new DataMigrationException("Cannot migrate old rating xobject to new storage system.", e);
             } catch (SolrException e) {
-                throw new DataMigrationException("Error while migrating Like informations.", e);
+                throw new DataMigrationException("Error while migrating Like information.", e);
             }
         }
     }
@@ -393,7 +393,7 @@ public class R120901000XWIKI17761DataMigration extends AbstractHibernateDataMigr
                 .setReference(ratedPage)
                 .setCreatedAt(date)
                 .setUpdatedAt(date)
-                // We explicitely don't retrieve scale from config here since the previous ratings
+                // We explicitly don't retrieve scale from config here since the previous ratings
                 // were done with a scale of 5.
                 .setScaleUpperBound(5)
                 .setVote(vote);

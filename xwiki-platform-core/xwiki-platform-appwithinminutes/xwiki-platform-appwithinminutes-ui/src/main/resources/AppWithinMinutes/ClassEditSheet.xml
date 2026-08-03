@@ -1481,7 +1481,7 @@ XWiki.FormFieldPrettyNameManager = Class.create({
     prettyNameInput.ariaLabel = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldPrettyNameToolTip'))';
     // Replace the preview label with the pretty name input.
     var previewLabel = field.getViewer().down('label');
-    // We unset the for attribute, so that this label will not be set implicitely OR explicitely anymore.
+    // We unset the for attribute, so that this label will not be set implicitly OR explicitly anymore.
     previewLabel.writeAttribute('for', '');
     previewLabel.removeChild(previewLabel.lastChild);
     previewLabel.insert(prettyNameInput);

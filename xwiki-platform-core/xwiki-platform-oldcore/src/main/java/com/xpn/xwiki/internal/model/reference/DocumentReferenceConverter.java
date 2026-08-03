@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -80,7 +81,8 @@ public class DocumentReferenceConverter extends AbstractConverter<DocumentRefere
                     result = converter.convert(DocumentReference.class, value);
                 } catch (ConversionException e) {
                     logger.warn("The type [{}] cannot be converted natively to DocumentReference, "
-                        + "falling back on using toString to convert it.", value.getClass().getName());
+                        + "falling back on using toString to convert it. Root cause is [{}]",
+                        value.getClass().getName(), ExceptionUtils.getRootCauseMessage(e));
                     result = this.stringResolver.resolve(value.toString());
                 }
             } else {

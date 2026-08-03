@@ -30,6 +30,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -243,7 +244,8 @@ public class SolrQueryExecutor extends AbstractQueryExecutor
             } catch (Exception e) {
                 // Don't take any risk of including a result for which we cannot determine the document reference and
                 // thus cannot determine if the given users have access to it or not.
-                this.logger.warn("Removing bad result: {}", result, e);
+                this.logger.warn("Removing bad result: [{}]. Root cause is [{}]", result,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
 
             // FIXME: We should update maxScore as well when removing the top scored item. How do we do that?

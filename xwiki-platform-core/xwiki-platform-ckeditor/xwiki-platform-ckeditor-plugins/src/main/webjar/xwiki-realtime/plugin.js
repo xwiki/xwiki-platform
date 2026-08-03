@@ -154,7 +154,7 @@
           await editor._realtime.disconnect();
         }
       } else if (previousMode === 'source' && editor.mode === 'wysiwyg' && editor._realtime.rejoin) {
-        // Swithing from Source back to WYSIWYG mode, which had realtime enabled before the switch.
+        // Switching from Source back to WYSIWYG mode, which had realtime enabled before the switch.
         editor.showNotification(editor.localization.get('xwiki-realtime.joiningCollaboration'));
         editor._realtime.context.realtimeEnabled = true;
         await editor._realtime.connect();

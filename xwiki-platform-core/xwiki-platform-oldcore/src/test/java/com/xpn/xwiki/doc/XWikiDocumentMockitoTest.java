@@ -909,7 +909,8 @@ class XWikiDocumentMockitoTest
         this.document.setMetaDataDirty(false);
 
         DocumentReference creator = new DocumentReference("Wiki", "XWiki", "Creator");
-        when(this.userReferenceDocumentReferenceResolver.resolve(creator)).thenReturn(mock(UserReference.class));
+        UserReference userReferenceMock = mock(UserReference.class);
+        when(this.userReferenceDocumentReferenceResolver.resolve(creator)).thenReturn(userReferenceMock);
         this.document.setCreatorReference(creator);
 
         assertEquals(true, this.document.isMetaDataDirty());
@@ -948,7 +949,8 @@ class XWikiDocumentMockitoTest
         this.document.setMetaDataDirty(false);
 
         DocumentReference author = new DocumentReference("Wiki", "XWiki", "Author");
-        when(this.userReferenceDocumentReferenceResolver.resolve(author)).thenReturn(mock(UserReference.class));
+        UserReference userReferenceMock2 = mock(UserReference.class);
+        when(this.userReferenceDocumentReferenceResolver.resolve(author)).thenReturn(userReferenceMock2);
         this.document.setAuthorReference(author);
 
         assertEquals(true, this.document.isMetaDataDirty());
@@ -990,7 +992,8 @@ class XWikiDocumentMockitoTest
         this.document.setMetaDataDirty(false);
 
         DocumentReference contentAuthor = new DocumentReference("Wiki", "XWiki", "ContentAuthor");
-        when(this.userReferenceDocumentReferenceResolver.resolve(contentAuthor)).thenReturn(mock(UserReference.class));
+        UserReference userReferenceMock3 = mock(UserReference.class);
+        when(this.userReferenceDocumentReferenceResolver.resolve(contentAuthor)).thenReturn(userReferenceMock3);
         this.document.setContentAuthorReference(contentAuthor);
 
         assertEquals(true, this.document.isMetaDataDirty());
@@ -1122,12 +1125,18 @@ class XWikiDocumentMockitoTest
     }
 
     @Test
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which object is the receiver and which argument
+    // it gets. Using assertEquals()/assertNotEquals() would move that into JUnit's internals and would
+    // invite a later SonarQube S3415 "swap these arguments" change that silently stops testing the
+    // contract.
+    @SuppressWarnings("java:S5785")
     void testEqualsDatas()
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         XWikiDocument otherDocument = document.clone();
 
-        assertEquals(document, otherDocument);
+        assertTrue(document.equals(otherDocument));
         assertTrue(document.equalsData(otherDocument));
 
         otherDocument.setAuthorReference(new DocumentReference("wiki", "space", "otherauthor"));
@@ -1139,11 +1148,17 @@ class XWikiDocumentMockitoTest
 
         document.setMinorEdit(false);
 
-        assertNotEquals(document, otherDocument);
+        assertFalse(document.equals(otherDocument));
         assertTrue(document.equalsData(otherDocument));
     }
 
     @Test
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which object is the receiver and which argument
+    // it gets. Using assertEquals()/assertNotEquals() would move that into JUnit's internals and would
+    // invite a later SonarQube S3415 "swap these arguments" change that silently stops testing the
+    // contract.
+    @SuppressWarnings("java:S5785")
     void testEqualsAttachments() throws XWikiException
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
@@ -1153,12 +1168,12 @@ class XWikiDocumentMockitoTest
         XWikiAttachment otherAttachment =
             otherDocument.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
 
-        assertEquals(document, otherDocument);
+        assertTrue(document.equals(otherDocument));
         assertTrue(document.equalsData(otherDocument));
 
         otherAttachment.setContent(new byte[] {1, 2, 3});
 
-        assertNotEquals(document, otherDocument);
+        assertFalse(document.equals(otherDocument));
         assertFalse(document.equalsData(otherDocument));
     }
 

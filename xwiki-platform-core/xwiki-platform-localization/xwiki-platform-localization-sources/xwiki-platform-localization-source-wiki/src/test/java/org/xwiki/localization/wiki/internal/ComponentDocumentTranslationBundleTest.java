@@ -198,7 +198,8 @@ class ComponentDocumentTranslationBundleTest
         Translation frTranslation = this.localization.getTranslation("xwiki.translation", Locale.FRENCH);
         assertEquals(
             "Failed to load and register the translation for locale [fr] from document [xwiki:space.Translations]. "
-                + "Falling back to default locale.",
+                + "Falling back to default locale. Root cause is [AccessDeniedException: Access denied when "
+                + "checking [script] access to [xwiki:space.Translations] for user [Public]].",
             this.logCapture.getMessage(0));
         assertEquals("root", frTranslation.getRawSource());
         verify(this.oldcore.getMockDocumentAuthorizationManager())

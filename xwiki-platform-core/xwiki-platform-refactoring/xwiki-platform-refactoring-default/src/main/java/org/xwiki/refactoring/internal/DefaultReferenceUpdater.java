@@ -195,7 +195,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
                             modified = true;
                         }
                     } catch (Exception e) {
-                        this.logger.warn("Failed to rename links from xobject property [{}], skipping it. Error: {}",
+                        this.logger.warn("Failed to rename links from xobject property [{}], skipping it. Error: [{}]",
                             largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
                     }
                 }

@@ -108,7 +108,7 @@ public class TextAreaClass extends StringClass
         }
 
         /**
-         * Retreive the {@link EditorType} based on its value.
+         * Retrieve the {@link EditorType} based on its value.
          * <p>
          * The search is case insensitive.
          *
@@ -170,7 +170,7 @@ public class TextAreaClass extends StringClass
         }
 
         /**
-         * Retreive the {@link ContentType} based on its value.
+         * Retrieve the {@link ContentType} based on its value.
          * <p>
          * The search is case insensitive.
          *

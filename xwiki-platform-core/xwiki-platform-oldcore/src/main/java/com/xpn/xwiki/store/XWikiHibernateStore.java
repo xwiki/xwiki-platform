@@ -599,7 +599,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     Session session = getSession(context);
                     session.setHibernateFlushMode(FlushMode.COMMIT);
 
-                    // These informations will allow to not look for attachments and objects on loading
+                    // This information will allow to not look for attachments and objects on loading
                     doc.setElement(XWikiDocument.HAS_ATTACHMENTS, !doc.getAttachmentList().isEmpty());
                     doc.setElement(XWikiDocument.HAS_OBJECTS, !doc.getXObjects().isEmpty());
 
@@ -768,10 +768,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 if (this.logger.isDebugEnabled()) {
                                     this.logger.debug("saveXWikiDoc:");
                                     this.logger.debug("    - document: [{}]", doc.getDocumentReferenceWithLocale());
-                                    this.logger.debug(
-                                        "    - optimizedObjects: {} (doc.isNew: {} doc.isChangeTracked: {}, isClassOptimized: {})",
-                                        optimizedObjects, doc.isNew(), doc.isChangeTracked(),
-                                        isClassOptimized(entry.getKey()));
+                                    this.logger.debug("    - optimizedObjects: [{}] (doc.isNew: [{}], "
+                                        + "doc.isChangeTracked: [{}], isClassOptimized: [{}])", optimizedObjects,
+                                        doc.isNew(), doc.isChangeTracked(), isClassOptimized(entry.getKey()));
                                     this.logger.debug("    - saved xobjects: [{}]", count);
                                 }
                             }
@@ -1027,7 +1026,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 executeWrite(context, session -> {
                     saveXWikiDoc(newDocument, context, false);
 
-                    // Since the save documment is called without a commit, the information are not flushed
+                    // Since the save document is called without a commit, the information is not flushed
                     // in the session either. However we need the new information in the session for the delete
                     // in particular to know the possible changes made in the spaces.
                     session.flush();
@@ -3276,7 +3275,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * is to simply replace all instances of \ with \\ which makes the first backslash escape the second.
      *
      * @param sql the uncleaned sql.
-     * @return same as sql except it is guarenteed not to contain groups of odd numbers of backslashes.
+     * @return same as sql except it is guaranteed not to contain groups of odd numbers of backslashes.
      * @since 2.4M1
      */
     private String filterSQL(String sql)

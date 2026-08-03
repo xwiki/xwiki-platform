@@ -108,7 +108,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
     private void warnDatabaseTooOld(String databaseName, Version databaseVersion)
     {
         this.logger.warn(
-            "The migration cannot run on {} versions lower than {}. The short String limitation will remain 255.",
+            "The migration cannot run on [{}] versions lower than [{}]. The short String limitation will remain 255.",
             databaseName, databaseVersion);
     }
 
@@ -141,7 +141,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
                     }
                 }
             } catch (SQLException e) {
-                this.logger.warn("Failed to get database information: {}", ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("Failed to get database information: [{}]", ExceptionUtils.getRootCauseMessage(e));
             }
         } else if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MSSQL) {
             // Impossible to apply this migration on Microsoft SQL Server
@@ -279,7 +279,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
             String script = String.format("<changeSet author=\"xwiki\" id=\"R%s\">%s</changeSet>",
                 getVersion().getVersion(), builder.toString());
 
-            this.logger.debug("Liquibase script: {}", script);
+            this.logger.debug("Liquibase script: [{}]", script);
 
             return script;
         }

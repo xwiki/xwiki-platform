@@ -136,7 +136,7 @@ public class QuestionJobResourceReferenceHandler extends AbstractTemplateJobReso
 
         String jobType = job.getType();
 
-        // Provide informations about the job to the template
+        // Provide information about the job to the template
         this.scriptContextManager.getCurrentScriptContext().setAttribute("job", job, ScriptContext.ENGINE_SCOPE);
 
         String[] templates = getTemplates(question.getClass(), jobType, prefix);

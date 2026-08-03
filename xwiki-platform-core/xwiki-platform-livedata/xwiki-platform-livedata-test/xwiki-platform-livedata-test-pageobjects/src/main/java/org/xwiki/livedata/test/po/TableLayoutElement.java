@@ -1235,7 +1235,8 @@ public class TableLayoutElement extends BaseElement
 
     private boolean isPlainTextField(WebElement field)
     {
-        if ("input".equals(field.getTagName())) {
+        // Date pickers are actually text inputs.
+        if ("input".equals(field.getTagName()) && !List.of(getClasses(field)).contains("datetime")) {
             String type = field.getAttribute("type");
             return type == null
                 || List.of("text", "email", "password", "number", "tel", "search", "url").contains(type);

@@ -1385,7 +1385,13 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         logProgress("%d schema updates required.", this.logCount);
-        this.logger.debug("About to execute this Liquibase XML: [{}]", sb);
-        return sb.toString();
+
+        // Build the String on purpose (it is needed for the return value anyway): log arguments are kept as objects
+        // in the captured LogEvent and XStream-serialized into the job log (see SafeMessageConverter in
+        // xwiki-commons), and this builder holds the whole Liquibase XML of the migration.
+        String liquibaseXML = sb.toString();
+        this.logger.debug("About to execute this Liquibase XML: [{}]", liquibaseXML);
+
+        return liquibaseXML;
     }
 }

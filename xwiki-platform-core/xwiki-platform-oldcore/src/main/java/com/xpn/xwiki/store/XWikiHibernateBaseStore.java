@@ -632,12 +632,16 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      *
      * @param inputxcontext
      */
+    @SuppressWarnings("java:S2629")
     public void cleanUp(XWikiContext inputxcontext)
     {
         try {
             Session session = this.store.getCurrentSession();
             if (session != null) {
-                LOGGER.warn("Cleanup of session was needed: [{}]", session);
+                // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+                // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and a Session is
+                // a live resource that implements Serializable, so it would be walked field by field.
+                LOGGER.warn("Cleanup of session was needed: [{}]", session.toString());
 
                 this.store.endTransaction(false);
             }

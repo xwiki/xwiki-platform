@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
 import org.slf4j.Logger;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -41,7 +40,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -191,15 +189,10 @@ class WorkspaceMigrationTest
             any(XWikiException.class));
     }
 
-    /**
-     * The list of documents is passed as the {@link StringBuilder} it is built into, so it is matched on its rendered
-     * value rather than by equality.
-     */
     private void verifyDocumentsToRestoreLogged(String expectedDocuments)
     {
-        verify(this.logger).warn(eq("Failed to restore some documents: [{}]. You should import manually "
+        verify(this.logger).warn("Failed to restore some documents: [{}]. You should import manually "
             + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
-            + " wiki, to restore these documents."), argThat(
-                (ArgumentMatcher<Object>) documents -> expectedDocuments.equals(documents.toString())));
+            + " wiki, to restore these documents.", expectedDocuments);
     }
 }

@@ -76,7 +76,7 @@ export default {
      * @param newValue - the new filtering value
      * @param filterOperator - the operator to apply, when undefined the default operator is used
      * @param skipFetch - when true, the filter will be applied on the reactive variables, but will not trigger an
-     * fetch. When undefined, the default value is false. This paramter is important in the case of asynchronous
+     * fetch. When undefined, the default value is false. This parameter is important in the case of asynchronous
      * methods where we need to have an instance feedback on the UI (e.g., between the advanced filtering panel and
      * the top filters in the table layout)
      */
@@ -157,7 +157,7 @@ export default {
           if (!rule.to.includes(newOperator)) {
             return;
           }
-          // Rule matches the `from` and `to` operator criterias
+          // Rule matches the `from` and `to` operator criteria
           const newValue = rule.getValue({
             oldValue: this.filterEntry.value,
             oldOperator,
@@ -181,7 +181,7 @@ export default {
         if (e.detail.oldEntry.operator === e.detail.newEntry.operator) {
           return;
         }
-        // We don't want the other filter widget to call the hanlder the same value
+        // We don't want the other filter widget to call the handler the same value
         e.stopImmediatePropagation();
         this._operatorChangeHandler(
           e.detail.oldEntry.operator,

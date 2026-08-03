@@ -62,7 +62,7 @@ test("BlockNote's content can be modified", async ({ mount }) => {
 });
 
 // eslint-disable-next-line max-statements
-test("Image insertion UI can be overriden", async ({ mount, page }) => {
+test("Image insertion UI can be overridden", async ({ mount, page }) => {
   let overrideFnCalledWithUrl: string | null = null;
 
   const component = await mount(

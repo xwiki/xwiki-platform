@@ -95,7 +95,7 @@ const { t } = useI18n({ messages: translations });
 
 const query = ref(initialValue ?? "");
 
-// When programatically updating `query` (e.g. after the user selected a suggestion),
+// When programmatically updating `query` (e.g. after the user selected a suggestion),
 // this trigger prevents the query watcher from performing a new search (which would be pointless)
 const justDynamicallyUpdatedQuery = ref(false);
 

@@ -45,7 +45,7 @@ describe("BaseDisplayer.vue", () => {
       },
     });
 
-    // Manuelly triggers setEdit until we find a way to simulate the hovering of the displayer and
+    // Manually triggers setEdit until we find a way to simulate the hovering of the displayer and
     // get access the popover content.
     wrapper.vm.setEdit();
 

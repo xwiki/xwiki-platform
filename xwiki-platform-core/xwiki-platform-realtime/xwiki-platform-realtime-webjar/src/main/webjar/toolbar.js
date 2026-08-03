@@ -72,10 +72,10 @@ define('xwiki-realtime-toolbar', [
         event.preventDefault();
         // FIXME: We can't rely on the save status to determine whether to save or cancel (e.g. to prevent creating a
         // new version when there are no changes and the document is not new) because:
-        // * the save status takes into account only the fiels that are synchronized in realtime
-        // * not all form fiels are synchronized
-        // The document title is currenly not synchronized, so when someone changes the title the others don't know that
-        // the document is dirty and thus has to be saved.
+        // * the save status takes into account only the fields that are synchronized in realtime
+        // * not all form fields are synchronized
+        // The document title is currently not synchronized, so when someone changes the title the others don't know
+        // that the document is dirty and thus has to be saved.
         // We should catch changes on all non-hidden form fields (that the user can change) and synchronize them. Once
         // we do this we can use the following code:
         //

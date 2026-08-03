@@ -74,7 +74,7 @@ interface MacroInfos<Parameters extends Record<string, MacroParameterType>> {
  * @beta
  */
 interface BlockMacro<Parameters extends Record<string, MacroParameterType>> {
-  /** Macro informations */
+  /** Macro information */
   infos: MacroInfos<Parameters>;
 
   /** Indicator that the macro renders as a block */
@@ -101,7 +101,7 @@ interface BlockMacro<Parameters extends Record<string, MacroParameterType>> {
  * @beta
  */
 interface InlineMacro<Parameters extends Record<string, MacroParameterType>> {
-  /** Macro informations */
+  /** Macro information */
   infos: MacroInfos<Parameters>;
 
   /** Indicator that the macro renders as an inline content */

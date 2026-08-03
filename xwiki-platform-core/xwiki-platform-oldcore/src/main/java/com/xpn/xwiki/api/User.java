@@ -23,15 +23,14 @@ import java.text.MessageFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
 import com.xpn.xwiki.web.Utils;
@@ -47,10 +46,6 @@ public class User extends Api
 {
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(User.class);
-
-    /** User class reference. */
-    private static final EntityReference USERCLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
-        new EntityReference("XWiki", EntityType.SPACE));
 
     /** Reference resolver. */
     private static final DocumentReferenceResolver<String> REFERENCE_RESOLVER = Utils.getComponent(
@@ -186,11 +181,9 @@ public class User extends Api
                 boolean result = false;
 
                 XWikiDocument userDoc = getXWikiContext().getWiki().getDocument(userReference, getXWikiContext());
-                BaseObject obj = userDoc.getXObject(USERCLASS_REFERENCE);
-                // We only allow empty password from users having a XWikiUsers object.
+                BaseObject obj = userDoc.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE);
                 if (obj != null) {
-                    final String stored = obj.getStringValue("password");
-                    result = new PasswordClass().getEquivalentPassword(stored, password).equals(stored);
+                    result = obj.isPasswordValueMatching(XWikiUsersDocumentInitializer.PASSWORD_FIELD, password);
                 }
 
                 return result;

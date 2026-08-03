@@ -51,6 +51,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -444,11 +445,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             boolean result = false;
 
             final XWikiDocument doc = context.getWiki().getDocument(username, context);
-            final BaseObject userObject = doc.getXObject(USERCLASS_REFERENCE);
-            // We only allow empty password from users having a XWikiUsers object.
+            final BaseObject userObject = doc.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE);
             if (userObject != null) {
-                final String stored = userObject.getStringValue("password");
-                result = new PasswordClass().getEquivalentPassword(stored, password).equals(stored);
+                result = userObject.isPasswordValueMatching(XWikiUsersDocumentInitializer.PASSWORD_FIELD, password);
             }
 
             if (LOGGER.isDebugEnabled()) {

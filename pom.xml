@@ -1198,6 +1198,13 @@
         <artifactId>font-awesome</artifactId>
         <version>7.2.0</version>
       </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-bom</artifactId>
+        <version>7.1.1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

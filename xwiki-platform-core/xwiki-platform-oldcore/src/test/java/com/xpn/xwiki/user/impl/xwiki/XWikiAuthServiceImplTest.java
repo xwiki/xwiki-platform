@@ -140,7 +140,7 @@ class XWikiAuthServiceImplTest
             new XWikiDocument(new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "SomeUser"));
         BaseObject mockUserObj =
             userDoc.newXObject(new LocalDocumentReference("XWiki", "XWikiUsers"), this.oldcore.getXWikiContext());
-        mockUserObj.setStringValue("password", "pass");
+        mockUserObj.setPasswordValue("password", "pass");
 
         // Save the user
         this.oldcore.getSpyXWiki().saveDocument(userDoc, this.oldcore.getXWikiContext());
@@ -163,7 +163,7 @@ class XWikiAuthServiceImplTest
             new XWikiDocument(new DocumentReference(this.oldcore.getXWikiContext().getMainXWiki(), "XWiki", "Admin"));
         BaseObject mockUserObj =
             userDocLocal.newXObject(new LocalDocumentReference("XWiki", "XWikiUsers"), this.oldcore.getXWikiContext());
-        mockUserObj.setStringValue("password", "admin");
+        mockUserObj.setPasswordValue("password", "admin");
 
         // Save the user
         this.oldcore.getSpyXWiki().saveDocument(userDocLocal, this.oldcore.getXWikiContext());

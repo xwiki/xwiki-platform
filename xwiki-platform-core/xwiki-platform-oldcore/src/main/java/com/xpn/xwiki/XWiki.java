@@ -218,6 +218,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.mandatory.XWikiPreferencesDocumentInitializer;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
@@ -3872,18 +3873,14 @@ public class XWiki implements EventListener
             userDocument = userDocument.clone();
 
             // Get the stored validation key
-            BaseObject userObject = userDocument.getObject("XWiki.XWikiUsers", 0);
-            String storedKey = userObject.getStringValue("validkey");
+            BaseObject userObject =
+                userDocument.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE, 0);
 
             // Get the validation key from the URL
-            String validationKey = request.getParameter("validkey");
-            PropertyInterface validationKeyClass = getClass("XWiki.XWikiUsers", context).get("validkey");
-            if (validationKeyClass instanceof PasswordClass) {
-                validationKey = ((PasswordClass) validationKeyClass).getEquivalentPassword(storedKey, validationKey);
-            }
+            String validationKey = request.getParameter(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
 
             // Compare the two keys
-            if ((!"".equals(storedKey) && (storedKey.equals(validationKey)))) {
+            if (userObject.isPasswordValueMatching(XWikiUsersDocumentInitializer.VALIDKEY_FIELD, validationKey)) {
                 // Ensure to remove the validation key value, so it cannot be used afterwards to enable back
                 // a disabled user.
                 userObject.setStringValue("validkey", "");

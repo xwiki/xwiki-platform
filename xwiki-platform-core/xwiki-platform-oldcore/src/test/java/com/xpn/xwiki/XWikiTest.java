@@ -638,11 +638,9 @@ class XWikiTest
         XWikiDocument testUser =
             new XWikiDocument(new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "TestUser"));
         BaseObject userObject = (BaseObject) this.xwiki.getUserClass(context).newObject(context);
+        // Check with a correct hashed key
+        userObject.setPasswordValue("validkey", "plaintextkey");
 
-        // Check with a correct plaintext key
-        BaseProperty validationKey = new StringProperty();
-        validationKey.setValue("plaintextkey");
-        userObject.safeput("validkey", validationKey);
         testUser.addObject("XWiki.XWikiUsers", userObject);
 
         this.xwiki.saveDocument(testUser, context);
@@ -651,24 +649,8 @@ class XWikiTest
         XWikiDocument reloadedDocument = this.xwiki.getDocument(testUser, context);
         assertEquals("", reloadedDocument.getObject("XWiki.XWikiUsers").getStringValue("validkey"));
 
-        // Check with an incorrect plaintext key
-        validationKey.setValue("wrong key");
-        this.xwiki.saveDocument(testUser, context);
-
-        assertEquals(-1, this.xwiki.validateUser(false, this.oldcore.getXWikiContext()));
-
-        // Check with a correct hashed key
-        validationKey = ((PropertyClass) this.xwiki.getUserClass(context).get("validkey")).fromString("plaintextkey");
-        assertTrue(validationKey.getValue().toString().startsWith("hash:"));
-        userObject.safeput("validkey", validationKey);
-        this.xwiki.saveDocument(testUser, context);
-
-        assertEquals(0, this.xwiki.validateUser(false, this.oldcore.getXWikiContext()));
-
         // Check with an incorrect hashed key
-        validationKey = ((PropertyClass) this.xwiki.getUserClass(context).get("validkey")).fromString("wrong key");
-        assertTrue(validationKey.getValue().toString().startsWith("hash:"));
-        userObject.safeput("validkey", validationKey);
+        userObject.setPasswordValue("validkey", "wrong key");
         this.xwiki.saveDocument(testUser, context);
 
         assertEquals(-1, this.xwiki.validateUser(false, this.oldcore.getXWikiContext()));

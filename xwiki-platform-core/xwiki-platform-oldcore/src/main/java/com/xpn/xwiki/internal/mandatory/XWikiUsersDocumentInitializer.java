@@ -70,6 +70,22 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
     private static final String TIMEZONE_FIELD = "timezone";
 
     /**
+     * The name of the field containing the account validation key.
+     *
+     * @since 18.6.0RC1
+     * @since 18.4.5
+     */
+    public static final String VALIDKEY_FIELD = "validkey";
+
+    /**
+     * The name of the field containing the user password.
+     *
+     * @since 18.6.0RC1
+     * @since 18.4.5
+     */
+    public static final String PASSWORD_FIELD = "password";
+
+    /**
      * Used to bind a class to a document sheet.
      */
     @Inject
@@ -90,8 +106,8 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addTextField("first_name", "First Name", 30);
         xclass.addTextField("last_name", "Last Name", 30);
         xclass.addEmailField(EMAIL_FIELD, "e-Mail", 30);
-        xclass.addPasswordField("password", "Password", 10);
-        xclass.addPasswordField("validkey", "Validation Key", 10);
+        xclass.addPasswordField(PASSWORD_FIELD, "Password", 10);
+        xclass.addPasswordField(VALIDKEY_FIELD, "Validation Key", 10);
         xclass.addBooleanField("active", "Active", "active");
         xclass.addTextField("company", "Company", 30);
         xclass.addTextField("blog", "Blog", 60);

@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -368,6 +370,33 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     /**
+     * Utility method to retrieve the password property of the given name and set its value.
+     * @param name the name of the password property for which to set a value
+     * @param value the value of the property to set
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public void setPasswordValue(String name, String value)
+    {
+        PasswordProperty property = (PasswordProperty) safeget(name);
+
+        if (!(property instanceof PasswordProperty)) {
+            if (property != null) {
+                // Make sure to delete the property if it's not the right type
+                removeField(name);
+            }
+
+            property = new PasswordProperty();
+        }
+
+        property.setName(name);
+        property.setValue(new PasswordClass().getPasswordHash(value));
+
+        safeput(name, property);
+    }
+
+    /**
      * @param name the name of the property
      * @param value the value to set
      */
@@ -616,6 +645,43 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
         property.setValue(value);
         safeput(name, property);
+    }
+
+    /**
+     * Utility method to check if the given raw password matches the password value set in the given property name.
+     * Note that the method returns false if there's no password property for the given name. The algorithm for
+     * checking the password is delegated to {@link PasswordClass#arePasswordsMatching}.
+     * @param passwordFieldName the name of the password property
+     * @param rawPassword the password to check
+     * @return {@code true} if the password matches the password value set in the given password property.
+     * @since 18.8.0RC1
+     * @since 18.4.5
+     */
+    @Unstable
+    public boolean isPasswordValueMatching(String passwordFieldName, String rawPassword)
+    {
+        PropertyInterface property = safeget(passwordFieldName);
+        boolean result = false;
+        if (property instanceof PasswordProperty passwordProperty) {
+            PropertyClass propertyClass = passwordProperty.getPropertyClass(getXWikiContext());
+            if (propertyClass == null) {
+                propertyClass = new PasswordClass();
+            }
+            if (propertyClass instanceof PasswordClass passwordClass) {
+                result = passwordClass.arePasswordsMatching(rawPassword, passwordProperty.getValue());
+            }
+        } else if (property instanceof StringProperty stringProperty) {
+            // Legacy fallback if the property is a StringProperty,
+            // in such case we check if the value matches a hash password or not to know if the perform was stored in
+            // clear or not and how we should compare it.
+            String passwordValue = stringProperty.getValue();
+            if (PasswordClass.isPasswordHashed(passwordValue)) {
+                result = new PasswordClass().arePasswordsMatching(rawPassword, passwordValue);
+            } else {
+                result = Strings.CI.equals(passwordValue, rawPassword);
+            }
+        }
+        return result;
     }
 
     // These functions should not be used

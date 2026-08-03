@@ -46,7 +46,7 @@ public class PasswordPropertyParser implements ObjectPropertyParser
     public BaseProperty<?> fromString(String value) throws XWikiException
     {
         PasswordClass passwordClass = new PasswordClass();
-        if (value.startsWith("hash:")) {
+        if (PasswordClass.isPasswordHashed(value)) {
             passwordClass.setStorageType(PasswordMetaClass.HASH);
         } else {
             passwordClass.setStorageType(PasswordMetaClass.CLEAR);

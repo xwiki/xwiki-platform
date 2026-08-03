@@ -238,7 +238,7 @@ public class XWikiStats extends BaseCollection
     /**
      * Initialize statistics object from XML schema.
      *
-     * @param oel the XML root node containing statistics datas.
+     * @param oel the XML root node containing statistics data.
      * @throws XWikiException error when parsing XML schema.
      */
     @Override

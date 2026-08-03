@@ -112,7 +112,7 @@ public abstract class AbstractNotificationsSettingsPage extends ViewPage
     }
 
     /**
-     * Initialize the page with applications informations.
+     * Initialize the page with applications information.
      */
     protected void initializeApplications()
     {

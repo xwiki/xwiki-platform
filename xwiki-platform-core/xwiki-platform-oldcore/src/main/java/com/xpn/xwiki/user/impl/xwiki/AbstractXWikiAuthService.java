@@ -77,9 +77,7 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
      */
     protected Principal authenticateSuperAdmin(String password, XWikiContext context)
     {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Authenticate superadmin");
-        }
+        LOGGER.trace("Authenticate superadmin");
 
         Principal principal;
 

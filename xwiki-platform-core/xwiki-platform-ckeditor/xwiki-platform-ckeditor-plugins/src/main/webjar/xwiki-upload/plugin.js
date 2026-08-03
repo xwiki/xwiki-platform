@@ -309,7 +309,7 @@
               // Mark the pasted image in order to upload it afterwards.
               image.dataset.xwikiPastedImage = true;
               if (!imageFileStore[image.src] && pastedImageFiles.length) {
-                // Unfortunatelly, there's no explicit mapping between the HTML image elements an the image file objects
+                // Unfortunately, there's no explicit mapping between the HTML image elements and the image file objects
                 // (from the clipboard). We assume that:
                 // * the HTML image elements and the image files are in the same order
                 // * the image files are not duplicated if the same image URL is used multiple times in the HTML

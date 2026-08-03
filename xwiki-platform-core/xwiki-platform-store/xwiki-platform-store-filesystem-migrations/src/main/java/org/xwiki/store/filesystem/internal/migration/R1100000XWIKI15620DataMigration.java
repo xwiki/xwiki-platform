@@ -99,7 +99,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
         try {
             Files.delete(directory.toPath());
         } catch (Exception e) {
-            this.logger.warn("Failed to clean legacy folder [{}]: {}", directory,
+            this.logger.warn("Failed to clean legacy folder [{}]: [{}]", directory,
                 ExceptionUtils.getRootCauseMessage(e));
         }
     }

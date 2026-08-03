@@ -228,7 +228,7 @@ class EmbeddedSolrInitializationTest
         }
         String dataDir = properties.getProperty("dataDir");
         assertNotNull(dataDir, "dataDir property from properties file was null: " + file.toString());
-        assertTrue(dataDir.contains(File.separator), "File seperators were not escaped properly in the "
+        assertTrue(dataDir.contains(File.separator), "File separators were not escaped properly in the "
             + "cache path!: \"" + dataDir + "\" does not contain '" + File.separator + "'!");
 
     }

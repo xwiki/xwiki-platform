@@ -119,7 +119,8 @@ class HqlQueryExecutorTest
     public void afterComponent()
     {
         when(this.hibernateStore.getConfiguration()).thenReturn(new Configuration());
-        when(this.hibernateStore.getConfigurationMetadata()).thenReturn(mock(Metadata.class));
+        Metadata metadataMock = mock(Metadata.class);
+        when(this.hibernateStore.getConfigurationMetadata()).thenReturn(metadataMock);
 
         when(this.xwikiproperties.getProperty("query.hql.safe", List.class))
             .thenReturn(List.of("select normallynotallowed from XWikiDocument as doc where 1=\\d+"));
@@ -378,7 +379,8 @@ class HqlQueryExecutorTest
 
         when(this.contextComponentMannager.getInstance(QueryFilter.class, "escapeLikeParameters")).thenReturn(filter);
 
-        when(session.createQuery(anyString())).thenReturn(mock(org.hibernate.query.Query.class));
+        org.hibernate.query.Query queryMock = mock(org.hibernate.query.Query.class);
+        when(session.createQuery(anyString())).thenReturn(queryMock);
 
         this.executor.createHibernateQuery(session, query);
 

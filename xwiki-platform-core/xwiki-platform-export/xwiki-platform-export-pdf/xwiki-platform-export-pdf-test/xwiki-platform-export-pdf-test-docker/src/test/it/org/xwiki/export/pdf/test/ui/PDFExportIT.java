@@ -408,7 +408,7 @@ class PDFExportIT
             assertTrue(pageText.startsWith("""
                 Parent
                 Chapter 1
-                """), "Unexpeced parent document content: " + pageText);
+                """), "Unexpected parent document content: " + pageText);
             assertEquals("""
                 Hidden
                 Hidden content

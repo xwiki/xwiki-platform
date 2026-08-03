@@ -62,15 +62,15 @@ import com.xpn.xwiki.web.Utils;
  */
 public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 {
-    public static final EntityReference GROUPCLASS_REFERENCE =
-        new EntityReference("XWikiGroups", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
-
     /**
      * Name of the "XWiki.XWikiGroups" class without the space name.
      */
     private static final String CLASS_SUFFIX_XWIKIGROUPS = "XWikiGroups";
+
+    public static final EntityReference GROUPCLASS_REFERENCE = new EntityReference(CLASS_SUFFIX_XWIKIGROUPS,
+        EntityType.DOCUMENT, new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiGroupServiceImpl.class);
 
     /**
      * Name of the "XWiki.XWikiUsers" class without the space name.
@@ -96,11 +96,6 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      * Name of the field of class XWiki.XWikiGroups where group's members names are inserted.
      */
     private static final String FIELD_XWIKIGROUPS_MEMBER = "member";
-
-    /**
-     * Default space name for a group or a user.
-     */
-    private static final String DEFAULT_MEMBER_SPACE = "XWiki";
 
     /**
      * String between wiki name and full name in document path.
@@ -221,7 +216,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         if (memberWiki != null) {
             equals |= currentMember.equals(memberWiki + WIKI_FULLNAME_SEP + memberSpace + SPACE_NAME_SEP + memberName);
 
-            if (memberSpace == null || DEFAULT_MEMBER_SPACE.equals(memberSpace)) {
+            if (memberSpace == null || XWiki.SYSTEM_SPACE.equals(memberSpace)) {
                 equals |= currentMember.equals(memberSpace + SPACE_NAME_SEP + memberName);
             }
         }
@@ -229,7 +224,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(memberWiki)) {
             equals |= currentMember.equals(memberName);
 
-            if (memberSpace == null || DEFAULT_MEMBER_SPACE.equals(memberSpace)) {
+            if (memberSpace == null || XWiki.SYSTEM_SPACE.equals(memberSpace)) {
                 equals |= currentMember.equals(memberSpace + SPACE_NAME_SEP + memberName);
             }
         }
@@ -328,7 +323,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         parameterValues.add(FIELD_XWIKIGROUPS_MEMBER);
 
         if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(memberWiki)) {
-            if (memberSpace == null || DEFAULT_MEMBER_SPACE.equals(memberSpace)) {
+            if (memberSpace == null || XWiki.SYSTEM_SPACE.equals(memberSpace)) {
                 parameterValues.add(HQLLIKE_ALL_SYMBOL + memberName + HQLLIKE_ALL_SYMBOL);
             } else {
                 parameterValues
@@ -458,7 +453,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      *            <li>asc : a Boolean, if true the order is ascendent</li>
      *            </ul>
      * @param parameterValues the list of values to fill for use with HQL named request.
-     * @return the formated HQL named request.
+     * @return the formatted HQL named request.
      */
     protected String createMatchUserOrGroupWhereClause(boolean user, Object[][] matchFields, Object[][] order,
         List<Object> parameterValues)
@@ -783,7 +778,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                     .bindValue("shortname", XWikiRightService.GUEST_USER_FULLNAME)
                     .bindValue("veryshortname", XWikiRightService.GUEST_USER);
             } else if (memberReference.getWikiReference().getName().equals(context.getWikiId())
-                || ("XWiki".equals(memberReference.getLastSpaceReference().getName())
+                || (XWiki.SYSTEM_SPACE.equals(memberReference.getLastSpaceReference().getName())
                     && memberReference.getName().equals(XWikiRightService.GUEST_USER))) {
                 query = context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser")
                     .bindValue("username", this.entityReferenceSerializer.serialize(memberReference))
@@ -812,7 +807,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         if (isAllGroupImplicit(context) && !XWikiRightService.isGuest(memberReference)
             && memberReference.getWikiReference().getName().equals(context.getWikiId())) {
             DocumentReference currentXWikiAllGroup =
-                new DocumentReference(context.getWikiId(), "XWiki", XWikiRightService.ALLGROUP_GROUP);
+                new DocumentReference(context.getWikiId(), XWiki.SYSTEM_SPACE, XWikiRightService.ALLGROUP_GROUP);
 
             if (!currentXWikiAllGroup.equals(memberReference)) {
                 groupReferences.add(currentXWikiAllGroup);

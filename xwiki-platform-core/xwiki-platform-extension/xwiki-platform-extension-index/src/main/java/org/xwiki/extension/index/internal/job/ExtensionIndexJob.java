@@ -256,7 +256,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     {
         SolrQuery solrQuery = new SolrQuery();
         Set<ExtensionId> extensionIds = this.indexStore.searchExtensionIds(solrQuery);
-        Map<String, SortedSet<Version>> extensions = new HashMap<>(extensionIds.size());
+        Map<String, SortedSet<Version>> extensions = HashMap.newHashMap(extensionIds.size());
         for (ExtensionId extensionId : extensionIds) {
             add(extensionId, extensions);
         }
@@ -579,7 +579,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
                 try {
                     updated |= addRemoteExtensions(searchableRepository, indexedExtensions);
                 } catch (Exception e) {
-                    this.logger.warn("Failed to get remote extension from repository [{}]: {}",
+                    this.logger.warn("Failed to get remote extension from repository [{}]: [{}]",
                         repository.getDescriptor(), ExceptionUtils.getRootCauseMessage(e));
                 }
             }

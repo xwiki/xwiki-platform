@@ -319,8 +319,8 @@ Object.extend(XWiki, {
   },
 
   /**
-   * Add click listeners on all rendereing error messages to let the user read the detailed error description.
-   * If a content is passed, add click listener for errors reported in this content (usefull for AJAX requests response)
+   * Add click listeners on all rendering error messages to let the user read the detailed error description.
+   * If a content is passed, add click listener for errors reported in this content (useful for AJAX requests response)
    * Otherwise make all the document's body errors expandable.
    */
   makeRenderingErrorsExpandable: function(content) {
@@ -528,7 +528,7 @@ Object.extend(XWiki, {
    * Then it fires an custom event to signify the (modified) DOM is now loaded.
    */
   initialize: function() {
-    // Extra security to make sure we do not get initalized twice.
+    // Extra security to make sure we do not get initialized twice.
     // It would fire the custom xwiki:dom:loaded event twice, which could make their observers misbehave.
     if (typeof this.isInitialized == "undefined" || this.isInitialized == false) {
       // This variable is set when the marker script is executed, which should always be the last script to execute.
@@ -984,7 +984,7 @@ window.shortcut = new Object({
      *
      * @param callback the callback used for the shortcut
      * @param shortcut_type the shortcut type
-     * @retun {*} The new callback to be used for defining the shortcut against Keypress JS libray
+     * @return {*} The new callback to be used for defining the shortcut against Keypress JS library
      * @private
      */
     _wrap_shortcut_call: function(callback, shortcut_type) {
@@ -1648,7 +1648,7 @@ document.observe("xwiki:dom:loaded", function() {
    * The clone will be stored in the __fm_ghost property of the element and is inserted
    * after the element in the DOM. The clone is not visible initially.
    *
-   * @param element the element whose position and dimesions should be cloned
+   * @param element the element whose position and dimensions should be cloned
    */
   function createGhost(element) {
     if (typeof(element.__fm_ghost) == 'undefined') {
@@ -1708,7 +1708,7 @@ document.observe("xwiki:dom:loaded", function() {
 
   /**
    * Injects the given HTML into the page head after removing the stylesheets and JavaScript files that are already
-   * present in the page head (othewise they may be loaded again).
+   * present in the page head (otherwise they may be loaded again).
    *
    * @param {String} html the HTML to extend the page head with
    */

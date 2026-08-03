@@ -209,9 +209,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
             // Process logout (this only works with Forms)
             if (auth.processLogout(wrappedRequest, response, new URLPatternMatcher())) {
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("User [{}] has been logged-out", context.getUser());
-                }
+                LOGGER.info("User [{}] has been logged-out", context.getUser());
                 wrappedRequest.setUserPrincipal(null);
                 return null;
             }
@@ -231,8 +229,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
             return null;
         } finally {
-            LOGGER.debug("XWikiAuthServiceImpl.checkAuth(XWikiContext) took " + (System.currentTimeMillis() - time)
-                + " milliseconds to run.");
+            LOGGER.debug("XWikiAuthServiceImpl.checkAuth(XWikiContext) took [{}] milliseconds to run.",
+                System.currentTimeMillis() - time);
         }
     }
 
@@ -453,11 +451,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
             if (LOGGER.isDebugEnabled()) {
                 if (result) {
-                    LOGGER.debug("Password check for user " + username + " successful");
+                    LOGGER.debug("Password check for user [{}] successful", username);
                 } else {
-                    LOGGER.debug("Password check for user " + username + " failed");
+                    LOGGER.debug("Password check for user [{}] failed", username);
                 }
-                LOGGER.debug((System.currentTimeMillis() - time) + " milliseconds spent validating password.");
+                LOGGER.debug("Spent [{}] milliseconds validating the password.", System.currentTimeMillis() - time);
             }
 
             return result;
@@ -494,30 +492,22 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     {
         String createuser = getParam("auth_createuser", context);
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Create user param is " + createuser);
-        }
+        LOGGER.debug("Create user param is [{}]", createuser);
 
         if (createuser != null) {
             String wikiname = context.getWiki().clearName(user, true, true, context);
             XWikiDocument userdoc =
                 context.getWiki().getDocument(new DocumentReference(context.getWikiId(), XWiki.SYSTEM_SPACE, wikiname), context);
             if (userdoc.isNew()) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("User page does not exist for user " + user);
-                }
+                LOGGER.debug("User page does not exist for user [{}]", user);
 
                 if ("empty".equals(createuser)) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Creating emptry user for user " + user);
-                    }
+                    LOGGER.debug("Creating empty user for user [{}]", user);
 
                     context.getWiki().createEmptyUser(wikiname, "edit", context);
                 }
             } else {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("User page already exists for user " + user);
-                }
+                LOGGER.debug("User page already exists for user [{}]", user);
             }
 
             return wikiname;

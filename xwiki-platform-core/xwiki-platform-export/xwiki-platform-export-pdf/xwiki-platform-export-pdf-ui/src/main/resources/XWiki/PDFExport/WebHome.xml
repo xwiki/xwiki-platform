@@ -434,7 +434,7 @@ require([
         // Use the same width as the main window because the CSS or JavaScript code could rely on it (we want the result
         // to look exactly as if the user has opened the export URL directly).
         'width': $(window).width(),
-        // Remove the borders in order to have exacly the same width as the window (viewport). See above.
+        // Remove the borders in order to have exactly the same width as the window (viewport). See above.
         'border': 0,
         // Reduce a bit the height (to the height of the top bar). This is technically not needed, but we want to make
         // sure the iframe doesn't cover something important.

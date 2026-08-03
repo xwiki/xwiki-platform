@@ -223,7 +223,7 @@ class DefaultWikiManagerTest
     {
         this.wikiManager.delete("wikiid");
         verify(this.wikiDeleter).delete("wikiid");
-        verify(this.observationManager).notify(eq(new WikiDeletedEvent("wikiid")), eq("wikiid"));
+        verify(this.observationManager).notify(new WikiDeletedEvent("wikiid"), "wikiid");
     }
 
     @Test

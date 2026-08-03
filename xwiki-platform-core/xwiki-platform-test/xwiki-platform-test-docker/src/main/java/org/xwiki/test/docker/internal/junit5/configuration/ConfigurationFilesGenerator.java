@@ -118,7 +118,7 @@ public class ConfigurationFilesGenerator
                     String fileName = entry.getName().replace(VM_EXTENSION, "");
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
                     if (this.testConfiguration.isVerbose()) {
-                        LOGGER.info("... Generating: {}", outputFile);
+                        LOGGER.info("... Generating: [{}]", outputFile);
                     }
                     // Note: Init is done once even if this method is called several times...
                     Velocity.init();
@@ -146,7 +146,7 @@ public class ConfigurationFilesGenerator
         File outputDirectory = new File(configurationFileTargetDirectory, "classes");
         File outputFile = new File(outputDirectory, LOGBACK_FILE);
         if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... Generating logging configuration: {}", outputFile);
+            LOGGER.info("... Generating logging configuration: [{}]", outputFile);
         }
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
             // Allows modules to override the default logback config by providing a LOGBACK_OVERRIDE_FILE file in
@@ -442,7 +442,7 @@ public class ConfigurationFilesGenerator
         // DB connections. compared  to in the past. When the tests succeed, xwiki starts in about 1mn20s. When they
         // fail xwiki takes over 5mn to start, showing how slow the machine is. When it succeeds the connection cool
         // is used up to 40 connections (out of 50) so already close to the max. When it fails, it goes quickly to 50.
-        // Basically the connections are not released fast enough becauase the SQL queries take longer to execute.
+        // Basically the connections are not released fast enough because the SQL queries take longer to execute.
         // Thus trying with 300 max connections to see if that's the problem.
         props.setProperty("xwikiDbDbcpMaxTotal", "300");
 

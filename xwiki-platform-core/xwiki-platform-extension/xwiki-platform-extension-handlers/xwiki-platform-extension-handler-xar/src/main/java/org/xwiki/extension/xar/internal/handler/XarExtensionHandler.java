@@ -289,7 +289,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             try {
                 currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
             } catch (Exception e) {
-                this.logger.error("Failed to lookup JobContext, it will be impossible to do interactive install");
+                this.logger.error("Failed to lookup JobContext, it will be impossible to do interactive install", e);
             }
 
             if (currentJob != null) {

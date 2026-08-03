@@ -77,7 +77,8 @@ public class ConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
         } catch (NullPointerException e) {
             this.logger.warn("The QueryExecutor was called without an XWikiContext available. "
                 + "This means the old core (and likely the storage engine) is probably "
-                + "not yet initialized. The default QueryExecutor will be returned.", e);
+                + "not yet initialized. The default QueryExecutor will be returned. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
             return;
         }
 

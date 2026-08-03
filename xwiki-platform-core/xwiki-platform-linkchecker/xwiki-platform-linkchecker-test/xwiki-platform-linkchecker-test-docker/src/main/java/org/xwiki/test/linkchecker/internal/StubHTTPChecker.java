@@ -26,7 +26,7 @@ import org.xwiki.rendering.internal.transformation.linkchecker.HTTPChecker;
 
 /**
  * Stubbed HTTP Checker implementation for the Link Checker functional UI tests in order for the test to not
- * depend on the environment (Internet Connexion and availability of external sites).
+ * depend on the environment (Internet Connection and availability of external sites).
  *
  * @version $Id$
  * @since 3.4M1

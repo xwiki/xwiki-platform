@@ -44,6 +44,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.Part;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -213,7 +214,7 @@ class ConsumedBodyRestoringRequestWrapper extends HttpServletRequestWrapper
             parts = getParts();
         } catch (ServletException e) {
             LOGGER.warn("The multipart request body was consumed and its parts could not be retrieved to restore it: "
-                + "{}", e.getMessage());
+                + "[{}]", ExceptionUtils.getRootCauseMessage(e));
 
             return false;
         }

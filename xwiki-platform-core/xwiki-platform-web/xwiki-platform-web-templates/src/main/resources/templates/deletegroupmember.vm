@@ -21,7 +21,7 @@
 #set($obj = $doc.getObject("XWiki.XWikiGroups", "member", $fullname))
 #set($discard = $doc.removeObject($obj))
 
-## add a new empty group object so the group does not dissappears
+## add a new empty group object so the group does not disappear
 #if($doc.getObjects("XWiki.XWikiGroups").size() == 0)
   #set($discard = $doc.newObject("XWiki.XWikiGroups"))
   added empty group

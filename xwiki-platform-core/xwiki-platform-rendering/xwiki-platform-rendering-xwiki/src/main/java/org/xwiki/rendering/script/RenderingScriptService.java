@@ -206,7 +206,7 @@ public class RenderingScriptService implements ScriptService
     }
 
     /**
-     * Performs transformations on the passed block using the passed transformation context using the curent user as
+     * Performs transformations on the passed block using the passed transformation context using the current user as
      * context author. Requires programming rights.
      * 
      * @param block the block on which to perform the transformations

@@ -44,7 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Docker tests for the image style administration, tests the user interface of the administation as well as the rest
+ * Docker tests for the image style administration, tests the user interface of the administration as well as the rest
  * endpoints.
  *
  * @version $Id$

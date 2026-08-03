@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -127,7 +128,8 @@ public class UIExtensionScriptService implements ScriptService
                 extensions = filter.filter(extensions, this.parseFilterParameters(entry.getValue()));
             } catch (ComponentLookupException e) {
                 logger.warn("Unable to find a UIExtensionFilter for hint [{}] "
-                    + "while getting UIExtensions for extension point [{}]", filterHint, extensionPointId);
+                    + "while getting UIExtensions for extension point [{}]. Root cause is [{}]", filterHint,
+                    extensionPointId, ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

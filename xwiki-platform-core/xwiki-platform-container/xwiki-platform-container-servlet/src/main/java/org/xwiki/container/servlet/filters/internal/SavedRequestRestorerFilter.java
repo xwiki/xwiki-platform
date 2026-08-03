@@ -249,7 +249,7 @@ public class SavedRequestRestorerFilter implements Filter
     }
 
     /**
-     * If this request specifies a saved request (using the srid paramter) and the URL matches the one of the saved
+     * If this request specifies a saved request (using the srid parameter) and the URL matches the one of the saved
      * request, return the SavedRequest and remove it from the session.
      * 
      * @param request the current request

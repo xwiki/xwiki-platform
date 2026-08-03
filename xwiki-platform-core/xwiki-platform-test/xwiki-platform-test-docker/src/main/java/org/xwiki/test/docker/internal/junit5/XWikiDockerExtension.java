@@ -410,8 +410,8 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
             XWikiExecutor executor = DockerTestUtils.getCurrentXWikiExecutor(extensionContext);
             String url = executor.getHttpClientBaseURL();
 
-            LOGGER.info("XWiki is kept running for manual inspection ({}={}).", KEEP_RUNNING_PROPERTY, true);
-            LOGGER.info("Access XWiki at: {}", url);
+            LOGGER.info("XWiki is kept running for manual inspection ([{}]=[{}]).", KEEP_RUNNING_PROPERTY, true);
+            LOGGER.info("Access XWiki at: [{}]", url);
             LOGGER.info("You can log in as [{}] with password [{}]", SUPERADMIN, SUPERADMIN_PASSWORD);
 
             // Wait for the user to create the file "stop.txt" in the current directory.

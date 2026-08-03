@@ -31,6 +31,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -197,7 +198,8 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
             return new HashSet<>(this.packagerProvider.get()
                 .getDocumentReferences(xarInstalledExtension.getXarPackage().getEntries(), configuration));
         } catch (UnsupportedNamespaceException e) {
-            this.logger.warn("Unsupported namespace [{}].", namespace);
+            this.logger.warn("Unsupported namespace [{}]. Root cause is [{}].", namespace,
+                ExceptionUtils.getRootCauseMessage(e));
         } catch (Exception e) {
             this.logger.error("Failed to retrieve the list of documents from the XAR package [{}].",
                 xarInstalledExtension.getId(), e);

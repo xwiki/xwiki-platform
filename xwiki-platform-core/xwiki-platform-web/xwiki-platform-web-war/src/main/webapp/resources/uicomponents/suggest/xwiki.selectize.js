@@ -246,7 +246,7 @@ define('xwiki-selectize', [
   // This started as a hack needed in order to be able to access internal selectize fields that are prefixed with $ when
   // the JavaScript is minified, because this code is parsed with Velocity. Otherwise, if we access these fields directly
   // by their name (e.g. selectize.$control) then we might get a Velocity syntax error on the minified JavaScript file.
-  // We keept this after replacing selectize.js with Tom Select in order to keep backwards compatibility.
+  // We kept this after replacing selectize.js with Tom Select in order to keep backwards compatibility.
   TomSelect.prototype.get$ = function(key) {
     return $(this[key]);
   };

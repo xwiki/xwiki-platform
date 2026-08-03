@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatcher;
 import org.slf4j.Logger;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -40,6 +41,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -118,9 +120,7 @@ class WorkspaceMigrationTest
             eq(new DocumentReference("workspace", "XWiki", "RegistrationConfig")), any(XWikiContext.class));
 
         // Verify that the log contains a warning about the documents that the migration failed to restore
-        verify(this.logger).warn("Failed to restore some documents: [{}]. You should import manually "
-            + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
-            + " wiki, to restore these documents.", "workspace:XWiki.AdminRegistrationSheet, "
+        verifyDocumentsToRestoreLogged("workspace:XWiki.AdminRegistrationSheet, "
             + "workspace:XWiki.RegistrationHelp, workspace:XWiki.AdminUsersSheet");
     }
 
@@ -143,9 +143,7 @@ class WorkspaceMigrationTest
         this.workspacesMigration.hibernateMigrate();
 
         // Verify that the log contains a warning about the documents that the migration failed to restore
-        verify(this.logger).warn("Failed to restore some documents: [{}]. You should import manually "
-            + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
-            + " wiki, to restore these documents.", "workspacetemplate:XWiki.AdminRegistrationSheet, "
+        verifyDocumentsToRestoreLogged("workspacetemplate:XWiki.AdminRegistrationSheet, "
             + "workspacetemplate:XWiki.RegistrationConfig, workspacetemplate:XWiki.RegistrationHelp, "
             + "workspacetemplate:XWiki.AdminUsersSheet");
     }
@@ -191,5 +189,17 @@ class WorkspaceMigrationTest
         // Verify
         verify(this.logger).error(eq("Error while restoring documents from the Workspace XAR"),
             any(XWikiException.class));
+    }
+
+    /**
+     * The list of documents is passed as the {@link StringBuilder} it is built into, so it is matched on its rendered
+     * value rather than by equality.
+     */
+    private void verifyDocumentsToRestoreLogged(String expectedDocuments)
+    {
+        verify(this.logger).warn(eq("Failed to restore some documents: [{}]. You should import manually "
+            + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
+            + " wiki, to restore these documents."), argThat(
+                (ArgumentMatcher<Object>) documents -> expectedDocuments.equals(documents.toString())));
     }
 }

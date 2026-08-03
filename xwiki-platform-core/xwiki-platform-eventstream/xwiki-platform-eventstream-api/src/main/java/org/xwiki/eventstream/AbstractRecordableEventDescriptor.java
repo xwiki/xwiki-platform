@@ -23,6 +23,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.NamespacedComponentManager;
@@ -92,7 +93,8 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
                         () -> contextualLocalizationManager.getTranslationPlain(key));
                 } catch (Exception e) {
                     logger.warn("Failed to render the translation key [{}] in the namespace [{}] for the event "
-                            + "descriptor of [{}].", key, namespaceOfTheDescriptor, getEventType(), e);
+                            + "descriptor of [{}]. Root cause is [{}]", key, namespaceOfTheDescriptor, getEventType(),
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         }

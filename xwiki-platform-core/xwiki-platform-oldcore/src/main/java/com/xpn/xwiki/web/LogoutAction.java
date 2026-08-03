@@ -27,7 +27,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.model.EntityType;
@@ -52,7 +51,8 @@ import com.xpn.xwiki.XWikiException;
 @Singleton
 public class LogoutAction extends XWikiAction
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LogoutAction.class);
+    @Inject
+    private Logger logger;
 
     @Inject
     private CSRFToken csrf;
@@ -105,7 +105,7 @@ public class LogoutAction extends XWikiAction
 
             sendRedirect(response, redirect);
         } else {
-            LOGGER.debug("Skipping the redirect because the response has already been committed"
+            this.logger.debug("Skipping the redirect because the response has already been committed"
                 + " (e.g. by a custom authenticator)");
         }
 

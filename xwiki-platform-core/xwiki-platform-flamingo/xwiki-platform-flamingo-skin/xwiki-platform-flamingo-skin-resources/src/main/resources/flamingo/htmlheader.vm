@@ -171,7 +171,7 @@
 #end
 ## These elements will be closed in the htmlfooter.vm file
 ## We put a space before each class added in #if, to avoid losing them because of velocity line stripping
-## TODO: the classes should be refactored to use a array of classes where individal classes are happened on by one and
+## TODO: the classes should be refactored to use a array of classes where individual classes are happened on by one and
 ## joined with space at the end
 ## Note: when showLeftPanels and showRightPanels are both equals to 0, it is intentional of hideleft and hideright to
 ## be concatenated without space.

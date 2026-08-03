@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.NotificationFormat;
@@ -132,7 +133,8 @@ public class EventUserFilterPreferencesGetter
                     && matchAllEvents(pref)
             );
         } catch (Exception e) {
-            logger.warn("Failed to get the list of UserFilter notification preferences.", e);
+            logger.warn("Failed to get the list of UserFilter notification preferences. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
             return Stream.empty();
         }
     }

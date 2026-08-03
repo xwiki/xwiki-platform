@@ -311,7 +311,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     builder.append(',').append((' '));
                 }
             }
-            this.logger.debug("Find mail statuses for query [{}] and parameters [{}]", queryString, builder.toString());
+            this.logger.debug("Find mail statuses for query [{}] and parameters [{}]", queryString, builder);
         }
     }
 

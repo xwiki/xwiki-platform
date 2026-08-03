@@ -205,7 +205,7 @@ public class JavascriptImportmapResolver
             target.put(key, value.url);
         } else if (!Objects.equals(value.url, existingValue)) {
             this.logger.warn(
-                "Conflicting {} resolution for key [{}]. Existing value: [{}], new value: [{}]",
+                "Conflicting [{}] resolution for key [{}]. Existing value: [{}], new value: [{}]",
                 conflictLabel, key, existingValue, value.url);
         }
     }

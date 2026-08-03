@@ -38,7 +38,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -168,7 +167,7 @@ class DefaultNotificationFilterPreferenceManagerTest
         this.filterPreferenceManager.setStartDateForUser(user, date);
 
         // Checks
-        verify(this.filterPreferencesModelBridge).setStartDateForUser(eq(user), eq(date));
+        verify(this.filterPreferencesModelBridge).setStartDateForUser(user, date);
     }
 
     @Test

@@ -93,7 +93,7 @@ public class DefaultLinkStore implements LinkStore
         try {
             return this.solr.getClient(SolrClientInstance.CORE_NAME);
         } catch (SolrException e) {
-            throw new LinkException("Failed to acces Solr search core", e);
+            throw new LinkException("Failed to access Solr search core", e);
         }
     }
 
@@ -124,7 +124,7 @@ public class DefaultLinkStore implements LinkStore
 
         // Get the links from the solr document
         Collection<Object> links = solrDocument.getFieldValues(FieldUtils.LINKS);
-        Set<EntityReference> entities = new HashSet<>(links.size());
+        Set<EntityReference> entities = HashSet.newHashSet(links.size());
         for (Object link : links) {
             if (link instanceof String linkString) {
                 EntityReference entityLink = this.linkSerializer.unserialize(linkString);

@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.management.MBeanServer;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jgroups.Address;
 import org.jgroups.Global;
 import org.jgroups.JChannel;
@@ -184,12 +185,13 @@ public class JGroupsNetworkChannel implements NetworkChannel, Receiver
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             JmxConfigurator.registerChannel(this.jchannel, mbs, this.jchannel.getClusterName() + '-' + currentMemberId);
         } catch (Exception e) {
-            this.logger.warn("Failed to register channel [" + getId() + "] against the JMX Server", e);
+            this.logger.warn("Failed to register channel [{}] against the JMX Server. Root cause is [{}]", getId(),
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         // Create the mapping between JGroups member address and XWiki observation id
         this.membersIdMap = new ConcurrentHashMap<>();
-        // Add current instance to the maping
+        // Add current instance to the mapping
         // Need to be done after starting the channel to know the address
         this.membersIdMap.put(this.jchannel.getAddress().toString(), currentMemberId);
         this.members =
@@ -221,7 +223,8 @@ public class JGroupsNetworkChannel implements NetworkChannel, Receiver
             JmxConfigurator.unregisterChannel(this.jchannel, mbs,
                 this.jchannel.getClusterName() + '-' + currentMemberId);
         } catch (Exception e) {
-            this.logger.warn("Failed to unregister channel [{}] from the JMX Server", this.id, e);
+            this.logger.warn("Failed to unregister channel [{}] from the JMX Server. Root cause is [{}]", this.id,
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         // Unregister the channel

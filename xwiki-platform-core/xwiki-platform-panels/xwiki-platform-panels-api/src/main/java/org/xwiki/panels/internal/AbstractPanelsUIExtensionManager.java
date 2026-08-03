@@ -139,7 +139,7 @@ public abstract class AbstractPanelsUIExtensionManager implements UIExtensionMan
                 // soon as a UIExtension component is modified
                 this.asyncContext.useComponent(UIExtension.class);
             } catch (ComponentLookupException e) {
-                this.logger.error("Failed to lookup Panels instances, error: [{}]", e);
+                this.logger.error("Failed to lookup Panels instances", e);
             }
         }
 

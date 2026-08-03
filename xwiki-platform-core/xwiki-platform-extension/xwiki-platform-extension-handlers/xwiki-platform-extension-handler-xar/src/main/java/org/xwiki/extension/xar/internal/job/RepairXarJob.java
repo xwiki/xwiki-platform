@@ -24,6 +24,7 @@ import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
@@ -321,7 +322,8 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
                             extensionDependency.getVersionConstraint().getVersion()),
                         namespace, true, new ExtensionPlanContext(extensionContext, extensionDependency));
                 } catch (InstallException e) {
-                    this.logger.warn("Failed to repair dependency [{}]", extensionDependency, e);
+                    this.logger.warn("Failed to repair dependency [{}]. Root cause is [{}]", extensionDependency,
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         }

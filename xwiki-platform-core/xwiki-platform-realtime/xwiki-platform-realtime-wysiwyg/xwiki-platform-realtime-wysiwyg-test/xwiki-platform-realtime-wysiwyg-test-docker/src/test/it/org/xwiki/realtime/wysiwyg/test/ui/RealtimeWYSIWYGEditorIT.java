@@ -288,7 +288,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(self.getAvatarURL().contains("noavatar.png"), "Unexpected avatar URL: " + self.getAvatarURL());
         assertEquals("John", self.getAvatarHint());
         assertEquals("Jo", self.getAbbreviation());
-        assertEquals(2, secondEditPage.getToolbar().getVisibleCoeditors().size());
+        assertEquals(2, secondEditPage.getToolbar().getVisibleCoeditorCount());
 
         // Verify the placeholder text is present, because the content is empty.
         secondTextArea.waitForPlaceholder("Start typing here...");
@@ -311,7 +311,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertTrue(self.getAvatarURL().contains("noavatar.png"), "Unexpected avatar URL: " + self.getAvatarURL());
         assertEquals("John", self.getAvatarHint());
         assertEquals("Jo", self.getAbbreviation());
-        assertEquals(2, firstEditPage.getToolbar().getVisibleCoeditors().size());
+        assertEquals(2, firstEditPage.getToolbar().getVisibleCoeditorCount());
 
         // Type in the first tab to see that it gets propagated to the second tab.
         firstTextArea.sendKeys("one", Keys.ENTER, "two", Keys.ENTER, "three");

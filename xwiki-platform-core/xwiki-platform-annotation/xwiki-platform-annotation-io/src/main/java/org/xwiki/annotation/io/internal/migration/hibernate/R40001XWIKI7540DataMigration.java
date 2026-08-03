@@ -138,7 +138,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
     protected boolean checkAnnotationsAndComments() throws DataMigrationException
     {
         XWikiContext context = getXWikiContext();
-        String resultOfSkippingDatabase = "Comments and anotations will remain separated";
+        String resultOfSkippingDatabase = "Comments and annotations will remain separated";
 
         try {
             EntityReference currentAnnotationClassReference = this.configuration.getAnnotationClassReference();
@@ -185,7 +185,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
         // 1st step: populate the 2 maps with the work to be done.
         getStore().executeRead(getXWikiContext(), new GetWorkToBeDoneHibernateCallback());
 
-        this.logger.info("There is a total of {} documents to migrate.",
+        this.logger.info("There is a total of [{}] documents to migrate.",
             this.documentToDatedObjectsMap.keySet().size());
 
         // 2nd step: for each document, delete the old objects and create new (updated) ones. One transaction per

@@ -107,9 +107,9 @@ public class SxDocumentSource implements SxSource
                         finalCache = cache;
                     }
                 } catch (Exception ex) {
-                    LOGGER.warn("SX object [{}#{}] has an invalid cache policy: [{}]",
+                    LOGGER.warn("SX object [{}#{}] has an invalid cache policy: [{}]. Root cause is [{}]",
                         this.document.getFullName(), sxObj.getStringValue(NAME_PROPERTY_NAME),
-                        sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME));
+                        sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME), ExceptionUtils.getRootCauseMessage(ex));
                 }
             }
         }

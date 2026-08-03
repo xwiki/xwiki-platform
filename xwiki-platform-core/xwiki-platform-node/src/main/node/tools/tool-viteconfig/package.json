@@ -26,7 +26,10 @@
   },
   "dependencies": {
     "@jridgewell/remapping": "catalog:",
-    "vite": "catalog:"
+    "@vitejs/plugin-vue": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-css-injected-by-js": "catalog:",
+    "vite-plugin-dts": "catalog:"
   },
   "devDependencies": {
     "@xwiki/platform-tool-tsconfig": "workspace:*",

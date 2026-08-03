@@ -105,7 +105,7 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
                     try {
                         currentIterator = getReferences(new WikiReference(wiki)).iterator();
                     } catch (SolrIndexerException e) {
-                        logger.error("Failed to get references for wiki [" + wiki + "]", e);
+                        logger.error("Failed to get references for wiki [{}]", wiki, e);
                     }
 
                     if (!currentIterator.hasNext()) {

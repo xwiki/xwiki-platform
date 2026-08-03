@@ -59,7 +59,7 @@ function positionTip(e){
 
     var leftedge=(offsetxpoint<0) ? offsetxpoint*(-1) : -1000
 
-    //if the horizontal distance isn't enough to accomodate the width of the context menu
+    //if the horizontal distance isn't enough to accommodate the width of the context menu
     if (rightedge<tipobj.offsetWidth) {
       //move the horizontal position of the menu to the left by it's width
       tipobj.style.left=ie? ietruebody().scrollLeft+event.clientX-tipobj.offsetWidth+"px" : window.pageXOffset+e.clientX-tipobj.offsetWidth+"px"

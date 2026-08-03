@@ -128,7 +128,7 @@ public class DefaultRemoteObservationManager implements RemoteObservationManager
             try {
                 startChannel(channelId);
             } catch (RemoteEventException e) {
-                this.logger.error("Failed to start channel [" + channelId + "]", e);
+                this.logger.error("Failed to start channel [{}]", channelId, e);
             }
         }
     }

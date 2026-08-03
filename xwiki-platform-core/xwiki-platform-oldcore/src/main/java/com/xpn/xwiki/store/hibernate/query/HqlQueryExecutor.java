@@ -135,7 +135,7 @@ public class HqlQueryExecutor extends AbstractQueryExecutor implements Initializ
                                 safeQueries.add(definition.getName());
                             }
                         } catch (QueryException e) {
-                            this.logger.warn("Failed to validate named query [{}] with statement [{}]: {}",
+                            this.logger.warn("Failed to validate named query [{}] with statement [{}]: [{}]",
                                 definition.getName(), definition.getQuery(), ExceptionUtils.getRootCauseMessage(e));
                         }
                     }

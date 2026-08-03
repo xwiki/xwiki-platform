@@ -207,7 +207,7 @@ class IndexerJobTest
 
     private void assertLog(int added, int deleted, int updated)
     {
-        assertEquals("%d documents added, %d deleted and %d updated during the synchronization of the Solr index."
+        assertEquals("[%d] documents added, [%d] deleted and [%d] updated during the synchronization of the Solr index."
             .formatted(added, deleted, updated), this.logCapture.getLogEvent(0).getFormattedMessage());
     }
 

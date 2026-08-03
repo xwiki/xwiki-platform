@@ -266,8 +266,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             }
         } catch (Exception e) {
             // This should not happen..
-            logDeny(username, doc.getFullName(), action, "access manager exception " + e.getMessage());
-            e.printStackTrace();
+            logDeny(username, doc.getFullName(), action, "access manager exception", e);
 
             return false;
         }
@@ -357,9 +356,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         List<BaseObject> rightObjects = doc.getXObjects(rightClassReference);
         if (rightObjects != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Checking objects [{}]", rightObjects.size());
-            }
+            LOGGER.debug("Checking objects [{}]", rightObjects.size());
 
             for (int i = 0; i < rightObjects.size(); i++) {
                 LOGGER.debug("Checking object [{}]", i);
@@ -447,9 +444,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 userOrGroupDocumentReference, grouplist, context);
         }
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Searching for matching rights for [{}] groups: [{}]", grouplist.size(), grouplist);
-        }
+        LOGGER.debug("Searching for matching rights for [{}] groups: [{}]", grouplist.size(), grouplist);
 
         for (String group : grouplist) {
             try {
@@ -461,7 +456,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 }
             } catch (XWikiRightNotFoundException e) {
             } catch (Exception e) {
-                LOGGER.error("Failed to check right [{}] for group [{}] on document [¶}]", accessLevel, group,
+                LOGGER.error("Failed to check right [{}] for group [{}] on document [{}]", accessLevel, group,
                     doc.getPrefixedFullName(), e);
             }
         }
@@ -774,7 +769,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         } catch (XWikiException e) {
             logDeny(userOrGroupName, entityReference, accessLevel, "global level (exception)", e);
-            e.printStackTrace();
 
             return false;
         } finally {

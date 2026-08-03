@@ -43,7 +43,7 @@
   #showfilelist($xwiki.package.errors 'error')
 #else
   ## If the current user does not have admin and this template is being displayed
-  ## it means security settings have been changed with the import (probably a defaut XE XAR import)
+  ## it means security settings have been changed with the import (probably a default XE XAR import)
   ## We display a warning and invite the user to log in to further administrate the wiki
   #warning("$services.localization.render('core.importer.securitySettingsChanged', [$xwiki.getURL('XWiki.XWikiLogin', 'login', 'loginLink=1')])")
 #end

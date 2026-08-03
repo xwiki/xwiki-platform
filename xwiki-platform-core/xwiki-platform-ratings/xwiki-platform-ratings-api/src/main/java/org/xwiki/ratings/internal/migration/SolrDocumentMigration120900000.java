@@ -112,7 +112,7 @@ public class SolrDocumentMigration120900000
                 }
                 startIndex += BATCH_MIGRATION_SIZE;
                 totalMigrated += documentList.size();
-                logger.info("[{}] {} information migrated.", totalMigrated, managerId);
+                logger.info("[{}] information migrated for the ratings manager [{}].", totalMigrated, managerId);
             } catch (SolrServerException | IOException e) {
                 throw new SolrException("Error when executing query to perform 120700000 documents migration", e);
             }

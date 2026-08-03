@@ -440,7 +440,7 @@ define('xwiki-realtime-saver', [
       const newAjaxSaveAndContinue = {
         // Prevent the save buttons from reloading the page. Instead, reset the editor's content.
         // FIXME: The in-place editor is also overriding reloadEditor, before this code is executed, so here we're
-        // actually overwritting in-place editor's behavior.
+        // actually overwriting in-place editor's behavior.
         reloadEditor: () => {
           xwikiDocument.reload();
           // HACK: Replicate the behavior from the in-place editor.

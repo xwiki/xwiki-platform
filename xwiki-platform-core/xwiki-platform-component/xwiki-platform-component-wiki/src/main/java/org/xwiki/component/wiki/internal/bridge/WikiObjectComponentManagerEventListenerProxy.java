@@ -101,7 +101,8 @@ public class WikiObjectComponentManagerEventListenerProxy
                 wikiObjectsList.add(componentBuilder.getClassReference());
             }
         } catch (ComponentLookupException e) {
-            logger.warn("Unable to collect a list of wiki objects components: %s", e);
+            logger.warn("Unable to collect a list of wiki objects components. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         return wikiObjectsList;
@@ -144,8 +145,8 @@ public class WikiObjectComponentManagerEventListenerProxy
                     }
                 }
             } catch (Exception e) {
-                logger.warn(String.format("Unable to register the components for [%s] XObjects: %s", xObjectClass,
-                    ExceptionUtils.getRootCauseMessage(e)));
+                logger.warn("Unable to register the components for [{}] XObjects: [{}]", xObjectClass,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }
@@ -181,8 +182,8 @@ public class WikiObjectComponentManagerEventListenerProxy
 
             this.wikiComponentManagerEventListenerHelper.registerComponentList(wikiComponents);
         } catch (WikiComponentException e) {
-            logger.warn(String.format("Unable to register the component associated to [%s]: %s", objectReference,
-                ExceptionUtils.getRootCauseMessage(e)));
+            logger.warn("Unable to register the component associated to [{}]: [{}]", objectReference,
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

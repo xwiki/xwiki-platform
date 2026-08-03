@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.xwiki.environment.Environment;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
@@ -72,12 +73,12 @@ class TempResourceActionTest
     /**
      * The action being tested.
      */
+    @InjectMockComponents
     private TempResourceAction action;
 
     @BeforeEach
     void beforeEach() throws Exception
     {
-        this.action = new TempResourceAction();
         when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
     }
 

@@ -211,7 +211,7 @@ public class WARBuilder
         LOGGER.info("Copying JDBC driver for database [{}]...", this.testConfiguration.getDatabase());
         File jdbcDriverFile = JDBCDriverResolver.resolve(this.testConfiguration, this.mavenResolver);
         if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... JDBC driver file: {}", jdbcDriverFile);
+            LOGGER.info("... JDBC driver file: [{}]", jdbcDriverFile);
         }
         copyFile(jdbcDriverFile, libDirectory);
     }
@@ -223,7 +223,7 @@ public class WARBuilder
         for (File file : warDependencies) {
             // Unzip the WARs in the target directory
             if (testConfiguration.isVerbose()) {
-                LOGGER.info("... Unzipping WAR: {}", file);
+                LOGGER.info("... Unzipping WAR: [{}]", file);
             }
             unzip(file, targetWARDirectory);
         }
@@ -242,11 +242,11 @@ public class WARBuilder
         createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
             if (testConfiguration.isVerbose()) {
-                LOGGER.info("... Copying JAR: {}", artifact.getFile());
+                LOGGER.info("... Copying JAR: [{}]", artifact.getFile());
             }
             copyFile(artifact.getFile(), libDirectory);
             if (testConfiguration.isVerbose()) {
-                LOGGER.info("... Generating XED file for: {}", artifact.getFile());
+                LOGGER.info("... Generating XED file for: [{}]", artifact.getFile());
             }
             generateXEDForJAR(artifact, libDirectory, this.mavenResolver);
         }
@@ -259,7 +259,7 @@ public class WARBuilder
         File skinsDirectory = new File(targetWARDirectory, "skins");
         for (File file : skinDependencies) {
             if (testConfiguration.isVerbose()) {
-                LOGGER.info("... Unzipping skin: {}", file);
+                LOGGER.info("... Unzipping skin: [{}]", file);
             }
             unzip(file, skinsDirectory);
         }

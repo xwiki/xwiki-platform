@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -145,7 +146,8 @@ public class LiveNotificationEmailListener extends AbstractEventListener
                 }
 
             } catch (EventStreamException e) {
-                logger.warn("Unable to retrieve a full list of RecordableEventDescriptor.", e);
+                logger.warn("Unable to retrieve a full list of RecordableEventDescriptor. Root cause is [{}]",
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

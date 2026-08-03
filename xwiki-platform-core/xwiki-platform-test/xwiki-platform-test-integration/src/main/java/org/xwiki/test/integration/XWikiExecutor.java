@@ -520,7 +520,8 @@ public class XWikiExecutor
         if (response.timedOut) {
             String message = String.format("Failed to start XWiki in [%s] seconds, last error code [%s], message [%s]",
                 timeout, response.responseCode, response.responseBody);
-            LOGGER.info(message);
+            LOGGER.info("Failed to start XWiki in [{}] seconds, last error code [{}], message [{}]", timeout,
+                response.responseCode, response.responseBody);
             stop();
             throw new RuntimeException(message);
         } else {

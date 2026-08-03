@@ -499,9 +499,7 @@ public class HtmlPackager
     private static void addDirToZip(File directory, FileFilter filter, ZipOutputStream out, String basePath,
         Collection<String> exportedSkinFiles) throws IOException
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
-        }
+        LOGGER.debug("Adding dir [{}] to the Zip file being generated.", directory.getPath());
 
         if (!directory.isDirectory()) {
             return;

@@ -637,9 +637,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
         try {
             Session session = this.store.getCurrentSession();
             if (session != null) {
-                if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("Cleanup of session was needed: {}", session.toString());
-                }
+                LOGGER.warn("Cleanup of session was needed: [{}]", session);
 
                 this.store.endTransaction(false);
             }
@@ -864,9 +862,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                         try {
                             this.store.endTransaction(commit);
                         } catch (Exception e) {
-                            if (LOGGER.isErrorEnabled()) {
-                                LOGGER.error("Exception while close transaction", e);
-                            }
+                            LOGGER.error("Exception while closing the transaction", e);
                         }
                     }
                 }

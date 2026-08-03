@@ -322,7 +322,7 @@ public interface DocumentAccessBridge
     /**
      * Retrieves the textual content of the document, in the given language.
      * 
-     * @param documentReference the referenc of the document to access
+     * @param documentReference the reference of the document to access
      * @param language The desired translation of the document.
      * @return The document's content.
      * @throws Exception If the document cannot be accessed.
@@ -333,7 +333,7 @@ public interface DocumentAccessBridge
     /**
      * Retrieves the textual content of the document, in the given language.
      * 
-     * @param documentReference the referenc of the document to access
+     * @param documentReference the reference of the document to access
      * @param language The desired translation of the document.
      * @return The document's content.
      * @throws Exception If the document cannot be accessed.

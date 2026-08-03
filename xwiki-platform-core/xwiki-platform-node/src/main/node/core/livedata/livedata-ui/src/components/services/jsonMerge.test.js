@@ -39,7 +39,7 @@ describe("jsonMerge.js", () => {
     expect(merge({ a: 1 }, {})).toEqual({ a: 1 });
   });
 
-  it("merge objects with simmilar ids", () => {
+  it("merge objects with similar ids", () => {
     expect(merge({ id: 1, a: 1 }, { id: 1, a: 2 })).toEqual({ id: 1, a: 2 });
   });
 

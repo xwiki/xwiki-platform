@@ -25,7 +25,7 @@ import { stub } from "sinon";
 import { describe, expect, it, vi } from "vitest";
 
 const getJSONStub = stub($, "getJSON");
-// @ts-expect-error leftover from inintial javascript implementation
+// @ts-expect-error leftover from initial javascript implementation
 getJSONStub.returns(Promise.resolve({ count: 0, entries: [] }));
 
 global.XWiki = { contextPath: "http://localhost/" };

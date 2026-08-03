@@ -83,7 +83,7 @@ catalog:
   "@mantine/hooks": 9.4.1
   "@microsoft/api-extractor": 7.58.9
   "@oxc-project/runtime": 0.139.0
-  "@playwright/experimental-ct-react": 1.61.1
+  "@playwright/experimental-ct-react": 1.62.1
   "@playwright/experimental-ct-vue": 1.61.1
   "@playwright/test": 1.61.1
   "@tsconfig/node24": 24.0.4

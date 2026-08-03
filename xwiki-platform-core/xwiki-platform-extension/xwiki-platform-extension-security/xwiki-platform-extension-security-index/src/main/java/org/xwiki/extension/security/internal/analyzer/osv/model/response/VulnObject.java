@@ -41,36 +41,33 @@ public class VulnObject
     private static final String CVSS_V3 = "CVSS_V3";
     private static final String CVSS_V2 = "CVSS_V2";
 
-    private List<AffectObject> affected;
+    private List<AffectObject> affected = new ArrayList<>();
 
     private String id;
 
-    private List<VulnReferenceObject> references;
+    private List<VulnReferenceObject> references = new ArrayList<>();
 
     private List<SeverityObject> severity;
 
-    private List<String> aliases;
+    private List<String> aliases = new ArrayList<>();
 
     /**
-     * @return the affected field, or an empty list when the vulnerability has none (the field is optional in the OSV
-     *     schema)
+     * @return the affected field, never {@code null} but empty when the vulnerability has none (the field is optional
+     *     in the OSV schema)
      * @see <a href="https://ossf.github.io/osv-schema/#affected-fields">affected doc</a>
      */
     public List<AffectObject> getAffected()
     {
-        if (this.affected == null) {
-            return List.of();
-        }
         return this.affected;
     }
 
     /**
-     * @param affected the affected field
+     * @param affected the affected field, {@code null} being stored as an empty list
      * @see <a href="https://ossf.github.io/osv-schema/#affected-fields">affected doc</a>
      */
     public void setAffected(List<AffectObject> affected)
     {
-        this.affected = affected;
+        this.affected = (affected == null) ? new ArrayList<>() : affected;
     }
 
     /**
@@ -90,23 +87,20 @@ public class VulnObject
     }
 
     /**
-     * @return the references field, or an empty list when the vulnerability has none (the field is optional in the OSV
-     *     schema)
+     * @return the references field, never {@code null} but empty when the vulnerability has none (the field is optional
+     *     in the OSV schema)
      */
     public List<VulnReferenceObject> getReferences()
     {
-        if (this.references == null) {
-            return List.of();
-        }
         return this.references;
     }
 
     /**
-     * @param references references field
+     * @param references references field, {@code null} being stored as an empty list
      */
     public void setReferences(List<VulnReferenceObject> references)
     {
-        this.references = references;
+        this.references = (references == null) ? new ArrayList<>() : references;
     }
 
     /**
@@ -187,24 +181,21 @@ public class VulnObject
     }
 
     /**
-     * @return the list of aliases associated with this vulnerability
+     * @return the list of aliases associated with this vulnerability, never {@code null} but empty when there is none
      */
     public List<String> getAliases()
     {
-        if (this.aliases == null) {
-            this.aliases = new ArrayList<>();
-        }
         return this.aliases;
     }
 
     /**
      * Sets the list of aliases associated with this vulnerability.
      *
-     * @param aliases the list of aliases to be set
+     * @param aliases the list of aliases to be set, {@code null} being stored as an empty list
      */
     public void setAliases(List<String> aliases)
     {
-        this.aliases = aliases;
+        this.aliases = (aliases == null) ? new ArrayList<>() : aliases;
     }
 
     @Override

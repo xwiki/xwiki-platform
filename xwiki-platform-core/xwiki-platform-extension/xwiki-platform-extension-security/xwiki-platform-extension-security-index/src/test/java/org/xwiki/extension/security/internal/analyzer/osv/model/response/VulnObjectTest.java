@@ -56,6 +56,26 @@ class VulnObjectTest
     }
 
     @Test
+    void getListFieldsSetToNull()
+    {
+        this.vulnObject.setAffected(null);
+        this.vulnObject.setReferences(null);
+        this.vulnObject.setAliases(null);
+
+        assertEquals(List.of(), this.vulnObject.getAffected());
+        assertEquals(List.of(), this.vulnObject.getReferences());
+        assertEquals(List.of(), this.vulnObject.getAliases());
+    }
+
+    @Test
+    void getListFieldsNotSet()
+    {
+        assertEquals(List.of(), this.vulnObject.getAffected());
+        assertEquals(List.of(), this.vulnObject.getReferences());
+        assertEquals(List.of(), this.vulnObject.getAliases());
+    }
+
+    @Test
     void getMaxFixVersion()
     {
         EventObject eventObject = new EventObject();

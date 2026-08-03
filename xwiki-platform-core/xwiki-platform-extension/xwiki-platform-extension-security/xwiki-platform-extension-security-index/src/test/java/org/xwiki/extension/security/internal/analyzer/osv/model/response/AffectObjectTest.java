@@ -47,4 +47,11 @@ class AffectObjectTest
         this.affectObject.setRanges(List.of(rangeObject));
         assertEquals(List.of(rangeObject), this.affectObject.getRanges());
     }
+
+    @Test
+    void getRangesSetToNull()
+    {
+        this.affectObject.setRanges(null);
+        assertEquals(List.of(), this.affectObject.getRanges());
+    }
 }

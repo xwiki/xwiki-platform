@@ -311,7 +311,11 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     builder.append(',').append((' '));
                 }
             }
-            this.logger.debug("Find mail statuses for query [{}] and parameters [{}]", queryString, builder);
+            // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+            // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and a StringBuilder
+            // would be written out as its internal char array.
+            this.logger.debug("Find mail statuses for query [{}] and parameters [{}]", queryString,
+                builder.toString());
         }
     }
 

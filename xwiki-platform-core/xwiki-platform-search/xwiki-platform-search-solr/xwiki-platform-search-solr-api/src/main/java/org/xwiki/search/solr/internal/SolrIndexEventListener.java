@@ -176,7 +176,10 @@ public class SolrIndexEventListener implements EventListener
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to handle event [{}] with source [{}]", event, source, e);
+            // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+            // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and the source is
+            // an arbitrary object whose graph would be written out and read back as null if it cannot be resolved.
+            this.logger.error("Failed to handle event [{}] with source [{}]", event, String.valueOf(source), e);
         }
     }
 

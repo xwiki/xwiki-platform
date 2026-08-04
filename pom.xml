@@ -110,10 +110,10 @@
     <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>9.7.0</mysql.version>
+    <mysql.version>26.7.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.5.9</mariadb.version>
+    <mariadb.version>3.5.10</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
@@ -310,7 +310,7 @@
       <dependency>
         <groupId>com.github.junrar</groupId>
         <artifactId>junrar</artifactId>
-        <version>8.0.0</version>
+        <version>8.1.0</version>
       </dependency>
 
       <dependency>
@@ -536,7 +536,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.22.2</version>
+        <version>1.23.1</version>
       </dependency>
 
       <!-- PDF -->

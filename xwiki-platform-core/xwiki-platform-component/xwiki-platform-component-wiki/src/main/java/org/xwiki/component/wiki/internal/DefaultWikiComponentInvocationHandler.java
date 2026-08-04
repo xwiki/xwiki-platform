@@ -123,8 +123,12 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
                     componentDependency = componentManager.getInstance(cd.getRoleType(), cd.getRoleHint());
                 }
             } catch (ComponentLookupException e) {
+                // Pass the role type name rather than the Type: log arguments are kept as objects in the captured
+                // LogEvent and XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and
+                // a Type is backed by a Class that cannot always be resolved when that log is read back. The
+                // document reference stays an object on purpose, since the log displayers render it as a link.
                 LOGGER.warn("No component found for role [{}] with hint [{}], declared as dependency for wiki "
-                    + "component [{}]. Root cause is [{}]", cd.getRoleType(), cd.getRoleHint(),
+                    + "component [{}]. Root cause is [{}]", cd.getRoleType().getTypeName(), cd.getRoleHint(),
                     this.wikiComponent.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
             }
             methodContext.put(dependency.getKey(), componentDependency);

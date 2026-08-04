@@ -636,6 +636,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
      * @param emails Mail Collection
      * @return True in any case (TODO ?)
      */
+    @SuppressWarnings("java:S2629")
     public boolean sendMails(Collection<Mail> emails, MailConfiguration mailConfiguration, XWikiContext context)
         throws MessagingException, UnsupportedEncodingException
     {
@@ -649,7 +650,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 count++;
 
                 Mail mail = emailIt.next();
-                LOGGER.info("Sending email [{}]", mail);
+                // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+                // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and a Mail holds
+                // the body and the attachments, none of which its toString() prints.
+                LOGGER.info("Sending email [{}]", mail.toString());
 
                 if ((transport == null) || (session == null)) {
                     // initialize JavaMail Session and Transport
@@ -688,7 +692,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 } catch (SendFailedException ex) {
                     sendFailedCount++;
                     LOGGER.error("SendFailedException has occurred.", ex);
-                    LOGGER.error("Detailed email information: [{}]", mail);
+                    // See the comment above about building the String rather than passing the Mail.
+                    LOGGER.error("Detailed email information: [{}]", mail.toString());
                     if (emailCount == 1) {
                         throw ex;
                     }
@@ -697,7 +702,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                     }
                 } catch (MessagingException mex) {
                     LOGGER.error(MESSAGING_EXCEPTION_ERROR, mex);
-                    LOGGER.error("Detailed email information: [{}]", mail);
+                    // See the comment above about building the String rather than passing the Mail.
+                    LOGGER.error("Detailed email information: [{}]", mail.toString());
                     if (emailCount == 1) {
                         throw mex;
                     }

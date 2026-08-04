@@ -88,6 +88,7 @@
       <div
         @keydown.esc.capture="cancelEdit"
         @focusout="onDisplayerBlur"
+        @focusin="editorFocused = true"
         v-if="!isView && !isLoading"
         ref="editBlock"
       >
@@ -160,6 +161,7 @@ export default {
   data() {
     return {
       duringEditing: false,
+      editorFocused: false,
       href: undefined,
     };
   },
@@ -211,6 +213,7 @@ export default {
     // Switches the displayer to edit mode.
     setEdit() {
       if (this.isEditable && this.isView) {
+        this.editorFocused = false;
         this.$emit("update:isView", false);
         this.logic.getEditBus().start(this.entry, this.propertyId);
       }
@@ -295,17 +298,19 @@ export default {
     // We switch back to view mode whenever focus of the current cell is lost.
     // eslint-disable-next-line max-statements
     async onDisplayerBlur(evt) {
+      const displayerElement = this.$refs["displayerRoot"];
       if (!this.isView) {
         const editBlock = this.$refs["editBlock"];
 
-        // The edit block is not rendered while the editor is still loading (e.g. while an edit confirmation modal is
-        // displayed), so there is nothing to switch away from yet and clicks (such as on the modal buttons) must be
-        // ignored.
+        // The editor has not been focused yet, so this focusout either comes
+        // from the action popover closing right after it opened the editor,
+        // or an edit confirmation modal is currently displayed. Keep editing.
+        if (!this.editorFocused) {
+          return;
+        }
+
         // Focus moved to another element of this cell: keep editing.
-        if (
-          !editBlock ||
-          (evt.relatedTarget && this.$el.contains(evt.relatedTarget))
-        ) {
+        if (evt.relatedTarget && displayerElement.contains(evt.relatedTarget)) {
           return;
         }
 
@@ -316,7 +321,7 @@ export default {
           await new Promise((resolve) => requestAnimationFrame(resolve));
           if (
             editBlock !== this.$refs["editBlock"] ||
-            this.$el.contains(document.activeElement)
+            displayerElement.contains(document.activeElement)
           ) {
             return;
           }
@@ -324,8 +329,6 @@ export default {
 
         await this.applyEdit();
       } else {
-        const displayerElement = this.$refs["displayerRoot"];
-
         if (!displayerElement) {
           return;
         }

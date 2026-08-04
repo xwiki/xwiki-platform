@@ -150,8 +150,9 @@ class DocumentTranslationBundleFactoryTest
 
         // Return the "context" component manager for the current wiki and the current user but not for another wiki.
         when(this.componentManagerManager.getComponentManager("wiki:xwiki", true)).thenReturn(this.oldcore.getMocker());
+        ComponentManager componentManagerMock = mock(ComponentManager.class);
         when(this.componentManagerManager.getComponentManager("wiki:otherwiki", true))
-            .thenReturn(mock(ComponentManager.class));
+            .thenReturn(componentManagerMock);
         when(this.componentManagerManager.getComponentManager("user:null", true)).thenReturn(this.oldcore.getMocker());
 
         // Initialize document bundle factory

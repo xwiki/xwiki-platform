@@ -150,8 +150,9 @@ class WatchedLocationReferenceTest
         assertFalse(this.watchedLocationReference.matchExactly(filterPreference));
 
         when(filterPreference.getEventTypes()).thenReturn(Collections.emptySet());
+        EntityReference entityReferenceMock = mock(EntityReference.class);
         when(this.resolver.resolve(this.serializedReference, EntityType.DOCUMENT))
-            .thenReturn(mock(EntityReference.class));
+            .thenReturn(entityReferenceMock);
         assertFalse(this.watchedLocationReference.matchExactly(filterPreference));
     }
 
@@ -179,8 +180,9 @@ class WatchedLocationReferenceTest
         assertTrue(this.watchedLocationReference.match(filterPreference));
 
         when(filterPreference.getEventTypes()).thenReturn(Collections.emptySet());
+        EntityReference entityReferenceMock = mock(EntityReference.class);
         when(this.resolver.resolve(this.serializedReference, EntityType.DOCUMENT))
-            .thenReturn(mock(EntityReference.class));
+            .thenReturn(entityReferenceMock);
         assertFalse(this.watchedLocationReference.match(filterPreference));
     }
 

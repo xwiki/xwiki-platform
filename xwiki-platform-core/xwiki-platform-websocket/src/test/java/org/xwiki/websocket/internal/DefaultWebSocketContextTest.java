@@ -119,7 +119,8 @@ class DefaultWebSocketContextTest
         when(this.endPointConfig.getUserProperties()).thenReturn(this.userProperties);
         when(this.session.getUserProperties()).thenReturn(this.userProperties);
 
-        when(this.request.getHttpSession()).thenReturn(mock(HttpSession.class));
+        HttpSession httpSessionMock = mock(HttpSession.class);
+        when(this.request.getHttpSession()).thenReturn(httpSessionMock);
 
         XWiki wiki = mock(XWiki.class);
         when(wiki.checkAuth(this.xcontext)).thenReturn(new XWikiUser(this.currentUserReference));

@@ -99,8 +99,9 @@ class ClassSheetPageTest extends PageTest
     void setUp() throws Exception
     {
         // Spy the jsfx plugin used during the macro rendering to return a mock of its API when required. 
+        SkinExtensionPluginApi skinExtensionPluginApiMock = mock(SkinExtensionPluginApi.class);
         when(this.oldcore.getSpyXWiki().getPluginApi("jsfx", this.context))
-            .thenReturn(mock(SkinExtensionPluginApi.class));
+            .thenReturn(skinExtensionPluginApiMock);
 
         // Return minimal icons metadata since this is not what we want to test in this test suite.
         IconManager iconManager = this.componentManager.registerMockComponent(IconManager.class);

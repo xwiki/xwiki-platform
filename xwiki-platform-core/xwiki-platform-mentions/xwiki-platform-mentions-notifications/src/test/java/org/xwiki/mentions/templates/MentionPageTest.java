@@ -125,7 +125,8 @@ class MentionPageTest extends PageTest
 
         LocalizationScriptService localizationScriptService =
             this.componentManager.getInstance(ScriptService.class, "localization");
-        when(localizationScriptService.get(any())).thenReturn(mock(Translation.class));
+        Translation translationMock = mock(Translation.class);
+        when(localizationScriptService.get(any())).thenReturn(translationMock);
 
         // Initialization of the velocity context.
         DefaultEvent event1 = new DefaultEvent();
@@ -190,7 +191,8 @@ class MentionPageTest extends PageTest
 
         LocalizationScriptService localizationScriptService =
                 this.componentManager.getInstance(ScriptService.class, "localization");
-        when(localizationScriptService.get(any())).thenReturn(mock(Translation.class));
+        Translation translationMock = mock(Translation.class);
+        when(localizationScriptService.get(any())).thenReturn(translationMock);
 
         // Initialization of the velocity context.
         DefaultEvent event1 = new DefaultEvent();

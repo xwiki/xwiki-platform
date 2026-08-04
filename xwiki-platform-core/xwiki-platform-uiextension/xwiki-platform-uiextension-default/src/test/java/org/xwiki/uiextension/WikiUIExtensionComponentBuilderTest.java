@@ -126,8 +126,10 @@ class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
 
         // Components accessed through dynamic lookup.
         VelocityManager velocityManager = componentManager.registerMockComponent(VelocityManager.class);
-        when(velocityManager.getVelocityEngine()).thenReturn(mock(VelocityEngine.class));
-        when(velocityManager.getVelocityContext()).thenReturn(mock(VelocityContext.class));
+        VelocityEngine velocityEngineMock = mock(VelocityEngine.class);
+        when(velocityManager.getVelocityEngine()).thenReturn(velocityEngineMock);
+        VelocityContext velocityContextMock = mock(VelocityContext.class);
+        when(velocityManager.getVelocityContext()).thenReturn(velocityContextMock);
 
         ModelContext modelContext = componentManager.registerMockComponent(ModelContext.class);
         when(modelContext.getCurrentEntityReference()).thenReturn(DOC_REF);

@@ -101,6 +101,7 @@ abstract class AbstractQueryGeneratorTest
         UserProperties userProperties = mock(UserProperties.class);
         when(userProperties.displayHiddenDocuments()).thenReturn(false);
         when(this.userPropertiesResolver.resolve(any(UserReference.class))).thenReturn(userProperties);
-        when(this.userReferenceResolver.resolve(USER_REFERENCE)).thenReturn(mock(UserReference.class));
+        UserReference userReferenceMock = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(USER_REFERENCE)).thenReturn(userReferenceMock);
     }
 }

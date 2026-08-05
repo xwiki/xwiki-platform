@@ -57,6 +57,7 @@ define(['jquery', 'xwiki-icon!xwiki-tree-finder-icons', 'jsTree', 'xwiki-events-
       displayValue: true,
       displayValueText: '',
       fadeOnClear: false,
+      hideButton: false,
       json: true,
       minchars: 3,
       resultHint: options.finder.suggestion.hint,

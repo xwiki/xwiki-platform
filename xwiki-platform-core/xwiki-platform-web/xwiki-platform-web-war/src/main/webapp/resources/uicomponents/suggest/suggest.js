@@ -81,12 +81,14 @@ var XWiki = (function(XWiki){
     highlight: true,
     // Fade the suggestion container on clear
     fadeOnClear: true,
-    // Show a 'hide suggestions' button. Disabled by default (see XWIKI-24324); pass an object such as
-    // { positions: [ "top" ], text: "hide suggestions" } to enable it.
-    hideButton: false,
+    // Show a 'hide suggestions' button
+    hideButton: {
+      positions: [ "top" ],
+      text: "$escapetool.javascript($services.localization.render('core.widgets.suggest.hide'))"
+    },
     // A node to insert before the suggestions
     insertBeforeSuggestions: null,
-    // A node to insert after the suggestions (e.g. a "go to search page" link)
+    // A node to insert after the suggestions
     insertAfterSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,

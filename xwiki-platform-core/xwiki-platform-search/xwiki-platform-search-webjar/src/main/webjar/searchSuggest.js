@@ -176,6 +176,7 @@ var XWiki = (function (XWiki) {
         minchars: 3,
         sources : this.sources,
         insertAfterSuggestions : new Element("div", {'class' : 'results'}).update( allResults ),
+        hideButton: false,
         displayValue: true,
         displayValueText: this._l10n['platform.search.suggestResultLocatedIn'],
         resultInfoHTML: true,

@@ -100,7 +100,7 @@ public abstract class AbstractDistributionStep implements DistributionStep
     {
         String wiki = getWiki();
 
-        return wiki == null ? null : new Namespace("wiki", getWiki());
+        return wiki == null ? null : new Namespace("wiki", wiki);
     }
 
     protected String getTemplate()

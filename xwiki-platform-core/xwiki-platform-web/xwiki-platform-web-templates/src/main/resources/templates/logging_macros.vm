@@ -20,6 +20,18 @@
 #set ($discard = $xwiki.ssfx.use('uicomponents/logging/logging.css', true))
 #set ($discard = $xwiki.jsfx.use('uicomponents/logging/logging.js', true))
 
+## FIXME: Duplicated from extension.vm
+#macro (wikiHomePageLink $namespace)
+  #set ($wikiName = $stringtool.removeStart($namespace, 'wiki:'))
+  #set ($wikiReference = $services.model.createDocumentReference($wikiName, '', '').wikiReference)
+  #set ($wikiHomeDocumentReference = $services.model.resolveDocument('', 'default', $wikiReference))
+  #set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
+  #if ("$!wikiPrettyName.trim()" == '')
+    #set ($wikiPrettyName = $wikiName)
+  #end
+<a href="$escapetool.xml($xwiki.getURL($wikiHomeDocumentReference))">$escapetool.xml($wikiPrettyName)</a>##
+#end
+
 #macro (getThrowableRootCauseMessage $throwable)
   #if ($throwable.cause)
     #getThrowableRootCauseMessage($throwable.cause)

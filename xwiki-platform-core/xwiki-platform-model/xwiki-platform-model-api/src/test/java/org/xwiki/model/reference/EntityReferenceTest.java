@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Unit tests for {@link EntityReference}.
@@ -372,34 +371,25 @@ class EntityReferenceTest
     @Test
     void nullTypeInConstructor()
     {
-        try {
-            new EntityReference("name", null);
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("An Entity Reference type cannot be null", expected.getMessage());
-        }
+        IllegalArgumentException expected =
+            assertThrows(IllegalArgumentException.class, () -> new EntityReference("name", null));
+        assertEquals("An Entity Reference type cannot be null", expected.getMessage());
     }
 
     @Test
     void nullNameInConstructor()
     {
-        try {
-            new EntityReference(null, EntityType.WIKI);
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("An Entity Reference name cannot be null or empty", expected.getMessage());
-        }
+        IllegalArgumentException expected =
+            assertThrows(IllegalArgumentException.class, () -> new EntityReference(null, EntityType.WIKI));
+        assertEquals("An Entity Reference name cannot be null or empty", expected.getMessage());
     }
 
     @Test
     void emptyNameInConstructor()
     {
-        try {
-            new EntityReference("", EntityType.WIKI);
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("An Entity Reference name cannot be null or empty", expected.getMessage());
-        }
+        IllegalArgumentException expected =
+            assertThrows(IllegalArgumentException.class, () -> new EntityReference("", EntityType.WIKI));
+        assertEquals("An Entity Reference name cannot be null or empty", expected.getMessage());
     }
 
     @Test

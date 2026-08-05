@@ -53,8 +53,8 @@ import com.xpn.xwiki.web.XWikiServletResponseStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -241,13 +241,10 @@ class SyndEntryDocumentSourceTest
     {
         // odd user name length implies no access rights
         this.oldcore.getXWikiContext().setUser("XWiki.Albatross");
-        try {
-            this.source.source(new SyndEntryImpl(), doc, Collections.EMPTY_MAP, this.oldcore.getXWikiContext());
-            fail(ACCESS_RIGHTS_VIOLATED);
-        } catch (XWikiException expected) {
-            // we should get an exception
-            assertEquals(XWikiException.ERROR_XWIKI_ACCESS_DENIED, expected.getCode());
-        }
+        XWikiException expected = assertThrows(XWikiException.class,
+            () -> this.source.source(new SyndEntryImpl(), doc, Collections.EMPTY_MAP, this.oldcore.getXWikiContext()),
+            ACCESS_RIGHTS_VIOLATED);
+        assertEquals(XWikiException.ERROR_XWIKI_ACCESS_DENIED, expected.getCode());
         // even user name length implies all access rights
         this.oldcore.getXWikiContext().setUser("Condor");
         this.source.source(new SyndEntryImpl(), doc, Collections.EMPTY_MAP, this.oldcore.getXWikiContext());

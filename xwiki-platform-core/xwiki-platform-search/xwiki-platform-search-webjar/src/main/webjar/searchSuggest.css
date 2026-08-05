@@ -27,4 +27,10 @@ ul.xlist li.showAllResults button.xitemcontainer {
   padding: 4px 8px;
   font-size: 1em;
   color: var(--link-color);
+
+  & div {
+    display: flex;
+    justify-content: space-between;
+  }
+
 }

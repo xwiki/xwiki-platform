@@ -110,6 +110,8 @@ public class TestConfiguration
 
     private XWikiInstances xwikiInstances;
 
+    private WikiDescriptorTarget wikiDescriptorTarget;
+
     /**
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
@@ -150,6 +152,7 @@ public class TestConfiguration
         mergeSolrMode(testConfiguration.solrMode);
         mergeRemoteSolrTag(testConfiguration.getRemoteSolrTag());
         mergeXWikiInstances(testConfiguration.getXWikiInstances());
+        mergeWikiDescriptorTarget(testConfiguration.wikiDescriptorTarget);
     }
 
     private void mergeBrowser(Browser browser) throws DockerTestException
@@ -443,6 +446,19 @@ public class TestConfiguration
             }
         } else {
             this.remoteSolrTag = remoteSolrTag;
+        }
+    }
+
+    private void mergeWikiDescriptorTarget(WikiDescriptorTarget wikiDescriptorTarget) throws DockerTestException
+    {
+        if (this.wikiDescriptorTarget != null) {
+            if (wikiDescriptorTarget != null && this.wikiDescriptorTarget != wikiDescriptorTarget) {
+                throw new DockerTestException(
+                    String.format("Cannot merge wiki descriptor target [%s] since it was already specified as [%s]",
+                        wikiDescriptorTarget, this.wikiDescriptorTarget));
+            }
+        } else {
+            this.wikiDescriptorTarget = wikiDescriptorTarget;
         }
     }
 
@@ -1095,6 +1111,32 @@ public class TestConfiguration
     public void setXWikiInstances(XWikiInstances xwikiInstances)
     {
         this.xwikiInstances = xwikiInstances;
+    }
+
+    /**
+     * @return the host/port to set as the default one in the wiki descriptor for all the tests of the XWiki instance,
+     *         that is {@link WikiDescriptorTarget#HTTP_CLIENT} when it's not specified. Note that a test can override
+     *         it with {@link UseWikiDescriptorTarget}. See {@link UITest#wikiDescriptorTarget()}.
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.4
+     * @since 18.7.0RC1
+     */
+    public WikiDescriptorTarget getWikiDescriptorTarget()
+    {
+        return this.wikiDescriptorTarget != null ? this.wikiDescriptorTarget : WikiDescriptorTarget.HTTP_CLIENT;
+    }
+
+    /**
+     * @param wikiDescriptorTarget see {@link #getWikiDescriptorTarget()}
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.4
+     * @since 18.7.0RC1
+     */
+    public void setWikiDescriptorTarget(WikiDescriptorTarget wikiDescriptorTarget)
+    {
+        this.wikiDescriptorTarget = wikiDescriptorTarget;
     }
 
     /**

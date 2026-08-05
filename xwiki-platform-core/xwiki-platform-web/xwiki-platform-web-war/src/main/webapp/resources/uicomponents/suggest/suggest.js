@@ -81,12 +81,13 @@ var XWiki = (function(XWiki){
     highlight: true,
     // Fade the suggestion container on clear
     fadeOnClear: true,
-    // Show a 'hide suggestions' button
-    hideButton: {
-      positions: [ "top" ],
-      text: "$escapetool.javascript($services.localization.render('core.widgets.suggest.hide'))"
-    },
+    // Show a 'hide suggestions' button. Disabled by default (see XWIKI-24324); pass an object such as
+    // { positions: [ "top" ], text: "hide suggestions" } to enable it.
+    hideButton: false,
+    // A node to insert before the suggestions
     insertBeforeSuggestions: null,
+    // A node to insert after the suggestions (e.g. a "go to search page" link)
+    insertAfterSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
     // Display value prefix text
@@ -628,11 +629,14 @@ var XWiki = (function(XWiki){
       }
     }
 
-    var withEnableButton = typeof this.options.hideButton !== "undefined"
+    if (this.options.insertAfterSuggestions && !this.options.insertAfterSuggestions.parentNode) {
+      this.resultContainer.insert(this.options.insertAfterSuggestions);
+    }
+
+    var withEnableButton = this.options.hideButton
                         && typeof this.options.hideButton.positions === "object"
                         && this.options.hideButton.positions.length > 0;
     if (withEnableButton && !this.container.down('.hide-button')) {
-      // TODO: replace the label "hide suggestions" to an icon (see XWIKI-24324).
       var positions = this.options.hideButton.positions;
       for (var i=0; i< positions.length; i++) {
         var hideButton = new Element('button', {'class' : 'hide-button', 'type' : 'button'})

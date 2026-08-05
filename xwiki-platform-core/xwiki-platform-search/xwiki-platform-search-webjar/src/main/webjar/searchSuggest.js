@@ -175,7 +175,7 @@ var XWiki = (function (XWiki) {
         align: "auto",
         minchars: 3,
         sources : this.sources,
-        insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update( allResults ),
+        insertAfterSuggestions : new Element("div", {'class' : 'results'}).update( allResults ),
         displayValue: true,
         displayValueText: this._l10n['platform.search.suggestResultLocatedIn'],
         resultInfoHTML: true,

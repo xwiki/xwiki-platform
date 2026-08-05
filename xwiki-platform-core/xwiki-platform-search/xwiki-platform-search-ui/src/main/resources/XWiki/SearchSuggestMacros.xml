@@ -37,9 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
-## Resolve the icon of a search suggest source, shared between XWiki.SearchSuggestCode (the suggest JSON source)
-## and XWiki.SearchSuggestConfigSheet (the admin preview), so the icon theme detection stays in a single place.
-##
+## Resolve the icon of a search suggest source
 ## Sets $icon and $isIconThemeIcon in the caller's context:
 ## - if $rawIcon starts with "icon:", $icon is cleared and $isIconThemeIcon is true; the caller is expected to use
 ##   $iconHTML (also set by this macro) to display the icon.
@@ -51,7 +49,6 @@
   #set ($iconHTML = '')
   #set ($isIconThemeIcon = $icon.startsWith('icon:'))
   #if ($isIconThemeIcon)
-    ## Use the icon theme currently configured on the wiki, instead of hard-coding the Silk icon set.
     #set ($iconHTML = $services.icon.renderHTML($icon.substring(5)))
     #set ($icon = '')
   #end

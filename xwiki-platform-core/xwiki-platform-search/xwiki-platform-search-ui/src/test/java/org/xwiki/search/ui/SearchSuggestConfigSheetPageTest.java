@@ -150,10 +150,7 @@ class SearchSuggestConfigSheetPageTest extends PageTest
     {
         when(this.oldcore.getMockDocumentAuthorizationManager()
             .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE, TEST_PAGE)).thenReturn(false);
-
-        // Use an icon theme icon rather than the escaping test string, to exercise the icon theme rendering
-        // ($services.icon.renderHTML() in SearchSuggestConfigSheet.xml), which bypasses Velocity evaluation and
-        // thus doesn't require script rights.
+        
         this.testPageDocument.getXObject(SEARCH_SUGGEST_SOURCE_CLASS).setStringValue("icon", "icon:user");
         this.xwiki.saveDocument(this.testPageDocument, this.context);
         String iconHTML = "<span class=\"fa fa-user\"></span>";

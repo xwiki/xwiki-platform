@@ -172,11 +172,10 @@ class SearchSuggestConfigSheetPageTest extends PageTest
         assertEquals(this.testString + "SearchSuggestSources", presentationLink.attr("aria-controls"));
         assertEquals(this.testString + "SearchSuggestSources", result.getElementsByClass("tab-pane").get(0).attr("id"));
         assertEquals(this.testString, result.getElementsByClass("limit").text());
-
-        // This should not be evaluated.
+        
         assertEquals(this.testString, result.getElementsByClass("name").text());
 
-        // The icon theme icon is rendered directly and no longer goes through the legacy "icon" image markup.
+        // The icon is rendered as expected.
         assertEquals(0, result.getElementsByClass("icon").size());
         assertEquals(1, result.getElementsByClass("fa-user").size());
     }

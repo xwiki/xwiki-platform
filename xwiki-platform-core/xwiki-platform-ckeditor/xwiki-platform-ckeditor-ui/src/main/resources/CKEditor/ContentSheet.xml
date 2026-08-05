@@ -73,7 +73,7 @@
       #set ($discard = $xwiki.ssx.use('CKEditor.ContentSheet'))
       ## Include the stylesheets that affect the content in view mode.
       #ckeditor_templateWithoutEmptyLines("stylesheets.vm")
-      #if ($xwiki.getDocument('CKEditor.Config').getValue('loadJavaScriptSkinExtensions') == 1)
+      #if ($xwiki.getDocument('CKEditor.Config').getValue('loadJavaScriptSkinExtensions') != 0)
         #ckeditor_templateWithoutEmptyLines("javascript.vm")
       #end
     &lt;/head&gt;

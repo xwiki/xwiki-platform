@@ -139,6 +139,17 @@ ul.xlist li.showAllResults {
   margin-left:10px;
 }
 
+div.suggestItems.searchSuggest div.resultContainer div.results {
+  padding-left: 12px;
+  border-top: 1px solid var(--xwiki-border-color);
+}
+
+/* Cancel these elements' own border-top (see above) so div.results doesn't draw two stacked separator lines. */
+div.suggestItems.searchSuggest div.resultContainer div.sourceName,
+div.suggestItems.searchSuggest div.resultContainer li.showAllResults {
+  border-top: none;
+}
+
 .horizontalLayout div.resultContainer div.results {
   clear:both;
 }

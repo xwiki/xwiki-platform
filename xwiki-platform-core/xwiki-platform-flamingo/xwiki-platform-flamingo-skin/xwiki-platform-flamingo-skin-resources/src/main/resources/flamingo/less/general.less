@@ -68,8 +68,17 @@ table {
 // Badges & Labels ============================================================
 .badge,
 .label {
-  margin: 0 2px;
-  vertical-align: 1px;
+  // Matches the horizontal padding scale Bootstrap already uses for .label
+  // (padding: .2em .6em .3em) instead of an arbitrary pixel gap.
+  margin: 0 .2em;
+}
+
+.badge {
+  vertical-align: 0.1em;
+}
+
+.label {
+  vertical-align: 0.05em;
 }
 
 // Code =======================================================================

@@ -90,8 +90,6 @@ class SearchSuggestConfigSheetPageTest extends PageTest
 
     private AuthorExecutor authorExecutor;
 
-    private IconManager iconManager;
-
     private VelocityEngine velocityEngine;
 
     private XWikiDocument testPageDocument;
@@ -108,7 +106,7 @@ class SearchSuggestConfigSheetPageTest extends PageTest
         // Minimal icon environment: only IconManager#renderHTML() is actually exercised by these tests.
         this.componentManager.registerMockComponent(IconSetManager.class);
         this.componentManager.registerMockComponent(IconRenderer.class);
-        this.iconManager = this.componentManager.registerMockComponent(IconManager.class);
+        IconManager iconManager = this.componentManager.registerMockComponent(IconManager.class);
 
         this.xwiki.initializeMandatoryDocuments(this.context);
         loadPage(SEARCH_SUGGEST_SOURCE_CLASS);
@@ -159,7 +157,8 @@ class SearchSuggestConfigSheetPageTest extends PageTest
         this.testPageDocument.getXObject(SEARCH_SUGGEST_SOURCE_CLASS).setStringValue("icon", "icon:user");
         this.xwiki.saveDocument(this.testPageDocument, this.context);
         String iconHTML = "<span class=\"fa fa-user\"></span>";
-        when(this.iconManager.renderHTML("user")).thenReturn(iconHTML);
+        IconManager iconManager = this.componentManager.getInstance(IconManager.class);
+        when(iconManager.renderHTML("user")).thenReturn(iconHTML);
 
         this.context.setDoc(this.testPageDocument);
         Document result = renderHTMLPage(this.searchSuggestConfigSheetDocument);

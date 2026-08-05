@@ -144,10 +144,10 @@ export default {
   /* Make the cards 30rem large, and display as many of them on one row */
   .layout-cards .layout-table-root {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 30rem);
+    grid-template-columns: repeat(auto-fill, 22rem);
     grid-auto-rows: min-content;
-    gap: 1.5rem;
-    grid-gap: 1.5rem; /* safari */
+    gap: 1rem;
+    grid-gap: 1rem; /* safari */
   }
 }
 

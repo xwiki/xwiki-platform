@@ -157,7 +157,6 @@ com.xpn.xwiki.internal.render.DefaultOldRendering
 com.xpn.xwiki.internal.render.OldRenderingProvider
 com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString
 com.xpn.xwiki.internal.user.MyPersistentLoginManagerProvider
-com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier
 com.xpn.xwiki.internal.user.UserCreatedEventListener
 com.xpn.xwiki.internal.velocity.DefaultVelocityEvaluator
 org.xwiki.internal.web.EffectiveAuthorSetterListener
@@ -279,6 +278,7 @@ org.xwiki.model.validation.edit.XWikiDocumentLockEditConfirmationChecker
 org.xwiki.evaluation.internal.DefaultObjectEvaluator
 org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator
 org.xwiki.internal.attachment.XWikiAttachmentSecurityManager
+org.xwiki.internal.authentication.DefaultUserAuthenticatedEventNotifier
 org.xwiki.internal.authentication.LoginLinkUIExtension
 org.xwiki.internal.authentication.RegisterLinkUIExtension
 org.xwiki.internal.filter.Importer

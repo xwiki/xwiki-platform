@@ -1019,7 +1019,7 @@ public class RepositoryManager
         // Gather already stored versions stored in dedicated pages, to avoid re-importing them. It means that it won't
         // fix any problem in exist version pages, but re-verifying all version pages with every import is very slow
         // and useless 99% of the time.
-        Set<Version> validPageVersions = new HashSet<>();
+        Versions validPageVersions = new Versions();
 
         // Remove version pages corresponding to not existing versions
         cleanNotExistingProjectVersionPages(projectDocument, project.getId().getVersion(), projectVersions,
@@ -1033,11 +1033,16 @@ public class RepositoryManager
         for (Map.Entry<Version, String> entry : projectVersions.entrySet()) {
             Version version = entry.getKey();
 
-            // Skip already stored versions
-            if (!validPageVersions.contains(version)) {
+            // Skip already stored versions, unless the index is invalid
+            Long versionIndex = validPageVersions.versions.get(version);
+            if (versionIndex == null || versionIndex != index) {
                 needSave |=
-                    updateProjectVersion(entry.getValue(), version, project, repository, index++, projectDocument);
+                    updateProjectVersion(entry.getValue(), version, project, repository, index, projectDocument);
             }
+
+            // Increment index even if the version was skipped, to ensure that the index is always incremented for each
+            // version in the remoteVersions map
+            index++;
         }
 
         // Save
@@ -1108,13 +1113,13 @@ public class RepositoryManager
     }
 
     private void cleanNotExistingProjectVersionPages(XWikiDocument projectDocument, Version currentVersion,
-        TreeMap<Version, String> extensionVersions, Set<Version> validPageVersions, XWikiContext xcontext)
+        TreeMap<Version, String> extensionVersions, Versions validPageVersions, XWikiContext xcontext)
         throws QueryException, XWikiException
     {
         EntityReference versionsSpaceReference = new EntityReference(XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME,
             EntityType.SPACE, projectDocument.getDocumentReference().getLocalDocumentReference().getParent());
         Query query =
-            this.queryManager.createQuery("select doc.fullName, version.version from Document doc, doc.object("
+            this.queryManager.createQuery("select doc.fullName, version.version, version.index from Document doc, doc.object("
                 + XWikiRepositoryModel.PROJECTVERSION_CLASSNAME
                 + ") version where doc.space = :space OR doc.space like :space", Query.XWQL);
         query.bindValue("space", this.localReferenceSerializer.serialize(versionsSpaceReference) + ".%");
@@ -1123,6 +1128,7 @@ public class RepositoryManager
         XWiki xwiki = xcontext.getWiki();
         for (Object[] result : results) {
             Version version = new DefaultVersion((String) result[1]);
+            Long index = (Long) result[2];
 
             // Remove the document if the version does not exist
             if (!currentVersion.equals(version) && !extensionVersions.containsKey(version)) {
@@ -1131,7 +1137,7 @@ public class RepositoryManager
                 xwiki.deleteDocument(document, xcontext);
             } else {
                 // Remember already existing valid version stored in dedicated pages
-                validPageVersions.add(version);
+                validPageVersions.addVersion(version, index);
             }
         }
     }

@@ -169,27 +169,32 @@
     }
   };
   
+  // Applies the second change only once the first one has succeeded, so that both changes are not sent concurrently
+  // and so that the page is not reloaded before the second one is done.
+  var performChainedChanges = function (firstOption, secondOption) {
+    var firstPromise = performChange(firstOption);
+    if (firstPromise) {
+      return firstPromise.then(function () {
+        return performChange(secondOption);
+      });
+    }
+  };
+
   var handleSubmit = function () {
     var chosenOption = $('#watchModal input[type="radio"]:checked').val();
     var promise;
     if (chosenOption == 'unwatchPageWatchSpace') {
-      var firstPromise = performChange('unwatchPage');
-      if (firstPromise !== 'undefined') {
-        promise = firstPromise.pipe(performChange('watchSpace'))
-      }
+      promise = performChainedChanges('unwatchPage', 'watchSpace');
     } else if (chosenOption == 'unblockPageBlockSpace') {
-      var firstPromise = performChange('unblockPage');
-      if (firstPromise !== 'undefined') {
-        promise = firstPromise.pipe(performChange('blockSpace'))
-      }
+      promise = performChainedChanges('unblockPage', 'blockSpace');
     } else {
       promise = performChange(chosenOption);
     }
-    if (promise !== 'undefined') {
+    if (promise) {
       promise.done(function () {
         removeAnySelection();
         window.location.reload();
-      }).error(function (data) {
+      }).fail(function (data) {
         removeAnySelection();
         console.error("Error when processing the request: " + data);
       });

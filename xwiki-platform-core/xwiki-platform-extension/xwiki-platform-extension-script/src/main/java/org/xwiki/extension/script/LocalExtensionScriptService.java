@@ -26,8 +26,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Various script APIs related to installed extensions.
@@ -62,12 +65,43 @@ public class LocalExtensionScriptService extends AbstractExtensionScriptService
     /**
      * Get a list of cached extensions from the local extension repository. This doesn't include core extensions, only
      * custom extensions fetched or installed.
-     * 
+     *
      * @return a list of read-only handlers corresponding to the local extensions, an empty list if nothing is available
      *         in the local repository
      */
     public Collection<LocalExtension> getLocalExtensions()
     {
         return safe(this.localExtensionRepository.getLocalExtensions());
+    }
+
+    /**
+     * Remove an extension from the local repository (cache). This forces a fresh download the next time the extension
+     * is installed, which is useful for reinstalling snapshot extensions that have been updated remotely.
+     *
+     * @param id the identifier of the extension to remove from the local cache
+     * @param version the version of the extension to remove from the local cache
+     * @return true if the extension was removed or not present, false on error
+     * @since 18.3.0RC1
+     */
+    public boolean removeExtension(String id, String version)
+    {
+        setError(null);
+
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
+            setError(new Exception("You need Programming Rights to remove extensions from the local cache"));
+            return false;
+        }
+
+        try {
+            LocalExtension localExtension =
+                this.localExtensionRepository.getLocalExtension(new ExtensionId(id, version));
+            if (localExtension != null) {
+                this.localExtensionRepository.removeExtension(localExtension);
+            }
+            return true;
+        } catch (ResolveException e) {
+            setError(e);
+            return false;
+        }
     }
 }

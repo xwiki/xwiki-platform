@@ -238,6 +238,8 @@ ${escapetool.xml($name)}##
     #getInstalledExtension($extension $extensionNamespace $installedExtension)
     ## If the installed extension might be invalid and need repairing
     #extensionRepairButtons($installedExtension)
+    ## This extension can be reinstalled (re-download and re-install)
+    #extensionReinstallButtons($installedExtension)
     ## This extension can be uninstalled
     #extensionUninstallButtons($installedExtension)
     ## XAR specific buttons
@@ -307,6 +309,17 @@ ${escapetool.xml($name)}##
            && !$installedExtension.isValid($extensionNamespace))
     ## It's invalid on provided namespace
     #extensionActionButtonWithDisplayHint('install' 'repair')
+  #end
+#end
+
+#macro(extensionReinstallButtons $installedExtension)
+  #if ($installedExtension.isInstalled($NULL))
+    ## It's installed on root namespace, propose reinstall on root
+    #extensionActionGlobalButton('reinstall' true)
+  #end
+  #if (!$installedExtension.isInstalled($NULL) && $installedExtension.isInstalled($extensionNamespace))
+    ## It's installed on provided namespace, propose reinstall on that namespace
+    #extensionActionButton('reinstall' true)
   #end
 #end
 
@@ -1163,6 +1176,10 @@ $namespace##
     #computeInstallPlan($request.extensionId $request.extensionVersion $NULL)
   #elseif ($request.extensionAction == 'upgradeGlobally' || $request.extensionAction == 'downgradeGlobally')
     #computeUpgradePlan($request.extensionId $request.extensionVersion)
+  #elseif ($request.extensionAction == 'reinstall')
+    #computeReinstallPlan($request.extensionId $request.extensionVersion $extensionNamespace)
+  #elseif ($request.extensionAction == 'reinstallGlobally')
+    #computeReinstallPlan($request.extensionId $request.extensionVersion $NULL)
   #elseif ($request.extensionAction == 'uninstall')
     #computeUninstallPlan($request.extensionId $request.extensionVersion $extensionNamespace)
   #elseif ($request.extensionAction == 'uninstallGlobally')
@@ -1208,6 +1225,31 @@ $namespace##
 
 #macro (computeInstallPlan $extensionId $extensionVersion $extensionNamespace)
   #set ($installPlanRequest = $extensionManager.createInstallPlanRequest($extensionId, $extensionVersion, $extensionNamespace))
+  #if ($extensionConfig.skipCheckRight)
+    #set ($discard = $installPlanRequest.removeProperty('checkrights'))
+  #end
+  #if ($extensionConfig.skipCurrentUser)
+    #set ($discard = $installPlanRequest.removeProperty('user.reference'))
+  #end
+  #if ($extensionConfig.installJAROnRoot)
+    #set ($discard = $installPlanRequest.rewriter.installExtensionTypeOnRootNamespace('jar'))
+    #set ($discard = $installPlanRequest.rewriter.installExtensionTypeOnRootNamespace('webjar'))
+    #set ($discard = $installPlanRequest.rewriter.installExtensionTypeOnRootNamespace('webjar-node'))
+  #end
+  #set ($discard = $extensionManager.createInstallPlan($installPlanRequest))
+  #handleExtensionJobStartFailure('extensions.install.error.prepareFailure')
+#end
+
+#macro (computeReinstallPlan $extensionId $extensionVersion $extensionNamespace)
+  ## Remove from local cache to force a fresh download (useful for snapshot versions)
+  #set ($discard = $services.extension.local.removeExtension($extensionId, $extensionVersion))
+  ## Create install plan ignoring the fact that the extension is already installed
+  #set ($installPlanRequest = $extensionManager.createInstallPlanRequest($extensionId, $extensionVersion, $extensionNamespace))
+  #set ($discard = $installPlanRequest.setInstalledIgnored(true))
+  ## Force overwrite: bypass the 3-way merge so the freshly-downloaded content is written as-is.
+  ## Without this, the merge sees previous==next (both from the re-downloaded XAR) and silently keeps
+  ## the current wiki content unchanged.
+  #set ($discard = $installPlanRequest.setProperty('extension.xar.packager.forceOverwrite', true))
   #if ($extensionConfig.skipCheckRight)
     #set ($discard = $installPlanRequest.removeProperty('checkrights'))
   #end

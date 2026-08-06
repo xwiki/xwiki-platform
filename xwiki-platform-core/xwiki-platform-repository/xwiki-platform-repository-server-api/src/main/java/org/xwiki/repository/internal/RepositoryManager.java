@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -118,6 +119,21 @@ public class RepositoryManager
 
     private static final LocalDocumentReference PROJECT_VERSIONSHOME_REFERENCE =
         new LocalDocumentReference("ExtensionCode", "ProjectVersionsHome");
+
+    private class Versions
+    {
+        private final Map<Version, Long> versions = new HashMap<>();
+
+        private long lastIndex;
+
+        public void addVersion(Version version, Long index)
+        {
+            this.versions.put(version, index);
+            if (index != null && index > this.lastIndex) {
+                this.lastIndex = index;
+            }
+        }
+    }
 
     /**
      * Get the reference of the class in the current wiki.
@@ -916,7 +932,7 @@ public class RepositoryManager
         // Gather already stored versions stored in dedicated pages, to avoid re-importing them. It means that it won't
         // fix any problem in exist version pages, but re-verifying all version pages with every import is very slow
         // and useless 99% of the time.
-        Set<Version> validPageVersions = new HashSet<>();
+        Versions validPageVersions = new Versions();
 
         // Remove version pages corresponding to not existing versions
         cleanNotExistingExtensionVersionPages(extensionDocument, extension.getId().getVersion(), remoteVersions,
@@ -934,9 +950,16 @@ public class RepositoryManager
             String id = entry.getValue();
 
             // Give priority to the main extension versions in case of conflict
-            // Skip already stored versions
-            if (!remoteVersions.containsKey(version) && !validPageVersions.contains(version)) {
-                updateExtensionVersion(id, version, extension, repository, index++, extensionDocument);
+            if (!remoteVersions.containsKey(version)) {
+                // Skip already stored versions, unless the index is invalid
+                Long versionIndex = validPageVersions.versions.get(version);
+                if (versionIndex == null || versionIndex != index) {
+                    updateExtensionVersion(id, version, extension, repository, index, extensionDocument);
+                }
+
+                // Increment index even if the version was skipped, to ensure that the index is always incremented for each
+                // version in the remoteVersions map
+                index++;
             }
         }
 
@@ -945,10 +968,15 @@ public class RepositoryManager
             Version version = entry.getKey();
             String id = entry.getValue();
 
-            // Skip already stored versions
-            if (!validPageVersions.contains(version)) {
-                updateExtensionVersion(id, version, extension, repository, index++, extensionDocument);
+            // Skip already stored versions, unless the index is invalid
+            Long versionIndex = validPageVersions.versions.get(version);
+            if (versionIndex == null || versionIndex != index) {
+                updateExtensionVersion(id, version, extension, repository, index, extensionDocument);
             }
+
+            // Increment index even if the version was skipped, to ensure that the index is always incremented for each
+            // version in the remoteVersions map
+            index++;
         }
 
         return needSave;
@@ -1044,13 +1072,13 @@ public class RepositoryManager
 
     private void cleanNotExistingExtensionVersionPages(XWikiDocument extensionDocument, Version currentVersion,
         TreeMap<Version, String> extensionVersions, TreeMap<Version, String> featureVersions,
-        boolean versionProxyEnabled, Set<Version> validPageVersions, XWikiContext xcontext)
+        boolean versionProxyEnabled, Versions validPageVersions, XWikiContext xcontext)
         throws QueryException, XWikiException
     {
         EntityReference versionsSpaceReference = new EntityReference(XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME,
             EntityType.SPACE, extensionDocument.getDocumentReference().getLocalDocumentReference().getParent());
         Query query =
-            this.queryManager.createQuery("select doc.fullName, version.version from Document doc, doc.object("
+            this.queryManager.createQuery("select doc.fullName, version.version, version.index from Document doc, doc.object("
                 + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME
                 + ") version where doc.space = :spaceExact OR doc.space like :spaceLike", Query.XWQL);
         String spaceReference = this.localReferenceSerializer.serialize(versionsSpaceReference);
@@ -1063,6 +1091,7 @@ public class RepositoryManager
         for (Object[] result : results) {
             DocumentReference documentReference = this.currentStringResolver.resolve((String) result[0]);
             Version version = new DefaultVersion((String) result[1]);
+            Long index = (Long) result[2];
 
             // Remove the document if:
             // * the versions does not exist
@@ -1073,7 +1102,7 @@ public class RepositoryManager
                 xwiki.deleteDocument(document, xcontext);
             } else if (!documentReference.equals(extensionDocument.getDocumentReference())) {
                 // Remember already existing valid version stored in dedicated pages
-                validPageVersions.add(version);
+                validPageVersions.addVersion(version, index);
             }
         }
     }
@@ -1752,7 +1781,7 @@ public class RepositoryManager
 
         // Update version object
         BaseObject versionObject =
-            this.extensionStore.getProjectVersionObject(projectVersionDocument, extensionVersion.getId().getVersion());
+            this.extensionStore.getExtensionVersionObject(projectVersionDocument, extensionVersion.getId().getVersion());
         if (versionObject == null) {
             versionObject =
                 projectVersionDocument.newXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, xcontext);

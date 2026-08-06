@@ -235,6 +235,7 @@ import com.xpn.xwiki.job.JobRequestContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
@@ -4270,6 +4271,23 @@ public class XWiki implements EventListener
             BaseObject userObject =
                 doc.newXObject(userClassReference.removeParent(userClassReference.getWikiReference()), context);
             userClass.fromMap(map, userObject);
+
+            // Make sure the user type property has an explicit value even when it's not part of the submitted
+            // data (e.g. the registration and the "create user" forms don't have a field for it), so that it's
+            // consistently stored and can be reliably filtered, sorted and displayed (e.g. in the User Directory).
+            // Note: fromMap() only leaves the property unset when the map has no entry for it at all, so this
+            // doesn't override a value that was actually submitted (even if that value is an empty string).
+            if (userObject.safeget(XWikiUsersDocumentInitializer.USERTYPE_FIELD) == null) {
+                PropertyClass userTypeProperty =
+                    (PropertyClass) userClass.get(XWikiUsersDocumentInitializer.USERTYPE_FIELD);
+                if (userTypeProperty instanceof ListClass listUserTypeProperty) {
+                    // Go through the property class's own factory rather than setStringValue() so that the
+                    // property is created with the storage type the class is actually configured for (e.g. a
+                    // StringListProperty/DBStringListProperty if the field has been customized to be multiSelect).
+                    userObject.safeput(XWikiUsersDocumentInitializer.USERTYPE_FIELD,
+                        listUserTypeProperty.fromString(listUserTypeProperty.getDefaultValue()));
+                }
+            }
 
             doc.setParentReference(parentReference);
             doc.setContent(content);

@@ -24,7 +24,7 @@ import org.xwiki.model.EntityType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit test for the Object reference ({@link PageObjectReference}).
@@ -47,25 +47,17 @@ class PageObjectReferenceTest
     @Test
     void testInvalidType()
     {
-        try {
-            new PageObjectReference(new EntityReference("className", EntityType.PAGE));
-
-            fail("Should have thrown exception");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid type [PAGE] for an object reference", expected.getMessage());
-        }
+        IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
+            () -> new PageObjectReference(new EntityReference("className", EntityType.PAGE)));
+        assertEquals("Invalid type [PAGE] for an object reference", expected.getMessage());
     }
 
     @Test
     void testInvalidNullParent()
     {
-        try {
-            new PageObjectReference(new EntityReference("className", EntityType.PAGE_OBJECT));
-
-            fail("Should have thrown exception");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [null] in an object reference", expected.getMessage());
-        }
+        IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
+            () -> new PageObjectReference(new EntityReference("className", EntityType.PAGE_OBJECT)));
+        assertEquals("Invalid parent reference [null] in an object reference", expected.getMessage());
     }
 
     /**
@@ -74,14 +66,10 @@ class PageObjectReferenceTest
     @Test
     void testInvalidParentType()
     {
-        try {
-            new PageObjectReference(
-                new EntityReference("className", EntityType.PAGE_OBJECT, new EntityReference("wiki", EntityType.WIKI)));
-
-            fail("Should have thrown exception");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("Invalid parent reference [Wiki wiki] in an object reference", expected.getMessage());
-        }
+        IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
+            () -> new PageObjectReference(new EntityReference("className", EntityType.PAGE_OBJECT,
+                new EntityReference("wiki", EntityType.WIKI))));
+        assertEquals("Invalid parent reference [Wiki wiki] in an object reference", expected.getMessage());
     }
 
     @Test

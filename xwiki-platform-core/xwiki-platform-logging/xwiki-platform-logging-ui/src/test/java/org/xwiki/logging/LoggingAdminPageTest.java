@@ -78,7 +78,7 @@ class LoggingAdminPageTest extends PageTest
     void setUp() throws Exception
     {
         // Spy the jsfx plugin used during the macro rendering to return a mock of its API when required. 
-        SkinExtensionPluginApi skinExtensionPluginApiMock = mock(SkinExtensionPluginApi.class);
+        SkinExtensionPluginApi skinExtensionPluginApiMock = mock();
         when(this.oldcore.getSpyXWiki().getPluginApi("jsfx", this.context))
             .thenReturn(skinExtensionPluginApiMock);
         // Return minimal icons metadata since this is not what we want to test here.

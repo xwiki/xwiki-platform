@@ -68,7 +68,7 @@ class WikiManagerPageTest extends PageTest
     void verifyLiveDataMacroConfiguration() throws Exception
     {
         // Spy the jsfx plugin used during the macro rendering to return a mock of its API when required. 
-        SkinExtensionPluginApi skinExtensionPluginApiMock = mock(SkinExtensionPluginApi.class);
+        SkinExtensionPluginApi skinExtensionPluginApiMock = mock();
         when(this.oldcore.getSpyXWiki().getPluginApi("jsfx", this.context))
             .thenReturn(skinExtensionPluginApiMock);
 

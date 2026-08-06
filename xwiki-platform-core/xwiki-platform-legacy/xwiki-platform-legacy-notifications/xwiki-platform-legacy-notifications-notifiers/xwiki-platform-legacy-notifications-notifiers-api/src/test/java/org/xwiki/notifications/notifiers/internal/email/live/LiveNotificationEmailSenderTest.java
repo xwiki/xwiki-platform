@@ -77,15 +77,15 @@ class LiveNotificationEmailSenderTest
 
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
 
-        NotificationUserIterator notificationUserIteratorMock = mock(NotificationUserIterator.class);
+        NotificationUserIterator notificationUserIteratorMock = mock();
         when(this.notificationUserIteratorProvider.get()).thenReturn(notificationUserIteratorMock);
 
-        LiveMimeMessageIterator liveMimeMessageIteratorMock = mock(LiveMimeMessageIterator.class);
+        LiveMimeMessageIterator liveMimeMessageIteratorMock = mock();
         when(this.liveMimeMessageIteratorProvider.get()).thenReturn(liveMimeMessageIteratorMock);
 
         when(this.sessionFactory.create(any())).thenReturn(null);
 
-        MailListener mailListenerMock = mock(MailListener.class);
+        MailListener mailListenerMock = mock();
         when(this.mailListenerProvider.get()).thenReturn(mailListenerMock);
 
         this.sender.sendEmails(event1);

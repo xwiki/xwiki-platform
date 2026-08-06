@@ -78,7 +78,7 @@ class ZipExplorerTest
 
         Provider<XWikiContext> xwikiContextProvider =
             componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        XWikiContext xWikiContextMock = mock(XWikiContext.class);
+        XWikiContext xWikiContextMock = mock();
         when(xwikiContextProvider.get()).thenReturn(xWikiContextMock);
     }
 

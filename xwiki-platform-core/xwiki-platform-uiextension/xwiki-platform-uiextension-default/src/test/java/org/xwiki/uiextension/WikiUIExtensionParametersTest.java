@@ -297,7 +297,7 @@ class WikiUIExtensionParametersTest
 
         when(result.getStringValue(WikiUIExtensionConstants.ID_PROPERTY)).thenReturn("id");
         when(result.getStringValue(WikiUIExtensionConstants.PARAMETERS_PROPERTY)).thenReturn(parameters);
-        XWikiDocument xWikiDocumentMock = mock(XWikiDocument.class);
+        XWikiDocument xWikiDocumentMock = mock();
         when(result.getOwnerDocument()).thenReturn(xWikiDocumentMock);
         when(result.getOwnerDocument().getAuthorReference()).thenReturn(WikiUIExtensionParametersTest.AUTHOR_REFERENCE);
         when(result.getDocumentReference()).thenReturn(WikiUIExtensionParametersTest.DOCUMENT_REFERENCE);

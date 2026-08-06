@@ -70,14 +70,14 @@ class Less4jCompilerTest
         // Is is actually more an integration test than a unit test
 
         // Import 1
-        Resource resourceMock = mock(Resource.class);
+        Resource resourceMock = mock();
         when(this.skin.getResource("less/style.less.vm")).thenReturn(resourceMock);
         StringWriter import1source = new StringWriter();
         IOUtils.copy(new FileInputStream(getClass().getResource("/style.less.vm").getFile()), import1source);
         when(this.templateManager.renderFromSkin("less/style.less.vm", this.skin)).thenReturn(import1source.toString());
 
         // Import 2
-        Resource resourceMock2 = mock(Resource.class);
+        Resource resourceMock2 = mock();
         when(this.skin.getResource("less/subdir/import2.less")).thenReturn(resourceMock2);
         Template import2 = mock(Template.class);
         when(this.templateManager.getTemplate("less/subdir/import2.less", this.skin)).thenReturn(import2);
@@ -88,7 +88,7 @@ class Less4jCompilerTest
         when(importContent2.getContent()).thenReturn(import2source.toString());
 
         // Import 3
-        Resource resourceMock3 = mock(Resource.class);
+        Resource resourceMock3 = mock();
         when(this.skin.getResource("less/subdir/import3.less")).thenReturn(resourceMock3);
         Template import3 = mock(Template.class);
         when(this.templateManager.getTemplate("less/subdir/import3.less", this.skin)).thenReturn(import3);

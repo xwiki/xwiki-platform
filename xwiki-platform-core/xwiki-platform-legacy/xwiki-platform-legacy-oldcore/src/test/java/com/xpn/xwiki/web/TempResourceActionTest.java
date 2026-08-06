@@ -204,7 +204,7 @@ class TempResourceActionTest
         oldcore.getXWikiContext().setResponse(response);
         when(request.getRequestURI()).thenReturn("/xwiki/bin/temp/Space/Page/module/file.txt");
         when(request.getParameter("force-download")).thenReturn("1");
-        ServletOutputStream servletOutputStreamMock = mock(ServletOutputStream.class);
+        ServletOutputStream servletOutputStreamMock = mock();
         when(response.getOutputStream()).thenReturn(servletOutputStreamMock);
         oldcore.getXWikiContext().setWikiId("wiki");
         createEmptyFile("temp/module/wiki/Space/Page/file.txt");

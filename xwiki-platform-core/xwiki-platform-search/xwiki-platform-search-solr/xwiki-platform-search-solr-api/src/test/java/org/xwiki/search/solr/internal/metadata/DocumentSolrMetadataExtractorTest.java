@@ -415,12 +415,12 @@ class DocumentSolrMetadataExtractorTest
         StringClass stringClass = mock(StringClass.class);
         when(stringClass.getClassType()).thenReturn("String");
 
-        TextAreaClass textAreaClassMock = mock(TextAreaClass.class);
+        TextAreaClass textAreaClassMock = mock();
         when(xclass.get("comment")).thenReturn(textAreaClassMock);
         when(xclass.get("summary")).thenReturn(stringClass);
-        PasswordClass passwordClassMock = mock(PasswordClass.class);
+        PasswordClass passwordClassMock = mock();
         when(xclass.get("password")).thenReturn(passwordClassMock);
-        BooleanClass booleanClassMock = mock(BooleanClass.class);
+        BooleanClass booleanClassMock = mock();
         when(xclass.get("enabled")).thenReturn(booleanClassMock);
 
         //
@@ -512,7 +512,7 @@ class DocumentSolrMetadataExtractorTest
         when(userObject.getRelativeXClassReference())
             .thenReturn(userClassRef.removeParent(userClassRef.getWikiReference()));
 
-        EmailClass emailClassMock = mock(EmailClass.class);
+        EmailClass emailClassMock = mock();
         when(xclass.get("email")).thenReturn(emailClassMock);
 
         //

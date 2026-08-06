@@ -66,7 +66,7 @@ class DocumentsConfigurationSourceTest
     @BeforeEach
     void before()
     {
-        XWikiContext xWikiContextMock = mock(XWikiContext.class);
+        XWikiContext xWikiContextMock = mock();
         when(this.xcontextProvider.get()).thenReturn(xWikiContextMock);
     }
 

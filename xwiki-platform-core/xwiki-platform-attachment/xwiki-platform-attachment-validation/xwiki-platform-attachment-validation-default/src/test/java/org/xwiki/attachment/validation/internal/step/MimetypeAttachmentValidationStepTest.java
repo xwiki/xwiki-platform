@@ -70,7 +70,7 @@ class MimetypeAttachmentValidationStepTest
         when(this.attachmentValidationConfiguration.getBlockerMimetypes()).thenReturn(List.of(blockerMimetype));
 
         AttachmentAccessWrapper wrapper = mock(AttachmentAccessWrapper.class);
-        InputStream inputStreamMock = mock(InputStream.class);
+        InputStream inputStreamMock = mock();
         when(wrapper.getInputStream()).thenReturn(inputStreamMock);
         when(wrapper.getFileName()).thenReturn("test.txt");
         AttachmentValidationException exception = assertThrows(AttachmentValidationException.class,
@@ -93,7 +93,7 @@ class MimetypeAttachmentValidationStepTest
         when(this.attachmentValidationConfiguration.getAllowedMimetypes()).thenReturn(List.of(blockerMimetype));
 
         AttachmentAccessWrapper wrapper = mock(AttachmentAccessWrapper.class);
-        InputStream inputStreamMock = mock(InputStream.class);
+        InputStream inputStreamMock = mock();
         when(wrapper.getInputStream()).thenReturn(inputStreamMock);
         when(wrapper.getFileName()).thenReturn("test.txt");
         AttachmentValidationException exception = assertThrows(AttachmentValidationException.class,

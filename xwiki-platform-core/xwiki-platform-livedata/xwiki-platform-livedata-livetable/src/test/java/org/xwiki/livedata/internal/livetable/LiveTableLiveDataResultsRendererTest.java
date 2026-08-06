@@ -192,7 +192,7 @@ class LiveTableLiveDataResultsRendererTest
     {
         String templateName = "template.vm";
         String json = "{}";
-        Template templateMock = mock(Template.class);
+        Template templateMock = mock();
         when(this.templateManager.getTemplate(templateName)).thenReturn(templateMock);
         when(this.templateManager.render(templateName)).thenReturn(json);
         assertEquals(json, this.resultsRenderer.getLiveTableResultsFromTemplate(templateName, new LiveDataQuery()));

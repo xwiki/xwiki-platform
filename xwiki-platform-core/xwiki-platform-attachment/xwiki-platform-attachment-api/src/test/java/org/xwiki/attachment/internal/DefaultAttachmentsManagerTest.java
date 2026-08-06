@@ -108,7 +108,7 @@ class DefaultAttachmentsManagerTest
     void availableDocumentHasAttachment() throws Exception
     {
         when(this.wiki.getDocument(DOCUMENT_REFERENCE, this.xWikiContext)).thenReturn(this.document);
-        XWikiAttachment xWikiAttachmentMock = mock(XWikiAttachment.class);
+        XWikiAttachment xWikiAttachmentMock = mock();
         when(this.document.getExactAttachment("file.txt")).thenReturn(xWikiAttachmentMock);
         assertFalse(this.attachmentsManager.available(ATTACHMENT_LOCATION));
     }

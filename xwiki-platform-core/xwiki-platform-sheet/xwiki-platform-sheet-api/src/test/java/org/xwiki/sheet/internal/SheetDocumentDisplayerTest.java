@@ -272,7 +272,7 @@ class SheetDocumentDisplayerTest
 
         assertSame(output, this.displayer.display(document, parameters));
 
-        assertEquals("Failed to apply sheet [wiki2:Code.Sheet]. Root cause is [Exception: Database is down]",
+        assertEquals("Failed to apply sheet [wiki2:Code.Sheet]",
             this.logCapture.getMessage(0));
     }
 }

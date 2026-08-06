@@ -156,8 +156,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
                     this.capacity = Integer.parseInt(capacityParam.trim());
                 } catch (NumberFormatException e) {
                     LOGGER.warn("Failed to parse the [xwiki.plugin.image.cache.capacity] configuration parameter. "
-                        + "Using [{}] as the cache capacity. Root cause is [{}]", this.capacity,
-                        ExceptionUtils.getRootCauseMessage(e));
+                        + "Using [{}] as the cache capacity", this.capacity, e);
                 }
             }
             lru.setMaxEntries(this.capacity);

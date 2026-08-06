@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -58,8 +57,7 @@ public class DefaultWikiPropertyGroupManager implements WikiPropertyGroupManager
             try {
                 descriptor.addPropertyGroup(provider.get(wikiId));
             } catch (WikiPropertyGroupException e) {
-                logger.warn("Unable to load property groups [{}]. Root cause is [{}]", propertyGroupName,
-                    ExceptionUtils.getRootCauseMessage(e));
+                logger.warn("Unable to load property groups [{}]", propertyGroupName, e);
             }
         }
     }

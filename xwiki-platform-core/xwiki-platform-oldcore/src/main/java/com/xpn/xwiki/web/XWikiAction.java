@@ -707,8 +707,7 @@ public abstract class XWikiAction implements LegacyAction
                         if ("IOException: Broken pipe".equals(ExceptionUtils.getRootCauseMessage(e))) {
                             return;
                         }
-                        LOGGER.warn("Uncaught exception. Root cause is [{}]",
-                            ExceptionUtils.getRootCauseMessage(e));
+                        LOGGER.warn("Uncaught exception", e);
                     }
                     // If the request is an AJAX request, we don't return a whole HTML page, but just the exception
                     // inline.

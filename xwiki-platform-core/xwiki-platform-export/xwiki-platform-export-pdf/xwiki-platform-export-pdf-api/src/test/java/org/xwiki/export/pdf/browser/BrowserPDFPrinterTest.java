@@ -271,8 +271,7 @@ class BrowserPDFPrinterTest
         when(this.browserManager.isConnected()).thenThrow(exception);
         assertFalse(this.printer.isAvailable());
 
-        verify(this.logger).warn("Failed to connect to the web browser used for server-side PDF printing. "
-            + "Root cause is [{}]", "RuntimeException: Connection failed!");
+        verify(this.logger).warn("Failed to connect to the web browser used for server-side PDF printing", exception);
     }
 
     @Test

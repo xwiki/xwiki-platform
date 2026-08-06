@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.api;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
@@ -122,8 +121,8 @@ public class User extends Api
                 result = this.user.isUserInGroup(groupName, getXWikiContext());
             }
         } catch (Exception ex) {
-            LOGGER.warn("Unhandled exception while checking if user [{}] belongs to group [{}]. Root cause is [{}]",
-                this.user, groupName, ExceptionUtils.getRootCauseMessage(ex));
+            LOGGER.warn("Unhandled exception while checking if user [{}] belongs to group [{}]",
+                this.user, groupName, ex);
         }
         return result;
     }

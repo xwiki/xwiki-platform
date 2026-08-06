@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.annotation.maintainer.AnnotationMaintainer;
 import org.xwiki.annotation.maintainer.MaintainerServiceException;
@@ -98,8 +97,8 @@ public class DocumentContentAnnotationUpdateListener extends AbstractLocalEventL
                 maintainer.updateAnnotations(this.serializer.serialize(currentDocument.getDocumentReference()),
                     previousContent, content);
             } catch (MaintainerServiceException e) {
-                this.logger.warn("Failed to maintain the annotations of document [{}]. Root cause is [{}]",
-                    currentDocument.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("Failed to maintain the annotations of document [{}]",
+                    currentDocument.getDocumentReference(), e);
                 // nothing else, just go further
             }
             isUpdating = false;

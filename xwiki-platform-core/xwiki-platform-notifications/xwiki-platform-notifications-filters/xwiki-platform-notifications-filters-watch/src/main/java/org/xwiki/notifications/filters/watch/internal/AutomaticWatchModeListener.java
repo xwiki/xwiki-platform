@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -143,8 +142,8 @@ public class AutomaticWatchModeListener extends AbstractEventListener
                 watchedEntitiesManager.watchEntity(
                         factory.createWatchedLocationReference(currentDoc.getDocumentReference()), userReference);
             } catch (NotificationException e) {
-                logger.warn("Failed to watch document [{}] for user [{}]. Root cause is [{}]",
-                        currentDoc.getDocumentReference(), userReference, ExceptionUtils.getRootCauseMessage(e));
+                logger.warn("Failed to watch document [{}] for user [{}]",
+                    currentDoc.getDocumentReference(), userReference, e);
             }
         }
     }

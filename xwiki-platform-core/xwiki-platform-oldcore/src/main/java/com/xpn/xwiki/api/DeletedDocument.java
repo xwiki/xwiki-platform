@@ -23,7 +23,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -210,8 +209,7 @@ public class DeletedDocument extends Api
             return cal.before(Calendar.getInstance());
         } catch (Exception ex) {
             // Public APIs should not throw exceptions
-            LOGGER.warn("Failed to check if entry [{}] can be removed from the recycle bin. Root cause is [{}]",
-                getId(), ExceptionUtils.getRootCauseMessage(ex));
+            LOGGER.warn("Failed to check if entry [{}] can be removed from the recycle bin", getId(), ex);
             return false;
         }
     }
@@ -238,8 +236,7 @@ public class DeletedDocument extends Api
             try {
                 return new Document(this.deletedDoc.restoreDocument(null, this.context), this.context);
             } catch (XWikiException e) {
-                LOGGER.warn("Failed to restore deleted document [{}]. Root cause is [{}]", getFullName(),
-                    ExceptionUtils.getRootCauseMessage(e));
+                LOGGER.warn("Failed to restore deleted document [{}]", getFullName(), e);
             }
         }
 

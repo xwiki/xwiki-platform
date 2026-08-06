@@ -38,6 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -78,8 +80,7 @@ class XMLScriptServiceTest
             }
         }
 
-        verify(logger).warn("Cannot initialize the XML Script Service. Root cause is [{}]",
-            "ClassNotFoundException: does.not.exist.DOMImplementationSource");
+        verify(logger).warn(eq("Cannot initialize the XML Script Service"), any(ClassNotFoundException.class));
     }
 
     @Test

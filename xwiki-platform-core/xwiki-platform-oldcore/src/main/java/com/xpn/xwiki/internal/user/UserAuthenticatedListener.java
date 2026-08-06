@@ -70,7 +70,7 @@ public class UserAuthenticatedListener extends AbstractLocalEventListener
             // ID should not cause problems, it's just not strictly required.
             // We also assume all authenticator properly send UserAuthenticatedEvent events. If it's not the case, it's
             // probably a bug to fix, and the authenticator can always add its own session fixation protection.
-            servletResuest.getRequest().changeSessionId();
+            servletResuest.getHttpServletRequest().changeSessionId();
         }
     }
 }

@@ -294,7 +294,9 @@ public class DefaultQuery implements SecureQuery
         if (!this.filters.contains(filter)) {
             this.filters.add(filter);
         } else {
-            LOGGER.warn("QueryFilter [{}] already added to the query [{}]", filter, this.getStatement());
+            // Stringify the filter at the call site: it can be provided by an extension, and a log captured in a job
+            // status is serialized, which loses any argument whose class cannot be resolved when it is read back.
+            LOGGER.warn("QueryFilter [{}] already added to the query [{}]", filter.toString(), this.getStatement());
         }
 
         return this;

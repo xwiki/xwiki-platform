@@ -26,9 +26,11 @@ import java.io.UnsupportedEncodingException;
 import javax.xml.transform.stream.StreamSource;
 
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.LSInput;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
@@ -36,6 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for {@link org.xwiki.xml.script.XMLScriptService}.
@@ -46,8 +50,37 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ComponentTest
 class XMLScriptServiceTest
 {
+    /**
+     * The system property read by {@link org.w3c.dom.bootstrap.DOMImplementationRegistry} to locate the
+     * {@code DOMImplementationSource} classes to use.
+     */
+    private static final String SOURCE_LIST_PROPERTY = "org.w3c.dom.DOMImplementationSourceList";
+
     @InjectMockComponents
     private XMLScriptService xml;
+
+    @Test
+    void initializeWhenNoDOMImplementationAvailable()
+    {
+        XMLScriptService service = new XMLScriptService();
+        Logger logger = mock();
+        ReflectionUtils.setFieldValue(service, "logger", logger);
+
+        // Point the DOM implementation registry at a source class that doesn't exist so that its instantiation fails.
+        String savedSourceList = System.setProperty(SOURCE_LIST_PROPERTY, "does.not.exist.DOMImplementationSource");
+        try {
+            service.initialize();
+        } finally {
+            if (savedSourceList == null) {
+                System.clearProperty(SOURCE_LIST_PROPERTY);
+            } else {
+                System.setProperty(SOURCE_LIST_PROPERTY, savedSourceList);
+            }
+        }
+
+        verify(logger).warn("Cannot initialize the XML Script Service. Root cause is [{}]",
+            "ClassNotFoundException: does.not.exist.DOMImplementationSource");
+    }
 
     @Test
     void testGetDomDocument()

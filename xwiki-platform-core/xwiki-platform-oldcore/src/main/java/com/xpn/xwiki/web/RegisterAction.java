@@ -58,15 +58,15 @@ public class RegisterAction extends XWikiAction
      */
     private static final String REG_CONSTANT = "reg";
 
-    /** Logger. */
-    @Inject
-    private Logger logger;
-
     /** Space where the registration config and class are stored. */
     private static final String WIKI_SPACE = "XWiki";
 
     /** Allowed templates for this action. */
     private static final List<String> ALLOWED_TEMPLATES = Arrays.asList(REGISTER, "registerinline");
+
+    /** Logger. */
+    @Inject
+    private Logger logger;
 
     @Inject
     private RegistrationConfiguration registrationConfiguration;

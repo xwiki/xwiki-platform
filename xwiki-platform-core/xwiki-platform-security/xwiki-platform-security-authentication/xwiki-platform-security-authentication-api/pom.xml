@@ -36,6 +36,9 @@
     <xwiki.jacoco.instructionRatio>0.10</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Authentication API</xwiki.extension.name>
+
+    <!-- ID of the package which is not needed anymore in this version of XWiki, because it include the same APIs  -->
+    <xwiki.extension.features>org.xwiki.contrib:userauthenticatedevent-backport</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

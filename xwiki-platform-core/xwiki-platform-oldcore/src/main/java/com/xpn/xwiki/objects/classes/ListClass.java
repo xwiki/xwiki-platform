@@ -868,8 +868,9 @@ public abstract class ListClass extends PropertyClass
             }
             radio.addElement(display);
 
-            buffer.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-" + XMLUtils.escape(name) + "-"
-                + object.getNumber() + "-" + count++ + "\">");
+            buffer.append("<label class=\"xwiki-form-listclass\" for=\"xwiki-form-")
+                .append(XMLUtils.escape(name)).append('-').append(object.getNumber()).append('-')
+                .append(count++).append("\">");
             buffer.append(radio.toString());
             buffer.append("</label>");
         }

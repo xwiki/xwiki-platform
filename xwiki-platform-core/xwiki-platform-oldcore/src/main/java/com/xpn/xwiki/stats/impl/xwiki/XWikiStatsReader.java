@@ -431,7 +431,7 @@ public class XWikiStatsReader
                 }
 
                 paramList.add(this.compactwikiEntityReferenceSerializer.serialize(user));
-                userListWhere.append("?" + paramList.size());
+                userListWhere.append('?').append(paramList.size());
             }
         } catch (Exception e) {
             LOGGER.error("Failed to get filter users list", e);

@@ -2549,7 +2549,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         XWikiContext context) throws XWikiException
     {
         String sql = createSQLQuery(SELECT_DISTINCT_DOC_FULLNAME, wheresql);
-        return searchDocumentReferencesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
+        return searchDocumentReferencesInternal(sql, nb, start, Collections.emptyList(), context);
     }
 
     @Override
@@ -2557,7 +2557,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         XWikiContext context) throws XWikiException
     {
         String sql = createSQLQuery(SELECT_DISTINCT_DOC_FULLNAME, wheresql);
-        return searchDocumentsNamesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
+        return searchDocumentsNamesInternal(sql, nb, start, Collections.emptyList(), context);
     }
 
     @Override

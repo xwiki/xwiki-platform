@@ -103,7 +103,7 @@ public class DownloadAction extends XWikiAction
     private static final String RANGE_HEADER_NAME = "Range";
 
     /** The format of a valid range header. */
-    private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=([0-9]+)?-([0-9]+)?");
+    private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=(\\d+)?-(\\d+)?");
 
     @Inject
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;

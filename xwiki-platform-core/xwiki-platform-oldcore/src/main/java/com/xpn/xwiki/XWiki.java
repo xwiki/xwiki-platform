@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1715,12 +1716,12 @@ public class XWiki implements EventListener
         if (getEnvironment() != null) {
             try (InputStream is = getResourceAsStream(name)) {
                 if (is != null) {
-                    return IOUtils.toString(is, DEFAULT_ENCODING);
+                    return IOUtils.toString(is, StandardCharsets.UTF_8);
                 }
             }
         }
         // Resources should always be encoded as UTF-8, to reduce the dependency on the system encoding
-        return FileUtils.readFileToString(new File(name), DEFAULT_ENCODING);
+        return FileUtils.readFileToString(new File(name), StandardCharsets.UTF_8);
     }
 
     public Date getResourceLastModificationDate(String name)
@@ -3381,8 +3382,11 @@ public class XWiki implements EventListener
             return contextLanguage;
         }
 
-        String language = "", requestLanguage = "", userPreferenceLanguage = "", navigatorLanguage = "",
-            cookieLanguage = "";
+        String language = "";
+        String requestLanguage = "";
+        String userPreferenceLanguage = "";
+        String navigatorLanguage = "";
+        String cookieLanguage = "";
         boolean setCookie = false;
 
         if (!context.getWiki().isMultiLingual(context)) {
@@ -3474,8 +3478,12 @@ public class XWiki implements EventListener
     // TODO: move implementation to #getInterfaceLocalePreference
     public String getInterfaceLanguagePreference(XWikiContext context)
     {
-        String language = "", requestLanguage = "", userPreferenceLanguage = "", navigatorLanguage = "",
-            cookieLanguage = "", contextLanguage = "";
+        String language = "";
+        String requestLanguage = "";
+        String userPreferenceLanguage = "";
+        String navigatorLanguage = "";
+        String cookieLanguage = "";
+        String contextLanguage = "";
         boolean setCookie = false;
 
         if (!context.getWiki().isMultiLingual(context)) {
@@ -3629,7 +3637,7 @@ public class XWiki implements EventListener
 
         // If we use the Cache Store layer.. we need to flush it
         XWikiStoreInterface store = getStore();
-        if ((store != null) && (store instanceof XWikiCacheStoreInterface)) {
+        if (store instanceof XWikiCacheStoreInterface) {
             ((XWikiCacheStoreInterface) getStore()).flushCache();
         }
         // Flush renderers.. Groovy renderer has a cache
@@ -4447,11 +4455,15 @@ public class XWiki implements EventListener
 
     public String include(String topic, boolean isForm, XWikiContext context) throws XWikiException
     {
-        String database = null, incdatabase = null;
-        String prefixedTopic, localTopic;
+        String database = null;
+        String incdatabase = null;
+        String prefixedTopic;
+        String localTopic;
 
         // Save current documents in script context
-        Document currentAPIdoc = null, currentAPIcdoc = null, currentAPItdoc = null;
+        Document currentAPIdoc = null;
+        Document currentAPIcdoc = null;
+        Document currentAPItdoc = null;
         ScriptContextManager scritContextManager = Utils.getComponent(ScriptContextManager.class);
         ScriptContext scontext = scritContextManager.getScriptContext();
         String currentDocName = context.getWikiId() + ":" + context.getDoc().getFullName();

@@ -53,14 +53,14 @@ public class EditForm extends XWikiForm
      * {@code XWiki.XWikiRights_0_member}).
      */
     private static final Pattern XPROPERTY_REFERENCE_PATTERN =
-        Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)_(.+)$");
+        Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_(\\d+)_(.+)$");
 
     /**
      * Format for passing xobjects references in URLs. General format:
      * {@code &lt;space&gt;.&lt;pageClass&gt;_<number>} (e.g.
      * {@code XWiki.XWikiRights_0}).
      */
-    private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)$");
+    private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_(\\d+)$");
 
     // ---- Form fields -------------------------------------------------
     private String content;

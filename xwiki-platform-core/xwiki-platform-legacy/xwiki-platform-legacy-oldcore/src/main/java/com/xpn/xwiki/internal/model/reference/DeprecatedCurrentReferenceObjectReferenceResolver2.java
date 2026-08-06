@@ -57,6 +57,6 @@ public class DeprecatedCurrentReferenceObjectReferenceResolver2 implements Objec
     @Override
     public ObjectReference resolve(EntityReference objectReferenceRepresentation)
     {
-        return this.resolver.resolve((EntityReference) objectReferenceRepresentation);
+        return this.resolver.resolve(objectReferenceRepresentation);
     }
 }

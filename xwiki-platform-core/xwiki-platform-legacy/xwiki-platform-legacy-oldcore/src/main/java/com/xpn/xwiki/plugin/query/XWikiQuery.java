@@ -61,7 +61,7 @@ public class XWikiQuery extends XWikiCriteria
         Set<String> properties = bclass.getPropertyList();
         Iterator<String> propid = properties.iterator();
         while (propid.hasNext()) {
-            String propname = (String) propid.next();
+            String propname = propid.next();
             Map<String, String[]> map = Util.getObject(request, className + "_" + propname);
             try {
                 PropertyClass.class.getMethod("fromSearchMap", XWikiQuery.class, Map.class).invoke(

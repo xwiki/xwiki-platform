@@ -22,6 +22,7 @@ package org.xwiki.livedata.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -105,7 +106,7 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
     private LiveDataConfiguration mergeBaseConfig(LiveDataConfiguration config) throws LiveDataException, IOException
     {
         InputStream baseConfigInputStream = getClass().getResourceAsStream("/liveDataConfiguration.json");
-        String baseConfigJSON = IOUtils.toString(baseConfigInputStream, "UTF-8");
+        String baseConfigJSON = IOUtils.toString(baseConfigInputStream, StandardCharsets.UTF_8);
         LiveDataConfiguration baseConfig = this.stringLiveDataConfigResolver.resolve(baseConfigJSON);
 
         // Make sure both configurations have the same id so that they are properly merged.

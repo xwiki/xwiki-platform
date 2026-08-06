@@ -427,7 +427,8 @@ public class DBListClass extends ListClass
     // return first or second column from user query
     public String returnCol(String hqlQuery, boolean first)
     {
-        String firstCol = "-", secondCol = "-";
+        String firstCol = "-";
+        String secondCol = "-";
         if (StringUtils.isEmpty(hqlQuery)) {
             return firstCol;
         }
@@ -547,7 +548,8 @@ public class DBListClass extends ListClass
                 String classname = this.getObject().getName();
                 String fieldname = this.getName();
                 String hibquery = this.getSql();
-                String secondCol = "-", firstCol = "-";
+                String secondCol = "-";
+                String firstCol = "-";
 
                 if (hibquery != null && !hibquery.isEmpty()) {
                     firstCol = returnCol(hibquery, true);

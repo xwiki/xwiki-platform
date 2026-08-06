@@ -100,6 +100,20 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
     private static final String TIMEZONE_FIELD = "timezone";
 
     /**
+     * The name of the field containing the user type.
+     *
+     * @since 18.7.0RC1
+     */
+    public static final String USERTYPE_FIELD = "usertype";
+
+    /**
+     * The default value of the {@link #USERTYPE_FIELD} field.
+     *
+     * @since 18.7.0RC1
+     */
+    public static final String USERTYPE_DEFAULT_VALUE = "Simple";
+
+    /**
      * Used to bind a class to a document sheet.
      */
     @Inject
@@ -130,7 +144,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addStaticListField("imtype", "IM Type", "AIM|Yahoo|Jabber|MSN|Skype|ICQ");
         xclass.addTextField("imaccount", "imaccount", 30);
         xclass.addStaticListField("editor", "Default Editor", "Text|Wysiwyg");
-        xclass.addStaticListField("usertype", "User type", "Simple|Advanced", "Simple");
+        xclass.addStaticListField(USERTYPE_FIELD, "User type", "Simple|Advanced", USERTYPE_DEFAULT_VALUE);
         xclass.addStaticListField("underline", "Underline links", "OnlyInlineLinks|Yes|No", "OnlyInlineLinks");
         xclass.addBooleanField("displayHiddenDocuments", "Display Hidden Documents", "yesno");
         xclass.addTimezoneField(TIMEZONE_FIELD, "Time Zone", 30);

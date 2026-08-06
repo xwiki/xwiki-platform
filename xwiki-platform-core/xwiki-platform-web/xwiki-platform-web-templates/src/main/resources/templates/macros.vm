@@ -242,6 +242,10 @@ $xwiki.getUserName("xwiki:${username}")
  *   useInlineHTML: false, // whether to use in-line HTML elements to display the user or not
  *   wrapAvatar: false // whether to wrap the avatar image with a span or not
  *   displayLink: true // @since 15.9 ; whether to wrap the user name in a link to the user profile
+ *   avatarSize: 120 // @since 18.7.0RC1 ; the size (in pixels) of the avatar
+ *   displayName: true // @since 18.7.0RC1 ; whether to visually display the name (it stays exposed to assistive
+ *                      // technologies either way, through a native tooltip on the avatar when false); set to
+ *                      // false together with displayLink when the avatar alone is enough on screen
  * }
  *#
 #macro (displayUser $arg $options)
@@ -258,7 +262,9 @@ $xwiki.getUserName("xwiki:${username}")
     'showAlias': false,
     'useInlineHTML': false,
     'wrapAvatar': false,
-    'displayLink': true
+    'displayLink': true,
+    'avatarSize': 120,
+    'displayName': true
   })
   #if ($options.entrySet())
     #set ($discard = $macro.options.putAll($options))
@@ -301,12 +307,21 @@ $xwiki.getUserName("xwiki:${username}")
       #set ($userAliasDisplay = "<span class=""${type}-alias"">" + $escapetool.xml($userAlias) + '</span>')
     #end
     #set ($escapedUserName = $escapetool.xml($userName))
-    #getUserAvatarURL($userReference $avatarURL 120)
+    #getUserAvatarURL($userReference $avatarURL $macro.options.avatarSize)
     #set ($avatarWrapperStart = '')
     #set ($avatarWrapperEnd = '')
     #if ($macro.options.wrapAvatar)
       #set ($avatarWrapperStart = "<span class=""${type}-avatar-wrapper"">")
       #set ($avatarWrapperEnd = '</span>')
+    #end
+    #set ($avatarExtraAttributes = '')
+    #set ($displayedUserName = $escapedUserName)
+    #if (!$macro.options.displayName)
+      ## The name isn't visible, so give the avatar a native tooltip instead - and hide it from assistive
+      ## technologies since it now carries a tooltip duplicating the name; without this, some screen readers
+      ## announce the name a second time on hover (see XWIKI-23710).
+      #set ($avatarExtraAttributes = " title=""$escapedUserName"" aria-hidden=""true""")
+      #set ($displayedUserName = "<span class=""sr-only"">$escapedUserName</span>")
     #end
     #set($userNameTagAttributes = "class=""${type}-name""")
     #if ($macro.options.displayLink)
@@ -320,9 +335,9 @@ $xwiki.getUserName("xwiki:${username}")
       "<$userTag class=""$type"" data-reference=""$escapetool.xml($userReference)"">",
         "<$userNameTag $userNameTagAttributes>",
         $avatarWrapperStart,
-          "<img class=""${type}-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt="""" />",
+          "<img class=""${type}-avatar""$avatarExtraAttributes src=""$escapetool.xml($avatarURL.url)"" alt="""" />",
         $avatarWrapperEnd,
-        $escapedUserName,
+        $displayedUserName,
         "</$userNameTag>",
         $userAliasDisplay,
       "</$userTag>"

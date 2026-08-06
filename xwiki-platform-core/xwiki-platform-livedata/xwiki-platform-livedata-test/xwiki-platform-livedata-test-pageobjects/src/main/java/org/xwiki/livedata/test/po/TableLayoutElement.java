@@ -869,7 +869,10 @@ public class TableLayoutElement extends BaseElement
      */
     public void setNewEntryCell(String columnLabel, String fieldName, String value)
     {
-        setNewEntryCell(countRows(), columnLabel, fieldName, value);
+        WebElement input = setNewEntryCell(countRows(), columnLabel, fieldName, value);
+        // Ensure all editors have closed by clicking a fixed element outside the livedata.
+        getDriver().findElement(By.cssSelector("#document-title")).click();
+        getDriver().waitUntilCondition(ExpectedConditions.stalenessOf(input));
     }
 
     /**

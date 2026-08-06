@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Deprecated
@@ -48,7 +49,12 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface
                 notifyPage(xnotif, rule, doc, action, context);
             }
         } catch (Throwable e) {
-            LOGGER.error("Error executing notifications", e);
+            XWikiException e2 =
+                new XWikiException(XWikiException.MODULE_XWIKI_NOTIFICATION, XWikiException.ERROR_XWIKI_NOTIFICATION,
+                    "Error executing notifications", e);
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(e2.getFullMessage());
+            }
         }
     }
 
@@ -64,7 +70,14 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface
                 notif.notify(rule, doc, action, context);
             }
         } catch (Throwable e) {
-            LOGGER.error("Error parsing groovy notification for page [{}]", page, e);
+            Object[] args = {page};
+            XWikiException e2 =
+                new XWikiException(XWikiException.MODULE_XWIKI_GROOVY,
+                    XWikiException.ERROR_XWIKI_GROOVY_EXECUTION_FAILED,
+                    "Error parsing groovy notification for page {0}", e, args);
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(e2.getFullMessage());
+            }
         }
     }
 }

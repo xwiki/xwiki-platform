@@ -158,9 +158,6 @@ public class R180700000XWIKI16742DataMigration extends AbstractHibernateDataMigr
         // This condition should never happen normally, but we might imagine so DB with stale objects for some
         // reasons, so we won't take the chance.
         if (userObject != null) {
-            // Go through the property class's own factory rather than setStringValue() so that the property is
-            // created with the storage type the class is actually configured for (e.g. a
-            // StringListProperty/DBStringListProperty if the field has been customized to be multiSelect).
             userObject.safeput(XWikiUsersDocumentInitializer.USERTYPE_FIELD,
                 userTypeProperty.fromString(userTypeProperty.getDefaultValue()));
 

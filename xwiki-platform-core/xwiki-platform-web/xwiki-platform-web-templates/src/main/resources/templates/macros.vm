@@ -245,9 +245,7 @@ $xwiki.getUserName("xwiki:${username}")
  *   avatarCssClass: '' // @since 18.7.0RC1 ; extra CSS class(es) to add on the avatar image; available classes
  *                       // are "small-avatar"/"medium-avatar"/"large-avatar" for the size and "circle-avatar"
  *                       // for a fully rounded avatar
- *   displayName: true // @since 18.7.0RC1 ; whether to visually display the name (it stays exposed to assistive
- *                      // technologies either way, through a native tooltip on the avatar when false); set to
- *                      // false together with displayLink when the avatar alone is enough on screen
+ *   displayName: true // @since 18.7.0RC1 ; whether to visually display the name
  * }
  *#
 #macro (displayUser $arg $options)

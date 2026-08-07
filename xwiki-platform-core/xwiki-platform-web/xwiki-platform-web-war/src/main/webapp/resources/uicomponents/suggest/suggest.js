@@ -52,6 +52,10 @@ var XWiki = (function(XWiki){
     cache : false,
     seps : "",
     icon : null,
+    // Pre-rendered HTML for the icon displayed on each suggestion (e.g. from the icon theme via
+    // $services.icon.renderHTML). Unlike `icon`, which is a URL painted as a background image, this is inserted as-is
+    // at the start of each suggestion entry.
+    iconHTML : '',
     // The name of the JSON variable or XML element holding the results.
     // "results" for the old suggest, "searchResults" for the REST search.
     resultsParameter : "results",
@@ -795,6 +799,9 @@ var XWiki = (function(XWiki){
         var iconElement = new Element('i', {'class': 'icon ' + data.icon});
       }
       displayNode.insert({top: iconElement});
+    } else if (source.iconHTML) {
+      // The icon is provided as pre-rendered HTML by the source (e.g. from the icon theme).
+      displayNode.insert({top: source.iconHTML});
     }
     return displayNode;
   },

@@ -1615,11 +1615,13 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     #set ($linkLabel = $escapetool.xml($buttontext))
     #set ($modalUrl = $escapetool.xml("$xcontext.macro.doc.URL?$escapetool.url($queryString)"))
     {{html clean="false"}}
-      &lt;span class="buttonwrapper"&gt;
-        &lt;button type="button" class="attachment-picker-start button"
-          title="$!{linkLabel}"
-          data-modal-url="${modalUrl}"&gt;$!linkLabel&lt;/button&gt;
-      &lt;/span&gt;
+      &lt;p&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;button type="button" class="attachment-picker-start button"
+            title="$!{linkLabel}"
+            data-modal-url="${modalUrl}"&gt;$!linkLabel&lt;/button&gt;
+        &lt;/span&gt;
+      &lt;/p&gt;
     {{/html}}##
   #end
 #end

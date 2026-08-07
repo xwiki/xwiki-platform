@@ -20,6 +20,7 @@
 
 import { CustomFormattingToolbar } from "./CustomFormattingToolbar";
 import { FilePanel } from "./files/FilePanel";
+import { ImageSuggestionController } from "./images/ImageSuggestionController";
 import { CustomLinkToolbar } from "./links/CustomLinkToolbar";
 import {
   createBlockNoteSchema,
@@ -28,7 +29,7 @@ import {
 } from "../blocknote";
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
-import { DepsContainerContext, MacrosContext } from "../contexts";
+import { DepsContainerContext } from "../contexts";
 import { blocksToYXmlFragment } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -135,13 +136,12 @@ type BlockNoteViewWrapperProps = {
   macros:
     | {
         /**
-         * List of buildable, client-rendered macros. Optional: consumers that only use the server-rendered
-         * xwikiMacroBlock / xwikiInlineMacro specs (edited/inserted through {@link ctx}) can omit it.
+         * List of buildable macros
          *
          * @since 18.0.0RC1
          * @beta
          */
-        list?: MacroWithUnknownParamsType[];
+        list: MacroWithUnknownParamsType[];
 
         /**
          * Context for macros
@@ -231,7 +231,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   refs: { setEditor } = {},
   // eslint-disable-next-line max-statements
 }: BlockNoteViewWrapperProps) => {
-  const { t } = useTranslation();
+  console.debug(`BlockNote is now using syntax "${syntax.id}"`, syntax);
 
   const builtMacros: BlockNoteConcreteMacro[] = [];
 
@@ -246,7 +246,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
         .get()!,
     );
 
-    for (const macro of macros.list ?? []) {
+    for (const macro of macros.list) {
       builtMacros.push(
         adaptMacroForBlockNote(macro, macros.ctx, macroAstToReactJsxConverter),
       );
@@ -325,70 +325,72 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     }
   }
 
+  const { t } = useTranslation();
+
   // Renders the editor instance using a React component.
   return (
     <DepsContainerContext.Provider value={depsContainer}>
-      <MacrosContext.Provider value={macros ? macros.ctx : null}>
-        <BlockNoteView
-          editor={editor}
-          theme={theme}
-          // Override some builtin components
-          formattingToolbar={false}
-          linkToolbar={false}
-          filePanel={false}
-          slashMenu={false}
-          onChange={(editor) => onChange?.(editor)}
-        >
-          <SuggestionMenuController
-            triggerCharacter={"/"}
-            getItems={async (query) =>
-              querySuggestionsMenuItems(
-                editor,
-                query,
+      <BlockNoteView
+        editor={editor}
+        theme={theme}
+        // Override some builtin components
+        formattingToolbar={false}
+        linkToolbar={false}
+        filePanel={false}
+        slashMenu={false}
+        onChange={(editor) => onChange?.(editor)}
+      >
+        <SuggestionMenuController
+          triggerCharacter={"/"}
+          getItems={async (query) =>
+            querySuggestionsMenuItems(
+              editor,
+              query,
+              builtMacros,
+              syntax,
+              lang,
+              t,
+              macros ? macros.ctx.openInsertionEditor : undefined,
+            )
+          }
+        />
+
+        <ImageSuggestionController maxSuggestions={5} />
+
+        {/* TODO: suggestions menu for inline macros */}
+
+        <FormattingToolbarController
+          formattingToolbar={(props) => (
+            <CustomFormattingToolbar
+              formattingToolbarProps={props}
+              imageEditionOverrideFn={overrides?.imageEdition}
+              linkEditionHandler={linkEditionHandler}
+              additionalBlockTypes={filterMap(
                 builtMacros,
-                syntax,
-                lang,
-                t,
-                macros ? macros.ctx.openInsertionEditor : undefined,
-              )
-            }
-          />
+                (built) => built.dropdownTransformItem,
+              )}
+              macros={macros}
+            />
+          )}
+        />
 
-          {/* TODO: suggestions menu for inline macros */}
-
-          <FormattingToolbarController
-            formattingToolbar={(props) => (
-              <CustomFormattingToolbar
-                formattingToolbarProps={props}
-                imageEditionOverrideFn={overrides?.imageEdition}
-                linkEditionHandler={linkEditionHandler}
-                additionalBlockTypes={filterMap(
-                  builtMacros,
-                  (built) => built.dropdownTransformItem,
-                )}
-                macros={macros}
+        <LinkToolbarController
+          linkToolbar={(props) => (
+            <FormattingToolbar>
+              <CustomLinkToolbar
+                linkToolbarProps={props}
+                linkEditionFn={linkEditionHandler}
               />
-            )}
-          />
+            </FormattingToolbar>
+          )}
+        />
 
-          <LinkToolbarController
-            linkToolbar={(props) => (
-              <FormattingToolbar>
-                <CustomLinkToolbar
-                  linkToolbarProps={props}
-                  linkEditionFn={linkEditionHandler}
-                />
-              </FormattingToolbar>
-            )}
-          />
-
-          <FilePanelController
-            filePanel={({ blockId }) => (
-              <FilePanel blockId={blockId} editor={editor} />
-            )}
-          />
-        </BlockNoteView>
-      </MacrosContext.Provider>
+        <FilePanelController
+          filePanel={({ blockId }) => (
+            <FilePanel blockId={blockId} editor={editor} />
+          )}
+        />
+      </BlockNoteView>
     </DepsContainerContext.Provider>
   );
 };

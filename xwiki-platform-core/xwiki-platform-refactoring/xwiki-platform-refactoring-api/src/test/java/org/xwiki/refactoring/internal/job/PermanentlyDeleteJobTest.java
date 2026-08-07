@@ -144,7 +144,7 @@ class PermanentlyDeleteJobTest extends AbstractJobTest
     }
 
     @Test
-     void jobGroupAtWikiLevel() throws Exception
+     void jobGroupAtWikiLevel()
     {
         PermanentlyDeleteRequest request = createRequest();
         this.deleteJob.initialize(request);

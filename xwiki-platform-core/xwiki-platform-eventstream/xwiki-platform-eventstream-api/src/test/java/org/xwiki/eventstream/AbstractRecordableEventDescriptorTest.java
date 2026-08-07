@@ -70,13 +70,13 @@ class AbstractRecordableEventDescriptorTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    void getApplicationIcon() throws Exception
+    void getApplicationIcon()
     {
         assertEquals("applicationIcon :)", fakeRecordableEventDescriptor.getApplicationIcon());
     }
 
     @Test
-    void getEventType() throws Exception
+    void getEventType()
     {
         assertEquals("fake", fakeRecordableEventDescriptor.getEventType());
     }

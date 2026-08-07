@@ -250,7 +250,7 @@ class StaticListClassTest
      * Tests the suggest code generated when "use suggest" is set.
      */
     @Test
-    void testDisplayEditWithSuggest() throws Exception
+    void testDisplayEditWithSuggest()
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);

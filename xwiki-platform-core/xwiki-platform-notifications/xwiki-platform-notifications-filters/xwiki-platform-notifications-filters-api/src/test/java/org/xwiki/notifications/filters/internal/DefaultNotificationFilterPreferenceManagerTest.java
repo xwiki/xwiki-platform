@@ -84,7 +84,7 @@ class DefaultNotificationFilterPreferenceManagerTest
     }
 
     @Test
-    void filterPreferencesWithFilter() throws Exception
+    void filterPreferencesWithFilter()
     {
         NotificationFilterPreference filterPreference1 = mock(NotificationFilterPreference.class);
         when(filterPreference1.getFilterName()).thenReturn("someFilter");
@@ -105,7 +105,7 @@ class DefaultNotificationFilterPreferenceManagerTest
     }
 
     @Test
-    void filterPreferencesWithFilterAndFilterType() throws Exception
+    void filterPreferencesWithFilterAndFilterType()
     {
         NotificationFilterPreference filterPreference1 = mock(NotificationFilterPreference.class);
         when(filterPreference1.getFilterName()).thenReturn("someFilter");

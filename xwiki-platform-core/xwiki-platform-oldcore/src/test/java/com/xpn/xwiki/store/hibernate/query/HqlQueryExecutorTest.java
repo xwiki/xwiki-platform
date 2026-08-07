@@ -304,7 +304,7 @@ class HqlQueryExecutorTest
     }
 
     @Test
-    void createNamedNativeHibernateQuery() throws Exception
+    void createNamedNativeHibernateQuery()
     {
         DefaultQuery query = new DefaultQuery("queryName", this.executor);
 
@@ -335,7 +335,7 @@ class HqlQueryExecutorTest
     }
 
     @Test
-    void createHibernateQueryWhenFilter() throws Exception
+    void createHibernateQueryWhenFilter()
     {
         Session session = mock(Session.class);
 
@@ -430,7 +430,7 @@ class HqlQueryExecutorTest
     // Not allowed
 
     @Test
-    void executeWhenNotAllowedSelect() throws Exception
+    void executeWhenNotAllowedSelect()
     {
         QueryException expected = assertThrows(QueryException.class,
             () -> execute("select notallowed.name from NotAllowedTable notallowed", false));
@@ -441,7 +441,7 @@ class HqlQueryExecutorTest
     }
 
     @Test
-    void executeDeleteWithoutProgrammingRight() throws Exception
+    void executeDeleteWithoutProgrammingRight()
     {
         QueryException expected =
             assertThrows(QueryException.class, () -> execute("delete from XWikiDocument as doc", false));
@@ -450,7 +450,7 @@ class HqlQueryExecutorTest
     }
 
     @Test
-    void executeNamedQueryWithoutProgrammingRight() throws Exception
+    void executeNamedQueryWithoutProgrammingRight()
     {
         QueryException expected = assertThrows(QueryException.class, () -> executeNamed("somename", false));
         assertEquals("Named queries requires programming right. Named query = [somename]",
@@ -458,7 +458,7 @@ class HqlQueryExecutorTest
     }
 
     @Test
-    void executeUpdateWithoutProgrammingRight() throws Exception
+    void executeUpdateWithoutProgrammingRight()
     {
         QueryException expected =
             assertThrows(QueryException.class, () -> execute("update XWikiDocument set name='name'", false));

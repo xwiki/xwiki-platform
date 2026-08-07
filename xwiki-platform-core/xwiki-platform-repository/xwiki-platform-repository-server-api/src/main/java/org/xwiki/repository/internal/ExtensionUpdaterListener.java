@@ -41,11 +41,21 @@ import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * Keep the extension page up to date.
+ * 
+ * @version $Id$
+ */
 @Component
-@Named("ExtensionUpdaterListener")
+@Named(ExtensionUpdaterListener.NAME)
 @Singleton
 public class ExtensionUpdaterListener extends AbstractEventListener
 {
+    /**
+     * The name of the listener.
+     */
+    public static final String NAME = "ExtensionUpdaterListener";
+
     private static final BeginEvent IMPORT_PROCESS = new ExtensionImportStartingEvent();
 
     /**
@@ -61,13 +71,12 @@ public class ExtensionUpdaterListener extends AbstractEventListener
     private ObservationContext observationContext;
 
     /**
-     * @param name
-     * @param events
+     * The default constructor.
      */
     public ExtensionUpdaterListener()
     {
-        super("ExtensionUpdaterListener", new DocumentCreatingEvent(), new DocumentUpdatingEvent(),
-            new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
+        super(NAME, new DocumentCreatingEvent(), new DocumentUpdatingEvent(), new DocumentCreatedEvent(),
+            new DocumentUpdatedEvent(), new DocumentDeletedEvent());
     }
 
     @Override
@@ -76,7 +85,7 @@ public class ExtensionUpdaterListener extends AbstractEventListener
         XWikiDocument document = (XWikiDocument) source;
 
         if (event instanceof DocumentCreatingEvent || event instanceof DocumentUpdatingEvent) {
-            if (document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE) != null) {
+            if (isExtensionPage(document)) {
                 // Main extension page creating/updating
                 try {
                     this.repositoryManagerProvider.get().validateExtension(document, false);
@@ -103,6 +112,11 @@ public class ExtensionUpdaterListener extends AbstractEventListener
                     e);
             }
         }
+    }
+
+    private boolean isExtensionPage(XWikiDocument document)
+    {
+        return document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE) != null;
     }
 
     private boolean isExtensionVersionPage(XWikiDocument document)

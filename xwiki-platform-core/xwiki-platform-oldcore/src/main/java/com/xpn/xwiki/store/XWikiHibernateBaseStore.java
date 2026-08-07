@@ -85,39 +85,6 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     private Execution execution;
 
     /**
-     * THis allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
-     * in the WEB-INF directory.
-     *
-     * @param xwiki
-     * @param context
-     * @deprecated 1.6M1. Use ComponentManager.lookup(String) instead.
-     */
-    @Deprecated
-    public XWikiHibernateBaseStore(XWiki xwiki, XWikiContext context)
-    {
-        String path = xwiki.Param("xwiki.store.hibernate.path", "/WEB-INF/hibernate.cfg.xml");
-        LOGGER.debug("Hibernate configuration file: [{}]", path);
-
-        this.hibernateConfiguration = new HibernateConfiguration();
-
-        setPath(path);
-    }
-
-    /**
-     * Initialize the storage engine with a specific path This is used for tests.
-     *
-     * @param hibpath
-     * @deprecated 1.6M1. Use ComponentManager.lookup(String) instead.
-     */
-    @Deprecated
-    public XWikiHibernateBaseStore(String hibpath)
-    {
-        this.hibernateConfiguration = new HibernateConfiguration();
-
-        setPath(hibpath);
-    }
-
-    /**
      * Empty constructor needed for component manager.
      */
     public XWikiHibernateBaseStore()

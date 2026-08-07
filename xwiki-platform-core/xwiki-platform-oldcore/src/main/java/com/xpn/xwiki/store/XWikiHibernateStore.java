@@ -215,44 +215,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private Optional<Set<EntityReference>> optimizedObjectClasses;
 
     /**
-     * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
-     * in the WEB-INF directory.
-     *
-     * @param xwiki
-     * @param context
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateStore(XWiki xwiki, XWikiContext context)
-    {
-        super(xwiki, context);
-        initValidColumTypes();
-    }
-
-    /**
-     * Initialize the storage engine with a specific path. This is used for tests.
-     *
-     * @param hibpath
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateStore(String hibpath)
-    {
-        super(hibpath);
-        initValidColumTypes();
-    }
-
-    /**
-     * @see #XWikiHibernateStore(XWiki, XWikiContext)
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateStore(XWikiContext context)
-    {
-        this(context.getWiki(), context);
-    }
-
-    /**
      * Empty constructor needed for component manager.
      */
     public XWikiHibernateStore()

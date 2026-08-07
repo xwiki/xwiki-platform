@@ -333,6 +333,20 @@ class FlamingoThemeIT
         editThemePage.setVariableValue("text-color", "#663300");
         // Again...
         editThemePage.selectVariableCategory("Typography");
+        // Verify that setting only "Font Family Sans Serif" (and leaving "Font Family Base" empty) is enough for
+        // the custom font to be applied, since Bootstrap LESS makes @font-family-base fall back to
+        // @font-family-sans-serif by default (see: https://jira.xwiki.org/browse/XWIKI-24593).
+        editThemePage.setVariableValue("font-family-sans-serif", "math");
+        try {
+            editThemePage.refreshPreview();
+        } catch (TimeoutException e) {
+            editThemePage.refreshPreview();
+        }
+        previewBox = editThemePage.getPreviewBox();
+        assertFalse(previewBox.hasError());
+        assertEquals("math", previewBox.getTitleFontFamily().toLowerCase());
+        previewBox.switchToDefaultContent();
+
         editThemePage.setVariableValue("font-family-base", "Monospace");
         // Change the background of the buttons using the default style. It's light enough to keep a proper contrast
         // with the button text color.

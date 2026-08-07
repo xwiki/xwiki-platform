@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import jakarta.inject.Inject;
 
 import org.hibernate.ObjectNotFoundException;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 
@@ -108,9 +107,8 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
                 return null;
             });
         } catch (Exception e) {
-            this.logger.warn("Error deleting attachment archive [{}] of doc [{}]. Root cause is [{}]",
-                attachment.getFilename(), attachment.getDoc().getDocumentReference(),
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Error deleting attachment archive [{}] of doc [{}]", attachment.getFilename(),
+                attachment.getDoc().getDocumentReference(), e);
         }
     }
 }

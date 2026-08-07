@@ -236,7 +236,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         try {
             cookie.setMaxAge(Math.round(60 * 60 * 24 * Float.parseFloat(this.cookieLife)));
         } catch (Exception e) {
-            LOGGER.error("Failed to set the cookie max age with duration [{}]", this.cookieLife, e);
+            LOGGER.error("Failed to set the cookie max age with duration [{}]", this.cookieLife);
         }
     }
 

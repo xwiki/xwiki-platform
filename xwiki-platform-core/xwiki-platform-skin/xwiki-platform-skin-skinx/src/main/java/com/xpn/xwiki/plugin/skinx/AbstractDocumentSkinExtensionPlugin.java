@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -315,7 +316,9 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             return getAuthorizationManager().hasAccess(Right.SCRIPT, EntityType.DOCUMENT, authorReference,
                 documentReference);
         } catch (XWikiException e) {
-            LOGGER.error("Error while loading [{}] for checking script right", documentReference, e);
+            LOGGER.error("Error while loading [{}] for checking script right: [{}]", documentReference,
+                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.debug("Original error stack trace: ", e);
             return false;
         }
     }

@@ -375,7 +375,8 @@ public class ExtensionStore implements Initializable, Disposable
                     }
                 }
             } catch (Exception e) {
-                this.logger.error("Failed to resolve the support plan with id [{}]", supportPlanId, e);
+                this.logger.error("Failed to resolve the support plan with id [{}]: {}", supportPlanId,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

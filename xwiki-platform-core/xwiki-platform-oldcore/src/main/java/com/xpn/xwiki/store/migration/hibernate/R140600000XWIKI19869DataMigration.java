@@ -252,8 +252,8 @@ public class R140600000XWIKI19869DataMigration extends AbstractHibernateDataMigr
                 }
             } catch (Exception e) {
                 this.logger.warn(
-                    "Failed to handle revision [{}] for user page [{}]: [{}]. It's recommended to delete this version.",
-                    node.getVersion(), userDoc.getDocumentReference(),
+                    "Failed to handle revision [{}] for user page [{}]: {}. It's recommended to delete this version.",
+                    node.getVersion().toString(), userDoc.getDocumentReference(),
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }

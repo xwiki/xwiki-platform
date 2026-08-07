@@ -485,8 +485,7 @@ public class XWiki extends Api
             }
             return result;
         } catch (Exception ex) {
-            LOGGER.warn("Failed to retrieve the deleted attachments of document [{}]. Root cause is [{}]", docName,
-                ExceptionUtils.getRootCauseMessage(ex));
+            LOGGER.warn("Failed to retrieve the deleted attachments of document [{}]", docName, ex);
         }
         return Collections.emptyList();
     }
@@ -517,8 +516,8 @@ public class XWiki extends Api
             }
             return result;
         } catch (Exception ex) {
-            LOGGER.warn("Failed to retrieve the deleted attachments named [{}] of document [{}]. Root cause is [{}]",
-                filename, docName, ExceptionUtils.getRootCauseMessage(ex));
+            LOGGER.warn("Failed to retrieve the deleted attachments named [{}] of document [{}]",
+                filename, docName, ex);
         }
         return Collections.emptyList();
     }
@@ -537,8 +536,7 @@ public class XWiki extends Api
                 return new DeletedAttachment(attachment, this.context);
             }
         } catch (Exception ex) {
-            LOGGER.warn("Failed to retrieve the deleted attachment with id [{}]. Root cause is [{}]", id,
-                ExceptionUtils.getRootCauseMessage(ex));
+            LOGGER.warn("Failed to retrieve the deleted attachment with id [{}]", id, ex);
         }
         return null;
     }
@@ -2405,8 +2403,7 @@ public class XWiki extends Api
         try {
             return this.xwiki.getURLContent(surl, username, password, this.context);
         } catch (Exception e) {
-            LOGGER.warn("Failed to retrieve content from [{}]. Root cause is [{}]", surl,
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to retrieve content from [{}]", surl, e);
             return "";
         }
     }
@@ -2428,8 +2425,7 @@ public class XWiki extends Api
         try {
             return this.xwiki.getURLContent(surl, this.context);
         } catch (Exception e) {
-            LOGGER.warn("Failed to retrieve content from [{}]. Root cause is [{}]", surl,
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to retrieve content from [{}]", surl, e);
             return "";
         }
     }

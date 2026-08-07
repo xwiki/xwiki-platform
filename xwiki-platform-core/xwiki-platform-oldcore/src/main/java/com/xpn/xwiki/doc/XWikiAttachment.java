@@ -1177,11 +1177,9 @@ public class XWikiAttachment implements Cloneable
 
                     this.attachment_archive = store.loadArchive(this, xcontext, true);
                 } catch (Exception e) {
-                    LOGGER.warn(
-                        "Failed to load archive for attachment [{}@{}]. "
-                            + "This attachment is broken, please consider re-uploading it. Root cause is [{}]",
-                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(),
-                        ExceptionUtils.getRootCauseMessage(e));
+                    LOGGER.warn("Failed to load archive for attachment [{}@{}]. This attachment is broken, please "
+                        + "consider re-uploading it",
+                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
                 }
             } finally {
                 if (currentWiki != null) {

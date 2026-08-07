@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.io.IOService;
@@ -150,7 +149,6 @@ public class XWikiAnnotationRightService implements AnnotationRightService
      */
     private void logException(Exception e, String target, String user)
     {
-        this.logger.warn("Couldn't get access rights for the target [{}] for user [{}]. Root cause is [{}]", target,
-            user, ExceptionUtils.getRootCauseMessage(e));
+        this.logger.warn("Couldn't get access rights for the target [{}] for user [{}]", target, user, e);
     }
 }

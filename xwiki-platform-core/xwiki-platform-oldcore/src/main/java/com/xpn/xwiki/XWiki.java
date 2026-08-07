@@ -1684,8 +1684,8 @@ public class XWiki implements EventListener
                 }
             } catch (Exception e) {
                 // Failed to retrieve the version, log a warning
-                LOGGER.warn("Failed to retrieve XWiki's version from [{}], using the [{}] property. Root cause is "
-                    + "[{}]", VERSION_FILE, VERSION_FILE_PROPERTY, ExceptionUtils.getRootCauseMessage(e));
+                LOGGER.warn("Failed to retrieve XWiki's version from [{}], using the [{}] property",
+                    VERSION_FILE, VERSION_FILE_PROPERTY, e);
             }
 
             if (this.version == null) {
@@ -3982,7 +3982,7 @@ public class XWiki implements EventListener
                 }
             } catch (RuntimeException ex) {
                 LOGGER.warn("Invalid regular expression for the [xwiki.validusername] property. Falling back on the "
-                    + "default one. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(ex));
+                    + "default one", ex);
                 if (!context.getUtil().match(defaultValidationRegex, xwikiname)) {
                     return -4;
                 }
@@ -4022,8 +4022,7 @@ public class XWiki implements EventListener
                 try {
                     sendValidationEmail(xwikiname, password, email, validkey, "validation_email_content", context);
                 } catch (XWikiException e) {
-                    LOGGER.warn("User [{}] created but failed to send the validation mail to them. Root cause is "
-                        + "[{}]", xwikiname, ExceptionUtils.getRootCauseMessage(e));
+                    LOGGER.warn("User [{}] created but failed to send the validation mail to them", xwikiname, e);
                     return -11;
                 }
 
@@ -4515,8 +4514,7 @@ public class XWiki implements EventListener
                         XWikiException.ERROR_XWIKI_ACCESS_DENIED, "Access to this document is denied: " + doc);
                 }
             } catch (XWikiException e) {
-                LOGGER.warn("Failed to include topic [{}]. Root cause is [{}]", topic,
-                    ExceptionUtils.getRootCauseMessage(e));
+                LOGGER.warn("Failed to include topic [{}]", topic, e);
                 return "Topic " + topic + " does not exist";
             }
 
@@ -6088,7 +6086,7 @@ public class XWiki implements EventListener
             LOGGER.debug("Initialized AuthService using Reflection.");
         } catch (Exception e) {
             LOGGER.warn("Failed to initialize the AuthService from class [{}], falling back on the standard "
-                + "authenticator. Root cause is [{}]", authClass.getName(), ExceptionUtils.getRootCauseMessage(e));
+                + "authenticator", authClass.getName(), e);
 
             this.authService = new XWikiAuthServiceImpl();
 
@@ -6121,8 +6119,7 @@ public class XWiki implements EventListener
 
                     if (!DEFAULT_RIGHT_SERVICE_CLASS.equals(rightsClass)) {
                         LOGGER.warn("Failed to initialize custom RightService [{}] by Reflection, using default "
-                            + "implementation [{}]. Root cause is [{}]", rightsClass, DEFAULT_RIGHT_SERVICE_CLASS,
-                            ExceptionUtils.getRootCauseMessage(e));
+                            + "implementation [{}]", rightsClass, DEFAULT_RIGHT_SERVICE_CLASS, e);
                         rightsClass = DEFAULT_RIGHT_SERVICE_CLASS;
                         try {
                             this.rightService = (XWikiRightService) Class.forName(rightsClass).newInstance();
@@ -6189,8 +6186,7 @@ public class XWiki implements EventListener
                 factoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
                     .getConstructor(XWiki.class).newInstance(this);
             } catch (Exception e) {
-                LOGGER.warn("Failed to initialize URLFactory Service [{}]. Root cause is [{}]", urlFactoryServiceClass,
-                    ExceptionUtils.getRootCauseMessage(e));
+                LOGGER.warn("Failed to initialize URLFactory Service [{}]", urlFactoryServiceClass, e);
             }
         }
         if (factoryService == null) {

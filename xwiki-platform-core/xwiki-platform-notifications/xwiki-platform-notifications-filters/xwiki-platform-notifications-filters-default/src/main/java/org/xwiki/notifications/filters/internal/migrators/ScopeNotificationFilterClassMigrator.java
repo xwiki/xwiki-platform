@@ -131,8 +131,7 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
                 try {
                     migrateDocument(userDocument);
                 } catch (XWikiException e) {
-                    logger.warn("Failed to migrate document [{}]. Root cause is [{}]", result,
-                        ExceptionUtils.getRootCauseMessage(e));
+                    logger.warn("Failed to migrate document [{}]", result, e);
                 }
             }
 

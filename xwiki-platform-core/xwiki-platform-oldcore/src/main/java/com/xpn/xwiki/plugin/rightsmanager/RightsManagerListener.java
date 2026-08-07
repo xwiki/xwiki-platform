@@ -22,7 +22,6 @@ package com.xpn.xwiki.plugin.rightsmanager;
 
 import java.util.List;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -118,15 +117,13 @@ public final class RightsManagerListener implements EventListener
                 try {
                     cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, true, context);
                 } catch (XWikiException e) {
-                    LOGGER.warn("Failed to clean the rights of deleted user [{}]. Root cause is [{}]", userOrGroupName,
-                        ExceptionUtils.getRootCauseMessage(e));
+                    LOGGER.warn("Failed to clean the rights of deleted user [{}]", userOrGroupName, e);
                 }
             } else if (document.getObject("XWiki.XWikiGroups") != null) {
                 try {
                     cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, false, context);
                 } catch (XWikiException e) {
-                    LOGGER.warn("Failed to clean the rights of deleted group [{}]. Root cause is [{}]",
-                        userOrGroupName, ExceptionUtils.getRootCauseMessage(e));
+                    LOGGER.warn("Failed to clean the rights of deleted group [{}]", userOrGroupName, e);
                 }
             }
         }

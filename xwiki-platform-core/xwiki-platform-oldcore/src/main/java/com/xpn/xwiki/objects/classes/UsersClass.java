@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.dom4j.Element;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.EntityReference;
@@ -113,8 +112,7 @@ public class UsersClass extends ListClass
             return (List<String>) context.getWiki().getGroupService(context)
                 .getAllMatchedUsers(null, false, 0, 0, null, context);
         } catch (XWikiException e) {
-            LOGGER.warn("Failed to retrieve the list of users. Root cause is [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to retrieve the list of users", e);
             return Collections.emptyList();
         }
     }

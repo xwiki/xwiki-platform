@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -174,14 +173,12 @@ public class GroupScriptService implements ScriptService
                     try {
                         ret = !getMembers(candidate, true).contains(target);
                     } catch (GroupException e) {
-                        this.logger.warn("Failed to access the members of the candidate group [{}]. "
-                            + "Root cause is [{}]", candidate, ExceptionUtils.getRootCauseMessage(e));
+                        this.logger.warn("Failed to access the members of the candidate group [{}]", candidate, e);
                         ret = false;
                     }
                 }
             } catch (GroupException e) {
-                this.logger.warn("Failed to access the members of the target group [{}]. Root cause is [{}]", target,
-                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("Failed to access the members of the target group [{}]", target, e);
                 ret = false;
             }
         }

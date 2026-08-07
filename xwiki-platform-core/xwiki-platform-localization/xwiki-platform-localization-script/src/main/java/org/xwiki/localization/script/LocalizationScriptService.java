@@ -35,7 +35,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
@@ -402,8 +401,7 @@ public class LocalizationScriptService implements ScriptService
             iterator.close();
 
         } catch (Exception e) {
-            this.logger.warn("Exception while looking for XWiki Locales. Root cause is [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Exception while looking for XWiki Locales", e);
         }
 
         return locales;

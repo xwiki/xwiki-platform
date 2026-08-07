@@ -422,8 +422,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             try {
                 return this.componentManager.getInstance(AttachmentVersioningStore.class, storeType);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Can't find attachment versioning store for type [{}]. Root cause is [{}]", storeType,
-                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("Can't find attachment versioning store for type [{}]", storeType, e);
             }
         }
 

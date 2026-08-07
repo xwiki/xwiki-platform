@@ -177,8 +177,8 @@ class BrowserPDFPrinterTest
         when(this.configuration.isXWikiURISpecified()).thenReturn(false);
         when(this.browserManager.createIncognitoTab()).thenReturn(this.browserTab);
 
-        IOException e = assertThrows(IOException.class,
-            () -> this.printer.print(new URL("http://external:9293/xwiki/bin/export/Some/Page?x=y#z")));
+        URL printPreviewURL = new URL("http://external:9293/xwiki/bin/export/Some/Page?x=y#z");
+        IOException e = assertThrows(IOException.class, () -> this.printer.print(printPreviewURL));
         assertEquals("Couldn't find an alternative print preview URL "
             + "that the web browser used for PDF printing can access.", e.getMessage());
 

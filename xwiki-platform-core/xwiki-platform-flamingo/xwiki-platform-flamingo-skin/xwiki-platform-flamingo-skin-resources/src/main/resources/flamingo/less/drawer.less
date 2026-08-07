@@ -174,6 +174,16 @@
   }
 }
 
+@media (scripting: none), (scripting: initial-only) {
+  /* If scripting (understand here: javascript) is not supported on the current context, then we want to 
+    make sure the dialog which is closed by default is still visible. 
+    It's not looking very good but at least it works :) */
+  #tmDrawer.drawer-nav {
+    display: block;
+    margin-right: 0;
+  }
+}
+
 .drawer-menu-item-icon {
   display: inline-block;
   width: 30px;

@@ -23,6 +23,16 @@
 #if ($services.debug.isEnabled())
 #template('debug.vm')
 #end
+<div class="end-of-dom-container">
+#if (($displayAdminMenu || $displayMoreActionsMenu) && $canView)
+  #template("export_modal.vm")
+  #exportModal()
+#end
+## The primary use of this extension point is to gather modal elements that did not get loaded asynchronously.
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.body.end', {'sortByParameter': 'order'}))
+  $services.rendering.render($uix.execute(), 'html/5.0')
+#end
+</div>
 </body>
 </html>
 #else ## Portlet Mode

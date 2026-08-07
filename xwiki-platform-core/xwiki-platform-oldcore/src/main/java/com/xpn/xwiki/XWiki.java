@@ -236,6 +236,7 @@ import com.xpn.xwiki.job.JobRequestContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
@@ -4250,6 +4251,16 @@ public class XWiki implements EventListener
             BaseObject userObject =
                 doc.newXObject(userClassReference.removeParent(userClassReference.getWikiReference()), context);
             userClass.fromMap(map, userObject);
+
+            // Make sure the user type property has an explicit value even when it's not part of the submitted data
+            if (userObject.safeget(XWikiUsersDocumentInitializer.USERTYPE_FIELD) == null) {
+                PropertyClass userTypeProperty =
+                    (PropertyClass) userClass.get(XWikiUsersDocumentInitializer.USERTYPE_FIELD);
+                if (userTypeProperty instanceof ListClass listUserTypeProperty) {
+                    userObject.safeput(XWikiUsersDocumentInitializer.USERTYPE_FIELD,
+                        listUserTypeProperty.fromString(listUserTypeProperty.getDefaultValue()));
+                }
+            }
 
             doc.setParentReference(parentReference);
             doc.setContent(content);

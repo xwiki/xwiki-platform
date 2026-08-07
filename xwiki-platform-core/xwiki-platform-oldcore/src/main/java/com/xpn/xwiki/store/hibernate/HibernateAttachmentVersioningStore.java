@@ -52,16 +52,6 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
     private Logger logger;
 
     /**
-     * @param context the current context.
-     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentVersioningStore.class) instead.
-     */
-    @Deprecated
-    public HibernateAttachmentVersioningStore(XWikiContext context)
-    {
-        super(context.getWiki(), context);
-    }
-
-    /**
      * Empty constructor needed for component manager.
      */
     public HibernateAttachmentVersioningStore()

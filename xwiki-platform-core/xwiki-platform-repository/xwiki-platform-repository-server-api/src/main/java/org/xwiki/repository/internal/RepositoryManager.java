@@ -80,6 +80,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -203,6 +204,9 @@ public class RepositoryManager
     private ContextualAuthorizationManager authorization;
 
     @Inject
+    private ObservationManager observation;
+
+    @Inject
     private Logger logger;
 
     private int maxTitleSize = -1;
@@ -237,12 +241,7 @@ public class RepositoryManager
         // Update last version field
 
         String lastVersion = StringUtils.defaultString(findExtensionLastVersion(document));
-        if (!Strings.CS.equals(lastVersion, this.extensionStore.getValue(extensionObject,
-            XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, (String) null))) {
-            extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion, xcontext);
-
-            needSave = true;
-        }
+        updateLastVersion(lastVersion, extensionObject, xcontext);
 
         // Update valid extension field
 
@@ -469,6 +468,68 @@ public class RepositoryManager
         for (String documentName : query.<String>execute()) {
             validateExtension(getDocument(documentName), true);
         }
+    }
+
+    /**
+     * Update the extension last version if needed.
+     * 
+     * @throws XWikiException when failing to update the last version of the extension
+     * @throws QueryException when failing to update the last version of the extension
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     * @since 17.10.12
+     */
+    public void updateLastExtensionVersion(DocumentReference extensionReference) throws XWikiException, QueryException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWikiDocument extensionDocument = xcontext.getWiki().getDocument(extensionReference, xcontext);
+
+        if (!extensionDocument.isNew()) {
+            // Avoid modifying cached document
+            extensionDocument = extensionDocument.clone();
+
+            if (updateLastExtensionVersion(extensionDocument, xcontext)) {
+                xcontext.getWiki().saveDocument(extensionDocument, "Updated last version of the extension", true,
+                    xcontext);
+            }
+        }
+    }
+
+    private boolean updateLastExtensionVersion(XWikiDocument extensionDocument, XWikiContext xcontext)
+        throws XWikiException, QueryException
+    {
+        BaseObject extensionObject = extensionDocument.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
+
+        if (extensionObject == null) {
+            // Not an extension
+            return false;
+        }
+
+        return updateLastVersion(extensionObject, xcontext);
+    }
+
+    private boolean updateLastVersion(BaseObject extensionObject, XWikiContext xcontext)
+        throws QueryException, XWikiException
+    {
+        String lastVersion = StringUtils.defaultString(findExtensionLastVersion(extensionObject.getOwnerDocument()));
+
+        return updateLastVersion(lastVersion, extensionObject, xcontext);
+    }
+
+    private boolean updateLastVersion(String lastVersion, BaseObject extensionObject, XWikiContext xcontext)
+        throws XWikiException
+    {
+        boolean needSave = false;
+
+        if (!Strings.CS.equals(lastVersion, this.extensionStore.getValue(extensionObject,
+            XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, (String) null))) {
+            extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion, xcontext);
+
+            needSave = true;
+        }
+
+        return needSave;
     }
 
     private XWikiDocument getDocument(String fullName) throws XWikiException
@@ -757,98 +818,108 @@ public class RepositoryManager
         ExtensionRepository repository, Type type, TreeMap<Version, String> remoteVersions,
         DocumentReference projectReference) throws AccessDeniedException, XWikiException, QueryException
     {
-        boolean needSave = extensionDocument.isNew();
+        this.observation.notify(new ExtensionImportStartingEvent(), extensionDocument);
 
-        XWikiContext xcontext = this.xcontextProvider.get();
+        try {
+            boolean needSave = extensionDocument.isNew();
 
-        String extensionId = extension.getId().getId();
+            XWikiContext xcontext = this.xcontextProvider.get();
 
-        // Make sure the current user is allowed to edit the extension document before performing any side effect
-        // (saving the extension document, creating or deleting version pages, etc.).
-        this.authorization.checkAccess(Right.EDIT, extensionDocument.getDocumentReference());
+            String extensionId = extension.getId().getId();
 
-        // Update document
+            // Make sure the current user is allowed to edit the extension document before performing any side effect
+            // (saving the extension document, creating or deleting version pages, etc.).
+            this.authorization.checkAccess(Right.EDIT, extensionDocument.getDocumentReference());
 
-        BaseObject extensionObject = this.extensionStore.getExtensionObject(extensionDocument);
-        if (extensionObject == null) {
-            extensionObject = extensionDocument.newXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE, xcontext);
-            needSave = true;
-        }
+            // Update document
 
-        if (!Strings.CS.equals(extensionId,
-            this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID, (String) null))) {
-            extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_ID, extensionId, xcontext);
-            needSave = true;
-        }
+            BaseObject extensionObject = this.extensionStore.getExtensionObject(extensionDocument);
+            if (extensionObject == null) {
+                extensionObject = extensionDocument.newXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE, xcontext);
+                needSave = true;
+            }
 
-        // Make sure we use the dedicated version page mode
-        needSave |= this.extensionStore.setVersionPageEnabled(extensionObject);
+            if (!Strings.CS.equals(extensionId,
+                this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID, (String) null))) {
+                extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_ID, extensionId, xcontext);
+                needSave = true;
+            }
 
-        // Update main extension page
+            // Make sure we use the dedicated version page mode
+            needSave |= this.extensionStore.setVersionPageEnabled(extensionObject);
 
-        needSave |= updateExtension(extension, extensionObject, projectReference, xcontext);
-        needSave |= updateExtensionMain(extension, extensionObject, xcontext);
-        needSave |= updateExtensionVersionDependencies(extension, extensionDocument);
+            // Update main extension page
 
-        // Get former ids versions
-        TreeMap<Version, String> previousRemoteVersions = new TreeMap<>();
-        List<String> previousIds = extensionObject.getListValue(XWikiRepositoryModel.PROP_EXTENSION_PREVIOUSIDS);
-        if (previousIds.isEmpty()) {
-            // If it's empty but not explicitly empty it means it's unset so we use the old behavior of using features
-            // as previous ids
-            if (extensionObject.getIntValue(XWikiRepositoryModel.PROP_EXTENSION_PREVIOUSIDS_EMPTY, 0) == 0) {
-                Collection<ExtensionId> features = extension.getExtensionFeatures();
-                for (ExtensionId feature : features) {
+            needSave |= updateExtension(extension, extensionObject, projectReference, xcontext);
+            needSave |= updateExtensionMain(extension, extensionObject, xcontext);
+            needSave |= updateExtensionVersionDependencies(extension, extensionDocument);
+
+            // Get former ids versions
+            TreeMap<Version, String> previousRemoteVersions = new TreeMap<>();
+            List<String> previousIds = extensionObject.getListValue(XWikiRepositoryModel.PROP_EXTENSION_PREVIOUSIDS);
+            if (previousIds.isEmpty()) {
+                // If it's empty but not explicitly empty it means it's unset so we use the old behavior of using
+                // features
+                // as previous ids
+                if (extensionObject.getIntValue(XWikiRepositoryModel.PROP_EXTENSION_PREVIOUSIDS_EMPTY, 0) == 0) {
+                    Collection<ExtensionId> features = extension.getExtensionFeatures();
+                    for (ExtensionId feature : features) {
+                        try {
+                            getRemoteVersions(feature.getId(), repository, type, previousRemoteVersions);
+                        } catch (ResolveException e) {
+                            // Ignore
+                        }
+                    }
+                }
+            } else {
+                // Use the explicit previous ids
+                for (String previousId : previousIds) {
                     try {
-                        getRemoteVersions(feature.getId(), repository, type, previousRemoteVersions);
+                        getRemoteVersions(previousId, repository, type, previousRemoteVersions);
                     } catch (ResolveException e) {
                         // Ignore
                     }
                 }
             }
-        } else {
-            // Use the explicit previous ids
-            for (String previousId : previousIds) {
-                try {
-                    getRemoteVersions(previousId, repository, type, previousRemoteVersions);
-                } catch (ResolveException e) {
-                    // Ignore
-                }
+
+            // Proxy marker
+
+            BaseObject extensionProxyObject =
+                extensionDocument.getXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE);
+            if (extensionProxyObject == null) {
+                extensionProxyObject =
+                    extensionDocument.newXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE, xcontext);
+                extensionProxyObject.setIntValue(XWikiRepositoryModel.PROP_PROXY_AUTOUPDATE, 1);
+                needSave = true;
             }
+
+            needSave |= update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYID,
+                repository.getDescriptor().getId());
+            needSave |= update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYTYPE,
+                repository.getDescriptor().getType());
+            needSave |= update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYURI,
+                repository.getDescriptor().getURI().toString());
+
+            // Versions
+
+            updateExtensionVersions(extension, extensionDocument, extensionObject, repository, remoteVersions,
+                previousRemoteVersions, xcontext);
+
+            // Update last version
+            needSave |= updateLastVersion(extensionObject, xcontext);
+
+            // Save
+
+            if (needSave) {
+                saveDocument(extensionDocument,
+                    "Imported extension [" + extensionId + "] from repository [" + repository.getDescriptor() + "]",
+                    xcontext);
+            }
+
+            return extensionDocument.getDocumentReference();
+        } finally {
+            this.observation.notify(new ExtensionImportFinishedEvent(), extensionDocument);
         }
-
-        // Proxy marker
-
-        BaseObject extensionProxyObject =
-            extensionDocument.getXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE);
-        if (extensionProxyObject == null) {
-            extensionProxyObject =
-                extensionDocument.newXObject(XWikiRepositoryModel.EXTENSIONPROXY_CLASSREFERENCE, xcontext);
-            extensionProxyObject.setIntValue(XWikiRepositoryModel.PROP_PROXY_AUTOUPDATE, 1);
-            needSave = true;
-        }
-
-        needSave |= update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYID,
-            repository.getDescriptor().getId());
-        needSave |= update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYTYPE,
-            repository.getDescriptor().getType());
-        needSave |= update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYURI,
-            repository.getDescriptor().getURI().toString());
-
-        // Versions
-
-        updateExtensionVersions(extension, extensionDocument, extensionObject, repository, remoteVersions,
-            previousRemoteVersions, xcontext);
-
-        // Save
-
-        if (needSave) {
-            saveDocument(extensionDocument,
-                "Imported extension [" + extensionId + "] from repository [" + repository.getDescriptor() + "]",
-                xcontext);
-        }
-
-        return extensionDocument.getDocumentReference();
     }
 
     private boolean updateExtensionVersions(Extension extension, XWikiDocument extensionDocument,
@@ -957,7 +1028,8 @@ public class RepositoryManager
                     updateExtensionVersion(id, version, extension, repository, index, extensionDocument);
                 }
 
-                // Increment index even if the version was skipped, to ensure that the index is always incremented for each
+                // Increment index even if the version was skipped, to ensure that the index is always incremented for
+                // each
                 // version in the remoteVersions map
                 index++;
             }
@@ -1080,8 +1152,8 @@ public class RepositoryManager
     {
         EntityReference versionsSpaceReference = new EntityReference(XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME,
             EntityType.SPACE, extensionDocument.getDocumentReference().getLocalDocumentReference().getParent());
-        Query query =
-            this.queryManager.createQuery("select doc.fullName, version.version, version.index from Document doc, doc.object("
+        Query query = this.queryManager
+            .createQuery("select doc.fullName, version.version, version.index from Document doc, doc.object("
                 + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME
                 + ") version where doc.space = :spaceExact OR doc.space like :spaceLike", Query.XWQL);
         String spaceReference = this.localReferenceSerializer.serialize(versionsSpaceReference);
@@ -1116,8 +1188,8 @@ public class RepositoryManager
     {
         EntityReference versionsSpaceReference = new EntityReference(XWikiRepositoryModel.EXTENSIONVERSIONS_SPACENAME,
             EntityType.SPACE, projectDocument.getDocumentReference().getLocalDocumentReference().getParent());
-        Query query =
-            this.queryManager.createQuery("select doc.fullName, version.version, version.index from Document doc, doc.object("
+        Query query = this.queryManager
+            .createQuery("select doc.fullName, version.version, version.index from Document doc, doc.object("
                 + XWikiRepositoryModel.PROJECTVERSION_CLASSNAME
                 + ") version where doc.space = :space OR doc.space like :space", Query.XWQL);
         query.bindValue("space", this.localReferenceSerializer.serialize(versionsSpaceReference) + ".%");
@@ -1235,9 +1307,9 @@ public class RepositoryManager
             }
         }
 
-        BaseObject extensionVersionObject = extensionVersionDocument.getXObject(
-            XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, XWikiRepositoryModel.PROP_VERSION_VERSION, version,
-            false);
+        BaseObject extensionVersionObject =
+            extensionVersionDocument.getXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE,
+                XWikiRepositoryModel.PROP_VERSION_VERSION, version, false);
 
         if (extensionVersionObject == null && allowProxying
             && this.extensionStore.isVersionProxyingEnabled(extensionDocument)) {
@@ -1262,9 +1334,9 @@ public class RepositoryManager
             try {
                 XWikiDocument extensionDocumentClone = extensionDocument.clone();
                 updateExtensionVersion(extension, extensionDocumentClone, 0, xcontext);
-                extensionVersionObject = extensionDocumentClone.getXObject(
-                    XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, XWikiRepositoryModel.PROP_VERSION_VERSION,
-                    version, false);
+                extensionVersionObject =
+                    extensionDocumentClone.getXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE,
+                        XWikiRepositoryModel.PROP_VERSION_VERSION, version, false);
             } catch (XWikiException e) {
                 throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
             }
@@ -1792,8 +1864,8 @@ public class RepositoryManager
         boolean needSave = false;
 
         // Update version object
-        BaseObject versionObject =
-            this.extensionStore.getExtensionVersionObject(projectVersionDocument, extensionVersion.getId().getVersion());
+        BaseObject versionObject = this.extensionStore.getExtensionVersionObject(projectVersionDocument,
+            extensionVersion.getId().getVersion());
         if (versionObject == null) {
             versionObject =
                 projectVersionDocument.newXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, xcontext);

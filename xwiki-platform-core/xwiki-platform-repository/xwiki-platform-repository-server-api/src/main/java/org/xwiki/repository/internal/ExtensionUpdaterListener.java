@@ -19,34 +19,34 @@
  */
 package org.xwiki.repository.internal;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.observation.EventListener;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.ObservationContext;
+import org.xwiki.observation.event.BeginEvent;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 
 @Component
 @Named("ExtensionUpdaterListener")
 @Singleton
-public class ExtensionUpdaterListener implements EventListener
+public class ExtensionUpdaterListener extends AbstractEventListener
 {
-    /**
-     * Listened events.
-     */
-    private static final List<Event> EVENTS =
-        Arrays.<Event>asList(new DocumentCreatingEvent(), new DocumentUpdatingEvent());
+    private static final BeginEvent IMPORT_PROCESS = new ExtensionImportStartingEvent();
 
     /**
      * The logger to log.
@@ -57,16 +57,17 @@ public class ExtensionUpdaterListener implements EventListener
     @Inject
     private Provider<RepositoryManager> repositoryManagerProvider;
 
-    @Override
-    public List<Event> getEvents()
-    {
-        return EVENTS;
-    }
+    @Inject
+    private ObservationContext observationContext;
 
-    @Override
-    public String getName()
+    /**
+     * @param name
+     * @param events
+     */
+    public ExtensionUpdaterListener()
     {
-        return "ExtensionUpdaterListener";
+        super("ExtensionUpdaterListener", new DocumentCreatingEvent(), new DocumentUpdatingEvent(),
+            new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
     }
 
     @Override
@@ -74,15 +75,42 @@ public class ExtensionUpdaterListener implements EventListener
     {
         XWikiDocument document = (XWikiDocument) source;
 
-        BaseObject extensionObject = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-
-        if (extensionObject != null) {
+        if (event instanceof DocumentCreatingEvent || event instanceof DocumentUpdatingEvent) {
+            if (document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE) != null) {
+                // Main extension page creating/updating
+                try {
+                    this.repositoryManagerProvider.get().validateExtension(document, false);
+                } catch (Exception e) {
+                    this.logger.error("Failed to validate extension in document [{}]", document.getDocumentReference(),
+                        e);
+                }
+            }
+        } else if (!this.observationContext.isIn(IMPORT_PROCESS) && isExtensionVersionPage(document)) {
+            // Update the last version of the extension after modifying a version page, but only if not in the middle of
+            // an extension import (in which case it will be done at the end of the import)
             try {
-                this.repositoryManagerProvider.get().validateExtension(document, false);
+                // Get extension page reference from the extension version page
+                EntityReference versionParent = document.getDocumentReference().getParent().getParent().getParent();
+                if (versionParent != null) {
+                    DocumentReference extensionReference =
+                        new DocumentReference("WebHome", (SpaceReference) versionParent);
+
+                    // Update the last version of the extension
+                    this.repositoryManagerProvider.get().updateLastExtensionVersion(extensionReference);
+                }
             } catch (Exception e) {
-                this.logger.error("Failed to validate extension in document [{}]", document.getDocumentReference(), e);
+                this.logger.error("Failed to update extension for version page [{}]", document.getDocumentReference(),
+                    e);
             }
         }
     }
 
+    private boolean isExtensionVersionPage(XWikiDocument document)
+    {
+        return (document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE) == null
+            && document.getXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE) != null)
+            || (document.getOriginalDocument().getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE) == null
+                && document.getOriginalDocument()
+                    .getXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE) != null);
+    }
 }

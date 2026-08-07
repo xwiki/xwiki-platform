@@ -1515,9 +1515,6 @@ public class RepositoryManager
                 needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION,
                     scm.getDeveloperConnection().toString());
             }
-            if (scm.getTag() != null) {
-                needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMTAG, scm.getTag());
-            }
         }
 
         // Authors
@@ -1587,9 +1584,6 @@ public class RepositoryManager
             if (scm.getDeveloperConnection() != null) {
                 needSave |= update(projectObject, XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION,
                     scm.getDeveloperConnection().toString());
-            }
-            if (scm.getTag() != null) {
-                needSave |= update(projectObject, XWikiRepositoryModel.PROP_EXTENSION_SCMTAG, scm.getTag());
             }
         }
 

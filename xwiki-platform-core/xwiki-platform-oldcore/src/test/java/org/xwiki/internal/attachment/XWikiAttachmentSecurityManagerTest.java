@@ -39,7 +39,6 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -97,7 +96,7 @@ class XWikiAttachmentSecurityManagerTest
     }
 
     @Test
-    void downloadWhenForce() throws XWikiException, IOException
+    void downloadWhenForce() throws IOException
     {
         XWikiAttachment attachment = createAttachment();
         when(this.request.getParameter("force-download")).thenReturn("1");

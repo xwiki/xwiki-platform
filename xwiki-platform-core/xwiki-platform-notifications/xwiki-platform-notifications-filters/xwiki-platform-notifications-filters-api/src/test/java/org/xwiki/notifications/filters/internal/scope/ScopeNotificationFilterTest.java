@@ -122,7 +122,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void matchPreferenceWithCorrectPreference() throws Exception
+    void matchPreferenceWithCorrectPreference()
     {
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.DEFAULT);
@@ -133,7 +133,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void matchPreferenceWithIncorrectPreference() throws Exception
+    void matchPreferenceWithIncorrectPreference()
     {
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.SYSTEM);
@@ -142,13 +142,13 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void getName() throws Exception
+    void getName()
     {
         assertEquals(ScopeNotificationFilter.FILTER_NAME, this.scopeNotificationFilter.getName());
     }
 
     @Test
-    void complexCase1() throws Exception
+    void complexCase1()
     {
         // Preferences:
         //
@@ -240,7 +240,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void withTopLevelInclusiveFilters() throws Exception
+    void withTopLevelInclusiveFilters()
     {
         // Preferences:
         //
@@ -321,7 +321,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void filterExpressionWithSubQuery() throws Exception
+    void filterExpressionWithSubQuery()
     {
         NotificationPreference pref1 = mock(NotificationPreference.class);
         NotificationPreference pref2 = mock(NotificationPreference.class);

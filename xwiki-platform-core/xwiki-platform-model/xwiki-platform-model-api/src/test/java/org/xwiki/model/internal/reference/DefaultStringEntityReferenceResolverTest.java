@@ -62,7 +62,7 @@ class DefaultStringEntityReferenceResolverTest implements TestConstants
     private DefaultStringEntityReferenceResolver resolver;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         when(this.referenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
         when(this.referenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(DEFAULT_SPACE_REFERENCE);
@@ -86,7 +86,7 @@ class DefaultStringEntityReferenceResolverTest implements TestConstants
     }
 
     @Test
-    void resolveDocumentReference() throws Exception
+    void resolveDocumentReference()
     {
         EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
         assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
@@ -165,14 +165,14 @@ class DefaultStringEntityReferenceResolverTest implements TestConstants
     }
 
     @Test
-    void resolveDocumentReferenceWithReferenceParameter() throws Exception
+    void resolveDocumentReferenceWithReferenceParameter()
     {
         DocumentReference otherReference = new DocumentReference("otherwiki", "otherspace", "otherpage");
         assertEquals(otherReference, resolver.resolve("", EntityType.DOCUMENT, otherReference));
     }
 
     @Test
-    void resolveAttachmentReference() throws Exception
+    void resolveAttachmentReference()
     {
         EntityReference reference = resolver.resolve("wiki:space.page@filename.ext", EntityType.ATTACHMENT);
         assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
@@ -503,7 +503,7 @@ class DefaultStringEntityReferenceResolverTest implements TestConstants
     }
 
     @Test
-    void resolvePageReference() throws Exception
+    void resolvePageReference()
     {
         EntityReference reference;
 
@@ -557,7 +557,7 @@ class DefaultStringEntityReferenceResolverTest implements TestConstants
     }
 
     @Test
-    void resolvePageReferenceKeywords() throws Exception
+    void resolvePageReferenceKeywords()
     {
         EntityReference reference = this.resolver.resolve(".", EntityType.PAGE);
         assertEquals(new PageReference(DEFAULT_WIKI, DEFAULT_PAGE), reference);
@@ -579,7 +579,7 @@ class DefaultStringEntityReferenceResolverTest implements TestConstants
     }
 
     @Test
-    void resolvePageReferenceKeywordsWithDocumentParameter() throws Exception
+    void resolvePageReferenceKeywordsWithDocumentParameter()
     {
         EntityReference reference = this.resolver.resolve(".", EntityType.PAGE,
             new DocumentReference("wiki", Arrays.asList("space1", "space2"), DEFAULT_DOCUMENT));
@@ -597,7 +597,7 @@ class DefaultStringEntityReferenceResolverTest implements TestConstants
     }
 
     @Test
-    void resolvePageReferenceParameters() throws Exception
+    void resolvePageReferenceParameters()
     {
         PageReference pageReference = new PageReference("wiki", "space", "page");
         Map<String, Serializable> parameters = new HashMap<>();

@@ -107,7 +107,7 @@ class ModelScriptServiceTest
     }
 
     @Test
-    void createDocumentReferenceWithDefaultHint() throws Exception
+    void createDocumentReferenceWithDefaultHint()
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
         when(this.documentResolver.resolve(reference)).thenReturn(reference);
@@ -127,7 +127,7 @@ class ModelScriptServiceTest
     }
 
     @Test
-    void createPageReferenceWhenEmptyParameters() throws Exception
+    void createPageReferenceWhenEmptyParameters()
     {
         PageReference reference = new PageReference("defaultwiki", "defaultpage");
         when(this.entityResolver.resolve(null, EntityType.PAGE)).thenReturn(reference);
@@ -266,7 +266,7 @@ class ModelScriptServiceTest
     }
 
     @Test
-    void resolveSpace() throws Exception
+    void resolveSpace()
     {
         SpaceReference reference = new SpaceReference("Space", new WikiReference("wiki"));
         when(this.stringEntityReferenceResolver.resolve("x", EntityType.SPACE, new Object[] {})).thenReturn(reference);

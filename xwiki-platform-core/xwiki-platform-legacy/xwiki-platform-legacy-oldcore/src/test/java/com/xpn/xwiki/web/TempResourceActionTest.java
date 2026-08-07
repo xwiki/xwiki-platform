@@ -77,7 +77,7 @@ class TempResourceActionTest
     private TempResourceAction action;
 
     @BeforeEach
-    void beforeEach() throws Exception
+    void beforeEach()
     {
         when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
     }
@@ -136,7 +136,7 @@ class TempResourceActionTest
      * Tests {@link TempResourceAction#getTemporaryFile(String, XWikiContext)} when the file is missing.
      */
     @Test
-    void testGetTemporaryFileMissing() throws Exception
+    void testGetTemporaryFileMissing()
     {
         assertFalse(new File(this.temporaryDirectory, "temp/module/xwiki/Space/Page/file.txt").exists());
         assertNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", oldcore.getXWikiContext()));

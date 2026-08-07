@@ -40,7 +40,7 @@ class ExplicitReferenceEntityReferenceResolverTest
     private EntityReferenceResolver<EntityReference> resolver;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         this.resolver = new ExplicitReferenceEntityReferenceResolver();
     }

@@ -28,7 +28,6 @@ import javax.inject.Named;
 import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.query.QueryException;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -73,7 +72,7 @@ class DefaultEventStoreNoLegacyTest
     }
 
     @Test
-    void saveEvent() throws EventStreamException
+    void saveEvent()
     {
         this.defaultStore.saveEvent(EVENT);
 
@@ -81,7 +80,7 @@ class DefaultEventStoreNoLegacyTest
     }
 
     @Test
-    void saveEventStatus() throws Exception
+    void saveEventStatus()
     {
         this.defaultStore.saveEventStatus(EVENTSTATUS);
 
@@ -89,7 +88,7 @@ class DefaultEventStoreNoLegacyTest
     }
 
     @Test
-    void deleteEventByInstance() throws EventStreamException
+    void deleteEventByInstance()
     {
         this.defaultStore.deleteEvent(EVENT);
 
@@ -97,7 +96,7 @@ class DefaultEventStoreNoLegacyTest
     }
 
     @Test
-    void deleteEventstatus() throws EventStreamException
+    void deleteEventstatus()
     {
         this.defaultStore.deleteEventStatus(EVENTSTATUS);
 
@@ -105,7 +104,7 @@ class DefaultEventStoreNoLegacyTest
     }
 
     @Test
-    void deleteEventById() throws EventStreamException, InterruptedException, ExecutionException
+    void deleteEventById() throws InterruptedException, ExecutionException
     {
         assertFalse(this.defaultStore.deleteEvent("id").get().isPresent());
 
@@ -119,7 +118,7 @@ class DefaultEventStoreNoLegacyTest
     }
 
     @Test
-    void getEvent() throws EventStreamException, QueryException
+    void getEvent() throws EventStreamException
     {
         assertFalse(this.defaultStore.getEvent("id").isPresent());
 

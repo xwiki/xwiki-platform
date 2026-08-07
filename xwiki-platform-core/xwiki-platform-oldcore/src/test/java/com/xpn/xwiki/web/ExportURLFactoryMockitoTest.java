@@ -131,7 +131,7 @@ class ExportURLFactoryMockitoTest
     }
 
     @Test
-    void createURLWhenNotInExportedPages() throws Exception
+    void createURLWhenNotInExportedPages()
     {
         this.factory.init(Arrays.asList(DOCUMENT_REFERENCE), null, new FilesystemExportContext(),
             this.oldCore.getXWikiContext());
@@ -143,7 +143,7 @@ class ExportURLFactoryMockitoTest
     }
 
     @Test
-    void createURLWhenInExportedPages() throws Exception
+    void createURLWhenInExportedPages()
     {
         FilesystemExportContext exportContext = new FilesystemExportContext();
         // Simulate locating the doc in pages/xwiki/Main/WebHome (ie 3 levels deep)
@@ -158,7 +158,7 @@ class ExportURLFactoryMockitoTest
     }
 
     @Test
-    void createAttachmentURLWhenUserHasViewRight(@TempDir File exportDir) throws Exception
+    void createAttachmentURLWhenUserHasViewRight(@TempDir File exportDir)
     {
         when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, ATTACHMENT_REFERENCE)).thenReturn(true);
 
@@ -176,7 +176,7 @@ class ExportURLFactoryMockitoTest
     }
 
     @Test
-    void createAttachmentURLWhenAccessCheckIsDisabled(@TempDir File exportDir) throws Exception
+    void createAttachmentURLWhenAccessCheckIsDisabled(@TempDir File exportDir)
     {
         when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, ATTACHMENT_REFERENCE)).thenReturn(false);
 
@@ -193,7 +193,7 @@ class ExportURLFactoryMockitoTest
     }
 
     @Test
-    void createAttachmentURLWhenUserHasNoViewRight(@TempDir File exportDir) throws Exception
+    void createAttachmentURLWhenUserHasNoViewRight(@TempDir File exportDir)
     {
         when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, ATTACHMENT_REFERENCE)).thenReturn(false);
 

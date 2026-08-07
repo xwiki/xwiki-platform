@@ -299,7 +299,7 @@ class DefaultMergeManagerTest
         private MergeConfiguration configuration;
 
         @BeforeEach
-        void before() throws Exception
+        void before()
         {
             this.currentDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
             this.previousDocument = this.currentDocument.clone();
@@ -435,7 +435,7 @@ class DefaultMergeManagerTest
         }
 
         @Test
-        void testMergeCurrentObjectRemoved() throws Exception
+        void testMergeCurrentObjectRemoved()
         {
             this.xobject.setStringValue("test", "");
             this.xobject.setStringValue("previoustest", "previoustest");
@@ -461,7 +461,7 @@ class DefaultMergeManagerTest
         }
 
         @Test
-        void testMergeCurrentObjectRemovedFallbackNext() throws Exception
+        void testMergeCurrentObjectRemovedFallbackNext()
         {
             this.configuration.setConflictFallbackVersion(MergeConfiguration.ConflictFallbackVersion.NEXT);
             this.xobject.setStringValue("test", "");
@@ -655,7 +655,7 @@ class DefaultMergeManagerTest
         }
 
         @Test
-        void testMergeAttachmentModifiedDeletedInCurrent() throws Exception
+        void testMergeAttachmentModifiedDeletedInCurrent()
         {
             XWikiAttachment attachment = new XWikiAttachment();
 

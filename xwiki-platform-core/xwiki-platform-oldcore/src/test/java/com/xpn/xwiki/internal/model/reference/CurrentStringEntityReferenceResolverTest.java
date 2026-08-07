@@ -71,13 +71,13 @@ class CurrentStringEntityReferenceResolverTest
     private CurrentStringEntityReferenceResolver resolver;
 
     @BeforeEach
-    void beforeEach() throws Exception
+    void beforeEach()
     {
         this.oldcore.getXWikiContext().setWikiId(CURRENT_WIKI);
     }
 
     @Test
-    void testResolveDocumentReferenceWhenNoContextWiki() throws Exception
+    void testResolveDocumentReferenceWhenNoContextWiki()
     {
         this.oldcore.getXWikiContext().setWikiId(null);
 
@@ -89,7 +89,7 @@ class CurrentStringEntityReferenceResolverTest
     }
 
     @Test
-    void testResolveDocumentReferenceWhenNoContextDocument() throws Exception
+    void testResolveDocumentReferenceWhenNoContextDocument()
     {
         this.oldcore.getXWikiContext().setWikiId(null);
         this.oldcore.getXWikiContext().setDoc(null);
@@ -102,7 +102,7 @@ class CurrentStringEntityReferenceResolverTest
     }
 
     @Test
-    void testResolveDocumentReferenceWhenContextDocument() throws Exception
+    void testResolveDocumentReferenceWhenContextDocument()
     {
         this.oldcore.getXWikiContext()
             .setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_DOCUMENT)));
@@ -115,7 +115,7 @@ class CurrentStringEntityReferenceResolverTest
     }
 
     @Test
-    void testResolveAttachmentReference() throws Exception
+    void testResolveAttachmentReference()
     {
         this.oldcore.getXWikiContext()
             .setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_DOCUMENT)));

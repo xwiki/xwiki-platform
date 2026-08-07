@@ -242,7 +242,9 @@ $xwiki.getUserName("xwiki:${username}")
  *   useInlineHTML: false, // whether to use in-line HTML elements to display the user or not
  *   wrapAvatar: false // whether to wrap the avatar image with a span or not
  *   displayLink: true // @since 15.9 ; whether to wrap the user name in a link to the user profile
- *   avatarSize: 120 // @since 18.7.0RC1 ; the size (in pixels) of the avatar
+ *   avatarCssClass: '' // @since 18.7.0RC1 ; extra CSS class(es) to add on the avatar image; available classes
+ *                       // are "small-avatar"/"medium-avatar"/"large-avatar" for the size and "circle-avatar"
+ *                       // for a fully rounded avatar
  *   displayName: true // @since 18.7.0RC1 ; whether to visually display the name (it stays exposed to assistive
  *                      // technologies either way, through a native tooltip on the avatar when false); set to
  *                      // false together with displayLink when the avatar alone is enough on screen
@@ -263,7 +265,7 @@ $xwiki.getUserName("xwiki:${username}")
     'useInlineHTML': false,
     'wrapAvatar': false,
     'displayLink': true,
-    'avatarSize': 120,
+    'avatarCssClass': '',
     'displayName': true
   })
   #if ($options.entrySet())
@@ -307,12 +309,16 @@ $xwiki.getUserName("xwiki:${username}")
       #set ($userAliasDisplay = "<span class=""${type}-alias"">" + $escapetool.xml($userAlias) + '</span>')
     #end
     #set ($escapedUserName = $escapetool.xml($userName))
-    #getUserAvatarURL($userReference $avatarURL $macro.options.avatarSize)
+    #getUserAvatarURL($userReference $avatarURL 120)
     #set ($avatarWrapperStart = '')
     #set ($avatarWrapperEnd = '')
     #if ($macro.options.wrapAvatar)
       #set ($avatarWrapperStart = "<span class=""${type}-avatar-wrapper"">")
       #set ($avatarWrapperEnd = '</span>')
+    #end
+    #set ($avatarClass = "${type}-avatar")
+    #if ("$!macro.options.avatarCssClass" != '')
+      #set ($avatarClass = "$avatarClass $macro.options.avatarCssClass")
     #end
     #set ($avatarExtraAttributes = '')
     #set ($displayedUserName = $escapedUserName)
@@ -335,7 +341,7 @@ $xwiki.getUserName("xwiki:${username}")
       "<$userTag class=""$type"" data-reference=""$escapetool.xml($userReference)"">",
         "<$userNameTag $userNameTagAttributes>",
         $avatarWrapperStart,
-          "<img class=""${type}-avatar""$avatarExtraAttributes src=""$escapetool.xml($avatarURL.url)"" alt="""" />",
+          "<img class=""$escapetool.xml($avatarClass)""$avatarExtraAttributes src=""$escapetool.xml($avatarURL.url)"" alt="""" />",
         $avatarWrapperEnd,
         $displayedUserName,
         "</$userNameTag>",

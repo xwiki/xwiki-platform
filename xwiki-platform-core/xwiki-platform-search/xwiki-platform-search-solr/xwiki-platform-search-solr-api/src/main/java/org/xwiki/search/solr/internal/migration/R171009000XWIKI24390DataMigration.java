@@ -87,7 +87,6 @@ public class R171009000XWIKI24390DataMigration implements HibernateDataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        // Change to 171009000 for 17.10.9.
         return new XWikiDBVersion(180500000);
     }
 
@@ -106,13 +105,20 @@ public class R171009000XWIKI24390DataMigration implements HibernateDataMigration
     @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
-        XWikiDBVersion ltsVersion = new XWikiDBVersion(171009000);
-        XWikiDBVersion afterLTSVersion = new XWikiDBVersion(180000000);
-        // Execute the migration if the version is either before the LTS version or equal to or larger than the
-        // afterLTSVersion and before the version of this migration.
-        // We only need to execute this migration once on the main wiki.
-        return getXWikiContext().isMainWiki() && (startupVersion.compareTo(ltsVersion) < 0
-            || (startupVersion.compareTo(afterLTSVersion) >= 0 && startupVersion.compareTo(getVersion()) < 0));
+        // Only apply on main wiki since the Solr core is shared between all wikis and we only need to do this once.
+        if (getXWikiContext().isMainWiki()) {
+            XWikiDBVersion ltsVersion = new XWikiDBVersion(171009000);
+            XWikiDBVersion afterLTSVersion = new XWikiDBVersion(180000000);
+            XWikiDBVersion midLTSVersion = new XWikiDBVersion(180404000);
+
+            // Execute the migration only if migrating from:
+            // * < 17.10.9 (migrated in 17.10.9+)
+            // * >= 18.0.0 and < 18.4.4 (migrated in 18.4.4+)
+            return startupVersion.compareTo(ltsVersion) < 0
+                || (startupVersion.compareTo(afterLTSVersion) >= 0 && startupVersion.compareTo(midLTSVersion) < 0);
+        }
+
+        return false;
     }
 
     @Override

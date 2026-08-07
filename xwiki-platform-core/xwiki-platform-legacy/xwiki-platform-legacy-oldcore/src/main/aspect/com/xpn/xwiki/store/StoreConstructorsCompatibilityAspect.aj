@@ -82,7 +82,8 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      *
      * @param xwiki the XWiki object holding the configuration
      * @param context the current context, unused
-     * @deprecated 1.6M1. Use ComponentManager.lookup(String) instead.
+     * @deprecated 1.6M1. Use the concrete store component instead, for example {@link XWikiStoreInterface} with
+     *             hint {@code hibernate}.
      */
     @Deprecated
     public XWikiHibernateBaseStore.new(XWiki xwiki, XWikiContext context)
@@ -100,7 +101,8 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      * Look up the component instead.
      *
      * @param hibpath the path to the Hibernate configuration file
-     * @deprecated 1.6M1. Use ComponentManager.lookup(String) instead.
+     * @deprecated 1.6M1. Use the concrete store component instead, for example {@link XWikiStoreInterface} with
+     *             hint {@code hibernate}.
      */
     @Deprecated
     public XWikiHibernateBaseStore.new(String hibpath)
@@ -119,7 +121,7 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      *
      * @param xwiki the XWiki object holding the configuration
      * @param context the current context, unused
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
+     * @deprecated 1.6M1. Use the {@link XWikiStoreInterface} component with hint {@code hibernate} instead.
      */
     @Deprecated
     public XWikiHibernateStore.new(XWiki xwiki, XWikiContext context)
@@ -137,7 +139,7 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      * Look up the component instead.
      *
      * @param hibpath the path to the Hibernate configuration file
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
+     * @deprecated 1.6M1. Use the {@link XWikiStoreInterface} component with hint {@code hibernate} instead.
      */
     @Deprecated
     public XWikiHibernateStore.new(String hibpath)
@@ -155,7 +157,7 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      * Look up the component instead.
      *
      * @param context the current context, used to reach the XWiki object
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
+     * @deprecated 1.6M1. Use the {@link XWikiStoreInterface} component with hint {@code hibernate} instead.
      */
     @Deprecated
     public XWikiHibernateStore.new(XWikiContext context)
@@ -174,7 +176,8 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      *
      * @param xwiki the XWiki object holding the configuration
      * @param context the current context, unused
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
+     * @deprecated 1.6M1. Use the {@link XWikiAttachmentStoreInterface} component with hint {@code hibernate}
+     *             instead.
      */
     @Deprecated
     public XWikiHibernateAttachmentStore.new(XWiki xwiki, XWikiContext context)
@@ -192,7 +195,8 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      * Look up the component instead.
      *
      * @param context the current context, used to reach the XWiki object
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
+     * @deprecated 1.6M1. Use the {@link XWikiAttachmentStoreInterface} component with hint {@code hibernate}
+     *             instead.
      */
     @Deprecated
     public XWikiHibernateAttachmentStore.new(XWikiContext context)
@@ -210,7 +214,8 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      * Look up the component instead.
      *
      * @param hibpath the path to the Hibernate configuration file
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
+     * @deprecated 1.6M1. Use the {@link XWikiAttachmentStoreInterface} component with hint {@code hibernate}
+     *             instead.
      */
     @Deprecated
     public XWikiHibernateAttachmentStore.new(String hibpath)
@@ -229,7 +234,8 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      *
      * @param xwiki the XWiki object holding the configuration
      * @param context the current context, unused
-     * @deprecated 1.6M1. use ComponentManager.lookup(XWikiVersioningStoreInterface.class) instead.
+     * @deprecated 1.6M1. Use the {@link XWikiVersioningStoreInterface} component with hint {@code hibernate}
+     *             instead.
      */
     @Deprecated
     public XWikiHibernateVersioningStore.new(XWiki xwiki, XWikiContext context)
@@ -247,7 +253,8 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      * Look up the component instead.
      *
      * @param hibpath the path to the Hibernate configuration file
-     * @deprecated 1.6M1. use ComponentManager.lookup(XWikiVersioningStoreInterface.class) instead.
+     * @deprecated 1.6M1. Use the {@link XWikiVersioningStoreInterface} component with hint {@code hibernate}
+     *             instead.
      */
     @Deprecated
     public XWikiHibernateVersioningStore.new(String hibpath)
@@ -265,7 +272,8 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      * Look up the component instead.
      *
      * @param context the current context, used to reach the XWiki object
-     * @deprecated 1.6M1. use ComponentManager.lookup(XWikiVersioningStoreInterface.class) instead.
+     * @deprecated 1.6M1. Use the {@link XWikiVersioningStoreInterface} component with hint {@code hibernate}
+     *             instead.
      */
     @Deprecated
     public XWikiHibernateVersioningStore.new(XWikiContext context)
@@ -283,7 +291,8 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      * Look up the component instead.
      *
      * @param context the current context, used to reach the XWiki object
-     * @deprecated 1.6M1. Use ComponentManager#getInstance(XWikiRecycleBinStoreInterface.class) instead.
+     * @deprecated 1.6M1. Use the {@link XWikiRecycleBinStoreInterface} component with hint {@code hibernate}
+     *             instead.
      */
     @Deprecated
     public XWikiHibernateRecycleBinStore.new(XWikiContext context)
@@ -301,7 +310,7 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      * Look up the component instead.
      *
      * @param context the current context, used to reach the XWiki object
-     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentRecycleBinStore.class) instead.
+     * @deprecated 1.6M1. Use the {@link AttachmentRecycleBinStore} component with hint {@code hibernate} instead.
      */
     @Deprecated
     public HibernateAttachmentRecycleBinStore.new(XWikiContext context)
@@ -319,7 +328,7 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      * Look up the component instead.
      *
      * @param context the current context, used to reach the XWiki object
-     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentVersioningStore.class) instead.
+     * @deprecated 1.6M1. Use the {@link AttachmentVersioningStore} component with hint {@code hibernate} instead.
      */
     @Deprecated
     public HibernateAttachmentVersioningStore.new(XWikiContext context)
@@ -336,7 +345,7 @@ public privileged aspect StoreConstructorsCompatibilityAspect
      * exactly like one built with the no-argument constructor. The context is ignored.
      *
      * @param context the current context, unused
-     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentVersioningStore.class) instead.
+     * @deprecated 1.6M1. Use the {@link AttachmentVersioningStore} component with hint {@code void} instead.
      */
     @Deprecated
     public VoidAttachmentVersioningStore.new(XWikiContext context)

@@ -86,7 +86,10 @@ var XWiki = (function(XWiki){
       positions: [ "top" ],
       text: "$escapetool.javascript($services.localization.render('core.widgets.suggest.hide'))"
     },
+    // A node to insert before the suggestions
     insertBeforeSuggestions: null,
+    // A node to insert after the suggestions
+    insertAfterSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
     // Display value prefix text
@@ -585,9 +588,14 @@ var XWiki = (function(XWiki){
             sourceContainer.addClassName('hidden').addClassName('loading');
           }
 
-          if (typeof source.icon != 'undefined') {
-            // If there is an icon for this source group, set it as background image
-            // TODO: Replace with the use of the icon theme (see XWIKI-24323).
+          if (source.iconHTML) {
+            // Use the icon theme currently configured on the wiki to display the source group icon.
+            sourceHeader.insert({top: source.iconHTML});
+            sourceHeader.addClassName('withIcon');
+          } else if (source.icon) {
+            // Fallback for sources that specify a plain icon URL (e.g. for backward compatibility): set it as
+            // background image. Note that an empty icon (e.g. because the icon theme lookup failed) must not reach
+            // this branch, otherwise the empty src would make the browser fetch the current page as an "image".
             var iconImage = new Image();
             iconImage.onload = function(){
               this.sourceHeader.setStyle({
@@ -623,11 +631,14 @@ var XWiki = (function(XWiki){
       }
     }
 
-    var withEnableButton = typeof this.options.hideButton !== "undefined"
+    if (this.options.insertAfterSuggestions && !this.options.insertAfterSuggestions.parentNode) {
+      this.resultContainer.insert(this.options.insertAfterSuggestions);
+    }
+
+    var withEnableButton = this.options.hideButton
                         && typeof this.options.hideButton.positions === "object"
                         && this.options.hideButton.positions.length > 0;
     if (withEnableButton && !this.container.down('.hide-button')) {
-      // TODO: replace the label "hide suggestions" to an icon (see XWIKI-24324).
       var positions = this.options.hideButton.positions;
       for (var i=0; i< positions.length; i++) {
         var hideButton = new Element('button', {'class' : 'hide-button', 'type' : 'button'})

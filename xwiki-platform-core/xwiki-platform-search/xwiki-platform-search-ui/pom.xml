@@ -78,6 +78,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Icon script service, used to test rendering icon theme icons in the search suggest sources. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-web-templates</artifactId>

@@ -342,15 +342,18 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
           <SuggestionMenuController
             triggerCharacter={"/"}
             getItems={async (query) =>
-              querySuggestionsMenuItems(
+              querySuggestionsMenuItems({
                 editor,
                 query,
-                builtMacros,
+                macros: builtMacros,
                 syntax,
                 lang,
                 t,
-                macros ? macros.ctx.openInsertionEditor : undefined,
-              )
+                linkEditionHandler,
+                openMacroInsertionEditor: macros
+                  ? macros.ctx.openInsertionEditor
+                  : undefined,
+              })
             }
           />
 

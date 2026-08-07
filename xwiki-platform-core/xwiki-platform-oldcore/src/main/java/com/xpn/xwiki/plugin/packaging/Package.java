@@ -846,7 +846,11 @@ public class Package
                         // let's log the error but not stop
                         result = DocumentInfo.INSTALL_ERROR;
                         addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
-                        LOGGER.error("Failed to delete document [{}]", previousdoc.getDocumentReference(), e);
+                        // The stack trace is kept for the debug level: this runs once per document of the
+                        // package, so printing a trace for every failure would flood the log.
+                        String failedToDelete = "Failed to delete document [{}]";
+                        LOGGER.error(failedToDelete, previousdoc.getDocumentReference());
+                        LOGGER.debug(failedToDelete, previousdoc.getDocumentReference(), e);
                     }
                 } else if (previousdoc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
                     // We conserve the old attachments in the new documents

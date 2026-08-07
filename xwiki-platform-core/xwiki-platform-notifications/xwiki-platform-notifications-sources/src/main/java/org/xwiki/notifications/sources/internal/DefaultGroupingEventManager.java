@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -89,7 +90,8 @@ public class DefaultGroupingEventManager implements GroupingEventManager
                         this.componentManager.getInstance(GroupingEventStrategy.class, strategyHint);
                 } catch (ComponentLookupException e) {
                     this.logger.error("Error when getting grouping event strategy instance with hint [{}]. "
-                        + "It will fallback on default strategy.", strategyHint, e);
+                            + "It will fallback on default strategy. Root cause: [{}].", strategyHint,
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
             } else {
                 this.logger.warn(

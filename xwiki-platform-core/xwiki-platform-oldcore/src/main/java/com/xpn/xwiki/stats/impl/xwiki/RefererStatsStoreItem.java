@@ -101,7 +101,7 @@ public class RefererStatsStoreItem extends AbstractStatsStoreItem
             // TODO Fix use of deprecated call.
             store.saveXWikiCollection(refererStat, this.context, true);
         } catch (XWikiException e) {
-            LOGGER.error("Failed to save referer statistics object [{}]", getId(), e);
+            LOGGER.error("Failed to save referer statistics object [{}]", getId());
         }
     }
 }

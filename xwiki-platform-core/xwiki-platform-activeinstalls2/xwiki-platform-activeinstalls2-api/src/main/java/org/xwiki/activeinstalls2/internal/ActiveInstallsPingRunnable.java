@@ -93,15 +93,14 @@ public class ActiveInstallsPingRunnable extends AbstractXWikiRunnable
                 this.manager.sendPing();
                 break;
             } catch (Exception e) {
+                String message = String.format(
+                    "Failed to send Active Installation ping to [%s] (try [%s]). Error = [%s].",
+                    this.configuration.getPingInstanceURL(), count, ExceptionUtils.getRootCauseMessage(e));
                 if (count == RETRIES) {
-                    LOGGER.warn("Failed to send Active Installation ping to [{}] (try [{}]). Error = [{}]. Will "
-                        + "retry in [{} {}]...", this.configuration.getPingInstanceURL(), count,
-                        ExceptionUtils.getRootCauseMessage(e), this.period,
+                    message = String.format("%s Will retry in [%s %s]...", message, this.period,
                         this.timeUnit.toString().toLowerCase(Locale.ROOT));
-                } else {
-                    LOGGER.warn("Failed to send Active Installation ping to [{}] (try [{}]). Error = [{}].",
-                        this.configuration.getPingInstanceURL(), count, ExceptionUtils.getRootCauseMessage(e));
                 }
+                LOGGER.warn(message);
                 // Wait a little but before retrying so that it makes a difference.
                 if (count < RETRIES) {
                     Thread.sleep(getRetryTimeout());

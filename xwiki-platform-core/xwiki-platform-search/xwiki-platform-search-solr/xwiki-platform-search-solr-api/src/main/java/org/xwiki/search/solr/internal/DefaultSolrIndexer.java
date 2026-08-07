@@ -756,7 +756,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         try {
             result = this.componentManager.getInstance(SolrMetadataExtractor.class, entityType.name().toLowerCase());
         } catch (ComponentLookupException e) {
-            this.logger.warn("Unsupported entity type: [{}]", entityType, e);
+            this.logger.warn("Unsupported entity type: [{}]", entityType.toString(), e);
         }
 
         return result;

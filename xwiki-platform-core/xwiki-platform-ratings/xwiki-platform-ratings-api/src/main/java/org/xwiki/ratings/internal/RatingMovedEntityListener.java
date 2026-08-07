@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -76,7 +77,8 @@ public class RatingMovedEntityListener extends AbstractLocalEventListener
                 manager.moveRatings(oldReference, newReference);
             }
         } catch (RatingsException e) {
-            logger.error("Error while updating ratings related to old reference [{}] from ratings", oldReference, e);
+            logger.error("Error while updating ratings related to old reference [{}] from ratings: [{}]", oldReference,
+                ExceptionUtils.getRootCause(e));
         }
     }
 }

@@ -275,7 +275,7 @@ public class XWikiRCSArchive extends Archive
                     // 3) Cannot get the revision as a string from a node version. Not sure why this
                     //    is happening though... See https://jira.xwiki.org/browse/XWIKI-2076
                     LOGGER.warn("Error in revision [{}]: [{}]. Ignoring non-fatal error, the Author, Comment and Date "
-                        + "are not set.", node.getVersion(), ExceptionUtils.getRootCauseMessage(e));
+                        + "are not set.", node.getVersion().toString(), ExceptionUtils.getRootCauseMessage(e));
                 }
             }
 

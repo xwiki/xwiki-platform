@@ -793,7 +793,7 @@ class DefaultModelBridgeTest
     }
 
     @Test
-    void canRestoreDeletedDocument() throws Exception
+    void canRestoreDeletedDocument()
     {
         String deletedDocumentFullName = "Space.DeletedDocument";
 

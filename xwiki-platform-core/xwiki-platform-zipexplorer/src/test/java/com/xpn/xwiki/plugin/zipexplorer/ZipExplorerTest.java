@@ -221,7 +221,7 @@ class ZipExplorerTest
     }
 
     @Test
-    void getFileLink() throws Exception
+    void getFileLink()
     {
         XWikiDocument xwikiDocument = mock(XWikiDocument.class);
         when(xwikiDocument.getAttachmentURL(eq("zipfile.zip"), any(XWikiContext.class))).thenReturn(

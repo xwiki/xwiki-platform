@@ -93,7 +93,7 @@ class GadgetObjectRequiredRightAnalyzerTest
     private DocumentReference documentReference;
 
     @BeforeEach
-    void setup() throws Exception
+    void setup()
     {
         doReturn(this.objectReference).when(this.object).getReference();
 

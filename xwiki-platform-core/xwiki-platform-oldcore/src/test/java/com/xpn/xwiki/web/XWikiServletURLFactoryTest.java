@@ -142,7 +142,7 @@ class XWikiServletURLFactoryTest
      * @param wikiName the wiki name
      * @throws XWikiException if creating the wiki fails
      */
-    private void createWiki(String wikiName) throws XWikiException, WikiManagerException
+    private void createWiki(String wikiName) throws WikiManagerException
     {
         WikiDescriptor wikidescriptor = new WikiDescriptor(wikiName, wikiName + "server");
 

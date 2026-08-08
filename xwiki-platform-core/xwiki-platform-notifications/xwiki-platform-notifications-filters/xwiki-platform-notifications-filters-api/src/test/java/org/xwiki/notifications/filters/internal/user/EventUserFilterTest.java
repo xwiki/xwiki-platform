@@ -99,7 +99,7 @@ class EventUserFilterTest
         when(this.serializer.serialize(USER_E)).thenReturn(SERIALIZED_USER_E);
     }
 
-    private Collection<NotificationFilterPreference> mockPreferences() throws NotificationException
+    private Collection<NotificationFilterPreference> mockPreferences()
     {
         NotificationFilterPreference p1 = mock(NotificationFilterPreference.class);
         when(p1.isEnabled()).thenReturn(true);

@@ -455,7 +455,6 @@ class XWikiRightServiceImplTest
      */
     @Test
     void programmingRightsAfterDropPermissionsForRenderingCycle(MockitoComponentManager componentManager)
-        throws Exception
     {
         final Document doc =
             new Document(new XWikiDocument(new DocumentReference("XWiki", "Test", "Permissions")), this.context);

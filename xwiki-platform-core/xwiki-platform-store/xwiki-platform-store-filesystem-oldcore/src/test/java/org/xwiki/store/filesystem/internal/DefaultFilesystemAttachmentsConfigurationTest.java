@@ -60,7 +60,7 @@ class DefaultFilesystemAttachmentsConfigurationTest
     }
 
     @Test
-    void getDirectory() throws IOException
+    void getDirectory()
     {
         assertNull(configuration.getDirectory());
 

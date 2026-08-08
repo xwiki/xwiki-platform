@@ -463,7 +463,7 @@ class IncludeMacroTest
     }
 
     @Test
-    void executeWithRecursiveIncludeContextCurrent() throws Exception
+    void executeWithRecursiveIncludeContextCurrent()
     {
         MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
         // Add an Include Macro MarkerBlock as a parent of the include Macro block since this is what would have

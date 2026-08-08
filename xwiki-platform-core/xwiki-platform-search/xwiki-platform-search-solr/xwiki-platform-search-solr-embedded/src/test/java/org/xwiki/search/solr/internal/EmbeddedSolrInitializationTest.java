@@ -112,7 +112,7 @@ class EmbeddedSolrInitializationTest
         });
     }
 
-    private void getInstanceAndAssertHomeDirectory(String expected) throws ComponentLookupException, Exception
+    private void getInstanceAndAssertHomeDirectory(String expected) throws Exception
     {
         Solr instance = this.componentManager.getInstance(Solr.class, EmbeddedSolr.TYPE);
         assertNotNull(instance);

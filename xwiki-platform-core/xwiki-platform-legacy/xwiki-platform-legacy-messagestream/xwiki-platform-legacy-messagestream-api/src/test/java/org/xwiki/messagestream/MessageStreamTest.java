@@ -99,7 +99,7 @@ class MessageStreamTest
         when(this.mockEventStore.saveEvent(any())).thenReturn(CompletableFuture.completedFuture(null));
     }
 
-    private Event setupForNewMessage() throws Exception
+    private Event setupForNewMessage()
     {
         Event event = new DefaultEvent();
         event.setId(UUID.randomUUID().toString());
@@ -134,7 +134,7 @@ class MessageStreamTest
         return e;
     }
 
-    private Event setupForDirectMessage() throws ComponentLookupException, Exception
+    private Event setupForDirectMessage() throws Exception
     {
         Event e = setupForNewMessage();
 
@@ -143,7 +143,7 @@ class MessageStreamTest
         return e;
     }
 
-    private Event setupForGroupMessage() throws ComponentLookupException, Exception
+    private Event setupForGroupMessage() throws Exception
     {
         Event e = setupForNewMessage();
 

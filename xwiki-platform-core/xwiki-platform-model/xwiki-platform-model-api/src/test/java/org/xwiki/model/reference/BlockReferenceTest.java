@@ -59,8 +59,8 @@ class BlockReferenceTest
     @Test
     void testInvalidType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new BlockReference(new EntityReference("Block", EntityType.DOCUMENT)));
+        EntityReference reference = new EntityReference("Block", EntityType.DOCUMENT);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new BlockReference(reference));
 
         assertEquals("Invalid type [DOCUMENT] for a block reference", e.getMessage());
     }
@@ -71,8 +71,9 @@ class BlockReferenceTest
     @Test
     void testInvalidParentType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new BlockReference(
-            new EntityReference("Block", EntityType.BLOCK, new EntityReference("Object", EntityType.OBJECT))));
+        EntityReference reference = new EntityReference("Block", EntityType.BLOCK,
+            new EntityReference("Object", EntityType.OBJECT));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new BlockReference(reference));
 
         assertEquals("Invalid parent reference [Object Object] in a block reference", e.getMessage());
     }

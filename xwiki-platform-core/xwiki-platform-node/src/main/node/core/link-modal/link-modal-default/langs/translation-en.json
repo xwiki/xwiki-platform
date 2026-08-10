@@ -1,0 +1,18 @@
+{
+  "link-modal.target-types.url.label": "URL",
+  "link-modal.target-types.url.url": "URL",
+
+  "link-modal.target-types.email.label": "E-mail",
+  "link-modal.target-types.email.address": "E-mail address",
+  "link-modal.target-types.email.subject": "Message subject",
+  "link-modal.target-types.email.body": "Message body",
+
+  "link-modal.target-types.page.label": "Page",
+  "link-modal.target-types.page.reference": "Page reference",
+  "link-modal.target-types.page.query-string": "Query string",
+  "link-modal.target-types.page.anchor": "Anchor",
+
+  "link-modal.target-types.attachment.label": "Attachment",
+  "link-modal.target-types.attachment.reference": "Attachment reference",
+  "link-modal.target-types.attachment.query-string": "Query string"
+}

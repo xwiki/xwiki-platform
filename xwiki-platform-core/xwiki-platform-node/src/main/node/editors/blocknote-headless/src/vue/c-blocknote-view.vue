@@ -19,12 +19,14 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
+import { resolverPromise } from "@xwiki/platform-component-manager-default";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
 import {
   LinkModal,
   linkTargetToResourceReference,
   parseLinkTarget,
   resourceReferenceToLinkTarget,
+  serializeLinkTarget,
 } from "@xwiki/platform-link-modal-ui";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
@@ -36,6 +38,7 @@ import {
   shallowRef,
   toRaw,
   useTemplateRef,
+  watch,
 } from "vue";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type {
@@ -162,35 +165,24 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
 };
 
-/**
- * The reference of the linked resource is the authoritative link target (the URL is only a rendering
- * of it), so build the target to configure in the link modal from that reference when the
- * integration provides one, and fall back on reverse-engineering the URL otherwise.
- */
-function currentLinkTarget(current: LinkEditionData): LinkTarget {
-  return (
-    (current.reference &&
-      resourceReferenceToLinkTarget(current.reference, modelReferenceParser)) ??
-    parseLinkTarget(current.url, remoteURLParser)
+const submitEditedLink = async ({ displayText, target }: LinkData) => {
+  const resolver = await resolverPromise;
+  const referenceCtx = { modelReferenceParser, modelReferenceSerializer };
+
+  const url = await serializeLinkTarget(target, resolver, {
+    remoteURLParser,
+    remoteURLSerializer,
+  });
+  const reference = await linkTargetToResourceReference(
+    target,
+    resolver,
+    referenceCtx,
   );
-}
-
-const submitEditedLink = ({ displayText, target }: LinkData) => {
-  const { type, config } = target;
-
-  // TODO: support
-
-  const url =
-    type === "url"
-      ? config.url
-      : type === "email"
-        ? `mailto:${config.address}`
-        : remoteURLSerializer.serialize(config.ref!)!;
 
   editingLink.value?.onSubmit({
     title: displayText,
     url,
-    reference: linkTargetToResourceReference(target, modelReferenceSerializer),
+    reference,
   });
 
   editingLink.value = null;
@@ -202,6 +194,56 @@ const linkModalContainer = useTemplateRef<HTMLElement>("link-modal-container");
 const mountedBlockNote = ref<{ unmount: () => void }>();
 
 const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
+
+// `parseLinkTarget` is asynchronous (it resolves the registered link target type extensions from the shared
+// component manager), so unlike `editingLink` it cannot be computed directly in the template.
+const currentLinkData = shallowRef<LinkData | null>(null);
+
+/**
+ * The reference of the linked resource is the authoritative link target (the URL is only a rendering
+ * of it), so build the target to configure in the link modal from that reference when the
+ * integration provides one, and fall back on reverse-engineering the URL otherwise.
+ */
+async function currentLinkTarget(
+  current: LinkEditionData,
+  resolver: Awaited<typeof resolverPromise>,
+): Promise<LinkTarget> {
+  const referenceCtx = { modelReferenceParser, modelReferenceSerializer };
+
+  const target =
+    current.reference &&
+    (await resourceReferenceToLinkTarget(
+      current.reference,
+      resolver,
+      referenceCtx,
+    ));
+
+  return (
+    target ??
+    (await parseLinkTarget(current.url, resolver, {
+      remoteURLParser,
+      remoteURLSerializer,
+    }))
+  );
+}
+
+watch(editingLink, async (linkProps) => {
+  if (!linkProps) {
+    currentLinkData.value = null;
+    return;
+  }
+
+  const resolver = await resolverPromise;
+  const target = await currentLinkTarget(linkProps.current, resolver);
+
+  // Guard against a race: only apply the result if `editingLink` hasn't changed again while parsing.
+  if (editingLink.value === linkProps) {
+    currentLinkData.value = {
+      displayText: linkProps.current.title,
+      target,
+    };
+  }
+});
 
 function handleLinkEditorOutsideClick(e: MouseEvent) {
   if (!editingLink.value || !linkModalContainer.value) {
@@ -242,12 +284,9 @@ onUnmounted(() => {
 <template>
   <div ref="blocknote-container" />
 
-  <div ref="link-modal-container" v-if="editingLink">
+  <div ref="link-modal-container" v-if="currentLinkData">
     <LinkModal
-      :current="{
-        displayText: editingLink.current.title,
-        target: currentLinkTarget(editingLink.current),
-      }"
+      :current="currentLinkData"
       :deps-container="depsContainer"
       @submit="submitEditedLink"
       @cancel="editingLink = null"

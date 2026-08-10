@@ -18,17 +18,19 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import AttachmentConfig from "./linkTypes/AttachmentConfig.vue";
-import EmailConfig from "./linkTypes/EmailConfig.vue";
-import PageConfig from "./linkTypes/PageConfig.vue";
-import UrlConfig from "./linkTypes/UrlConfig.vue";
 import { createLinkEditionContext } from "../linkSuggest.js";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
-import { provide } from "vue";
+import { resolverPromise } from "@xwiki/platform-component-manager-default";
+import { listEnabledLinkTargetTypeExtensions } from "@xwiki/platform-link-modal-api";
+import { computed, markRaw, provide, ref, shallowRef, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
-import type { LinkData } from "../data/linkType";
+import type {
+  LinkData,
+  LinkTargetTypeExtension,
+} from "@xwiki/platform-link-modal-api";
 import type { Container } from "inversify";
+import type { Component } from "vue";
 
 const props = defineProps<{
   current: LinkData;
@@ -41,31 +43,77 @@ provide("linkEditionCtx", createLinkEditionContext(props.depsContainer));
 
 const linkData = typedRef(props.current);
 
+// The list of registered, enabled link target types (built-in and 3rd-party). Resolved once, lazily, from the
+// shared component manager (see `@xwiki/platform-component-manager-default`), and shared with `LinkConfig.vue`
+// (rendered nested inside whichever configuration component is active below) so it can build the link type
+// selector from it.
+const extensions = ref<LinkTargetTypeExtension[]>([]);
+const extensionsLoading = ref(true);
+
+provide("linkTargetTypeExtensions", extensions);
+
+(async () => {
+  try {
+    const resolver = await resolverPromise;
+    extensions.value = await listEnabledLinkTargetTypeExtensions(resolver);
+  } catch (e) {
+    console.error("Failed to resolve the registered link target types", e);
+  } finally {
+    extensionsLoading.value = false;
+  }
+})();
+
+// The configuration component for the currently selected link target type, loaded lazily (mirrors
+// `LivedataDisplayer.vue`'s own resolve-then-`markRaw()` pattern for the same reason: dynamically registered
+// components must be excluded from Vue's reactivity tracking).
+const activeConfigComponent = shallowRef<Component | null>(null);
+const activeConfigLoading = ref(false);
+
+// eslint-disable-next-line max-statements
+watchEffect(async () => {
+  if (extensionsLoading.value) {
+    return;
+  }
+
+  const type = linkData.value.target.type;
+  const extension = extensions.value.find((e) => e.type === type);
+
+  if (!extension) {
+    // The extension providing this type is not (or no longer) registered/enabled: nothing to render.
+    activeConfigComponent.value = null;
+    return;
+  }
+
+  activeConfigLoading.value = true;
+  const component = await extension.component();
+
+  // Guard against a race with a later invocation of this same watchEffect: only apply the result if the
+  // selected type hasn't changed again while `component()` was loading.
+  if (linkData.value.target.type === type) {
+    activeConfigComponent.value = markRaw(component);
+    activeConfigLoading.value = false;
+  }
+});
+
+const ready = computed(
+  () =>
+    !extensionsLoading.value &&
+    !activeConfigLoading.value &&
+    activeConfigComponent.value !== null,
+);
+
 defineEmits<{ submit: [LinkData]; cancel: [] }>();
 </script>
 
 <template>
   <div :class="$style.container">
-    <url-config
-      v-if="linkData.target.type === 'url'"
-      v-model="linkData.target.config"
-      :link-data="linkData"
-    />
+    <p v-if="!ready" :class="$style.loading">
+      {{ t("link-modal.loading") }}
+    </p>
 
-    <page-config
-      v-if="linkData.target.type === 'page'"
-      v-model="linkData.target.config"
-      :link-data="linkData"
-    />
-
-    <attachment-config
-      v-if="linkData.target.type === 'attachment'"
-      v-model="linkData.target.config"
-      :link-data="linkData"
-    />
-
-    <email-config
-      v-if="linkData.target.type === 'email'"
+    <component
+      v-else
+      :is="activeConfigComponent"
       v-model="linkData.target.config"
       :link-data="linkData"
     />
@@ -103,6 +151,12 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
   background: var(--cr-color-neutral-50);
   padding: var(--cr-spacing-medium);
   z-index: 99;
+}
+
+.loading {
+  font-style: italic;
+  color: var(--cr-color-neutral-500);
+  margin: 0;
 }
 
 .actions {

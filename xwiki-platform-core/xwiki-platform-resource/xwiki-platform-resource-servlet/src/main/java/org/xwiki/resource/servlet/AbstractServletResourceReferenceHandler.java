@@ -93,7 +93,7 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
                         getResourceName(typedResourceReference));
                 }
             } catch (Exception e) {
-                this.logger.error(e.getMessage(), e);
+                this.logger.error("Failed to serve the resource [{}]", getResourceName(typedResourceReference), e);
                 sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             }
         }

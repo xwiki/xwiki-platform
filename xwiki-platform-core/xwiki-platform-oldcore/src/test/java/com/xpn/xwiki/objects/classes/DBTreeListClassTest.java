@@ -46,7 +46,7 @@ class DBTreeListClassTest
     private MockitoOldcore oldcore;
 
     @BeforeEach
-    void before() throws Exception
+    void before()
     {
         doAnswer(invocation -> invocation.getArgument(0))
             .when(this.oldcore.getSpyXWiki()).parseContent(any(), any(XWikiContext.class));

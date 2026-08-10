@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @ReferenceComponentList
-public class UsersCacheTest
+class UsersCacheTest
 {
     @MockComponent
     private CacheManager cacheManager;
@@ -112,7 +112,7 @@ public class UsersCacheTest
     // Tests
 
     @Test
-    public void getUsers() throws QueryException
+    void getUsers() throws QueryException
     {
         mockUsers(false, USERS_STRING_ALL);
         mockUsers(true, USERS_STRING_ACTIVE);
@@ -122,7 +122,7 @@ public class UsersCacheTest
     }
 
     @Test
-    public void getUsersNoUser() throws QueryException
+    void getUsersNoUser() throws QueryException
     {
         mockUsers(true, Collections.emptyList());
         mockUsers(false, Collections.emptyList());

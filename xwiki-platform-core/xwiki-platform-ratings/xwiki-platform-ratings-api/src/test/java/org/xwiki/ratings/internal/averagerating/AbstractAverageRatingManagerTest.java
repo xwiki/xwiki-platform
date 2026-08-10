@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class AbstractAverageRatingManagerTest
+class AbstractAverageRatingManagerTest
 {
     private RatingsManager ratingsManager;
     private AverageRating averageRating;
@@ -51,7 +51,7 @@ public class AbstractAverageRatingManagerTest
     private ObservationManager observationManager;
 
     @Component
-    public class DumbAsbtractAverageRatingsManager extends AbstractAverageRatingManager {
+    class DumbAsbtractAverageRatingsManager extends AbstractAverageRatingManager {
         boolean isSaved;
 
         @Override

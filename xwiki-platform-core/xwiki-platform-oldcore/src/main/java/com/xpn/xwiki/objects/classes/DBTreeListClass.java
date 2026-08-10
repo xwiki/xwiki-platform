@@ -125,7 +125,7 @@ public class DBTreeListClass extends DBListClass
     {
         List<ListItem> list = getDBList(context);
         Map<String, List<ListItem>> map = new HashMap<>();
-        if ((list == null) || (list.size() == 0)) {
+        if ((list == null) || (list.isEmpty())) {
             return map;
         }
         // The root of the tree is considered to be the empty string.
@@ -195,8 +195,8 @@ public class DBTreeListClass extends DBListClass
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
             selectlist = new ArrayList<>();
-        } else if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+        } else if (prop instanceof ListProperty listProperty) {
+            selectlist = listProperty.getList();
         } else {
             selectlist = new ArrayList<>();
             selectlist.add(String.valueOf(prop.getValue()));
@@ -266,7 +266,7 @@ public class DBTreeListClass extends DBListClass
 
     private void mergeItems(List<ListItem> itemPath, List<List<ListItem>> resList)
     {
-        if (itemPath == null || itemPath.size() == 0) {
+        if (itemPath == null || itemPath.isEmpty()) {
             return;
         }
 
@@ -294,7 +294,7 @@ public class DBTreeListClass extends DBListClass
     {
         for (ListItem tmpItem : treeList) {
             if (item.equals(tmpItem.getId())) {
-                if (tmpItem.getParent().length() > 0) {
+                if (!tmpItem.getParent().isEmpty()) {
                     getItemPath(tmpItem.getParent(), treeList, resList);
                 }
                 resList.add(tmpItem);
@@ -358,8 +358,8 @@ public class DBTreeListClass extends DBListClass
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
             selectlist = new ArrayList<>();
-        } else if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+        } else if (prop instanceof ListProperty listProperty) {
+            selectlist = listProperty.getList();
         } else {
             selectlist = new ArrayList<>();
             selectlist.add(String.valueOf(prop.getValue()));
@@ -528,7 +528,7 @@ public class DBTreeListClass extends DBListClass
                 // Let's create the complete query
                 select.append(" from ");
                 select.append(StringUtils.join(fromStatements.iterator(), ", "));
-                if (whereStatements.size() > 0) {
+                if (!whereStatements.isEmpty()) {
                     select.append(" where ");
                     select.append(StringUtils.join(whereStatements.iterator(), " and "));
                 }
@@ -543,7 +543,7 @@ public class DBTreeListClass extends DBListClass
         try {
             sql = context.getWiki().parseContent(sql, context);
         } catch (Exception e) {
-            LOGGER.error("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
+            LOGGER.error("Failed to parse SQL script [{}]. Continuing with non-rendered script.", sql, e);
         }
         return sql;
     }

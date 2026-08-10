@@ -100,8 +100,7 @@ public class CodeMacroSource
                 return true;
             }
 
-            if (obj instanceof CodeMacroSource) {
-                CodeMacroSource otherSource = (CodeMacroSource) obj;
+            if (obj instanceof CodeMacroSource otherSource) {
 
                 EqualsBuilder builder = new EqualsBuilder();
 

@@ -72,7 +72,7 @@ public class InvitationGuestActionsPage extends BasePage
     public String getMessage()
     {
         List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.id("invitation-action-message"));
-        if (elements.size() > 0) {
+        if (!elements.isEmpty()) {
             return elements.get(0).getText();
         }
         // Returning null would lead to NPE when calling equals and we don't get the friendly test failure message.

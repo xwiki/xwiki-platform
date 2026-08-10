@@ -40,7 +40,7 @@ public enum Editor
     WYSIWYG,
 
     /**
-     * The editor is not explictly defined which means it'll dedcided based on some context information (for example
+     * The editor is not explicitly defined which means it'll dedcided based on some context information (for example
      * based on the wiki's default editor).
      */
     UNDEFINED;

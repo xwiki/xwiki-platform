@@ -184,12 +184,12 @@ public class JGroupsNetworkChannel implements NetworkChannel, Receiver
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             JmxConfigurator.registerChannel(this.jchannel, mbs, this.jchannel.getClusterName() + '-' + currentMemberId);
         } catch (Exception e) {
-            this.logger.warn("Failed to register channel [" + getId() + "] against the JMX Server", e);
+            this.logger.warn("Failed to register channel [{}] against the JMX Server", getId(), e);
         }
 
         // Create the mapping between JGroups member address and XWiki observation id
         this.membersIdMap = new ConcurrentHashMap<>();
-        // Add current instance to the maping
+        // Add current instance to the mapping
         // Need to be done after starting the channel to know the address
         this.membersIdMap.put(this.jchannel.getAddress().toString(), currentMemberId);
         this.members =

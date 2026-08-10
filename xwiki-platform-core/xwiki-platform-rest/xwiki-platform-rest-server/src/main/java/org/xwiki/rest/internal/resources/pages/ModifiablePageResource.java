@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.Page;
@@ -46,6 +47,9 @@ public class ModifiablePageResource extends XWikiResource
 
     @Inject
     private ContextualAuthorizationManager contextualAuthorizationManager;
+
+    @Inject
+    private RefactoringConfiguration refactoringConfiguration;
 
     /**
      * Creates or updates the specified page.
@@ -82,23 +86,25 @@ public class ModifiablePageResource extends XWikiResource
      *
      * @param documentInfo identifies the page to be deleted
      * @param skipRecycleBin when {@code true}, the page is deleted permanently instead of being sent to the recycle
-     *  bin; the caller is responsible for having checked that skipping the recycle bin is allowed (wiki configuration)
+     *  bin, provided the wiki configuration allows skipping the recycle bin
      * @throws XWikiException if deleting the page fails
      * @throws WebApplicationException with an {@link Status#UNAUTHORIZED} status if the current user doesn't have the
      *  right to delete the page
      */
-    void deletePage(DocumentInfo documentInfo, boolean skipRecycleBin) throws XWikiException
+    void deletePage(DocumentInfo documentInfo, Boolean skipRecycleBin) throws XWikiException
     {
         Document doc = documentInfo.getDocument();
         DocumentReference documentReference = doc.getDocumentReference();
 
-        // Deleting a page requires the DELETE right, whether or not the recycle bin is skipped. Check it up-front so
-        // that a proper HTTP 401 is returned instead of a generic server error.
+        // Deleting a page requires the DELETE right. Check it up-front so that a proper HTTP 401 is returned instead of
+        // a generic server error.
         if (!this.contextualAuthorizationManager.hasAccess(Right.DELETE, documentReference)) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
 
-        if (skipRecycleBin) {
+        // Skipping the recycle bin permanently deletes the page, so it's only honored when the wiki configuration
+        // enables it.
+        if (Boolean.TRUE.equals(skipRecycleBin) && this.refactoringConfiguration.isRecycleBinSkippingActivated()) {
             // Permanently delete the page, bypassing the recycle bin.
             XWikiContext xcontext = getXWikiContext();
             XWiki xwiki = xcontext.getWiki();

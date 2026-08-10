@@ -93,9 +93,8 @@ public class DefaultWikiComponentManagerEventListener extends AbstractEventListe
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (source instanceof DocumentModelBridge) {
+        if (source instanceof DocumentModelBridge document) {
             // Get the document reference
-            DocumentModelBridge document = (DocumentModelBridge) source;
             DocumentReference documentReference = document.getDocumentReference();
 
             if (event instanceof  DocumentCreatedEvent || event instanceof DocumentUpdatedEvent) {
@@ -104,7 +103,7 @@ public class DefaultWikiComponentManagerEventListener extends AbstractEventListe
                 // Unregister components from the deleted document, if any
                 this.wikiComponentManagerEventListenerHelper.unregisterComponents(documentReference);
             }
-        /* If we are at application startup time, we have to instanciate every document or object that we can find
+        /* If we are at application startup time, we have to instantiate every document or object that we can find
          * in the wiki */
         } else if (event instanceof ApplicationReadyEvent || event instanceof WikiReadyEvent) {
             // These 2 events are created when the database is ready. We register all wiki components.
@@ -126,13 +125,14 @@ public class DefaultWikiComponentManagerEventListener extends AbstractEventListe
                         List<WikiComponent> components = provider.buildComponents(reference);
                         this.wikiComponentManagerEventListenerHelper.registerComponentList(components);
                     } catch (WikiComponentException e) {
-                        this.logger.warn("Failed to build the wiki component located in the document [{}]: {}",
+                        this.logger.warn("Failed to build the wiki component located in the document [{}]: [{}]",
                                 reference, ExceptionUtils.getRootCauseMessage(e));
                     }
                 }
             }
         } catch (ComponentLookupException e) {
-            this.logger.warn(String.format("Unable to get a list of registered WikiComponentBuilder: %s", e));
+            this.logger.warn("Unable to get a list of registered WikiComponentBuilder: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 
@@ -157,7 +157,7 @@ public class DefaultWikiComponentManagerEventListener extends AbstractEventListe
                     List<WikiComponent> components = provider.buildComponents(documentReference);
                     this.wikiComponentManagerEventListenerHelper.registerComponentList(components);
                 } catch (WikiComponentException e) {
-                    this.logger.warn("Failed to create wiki component(s) for document [{}]: {}", documentReference,
+                    this.logger.warn("Failed to create wiki component(s) for document [{}]: [{}]", documentReference,
                             ExceptionUtils.getRootCauseMessage(e));
                 }
                 break;

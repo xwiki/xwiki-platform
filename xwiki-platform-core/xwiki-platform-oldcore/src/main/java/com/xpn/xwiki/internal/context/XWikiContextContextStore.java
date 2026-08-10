@@ -105,7 +105,7 @@ public class XWikiContextContextStore extends AbstractContextStore
     public static final String PROP_ACTION = "action";
 
     /**
-     * The prefix of the entries containing request related informations.
+     * The prefix of the entries containing request related information.
      */
     public static final String PREFIX_PROP_REQUEST = "request.";
 
@@ -228,7 +228,7 @@ public class XWikiContextContextStore extends AbstractContextStore
     public static final String PROP_REQUEST_WIKI = PREFIX_PROP_REQUEST + SUFFIX_PROP_REQUEST_WIKI;
 
     /**
-     * The prefix of the entries containing context document related informations.
+     * The prefix of the entries containing context document related information.
      */
     public static final String PREFIX_PROP_DOCUMENT = "doc.";
 

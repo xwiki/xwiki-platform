@@ -157,7 +157,7 @@
 
       /**
        * @param node an instance of CKEDITOR.htmlParser.node
-       * @return true if the given node is a macro placeholder, false othewise
+       * @return true if the given node is a macro placeholder, false otherwise
        */
       var isMacroPlaceholder = function(node) {
         return (node.name === 'div' || node.name === 'span') && node.hasClass('macro-placeholder');
@@ -174,7 +174,7 @@
         // placeholder).
         const placeholder = $(macroWidget.element.$).children('.macro-placeholder').addClass('hidden');
         if (!isWidgetVisible(macroWidget)) {
-          // Show the placeholder if the macro widget is not visible, either because the macro doesn't have ouput or
+          // Show the placeholder if the macro widget is not visible, either because the macro doesn't have output or
           // because its output is not visible).
           placeholder.removeClass('hidden');
         }
@@ -890,7 +890,7 @@
       var macroPlugin = this;
       editor.addCommand(definition.commandId, {
         exec: function(editor) {
-          // The macro can be inserted either direcly (using the parameter values specified in the macro call) or after
+          // The macro can be inserted either directly (using the parameter values specified in the macro call) or after
           // filling the missing parameter values in the Macro Editor dialog (which is prefilled with the parameter
           // values from the macro call).
           editor.execCommand(definition.insertDirectly ? 'xwiki-macro-insert' : 'xwiki-macro', definition.macroCall);

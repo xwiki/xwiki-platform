@@ -59,12 +59,6 @@ class XWikiMessageToolTest
 
     private DocumentReference translationDocumentReference2;
 
-    private DocumentReference translationDocumentReferenceFR2;
-
-    private String translationDocumentName1;
-
-    private String translationDocumentName2;
-
     @BeforeEach
     void beforeEach()
     {
@@ -75,14 +69,8 @@ class XWikiMessageToolTest
 
         this.translationDocumentReferenceFR1 = new DocumentReference(this.translationDocumentReference1, Locale.FRENCH);
 
-        this.translationDocumentName1 = "TranslationSpace1.TranslationPage1";
-
         this.translationDocumentReference2 =
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "TranslationSpace1", "TranslationPage2");
-
-        this.translationDocumentReferenceFR2 = new DocumentReference(this.translationDocumentReference2, Locale.FRENCH);
-
-        this.translationDocumentName2 = "TranslationSpace2.TranslationPage2";
     }
 
     public class TestResources extends ListResourceBundle

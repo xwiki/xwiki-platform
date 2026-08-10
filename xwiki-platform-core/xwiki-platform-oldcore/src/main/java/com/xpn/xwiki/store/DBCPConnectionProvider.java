@@ -149,14 +149,14 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
 
             // Isolation level
             String isolationLevel = (String) props.get(Environment.ISOLATION);
-            if ((isolationLevel != null) && (isolationLevel.trim().length() > 0)) {
+            if ((isolationLevel != null) && (!isolationLevel.trim().isEmpty())) {
                 dbcpProperties.put("defaultTransactionIsolation", isolationLevel);
             }
 
             // Turn off autocommit (unless autocommit property is set)
             // Note that this property will be overwritten below if the DBCP "defaultAutoCommit" property is defined.
             String autocommit = (String) props.get(AUTOCOMMIT);
-            if ((autocommit != null) && (autocommit.trim().length() > 0)) {
+            if ((autocommit != null) && (!autocommit.trim().isEmpty())) {
                 dbcpProperties.put("defaultAutoCommit", autocommit);
             } else {
                 dbcpProperties.put("defaultAutoCommit", String.valueOf(Boolean.FALSE));
@@ -164,7 +164,7 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
 
             // Pool size
             String poolSize = (String) props.get(Environment.POOL_SIZE);
-            if ((poolSize != null) && (poolSize.trim().length() > 0) && (Integer.parseInt(poolSize) > 0)) {
+            if ((poolSize != null) && (!poolSize.trim().isEmpty()) && (Integer.parseInt(poolSize) > 0)) {
                 dbcpProperties.put("maxTotal", poolSize);
             }
 

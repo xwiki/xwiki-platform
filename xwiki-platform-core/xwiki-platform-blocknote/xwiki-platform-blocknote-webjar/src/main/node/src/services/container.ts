@@ -19,19 +19,17 @@
  */
 import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
 import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
+import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
+import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
 import { MinimalApp } from "./cristal/MinimalApp";
 import { DefaultDocumentService } from "./document/DefaultDocumentService";
 import { DefaultImageWizard } from "./image/DefaultImageWizard";
 import { DefaultLinkSuggestServiceProvider } from "./link/DefaultLinkSuggestServiceProvider";
-import { XWikiLinkSuggestService } from "./link/XWikiLinkSuggestService";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
 import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
-import { XWikiInlineMacro } from "./macros/XWikiInlineMacro";
-import { XWikiMacroBlock } from "./macros/XWikiMacroBlock";
 import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
 import { DefaultModelReferenceParserProvider } from "./model/reference/DefaultModelReferenceParserProvider";
 import { DefaultModelReferenceSerializerProvider } from "./model/reference/DefaultModelReferenceSerializerProvider";
-import { DefaultResourceReferenceParser } from "./model/reference/DefaultResourceReferenceParser";
 import { XWikiModelReferenceHandler } from "./model/reference/XWikiModelReferenceHandler";
 import { XWikiModelReferenceParser } from "./model/reference/XWikiModelReferenceParser";
 import { XWikiModelReferenceSerializer } from "./model/reference/XWikiModelReferenceSerializer";
@@ -40,18 +38,16 @@ import { DefaultRemoteURLSerializerProvider } from "./model/url/DefaultRemoteURL
 import { XWikiRemoteURLParser } from "./model/url/XWikiRemoteURLParser";
 import { XWikiRemoteURLSerializer } from "./model/url/XWikiRemoteURLSerializer";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
-import { XWikiDesignSystemLoader } from "./skin/XWikiDesignSystemLoader";
 import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
 import { XWikiStorage } from "./storage/XWikiStorage";
-import { DefaultUniAstIterator } from "./uniast/DefaultUniAstIterator";
-import { XWikiUniAstProcessor } from "./uniast/XWikiUniAstProcessor";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
-import { ComponentInit as MacroServiceComponentList } from "@xwiki/platform-macros-service";
+import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
 import { ComponentInit as MarkdownSyntaxConfig } from "@xwiki/platform-markdown-syntax-config";
 import { ComponentInit as MinimalSyntaxConfig } from "@xwiki/platform-minimal-syntax-config";
+import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
 import { ComponentInit as XWikiSyntaxConfig } from "@xwiki/platform-xwiki-syntax-config";
 import { Container } from "inversify";
 
@@ -81,23 +77,19 @@ DefaultAuthenticationManagerProvider.bind(container);
 XWikiAuthenticationManager.bind(container);
 
 DefaultLinkSuggestServiceProvider.bind(container);
-XWikiLinkSuggestService.bind(container);
 
 DefaultSkinManager.bind(container);
-XWikiDesignSystemLoader.bind(container);
 
 DefaultStorageProvider.bind(container);
 XWikiStorage.bind(container);
 new DefaultAttachmentsComponentInit(container);
-new MacroServiceComponentList(container);
 
 new CollaborationComponentList(container);
 new XWikiCollaborationComponentList(container);
+new LinkSuggestXWikiComponentList(container);
 
-DefaultUniAstIterator.bind(container);
-XWikiUniAstProcessor.bind(container);
-XWikiMacroBlock.bind(container);
-XWikiInlineMacro.bind(container);
+DefaultBlockNoteIterator.bind(container);
+XWikiBlockNoteProcessor.bind(container);
 
 DefaultImageWizard.bind(container);
 DefaultMacroWizard.bind(container);

@@ -21,7 +21,6 @@ package org.xwiki.index.internal.migration;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -102,7 +101,7 @@ public class R140300000XWIKI19614DataMigration extends AbstractDocumentsMigratio
                         String locale = Objects.toString(array[1], "");
                         return resolveDocumentReference(String.valueOf(array[0]), locale).stream();
                     })
-                    .collect(Collectors.toList());
+                    .toList();
             } catch (QueryException e) {
                 throw new DataMigrationException(
                     String.format("Failed retrieve the list of all the documents for wiki [%s].", wiki.getName()), e);

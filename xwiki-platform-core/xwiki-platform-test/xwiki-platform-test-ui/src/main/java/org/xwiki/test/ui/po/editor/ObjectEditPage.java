@@ -179,9 +179,9 @@ public class ObjectEditPage extends EditPage
     {
         WebElement xclass = getDriver().findElement(By.id("xclass_" + className));
         List<WebElement> deprecatedPropertiesElements = xclass.findElements(By.className("deprecatedProperties"));
-        if (deprecatedPropertiesElements.size() > 0) {
+        if (!deprecatedPropertiesElements.isEmpty()) {
             String xpath = "//label[. = '" + propertyName + ":']";
-            return deprecatedPropertiesElements.get(0).findElements(By.xpath(xpath)).size() > 0;
+            return !deprecatedPropertiesElements.get(0).findElements(By.xpath(xpath)).isEmpty();
         }
         return false;
     }

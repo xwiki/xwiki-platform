@@ -270,7 +270,7 @@ public class EntityReferenceTreeNode
         }
 
         if (!getChildren().isEmpty()) {
-            if (builder.length() > 0) {
+            if (!builder.isEmpty()) {
                 builder.append(" = ");
             }
             builder.append(getChildren());

@@ -90,7 +90,7 @@ import static org.mockito.Mockito.when;
  * @since 12.9RC1
  */
 @ComponentTest
-public class SolrRatingsManagerTest
+class SolrRatingsManagerTest
 {
     @InjectMockComponents
     private SolrRatingsManager manager;
@@ -154,7 +154,6 @@ public class SolrRatingsManagerTest
         doAnswer(invocationOnMock -> {
             String fieldName = invocationOnMock.getArgument(0);
             Object fieldValue = invocationOnMock.getArgument(1);
-            Type type = invocationOnMock.getArgument(2);
             SolrInputDocument inputDocument = invocationOnMock.getArgument(3);
             inputDocument.setField(fieldName, fieldValue);
             return null;
@@ -997,8 +996,9 @@ public class SolrRatingsManagerTest
 
         // rating2 have not the appropriate reference but the appropriate parent
         when(rating2.get(RatingQueryField.IDENTIFIER.getFieldName())).thenReturn("rating2");
+        EntityReference entityReferenceMock = mock(EntityReference.class);
         when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), rating2, EntityReference.class))
-            .thenReturn(mock(EntityReference.class));
+            .thenReturn(entityReferenceMock);
         when(this.solrUtils.getCollection(RatingQueryField.PARENTS_REFERENCE.getFieldName(), rating2,
             EntityReference.class))
             .thenReturn(Collections.singletonList(oldReference));
@@ -1013,8 +1013,9 @@ public class SolrRatingsManagerTest
 
         // rating4 only contain the appropriate parent
         when(rating4.get(RatingQueryField.IDENTIFIER.getFieldName())).thenReturn("rating4");
+        EntityReference entityReferenceMock2 = mock(EntityReference.class);
         when(this.solrUtils.get(RatingQueryField.ENTITY_REFERENCE.getFieldName(), rating4, EntityReference.class))
-            .thenReturn(mock(EntityReference.class));
+            .thenReturn(entityReferenceMock2);
         when(this.solrUtils.getCollection(RatingQueryField.PARENTS_REFERENCE.getFieldName(), rating4,
             EntityReference.class))
             .thenReturn(Arrays.asList(mock(EntityReference.class), mock(EntityReference.class), oldReference));

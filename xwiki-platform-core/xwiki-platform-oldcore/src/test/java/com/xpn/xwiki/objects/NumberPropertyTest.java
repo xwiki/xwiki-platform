@@ -33,6 +33,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @version $Id$
  */
+// The equals() tests below verify that contract itself, so their assertions deliberately call equals()
+// explicitly: the boolean form is what makes visible which object is the receiver and which argument it
+// gets, which matters here because the null-valued and non-null-valued sides are not interchangeable.
+// Using assertEquals()/assertNotEquals() would move that into JUnit's internals and would invite a later
+// SonarQube S3415 "swap these arguments" change that silently stops testing the contract. That is why
+// those methods, and only those, carry @SuppressWarnings("java:S5785").
 class NumberPropertyTest
 {
     /**
@@ -40,6 +46,7 @@ class NumberPropertyTest
      * NPE (<a href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
+    @SuppressWarnings("java:S5785")
     void nullValueEqualsWithOtherNumberProperty()
     {
         IntegerProperty nullValueProperty = new IntegerProperty();
@@ -59,6 +66,7 @@ class NumberPropertyTest
      * NPE (<a href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
+    @SuppressWarnings("java:S5785")
     void notNullValueEqualsWithOtherNullNumberProperty()
     {
         IntegerProperty nullValueProperty = new IntegerProperty();
@@ -78,6 +86,7 @@ class NumberPropertyTest
      * (<a href="https://jira.xwiki.org/browse/XWIKI-9326">XWIKI-9326</a>).
      */
     @Test
+    @SuppressWarnings("java:S5785")
     void equalNullValueEquals()
     {
         IntegerProperty nullValueProperty1 = new IntegerProperty();
@@ -96,6 +105,7 @@ class NumberPropertyTest
      * Two equal non-null values.
      */
     @Test
+    @SuppressWarnings("java:S5785")
     void equalNotNullValues()
     {
         IntegerProperty nullValueProperty = new IntegerProperty();
@@ -111,6 +121,7 @@ class NumberPropertyTest
      * Two not equal non-null values.
      */
     @Test
+    @SuppressWarnings("java:S5785")
     void notEqualNonNullValues()
     {
         IntegerProperty nullValueProperty = new IntegerProperty();

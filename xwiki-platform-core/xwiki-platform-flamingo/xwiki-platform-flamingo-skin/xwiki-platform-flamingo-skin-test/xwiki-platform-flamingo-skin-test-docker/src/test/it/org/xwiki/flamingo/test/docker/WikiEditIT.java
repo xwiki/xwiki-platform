@@ -896,7 +896,7 @@ class WikiEditIT
 
         // Right now error messages from the server are different if we are using Save&View or Save&Continue.
         // This needs to be fixed as part of XWIKI-16425.
-        String saveErrorMessage = "Failed to save the page. Reason: An error occured while saving: Error number"
+        String saveErrorMessage = "Failed to save the page. Reason: An error occurred while saving: Error number"
             + " 3201 in 3: Exception while saving document " + setup.serializeReference(testReference) + ".";
 
         // try with save and continue

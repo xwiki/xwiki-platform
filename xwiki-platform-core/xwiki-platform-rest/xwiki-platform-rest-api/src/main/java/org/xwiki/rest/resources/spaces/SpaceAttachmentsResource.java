@@ -35,9 +35,32 @@ import org.xwiki.rest.model.jaxb.Attachments;
 @Path("/wikis/{wikiName}/spaces/{spaceName: .+}/attachments")
 public interface SpaceAttachmentsResource
 {
+    /**
+     * Lists the attachments contained in the pages of a given space, optionally filtered.
+     *
+     * @param wikiName the identifier of the wiki storing the space, for example {@code xwiki} for the main wiki
+     * @param spaceName the reference of the space(s) to list attachments from; nested spaces are separated by
+     *  {@code /spaces/} (for example {@code A/spaces/B/spaces/C} for the space {@code A.B.C})
+     * @param name keeps only attachments whose file name contains this value (case-insensitive), for example
+     *  {@code logo}; empty by default (no filtering)
+     * @param page keeps only attachments held by a page whose full name contains this value (case-insensitive), for
+     *  example {@code WebHome}; empty by default (no filtering)
+     * @param author keeps only attachments whose author reference contains this value (case-insensitive), for example
+     *  {@code XWiki.Admin}; empty by default (no filtering)
+     * @param types a comma-separated list of media types and/or file-name extensions (extensions start with a dot) to
+     *  keep, for example {@code image/png,.pdf}; empty by default (no filtering)
+     * @param start the 0-based index of the first attachment to return, used together with {@code number} for
+     *  pagination; defaults to {@code 0}
+     * @param number the maximum number of attachments to return; defaults to {@code 25}, and a value that is negative
+     *  or larger than the wiki's configured REST query limit is rejected with a {@code 400} response
+     * @param withPrettyNames when {@code true}, also computes human-readable display names (for example the author's
+     *  display name and the document title) in addition to the technical references, at some extra cost; defaults to
+     *  {@code false}
+     * @return the matching attachments the current user is allowed to view, within the requested pagination window
+     * @throws XWikiRestException if the attachments cannot be retrieved
+     */
     // Needs a lot of parameters to bind path and query parameters
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings({"checkstyle:ParameterNumber", "checkstyle:MissingJavadocMethod"})
+    @SuppressWarnings("checkstyle:ParameterNumber")
     @GET Attachments getAttachments(
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,

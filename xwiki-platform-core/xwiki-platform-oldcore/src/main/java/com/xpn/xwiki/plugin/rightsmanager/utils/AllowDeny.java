@@ -44,7 +44,7 @@ public class AllowDeny
         StringBuilder sb = new StringBuilder();
 
         String allowString = this.allow.toString();
-        if (allowString.length() > 0) {
+        if (!allowString.isEmpty()) {
             sb.append('{');
             sb.append("allow : ");
             sb.append(this.allow);
@@ -52,7 +52,7 @@ public class AllowDeny
         }
 
         String denyString = this.deny.toString();
-        if (denyString.length() > 0) {
+        if (!denyString.isEmpty()) {
             sb.append('{');
             sb.append("deny : ");
             sb.append(this.deny);

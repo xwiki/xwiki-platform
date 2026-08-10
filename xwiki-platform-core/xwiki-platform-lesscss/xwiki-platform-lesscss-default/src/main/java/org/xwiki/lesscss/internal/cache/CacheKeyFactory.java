@@ -82,14 +82,17 @@ public class CacheKeyFactory
             Request request = container.getRequest();
             List<String> excludes = Arrays.asList("skin", "colorTheme", "colorThemeVersion", "language", "docVersion",
                 XWiki.CACHE_VERSION);
-            if (request instanceof ServletRequest) {
-                Map<String, String[]> parameters = ((ServletRequest) request).getHttpServletRequest().getParameterMap();
+            if (request instanceof ServletRequest servletRequest) {
+                Map<String, String[]> parameters = servletRequest.getHttpServletRequest().getParameterMap();
+                StringBuilder resultBuilder = new StringBuilder(result);
                 for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
                     if (!excludes.contains(entry.getKey())) {
                         String[] values = entry.getValue();
-                        result += CACHE_KEY_SEPARATOR + entry.getKey() + ":" + StringUtils.join(values, "|");
+                        resultBuilder.append(CACHE_KEY_SEPARATOR).append(entry.getKey()).append(":")
+                            .append(StringUtils.join(values, "|"));
                     }
                 }
+                result = resultBuilder.toString();
             }
 
             String xcontext = xcontextCacheKeyFactory.getCacheKey();

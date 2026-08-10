@@ -39,7 +39,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
@@ -158,14 +158,11 @@ class DefaultReferenceEntityReferenceResolverTest implements TestConstants
     @Test
     void resolveDocumentReferenceWhenInvalidReference()
     {
-        try {
-            this.resolver.resolve(new EntityReference("document", EntityType.DOCUMENT,
-                new EntityReference("filename", EntityType.ATTACHMENT)), EntityType.DOCUMENT);
-
-            fail("Should have thrown an exception here");
-        } catch (InvalidEntityReferenceException expected) {
-            assertEquals("Invalid reference [Document filename???document]", expected.getMessage());
-        }
+        InvalidEntityReferenceException expected =
+            assertThrows(InvalidEntityReferenceException.class, () -> this.resolver.resolve(
+                new EntityReference("document", EntityType.DOCUMENT,
+                    new EntityReference("filename", EntityType.ATTACHMENT)), EntityType.DOCUMENT));
+        assertEquals("Invalid reference [Document filename???document]", expected.getMessage());
     }
 
     @Test

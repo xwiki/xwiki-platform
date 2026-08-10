@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-public class DefaultXWikiStubContextProviderTest
+class DefaultXWikiStubContextProviderTest
 {
     @MockComponent
     private Execution execution;
@@ -67,7 +67,7 @@ public class DefaultXWikiStubContextProviderTest
     private XWikiURLFactoryService urlFactoryService = mock(XWikiURLFactoryService.class);
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequestStub());
         this.oldcore.getXWikiContext().setResponse(new XWikiServletResponseStub());
@@ -80,7 +80,7 @@ public class DefaultXWikiStubContextProviderTest
     }
 
     @Test
-    public void createStubContext()
+    void createStubContext()
     {
         XWikiContext xcontext1 = this.provider.createStubContext();
         XWikiContext xcontext2 = this.provider.createStubContext();
@@ -92,7 +92,7 @@ public class DefaultXWikiStubContextProviderTest
     }
 
     @Test
-    public void createStubContextWithLoopProtection()
+    void createStubContextWithLoopProtection()
     {
         XWikiContext[] subContext = new XWikiContext[1];
 
@@ -115,7 +115,7 @@ public class DefaultXWikiStubContextProviderTest
     }
 
     @Test
-    public void createStubContextWithNoExecutionContext()
+    void createStubContextWithNoExecutionContext()
     {
         when(this.execution.getContext()).thenReturn(null);
 

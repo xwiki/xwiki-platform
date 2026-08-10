@@ -23,8 +23,11 @@ import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -64,6 +67,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class WikisResourceIT extends AbstractHttpIT
 {
+    private static final int MAX_REPORTED_INVERSIONS = 10;
+
     private String wikiName;
 
     private List<String> spaces;
@@ -116,7 +121,7 @@ class WikisResourceIT extends AbstractHttpIT
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(wikis.getWikis().size() > 0, getHttpMethodInfo(getMethod));
+        assertTrue(!wikis.getWikis().isEmpty(), getHttpMethodInfo(getMethod));
 
         for (Wiki wiki : wikis.getWikis()) {
             Link link = getFirstLinkByRelation(wiki, Relations.SPACES);
@@ -365,7 +370,7 @@ class WikisResourceIT extends AbstractHttpIT
 
         Pages pages = (Pages) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        assertTrue(pages.getPageSummaries().size() > 0);
+        assertTrue(!pages.getPageSummaries().isEmpty());
 
         for (PageSummary pageSummary : pages.getPageSummaries()) {
             checkLinks(pageSummary);
@@ -410,7 +415,7 @@ class WikisResourceIT extends AbstractHttpIT
 
         Attachments attachments = (Attachments) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        assertTrue(attachments.getAttachments().size() > 0);
+        assertTrue(!attachments.getAttachments().isEmpty());
 
         for (Attachment attachment : attachments.getAttachments()) {
             checkLinks(attachment);
@@ -430,7 +435,8 @@ class WikisResourceIT extends AbstractHttpIT
         }
 
         // Verify we can search for all attachments in a given space (sandbox)
-        // Also verify that a space can be looked up independtly of its case ("sandbox" will match the "Sandbox" space)
+        // Also verify that a space can be looked up independently of its case ("sandbox" will match the "Sandbox"
+        // space)
         getMethod = executeGet(
             String.format("%s?space=" + getTestClassName(), buildURI(WikiAttachmentsResource.class, getWiki())));
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
@@ -556,6 +562,111 @@ class WikisResourceIT extends AbstractHttpIT
         SearchResults searchResults = getUtil().getDriver().waitUntilCondition(d -> search(1, query));
 
         assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+    }
+
+    /**
+     * Check that the pages are returned ordered by full name, which is what makes paginating them with
+     * number/start stable.
+     */
+    @Test
+    void testPagesOrder() throws Exception
+    {
+        // Names whose order differs between a binary and a locale-aware collation, see also SolrIndexerIT#sortOrder:
+        // XWiki requires a binary collation in all databases, also for consistency with Solr.
+        List<String> suffixes = List.of("Abc", "aBc", "Bac", "bAc", "Äbc", "äBc");
+        List<DocumentReference> references = suffixes.stream()
+            .map(suffix -> new DocumentReference(this.wikiName, this.spaces, this.pageName + suffix))
+            .toList();
+        // The expected order is the binary order of the full names.
+        List<String> createdOrdered = suffixes.stream().map(suffix -> this.fullName + suffix).sorted().toList();
+        try {
+            for (DocumentReference reference : references) {
+                getUtil().rest().savePage(reference, "content", "title");
+            }
+
+            GetMethod getMethod =
+                executeGet(String.format("%s?number=1000", buildURI(WikiPagesResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+            Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+            List<String> fullNames = pages.getPageSummaries().stream().map(PageSummary::getFullName).toList();
+            // The whole result must be ordered by full name, translations of the same document compare equal.
+            assertEquals("", describeInversions(fullNames, Comparator.naturalOrder()),
+                "The pages aren't ordered by full name.");
+            // Check the pages created by this test explicitly, so that the assertion above cannot pass just because
+            // no page exercised the ordering.
+            assertEquals(createdOrdered, fullNames.stream().filter(createdOrdered::contains).distinct().toList());
+        } finally {
+            for (DocumentReference reference : references) {
+                getUtil().rest().delete(reference);
+            }
+        }
+    }
+
+    /**
+     * Check that the attachments are returned ordered by page and file name, which is what makes paginating them
+     * with number/start stable.
+     */
+    @Test
+    void testAttachmentsOrder() throws Exception
+    {
+        getUtil().rest().delete(this.reference);
+
+        // Names whose order differs between a binary and a locale-aware collation, see also SolrIndexerIT#sortOrder:
+        // XWiki requires a binary collation in all databases, also for consistency with Solr.
+        List<String> fileNames = Stream.of("Abc", "aBc", "Bac", "bAc", "Äbc", "äBc")
+            .map(name -> getTestMethodName() + name + ".txt")
+            .toList();
+        // The expected order is the binary order of the file names, all attachments are on the same page.
+        List<String> createdOrdered = fileNames.stream().sorted().toList();
+        try {
+            for (String fileName : fileNames) {
+                getUtil().rest().attachFile(new AttachmentReference(fileName, this.reference),
+                    new ByteArrayInputStream(fileName.getBytes(StandardCharsets.UTF_8)), true);
+            }
+
+            GetMethod getMethod =
+                executeGet(String.format("%s?number=1000", buildURI(WikiAttachmentsResource.class, getWiki())));
+            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+            Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+            // The whole result must be ordered by page and then file name.
+            List<List<String>> keys = attachments.getAttachments().stream()
+                .map(attachment -> List.of(attachment.getPageId(), attachment.getName()))
+                .toList();
+            Comparator<List<String>> keyComparator =
+                Comparator.<List<String>, String>comparing(key -> key.get(0)).thenComparing(key -> key.get(1));
+            assertEquals("", describeInversions(keys, keyComparator),
+                "The attachments aren't ordered by page and file name.");
+            // Check the attachments created by this test explicitly, so that the assertion above cannot pass just
+            // because no attachment exercised the ordering.
+            assertEquals(createdOrdered, attachments.getAttachments().stream()
+                .map(Attachment::getName)
+                .filter(createdOrdered::contains)
+                .toList());
+        } finally {
+            getUtil().rest().delete(this.reference);
+        }
+    }
+
+    /**
+     * @return a description of the pairs of consecutive items that are in the wrong order, so that a failure reports
+     *     the actual problem and not the whole result, empty when the items are correctly ordered
+     */
+    private static <T> String describeInversions(List<T> items, Comparator<T> comparator)
+    {
+        List<String> inversions = IntStream.range(1, items.size())
+            .filter(i -> comparator.compare(items.get(i - 1), items.get(i)) > 0)
+            .mapToObj(i -> "[%d] %s > [%d] %s".formatted(i - 1, items.get(i - 1), i, items.get(i)))
+            .toList();
+
+        if (inversions.isEmpty()) {
+            return "";
+        }
+
+        // Only report the first few pairs, an unordered result inverts a lot of them.
+        return "%d of %d consecutive pairs are in the wrong order: %s".formatted(inversions.size(),
+            Math.max(items.size() - 1, 0), inversions.stream().limit(MAX_REPORTED_INVERSIONS).toList());
     }
 
     @Test

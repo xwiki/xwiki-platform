@@ -32,7 +32,8 @@ import org.xwiki.store.RootTransactionRunnable;
  * @version $Id$
  * @since 3.0M2
  */
-public class XWikiHibernateTransaction extends RootTransactionRunnable implements HibernateTransaction
+public class XWikiHibernateTransaction extends RootTransactionRunnable<XWikiHibernateTransaction>
+    implements HibernateTransaction
 {
     /**
      * The storage engine.

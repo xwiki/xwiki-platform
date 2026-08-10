@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.phase.Initializable;
@@ -149,7 +150,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
             }
             return documentReferences;
         } catch (QueryException e) {
-            this.logger.warn("Failed to query sheet bindings.", e);
+            this.logger.warn("Failed to query sheet bindings", e);
             return Collections.emptyList();
         }
     }
@@ -193,7 +194,8 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
             String docStringReference =
                 this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
 
-            this.logger.warn("Failed to bind sheet [{}] to document [{}].", sheetReferenceString, docStringReference);
+            this.logger.warn("Failed to bind sheet [{}] to document [{}]. Root cause is [{}]", sheetReferenceString,
+                docStringReference, ExceptionUtils.getRootCauseMessage(e));
 
             return false;
         }

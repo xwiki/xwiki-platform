@@ -67,7 +67,6 @@ import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.repository.search.Searchable;
 import org.xwiki.extension.version.Version;
-import org.xwiki.extension.version.Version.Type;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.internal.VersionUtils;
 import org.xwiki.job.AbstractJob;
@@ -257,7 +256,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
     {
         SolrQuery solrQuery = new SolrQuery();
         Set<ExtensionId> extensionIds = this.indexStore.searchExtensionIds(solrQuery);
-        Map<String, SortedSet<Version>> extensions = new HashMap<>(extensionIds.size());
+        Map<String, SortedSet<Version>> extensions = HashMap.newHashMap(extensionIds.size());
         for (ExtensionId extensionId : extensionIds) {
             add(extensionId, extensions);
         }
@@ -567,34 +566,6 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         this.progress.popLevelProgress(indexedExtensions);
     }
 
-    private void addLocalExtensions(Map<String, SortedSet<Version>> indexedExtensions)
-        throws SearchException, SolrServerException, IOException
-    {
-        boolean updated = false;
-
-        IterableResult<Extension> extensions = this.localExtensions.search("", 0, -1);
-
-        // Add the extensions
-        for (Extension extension : extensions) {
-            if (!this.invalidFlavors.contains(extension.getId().getId())) {
-                // TODO: support beta and snapshots versions too ?
-                if (extension.getId().getVersion().getType() == Type.STABLE
-                    && !this.indexStore.exists(extension.getId(), true)) {
-                    this.indexStore.add(extension, true);
-
-                    updated = true;
-                    getStatus().setExtensionAdded(true);
-
-                    add(extension.getId(), indexedExtensions);
-                }
-            }
-        }
-
-        if (updated) {
-            this.indexStore.commit();
-        }
-    }
-
     private void addRemoteExtensions(Map<String, SortedSet<Version>> indexedExtensions)
         throws SolrServerException, IOException
     {
@@ -608,7 +579,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
                 try {
                     updated |= addRemoteExtensions(searchableRepository, indexedExtensions);
                 } catch (Exception e) {
-                    this.logger.warn("Failed to get remote extension from repository [{}]: {}",
+                    this.logger.warn("Failed to get remote extension from repository [{}]: [{}]",
                         repository.getDescriptor(), ExceptionUtils.getRootCauseMessage(e));
                 }
             }

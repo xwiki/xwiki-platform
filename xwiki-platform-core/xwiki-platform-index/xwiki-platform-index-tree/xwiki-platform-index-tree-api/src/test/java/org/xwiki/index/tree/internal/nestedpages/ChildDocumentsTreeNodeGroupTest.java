@@ -136,7 +136,7 @@ class ChildDocumentsTreeNodeGroupTest
     private DocumentReference terminalDocumentReference = new DocumentReference("wiki", "Some", "Page");
 
     @BeforeEach
-    public void before(MockitoComponentManager componentManager) throws Exception
+    void before(MockitoComponentManager componentManager) throws Exception
     {
         when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));

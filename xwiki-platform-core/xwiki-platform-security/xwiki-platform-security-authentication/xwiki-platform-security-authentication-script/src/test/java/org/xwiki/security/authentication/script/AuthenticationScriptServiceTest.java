@@ -28,7 +28,6 @@ import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.mail.internet.InternetAddress;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -203,7 +202,6 @@ class AuthenticationScriptServiceTest
         UserReference userReference = mock(UserReference.class);
         ResetPasswordRequestResponse requestResponse = mock(ResetPasswordRequestResponse.class);
         when(this.resetPasswordManager.requestResetPassword(userReference)).thenReturn(requestResponse);
-        InternetAddress userEmail = new InternetAddress("acme@xwiki.org");
 
         this.scriptService.requestResetPassword(userReference);
         verify(this.resetPasswordManager).sendResetPasswordEmailRequest(requestResponse);

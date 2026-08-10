@@ -55,7 +55,7 @@ class NumberClassTest
         bc.setName("Some.Class");
         nc.setObject(bc);
 
-        // A String value containing non-numeric caracters can not be respresented as a numeric value, so this sould
+        // A String value containing non-numeric characters can not be represented as a numeric value, so this sould
         // throw an exception
         XWikiException xWikiException = assertThrows(XWikiException.class, () -> nc.fromString("asd"));
         assertEquals("Error number 0 in 0: Error when parsing [asd] to type [long]",  xWikiException.getMessage());

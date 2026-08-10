@@ -52,7 +52,7 @@ public abstract class AbstractXMLSerializer<R, P extends R> implements XMLSerial
     public InputStream serialize(final R object) throws IOException
     {
         // This puts everything on the heap for now.
-        // if size becomes a major problem, the alternitive is to fork over another thread
+        // if size becomes a major problem, the alternative is to fork over another thread
         // and use a PipedInputStream.
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

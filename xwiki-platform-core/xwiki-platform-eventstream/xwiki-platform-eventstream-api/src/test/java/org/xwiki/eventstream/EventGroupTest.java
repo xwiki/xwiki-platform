@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class EventGroupTest
+class EventGroupTest
 {
     EventGroup g;
 
@@ -52,7 +52,7 @@ public class EventGroupTest
     DefaultEvent event3 = new DefaultEvent();
 
     @BeforeEach
-    public void beforeEach()
+    void beforeEach()
     {
         this.g = new EventGroup();
 
@@ -62,7 +62,7 @@ public class EventGroupTest
     }
 
     @Test
-    public void testConstructors()
+    void testConstructors()
     {
         assertNotNull(this.g.getEvents());
         assertEquals(0, this.g.getEvents().size());
@@ -94,7 +94,7 @@ public class EventGroupTest
     }
 
     @Test
-    public void testConstructorsWithNull()
+    void testConstructorsWithNull()
     {
         this.g = new EventGroup((List<Event>) null);
         assertNotNull(this.g.getEvents());
@@ -110,7 +110,7 @@ public class EventGroupTest
     }
 
     @Test
-    public void testConstructorsWithNullElements()
+    void testConstructorsWithNullElements()
     {
         List<Event> eventsList = new ArrayList<Event>();
         eventsList.add(this.event1);
@@ -133,7 +133,7 @@ public class EventGroupTest
     }
 
     @Test
-    public void testGetMainEvent()
+    void testGetMainEvent()
     {
         this.event1.setImportance(Importance.BACKGROUND);
         this.event2.setImportance(Importance.MAJOR);
@@ -177,7 +177,7 @@ public class EventGroupTest
     }
 
     @Test
-    public void testAddEvents()
+    void testAddEvents()
     {
         assertTrue(this.g.getEvents().isEmpty());
         assertTrue(this.g.getEvents().isEmpty());
@@ -200,7 +200,7 @@ public class EventGroupTest
     }
 
     @Test
-    public void testAddEventsWithNull()
+    void testAddEventsWithNull()
     {
         this.g.addEvents((Event) null);
         assertTrue(this.g.getEvents().isEmpty());
@@ -212,7 +212,7 @@ public class EventGroupTest
     }
 
     @Test
-    public void testClearEvents()
+    void testClearEvents()
     {
         assertTrue(this.g.getEvents().isEmpty());
         this.g.addEvents(this.event1);
@@ -230,7 +230,7 @@ public class EventGroupTest
     }
 
     @Test
-    public void testGetEventsIsReadonly()
+    void testGetEventsIsReadonly()
     {
         this.g.addEvents(this.event1, this.event2);
 
@@ -238,7 +238,7 @@ public class EventGroupTest
     }
 
     @Test
-    public void testGetEventsIsNotLive()
+    void testGetEventsIsNotLive()
     {
         this.g.addEvents(this.event1, this.event2);
         Set<Event> view = this.g.getEvents();

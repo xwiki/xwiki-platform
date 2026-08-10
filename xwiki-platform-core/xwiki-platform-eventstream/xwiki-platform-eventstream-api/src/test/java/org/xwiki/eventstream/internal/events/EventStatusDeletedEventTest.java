@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class EventStatusDeletedEventTest
+class EventStatusDeletedEventTest
 {
     @Test
-    public void matches()
+    void matches()
     {
         EventStatusDeletedEvent event = new EventStatusDeletedEvent();
 

@@ -31,6 +31,7 @@ import org.xwiki.index.tree.test.po.DocumentPickerModal;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestLocalReference;
@@ -244,16 +245,21 @@ class CopyPageIT
     @Test
     void copyPagePreservingChildren(TestUtils setup) throws Exception
     {
-        String sourceSpaceName = "CopyWithChildren";
-        String childSpaceName = "ChildSpace";
-        String targetSpaceName = "CopyWithChildrenCopy";
+        // Use a nested space hierarchy for both the source and the target to verify that copying a WebHome page
+        // located deep in a hierarchy to another location deep in a hierarchy works and preserves the children.
+        List<String> sourceSpaces = Arrays.asList("CopyWithChildren", "SourceLevel2", "SourceLevel3");
+        List<String> childSpaces = Arrays.asList("CopyWithChildren", "SourceLevel2", "SourceLevel3", "ChildSpace");
+        SpaceReference targetParentReference =
+            new SpaceReference("xwiki", Arrays.asList("CopyWithChildrenTarget", "TargetLevel2"));
+        String targetName = "TargetLevel3";
+        List<String> targetSpaces = Arrays.asList("CopyWithChildrenTarget", "TargetLevel2", "TargetLevel3");
+        List<String> targetChildSpaces =
+            Arrays.asList("CopyWithChildrenTarget", "TargetLevel2", "TargetLevel3", "ChildSpace");
 
-        DocumentReference sourceReference = new DocumentReference("xwiki", sourceSpaceName, "WebHome");
-        DocumentReference childReference =
-            new DocumentReference("xwiki", Arrays.asList(sourceSpaceName, childSpaceName), "WebHome");
-        DocumentReference targetReference = new DocumentReference("xwiki", targetSpaceName, "WebHome");
-        DocumentReference targetChildReference =
-            new DocumentReference("xwiki", Arrays.asList(targetSpaceName, childSpaceName), "WebHome");
+        DocumentReference sourceReference = new DocumentReference("xwiki", sourceSpaces, "WebHome");
+        DocumentReference childReference = new DocumentReference("xwiki", childSpaces, "WebHome");
+        DocumentReference targetReference = new DocumentReference("xwiki", targetSpaces, "WebHome");
+        DocumentReference targetChildReference = new DocumentReference("xwiki", targetChildSpaces, "WebHome");
 
         // Clean-up: delete pages that may already exist
         setup.rest().delete(sourceReference);
@@ -273,8 +279,11 @@ class CopyPageIT
         // Verify that the preserve children checkbox is present and checked by default
         assertTrue(copyPage.isDeepCopy());
 
-        // Set the target space name
-        copyPage.getDocumentPicker().toggleLocationAdvancedEdit().setName(targetSpaceName);
+        // Set the nested target location, using the advanced edit to set both the parent space and the name.
+        DocumentPicker documentPicker = copyPage.getDocumentPicker();
+        documentPicker.toggleLocationAdvancedEdit()
+            .setParent(setup.serializeReference(targetParentReference)).setName(targetName);
+        documentPicker.waitForName(targetName);
 
         // Click copy button and wait for completion
         CopyOrRenameOrDeleteStatusPage copyStatusPage = copyPage.clickCopyButton().waitUntilFinished();
@@ -282,12 +291,13 @@ class CopyPageIT
         // Check successful copy confirmation
         assertEquals(COPY_SUCCESSFUL, copyStatusPage.getInfoMessage());
 
-        // Verify the parent page was copied
-        assertTrue(setup.pageExists(Arrays.asList(targetSpaceName), "WebHome"),
-            String.format("Target page [%s.WebHome] should have been copied", targetSpaceName));
+        // Verify the parent page was copied to the nested target location, along with its content
+        assertTrue(setup.pageExists(targetSpaces, "WebHome"),
+            String.format("Target page [%s.WebHome] should have been copied", targetSpaces));
+        assertEquals(PAGE_CONTENT, copyStatusPage.gotoNewPage().getContent());
 
         // Verify the child page was preserved during the copy
-        assertTrue(setup.pageExists(Arrays.asList(targetSpaceName, childSpaceName), "WebHome"),
-            String.format("Child page [%s.%s.WebHome] should have been copied", targetSpaceName, childSpaceName));
+        assertTrue(setup.pageExists(targetChildSpaces, "WebHome"),
+            String.format("Child page [%s.WebHome] should have been copied", targetChildSpaces));
     }
 }

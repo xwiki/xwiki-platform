@@ -94,17 +94,13 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
     public XWikiDocument merge(XWikiDocument currentDocument, XWikiDocument previousDocument,
         XWikiDocument nextDocument, XWikiDocumentMergerConfiguration configuration) throws XarExtensionException
     {
-        //////////
         // Upgrade
-        //////////
 
         if (previousDocument != null) {
             return upgrade(currentDocument, previousDocument, nextDocument, configuration);
         }
 
-        //////////
         // Install
-        //////////
 
         return install(currentDocument, nextDocument, configuration);
     }

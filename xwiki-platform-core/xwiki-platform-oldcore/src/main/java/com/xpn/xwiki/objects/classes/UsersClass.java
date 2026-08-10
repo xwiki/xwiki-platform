@@ -112,7 +112,7 @@ public class UsersClass extends ListClass
             return (List<String>) context.getWiki().getGroupService(context)
                 .getAllMatchedUsers(null, false, 0, 0, null, context);
         } catch (XWikiException e) {
-            LOGGER.warn("Failed to retrieve the list of users.", e);
+            LOGGER.warn("Failed to retrieve the list of users", e);
             return Collections.emptyList();
         }
     }
@@ -124,7 +124,7 @@ public class UsersClass extends ListClass
         // return an iterator instead that gets users by batches.
         Map<String, ListItem> result;
         List<String> users = getList(context);
-        if (users != null && users.size() > 0) {
+        if (users != null && !users.isEmpty()) {
             result = new LinkedHashMap<>();
             for (String userName : users) {
                 // Get the user name for pretty display

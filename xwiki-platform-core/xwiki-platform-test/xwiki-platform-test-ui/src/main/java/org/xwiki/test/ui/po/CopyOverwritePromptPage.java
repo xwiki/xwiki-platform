@@ -80,7 +80,7 @@ public class CopyOverwritePromptPage extends ViewPage
 
     /**
      * Click the cancel link.
-     * @return the view page of the originaly copied document.
+     * @return the view page of the originally copied document.
      */
     public ViewPage clickCancelButton()
     {

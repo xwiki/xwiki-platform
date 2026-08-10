@@ -42,4 +42,12 @@ public class XarClassModel
     public static final String ELEMENT_NAMEFIELD = "nameField";
 
     public static final String ELEMENT_VALIDATIONSCRIPT = "validationScript";
+
+    /**
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
+     */
+    protected XarClassModel()
+    {
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
+    }
 }

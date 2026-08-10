@@ -89,27 +89,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
      * Pattern matching the cell range.
      */
     private static final Pattern RANGE_PATTERN =
-        Pattern.compile("^([A-Z]+|\\.)([0-9]+|\\.)-([A-Z]+|\\.)([0-9]+|\\.)$");
-
-    /**
-     * The name of the category dataset.
-     */
-    private static final String CATEGORY_DATASET = "category";
-
-    /**
-     * The name of the time series dataset.
-     */
-    private static final String TIME_SERIES_DATASET = "timeseries";
-
-    /**
-     * The name of the pie dataset.
-     */
-    private static final String PIE_DATASET = "pie";
-
-    /**
-     * The default dataset.
-     */
-    private static final String DEFAULT_DATASET = CATEGORY_DATASET;
+        Pattern.compile("^([A-Z]+|\\.)(\\d+|\\.)-([A-Z]+|\\.)(\\d+|\\.)$");
 
     /**
      * The range parameter.

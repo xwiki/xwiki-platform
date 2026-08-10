@@ -21,7 +21,6 @@ package org.xwiki.rendering.internal.macro.dashboard;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -85,14 +84,8 @@ public class ColumnsDashboardRenderer implements DashboardRenderer
 
         // sort the column gadgets by first the column number then by index in column, for all those which have a valid
         // position
-        Collections.sort(columnGadgets, new Comparator<ColumnGadget>()
-        {
-            public int compare(ColumnGadget g1, ColumnGadget g2)
-            {
-                return g1.getColumn().equals(g2.getColumn()) ? g1.getIndex() - g2.getIndex() : g1.getColumn()
-                    - g2.getColumn();
-            }
-        });
+        Collections.sort(columnGadgets, (g1, g2) -> g1.getColumn().equals(g2.getColumn())
+            ? g1.getIndex() - g2.getIndex() : g1.getColumn() - g2.getColumn());
 
         // get the maximmum column number in the gadgets list and create that number of columns. This is the column
         // number of the last gadget in the ordered list. Default is 1 column, the empty dashboard is made of one empty

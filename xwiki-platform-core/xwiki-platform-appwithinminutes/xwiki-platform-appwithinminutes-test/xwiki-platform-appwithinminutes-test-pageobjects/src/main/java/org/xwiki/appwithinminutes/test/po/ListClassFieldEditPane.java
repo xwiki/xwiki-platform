@@ -154,7 +154,7 @@ public class ListClassFieldEditPane extends SuggestClassFieldEditPane
     {
         By xpath = By.xpath(".//*[local-name() = 'select' or (local-name() = 'input' and not(@type = 'hidden'))]");
         List<WebElement> inputs = getDriver().findElementsWithoutWaiting(defaultValueContainer, xpath);
-        if (inputs.size() > 0) {
+        if (!inputs.isEmpty()) {
             WebElement input = inputs.get(0);
             return "select".equalsIgnoreCase(input.getTagName()) ? "select" : input.getAttribute("type").toLowerCase();
         }

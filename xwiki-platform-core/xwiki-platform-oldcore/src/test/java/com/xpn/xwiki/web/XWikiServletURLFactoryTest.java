@@ -465,7 +465,7 @@ class XWikiServletURLFactoryTest
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
-        // Set a deamon request
+        // Set a daemon request
         initDaemonRequest("request", 42);
 
         this.oldcore.getXWikiContext().setWikiId("wiki1");

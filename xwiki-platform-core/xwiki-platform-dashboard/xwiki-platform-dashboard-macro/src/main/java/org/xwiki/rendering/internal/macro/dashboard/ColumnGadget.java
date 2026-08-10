@@ -79,10 +79,8 @@ class ColumnGadget extends Gadget
         try {
             this.column = Integer.valueOf(split[0].trim());
             this.index = Integer.valueOf(split[1].trim());
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
             // nothing, just leave column and index null. Not layoutable in columns
-        } catch (NumberFormatException e) {
-            // same, nothing, just leave column and index null. Not layoutable in columns
         }
     }
 }

@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
@@ -71,9 +70,6 @@ class DeleteJobTest extends AbstractEntityJobTest
 
     @MockComponent
     private RefactoringConfiguration configuration;
-
-    @MockComponent
-    private DocumentAccessBridge documentAccessBridge;
 
     @MockComponent
     private BatchOperationExecutor batchOperationExecutor;
@@ -141,7 +137,6 @@ class DeleteJobTest extends AbstractEntityJobTest
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
 
         when(this.configuration.isRecycleBinSkippingActivated()).thenReturn(true);
-        when(this.documentAccessBridge.isAdvancedUser()).thenReturn(true);
 
         DocumentReference userReference = new DocumentReference("wiki", "Users", "Alice");
         DocumentReference authorReference = new DocumentReference("wiki", "Users", "Bob");

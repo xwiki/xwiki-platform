@@ -18,7 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { MACRO_NAME_PREFIX } from "./utils";
+import { DefinitionListItemBlock } from "./definitionList";
+import { XWikiGroupBlock } from "./group";
+import { XWikiInlineMacro, XWikiMacroBlock } from "./macro";
+import { XWikiRawBlock } from "./raw";
+import {
+  SubscriptStyle,
+  SuperscriptStyle,
+  VerbatimStyle,
+  XWikiParametersStyle,
+} from "./styles";
+import { MACRO_NAME_PREFIX, insertMacroInvocation } from "./utils";
 import translations from "../translations";
 import {
   BlockNoteEditor,
@@ -26,12 +36,15 @@ import {
   combineByGroup,
   defaultBlockSpecs,
   defaultInlineContentSpecs,
+  defaultStyleSpecs,
 } from "@blocknote/core";
 import { filterSuggestionItems } from "@blocknote/core/extensions";
 import * as locales from "@blocknote/core/locales";
 import { getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
-import type { BlockNoteConcreteMacro } from "./utils";
+import { createElement } from "react";
+import { RiFileList3Fill } from "react-icons/ri";
+import type { BlockNoteConcreteMacro, ContextForMacros } from "./utils";
 import type { Block, InlineContent, Link, StyledText } from "@blocknote/core";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
@@ -44,11 +57,6 @@ import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
  * @returns The created schema
  */
 function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
-  // Get rid of some block types
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { audio, video, file, toggleListItem, ...remainingBlockSpecs } =
-    defaultBlockSpecs;
-
   macros = [
     ...macros.sort((a, b) =>
       a.macro.infos.name.localeCompare(b.macro.infos.name),
@@ -57,7 +65,11 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
 
   const blockNoteSchema = BlockNoteSchema.create({
     blockSpecs: {
-      ...remainingBlockSpecs,
+      ...defaultBlockSpecs,
+      xwikiDefinitionListItem: DefinitionListItemBlock(),
+      xwikiGroup: XWikiGroupBlock(),
+      xwikiMacroBlock: XWikiMacroBlock(),
+      xwikiRaw: XWikiRawBlock(),
 
       // Macros
       ...Object.fromEntries(
@@ -75,6 +87,12 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
     inlineContentSpecs: {
       ...defaultInlineContentSpecs,
 
+      // The generic inline macro (server-rendered inline macros without a dedicated client-side rendering). It is
+      // registered through Object.fromEntries so that its type stays erased under an index signature, like the dynamic
+      // macros below: a statically-typed custom inline content entry would tighten the inline content schema and break
+      // the call sites that expect the default inline content schema.
+      ...Object.fromEntries([["xwikiInlineMacro", XWikiInlineMacro]]),
+
       // Macros
       ...Object.fromEntries(
         filterMap(macros, ({ macro, bnRendering }) =>
@@ -86,6 +104,14 @@ function createBlockNoteSchema(macros: BlockNoteConcreteMacro[]) {
             : null,
         ),
       ),
+    },
+
+    styleSpecs: {
+      ...defaultStyleSpecs,
+      subscript: SubscriptStyle,
+      superscript: SuperscriptStyle,
+      xwikiVerbatim: VerbatimStyle,
+      xwikiParameters: XWikiParametersStyle,
     },
   });
 
@@ -124,9 +150,36 @@ function querySuggestionsMenuItems(
   macros: BlockNoteConcreteMacro[],
   syntax: SyntaxConfig,
   lang: EditorLanguage,
+  t: (key: string) => string,
+  openInsertionEditor?: ContextForMacros["openInsertionEditor"],
 ): DefaultReactSuggestionItem[] {
   const { blocks: blocksSupport, inlineContents: inlineSupport } =
     syntax.features;
+
+  // A single generic "Macro" entry that opens the macro wizard. It is used to insert the server-rendered
+  // xwikiMacroBlock / xwikiInlineMacro (the per-macro entries below only exist for client-rendered macros).
+  const genericMacroItem: DefaultReactSuggestionItem[] =
+    openInsertionEditor && (blocksSupport.macros || inlineSupport.macros)
+      ? [
+          {
+            title: t("blocknote.slashMenu.macro.title"),
+            subtext: t("blocknote.slashMenu.macro.subtext"),
+            aliases: ["macro"],
+            group: "Macros",
+            icon: createElement(RiFileList3Fill),
+            onItemClick: () =>
+              openInsertionEditor(
+                {
+                  kind: "block",
+                  id: null,
+                  params: null,
+                  body: { type: "none" },
+                },
+                (invocation) => insertMacroInvocation(editor, invocation),
+              ),
+          },
+        ]
+      : [];
 
   let items = filterSuggestionItems(
     combineByGroup(
@@ -150,6 +203,8 @@ function querySuggestionsMenuItems(
               : null,
           )
         : [],
+
+      genericMacroItem,
     ),
     query,
   );
@@ -159,9 +214,9 @@ function querySuggestionsMenuItems(
   const locale = locales[lang].slash_menu;
 
   const isLocale = (value: string, candidates: (keyof typeof locale)[]) =>
-    candidates.findIndex(
+    candidates.some(
       (localeKey: keyof typeof locale) => locale[localeKey].title === value,
-    ) !== -1;
+    );
 
   if (!blocksSupport.headings.levels1To3) {
     items = items.filter(

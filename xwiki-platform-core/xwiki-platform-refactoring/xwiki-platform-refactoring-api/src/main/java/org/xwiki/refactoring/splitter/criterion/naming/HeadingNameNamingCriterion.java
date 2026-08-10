@@ -35,7 +35,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.internal.RefactoringUtils;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.BlockFilter;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
@@ -132,21 +131,17 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
 
     private Optional<String> getFirstHeadingName(XDOM xdom)
     {
-        if (xdom.getChildren().size() > 0) {
+        if (!xdom.getChildren().isEmpty()) {
             Block firstChild = xdom.getChildren().get(0);
             if (firstChild instanceof HeaderBlock) {
                 // Clone the header block and remove any unwanted stuff.
-                Block clonedHeaderBlock = firstChild.clone(new BlockFilter()
-                {
-                    public List<Block> filter(Block block)
-                    {
-                        List<Block> blocks = new ArrayList<>();
-                        if (block instanceof WordBlock || block instanceof SpaceBlock
-                            || block instanceof SpecialSymbolBlock) {
-                            blocks.add(block);
-                        }
-                        return blocks;
+                Block clonedHeaderBlock = firstChild.clone(block -> {
+                    List<Block> blocks = new ArrayList<>();
+                    if (block instanceof WordBlock || block instanceof SpaceBlock
+                        || block instanceof SpecialSymbolBlock) {
+                        blocks.add(block);
                     }
+                    return blocks;
                 });
                 XDOM heading = new XDOM(clonedHeaderBlock.getChildren());
 

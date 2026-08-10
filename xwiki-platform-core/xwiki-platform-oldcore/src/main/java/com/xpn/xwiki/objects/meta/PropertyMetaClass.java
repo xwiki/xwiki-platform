@@ -185,7 +185,7 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
         } catch (Exception e) {
             // Fail silently.
         }
-        return instance != null && instance instanceof BaseCollection ? (BaseCollection) instance : super
+        return instance != null && instance instanceof BaseCollection baseCollection ? baseCollection : super
             .newObject(context);
     }
 

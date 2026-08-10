@@ -60,7 +60,7 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 @ReferenceComponentList
 @ComponentList({DefaultLegacySpaceResolver.class})
-public class FileSystemURLFactoryTest
+class FileSystemURLFactoryTest
 {
     private static final DocumentReference USER_REFERENCE = new DocumentReference("xwiki", "XWiki", "Alice");
 
@@ -83,7 +83,7 @@ public class FileSystemURLFactoryTest
     private XWikiRequest mockXWikiRequest;
 
     @BeforeEach
-    public void beforeEach() throws XWikiException, IOException
+    void beforeEach() throws XWikiException, IOException
     {
         this.oldcore.getXWikiContext().setUserReference(USER_REFERENCE);
 
@@ -100,7 +100,7 @@ public class FileSystemURLFactoryTest
     }
 
     @Test
-    public void createAttachmentURLWhenAttachmentDoesntExist() throws Exception
+    void createAttachmentURLWhenAttachmentDoesntExist()
     {
         Map<String, File> usedFiles = new HashMap<>();
         this.oldcore.getXWikiContext().put("pdfexport-file-mapping", usedFiles);
@@ -119,7 +119,7 @@ public class FileSystemURLFactoryTest
     }
 
     @Test
-    void createAttachmentURLWhenAccessCheckIsDisabled(@TempDir File exportDir) throws Exception
+    void createAttachmentURLWhenAccessCheckIsDisabled(@TempDir File exportDir)
     {
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, ATTACHMENT_REFERENCE))
             .thenReturn(false);
@@ -135,7 +135,7 @@ public class FileSystemURLFactoryTest
     }
 
     @Test
-    void createAttachmentURLWhenUserHasViewRight(@TempDir File exportDir) throws Exception
+    void createAttachmentURLWhenUserHasViewRight(@TempDir File exportDir)
     {
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, ATTACHMENT_REFERENCE))
             .thenReturn(true);
@@ -151,7 +151,7 @@ public class FileSystemURLFactoryTest
     }
 
     @Test
-    void createAttachmentURLWhenUserHasNoViewRight(@TempDir File exportDir) throws Exception
+    void createAttachmentURLWhenUserHasNoViewRight(@TempDir File exportDir)
     {
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, ATTACHMENT_REFERENCE))
             .thenReturn(false);

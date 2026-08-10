@@ -41,7 +41,6 @@ import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,7 +92,7 @@ class DefaultWikiProvisioningJobExecutorTest
         // Verify
         // Id of the job.
         List<String> jobId = List.of("wiki", "provisioning", "wikiprovisioning.test", "wikiid");
-        verify(provisioningJob).initialize(eq(new WikiProvisioningJobRequest(jobId, "wikiid", "templateid", user)));
+        verify(provisioningJob).initialize(new WikiProvisioningJobRequest(jobId, "wikiid", "templateid", user));
         Thread.sleep(100);
         verify(provisioningJob).run();
 

@@ -38,16 +38,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       external: ['jquery', 'vue', 'vue-i18n', '@xwiki/platform-livedata-ui', 'xwiki-platform-localization-webjar'],
-      output: {
-        globals: {
-          vue: 'Vue'
-        }
-      }
     }
-  },
-  define: {
-    // define process to avoid runtime error with jquery
-    'process.env': {}
   },
   plugins: [vue()],
   resolve: {

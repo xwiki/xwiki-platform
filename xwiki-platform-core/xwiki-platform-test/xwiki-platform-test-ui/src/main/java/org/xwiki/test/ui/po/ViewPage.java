@@ -312,7 +312,7 @@ public class ViewPage extends BasePage
 
     public boolean isInlinePage()
     {
-        return getDriver().findElements(By.xpath("//form[@id = 'inline']")).size() > 0;
+        return !getDriver().findElements(By.xpath("//form[@id = 'inline']")).isEmpty();
     }
 
     /**
@@ -382,6 +382,16 @@ public class ViewPage extends BasePage
     public String getTitleFontFamily()
     {
         return getElementCSSValue(By.id("document-title"), "font-family");
+    }
+
+    /**
+     * @return the color of the page's text, i.e. the color set on the {@code body} element and inherited by all the
+     *     text of the page that doesn't define a color of its own
+     * @since 18.7.0RC1
+     */
+    public String getTextColor()
+    {
+        return getElementCSSValue(By.tagName("body"), "color");
     }
 
     private String getElementCSSValue(By locator, String attribute)

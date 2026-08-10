@@ -105,6 +105,12 @@
         ></button>
       </th>
     </template>
+
+    <template #footer>
+      <th v-if="logic.isEditMode()">
+        {{ $t("livedata.table.action.header") }}
+      </th>
+    </template>
   </draggable>
 </template>
 

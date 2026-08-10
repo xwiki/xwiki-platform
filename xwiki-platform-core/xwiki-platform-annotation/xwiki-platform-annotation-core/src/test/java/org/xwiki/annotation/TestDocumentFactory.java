@@ -99,7 +99,7 @@ public class TestDocumentFactory
                 }
                 currentKey = line.substring(1);
             } else {
-                if (currentValue.length() > 0) {
+                if (!currentValue.isEmpty()) {
                     currentValue.append("\n");
                 }
                 currentValue.append(line);
@@ -133,7 +133,7 @@ public class TestDocumentFactory
             doc.set(key, currentValue);
             doc.set(key + "Syntax", syntax);
         } else {
-            doc.set(currentKey, currentValue.toString());
+            doc.set(currentKey, currentValue);
         }
     }
 

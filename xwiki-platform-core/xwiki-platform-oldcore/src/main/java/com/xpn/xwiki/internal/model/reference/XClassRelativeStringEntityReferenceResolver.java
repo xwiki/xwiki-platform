@@ -64,9 +64,8 @@ public class XClassRelativeStringEntityReferenceResolver extends AbstractStringE
         // We allow to pass a page reference in parameter. If the passed representation doesn't contain a page then the
         // page from the parameter will be used.
         EntityReference explicitReference = new EntityReference("XWiki", EntityType.SPACE);
-        if (parameters.length > 0 && (parameters[0] instanceof EntityReference)) {
-            EntityReference extractedPageReference =
-                ((EntityReference) parameters[0]).extractReference(EntityType.DOCUMENT);
+        if (parameters.length > 0 && parameters[0] instanceof EntityReference entityReference) {
+            EntityReference extractedPageReference = entityReference.extractReference(EntityType.DOCUMENT);
             if (extractedPageReference != null) {
                 explicitReference =
                     new EntityReference(extractedPageReference.getName(), EntityType.DOCUMENT, explicitReference);

@@ -21,6 +21,7 @@ package org.xwiki.platform.notifications.test.po;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -53,13 +54,15 @@ public class NotificationsTrayPage extends ViewPage
 {
     private static final String CLASS = "class";
 
+    private static final String NOTIFICATION_BUTTON_CSS_SELECTOR = "li#tmNotifications";
+
     @FindBy(css = "li#tmNotifications div.notifications-area")
     private WebElement notificationsArea;
 
     @FindBy(css = "li#tmNotifications button[title='Notifications']")
     private WebElement bellButton;
 
-    @FindBy(css = "li#tmNotifications")
+    @FindBy(css = NOTIFICATION_BUTTON_CSS_SELECTOR)
     private WebElement notificationsButton;
 
     @FindBy(css = "span.notifications-count")
@@ -138,7 +141,7 @@ public class NotificationsTrayPage extends ViewPage
             if (Set.of(200, 202).contains(getMethod.getStatusCode())) {
                 String responseBody = IOUtils.toString(getMethod.getResponseBodyAsStream(), UTF_8);
                 Map<?, ?> map = new ObjectMapper().readValue(responseBody, Map.class);
-                return getOptionalLong(String.valueOf(map.get("unread")), responseBody);
+                return getOptionalLong(String.valueOf(map.get("unread")));
             } else {
                 return Optional.empty();
             }
@@ -147,7 +150,7 @@ public class NotificationsTrayPage extends ViewPage
         }
     }
 
-    private static Optional<Long> getOptionalLong(String str, String responseBody)
+    private static Optional<Long> getOptionalLong(String str)
     {
         try {
             return Optional.of(Long.parseLong(str));
@@ -161,7 +164,7 @@ public class NotificationsTrayPage extends ViewPage
      */
     public boolean isMenuOpen()
     {
-        return Arrays.asList(notificationsButton.getAttribute(CLASS).split(" ")).contains("open");
+        return Arrays.asList(getNotificationsButton().getAttribute(CLASS).split(" ")).contains("open");
     }
 
     /**
@@ -171,11 +174,9 @@ public class NotificationsTrayPage extends ViewPage
      */
     public boolean isNotificationMenuVisible()
     {
-        try {
-            return notificationsButton.isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+        List<WebElement> buttons =
+            getDriver().findElementsWithoutWaiting(By.cssSelector(NOTIFICATION_BUTTON_CSS_SELECTOR));
+        return !buttons.isEmpty() && buttons.getFirst().isDisplayed();
     }
 
     /**
@@ -320,7 +321,7 @@ public class NotificationsTrayPage extends ViewPage
      */
     public GroupedNotificationElementPage getGroupedNotificationsPage()
     {
-        return new GroupedNotificationElementPage(this.getNotificationsButton());
+        return new GroupedNotificationElementPage(getNotificationsButton());
     }
 
     /**

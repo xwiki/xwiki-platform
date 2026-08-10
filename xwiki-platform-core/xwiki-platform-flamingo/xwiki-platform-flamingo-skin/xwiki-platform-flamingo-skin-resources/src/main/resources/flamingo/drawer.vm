@@ -33,7 +33,15 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
       </a>
       <div class="brand-links">
         #define ($logoutLink)
-          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogout" rel="nofollow">$services.icon.renderHTML('log-out') $escapetool.xml($services.localization.render('logout'))</a>
+          ## In the event of a logout action being performed while currently on the logout page
+          ## (e.g., due to a CSRF error), we do not want to loop back to it. We also can't trust the original xredirect
+          ## if the CSRF token was invalid, so to be safe we redirect to the home page.
+          #if ($xcontext.action == 'logout')
+            #set ($logoutXRedirect = $xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference, 'view'))
+          #else
+            #set ($logoutXRedirect = $xwiki.relativeRequestURL)
+          #end
+          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', $escapetool.url({'xredirect': $logoutXRedirect, 'form_token': $services.csrf.getToken()}))" id="tmLogout" rel="nofollow">$services.icon.renderHTML('log-out') $escapetool.xml($services.localization.render('logout'))</a>
         #end
         #if ($xcontext.user != 'XWiki.XWikiGuest')
           <a href="$xwiki.getURL($xcontext.user, 'view')" class="brand-user" id="tmUser">$!xwiki.getUserName($xcontext.user, false)</a>

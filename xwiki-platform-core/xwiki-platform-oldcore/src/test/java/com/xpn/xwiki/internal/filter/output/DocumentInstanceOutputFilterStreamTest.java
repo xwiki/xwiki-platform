@@ -454,7 +454,7 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
     }
 
     @Test
-    public void documentwithunknownClassproperty() throws FilterException, XWikiException
+    void documentwithunknownClassproperty() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 

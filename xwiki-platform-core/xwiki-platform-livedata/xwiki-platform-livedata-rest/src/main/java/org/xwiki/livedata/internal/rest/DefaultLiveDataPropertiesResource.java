@@ -23,7 +23,6 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
@@ -74,7 +73,7 @@ public class DefaultLiveDataPropertiesResource extends AbstractLiveDataResource 
 
         List<PropertyDescriptor> properties = propertyDescriptors.stream()
             .map(propertyDescriptor -> createPropertyType(propertyDescriptor, source, namespace))
-            .collect(Collectors.toList());
+            .toList();
         return (Properties) new Properties().withProperties(properties).withLinks(self, parent);
     }
 

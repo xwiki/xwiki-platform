@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -103,7 +102,7 @@ class XWikiVersioningStoreInterfaceTest
         assertEquals(5, versions.size());
         assertEquals(5, versionsCount);
         assertIterableEquals(List.of("1.3", "2.1", "3.2", "4.1", "5.2"),
-            versions.stream().map(Version::toString).collect(Collectors.toList()));
+            versions.stream().map(Version::toString).toList());
     }
 
     @Test
@@ -115,7 +114,7 @@ class XWikiVersioningStoreInterfaceTest
         assertEquals(6, versions.size());
         assertEquals(6, versionsCount);
         assertIterableEquals(List.of("1.1", "1.3", "3.1", "3.2", "5.1", "5.2"),
-            versions.stream().map(Version::toString).collect(Collectors.toList()));
+            versions.stream().map(Version::toString).toList());
     }
 
     @Test
@@ -128,7 +127,7 @@ class XWikiVersioningStoreInterfaceTest
         assertEquals(5, versions.size());
         assertEquals(5, versionsCount);
         assertIterableEquals(List.of("1.2", "1.3", "2.1", "3.1", "3.2"),
-            versions.stream().map(Version::toString).collect(Collectors.toList()));
+            versions.stream().map(Version::toString).toList());
     }
 
     @Test
@@ -139,6 +138,6 @@ class XWikiVersioningStoreInterfaceTest
         Collection<Version> versions = this.versioningStore.getXWikiDocVersions(null, criteria, null);
         assertEquals(1, versions.size());
         assertIterableEquals(List.of("5.2"),
-            versions.stream().map(Version::toString).collect(Collectors.toList()));
+            versions.stream().map(Version::toString).toList());
     }
 }

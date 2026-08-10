@@ -94,10 +94,17 @@
   #set ($macro.previousDisplayMode = $xcontext.displayMode)
   #set ($discard = $xcontext.setDisplayMode('view'))
   #set ($restricted = "$!source.restricted" == 'true')
+  ## The source reference is used to determine the author whose rights are used to render the content. It's the object
+  ## property reference when editing an object property (so that the document author is used for the unmodified stored
+  ## value) and the document reference otherwise.
+  #set ($sourceReference = $source.sourceReference)
+  #if (!$sourceReference)
+    #set ($sourceReference = $source.documentReferenceWithLocale)
+  #end
   #if ($source.html)
-    #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReferenceWithLocale, $restricted))
+    #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $sourceReference, $restricted))
   #else
-    #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $source.documentReferenceWithLocale, $restricted))
+    #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $sourceReference, $restricted))
   #end
   #if ("$!html" == '')
     ## Prevent Firefox from inserting bogus whitespace when the text area is empty.
@@ -158,12 +165,27 @@
   #if (!$sourceDocumentReference)
     #set ($sourceDocumentReference = $tdoc.documentReferenceWithLocale)
   #end
+  ## The source reference used server-side to determine the author whose rights are used to render the content (e.g. the
+  ## object property reference when editing an object property). We remove it from the attributes so that it's not
+  ## output as an HTML attribute, it's only meant to be used server-side.
+  #set ($sourcePropertyReference = $parameters.attributes.remove('data-sourcePropertyReference'))
   #set ($source = {
     'documentReferenceWithLocale': $sourceDocumentReference,
+    'sourceReference': $sourcePropertyReference,
     'syntax': $syntaxId,
     'content': $parameters.content,
     'restricted': $parameters.attributes.data-restricted
   })
+  ## The source document reference is kept with its locale in $source because it's needed server-side to render
+  ## the edited content in the right translation. The value written to the data-sourceDocumentReference HTML
+  ## attribute must however be a properly serialized reference string: the client resolves it to build the file
+  ## upload URL and to store temporary attachments, which are keyed on a locale-free reference. A raw reference
+  ## object would be serialized with its implicit toString() into an invalid "wiki:Space.Page()" value (empty
+  ## locale parameters rendered as "()"), which resolves to the wrong document and breaks image uploads.
+  #if ($parameters.attributes.containsKey('data-sourceDocumentReference'))
+    #set ($discard = $parameters.attributes.put('data-sourceDocumentReference',
+      $services.model.serialize($sourceDocumentReference)))
+  #end
   ##
   ## Disable the file upload and drag &amp; drop when the current user doesn't have edit right on the source document, if
   ## the source is restricted. This is the case for instance when an user with comment right adds a comment to a page

@@ -210,7 +210,7 @@ public class DocumentSelectionResolver
 
             List<String> constraints = extendQuery(entry.getKey(), entry.getValue(), parameters);
             if (!constraints.isEmpty()) {
-                statement.append(statement.length() == 0 ? "where (" : " or (");
+                statement.append(statement.isEmpty() ? "where (" : " or (");
                 statement.append(StringUtils.join(constraints, " and "));
                 statement.append(')');
             }
@@ -370,8 +370,8 @@ public class DocumentSelectionResolver
     {
         Set<DocumentReference> excludedDocumentReferences = new LinkedHashSet<>();
         exclusions.forEach(excludedEntityReference -> {
-            if (excludedEntityReference instanceof DocumentReference) {
-                excludedDocumentReferences.add((DocumentReference) excludedEntityReference);
+            if (excludedEntityReference instanceof DocumentReference documentReference) {
+                excludedDocumentReferences.add(documentReference);
             }
         });
         return excludedDocumentReferences;

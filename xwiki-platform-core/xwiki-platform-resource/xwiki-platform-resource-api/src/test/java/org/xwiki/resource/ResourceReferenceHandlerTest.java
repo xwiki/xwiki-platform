@@ -52,7 +52,7 @@ class ResourceReferenceHandlerTest
             ResourceReferenceHandlerException
         {
         }
-    };
+    }
 
     @Test
     void priority()

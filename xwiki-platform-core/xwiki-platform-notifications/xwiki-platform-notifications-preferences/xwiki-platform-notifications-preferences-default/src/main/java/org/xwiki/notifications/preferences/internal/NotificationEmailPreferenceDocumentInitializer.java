@@ -97,7 +97,7 @@ public class NotificationEmailPreferenceDocumentInitializer extends AbstractMand
         xclass.addStaticListField(FIELD_INTERVAL, "Notification interval", 1, false,
             "hourly=Hourly|daily=Daily|weekly=Weekly|live=Live", SELECT, SEPARATORS);
 
-        String values = Arrays.stream(NotificationEmailDiffType.values()).map(v -> v.name())
+        String values = Arrays.stream(NotificationEmailDiffType.values()).map(Enum::name)
             .reduce((v1, v2) -> String.format("%s|%s", v1, v2)).get();
 
         xclass.addStaticListField(FIELD_DIFF_TYPE, "Diff Type", 1, false, values, SELECT, SEPARATORS);

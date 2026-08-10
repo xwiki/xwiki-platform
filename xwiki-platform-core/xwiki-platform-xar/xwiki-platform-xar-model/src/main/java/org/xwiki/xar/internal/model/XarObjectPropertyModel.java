@@ -28,4 +28,12 @@ public class XarObjectPropertyModel
     public static final String ELEMENT_PROPERTY = "property";
 
     public static final String ATTRIBUTE_TYPE = "type";
+
+    /**
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
+     */
+    protected XarObjectPropertyModel()
+    {
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
+    }
 }

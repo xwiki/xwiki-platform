@@ -93,7 +93,7 @@ public final class StoreTestUtils
     }
 
     /**
-     * Encodes a given string so that it may be used as a URL component. Compatable with javascript decodeURIComponent,
+     * Encodes a given string so that it may be used as a URL component. Compatible with javascript decodeURIComponent,
      * though more strict than encodeURIComponent: all characters except [a-zA-Z0-9], '.', '-', '*', '_' are converted
      * to hexadecimal, and spaces are substituted by '+'.
      * 

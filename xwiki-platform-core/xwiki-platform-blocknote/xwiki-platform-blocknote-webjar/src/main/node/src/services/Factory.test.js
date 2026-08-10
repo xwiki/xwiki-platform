@@ -21,6 +21,12 @@ import { Factory } from "./Factory";
 import { describe, expect, it, vi } from "vitest";
 
 describe("Factory", () => {
+  vi.mock("@xwiki/platform-component-manager-default", () => ({
+    resolverPromise: Promise.resolve({
+      getAsync() {},
+    }),
+  }));
+
   vi.mock("./Logic", () => {
     return {
       Logic: class MockLogic {

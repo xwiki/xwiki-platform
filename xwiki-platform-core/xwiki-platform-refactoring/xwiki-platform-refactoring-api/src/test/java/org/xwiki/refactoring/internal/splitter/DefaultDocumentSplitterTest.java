@@ -72,7 +72,7 @@ class DefaultDocumentSplitterTest
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     @Test
-    void split() throws Exception
+    void split()
     {
         SplittingCriterion splittingCriterion = mock(SplittingCriterion.class);
         when(splittingCriterion.shouldSplit(any(Block.class), anyInt())).thenReturn(true, false, false, true);
@@ -120,7 +120,7 @@ class DefaultDocumentSplitterTest
     }
 
     @Test
-    void updateAnchors() throws Exception
+    void updateAnchors()
     {
         SplittingCriterion splittingCriterion = mock(SplittingCriterion.class);
         when(splittingCriterion.shouldSplit(any(Block.class), anyInt())).thenReturn(false, false, true, true);

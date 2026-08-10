@@ -140,7 +140,6 @@ public class JCaptchaCaptcha extends AbstractCaptcha
 
         String answer = request.getParameter("captchaAnswer");
 
-        boolean result = captchaService.validateResponseForID(id, answer);
-        return result;
+        return captchaService.validateResponseForID(id, answer);
     }
 }

@@ -99,8 +99,9 @@ class GroupMessageStreamNotificationFilterTest
         Utils.setComponentManager(rootComponentManager);
         ComponentManager componentManager =
             rootComponentManager.registerMockComponent(ComponentManager.class, "context");
+        DocumentReferenceResolver<String> documentReferenceResolverMock = mock();
         when(componentManager.getInstance(DocumentReferenceResolver.class, "currentmixed"))
-            .thenReturn(mock(DocumentReferenceResolver.class));
+            .thenReturn(documentReferenceResolverMock);
 
         XWiki xWiki = mock(XWiki.class);
         when(this.xWikiContext.getWiki()).thenReturn(xWiki);
@@ -120,8 +121,9 @@ class GroupMessageStreamNotificationFilterTest
         Utils.setComponentManager(rootComponentManager);
         ComponentManager componentManager =
             rootComponentManager.registerMockComponent(ComponentManager.class, "context");
+        DocumentReferenceResolver<String> documentReferenceResolverMock = mock();
         when(componentManager.getInstance(DocumentReferenceResolver.class, "currentmixed"))
-            .thenReturn(mock(DocumentReferenceResolver.class));
+            .thenReturn(documentReferenceResolverMock);
 
         XWiki xWiki = mock(XWiki.class);
         when(this.xWikiContext.getWiki()).thenReturn(xWiki);
@@ -143,8 +145,9 @@ class GroupMessageStreamNotificationFilterTest
         Utils.setComponentManager(rootComponentManager);
         ComponentManager componentManager =
             rootComponentManager.registerMockComponent(ComponentManager.class, "context");
+        DocumentReferenceResolver<String> documentReferenceResolverMock = mock();
         when(componentManager.getInstance(DocumentReferenceResolver.class, "currentmixed"))
-            .thenReturn(mock(DocumentReferenceResolver.class));
+            .thenReturn(documentReferenceResolverMock);
 
         XWiki xWiki = mock(XWiki.class);
         when(this.xWikiContext.getWiki()).thenReturn(xWiki);

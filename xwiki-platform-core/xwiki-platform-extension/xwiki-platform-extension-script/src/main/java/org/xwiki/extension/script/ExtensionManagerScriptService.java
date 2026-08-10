@@ -178,7 +178,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param nb the maximum number of search results to return. -1 indicate no limit. 0 indicate that no result will be
      *            returned but it can be used to get the total hits.
      * @return the found extensions descriptors, empty list if nothing could be found and null if an expected error has
-     *         been catched
+     *         been caught
      * @see org.xwiki.extension.repository.search.Searchable
      */
     public IterableResult<Extension> search(String pattern, int offset, int nb)
@@ -203,7 +203,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * 
      * @param query the search query
      * @return the found extensions descriptors, empty list if nothing could be found and null if an expected error has
-     *         been catched
+     *         been caught
      * @see org.xwiki.extension.repository.search.Searchable
      * @since 7.1RC1
      */
@@ -461,7 +461,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         // Indicate if it's allowed to do modification on root namespace
         installRequest.setRootModificationsAllowed(namespace == null || xcontext.isMainWiki(toWikiId(namespace)));
 
-        // Allow overwritting a few things in extensions descriptors
+        // Allow overwriting a few things in extensions descriptors
         installRequest.setRewriter(new ScriptExtensionRewriter());
 
         contextualize(installRequest);
@@ -1006,11 +1006,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public boolean isAllowed(Extension extension, String namespace)
     {
-        if (extension instanceof IndexedExtension) {
-            if (Boolean.FALSE.equals(((IndexedExtension) extension).isCompatible(namespace))) {
-                // If the extension has explicitly been marked as incompatible, return false
-                return false;
-            }
+        if (extension instanceof IndexedExtension indexedExtension
+            && Boolean.FALSE.equals(indexedExtension.isCompatible(namespace))) {
+            // If the extension has explicitly been marked as incompatible, return false
+            return false;
         }
 
         return this.namespaceResolver.isAllowed(extension.getAllowedNamespaces(), namespace);

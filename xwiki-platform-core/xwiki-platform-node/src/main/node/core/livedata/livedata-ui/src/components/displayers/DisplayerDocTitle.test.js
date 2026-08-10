@@ -46,6 +46,7 @@ describe("DisplayerDocTitle.vue", () => {
           };
         },
         isContentTrusted: () => true,
+        isEditMode: () => false,
       },
     });
     expect(wrapper.find("a").html()).toBe(
@@ -68,6 +69,7 @@ describe("DisplayerDocTitle.vue", () => {
             propertyHref: "colorHref",
           };
         },
+        isEditMode: () => false,
       },
     });
     expect(wrapper.find("a").html()).toBe(

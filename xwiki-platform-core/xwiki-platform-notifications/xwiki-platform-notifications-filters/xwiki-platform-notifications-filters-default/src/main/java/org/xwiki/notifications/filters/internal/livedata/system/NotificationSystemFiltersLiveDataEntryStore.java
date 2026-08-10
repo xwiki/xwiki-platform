@@ -139,8 +139,8 @@ public class NotificationSystemFiltersLiveDataEntryStore extends AbstractNotific
         }
 
         List<ToggleableNotificationFilter> allFilters = notificationFilters.stream()
-            .filter(filter -> filter instanceof ToggleableNotificationFilter)
-            .map(item -> (ToggleableNotificationFilter) item)
+            .filter(ToggleableNotificationFilter.class::isInstance)
+            .map(ToggleableNotificationFilter.class::cast)
             .toList();
 
         int totalFilters = allFilters.size();

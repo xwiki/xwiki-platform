@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
-public class AuthServiceConfigurationTest
+class AuthServiceConfigurationTest
 {
     @InjectMockComponents
     private AuthServiceConfiguration configuration;

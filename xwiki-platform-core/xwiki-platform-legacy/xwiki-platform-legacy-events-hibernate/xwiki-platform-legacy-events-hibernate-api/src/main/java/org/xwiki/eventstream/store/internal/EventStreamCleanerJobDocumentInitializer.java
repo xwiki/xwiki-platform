@@ -30,7 +30,6 @@ import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.internal.document.DefaultDocumentAuthors;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
@@ -79,10 +78,6 @@ public class EventStreamCleanerJobDocumentInitializer extends AbstractEventListe
      */
     private static final String XWIKI = "XWiki";
 
-    /**
-     * XWiki Default Admin account.
-     */
-    private static final DocumentReference SUPER_ADMIN = new DocumentReference(MAIN_WIKI, XWIKI, "superadmin");
 
     /**
      * XWiki Rights class name.

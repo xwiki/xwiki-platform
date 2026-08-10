@@ -188,7 +188,7 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
             }
 
             this.logger.info(
-                "{} documents added, {} deleted and {} updated during the synchronization of the Solr index.",
+                "[{}] documents added, [{}] deleted and [{}] updated during the synchronization of the Solr index.",
                 counter[Action.ADD.ordinal()], counter[Action.DELETE.ordinal()], counter[Action.UPDATE.ordinal()]);
 
             if (getRequest().isCleanInvalid()) {

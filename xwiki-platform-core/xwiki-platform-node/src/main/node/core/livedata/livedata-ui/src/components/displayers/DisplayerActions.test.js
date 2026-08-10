@@ -30,7 +30,11 @@ describe("DisplayerActions.vue", () => {
   });
 
   it("Renders an entry in view mode", () => {
-    const wrapper = initWrapper(DisplayerActions, {});
+    const wrapper = initWrapper(DisplayerActions, {
+      logic: {
+        isEditMode: () => false,
+      },
+    });
     expect(wrapper.text()).toMatch("jump");
   });
 
@@ -45,6 +49,7 @@ describe("DisplayerActions.vue", () => {
         isActionAllowed() {
           return false;
         },
+        isEditMode: () => false,
       },
     });
     expect(wrapper.text()).toMatch("");

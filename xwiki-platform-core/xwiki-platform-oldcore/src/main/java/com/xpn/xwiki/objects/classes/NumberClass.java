@@ -20,8 +20,6 @@
 package com.xpn.xwiki.objects.classes;
 
 import org.apache.ecs.xhtml.input;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
@@ -84,9 +82,6 @@ public class NumberClass extends PropertyClass
     private static final String XCLASSNAME = "number";
     private static final String SIZE = "size";
     private static final String NUMBER_TYPE = "numberType";
-
-    /** Logging helper object. */
-    private static final Logger LOG = LoggerFactory.getLogger(NumberClass.class);
 
     /**
      * Constructor with a meta class.

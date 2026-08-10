@@ -99,5 +99,5 @@ public class XARDocumentModel extends XarDocumentModel
             new EventParameter(WikiDocumentFilter.PARAMETER_TITLE));
         DOCUMENTREVISION_PARAMETERS.put(ELEMENT_VALIDATIONSCRIPT,
             new EventParameter(WikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT));
-    };
+    }
 }

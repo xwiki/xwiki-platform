@@ -22,7 +22,7 @@ import EmailConfig from "../vue/EmailConfig.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { injectable } from "inversify";
 import type { LinkEmailConfig } from "../data/linkType";
-import type { LinkTargetTypeExtension } from "@xwiki/platform-link-modal-api";
+import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
 import type { Component } from "vue";
 
 /**
@@ -36,7 +36,7 @@ class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailConfig> {
   readonly type = "email";
   readonly order = 200;
 
-  getLabel = labelFromTranslations("link-modal.target-types.email.label");
+  getLabel = labelFromTranslations("link-type.target-types.email.label");
 
   createDefaultConfig(): LinkEmailConfig {
     return { address: "" };

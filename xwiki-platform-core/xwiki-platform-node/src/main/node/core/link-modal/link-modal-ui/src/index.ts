@@ -33,7 +33,7 @@ const LinkModal = _LinkModal;
 /**
  * Shared "chrome" rendered by every link target type's configuration component: the display-text field, the
  * link type selector, and the "Options" section. Re-exported so that link target type extensions defined in
- * other packages (e.g., `@xwiki/platform-link-modal-default`) can wrap their own configuration component with it.
+ * other packages (e.g., `@xwiki/platform-link-type-default`) can wrap their own configuration component with it.
  *
  * @since 18.7.0RC1
  * @beta
@@ -62,17 +62,3 @@ export type {
   LinkSuggestion,
   LinkSuggestor,
 } from "./linkSuggest";
-
-export type {
-  LinkData,
-  LinkTarget,
-  LinkTargetTypeExtension,
-  LinkTargetUrlContext,
-} from "@xwiki/platform-link-modal-api";
-export {
-  linkTargetTypeExtensionRole,
-  listEnabledLinkTargetTypeExtensions,
-  listLinkTargetTypeExtensions,
-  parseLinkTarget,
-  serializeLinkTarget,
-} from "@xwiki/platform-link-modal-api";

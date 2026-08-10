@@ -26,7 +26,7 @@ import type { LinkPageConfig } from "../data/linkType";
 import type {
   LinkTargetTypeExtension,
   LinkTargetUrlContext,
-} from "@xwiki/platform-link-modal-api";
+} from "@xwiki/platform-link-type-api";
 import type { Component } from "vue";
 
 /**
@@ -40,7 +40,7 @@ class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
   readonly type = "page";
   readonly order = 0;
 
-  getLabel = labelFromTranslations("link-modal.target-types.page.label");
+  getLabel = labelFromTranslations("link-type.target-types.page.label");
 
   createDefaultConfig(): LinkPageConfig {
     return { ref: null };

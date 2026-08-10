@@ -69,7 +69,7 @@ type LinkTargetUrlContext = {
  *
  * There is no priority/override mechanism: every bound implementation is returned by
  * `container.getAll(linkTargetTypeExtensionRole)`. To offer a reduced or replaced set of built-in types, a
- * consumer simply does not instantiate `@xwiki/platform-link-modal-default`'s `ComponentInit` (or provides its
+ * consumer simply does not instantiate `@xwiki/platform-link-type-default`'s `ComponentInit` (or provides its
  * own alternative), the same way any other `ComponentInit` in this codebase is opted into (or out of) by whoever
  * assembles the `depsContainer`. To conditionally hide an already-registered type without removing its
  * registration, use {@link isEnabled} instead.

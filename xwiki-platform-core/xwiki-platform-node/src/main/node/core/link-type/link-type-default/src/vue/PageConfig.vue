@@ -31,12 +31,12 @@ import { EntityType } from "@xwiki/platform-model-api";
 import { inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { LinkPageConfig } from "../data/linkType";
-import type { LinkData } from "@xwiki/platform-link-modal-api";
 import type {
   LinkEditionContext,
   LinkSuggestion,
   SearchLinkSuggestor,
 } from "@xwiki/platform-link-modal-ui";
+import type { LinkData } from "@xwiki/platform-link-type-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 
 defineProps<{ linkData: LinkData }>();
@@ -120,7 +120,7 @@ watch(query, async (query) => {
     <template #config>
       <search-box
         v-bind="{ 'data-test': 'linkPageReference' }"
-        :label="t('link-modal.target-types.page.reference')"
+        :label="t('link-type.target-types.page.reference')"
         :initial-value="
           model.ref !== null
             ? linkEditionCtx.modelReferenceSerializer.serialize(model.ref)!
@@ -151,13 +151,13 @@ watch(query, async (query) => {
     <template #options>
       <x-text-field
         v-bind="{ 'data-test': 'linkPageQueryString' }"
-        :label="t('link-modal.target-types.page.query-string')"
+        :label="t('link-type.target-types.page.query-string')"
         v-model="model.queryString"
       />
 
       <x-text-field
         v-bind="{ 'data-test': 'linkPageAnchor' }"
-        :label="t('link-modal.target-types.page.anchor')"
+        :label="t('link-type.target-types.page.anchor')"
         v-model="model.anchor"
       />
     </template>

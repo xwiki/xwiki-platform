@@ -26,7 +26,7 @@ import type { LinkAttachmentConfig } from "../data/linkType";
 import type {
   LinkTargetTypeExtension,
   LinkTargetUrlContext,
-} from "@xwiki/platform-link-modal-api";
+} from "@xwiki/platform-link-type-api";
 import type { Component } from "vue";
 
 /**
@@ -42,7 +42,7 @@ class AttachmentLinkTargetType
   readonly type = "attachment";
   readonly order = 100;
 
-  getLabel = labelFromTranslations("link-modal.target-types.attachment.label");
+  getLabel = labelFromTranslations("link-type.target-types.attachment.label");
 
   createDefaultConfig(): LinkAttachmentConfig {
     return { ref: null };

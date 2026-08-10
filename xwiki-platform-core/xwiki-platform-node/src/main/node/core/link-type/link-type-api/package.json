@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-link-modal-api",
+  "name": "@xwiki/platform-link-type-api",
   "version": "18.7.0-SNAPSHOT",
   "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-api",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-type/link-type-api",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {

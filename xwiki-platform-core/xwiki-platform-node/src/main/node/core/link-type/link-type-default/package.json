@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-link-modal-default",
+  "name": "@xwiki/platform-link-type-default",
   "version": "18.7.0-SNAPSHOT",
   "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-default",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-type/link-type-default",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -40,9 +40,9 @@
   "dependencies": {
     "@xwiki/platform-dsapi": "workspace:*",
     "@xwiki/platform-icons": "workspace:*",
-    "@xwiki/platform-link-modal-api": "workspace:*",
     "@xwiki/platform-link-modal-ui": "workspace:*",
     "@xwiki/platform-link-suggest-api": "workspace:*",
+    "@xwiki/platform-link-type-api": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",

@@ -21,12 +21,12 @@
 import { translations } from "../translations";
 import { LinkConfig } from "@xwiki/platform-link-modal-ui";
 import { useI18n } from "vue-i18n";
-import type { LinkUrlConfig } from "../data/linkType";
-import type { LinkData } from "@xwiki/platform-link-modal-api";
+import type { LinkEmailConfig } from "../data/linkType";
+import type { LinkData } from "@xwiki/platform-link-type-api";
 
 defineProps<{ linkData: LinkData }>();
 
-const model = defineModel<LinkUrlConfig>({
+const model = defineModel<LinkEmailConfig>({
   required: true,
 });
 
@@ -37,11 +37,25 @@ const { t } = useI18n({ messages: translations });
   <LinkConfig :link-data>
     <template #config>
       <x-text-field
-        v-bind="{ 'data-test': 'linkUrl' }"
-        :label="t('link-modal.target-types.url.url')"
-        type="url"
-        v-model="model.url"
+        v-bind="{ 'data-test': 'linkEmailAddress' }"
+        :label="t('link-type.target-types.email.address')"
+        type="email"
+        v-model="model.address"
         required
+      />
+    </template>
+
+    <template #options>
+      <x-text-field
+        v-bind="{ 'data-test': 'linkEmailSubject' }"
+        :label="t('link-type.target-types.email.subject')"
+        v-model="model.messageSubject"
+      />
+
+      <x-text-field
+        v-bind="{ 'data-test': 'linkEmailBody' }"
+        :label="t('link-type.target-types.email.body')"
+        v-model="model.messageBody"
       />
     </template>
   </LinkConfig>

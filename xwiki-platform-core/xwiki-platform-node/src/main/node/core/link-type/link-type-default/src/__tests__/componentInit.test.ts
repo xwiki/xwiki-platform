@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { ComponentInit } from "../componentInit";
-import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-modal-api";
+import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-type-api";
 import { Container, injectable } from "inversify";
 import { describe, expect, it } from "vitest";
-import type { LinkTargetTypeExtension } from "@xwiki/platform-link-modal-api";
+import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
 
 describe("ComponentInit", () => {
   it("registers exactly the 4 built-in link target types", () => {

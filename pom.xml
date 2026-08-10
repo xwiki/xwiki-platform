@@ -127,6 +127,9 @@
     <!-- npm registries configuration -->
     <xwiki.npm.snapshot.registry>https://nexus-snapshots.xwiki.org/repository/npmhosted/</xwiki.npm.snapshot.registry>
     <xwiki.npm.release.registry>https://registry.npmjs.org</xwiki.npm.release.registry>
+
+    <!-- Enable reproducible builds -->
+    <project.build.outputTimestamp>2026-08-11T00:00:00Z</project.build.outputTimestamp>
   </properties>
   <scm>
     <url>https://github.com/${xwiki.github.owner}/${xwiki.github.repository}/tree/master/</url>

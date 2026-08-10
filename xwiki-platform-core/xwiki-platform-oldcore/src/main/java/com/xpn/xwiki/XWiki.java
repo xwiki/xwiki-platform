@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1683,8 +1684,8 @@ public class XWiki implements EventListener
                 }
             } catch (Exception e) {
                 // Failed to retrieve the version, log a warning
-                LOGGER.warn("Failed to retrieve XWiki's version from [{}], using the [{}] property. Root cause is "
-                    + "[{}]", VERSION_FILE, VERSION_FILE_PROPERTY, ExceptionUtils.getRootCauseMessage(e));
+                LOGGER.warn("Failed to retrieve XWiki's version from [{}], using the [{}] property",
+                    VERSION_FILE, VERSION_FILE_PROPERTY, e);
             }
 
             if (this.version == null) {
@@ -1715,12 +1716,12 @@ public class XWiki implements EventListener
         if (getEnvironment() != null) {
             try (InputStream is = getResourceAsStream(name)) {
                 if (is != null) {
-                    return IOUtils.toString(is, DEFAULT_ENCODING);
+                    return IOUtils.toString(is, StandardCharsets.UTF_8);
                 }
             }
         }
         // Resources should always be encoded as UTF-8, to reduce the dependency on the system encoding
-        return FileUtils.readFileToString(new File(name), DEFAULT_ENCODING);
+        return FileUtils.readFileToString(new File(name), StandardCharsets.UTF_8);
     }
 
     public Date getResourceLastModificationDate(String name)
@@ -3381,8 +3382,11 @@ public class XWiki implements EventListener
             return contextLanguage;
         }
 
-        String language = "", requestLanguage = "", userPreferenceLanguage = "", navigatorLanguage = "",
-            cookieLanguage = "";
+        String language = "";
+        String requestLanguage = "";
+        String userPreferenceLanguage = "";
+        String navigatorLanguage = "";
+        String cookieLanguage = "";
         boolean setCookie = false;
 
         if (!context.getWiki().isMultiLingual(context)) {
@@ -3474,8 +3478,12 @@ public class XWiki implements EventListener
     // TODO: move implementation to #getInterfaceLocalePreference
     public String getInterfaceLanguagePreference(XWikiContext context)
     {
-        String language = "", requestLanguage = "", userPreferenceLanguage = "", navigatorLanguage = "",
-            cookieLanguage = "", contextLanguage = "";
+        String language = "";
+        String requestLanguage = "";
+        String userPreferenceLanguage = "";
+        String navigatorLanguage = "";
+        String cookieLanguage = "";
+        String contextLanguage = "";
         boolean setCookie = false;
 
         if (!context.getWiki().isMultiLingual(context)) {
@@ -3629,7 +3637,7 @@ public class XWiki implements EventListener
 
         // If we use the Cache Store layer.. we need to flush it
         XWikiStoreInterface store = getStore();
-        if ((store != null) && (store instanceof XWikiCacheStoreInterface)) {
+        if (store instanceof XWikiCacheStoreInterface) {
             ((XWikiCacheStoreInterface) getStore()).flushCache();
         }
         // Flush renderers.. Groovy renderer has a cache
@@ -3974,7 +3982,7 @@ public class XWiki implements EventListener
                 }
             } catch (RuntimeException ex) {
                 LOGGER.warn("Invalid regular expression for the [xwiki.validusername] property. Falling back on the "
-                    + "default one. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(ex));
+                    + "default one", ex);
                 if (!context.getUtil().match(defaultValidationRegex, xwikiname)) {
                     return -4;
                 }
@@ -4014,8 +4022,7 @@ public class XWiki implements EventListener
                 try {
                     sendValidationEmail(xwikiname, password, email, validkey, "validation_email_content", context);
                 } catch (XWikiException e) {
-                    LOGGER.warn("User [{}] created but failed to send the validation mail to them. Root cause is "
-                        + "[{}]", xwikiname, ExceptionUtils.getRootCauseMessage(e));
+                    LOGGER.warn("User [{}] created but failed to send the validation mail to them", xwikiname, e);
                     return -11;
                 }
 
@@ -4447,11 +4454,15 @@ public class XWiki implements EventListener
 
     public String include(String topic, boolean isForm, XWikiContext context) throws XWikiException
     {
-        String database = null, incdatabase = null;
-        String prefixedTopic, localTopic;
+        String database = null;
+        String incdatabase = null;
+        String prefixedTopic;
+        String localTopic;
 
         // Save current documents in script context
-        Document currentAPIdoc = null, currentAPIcdoc = null, currentAPItdoc = null;
+        Document currentAPIdoc = null;
+        Document currentAPIcdoc = null;
+        Document currentAPItdoc = null;
         ScriptContextManager scritContextManager = Utils.getComponent(ScriptContextManager.class);
         ScriptContext scontext = scritContextManager.getScriptContext();
         String currentDocName = context.getWikiId() + ":" + context.getDoc().getFullName();
@@ -4503,8 +4514,7 @@ public class XWiki implements EventListener
                         XWikiException.ERROR_XWIKI_ACCESS_DENIED, "Access to this document is denied: " + doc);
                 }
             } catch (XWikiException e) {
-                LOGGER.warn("Failed to include topic [{}]. Root cause is [{}]", topic,
-                    ExceptionUtils.getRootCauseMessage(e));
+                LOGGER.warn("Failed to include topic [{}]", topic, e);
                 return "Topic " + topic + " does not exist";
             }
 
@@ -6076,7 +6086,7 @@ public class XWiki implements EventListener
             LOGGER.debug("Initialized AuthService using Reflection.");
         } catch (Exception e) {
             LOGGER.warn("Failed to initialize the AuthService from class [{}], falling back on the standard "
-                + "authenticator. Root cause is [{}]", authClass.getName(), ExceptionUtils.getRootCauseMessage(e));
+                + "authenticator", authClass.getName(), e);
 
             this.authService = new XWikiAuthServiceImpl();
 
@@ -6109,8 +6119,7 @@ public class XWiki implements EventListener
 
                     if (!DEFAULT_RIGHT_SERVICE_CLASS.equals(rightsClass)) {
                         LOGGER.warn("Failed to initialize custom RightService [{}] by Reflection, using default "
-                            + "implementation [{}]. Root cause is [{}]", rightsClass, DEFAULT_RIGHT_SERVICE_CLASS,
-                            ExceptionUtils.getRootCauseMessage(e));
+                            + "implementation [{}]", rightsClass, DEFAULT_RIGHT_SERVICE_CLASS, e);
                         rightsClass = DEFAULT_RIGHT_SERVICE_CLASS;
                         try {
                             this.rightService = (XWikiRightService) Class.forName(rightsClass).newInstance();
@@ -6177,8 +6186,7 @@ public class XWiki implements EventListener
                 factoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
                     .getConstructor(XWiki.class).newInstance(this);
             } catch (Exception e) {
-                LOGGER.warn("Failed to initialize URLFactory Service [{}]. Root cause is [{}]", urlFactoryServiceClass,
-                    ExceptionUtils.getRootCauseMessage(e));
+                LOGGER.warn("Failed to initialize URLFactory Service [{}]", urlFactoryServiceClass, e);
             }
         }
         if (factoryService == null) {

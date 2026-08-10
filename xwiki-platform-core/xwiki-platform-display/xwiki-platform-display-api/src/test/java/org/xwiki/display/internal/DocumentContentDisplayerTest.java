@@ -111,7 +111,8 @@ class DocumentContentDisplayerTest
         XDOM content = new XDOM(Collections.emptyList());
         when(this.document.getPreparedXDOM()).thenReturn(content);
 
-        when(this.document.getDocumentReference()).thenReturn(mock());
+        DocumentReference documentReferenceMock = mock();
+        when(this.document.getDocumentReference()).thenReturn(documentReferenceMock);
 
         // The reference of the current document musts be set as the value of the BASE meta data.
         DocumentReference currentDocRef = new DocumentReference("wiki", "Space", "Page");

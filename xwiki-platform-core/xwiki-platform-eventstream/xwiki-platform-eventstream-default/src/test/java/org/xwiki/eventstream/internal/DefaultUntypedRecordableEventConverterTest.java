@@ -58,7 +58,7 @@ class DefaultUntypedRecordableEventConverterTest
     }
 
     @Test
-    void getSupportedEvents() throws Exception
+    void getSupportedEvents()
     {
         List<RecordableEvent> supportedEvents = this.converter.getSupportedEvents();
 

@@ -33,7 +33,6 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -181,16 +180,6 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     private Logger logger;
 
     /**
-     * @param context used for environment
-     * @deprecated 1.6M1. Use ComponentManager#getInstance(XWikiRecycleBinStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateRecycleBinStore(XWikiContext context)
-    {
-        super(context.getWiki(), context);
-    }
-
-    /**
      * Empty constructor needed for component manager.
      */
     public XWikiHibernateRecycleBinStore()
@@ -213,8 +202,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
             try {
                 return this.componentManager.getInstance(XWikiRecycleBinContentStoreInterface.class, storeType);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Can't find recycle bin content store for type [{}]. Root cause is [{}]", storeType,
-                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("Can't find recycle bin content store for type [{}]", storeType, e);
             }
         }
 

@@ -199,7 +199,8 @@ class DefaultNotificationsResourceTest
         DocumentReference userIdDocReference = mock(DocumentReference.class);
         when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
 
-        when(this.context.getUserReference()).thenReturn(mock(DocumentReference.class));
+        DocumentReference documentReferenceMock = mock();
+        when(this.context.getUserReference()).thenReturn(documentReferenceMock);
         assertNull(this.notificationsResource.getNotificationsRSS(null, userId, null, null, null, null, null, null,
             null, null, null, null, null, null, null, null));
         verify(this.response).sendError(HttpServletResponse.SC_UNAUTHORIZED);

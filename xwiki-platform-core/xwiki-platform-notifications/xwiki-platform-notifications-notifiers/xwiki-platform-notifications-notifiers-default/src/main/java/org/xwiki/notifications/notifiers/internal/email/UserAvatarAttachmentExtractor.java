@@ -30,7 +30,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
@@ -42,6 +41,7 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 
 import net.coobird.thumbnailator.Thumbnails;
 
@@ -105,16 +105,15 @@ public class UserAvatarAttachmentExtractor
                 XWiki xwiki = context.getWiki();
 
                 XWikiDocument userProfileDocument = xwiki.getDocument(userReference, context);
-                DocumentReference usersClassReference = xwiki.getUserClass(context).getDocumentReference();
-                String avatarFileName = userProfileDocument.getStringValue(usersClassReference, "avatar");
+                String avatarFileName = userProfileDocument.getStringValue(
+                    XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE, "avatar");
                 XWikiAttachment attachment = userProfileDocument.getAttachment(avatarFileName);
 
                 if (attachment != null && attachment.isImage(context)) {
                     return attachment.getContentInputStream(context);
                 }
             } catch (Exception e) {
-                logger.warn("Failed to get the avatar of [{}]. Fallback to default one. Root cause is [{}]",
-                    userReference, ExceptionUtils.getRootCauseMessage(e));
+                logger.warn("Failed to get the avatar of [{}]. Fallback to default one", userReference, e);
             }
         }
 

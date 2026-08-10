@@ -351,7 +351,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         try {
             getAttachments().add(this.logoAttachmentExtractor.getLogo());
         } catch (Exception e) {
-            this.logger.warn("Failed to get the logo. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to get the logo", e);
         }
     }
 
@@ -379,8 +379,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
             try {
                 attachments.add(userAvatarAttachmentExtractor.getUserAvatar(userAvatar, 32));
             } catch (Exception e) {
-                this.logger.warn("Failed to add the avatar of [{}] in the email. Root cause is [{}]", userAvatar,
-                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("Failed to add the avatar of [{}] in the email", userAvatar, e);
             }
         }
     }

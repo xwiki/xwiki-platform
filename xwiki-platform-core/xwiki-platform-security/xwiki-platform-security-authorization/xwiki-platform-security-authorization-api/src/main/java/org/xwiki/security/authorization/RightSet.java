@@ -196,7 +196,7 @@ public class RightSet extends AbstractSet<Right> implements Cloneable, java.io.S
     @Override
     public boolean remove(Object o)
     {
-        if (o == null || !(o instanceof Right)) {
+        if (!(o instanceof Right)) {
             return false;
         }
         long old = rights;

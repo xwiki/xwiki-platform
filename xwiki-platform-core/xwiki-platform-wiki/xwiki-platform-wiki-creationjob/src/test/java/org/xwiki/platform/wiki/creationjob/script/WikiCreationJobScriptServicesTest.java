@@ -21,7 +21,6 @@ package org.xwiki.platform.wiki.creationjob.script;
 
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -128,8 +127,7 @@ class WikiCreationJobScriptServicesTest
         Exception lastError = this.wikiCreationJobScriptServices.getLastError();
         assertNotNull(lastError);
         assertEquals("The extension [badExtension/version] is not authorized.", lastError.getMessage());
-        verify(this.logger).warn("Failed to create a new wiki. Root cause is [{}]",
-            ExceptionUtils.getRootCauseMessage(lastError));
+        verify(this.logger).error("Failed to create a new wiki.", lastError);
     }
 
     @Test

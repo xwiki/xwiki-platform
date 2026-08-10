@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
 
@@ -235,7 +236,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         try {
             cookie.setMaxAge(Math.round(60 * 60 * 24 * Float.parseFloat(this.cookieLife)));
         } catch (Exception e) {
-            LOGGER.error("Failed to set the cookie max age with duration [{}]", this.cookieLife, e);
+            LOGGER.error("Failed to set the cookie max age with duration [{}]", this.cookieLife);
         }
     }
 
@@ -548,7 +549,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             // so here we must re-introduce the = sign needed by Base64.
             // See XWIKI-2211
             byte[] decodedEncryptedText =
-                Base64.decodeBase64(encryptedText.replace("_", "=").getBytes("ISO-8859-1"));
+                Base64.decodeBase64(encryptedText.replace("_", "=").getBytes(StandardCharsets.ISO_8859_1));
             Cipher c1 = Cipher.getInstance(this.cipherParameters);
             c1.init(Cipher.DECRYPT_MODE, this.secretKey);
             byte[] decryptedText = c1.doFinal(decodedEncryptedText);

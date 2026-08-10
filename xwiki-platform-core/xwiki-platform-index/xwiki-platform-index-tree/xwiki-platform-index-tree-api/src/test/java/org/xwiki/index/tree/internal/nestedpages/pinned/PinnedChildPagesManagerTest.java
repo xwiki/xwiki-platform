@@ -94,7 +94,7 @@ class PinnedChildPagesManagerTest
         new DocumentReference(PinnedChildPagesClassInitializer.CLASS_REFERENCE, new WikiReference("wiki"));
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);

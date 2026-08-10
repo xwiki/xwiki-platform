@@ -144,8 +144,7 @@ public abstract class AbstractXWikiEndpoint extends Endpoint implements Endpoint
         try {
             session.close(new CloseReason(closeCode, reasonPhrase));
         } catch (IOException e) {
-            this.logger.warn("Failed to close the session. Root cause is [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to close the session", e);
         }
     }
 }

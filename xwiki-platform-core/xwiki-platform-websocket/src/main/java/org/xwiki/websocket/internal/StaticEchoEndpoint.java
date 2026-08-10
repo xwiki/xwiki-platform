@@ -30,7 +30,6 @@ import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -77,8 +76,7 @@ public class StaticEchoEndpoint implements EndpointComponent
                     session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT,
                         "We don't accept connections from guest users. Please login first."));
                 } catch (IOException e) {
-                    this.logger.warn("Failed to close the session. Root cause is [{}]",
-                        ExceptionUtils.getRootCauseMessage(e));
+                    this.logger.warn("Failed to close the session", e);
                 }
             }
         });

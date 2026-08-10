@@ -872,7 +872,7 @@ public class HibernateStore implements Disposable, Initializable
             if (current instanceof SQLException sx) {
                 while (sx.getNextException() != null) {
                     sx = sx.getNextException();
-                    sb.append("\nSQL next exception = [" + sx + "]");
+                    sb.append("\nSQL next exception = [").append(sx).append(']');
                 }
             }
         }

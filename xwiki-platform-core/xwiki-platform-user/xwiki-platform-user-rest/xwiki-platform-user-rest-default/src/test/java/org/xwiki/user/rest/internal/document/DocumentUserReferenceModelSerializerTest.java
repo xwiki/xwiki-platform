@@ -23,6 +23,8 @@ import java.net.URI;
 
 import javax.mail.internet.InternetAddress;
 
+import jakarta.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -85,7 +87,8 @@ class DocumentUserReferenceModelSerializerTest
     private EmailAddressObfuscator emailAddressObfuscator;
 
     @MockComponent
-    private UserReferenceSerializer<DocumentReference> userReferenceResolver;
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     @MockComponent
     private UserReferenceSerializer<String> userReferenceStringResolver;
@@ -174,7 +177,7 @@ class DocumentUserReferenceModelSerializerTest
         when(this.userReferenceStringResolver.serialize(SuperAdminUserReference.INSTANCE))
             .thenReturn("XWiki.superadmin");
         DocumentReference superadminDocumentReference = new DocumentReference("xwiki", "XWiki", "superadmin");
-        when(this.userReferenceResolver.serialize(SuperAdminUserReference.INSTANCE))
+        when(this.userReferenceSerializer.serialize(SuperAdminUserReference.INSTANCE))
             .thenReturn(superadminDocumentReference);
         mockDocument(superadminDocumentReference);
 
@@ -247,7 +250,7 @@ class DocumentUserReferenceModelSerializerTest
         when(testUserProperties.getProperty("usertype")).thenReturn("Advanced");
         when(this.userPropertiesResolver.resolve(testUserReference)).thenReturn(testUserProperties);
 
-        when(this.userReferenceResolver.serialize(testUserReference)).thenReturn(testUserDocumentReference);
+        when(this.userReferenceSerializer.serialize(testUserReference)).thenReturn(testUserDocumentReference);
 
         when(this.userReferenceStringResolver.serialize(testUserReference)).thenReturn(userId);
 

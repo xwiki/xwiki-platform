@@ -53,6 +53,7 @@
     :aria="{ expanded: false }"
     tag="div"
     @focusin="onDisplayerFocus"
+    @focusout="onDisplayerBlur"
   >
     <div
       :class="{ view: isView, edit: !isView, editable: isEditable }"
@@ -87,7 +88,6 @@
       <!-- The slot containing the displayer Editor widget -->
       <div
         @keydown.esc.capture="cancelEdit"
-        @focusout="onDisplayerBlur"
         @focusin="editorFocused = true"
         v-if="!isView && !isLoading"
         ref="editBlock"

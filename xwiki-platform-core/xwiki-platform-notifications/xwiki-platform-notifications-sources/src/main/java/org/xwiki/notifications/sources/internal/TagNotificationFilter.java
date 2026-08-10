@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
@@ -120,8 +119,7 @@ public class TagNotificationFilter implements NotificationFilter
             return value(EventProperty.PAGE).inStrings(pagesHoldingTags)
                     .and(value(EventProperty.WIKI).eq(value(currentWiki)));
         } catch (QueryException e) {
-            logger.warn("Failed to get the list of documents holding some tags. Root cause is [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            logger.warn("Failed to get the list of documents holding some tags", e);
             return null;
         }
     }

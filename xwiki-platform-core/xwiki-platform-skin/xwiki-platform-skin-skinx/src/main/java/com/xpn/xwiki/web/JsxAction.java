@@ -62,16 +62,16 @@ public class JsxAction extends AbstractSxAction
     /** The extension type of this action. */
     public static final JsExtension JSX = new JsExtension();
 
-    /** Logging helper. */
-    @Inject
-    private Logger logger;
-
     private static final String SOURCE_MAPS_SESSION_ATTRIBUTE = JsxAction.class.getName() + ".sourceMaps";
 
     /**
      * We need to add minify=false so that we don't try to minify the source map.
      */
     private static final String SOURCE_MAP_PARAMS = "sourceMap=true&minify=false";
+
+    /** Logging helper. */
+    @Inject
+    private Logger logger;
 
     @Override
     public Extension getExtensionType()

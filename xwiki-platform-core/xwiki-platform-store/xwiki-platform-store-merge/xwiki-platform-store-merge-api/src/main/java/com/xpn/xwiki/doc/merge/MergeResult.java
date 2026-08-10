@@ -84,7 +84,7 @@ public class MergeResult
 
         for (LogEvent logEvent : getLog()) {
             if (logEvent.getLevel() == logLevel) {
-                if (logEvent.getThrowable() != null && logEvent.getThrowable() instanceof Exception) {
+                if (logEvent.getThrowable() instanceof Exception) {
                     exceptions.add(new MergeException(logEvent.getFormattedMessage(), logEvent.getThrowable()));
                 } else {
                     exceptions.add(new MergeException(logEvent.getFormattedMessage()));

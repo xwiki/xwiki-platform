@@ -199,8 +199,8 @@ class GroupScriptServiceTest
         verify(this.groupManager, never()).getMembers(CANDIDATE_GROUP, true);
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("Failed to access the members of the target group [xwiki:XWiki.Target]. Root cause is "
-            + "[GroupException: target failure]", this.logCapture.getMessage(0));
+        assertEquals("Failed to access the members of the target group [xwiki:XWiki.Target]",
+            this.logCapture.getMessage(0));
     }
 
     @Test
@@ -214,7 +214,7 @@ class GroupScriptServiceTest
         assertFalse(actual);
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("Failed to access the members of the candidate group [xwiki:XWiki.Added]. Root cause is "
-            + "[GroupException: candidate failure]", this.logCapture.getMessage(0));
+        assertEquals("Failed to access the members of the candidate group [xwiki:XWiki.Added]",
+            this.logCapture.getMessage(0));
     }
 }

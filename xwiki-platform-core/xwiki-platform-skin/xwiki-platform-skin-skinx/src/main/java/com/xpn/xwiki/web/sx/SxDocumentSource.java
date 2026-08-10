@@ -151,7 +151,7 @@ public class SxDocumentSource implements SxSource
                 }
                 // Also add a newline, in case the different object contents don't end with a blank
                 // line, and could cause syntax errors when concatenated.
-                resultBuilder.append(sxContent + "\n");
+                resultBuilder.append(sxContent).append('\n');
             }
         }
         return resultBuilder.toString();

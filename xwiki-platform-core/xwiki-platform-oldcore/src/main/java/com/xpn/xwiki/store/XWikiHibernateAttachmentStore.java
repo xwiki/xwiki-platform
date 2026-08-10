@@ -57,42 +57,6 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     private AttachmentVersioningStore attachmentVersioningStore;
 
     /**
-     * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
-     * in the WEB-INF directory.
-     *
-     * @param xwiki
-     * @param context
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateAttachmentStore(XWiki xwiki, XWikiContext context)
-    {
-        super(xwiki, context);
-    }
-
-    /**
-     * @see #XWikiHibernateAttachmentStore(XWiki, XWikiContext)
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateAttachmentStore(XWikiContext context)
-    {
-        this(context.getWiki(), context);
-    }
-
-    /**
-     * Initialize the storage engine with a specific path This is used for tests.
-     *
-     * @param hibpath
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateAttachmentStore(String hibpath)
-    {
-        super(hibpath);
-    }
-
-    /**
      * Empty constructor needed for component manager.
      */
     public XWikiHibernateAttachmentStore()
@@ -422,8 +386,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             try {
                 return this.componentManager.getInstance(AttachmentVersioningStore.class, storeType);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Can't find attachment versioning store for type [{}]. Root cause is [{}]", storeType,
-                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("Can't find attachment versioning store for type [{}]", storeType, e);
             }
         }
 

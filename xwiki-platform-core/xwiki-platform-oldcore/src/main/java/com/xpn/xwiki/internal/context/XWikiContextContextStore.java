@@ -602,8 +602,7 @@ public class XWikiContextContextStore extends AbstractContextStore
                     restoreDocument(wikiDescriptor.getMainPageReference(), xcontext);
                 }
             } catch (WikiManagerException e) {
-                this.logger.warn("Can't access the descriptor of the restored context wiki [{}]. Root cause is [{}]",
-                    storedWikiId, ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("Can't access the descriptor of the restored context wiki [{}]", storedWikiId, e);
             }
         }
     }

@@ -90,8 +90,7 @@ public class DefaultModelBridge implements ModelBridge
             } catch (XWikiException e) {
                 String stringReference =
                     this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
-                this.logger.warn("Failed to load the default translation of [{}]. Root cause is [{}]", stringReference,
-                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("Failed to load the default translation of [{}]", stringReference, e);
             }
         }
         return document;

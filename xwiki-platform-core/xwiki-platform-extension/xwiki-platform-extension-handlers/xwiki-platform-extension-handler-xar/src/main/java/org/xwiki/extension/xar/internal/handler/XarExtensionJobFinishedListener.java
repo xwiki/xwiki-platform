@@ -34,7 +34,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionContext;
@@ -191,8 +190,8 @@ public class XarExtensionJobFinishedListener implements EventListener
                             }
                         }
                     } catch (Exception e) {
-                        this.logger.warn("Exception when cleaning pages removed since previous xar extension version. "
-                            + "Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
+                        this.logger.warn("Exception when cleaning pages removed since previous xar extension version",
+                            e);
                     }
                 }
             }
@@ -261,8 +260,7 @@ public class XarExtensionJobFinishedListener implements EventListener
                 try {
                     job.getStatus().ask(question);
                 } catch (InterruptedException e) {
-                    this.logger.warn("The thread has been interrupted. Root cause is [{}]",
-                        ExceptionUtils.getRootCauseMessage(e));
+                    this.logger.warn("The thread has been interrupted", e);
 
                     // The thread has been interrupted, do nothing
                     return;

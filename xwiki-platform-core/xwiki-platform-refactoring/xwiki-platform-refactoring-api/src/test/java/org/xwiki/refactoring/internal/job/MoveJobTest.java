@@ -764,7 +764,7 @@ class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    void visitDocuments() throws Exception
+    void visitDocuments()
     {
         SpaceReference sourceReference = new SpaceReference("wiki", "Path", "To", "Space");
         SpaceReference destinationReference = new SpaceReference("wiki", "Other", "Space");

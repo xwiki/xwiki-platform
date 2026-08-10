@@ -339,7 +339,7 @@ public final class DockerTestUtils
             InetAddress ip = InetAddress.getLocalHost();
             hostname = ip.getHostName();
         } catch (Exception e) {
-            LOGGER.warn("Failed to get hostname. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to get hostname", e);
             hostname = "Unknown";
         }
         return hostname;

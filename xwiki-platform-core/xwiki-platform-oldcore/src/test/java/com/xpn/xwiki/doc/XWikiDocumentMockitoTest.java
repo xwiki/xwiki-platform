@@ -1385,7 +1385,7 @@ class XWikiDocumentMockitoTest
     }
 
     @Test
-    void testResolveClassReference() throws Exception
+    void testResolveClassReference()
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
 
@@ -1736,13 +1736,13 @@ class XWikiDocumentMockitoTest
     }
 
     @Test
-    void getAttachmentWithNullFilename() throws XWikiException
+    void getAttachmentWithNullFilename()
     {
         assertNull(this.document.getAttachment(null));
     }
 
     @Test
-    void listAdd() throws XWikiException
+    void listAdd()
     {
         // reset
         attachmentList.clear();
@@ -1764,7 +1764,7 @@ class XWikiDocumentMockitoTest
     }
 
     @Test
-    void listMaintainsOrder() throws XWikiException
+    void listMaintainsOrder()
     {
         XWikiAttachment attachment1 = new XWikiAttachment(this.document, "attachmentA");
         XWikiAttachment attachment2 = new XWikiAttachment(this.document, "attachmentB");
@@ -1780,14 +1780,14 @@ class XWikiDocumentMockitoTest
     }
 
     @Test
-    void listClear() throws XWikiException
+    void listClear()
     {
         attachmentList.clear();
         assertTrue(attachmentList.isEmpty());
     }
 
     @Test
-    void listRemove() throws XWikiException
+    void listRemove()
     {
         // remove through object parameter
         XWikiAttachment attachment = new XWikiAttachment(this.document, "remove");
@@ -1807,7 +1807,7 @@ class XWikiDocumentMockitoTest
     }
 
     @Test
-    void listSet() throws XWikiException
+    void listSet()
     {
         XWikiAttachment attachment = new XWikiAttachment(this.document, "testAttachment");
         attachmentList.set(0, attachment);
@@ -1822,7 +1822,7 @@ class XWikiDocumentMockitoTest
     }
 
     @Test
-    void listAddAll() throws XWikiException
+    void listAddAll()
     {
         ArrayList<XWikiAttachment> list = new ArrayList<XWikiAttachment>();
         XWikiAttachment attachment1 = new XWikiAttachment(this.document, "attachmentA");
@@ -1846,7 +1846,7 @@ class XWikiDocumentMockitoTest
     }
 
     @Test
-    void listRemoveAll() throws XWikiException
+    void listRemoveAll()
     {
         ArrayList<XWikiAttachment> list = new ArrayList<XWikiAttachment>();
         XWikiAttachment attachment1 = new XWikiAttachment(this.document, "attachmentA");
@@ -1866,7 +1866,7 @@ class XWikiDocumentMockitoTest
     }
 
     @Test
-    void listRetainAll() throws XWikiException
+    void listRetainAll()
     {
         ArrayList<XWikiAttachment> list = new ArrayList<XWikiAttachment>();
         XWikiAttachment attachment1 = new XWikiAttachment(this.document, "attachmentA");

@@ -278,8 +278,8 @@ class DefaultURLSecurityManagerTest
         uri = new URI("market://launch?id=somePackageName");
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
         assertEquals(1, this.logCapture.size());
-        assertEquals("Error while transforming URI [market://launch?id=somePackageName] to URL",
-            this.logCapture.getMessage(0));
+        assertEquals("Error while transforming URI [market://launch?id=somePackageName] to URL: "
+            + "[MalformedURLException: unknown protocol: market]", this.logCapture.getMessage(0));
 
         // invalidate cache so that we can call inject other trustedDomains
         this.urlSecurityManager.invalidateCache();
@@ -323,8 +323,8 @@ class DefaultURLSecurityManagerTest
         assertFalse(this.urlSecurityManager.isURITrusted(uri));
 
         assertEquals(2, this.logCapture.size());
-        assertEquals("Error while transforming URI [sftp://xwiki.org/something] to URL",
-            this.logCapture.getMessage(1));
+        assertEquals("Error while transforming URI [sftp://xwiki.org/something] to URL: "
+            + "[MalformedURLException: unknown protocol: sftp]", this.logCapture.getMessage(1));
     }
 
     private void assertParseToSafeThrowSecurity(String location, String expectedExceptionLocation)
@@ -388,8 +388,8 @@ class DefaultURLSecurityManagerTest
         location = "market://launch?id=somePackageName";
         assertParseToSafeThrowSecurity(location, location);
         assertEquals(1, this.logCapture.size());
-        assertEquals("Error while transforming URI [market://launch?id=somePackageName] to URL",
-            this.logCapture.getMessage(0));
+        assertEquals("Error while transforming URI [market://launch?id=somePackageName] to URL: "
+            + "[MalformedURLException: unknown protocol: market]", this.logCapture.getMessage(0));
 
         // invalidate cache so that we can call inject other trustedDomains
         this.urlSecurityManager.invalidateCache();
@@ -439,8 +439,8 @@ class DefaultURLSecurityManagerTest
         assertParseToSafeThrowSecurity(location, location);
 
         assertEquals(2, this.logCapture.size());
-        assertEquals("Error while transforming URI [sftp://xwiki.org/xwiki/something/] to URL",
-            this.logCapture.getMessage(1));
+        assertEquals("Error while transforming URI [sftp://xwiki.org/xwiki/something/] to URL: "
+            + "[MalformedURLException: unknown protocol: sftp]", this.logCapture.getMessage(1));
 
         // Check behaviour with |
         location = "http://extensions.xwiki.org/xwiki/bin/view/Main/WebHome#|t=recommendedextensions&p=1&l=15&s=doc"

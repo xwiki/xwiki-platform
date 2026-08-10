@@ -124,7 +124,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                             session.createSQLQuery("update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
 
                     for (Object[] result : rs) {
-                        R4359XWIKI1459DataMigration.this.logger.info("Updating document [{}]...", result[2]);
+                        R4359XWIKI1459DataMigration.this.logger.info("Updating document [{}]...", result[2].toString());
                         long docId = Long.parseLong(result[0].toString());
                         String sArchive = result[1].toString();
 

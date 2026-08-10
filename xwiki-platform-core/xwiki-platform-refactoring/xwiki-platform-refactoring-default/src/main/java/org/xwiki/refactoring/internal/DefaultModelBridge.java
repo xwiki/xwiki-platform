@@ -238,8 +238,7 @@ public class DefaultModelBridge implements ModelBridge
             return true;
         } catch (Exception e) {
             // Just warn, since it's a recoverable situation.
-            this.logger.warn("Failed to unlock document [{}]. Root cause is [{}]", reference,
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to unlock document [{}]", reference, e);
             return false;
         }
     }
@@ -582,7 +581,7 @@ public class DefaultModelBridge implements ModelBridge
                 result.add(deletedDocument.getId());
             }
         } catch (Exception e) {
-            logger.error("Failed to get deleted document IDs for batch [{}]", batchId, e);
+            logger.error("Failed to get deleted document IDs for batch [{}]", batchId);
         }
 
         return result;

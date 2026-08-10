@@ -95,7 +95,7 @@ class WorkspaceMigrationTest
         // Mocks about the old workspace object
         BaseObject oldWorkspaceObject = mock(BaseObject.class);
         when(oldDescriptorDocument.getXObject(
-            eq(new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass"))))
+            new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass")))
             .thenReturn(oldWorkspaceObject);
 
         // Mocks about the old document to restore form the main wiki
@@ -176,7 +176,7 @@ class WorkspaceMigrationTest
         // Mocks about the old workspace object
         BaseObject oldWorkspaceObject = mock(BaseObject.class);
         when(oldDescriptorDocument.getXObject(
-            eq(new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass"))))
+            new DocumentReference("mainWiki", "WorkspaceManager", "WorkspaceClass")))
             .thenReturn(oldWorkspaceObject);
 
         doThrow(new XWikiException()).when(this.documentRestorerFromAttachedXAR).restoreDocumentFromAttachedXAR(

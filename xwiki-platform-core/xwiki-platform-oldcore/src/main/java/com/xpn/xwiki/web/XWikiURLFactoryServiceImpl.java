@@ -63,7 +63,7 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
                     (Class<? extends XWikiURLFactory>) Class.forName(urlFactoryClassName);
                 this.factoryMap.put(mode, urlFactoryClass);
             } catch (Exception e) {
-                LOGGER.error("Failed to load custom url factory class [{}]", urlFactoryClassName, e);
+                LOGGER.error("Failed to load custom url factory class [{}]", urlFactoryClassName);
             }
         }
     }

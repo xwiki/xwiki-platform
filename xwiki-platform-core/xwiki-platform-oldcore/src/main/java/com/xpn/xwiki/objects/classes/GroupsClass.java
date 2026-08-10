@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.dom4j.Element;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.EntityReference;
@@ -103,8 +102,7 @@ public class GroupsClass extends ListClass
             return (List<String>) context.getWiki().getGroupService(context)
                 .getAllMatchedGroups(null, false, 0, 0, null, context);
         } catch (XWikiException e) {
-            LOGGER.warn("Failed to retrieve the list of groups. Root cause is [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to retrieve the list of groups", e);
             return Collections.emptyList();
         }
     }

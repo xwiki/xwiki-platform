@@ -404,8 +404,8 @@ public class XWikiAttachment implements Cloneable
 
         // Log this since it's probably a mistake so that we find who is doing bad things
         if (this.authorReference != null && this.authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake. "
-                + "Call stack is [{}]", ExceptionUtils.getStackTrace(new Exception()));
+            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
+                new Exception("See stack trace"));
         }
     }
 
@@ -1177,11 +1177,9 @@ public class XWikiAttachment implements Cloneable
 
                     this.attachment_archive = store.loadArchive(this, xcontext, true);
                 } catch (Exception e) {
-                    LOGGER.warn(
-                        "Failed to load archive for attachment [{}@{}]. "
-                            + "This attachment is broken, please consider re-uploading it. Root cause is [{}]",
-                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(),
-                        ExceptionUtils.getRootCauseMessage(e));
+                    LOGGER.warn("Failed to load archive for attachment [{}@{}]. This attachment is broken, please "
+                        + "consider re-uploading it",
+                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
                 }
             } finally {
                 if (currentWiki != null) {

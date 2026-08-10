@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import jakarta.inject.Inject;
 
 import org.hibernate.ObjectNotFoundException;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 
@@ -50,16 +49,6 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
     /** logger. */
     @Inject
     private Logger logger;
-
-    /**
-     * @param context the current context.
-     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentVersioningStore.class) instead.
-     */
-    @Deprecated
-    public HibernateAttachmentVersioningStore(XWikiContext context)
-    {
-        super(context.getWiki(), context);
-    }
 
     /**
      * Empty constructor needed for component manager.
@@ -118,9 +107,8 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
                 return null;
             });
         } catch (Exception e) {
-            this.logger.warn("Error deleting attachment archive [{}] of doc [{}]. Root cause is [{}]",
-                attachment.getFilename(), attachment.getDoc().getDocumentReference(),
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Error deleting attachment archive [{}] of doc [{}]", attachment.getFilename(),
+                attachment.getDoc().getDocumentReference(), e);
         }
     }
 }

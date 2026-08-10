@@ -65,6 +65,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DocumentUserReferenceModelSerializer extends AbstractUserReferenceModelSerializer
 {
     @Inject
+    @Named("document")
     private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     @Inject

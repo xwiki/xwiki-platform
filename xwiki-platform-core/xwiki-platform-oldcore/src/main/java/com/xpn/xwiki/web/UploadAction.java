@@ -139,8 +139,7 @@ public class UploadAction extends XWikiAction
             try {
                 uploadAttachment(file.getValue(), file.getKey(), fileupload, doc, context);
             } catch (Exception ex) {
-                this.logger.warn("Failed to save uploaded file [{}]. Root cause is [{}]", file.getKey(),
-                    ExceptionUtils.getRootCauseMessage(ex));
+                this.logger.warn("Failed to save uploaded file [{}]", file.getKey(), ex);
                 failedFiles.put(file.getKey(), ExceptionUtils.getRootCauseMessage(ex));
             }
         }

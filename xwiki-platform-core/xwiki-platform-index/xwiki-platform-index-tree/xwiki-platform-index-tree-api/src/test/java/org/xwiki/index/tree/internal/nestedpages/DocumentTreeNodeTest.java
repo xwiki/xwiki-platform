@@ -108,7 +108,7 @@ class DocumentTreeNodeTest
     private DocumentReference terminalDocumentReference = new DocumentReference("wiki", "Some", "Page");
 
     @BeforeEach
-    void before() throws Exception
+    void before()
     {
         when(this.translationsTreeNode.getType()).thenReturn("translations");
         when(this.attachmentsTreeNode.getType()).thenReturn("attachments");
@@ -138,7 +138,7 @@ class DocumentTreeNodeTest
      * @see "XWIKI-14643: Missing page in breadcrumbs treeview when treeview is expanded"
      */
     @Test
-    void pagination() throws Exception
+    void pagination()
     {
         this.documentTreeNode.getProperties().put("hierarchyMode", "reference");
         this.documentTreeNode.getProperties().put("showTranslations", true);

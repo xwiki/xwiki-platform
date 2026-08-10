@@ -649,7 +649,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
                 result = true;
             } catch (XWikiException e) {
                 LOGGER.error("Error while trying to load document [{}] as owner document of [{}]", documentReference,
-                    this, e);
+                    this);
             }
         }
         return result;

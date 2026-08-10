@@ -42,7 +42,6 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -180,6 +179,6 @@ class DefaultNotificationPreferenceManagerTest
                 List.of(this.mockPreference11, this.mockPreference12, this.mockPreference21, this.mockPreference22));
 
         verify(this.mockPreferenceProvider1)
-            .savePreferences(eq(List.of(this.mockPreference11, this.mockPreference12)));
+            .savePreferences(List.of(this.mockPreference11, this.mockPreference12));
     }
 }

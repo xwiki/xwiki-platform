@@ -57,7 +57,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -123,7 +122,7 @@ class NotificationPreferenceScriptServiceTest
         NotificationPreferenceImpl existingPref3 = new NotificationPreferenceImpl(false,
                 NotificationFormat.EMAIL, "delete");
 
-        when(notificationPreferenceManager.getAllPreferences(eq(userRef))).thenReturn(
+        when(notificationPreferenceManager.getAllPreferences(userRef)).thenReturn(
                 List.of(existingPref1, existingPref2, existingPref3));
 
         final MutableBoolean isOk = new MutableBoolean(false);

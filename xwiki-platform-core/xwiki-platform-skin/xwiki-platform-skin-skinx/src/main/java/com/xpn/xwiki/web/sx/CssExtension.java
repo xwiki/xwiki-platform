@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +61,7 @@ public class CssExtension implements Extension
                 compressor.compress(out, -1);
                 return out.toString();
             } catch (IOException ex) {
-                LOGGER.warn("Failed to compress the SSX code. Root cause is [{}]",
-                    ExceptionUtils.getRootCauseMessage(ex));
+                LOGGER.warn("Failed to compress the SSX code", ex);
             }
             return source;
         };

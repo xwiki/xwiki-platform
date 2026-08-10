@@ -29,7 +29,6 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
@@ -785,8 +784,7 @@ public class XWikiWebDriver extends RemoteWebDriver
             LOGGER.warn("The currently running test wasted [{}] ms waiting for element [{}] which was not found. "
                 + "Tests should look for elements that are expected to be present; to check for the absence of an "
                 + "element or to avoid waiting, use findElementWithoutWaiting(), hasElementWithoutWaiting() or "
-                + "waitUntilElementDisappears() instead. Call stack is [{}]", elapsedMillis, by,
-                ExceptionUtils.getStackTrace(locationException));
+                + "waitUntilElementDisappears() instead.", elapsedMillis, by, locationException);
         }
     }
 

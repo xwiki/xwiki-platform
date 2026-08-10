@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -32,6 +34,9 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -47,6 +52,7 @@ import static org.mockito.Mockito.when;
  * @since 13.3RC1
  * @since 12.10.7
  */
+@OldcoreTest
 class LevelsClassTest
 {
     private static final List<String> DEFAULT_LIST = Arrays.asList(
@@ -59,20 +65,26 @@ class LevelsClassTest
         "delete"
     );
 
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
+    @MockComponent
+    private ContextualLocalizationManager contextualLocalizationManager;
+
     private XWikiContext context;
     private XWikiRequest xWikiRequest;
 
     @BeforeEach
     void setup() throws XWikiException
     {
-        this.context = mock(XWikiContext.class);
+        this.context = this.oldcore.getXWikiContext();
         XWiki xWiki = mock(XWiki.class);
-        when(this.context.getWiki()).thenReturn(xWiki);
+        this.context.setWiki(xWiki);
         XWikiRightService xWikiRightService = mock(XWikiRightService.class);
         when(xWiki.getRightService()).thenReturn(xWikiRightService);
         when(xWikiRightService.listAllLevels(context)).thenReturn(DEFAULT_LIST);
         this.xWikiRequest = mock(XWikiRequest.class);
-        when(this.context.getRequest()).thenReturn(this.xWikiRequest);
+        this.context.setRequest(this.xWikiRequest);
     }
 
     @Test
@@ -91,7 +103,9 @@ class LevelsClassTest
 
         // View and edit should be selected even despite the weird case in edit right
         // Comment should not be selected since there's a space before it
-        String expectedString = "<select id='authorizationrights' name='authorizationrights' size='6'>"
+        String expectedString = "<select size='6' id='authorizationrights' "
+            + "aria-label='core.model.xclass.editClassProperty.textAlternative' "
+            + "name='authorizationrights'>"
             + "<option value='admin' label='admin'>admin</option>"
             + "<option value='programming' label='programming'>programming</option>"
             + "<option selected='selected' value='edit' label='edit'>edit</option>"

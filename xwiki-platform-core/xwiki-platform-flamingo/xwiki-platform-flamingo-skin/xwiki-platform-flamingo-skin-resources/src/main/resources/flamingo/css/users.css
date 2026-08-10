@@ -67,6 +67,14 @@ li.group {
   margin-right: .3em;
 }
 
+// #displayUser()/#displayGroup() add this class on the avatar when the name isn't visually displayed
+// (e.g. an icon-only avatar link): there is then no visible name next to the avatar to justify the spacing
+// above, and keeping it would widen the link's box past the avatar image itself (see XWIKI-23710).
+.user-avatar.icon-only,
+.group-avatar.icon-only {
+  margin-right: 0;
+}
+
 .user img.user-avatar,
 .group img.group-avatar {
   border-radius: var(--border-radius-small);

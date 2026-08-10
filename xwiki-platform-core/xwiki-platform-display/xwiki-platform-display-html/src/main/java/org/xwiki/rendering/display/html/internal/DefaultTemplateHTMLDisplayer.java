@@ -195,6 +195,8 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
                 .collect(Collectors.joining(",")).toLowerCase());
             typeName.append(')');
             typeNames.add(typeName.toString());
+            // Keep the previous fully qualified naming as a fallback for backwards compatibility
+            typeNames.add(ReflectionUtils.serializeType(type).toLowerCase());
         } else if (type != null) {
             typeNames.add(ReflectionUtils.serializeType(type).toLowerCase());
         }

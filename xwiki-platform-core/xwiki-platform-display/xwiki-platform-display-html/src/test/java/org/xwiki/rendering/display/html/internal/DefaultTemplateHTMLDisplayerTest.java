@@ -126,6 +126,10 @@ class DefaultTemplateHTMLDisplayerTest
         verify(this.templateManager)
             .getTemplate("html_displayer/list(block)/view.vm");
         verify(this.templateManager).getTemplate("html_displayer/list(block).vm");
+        verify(this.templateManager)
+            .getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block)/view.vm");
+        verify(this.templateManager)
+            .getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block).vm");
         verify(this.templateManager).getTemplate("html_displayer/view.vm");
         verify(this.templateManager).getTemplate("html_displayer/default.vm");
         this.defaultTemplateHTMLDisplayer.display(new Type()

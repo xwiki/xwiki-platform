@@ -19,6 +19,7 @@
  */
 import { entityResourceReference, parseEntityReference } from "./referenceHelpers";
 import { labelFromTranslations } from "./labels";
+import AttachmentConfig from "../vue/AttachmentConfig.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
@@ -51,8 +52,8 @@ class AttachmentLinkTargetType
     return { ref: null };
   }
 
-  async component(): Promise<Component> {
-    return (await import("../vue/AttachmentConfig.vue")).default;
+  component(): Component {
+    return AttachmentConfig;
   }
 
   tryParseUrl(

@@ -271,14 +271,14 @@ describe("linkTargetToResourceReference", () => {
 });
 
 describe("listEnabledLinkTargetTypeExtensions", () => {
-  it("excludes extensions whose isEnabled() resolves to false", async () => {
+  it("excludes extensions whose isEnabled() returns false", () => {
     const container = buildContainer([
       CatchAllExtension,
       PageExtension,
       DisabledExtension,
     ]);
 
-    const enabled = await listEnabledLinkTargetTypeExtensions(container);
+    const enabled = listEnabledLinkTargetTypeExtensions(container);
 
     expect(enabled.map((e) => e.type).sort()).toEqual(["page", "url"]);
   });

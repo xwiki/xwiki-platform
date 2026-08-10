@@ -22,14 +22,10 @@ import { createLinkEditionContext } from "../linkSuggest.js";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
 import { listEnabledLinkTargetTypeExtensions } from "@xwiki/platform-link-modal-api";
-import { computed, markRaw, provide, ref, shallowRef, watchEffect } from "vue";
+import { computed, markRaw, provide } from "vue";
 import { useI18n } from "vue-i18n";
-import type {
-  LinkData,
-  LinkTargetTypeExtension,
-} from "@xwiki/platform-link-modal-api";
+import type { LinkData } from "@xwiki/platform-link-modal-api";
 import type { Container } from "inversify";
-import type { Component } from "vue";
 
 const props = defineProps<{
   current: LinkData;
@@ -42,77 +38,35 @@ provide("linkEditionCtx", createLinkEditionContext(props.depsContainer));
 
 const linkData = typedRef(props.current);
 
-// The list of registered, enabled link target types (built-in and 3rd-party), resolved from the same
-// `depsContainer` used for every other domain service (see `createLinkEditionContext` above), and shared with
-// `LinkConfig.vue` (rendered nested inside whichever configuration component is active below) so it can build
-// the link type selector from it.
-const extensions = ref<LinkTargetTypeExtension[]>([]);
-const extensionsLoading = ref(true);
+// The list of registered, enabled link target types (built-in and 3rd-party), resolved synchronously from the
+// same `depsContainer` used for every other domain service (see `createLinkEditionContext` above), and shared
+// with `LinkConfig.vue` (rendered nested inside whichever configuration component is active below) so it can
+// build the link type selector from it.
+const extensions = computed(() =>
+  listEnabledLinkTargetTypeExtensions(props.depsContainer),
+);
 
 provide("linkTargetTypeExtensions", extensions);
 
-(async () => {
-  try {
-    extensions.value = await listEnabledLinkTargetTypeExtensions(
-      props.depsContainer,
-    );
-  } catch (e) {
-    console.error("Failed to resolve the registered link target types", e);
-  } finally {
-    extensionsLoading.value = false;
-  }
-})();
+// The configuration component for the currently selected link target type. `markRaw()` excludes it from Vue's
+// reactivity tracking (mirrors `LivedataDisplayer.vue`'s own use of `markRaw()` for the same reason, for a
+// dynamically registered component).
+const activeConfigComponent = computed(() => {
+  const extension = extensions.value.find(
+    (e) => e.type === linkData.value.target.type,
+  );
 
-// The configuration component for the currently selected link target type, loaded lazily (mirrors
-// `LivedataDisplayer.vue`'s own resolve-then-`markRaw()` pattern for the same reason: dynamically registered
-// components must be excluded from Vue's reactivity tracking).
-const activeConfigComponent = shallowRef<Component | null>(null);
-const activeConfigLoading = ref(false);
-
-// eslint-disable-next-line max-statements
-watchEffect(async () => {
-  if (extensionsLoading.value) {
-    return;
-  }
-
-  const type = linkData.value.target.type;
-  const extension = extensions.value.find((e) => e.type === type);
-
-  if (!extension) {
-    // The extension providing this type is not (or no longer) registered/enabled: nothing to render.
-    activeConfigComponent.value = null;
-    return;
-  }
-
-  activeConfigLoading.value = true;
-  const component = await extension.component();
-
-  // Guard against a race with a later invocation of this same watchEffect: only apply the result if the
-  // selected type hasn't changed again while `component()` was loading.
-  if (linkData.value.target.type === type) {
-    activeConfigComponent.value = markRaw(component);
-    activeConfigLoading.value = false;
-  }
+  // The extension providing this type is not (or no longer) registered/enabled: nothing to render.
+  return extension ? markRaw(extension.component()) : null;
 });
-
-const ready = computed(
-  () =>
-    !extensionsLoading.value &&
-    !activeConfigLoading.value &&
-    activeConfigComponent.value !== null,
-);
 
 defineEmits<{ submit: [LinkData]; cancel: [] }>();
 </script>
 
 <template>
   <div :class="$style.container">
-    <p v-if="!ready" :class="$style.loading">
-      {{ t("link-modal.loading") }}
-    </p>
-
     <component
-      v-else
+      v-if="activeConfigComponent"
       :is="activeConfigComponent"
       v-model="linkData.target.config"
       :link-data="linkData"
@@ -151,12 +105,6 @@ defineEmits<{ submit: [LinkData]; cancel: [] }>();
   background: var(--cr-color-neutral-50);
   padding: var(--cr-spacing-medium);
   z-index: 99;
-}
-
-.loading {
-  font-style: italic;
-  color: var(--cr-color-neutral-500);
-  margin: 0;
 }
 
 .actions {

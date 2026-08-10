@@ -19,6 +19,7 @@
  */
 import { untypedResourceReference } from "./referenceHelpers";
 import { labelFromTranslations } from "./labels";
+import UrlConfig from "../vue/UrlConfig.vue";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
 import type { LinkUrlConfig } from "../data/linkType";
@@ -45,8 +46,8 @@ class UrlLinkTargetType implements LinkTargetTypeExtension<LinkUrlConfig> {
     return { url: "" };
   }
 
-  async component(): Promise<Component> {
-    return (await import("../vue/UrlConfig.vue")).default;
+  component(): Component {
+    return UrlConfig;
   }
 
   tryParseUrl(url: string): LinkUrlConfig | null {

@@ -325,7 +325,12 @@ $xwiki.getUserName("xwiki:${username}")
       ## technologies since it now carries a tooltip duplicating the name; without this, some screen readers
       ## announce the name a second time on hover (see XWIKI-23710).
       #set ($avatarExtraAttributes = " title=""$escapedUserName"" aria-hidden=""true""")
-      #set ($displayedUserName = "<span class=""sr-only"">$escapedUserName</span>")
+      #set ($accessibleUserName = $escapedUserName)
+      #if ($macro.options.displayLink)
+        ## Without a visible name, provide an appropriate accessible name for the link.
+        #set ($accessibleUserName = $escapetool.xml($services.localization.render('web.displayUser.viewProfile.hint', [$userName])))
+      #end
+      #set ($displayedUserName = "<span class=""sr-only"">$accessibleUserName</span>")
     #end
     #set($userNameTagAttributes = "class=""${type}-name""")
     #if ($macro.options.displayLink)

@@ -31,15 +31,7 @@ export default defineConfig({
   build: {
     outDir: "../../../target/node-dist",
     lib: {
-      entry: {
-        main: resolve(__dirname, "src/main.js"),
-        // Kept as a separate entry (rather than folded into `main`, which is only loaded on demand) so it can be
-        // deployed as its own eager importmap module — see this module's pom.xml and the file itself.
-        registerLinkModalDefaults: resolve(
-          __dirname,
-          "src/registerLinkModalDefaults.js",
-        ),
-      },
+      entry: resolve(__dirname, "src/main.js"),
       fileName: (format, entryName) => `${entryName}.${format}.js`,
       formats: ["es"],
     },

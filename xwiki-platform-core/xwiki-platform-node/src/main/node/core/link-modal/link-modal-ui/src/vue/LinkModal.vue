@@ -21,7 +21,6 @@
 import { createLinkEditionContext } from "../linkSuggest.js";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
-import { resolverPromise } from "@xwiki/platform-component-manager-default";
 import { listEnabledLinkTargetTypeExtensions } from "@xwiki/platform-link-modal-api";
 import { computed, markRaw, provide, ref, shallowRef, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
@@ -43,10 +42,10 @@ provide("linkEditionCtx", createLinkEditionContext(props.depsContainer));
 
 const linkData = typedRef(props.current);
 
-// The list of registered, enabled link target types (built-in and 3rd-party). Resolved once, lazily, from the
-// shared component manager (see `@xwiki/platform-component-manager-default`), and shared with `LinkConfig.vue`
-// (rendered nested inside whichever configuration component is active below) so it can build the link type
-// selector from it.
+// The list of registered, enabled link target types (built-in and 3rd-party), resolved from the same
+// `depsContainer` used for every other domain service (see `createLinkEditionContext` above), and shared with
+// `LinkConfig.vue` (rendered nested inside whichever configuration component is active below) so it can build
+// the link type selector from it.
 const extensions = ref<LinkTargetTypeExtension[]>([]);
 const extensionsLoading = ref(true);
 
@@ -54,8 +53,9 @@ provide("linkTargetTypeExtensions", extensions);
 
 (async () => {
   try {
-    const resolver = await resolverPromise;
-    extensions.value = await listEnabledLinkTargetTypeExtensions(resolver);
+    extensions.value = await listEnabledLinkTargetTypeExtensions(
+      props.depsContainer,
+    );
   } catch (e) {
     console.error("Failed to resolve the registered link target types", e);
   } finally {

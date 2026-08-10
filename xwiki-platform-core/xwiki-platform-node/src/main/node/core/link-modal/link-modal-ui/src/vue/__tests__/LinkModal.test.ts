@@ -19,7 +19,7 @@
  */
 import LinkModal from "../LinkModal.vue";
 import { flushPromises, mount } from "@vue/test-utils";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { defineComponent, reactive } from "vue";
 import { createI18n } from "vue-i18n";
 import type {
@@ -28,16 +28,10 @@ import type {
 } from "@xwiki/platform-link-modal-api";
 import type { Container } from "inversify";
 
-const { getAllAsyncMock } = vi.hoisted(() => ({ getAllAsyncMock: vi.fn() }));
-
-vi.mock("@xwiki/platform-component-manager-default", () => ({
-  resolverPromise: Promise.resolve({ getAllAsync: getAllAsyncMock }),
-}));
-
-// `LinkModal.vue` resolves domain services out of `depsContainer` via `createLinkEditionContext`; a minimal fake
-// satisfying every lookup it performs is enough since none of these services are exercised in this test (the fake
-// configuration components below don't use them).
-function fakeDepsContainer(): Container {
+// `LinkModal.vue` resolves domain services, as well as the registered `LinkTargetTypeExtension`s, out of the
+// same `depsContainer`; a minimal fake satisfying every lookup it performs is enough since none of the domain
+// services are exercised in this test (the fake configuration components below don't use them).
+function fakeDepsContainer(extensions: LinkTargetTypeExtension[]): Container {
   const noopProvider = { get: () => null };
   const providers: Record<string, unknown> = {
     LinkSuggestServiceProvider: noopProvider,
@@ -49,7 +43,10 @@ function fakeDepsContainer(): Container {
     AttachmentsService: {},
     DocumentService: {},
   };
-  return { get: (token: string) => providers[token] } as unknown as Container;
+  return {
+    get: (token: string) => providers[token],
+    getAll: () => extensions,
+  } as unknown as Container;
 }
 
 function fakeExtension(
@@ -67,43 +64,42 @@ function fakeExtension(
   };
 }
 
-function mountLinkModal(current: LinkData) {
+function mountLinkModal(
+  current: LinkData,
+  extensions: LinkTargetTypeExtension[] = [],
+) {
   const i18n = createI18n({ legacy: false, locale: "en", messages: {} });
 
   return mount(LinkModal, {
-    props: { current, depsContainer: fakeDepsContainer() },
+    props: { current, depsContainer: fakeDepsContainer(extensions) },
     global: { plugins: [i18n] },
   });
 }
 
 describe("LinkModal", () => {
-  beforeEach(() => {
-    getAllAsyncMock.mockReset();
-  });
-
   it("shows a loading state until the registered extensions have resolved", async () => {
-    let resolveExtensions!: (value: LinkTargetTypeExtension[]) => void;
-    getAllAsyncMock.mockReturnValue(
-      new Promise((resolve) => {
-        resolveExtensions = resolve;
-      }),
+    let resolveEnabled!: (value: boolean) => void;
+    const pendingExtension = fakeExtension(
+      "fake",
+      "Fake",
+      defineComponent({ template: "<div>fake config</div>" }),
     );
+    // `isEnabled()` is the only remaining async step once extensions are resolved from `depsContainer`
+    // (`container.getAll(...)` itself is synchronous) — delay it to observe the loading state.
+    pendingExtension.isEnabled = () =>
+      new Promise((resolve) => {
+        resolveEnabled = resolve;
+      });
 
-    const wrapper = mountLinkModal({
-      displayText: "",
-      target: { type: "fake", config: {} },
-    });
+    const wrapper = mountLinkModal(
+      { displayText: "", target: { type: "fake", config: {} } },
+      [pendingExtension],
+    );
 
     await flushPromises();
     expect(wrapper.text()).toContain("Loading");
 
-    resolveExtensions([
-      fakeExtension(
-        "fake",
-        "Fake",
-        defineComponent({ template: "<div>fake config</div>" }),
-      ),
-    ]);
+    resolveEnabled(true);
     await flushPromises();
 
     expect(wrapper.text()).not.toContain("Loading");
@@ -111,7 +107,7 @@ describe("LinkModal", () => {
   });
 
   it("renders the configuration component matching the current target's type", async () => {
-    getAllAsyncMock.mockResolvedValue([
+    const extensions = [
       fakeExtension(
         "a",
         "A",
@@ -122,12 +118,12 @@ describe("LinkModal", () => {
         "B",
         defineComponent({ template: "<div>component-b</div>" }),
       ),
-    ]);
+    ];
 
-    const wrapper = mountLinkModal({
-      displayText: "",
-      target: { type: "b", config: {} },
-    });
+    const wrapper = mountLinkModal(
+      { displayText: "", target: { type: "b", config: {} } },
+      extensions,
+    );
 
     await flushPromises();
 
@@ -136,7 +132,7 @@ describe("LinkModal", () => {
   });
 
   it("swaps the rendered component when the target's type changes", async () => {
-    getAllAsyncMock.mockResolvedValue([
+    const extensions = [
       fakeExtension(
         "a",
         "A",
@@ -147,7 +143,7 @@ describe("LinkModal", () => {
         "B",
         defineComponent({ template: "<div>component-b</div>" }),
       ),
-    ]);
+    ];
 
     // `reactive()` so that mutating `current.target` below goes through the same reactive proxy that
     // `LinkModal.vue` wraps its `current` prop into internally (`ref()` of a plain object creates a *new* proxy,
@@ -156,7 +152,7 @@ describe("LinkModal", () => {
       displayText: "",
       target: { type: "a", config: {} },
     });
-    const wrapper = mountLinkModal(current);
+    const wrapper = mountLinkModal(current, extensions);
     await flushPromises();
     expect(wrapper.text()).toContain("component-a");
 
@@ -168,19 +164,19 @@ describe("LinkModal", () => {
   });
 
   it("emits submit with the current link data when the submit button is clicked", async () => {
-    getAllAsyncMock.mockResolvedValue([
+    const extensions = [
       fakeExtension(
         "a",
         "A",
         defineComponent({ template: "<div>component-a</div>" }),
       ),
-    ]);
+    ];
 
     const current: LinkData = {
       displayText: "hello",
       target: { type: "a", config: {} },
     };
-    const wrapper = mountLinkModal(current);
+    const wrapper = mountLinkModal(current, extensions);
     await flushPromises();
 
     await wrapper.find("[data-test='linkSubmit']").trigger("click");

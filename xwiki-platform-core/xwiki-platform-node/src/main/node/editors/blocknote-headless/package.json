@@ -42,7 +42,6 @@
   "dependencies": {
     "@xwiki/platform-attachments-api": "workspace:*",
     "@xwiki/platform-collaboration-api": "workspace:*",
-    "@xwiki/platform-component-manager-default": "workspace:*",
     "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-dsapi": "workspace:*",
     "@xwiki/platform-editors-blocknote-react": "workspace:*",

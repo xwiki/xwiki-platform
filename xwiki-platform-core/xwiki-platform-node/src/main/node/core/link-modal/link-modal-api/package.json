@@ -38,23 +38,25 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-component-manager-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
     "@xwiki/platform-rendering-api": "workspace:*"
   },
   "peerDependencies": {
+    "inversify": "8.x",
+    "reflect-metadata": "0.x",
     "vue": "3.x"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
-    "@xwiki/platform-component-manager-default": "workspace:*",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "eslint": "catalog:",
+    "inversify": "catalog:",
+    "reflect-metadata": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-export { registerLinkModalDefaults } from "./register";
+export { ComponentInit } from "./componentInit";
 
 export { PageLinkTargetType } from "./extensions/PageLinkTargetType";
 export { AttachmentLinkTargetType } from "./extensions/AttachmentLinkTargetType";

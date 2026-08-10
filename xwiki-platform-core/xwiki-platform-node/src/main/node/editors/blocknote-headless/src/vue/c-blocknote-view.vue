@@ -19,7 +19,6 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
-import { resolverPromise } from "@xwiki/platform-component-manager-default";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
 import {
   LinkModal,
@@ -31,6 +30,7 @@ import {
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
+  computed,
   onBeforeUnmount,
   onMounted,
   onUnmounted,
@@ -38,7 +38,6 @@ import {
   shallowRef,
   toRaw,
   useTemplateRef,
-  watch,
 } from "vue";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type {
@@ -165,17 +164,16 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
 };
 
-const submitEditedLink = async ({ displayText, target }: LinkData) => {
-  const resolver = await resolverPromise;
+const submitEditedLink = ({ displayText, target }: LinkData) => {
   const referenceCtx = { modelReferenceParser, modelReferenceSerializer };
 
-  const url = await serializeLinkTarget(target, resolver, {
+  const url = serializeLinkTarget(target, depsContainer, {
     remoteURLParser,
     remoteURLSerializer,
   });
-  const reference = await linkTargetToResourceReference(
+  const reference = linkTargetToResourceReference(
     target,
-    resolver,
+    depsContainer,
     referenceCtx,
   );
 
@@ -195,54 +193,36 @@ const mountedBlockNote = ref<{ unmount: () => void }>();
 
 const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
 
-// `parseLinkTarget` is asynchronous (it resolves the registered link target type extensions from the shared
-// component manager), so unlike `editingLink` it cannot be computed directly in the template.
-const currentLinkData = shallowRef<LinkData | null>(null);
-
 /**
  * The reference of the linked resource is the authoritative link target (the URL is only a rendering
  * of it), so build the target to configure in the link modal from that reference when the
  * integration provides one, and fall back on reverse-engineering the URL otherwise.
  */
-async function currentLinkTarget(
-  current: LinkEditionData,
-  resolver: Awaited<typeof resolverPromise>,
-): Promise<LinkTarget> {
+function currentLinkTarget(current: LinkEditionData): LinkTarget {
   const referenceCtx = { modelReferenceParser, modelReferenceSerializer };
 
   const target =
     current.reference &&
-    (await resourceReferenceToLinkTarget(
-      current.reference,
-      resolver,
-      referenceCtx,
-    ));
+    resourceReferenceToLinkTarget(current.reference, depsContainer, referenceCtx);
 
   return (
     target ??
-    (await parseLinkTarget(current.url, resolver, {
+    parseLinkTarget(current.url, depsContainer, {
       remoteURLParser,
       remoteURLSerializer,
-    }))
+    })
   );
 }
 
-watch(editingLink, async (linkProps) => {
-  if (!linkProps) {
-    currentLinkData.value = null;
-    return;
+const currentLinkData = computed<LinkData | null>(() => {
+  if (!editingLink.value) {
+    return null;
   }
 
-  const resolver = await resolverPromise;
-  const target = await currentLinkTarget(linkProps.current, resolver);
-
-  // Guard against a race: only apply the result if `editingLink` hasn't changed again while parsing.
-  if (editingLink.value === linkProps) {
-    currentLinkData.value = {
-      displayText: linkProps.current.title,
-      target,
-    };
-  }
+  return {
+    displayText: editingLink.value.current.title,
+    target: currentLinkTarget(editingLink.value.current),
+  };
 });
 
 function handleLinkEditorOutsideClick(e: MouseEvent) {

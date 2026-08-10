@@ -40,7 +40,6 @@
   "dependencies": {
     "@blocknote/core": "catalog:",
     "@xwiki/platform-attachments-api": "workspace:*",
-    "@xwiki/platform-component-manager-default": "workspace:*",
     "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-dsapi": "workspace:*",
     "@xwiki/platform-link-modal-api": "workspace:*",
@@ -61,7 +60,6 @@
     "@microsoft/api-extractor": "catalog:",
     "@types/lodash-es": "catalog:",
     "@vue/test-utils": "catalog:",
-    "@xwiki/platform-component-manager-api": "workspace:*",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",

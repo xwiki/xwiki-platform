@@ -24,7 +24,7 @@ import { useI18n } from "vue-i18n";
 import type {
   LinkData,
   LinkTargetTypeExtension,
-} from "@xwiki/platform-link-modal-api";
+} from "@xwiki/platform-link-type-api";
 import type { Ref } from "vue";
 
 const props = defineProps<{ linkData: LinkData }>();
@@ -38,7 +38,7 @@ defineSlots<{
 const { t, locale } = useI18n({ messages: translations });
 
 // Provided by `LinkModal.vue`: the list of registered, enabled link target types, already resolved from the
-// shared component manager — see `@xwiki/platform-link-modal-api`'s `LinkTargetTypeExtension`.
+// shared component manager — see `@xwiki/platform-link-type-api`'s `LinkTargetTypeExtension`.
 const extensions = inject<Ref<LinkTargetTypeExtension[]>>(
   "linkTargetTypeExtensions",
 )!;

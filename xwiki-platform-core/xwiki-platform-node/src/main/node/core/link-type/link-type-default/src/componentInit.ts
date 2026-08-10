@@ -21,12 +21,12 @@ import { AttachmentLinkTargetType } from "./extensions/AttachmentLinkTargetType"
 import { EmailLinkTargetType } from "./extensions/EmailLinkTargetType";
 import { PageLinkTargetType } from "./extensions/PageLinkTargetType";
 import { UrlLinkTargetType } from "./extensions/UrlLinkTargetType";
-import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-modal-api";
+import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 
 /**
  * Registers the built-in link target types (page, attachment, url, email) against the given `depsContainer`, as
- * unconstrained bindings of {@link linkTargetTypeExtensionRole} — see `@xwiki/platform-link-modal-api`'s
+ * unconstrained bindings of {@link linkTargetTypeExtensionRole} — see `@xwiki/platform-link-type-api`'s
  * `LinkTargetTypeExtension` for the rationale (mirrors `@xwiki/platform-markdown-syntax-config` and its
  * siblings' own `"SyntaxConfig"` registration).
  *

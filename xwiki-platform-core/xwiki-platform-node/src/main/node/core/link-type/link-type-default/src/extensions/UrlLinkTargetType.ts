@@ -23,7 +23,7 @@ import UrlConfig from "../vue/UrlConfig.vue";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
 import type { LinkUrlConfig } from "../data/linkType";
-import type { LinkTargetTypeExtension } from "@xwiki/platform-link-modal-api";
+import type { LinkTargetTypeExtension } from "@xwiki/platform-link-type-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Component } from "vue";
 
@@ -40,7 +40,7 @@ class UrlLinkTargetType implements LinkTargetTypeExtension<LinkUrlConfig> {
   readonly type = "url";
   readonly order = Number.MAX_SAFE_INTEGER;
 
-  getLabel = labelFromTranslations("link-modal.target-types.url.label");
+  getLabel = labelFromTranslations("link-type.target-types.url.label");
 
   createDefaultConfig(): LinkUrlConfig {
     return { url: "" };

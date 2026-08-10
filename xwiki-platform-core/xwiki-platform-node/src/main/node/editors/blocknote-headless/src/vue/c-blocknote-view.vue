@@ -20,13 +20,13 @@
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
+import { LinkModal } from "@xwiki/platform-link-modal-ui";
 import {
-  LinkModal,
   linkTargetToResourceReference,
   parseLinkTarget,
   resourceReferenceToLinkTarget,
   serializeLinkTarget,
-} from "@xwiki/platform-link-modal-ui";
+} from "@xwiki/platform-link-type-api";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
@@ -48,7 +48,7 @@ import type {
   LinkEditionData,
   LinkEditionHandlerProps,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { LinkData, LinkTarget } from "@xwiki/platform-link-modal-ui";
+import type { LinkData, LinkTarget } from "@xwiki/platform-link-type-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type {
   ModelReferenceParserProvider,

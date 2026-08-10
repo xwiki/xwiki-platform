@@ -6,10 +6,10 @@
 
 import { AttachmentReference } from '@xwiki/platform-model-api';
 import { Component } from 'vue';
+import { Container } from 'inversify';
 import { DocumentReference } from '@xwiki/platform-model-api';
 import { LinkTargetTypeExtension } from '@xwiki/platform-link-modal-api';
 import { LinkTargetUrlContext } from '@xwiki/platform-link-modal-api';
-import { Manager } from '@xwiki/platform-component-manager-api';
 
 // @beta
 export class AttachmentLinkTargetType implements LinkTargetTypeExtension<LinkAttachmentConfig> {
@@ -27,6 +27,11 @@ export class AttachmentLinkTargetType implements LinkTargetTypeExtension<LinkAtt
     tryParseUrl(url: string, input: LinkTargetUrlContext): LinkAttachmentConfig | null;
     // (undocumented)
     readonly type = "attachment";
+}
+
+// @beta
+export class ComponentInit {
+    constructor(container: Container);
 }
 
 // @beta
@@ -89,9 +94,6 @@ export class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfi
     // (undocumented)
     readonly type = "page";
 }
-
-// @beta
-export function registerLinkModalDefaults(manager: Manager): void;
 
 // @beta
 export class UrlLinkTargetType implements LinkTargetTypeExtension<LinkUrlConfig> {

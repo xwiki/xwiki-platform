@@ -17,20 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { registerLinkModalDefaults } from "../register";
-import { createManager } from "@xwiki/platform-component-manager-default";
+import { ComponentInit } from "../componentInit";
 import { linkTargetTypeExtensionRole } from "@xwiki/platform-link-modal-api";
-import { injectable } from "inversify";
+import { Container, injectable } from "inversify";
 import { describe, expect, it } from "vitest";
 import type { LinkTargetTypeExtension } from "@xwiki/platform-link-modal-api";
 
-describe("registerLinkModalDefaults", () => {
-  it("registers exactly the 4 built-in link target types", async () => {
-    const manager = createManager();
-    registerLinkModalDefaults(manager);
+describe("ComponentInit", () => {
+  it("registers exactly the 4 built-in link target types", () => {
+    const container = new Container();
+    new ComponentInit(container);
 
-    const resolver = await manager.build();
-    const extensions = await resolver.getAllAsync<LinkTargetTypeExtension>(
+    const extensions = container.getAll<LinkTargetTypeExtension>(
       linkTargetTypeExtensionRole,
     );
 
@@ -42,11 +40,11 @@ describe("registerLinkModalDefaults", () => {
     ]);
   });
 
-  it("lets a 3rd-party registration override a built-in type by using the same name at a lower priority", async () => {
+  it("lets a 3rd party add its own link target type into the same container", () => {
     @injectable()
-    class OverridePage implements LinkTargetTypeExtension {
-      readonly type = "page";
-      getLabel = () => "Custom page";
+    class CustomLinkTargetType implements LinkTargetTypeExtension {
+      readonly type = "custom";
+      getLabel = () => "Custom";
       createDefaultConfig = () => undefined;
       component = (): never => {
         throw new Error("not used in this test");
@@ -55,23 +53,20 @@ describe("registerLinkModalDefaults", () => {
       serializeUrl = () => "";
     }
 
-    const manager = createManager();
-    registerLinkModalDefaults(manager);
-    manager.registerComponent(
+    const container = new Container();
+    new ComponentInit(container);
+    container.bind(linkTargetTypeExtensionRole).to(CustomLinkTargetType);
+
+    const extensions = container.getAll<LinkTargetTypeExtension>(
       linkTargetTypeExtensionRole,
-      async () => OverridePage,
-      {
-        name: "page",
-        priority: 1,
-      },
     );
 
-    const resolver = await manager.build();
-    const page = await resolver.getAsync<LinkTargetTypeExtension>(
-      linkTargetTypeExtensionRole,
+    expect(extensions.map((e) => e.type).sort()).toEqual([
+      "attachment",
+      "custom",
+      "email",
       "page",
-    );
-
-    expect(page).toBeInstanceOf(OverridePage);
+      "url",
+    ]);
   });
 });

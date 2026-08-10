@@ -5,9 +5,9 @@
 ```ts
 
 import { Component } from 'vue';
+import { Container } from 'inversify';
 import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
 import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
-import { Resolver } from '@xwiki/platform-component-manager-api';
 
 // @beta
 export type LinkData = {
@@ -40,7 +40,7 @@ export interface LinkTargetTypeExtension<TConfig = unknown> {
 }
 
 // @beta
-export const linkTargetTypeExtensionRole: unique symbol;
+export const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
 
 // @beta
 export type LinkTargetUrlContext = {
@@ -49,16 +49,16 @@ export type LinkTargetUrlContext = {
 };
 
 // @beta (undocumented)
-export function listEnabledLinkTargetTypeExtensions(resolver: Resolver): Promise<LinkTargetTypeExtension[]>;
+export function listEnabledLinkTargetTypeExtensions(container: Container): Promise<LinkTargetTypeExtension[]>;
 
 // @beta (undocumented)
-export function listLinkTargetTypeExtensions(resolver: Resolver): Promise<LinkTargetTypeExtension[]>;
+export function listLinkTargetTypeExtensions(container: Container): LinkTargetTypeExtension[];
 
 // @beta
-export function parseLinkTarget(url: string, resolver: Resolver, ctx: LinkTargetUrlContext): Promise<LinkTarget>;
+export function parseLinkTarget(url: string, container: Container, ctx: LinkTargetUrlContext): LinkTarget;
 
 // @beta
-export function serializeLinkTarget(target: LinkTarget, resolver: Resolver, ctx: LinkTargetUrlContext): Promise<string>;
+export function serializeLinkTarget(target: LinkTarget, container: Container, ctx: LinkTargetUrlContext): string;
 
 // (No @packageDocumentation comment for this package)
 

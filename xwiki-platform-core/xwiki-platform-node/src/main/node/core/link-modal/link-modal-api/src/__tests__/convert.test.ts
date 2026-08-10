@@ -23,7 +23,7 @@ import {
   serializeLinkTarget,
 } from "../convert";
 import { linkTargetTypeExtensionRole } from "../linkTargetType";
-import { createManager } from "@xwiki/platform-component-manager-default";
+import { Container, injectable } from "inversify";
 import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 import type { LinkTargetTypeExtension } from "../linkTargetType";
@@ -37,6 +37,7 @@ const ctx = {
   remoteURLSerializer: mock<RemoteURLSerializer>(),
 };
 
+@injectable()
 class CatchAllExtension implements LinkTargetTypeExtension<{ url: string }> {
   readonly type = "url";
   readonly order = Number.MAX_SAFE_INTEGER;
@@ -49,6 +50,7 @@ class CatchAllExtension implements LinkTargetTypeExtension<{ url: string }> {
   serializeUrl = (config: { url: string }) => config.url;
 }
 
+@injectable()
 class PageExtension implements LinkTargetTypeExtension<{ ref: string }> {
   readonly type = "page";
   readonly order = 0;
@@ -62,6 +64,7 @@ class PageExtension implements LinkTargetTypeExtension<{ ref: string }> {
   serializeUrl = (config: { ref: string }) => `page:${config.ref}`;
 }
 
+@injectable()
 class DisabledExtension implements LinkTargetTypeExtension<unknown> {
   readonly type = "disabled";
   getLabel = () => "Disabled";
@@ -74,35 +77,31 @@ class DisabledExtension implements LinkTargetTypeExtension<unknown> {
   isEnabled = () => false;
 }
 
-async function buildResolver(
+function buildContainer(
   extensions: (new () => LinkTargetTypeExtension)[],
-) {
-  const manager = createManager();
+): Container {
+  const container = new Container();
 
-  extensions.forEach((extension, index) => {
-    manager.registerComponent(
-      linkTargetTypeExtensionRole,
-      async () => extension,
-      { name: `type-${index}` },
-    );
+  extensions.forEach((extension) => {
+    container.bind(linkTargetTypeExtensionRole).to(extension);
   });
 
-  return manager.build();
+  return container;
 }
 
 describe("parseLinkTarget", () => {
-  it("returns the type contributed by the first matching extension, in order", async () => {
-    const resolver = await buildResolver([CatchAllExtension, PageExtension]);
+  it("returns the type contributed by the first matching extension, in order", () => {
+    const container = buildContainer([CatchAllExtension, PageExtension]);
 
-    const target = await parseLinkTarget("page:Some.Page", resolver, ctx);
+    const target = parseLinkTarget("page:Some.Page", container, ctx);
 
     expect(target).toEqual({ type: "page", config: { ref: "Some.Page" } });
   });
 
-  it("falls back to the lowest-priority catch-all when nothing else matches", async () => {
-    const resolver = await buildResolver([CatchAllExtension, PageExtension]);
+  it("falls back to the catch-all (lowest order) when nothing else matches", () => {
+    const container = buildContainer([CatchAllExtension, PageExtension]);
 
-    const target = await parseLinkTarget("https://example.org", resolver, ctx);
+    const target = parseLinkTarget("https://example.org", container, ctx);
 
     expect(target).toEqual({
       type: "url",
@@ -110,46 +109,46 @@ describe("parseLinkTarget", () => {
     });
   });
 
-  it("throws when no registered extension matches", async () => {
-    const resolver = await buildResolver([PageExtension]);
+  it("throws when no registered extension matches", () => {
+    const container = buildContainer([PageExtension]);
 
-    await expect(
-      parseLinkTarget("https://example.org", resolver, ctx),
-    ).rejects.toThrow();
+    expect(() =>
+      parseLinkTarget("https://example.org", container, ctx),
+    ).toThrow();
   });
 });
 
 describe("serializeLinkTarget", () => {
-  it("serializes using the extension matching the target's type", async () => {
-    const resolver = await buildResolver([CatchAllExtension, PageExtension]);
+  it("serializes using the extension matching the target's type", () => {
+    const container = buildContainer([CatchAllExtension, PageExtension]);
 
-    const url = await serializeLinkTarget(
+    const url = serializeLinkTarget(
       { type: "page", config: { ref: "Some.Page" } },
-      resolver,
+      container,
       ctx,
     );
 
     expect(url).toBe("page:Some.Page");
   });
 
-  it("throws when no registered extension matches the target's type", async () => {
-    const resolver = await buildResolver([PageExtension]);
+  it("throws when no registered extension matches the target's type", () => {
+    const container = buildContainer([PageExtension]);
 
-    await expect(
-      serializeLinkTarget({ type: "email", config: {} }, resolver, ctx),
-    ).rejects.toThrow();
+    expect(() =>
+      serializeLinkTarget({ type: "email", config: {} }, container, ctx),
+    ).toThrow();
   });
 });
 
 describe("listEnabledLinkTargetTypeExtensions", () => {
   it("excludes extensions whose isEnabled() resolves to false", async () => {
-    const resolver = await buildResolver([
+    const container = buildContainer([
       CatchAllExtension,
       PageExtension,
       DisabledExtension,
     ]);
 
-    const enabled = await listEnabledLinkTargetTypeExtensions(resolver);
+    const enabled = await listEnabledLinkTargetTypeExtensions(container);
 
     expect(enabled.map((e) => e.type).sort()).toEqual(["page", "url"]);
   });

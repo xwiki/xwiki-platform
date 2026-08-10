@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { labelFromTranslations } from "./labels";
+import EmailConfig from "../vue/EmailConfig.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { injectable } from "inversify";
 import type { LinkEmailConfig } from "../data/linkType";
@@ -41,8 +42,8 @@ class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailConfig> {
     return { address: "" };
   }
 
-  async component(): Promise<Component> {
-    return (await import("../vue/EmailConfig.vue")).default;
+  component(): Component {
+    return EmailConfig;
   }
 
   tryParseUrl(url: string): LinkEmailConfig | null {

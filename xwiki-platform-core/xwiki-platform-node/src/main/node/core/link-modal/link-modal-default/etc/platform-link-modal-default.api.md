@@ -14,7 +14,7 @@ import { LinkTargetUrlContext } from '@xwiki/platform-link-modal-api';
 // @beta
 export class AttachmentLinkTargetType implements LinkTargetTypeExtension<LinkAttachmentConfig> {
     // (undocumented)
-    component(): Promise<Component>;
+    component(): Component;
     // (undocumented)
     createDefaultConfig(): LinkAttachmentConfig;
     // (undocumented)
@@ -37,7 +37,7 @@ export class ComponentInit {
 // @beta
 export class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailConfig> {
     // (undocumented)
-    component(): Promise<Component>;
+    component(): Component;
     // (undocumented)
     createDefaultConfig(): LinkEmailConfig;
     // (undocumented)
@@ -80,7 +80,7 @@ export type LinkUrlConfig = {
 // @beta
 export class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
     // (undocumented)
-    component(): Promise<Component>;
+    component(): Component;
     // (undocumented)
     createDefaultConfig(): LinkPageConfig;
     // (undocumented)
@@ -98,7 +98,7 @@ export class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfi
 // @beta
 export class UrlLinkTargetType implements LinkTargetTypeExtension<LinkUrlConfig> {
     // (undocumented)
-    component(): Promise<Component>;
+    component(): Component;
     // (undocumented)
     createDefaultConfig(): LinkUrlConfig;
     // (undocumented)

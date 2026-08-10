@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { labelFromTranslations } from "./labels";
+import PageConfig from "../vue/PageConfig.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { injectable } from "inversify";
@@ -45,8 +46,8 @@ class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
     return { ref: null };
   }
 
-  async component(): Promise<Component> {
-    return (await import("../vue/PageConfig.vue")).default;
+  component(): Component {
+    return PageConfig;
   }
 
   tryParseUrl(

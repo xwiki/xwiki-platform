@@ -44,8 +44,8 @@ function listLinkTargetTypeExtensions(
 
 /**
  * @param container - the `depsContainer` to look up registered {@link LinkTargetTypeExtension}s from
- * @returns the registered link target type extensions whose {@link LinkTargetTypeExtension.isEnabled} resolves
- *   to `true` (or is unset), sorted by ascending {@link LinkTargetTypeExtension.order}. Intended for populating
+ * @returns the registered link target type extensions whose {@link LinkTargetTypeExtension.isEnabled} returns
+ *   `true` (or is unset), sorted by ascending {@link LinkTargetTypeExtension.order}. Intended for populating
  *   the link type selector — {@link parseLinkTarget}/{@link serializeLinkTarget} deliberately consider *every*
  *   registered extension (see {@link listLinkTargetTypeExtensions}), so that a link using a type that was
  *   disabled after being created can still be displayed and re-submitted correctly.
@@ -53,21 +53,12 @@ function listLinkTargetTypeExtensions(
  * @since 18.7.0RC1
  * @beta
  */
-async function listEnabledLinkTargetTypeExtensions(
+function listEnabledLinkTargetTypeExtensions(
   container: Container,
-): Promise<LinkTargetTypeExtension[]> {
-  const extensions = listLinkTargetTypeExtensions(container);
-
-  const withEnabledFlag = await Promise.all(
-    extensions.map(async (extension) => ({
-      extension,
-      enabled: (await extension.isEnabled?.()) ?? true,
-    })),
+): LinkTargetTypeExtension[] {
+  return listLinkTargetTypeExtensions(container).filter(
+    (extension) => extension.isEnabled?.() ?? true,
   );
-
-  return withEnabledFlag
-    .filter(({ enabled }) => enabled)
-    .map(({ extension }) => extension);
 }
 
 /**

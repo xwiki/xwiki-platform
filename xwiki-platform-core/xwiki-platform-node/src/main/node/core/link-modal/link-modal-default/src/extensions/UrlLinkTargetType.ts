@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { labelFromTranslations } from "./labels";
+import UrlConfig from "../vue/UrlConfig.vue";
 import { injectable } from "inversify";
 import type { LinkUrlConfig } from "../data/linkType";
 import type { LinkTargetTypeExtension } from "@xwiki/platform-link-modal-api";
@@ -42,8 +43,8 @@ class UrlLinkTargetType implements LinkTargetTypeExtension<LinkUrlConfig> {
     return { url: "" };
   }
 
-  async component(): Promise<Component> {
-    return (await import("../vue/UrlConfig.vue")).default;
+  component(): Component {
+    return UrlConfig;
   }
 
   tryParseUrl(url: string): LinkUrlConfig | null {

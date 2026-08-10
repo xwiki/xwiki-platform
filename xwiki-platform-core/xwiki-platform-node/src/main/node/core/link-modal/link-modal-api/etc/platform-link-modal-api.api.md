@@ -25,13 +25,13 @@ export type LinkTarget = {
 // @beta
 export interface LinkTargetTypeExtension<TConfig = unknown> {
     // (undocumented)
-    component(): Promise<Component>;
+    component(): Component;
     // (undocumented)
     createDefaultConfig(): TConfig;
     // (undocumented)
     getLabel(locale: string): string;
     // (undocumented)
-    isEnabled?(): boolean | Promise<boolean>;
+    isEnabled?(): boolean;
     readonly order?: number;
     serializeUrl(config: TConfig, ctx: LinkTargetUrlContext): string;
     // (undocumented)
@@ -49,7 +49,7 @@ export type LinkTargetUrlContext = {
 };
 
 // @beta (undocumented)
-export function listEnabledLinkTargetTypeExtensions(container: Container): Promise<LinkTargetTypeExtension[]>;
+export function listEnabledLinkTargetTypeExtensions(container: Container): LinkTargetTypeExtension[];
 
 // @beta (undocumented)
 export function listLinkTargetTypeExtensions(container: Container): LinkTargetTypeExtension[];

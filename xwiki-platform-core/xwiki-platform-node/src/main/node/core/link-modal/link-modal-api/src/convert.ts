@@ -24,20 +24,20 @@ import type {
   LinkTargetTypeExtension,
   LinkTargetUrlContext,
 } from "./linkTargetType";
-import type { Resolver } from "@xwiki/platform-component-manager-api";
+import type { Container } from "inversify";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 
 /**
- * @param resolver - the component manager resolver to look up registered {@link LinkTargetTypeExtension}s from
+ * @param container - the `depsContainer` to look up registered {@link LinkTargetTypeExtension}s from
  * @returns every registered link target type extension, sorted by ascending {@link LinkTargetTypeExtension.order}
  *
  * @since 18.7.0RC1
  * @beta
  */
-async function listLinkTargetTypeExtensions(
-  resolver: Resolver,
-): Promise<LinkTargetTypeExtension[]> {
-  const extensions = await resolver.getAllAsync<LinkTargetTypeExtension>(
+function listLinkTargetTypeExtensions(
+  container: Container,
+): LinkTargetTypeExtension[] {
+  const extensions = container.getAll<LinkTargetTypeExtension>(
     linkTargetTypeExtensionRole,
   );
 
@@ -45,20 +45,20 @@ async function listLinkTargetTypeExtensions(
 }
 
 /**
- * @param resolver - the component manager resolver to look up registered `LinkTargetTypeExtension`s from
- * @returns the registered link target type extensions whose `LinkTargetTypeExtension.isEnabled` resolves
- *   to `true` (or is unset), sorted by ascending `LinkTargetTypeExtension.order`. Intended for populating
- *   the link type selector — `parseLinkTarget`/`serializeLinkTarget` deliberately consider *every*
- *   registered extension (see `listLinkTargetTypeExtensions`), so that a link using a type that was
+ * @param container - the `depsContainer` to look up registered {@link LinkTargetTypeExtension}s from
+ * @returns the registered link target type extensions whose {@link LinkTargetTypeExtension.isEnabled} resolves
+ *   to `true` (or is unset), sorted by ascending {@link LinkTargetTypeExtension.order}. Intended for populating
+ *   the link type selector — {@link parseLinkTarget}/{@link serializeLinkTarget} deliberately consider *every*
+ *   registered extension (see {@link listLinkTargetTypeExtensions}), so that a link using a type that was
  *   disabled after being created can still be displayed and re-submitted correctly.
  *
  * @since 18.7.0RC1
  * @beta
  */
 async function listEnabledLinkTargetTypeExtensions(
-  resolver: Resolver,
+  container: Container,
 ): Promise<LinkTargetTypeExtension[]> {
-  const extensions = await listLinkTargetTypeExtensions(resolver);
+  const extensions = listLinkTargetTypeExtensions(container);
 
   const withEnabledFlag = await Promise.all(
     extensions.map(async (extension) => ({
@@ -78,7 +78,7 @@ async function listEnabledLinkTargetTypeExtensions(
  * {@link LinkTargetTypeExtension.tryParseUrl}).
  *
  * @param url - the URL to parse
- * @param resolver - the component manager resolver to look up registered link target types from
+ * @param container - the `depsContainer` to look up registered link target types from
  * @param ctx - services needed by extensions to inspect the URL
  *
  * @returns the parsed link target
@@ -89,12 +89,12 @@ async function listEnabledLinkTargetTypeExtensions(
  * @since 18.7.0RC1
  * @beta
  */
-async function parseLinkTarget(
+function parseLinkTarget(
   url: string,
-  resolver: Resolver,
+  container: Container,
   ctx: LinkTargetUrlContext,
-): Promise<LinkTarget> {
-  const extensions = await listLinkTargetTypeExtensions(resolver);
+): LinkTarget {
+  const extensions = listLinkTargetTypeExtensions(container);
 
   for (const extension of extensions) {
     const config = extension.tryParseUrl(url, ctx);
@@ -114,7 +114,7 @@ async function parseLinkTarget(
  * its `type` field. The reverse of {@link parseLinkTarget}.
  *
  * @param target - the link target to serialize
- * @param resolver - the component manager resolver to look up registered link target types from
+ * @param container - the `depsContainer` to look up registered link target types from
  * @param ctx - services needed by extensions to build the URL
  *
  * @returns the serialized URL
@@ -124,12 +124,12 @@ async function parseLinkTarget(
  * @since 18.7.0RC1
  * @beta
  */
-async function serializeLinkTarget(
+function serializeLinkTarget(
   target: LinkTarget,
-  resolver: Resolver,
+  container: Container,
   ctx: LinkTargetUrlContext,
-): Promise<string> {
-  const extensions = await listLinkTargetTypeExtensions(resolver);
+): string {
+  const extensions = listLinkTargetTypeExtensions(container);
   const extension = extensions.find((e) => e.type === target.type);
 
   if (!extension) {
@@ -151,7 +151,7 @@ async function serializeLinkTarget(
  * {@link listLinkTargetTypeExtensions}), for the same reason as {@link parseLinkTarget}.
  *
  * @param reference - the reference of the linked resource
- * @param resolver - the component manager resolver to look up registered link target types from
+ * @param container - the `depsContainer` to look up registered link target types from
  * @param ctx - services needed by extensions to inspect the reference
  *
  * @returns the matching link target, or `undefined` when no registered extension claims this resource
@@ -160,12 +160,12 @@ async function serializeLinkTarget(
  * @since 18.7.0RC1
  * @beta
  */
-async function resourceReferenceToLinkTarget(
+function resourceReferenceToLinkTarget(
   reference: ResourceReference,
-  resolver: Resolver,
+  container: Container,
   ctx: LinkTargetReferenceContext,
-): Promise<LinkTarget | undefined> {
-  const extensions = await listLinkTargetTypeExtensions(resolver);
+): LinkTarget | undefined {
+  const extensions = listLinkTargetTypeExtensions(container);
 
   for (const extension of extensions) {
     const config = extension.tryParseReference?.(reference, ctx) ?? null;
@@ -184,7 +184,7 @@ async function resourceReferenceToLinkTarget(
  * {@link resourceReferenceToLinkTarget}.
  *
  * @param target - the link target to convert
- * @param resolver - the component manager resolver to look up registered link target types from
+ * @param container - the `depsContainer` to look up registered link target types from
  * @param ctx - services needed by extensions to build the reference
  *
  * @returns the reference of the linked resource, or `undefined` when no registered extension matches
@@ -195,12 +195,12 @@ async function resourceReferenceToLinkTarget(
  * @since 18.7.0RC1
  * @beta
  */
-async function linkTargetToResourceReference(
+function linkTargetToResourceReference(
   target: LinkTarget,
-  resolver: Resolver,
+  container: Container,
   ctx: LinkTargetReferenceContext,
-): Promise<ResourceReference | undefined> {
-  const extensions = await listLinkTargetTypeExtensions(resolver);
+): ResourceReference | undefined {
+  const extensions = listLinkTargetTypeExtensions(container);
   const extension = extensions.find((e) => e.type === target.type);
 
   return extension?.configToReference?.(target.config, ctx);

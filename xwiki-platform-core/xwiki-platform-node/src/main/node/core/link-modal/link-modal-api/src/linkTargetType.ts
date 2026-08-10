@@ -29,23 +29,23 @@ import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Component } from "vue";
 
 /**
- * Component manager role identifier used to register {@link LinkTargetTypeExtension} implementations with
- * `@xwiki/platform-component-manager-default`'s shared `manager`. The extension's own `type` field is used as the
- * registration name (hint).
+ * Inversify role used to register {@link LinkTargetTypeExtension} implementations against the shared
+ * `depsContainer` (the same container already used to resolve other domain services, e.g.
+ * `LinkSuggestService`). Multiple, independent packages can each bind their own implementation to this same
+ * role — see {@link LinkTargetTypeExtension} for the registration example — and every registered implementation
+ * is returned by `container.getAll(linkTargetTypeExtensionRole)`. This mirrors the existing `"SyntaxConfig"` role
+ * (see `@xwiki/platform-syntaxes-config`): an unconstrained (no `.whenNamed()`/`.whenDefault()`) multi-binding,
+ * disambiguated by a plain `type` field on each resolved object rather than by an Inversify name/tag.
  *
  * @since 18.7.0RC1
  * @beta
  */
-const linkTargetTypeExtensionRole: unique symbol = Symbol(
-  "LinkTargetTypeExtension",
-);
+const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
 
 /**
  * Services required to parse a plain URL into a link target's configuration, and to serialize it back into one.
- * Passed explicitly at call time, rather than through constructor injection, because
- * {@link LinkTargetTypeExtension} implementations are resolved through the shared client-side component
- * manager's own, isolated container, which has no access to the hosting application's domain-service container
- * (e.g., the `depsContainer` used elsewhere to resolve `LinkSuggestService`).
+ * Passed explicitly at call time, rather than through constructor injection, so that implementations stay
+ * decoupled from exactly which services the caller happens to have on hand.
  *
  * @since 18.7.0RC1
  * @beta
@@ -75,22 +75,29 @@ type LinkTargetReferenceContext = {
  * modal (e.g., a link to a page, to an attachment, to an URL, to an e-mail address, or any other kind contributed
  * by an extension).
  *
- * Implementations are registered with `@xwiki/platform-component-manager-default`'s shared `manager`, using
- * {@link linkTargetTypeExtensionRole} as the role and the extension's own `type` field as the registration name
- * (hint):
+ * Implementations are registered against the shared `depsContainer`, using {@link linkTargetTypeExtensionRole}
+ * as an unconstrained (multi-)binding — mirroring how `@xwiki/platform-markdown-syntax-config` and its siblings
+ * each contribute their own `"SyntaxConfig"` binding:
  *
  * ```ts
- * manager.registerComponent(linkTargetTypeExtensionRole, async () => MyLinkTargetType, { name: "my-type" });
+ * class ComponentInit {
+ *   constructor(container: Container) {
+ *     container.bind(linkTargetTypeExtensionRole).to(MyLinkTargetType);
+ *   }
+ * }
  * ```
  *
- * Registering a new implementation under the *same* name as an existing one, with a lower `priority` (a
- * `registerComponent` option, defaulting to `1000`, lower wins) replaces it. There is no built-in way to hide a
- * type without providing a full replacement this way — use {@link isEnabled} instead.
+ * There is no priority/override mechanism: every bound implementation is returned by
+ * `container.getAll(linkTargetTypeExtensionRole)`. To offer a reduced or replaced set of built-in types, a
+ * consumer simply does not instantiate `@xwiki/platform-link-modal-default`'s `ComponentInit` (or provides its
+ * own alternative), the same way any other `ComponentInit` in this codebase is opted into (or out of) by whoever
+ * assembles the `depsContainer`. To conditionally hide an already-registered type without removing its
+ * registration, use {@link isEnabled} instead.
  *
- * Implementations must be usable with a no-argument constructor: they are instantiated through the component
- * manager's own, isolated Inversify container, which is not connected to any other dependency injection container
- * used by the hosting application. Anything an implementation needs beyond its own logic must be received as an
- * explicit argument (see {@link LinkTargetUrlContext}), not through `@inject()`.
+ * Implementations must be usable with a no-argument constructor (`@injectable()`, no `@inject(...)` constructor
+ * parameters): they are resolved directly from `depsContainer`, but nothing about their own construction is
+ * expected to depend on other bindings — anything an implementation needs beyond its own logic must be received
+ * as an explicit argument (see {@link LinkTargetUrlContext}) rather than through constructor injection.
  *
  * @typeParam TConfig - the shape of this link target type's configuration
  *
@@ -99,8 +106,9 @@ type LinkTargetReferenceContext = {
  */
 interface LinkTargetTypeExtension<TConfig = unknown> {
   /**
-   * Stable identifier of this link target type. Used as the corresponding {@link LinkTarget}'s `type` field, and
-   * as the registration name (hint) with the component manager.
+   * Stable identifier of this link target type, used as the corresponding {@link LinkTarget}'s `type` field.
+   * Since bindings to {@link linkTargetTypeExtensionRole} are unconstrained, this is the only thing
+   * disambiguating one registered implementation from another.
    */
   readonly type: string;
 
@@ -182,8 +190,7 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
    *   link. Defaults to always enabled when unset. This only affects the type selector, not the ability to
    *   correctly display and re-submit a link that already uses this type ({@link tryParseUrl}/
    *   {@link serializeUrl} are always available regardless of this flag) — this is the supported way to
-   *   remove/hide a link target type (including a built-in one) without providing a full replacement
-   *   implementation.
+   *   conditionally hide a link target type (including a built-in one) without un-registering it.
    */
   isEnabled?(): boolean | Promise<boolean>;
 }

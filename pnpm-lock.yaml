@@ -1687,9 +1687,6 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-api:
     dependencies:
-      '@xwiki/platform-component-manager-api':
-        specifier: workspace:*
-        version: link:../../component/component-manager/component-manager-api
       '@xwiki/platform-model-reference-api':
         specifier: workspace:*
         version: link:../../model/model-reference/model-reference-api
@@ -1703,9 +1700,6 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.58.9(@types/node@24.12.4)
-      '@xwiki/platform-component-manager-default':
-        specifier: workspace:*
-        version: link:../../component/component-manager/component-manager-default
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1724,6 +1718,12 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.7.0(jiti@2.7.0)(supports-color@8.1.1)
+      inversify:
+        specifier: 'catalog:'
+        version: 8.2.3(reflect-metadata@0.2.2)
+      reflect-metadata:
+        specifier: 'catalog:'
+        version: 0.2.2
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1742,9 +1742,6 @@ importers:
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-default:
     dependencies:
-      '@xwiki/platform-component-manager-api':
-        specifier: workspace:*
-        version: link:../../component/component-manager/component-manager-api
       '@xwiki/platform-dsapi':
         specifier: workspace:*
         version: link:../../ds/api
@@ -1779,9 +1776,6 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.58.9(@types/node@24.12.4)
-      '@xwiki/platform-component-manager-default':
-        specifier: workspace:*
-        version: link:../../component/component-manager/component-manager-default
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1836,9 +1830,6 @@ importers:
       '@xwiki/platform-attachments-api':
         specifier: workspace:*
         version: link:../../attachments/attachments-api
-      '@xwiki/platform-component-manager-default':
-        specifier: workspace:*
-        version: link:../../component/component-manager/component-manager-default
       '@xwiki/platform-document-api':
         specifier: workspace:*
         version: link:../../document/document-api
@@ -1879,9 +1870,6 @@ importers:
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.4.11(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3))
-      '@xwiki/platform-component-manager-api':
-        specifier: workspace:*
-        version: link:../../component/component-manager/component-manager-api
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -3196,9 +3184,6 @@ importers:
       '@xwiki/platform-collaboration-api':
         specifier: workspace:*
         version: link:../../core/collaboration/collaboration-api
-      '@xwiki/platform-component-manager-default':
-        specifier: workspace:*
-        version: link:../../core/component/component-manager/component-manager-default
       '@xwiki/platform-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api

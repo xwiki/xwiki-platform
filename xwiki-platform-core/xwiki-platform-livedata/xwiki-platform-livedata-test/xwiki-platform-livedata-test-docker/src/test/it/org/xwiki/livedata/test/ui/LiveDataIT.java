@@ -65,6 +65,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.Keys.BACK_SPACE;
 import static org.openqa.selenium.Keys.CONTROL;
@@ -885,6 +886,85 @@ class LiveDataIT
         tableLayout.filterColumn(USER_COLUMN, "U1");
         tableLayout.waitUntilRowCountEqualsTo(1);
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+    }
+
+    @Test
+    @Order(11)
+    void addEntryFromTableLayout(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
+        String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
+        String newRowLocation = testUtils.serializeReference(testReference.getLocalDocumentReference().getParent());
+
+        // Create the Live Data page.
+        // The "uuid" row naming strategy generates a new page named after a random UUID in the "newRowLocation" space.
+        // "hasEditMode=true" exposes the edit mode toggle in the actions menu.
+        String sourceParameters = String.format(
+            "translationPrefix=&className=%s&hasEditMode=true&newRowNamingStrategy=uuid&newRowLocation=%s",
+            className, newRowLocation);
+        String content = """
+            {{liveData
+              id="test"
+              properties="%s"
+              source="liveTable"
+              sourceParameters="%s"
+            /}}
+            """.formatted(NAME_COLUMN, sourceParameters);
+        testUtils.createPage(testReference, content, "Add entry from layout");
+
+        // Define the XClass on the test page.
+        testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
+
+        DocumentReference initialEntry = new DocumentReference("InitialEntry", testReference.getLastSpaceReference());
+        testUtils.addObject(initialEntry, className, singletonMap(NAME_COLUMN, NAME_LYNDA));
+
+        testUtils.createUser("creator", "creator", null);
+        testUtils.setRightsOnSpace(testReference.getLastSpaceReference(), null, "XWiki.creator", "edit", true);
+        testUtils.login("creator", "creator");
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        assertTrue(liveData.hasEditModeAction());
+        assertFalse(tableLayout.hasEditModeActionsColumn());
+        assertFalse(tableLayout.canAddEntry());
+
+        // Enable edit mode: the actions column and the "Add entry" row appear.
+        liveData.toggleEditMode();
+        tableLayout.waitUntilReady();
+        assertTrue(tableLayout.hasEditModeActionsColumn());
+        assertTrue(tableLayout.canAddEntry());
+
+        // Add a new entry from the layout and save it. It is persisted, so we now have two entries.
+        tableLayout.startNewEntry();
+        tableLayout.setNewEntryCell(NAME_COLUMN, NAME_COLUMN, NAME_ESTHER);
+        tableLayout.saveNewEntry();
+        assertEquals(2, tableLayout.getTotalEntries());
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+        tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
+
+        // Start a new entry but cancel it: the draft entry is discarded and no new entry is persisted.
+        tableLayout.startNewEntry();
+        tableLayout.setNewEntryCell(NAME_COLUMN, NAME_COLUMN, NAME_CHARLY);
+        tableLayout.cancelNewEntry();
+        assertEquals(2, tableLayout.getTotalEntries());
+        // The "Add entry" row is available again once the draft is discarded.
+        assertTrue(tableLayout.canAddEntry());
+
+        // Disable edit mode: the actions column and the "Add entry" row are hidden again.
+        liveData.toggleEditMode();
+        tableLayout.waitUntilReady();
+        assertFalse(tableLayout.hasEditModeActionsColumn());
+        assertFalse(tableLayout.canAddEntry());
+        assertEquals(2, tableLayout.getTotalEntries());
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+        tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

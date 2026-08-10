@@ -110,7 +110,7 @@ export default {
     },
 
     // Load the filter component corresponding to the given filterId
-    // On success, set `this.filterComponent` to the retreived component,
+    // On success, set `this.filterComponent` to the retrieved component,
     // which automatically insert the component in the html
     async loadFilter(filterId) {
       const component = await componentStore.load(

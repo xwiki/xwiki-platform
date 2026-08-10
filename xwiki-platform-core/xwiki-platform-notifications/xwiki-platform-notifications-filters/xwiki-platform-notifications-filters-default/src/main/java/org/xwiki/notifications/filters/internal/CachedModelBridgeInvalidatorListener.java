@@ -70,9 +70,7 @@ public class CachedModelBridgeInvalidatorListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (source instanceof DefaultNotificationFilterPreference) {
-            DefaultNotificationFilterPreference preferences = (DefaultNotificationFilterPreference) source;
-
+        if (source instanceof DefaultNotificationFilterPreference preferences) {
             String owner = preferences.getOwner();
 
             if (owner != null) {
@@ -86,10 +84,10 @@ public class CachedModelBridgeInvalidatorListener extends AbstractEventListener
                         .invalidatePreferencefilter(new WikiReference(owner));
                 }
             }
-        } else if (source instanceof DocumentReference) {
-            ((CachedFilterPreferencesModelBridge) this.bridge).invalidatePreferencefilter((DocumentReference) source);
-        } else if (source instanceof WikiReference) {
-            ((CachedFilterPreferencesModelBridge) this.bridge).invalidatePreferencefilter((WikiReference) source);
+        } else if (source instanceof DocumentReference documentReference) {
+            ((CachedFilterPreferencesModelBridge) this.bridge).invalidatePreferencefilter(documentReference);
+        } else if (source instanceof WikiReference wikiReference) {
+            ((CachedFilterPreferencesModelBridge) this.bridge).invalidatePreferencefilter(wikiReference);
         }
     }
 }

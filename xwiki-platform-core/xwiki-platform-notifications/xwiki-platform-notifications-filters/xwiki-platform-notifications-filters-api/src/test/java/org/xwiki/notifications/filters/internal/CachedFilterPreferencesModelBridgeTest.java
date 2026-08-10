@@ -56,11 +56,11 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class CachedFilterPreferencesModelBridgeTest
 {
-    private final static DocumentReference USER = new DocumentReference("wiki", "XWiki", "User");
+    private static final DocumentReference USER = new DocumentReference("wiki", "XWiki", "User");
 
-    private final static String USER_STRING = "wiki:XWiki.User";
+    private static final String USER_STRING = "wiki:XWiki.User";
 
-    private final static WikiReference WIKI = new WikiReference("wiki");
+    private static final WikiReference WIKI = new WikiReference("wiki");
 
     @InjectMockComponents
     private CachedFilterPreferencesModelBridge cachedModelBridge;

@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 3.0M2
  */
 @ExtendWith(XWikiTempDirExtension.class)
-public class FileDeleteTransactionRunnableTest
+class FileDeleteTransactionRunnableTest
 {
     private static final String[] FILE_PATH = { "path", "to", "file" };
 
@@ -58,7 +58,7 @@ public class FileDeleteTransactionRunnableTest
     private File tmpDir;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
         this.location = this.tmpDir;
         for (int i = 0; i < FILE_PATH.length; i++) {
@@ -75,7 +75,7 @@ public class FileDeleteTransactionRunnableTest
     }
 
     @Test
-    public void simpleTest() throws Exception
+    void simpleTest() throws Exception
     {
         assertTrue(this.location.exists());
         this.runnable.start();
@@ -84,13 +84,14 @@ public class FileDeleteTransactionRunnableTest
     }
 
     @Test
-    public void rollbackAfterPreRunTest()
+    void rollbackAfterPreRunTest()
     {
         assertTrue(this.location.exists());
 
         // After preRun(), before run.
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
+            @Override
             public void onRun() throws Exception
             {
                 assertFalse(temp.exists());
@@ -105,13 +106,14 @@ public class FileDeleteTransactionRunnableTest
     }
 
     @Test
-    public void rollbackAfterRunTest()
+    void rollbackAfterRunTest()
     {
         assertTrue(this.location.exists());
 
         // After run() before onCommit()
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
+            @Override
             public void onRun() throws Exception
             {
                 assertTrue(temp.exists());
@@ -126,7 +128,7 @@ public class FileDeleteTransactionRunnableTest
     }
 
     @Test
-    public void deleteNonexistantTest() throws Exception
+    void deleteNonexistantTest() throws Exception
     {
         this.location.delete();
         assertFalse(this.location.exists());
@@ -136,13 +138,14 @@ public class FileDeleteTransactionRunnableTest
     }
 
     @Test
-    public void rollbackDeleteNonexistantTest()
+    void rollbackDeleteNonexistantTest()
     {
         this.location.delete();
         assertFalse(this.location.exists());
 
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
+            @Override
             public void onRun() throws Exception
             {
                 assertFalse(temp.exists());
@@ -167,9 +170,7 @@ public class FileDeleteTransactionRunnableTest
 
     private void validateRollback(final StartableTransactionRunnable str)
     {
-        assertThrows(Exception.class, () -> {
-            str.start();
-        });
+        assertThrows(Exception.class, str::start);
 
         assertTrue(this.location.exists());
         assertFalse(this.temp.exists());

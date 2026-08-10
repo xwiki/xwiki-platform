@@ -22,6 +22,7 @@ package org.xwiki.mentions.script;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.index.TaskManager;
 import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.mentions.MentionsConfiguration;
 import org.xwiki.mentions.MentionsFormatter;
@@ -30,6 +31,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,7 +51,13 @@ class MentionsScriptServiceTest
 
     @MockComponent
     private MentionFormatterProvider mentionFormatterProvider;
-    
+
+    @MockComponent
+    private MentionsConfiguration configuration;
+
+    @MockComponent
+    private TaskManager taskManager;
+
     @Mock
     private MentionsFormatter mentionsFormatter;
 
@@ -72,5 +81,28 @@ class MentionsScriptServiceTest
         this.mentionsScriptService.format("actorReference", DisplayStyle.FIRST_NAME, "");
         verify(this.mentionFormatterProvider).get(MentionsConfiguration.USER_MENTION_TYPE);
         verify(this.mentionsFormatter).formatMention("actorReference", DisplayStyle.FIRST_NAME);
+    }
+
+    @Test
+    void configurationValues()
+    {
+        // Distinct values, so that a getter delegating to the wrong configuration method is caught.
+        when(this.configuration.getMentionsColor()).thenReturn("#000000");
+        when(this.configuration.getSelfMentionsColor()).thenReturn("#111111");
+        when(this.configuration.getSelfMentionsForeground()).thenReturn("#222222");
+        when(this.configuration.isQuoteActivated()).thenReturn(true);
+
+        assertEquals("#000000", this.mentionsScriptService.getMentionsColor());
+        assertEquals("#111111", this.mentionsScriptService.getSelfMentionsColor());
+        assertEquals("#222222", this.mentionsScriptService.getSelfMentionsForeground());
+        assertTrue(this.mentionsScriptService.isQuoteActivated());
+    }
+
+    @Test
+    void getQueueSize()
+    {
+        when(this.taskManager.getQueueSize(MentionsConfiguration.MENTION_TASK_ID)).thenReturn(42L);
+
+        assertEquals(42L, this.mentionsScriptService.getQueueSize());
     }
 }

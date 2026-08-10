@@ -135,7 +135,6 @@ public class IndexedObjectReference extends ObjectReference
             className = name.substring(0, openPosition);
         } catch (NumberFormatException e) {
             // number could not be parsed, which means className stays name, and object stays null
-            return;
         }
     }
 }

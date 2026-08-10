@@ -138,7 +138,6 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
 
     private BlockAsyncRendererResult renderWiki(boolean async, boolean cached) throws RenderingException
     {
-        ///////////////////////////////////////
         // Parsing and execution
 
         XDOM xdom;
@@ -154,7 +153,6 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
             throw new RenderingException("Failed to execute template", e);
         }
 
-        ///////////////////////////////////////
         // Rendering
 
         String resultString = null;
@@ -168,12 +166,10 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
 
     private BlockAsyncRendererResult renderVelocity(boolean async, boolean cached) throws RenderingException
     {
-        ///////////////////////////////////////
         // Velocity
 
         String result = evaluateContent(this.template, this.content);
 
-        ///////////////////////////////////////
         // XDOM
 
         XDOM xdom;
@@ -194,7 +190,7 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
     private void transform(Block block) throws TransformationException
     {
         TransformationContext transformationContext =
-            new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)),
+            new TransformationContext(block instanceof XDOM xdom ? xdom : new XDOM(Arrays.asList(block)),
                 this.renderingContext.getDefaultSyntax(), this.renderingContext.isRestricted());
 
         // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally

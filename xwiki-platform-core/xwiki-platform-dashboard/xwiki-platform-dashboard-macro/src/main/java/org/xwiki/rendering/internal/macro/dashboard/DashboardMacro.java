@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -194,7 +195,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         if (renderer == null) {
             String message = "Could not find dashboard renderer " + parameters.getLayout();
             // log and throw further
-            this.logger.error(message);
+            this.logger.error("Could not find dashboard renderer [{}]", parameters.getLayout());
             throw new MacroExecutionException(message);
         }
 
@@ -207,7 +208,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         } catch (Exception e) {
             String message = "Could not render the gadgets for layout " + parameters.getLayout();
             // log and throw further
-            this.logger.error(message, e);
+            this.logger.error("Could not render the gadgets for layout [{}]", parameters.getLayout(), e);
             throw new MacroExecutionException(message, e);
         }
 
@@ -256,10 +257,8 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         ExecutionContext ec = this.execution.getContext();
         if (ec != null) {
             Integer dashboardCalls = (Integer) ec.getProperty(DASHBOARD_MACRO_CALLS);
-            if (dashboardCalls != null) {
-                if (dashboardCalls > 0) {
-                    ec.setProperty(DASHBOARD_MACRO_CALLS, dashboardCalls - 1);
-                }
+            if (dashboardCalls != null && dashboardCalls > 0) {
+                ec.setProperty(DASHBOARD_MACRO_CALLS, dashboardCalls - 1);
             }
         }
     }
@@ -289,7 +288,8 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         try {
             return this.componentManager.getInstance(DashboardRenderer.class, layout);
         } catch (ComponentLookupException e) {
-            this.logger.warn("Could not find the Dashboard renderer for layout \"" + layout + "\"");
+            this.logger.warn("Could not find the Dashboard renderer for layout [{}]. Root cause is [{}]", layout,
+                ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }

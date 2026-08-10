@@ -22,7 +22,6 @@ package org.xwiki.chart.internal;
 import java.util.Map;
 
 import org.jfree.chart.plot.Plot;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.chart.ChartGenerator;
@@ -72,7 +71,6 @@ class DefaultChartGeneratorTest
         ChartModel model = mock(ChartModel.class);
         String type = "fooType";
         String title = "some title";
-
         when(componentManager.getInstance(PlotGenerator.class, type)).thenReturn(this.plotGenerator);
         Plot plot = mock(Plot.class);
         when(plotGenerator.generate(eq(model), anyMap())).thenReturn(plot);

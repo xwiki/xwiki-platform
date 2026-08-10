@@ -123,7 +123,7 @@ public class ExportAction extends XWikiAction
         // down or even block the PDF export
         //
         // Ideally we should ask for a CSRF token, but this would break backwards compatibility. We can't rely on the
-        // Accept HTTP header either becuse it includes */* most of the time, even when the request originates from a
+        // Accept HTTP header either because it includes */* most of the time, even when the request originates from a
         // script or image HTML tag. The best option seems to be to rely on the Sec-Fetch-Dest header which is set by
         // modern browsers to indicate the context in which the request is made.
         // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Dest
@@ -257,11 +257,11 @@ public class ExportAction extends XWikiAction
 
         String name = request.get("name");
         String description = request.get("description");
-        boolean history = Boolean.valueOf(request.get("history"));
+        boolean history = Boolean.parseBoolean(request.get("history"));
         boolean attachmentJRCS =
             getBooleanProperty("attachment_jrcs", "xwiki.action.export.xar.attachment.jrcs", true, context);
         boolean optimized = getBooleanProperty("optimized", "xwiki.action.export.xar.optimized", true, context);
-        boolean backup = Boolean.valueOf(request.get("backup"));
+        boolean backup = Boolean.parseBoolean(request.get("backup"));
         String author = request.get("author");
         String licence = request.get("licence");
         String version = request.get("version");

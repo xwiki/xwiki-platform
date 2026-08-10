@@ -88,7 +88,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     {
       if (bytes === 0) return 'N/A';
       let sizes = ['B', 'KB', 'MB'];
-      let unitIndex = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+      let unitIndex = Number.parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
       return (bytes / Math.pow(1024, unitIndex)).toFixed(1) +
           sizes[Math.min(unitIndex, sizes.length - 1)];
     }

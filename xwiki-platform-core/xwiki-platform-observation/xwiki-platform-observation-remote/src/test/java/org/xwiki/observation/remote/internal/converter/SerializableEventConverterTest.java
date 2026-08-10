@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  */
 @ComponentTest
-public class SerializableEventConverterTest
+class SerializableEventConverterTest
 {
     @InjectMockComponents(role = RemoteEventConverter.class)
     private SerializableEventConverter remoteConverter;
@@ -46,7 +46,7 @@ public class SerializableEventConverterTest
     private SerializableEventConverter localConverter;
 
     @Test
-    public void toRemote()
+    void toRemote()
     {
         assertFalse(this.remoteConverter.toRemote(new LocalEventData(null, null, null), null));
         assertFalse(this.remoteConverter.toRemote(new LocalEventData(new LogEvent(), this, this), null));

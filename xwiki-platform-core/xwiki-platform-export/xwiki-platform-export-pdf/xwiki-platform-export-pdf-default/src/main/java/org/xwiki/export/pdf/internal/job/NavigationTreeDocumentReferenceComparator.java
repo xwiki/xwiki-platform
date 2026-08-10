@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -106,7 +105,7 @@ public class NavigationTreeDocumentReferenceComparator extends DocumentReference
     protected List<EntityReference> getPath(EntityReference entityReference)
     {
         return this.nestedPagesTree.getPath(getNodeId(entityReference)).stream()
-            .map(this::resolveEntityReferenceFromNodeId).filter(Objects::nonNull).collect(Collectors.toList());
+            .map(this::resolveEntityReferenceFromNodeId).filter(Objects::nonNull).toList();
     }
 
     private String getNodeId(EntityReference entityReference)
@@ -224,6 +223,6 @@ public class NavigationTreeDocumentReferenceComparator extends DocumentReference
             return List.of();
         }
         return children.stream().map(this::resolveEntityReferenceFromNodeId).filter(Objects::nonNull)
-            .collect(Collectors.toList());
+            .toList();
     }
 }

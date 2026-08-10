@@ -99,8 +99,6 @@ class TemporaryAttachmentSessionTest
     @Test
     void dispose()
     {
-        Map<DocumentReference, Map<String, XWikiAttachment>> editionsMap =
-            this.temporaryAttachmentSession.getEditionsMap();
 
         XWikiAttachmentContent contentFoo1 = mock(XWikiAttachmentContent.class);
         XWikiAttachmentContent contentBar1 = mock(XWikiAttachmentContent.class);

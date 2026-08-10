@@ -54,7 +54,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -120,12 +120,9 @@ class WikiChildrenResourceImplTest
     @Test
     void getChildrenNoRights() throws Exception
     {
-        try {
-            this.wikiChildrenResource.getChildren("wiki", 0, 10, "foo");
-            fail();
-        } catch (WebApplicationException e) {
-            assertEquals(Response.Status.FORBIDDEN, e.getResponse().getStatusInfo());
-        }
+        WebApplicationException e = assertThrows(WebApplicationException.class,
+            () -> this.wikiChildrenResource.getChildren("wiki", 0, 10, "foo"));
+        assertEquals(Response.Status.FORBIDDEN, e.getResponse().getStatusInfo());
     }
 
     @Test

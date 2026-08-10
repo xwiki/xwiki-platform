@@ -27,7 +27,6 @@ import javax.script.ScriptContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.model.reference.DocumentReference;
@@ -53,7 +52,8 @@ public class EditAction extends XWikiAction
     /**
      * The object used for logging.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
+    @Inject
+    private Logger logger;
 
     @Inject
     @Named("document")
@@ -325,7 +325,7 @@ public class EditAction extends XWikiAction
             }
         } catch (Exception e) {
             // Lock should never make XWiki fail, but we should log any related information.
-            LOGGER.error("Exception while setting up lock", e);
+            this.logger.error("Exception while setting up lock", e);
         }
     }
 }

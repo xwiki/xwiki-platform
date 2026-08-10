@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -70,17 +71,17 @@ class TableTimeTableXYBuilderTest extends AbstractMacroContentTableBlockDataSour
 
         TimeTableXYDataset dataset = (TimeTableXYDataset) chartModel.getDataset();
 
-        assertTrue(dataset.getSeriesCount() == 3);
+        assertEquals(3, dataset.getSeriesCount());
 
-        assertTrue(dataset.getSeriesKey(0).equals(" column 2 "));
-        assertTrue(dataset.getSeriesKey(1).equals(" column 3 "));
-        assertTrue(dataset.getSeriesKey(2).equals(" column 4"));
+        assertEquals(" column 2 ", dataset.getSeriesKey(0));
+        assertEquals(" column 3 ", dataset.getSeriesKey(1));
+        assertEquals(" column 4", dataset.getSeriesKey(2));
 
-        assertTrue(dataset.getTimePeriod(0).getStart().equals(new Date(0)));
-        assertTrue(dataset.getTimePeriod(0).getEnd().equals(dateFormat.parse("2012-01-01 10:30:10")));
+        assertEquals(new Date(0), dataset.getTimePeriod(0).getStart());
+        assertEquals(dateFormat.parse("2012-01-01 10:30:10"), dataset.getTimePeriod(0).getEnd());
 
-        assertTrue(dataset.getTimePeriod(1).getStart().equals(dateFormat.parse("2012-01-01 10:30:10")));
-        assertTrue(dataset.getTimePeriod(1).getEnd().equals(dateFormat.parse("2012-01-01 10:30:20")));
+        assertEquals(dateFormat.parse("2012-01-01 10:30:10"), dataset.getTimePeriod(1).getStart());
+        assertEquals(dateFormat.parse("2012-01-01 10:30:20"), dataset.getTimePeriod(1).getEnd());
     }
 
     @Test

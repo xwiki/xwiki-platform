@@ -111,7 +111,7 @@ public class XWikiExecutorSuite extends ClasspathSuite
                     // If the runner still has tests remaining after the filtering, add it.
                     runners.add(runner);
                 } catch (NoTestsRemainException e) {
-                    LOGGER.info("Skipping test class: {}", description.getClassName());
+                    LOGGER.info("Skipping test class: [{}]", description.getClassName());
                 }
             }
         }

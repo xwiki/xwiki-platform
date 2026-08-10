@@ -87,6 +87,17 @@ public class CreatePagePage extends BaseElement
         return this.pageTypePicker.getAvailableTemplates();
     }
 
+    /**
+     * @return the value of the template option selected by default in the page type picker: a template provider's
+     *         local reference when a recommended template is pre-selected based on the current location, or
+     *         {@code blank} when the blank page option is selected by default
+     * @since 18.7.0RC1
+     */
+    public String getSelectedTemplate()
+    {
+        return this.pageTypePicker.getSelectedTemplate();
+    }
+
     public void setTemplate(String template)
     {
         this.pageTypePicker.selectTemplateByValue(template);

@@ -31,10 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * @version $Id$
  */
-public class PageAttachmentReferenceTest
+class PageAttachmentReferenceTest
 {
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
             () -> new PageAttachmentReference(new EntityReference("filename", EntityType.PAGE)));
@@ -43,7 +43,7 @@ public class PageAttachmentReferenceTest
     }
 
     @Test
-    public void testInvalidNullParent()
+    void testInvalidNullParent()
     {
         IllegalArgumentException e =
             assertThrows(IllegalArgumentException.class, () -> new PageAttachmentReference("filename", null));
@@ -52,7 +52,7 @@ public class PageAttachmentReferenceTest
     }
 
     @Test
-    public void testInvalidParentType()
+    void testInvalidParentType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new PageAttachmentReference(
             new EntityReference("filename", EntityType.PAGE_ATTACHMENT, new WikiReference("wiki"))));
@@ -61,7 +61,7 @@ public class PageAttachmentReferenceTest
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         PageAttachmentReference reference =
             new PageAttachmentReference("file", new PageReference("wiki", "space", "page"))

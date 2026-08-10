@@ -231,7 +231,7 @@ public class Attachment extends Api
      * Get a list of attachment versions from 1.1 to the current.
      * Versions are represented as a JRCS Version object.
      * This gets versions by counting backward from the current version to 1.1
-     * which will be correct as long as the database is in a consistant state.
+     * which will be correct as long as the database is in a consistent state.
      *
      * @return a list of Versions.
      * @throws XWikiException this will never happen.

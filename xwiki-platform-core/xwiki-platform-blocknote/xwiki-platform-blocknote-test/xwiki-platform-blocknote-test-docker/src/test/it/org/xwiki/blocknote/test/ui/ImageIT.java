@@ -29,6 +29,7 @@ import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -38,7 +39,11 @@ import org.xwiki.wysiwyg.test.po.image.ImageDialogEditModal;
 import org.xwiki.wysiwyg.test.po.image.ImageDialogSelectModal;
 import org.xwiki.wysiwyg.test.po.image.edit.ImageDialogAdvancedEditForm;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -86,6 +91,10 @@ class ImageIT extends AbstractBlockNoteIT
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
+        AttachmentReference imageReference = new AttachmentReference("missing.png", testReference);
+        assertThat(textArea.getImage(0).getDomAttribute("src"),
+            endsWith(setup.getPath(imageReference, "download", "")));
+
         // Select the image and used the context toolbar to open the image edit modal.
         textArea.clickImage(0);
         ImageDialogEditModal imageEditModal = editor.getToolBar().editImage();
@@ -98,16 +107,22 @@ class ImageIT extends AbstractBlockNoteIT
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
         assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
             before
 
-            [[image:attach:missing.png||width="127" data-xwiki-image-style-alignment="center"]]
+            [[image:missing.png||width="127" data-xwiki-image-style-alignment="center"]]
 
-            (% style="color:default;background-color:default;text-align:left" %)
             after""", wikiEditor.getContent());
+
+        // Add some custom image parameters to verify they are preserved even when the image source is changed.
+        wikiEditor.setContent("""
+            before
+
+            [[image:missing.png||class="test-image" width="127" id="I1234" data-xwiki-image-style-alignment="center" data-foo="bar"]]
+
+            after""");
+        wikiEditor.clickSaveAndView();
         
         // Edit again, to verify that the image modal shows the correct with and alignment values.
-        wikiEditor.clickCancel();
         page.editInplace();
 
         editor = new BlockNoteEditor("content");
@@ -115,6 +130,7 @@ class ImageIT extends AbstractBlockNoteIT
 
         textArea.clickImage(0);
         imageEditModal = editor.getToolBar().editImage();
+        assertFalse(imageEditModal.switchToStandardTab().isCaptionCheckboxChecked());
         ImageDialogAdvancedEditForm advancedImageProperties = imageEditModal.switchToAdvancedTab();
         assertEquals("center", advancedImageProperties.getAlignment());
         assertEquals("127px", advancedImageProperties.getWidth());
@@ -128,16 +144,55 @@ class ImageIT extends AbstractBlockNoteIT
         imageEditModal.switchToAdvancedTab().selectEndAlignment();
         imageEditModal.clickInsert();
 
+        assertEquals("127", textArea.getImage(0).getDomProperty("offsetHeight"));
+
         // Save and check the source.
         page.save();
         wikiEditor = page.editWiki();
         assertEquals("""
-            (% style="color:default;background-color:default;text-align:left" %)
             before
 
-            [[image:attach:image.gif||width="127" data-xwiki-image-style-alignment="end"]]
+            [[image:image.gif||class="test-image" id="I1234" data-foo="bar" width="127" data-xwiki-image-style-alignment="end"]]
 
-            (% style="color:default;background-color:default;text-align:left" %)
+            after""", wikiEditor.getContent());
+        
+        // Verify the image caption is preserved when editing the image.
+        wikiEditor.setContent("""
+            before
+
+            [[some caption>>image:image.gif||class="test-image" id="I1234" data-foo="bar" width="127" data-xwiki-image-style-alignment="end"]]
+
+            after""");
+        wikiEditor.clickSaveAndView();
+        page.editInplace();
+
+        editor = new BlockNoteEditor("content");
+        textArea = editor.getRichTextArea();
+
+        imageReference = new AttachmentReference("image.gif", testReference);
+        assertThat(textArea.getImage(0).getDomAttribute("src"),
+            containsString(setup.getPath(imageReference, "download", "width=127&rev=")));
+        
+        // Verify the image caption is visible.
+        assertThat(textArea.getText(), containsString("some caption"));
+
+        textArea.clickImage(0);
+        imageEditModal = editor.getToolBar().editImage();
+        assertTrue(imageEditModal.switchToStandardTab().isCaptionCheckboxChecked());
+        imageEditModal.switchToAdvancedTab().removeAlignment();
+        imageEditModal.clickInsert();
+
+        // Verify the image caption is still visible.
+        assertThat(textArea.getText(), containsString("some caption"));
+
+        // Save and check the source.
+        page.save();
+        wikiEditor = page.editWiki();
+        assertEquals("""
+            before
+
+            [[some caption>>image:image.gif||class="test-image" id="I1234" data-foo="bar" width="127"]]
+
             after""", wikiEditor.getContent());
 
         // Verify that the image was actually uploaded and attached to the page.

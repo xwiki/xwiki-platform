@@ -313,7 +313,6 @@ public class Class extends Collection
         if (!(other instanceof Class)) {
             return false;
         }
-        Class otherClass = (Class) other;
         return getBaseClass().equals(((Class) other).getBaseClass());
     }
 }

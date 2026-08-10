@@ -408,7 +408,7 @@ class PDFExportIT
             assertTrue(pageText.startsWith("""
                 Parent
                 Chapter 1
-                """), "Unexpeced parent document content: " + pageText);
+                """), "Unexpected parent document content: " + pageText);
             assertEquals("""
                 Hidden
                 Hidden content
@@ -1658,6 +1658,31 @@ class PDFExportIT
                   Sapphire Azure Mauve Palatinate Black Currant Lavender
                 one two three four five six seven eight nine ten
                 """.replaceAll("\\s+", ""), pdf.getTextFromPage(1).replaceAll("\\s+", ""));
+        }
+    }
+
+    /**
+     * Verify anchors that target headings that come from the non-generated output of a macro (e.g. headings inside a
+     * message box macro).
+     */
+    @Test
+    @Order(35)
+    void sectionAnchors(TestUtils setup) throws Exception
+    {
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(List.of("PDFExportIT", "SectionAnchors"), "WebHome"));
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the child pages in the export because we want to verify the section anchors from each child page.
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.SectionAnchors.WebHome").deselect().select();
+        exportTreeModal.export();
+
+        try (PDFDocument pdf = export(new PDFExportOptionsModal())) {
+            // We should have 5 pages: cover page, table of contents and one page for each wiki page (one parent and 2
+            // children).
+            assertEquals(5, pdf.getNumberOfPages());
+
+            assertEquals(Map.of("link", "HHeading"), pdf.getLinksFromPage(3));
+            assertEquals(Map.of("link", "HHeading-1"), pdf.getLinksFromPage(4));
         }
     }
 

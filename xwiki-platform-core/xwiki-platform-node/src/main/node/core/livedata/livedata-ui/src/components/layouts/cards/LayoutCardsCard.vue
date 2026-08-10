@@ -82,6 +82,26 @@
         </XWikiDraggableItem>
       </template>
     </draggable>
+
+    <!-- Save/cancel actions for a draft entry being created in edit mode. -->
+    <div v-if="logic.isEditMode() && entry._new" class="card-actions">
+      <button
+        type="button"
+        class="btn btn-default"
+        :title="$t('livedata.table.action.save')"
+        @click="logic.saveNewEntry()"
+      >
+        <XWikiIcon :icon-descriptor="{ name: 'check' }" />
+      </button>
+      <button
+        type="button"
+        class="btn btn-default"
+        :title="$t('livedata.table.action.cancel')"
+        @click="logic.cancelNewEntry()"
+      >
+        <XWikiIcon :icon-descriptor="{ name: 'cross' }" />
+      </button>
+    </div>
   </div>
 </template>
 
@@ -147,6 +167,22 @@ export default {
     reorderProperty(e) {
       this.logic.reorderProperty(e.moved.oldIndex, e.moved.newIndex);
     },
+  },
+
+  mounted() {
+    // Autofocus the first editable field of a new card.
+    // This makes new entry creation smoother by making it directly editable.
+    if (this.entry?._new) {
+      const tryFocus = (attempt = 0) => {
+        const cell = this.$el.querySelector(".editable")?.closest("[tabindex]");
+        if (cell) {
+          cell.focus();
+        } else if (attempt < 20) {
+          requestAnimationFrame(() => tryFocus(attempt + 1));
+        }
+      };
+      tryFocus();
+    }
   },
 };
 </script>
@@ -214,6 +250,13 @@ export default {
 .layout-cards .value {
   flex-grow: 1;
   align-self: stretch;
+}
+
+.layout-cards .card-actions {
+  display: flex;
+  gap: 0.5em;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
 }
 
 /* for not IE11 */

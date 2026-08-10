@@ -77,9 +77,7 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
         super(status.getJobType(), ObjectUtils.cloneIfPossible((DistributionRequest) status.getRequest()), null,
             observationManager, loggerManager);
 
-        if (status instanceof DistributionJobStatus) {
-            DistributionJobStatus distributionJobStatus = (DistributionJobStatus) status;
-
+        if (status instanceof DistributionJobStatus distributionJobStatus) {
             this.previousDistributionExtension = distributionJobStatus.previousDistributionExtension;
             this.previousDistributionExtensionUi = distributionJobStatus.previousDistributionExtensionUi;
             this.distributionExtension = distributionJobStatus.distributionExtension;
@@ -128,7 +126,7 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
         this.currentStateIndex = currentStateIndex;
     }
 
-    // Distribution informations
+    // Distribution information
 
     public ExtensionId getPreviousDistributionExtension()
     {

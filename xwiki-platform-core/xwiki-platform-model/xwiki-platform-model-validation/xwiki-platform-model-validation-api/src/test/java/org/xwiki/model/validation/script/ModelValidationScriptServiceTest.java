@@ -86,7 +86,7 @@ class ModelValidationScriptServiceTest
     private EntityReference entityReferenceTarget;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         when(this.nameStrategy.transform(TEST_NAME)).thenReturn(TRANSFORMED_NAME);
         when(this.nameStrategy.transform(this.entityReferenceSource)).thenReturn(this.entityReferenceTarget);

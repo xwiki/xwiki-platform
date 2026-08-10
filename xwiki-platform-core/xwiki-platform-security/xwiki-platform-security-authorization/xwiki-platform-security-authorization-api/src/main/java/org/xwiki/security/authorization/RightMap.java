@@ -111,7 +111,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     @Override
     public boolean containsKey(Object o)
     {
-        return o instanceof Right && getValue(((Right) o).ordinal()) != null;
+        return o instanceof Right right && getValue(right.ordinal()) != null;
     }
 
     @Override
@@ -143,7 +143,7 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     @Override
     public V get(Object o)
     {
-        return (o instanceof Right ? unmaskNull(getValue(((Right) o).ordinal())) : null);
+        return (o instanceof Right right ? unmaskNull(getValue(right.ordinal())) : null);
     }
 
     @Override
@@ -224,8 +224,8 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     @Override
     public V remove(Object o)
     {
-        if (o instanceof Right) {
-            return updateValue(((Right) o).ordinal(), null);
+        if (o instanceof Right right) {
+            return updateValue(right.ordinal(), null);
         }
         return null;
     }
@@ -377,8 +377,8 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
             }
 
             Map.Entry entry = (Map.Entry) o;
-            return entry.getKey() instanceof Right
-                && maskNull(entry.getValue()).equals(getValue(((Right) entry.getKey()).ordinal()));
+            return entry.getKey() instanceof Right right
+                && maskNull(entry.getValue()).equals(getValue(right.ordinal()));
         }
 
         @Override

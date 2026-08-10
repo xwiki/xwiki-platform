@@ -495,7 +495,7 @@ public class Utils
     {
         StringBuilder jobIdSegment = new StringBuilder();
         for (Object idElement : listSegment) {
-            if (jobIdSegment.length() > 0) {
+            if (!jobIdSegment.isEmpty()) {
                 jobIdSegment.append('/');
             }
             jobIdSegment.append(URIUtils.encodePathSegment(idElement.toString()));
@@ -519,7 +519,7 @@ public class Utils
     {
         StringBuilder spaceSegment = new StringBuilder();
         for (Object space : spaces) {
-            if (spaceSegment.length() > 0) {
+            if (!spaceSegment.isEmpty()) {
                 spaceSegment.append("/spaces/");
             }
             spaceSegment.append(URIUtils.encodePathSegment(space.toString()));

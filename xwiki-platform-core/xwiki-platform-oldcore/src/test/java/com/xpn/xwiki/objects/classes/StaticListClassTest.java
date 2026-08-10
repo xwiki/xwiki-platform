@@ -149,7 +149,7 @@ class StaticListClassTest
         staticListClass.setSize(7);
         StringBuilder values = new StringBuilder();
         for (String value : VALUES_WITH_HTML_SPECIAL_CHARS) {
-            if (values.length() > 0) {
+            if (!values.isEmpty()) {
                 values.append('|');
             }
             values.append(value).append('=').append(StringUtils.reverse(value));
@@ -250,7 +250,7 @@ class StaticListClassTest
      * Tests the suggest code generated when "use suggest" is set.
      */
     @Test
-    void testDisplayEditWithSuggest() throws Exception
+    void testDisplayEditWithSuggest()
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);
@@ -269,7 +269,7 @@ class StaticListClassTest
         staticListClass.setSize(7);
         StringBuilder values = new StringBuilder();
         for (String value : VALUES_WITH_HTML_SPECIAL_CHARS) {
-            if (values.length() > 0) {
+            if (!values.isEmpty()) {
                 values.append('|');
             }
             values.append(value).append('=').append(StringUtils.reverse(value));

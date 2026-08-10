@@ -35,13 +35,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @sice 9.4RC1
  */
 @ComponentTest
-public class FSPathStringEntityReferenceSerializerTest
+class FSPathStringEntityReferenceSerializerTest
 {
     @InjectMockComponents
     private FSPathStringEntityReferenceSerializer serializer;
 
     @Test
-    public void serialize()
+    void serialize()
     {
         DocumentReference documentReference = new DocumentReference("wik.i", "spac.e", "pag.e");
         AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);

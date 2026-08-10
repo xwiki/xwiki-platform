@@ -167,8 +167,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
 
-        if (document instanceof XWikiDocument) {
-            return ((XWikiDocument) document).getTranslatedDocument(xcontext);
+        if (document instanceof XWikiDocument xwikiDocument) {
+            return xwikiDocument.getTranslatedDocument(xcontext);
         } else {
             return getTranslatedDocumentInstance(document.getDocumentReference());
         }

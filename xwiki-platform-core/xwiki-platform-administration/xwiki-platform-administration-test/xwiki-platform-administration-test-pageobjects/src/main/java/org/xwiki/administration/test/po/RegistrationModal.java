@@ -19,6 +19,8 @@
  */
 package org.xwiki.administration.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -46,6 +48,38 @@ public class RegistrationModal extends AbstractRegistrationPage
     public void clickRegister()
     {
         this.createButton.click();
+    }
+
+    /**
+     * Wait until submitting the modal (see {@link #clickRegister()}) has produced an outcome (a live validation error,
+     * a server-side error notification or a success notification) and report whether the user was created. When the
+     * creation succeeded, the success notification is dismissed by clicking on it.
+     * <p>
+     * This waits only until an outcome is displayed rather than blindly looking for the success notification, which is
+     * legitimately absent on failure and would otherwise cost the full Selenium implicit-wait timeout.
+     *
+     * @return {@code true} if the user was created successfully, {@code false} if the creation failed
+     * @since 18.6.0RC1
+     */
+    public boolean isUserCreatedSuccessfully()
+    {
+        getDriver().waitUntilElementsAreVisible(new By[] {
+            // A live validation error message appears.
+            By.cssSelector("dd > span.LV_validation_message.LV_invalid"),
+            // The operation fails on the server.
+            By.cssSelector(".xnotification-error"),
+            // The operation succeeds.
+            By.cssSelector(".xnotification-done")
+        }, false);
+
+        List<WebElement> successNotifications = getDriver().findElementsWithoutWaiting(
+            By.xpath("//div[contains(@class, 'xnotification-done') and contains(., 'User created')]"));
+        if (successNotifications.isEmpty()) {
+            return false;
+        }
+        // Dismiss the success notification by clicking on it.
+        successNotifications.getFirst().click();
+        return true;
     }
 
     /**

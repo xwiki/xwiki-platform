@@ -297,7 +297,7 @@ define('xwiki-realtime-wysiwyg', [
         this._onLocal();
         // Push commits to the server.
         this._connection.chainpad.sync();
-        // Wait for aknowledgement.
+        // Wait for acknowledgement.
         await new Promise(resolve => this._connection.chainpad.onSettle(resolve));
       }
     }

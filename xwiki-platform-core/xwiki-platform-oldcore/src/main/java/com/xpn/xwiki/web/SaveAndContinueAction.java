@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
@@ -51,13 +50,9 @@ public class SaveAndContinueAction extends XWikiAction
     /** Key for storing the wrapped action in the context. */
     private static final String WRAPPED_ACTION_CONTEXT_KEY = "SaveAndContinueAction.wrappedAction";
 
-    /**
-     * The default context value to put with {@link #MERGED_DOCUMENTS} key.
-     */
-    private static final String MERGED_DOCUMENTS_VALUE = "true";
-
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
+    @Inject
+    private Logger logger;
 
     @Inject
     @Named("save")
@@ -118,7 +113,7 @@ public class SaveAndContinueAction extends XWikiAction
                         localizePlainOrKey("core.editors.saveandcontinue.theDocumentWasNotSaved");
                     // This should not happen. SaveAction.save(context) should normally throw an
                     // exception when failing during save and continue.
-                    LOGGER.error("SaveAction.save(context) returned true while using save & continue");
+                    this.logger.error("SaveAction.save(context) returned true while using save & continue");
                     writeAjaxErrorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
                 } else if (context.getResponse().getStatus() != HttpStatus.SC_CONFLICT) {
                     context.put(WRAPPED_ACTION_CONTEXT_KEY, sa);

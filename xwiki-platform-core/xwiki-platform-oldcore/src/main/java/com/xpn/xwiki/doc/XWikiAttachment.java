@@ -507,10 +507,8 @@ public class XWikiAttachment implements Cloneable
             this.doc = doc;
             this.reference = null;
 
-            if (updateDirty) {
-                if (isMetaDataDirty() && doc != null) {
-                    doc.setMetaDataDirty(true);
-                }
+            if (updateDirty && isMetaDataDirty() && doc != null) {
+                doc.setMetaDataDirty(true);
             }
         }
     }
@@ -572,10 +570,8 @@ public class XWikiAttachment implements Cloneable
     {
         setMetaDataDirty(dirty);
 
-        if (deep) {
-            if (this.content != null) {
-                this.content.setContentDirty(dirty);
-            }
+        if (deep && this.content != null) {
+            this.content.setContentDirty(dirty);
         }
     }
 
@@ -659,7 +655,7 @@ public class XWikiAttachment implements Cloneable
      * @param out the output where to write the XML
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
      * @param bWithVersions if true, all archive version is also included
-     * @param format true if the XML should be formated
+     * @param format true if the XML should be formatted
      * @param context current XWikiContext
      * @throws IOException when an error occurs during streaming operation
      * @throws XWikiException when an error occurs during xwiki operation
@@ -677,7 +673,7 @@ public class XWikiAttachment implements Cloneable
      * @param out the output where to write the XML
      * @param bWithAttachmentContent if true, binary content of the attachment is included (base64 encoded)
      * @param bWithVersions if true, all archive version is also included
-     * @param format true if the XML should be formated
+     * @param format true if the XML should be formatted
      * @param encoding the encoding to use when serializing XML
      * @throws XWikiException when an error occurs during xwiki operation
      * @since 9.10RC1
@@ -919,7 +915,7 @@ public class XWikiAttachment implements Cloneable
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    LOGGER.warn("Failed to close attachment content input stream: {}",
+                    LOGGER.warn("Failed to close attachment content input stream: [{}]",
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
@@ -993,7 +989,9 @@ public class XWikiAttachment implements Cloneable
 
             return latestStoredVersion != null ? latestStoredVersion.getVersion() : null;
         } catch (XWikiException e) {
-            LOGGER.warn(ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to get the latest stored version of attachment [{}] of document [{}]. "
+                + "Root cause is [{}]", this.filename, this.doc.getDocumentReference(),
+                ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
     }
@@ -1040,8 +1038,8 @@ public class XWikiAttachment implements Cloneable
         try {
             return getAttachment_archive().getVersions();
         } catch (Exception ex) {
-            LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: {}",
-                new Object[] {getFilename(), getDoc().getDocumentReference(), ex.getMessage()});
+            LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: [{}]",
+                getFilename(), getDoc().getDocumentReference(), ExceptionUtils.getRootCauseMessage(ex));
             return new Version[] {new Version(this.getVersion())};
         }
     }
@@ -1179,9 +1177,8 @@ public class XWikiAttachment implements Cloneable
 
                     this.attachment_archive = store.loadArchive(this, xcontext, true);
                 } catch (Exception e) {
-                    LOGGER.warn(
-                        "Failed to load archive for attachment [{}@{}]. "
-                            + "This attachment is broken, please consider re-uploading it",
+                    LOGGER.warn("Failed to load archive for attachment [{}@{}]. This attachment is broken, please "
+                        + "consider re-uploading it",
                         this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
                 }
             } finally {
@@ -1308,11 +1305,7 @@ public class XWikiAttachment implements Cloneable
     public boolean isImage(XWikiContext context)
     {
         String contenttype = getMimeType(context);
-        if (contenttype.startsWith("image/")) {
-            return true;
-        } else {
-            return false;
-        }
+        return contenttype.startsWith("image/");
     }
 
     public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException
@@ -1325,7 +1318,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * Apply the provided attachment so that the current one contains the same informations and indicate if it was
+     * Apply the provided attachment so that the current one contains the same information and indicate if it was
      * necessary to modify it in any way.
      *
      * @param attachment the attachment to apply

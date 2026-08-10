@@ -117,7 +117,8 @@ public class BasePage extends BaseElement
     private WebElement notificationsMenu;
 
     /**
-     * Used to scroll the page to the top before accessing the floating menu.
+     * The wiki logo displayed in the page header. Also used to scroll the page to the top before accessing the
+     * floating menu.
      */
     @FindBy(id = "companylogo")
     protected WebElement logo;
@@ -268,7 +269,7 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Performs a click on the "edit acces rights" entry of the content menu.
+     * Performs a click on the "edit access rights" entry of the content menu.
      */
     public RightsEditPage editRights()
     {
@@ -542,6 +543,15 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * @return the URL of the image displayed as the wiki logo in the page header
+     * @since 18.7.0RC1
+     */
+    public String getLogoImageURL()
+    {
+        return this.logo.findElement(By.tagName("img")).getAttribute("src");
+    }
+
+    /**
      * @since 4.5M1
      */
     public void watchSpace()
@@ -727,7 +737,7 @@ public class BasePage extends BaseElement
             if (wcagContext.shouldWCAGStopOnError()) {
                 throw e;
             } else {
-                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
+                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag:", e);
             }
         }
     }

@@ -227,9 +227,7 @@ public class CompositeEvent
             return true;
         }
 
-        if (obj instanceof CompositeEvent) {
-            CompositeEvent compositeEvent = (CompositeEvent) obj;
-
+        if (obj instanceof CompositeEvent compositeEvent) {
             EqualsBuilder builder = new EqualsBuilder();
             builder.append(getSimilarityBetweenEvents(), compositeEvent.getSimilarityBetweenEvents());
             builder.append(getEvents(), compositeEvent.getEvents());

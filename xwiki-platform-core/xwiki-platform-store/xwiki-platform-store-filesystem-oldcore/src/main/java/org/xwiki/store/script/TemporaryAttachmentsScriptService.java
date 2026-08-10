@@ -176,7 +176,7 @@ public class TemporaryAttachmentsScriptService implements ScriptService
                 .filter(persistedAttachment -> temporaryAttachments.stream()
                     .map(xWikiAttachment -> convertToAttachment(document, xWikiAttachment))
                     .noneMatch(attachmentEqualityPredicate(persistedAttachment)));
-        fullList.addAll(nonOverriddenAttachments.collect(Collectors.toList()));
+        fullList.addAll(nonOverriddenAttachments.toList());
 
         fullList.sort(getLowerCaseStringComparator());
         return fullList;

@@ -877,7 +877,8 @@ class XWikiDocumentTest
 
         assertEquals("Page", this.document.getRenderedTitle(this.oldcore.getXWikiContext()));
 
-        assertEquals("Failed to interpret title of document [Wiki:Space.Page].", this.logCapture.getLogEvent(0).getFormattedMessage());
+        assertEquals("Failed to interpret title of document [Wiki:Space.Page]",
+            this.logCapture.getLogEvent(0).getFormattedMessage());
     }
 
     /**

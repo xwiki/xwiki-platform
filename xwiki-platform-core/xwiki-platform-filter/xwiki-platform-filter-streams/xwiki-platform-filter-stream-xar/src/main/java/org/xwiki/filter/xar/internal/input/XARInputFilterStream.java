@@ -81,10 +81,10 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
         if (this.properties.isForceDocument() || inputSource instanceof ReaderInputSource
             || inputSource instanceof SourceInputSource) {
             readDocument(filter, proxyFilter);
-        } else if (inputSource instanceof InputStreamInputSource) {
+        } else if (inputSource instanceof InputStreamInputSource inputStreamInputSource) {
             InputStream stream;
             try {
-                stream = ((InputStreamInputSource) inputSource).getInputStream();
+                stream = inputStreamInputSource.getInputStream();
             } catch (IOException e) {
                 throw new FilterException("Failed to get input stream", e);
             }

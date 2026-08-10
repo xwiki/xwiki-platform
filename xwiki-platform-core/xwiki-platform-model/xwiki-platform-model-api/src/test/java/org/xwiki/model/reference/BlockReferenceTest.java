@@ -32,13 +32,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  * @since 6.0M1
  */
-public class BlockReferenceTest
+class BlockReferenceTest
 {
     /**
      * Ensures the equivalence of constructors.
      */
     @Test
-    public void testConstructors()
+    void testConstructors()
     {
         BlockReference reference = new BlockReference(new EntityReference("Block", EntityType.BLOCK));
         assertEquals(reference, new BlockReference("Block"));
@@ -57,7 +57,7 @@ public class BlockReferenceTest
     }
 
     @Test
-    public void testInvalidType()
+    void testInvalidType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
             () -> new BlockReference(new EntityReference("Block", EntityType.DOCUMENT)));
@@ -69,7 +69,7 @@ public class BlockReferenceTest
      * Tests that an object reference throws exception if it doesn't have a document as a parent.
      */
     @Test
-    public void testInvalidParentType()
+    void testInvalidParentType()
     {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new BlockReference(
             new EntityReference("Block", EntityType.BLOCK, new EntityReference("Object", EntityType.OBJECT))));
@@ -78,7 +78,7 @@ public class BlockReferenceTest
     }
 
     @Test
-    public void testReplaceParent()
+    void testReplaceParent()
     {
         BlockReference reference = new BlockReference("Block", new DocumentReference("wiki", "space", "page"))
             .replaceParent(new DocumentReference("wiki2", "space2", "page2"));

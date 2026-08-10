@@ -363,8 +363,9 @@ public class WikiUserManagerScriptService implements ScriptService
         MemberCandidacy candidacy = null;
         try {
             candidacy = wikiUserManager.getCandidacy(wikiId, candidacyId);
-            // Check the rights
-            if (!canSeeCandidacy(candidacy)) {
+            // Check the rights, unless the candidacy does not exist (e.g. a canceled invitation whose candidacy id
+            // is still being requested, typically on a form resubmission).
+            if (candidacy != null && !canSeeCandidacy(candidacy)) {
                 setLastError(new WikiUserManagerScriptServiceException("You are not allowed to see this candidacy."));
                 candidacy = null;
             }

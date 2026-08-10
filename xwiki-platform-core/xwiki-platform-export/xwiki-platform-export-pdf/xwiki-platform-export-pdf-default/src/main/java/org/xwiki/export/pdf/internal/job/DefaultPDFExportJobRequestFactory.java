@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -164,7 +163,7 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
         request.setWithHeader(!"0".equals(httpRequest.get("pdfheader")));
         request.setWithFooter(!"0".equals(httpRequest.get("pdffooter")));
         request.setDocuments(this.documentSelectionResolver.getSelectedDocuments(true).stream()
-            .sorted(this.documentReferenceComparatorProvider.get()).collect(Collectors.toList()));
+            .sorted(this.documentReferenceComparatorProvider.get()).toList());
 
         request.setFileName(xcontext.getDoc().getRenderedTitle(Syntax.PLAIN_1_0, xcontext) + ".pdf");
     }

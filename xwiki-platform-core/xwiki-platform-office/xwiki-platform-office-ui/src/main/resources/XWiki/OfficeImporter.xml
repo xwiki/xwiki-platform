@@ -430,7 +430,7 @@
     $('.splitDocument-setting').prop('disabled', splitDocumentDisabled);
   };
 
-  // Initalize the default state.
+  // Initialize the default state.
   maybeDisableSplitDocumentSettings();
 
   // Enable/disable the split document settings when the checkbox's value changes.

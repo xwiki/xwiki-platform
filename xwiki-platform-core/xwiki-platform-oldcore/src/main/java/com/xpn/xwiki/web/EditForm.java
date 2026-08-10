@@ -53,16 +53,14 @@ public class EditForm extends XWikiForm
      * {@code XWiki.XWikiRights_0_member}).
      */
     private static final Pattern XPROPERTY_REFERENCE_PATTERN =
-        Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)_(.+)$");
+        Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_(\\d+)_(.+)$");
 
     /**
      * Format for passing xobjects references in URLs. General format:
      * {@code &lt;space&gt;.&lt;pageClass&gt;_<number>} (e.g.
      * {@code XWiki.XWikiRights_0}).
      */
-    private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)$");
-
-    private static final String OBJECTS_CLASS_DELIMITER = "_";
+    private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_(\\d+)$");
 
     // ---- Form fields -------------------------------------------------
     private String content;
@@ -217,10 +215,11 @@ public class EditForm extends XWikiForm
         @SuppressWarnings("unchecked")
         Map<String, String[]> allParameters = getRequest().getParameterMap();
         Map<String, String[]> result = new HashMap<>();
-        for (String name : allParameters.keySet()) {
+        for (Map.Entry<String, String[]> entry : allParameters.entrySet()) {
+            String name = entry.getKey();
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);
-                result.put(newname, allParameters.get(name));
+                result.put(newname, entry.getValue());
             }
         }
         return result;
@@ -392,17 +391,6 @@ public class EditForm extends XWikiForm
 
     /**
      * see {@link #getObjectPolicy}
-     * 
-
-     * @since 7.0RC1
-     */
-    private void setObjectPolicy(ObjectPolicyType objectPolicy)
-    {
-        this.objectPolicy = objectPolicy;
-    }
-
-    /**
-     * see {@link #getObjectPolicy}
      *
      * @param objectPolicyName is a string converted to {@link com.xpn.xwiki.web.ObjectPolicyType ObjectPolicyType}
      * @since 7.0RC1
@@ -521,7 +509,7 @@ public class EditForm extends XWikiForm
                 try {
                     classNumber = Integer.parseInt(classNumberAsString);
                 } catch (NumberFormatException e) {
-                    // If the numner isn't valid, skip the property update
+                    // If the number isn't valid, skip the property update
                     LOGGER.warn("Invalid xobject number [{}], ignoring property update [{}].", classNumberAsString,
                         parameter.getKey());
                     continue;

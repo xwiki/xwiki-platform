@@ -21,6 +21,7 @@ package org.xwiki.livedata.internal.livetable;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -77,7 +78,7 @@ public class DefaultLiveDataConfigurationProvider implements Provider<LiveDataCo
             try {
                 InputStream defaultConfigInputStream =
                     getClass().getResourceAsStream("/liveTableLiveDataConfiguration.json");
-                this.defaultConfigJSON = IOUtils.toString(defaultConfigInputStream, "UTF-8");
+                this.defaultConfigJSON = IOUtils.toString(defaultConfigInputStream, StandardCharsets.UTF_8);
             } catch (IOException e) {
                 throw new RuntimeException(
                     "Failed to read the default live data configuration for the live table source.", e);

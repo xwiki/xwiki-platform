@@ -414,7 +414,7 @@ define('xwiki-suggestAttachments', [
     var attachments = convertFilesToAttachments(files, selectize.settings);
     attachments = attachmentsFilter.filter(attachments, selectize.settings.accept);
     if (selectize.settings.maxItems === 1) {
-      // Upload only a single file if single selecion is on.
+      // Upload only a single file if single selection is on.
       attachments = attachments.slice(0, 1);
     }
     attachments = processAttachments(selectize.settings, {attachments: attachments});

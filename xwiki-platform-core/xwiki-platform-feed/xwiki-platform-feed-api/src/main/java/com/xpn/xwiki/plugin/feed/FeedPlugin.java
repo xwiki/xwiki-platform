@@ -36,6 +36,7 @@ import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -300,12 +301,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             XWikiFeedFetcher feedFetcher = new XWikiFeedFetcher();
             feedFetcher.setUserAgent(context.getWiki().Param("xwiki.plugins.feed.useragent",
                 context.getWiki().getHttpUserAgent(context)));
-            SyndFeed feed =
-                feedFetcher.retrieveFeed(
-                    feedURL,
-                    (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.timeout",
-                        context.getWiki().getHttpTimeout(context)));
-            return feed;
+            return feedFetcher.retrieveFeed(
+                feedURL,
+                (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.timeout",
+                    context.getWiki().getHttpTimeout(context)));
         } catch (Exception ex) {
             if (ignoreInvalidFeeds) {
                 @SuppressWarnings("unchecked")
@@ -417,7 +416,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     }
                     map.put(feedDocName, e);
                     // and log it
-                    LOGGER.error("Failed to update feeds in document " + feedDocName, e);
+                    LOGGER.error("Failed to update feeds in document [{}]", feedDocName, e);
                 }
             }
         }
@@ -682,7 +681,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             // If some day wiki syntax is supported in document titles, we might want to convert to wiki syntax instead.
             title = this.stripHtmlTags(entry.getTitle());
         } catch (ConversionException e) {
-            LOGGER.warn("Failed to strip HTML tags from entry title : " + e.getMessage());
+            LOGGER.warn("Failed to strip HTML tags from entry title: [{}]", ExceptionUtils.getRootCauseMessage(e));
             // Nevermind, we will use the original title
             title = entry.getTitle();
         }
@@ -693,7 +692,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         StringBuffer categs = new StringBuffer("");
         if (categList != null) {
             for (SyndCategory categ : categList) {
-                if (categs.length() != 0) {
+                if (!categs.isEmpty()) {
                     categs.append(", ");
                 }
                 categs.append(categ.getName());
@@ -708,7 +707,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         List<SyndContent> contentList = entry.getContents();
         if (contentList != null && !contentList.isEmpty()) {
             for (SyndContent content : contentList) {
-                if (contents.length() != 0) {
+                if (!contents.isEmpty()) {
                     contents.append("\n");
                 }
                 contents.append(content.getValue());
@@ -784,9 +783,12 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 "select distinct obj.number, obj.name from BaseObject as obj, StringProperty as prop , LargeStringProperty as lprop "
                     + "where obj.className='XWiki.FeedEntryClass' and obj.id=prop.id.id and obj.id=lprop.id.id ";
 
+            StringBuilder sqlBuilder = new StringBuilder(sql);
             for (int i = 0; i < queryTab.length; i++) {
-                sql += " and (prop.value LIKE '%" + queryTab[i] + "%' or lprop.value LIKE '%" + queryTab[i] + "%')";
+                sqlBuilder.append(" and (prop.value LIKE '%").append(queryTab[i])
+                    .append("%' or lprop.value LIKE '%").append(queryTab[i]).append("%')");
             }
+            sql = sqlBuilder.toString();
             List<Object[]> res = context.getWiki().search(sql, context);
 
             if (res == null) {
@@ -794,7 +796,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             }
 
             List<com.xpn.xwiki.api.Object> apiObjs = new ArrayList<>();
-            for (Object obj[] : res) {
+            for (Object[] obj : res) {
                 try {
                     XWikiDocument doc = context.getWiki().getDocument((String) obj[1], context);
                     if (context.getWiki().getRightService().checkAccess("view", doc, context)) {
@@ -849,13 +851,13 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             Constructor< ? extends SyndEntrySource> ctor = null;
             if (params != null) {
                 try {
-                    ctor = sesc.getConstructor(new Class[] {Map.class});
-                    return ctor.newInstance(new Object[] {params});
+                    ctor = sesc.getConstructor(Map.class);
+                    return ctor.newInstance(params);
                 } catch (Throwable t) {
                 }
             }
-            ctor = sesc.getConstructor(new Class[] {});
-            return ctor.newInstance(new Object[] {});
+            ctor = sesc.getConstructor();
+            return ctor.newInstance();
         } catch (Throwable t) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "", t);
         }
@@ -997,7 +999,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             writer.close();
             return writer.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to serialize the feed to the [{}] format", type, e);
             return "";
         }
     }

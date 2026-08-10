@@ -157,7 +157,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
 
                 return parseTitle(title);
             } catch (Exception e) {
-                logger.warn("Failed to interpret title of document [{}].", document.getDocumentReference(), e);
+                logger.warn("Failed to interpret title of document [{}]", document.getDocumentReference(), e);
             }
         }
 
@@ -169,8 +169,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                     return title;
                 }
             } catch (Exception e) {
-                logger.warn("Failed to extract title from content of document [{}].", document.getDocumentReference(),
-                    e);
+                logger.warn("Failed to extract title from content of document [{}]",
+                    document.getDocumentReference(), e);
             }
         }
 

@@ -50,8 +50,8 @@
 
 === 2.0 HTML ===
 
-{{info}}У синтаксисі XWiki {{velocity}}$crtSyntaxVer{{/velocity}} HTML або XHTML потрібно вводити за допомогою [[HTML макроса&gt;&gt;https://extensions.xwiki.org/xwiki/bin/ view/Extension/HTML%20Macro]].{{/info}}
+{{info}}У синтаксисі XWiki {{velocity}}$crtSyntaxVer{{/velocity}} HTML або XHTML потрібно вводити за допомогою [[HTML-макроса&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/HTML%20Macro]].{{/info}}
 
 |=Синтаксис XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Результат
-|{{{{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}}}}}|{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML &lt;/abbr&gt;{{/html}}</content>
+|{{{{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}} }}}|{{html}}&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;{{/html}}</content>
 </xwikidoc>

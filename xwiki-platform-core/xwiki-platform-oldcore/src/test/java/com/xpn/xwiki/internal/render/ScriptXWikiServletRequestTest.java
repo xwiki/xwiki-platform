@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class ScriptXWikiServletRequestTest
+class ScriptXWikiServletRequestTest
 {
     private final ContextualAuthorizationManager authorization = mock(ContextualAuthorizationManager.class);
 

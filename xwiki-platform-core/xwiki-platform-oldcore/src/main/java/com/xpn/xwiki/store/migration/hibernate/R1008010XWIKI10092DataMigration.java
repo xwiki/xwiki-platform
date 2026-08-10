@@ -22,7 +22,6 @@ package com.xpn.xwiki.store.migration.hibernate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -92,8 +91,8 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
         // Clean the document cache to make sure the new properties we just added directly to the database are not lost
         // during next save before a version of the document without those properties was already in the cache
         XWikiStoreInterface store = xcontext.getWiki().getStore();
-        if (store instanceof XWikiCacheStoreInterface) {
-            ((XWikiCacheStoreInterface) store).flushCache();
+        if (store instanceof XWikiCacheStoreInterface cacheStore) {
+            cacheStore.flushCache();
         }
     }
 
@@ -148,7 +147,7 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
         Set<String> missingProperties = new HashSet<>(xclass.getPropertyList());
         missingProperties.removeAll(getCurrentProperties(objectId, session));
         return missingProperties.stream().map(propertyName -> (PropertyClass) xclass.get(propertyName))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private List<String> getCurrentProperties(Long objectId, Session session)

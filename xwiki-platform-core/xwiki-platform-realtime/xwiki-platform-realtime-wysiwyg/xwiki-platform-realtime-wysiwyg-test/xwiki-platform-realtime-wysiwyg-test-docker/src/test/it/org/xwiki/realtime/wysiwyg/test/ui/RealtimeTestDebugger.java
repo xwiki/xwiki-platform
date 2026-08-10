@@ -19,6 +19,7 @@
  */
 package org.xwiki.realtime.wysiwyg.test.ui;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.openqa.selenium.logging.LogType;
@@ -57,7 +58,7 @@ public class RealtimeTestDebugger implements TestExecutionExceptionHandler
 
         driver.getWindowHandles().forEach(handle -> {
             driver.switchTo().window(handle);
-            LOGGER.info("Debug info for browser window {}:", handle);
+            LOGGER.info("Debug info for browser window [{}]:", handle);
             printBrowserLogs(driver);
             printRealtimeDebugInfo(driver);
         });
@@ -72,17 +73,17 @@ public class RealtimeTestDebugger implements TestExecutionExceptionHandler
             driver.manage().logs().get(LogType.BROWSER).forEach(entry -> LOGGER.info(entry.toString()));
         } catch (Exception e) {
             // Not all browser drivers support getting the logs.
-            LOGGER.warn("Failed to get browser console logs: {}", e.getMessage());
+            LOGGER.warn("Failed to get browser console logs: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
     }
 
     private void printRealtimeDebugInfo(XWikiWebDriver driver)
     {
         try {
-            LOGGER.info("Realtime debug info: {}",
+            LOGGER.info("Realtime debug info: [{}]",
                 driver.executeScript("return JSON.stringify(window.REALTIME_DEBUG)"));
         } catch (Exception e) {
-            LOGGER.warn("Failed to get realtime debug info: {}", e.getMessage());
+            LOGGER.warn("Failed to get realtime debug info: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
     }
 }

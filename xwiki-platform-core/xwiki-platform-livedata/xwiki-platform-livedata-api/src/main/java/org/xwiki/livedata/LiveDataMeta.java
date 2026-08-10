@@ -136,7 +136,7 @@ public class LiveDataMeta implements InitializableLiveDataElement
      */
     public void setLayouts(Collection<LiveDataLayoutDescriptor> layouts)
     {
-        this.layouts = layouts;
+        this.layouts = layouts == null ? null : new ArrayList<>(layouts);
     }
 
     /**

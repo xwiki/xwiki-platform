@@ -1,5 +1,9 @@
 {
   "extends": "@xwiki/platform-tool-tsconfig",
+  "compilerOptions": {
+    // Required to have Vue components in the PlayWright directory
+    "isolatedDeclarations": false
+  },
   "include": ["**/*.tsx", "**/*.ts"],
   "exclude": []
 }

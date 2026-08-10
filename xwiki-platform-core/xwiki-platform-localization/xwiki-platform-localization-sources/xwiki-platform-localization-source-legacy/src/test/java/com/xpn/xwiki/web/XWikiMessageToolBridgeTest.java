@@ -54,7 +54,7 @@ class XWikiMessageToolBridgeTest
     private DocumentReference defaultWikiTranslationReference;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
 
         this.oldcore.notifyDocumentCreatedEvent(true);

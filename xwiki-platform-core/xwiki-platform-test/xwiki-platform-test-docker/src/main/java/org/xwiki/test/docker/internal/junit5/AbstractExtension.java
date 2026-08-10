@@ -159,7 +159,7 @@ public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCa
     {
         List<ServletContainerExecutor> executors = loadServletContainerExecutors(context);
 
-        if (CollectionUtils.isNotEmpty(executors)) {
+        if (CollectionUtils.isNotEmpty(executors) && index < executors.size()) {
             return executors.get(index);
         }
 

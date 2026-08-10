@@ -158,8 +158,7 @@ public class XClassDeletingListener extends AbstractEventListener
                 cancelableEvent.cancel("Question has been interrupted.");
             }
             // we always want the event and the CancelableJobStatus to be consistent
-            if (jobStatus instanceof CancelableJobStatus) {
-                CancelableJobStatus cancelableJobStatus = (CancelableJobStatus) jobStatus;
+            if (jobStatus instanceof CancelableJobStatus cancelableJobStatus) {
                 if (cancelableJobStatus.isCanceled()) {
                     cancelableEvent.cancel();
                 }

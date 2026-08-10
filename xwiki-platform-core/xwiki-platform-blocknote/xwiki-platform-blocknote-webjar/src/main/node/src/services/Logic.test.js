@@ -57,7 +57,7 @@ describe("Logic", () => {
     const host = document.createElement("div");
     host.name = "test";
 
-    const logic = new Logic(host);
+    const logic = new Logic(host, { designSystemLoader: undefined });
     await logic.ready;
   });
 });

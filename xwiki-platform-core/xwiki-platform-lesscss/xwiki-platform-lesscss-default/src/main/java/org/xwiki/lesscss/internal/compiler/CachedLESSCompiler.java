@@ -109,9 +109,9 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
             if (useVelocity) {
                 DocumentReference authorReference;
                 DocumentReference documentReference;
-                if (lessResourceReference instanceof WikiLESSResourceReference) {
-                    authorReference = ((WikiLESSResourceReference) lessResourceReference).getAuthorReference();
-                    documentReference = ((WikiLESSResourceReference) lessResourceReference).getDocumentReference();
+                if (lessResourceReference instanceof WikiLESSResourceReference wikiLESSResourceReference) {
+                    authorReference = wikiLESSResourceReference.getAuthorReference();
+                    documentReference = wikiLESSResourceReference.getDocumentReference();
                 } else {
                     authorReference = InternalTemplateManager.SUPERADMIN_REFERENCE;
                     documentReference = null;

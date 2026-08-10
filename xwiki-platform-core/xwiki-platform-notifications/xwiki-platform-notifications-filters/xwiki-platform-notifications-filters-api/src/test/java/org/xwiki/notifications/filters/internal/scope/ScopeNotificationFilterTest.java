@@ -21,7 +21,7 @@ package org.xwiki.notifications.filters.internal.scope;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +58,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -115,7 +114,7 @@ class ScopeNotificationFilterTest
 
         when(this.resolver.resolve(entityStringValue, resultReference.getType())).thenReturn(resultReference);
 
-        when(this.serializer.serialize(eq(resultReference))).thenReturn(entityStringValue);
+        when(this.serializer.serialize(resultReference)).thenReturn(entityStringValue);
 
         when(preference.getStartingDate()).thenReturn(new Date(0));
 
@@ -123,7 +122,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void matchPreferenceWithCorrectPreference() throws Exception
+    void matchPreferenceWithCorrectPreference()
     {
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.DEFAULT);
@@ -134,7 +133,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void matchPreferenceWithIncorrectPreference() throws Exception
+    void matchPreferenceWithIncorrectPreference()
     {
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.SYSTEM);
@@ -143,13 +142,13 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void getName() throws Exception
+    void getName()
     {
         assertEquals(ScopeNotificationFilter.FILTER_NAME, this.scopeNotificationFilter.getName());
     }
 
     @Test
-    void complexCase1() throws Exception
+    void complexCase1()
     {
         // Preferences:
         //
@@ -163,7 +162,7 @@ class ScopeNotificationFilterTest
         // Mock α
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties = new EnumMap<>(NotificationPreferenceProperty.class);
         properties.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(preference.getProperties()).thenReturn(properties);
 
@@ -241,7 +240,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void withTopLevelInclusiveFilters() throws Exception
+    void withTopLevelInclusiveFilters()
     {
         // Preferences:
         //
@@ -253,7 +252,7 @@ class ScopeNotificationFilterTest
         // Mock α
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties = new EnumMap<>(NotificationPreferenceProperty.class);
         properties.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(preference.getProperties()).thenReturn(properties);
 
@@ -322,12 +321,12 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void filterExpressionWithSubQuery() throws Exception
+    void filterExpressionWithSubQuery()
     {
         NotificationPreference pref1 = mock(NotificationPreference.class);
         NotificationPreference pref2 = mock(NotificationPreference.class);
-        Map<NotificationPreferenceProperty, Object> properties1 = new HashMap<>();
-        Map<NotificationPreferenceProperty, Object> properties2 = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties1 = new EnumMap<>(NotificationPreferenceProperty.class);
+        Map<NotificationPreferenceProperty, Object> properties2 = new EnumMap<>(NotificationPreferenceProperty.class);
         when(pref1.getProperties()).thenReturn(properties1);
         when(pref2.getProperties()).thenReturn(properties2);
         properties1.put(NotificationPreferenceProperty.EVENT_TYPE, "type1");
@@ -392,7 +391,7 @@ class ScopeNotificationFilterTest
         // Mock α
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getFormat()).thenReturn(NotificationFormat.ALERT);
-        Map<NotificationPreferenceProperty, Object> properties = new HashMap<>();
+        Map<NotificationPreferenceProperty, Object> properties = new EnumMap<>(NotificationPreferenceProperty.class);
         properties.put(NotificationPreferenceProperty.EVENT_TYPE, "update");
         when(preference.getProperties()).thenReturn(properties);
 

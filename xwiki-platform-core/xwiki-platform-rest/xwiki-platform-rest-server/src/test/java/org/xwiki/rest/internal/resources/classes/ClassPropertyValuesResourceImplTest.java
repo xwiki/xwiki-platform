@@ -61,7 +61,7 @@ import com.xpn.xwiki.objects.classes.DBListClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -134,23 +134,17 @@ class ClassPropertyValuesResourceImplTest
     {
         doThrow(new AccessDeniedException(this.xcontext.getUserReference(), this.propertyReference))
             .when(this.authorization).checkAccess(Right.VIEW, this.propertyReference);
-        try {
-            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, List.of("text"), false);
-            fail();
-        } catch (WebApplicationException expected) {
-            assertEquals(Status.UNAUTHORIZED.getStatusCode(), expected.getResponse().getStatus());
-        }
+        WebApplicationException expected = assertThrows(WebApplicationException.class,
+            () -> this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, List.of("text"), false));
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), expected.getResponse().getStatus());
     }
 
     @Test
     void getClassPropertyValuesNotFound() throws Exception
     {
-        try {
-            this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, List.of("text"), false);
-            fail();
-        } catch (WebApplicationException expected) {
-            assertEquals(Status.NOT_FOUND.getStatusCode(), expected.getResponse().getStatus());
-        }
+        WebApplicationException expected = assertThrows(WebApplicationException.class,
+            () -> this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, List.of("text"), false));
+        assertEquals(Status.NOT_FOUND.getStatusCode(), expected.getResponse().getStatus());
     }
 
     @Test

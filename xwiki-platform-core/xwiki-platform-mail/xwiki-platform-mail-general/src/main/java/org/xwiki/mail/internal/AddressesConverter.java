@@ -48,8 +48,8 @@ public class AddressesConverter extends AbstractConverter<Address[]>
             return null;
         }
 
-        if (value instanceof Address[]) {
-            return (Address[]) value;
+        if (value instanceof Address[] addressArray) {
+            return addressArray;
         }
 
         Address[] addresses;

@@ -75,6 +75,7 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
      * @since 17.10.10
      */
     @Unstable
+    @Override
     public boolean isResubmitAllowedForRequestId(String srid)
     {
         return this.csrf.isResubmitAllowedForRequestId(srid);

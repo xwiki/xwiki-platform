@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -55,11 +56,11 @@ class TablePieDatasetBuilderTest extends AbstractMacroContentTableBlockDataSourc
 
         PieDataset pieDataset = (PieDataset) dataset;
 
-        assertTrue(pieDataset.getKey(0).equals(" row 1 "));
-        assertTrue(pieDataset.getKey(1).equals(" row 2 "));
+        assertEquals(" row 1 ", pieDataset.getKey(0));
+        assertEquals(" row 2 ", pieDataset.getKey(1));
 
-        assertTrue(pieDataset.getValue(0).intValue() == 12);
-        assertTrue(pieDataset.getValue(1).intValue() == 22);
+        assertEquals(12, pieDataset.getValue(0).intValue());
+        assertEquals(22, pieDataset.getValue(1).intValue());
     }
 
     @Test
@@ -81,12 +82,12 @@ class TablePieDatasetBuilderTest extends AbstractMacroContentTableBlockDataSourc
 
         PieDataset pieDataset = (PieDataset) dataset;
 
-        assertTrue(pieDataset.getKey(0).equals(" column 2 "));
-        assertTrue(pieDataset.getKey(1).equals(" column 3 "));
-        assertTrue(pieDataset.getKey(2).equals(" column 4"));
+        assertEquals(" column 2 ", pieDataset.getKey(0));
+        assertEquals(" column 3 ", pieDataset.getKey(1));
+        assertEquals(" column 4", pieDataset.getKey(2));
 
-        assertTrue(pieDataset.getValue(0).intValue() == 12);
-        assertTrue(pieDataset.getValue(1).intValue() == 13);
-        assertTrue(pieDataset.getValue(2).intValue() == 14);
+        assertEquals(12, pieDataset.getValue(0).intValue());
+        assertEquals(13, pieDataset.getValue(1).intValue());
+        assertEquals(14, pieDataset.getValue(2).intValue());
     }
 }

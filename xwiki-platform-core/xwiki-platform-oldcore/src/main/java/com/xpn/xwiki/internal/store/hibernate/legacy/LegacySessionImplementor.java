@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.logging.LoggerConfiguration;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 
 /**
@@ -48,7 +47,7 @@ import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 @Deprecated
 public class LegacySessionImplementor extends SessionDelegatorBaseImpl
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LegacySessionImplementor.class);
 
     private static final String LEGACY_ORDINAL_PARAMS_PREFIX =
         QueryTranslator.ERROR_LEGACY_ORDINAL_PARAMS_NO_LONGER_SUPPORTED.substring(0, 115);

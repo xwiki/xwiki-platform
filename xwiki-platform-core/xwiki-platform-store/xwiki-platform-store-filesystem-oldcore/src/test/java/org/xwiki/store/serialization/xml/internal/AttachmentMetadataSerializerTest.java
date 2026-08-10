@@ -38,16 +38,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class AttachmentMetadataSerializerTest
 {
-    private static final String TEST_CONTENT =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-      + "<attachment serializer=\"attachment-meta/1.0\">\n"
-      + " <filename>file1</filename>\n"
-      + " <filesize>10</filesize>\n"
-      + " <author>me</author>\n"
-      + " <version>1.1</version>\n"
-      + " <comment>something whitty</comment>\n"
-      + " <date>1293045632168</date>\n"
-      + "</attachment>";
+    private static final String TEST_CONTENT = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <attachment serializer="attachment-meta/1.0">
+         <filename>file1</filename>
+         <filesize>10</filesize>
+         <author>me</author>
+         <version>1.1</version>
+         <comment>something whitty</comment>
+         <date>1293045632168</date>
+        </attachment>""";
 
     private AttachmentMetadataSerializer serializer;
 

@@ -40,7 +40,6 @@ import javax.script.ScriptContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
@@ -90,7 +89,8 @@ public class SaveAction extends EditAction
     protected static final String ASYNC_PARAM = "async";
 
     /** Logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SaveAction.class);
+    @Inject
+    private Logger logger;
 
     /**
      * The key used to store the JSON answer for the save action on the XWiki context.
@@ -138,7 +138,7 @@ public class SaveAction extends EditAction
      * @param context The current request {@link XWikiContext context}.
      * @return <code>true</code> if there was an error and the response needs to render an error page,
      *         <code>false</code> if the document was correctly saved.
-     * @throws XWikiException If an error occured: cannot communicate with the storage module, or cannot update the
+     * @throws XWikiException If an error occurred: cannot communicate with the storage module, or cannot update the
      *             document because the request contains invalid parameters.
      */
     public boolean save(XWikiContext context) throws XWikiException
@@ -393,7 +393,7 @@ public class SaveAction extends EditAction
                 try {
                     customValue = URLDecoder.decode(customValue, request.getCharacterEncoding());
                 } catch (UnsupportedEncodingException e) {
-                    LOGGER.error("Error while decoding a custom value decision.", e);
+                    this.logger.error("Error while decoding a custom value decision.", e);
                 }
                 customChoicesMap.put(conflictReference, customValue);
             }

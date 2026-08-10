@@ -139,8 +139,8 @@ public class WikiDescriptorMigrator extends AbstractHibernateDataMigration
             xwiki.saveDocument(document, "[UPGRADE] Set a default pretty name.", context);
         } catch (XWikiException e) {
             logger.warn("Failed to get or save the wiki descriptor document [{}]. You will not see the"
-                    + " corresponding wiki in the Wiki Index unless you give it a Pretty Name manually. {}",
-                    documentName, ExceptionUtils.getRootCauseMessage(e));
+                    + " corresponding wiki in the Wiki Index unless you give it a Pretty Name manually."
+                    + " Root cause is [{}]", documentName, ExceptionUtils.getRootCauseMessage(e));
         }
     }
 }

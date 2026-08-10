@@ -18,19 +18,25 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { createLinkSuggestor } from "../../linkSuggest";
-import { translations } from "../../translations";
-import LinkConfig from "../LinkConfig.vue";
-import SearchBox from "../SearchBox.vue";
+import { translations } from "../translations";
 import { filterMap, tryFallible } from "@xwiki/platform-fn-utils";
 import { CIcon, Size } from "@xwiki/platform-icons";
+import {
+  LinkConfig,
+  SearchBox,
+  createLinkSuggestor,
+} from "@xwiki/platform-link-modal-ui";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { EntityType } from "@xwiki/platform-model-api";
 import { inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import type { LinkAttachmentConfig, LinkData } from "../../data/linkType";
-import type { LinkEditionContext, LinkSuggestion } from "../../linkSuggest";
-import type { SearchLinkSuggestor } from "../SearchBox.vue";
+import type { LinkAttachmentConfig } from "../data/linkType";
+import type { LinkData } from "@xwiki/platform-link-modal-api";
+import type {
+  LinkEditionContext,
+  LinkSuggestion,
+  SearchLinkSuggestor,
+} from "@xwiki/platform-link-modal-ui";
 import type { AttachmentReference } from "@xwiki/platform-model-api";
 
 defineProps<{ linkData: LinkData }>();

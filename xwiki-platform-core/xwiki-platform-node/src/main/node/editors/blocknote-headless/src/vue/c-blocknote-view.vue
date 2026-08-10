@@ -19,8 +19,13 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
+import { resolverPromise } from "@xwiki/platform-component-manager-default";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
-import { LinkModal, parseLinkTarget } from "@xwiki/platform-link-modal-ui";
+import {
+  LinkModal,
+  parseLinkTarget,
+  serializeLinkTarget,
+} from "@xwiki/platform-link-modal-ui";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
@@ -31,6 +36,7 @@ import {
   shallowRef,
   toRaw,
   useTemplateRef,
+  watch,
 } from "vue";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type {
@@ -144,18 +150,12 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
 };
 
-const submitEditedLink = ({
-  displayText,
-  target: { type, config },
-}: LinkData) => {
-  // TODO: support
-
-  const url =
-    type === "url"
-      ? config.url
-      : type === "email"
-        ? `mailto:${config.address}`
-        : remoteURLSerializer.serialize(config.ref!)!;
+const submitEditedLink = async ({ displayText, target }: LinkData) => {
+  const resolver = await resolverPromise;
+  const url = await serializeLinkTarget(target, resolver, {
+    remoteURLParser,
+    remoteURLSerializer,
+  });
 
   editingLink.value?.onSubmit({
     title: displayText,
@@ -171,6 +171,31 @@ const linkModalContainer = useTemplateRef<HTMLElement>("link-modal-container");
 const mountedBlockNote = ref<{ unmount: () => void }>();
 
 const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
+
+// `parseLinkTarget` is asynchronous (it resolves the registered link target type extensions from the shared
+// component manager), so unlike `editingLink` it cannot be computed directly in the template.
+const currentLinkData = shallowRef<LinkData | null>(null);
+
+watch(editingLink, async (linkProps) => {
+  if (!linkProps) {
+    currentLinkData.value = null;
+    return;
+  }
+
+  const resolver = await resolverPromise;
+  const target = await parseLinkTarget(linkProps.current.url, resolver, {
+    remoteURLParser,
+    remoteURLSerializer,
+  });
+
+  // Guard against a race: only apply the result if `editingLink` hasn't changed again while parsing.
+  if (editingLink.value === linkProps) {
+    currentLinkData.value = {
+      displayText: linkProps.current.title,
+      target,
+    };
+  }
+});
 
 function handleLinkEditorOutsideClick(e: MouseEvent) {
   if (!editingLink.value || !linkModalContainer.value) {
@@ -211,12 +236,9 @@ onUnmounted(() => {
 <template>
   <div ref="blocknote-container" />
 
-  <div ref="link-modal-container" v-if="editingLink">
+  <div ref="link-modal-container" v-if="currentLinkData">
     <LinkModal
-      :current="{
-        displayText: editingLink.current.title,
-        target: parseLinkTarget(editingLink.current.url, remoteURLParser),
-      }"
+      :current="currentLinkData"
       :deps-container="depsContainer"
       @submit="submitEditedLink"
       @cancel="editingLink = null"

@@ -25,6 +25,7 @@ import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.ecs.ConcreteElement;
 import org.apache.ecs.xhtml.input;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
@@ -63,6 +64,18 @@ import com.xpn.xwiki.web.Utils;
 public class PropertyClass extends BaseCollection<ClassPropertyReference>
     implements PropertyClassInterface, Comparable<PropertyClass>
 {
+    /**
+     * The name of the HTML attribute used to provide a text alternative for an edit widget, as an accessibility
+     * fallback for the cases when the widget is not already associated with a visible {@code <label>}.
+     */
+    protected static final String ARIA_LABEL = "aria-label";
+
+    /**
+     * The translation key used to compute the {@link #ARIA_LABEL} fallback value.
+     */
+    protected static final String ARIA_LABEL_TRANSLATION_KEY =
+        "core.model.xclass.editClassProperty.textAlternative";
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -295,6 +308,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setDisabled(isDisabled());
+        setAriaLabelFallback(input, context);
         buffer.append(input.toString());
     }
 
@@ -420,11 +434,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
                 ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("object", new com.xpn.xwiki.api.Object(object, context), ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("type", type, ScriptContext.ENGINE_SCOPE);
-            // This is a text alternative fallback to explain what the input is about. 
-            // If the input has already been labelled in another way, this fallback will be ignored by Assistive Techs.
-            scontext.setAttribute("aria-label",
-                localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
-                    this.getTranslatedPrettyName(context)), ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute(ARIA_LABEL, getAriaLabelFallback(context), ScriptContext.ENGINE_SCOPE);
 
             BaseProperty prop = (BaseProperty) object.safeget(fieldName);
             if (prop != null) {
@@ -652,6 +662,29 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
             return getPrettyName();
         }
         return prettyName;
+    }
+
+    /**
+     * @param context the current context, used to resolve the translation
+     * @return the {@link #ARIA_LABEL} text alternative fallback value for this property's edit widget, to explain
+     *         what it is about. If the widget has already been labelled in another way, this fallback will be
+     *         ignored by Assistive Techs
+     */
+    protected String getAriaLabelFallback(XWikiContext context)
+    {
+        return localizePlainOrKey(ARIA_LABEL_TRANSLATION_KEY, getTranslatedPrettyName(context));
+    }
+
+    /**
+     * Sets the {@link #ARIA_LABEL} text alternative fallback (see {@link #getAriaLabelFallback(XWikiContext)}) on
+     * the given edit widget.
+     *
+     * @param element the edit widget on which to set the fallback
+     * @param context the current context, used to resolve the translation
+     */
+    protected void setAriaLabelFallback(ConcreteElement element, XWikiContext context)
+    {
+        element.addAttribute(ARIA_LABEL, getAriaLabelFallback(context));
     }
 
     @Override

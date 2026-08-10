@@ -141,6 +141,7 @@ public class PasswordClass extends StringClass
         input.setID(prefix + name);
         input.setSize(getSize());
         input.setDisabled(isDisabled());
+        setAriaLabelFallback(input, context);
         buffer.append(input.toString());
     }
 

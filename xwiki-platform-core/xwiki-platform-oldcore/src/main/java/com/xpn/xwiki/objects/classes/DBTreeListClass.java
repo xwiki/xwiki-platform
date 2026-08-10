@@ -350,6 +350,7 @@ public class DBTreeListClass extends DBListClass
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
+        setAriaLabelFallback(select, context);
 
         Map<String, ListItem> map = getMap(context);
         Map<String, List<ListItem>> treemap = getTreeMap(context);

@@ -16,7 +16,7 @@ import { ResourceReference } from '@xwiki/platform-rendering-api';
 // @beta
 export class AttachmentLinkTargetType implements LinkTargetTypeExtension<LinkAttachmentConfig> {
     // (undocumented)
-    component(): Promise<Component>;
+    component(): Component;
     // (undocumented)
     configToReference(input: LinkAttachmentConfig, input2: LinkTargetReferenceContext): ResourceReference | undefined;
     // (undocumented)
@@ -43,7 +43,7 @@ export class ComponentInit {
 // @beta
 export class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailConfig> {
     // (undocumented)
-    component(): Promise<Component>;
+    component(): Component;
     // (undocumented)
     configToReference(input: LinkEmailConfig): ResourceReference | undefined;
     // (undocumented)
@@ -90,7 +90,7 @@ export type LinkUrlConfig = {
 // @beta
 export class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
     // (undocumented)
-    component(): Promise<Component>;
+    component(): Component;
     // (undocumented)
     configToReference(input: LinkPageConfig, input2: LinkTargetReferenceContext): ResourceReference | undefined;
     // (undocumented)
@@ -112,7 +112,7 @@ export class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfi
 // @beta
 export class UrlLinkTargetType implements LinkTargetTypeExtension<LinkUrlConfig> {
     // (undocumented)
-    component(): Promise<Component>;
+    component(): Component;
     // (undocumented)
     configToReference(input: LinkUrlConfig): ResourceReference | undefined;
     // (undocumented)

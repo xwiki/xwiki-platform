@@ -2,8 +2,6 @@
   "link-modal.buttons.submit": "OK",
   "link-modal.buttons.cancel": "Cancel",
 
-  "link-modal.loading": "Loading...",
-
   "link-modal.config.target-type": "Link type",
   "link-modal.config.display-text": "Display text",
   "link-modal.config.options": "Options",

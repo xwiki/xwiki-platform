@@ -58,7 +58,7 @@ function fakeExtension(
     type,
     getLabel: () => label,
     createDefaultConfig: () => ({}),
-    component: async () => component,
+    component: () => component,
     tryParseUrl: () => null,
     serializeUrl: () => "",
   };
@@ -77,36 +77,7 @@ function mountLinkModal(
 }
 
 describe("LinkModal", () => {
-  it("shows a loading state until the registered extensions have resolved", async () => {
-    let resolveEnabled!: (value: boolean) => void;
-    const pendingExtension = fakeExtension(
-      "fake",
-      "Fake",
-      defineComponent({ template: "<div>fake config</div>" }),
-    );
-    // `isEnabled()` is the only remaining async step once extensions are resolved from `depsContainer`
-    // (`container.getAll(...)` itself is synchronous) — delay it to observe the loading state.
-    pendingExtension.isEnabled = () =>
-      new Promise((resolve) => {
-        resolveEnabled = resolve;
-      });
-
-    const wrapper = mountLinkModal(
-      { displayText: "", target: { type: "fake", config: {} } },
-      [pendingExtension],
-    );
-
-    await flushPromises();
-    expect(wrapper.text()).toContain("Loading");
-
-    resolveEnabled(true);
-    await flushPromises();
-
-    expect(wrapper.text()).not.toContain("Loading");
-    expect(wrapper.text()).toContain("fake config");
-  });
-
-  it("renders the configuration component matching the current target's type", async () => {
+  it("renders the configuration component matching the current target's type, on the first render", () => {
     const extensions = [
       fakeExtension(
         "a",
@@ -125,8 +96,8 @@ describe("LinkModal", () => {
       extensions,
     );
 
-    await flushPromises();
-
+    // No `flushPromises()`/`nextTick()` wait: everything resolves synchronously, so the correct component is
+    // already rendered right after `mount()` returns.
     expect(wrapper.text()).toContain("component-b");
     expect(wrapper.text()).not.toContain("component-a");
   });
@@ -153,10 +124,11 @@ describe("LinkModal", () => {
       target: { type: "a", config: {} },
     });
     const wrapper = mountLinkModal(current, extensions);
-    await flushPromises();
     expect(wrapper.text()).toContain("component-a");
 
     current.target = { type: "b", config: {} };
+    // Vue batches and flushes reactive DOM updates on the next tick, even when the underlying computation is
+    // synchronous — this waits for that render, not for any extension/component resolution.
     await flushPromises();
 
     expect(wrapper.text()).toContain("component-b");
@@ -177,7 +149,6 @@ describe("LinkModal", () => {
       target: { type: "a", config: {} },
     };
     const wrapper = mountLinkModal(current, extensions);
-    await flushPromises();
 
     await wrapper.find("[data-test='linkSubmit']").trigger("click");
 

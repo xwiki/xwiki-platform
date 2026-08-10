@@ -134,11 +134,9 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
   createDefaultConfig(): TConfig;
 
   /**
-   * @returns the Vue component rendering this type's fields in the link modal. Loaded lazily (e.g., through a
-   *   dynamic `import()`) so that link target types the user never selects do not increase the initial bundle
-   *   size.
+   * @returns the Vue component rendering this type's fields in the link modal.
    */
-  component(): Promise<Component>;
+  component(): Component;
 
   /**
    * @param url - a raw URL, as found in a link
@@ -192,7 +190,7 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
    *   {@link serializeUrl} are always available regardless of this flag) — this is the supported way to
    *   conditionally hide a link target type (including a built-in one) without un-registering it.
    */
-  isEnabled?(): boolean | Promise<boolean>;
+  isEnabled?(): boolean;
 }
 
 export { linkTargetTypeExtensionRole };

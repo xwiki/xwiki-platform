@@ -19,6 +19,7 @@
  */
 import { typedResourceReference } from "./referenceHelpers";
 import { labelFromTranslations } from "./labels";
+import EmailConfig from "../vue/EmailConfig.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
@@ -44,8 +45,8 @@ class EmailLinkTargetType implements LinkTargetTypeExtension<LinkEmailConfig> {
     return { address: "" };
   }
 
-  async component(): Promise<Component> {
-    return (await import("../vue/EmailConfig.vue")).default;
+  component(): Component {
+    return EmailConfig;
   }
 
   tryParseUrl(url: string): LinkEmailConfig | null {

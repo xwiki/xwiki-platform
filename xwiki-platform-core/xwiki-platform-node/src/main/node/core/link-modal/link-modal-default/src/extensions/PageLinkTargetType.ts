@@ -19,6 +19,7 @@
  */
 import { entityResourceReference, parseEntityReference } from "./referenceHelpers";
 import { labelFromTranslations } from "./labels";
+import PageConfig from "../vue/PageConfig.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
@@ -49,8 +50,8 @@ class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
     return { ref: null };
   }
 
-  async component(): Promise<Component> {
-    return (await import("../vue/PageConfig.vue")).default;
+  component(): Component {
+    return PageConfig;
   }
 
   tryParseUrl(

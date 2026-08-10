@@ -25,7 +25,7 @@ import { createI18n } from "vue-i18n";
 import type {
   LinkData,
   LinkTargetTypeExtension,
-} from "@xwiki/platform-link-modal-api";
+} from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 
 // `LinkModal.vue` resolves domain services, as well as the registered `LinkTargetTypeExtension`s, out of the

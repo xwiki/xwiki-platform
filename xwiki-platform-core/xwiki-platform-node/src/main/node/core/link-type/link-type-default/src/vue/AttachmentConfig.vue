@@ -30,18 +30,18 @@ import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { EntityType } from "@xwiki/platform-model-api";
 import { inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import type { LinkPageConfig } from "../data/linkType";
-import type { LinkData } from "@xwiki/platform-link-modal-api";
+import type { LinkAttachmentConfig } from "../data/linkType";
 import type {
   LinkEditionContext,
   LinkSuggestion,
   SearchLinkSuggestor,
 } from "@xwiki/platform-link-modal-ui";
-import type { DocumentReference } from "@xwiki/platform-model-api";
+import type { LinkData } from "@xwiki/platform-link-type-api";
+import type { AttachmentReference } from "@xwiki/platform-model-api";
 
 defineProps<{ linkData: LinkData }>();
 
-const model = defineModel<LinkPageConfig>({
+const model = defineModel<LinkAttachmentConfig>({
   required: true,
 });
 
@@ -49,7 +49,7 @@ const linkEditionCtx = inject<LinkEditionContext>("linkEditionCtx")!;
 const linkSuggestor = createLinkSuggestor(linkEditionCtx);
 
 const getSuggestions: SearchLinkSuggestor<
-  DocumentReference,
+  AttachmentReference,
   LinkSuggestion
 > = async (query) => {
   if (!linkSuggestor) {
@@ -57,17 +57,19 @@ const getSuggestions: SearchLinkSuggestor<
   }
 
   return filterMap(
-    await linkSuggestor({ query, type: LinkType.PAGE }),
+    await linkSuggestor({ query, type: LinkType.ATTACHMENT }),
     (result) => {
-      if (result.type !== LinkType.PAGE) {
+      if (result.type !== LinkType.ATTACHMENT) {
         return null;
       }
 
       const ref = tryFallible(() =>
-        linkEditionCtx.modelReferenceParser.parse(result.reference),
+        linkEditionCtx.modelReferenceParser.parse(result.reference, {
+          type: EntityType.ATTACHMENT,
+        }),
       );
 
-      if (ref?.type !== EntityType.DOCUMENT) {
+      if (ref?.type !== EntityType.ATTACHMENT) {
         return null;
       }
 
@@ -81,16 +83,18 @@ const getSuggestions: SearchLinkSuggestor<
   );
 };
 
-function submit(ref: DocumentReference) {
-  model.value = { ref, anchor: undefined, queryString: undefined };
+function submit(ref: AttachmentReference) {
+  model.value = { ref, queryString: undefined };
 }
 
 function trySelectRaw(query: string): boolean {
   const ref = tryFallible(() =>
-    linkEditionCtx.modelReferenceParser.parse(query),
+    linkEditionCtx.modelReferenceParser.parse(query, {
+      type: EntityType.ATTACHMENT,
+    }),
   );
 
-  if (ref?.type !== EntityType.DOCUMENT) {
+  if (ref?.type !== EntityType.ATTACHMENT) {
     return false;
   }
 
@@ -110,7 +114,7 @@ watch(query, async (query) => {
   }
 
   loadingSuggestions.value = true;
-  suggestions.value = await linkSuggestor({ query, type: LinkType.PAGE });
+  suggestions.value = await linkSuggestor({ query, type: LinkType.ATTACHMENT });
   loadingSuggestions.value = false;
 });
 </script>
@@ -119,8 +123,8 @@ watch(query, async (query) => {
   <link-config :link-data>
     <template #config>
       <search-box
-        v-bind="{ 'data-test': 'linkPageReference' }"
-        :label="t('link-modal.target-types.page.reference')"
+        v-bind="{ 'data-test': 'linkAttachmentReference' }"
+        :label="t('link-type.target-types.attachment.reference')"
         :initial-value="
           model.ref !== null
             ? linkEditionCtx.modelReferenceSerializer.serialize(model.ref)!
@@ -130,10 +134,14 @@ watch(query, async (query) => {
         @select="submit"
         :try-submit-raw="trySelectRaw"
       >
-        <template #renderSuggestion="{ renderingData: { title, segments } }">
+        <template
+          #renderSuggestion="{ renderingData: { reference, title, segments } }"
+        >
           <div class="suggestion-label">
             <c-icon name="file-earmark" :size="Size.Small" />
-            <span class="suggestion-title">{{ title }}</span>
+            <span class="suggestion-title">
+              {{ reference.substring(reference.lastIndexOf("@") + 1) }}
+            </span>
           </div>
           <div class="suggestion-hint">
             <!-- TODO: 'WebHome' is treated as a special hardcoded value for now, until https://jira.xwiki.org/browse/XWIKI-24366 -->
@@ -153,15 +161,9 @@ watch(query, async (query) => {
 
     <template #options>
       <x-text-field
-        v-bind="{ 'data-test': 'linkPageQueryString' }"
-        :label="t('link-modal.target-types.page.query-string')"
+        v-bind="{ 'data-test': 'linkAttachmentQueryString' }"
+        :label="t('link-type.target-types.attachment.query-string')"
         v-model="model.queryString"
-      />
-
-      <x-text-field
-        v-bind="{ 'data-test': 'linkPageAnchor' }"
-        :label="t('link-modal.target-types.page.anchor')"
-        v-model="model.anchor"
       />
     </template>
   </link-config>
@@ -170,10 +172,10 @@ watch(query, async (query) => {
 <style scoped>
 .segment {
   color: var(--cr-color-neutral-500);
-  padding-right: var(--cr-spacing-x-small);
+  padding-right: 0.5rem;
 
   &:not(:last-child)::after {
-    padding-left: var(--cr-spacing-x-small);
+    padding-left: 0.5rem;
     content: ">";
   }
 }

@@ -44,8 +44,8 @@ import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
-import { ComponentInit as LinkModalDefaultsComponentInit } from "@xwiki/platform-link-modal-default";
 import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
+import { ComponentInit as LinkTypeDefaultsComponentInit } from "@xwiki/platform-link-type-default";
 import { ComponentInit as MarkdownSyntaxConfig } from "@xwiki/platform-markdown-syntax-config";
 import { ComponentInit as MinimalSyntaxConfig } from "@xwiki/platform-minimal-syntax-config";
 import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
@@ -88,7 +88,7 @@ new DefaultAttachmentsComponentInit(container);
 new CollaborationComponentList(container);
 new XWikiCollaborationComponentList(container);
 new LinkSuggestXWikiComponentList(container);
-new LinkModalDefaultsComponentInit(container);
+new LinkTypeDefaultsComponentInit(container);
 
 DefaultBlockNoteIterator.bind(container);
 XWikiBlockNoteProcessor.bind(container);

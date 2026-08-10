@@ -21,10 +21,10 @@
 import { createLinkEditionContext } from "../linkSuggest.js";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
-import { listEnabledLinkTargetTypeExtensions } from "@xwiki/platform-link-modal-api";
+import { listEnabledLinkTargetTypeExtensions } from "@xwiki/platform-link-type-api";
 import { computed, markRaw, provide } from "vue";
 import { useI18n } from "vue-i18n";
-import type { LinkData } from "@xwiki/platform-link-modal-api";
+import type { LinkData } from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 
 const props = defineProps<{

@@ -76,7 +76,7 @@ type LinkSuggestor = (params: {
  * Link edition context
  *
  * Contains various services needed by multiple components, avoids duplication. Exposed so that link target type
- * extensions defined in other packages (e.g., `@xwiki/platform-link-modal-default`) can access these services
+ * extensions defined in other packages (e.g., `@xwiki/platform-link-type-default`) can access these services
  * from their own configuration component via `inject("linkEditionCtx")`.
  *
  * @since 18.7.0RC1

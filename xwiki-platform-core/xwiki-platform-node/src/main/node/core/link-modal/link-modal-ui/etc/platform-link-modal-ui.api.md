@@ -16,26 +16,15 @@ import { DefineComponent } from 'vue';
 import { DocumentService } from '@xwiki/platform-document-api';
 import { GlobalComponents } from 'vue';
 import { GlobalDirectives } from 'vue';
-import { LinkData } from '@xwiki/platform-link-modal-api';
+import { LinkData } from '@xwiki/platform-link-type-api';
 import { LinkSuggestService } from '@xwiki/platform-link-suggest-api';
-import { LinkTarget } from '@xwiki/platform-link-modal-api';
-import { LinkTargetReferenceContext } from '@xwiki/platform-link-modal-api';
-import { linkTargetToResourceReference } from '@xwiki/platform-link-modal-api';
-import { LinkTargetTypeExtension } from '@xwiki/platform-link-modal-api';
-import { linkTargetTypeExtensionRole } from '@xwiki/platform-link-modal-api';
-import { LinkTargetUrlContext } from '@xwiki/platform-link-modal-api';
 import { LinkType } from '@xwiki/platform-link-suggest-api';
-import { listEnabledLinkTargetTypeExtensions } from '@xwiki/platform-link-modal-api';
-import { listLinkTargetTypeExtensions } from '@xwiki/platform-link-modal-api';
 import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
-import { parseLinkTarget } from '@xwiki/platform-link-modal-api';
 import { PublicProps } from 'vue';
 import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
 import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
-import { resourceReferenceToLinkTarget } from '@xwiki/platform-link-modal-api';
-import { serializeLinkTarget } from '@xwiki/platform-link-modal-api';
 import { ShallowUnwrapRef } from 'vue';
 import { VNode } from 'vue';
 import { VNodeProps } from 'vue';
@@ -71,8 +60,6 @@ linkData: LinkData;
         options(): void;
     };
 });
-
-export { LinkData }
 
 // @beta
 export type LinkEditionContext = {
@@ -116,26 +103,6 @@ export type LinkSuggestor = (params: {
     type?: LinkType;
 }) => Promise<LinkSuggestion[]>;
 
-export { LinkTarget }
-
-export { LinkTargetReferenceContext }
-
-export { linkTargetToResourceReference }
-
-export { LinkTargetTypeExtension }
-
-export { linkTargetTypeExtensionRole }
-
-export { LinkTargetUrlContext }
-
-export { listEnabledLinkTargetTypeExtensions }
-
-export { listLinkTargetTypeExtensions }
-
-export { parseLinkTarget }
-
-export { resourceReferenceToLinkTarget }
-
 // @beta
 export const SearchBox: <T, U>(__VLS_props: NonNullable<Awaited<typeof __VLS_setup>>["props"], __VLS_ctx?: {
     slots: Readonly<{
@@ -176,8 +143,6 @@ export type SearchLinkSuggestion<T, U> = {
 
 // @beta (undocumented)
 export type SearchLinkSuggestor<T, U> = (query: string) => Promise<SearchLinkSuggestion<T, U>[] | false>;
-
-export { serializeLinkTarget }
 
 // (No @packageDocumentation comment for this package)
 

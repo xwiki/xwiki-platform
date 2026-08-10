@@ -19,52 +19,50 @@
  */
 import { entityResourceReference, parseEntityReference } from "./referenceHelpers";
 import { labelFromTranslations } from "./labels";
-import PageConfig from "../vue/PageConfig.vue";
+import AttachmentConfig from "../vue/AttachmentConfig.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";
 import { ResourceType } from "@xwiki/platform-rendering-api";
 import { injectable } from "inversify";
-import type { LinkPageConfig } from "../data/linkType";
+import type { LinkAttachmentConfig } from "../data/linkType";
 import type {
   LinkTargetReferenceContext,
   LinkTargetTypeExtension,
   LinkTargetUrlContext,
-} from "@xwiki/platform-link-modal-api";
+} from "@xwiki/platform-link-type-api";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { Component } from "vue";
 
 /**
- * Built-in link target type for links to an internal wiki page.
+ * Built-in link target type for links to an attachment.
  *
  * @since 18.7.0RC1
  * @beta
  */
 @injectable()
-class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
-  readonly type = "page";
-  readonly order = 0;
+class AttachmentLinkTargetType
+  implements LinkTargetTypeExtension<LinkAttachmentConfig>
+{
+  readonly type = "attachment";
+  readonly order = 100;
 
-  getLabel = labelFromTranslations("link-modal.target-types.page.label");
+  getLabel = labelFromTranslations("link-type.target-types.attachment.label");
 
-  createDefaultConfig(): LinkPageConfig {
+  createDefaultConfig(): LinkAttachmentConfig {
     return { ref: null };
   }
 
   component(): Component {
-    return PageConfig;
+    return AttachmentConfig;
   }
 
   tryParseUrl(
     url: string,
     { remoteURLParser }: LinkTargetUrlContext,
-  ): LinkPageConfig | null {
-    if (url.trim() === "") {
-      return { ref: null };
-    }
-
+  ): LinkAttachmentConfig | null {
     const ref = tryFallible(() => remoteURLParser.parse(url));
 
-    if (ref?.type !== EntityType.DOCUMENT) {
+    if (ref?.type !== EntityType.ATTACHMENT) {
       return null;
     }
 
@@ -72,47 +70,46 @@ class PageLinkTargetType implements LinkTargetTypeExtension<LinkPageConfig> {
 
     return {
       ref,
-      anchor: parsedUrl?.hash,
       queryString: parsedUrl?.search,
     };
   }
 
   serializeUrl(
-    { ref, queryString, anchor }: LinkPageConfig,
+    { ref, queryString }: LinkAttachmentConfig,
     { remoteURLSerializer }: LinkTargetUrlContext,
   ): string {
     const base = remoteURLSerializer.serialize(ref ?? undefined);
 
-    return `${base ?? ""}${queryString ?? ""}${anchor ?? ""}`;
+    return `${base ?? ""}${queryString ?? ""}`;
   }
 
   tryParseReference(
     reference: ResourceReference,
     { modelReferenceParser }: LinkTargetReferenceContext,
-  ): LinkPageConfig | null {
-    if (reference.type !== ResourceType.DOCUMENT) {
+  ): LinkAttachmentConfig | null {
+    if (reference.type !== ResourceType.ATTACHMENT) {
       return null;
     }
 
     const ref = parseEntityReference(
       reference.reference,
-      EntityType.DOCUMENT,
+      EntityType.ATTACHMENT,
       modelReferenceParser,
     );
 
-    return ref?.type === EntityType.DOCUMENT ? { ref } : null;
+    return ref?.type === EntityType.ATTACHMENT ? { ref } : null;
   }
 
   configToReference(
-    { ref }: LinkPageConfig,
+    { ref }: LinkAttachmentConfig,
     { modelReferenceSerializer }: LinkTargetReferenceContext,
   ): ResourceReference | undefined {
     return entityResourceReference(
-      ResourceType.DOCUMENT,
+      ResourceType.ATTACHMENT,
       ref,
       modelReferenceSerializer,
     );
   }
 }
 
-export { PageLinkTargetType };
+export { AttachmentLinkTargetType };

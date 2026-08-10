@@ -324,9 +324,6 @@ $xwiki.getUserName("xwiki:${username}")
       ## The name isn't visible, so give the avatar a native tooltip instead - and hide it from assistive
       ## technologies since it now carries a tooltip duplicating the name; without this, some screen readers
       ## announce the name a second time on hover (see XWIKI-23710).
-      ## Also drop the spacing that "${type}-avatar" normally reserves for a visible name next to it: with no
-      ## visible name, that margin is invisible but still widens the link's box past the avatar image, which
-      ## e.g. throws off the browser's native focus ring around the link (see XWIKI-23710).
       #set ($avatarClass = "$avatarClass icon-only")
       #set ($avatarExtraAttributes = " title=""$escapedUserName"" aria-hidden=""true""")
       #set ($accessibleUserName = $escapedUserName)

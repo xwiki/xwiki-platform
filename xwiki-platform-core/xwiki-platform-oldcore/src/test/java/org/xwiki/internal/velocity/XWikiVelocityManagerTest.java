@@ -71,7 +71,7 @@ import static org.mockito.Mockito.when;
     DefaultLoggerConfiguration.class
 })
 @OldcoreTest
-public class XWikiVelocityManagerTest
+class XWikiVelocityManagerTest
 {
     private static final DocumentReference TEMPLATE_DOCUMENT = new DocumentReference("xwiki", "XWiki", "TestMacros");
 

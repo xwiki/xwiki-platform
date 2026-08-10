@@ -58,6 +58,15 @@ interface LiveDataSource {
    * @returns a promise that completes when the values are updated
    */
   updateEntry(source: Source, entryId: string, values: unknown): Promise<void>;
+
+  /**
+   * Create a new entry from the given values.
+   * @param source - the source description
+   * @param values - the values of the new entry
+   * @returns a promise that completes when the entry is created
+   * @since 18.7.0RC1
+   */
+  addEntry(source: Source, values: unknown): Promise<void>;
 }
 
 export type { LiveDataSource };

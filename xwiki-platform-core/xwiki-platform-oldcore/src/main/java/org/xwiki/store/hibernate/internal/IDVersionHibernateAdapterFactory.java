@@ -116,7 +116,7 @@ public class IDVersionHibernateAdapterFactory implements HibernateAdapterFactory
                 try {
                     adapter = this.componentManager.getInstance(HibernateAdapter.class, roleHint);
                 } catch (ComponentLookupException e) {
-                    throw new HibernateException("Failed to initialize the adapater", e);
+                    throw new HibernateException("Failed to initialize the adapter", e);
                 }
             }
         }

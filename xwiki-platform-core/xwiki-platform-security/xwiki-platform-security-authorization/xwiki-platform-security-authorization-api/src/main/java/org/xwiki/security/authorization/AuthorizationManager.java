@@ -132,5 +132,5 @@ public interface AuthorizationManager
      */
     default void unregister(Right right) throws AuthorizationException
     {
-    };
+    }
 }

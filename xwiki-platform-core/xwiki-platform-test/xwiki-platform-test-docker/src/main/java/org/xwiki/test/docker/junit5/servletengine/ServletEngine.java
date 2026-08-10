@@ -45,11 +45,6 @@ public enum ServletEngine
     JETTY_STANDALONE,
 
     /**
-     * Represents the JBoss Wildfly engine.
-     */
-    WILDFLY("jboss/wildfly"),
-
-    /**
      * Represents an external Servlet Engine already configured and running (we won't start or stop it).
      */
     EXTERNAL;
@@ -108,8 +103,6 @@ public enum ServletEngine
             return "/var/lib/jetty/xwiki-data";
         } else if ("TOMCAT".equals(name())) {
             return "/usr/local/tomcat/xwiki-data";
-        } else if ("WILDFLY".equals(name())) {
-            return "/opt/jboss/xwiki-data";
         } else {
             throw new RuntimeException(String.format("Permanent directory not supported for [%s]", name()));
         }

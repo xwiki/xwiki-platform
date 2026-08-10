@@ -118,8 +118,8 @@ public class DefaultImageProcessor implements ImageProcessor
     protected int getBestImageTypeFor(Image image)
     {
         int imageType = BufferedImage.TYPE_4BYTE_ABGR;
-        if (image instanceof BufferedImage) {
-            imageType = ((BufferedImage) image).getType();
+        if (image instanceof BufferedImage bufferedImage) {
+            imageType = bufferedImage.getType();
             if (imageType == BufferedImage.TYPE_BYTE_INDEXED || imageType == BufferedImage.TYPE_BYTE_BINARY
                 || imageType == BufferedImage.TYPE_CUSTOM) {
                 // INDEXED and BINARY: GIFs or indexed PNGs may lose their transparent bits, for safety revert to ABGR.

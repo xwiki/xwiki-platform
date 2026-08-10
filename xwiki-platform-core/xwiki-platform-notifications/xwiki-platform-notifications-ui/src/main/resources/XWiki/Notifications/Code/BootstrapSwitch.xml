@@ -171,7 +171,7 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
     return this.bootstrapSwitchOrig.apply(this, arguments);
   };
 
-  // Copy data (such as default configuration, costructor) from the original Bootstrap Switch function.
+  // Copy data (such as default configuration, constructor) from the original Bootstrap Switch function.
   $.extend($.fn.bootstrapSwitch, $.fn.bootstrapSwitchOrig);
 
   [

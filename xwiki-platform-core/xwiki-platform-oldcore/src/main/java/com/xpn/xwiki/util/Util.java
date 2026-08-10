@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.oro.text.PatternCache;
 import org.apache.oro.text.PatternCacheLRU;
 import org.apache.oro.text.perl.Perl5Util;
@@ -727,12 +728,8 @@ public class Util
      */
     public static boolean isValidXMLElementName(String elementName)
     {
-        if (elementName == null || elementName.isEmpty() || elementName.matches("(?i)^(xml).*")
-            || !elementName.matches("(^[a-zA-Z\\_]+[\\w\\.\\-]*$)")) {
-            return false;
-        }
-
-        return true;
+        return elementName != null && !elementName.isEmpty() && !elementName.matches("(?i)^(xml).*")
+            && elementName.matches("(^[a-zA-Z\\_]+[\\w\\.\\-]*$)");
     }
 
     /**
@@ -845,7 +842,8 @@ public class Util
             l.getISO3Language();
             return result;
         } catch (MissingResourceException ex) {
-            LOGGER.warn("Invalid language: " + languageCode);
+            LOGGER.warn("Invalid language [{}]. Root cause is [{}]", languageCode,
+                ExceptionUtils.getRootCauseMessage(ex));
         }
         return defaultLanguage;
     }

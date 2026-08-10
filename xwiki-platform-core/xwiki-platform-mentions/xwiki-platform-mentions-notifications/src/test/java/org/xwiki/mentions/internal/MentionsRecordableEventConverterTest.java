@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
  * @since 12.5RC1
  */
 @ComponentTest
-public class MentionsRecordableEventConverterTest
+class MentionsRecordableEventConverterTest
 {
     @InjectMockComponents
     private MentionsRecordableEventConverter converter;

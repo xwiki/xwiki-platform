@@ -155,8 +155,8 @@ public class ExhaustiveCheckTagsSelector extends AbstractTagsSelector
                 .createQuery(hql, Query.HQL)
                 .addFilter(this.hiddenDocumentQueryFilter);
             if (parameters != null) {
-                if (parameters instanceof Map) {
-                    query.bindValues((Map) parameters);
+                if (parameters instanceof Map map) {
+                    query.bindValues(map);
                 } else {
                     query.bindValues((List) parameters);
                 }

@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Actualizar LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Arrastrar y soltar para cambiar el orden
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Borrar
 platform.appwithinminutes.liveTableEditorAddColumnHint=Añadir columna seleccionada
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Algunas columnas están obsoletas, probablemente porque se han eliminado los campos de aplicación correspondientes. ¿Quiere eliminarlas? &lt;a href=""&gt;Sí &lt;/a&gt; / &lt;a href=""&gt;No &lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Algunas columnas están obsoletas, probablemente porque se han eliminado los campos de aplicación correspondientes. ¿Quiere eliminarlas?
 platform.appwithinminutes.liveTableEditorIcon=Icono
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=El icono de la aplicación. Puede seleccionar un icono del selector de iconos o puede hacer referencia a una imagen adjunta.
 
@@ -266,5 +266,9 @@ platform.appwithinminutes.wizardStep3Description=Personalizar la página de inic
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Nombre de aplicación
 appWithinMinutes.classEditor.title={0} Estructura
-appWithinMinutes.templateProviderEditor.title={0} Entradas</content>
+appWithinMinutes.templateProviderEditor.title={0} Entradas
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Algunas columnas están obsoletas, probablemente porque se han eliminado los campos de aplicación correspondientes. ¿Quiere eliminarlas? &lt;a href=""&gt;Sí &lt;/a&gt; / &lt;a href=""&gt;No &lt;/a&gt;</content>
 </xwikidoc>

@@ -44,10 +44,10 @@ import static org.mockito.Mockito.when;
  * @since 11.8RC1
  * @version $Id$
  */
-public class MergeDocumentResultTest
+class MergeDocumentResultTest
 {
     @Test
-    public void putMergeResult()
+    void putMergeResult()
     {
         MergeDocumentResult mergeDocumentResult = new MergeDocumentResult(null, null, null);
         assertFalse(mergeDocumentResult.isModified());
@@ -122,7 +122,7 @@ public class MergeDocumentResultTest
     }
 
     @Test
-    public void putMergeResultTwice()
+    void putMergeResultTwice()
     {
         MergeDocumentResult mergeDocumentResult = new MergeDocumentResult(null, null, null);
         assertNull(mergeDocumentResult.getMergeResult(MergeDocumentResult.DocumentPart.CONTENT));

@@ -31,13 +31,13 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.Extension;
-import org.xwiki.test.docker.junit5.SolrMode;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
 import org.xwiki.tool.extension.ExtensionOverride;
 
@@ -94,6 +94,8 @@ public class UITestTestConfigurationResolver
 
     private static final String SAVEDBDATA_PROPERTY = "xwiki.test.ui.saveDatabaseData";
 
+    private static final String TESTEXTENSIONREPOSITORY_PROPERTY = "xwiki.test.ui.testExtensionRepository";
+
     private static final String SAVEPERMANENTDIRECTORY_PROPERTY = "xwiki.test.ui.savePermanentDirectoryData";
 
     private static final String SERVLET_ENGINE_NETWORK_ALIASES_PROPERTY = "xwiki.test.ui.servletEngineNetworkAliases";
@@ -133,6 +135,8 @@ public class UITestTestConfigurationResolver
         configuration.setForbiddenServletEngines(resolveForbiddenServletEngines(uiTestAnnotation.forbiddenEngines()));
         configuration.setDatabaseCommands(resolveDatabaseCommands(uiTestAnnotation.databaseCommands()));
         configuration.setSaveDatabaseData(resolveSaveDatabaseData(uiTestAnnotation.saveDatabaseData()));
+        configuration.setTestExtensionRepository(
+            resolve(uiTestAnnotation.testExtensionRepository(), TESTEXTENSIONREPOSITORY_PROPERTY));
         configuration.setSavePermanentDirectoryData(
             resolveSavePermanentDirectoryData(uiTestAnnotation.savePermanentDirectoryData()));
         configuration.setServletEngineNetworkAliases(resolveCommaSeparatedValues(
@@ -219,14 +223,7 @@ public class UITestTestConfigurationResolver
 
     private boolean resolveVerbose(boolean verbose)
     {
-        boolean isVerbose;
-        // Always display verbose logs for debugging when inside a container.
-        if (DockerTestUtils.isInAContainer()) {
-            isVerbose = true;
-        } else {
-            isVerbose = resolve(verbose, VERBOSE_PROPERTY);
-        }
-        return isVerbose;
+        return resolve(verbose, VERBOSE_PROPERTY);
     }
 
     private boolean resolveDebug(boolean debug)

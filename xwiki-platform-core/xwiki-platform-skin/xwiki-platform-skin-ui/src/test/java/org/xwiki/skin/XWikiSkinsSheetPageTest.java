@@ -35,7 +35,6 @@ import org.xwiki.edit.internal.DefaultEditorDescriptorBuilder;
 import org.xwiki.edit.internal.DefaultEditorManager;
 import org.xwiki.edit.internal.PureTextSyntaxContentEditor;
 import org.xwiki.icon.IconManagerScriptService;
-import org.xwiki.localization.macro.internal.TranslationMacro;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;

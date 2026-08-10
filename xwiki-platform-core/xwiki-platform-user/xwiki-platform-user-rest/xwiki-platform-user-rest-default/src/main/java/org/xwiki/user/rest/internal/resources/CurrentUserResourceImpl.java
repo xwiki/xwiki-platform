@@ -24,6 +24,10 @@ import java.net.URI;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Response;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -31,16 +35,11 @@ import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.user.rest.internal.UserReferenceModelSerializer;
 import org.xwiki.user.rest.model.jaxb.User;
 import org.xwiki.user.rest.resources.CurrentUserResource;
 
 import com.xpn.xwiki.XWikiException;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
 
 /**
  * @since 18.2.0RC1
@@ -53,9 +52,6 @@ public class CurrentUserResourceImpl extends XWikiResource implements CurrentUse
     @Inject
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
-
-    @Inject
-    private UserReferenceSerializer<String> stringUserReferenceSerializer;
 
     @Inject
     private Provider<UserReferenceModelSerializer> userReferenceModelSerializerProvider;
@@ -72,16 +68,15 @@ public class CurrentUserResourceImpl extends XWikiResource implements CurrentUse
         UserReferenceModelSerializer userReferenceModelSerializer = this.userReferenceModelSerializerProvider.get();
         if (userReferenceModelSerializer == null) {
             throw new ServerErrorException(Response.status(Response.Status.NOT_IMPLEMENTED).entity(
-                this.contextualLocalizationManager.getTranslationPlain(
-                    "rest.exception.userResource.unsupportedStore")).build());
+                this.contextualLocalizationManager.getTranslationPlain("rest.exception.userResource.unsupportedStore"))
+                .build());
         }
 
         DocumentReference userDocumentReference = getXWikiContext().getUserReference();
         try {
             UserReference userReference = this.userReferenceResolver.resolve(userDocumentReference);
 
-            return userReferenceModelSerializer.toRestUser(baseUri,
-                this.stringUserReferenceSerializer.serialize(userReference), userReference, preferences);
+            return userReferenceModelSerializer.toRestUser(baseUri, userReference, preferences);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

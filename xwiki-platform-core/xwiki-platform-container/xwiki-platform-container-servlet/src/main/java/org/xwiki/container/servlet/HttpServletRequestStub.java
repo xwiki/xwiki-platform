@@ -279,7 +279,7 @@ public class HttpServletRequestStub implements HttpServletRequest
     {
         Map<String, String[]> clone;
         if (map != null) {
-            clone = new LinkedHashMap<>(map.size());
+            clone = LinkedHashMap.newLinkedHashMap(map.size());
             for (Map.Entry<String, String[]> entry : map.entrySet()) {
                 clone.put(entry.getKey(), entry.getValue().clone());
             }
@@ -297,7 +297,7 @@ public class HttpServletRequestStub implements HttpServletRequest
         }
 
         return headers.entrySet().stream().filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
-            .map(entry -> Map.entry(entry.getKey(), entry.getValue().stream().collect(Collectors.toList())))
+            .map(entry -> Map.entry(entry.getKey(), entry.getValue().stream().toList()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (left, right) -> right,
                 () -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER)));
     }

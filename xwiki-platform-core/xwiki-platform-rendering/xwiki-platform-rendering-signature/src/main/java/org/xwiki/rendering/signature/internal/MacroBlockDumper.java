@@ -22,7 +22,7 @@ package org.xwiki.rendering.signature.internal;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -57,11 +57,9 @@ public class MacroBlockDumper implements BlockDumper
     @Override
     public void dump(OutputStream out, Block block) throws IOException
     {
-        if (block instanceof MacroBlock) {
-            MacroBlock b = (MacroBlock) block;
+        if (block instanceof MacroBlock b) {
             dump(out, b.getId(), b.getParameters(), b.getContent());
-        } else if (block instanceof MacroMarkerBlock) {
-            MacroMarkerBlock b = (MacroMarkerBlock) block;
+        } else if (block instanceof MacroMarkerBlock b) {
             dump(out, b.getId(), b.getParameters(), b.getContent());
         } else {
             throw new IllegalArgumentException("Unsupported block [" + block.getClass().getName() + "].");
@@ -114,11 +112,6 @@ public class MacroBlockDumper implements BlockDumper
 
     private static byte[] toBytes(String s)
     {
-        try {
-            return s.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException ignored) {
-            // Should never happen since UTF-8 is a requirement for any JVM.
-        }
-        return s.getBytes();
+        return s.getBytes(StandardCharsets.UTF_8);
     }
 }

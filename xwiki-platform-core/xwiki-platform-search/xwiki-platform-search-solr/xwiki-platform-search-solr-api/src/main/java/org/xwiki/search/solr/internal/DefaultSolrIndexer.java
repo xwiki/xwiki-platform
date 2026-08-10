@@ -241,8 +241,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 try {
                     dispatchQueueEntry(queueEntry);
                 } catch (Throwable e) {
-                    logger.warn("Failed to apply operation [{}] on root reference [{}]", queueEntry.operation,
-                        queueEntry.reference, e);
+                    logger.warn("Failed to apply operation [{}] on root reference [{}]",
+                        queueEntry.operation, queueEntry.reference, e);
                 } finally {
                     // Decrement only for entries submitted via addToQueue(); READY_MARKER entries come from
                     // waitReady() which does not increment pendingResolveItems.
@@ -631,6 +631,12 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
     private void flushDocuments(List<SolrInputDocument> documents)
     {
+        // An update request without any document has no body, which a remote Solr rejects with a
+        // "missing content stream" error. There is also nothing to send, so skip the request entirely.
+        if (documents.isEmpty()) {
+            return;
+        }
+
         try {
             // Copy the documents to flush to a new list so that we can clear the original list without affecting the
             // documents that are being added to the Solr server.

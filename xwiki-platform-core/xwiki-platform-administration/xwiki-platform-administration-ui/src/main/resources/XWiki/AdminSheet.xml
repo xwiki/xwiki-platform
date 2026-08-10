@@ -1170,7 +1170,7 @@ require(['jquery'], function($) {
   color: $theme.menuLinkColor;
 }
 
-/* Rotate the carret on collapse. */
+/* Rotate the caret on collapse. */
 .admin-menu a.panel-heading.collapsed &gt; *:last-child {
   transform: rotate(90deg);
 }

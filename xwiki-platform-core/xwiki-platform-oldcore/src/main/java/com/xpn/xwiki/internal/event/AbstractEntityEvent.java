@@ -64,7 +64,7 @@ public abstract class AbstractEntityEvent implements EntityEvent
             return true;
         }
 
-        return otherEvent instanceof EntityEvent && matchesReference(((EntityEvent) otherEvent).getReference());
+        return otherEvent instanceof EntityEvent entityEvent && matchesReference(entityEvent.getReference());
     }
 
     /**

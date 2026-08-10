@@ -86,11 +86,10 @@ public class AsyncRendererCacheListener extends AbstractEventListener
     {
         if (event instanceof RightUpdatedEvent) {
             this.cache.cleanCacheForRight();
-        } else if (event instanceof ComponentDescriptorEvent) {
-            ComponentDescriptorEvent componentEvent = ((ComponentDescriptorEvent) event);
+        } else if (event instanceof ComponentDescriptorEvent componentEvent) {
             this.cache.cleanCache(componentEvent.getRoleType(), componentEvent.getRoleHint());
-        } else if (event instanceof WikiDeletedEvent) {
-            WikiReference wikiReference = new WikiReference(((WikiDeletedEvent) event).getWikiId());
+        } else if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
+            WikiReference wikiReference = new WikiReference(wikiDeletedEvent.getWikiId());
 
             this.cache.cleanCache(wikiReference.getName());
         } else {
@@ -103,8 +102,8 @@ public class AsyncRendererCacheListener extends AbstractEventListener
             this.cache.cleanCache(document.getDocumentReferenceWithLocale());
 
             // Clean entries associated to the exact entry
-            if (event instanceof EntityEvent) {
-                onEntityEvent((EntityEvent) event, document);
+            if (event instanceof EntityEvent entityEvent) {
+                onEntityEvent(entityEvent, document);
             }
         }
     }
@@ -115,9 +114,7 @@ public class AsyncRendererCacheListener extends AbstractEventListener
         this.cache.cleanCache(event.getReference());
 
         // Clean entries associated to modified object class reference
-        if (event instanceof XObjectEvent) {
-            XObjectEvent objectEvent = (XObjectEvent) event;
-
+        if (event instanceof XObjectEvent objectEvent) {
             BaseObject obj;
 
             if (objectEvent instanceof XObjectDeletedEvent) {
@@ -126,7 +123,9 @@ public class AsyncRendererCacheListener extends AbstractEventListener
                 obj = document.getXObject(objectEvent.getReference());
             }
 
-            this.cache.cleanCache(obj.getXClassReference());
+            if (obj != null) {
+                this.cache.cleanCache(obj.getXClassReference());
+            }
         }
     }
 }

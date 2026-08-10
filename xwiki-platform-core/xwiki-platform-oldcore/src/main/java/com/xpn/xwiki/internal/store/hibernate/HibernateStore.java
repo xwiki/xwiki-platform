@@ -206,7 +206,7 @@ public class HibernateStore implements Disposable, Initializable
             }
         } catch (Exception e) {
             // Probably running under -security, which prevents calling File.exists()
-            this.logger.debug("Failed load resource [{}] using a file path", path);
+            this.logger.debug("Failed to load resource [{}] using a file path", path, e);
         }
 
         try {
@@ -215,7 +215,7 @@ public class HibernateStore implements Disposable, Initializable
                 return res;
             }
         } catch (Exception e) {
-            this.logger.debug("Failed to load resource [{}] using the application context", path);
+            this.logger.debug("Failed to load resource [{}] using the application context", path, e);
         }
 
         URL url = Thread.currentThread().getContextClassLoader().getResource(path);
@@ -306,7 +306,7 @@ public class HibernateStore implements Disposable, Initializable
                 return StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
                     URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
             } catch (UnsupportedEncodingException e) {
-                this.logger.error("Failedd to encode the current timezone id", e);
+                this.logger.error("Failed to encode the current timezone id", e);
             }
         }
 
@@ -725,7 +725,7 @@ public class HibernateStore implements Disposable, Initializable
         // XWiki uses a new Session for a new Transaction so we need to keep both in sync and thus we check if that's
         // the case. If it isn't it means some code is faulty somewhere.
         if (((session == null) && (transaction != null)) || ((transaction == null) && (session != null))) {
-            this.logger.warn("Incompatible session ({}) and transaction ({}) status", session, transaction);
+            this.logger.warn("Incompatible session [{}] and transaction [{}] status", session, transaction);
 
             // TODO: Fix this problem, don't ignore it!
             return false;
@@ -785,8 +785,8 @@ public class HibernateStore implements Disposable, Initializable
         this.logger.debug("Taken session from pool [{}]", session);
 
         // Put back legacy feature to the Hibernate session
-        if (session instanceof SessionImplementor) {
-            session = new LegacySessionImplementor((SessionImplementor) session, this.loggerConfiguration);
+        if (session instanceof SessionImplementor sessionImplementor) {
+            session = new LegacySessionImplementor(sessionImplementor, this.loggerConfiguration);
         }
 
         setCurrentSession(session);
@@ -869,11 +869,10 @@ public class HibernateStore implements Disposable, Initializable
             if (next == current) {
                 next = null;
             }
-            if (current instanceof SQLException) {
-                SQLException sx = (SQLException) current;
+            if (current instanceof SQLException sx) {
                 while (sx.getNextException() != null) {
                     sx = sx.getNextException();
-                    sb.append("\nSQL next exception = [" + sx + "]");
+                    sb.append("\nSQL next exception = [").append(sx).append(']');
                 }
             }
         }
@@ -1041,7 +1040,7 @@ public class HibernateStore implements Disposable, Initializable
                 }
             } catch (Exception e) {
                 this.logger.warn(
-                    "Failed to get the sequences of the schema [{}] ({}). Trying to create hibernate_sequence anyway.",
+                    "Failed to get the sequences of the schema [{}]: [{}]. Trying to create hibernate_sequence anyway.",
                     schemaName, ExceptionUtils.getRootCauseMessage(e));
 
                 // Ignore errors in the log during the creation of the sequence since we know it can fail and we
@@ -1099,8 +1098,8 @@ public class HibernateStore implements Disposable, Initializable
             // FIXME: remove when https://hibernate.atlassian.net/browse/HHH-14627
             // (org.hibernate.mapping.PersistentClass#getProperty does not support composite ids) is fixed
             KeyValue identifier = persistentClass.getIdentifier();
-            if (identifier instanceof org.hibernate.mapping.Component) {
-                Iterator<Property> it = ((org.hibernate.mapping.Component) identifier).getPropertyIterator();
+            if (identifier instanceof org.hibernate.mapping.Component component) {
+                Iterator<Property> it = component.getPropertyIterator();
 
                 while (it.hasNext()) {
                     Property property = it.next();

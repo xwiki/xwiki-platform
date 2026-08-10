@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @ComponentTest
 @ComponentList({ AttachmentURLStreamHandler.class, ExtendedURLStreamHandlerFactory.class })
-public class DefaultAttachmentClassLoaderFactoryTest
+class DefaultAttachmentClassLoaderFactoryTest
 {
     @InjectMockComponents
     private DefaultAttachmentClassLoaderFactory factory;

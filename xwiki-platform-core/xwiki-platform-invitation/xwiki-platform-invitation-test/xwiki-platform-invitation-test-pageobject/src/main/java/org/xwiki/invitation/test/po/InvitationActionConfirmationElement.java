@@ -25,7 +25,7 @@ import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
- * Represents the actions possible on the confirmation dialog for the invitation appliaction.
+ * Represents the actions possible on the confirmation dialog for the invitation application.
  *
  * @version $Id$
  * @since 4.2M1

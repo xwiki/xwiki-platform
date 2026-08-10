@@ -82,9 +82,9 @@ public class MetaClass extends BaseClass
     public void safeput(String name, PropertyInterface property)
     {
         addField(PROPERTY_NAME_PREFIX + name, property);
-        if (property instanceof PropertyClass) {
-            ((PropertyClass) property).setObject(this);
-            ((PropertyClass) property).setName(name);
+        if (property instanceof PropertyClass propertyClass) {
+            propertyClass.setObject(this);
+            propertyClass.setName(name);
         }
     }
 

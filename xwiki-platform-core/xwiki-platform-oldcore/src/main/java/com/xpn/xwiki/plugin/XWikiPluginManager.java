@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,9 +65,7 @@ public class XWikiPluginManager
     public void addPlugin(String name, String className, XWikiContext context)
     {
         if (this.pluginClassNames.contains(className)) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info(String.format("Skipping already registered plugin [%s]", name));
-            }
+            LOGGER.info("Skipping already registered plugin [{}]", name);
             return;
         }
         try {
@@ -90,7 +89,7 @@ public class XWikiPluginManager
             }
         } catch (Exception ex) {
             // Log an error but do not fail
-            LOGGER.error("Cannot initialize plugin [" + className + "]. This plugin will not be available.", ex);
+            LOGGER.error("Cannot initialize plugin [{}]. This plugin will not be available.", className, ex);
         }
     }
 
@@ -171,7 +170,7 @@ public class XWikiPluginManager
             try {
                 plugin.flushCache(context);
             } catch (Exception e) {
-                LOGGER.error("Failed to flush cache in plugin [" + plugin.getClass() + "]", e);
+                LOGGER.error("Failed to flush cache in plugin [{}]", plugin.getClass(), e);
             }
         }
     }
@@ -279,7 +278,8 @@ public class XWikiPluginManager
             try {
                 attach = plugin.downloadAttachment(attach, context);
             } catch (Exception ex) {
-                LOGGER.warn("downloadAttachment failed for plugin [" + plugin.getName() + "]: " + ex.getMessage());
+                LOGGER.warn("downloadAttachment failed for plugin [{}]: [{}]", plugin.getName(),
+                    ExceptionUtils.getRootCauseMessage(ex));
             }
         }
         return attach;

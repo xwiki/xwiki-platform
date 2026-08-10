@@ -272,9 +272,6 @@ class DefaultCSRFTokenTest
 
         when(this.httpRequest.getMethod()).thenReturn("GET");
         String url = this.csrf.getResubmissionURL();
-        // srid is random, extract it from the url
-        Matcher matcher = Pattern.compile(".*srid%3D([a-zA-Z0-9]+).*").matcher(url);
-        String srid = matcher.matches() ? matcher.group(1) : "asdf";
         String expected = resubmitUrl + "?xpage=resubmit";
         assertEquals(expected, url, "Invalid resubmission URL");
     }

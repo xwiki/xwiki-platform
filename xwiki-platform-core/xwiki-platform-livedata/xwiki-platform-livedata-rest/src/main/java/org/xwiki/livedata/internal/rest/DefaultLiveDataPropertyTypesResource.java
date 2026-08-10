@@ -22,7 +22,6 @@ package org.xwiki.livedata.internal.rest;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
@@ -72,7 +71,7 @@ public class DefaultLiveDataPropertyTypesResource extends AbstractLiveDataResour
                 namespace, source.getParameters());
 
         List<PropertyDescriptor> types = propertyTypes.stream()
-            .map(propertyType -> createPropertyType(propertyType, source, namespace)).collect(Collectors.toList());
+            .map(propertyType -> createPropertyType(propertyType, source, namespace)).toList();
         return (Types) new Types().withTypes(types).withLinks(self, parent);
     }
 }

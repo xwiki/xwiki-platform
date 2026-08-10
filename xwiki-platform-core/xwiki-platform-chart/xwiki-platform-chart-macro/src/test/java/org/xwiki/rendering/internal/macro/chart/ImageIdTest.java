@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.macro.chart;
 import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.macro.chart.ChartMacroParameters;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * Unit tests for {@link ImageId}.
@@ -41,6 +41,6 @@ class ImageIdTest
         ChartMacroParameters parameters1 = new ChartMacroParameters();
         ChartMacroParameters parameters2 = new ChartMacroParameters();
 
-        assertFalse(new ImageId(parameters1).getId().equals(new ImageId(parameters2).getId()));
+        assertNotEquals(new ImageId(parameters2).getId(), new ImageId(parameters1).getId());
     }
 }

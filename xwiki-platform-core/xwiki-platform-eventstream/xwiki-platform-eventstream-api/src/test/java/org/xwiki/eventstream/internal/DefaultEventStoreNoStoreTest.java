@@ -28,7 +28,6 @@ import javax.inject.Named;
 import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.query.QueryException;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -47,7 +46,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultEventStoreNoStoreTest
+class DefaultEventStoreNoStoreTest
 {
     private static final DefaultEvent EVENT = new DefaultEvent();
 
@@ -72,7 +71,7 @@ public class DefaultEventStoreNoStoreTest
     }
 
     @Test
-    void saveEvent() throws EventStreamException
+    void saveEvent()
     {
         this.defaultStore.saveEvent(EVENT);
 
@@ -80,7 +79,7 @@ public class DefaultEventStoreNoStoreTest
     }
 
     @Test
-    void saveEventStatus() throws Exception
+    void saveEventStatus()
     {
         this.defaultStore.saveEventStatus(EVENTSTATUS);
 
@@ -88,7 +87,7 @@ public class DefaultEventStoreNoStoreTest
     }
 
     @Test
-    void deleteEventByInstance() throws EventStreamException
+    void deleteEventByInstance()
     {
         this.defaultStore.deleteEvent(EVENT);
 
@@ -96,7 +95,7 @@ public class DefaultEventStoreNoStoreTest
     }
 
     @Test
-    void deleteEventstatus() throws EventStreamException
+    void deleteEventstatus()
     {
         this.defaultStore.deleteEventStatus(EVENTSTATUS);
 
@@ -104,7 +103,7 @@ public class DefaultEventStoreNoStoreTest
     }
 
     @Test
-    void deleteEventById() throws EventStreamException, InterruptedException, ExecutionException
+    void deleteEventById() throws InterruptedException, ExecutionException
     {
         assertFalse(this.defaultStore.deleteEvent("id").get().isPresent());
 
@@ -118,7 +117,7 @@ public class DefaultEventStoreNoStoreTest
     }
 
     @Test
-    void getEvent() throws EventStreamException, QueryException
+    void getEvent() throws EventStreamException
     {
         assertFalse(this.defaultStore.getEvent("id").isPresent());
 

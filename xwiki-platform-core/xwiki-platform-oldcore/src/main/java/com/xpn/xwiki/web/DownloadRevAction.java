@@ -24,6 +24,9 @@ import java.io.IOException;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -42,6 +45,9 @@ import com.xpn.xwiki.plugin.XWikiPluginManager;
 @Singleton
 public class DownloadRevAction extends DownloadAction
 {
+    @Inject
+    private Logger logger;
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -101,7 +107,7 @@ public class DownloadRevAction extends DownloadAction
                     context.getResponse().sendRedirect(url);
                     return null;
                 } catch (IOException ioe) {
-                    ioe.printStackTrace();
+                    this.logger.error("Failed to redirect to [{}]", url, ioe);
                 }
             }
         }

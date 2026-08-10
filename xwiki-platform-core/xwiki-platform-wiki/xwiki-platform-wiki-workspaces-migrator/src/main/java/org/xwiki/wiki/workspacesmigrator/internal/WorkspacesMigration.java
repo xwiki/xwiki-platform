@@ -157,6 +157,7 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
      *
      * @param wikiId id of the wiki to upgrade
      */
+    @SuppressWarnings("java:S2629")
     private void restoreDeletedDocuments(String wikiId)
     {
         XWikiContext xcontext = getXWikiContext();
@@ -200,17 +201,20 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
 
         // If the list is empty, the job is done
         if (!documentsToRestore.isEmpty()) {
-            String documentsToRestoreAsString = new String();
+            StringBuilder documentsToRestoreAsString = new StringBuilder();
             int counter = 0;
             for (DocumentReference d : documentsToRestore) {
                 if (counter++ > 0) {
-                    documentsToRestoreAsString += ", ";
+                    documentsToRestoreAsString.append(", ");
                 }
-                documentsToRestoreAsString += d;
+                documentsToRestoreAsString.append(d);
             }
+            // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+            // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and a StringBuilder
+            // would be written out as its internal char array.
             logger.warn("Failed to restore some documents: [{}]. You should import manually "
                     + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
-                    + " wiki, to restore these documents.", documentsToRestoreAsString);
+                    + " wiki, to restore these documents.", documentsToRestoreAsString.toString());
         }
     }
 

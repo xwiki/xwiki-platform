@@ -41,26 +41,17 @@ export default defineConfig({
         "vue",
         "vue-i18n",
         "xwiki-platform-localization-webjar",
+        "@xwiki/platform-component-manager-default",
       ],
-      output: {
-        globals: {
-          vue: "Vue",
-        },
-      },
     },
     sourcemap: true,
   },
   define: {
+    // Oxc replaces whole expressions only, so the entry below does not cover
+    // this one, on which React selects its production build.
+    "process.env.NODE_ENV": JSON.stringify("production"),
     // Define process to avoid runtime error with jQuery.
-    "process.env": {},
+    "process.env": "{}",
   },
   plugins: [react(), vue()],
-  esbuild: {
-    tsconfigRaw: {
-      compilerOptions: {
-        // Workaround for a vite bug (see https://github.com/vitejs/vite/issues/13736)
-        experimentalDecorators: true,
-      },
-    },
-  },
 });

@@ -31,7 +31,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
@@ -105,7 +104,7 @@ class DocumentTitleDisplayerTest
         // The execution context is expected to have the "xwikicontext" property set.
         ExecutionContext executionContext = new ExecutionContext();
         executionContext.setProperty("xwikicontext", new HashMap<String, Object>());
-        Mockito.when(this.execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(executionContext);
     }
 
     @Test

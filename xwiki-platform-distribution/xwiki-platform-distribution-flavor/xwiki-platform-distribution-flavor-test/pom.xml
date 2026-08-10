@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
@@ -357,8 +357,11 @@
     <stopport>8079</stopport>
     <rmiport>6666</rmiport>
     <seleniumPort>4444</seleniumPort>
-    <!-- Allow skipping the unpack -->
-    <xwiki.test.skipUnpack>false</xwiki.test.skipUnpack>
+    <!-- Skip the (large) application/data unpacks when tests are skipped: the unpacked application is only needed to
+         run the functional tests, so a -DskipTests build that only compiles/packages/deploys the modules has no use
+         for it. Can be overridden explicitly with -Dxwiki.test.skipUnpack=true|false. -->
+    <skipTests>false</skipTests>
+    <xwiki.test.skipUnpack>${skipTests}</xwiki.test.skipUnpack>
     <!-- Specify the part of the URL before the port number where the XWiki instance is running. This is used when running tests on a remote instance.
          Do not add a trailing slash. Example:
          http://localhost

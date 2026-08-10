@@ -66,8 +66,7 @@ public class DefaultModelBridge implements ModelBridge
     {
         if (xObjectTypes.isEmpty()) {
             return true;
-        } else if (source instanceof XWikiDocument) {
-            XWikiDocument document = (XWikiDocument) source;
+        } else if (source instanceof XWikiDocument document) {
             Map<DocumentReference, List<BaseObject>> documentXObjects = document.getXObjects();
 
             for (String objectType : xObjectTypes) {

@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class PrefilteringLiveNotificationEmailDispatcherTest
+class PrefilteringLiveNotificationEmailDispatcherTest
 {
     @InjectMockComponents
     private PrefilteringLiveNotificationEmailDispatcher dispatcher;
@@ -82,7 +82,6 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
         // Force a very short grace period so that the test does not take 1 minute
         FieldUtils.writeField(this.dispatcher, "grace", 100, true);
 
-        //////
         // One event
 
         DocumentReference userReference = new DocumentReference("wiki", "XWiki", "user");
@@ -96,7 +95,6 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
         events.put(userReference, List.of(event));
         verifySendMailsCalled(events);
 
-        //////
         // One event with two users
 
         DocumentReference user2Reference = new DocumentReference("wiki", "XWiki", "user2");
@@ -113,7 +111,6 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
         events.put(user2Reference, List.of(event));
         verifySendMailsCalled(events);
 
-        //////
         // Two similar events
 
         DefaultEvent similarevent = new DefaultEvent();

@@ -576,9 +576,9 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
 
     private InputStream getInputStream(InputSource content) throws FilterException
     {
-        if (content instanceof InputStreamInputSource) {
+        if (content instanceof InputStreamInputSource inputStreamInputSource) {
             try {
-                return ((InputStreamInputSource) content).getInputStream();
+                return inputStreamInputSource.getInputStream();
             } catch (IOException e) {
                 throw new FilterException("Failed to get the content input stream", e);
             }

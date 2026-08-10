@@ -205,7 +205,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     @Override
     public Stream<NotificationFilter> getToggleableFilters(Collection<NotificationFilter> filters)
     {
-        return filters.stream().filter(filter -> filter instanceof ToggleableNotificationFilter);
+        return filters.stream().filter(ToggleableNotificationFilter.class::isInstance);
     }
 
     @Override

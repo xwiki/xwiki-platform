@@ -662,7 +662,7 @@ $fn
 ## @param alwaysDisplay Force display of the links, even if there is only one page in total.
 ##
 #macro(printPagedViewLinks $itemsPerPage $totalPages $currentPageNumber $additionalQueryParams $alwaysDisplay)
-  ## Only display if there are more than 1 pages or we explicitely require it.
+  ## Only display if there are more than 1 pages or we explicitly require it.
   #if(($totalPages > 1) || $alwaysDisplay)
     <div class="pagedNavigation">
     #if($currentPageNumber > 1)
@@ -704,7 +704,7 @@ $fn
 ##        of range), then it will be corrected to a valid number. Starts at 1.
 ##
 #macro(preparePagedViewParams $totalItems $defaultItemsPerPage)
-  ## Reuse existing variable, in case it is manually overriden somewhere else
+  ## Reuse existing variable, in case it is manually overridden somewhere else
   #if(!$itemsPerPage)
     #if($request.ipp)
       #set($itemsPerPage = $numbertool.toNumber($request.ipp).intValue())
@@ -975,94 +975,118 @@ $html
   </${blockTag}>
 #end
 
-## Display a block warning message with the content $text.
-#macro(warning $text)
+## Display a block warning message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(warning $text $extraClass)
 #set( $parameters = {
 'text': $text,
 'classAffix': 'warning',
 'iconName': 'warning',
-'prettyNameKey': 'warning'
+'prettyNameKey': 'warning',
+'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display an inline warning message with the content $text.
-#macro(inlineWarning $text)
+## Display an inline warning message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(inlineWarning $text $extraClass)
 #set( $parameters = {
   'text': $text,
   'classAffix': 'warning',
   'iconName': 'warning',
   'prettyNameKey': 'warning',
-  'isInline': true
+  'isInline': true,
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display a block error message with the content $text.  
-#macro(error $text)
-#set( $parameters = {
-  'text': $text,
-  'classAffix': 'error',
-  'iconName': 'exclamation',
-  'prettyNameKey': 'error'
-})
-#_genericMessage($parameters)
-#end
-
-## Display an inline error message with the content $text.
-#macro(inlineError $text)
+## Display a block error message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(error $text $extraClass)
 #set( $parameters = {
   'text': $text,
   'classAffix': 'error',
   'iconName': 'exclamation',
   'prettyNameKey': 'error',
-  'isInline': true
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display a block info message with the content $text.  
-#macro(info $text)
+## Display an inline error message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(inlineError $text $extraClass)
 #set( $parameters = {
   'text': $text,
-  'classAffix': 'info',
-  'iconName': 'info',
-  'prettyNameKey': 'info'
+  'classAffix': 'error',
+  'iconName': 'exclamation',
+  'prettyNameKey': 'error',
+  'isInline': true,
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display an inline info message with the content $text.
-#macro(inlineInfo $text)
+## Display a block info message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(info $text $extraClass)
 #set( $parameters = {
   'text': $text,
   'classAffix': 'info',
   'iconName': 'info',
   'prettyNameKey': 'info',
-  'isInline': true
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display a block success message with the content $text.  
-#macro(success $text)
+## Display an inline info message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(inlineInfo $text $extraClass)
 #set( $parameters = {
   'text': $text,
-  'classAffix': 'success',
-  'iconName': 'check',
-  'prettyNameKey': 'success'
+  'classAffix': 'info',
+  'iconName': 'info',
+  'prettyNameKey': 'info',
+  'isInline': true,
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
 
-## Display an inline success message with the content $text.
-#macro(inlineSuccess $text)
+## Display a block success message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(success $text $extraClass)
 #set( $parameters = {
   'text': $text,
   'classAffix': 'success',
   'iconName': 'check',
   'prettyNameKey': 'success',
-  'isInline': true
+  'extraClass': "$!extraClass"
+})
+#_genericMessage($parameters)
+#end
+
+## Display an inline success message.
+## @param text the content to display in the message box
+## @param extraClass (optional) a space-separated list of extra CSS classes to add to the message box (since 18.6.0RC1)
+#macro(inlineSuccess $text $extraClass)
+#set( $parameters = {
+  'text': $text,
+  'classAffix': 'success',
+  'iconName': 'check',
+  'prettyNameKey': 'success',
+  'isInline': true,
+  'extraClass': "$!extraClass"
 })
 #_genericMessage($parameters)
 #end
@@ -1183,7 +1207,7 @@ $html
  * @param showTabs 0 to not show the tabs allowing to switch between MONTH,WEEK,AGENDA mode
  * @param showCalendars 0 to not show the calendars list drop down button
  * @param showTz Show a message saying the timezone of the dates/hours
- * @param mode Default mode to display (empty is Month display, WEEK is Week dispaly, AGENDA is the event display)
+ * @param mode Default mode to display (empty is Month display, WEEK is Week display, AGENDA is the event display)
  * @param language Language to display in (en,fr,de,..)
  * @param bgcolor Background color of the calendar in the form #255455
  * @param color Color of the events in the form #234567
@@ -1471,7 +1495,7 @@ $Msz MB##
   #end
   #set($classname = "$!options.className")
   ##
-  ## Columns informations
+  ## Columns information
   ##
   #set ($dataColumns = [])
   #set ($classParams = {})
@@ -1863,7 +1887,7 @@ $displayName##
       #end
     #end
     ## The offset needs to be taken into account when returning the total number of pages otherwise, client-side can
-    ## consider that previsouly returned results have been removed (e.g., in case of page size change).
+    ## consider that previously returned results have been removed (e.g., in case of page size change).
     #set($discard = $map.put('totalrows', $mathtool.add($filteredRows.size(), $offset)))
     #set($discard = $map.put('returnedrows', $filteredRows.size()))
   #else
@@ -1892,7 +1916,7 @@ $displayName##
  *#
 #macro(filterLocation $whereQL $whereParams $locationValue $hqlLocationBindingName $filterWebHome $customWhereQL)
   #if ("$!locationValue" != '')
-    ## Location is a special case, that we need to handle separatly.
+    ## Location is a special case, that we need to handle separately.
     ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
     #set ($locationFilterValue = $locationValue)
     ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as
@@ -1958,7 +1982,7 @@ $displayName##
  *#
 #macro(addLivetableLocationFilter $whereQL $whereParams $locationValue $filterWebHome $customWhereQL)
   #if ("$!locationValue" != '')
-    ## Location is a special case, that we need to handle separatly.
+    ## Location is a special case, that we need to handle separately.
     ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
     #set ($locationFilterValue = $locationValue)
     ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as
@@ -2024,7 +2048,7 @@ $displayName##
  *#
 #macro(addLocationFilter $whereQL $whereParams $locationValue $filterWebHome $customWhereQL)
   #if ("$!locationValue" != '')
-    ## Location is a special case, that we need to handle separatly.
+    ## Location is a special case, that we need to handle separately.
     ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
     #set ($locationFilterValue = $locationValue)
     ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as
@@ -2533,7 +2557,7 @@ $displayName##
  *        'angle' :  an angle of direction for the gradient
  *        'colors':  a list of maps of color-stops for the gradient, where the following entries are currently used: 
  *                'color'    : color value
- *                'position' : stop position for the color (between 0% and 100% or a lenght)
+ *                'position' : stop position for the color (between 0% and 100% or a length)
  *#
 #macro (css3_backgroundIconAndLinearGradient $icon $gradientData)
   ## Older color themes don't have values defined for the gradients, so we'll use a simple background-color instead
@@ -2719,7 +2743,7 @@ $string##
 #**
  * Displays the given title (i.e. the title of the sheet) if the condition is true. Otherwise displays the title of the
  * current document (i.e. the document the sheet is applied to). If the condition is not specified then it checks if the
- * current document is a sheet by looking for an object of type 'XWiki.SheetDescriptorClass'. You can pass a traslation
+ * current document is a sheet by looking for an object of type 'XWiki.SheetDescriptorClass'. You can pass a translation
  * key for the sheet title. This macro makes sure the document title is not displayed recursively.
  *
  * @param $title the sheet title, you can pass a translation key
@@ -3213,7 +3237,7 @@ Recursive title display detected!##
 ##
 ## Parse the provided filterValue according to its match type and assign the resulting start/end dates to the dateRange
 ## map.
-## First, if a after or before matchType is provided, a '/' is added respectivelly at the end or at the beguinning of  
+## First, if a after or before matchType is provided, a '/' is added respectively at the end or at the beginning of  
 ## filterValue.
 ## Then, we first start by trying to split filterValue using a '/', and parse the two substring as ISO 8601 dates.
 ## If none of the substring conforms to the ISO 8601 date format, a second try is done by splitting using '-', and 
@@ -3292,7 +3316,7 @@ Recursive title display detected!##
 #**
  * The output of the api.Document#display(...) methods is wrapped in an HTML (wiki syntax) rendering macro if it contains
  * HTML special characters or if it tries to close the outer HTML macro. This can be annoying when the output is going to
- * be insered in another HTML macro with wiki syntax disabled, or if the output is meant to be included in a JSON and
+ * be inserted in another HTML macro with wiki syntax disabled, or if the output is meant to be included in a JSON and
  * thus used on the client-side where we can't render the wiki syntax. For these use cases we need to get rid of the HTML
  * macro wrapping.
  *

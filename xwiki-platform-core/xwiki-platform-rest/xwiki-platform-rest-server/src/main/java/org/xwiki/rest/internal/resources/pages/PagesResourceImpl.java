@@ -58,8 +58,16 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
         try {
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
+            // The locale condition accepts null as Oracle stores the empty string as null, so a plain
+            // "language = ''" matches no document at all there.
+            // The name is added to the date ordering as several documents can share the same date (e.g. when they
+            // have been imported together). Only ordering by a unique key makes pagination via limit/offset
+            // deterministic, as the database is otherwise free to return tied rows in an arbitrary order that can
+            // differ between queries. The named query used for the default order already orders by name.
             Query query = ("date".equals(order)) ? queryManager.createQuery(
-                    "select doc.name from Document doc where doc.space=:space and language='' order by doc.date desc",
+                    "select doc.name from Document doc where doc.space=:space"
+                        + " and (doc.language = '' or doc.language is null)"
+                        + " order by doc.date desc, doc.name asc",
                     "xwql") : queryManager.getNamedQuery("getSpaceDocsName");
 
             /* Use an explicit query to improve performance */

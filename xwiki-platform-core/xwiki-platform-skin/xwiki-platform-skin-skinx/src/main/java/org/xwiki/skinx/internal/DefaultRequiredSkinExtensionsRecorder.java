@@ -93,8 +93,8 @@ public class DefaultRequiredSkinExtensionsRecorder implements RequiredSkinExtens
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         Api pluginApi = xcontext.getWiki().getPluginApi(skinExtensionPluginName, xcontext);
-        if (pluginApi instanceof SkinExtensionPluginApi) {
-            return ((SkinExtensionPluginApi) pluginApi).getImportString();
+        if (pluginApi instanceof SkinExtensionPluginApi skinExtensionPluginApi) {
+            return skinExtensionPluginApi.getImportString();
         } else {
             return "";
         }

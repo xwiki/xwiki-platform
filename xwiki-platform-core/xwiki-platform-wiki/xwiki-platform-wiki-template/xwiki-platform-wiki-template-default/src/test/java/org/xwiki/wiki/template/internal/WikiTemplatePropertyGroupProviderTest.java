@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -82,7 +81,7 @@ class WikiTemplatePropertyGroupProviderTest
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
         when(this.wikiDescriptorDocumentHelper.getDocumentFromWikiId("wikiId")).thenReturn(descriptorDocument);
         BaseObject object = mock(BaseObject.class);
-        when(descriptorDocument.getXObject(eq(WikiTemplateClassDocumentInitializer.SERVER_CLASS))).thenReturn(object);
+        when(descriptorDocument.getXObject(WikiTemplateClassDocumentInitializer.SERVER_CLASS)).thenReturn(object);
         when(object.getIntValue("iswikitemplate", 0)).thenReturn(1);
 
         // Test
@@ -96,7 +95,7 @@ class WikiTemplatePropertyGroupProviderTest
         XWikiDocument descriptorDocument2 = mock(XWikiDocument.class);
         when(this.wikiDescriptorDocumentHelper.getDocumentFromWikiId("wikiId2")).thenReturn(descriptorDocument2);
         BaseObject object2 = mock(BaseObject.class);
-        when(descriptorDocument2.getXObject(eq(WikiTemplateClassDocumentInitializer.SERVER_CLASS))).thenReturn(object2);
+        when(descriptorDocument2.getXObject(WikiTemplateClassDocumentInitializer.SERVER_CLASS)).thenReturn(object2);
         when(object2.getIntValue("iswikitemplate", 0)).thenReturn(0);
 
         // Test

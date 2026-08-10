@@ -21,6 +21,7 @@ package org.xwiki.test.docker.internal.junit5.servletengine;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,8 +40,11 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.utility.MountableFile;
+import org.xwiki.test.XWikiTempDirUtil;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.TestExtensionRepository;
 import org.xwiki.test.docker.internal.junit5.XWikiGenericContainer;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -78,6 +83,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String DOCKER_SOCK = "/var/run/docker.sock";
 
+    /**
+     * Directory inside the servlet container used to exchange files (conversion sources and targets, etc.) between the
+     * test and the running XWiki instance. It is created world-writable so that XWiki can write into it even when it
+     * doesn't run as root inside the container.
+     */
+    private static final String CONTAINER_EXCHANGE_DIRECTORY = "/tmp/xwiki-test-exchange";
+
     private static final String ROOT_USER = "root";
 
     private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
@@ -85,6 +97,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final String TOMCAT = "tomcat";
 
     private static final String JETTY = "jetty";
+
+    private static final String MEMORY_LIMIT_OPTION = "-Xmx1024m";
+
+    private static final String NETWORK_ALIAS_PREFIX = "xwikiweb";
 
     private final int index;
 
@@ -97,6 +113,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private TestConfiguration testConfiguration;
 
     private GenericContainer<?> servletContainer;
+
+    private File hostExchangeDirectory;
+
+    private boolean containerExchangeDirectoryCreated;
 
     /**
      * @param index the index of the executor
@@ -145,17 +165,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     {
         XWikiExecutor executor = null;
 
-        int httpPort = 8080 + this.index;
-
         switch (this.testConfiguration.getServletEngine()) {
             case TOMCAT:
                 configureTomcat(sourceWARDirectory);
                 break;
             case JETTY:
                 configureJetty(sourceWARDirectory);
-                break;
-            case WILDFLY:
-                configureWildFly(sourceWARDirectory);
                 break;
             case JETTY_STANDALONE:
                 // Resolve and unzip the xwiki-platform-tool-jetty-resources zip artifact and configure Jetty to
@@ -168,31 +183,28 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 break;
             default:
                 throw new RuntimeException(String.format("Servlet engine [%s] is not yet supported!",
-                    testConfiguration.getServletEngine()));
+                    this.testConfiguration.getServletEngine()));
         }
 
         if (this.servletContainer != null) {
-            String internalHost = this.testConfiguration.getServletEngine().isOutsideDocker()
-                ? GenericContainer.INTERNAL_HOST_HOSTNAME : "xwikiweb" + this.index;
-            int internalPort = 8080;
+            // Use a different alias for each instance, to make easier to target it
+            String dockerInstanceHost = getNetworkAlias(this.index);
+            // All instance use the same internal port, a different external port will be allocated
+            int dockerInstancePort = 8080;
 
-            startContainer(internalHost, internalPort);
+            // Start the instance
+            startContainer(dockerInstanceHost, dockerInstancePort);
 
-            String xwikiIPAddress = this.servletContainer.getHost();
-            httpPort = this.servletContainer.getMappedPort(httpPort);
+            String httpHost = this.servletContainer.getHost();
+            int httpPort = this.servletContainer.getMappedPort(dockerInstancePort);
 
-            executor = new XWikiExecutor(this.index, internalHost, internalPort, internalHost, internalPort,
-                xwikiIPAddress, httpPort);
+            executor = new XWikiExecutor(this.index, dockerInstanceHost, dockerInstancePort, dockerInstanceHost,
+                dockerInstancePort, httpHost, httpPort);
+        } else if (this.jettyStandaloneExecutor != null) {
+            executor = this.jettyStandaloneExecutor.start();
         }
 
         return executor;
-    }
-
-    private void configureWildFly(File sourceWARDirectory) throws Exception
-    {
-        this.servletContainer = createServletContainer();
-        mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
-            "/opt/jboss/wildfly/standalone/deployments/xwiki");
     }
 
     private void configureJetty(File sourceWARDirectory) throws Exception
@@ -201,6 +213,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(), "/var/lib/jetty/webapps/xwiki");
 
         List<String> javaOpts = new ArrayList<>();
+
+        // Cap the XWiki heap to not overcommit the agent's memory.
+        javaOpts.add(MEMORY_LIMIT_OPTION);
 
         // TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 has been fixed.
         addJava17AddOpens(javaOpts);
@@ -215,6 +230,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
 
         maybeEnableRemoteDebugging(javaOpts);
+
+        // Tell the instance where to find the other members of the cluster (when there are several instances)
+        javaOpts.addAll(RemoteObservationJavaOptions.get(this.index, this.testConfiguration));
+
         this.servletContainer.withEnv("JAVA_OPTIONS", StringUtils.join(javaOpts, ' '));
 
         // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
@@ -268,7 +287,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             "/usr/local/tomcat/webapps/xwiki");
 
         List<String> catalinaOpts = new ArrayList<>();
-        catalinaOpts.add("-Xmx1024m");
+        catalinaOpts.add(MEMORY_LIMIT_OPTION);
 
         // Note: Tomcat automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
         // need to add them as we do for Jetty.
@@ -285,6 +304,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             catalinaOpts.add(ORACLE_TZ_WORKAROUND);
         }
 
+        // Tell the instance where to find the other members of the cluster (when there are several instances)
+        catalinaOpts.addAll(RemoteObservationJavaOptions.get(this.index, this.testConfiguration));
+
         this.servletContainer.withEnv("CATALINA_OPTS", StringUtils.join(catalinaOpts, ' '));
     }
 
@@ -297,6 +319,15 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         if (this.testConfiguration.isDebug()) {
             options.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005");
         }
+    }
+
+    /**
+     * @param index the index of the XWiki instance
+     * @return the network alias with which the XWiki instance can be reached by the other containers
+     */
+    static String getNetworkAlias(int index)
+    {
+        return NETWORK_ALIAS_PREFIX + index;
     }
 
     private void startContainer(String internalHost, int internalPort) throws Exception
@@ -313,6 +344,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             .waitingFor(
                 Wait.forHttp("/xwiki/rest")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
+
+        // Copy the extension repository of the test inside the container since XWiki cannot access the file system of
+        // the host from there. Note that each instance gets its own copy of the same repository.
+        if (this.testConfiguration.isTestExtensionRepository()) {
+            this.servletContainer.withCopyFileToContainer(
+                MountableFile.forHostPath(TestExtensionRepository.getDirectory(this.testConfiguration).toString()),
+                TestExtensionRepository.CONTAINER_DIRECTORY);
+        }
 
         List<Integer> exposedPorts = new ArrayList<>();
         exposedPorts.add(internalPort);
@@ -412,7 +451,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private GenericContainer<?> createServletContainer() throws Exception
     {
         String baseImageName = getBaseImageName();
-        LOGGER.info("Get base image name: {}", baseImageName);
+        LOGGER.info("Get base image name: [{}]", baseImageName);
         GenericContainer<?> container;
 
         if (this.testConfiguration.isOffice()) {
@@ -459,10 +498,20 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                                 + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
                                 + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
                                 + "libxml2-dev libxslt1-dev")
-                            // Download the LibreOffice deb packages
-                            .run("wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
-                                + "mkdir /tmp/libreoffice && "
-                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz")
+                            // Download and extract the LibreOffice deb packages.
+                            // The download URL points to a mirror redirector: each request is redirected to one of
+                            // the mirrors, and some of them are unreachable or serve a truncated archive. Thus we
+                            // retry the whole download several times, each attempt going back to the redirector and
+                            // thus having a chance to be served by a healthy mirror. The extraction is part of the
+                            // retried command so that a truncated archive leads to a new download too.
+                            .run("for i in 1 2 3 4 5; do "
+                                + "wget --no-verbose --timeout=60 --tries=2 --retry-connrefused "
+                                + "-O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL "
+                                + "&& tar -C /tmp/ -xf /tmp/libreoffice.tar.gz && exit 0; "
+                                + "echo \"Attempt $i to get LibreOffice from $LIBREOFFICE_DOWNLOAD_URL failed\"; "
+                                + "sleep 10; "
+                                + "done; "
+                                + "exit 1")
                             // Install the LibreOffice deb packages and create a symlink to have a consistent path to
                             // the LibreOffice installation directory
                             .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
@@ -492,6 +541,104 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
 
         return container;
+    }
+
+    /**
+     * @return {@code true} when the XWiki instance runs directly on the host (e.g. Jetty standalone) and thus shares
+     *         the host filesystem, {@code false} when it runs inside a Docker container
+     */
+    private boolean isServerOnHost()
+    {
+        // When the servlet engine runs outside Docker, no servlet container is created (see #start()).
+        return this.servletContainer == null;
+    }
+
+    /**
+     * @param fileName the name of a file
+     * @return the path, as seen by the running XWiki instance, of a file with the given name located in the directory
+     *         used to exchange files with XWiki (a host temporary directory when XWiki runs on the host, an
+     *         in-container temporary directory otherwise)
+     * @throws IOException if the exchange directory can't be created
+     * @since 18.6.0RC1
+     */
+    public String getServerFilePath(String fileName) throws IOException
+    {
+        if (isServerOnHost()) {
+            return new File(getHostExchangeDirectory(), fileName).getAbsolutePath();
+        } else {
+            createContainerExchangeDirectory();
+            return CONTAINER_EXCHANGE_DIRECTORY + '/' + fileName;
+        }
+    }
+
+    /**
+     * Make the content of the passed host file readable by the running XWiki instance (by copying it into the
+     * container when XWiki runs in Docker, or into a host temporary directory otherwise).
+     *
+     * @param hostFile the file located on the host (e.g. a test resource)
+     * @return the path, as seen by the running XWiki instance, where the file content is now available (e.g. to be
+     *         used in a {@code file:} filter source reference)
+     * @throws IOException if the file can't be made available to the server
+     * @since 18.6.0RC1
+     */
+    public String copyFileToServer(File hostFile) throws IOException
+    {
+        String serverPath = getServerFilePath(hostFile.getName());
+        if (isServerOnHost()) {
+            FileUtils.copyFile(hostFile, new File(serverPath));
+        } else {
+            this.servletContainer.copyFileToContainer(MountableFile.forHostPath(hostFile.getAbsolutePath()),
+                serverPath);
+        }
+        return serverPath;
+    }
+
+    /**
+     * Retrieve to the host a file produced by the running XWiki instance (by copying it out of the container when
+     * XWiki runs in Docker; the file is already on the host otherwise).
+     *
+     * @param serverPath the path of the file as seen by the running XWiki instance (typically obtained from
+     *            {@link #getServerFilePath(String)})
+     * @return the file on the host
+     * @throws IOException if the file can't be retrieved from the server
+     * @since 18.6.0RC1
+     */
+    public File copyFileFromServer(String serverPath) throws IOException
+    {
+        if (isServerOnHost()) {
+            return new File(serverPath);
+        } else {
+            File hostFile = new File(getHostExchangeDirectory(), new File(serverPath).getName());
+            this.servletContainer.copyFileFromContainer(serverPath, hostFile.getAbsolutePath());
+            return hostFile;
+        }
+    }
+
+    private File getHostExchangeDirectory()
+    {
+        if (this.hostExchangeDirectory == null) {
+            // Create the directory under the module's "target" directory (as the @TempDir annotation does) so that
+            // the exchanged files don't leak outside the build workspace.
+            this.hostExchangeDirectory = XWikiTempDirUtil.createTemporaryDirectory();
+        }
+        return this.hostExchangeDirectory;
+    }
+
+    private void createContainerExchangeDirectory() throws IOException
+    {
+        if (!this.containerExchangeDirectoryCreated) {
+            try {
+                // Create the directory world-writable so that XWiki can write conversion outputs into it even when it
+                // doesn't run as root inside the container.
+                this.servletContainer.execInContainer("mkdir", "-p", "-m", "777", CONTAINER_EXCHANGE_DIRECTORY);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException(
+                    String.format("Interrupted while creating exchange directory [%s] in the servlet container",
+                        CONTAINER_EXCHANGE_DIRECTORY), e);
+            }
+            this.containerExchangeDirectoryCreated = true;
+        }
     }
 
     /**

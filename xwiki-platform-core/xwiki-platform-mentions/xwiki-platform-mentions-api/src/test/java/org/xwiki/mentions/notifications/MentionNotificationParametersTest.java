@@ -29,7 +29,9 @@ import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.model.reference.DocumentReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.xwiki.mentions.MentionLocation.COMMENT;
 import static org.xwiki.mentions.MentionLocation.DOCUMENT;
 
 /**
@@ -108,5 +110,64 @@ class MentionNotificationParametersTest
         Map<String, Set<MentionNotificationParameter>> newMentions =
             new MentionNotificationParameters(AUTHOR_REFERENCE, ENTITY_REFERENCE, DOCUMENT, VERSION).getNewMentions();
         assertThrows(UnsupportedOperationException.class, () -> newMentions.put("a", null));
+    }
+
+    @Test
+    void addSeveralMentionsOfTheSameType()
+    {
+        MentionNotificationParameters mentionNotificationParameters =
+            new MentionNotificationParameters(AUTHOR_REFERENCE, ENTITY_REFERENCE, DOCUMENT, VERSION)
+                .addMention(TYPE_A, MENTION_U1)
+                .addMention(TYPE_A, MENTION_U3)
+                .addNewMention(TYPE_A, MENTION_U2)
+                .addNewMention(TYPE_A, MENTION_U4);
+
+        // Adding a mention of an already known type must extend the existing set instead of replacing it.
+        assertEquals(Map.of(TYPE_A, Set.of(MENTION_U1, MENTION_U3)), mentionNotificationParameters.getMentions());
+        assertEquals(Map.of(TYPE_A, Set.of(MENTION_U2, MENTION_U4)), mentionNotificationParameters.getNewMentions());
+
+        // Adding twice the same mention is a no-op since the mentions are stored in a set.
+        mentionNotificationParameters.addMention(TYPE_A, MENTION_U1);
+        assertEquals(Map.of(TYPE_A, Set.of(MENTION_U1, MENTION_U3)), mentionNotificationParameters.getMentions());
+    }
+
+    @Test
+    void equalsAndHashCode()
+    {
+        MentionNotificationParameters parameters =
+            new MentionNotificationParameters(AUTHOR_REFERENCE, ENTITY_REFERENCE, DOCUMENT, VERSION)
+                .addMention(TYPE_A, MENTION_U1)
+                .addNewMention(TYPE_B, MENTION_U2);
+        MentionNotificationParameters equalParameters =
+            new MentionNotificationParameters(AUTHOR_REFERENCE, ENTITY_REFERENCE, DOCUMENT, VERSION)
+                .addMention(TYPE_A, MENTION_U1)
+                .addNewMention(TYPE_B, MENTION_U2);
+
+        assertEquals(parameters, equalParameters);
+        assertEquals(parameters.hashCode(), equalParameters.hashCode());
+
+        assertNotEquals(parameters,
+            new MentionNotificationParameters(AUTHOR_REFERENCE, ENTITY_REFERENCE, DOCUMENT, VERSION));
+        assertNotEquals(parameters,
+            new MentionNotificationParameters("xwiki:XWiki.OtherAuthor", ENTITY_REFERENCE, DOCUMENT, VERSION)
+                .addMention(TYPE_A, MENTION_U1)
+                .addNewMention(TYPE_B, MENTION_U2));
+        assertNotEquals(parameters,
+            new MentionNotificationParameters(AUTHOR_REFERENCE, new DocumentReference("xwiki", "XWiki", "OtherPage"),
+                DOCUMENT, VERSION)
+                .addMention(TYPE_A, MENTION_U1)
+                .addNewMention(TYPE_B, MENTION_U2));
+        assertNotEquals(parameters,
+            new MentionNotificationParameters(AUTHOR_REFERENCE, ENTITY_REFERENCE, COMMENT, VERSION)
+                .addMention(TYPE_A, MENTION_U1)
+                .addNewMention(TYPE_B, MENTION_U2));
+        assertNotEquals(parameters,
+            new MentionNotificationParameters(AUTHOR_REFERENCE, ENTITY_REFERENCE, DOCUMENT, "2.1")
+                .addMention(TYPE_A, MENTION_U1)
+                .addNewMention(TYPE_B, MENTION_U2));
+        assertNotEquals(parameters,
+            new MentionNotificationParameters(AUTHOR_REFERENCE, ENTITY_REFERENCE, DOCUMENT, VERSION)
+                .addMention(TYPE_A, MENTION_U1)
+                .addNewMention(TYPE_B, MENTION_U4));
     }
 }

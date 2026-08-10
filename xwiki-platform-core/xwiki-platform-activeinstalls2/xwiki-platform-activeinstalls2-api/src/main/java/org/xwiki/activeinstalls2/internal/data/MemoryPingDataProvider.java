@@ -31,7 +31,7 @@ import org.xwiki.component.annotation.Component;
 import co.elastic.clients.elasticsearch._types.mapping.Property;
 
 /**
- * Provide memory related informations (max memory, allocated memory, etc).
+ * Provide memory related information (max memory, allocated memory, etc).
  *
  * @version $Id$
  * @since 8.3M1

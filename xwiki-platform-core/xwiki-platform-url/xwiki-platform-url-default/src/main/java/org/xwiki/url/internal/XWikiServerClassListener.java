@@ -77,8 +77,8 @@ public class XWikiServerClassListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (this.securityManager instanceof DefaultURLSecurityManager) {
-            ((DefaultURLSecurityManager) this.securityManager).invalidateCache();
+        if (this.securityManager instanceof DefaultURLSecurityManager defaultSecurityManager) {
+            defaultSecurityManager.invalidateCache();
         }
     }
 }

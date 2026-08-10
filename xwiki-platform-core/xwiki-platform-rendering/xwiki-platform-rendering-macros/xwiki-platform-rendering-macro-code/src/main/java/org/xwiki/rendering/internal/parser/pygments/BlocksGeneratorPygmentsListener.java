@@ -85,7 +85,7 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
             String styleParameter = formatStyle(style);
 
             FormatBlock formatBlock;
-            if (styleParameter.length() > 0) {
+            if (!styleParameter.isEmpty()) {
                 formatBlock = new FormatBlock(blockList, Format.NONE);
                 formatBlock.setParameter("style", styleParameter);
                 this.blocks.add(formatBlock);
@@ -198,10 +198,8 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
     {
         Object obj = styles.get(pyName);
 
-        if (obj != null && !(obj instanceof PyNone)) {
-            if (((Boolean) obj)) {
-                styleOut.append(cssValue);
-            }
+        if (obj != null && !(obj instanceof PyNone) && ((Boolean) obj)) {
+            styleOut.append(cssValue);
         }
     }
 }

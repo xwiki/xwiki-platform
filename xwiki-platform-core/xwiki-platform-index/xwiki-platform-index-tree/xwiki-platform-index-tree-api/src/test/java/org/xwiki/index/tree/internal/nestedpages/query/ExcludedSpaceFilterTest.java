@@ -34,13 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 10.4
  */
 @ComponentTest
-public class ExcludedSpaceFilterTest
+class ExcludedSpaceFilterTest
 {
     @InjectMockComponents
     private ExcludedSpaceFilter excludedSpaceFilter;
 
     @Test
-    public void filterStatement()
+    void filterStatement()
     {
         assertEquals("select reference from XWikiSpace space  where reference not in (:excludedSpaces) order by name",
             this.excludedSpaceFilter.filterStatement("select reference from XWikiSpace space order by name",

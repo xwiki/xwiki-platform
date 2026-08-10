@@ -133,7 +133,7 @@ class DocumentTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeEach
-    void setUp() throws AuthorizationException, ComponentLookupException
+    void setUp() throws ComponentLookupException
     {
         this.oldcore.getSpyXWiki().initializeMandatoryDocuments(this.oldcore.getXWikiContext());
 

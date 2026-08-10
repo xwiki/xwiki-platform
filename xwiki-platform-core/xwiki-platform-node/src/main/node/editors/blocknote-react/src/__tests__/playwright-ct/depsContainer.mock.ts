@@ -24,6 +24,7 @@ import {
   EntityType,
   SpaceReference,
 } from "@xwiki/platform-model-api";
+import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
 import { mock } from "vitest-mock-extended";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
@@ -112,6 +113,10 @@ export function depsContainerMock(): Container {
       },
     }),
   } satisfies LinkSuggestServiceProvider);
+
+  container.get
+    .calledWith("ResourceReferenceParser")
+    .mockReturnValue(new DefaultResourceReferenceParser());
 
   container.get.calledWith("AttachmentsService").mockReturnValue(null);
   container.get.calledWith("DocumentsService").mockReturnValue(null);

@@ -23,7 +23,6 @@ package com.xpn.xwiki.store.migration.hibernate;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.sql.BatchUpdateException;
 import java.sql.Connection;
@@ -78,9 +77,7 @@ public class R35100XWIKI7564DataMigration extends AbstractHibernateDataMigration
             shouldExecute = (startupVersion.getVersion() > 0
                 && getStore().getDatabaseProductName() == DatabaseProduct.POSTGRESQL);
             getStore().endTransaction(getXWikiContext(), false);
-        } catch (XWikiException ex) {
-            // Shouldn't happen, ignore
-        } catch (DataMigrationException ex) {
+        } catch (XWikiException | DataMigrationException ex) {
             // Shouldn't happen, ignore
         }
         return shouldExecute;
@@ -130,10 +127,8 @@ public class R35100XWIKI7564DataMigration extends AbstractHibernateDataMigration
                     return;
                 }
                 throw ex;
-            } catch (UnsupportedEncodingException ex) {
-                // Should never happen, UTF-8 is always available
             } catch (IOException ex) {
-                // Shouldn't happen, the script is supposed to be there
+                // Shouldn't happen: UTF-8 is always available and the script is supposed to be there
             }
         }
     }

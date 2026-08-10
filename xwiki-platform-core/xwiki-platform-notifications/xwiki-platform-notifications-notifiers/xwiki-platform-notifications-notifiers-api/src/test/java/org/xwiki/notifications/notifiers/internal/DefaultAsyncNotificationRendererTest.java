@@ -83,7 +83,7 @@ class DefaultAsyncNotificationRendererTest
     private NotificationParameters notificationParameters;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         this.notificationParameters = new NotificationParameters();
         this.notificationParameters.user = USER_DOC_REFERENCE;

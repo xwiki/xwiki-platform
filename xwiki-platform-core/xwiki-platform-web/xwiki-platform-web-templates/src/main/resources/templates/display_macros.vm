@@ -169,7 +169,7 @@
 #macro (initRequiredSkinExtensions)
   #set ($requiredSkinExtensionsMap = $collectiontool.orderedMap)
   ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
-  ## (they are aready available on the target page so there's no need to re-load them).
+  ## (they are already available on the target page so there's no need to re-load them).
   #foreach ($pluginName in ['ssrx', 'ssfx', 'ssx', 'linkx', 'jsrx', 'jsfx', 'jsx'])
     ## Split the import string by line breaks so we can check which lines are always used.
     #set ($macro.importLines = $stringtool.split($xwiki.get($pluginName).importString, $escapetool.n))

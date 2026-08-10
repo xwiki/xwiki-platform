@@ -104,9 +104,7 @@ public class InQueryCondition extends AbstractPropertyQueryCondition
             return true;
         }
 
-        if (obj instanceof InQueryCondition) {
-            InQueryCondition condition = (InQueryCondition) obj;
-
+        if (obj instanceof InQueryCondition condition) {
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.appendSuper(super.equals(obj));

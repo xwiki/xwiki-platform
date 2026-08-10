@@ -62,7 +62,7 @@ class DefaultWatchedEntitiesConfigurationTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @BeforeEach
-    public void setUp()
+    void setUp()
     {
         when(documentAccessBridge.getCurrentDocumentReference())
             .thenReturn(new DocumentReference("wikiA", "Main", "WebHome"));

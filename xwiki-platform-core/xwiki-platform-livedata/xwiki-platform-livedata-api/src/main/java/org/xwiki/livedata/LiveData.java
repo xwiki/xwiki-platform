@@ -84,8 +84,7 @@ public class LiveData
             return true;
         }
 
-        if (obj instanceof LiveData) {
-            LiveData liveData = (LiveData) obj;
+        if (obj instanceof LiveData liveData) {
             return new EqualsBuilder().append(getCount(), liveData.getCount())
                 .append(getEntries(), liveData.getEntries()).build();
         }

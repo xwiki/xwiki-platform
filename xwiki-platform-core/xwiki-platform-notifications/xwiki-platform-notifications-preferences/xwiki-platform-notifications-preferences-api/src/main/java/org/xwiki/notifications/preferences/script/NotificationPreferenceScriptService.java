@@ -127,10 +127,10 @@ public class NotificationPreferenceScriptService implements ScriptService
         */
 
         List<NotificationPreference> existingPreferences = Collections.emptyList();
-        if (target instanceof DocumentReference) {
-            existingPreferences = notificationPreferenceManager.getAllPreferences((DocumentReference) target);
-        } else if (target instanceof WikiReference) {
-            existingPreferences = notificationPreferenceManager.getAllPreferences((WikiReference) target);
+        if (target instanceof DocumentReference documentReference) {
+            existingPreferences = notificationPreferenceManager.getAllPreferences(documentReference);
+        } else if (target instanceof WikiReference wikiReference) {
+            existingPreferences = notificationPreferenceManager.getAllPreferences(wikiReference);
         }
 
         // Instantiate a new copy of TargetableNotificationPreferenceBuilder because this component is not thread-safe.
@@ -374,8 +374,8 @@ public class NotificationPreferenceScriptService implements ScriptService
         DocumentReference userDocumentReference;
         if (userReference == CurrentUserReference.INSTANCE) {
             userDocumentReference = documentAccessBridge.getCurrentUserReference();
-        } else if (userReference instanceof DocumentUserReference) {
-            userDocumentReference = ((DocumentUserReference) userReference).getReference();
+        } else if (userReference instanceof DocumentUserReference documentUserReference) {
+            userDocumentReference = documentUserReference.getReference();
         } else {
             throw new NotificationException(
                 String.format("The method isEventTypeEnabledForUser should only be used with DocumentUserReference, "

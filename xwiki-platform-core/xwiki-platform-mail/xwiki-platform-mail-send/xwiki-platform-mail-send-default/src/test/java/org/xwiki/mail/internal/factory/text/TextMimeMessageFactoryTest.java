@@ -95,4 +95,26 @@ class TextMimeMessageFactoryTest
         assertEquals("important email", message.getSubject());
         assertEquals(bodyPart, ((Multipart) message.getContent()).getBodyPart(0));
     }
+
+    @Test
+    void createMessageWithNonLatinSubjectEncodedAsUTF8() throws MessagingException, IOException
+    {
+        String source = "Some mail content";
+        // Russian for "Notification".
+        String subject = "Уведомление";
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("subject", subject);
+
+        MimeBodyPart bodyPart = mock(MimeBodyPart.class);
+        when(this.mimeBodyPartFactory.create(source, parameters)).thenReturn(bodyPart);
+
+        MimeMessage message = this.textMimeMessageFactory.createMessage(source, parameters);
+
+        // The raw header must be an RFC 2047 encoded word using UTF-8 (and not the JVM default charset which would
+        // turn non-Latin characters into "?"). See XWIKI-17110.
+        assertTrue(message.getHeader("Subject")[0].contains("=?UTF-8?"),
+            "Subject header should be encoded using UTF-8 but was: " + message.getHeader("Subject")[0]);
+        // The decoded subject must match the original non-Latin value.
+        assertEquals(subject, message.getSubject());
+    }
 }

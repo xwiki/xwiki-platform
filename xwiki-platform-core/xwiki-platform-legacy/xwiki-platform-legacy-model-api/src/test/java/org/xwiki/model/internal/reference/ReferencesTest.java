@@ -32,7 +32,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 
 @ComponentTest
 @AllComponents
-public class ReferencesTest
+class ReferencesTest
 {
     @InjectComponentManager
     private MockitoComponentManager componentManager;

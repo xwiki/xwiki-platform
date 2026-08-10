@@ -75,7 +75,7 @@ public class XWikiConfig extends Properties
     }
 
     /**
-     * @return array of string splited from property.
+     * @return array of string split from property.
      * @param param - name of property
      */
     public String[] getPropertyAsList(String param)

@@ -221,7 +221,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
                 }
 
                 // Notify the waiting client that the execution is done
-                this.asyncIds.stream().forEach(asyncId -> shortCache.set(asyncId, result));
+                this.asyncIds.forEach(asyncId -> shortCache.set(asyncId, result));
             }
         }
 
@@ -371,8 +371,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
             this.shortCache.remove(asyncId);
         }
 
-        if (result instanceof Throwable) {
-            throw new NotificationException("Asynchronous notifications gathering failed", (Throwable) result);
+        if (result instanceof Throwable throwable) {
+            throw new NotificationException("Asynchronous notifications gathering failed", throwable);
         }
 
         return result;

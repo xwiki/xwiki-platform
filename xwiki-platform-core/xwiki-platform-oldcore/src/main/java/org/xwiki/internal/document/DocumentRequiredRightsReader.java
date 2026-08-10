@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -137,7 +138,8 @@ public class DocumentRequiredRightsReader
                 } catch (IllegalArgumentException e) {
                     // Ensure that we return an illegal right even if the right part of the value could be parsed.
                     right = Right.ILLEGAL;
-                    this.logger.warn("Illegal required right value [{}] in object [{}]", value, object.getReference());
+                    this.logger.warn("Illegal required right value [{}] in object [{}]. Root cause is [{}]", value,
+                        object.getReference(), ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         }

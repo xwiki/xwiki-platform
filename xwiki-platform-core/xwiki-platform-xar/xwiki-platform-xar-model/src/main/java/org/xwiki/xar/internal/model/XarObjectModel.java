@@ -34,4 +34,12 @@ public class XarObjectModel
     public static final String ELEMENT_CLASSNAME = "className";
 
     public static final String ELEMENT_GUID = "guid";
+
+    /**
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
+     */
+    protected XarObjectModel()
+    {
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
+    }
 }

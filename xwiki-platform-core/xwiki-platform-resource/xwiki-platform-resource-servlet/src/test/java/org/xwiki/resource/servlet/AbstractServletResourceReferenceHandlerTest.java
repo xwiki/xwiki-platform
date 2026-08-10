@@ -150,7 +150,7 @@ class AbstractServletResourceReferenceHandlerTest
 
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.ERROR, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("Failed to read resource [null]", this.logCapture.getMessage(0));
+        assertEquals("Failed to serve the resource [null]", this.logCapture.getMessage(0));
 
         verify(this.filterStream).close();
         verify(this.inputStream).close();

@@ -417,7 +417,8 @@ class XWikiAttachmentTest
         when(document.getAttachment(attachment.getFilename())).thenReturn(newAttachment);
 
         XWikiAttachmentContent content = mock(XWikiAttachmentContent.class);
-        when(content.getContentInputStream()).thenReturn(mock(InputStream.class));
+        InputStream inputStreamMock = mock(InputStream.class);
+        when(content.getContentInputStream()).thenReturn(inputStreamMock);
 
         XWikiAttachment archivedAttachment = new XWikiAttachment(document, attachment.getFilename());
         archivedAttachment.setAttachment_content(content);

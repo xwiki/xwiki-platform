@@ -141,7 +141,7 @@ export default {
     },
 
     // Load the layout component corresponding to the given layoutId
-    // On success, set `this.layoutComponent` to the retreived component,
+    // On success, set `this.layoutComponent` to the retrieved component,
     // which automatically insert the component in the html
     async loadLayout(layoutId) {
       const component = await componentStore.load("layout", layoutId);

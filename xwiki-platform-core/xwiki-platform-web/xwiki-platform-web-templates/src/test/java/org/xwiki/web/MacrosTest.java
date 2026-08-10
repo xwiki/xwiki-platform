@@ -79,12 +79,13 @@ class MacrosTest extends PageTest
     void setVariableGlobal() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-			+ "#macro(helloMacro $return)\n"
-			+ "  #set($return = $NULL)\n"
-			+ "  #setVariable(\"$return\" \"my new value\")\n"
-			+ "#end\n"
-			+ "#helloMacro($myVarToSet)"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #macro(helloMacro $return)
+              #set($return = $NULL)
+              #setVariable("$return" "my new value")
+            #end
+            #helloMacro($myVarToSet)"""));
         
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
         assertEquals("my new value", velocityContext.get("myVarToSet"));
@@ -94,16 +95,17 @@ class MacrosTest extends PageTest
     void setVariableInMacroContext() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-			+ "#macro(childMacro $return)\n"
-			+ "  #set($return = $NULL)\n"
-			+ "  #setVariable(\"$return\" \"value from child macro\")\n"
-			+ "#end\n"  		
-			+ "#macro(parentMacro $return)\n"
-			+ "  #childMacro($macro.childMacroResult)\n"
-			+ "  #setVariable(\"$return\" \"${macro.childMacroResult}/parentValue\")\n"
-			+ "#end\n"
-			+ "#parentMacro($myVarToSet)"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #macro(childMacro $return)
+              #set($return = $NULL)
+              #setVariable("$return" "value from child macro")
+            #end
+            #macro(parentMacro $return)
+              #childMacro($macro.childMacroResult)
+              #setVariable("$return" "${macro.childMacroResult}/parentValue")
+            #end
+            #parentMacro($myVarToSet)"""));
         
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
         assertEquals("value from child macro/parentValue", velocityContext.get("myVarToSet"));
@@ -113,11 +115,12 @@ class MacrosTest extends PageTest
     void addLivetableLocationFilter() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-            + "#set ($whereQL = '')\n"
-            + "#set ($whereParams = [])\n"
-            + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox')\n"
-            + "$whereQL $whereParams"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #set ($whereQL = '')
+            #set ($whereParams = [])
+            #addLivetableLocationFilter($whereQL, $whereParams, 'sandbox')
+            $whereQL $whereParams"""));
         assertEquals("AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!' [%sandbox%]", writer.toString().trim());
     }
 
@@ -125,11 +128,12 @@ class MacrosTest extends PageTest
     void addLivetableLocationFilterWhenFilteringWebHome() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-            + "#set ($whereQL = '')\n"
-            + "#set ($whereParams = [])\n"
-            + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', true)\n"
-            + "$whereQL $whereParams"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #set ($whereQL = '')
+            #set ($whereParams = [])
+            #addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', true)
+            $whereQL $whereParams"""));
         assertEquals("AND ((doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?) ESCAPE '!') OR "
             + "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!')) [%sandbox%, %sandbox%]",
             writer.toString().trim());
@@ -139,11 +143,12 @@ class MacrosTest extends PageTest
     void addLivetableLocationFilterWhenCustomWhere() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-            + "#set ($whereQL = '')\n"
-            + "#set ($whereParams = [])\n"
-            + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', false, 'SOMETHING')\n"
-            + "$whereQL $whereParams"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #set ($whereQL = '')
+            #set ($whereParams = [])
+            #addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', false, 'SOMETHING')
+            $whereQL $whereParams"""));
         assertEquals("SOMETHING []", writer.toString().trim());
     }
 
@@ -151,11 +156,12 @@ class MacrosTest extends PageTest
     void addLivetableLocationFilterWhenFilteringWebHomeAndCustomWhere() throws Exception
     {
         StringWriter writer = new StringWriter();
-        this.velocityManager.evaluate(writer, "logtag", new StringReader("\n"
-            + "#set ($whereQL = '')\n"
-            + "#set ($whereParams = [])\n"
-            + "#addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', true, 'SOMETHING')\n"
-            + "$whereQL $whereParams"));
+        this.velocityManager.evaluate(writer, "logtag", new StringReader("""
+
+            #set ($whereQL = '')
+            #set ($whereParams = [])
+            #addLivetableLocationFilter($whereQL, $whereParams, 'sandbox', true, 'SOMETHING')
+            $whereQL $whereParams"""));
         assertEquals("SOMETHING []", writer.toString().trim());
     }
 

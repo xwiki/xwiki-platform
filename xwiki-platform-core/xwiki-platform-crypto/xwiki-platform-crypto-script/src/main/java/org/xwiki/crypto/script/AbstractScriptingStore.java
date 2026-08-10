@@ -40,7 +40,7 @@ public abstract class AbstractScriptingStore
      * @deprecated use {@link StandardCharsets#UTF_8} instead
      */
     @Deprecated
-    protected static final Charset UTF8 = Charset.forName("UTF-8");
+    protected static final Charset UTF8 = StandardCharsets.UTF_8;
 
     protected StoreReference storeReference;
 
@@ -55,8 +55,8 @@ public abstract class AbstractScriptingStore
 
     protected void checkAccess(Right right) throws AccessDeniedException
     {
-        if (storeReference instanceof WikiStoreReference) {
-            contextualAuthorizationManager.checkAccess(right, ((WikiStoreReference) storeReference).getReference());
+        if (storeReference instanceof WikiStoreReference wikiStoreReference) {
+            contextualAuthorizationManager.checkAccess(right, wikiStoreReference.getReference());
         } else {
             contextualAuthorizationManager.checkAccess(Right.PROGRAM);
         }

@@ -120,6 +120,7 @@ class ProvidingTransactionRunnableTest
 
     private class TR2 extends TransactionRunnable<DBTransaction>
     {
+        @Override
         protected void onRun()
         {
             assertEquals(DB_CONNECTION, this.getContext().getConnection(), "DB Connection was not correct in TR2");
@@ -128,6 +129,7 @@ class ProvidingTransactionRunnableTest
 
     private class TR3 extends TransactionRunnable<MyInterfaceWithDataA1>
     {
+        @Override
         protected void onRun()
         {
             assertEquals(DATA_A1, this.getContext().getDataA1(), "Data A1 was not correct in TR3");

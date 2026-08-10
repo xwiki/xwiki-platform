@@ -1,7 +1,7 @@
 {
   "name": "@xwiki/platform-tool-viteconfig",
-  "version": "18.6.0-SNAPSHOT",
-  "license": "LGPL 2.1",
+  "version": "18.7.0-SNAPSHOT",
+  "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
@@ -26,7 +26,10 @@
   },
   "dependencies": {
     "@jridgewell/remapping": "catalog:",
-    "vite": "catalog:"
+    "@vitejs/plugin-vue": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-css-injected-by-js": "catalog:",
+    "vite-plugin-dts": "catalog:"
   },
   "devDependencies": {
     "@xwiki/platform-tool-tsconfig": "workspace:*",

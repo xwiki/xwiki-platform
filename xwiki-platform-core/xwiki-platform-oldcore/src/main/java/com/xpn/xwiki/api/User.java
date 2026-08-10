@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.api;
 
-import java.text.MessageFormat;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
@@ -123,8 +121,8 @@ public class User extends Api
                 result = this.user.isUserInGroup(groupName, getXWikiContext());
             }
         } catch (Exception ex) {
-            LOGGER.warn(new MessageFormat("Unhandled exception while checking if user {0}"
-                + " belongs to group {1}").format(new java.lang.Object[] { this.user, groupName }), ex);
+            LOGGER.warn("Unhandled exception while checking if user [{}] belongs to group [{}]",
+                this.user, groupName, ex);
         }
         return result;
     }

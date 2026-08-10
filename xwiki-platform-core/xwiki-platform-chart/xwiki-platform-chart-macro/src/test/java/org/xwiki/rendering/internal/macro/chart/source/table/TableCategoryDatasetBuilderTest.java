@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -59,19 +60,19 @@ class TableCategoryDatasetBuilderTest extends AbstractMacroContentTableBlockData
 
         CategoryDataset categoryDataset = (CategoryDataset) dataset;
 
-        assertTrue(categoryDataset.getRowKey(0).equals(" row 1 "));
-        assertTrue(categoryDataset.getRowKey(1).equals(" row 2 "));
+        assertEquals(" row 1 ", categoryDataset.getRowKey(0));
+        assertEquals(" row 2 ", categoryDataset.getRowKey(1));
 
-        assertTrue(categoryDataset.getColumnKey(0).equals(" column 2 "));
-        assertTrue(categoryDataset.getColumnKey(1).equals(" column 3 "));
-        assertTrue(categoryDataset.getColumnKey(2).equals(" column 4"));
+        assertEquals(" column 2 ", categoryDataset.getColumnKey(0));
+        assertEquals(" column 3 ", categoryDataset.getColumnKey(1));
+        assertEquals(" column 4", categoryDataset.getColumnKey(2));
 
-        assertTrue(categoryDataset.getValue(0, 0).intValue() == 12);
-        assertTrue(categoryDataset.getValue(0, 1).intValue() == 13);
-        assertTrue(categoryDataset.getValue(0, 2).intValue() == 14);
-        assertTrue(categoryDataset.getValue(1, 0).intValue() == 22);
-        assertTrue(categoryDataset.getValue(1, 1).intValue() == 23);
-        assertTrue(categoryDataset.getValue(1, 2).intValue() == 24);
+        assertEquals(12, categoryDataset.getValue(0, 0).intValue());
+        assertEquals(13, categoryDataset.getValue(0, 1).intValue());
+        assertEquals(14, categoryDataset.getValue(0, 2).intValue());
+        assertEquals(22, categoryDataset.getValue(1, 0).intValue());
+        assertEquals(23, categoryDataset.getValue(1, 1).intValue());
+        assertEquals(24, categoryDataset.getValue(1, 2).intValue());
     }
 
     @Test
@@ -95,18 +96,18 @@ class TableCategoryDatasetBuilderTest extends AbstractMacroContentTableBlockData
 
         CategoryDataset categoryDataset = (CategoryDataset) dataset;
 
-        assertTrue(categoryDataset.getColumnKey(0).equals(" row 1 "));
-        assertTrue(categoryDataset.getColumnKey(1).equals(" row 2 "));
+        assertEquals(" row 1 ", categoryDataset.getColumnKey(0));
+        assertEquals(" row 2 ", categoryDataset.getColumnKey(1));
 
-        assertTrue(categoryDataset.getRowKey(0).equals(" column 2 "));
-        assertTrue(categoryDataset.getRowKey(1).equals(" column 3 "));
-        assertTrue(categoryDataset.getRowKey(2).equals(" column 4"));
+        assertEquals(" column 2 ", categoryDataset.getRowKey(0));
+        assertEquals(" column 3 ", categoryDataset.getRowKey(1));
+        assertEquals(" column 4", categoryDataset.getRowKey(2));
 
-        assertTrue(categoryDataset.getValue(0, 0).intValue() == 12);
-        assertTrue(categoryDataset.getValue(1, 0).intValue() == 13);
-        assertTrue(categoryDataset.getValue(2, 0).intValue() == 14);
-        assertTrue(categoryDataset.getValue(0, 1).intValue() == 22);
-        assertTrue(categoryDataset.getValue(1, 1).intValue() == 23);
-        assertTrue(categoryDataset.getValue(2, 1).intValue() == 24);
+        assertEquals(12, categoryDataset.getValue(0, 0).intValue());
+        assertEquals(13, categoryDataset.getValue(1, 0).intValue());
+        assertEquals(14, categoryDataset.getValue(2, 0).intValue());
+        assertEquals(22, categoryDataset.getValue(0, 1).intValue());
+        assertEquals(23, categoryDataset.getValue(1, 1).intValue());
+        assertEquals(24, categoryDataset.getValue(2, 1).intValue());
     }
 }

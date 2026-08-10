@@ -154,11 +154,11 @@ public class DefaultOfficeServer implements OfficeServer
                     .formatRegistry(JsonDocumentFormatRegistry.create(input))
                     .filterChain(new LinkedImagesEmbedderFilter()).build();
             } else {
-                this.logger.debug("{} is missing. The default document format registry will be used instead.",
+                this.logger.debug("[{}] is missing. The default document format registry will be used instead.",
                     DOCUMENT_FORMATS_PATH);
             }
         } catch (Exception e) {
-            this.logger.warn("Failed to parse {} . The default document format registry will be used instead.",
+            this.logger.warn("Failed to parse [{}]. The default document format registry will be used instead",
                 DOCUMENT_FORMATS_PATH, e);
         }
 

@@ -32,8 +32,6 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.internal.web.PageTemplateRequiredRightsChecker;
 import org.xwiki.model.EntityType;
@@ -84,8 +82,6 @@ import static org.mockito.Mockito.when;
 class CreateActionTest
 {
     private static final String CSRF_TOKEN_VALUE = "token4234343";
-
-    private static final Logger log = LoggerFactory.getLogger(CreateActionTest.class);
 
     @InjectMockitoOldcore
     MockitoOldcore oldcore;
@@ -525,7 +521,7 @@ class CreateActionTest
         when(document.getContent()).thenReturn("Some non-empty content");
 
         // Submit from the UI spaceReference=X&name=Y&tocreate=terminal
-        // No diference if it was a non-terminal document, just easier to mock since we already have Main.WebHome set
+        // No difference if it was a non-terminal document, just easier to mock since we already have Main.WebHome set
         // up.
         when(mockRequest.getParameter("spaceReference")).thenReturn("Main");
         when(mockRequest.getParameter("name")).thenReturn("WebHome");
@@ -1618,7 +1614,7 @@ class CreateActionTest
         // Verify null is returned (this means the response has been returned)
         assertNull(result);
 
-        // Note: We are creating X.Y as terminal, since it is overriden from the UI, regardless of any backwards
+        // Note: We are creating X.Y as terminal, since it is overridden from the UI, regardless of any backwards
         // compatibility resolutions. Also using the template extracted from the template provider.
         verify(mockURLFactory).createURL("X", "Y", "edit",
             "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,

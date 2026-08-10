@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class PrefilteringLiveNotificationEmailManagerTest
+class PrefilteringLiveNotificationEmailManagerTest
 {
     @InjectMockComponents
     private PrefilteringLiveNotificationEmailManager manager;

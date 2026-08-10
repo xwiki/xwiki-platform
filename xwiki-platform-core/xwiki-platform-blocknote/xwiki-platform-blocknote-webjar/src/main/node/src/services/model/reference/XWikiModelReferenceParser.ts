@@ -20,15 +20,15 @@
 import { toCristalEntityReference } from "./XWikiEntityReference";
 import { EntityType } from "@xwiki/platform-model-api";
 import { Container, inject, injectable } from "inversify";
-import type {
-  ResourceReference,
-  ResourceReferenceParser,
-} from "./ResourceReferenceParser";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceParser,
   ModelReferenceParserOptions,
 } from "@xwiki/platform-model-reference-api";
+import type {
+  ResourceReference,
+  ResourceReferenceParser,
+} from "@xwiki/platform-rendering-api";
 
 @injectable("Singleton")
 export class XWikiModelReferenceParser implements ModelReferenceParser {

@@ -49,7 +49,7 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 public class RecordableEventListener extends AbstractEventListener
 {
     // Event only contains a single method so the whole class can be replaced by a lambda.
-    private static final BeginFoldEvent IGNORED_EVENTS = otherEvent -> otherEvent instanceof BeginFoldEvent;
+    private static final BeginFoldEvent IGNORED_EVENTS = BeginFoldEvent.class::isInstance;
 
     @Inject
     private EventStore eventStore;
@@ -96,11 +96,11 @@ public class RecordableEventListener extends AbstractEventListener
         try {
             this.eventStore.saveEvent(convertEvent(event, source, data)).whenComplete((e, ex) -> {
                 if (ex != null) {
-                    logger.warn("Failed to save the event [{}].", event.getClass().getCanonicalName(), ex);
+                    logger.warn("Failed to save the event [{}]", event.getClass().getCanonicalName(), ex);
                 }
             });
         } catch (Exception e) {
-            logger.warn("Failed to convert event [{}].", event.getClass().getCanonicalName(), e);
+            logger.warn("Failed to convert event [{}]", event.getClass().getCanonicalName(), e);
         }
     }
 

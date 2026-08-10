@@ -45,7 +45,7 @@ import org.xwiki.security.authorization.AuthorExecutor;
 public class SUExecutor
 {
     /**
-     * Contain the informations to restore.
+     * Contain the information to restore.
      *
      * @version $Id$
      */

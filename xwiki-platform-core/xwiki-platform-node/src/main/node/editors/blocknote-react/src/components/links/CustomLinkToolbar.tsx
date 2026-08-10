@@ -17,61 +17,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { LinkEditor } from "./LinkEditor";
 import { LinkToolbarExtension } from "@blocknote/core/extensions";
 import { useComponentsContext, useExtension } from "@blocknote/react";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   RiDeleteBin6Line,
   RiExternalLinkLine,
   RiPencilLine,
 } from "react-icons/ri";
+import type { LinkEditionHandler } from "./linkEdition";
 import type { LinkToolbarProps } from "@blocknote/react";
 
 export type CustomLinkToolbarProps = {
   linkToolbarProps: LinkToolbarProps;
+  linkEditionFn: LinkEditionHandler;
 };
 
 export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
   linkToolbarProps,
+  linkEditionFn,
 }) => {
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
 
   const { editLink, deleteLink } = useExtension(LinkToolbarExtension);
 
-  const [showLinkEditor, setShowLinkEditor] = useState(false);
-
   return (
     <>
-      <Components.Generic.Popover.Root open={showLinkEditor}>
-        <Components.Generic.Popover.Trigger>
-          {/* TODO: hide tooltip on click
-              (note: this comment is from BlockNote's source code but may remain relevant here) */}
-          <Components.FormattingToolbar.Button
-            className="bn-button"
-            data-test="editLink"
-            label={t("blocknote.linkToolbar.buttons.edit")}
-            icon={<RiPencilLine />}
-            onClick={() => setShowLinkEditor(true)}
-          />
-        </Components.Generic.Popover.Trigger>
-        <Components.Generic.Popover.Content
-          className="bn-popover-content bn-form-popover"
-          variant="form-popover"
-        >
-          <LinkEditor
-            current={{
+      <Components.FormattingToolbar.Button
+        className="bn-button"
+        data-test="editLink"
+        label={t("blocknote.linkToolbar.buttons.edit")}
+        icon={<RiPencilLine />}
+        onClick={() =>
+          linkEditionFn({
+            current: {
               url: linkToolbarProps.url,
               title: linkToolbarProps.text,
-            }}
-            updateLink={({ url, title }) =>
-              editLink(url, title, linkToolbarProps.range.from)
-            }
-          />
-        </Components.Generic.Popover.Content>
-      </Components.Generic.Popover.Root>
+            },
+            mode: "editExisting",
+            onSubmit({ url, title }) {
+              editLink(url, title, linkToolbarProps.range.from);
+            },
+          })
+        }
+      />
 
       <Components.FormattingToolbar.Button
         className="bn-button"

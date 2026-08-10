@@ -55,8 +55,8 @@ public class LESSSkinFileResourceReference implements LESSResourceReference
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof LESSSkinFileResourceReference) {
-            return fileName.equals(((LESSSkinFileResourceReference) o).fileName);
+        if (o instanceof LESSSkinFileResourceReference lessSkinFileResourceReference) {
+            return fileName.equals(lessSkinFileResourceReference.fileName);
         }
 
         return false;

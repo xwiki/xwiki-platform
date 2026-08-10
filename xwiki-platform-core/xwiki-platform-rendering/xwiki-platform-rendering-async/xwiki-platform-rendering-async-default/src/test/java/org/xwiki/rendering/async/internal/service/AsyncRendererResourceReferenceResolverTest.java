@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  */
 @ComponentTest
-public class AsyncRendererResourceReferenceResolverTest
+class AsyncRendererResourceReferenceResolverTest
 {
     @InjectMockComponents
     private AsyncRendererResourceReferenceResolver resolver;

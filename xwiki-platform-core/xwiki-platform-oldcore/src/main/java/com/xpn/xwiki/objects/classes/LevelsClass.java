@@ -171,6 +171,7 @@ public class LevelsClass extends ListClass
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
+        setAriaLabelFallback(select, context);
 
         List<String> list = getList(context);
 

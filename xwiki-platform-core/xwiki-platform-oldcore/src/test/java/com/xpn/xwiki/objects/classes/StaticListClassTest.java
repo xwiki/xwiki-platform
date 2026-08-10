@@ -167,6 +167,7 @@ class StaticListClassTest
     void testDisplayEditInput()
     {
         testDisplayEdit("input", VALUES_WITH_HTML_SPECIAL_CHARS, "<input size='7' id='w&#62;vb&#38;a&#60;r' "
+            + "aria-label='core.model.xclass.editClassProperty.textAlternative' "
             + "value='a&#60;b&#62;c|1&#34;2&#39;3|x&#123;y&#38;z' name='w&#62;vb&#38;a&#60;r' type='text'/>");
     }
 

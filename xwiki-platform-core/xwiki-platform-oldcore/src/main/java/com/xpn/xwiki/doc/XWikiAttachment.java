@@ -835,9 +835,9 @@ public class XWikiAttachment implements Cloneable
         return this.content;
     }
 
-    public void setAttachment_content(XWikiAttachmentContent attachment_content)
+    public void setAttachment_content(XWikiAttachmentContent attachmentContent)
     {
-        this.content = attachment_content;
+        this.content = attachmentContent;
 
         if (this.content != null) {
             this.content.setAttachment(this);
@@ -888,9 +888,9 @@ public class XWikiAttachment implements Cloneable
         return this.attachment_archive;
     }
 
-    public void setAttachment_archive(XWikiAttachmentArchive attachment_archive)
+    public void setAttachment_archive(XWikiAttachmentArchive attachmentArchive)
     {
-        this.attachment_archive = attachment_archive;
+        this.attachment_archive = attachmentArchive;
     }
 
     /**

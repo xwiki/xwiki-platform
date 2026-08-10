@@ -188,9 +188,9 @@ public class PackageAPI extends Api
         return apiFiles;
     }
 
-    public boolean add(String docFullName, int DefaultAction) throws XWikiException
+    public boolean add(String docFullName, int defaultAction) throws XWikiException
     {
-        return this.pack.add(docFullName, DefaultAction, getXWikiContext());
+        return this.pack.add(docFullName, defaultAction, getXWikiContext());
     }
 
     public boolean add(String docFullName) throws XWikiException

@@ -74,9 +74,6 @@ public class SxDocumentSource implements SxSource
     /** The document containing the extension. */
     private XWikiDocument document;
 
-    /** The current XWikiContext. */
-    private XWikiContext context;
-
     /** The type of Extension for getting the right kind of object from the document. */
     private Extension extension;
 
@@ -88,7 +85,6 @@ public class SxDocumentSource implements SxSource
      */
     public SxDocumentSource(XWikiContext context, Extension extension)
     {
-        this.context = context;
         this.document = context.getDoc();
         this.extension = extension;
     }
@@ -111,9 +107,9 @@ public class SxDocumentSource implements SxSource
                         finalCache = cache;
                     }
                 } catch (Exception ex) {
-                    LOGGER.warn("SX object [{}#{}] has an invalid cache policy: [{}]",
-                        new Object[]{this.document.getFullName(), sxObj.getStringValue(NAME_PROPERTY_NAME),
-                            sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME)});
+                    LOGGER.warn("SX object [{}#{}] has an invalid cache policy: [{}]. Root cause is [{}]",
+                        this.document.getFullName(), sxObj.getStringValue(NAME_PROPERTY_NAME),
+                        sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME), ExceptionUtils.getRootCauseMessage(ex));
                 }
             }
         }
@@ -155,7 +151,7 @@ public class SxDocumentSource implements SxSource
                 }
                 // Also add a newline, in case the different object contents don't end with a blank
                 // line, and could cause syntax errors when concatenated.
-                resultBuilder.append(sxContent + "\n");
+                resultBuilder.append(sxContent).append('\n');
             }
         }
         return resultBuilder.toString();

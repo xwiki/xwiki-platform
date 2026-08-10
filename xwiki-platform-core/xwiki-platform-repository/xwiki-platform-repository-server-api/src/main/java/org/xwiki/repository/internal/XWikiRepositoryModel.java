@@ -42,7 +42,7 @@ import org.xwiki.model.reference.RegexEntityReference;
 
 import com.xpn.xwiki.objects.BaseObjectReference;
 
-public class XWikiRepositoryModel
+public final class XWikiRepositoryModel
 {
     // References
 
@@ -163,6 +163,12 @@ public class XWikiRepositoryModel
     public static final String PROP_EXTENSION_ID = "id";
 
     /**
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     */
+    public static final String PROP_PROJECT_ID = PROP_EXTENSION_ID;
+
+    /**
      * @since 15.0RC1
      * @since 14.10.2
      */
@@ -218,6 +224,16 @@ public class XWikiRepositoryModel
     public static final String PROP_EXTENSION_SCMCONNECTION = "scmconnection";
 
     public static final String PROP_EXTENSION_SCMDEVCONNECTION = "scmdevconnection";
+
+    /**
+     * @since 18.6.0RC1
+     */
+    public static final String PROP_EXTENSION_SCMTAG = "scmtag";
+
+    /**
+     * @since 18.6.0RC1
+     */
+    public static final String PROP_EXTENSION_STAG = "scmtag";
 
     /**
      * @since 7.3M1
@@ -339,20 +355,24 @@ public class XWikiRepositoryModel
 
     // Consolidation
 
-    public static final String PROP_EXTENSION_LASTVERSION = "lastVersion";
+    /**
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     */
+    public static final String PROP_LASTVERSION = "lastVersion";
 
     public static final String PROP_EXTENSION_VALIDEXTENSION = "validExtension";
 
     // Solr
-
-    public static final String SOLRPROP_EXTENSION_VALIDEXTENSION =
-        toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, "boolean");
 
     public static final String SOLR_STRING = "string";
 
     public static final String SOLR_INTEGER = "int";
 
     public static final String SOLR_BOOLEAN = "boolean";
+
+    public static final String SOLRPROP_EXTENSION_VALIDEXTENSION =
+        toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, SOLR_BOOLEAN);
 
     public static final Map<String, SolrField> SOLR_FIELDS = new HashMap<>();
 
@@ -419,12 +439,13 @@ public class XWikiRepositoryModel
         // Not very interesting for fulltext search
         SOLR_FIELDS.put(Extension.FIELD_AUTHOR, new ExtensionSolrField(PROP_EXTENSION_AUTHORS, null));
         SOLR_FIELDS.put(Extension.FIELD_AUTHORS, SOLR_FIELDS.get(Extension.FIELD_AUTHOR));
-        SOLR_FIELDS.put(Extension.FIELD_VERSION, new ExtensionSolrField(PROP_EXTENSION_LASTVERSION, null));
+        SOLR_FIELDS.put(Extension.FIELD_VERSION, new ExtensionSolrField(PROP_LASTVERSION, null));
         SOLR_FIELDS.put(Extension.FIELD_LICENSE, new ExtensionSolrField(PROP_EXTENSION_LICENSENAME, null));
         SOLR_FIELDS.put(Extension.FIELD_LICENSES, SOLR_FIELDS.get(Extension.FIELD_LICENSE));
         SOLR_FIELDS.put(Extension.FIELD_SCM, new ExtensionSolrField(PROP_EXTENSION_SCMURL, null));
         SOLR_FIELDS.put(PROP_EXTENSION_SCMCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMCONNECTION, null));
         SOLR_FIELDS.put(PROP_EXTENSION_SCMDEVCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMDEVCONNECTION, null));
+        SOLR_FIELDS.put(PROP_EXTENSION_STAG, new ExtensionSolrField(PROP_EXTENSION_STAG, null));
         SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM,
             new ExtensionSolrField(PROP_EXTENSION_ISSUEMANAGEMENT_SYSTEM, null));
         SOLR_FIELDS.put(PROP_EXTENSION_ISSUEMANAGEMENT_URL,
@@ -457,6 +478,11 @@ public class XWikiRepositoryModel
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRepositoryModel.class);
+
+    private XWikiRepositoryModel()
+    {
+        // Utility class, no instantiation.
+    }
 
     public static String toExtensionClassSolrPropertyName(String propertyName)
     {
@@ -526,7 +552,7 @@ public class XWikiRepositoryModel
             try {
                 reposiories.add(toRepositoryDescriptor(stringRepository, factory));
             } catch (URISyntaxException e) {
-                LOGGER.warn("Failed to parse repository descriptor [{}]", stringRepository,
+                LOGGER.warn("Failed to parse repository descriptor [{}]. Root cause is [{}]", stringRepository,
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }

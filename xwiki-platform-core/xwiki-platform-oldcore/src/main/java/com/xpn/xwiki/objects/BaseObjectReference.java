@@ -176,8 +176,8 @@ public class BaseObjectReference extends ObjectReference
 
     private DocumentReference resolveClassReference(EntityReference classReference)
     {
-        if (classReference instanceof DocumentReference) {
-            return (DocumentReference) classReference;
+        if (classReference instanceof DocumentReference documentReference) {
+            return documentReference;
         }
 
         return Utils.<DocumentReferenceResolver<EntityReference>>getComponent(DocumentReferenceResolver.TYPE_REFERENCE)
@@ -207,12 +207,10 @@ public class BaseObjectReference extends ObjectReference
             name = builder.toString();
         } else {
             Matcher matcher = NUMBERPATTERN.matcher(name);
-            if (matcher.find()) {
-                if (matcher.group(1).length() % 2 == 0) {
-                    StringBuilder builder = new StringBuilder(name);
-                    builder.insert(matcher.start(), '\\');
-                    name = builder.toString();
-                }
+            if (matcher.find() && matcher.group(1).length() % 2 == 0) {
+                StringBuilder builder = new StringBuilder(name);
+                builder.insert(matcher.start(), '\\');
+                name = builder.toString();
             }
         }
 

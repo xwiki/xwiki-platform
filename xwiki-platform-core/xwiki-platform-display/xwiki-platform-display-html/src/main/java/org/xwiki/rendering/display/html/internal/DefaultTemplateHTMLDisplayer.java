@@ -155,7 +155,7 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
 
     private String cleanPath(String path)
     {
-        return path.replaceAll("<", "(").replaceAll(">", ")").replaceAll("\\?", "_").replaceAll(" ", "");
+        return path.replace("<", "(").replace(">", ")").replace("?", "_").replace(" ", "");
     }
 
     private List<String> getTemplatePaths(Type type, String mode)

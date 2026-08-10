@@ -33,6 +33,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
+// The equals() and hashCode() tests below verify those contracts themselves, so their assertions
+// deliberately call equals() (or compare hashCode() values) explicitly: the boolean form is what makes
+// visible which object is the receiver and which argument it gets, including null and an instance of a
+// foreign class. Using assertEquals()/assertNotEquals() would move that into JUnit's internals and would
+// invite a later SonarQube S3415 "swap these arguments" change that silently stops testing the contract.
+// That is why those methods, and only those, carry @SuppressWarnings("java:S5785").
 class ActionExecutingEventTest
 {
     // Tests for constructors
@@ -150,6 +156,7 @@ class ActionExecutingEventTest
     // Tests for equals(Object)
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsSameObject()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
@@ -157,6 +164,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsSameAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
@@ -164,6 +172,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWithNull()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
@@ -171,6 +180,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void doesntEqualWildcardAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
@@ -178,6 +188,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void doesntEqualDifferentAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
@@ -185,6 +196,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void doesntEqualDifferentCaseAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
@@ -193,6 +205,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void doesntEqualDifferentTypeOfAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
@@ -200,6 +213,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void wildcardActionDoesntEqualOtherActions()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
@@ -207,6 +221,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void wildcardActionDoesntEqualEmptyAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("");
@@ -214,6 +229,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void wildcardActionEqualsWildcardAction()
     {
         assertTrue(new ActionExecutingEvent().equals(new ActionExecutingEvent()),
@@ -221,6 +237,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void wildcardActionDoesntEqualNull()
     {
         assertFalse(new ActionExecutingEvent().equals(null), "Wildcard action equals null!");
@@ -229,6 +246,7 @@ class ActionExecutingEventTest
     // Tests for hashCode()
 
     @Test
+    @SuppressWarnings("java:S5785")
     void verifyHashCode()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("something");
@@ -236,6 +254,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void hashCodeWithEmptyAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent("");
@@ -243,6 +262,7 @@ class ActionExecutingEventTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void hashCodeForWildcardAction()
     {
         ActionExecutingEvent event = new ActionExecutingEvent();

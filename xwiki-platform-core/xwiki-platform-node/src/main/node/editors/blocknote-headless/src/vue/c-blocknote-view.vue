@@ -19,61 +19,69 @@
 -->
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
-import { createLinkEditionContext } from "../components/linkEditionContext";
-import messages from "../translations";
-import { BlockNoteToUniAstConverter } from "../uniast/bn-to-uniast";
-import { UniAstToBlockNoteConverter } from "../uniast/uniast-to-bn";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
+import { LinkModal, parseLinkTarget } from "@xwiki/platform-link-modal-ui";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
   onBeforeUnmount,
   onMounted,
+  onUnmounted,
   ref,
   shallowRef,
   toRaw,
   useTemplateRef,
 } from "vue";
-import { useI18n } from "vue-i18n";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type {
   BlockNoteViewWrapperProps,
+  BlockType,
   ContextForMacros,
   EditorType,
+  LinkEditionHandlerProps,
 } from "@xwiki/platform-editors-blocknote-react";
+import type { LinkData } from "@xwiki/platform-link-modal-ui";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type { UniAst } from "@xwiki/platform-uniast-api";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/platform-model-remote-url-api";
 
 type Props = {
   /** Main properties for the BlockNote editor */
   editorProps: Omit<
     BlockNoteViewWrapperProps,
-    "content" | "linkEditionCtx" | "macroAstToReactJsxConverter" | "macros"
+    | "depsContainer"
+    | "content"
+    | "linkEditionHandler"
+    | "macroAstToReactJsxConverter"
+    | "macros"
   >;
 
   /** Set to `false` to disable macros entirely */
   macros:
     | {
-        list: MacroWithUnknownParamsType[];
+        /** Optional list of client-rendered macros; omit it when only the server-rendered macros are used. */
+        list?: MacroWithUnknownParamsType[];
         ctx: ContextForMacros;
       }
     | false;
 
   /** Content to initialize the editor with */
-  editorContent: UniAst | Error;
+  editorContent: BlockType[];
 
   collaboration?: Collaboration;
 
-  /** InversifyJS container to inject dependencies from */
-  container: Container;
+  /** Container to inject dependencies from */
+  depsContainer: Container;
 };
 
 const {
   editorProps,
-  editorContent: uniAst,
+  editorContent,
   macros,
   collaboration = undefined,
-  container,
+  depsContainer,
 } = defineProps<Props>();
 
 const editorRef = shallowRef<EditorType | null>(null);
@@ -85,43 +93,33 @@ const emit = defineEmits<{
   "instant-change": [];
 
   // Emitted in the same context as "instant-change", but debounced
-  "debounced-change": [content: UniAst];
+  "debounced-change": [content: BlockType[]];
 }>();
 
-defineExpose({
-  // Get the editor's content
-  getContent: (): UniAst | Error => extractEditorContent(),
-});
+const remoteURLParser = depsContainer
+  .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+  .get()!;
 
-/**
- * Extract the editor's content and convert it to UniAst
- */
-function extractEditorContent(): UniAst | Error {
-  return blockNoteToUniAst.blocksToUniAst(editorRef.value!.document);
+const remoteURLSerializer = depsContainer
+  .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+  .get()!;
+
+function getContent(): BlockType[] {
+  return editorRef.value!.document;
 }
+
+defineExpose({
+  getContent,
+});
 
 /**
  * Notify the parent component the editor's content changed
  */
 function notifyChanges(): void {
-  const content = extractEditorContent();
-
-  // TODO: error reporting
-  if (content instanceof Error) {
-    throw content;
-  }
-
-  emit("debounced-change", content);
+  emit("debounced-change", getContent());
 }
 
 const notifyChangesDebounced = debounce(notifyChanges, 500);
-
-const { t } = useI18n({
-  messages,
-});
-
-// Create the link edition context
-const linkEditionCtx = createLinkEditionContext(container);
 
 // Build the properties object for the React BlockNoteView component
 const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
@@ -132,7 +130,6 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
   blockNoteOptions: editorProps.blockNoteOptions,
   macros,
-  linkEditionCtx,
   // We need to pass the raw version of the collaboration session (but most importantly for the yjs document inside it),
   // otherwise realtime synchronization fails.
   collaboration: toRaw(collaboration),
@@ -141,40 +138,61 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
       editorRef.value = editor;
     },
   },
+  depsContainer,
+  linkEditionHandler: (props) => {
+    editingLink.value = props;
+  },
 };
 
-const blockNoteToUniAst = new BlockNoteToUniAstConverter(
-  linkEditionCtx.remoteURLParser,
-  linkEditionCtx.modelReferenceSerializer,
-  macros ? macros.list : [],
-);
+const submitEditedLink = ({
+  displayText,
+  target: { type, config },
+}: LinkData) => {
+  // TODO: support
 
-const uniAstToBlockNote = new UniAstToBlockNoteConverter(
-  linkEditionCtx.remoteURLSerializer,
-);
+  const url =
+    type === "url"
+      ? config.url
+      : type === "email"
+        ? `mailto:${config.address}`
+        : remoteURLSerializer.serialize(config.ref!)!;
 
-const content =
-  uniAst instanceof Error
-    ? uniAst
-    : uniAstToBlockNote.uniAstToBlockNote(uniAst);
+  editingLink.value?.onSubmit({
+    title: displayText,
+    url,
+  });
+
+  editingLink.value = null;
+};
 
 const blockNoteContainer = useTemplateRef<HTMLElement>("blocknote-container");
+const linkModalContainer = useTemplateRef<HTMLElement>("link-modal-container");
 
 const mountedBlockNote = ref<{ unmount: () => void }>();
 
-onMounted(() => {
-  if (content instanceof Error) {
-    throw content;
+const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
+
+function handleLinkEditorOutsideClick(e: MouseEvent) {
+  if (!editingLink.value || !linkModalContainer.value) {
+    return;
   }
 
+  if (!e.composedPath().includes(linkModalContainer.value)) {
+    editingLink.value = null;
+  }
+}
+
+onMounted(() => {
   if (!blockNoteContainer.value) {
     throw new Error("Missing DOM container for BlockNote!");
   }
 
   mountedBlockNote.value = mountBlockNote(blockNoteContainer.value, {
     ...initializedEditorProps,
-    content,
+    content: editorContent,
   });
+
+  window.addEventListener("mousedown", handleLinkEditorOutsideClick);
 });
 
 onBeforeUnmount(() => {
@@ -184,14 +202,26 @@ onBeforeUnmount(() => {
 
   mountedBlockNote.value.unmount();
 });
+
+onUnmounted(() => {
+  window.removeEventListener("mousedown", handleLinkEditorOutsideClick);
+});
 </script>
 
 <template>
-  <h1 v-if="content instanceof Error">
-    {{ t("blocknote.document.parsingError", { reason: content }) }}
-  </h1>
-
   <div ref="blocknote-container" />
+
+  <div ref="link-modal-container" v-if="editingLink">
+    <LinkModal
+      :current="{
+        displayText: editingLink.current.title,
+        target: parseLinkTarget(editingLink.current.url, remoteURLParser),
+      }"
+      :deps-container="depsContainer"
+      @submit="submitEditedLink"
+      @cancel="editingLink = null"
+    />
+  </div>
 </template>
 
 <style scoped>
@@ -264,6 +294,17 @@ onBeforeUnmount(() => {
       margin: 0;
       padding: 0;
     }
+  }
+
+  /* Since BlockNote 0.51 the image element no longer gets a fallback "alt" attribute, so a broken or not-yet-loaded
+    image (e.g. a missing attachment) collapses to a zero size and can no longer be selected or clicked in the editor
+    (to edit or remove it). Give images a minimum size so they stay visible and selectable. Real images are larger
+    than this minimum so they are not affected. */
+  & .bn-visual-media {
+    /* 2em minimum width to keep some space to click on the image even with the resize handles displayed on hover,
+    this is especially useful for very small images, of missing images. */
+    min-width: 2em;
+    min-height: 1em;
   }
 }
 </style>

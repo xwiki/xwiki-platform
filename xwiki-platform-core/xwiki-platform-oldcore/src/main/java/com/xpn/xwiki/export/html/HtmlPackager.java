@@ -224,7 +224,7 @@ public class HtmlPackager
         // otherwise on some OS we wouldn't be able to unzip if there are pages having a path longer than 255 chars...
         String zipname = "pages/" + this.pathEntityReferenceSerializer.serialize(pageReference);
         String language = doc.getLanguage();
-        if (language != null && language.length() != 0) {
+        if (language != null && !language.isEmpty()) {
             zipname += POINT + language;
         }
         zipname += ".html";
@@ -368,7 +368,7 @@ public class HtmlPackager
             attachmentDir.mkdirs();
 
             // Create and initialize a custom URL factory
-            ExportURLFactory urlf = new ExportURLFactory();
+            ExportURLFactory urlf = new ExportURLFactory(true);
             Provider<FilesystemExportContext> exportContextProvider =
                 Utils.getComponent(new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
             // Note that the following line will set a FilesystemExportContext instance in the Execution Context
@@ -480,7 +480,7 @@ public class HtmlPackager
 
             // Don't include vm and LESS files by default
             FileFilter filter =
-                new NotFileFilter(new SuffixFileFilter(new String[]{ ".vm", ".less", "skin.properties" }));
+                new NotFileFilter(new SuffixFileFilter(".vm", ".less", "skin.properties"));
 
             addDirToZip(file, filter, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR,
                 exportedSkinFiles);
@@ -499,9 +499,7 @@ public class HtmlPackager
     private static void addDirToZip(File directory, FileFilter filter, ZipOutputStream out, String basePath,
         Collection<String> exportedSkinFiles) throws IOException
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
-        }
+        LOGGER.debug("Adding dir [{}] to the Zip file being generated.", directory.getPath());
 
         if (!directory.isDirectory()) {
             return;

@@ -39,6 +39,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -161,7 +162,7 @@ public class ExtensionStore implements Initializable, Disposable
         cacheConfiguration.setConfigurationId("repository.extensionid.documentreference");
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
         lru.setMaxEntries(10000);
-        cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+        cacheConfiguration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
 
         try {
             this.documentReferenceCache = this.cacheManager.createNewCache(cacheConfiguration);
@@ -259,8 +260,8 @@ public class ExtensionStore implements Initializable, Disposable
             try {
                 url = new URL(urlString);
             } catch (MalformedURLException e) {
-                this.logger.warn("The format of the URL property [{}] is wrong ({})", property.getReference(),
-                    urlString);
+                this.logger.warn("The format of the URL property [{}] is wrong: [{}]. Root cause is [{}]",
+                    property.getReference(), urlString, ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
@@ -631,9 +632,11 @@ public class ExtensionStore implements Initializable, Disposable
         DocumentReference[] cachedDocumentReference = this.documentReferenceCache.get(extensionId);
 
         if (cachedDocumentReference == null) {
-            Query query = this.queryManager.createQuery("select doc.fullName from Document doc, doc.object(" + clazz
-                + ") as extension where extension." + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :id", Query.XWQL);
-            query.bindValue("id", extensionId);
+            Query query = this.queryManager.createQuery(
+                "select doc.fullName from Document doc, doc.object(" + clazz + ") as extension where extension."
+                    + XWikiRepositoryModel.PROP_EXTENSION_ID + " = :" + XWikiRepositoryModel.PROP_EXTENSION_ID,
+                Query.XWQL);
+            query.bindValue(XWikiRepositoryModel.PROP_EXTENSION_ID, extensionId);
             query.setLimit(1);
 
             List<String> documentReferences = query.execute();
@@ -686,13 +689,29 @@ public class ExtensionStore implements Initializable, Disposable
      */
     public String getExtensionLastVersion(String extensionId) throws QueryException
     {
-        Query query =
-            this.queryManager.createQuery("select version.version, version.index from Document doc, doc.object("
-                + XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME
-                + ") as version where version.id = :extensionId and version.index is not null "
-                + "order by version.index desc", Query.XWQL);
+        return getLastVersion(extensionId, XWikiRepositoryModel.EXTENSIONVERSION_CLASSNAME);
+    }
 
-        query.bindValue("extensionId", extensionId);
+    /**
+     * @param projectId the identifier of the project
+     * @return the latest version of the project
+     * @throws QueryException when failing to search for the extension latest version
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     */
+    public String getProjectLastVersion(String projectId) throws QueryException
+    {
+        return getLastVersion(projectId, XWikiRepositoryModel.PROJECTVERSION_CLASSNAME);
+    }
+
+    private String getLastVersion(String id, String classStringReference) throws QueryException
+    {
+        Query query = this.queryManager.createQuery(
+            "select version.version, version.index from Document doc, doc.object(" + classStringReference
+                + ") as version where version.id = :id and version.index is not null order by version.index desc",
+            Query.XWQL);
+
+        query.bindValue("id", id);
 
         List<Object[]> results = query.execute();
 
@@ -784,6 +803,17 @@ public class ExtensionStore implements Initializable, Disposable
     public String getExtensionId(XWikiDocument document)
     {
         return document.getStringValue(XWikiRepositoryModel.PROP_EXTENSION_ID);
+    }
+
+    /**
+     * @param document the document holding the project metadata
+     * @return the identifier of the project
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     */
+    public String getProjectId(XWikiDocument document)
+    {
+        return document.getStringValue(XWikiRepositoryModel.PROP_PROJECT_ID);
     }
 
     /**

@@ -112,8 +112,8 @@ public class ContextExtendedURLURLNormalizer implements URLNormalizer<ExtendedUR
      */
     private String getContextPathFromApplicationContext()
     {
-        if (this.environment instanceof ServletEnvironment) {
-            return ((ServletEnvironment) this.environment).getServletContext().getContextPath();
+        if (this.environment instanceof ServletEnvironment servletEnvironment) {
+            return servletEnvironment.getServletContext().getContextPath();
         }
         return null;
     }

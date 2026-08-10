@@ -120,7 +120,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);
         TableBlock result = null;
         this.logger.debug("Table id is [{}], there are [{}] tables in the document [{}]",
-            new Object[]{this.tableId, tableBlocks.size(), this.documentReference});
+            this.tableId, tableBlocks.size(), this.documentReference);
         if (null != tableId) {
             for (TableBlock tableBlock : tableBlocks) {
                 String id = tableBlock.getParameter("id");
@@ -130,7 +130,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
                 }
             }
         } else {
-            result = (tableBlocks.size() > 0) ? tableBlocks.get(0) : null;
+            result = !tableBlocks.isEmpty() ? tableBlocks.get(0) : null;
         }
 
         if (null == result) {

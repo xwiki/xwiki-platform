@@ -239,8 +239,7 @@ class WebJarsResourceReferenceHandlerTest
         // Verify the exception is logged.
         assertEquals(1, this.logCapture.size());
         assertEquals(ERROR, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("Failed to evaluate the Velocity code from WebJar resource [angular/2.1.11/angular.js]",
-            this.logCapture.getMessage(0));
+        assertEquals("Failed to serve the resource [angular/2.1.11/angular.js]", this.logCapture.getMessage(0));
 
         // Verify that the client is properly notified about the failure.
         verify(this.response.getResponse()).sendError(500,

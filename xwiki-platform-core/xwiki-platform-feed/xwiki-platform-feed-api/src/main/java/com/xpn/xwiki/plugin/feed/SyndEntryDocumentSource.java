@@ -140,6 +140,11 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
     public static final String CONTENT_LENGTH = "ContentLength";
 
+    /**
+     * The JTidy configuration property name holding the input encoding.
+     */
+    private static final String INPUT_ENCODING = "input-encoding";
+
     public static final Properties TIDY_FEED_CONFIG;
 
     public static final Properties TIDY_XML_CONFIG;
@@ -180,7 +185,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         TIDY_XML_CONFIG.setProperty("input-xml", "yes");
         TIDY_XML_CONFIG.setProperty("output-xml", "yes");
         TIDY_XML_CONFIG.setProperty("add-xml-pi", "no");
-        TIDY_XML_CONFIG.setProperty("input-encoding", "UTF8");
+        TIDY_XML_CONFIG.setProperty(INPUT_ENCODING, "UTF8");
 
         // HTML specific configuration
         TIDY_HTML_CONFIG = new Properties(TIDY_FEED_CONFIG);
@@ -189,7 +194,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         TIDY_HTML_CONFIG.setProperty("drop-empty-paras", "yes");
         TIDY_HTML_CONFIG.setProperty("enclose-text", "yes");
         TIDY_HTML_CONFIG.setProperty("logical-emphasis", "yes");
-        TIDY_HTML_CONFIG.setProperty("input-encoding", "UTF8");
+        TIDY_HTML_CONFIG.setProperty(INPUT_ENCODING, "UTF8");
 
         // default parameters for all instances of this class
         DEFAULT_PARAMS = new HashMap<>();
@@ -352,7 +357,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         String author = xwiki.getUserName(doc.getAuthor(), null, false, context);
         // the description format should be taken from a resource bundle, and thus localized
         String descFormat = "Version %1$s edited by %2$s on %3$s";
-        return String.format(descFormat, new Object[] {doc.getVersion(), author, doc.getDate()});
+        return String.format(descFormat, doc.getVersion(), author, doc.getDate());
     }
 
     protected SyndContent getDescription(Document doc, Map<String, Object> params, XWikiContext context)
@@ -403,8 +408,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
         List<SyndCategory> result = new ArrayList<>();
         for (Object category : categories) {
-            if (category instanceof SyndCategory) {
-                result.add((SyndCategory) category);
+            if (category instanceof SyndCategory syndCategory) {
+                result.add(syndCategory);
             } else if (category != null) {
                 SyndCategory scat = new SyndCategoryImpl();
                 scat.setName(category.toString());
@@ -491,8 +496,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
         List<String> contributors = new ArrayList<>();
         for (Object rawContributor : rawContributors) {
-            if (rawContributor instanceof String) {
-                contributors.add((String) rawContributor);
+            if (rawContributor instanceof String contributor) {
+                contributors.add(contributor);
             } else {
                 contributors.add(rawContributor.toString());
             }
@@ -636,7 +641,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         // Even if we add a message listener we still have to redirect the output. Otherwise all the messages will be
         // written to the standard output (besides being logged by TIDY_LOGGER).
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ByteArrayInputStream in = new ByteArrayInputStream(xmlFragment.getBytes(Charset.forName(config.getProperty("input-encoding"))));
+        ByteArrayInputStream in = new ByteArrayInputStream(xmlFragment.getBytes(Charset.forName(config.getProperty(INPUT_ENCODING))));
         return tidy.parseDOM(in, out);
     }
 
@@ -760,12 +765,12 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      */
     protected Document castDocument(Object obj, XWikiContext context) throws XWikiException
     {
-        if (obj instanceof Document) {
-            return (Document) obj;
-        } else if (obj instanceof XWikiDocument) {
-            return ((XWikiDocument) obj).newDocument(context);
-        } else if (obj instanceof String) {
-            return context.getWiki().getDocument((String) obj, context).newDocument(context);
+        if (obj instanceof Document document) {
+            return document;
+        } else if (obj instanceof XWikiDocument xwikiDocument) {
+            return xwikiDocument.newDocument(context);
+        } else if (obj instanceof String string) {
+            return context.getWiki().getDocument(string, context).newDocument(context);
         } else {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, "");
         }

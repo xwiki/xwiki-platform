@@ -311,7 +311,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
 
     // Synchronize the location fields while the user types.
     // We catch the change event because we want to make sure everything's updated when the user change fields
-    // (particulary useful in our automated tests).
+    // (particularly useful in our automated tests).
     titleInput.on('input change', scheduleUpdateOfLocationAndNameFromTitleInput);
     wikiField.on('change', updateLocationFromWikiField);
     nameInput.on('input change', updateLocationFromNameInput);
@@ -398,12 +398,18 @@ require(['jquery'], function($) {
         insertAfterWhatNode: isSimpleUser ? breadcrumbContainer[0] : spaceReferenceInput[0]
       });
       spaceValidator.displayMessageWhenEmpty = true;
+      // A space/page name may legitimately contain dots, which are escaped with a backslash in the
+      // serialized reference (e.g. "Foo\." is the reference of a space named "Foo."). Neutralize the
+      // escaped sequences before checking, so that an escaped dot is not mistaken for a separator and
+      // flagged as a partial reference (leading / trailing / double dot). The double backslashes are
+      // collapsed first so that "\\." (escaped backslash followed by a separator) is handled correctly.
       let dotRegex = /(^\.)|(\.$)|(\.\.+)/
       spaceValidator.add(Validate.Custom, {
         failureMessage: l10n['core.validation.spacevalidation.message.invalidreference'],
         against: function(value) {
           if (typeof value === 'string') {
-            return value.strip().search(dotRegex) === -1;
+            let separatorsOnly = value.strip().replaceAll(/\\\\/g, 'x').replaceAll(/\\./g, 'x');
+            return separatorsOnly.search(dotRegex) === -1;
           } else {
             return true;
           }
@@ -528,7 +534,7 @@ require(['jquery'], function($) {
 
       var allowedSpaces = [];
       var allowedSpacesData = input.attr('data-allowed-spaces');
-      // Read the alowed spaces specified by the template provider, unless they are just suggestions in which case they
+      // Read the allowed spaces specified by the template provider, unless they are just suggestions in which case they
       // should be ignored by validation.
       if (!restrictionsAreSuggestions && allowedSpacesData) {
         allowedSpaces = JSON.parse(input.attr('data-allowed-spaces'));

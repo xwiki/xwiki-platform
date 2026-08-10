@@ -62,8 +62,8 @@ public class StringMetaClass extends PropertyMetaClass
         BooleanClass pickerClass = new BooleanClass(this);
         pickerClass.setName("picker");
         pickerClass.setPrettyName("Use Suggest");
-        pickerClass.setDisplayType("yesno");
-        pickerClass.setDisplayFormType("checkbox");
+        pickerClass.setDisplayType(BooleanClass.DISPLAY_YESNO);
+        pickerClass.setDisplayFormType(BooleanClass.DISPLAY_CHECKBOX);
         pickerClass.setDefaultValue(1);
         safeput(pickerClass.getName(), pickerClass);
     }

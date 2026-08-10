@@ -121,11 +121,11 @@ public class SafeInstalledExtension<T extends InstalledExtension> extends SafeLo
     {
         DocumentReference userReference = null;
         Object value = getNamespaceProperty("user.reference", namespace);
-        if (value instanceof DocumentReference) {
-            userReference = (DocumentReference) value;
-        } else if (value instanceof String) {
+        if (value instanceof DocumentReference documentReference) {
+            userReference = documentReference;
+        } else if (value instanceof String string) {
             // The extension store doesn't know how to serialize a DocumentReference and so it saves the string value.
-            userReference = this.documentReferenceResolver.resolve((String) value);
+            userReference = this.documentReferenceResolver.resolve(string);
         }
         return userReference;
     }

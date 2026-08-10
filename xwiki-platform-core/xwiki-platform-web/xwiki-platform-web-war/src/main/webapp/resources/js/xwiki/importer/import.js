@@ -78,17 +78,19 @@ var XWiki = (function(XWiki){
       hookRichImporterUI();
       /** Attach the HTML5 uploader, if available */
       var form = $('AddAttachment');
-      if (form && typeof(XWiki.FileUploader) != 'undefined') {
-        var input = form.down("input[type='file']");
-        var html5Uploader = new XWiki.FileUploader(input, {
-          'progressAutohide' : true,
-          'responseContainer' : $('packagelistcontainer'),
-          'responseURL' : window.docgeturl + '?xpage=packagelist&forceTestRights=1',
-          'maxFilesize' : parseInt(input.readAttribute('data-max-file-size'))
-        });
-        form.observe("xwiki:html5upload:done", hookRichImporterUI);
-        html5Uploader.hideFormButtons();
-      }
+      require(['xwiki-upload'], function(FileUploader) {
+        if (form && typeof (FileUploader) != 'undefined') {
+          var input = form.down("input[type='file']");
+          var html5Uploader = new FileUploader(input, {
+            'progressAutohide': true,
+            'responseContainer': $('packagelistcontainer'),
+            'responseURL': window.docgeturl + '?xpage=packagelist&forceTestRights=1',
+            'maxFilesize': parseInt(input.readAttribute('data-max-file-size'))
+          });
+          form.observe("xwiki:html5upload:done", hookRichImporterUI);
+          html5Uploader.hideFormButtons();
+        }
+      });
     });
 
     /**
@@ -109,7 +111,7 @@ var XWiki = (function(XWiki){
     });
 
     /**
-     * Helper class to request the server informations about a package via AJAX.
+     * Helper class to request the server information about a package via AJAX.
      */
     importer.PackageInformationRequest = Class.create({
 
@@ -406,7 +408,7 @@ var XWiki = (function(XWiki){
          * - The username of the author of the package (for example XWiki.Admin)
          * - Wether the package is a back up pack or not (contains revisions along with documents)
          *
-         * @param infos the array that contains the informations to build the header upon
+         * @param infos the array that contains the information to build the header upon
          */
         createPackageHeader:function(infos)
         {

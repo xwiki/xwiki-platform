@@ -91,7 +91,7 @@ public class SpaceNormalizerContentAlterer extends AbstractContentAlterer
             }
         }
         // if the last character is a space, remove it and add it to the removed chars
-        if (buffer.length() > 0 && buffer.charAt(buffer.length() - 1) == ' ') {
+        if (!buffer.isEmpty() && buffer.charAt(buffer.length() - 1) == ' ') {
             buffer.deleteCharAt(buffer.length() - 1);
             removedChars++;
             // remove the mapping from the altered to initial mapping since it doesn't exist anymore. buffer.length is
@@ -99,7 +99,7 @@ public class SpaceNormalizerContentAlterer extends AbstractContentAlterer
             alteredToInitial.remove(buffer.length());
         }
         // finally update the indexes for the last stream of removed chars
-        if (buffer.length() > 0) {
+        if (!buffer.isEmpty()) {
             // add the offsets for the remaining removed chars
             for (int t = 0; t < removedChars; ++t) {
                 initialToAltered.put(sequence.length() - 1 - t, buffer.length() - 1 - 1);

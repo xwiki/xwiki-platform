@@ -36,7 +36,7 @@ import org.apache.solr.common.params.CursorMarkParams;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.store.solr.internal.EventsSolrCoreInitializer;
+import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.XWikiSolrCore;
@@ -126,7 +126,7 @@ public class SolrDocumentMigration171001000
             Date date = this.solrUtils.get(Event.FIELD_DATE, solrDocument);
 
             SolrInputDocument solrInputDocument = new SolrInputDocument();
-            this.solrUtils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, id, solrInputDocument);
+            this.solrUtils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, id, solrInputDocument);
             this.solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Event.FIELD_PREFILTERING_DATE,
                 date, solrInputDocument);
             documentsToUpdate.add(solrInputDocument);

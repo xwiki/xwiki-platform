@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-common</artifactId>
   <packaging>deb</packaging>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-war</artifactId>
-      <version>18.6.0-SNAPSHOT</version>
+      <version>18.7.0-SNAPSHOT</version>
       <type>war</type>
       <scope>provided</scope>
     </dependency>
@@ -190,7 +190,7 @@
               <excludes>WEB-INF,WEB-INF/**/*,META-INF/extension.xed</excludes>
               <mapper>
                 <type>perm</type>
-                <prefix>/usr/lib/xwiki</prefix>
+                <prefix>${debian.xwiki.path}</prefix>
               </mapper>
             </data>
             <data>
@@ -198,7 +198,7 @@
               <type>directory</type>
               <mapper>
                 <type>perm</type>
-                <prefix>/usr/lib/xwiki/WEB-INF/lib</prefix>
+                <prefix>${debian.xwiki.path}/WEB-INF/lib</prefix>
               </mapper>
             </data>
             <data>
@@ -207,7 +207,7 @@
               <excludes>logback.xml</excludes>
               <mapper>
                 <type>perm</type>
-                <prefix>/usr/lib/xwiki/WEB-INF/classes</prefix>
+                <prefix>${debian.xwiki.path}/WEB-INF/classes</prefix>
               </mapper>
             </data>
             <data>
@@ -215,7 +215,7 @@
               <type>directory</type>
               <mapper>
                 <type>perm</type>
-                <prefix>/usr/lib/xwiki/META-INF</prefix>
+                <prefix>${debian.xwiki.path}/META-INF</prefix>
               </mapper>
             </data>
 
@@ -264,85 +264,85 @@
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/cache</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/cache</linkName>
               <linkTarget>/etc/xwiki/cache</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/classes/logback.xml</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/classes/logback.xml</linkName>
               <linkTarget>/etc/xwiki/logback.xml</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/fonts</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/fonts</linkName>
               <linkTarget>/etc/xwiki/fonts</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/observation</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/observation</linkName>
               <linkTarget>/etc/xwiki/observation</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/hibernate.cfg.xml</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/hibernate.cfg.xml</linkName>
               <linkTarget>/etc/xwiki/hibernate.cfg.xml</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/jboss-deployment-structure.xml</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/jboss-deployment-structure.xml</linkName>
               <linkTarget>/etc/xwiki/jboss-deployment-structure.xml</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/portlet.xml</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/portlet.xml</linkName>
               <linkTarget>/etc/xwiki/portlet.xml</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/sun-web.xml</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/sun-web.xml</linkName>
               <linkTarget>/etc/xwiki/sun-web.xml</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/jetty-ee10-web.xml</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/jetty-ee10-web.xml</linkName>
               <linkTarget>/etc/xwiki/jetty-ee10-web.xml</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/jetty-ee11-web.xml</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/jetty-ee11-web.xml</linkName>
               <linkTarget>/etc/xwiki/jetty-ee11-web.xml</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/web.xml</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/web.xml</linkName>
               <linkTarget>/etc/xwiki/web.xml</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/xwiki.cfg</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/xwiki.cfg</linkName>
               <linkTarget>/etc/xwiki/xwiki.cfg</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/xwiki.properties</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/xwiki.properties</linkName>
               <linkTarget>/etc/xwiki/xwiki.properties</linkTarget>
             </data>
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/xwiki-locales.txt</linkName>
+              <linkName>${debian.xwiki.path}/WEB-INF/xwiki-locales.txt</linkName>
               <linkTarget>/etc/xwiki/xwiki-locales.txt</linkTarget>
             </data>
           </dataSet>

@@ -86,7 +86,7 @@ class SpaceNormalizerContentAltererTest
      */
     @ParameterizedTest
     @MethodSource("filteringSource")
-    public void filtering(String initial, String altered)
+    void filtering(String initial, String altered)
     {
         AlteredContent alteredContent = this.alterer.alter(initial);
         assertEquals(altered, alteredContent.getContent().toString());

@@ -81,7 +81,7 @@ public class DocumentTitleDisplayer extends AbstractDocumentTitleDisplayer
                     txContext.setTargetSyntax(parameters.getTargetSyntax());
                     transformationManager.performTransformations(headingXDOM, txContext);
 
-                    Block headingBlock = headingXDOM.getChildren().size() > 0 ? headingXDOM.getChildren().get(0) : null;
+                    Block headingBlock = !headingXDOM.getChildren().isEmpty() ? headingXDOM.getChildren().get(0) : null;
                     if (headingBlock instanceof HeaderBlock) {
                         return new XDOM(headingBlock.getChildren());
                     }

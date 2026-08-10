@@ -227,11 +227,10 @@ define('xwiki-attachment-picker',
           .prop('href', downloadURL)
           .data('index', index)
           .append($('<span>').append(preview).addClass('previewWrapper'))
-          .append('<br/>')
           .append(textSpan);
 
         const attachmentGroup = $('<span class="attachmentGroup">')
-          .append($('<div/>').append(link))
+          .append(link)
           .data('id', result.id);
         if (result.isLocal) {
           attachmentGroup.addClass('localAttachment');

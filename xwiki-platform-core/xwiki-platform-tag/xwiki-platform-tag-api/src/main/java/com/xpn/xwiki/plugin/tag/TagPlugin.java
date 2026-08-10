@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -173,7 +174,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             PropertyClass tagPropertyDefinition = (PropertyClass) tagClass.getField(TAG_PROPERTY);
             tagProperty = tagPropertyDefinition.newProperty();
         } catch (XWikiException ex) {
-            LOGGER.warn("Failed to properly create tag property for the tag object, creating a default one");
+            LOGGER.warn("Failed to properly create tag property for the tag object, creating a default one. Root "
+                + "cause is [{}]", ExceptionUtils.getRootCauseMessage(ex));
             tagProperty = new DBStringListProperty();
         }
         tagProperty.setName(TAG_PROPERTY);
@@ -198,7 +200,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * Get cardinality map of tags within the wiki.
      * 
      * @param context XWiki context.
-     * @return map of tags (alphabetical order) with their occurences counts.
+     * @return map of tags (alphabetical order) with their occurrences counts.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      */
     public Map<String, Integer> getTagCount(XWikiContext context) throws XWikiException
@@ -235,7 +237,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * 
      * @param spaces the list of space to get tags in, as a comma separated, quoted space references strings.
      * @param context XWiki context.
-     * @return map of tags with their occurences counts
+     * @return map of tags with their occurrences counts
      * @throws XWikiException if search query fails (possible failures: space list parse error, DB problems, etc).
      * @since 8.2M1
      */
@@ -639,7 +641,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         // accessible to users, it's just not visible for simple users; it doesn't change permissions.
         List<String> docsToProcess = getDocumentsWithTag(tag, true, context);
 
-        if (docsToProcess.size() == 0) {
+        if (docsToProcess.isEmpty()) {
             return TagOperationResult.NO_EFFECT;
         }
         for (String docName : docsToProcess) {

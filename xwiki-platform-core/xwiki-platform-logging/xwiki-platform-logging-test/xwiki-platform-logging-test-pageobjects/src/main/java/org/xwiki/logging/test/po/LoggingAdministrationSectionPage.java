@@ -35,6 +35,8 @@ import org.xwiki.livedata.test.po.TableLayoutElement;
  * in its "Actions" column, a form to select a new level and submit it.
  *
  * @version $Id$
+ * @since 17.10.10
+ * @since 18.4.3
  * @since 18.5.0RC1
  */
 public class LoggingAdministrationSectionPage extends AdministrationSectionPage

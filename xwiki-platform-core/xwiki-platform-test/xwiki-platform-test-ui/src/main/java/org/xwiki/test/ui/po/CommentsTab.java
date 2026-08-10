@@ -124,6 +124,19 @@ public class CommentsTab extends BaseElement
         addCommentForm.clickSubmit(wait);
         return this.getCommentID(content);
     }
+    /**
+     * Toggle the comment thread for a comment if available
+     *
+     * @param id the root comment id
+     */
+    public void toggleCommentThread(int id)
+    {
+        WebElement threadButton = getDriver().findElement(
+            By.xpath(String.format("//div[@id='xwikicomment_%d']//button[contains(@class, 'thread-toggle')]", id)));
+        threadButton.click();
+        getDriver().waitUntilElementIsVisible(
+            By.cssSelector(threadButton.getAttribute("data-target") + ".collapse.in"));
+    }
 
     /**
      * Deletes a comment.
@@ -265,6 +278,7 @@ public class CommentsTab extends BaseElement
     {
         getDriver().findElement(
             By.xpath(String.format("//div[@id='xwikicomment_%d']//a[contains(@class, 'commentreply')]", id))).click();
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".collapse.in form#AddComment"));
     }
 
     /**

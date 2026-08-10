@@ -22,7 +22,6 @@ package org.xwiki.blocknote.test.ui;
 import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.Keys;
 import org.xwiki.blocknote.test.po.BlockNoteEditor;
 import org.xwiki.blocknote.test.po.BlockNoteRichTextArea;
 import org.xwiki.edit.test.po.InplaceEditablePage;
@@ -31,8 +30,9 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Edit and save to check that the wiki syntax is preserved.
@@ -63,268 +63,239 @@ class RoundTripIT extends AbstractBlockNoteIT
 {
     @Test
     @Order(1)
-    void textFormat(TestUtils setup, TestReference testReference) throws Exception
+    void textFormat(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             one **two** //three// __four__ --five-- ,,six,, ^^seven^^ ##eight## nine
 
             __//--**,,##^^all^^##,,**--//__""",
             // The content is modified on save:
-            // * subscript and superscript styles are lost because they are not supported by the editor
             // * the order of the nested styles is normalized because the editor stores text styles in a flat structure
-            // * the editor outputs default paragraph styles
             """
-                (% style="color:default;background-color:default;text-align:left" %)
-                one **two** //three// __four__ --five-- six seven ##eight## nine
+                one **two** //three// __four__ --five-- ,,six,, ^^seven^^ ##eight## nine
 
-                (% style="color:default;background-color:default;text-align:left" %)
-                **//__--##all##--__//**""");
+                **//__--^^,,##all##,,^^--__//**""");
     }
 
     @Test
     @Order(2)
-    void customParameters(TestUtils setup, TestReference testReference) throws Exception
+    void customParameters(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             (% data-bar="foo" %)
-            one (% data-foo="bar" %)two(%%) three
-            """,
-            // The content is modified on save:
-            // * custom parameters are lost because they are not supported by the editor
-            // * the editor outputs default paragraph styles
-            """
-                (% style="color:default;background-color:default;text-align:left" %)
-                one two three""");
+            one (% data-foo="bar" %)two(%%) three""");
     }
 
     @Test
     @Order(3)
-    void headings(TestUtils setup, TestReference testReference) throws Exception
+    void headings(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             = Heading 1 with **bold** and //italic// =
 
             == Heading 2 ==
 
+            (% id="HTest" %)
             === Heading 3 ===
 
             ==== Heading 4 ====
 
             ===== Heading 5 =====
 
-            ====== Heading 6 ======""",
-            // The content is modified on save:
-            // * the editor outputs default heading styles
-            """
-                (% style="color:default;background-color:default;text-align:left" %)
-                = Heading 1 with **bold** and //italic// =
-
-                (% style="color:default;background-color:default;text-align:left" %)
-                == Heading 2 ==
-
-                (% style="color:default;background-color:default;text-align:left" %)
-                === Heading 3 ===
-
-                (% style="color:default;background-color:default;text-align:left" %)
-                ==== Heading 4 ====
-
-                (% style="color:default;background-color:default;text-align:left" %)
-                ===== Heading 5 =====
-
-                (% style="color:default;background-color:default;text-align:left" %)
-                ====== Heading 6 ======""");
+            ====== Heading 6 ======""");
     }
 
     @Test
     @Order(4)
-    void emptyLines(TestUtils setup, TestReference testReference) throws Exception
+    void emptyLines(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             first
 
 
-            second""",
-            // The content is modified on save:
-            // * the empty line is converted to a paragraph on load but it isn't converted back to an empty line on save
-            // because the editor outputs default paragraph styles (so it's not an empty line anymore)
-            """
-                (% style="color:default;background-color:default;text-align:left" %)
-                first
-
-                (% style="color:default;background-color:default;text-align:left" %)
-
-
-                (% style="color:default;background-color:default;text-align:left" %)
-                second""");
+            second""");
     }
 
     @Test
     @Order(5)
-    void verbatim(TestUtils setup, TestReference testReference) throws Exception
+    void verbatim(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
-            one {{{**two**}}} three
+            one {{{**two**}}} three (% data-foo="bar" %){{{__four__}}}(%%) five
 
             {{{
             not **bold**
+            }}}
+
+            (% data-color="green" data-xwiki-verbatim-language="json" %)
+            {{{
+            {"value": "no [[link]]"}
             }}}""",
             // The content is modified on save:
-            // * the editor doesn't support inline verbatim so it outputs an escape sequence
-            // * the editor outputs default verbatim parameter values
-            // * the editor outputs default paragraph styles
+            // * XWiki doesn't render properly an inline verbatim block with parameters (it looks like the XWiki 2.1
+            // renderer expects the parameters to be on a separate Format block, otherwise it thinks the inline verbatim
+            // block is standalone)
             """
-                (% style="color:default;background-color:default;text-align:left" %)
-                one ~*~*two~*~* three
+                one {{{**two**}}} three (% data-foo="bar" %)
+                {{{__four__}}} five
 
-                (% data-xwiki-verbatim-language="" %)
                 {{{
                 not **bold**
+                }}}
+
+                (% data-color="green" data-xwiki-verbatim-language="json" %)
+                {{{
+                {"value": "no [[link]]"}
                 }}}""");
     }
 
     @Test
     @Order(6)
-    void blockquote(TestUtils setup, TestReference testReference) throws Exception
+    void blockquote(TestUtils setup, TestReference testReference)
     {
-        // Minimal test for now because we have the following issues:
-        // XWIKI-24011: Fail to edit a quote with multiple child blocks
-        // XWIKI-24012: Failed to save nested quote
         roundTrip(setup, testReference, """
-            > one""",
-            // The content is modified on save:
-            // * the editor outputs default blockquote styles
-            """
-                (% style="color:default;background-color:default" %)
-                > one""");
+            (% data-foo="bar" %)
+            >line1
+            >lineOne
+            >>line2
+            >>lineTwo
+            >>>line3
+            >>>lineThree
+            >>line4
+            >>lineFour""");
     }
 
     @Test
     @Order(7)
-    void unorderedList(TestUtils setup, TestReference testReference) throws Exception
+    void unorderedList(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             * one
-            ** two
+            (% data-version="3.2" %)
+            ** two(((
+            = Heading =
+
+            Paragraph
+            )))
             *** three
             * done""");
     }
 
     @Test
     @Order(8)
-    void orderedList(TestUtils setup, TestReference testReference) throws Exception
+    void orderedList(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
-            (% start="5" %)
-            1. one
+            (% data-foo="bar" start="5" %)
+            1. one(((
+            = Heading =
+
+            Paragraph
+            )))
             11. two
             111. three
-            1. done""",
-            // The content is modified on save:
-            // * the editor doesn't support setting the start value of ordered lists
-            """
-                1. one
-                11. two
-                111. three
-                1. done""");
+            1. done""");
     }
 
     @Test
     @Order(9)
-    void definitionList(TestUtils setup, TestReference testReference) throws Exception
+    void definitionList(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
+            (% data-type="user" %)
             ; name
             : John
             ; age
-            : 27""",
-            // The content is modified on save:
-            // * the editor doesn't support definition lists os we convert them to unordered lists
-            """
-                * name
-                * John
-                * age
-                * 27""");
+            : 27""");
     }
 
     @Test
     @Order(10)
-    void table(TestUtils setup, TestReference testReference) throws Exception
+    void table(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
-            |=|=One|=Two
+            |(% rowspan="2" %)one|two|three
+            |(% colspan="2" %)four
+
+            (% data-sortable="true" %)
+            |=(% data-foo="bar" %)|=One|=Two
             |=Three|1.3|2.3
-            |=Four|1.4|2.4""",
+            |=Four|1.4|(% data-type="number" %)2.4
+
+            |=Color|(% style="background-color:green;width:64px;padding:6px" %)green
+            |=Shape|circle""",
             // The content is modified on save:
-            // * header column is not supported
-            // * the editor outputs default table and cell styles
+            // * table cell parameters are lost (because the editor doesn't treat table cell as blocks, so there's no
+            // clean way to attach metadata)
+            //
+            // Note also that table cells currently accept only inline content. We'll have to update the test when this
+            // is fixed.
             """
-                (% style="color:default" %)
-                |=(% style="color:default;background-color:default;text-align:left" colspan="1" rowspan="1" %)|=(% style="color:default;background-color:default;text-align:left" colspan="1" rowspan="1" %)One|=(% style="color:default;background-color:default;text-align:left" colspan="1" rowspan="1" %)Two
-                |(% style="color:default;background-color:default;text-align:left" colspan="1" rowspan="1" %)Three|(% style="color:default;background-color:default;text-align:left" colspan="1" rowspan="1" %)1.3|(% style="color:default;background-color:default;text-align:left" colspan="1" rowspan="1" %)2.3
-                |(% style="color:default;background-color:default;text-align:left" colspan="1" rowspan="1" %)Four|(% style="color:default;background-color:default;text-align:left" colspan="1" rowspan="1" %)1.4|(% style="color:default;background-color:default;text-align:left" colspan="1" rowspan="1" %)2.4""");
+                |(% rowspan="2" %)one|two|three
+                |(% colspan="2" %)four
+
+                (% data-sortable="true" %)
+                |=|=One|=Two
+                |=Three|1.3|2.3
+                |=Four|1.4|2.4
+
+                |=Color|(% style="background-color:green;width:64px" %)green
+                |=Shape|circle""");
     }
 
     @Test
     @Order(11)
-    void link(TestUtils setup, TestReference testReference) throws Exception
+    void link(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference,
             """
-                begin https://www.xwiki.org [[label>>Some.Page||anchor="Heading" queryString="foo=bar"]] attach:file.pdf [[Other.Page]] end""",
-            // The content is modified on save:
-            // * anchor and queryString parameters are lost; we can specify then only for external URLs
-            // * links with generated labels are lost
-            """
-                (% style="color:default;background-color:default;text-align:left" %)
-                begin  [[label>>Some.Page]]   end""");
+                begin https://www.xwiki.org [[label>>Some.Page||queryString="foo=bar" anchor="Heading"]] attach:file.pdf [[Other.Page]] end
+
+                [[styled **text**>>path:/Some/Page||class="special-link" data-foo="bar"]]""");
     }
 
     @Test
     @Order(12)
-    void image(TestUtils setup, TestReference testReference) throws Exception
+    void image(TestUtils setup, TestReference testReference)
     {
         // Note that inline images are currently not supported by BlockNote.
         roundTrip(setup, testReference,
             """
-                [[Carol>>image:Path.To.Carol@avatar.png||alt="Carol's avatar" data-xwiki-image-style-alignment="center" width="150" height="100"]]
+                [[Carol>>image:Path.To.Carol@avatar.png||class="avatar" data-user-reference="XWiki.Carol" height="100" alt="Carol's avatar" width="150" data-xwiki-image-style-alignment="center"]]
 
-                image:icon:accept""",
-            // The content is modified on save:
-            // * the alt and height parameters are lost for some reason
-            // * parameter order is changed
-            // * information about freestanding images is lost
-            // * the editor outputs default image styles
-            """
-                [[Carol>>image:Path.To.Carol@avatar.png||width="150" data-xwiki-image-style-alignment="center"]]
-
-                [[image:icon:accept||data-xwiki-image-style-alignment="start"]]""");
+                image:icon:accept""");
     }
 
     @Test
     @Order(13)
-    void div(TestUtils setup, TestReference testReference) throws Exception
+    void div(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             (((
             group
-            )))""",
-            // The content is modified on save:
-            // * the editor doesn't support DIV blocks so only their content is preserved
-            """
-                (% style="color:default;background-color:default;text-align:left" %)
-                group""");
+
+            (% id="test" %)
+            (((
+            nested
+            )))
+            )))""");
     }
 
     @Test
     @Order(14)
-    void horizontalLine(TestUtils setup, TestReference testReference) throws Exception
+    void horizontalLine(TestUtils setup, TestReference testReference)
     {
-        // TODO: See XWIKI-24001: Dividers (horizontal rule) are not saved and content after them is lost
+        roundTrip(setup, testReference, """
+            one
+
+            ----
+
+            two""");
     }
 
     @Test
     @Order(15)
-    void macro(TestUtils setup, TestReference testReference) throws Exception
+    void macro(TestUtils setup, TestReference testReference)
     {
         roundTrip(setup, testReference, """
             before
@@ -339,55 +310,65 @@ class RoundTripIT extends AbstractBlockNoteIT
 
             {{include reference="Missing.Page"/}}
 
-            after""",
-            // The content is modified on save:
-            // * the editor outputs the default paragraph styles
-            """
-                (% style="color:default;background-color:default;text-align:left" %)
-                before
+            {{info Title="My title" cssClass="test"}}
+            My content.
 
-                (% style="color:default;background-color:default;text-align:left" %)
-                one {{html clean="false"}}two{{/html}} three
+            {{error}}
+            Some error
 
-                (% style="color:default;background-color:default;text-align:left" %)
-                empty {{html/}} macro
+            {{warning title="Final warning"}}
+            and a warning.
+            {{/warning}}
+            {{/error}}
+            {{/info}}
 
-                {{velocity wiki="true"}}
-                > quoted text
-                {{/velocity}}
-
-                {{include reference="Missing.Page"/}}
-
-                (% style="color:default;background-color:default;text-align:left" %)
-                after""");
+            after""");
     }
 
-    void roundTrip(TestUtils setup, TestReference testReference, String content) throws Exception
+    /**
+     * Insert the provided content in the provided page (testReference), edit the page with blocknote, save it back, and
+     * verify that the content is not altered. If you expect the content to be modified, see
+     * {@link #roundTrip(TestUtils, TestReference, String, String)}.
+     *
+     * @param setup the test setup
+     * @param testReference the reference of the page to edit
+     * @param content the initial content of the document
+     * @see #roundTrip(TestUtils, TestReference, String, String)
+     */
+    private void roundTrip(TestUtils setup, TestReference testReference, String content)
     {
         roundTrip(setup, testReference, content, content);
     }
 
-    void roundTrip(TestUtils setup, TestReference testReference, String contentBefore, String contentAfter)
-        throws Exception
+    /**
+     * Insert the provided content (contentBefore) in the provided page (testReference), edit the page with blocknote, 
+     * save it back, and
+     * verify that the content is matching expectations (contentAfter). If you expect the content to be unaltered, 
+     * see {@link #roundTrip(TestUtils, TestReference, String)}
+     *
+     * @param setup the test setup
+     * @param testReference the reference of the page to edit
+     * @param contentBefore the initial content
+     * @param contentAfter the expected final content
+     * @see #roundTrip(TestUtils, TestReference, String)
+     */
+    private void roundTrip(TestUtils setup, TestReference testReference, String contentBefore, String contentAfter)
     {
         setup.createPage(testReference, contentBefore, "");
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
-        textArea.sendKeys(Keys.PAGE_DOWN, "end");
+        textArea.appendParagraph("end").waitUntilTextContains("end");
 
         page = page.save();
         WikiEditPage wikiEditor = page.editWiki();
         String ending = """
 
 
-            (% style="color:default;background-color:default;text-align:left" %)
-            end
-
-            (% style="color:default;background-color:default;text-align:left" %)""";
+            end""";
         String content = wikiEditor.getContent();
-        assertTrue(content.endsWith(ending), "The content inserted through the editor is missing.");
+        assertThat("The content inserted through the editor is missing.", content, endsWith(ending));
         assertEquals(contentAfter, Strings.CS.removeEnd(content, ending));
     }
 }

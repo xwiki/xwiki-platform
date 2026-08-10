@@ -77,8 +77,8 @@ public final class LesserThanNode extends AbstractBinaryOperatorNode
             return true;
         }
 
-        if (o instanceof LesserThanNode) {
-            return super.equals(o) && isOrEquals() == ((LesserThanNode) o).isOrEquals();
+        if (o instanceof LesserThanNode lesserThanNode) {
+            return super.equals(o) && isOrEquals() == lesserThanNode.isOrEquals();
         }
 
         return false;

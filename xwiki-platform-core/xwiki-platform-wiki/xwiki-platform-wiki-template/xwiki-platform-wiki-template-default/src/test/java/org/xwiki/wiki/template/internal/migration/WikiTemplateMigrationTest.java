@@ -149,10 +149,10 @@ class WikiTemplateMigrationTest
         BaseObject descriptorObj2 = mock(BaseObject.class);
         BaseObject descriptorObj3 = mock(BaseObject.class);
         BaseObject descriptorObj4 = mock(BaseObject.class);
-        when(doc1.getXObject(eq(descriptorClassReference))).thenReturn(descriptorObj1);
-        when(doc2.getXObject(eq(descriptorClassReference))).thenReturn(descriptorObj2);
-        when(doc3.getXObject(eq(descriptorClassReference))).thenReturn(descriptorObj3);
-        when(doc4.getXObject(eq(descriptorClassReference))).thenReturn(descriptorObj4);
+        when(doc1.getXObject(descriptorClassReference)).thenReturn(descriptorObj1);
+        when(doc2.getXObject(descriptorClassReference)).thenReturn(descriptorObj2);
+        when(doc3.getXObject(descriptorClassReference)).thenReturn(descriptorObj3);
+        when(doc4.getXObject(descriptorClassReference)).thenReturn(descriptorObj4);
 
         when(descriptorObj1.getIntValue("iswikitemplate", 0)).thenReturn(1);
         when(descriptorObj2.getIntValue("iswikitemplate", 0)).thenReturn(1);
@@ -199,10 +199,10 @@ class WikiTemplateMigrationTest
 
         // superadmin is the author
         DocumentReference superadmin = new DocumentReference("mainWiki", "XWiki", "superadmin");
-        verify(doc1).setAuthorReference(eq(superadmin));
-        verify(doc2).setAuthorReference(eq(superadmin));
-        verify(doc3).setAuthorReference(eq(superadmin));
-        verify(doc4).setAuthorReference(eq(superadmin));
+        verify(doc1).setAuthorReference(superadmin);
+        verify(doc2).setAuthorReference(superadmin);
+        verify(doc3).setAuthorReference(superadmin);
+        verify(doc4).setAuthorReference(superadmin);
 
         // all the documents have been saved
         verify(this.xwiki).saveDocument(doc1, "[UPGRADE] Upgrade the template section.", this.xcontext);

@@ -68,7 +68,7 @@ public class DependencyPane extends BaseElement
     public String getStatusMessage()
     {
         List<WebElement> found = getDriver().findElementsWithoutWaiting(container, By.className("extension-status"));
-        return found.size() > 0 ? found.get(0).getText() : null;
+        return !found.isEmpty() ? found.get(0).getText() : null;
     }
 
     /**

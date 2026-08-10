@@ -105,6 +105,12 @@
         ></button>
       </th>
     </template>
+
+    <template #footer>
+      <th v-if="logic.isEditMode()">
+        {{ $t("livedata.table.action.header") }}
+      </th>
+    </template>
   </draggable>
 </template>
 
@@ -333,6 +339,10 @@ export default {
   width: 16px;
   /* Ensure that the resize handle is above the next column name. */
   z-index: 1;
+}
+
+.layout-table .draggable-item:last-child .resize-handle {
+  right: 0; /* Prevents an always showing horizontal scrollbar below the table */
 }
 
 .layout-table .draggable-item .resize-handle:focus-within,

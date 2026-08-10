@@ -96,8 +96,7 @@ public class ComputedFieldClass extends PropertyClass
      */
     public String getScript()
     {
-        String sValue = getLargeStringValue(FIELD_SCRIPT);
-        return sValue;
+        return getLargeStringValue(FIELD_SCRIPT);
     }
 
     /**

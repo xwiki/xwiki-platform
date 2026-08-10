@@ -135,9 +135,9 @@ public class MentionNotificationParameters implements Serializable
     }
 
     /**
-     * Returns an unmodifable map of the new mentions. The type of the mentioned actors are used as keys, and the values
-     * are {@link MentionNotificationParameter}, identifying a unique mention in a page by its actor reference and its
-     * anchor.
+     * Returns an unmodifiable map of the new mentions. The type of the mentioned actors are used as keys, and the
+     * values are {@link MentionNotificationParameter}, identifying a unique mention in a page by its actor reference
+     * and its anchor.
      *
      * @return the map of new mentions
      */

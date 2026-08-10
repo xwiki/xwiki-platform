@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  */
 @ComponentTest
-public class URLURLNormalizerTest
+class URLURLNormalizerTest
 {
     @InjectMockComponents
     private URLURLNormalizer normalizer;

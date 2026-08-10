@@ -70,8 +70,8 @@ public class IntegrationTest extends RenderingTest
         componentManager.unregisterComponent(org.xwiki.observation.EventListener.class, "ExtensionJobHistoryRecorder");
         componentManager.unregisterComponent(org.xwiki.observation.EventListener.class, "refactoring.legacyParentFieldUpdater");
 
-        SkinExtension mockSsfx = componentManager.registerMockComponent(SkinExtension.class, "ssfx");
-        SkinExtension mockJsfx = componentManager.registerMockComponent(SkinExtension.class, "jsfx");
+        componentManager.registerMockComponent(SkinExtension.class, "ssfx");
+        componentManager.registerMockComponent(SkinExtension.class, "jsfx");
 
         GadgetSource mockGadgetSource = componentManager.registerMockComponent(GadgetSource.class);
         // Mock gadget for macrodashboard_nested_velocity.test

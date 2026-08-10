@@ -146,8 +146,8 @@ public class XDOMOfficeDocument implements OfficeDocument
     private String getTitle(Block parent)
     {
         for (Block block : parent.getChildren()) {
-            if (block instanceof HeaderBlock) {
-                String title = renderTitle((HeaderBlock) block);
+            if (block instanceof HeaderBlock headerBlock) {
+                String title = renderTitle(headerBlock);
                 if (!StringUtils.isBlank(title)) {
                     return title;
                 }

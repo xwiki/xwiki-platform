@@ -238,7 +238,7 @@ public class DefaultModelBridge implements ModelBridge
             return true;
         } catch (Exception e) {
             // Just warn, since it's a recoverable situation.
-            this.logger.warn("Failed to unlock document [{}].", reference, e);
+            this.logger.warn("Failed to unlock document [{}]", reference, e);
             return false;
         }
     }
@@ -312,7 +312,7 @@ public class DefaultModelBridge implements ModelBridge
         }
 
         XWikiContext xcontext = this.xcontextProvider.get();
-        Set<DocumentReference> documentReferences = new HashSet<>(references.size());
+        Set<DocumentReference> documentReferences = HashSet.newHashSet(references.size());
         for (EntityReference entityReference : references) {
             documentReferences.add(this.documentReferenceResolver.resolve(entityReference, xcontext));
         }
@@ -362,7 +362,7 @@ public class DefaultModelBridge implements ModelBridge
 
             List<DocumentReference> childReferences = oldParentDocument.getChildrenReferences(context);
 
-            if (childReferences.size() > 0) {
+            if (!childReferences.isEmpty()) {
                 this.progressManager.pushLevelProgress(childReferences.size(), this);
                 popLevelProgress = true;
             }
@@ -382,7 +382,7 @@ public class DefaultModelBridge implements ModelBridge
                 this.progressManager.endStep(this);
             }
 
-            if (childReferences.size() > 0) {
+            if (!childReferences.isEmpty()) {
                 this.logger.info("Document parent fields updated from [{}] to [{}] for [{}] documents.",
                     oldParentReference, newParentReference, childReferences.size());
             }

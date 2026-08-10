@@ -76,8 +76,8 @@ public class DefaultMandatoryDocumentInitializerManager implements MandatoryDocu
                 }
             }
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to initialize component [{}] for document", MandatoryDocumentInitializer.class,
-                documentReference, e);
+            this.logger.error("Failed to initialize component [{}] for document [{}]",
+                MandatoryDocumentInitializer.class, documentReference, e);
         }
 
         return null;

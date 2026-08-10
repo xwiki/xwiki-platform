@@ -99,8 +99,7 @@ public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceH
                 System.setProperty(FREETTS_PROPERTIES_KEY, AbstractFreeTTSWordToSound.defaultVoicePackage);
             }
 
-            CaptchaService captchaService =
-                captchaServiceManager.getCaptchaService(jCaptchaResourceReference.getEngine());
+            CaptchaService captchaService = captchaServiceManager.getCaptchaService();
 
             String type = jCaptchaResourceReference.getCaptchaType();
             String id = request.getSession().getId();

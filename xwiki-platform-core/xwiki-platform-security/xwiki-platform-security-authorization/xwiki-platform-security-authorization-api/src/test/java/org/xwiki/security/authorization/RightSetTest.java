@@ -85,6 +85,11 @@ class RightSetTest extends AbstractSetTest<Right>
      */
     @Test
     @Override
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which set is the receiver and which argument it
+    // gets. Using assertNotEquals() would move that into JUnit's internals and would invite a later
+    // SonarQube S3415 "swap these arguments" change that silently stops testing the contract.
+    @SuppressWarnings("java:S5785")
     public void testSetEquals()
     {
         resetEmpty();

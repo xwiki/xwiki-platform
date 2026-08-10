@@ -54,7 +54,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultTemplateHTMLDisplayerTest
+class DefaultTemplateHTMLDisplayerTest
 {
     @MockComponent
     private TemplateManager templateManager;
@@ -68,7 +68,7 @@ public class DefaultTemplateHTMLDisplayerTest
     private DocumentReference documentReference;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         ScriptContext scriptContext = mock(ScriptContext.class);
         this.documentReference = new DocumentReference("wiki", "space", "page");
@@ -77,7 +77,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void getTemplateTest() throws Exception
+    void getTemplateTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(DocumentReference.class, documentReference);
         verify(this.templateManager).getTemplate("html_displayer/documentreference/view.vm");
@@ -87,7 +87,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
     
     @Test
-    public void getTemplateForEnum() throws Exception
+    void getTemplateForEnum() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(EntityType.class, EntityType.DOCUMENT);
         verify(this.templateManager).getTemplate("html_displayer/entitytype/view.vm");
@@ -99,7 +99,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void getTemplateWithNullTypeTest() throws Exception
+    void getTemplateWithNullTypeTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(null, "test");
         verify(this.templateManager).getTemplate("html_displayer/string/view.vm");
@@ -109,7 +109,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void getTemplateWithNullValueTest() throws Exception
+    void getTemplateWithNullValueTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display((new ArrayList<String>()).getClass(), null);
         verify(this.templateManager).getTemplate("html_displayer/arraylist/view.vm");
@@ -119,7 +119,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void getTemplateWithNullValueAndSpecialTypeTest() throws Exception
+    void getTemplateWithNullValueAndSpecialTypeTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(new DefaultParameterizedType(null, List.class, Block.class), null);
         verify(this.templateManager)
@@ -130,7 +130,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void getTemplateWithNullTypeAndNullValueTest() throws Exception
+    void getTemplateWithNullTypeAndNullValueTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(null, null);
         verify(this.templateManager).getTemplate("html_displayer/view.vm");
@@ -138,7 +138,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void displayTest() throws Exception
+    void displayTest() throws Exception
     {
         Template template = mock(Template.class);
 
@@ -151,7 +151,7 @@ public class DefaultTemplateHTMLDisplayerTest
     }
 
     @Test
-    public void displayWithExceptionTest() throws Exception
+    void displayWithExceptionTest() throws Exception
     {
         Template template = mock(Template.class);
 

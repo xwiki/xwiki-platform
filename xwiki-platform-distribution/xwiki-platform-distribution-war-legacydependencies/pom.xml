@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-legacydependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Legacy Dependencies</name>
@@ -58,6 +58,7 @@
                     <exclude>org.xwiki.commons:xwiki-platform-distribution-war-dependencies:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-component-api:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-velocity:*:jar:*</exclude>
+                    <exclude>org.xwiki.commons:xwiki-commons-properties:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-job-api:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-job-default:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-api:*:jar:*</exclude>
@@ -104,6 +105,10 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-velocity</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-properties</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
@@ -205,6 +210,13 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-legacy-velocity</artifactId>
       <version>${commons.version}</version>
+      <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-properties</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -226,6 +238,10 @@
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-filter-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-properties</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -245,6 +261,10 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-velocity</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-properties</artifactId>
         </exclusion>
         <exclusion>
           <groupId> org.xwiki.commons</groupId>
@@ -277,6 +297,10 @@
         <exclusion>
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-properties</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
@@ -403,6 +427,10 @@
           <groupId>org.xwiki.rendering</groupId>
         </exclusion>
         <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-properties</artifactId>
+        </exclusion>
+        <exclusion>
           <artifactId>xwiki-rendering-transformation-macro</artifactId>
           <groupId>org.xwiki.rendering</groupId>
         </exclusion>
@@ -485,6 +513,10 @@
           <groupId>org.xwiki.rendering</groupId>
           <artifactId>xwiki-rendering-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-properties</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -524,6 +556,10 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-component-default</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-properties</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

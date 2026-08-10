@@ -97,7 +97,7 @@ public class XarFile implements Closeable
     {
         XarEntry entry = this.xarPackage.getEntry(reference);
         if (entry == null) {
-            throw new IOException("Failed to find entry for referenc [" + reference + "]");
+            throw new IOException("Failed to find entry for reference [" + reference + "]");
         }
 
         return this.zipFile.getInputStream(this.zipFile.getEntry(entry.getEntryName()));

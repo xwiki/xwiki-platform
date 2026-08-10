@@ -28,6 +28,7 @@ import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfNestedElementsLocatedBy;
 
 /**
  * Represents the BlockNote rich text area.
@@ -117,6 +118,30 @@ public class BlockNoteRichTextArea extends BaseElement
     }
 
     /**
+     * Appends a new paragraph at the end of the content and types the given keys in it.
+     * <p>
+     * Since BlockNote 0.51 the trailing block (the empty area at the bottom of the editor) is no longer a real,
+     * editable paragraph but a non-editable decoration widget that inserts a new paragraph (and places the caret in it)
+     * only when clicked. As a consequence we can't simply move the caret to the end of the content (e.g. with
+     * {@code PAGE_DOWN}) and type, because the typed text would have no editable target and would be dropped. We have
+     * to click the trailing block first to materialize a real paragraph.
+     * <p>
+     * An alternative way to insert an end-of-content new line is to move the caret to the end of the last line, then
+     * press {@code ENTER}.
+     *
+     * @param keysToSend the sequence of keys to type in the new paragraph
+     * @return this blocknote rich text area instance
+     * @since 18.6.0RC1
+     */
+    public BlockNoteRichTextArea appendParagraph(CharSequence... keysToSend)
+    {
+        By trailingBlock = By.cssSelector(".bn-trailing-block");
+        getDriver().waitUntilCondition(visibilityOfNestedElementsLocatedBy(this.container, trailingBlock));
+        getDriver().createActions().click(this.container.findElement(trailingBlock)).perform();
+        return sendKeys(keysToSend);
+    }
+
+    /**
      * @return the element that has the focus in the rich text area
      */
     private WebElement getActiveElement()
@@ -150,10 +175,22 @@ public class BlockNoteRichTextArea extends BaseElement
     public BlockNoteRichTextArea clickImage(int index)
     {
         // The image might not be loaded yet, so wait until it's clickable before clicking on it.
-        WebElement image = this.container.findElements(By.tagName("img")).get(index);
+        WebElement image = getImage(index);
         getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(image));
         image.click();
         return this;
+    }
+
+    /**
+     * Returns the image with the specified index in the rich text area.
+     *
+     * @param index the index of the image to return, starting from 0
+     * @return the image element
+     * @since 18.6.0
+     */
+    public WebElement getImage(int index)
+    {
+        return this.container.findElements(By.tagName("img")).get(index);
     }
 
     /**
@@ -165,14 +202,32 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public MacroDialogEditModal doubleClickMacro(int index)
     {
-        // The double click event listener is registered on the macro output wrapper which is the first child of the
-        // block content.
-        WebElement macro = this.container.findElements(By.cssSelector("""
-            .bn-block-content[data-content-type="Macro_xwikiMacroBlock"] > :first-child,
-            .bn-inline-content-section[data-inline-content-type="Macro_xwikiInlineMacro"] > :first-child"""))
-            .get(index);
+        WebElement macro = getMacro(index);
         getDriver().createActions().doubleClick(macro).perform();
         return new MacroDialogEditModal().waitUntilReady();
+    }
+
+    /**
+     * Single clicks on the macro with the specified index in the rich text area to select it (node selection). This is
+     * what makes the macro toolbar (e.g. the edit macro button) show up.
+     *
+     * @param index the index of the macro to select, starting from 0
+     * @return this rich text area instance
+     * @since 18.6.0
+     */
+    public BlockNoteRichTextArea selectMacro(int index)
+    {
+        getMacro(index).click();
+        return this;
+    }
+
+    private WebElement getMacro(int index)
+    {
+        // The double click event listener is registered on the macro output wrapper which is the first child of the
+        // block content.
+        return this.container.findElements(By.cssSelector("""
+            .bn-block-content[data-content-type="xwikiMacroBlock"] > :first-child,
+            .bn-inline-content-section[data-inline-content-type="xwikiInlineMacro"] > :first-child""")).get(index);
     }
 
     /**

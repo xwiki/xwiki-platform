@@ -133,7 +133,7 @@ class DocumentTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeEach
-    void setUp() throws AuthorizationException, ComponentLookupException
+    void setUp() throws ComponentLookupException
     {
         this.oldcore.getSpyXWiki().initializeMandatoryDocuments(this.oldcore.getXWikiContext());
 
@@ -278,7 +278,7 @@ class DocumentTest
 
         this.oldcore.getXWikiContext().dropPermissions();
 
-        Throwable exception = assertThrows(XWikiException.class, () -> doc.saveAsAuthor());
+        Throwable exception = assertThrows(XWikiException.class, doc::saveAsAuthor);
         assertTrue(
             exception.getMessage()
                 .contains("Access denied; user null, acting through script in "
@@ -500,7 +500,7 @@ class DocumentTest
         when(this.oldcore.getMockRightService().hasAccessLevel("edit", this.oldcore.getXWikiContext().getUser(),
             document.getPrefixedFullName(), this.oldcore.getXWikiContext())).thenReturn(false);
 
-        assertThrows(XWikiException.class, () -> document.save());
+        assertThrows(XWikiException.class, document::save);
 
         when(this.oldcore.getMockRightService().hasAccessLevel("edit", this.oldcore.getXWikiContext().getUser(),
             document.getPrefixedFullName(), this.oldcore.getXWikiContext())).thenReturn(true);

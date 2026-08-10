@@ -86,6 +86,19 @@ public class ClassSheetPage extends ViewPage
     private WebElement addObjectToTemplateLink;
 
     /**
+     * The button used to create the template provider for the class.
+     */
+    @FindBy(xpath = "//input[@class = 'button' and @value = 'Create the template provider']")
+    private WebElement createTemplateProviderButton;
+
+    /**
+     * The link used to view the template provider page. This is displayed only after the template provider has been
+     * created.
+     */
+    @FindBy(partialLinkText = "View the template provider page")
+    private WebElement templateProviderLink;
+
+    /**
      * The widget used to specify the class instance to create.
      */
     private DocumentPicker documentPicker;
@@ -202,6 +215,31 @@ public class ClassSheetPage extends ViewPage
     {
         addObjectToTemplateLink.click();
         return new ClassSheetPage();
+    }
+
+    /**
+     * Clicks on the button to create the template provider for the class. This is visible only after the template
+     * contains an instance of the class.
+     *
+     * @return the current page, after it is reloaded
+     */
+    public ClassSheetPage clickCreateTemplateProviderButton()
+    {
+        createTemplateProviderButton.click();
+        // Create a new instance because the page is reloaded.
+        return new ClassSheetPage();
+    }
+
+    /**
+     * Clicks on the link to view the template provider page. This is visible only after the template provider has been
+     * created.
+     *
+     * @return the page that represents the class template provider
+     */
+    public ViewPage clickTemplateProviderLink()
+    {
+        templateProviderLink.click();
+        return new ViewPage();
     }
 
     public DocumentPicker getNewPagePicker()

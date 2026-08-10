@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Vaidate {@link DefaultWikiDescriptor}.
+ * Validate {@link DefaultWikiDescriptor}.
  * 
  * @version $Id$
  */

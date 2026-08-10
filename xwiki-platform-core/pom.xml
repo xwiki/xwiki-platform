@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -149,15 +149,158 @@
               </differences>
             </revapi.differences>
             -->
-            
-            
+            <revapi.differences>
+              <justification>
+                These utility classes (only static members) had their implicit public constructor made private to
+                follow SonarQube rule java:S1118 (utility classes should not be instantiable). Instantiating them was
+                never useful, but this is technically a real breakage since existing code calling the constructor will
+                fail at runtime.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.XWikiConstant::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.XWikiConstant::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.i18n.i18n::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.i18n.i18n::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.util.TOCGenerator::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.util.TOCGenerator::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.visibilityReduced</code>
+                  <old>method void com.xpn.xwiki.web.Utils::&lt;init&gt;()</old>
+                  <new>method void com.xpn.xwiki.web.Utils::&lt;init&gt;()</new>
+                  <oldVisibility>public</oldVisibility>
+                  <newVisibility>private</newVisibility>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
+                The advice of IncludeMacroCompatibilityAspect is now written in the code style instead of the
+                annotation style, so that it gets woven. The annotation style compiled the advice into a public method
+                of the aspect, while the code style compiles it into a synthetic one. Calling that method was never
+                meaningful, an aspect only exists to be woven.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method java.lang.Object org.xwiki.rendering.macro.include.IncludeMacroCompatibilityAspect::aroundExecute(org.aspectj.lang.ProceedingJoinPoint, org.xwiki.rendering.macro.include.IncludeMacroParameters) throws java.lang.Throwable</old>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
+                These deprecated store constructors moved out of xwiki-platform-oldcore and are re-added by
+                xwiki-platform-legacy-oldcore, so existing code calling them keeps working when the legacy jar is
+                used. They cannot produce a working store anyway, since these classes get all their collaborators
+                through component injection.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateBaseStore::&lt;init&gt;(com.xpn.xwiki.XWiki, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateBaseStore::&lt;init&gt;(java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateStore::&lt;init&gt;(com.xpn.xwiki.XWiki, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateStore::&lt;init&gt;(java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateStore::&lt;init&gt;(com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateAttachmentStore::&lt;init&gt;(com.xpn.xwiki.XWiki, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateAttachmentStore::&lt;init&gt;(com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateAttachmentStore::&lt;init&gt;(java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateVersioningStore::&lt;init&gt;(com.xpn.xwiki.XWiki, com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateVersioningStore::&lt;init&gt;(java.lang.String)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateVersioningStore::&lt;init&gt;(com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.XWikiHibernateRecycleBinStore::&lt;init&gt;(com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore::&lt;init&gt;(com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore::&lt;init&gt;(com.xpn.xwiki.XWikiContext)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void com.xpn.xwiki.store.VoidAttachmentVersioningStore::&lt;init&gt;(com.xpn.xwiki.XWikiContext)</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-importmap-plugin</artifactId>
-        <version>18.6.0-SNAPSHOT</version>
+        <version>18.7.0-SNAPSHOT</version>
         <executions>
           <!-- Make sure declared importmap are valid. -->
           <execution>

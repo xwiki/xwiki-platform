@@ -37,13 +37,13 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-public class BaseStringPropertyTest
+class BaseStringPropertyTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
     @Test
-    public void testHashCode()
+    void testHashCode()
     {
         String value = "test value";
 
@@ -57,7 +57,7 @@ public class BaseStringPropertyTest
     }
 
     @Test
-    public void setValueWhenTypeIsNotString() throws Exception
+    void setValueWhenTypeIsNotString() throws Exception
     {
         BaseStringProperty p = new BaseStringProperty();
         Integer value = new Integer(42);
@@ -73,7 +73,7 @@ public class BaseStringPropertyTest
     }
 
     @Test
-    public void setValueWhenTypeIsNotStringAndSameValue() throws Exception
+    void setValueWhenTypeIsNotStringAndSameValue() throws Exception
     {
         BaseStringProperty p = new BaseStringProperty();
         Integer value = new Integer(42);

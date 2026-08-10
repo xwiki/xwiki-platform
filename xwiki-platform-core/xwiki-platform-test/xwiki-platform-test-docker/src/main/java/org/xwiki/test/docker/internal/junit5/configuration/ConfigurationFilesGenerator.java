@@ -42,11 +42,13 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.TestExtensionRepository;
 import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecutor;
 import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
 
@@ -63,6 +65,8 @@ public class ConfigurationFilesGenerator
     private static final String JAR = "jar";
 
     private static final String VM_EXTENSION = ".vm";
+
+    private static final String NEWLINE = "\n";
 
     private static final String DB_USERNAME = "xwiki";
 
@@ -114,7 +118,7 @@ public class ConfigurationFilesGenerator
                     String fileName = entry.getName().replace(VM_EXTENSION, "");
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
                     if (this.testConfiguration.isVerbose()) {
-                        LOGGER.info("... Generating: {}", outputFile);
+                        LOGGER.info("... Generating: [{}]", outputFile);
                     }
                     // Note: Init is done once even if this method is called several times...
                     Velocity.init();
@@ -142,7 +146,7 @@ public class ConfigurationFilesGenerator
         File outputDirectory = new File(configurationFileTargetDirectory, "classes");
         File outputFile = new File(outputDirectory, LOGBACK_FILE);
         if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... Generating logging configuration: {}", outputFile);
+            LOGGER.info("... Generating logging configuration: [{}]", outputFile);
         }
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
             // Allows modules to override the default logback config by providing a LOGBACK_OVERRIDE_FILE file in
@@ -214,6 +218,13 @@ public class ConfigurationFilesGenerator
                 "maven-xwiki-snapshot:maven:https://nexus-snapshots.xwiki.org/repository/snapshots");
         }
 
+        // Repository containing the extensions declared in the resources of the module executing the test, so that
+        // the test can ask XWiki to install them.
+        if (this.testConfiguration.isTestExtensionRepository()) {
+            repositories.add(String.format("%s:maven:%s", TestExtensionRepository.ID,
+                TestExtensionRepository.getURL(this.testConfiguration)));
+        }
+
         props.setProperty("xwikiExtensionRepositories", StringUtils.join(repositories, ','));
 
         // Set the permanent directory but only when using docker as otherwise it's already available locally.
@@ -228,20 +239,54 @@ public class ConfigurationFilesGenerator
         props.setProperty("xwikiPropertiesAutomaticStartOnMainWiki", Boolean.FALSE.toString());
         props.setProperty("xwikiPropertiesAutomaticStartOnWiki", Boolean.FALSE.toString());
 
-        // Configure blob store properties
-        props.putAll(getBlobStoreConfigurationProperties());
+        // Configure additional properties (S3, Solr, etc)
+        props.setProperty("xwikiPropertiesAdditionalProperties", getAdditionalProperties());
 
         return props;
     }
 
-    private Properties getBlobStoreConfigurationProperties()
+    private String getAdditionalProperties()
     {
-        Properties props = new Properties();
+        StringBuilder additionalProperties = new StringBuilder();
 
+        // Configure blob store properties
+        additionalProperties.append(getBlobStoreConfigurationProperties());
+
+        additionalProperties.append(NEWLINE);
+
+        // Configure Solr properties
+        additionalProperties.append(getSolrConfigurationProperties());
+
+        additionalProperties.append(NEWLINE);
+
+        // Configure the distribution of events between the instances of a cluster
+        additionalProperties.append(getRemoteObservationConfigurationProperties());
+
+        return additionalProperties.toString();
+    }
+
+    private String getRemoteObservationConfigurationProperties()
+    {
+        if (this.testConfiguration.isCluster()) {
+            // Distribute the events between the XWiki instances so that, for example, they invalidate their caches
+            // when a document is modified by another instance.
+            // Note: the JGroups "tcp" channel is used since it doesn't require IP multicast, and the members of the
+            // cluster are passed to each instance as JGroups system properties (see RemoteObservationJavaOptions).
+            return
+                """
+                    observation.remote.enabled=true
+                    observation.remote.channels=tcp""";
+        }
+
+        return "";
+    }
+
+    private String getBlobStoreConfigurationProperties()
+    {
         BlobStore blobStore = this.testConfiguration.getBlobStore();
         if (blobStore == BlobStore.S3) {
             // Configure S3 blob store using additional properties
-            String additionalProperties =
+            return 
                 """
                     store.blobStoreType=%s
                     store.s3.bucketName=%s
@@ -254,11 +299,24 @@ public class ConfigurationFilesGenerator
                     BlobStoreContainerExecutor.getAccessKey(),
                     BlobStoreContainerExecutor.getSecretKey(),
                     blobStore.getEndpoint());
-
-            props.setProperty("xwikiPropertiesAdditionalProperties", additionalProperties);
         }
 
-        return props;
+        return "";
+    }
+
+    private String getSolrConfigurationProperties()
+    {
+        SolrMode solrMode = this.testConfiguration.getSolrMode();
+        if (solrMode == SolrMode.REMOTE) {
+            // Configure Solr remote access using additional properties
+            return
+                """
+                    solr.type=remote
+                    solr.remote.baseURL=%s""".formatted(
+                    solrMode.getBaseURL());
+        }
+
+        return "";
     }
 
     private Properties getDatabaseConfigurationProperties()
@@ -302,10 +360,15 @@ public class ConfigurationFilesGenerator
                 "schema",
                 "xwiki.postgresql.hbm.xml",
                 null)));
-        } else if (this.testConfiguration.getDatabase().equals(Database.HSQLDB_EMBEDDED)) {
+        } else if (this.testConfiguration.getDatabase().equals(Database.HSQLDB)) {
+            // Note: the "shutdown" parameter only makes sense in embedded mode: in server mode the database is shut
+            // down when its container is stopped.
+            String connectionURL = this.testConfiguration.isDatabaseEmbedded()
+                ? "jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true"
+                : String.format("jdbc:hsqldb:hsql://%s:%s/xwiki", ipAddress, port);
             props.putAll(getDBProperties(Arrays.asList(
                 "hsqldb",
-                "jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true",
+                connectionURL,
                 "sa",
                 "",
                 "org.hsqldb.jdbcDriver",
@@ -328,6 +391,18 @@ public class ConfigurationFilesGenerator
             throw new RuntimeException(
                 String.format("Failed to generate Hibernate config. Database [%s] not supported yet!",
                     this.testConfiguration.getDatabase()));
+        }
+
+        // In standardFlavor mode the WAR bundles the full standard distribution JARs and installs the standard
+        // flavor, so register the same extra Hibernate mappings the standard distribution registers (see
+        // xwiki.db.common.extraMappings / xwiki.db.default.extraMappings in xwiki-platform-distribution/pom.xml).
+        // Without this the standard UI (e.g. the notifications watch menu) queries entities such as
+        // DefaultNotificationFilterPreference that would otherwise be unmapped. In minimal mode these JARs are
+        // absent from WEB-INF/lib, so the mappings must NOT be registered.
+        if (this.testConfiguration.isStandardFlavor()) {
+            props.setProperty("xwikiDbHbmCommonExtraMappings",
+                "instance.hbm.xml,notification-filter-preferences.hbm.xml");
+            props.setProperty("xwikiDbHbmDefaultExtraMappings", "mailsender.hbm.xml");
         }
 
         return props;
@@ -367,7 +442,7 @@ public class ConfigurationFilesGenerator
         // DB connections. compared  to in the past. When the tests succeed, xwiki starts in about 1mn20s. When they
         // fail xwiki takes over 5mn to start, showing how slow the machine is. When it succeeds the connection cool
         // is used up to 40 connections (out of 50) so already close to the max. When it fails, it goes quickly to 50.
-        // Basically the connections are not released fast enough becauase the SQL queries take longer to execute.
+        // Basically the connections are not released fast enough because the SQL queries take longer to execute.
         // Thus trying with 300 max connections to see if that's the problem.
         props.setProperty("xwikiDbDbcpMaxTotal", "300");
 

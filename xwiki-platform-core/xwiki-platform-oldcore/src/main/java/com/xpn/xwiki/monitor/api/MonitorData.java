@@ -23,7 +23,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -144,9 +143,7 @@ public class MonitorData
         MonitorTimer timer;
         timer = this.timers.get(timername);
         if (timer != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("MONITOR: error recursive timers for " + timername);
-            }
+            LOGGER.debug("MONITOR: error recursive timers for [{}]", timername);
         } else {
             timer = new MonitorTimer(timername, details);
             timer.setStartDate();
@@ -164,9 +161,7 @@ public class MonitorData
         MonitorTimer timer;
         timer = this.timers.get(timername);
         if (timer == null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("MONITOR: could not find timer for " + timername);
-            }
+            LOGGER.debug("MONITOR: could not find timer for [{}]", timername);
         } else {
             timer.setDetails(details);
         }
@@ -181,9 +176,7 @@ public class MonitorData
         MonitorTimer timer;
         timer = this.timers.get(timername);
         if (timer == null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("MONITOR: could not find timer for " + timername);
-            }
+            LOGGER.debug("MONITOR: could not find timer for [{}]", timername);
         } else {
             timer.setEndDate();
             if (timer.getDetails() != null) {
@@ -196,10 +189,8 @@ public class MonitorData
                 this.timerSummaries.put(timername, tsummary);
             }
             tsummary.addTimer(timer.getDuration());
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("MONITOR " + this.wikiPage + " " + this.action + " " + timer.getName() + ": "
-                    + timer.getDuration() + "ms " + timer.getDetails());
-            }
+            LOGGER.debug("MONITOR page [{}], action [{}], timer [{}]: [{}]ms, details [{}]", this.wikiPage,
+                this.action, timer.getName(), timer.getDuration(), timer.getDetails());
         }
     }
 
@@ -216,12 +207,10 @@ public class MonitorData
     public void log()
     {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("MONITOR " + this.wikiPage + ": " + getDuration() + "ms");
-            Iterator<MonitorTimerSummary> it = this.timerSummaries.values().iterator();
-            while (it.hasNext()) {
-                MonitorTimerSummary tsummary = it.next();
-                LOGGER.debug("MONITOR " + this.wikiPage + " " + this.action + " " + tsummary.getName() + ": "
-                    + tsummary.getDuration() + "ms " + tsummary.getNbCalls());
+            LOGGER.debug("MONITOR page [{}]: [{}]ms", this.wikiPage, getDuration());
+            for (MonitorTimerSummary tsummary : this.timerSummaries.values()) {
+                LOGGER.debug("MONITOR page [{}], action [{}], timer [{}]: [{}]ms in [{}] calls", this.wikiPage,
+                    this.action, tsummary.getName(), tsummary.getDuration(), tsummary.getNbCalls());
             }
         }
     }

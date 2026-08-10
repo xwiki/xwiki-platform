@@ -38,6 +38,13 @@ import org.xwiki.test.ui.po.BaseElement;
 public class NotificationsContainerElement extends BaseElement
 {
     private static final String NOTIFICATION_MACRO_CONTAINER_CLASS = "notifications-macro";
+
+    /**
+     * Maximum number of page reloads performed while waiting for the expected number of notifications. Events are
+     * processed asynchronously, so the macro might not display all of them right after a page has been saved.
+     */
+    private static final int MAX_RELOAD_ATTEMPTS = 10;
+
     private final WebElement container;
 
     /**
@@ -56,6 +63,34 @@ public class NotificationsContainerElement extends BaseElement
     {
         return new NotificationsContainerElement(
             getUtil().getDriver().findElement(By.className(NOTIFICATION_MACRO_CONTAINER_CLASS)));
+    }
+
+    /**
+     * Wait for the notification macro of the current page to display at least the expected number of notifications,
+     * reloading the page between attempts. The notification macro loads its events through an asynchronous REST
+     * request that queries an asynchronously populated event store, so right after saving a page the corresponding
+     * event might not be available yet. This method first waits for the macro's asynchronous request to complete
+     * (through {@link #waitUntilPageIsReady()}) and, if the expected count is not reached, reloads the page to query
+     * the event store again. This method assumes that the notifications are directly displayed again after a page
+     * reload.
+     *
+     * @param expectedCount the minimum number of notifications to wait for
+     * @return an instance of {@link NotificationsContainerElement} located on the up-to-date page
+     * @since 18.6.0RC1
+     */
+    public static NotificationsContainerElement waitUntilNotificationCount(int expectedCount)
+    {
+        NotificationsContainerElement element = getElementForMacroInPage();
+        // Wait for the asynchronous REST request performed by the macro to complete before counting the events.
+        element.waitUntilPageIsReady();
+        int attempts = 0;
+        while (element.getNotificationsListCount() < expectedCount && attempts < MAX_RELOAD_ATTEMPTS) {
+            getUtil().getDriver().navigate().refresh();
+            element = getElementForMacroInPage();
+            element.waitUntilPageIsReady();
+            attempts++;
+        }
+        return element;
     }
 
     /**

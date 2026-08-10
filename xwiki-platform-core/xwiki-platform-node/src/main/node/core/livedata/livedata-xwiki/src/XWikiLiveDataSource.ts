@@ -114,6 +114,17 @@ export class XWikiLiveDataSource implements LiveDataSource {
     );
   }
 
+  addEntry(source: Source, values: unknown): Promise<void> {
+    return Promise.resolve(
+      this.$.ajax({
+        type: "POST",
+        url: this.getEntriesURL(source),
+        contentType: "application/json",
+        data: JSON.stringify({ values }),
+      }),
+    );
+  }
+
   private getEntriesURL(source: Source) {
     const entriesURL =
       this.baseURL + encodeURIComponent(source.id) + "/entries";

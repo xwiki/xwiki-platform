@@ -56,15 +56,24 @@ public class DefaultUsersQueryBuilder implements QueryBuilder<UsersClass>
     @Override
     public Query build(UsersClass usersClass) throws QueryException
     {
-        String statement = new StringBuilder("select doc.fullName as userReference,")
+        StringBuilder statementBuilder = new StringBuilder("select doc.fullName as userReference,")
             .append(" firstName.value||' '||lastName.value as userName ")
-            .append("from XWikiDocument doc, BaseObject obj, StringProperty firstName, StringProperty lastName ")
-            .append("where doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'")
+            .append("from XWikiDocument doc, BaseObject obj, StringProperty firstName, StringProperty lastName");
+        if (!usersClass.isIncludeInactiveUsers()) {
+            statementBuilder.append(", IntegerProperty active");
+        }
+        statementBuilder.append(" where doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'")
             .append(" and obj.id = firstName.id.id and firstName.id.name = 'first_name'")
             .append(" and obj.id = lastName.id.id and lastName.id.name = 'last_name'")
-            .append(" and doc.space = 'XWiki' ")
-            .append("order by lower(firstName.value), firstName.value, lower(lastName.value), lastName.value")
-            .toString();
+            .append(" and doc.space = 'XWiki' ");
+        if (!usersClass.isIncludeInactiveUsers()) {
+            // Only suggest enabled users. An enabled user always has its "active" property explicitly set to 1
+            // (XWiki sets it when the account is created active or later activated).
+            statementBuilder.append("and obj.id = active.id.id and active.id.name = 'active' and active.value = 1 ");
+        }
+        statementBuilder
+            .append("order by lower(firstName.value), firstName.value, lower(lastName.value), lastName.value");
+        String statement = statementBuilder.toString();
         Query query = this.queryManager.createQuery(statement, Query.HQL);
         // Resolve the document full name from the first column into a DocumentReference (the user profile reference).
         query.addFilter(this.documentFilter);

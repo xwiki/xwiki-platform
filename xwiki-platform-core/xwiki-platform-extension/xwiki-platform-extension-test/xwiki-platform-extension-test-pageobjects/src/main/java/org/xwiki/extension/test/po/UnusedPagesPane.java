@@ -55,6 +55,6 @@ public class UnusedPagesPane extends BaseElement
     {
         String reference = String.format("xwiki:%s.%s", space, page);
         String xpath = "//input[@type = 'checkbox' and @name = '" + reference + "' and @value = '']";
-        return getDriver().findElementsWithoutWaiting(this.documentTree, By.xpath(xpath)).size() > 0;
+        return !getDriver().findElementsWithoutWaiting(this.documentTree, By.xpath(xpath)).isEmpty();
     }
 }

@@ -19,18 +19,25 @@
  */
 package org.xwiki.web;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.model.validation.edit.EditConfirmationCheckerResults;
+import org.xwiki.model.validation.edit.EditConfirmationScriptService;
+import org.xwiki.model.validation.script.ModelValidationScriptService;
 import org.xwiki.properties.internal.converter.CollectionConverter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.PageTest;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -42,6 +49,7 @@ import com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin;
 import com.xpn.xwiki.plugin.skinx.SkinExtensionPluginApi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -74,10 +82,16 @@ class DisplayPageTest extends PageTest
     private static final String VALUE_1 = "value1";
 
     private static final String DEFAULT_SELECT =
-        "<select id='space.page_0_testField' name='space.page_0_testField' size='1'>"
+        "<select size='1' id='space.page_0_testField' "
+        + "aria-label='core.model.xclass.editClassProperty.textAlternative [space.page_testField]' "
+        + "name='space.page_0_testField'>"
         + "<option selected='selected' value='' label='space.page_testField_'>space.page_testField_</option>"
         + "<option value='value1' label='space.page_testField_value1'>space.page_testField_value1</option></select>"
         + "<input name='space.page_0_testField' type='hidden' value=''/>";
+
+    @MockComponent(classToMock = ModelValidationScriptService.class)
+    @Named("modelvalidation")
+    private ScriptService modelValidationScriptService;
 
     private TemplateManager templateManager;
 
@@ -87,6 +101,14 @@ class DisplayPageTest extends PageTest
     void setUp() throws Exception
     {
         this.templateManager = this.componentManager.getInstance(TemplateManager.class);
+
+        // display.vm runs the edit confirmation checkers before showing the editor (see #getEditConfirmation). Make
+        // the modelvalidation.edit script service return no errors/warnings so that the editor is displayed.
+        EditConfirmationScriptService editConfirmationScriptService = mock();
+        when(editConfirmationScriptService.check(any())).thenReturn(new EditConfirmationCheckerResults());
+        when(((ModelValidationScriptService) this.modelValidationScriptService)
+            .<EditConfirmationScriptService>get("edit")).thenReturn(editConfirmationScriptService);
+
         // Enable the ssfx/jsfx plugins
         this.oldcore.getSpyXWiki().getPluginManager()
             .addPlugin("ssfx", CssSkinFileExtensionPlugin.class.getName(), this.oldcore.getXWikiContext());

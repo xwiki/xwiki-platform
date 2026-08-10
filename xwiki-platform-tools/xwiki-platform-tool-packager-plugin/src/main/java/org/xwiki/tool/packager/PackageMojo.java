@@ -777,8 +777,8 @@ public class PackageMojo extends AbstractOldCoreMojo
     {
         Map<String, Object> properties = new HashMap<>(getDefaultConfigurationProperties());
         final Properties projectProperties = this.project.getProperties();
-        for (Object key : projectProperties.keySet()) {
-            properties.put(key.toString(), projectProperties.get(key).toString());
+        for (Map.Entry<Object, Object> entry : projectProperties.entrySet()) {
+            properties.put(entry.getKey().toString(), entry.getValue().toString());
         }
 
         VelocityContext context = new VelocityContext(properties);

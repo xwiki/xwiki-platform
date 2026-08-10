@@ -56,7 +56,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     /**
      * Log object to log messages in this class.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(ZipExplorerPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipExplorerPlugin.class);
 
     /**
      * Path separators for URL.
@@ -128,10 +128,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         newAttachment.setAuthorReference(attachment.getAuthorReference());
         newAttachment.setDate(attachment.getDate());
 
-        InputStream stream = null;
-        try {
-            stream = new BufferedInputStream(attachment.getContentInputStream(context));
-
+        try (InputStream stream = new BufferedInputStream(attachment.getContentInputStream(context))) {
             if (!isZipFile(stream)) {
                 return attachment;
             }
@@ -148,7 +145,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                     if (entry.getSize() == -1) {
                         // Note: We're copying the content of the file in the ZIP in memory. This is
                         // potentially going to cause an error if the file's size is greater than the
-                        // maximum size of a byte[] array in Java or if there's not enough memomry.
+                        // maximum size of a byte[] array in Java or if there's not enough memory.
                         byte[] data = IOUtils.toByteArray(zis);
 
                         newAttachment.setContent(data);
@@ -158,12 +155,9 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                     break;
                 }
             }
-        } catch (XWikiException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            IOUtils.closeQuietly(stream);
+        } catch (XWikiException | IOException e) {
+            LOGGER.error("Failed to extract file [{}] from the ZIP attachment [{}]", filename,
+                attachment.getReference(), e);
         }
         return newAttachment;
     }
@@ -192,10 +186,9 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                     zipList.add(entry.getName());
                 }
             }
-        } catch (XWikiException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (XWikiException | IOException e) {
+            LOGGER.error("Failed to list the entries of the ZIP attachment [{}] of document [{}]", attachmentName,
+                document.getPrefixedFullName(), e);
         }
         return zipList;
     }
@@ -236,7 +229,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                 if (i == aUrl.length - 1 && !url.endsWith(URL_SEPARATOR)) {
                     buf.append(aUrl[i]);
                 } else {
-                    buf.append(aUrl[i] + URL_SEPARATOR);
+                    buf.append(aUrl[i]).append(URL_SEPARATOR);
                 }
                 ListItem item = new ListItem(buf.toString(), aUrl[i], parentBuf);
                 if (!fileTree.containsKey(buf.toString())) {
@@ -293,7 +286,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
             // In case of error we log the error and continue with the undecoded URL.
             // TODO: Ideally this should rather fail fast but we have no exception handling
             // framework for scripting code. Change this when we have one.
-            LOG.error("Failed to decode URL path [" + path + "]", e);
+            LOGGER.error("Failed to decode URL path [{}]", path, e);
         }
 
         return path;
@@ -318,7 +311,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
             try {
                 filecontent.reset();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to reset the file content stream after checking for a ZIP header", e);
             }
         }
         return false;
@@ -339,7 +332,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
 
             // TODO: Ideally we should also check to see if the URL points to a file and not to
             // a directory.
-            if (filenameInZip.length() > 0) {
+            if (!filenameInZip.isEmpty()) {
                 isValidZipURL = true;
             }
         } catch (Exception e) {

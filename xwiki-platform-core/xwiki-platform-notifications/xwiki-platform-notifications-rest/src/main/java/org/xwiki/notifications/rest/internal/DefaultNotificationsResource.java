@@ -20,7 +20,7 @@
 package org.xwiki.notifications.rest.internal;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -269,7 +269,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         int maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
         String displayReadEvents, String tags, String currentWiki, boolean onlyUnread) throws NotificationException
     {
-        Map<ParametersKey, String> parametersMap = new HashMap<>();
+        Map<ParametersKey, String> parametersMap = new EnumMap<>(ParametersKey.class);
         parametersMap.put(ParametersKey.USE_USER_PREFERENCES, useUserPreferences);
         parametersMap.put(ParametersKey.USER_ID, userId);
         parametersMap.put(ParametersKey.UNTIL_DATE, untilDate);

@@ -30,10 +30,13 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.EditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Validate the Editing section of the Administration application, and in particular that changing the wiki-level
- * default editor controls which editor is used when editing a page.
+ * Validate the Editing section of the Administration application: that changing the wiki-level default editor controls
+ * which editor is used when editing a page, and that the "Make page title field mandatory" setting can be toggled and
+ * is properly reflected.
  *
  * @version $Id$
  * @since 18.5.0RC1
@@ -85,5 +88,35 @@ class EditingIT
 
         setup.gotoPage(testReference, "edit");
         assertEquals(EditPage.Editor.WYSIWYG, new EditPage().getEditor());
+    }
+
+    /**
+     * Validate that the "Make page title field mandatory" setting in the Editing administration section can be toggled
+     * and that the {@code xwiki.title.mandatory} wiki preference and the Administration UI stay in sync. The enforcement
+     * of the mandatory title in the editor is tested separately (see {@code WikiEditIT}).
+     */
+    @Test
+    @Order(2)
+    void mandatoryTitleSetting(TestUtils setup) throws Exception
+    {
+        EditingAdministrationSectionPage editingSection = EditingAdministrationSectionPage.gotoPage();
+        assertFalse(editingSection.isMandatoryTitle());
+
+        try {
+            // Setting the preference (e.g. programmatically) is reflected in the Administration UI.
+            setup.setWikiPreference("xwiki.title.mandatory", "1");
+            assertTrue(EditingAdministrationSectionPage.gotoPage().isMandatoryTitle());
+
+            // Toggling the control off in the Administration UI persists the change.
+            EditingAdministrationSectionPage.gotoPage().setMandatoryTitle(false);
+            assertFalse(EditingAdministrationSectionPage.gotoPage().isMandatoryTitle());
+
+            // Toggling it back on in the Administration UI persists the change.
+            EditingAdministrationSectionPage.gotoPage().setMandatoryTitle(true);
+            assertTrue(EditingAdministrationSectionPage.gotoPage().isMandatoryTitle());
+        } finally {
+            // Restore the default (non-mandatory) so that other tests are not affected.
+            setup.setWikiPreference("xwiki.title.mandatory", "0");
+        }
     }
 }

@@ -19,12 +19,15 @@
  */
 package org.xwiki.rest.test;
 
+import java.util.List;
+
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Pages;
 import org.xwiki.rest.model.jaxb.Space;
 import org.xwiki.rest.model.jaxb.Spaces;
@@ -47,7 +50,7 @@ class PagesResourceIT extends AbstractHttpIT
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(wikis.getWikis().size() > 0);
+        assertTrue(!wikis.getWikis().isEmpty());
 
         Wiki wiki = wikis.getWikis().get(0);
         Link link = getFirstLinkByRelation(wiki, Relations.SPACES);
@@ -57,7 +60,7 @@ class PagesResourceIT extends AbstractHttpIT
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Spaces spaces = (Spaces) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(spaces.getSpaces().size() > 0);
+        assertTrue(!spaces.getSpaces().isEmpty());
 
         Space space = spaces.getSpaces().get(0);
         link = getFirstLinkByRelation(space, Relations.PAGES);
@@ -67,7 +70,7 @@ class PagesResourceIT extends AbstractHttpIT
         assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
 
         Pages pages = (Pages) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-        assertTrue(pages.getPageSummaries().size() > 0);
+        assertTrue(!pages.getPageSummaries().isEmpty());
 
         checkLinks(pages);
     }
@@ -119,5 +122,63 @@ class PagesResourceIT extends AbstractHttpIT
             getUtil().rest().delete(ref1);
             getUtil().rest().delete(ref2);
         }
+    }
+
+    /**
+     * Check that the pages of a space are returned when they are ordered by date. On Oracle, the empty string is
+     * stored as null, so the locale condition of the query needs to accept null, too, or the result is always empty.
+     */
+    @Test
+    void testPagesResourceOrderedByDate() throws Exception
+    {
+        DocumentReference reference = new DocumentReference(getWiki(), getTestClassName(), getTestMethodName());
+        try {
+            getUtil().rest().delete(reference);
+            getUtil().rest().savePage(reference, "content", "title");
+
+            List<String> names = getPageNames("order=date&number=100");
+            assertTrue(names.contains(reference.getName()), names.toString());
+        } finally {
+            getUtil().rest().delete(reference);
+        }
+    }
+
+    /**
+     * Check that paginating the pages ordered by date returns each page exactly once, i.e., that the order doesn't
+     * change between queries with different limit/offset values.
+     */
+    @Test
+    void testPagesResourcePaginationOrderedByDate() throws Exception
+    {
+        String spaceName = getTestClassName();
+        DocumentReference ref1 = new DocumentReference(getWiki(), spaceName, getTestMethodName() + "A");
+        DocumentReference ref2 = new DocumentReference(getWiki(), spaceName, getTestMethodName() + "B");
+        try {
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+            getUtil().rest().savePage(ref1, "content1", "title1");
+            getUtil().rest().savePage(ref2, "content2", "title2");
+
+            List<String> allNames = getPageNames("order=date&number=100");
+            assertTrue(allNames.containsAll(List.of(ref1.getName(), ref2.getName())), allNames.toString());
+
+            // Fetching the pages one by one must return them in the same order as fetching them all at once.
+            for (int i = 0; i < allNames.size(); ++i) {
+                assertEquals(List.of(allNames.get(i)), getPageNames("order=date&number=1&start=" + i));
+            }
+        } finally {
+            getUtil().rest().delete(ref1);
+            getUtil().rest().delete(ref2);
+        }
+    }
+
+    private List<String> getPageNames(String queryString) throws Exception
+    {
+        GetMethod getMethod = executeGet("%s?%s".formatted(
+            buildURI(org.xwiki.rest.resources.pages.PagesResource.class, getWiki(), getTestClassName()), queryString));
+        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+        return pages.getPageSummaries().stream().map(PageSummary::getName).toList();
     }
 }

@@ -32,10 +32,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
+import jakarta.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
@@ -67,10 +68,13 @@ public class UploadAction extends XWikiAction
     public static final String FILE_FIELD_NAME = "filepath";
 
     /** Logging helper object. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(UploadAction.class);
+    @Inject
+    private Logger logger;
 
     /** The prefix of the corresponding filename input field name. */
     private static final String FILENAME_FIELD_NAME = "filename";
+
+    private static final String MESSAGE = "message";
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -79,16 +83,13 @@ public class UploadAction extends XWikiAction
         Object exception = context.get("exception");
         boolean ajax = ((Boolean) context.get("ajax")).booleanValue();
         // check Exception File upload is large
-        if (exception != null) {
-            if (exception instanceof AttachmentValidationException) {
-                AttachmentValidationException exp = (AttachmentValidationException) exception;
-                response.setStatus(exp.getHttpStatus());
-                getCurrentScriptContext().setAttribute("message", exp.getTranslationKey(), ENGINE_SCOPE);
-                getCurrentScriptContext().setAttribute("parameters", exp.getTranslationParameters(), ENGINE_SCOPE);
-                context.put("message", exp.getContextMessage());
+        if (exception != null && exception instanceof AttachmentValidationException exp) {
+            response.setStatus(exp.getHttpStatus());
+            getCurrentScriptContext().setAttribute(MESSAGE, exp.getTranslationKey(), ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute("parameters", exp.getTranslationParameters(), ENGINE_SCOPE);
+            context.put(MESSAGE, exp.getContextMessage());
 
-                return true;
-            }
+            return true;
         }
 
         // CSRF prevention
@@ -113,7 +114,7 @@ public class UploadAction extends XWikiAction
         // The document is saved for each attachment in the group.
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
         if (fileupload == null) {
-            getCurrentScriptContext().setAttribute("message", "core.action.upload.failure.noFiles",
+            getCurrentScriptContext().setAttribute(MESSAGE, "core.action.upload.failure.noFiles",
                 ENGINE_SCOPE);
 
             return true;
@@ -138,25 +139,25 @@ public class UploadAction extends XWikiAction
             try {
                 uploadAttachment(file.getValue(), file.getKey(), fileupload, doc, context);
             } catch (Exception ex) {
-                LOGGER.warn("Saving uploaded file failed", ex);
+                this.logger.warn("Failed to save uploaded file [{}]", file.getKey(), ex);
                 failedFiles.put(file.getKey(), ExceptionUtils.getRootCauseMessage(ex));
             }
         }
 
-        LOGGER.debug("Found files to upload: " + fileNames);
-        LOGGER.debug("Failed attachments: " + failedFiles);
-        LOGGER.debug("Wrong attachment names: " + wrongFileNames);
+        this.logger.debug("Found files to upload: {}", fileNames);
+        this.logger.debug("Failed attachments: {}", failedFiles);
+        this.logger.debug("Wrong attachment names: {}", wrongFileNames);
         if (ajax) {
             try {
                 response.getOutputStream().println("ok");
             } catch (IOException ex) {
-                LOGGER.error("Unhandled exception writing output:", ex);
+                this.logger.error("Unhandled exception writing output:", ex);
             }
             return false;
         }
         // Forward to the attachment page
         if (failedFiles.size() > 0 || !wrongFileNames.isEmpty()) {
-            getCurrentScriptContext().setAttribute("message", "core.action.upload.failure", ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute(MESSAGE, "core.action.upload.failure", ENGINE_SCOPE);
             getCurrentScriptContext().setAttribute("failedFiles", failedFiles, ENGINE_SCOPE);
             getCurrentScriptContext().setAttribute("wrongFileNames", wrongFileNames, ENGINE_SCOPE);
 
@@ -240,7 +241,7 @@ public class UploadAction extends XWikiAction
             // check Exception is ERROR_XWIKI_APP_JAVA_HEAP_SPACE when saving Attachment
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                context.put("message", "javaheapspace");
+                context.put(MESSAGE, "javaheapspace");
                 return true;
             }
             throw e;
@@ -266,12 +267,11 @@ public class UploadAction extends XWikiAction
 
         // Try to use the name provided by the user
         filename = fileupload.getFileItemAsString(filenameField, context);
-        if (!StringUtils.isBlank(filename)) {
-            // TODO These should be supported, the URL should just contain escapes.
-            if (filename.indexOf("/") != -1 || filename.indexOf("\\") != -1 || filename.indexOf(";") != -1) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_INVALID_CHARS,
-                    "Invalid filename: " + filename);
-            }
+        // TODO These should be supported, the URL should just contain escapes.
+        if (!StringUtils.isBlank(filename) && (filename.indexOf("/") != -1 || filename.indexOf("\\") != -1
+            || filename.indexOf(";") != -1)) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_INVALID_CHARS,
+                "Invalid filename: " + filename);
         }
 
         if (StringUtils.isBlank(filename)) {
@@ -286,7 +286,7 @@ public class UploadAction extends XWikiAction
             filename = fname;
         }
         // Sometimes spaces are replaced with '+' by the browser.
-        filename = filename.replaceAll("\\+", " ");
+        filename = filename.replace("+", " ");
 
         if (StringUtils.isBlank(filename)) {
             // The file field was left empty, ignore this
@@ -303,9 +303,9 @@ public class UploadAction extends XWikiAction
         if (ajax) {
             try {
                 context.getResponse().getOutputStream()
-                    .println("error: " + localizePlainOrKey((String) context.get("message")));
+                    .println("error: " + localizePlainOrKey((String) context.get(MESSAGE)));
             } catch (IOException ex) {
-                LOGGER.error("Unhandled exception writing output:", ex);
+                this.logger.error("Unhandled exception writing output:", ex);
             }
             return null;
         }

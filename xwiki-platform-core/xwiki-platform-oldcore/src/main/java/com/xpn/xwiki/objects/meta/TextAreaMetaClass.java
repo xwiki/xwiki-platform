@@ -95,8 +95,8 @@ public class TextAreaMetaClass extends StringMetaClass
         BooleanClass restrictedClass = new BooleanClass(this);
         restrictedClass.setName("restricted");
         restrictedClass.setPrettyName("Restricted");
-        restrictedClass.setDisplayType("yesno");
-        restrictedClass.setDisplayFormType("checkbox");
+        restrictedClass.setDisplayType(BooleanClass.DISPLAY_YESNO);
+        restrictedClass.setDisplayFormType(BooleanClass.DISPLAY_CHECKBOX);
         safeput(restrictedClass.getName(), restrictedClass);
     }
 

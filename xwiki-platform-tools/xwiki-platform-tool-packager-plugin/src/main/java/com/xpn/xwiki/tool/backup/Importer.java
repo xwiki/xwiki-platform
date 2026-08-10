@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.tool.utils.OldCoreHelper;
 
@@ -116,11 +115,8 @@ public class Importer
         pack.setWithVersions(false);
 
         // Parse XAR
-        FileInputStream fis = new FileInputStream(file);
-        try {
+        try (FileInputStream fis = new FileInputStream(file)) {
             pack.Import(fis, context);
-        } finally {
-            IOUtils.closeQuietly(fis);
         }
 
         // Import into the database

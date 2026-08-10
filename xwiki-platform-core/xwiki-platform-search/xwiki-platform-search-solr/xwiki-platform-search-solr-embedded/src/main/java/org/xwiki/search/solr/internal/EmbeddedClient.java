@@ -50,9 +50,9 @@ public class EmbeddedClient extends EmbeddedSolrServer
 {
     private static final long serialVersionUID = 1L;
 
-    private final SolrCore core;
+    private final transient SolrCore core;
 
-    private final SolrRequestParsers parser;
+    private final transient SolrRequestParsers parser;
 
     /**
      * A wrapper around a {@link StreamingResponseCallback} to workaround a bug in Solr. See

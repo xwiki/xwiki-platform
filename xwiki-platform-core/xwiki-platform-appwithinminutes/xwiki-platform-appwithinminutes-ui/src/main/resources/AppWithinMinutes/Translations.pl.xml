@@ -193,7 +193,7 @@ platform.appwithinminutes.liveTableEditorSaveComment=Zaktualizuj LiveTable
 platform.appwithinminutes.liveTableEditorMoveColumnHint=Przeciągnij i upuść, aby zmienić kolejność
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=usuń
 platform.appwithinminutes.liveTableEditorAddColumnHint=dodaj wybraną kolumne
-platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Niektóre kolumny są przestarzałe, prawdopodobnie dlatego, że odpowiednie pola aplikacji zostały usunięte. Czy chcesz je usunąć? &lt;a href=""&gt; Tak &lt;/a&gt; / &lt;a href=""&gt; Nie &lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Niektóre kolumny są przestarzałe, prawdopodobnie dlatego, że odpowiednie pola aplikacji zostały usunięte. Czy chcesz je usunąć?
 platform.appwithinminutes.liveTableEditorIcon=ikona
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Ikona aplikacji. Możesz wybrać ikonę z selektora ikon lub odwołać się do załączonego obrazu.
 
@@ -266,5 +266,9 @@ platform.appwithinminutes.wizardStep3Description=Dostosuj stronę główną apli
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=nazwa aplikacji
 appWithinMinutes.classEditor.title=Struktura {0}
-appWithinMinutes.templateProviderEditor.title=Wpisy {0}</content>
+appWithinMinutes.templateProviderEditor.title=Wpisy {0}
+
+### Since 18.6.0
+#@deprecated platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Niektóre kolumny są przestarzałe, prawdopodobnie dlatego, że odpowiednie pola aplikacji zostały usunięte. Czy chcesz je usunąć? &lt;a href=""&gt; Tak &lt;/a&gt; / &lt;a href=""&gt; Nie &lt;/a&gt;</content>
 </xwikidoc>

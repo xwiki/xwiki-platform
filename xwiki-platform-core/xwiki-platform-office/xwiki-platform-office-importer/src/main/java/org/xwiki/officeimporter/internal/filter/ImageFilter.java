@@ -20,7 +20,7 @@
 package org.xwiki.officeimporter.internal.filter;
 
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,7 +108,7 @@ public class ImageFilter extends AbstractHTMLFilter
         DocumentReference targetDocumentReference =
             targetDocumentName == null ? null : this.stringDocumentReferenceResolver.resolve(targetDocumentName);
 
-        boolean attachEmbeddedImages = Boolean.valueOf(cleaningParams.get("attachEmbeddedImages"));
+        boolean attachEmbeddedImages = Boolean.parseBoolean(cleaningParams.get("attachEmbeddedImages"));
         if (attachEmbeddedImages) {
             htmlDocument.setUserData(EMBEDDED_IMAGES, new HashMap<String, byte[]>(), null);
         }
@@ -141,7 +141,7 @@ public class ImageFilter extends AbstractHTMLFilter
         } catch (Exception e) {
             this.logger.warn("Failed to extract the image file name. Root cause is [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
-            this.logger.debug("Full stacktrace is: ", e);
+            this.logger.debug("Full stacktrace is:", e);
         }
         if (StringUtils.isEmpty(fileName)) {
             return;
@@ -170,7 +170,7 @@ public class ImageFilter extends AbstractHTMLFilter
             (Map<String, byte[]>) source.getOwnerDocument().getUserData(EMBEDDED_IMAGES);
         if (embeddedImages != null && value.startsWith("data:")) {
             // An image embedded using the Data URI scheme.
-            DataUri dataURI = DataUri.parse(value, Charset.forName(UTF_8));
+            DataUri dataURI = DataUri.parse(value, StandardCharsets.UTF_8);
             fileName = dataURI.getFilename();
             if (StringUtils.isEmpty(fileName)) {
                 fileName = String.valueOf(Math.abs(dataURI.hashCode()));
@@ -197,7 +197,7 @@ public class ImageFilter extends AbstractHTMLFilter
                 concerns "&" character.
                 Finally '@' is used in XWiki Syntax so it needs to be escaped to build the link properly.
                  */
-                fileName = fileName.replaceAll("\\+", "%2B");
+                fileName = fileName.replace("+", "%2B");
                 // We have to decode the image file name in case it contains URL special characters.
                 fileName = URLDecoder.decode(fileName, UTF_8);
             } catch (Exception e) {

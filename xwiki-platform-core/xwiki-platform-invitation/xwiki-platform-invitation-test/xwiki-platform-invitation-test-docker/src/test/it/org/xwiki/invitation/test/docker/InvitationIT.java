@@ -585,7 +585,7 @@ class InvitationIT
 
     /**
      * This test proves that: 1. A user can cancel an invitation after sending it, leaving a message for the recipient
-     * should they try to accept. 2. A canceled invitation cannot be accepted and the guest will see an explaination
+     * should they try to accept. 2. A canceled invitation cannot be accepted and the guest will see an explanation
      * with the message left when the sender canceled. 3. A canceled invitation cannot be declined, the guest gets the
      * sender's note. 4. A canceled invitation can still be reported as spam.
      */

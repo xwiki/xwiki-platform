@@ -33,7 +33,7 @@ public class PropAddForm extends XWikiForm
 
     public void setPropName(String propName)
     {
-        this.propName = propName.replaceAll(" ", "");
+        this.propName = propName.replace(" ", "");
     }
 
     public String getPropType()

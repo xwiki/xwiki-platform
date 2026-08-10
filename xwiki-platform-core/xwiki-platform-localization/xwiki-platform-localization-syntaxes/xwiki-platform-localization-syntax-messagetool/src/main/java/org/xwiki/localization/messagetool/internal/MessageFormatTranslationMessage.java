@@ -99,7 +99,7 @@ public class MessageFormatTranslationMessage implements TranslationMessage
 
             PARSERUTILS.removeTopLevelParagraph(blocks);
 
-            if (blocks.size() == 0) {
+            if (blocks.isEmpty()) {
                 block = new CompositeBlock();
             } else if (blocks.size() == 1) {
                 block = blocks.get(0);

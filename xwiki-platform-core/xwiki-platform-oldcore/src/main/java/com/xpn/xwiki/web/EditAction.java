@@ -27,7 +27,6 @@ import javax.script.ScriptContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.model.reference.DocumentReference;
@@ -53,7 +52,8 @@ public class EditAction extends XWikiAction
     /**
      * The object used for logging.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
+    @Inject
+    private Logger logger;
 
     @Inject
     @Named("document")
@@ -279,7 +279,7 @@ public class EditAction extends XWikiAction
         // Update the edited title.
         if (editForm.getTitle() != null) {
             document.setTitle(editForm.getTitle());
-        } else if (sectionNumber > 0 && document.getSections().size() > 0) {
+        } else if (sectionNumber > 0 && !document.getSections().isEmpty()) {
             // The edited content is either the content of the specified section or the content provided on the
             // request. We assume the content provided on the request is meant to overwrite the specified section.
             // In both cases the document content is currently having one section, so we can take its title.
@@ -325,7 +325,7 @@ public class EditAction extends XWikiAction
             }
         } catch (Exception e) {
             // Lock should never make XWiki fail, but we should log any related information.
-            LOGGER.error("Exception while setting up lock", e);
+            this.logger.error("Exception while setting up lock", e);
         }
     }
 }

@@ -152,11 +152,8 @@ public class Packager
     private void importXARToWiki(String comment, File xarFile, WikiReference wikiReference,
         PackageConfiguration configuration) throws IOException, XarException, XWikiException
     {
-        FileInputStream fis = new FileInputStream(xarFile);
-        try {
+        try (FileInputStream fis = new FileInputStream(xarFile)) {
             importXARToWiki(comment, fis, wikiReference, configuration);
-        } finally {
-            fis.close();
         }
     }
 
@@ -326,8 +323,8 @@ public class Packager
     {
         // Remove the version if any since it does not make sense in a XAR
         DocumentReference documentReference = reference;
-        if (reference instanceof DocumentVersionReference) {
-            documentReference = ((DocumentVersionReference) reference).removeVersion();
+        if (reference instanceof DocumentVersionReference documentVersionReference) {
+            documentReference = documentVersionReference.removeVersion();
         }
 
         return documentReference;

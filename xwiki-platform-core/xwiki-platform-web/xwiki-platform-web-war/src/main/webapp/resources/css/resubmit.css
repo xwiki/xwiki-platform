@@ -1,0 +1,34 @@
+#template('colorThemeInit.vm')
+
+.resubmit-box {
+    border: 1px solid var(--xwiki-border-color)
+}
+
+.resubmit-title,.resubmit-content {
+    padding: 16px
+}
+
+.resubmit-content,.resubmit-form {
+    display: flex;
+    flex-flow: column;
+    gap: 16px;
+    border-top: 1px solid var(--xwiki-border-color)
+}
+
+.resubmit-form {
+    padding: 16px 0;
+    gap: 8px;
+    flex: 0 1;
+    align-items: center
+}
+
+.resubmit-title {
+    font-weight: var(--font-weight-bold);
+    background-color: var(--panel-bg)
+}
+
+.main-explanation {
+    font-size: 2em;
+    color: var(--brand-danger);
+    font-weight: var(--font-weight-semibold)
+}

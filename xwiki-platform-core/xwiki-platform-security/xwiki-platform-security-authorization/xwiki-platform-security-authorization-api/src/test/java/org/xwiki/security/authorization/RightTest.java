@@ -40,7 +40,7 @@ class RightTest
 {
     static class FooRight implements RightDescription
     {
-        final static String NAME = "foo";
+        static final String NAME = "foo";
 
         @Override
         public String getName()

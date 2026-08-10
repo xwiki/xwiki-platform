@@ -130,8 +130,8 @@ public class SkinExtensionAsyncContextHandler implements AsyncContextHandler
     private AbstractSkinExtensionPlugin getPlugin(String name, List<XWikiPluginInterface> plugins)
     {
         for (XWikiPluginInterface plugin : plugins) {
-            if (plugin instanceof AbstractSkinExtensionPlugin && plugin.getName().equals(name)) {
-                return (AbstractSkinExtensionPlugin) plugin;
+            if (plugin instanceof AbstractSkinExtensionPlugin skinExtensionPlugin && plugin.getName().equals(name)) {
+                return skinExtensionPlugin;
             }
         }
 

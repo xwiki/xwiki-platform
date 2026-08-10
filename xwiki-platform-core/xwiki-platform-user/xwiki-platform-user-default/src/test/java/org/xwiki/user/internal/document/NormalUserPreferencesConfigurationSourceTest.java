@@ -51,7 +51,7 @@ import static org.mockito.Mockito.mock;
  * @version $Id$
  */
 @ComponentTest
-public class NormalUserPreferencesConfigurationSourceTest
+class NormalUserPreferencesConfigurationSourceTest
 {
     @InjectMockComponents
     private NormalUserPreferencesConfigurationSource source;
@@ -71,7 +71,8 @@ public class NormalUserPreferencesConfigurationSourceTest
     @BeforeComponent
     public void setup() throws Exception
     {
-        when(this.cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(mock(Cache.class));
+        Cache cacheMock = mock(Cache.class);
+        when(this.cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cacheMock);
     }
 
     @Test

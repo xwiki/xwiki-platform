@@ -36,11 +36,7 @@ import org.xwiki.query.WrappingQuery;
  */
 public final class HqlQueryUtils
 {
-    private static final String FROM = "from";
-
     private static final String WHERE = "where ";
-
-    private static final String ORDER = "order";
 
     private static final String ORDER_BY = "order by";
 

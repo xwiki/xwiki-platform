@@ -110,14 +110,13 @@ public class ExtensionRatingScriptService extends AbstractExtensionScriptService
 
         Collection<ExtensionRepository> repositories = getRepositories();
         for (ExtensionRepository repository : repositories) {
-            if (repository instanceof Ratable) {
+            if (repository instanceof Ratable ratable) {
                 try {
                     setError(null);
-                    return ((Ratable) repository).getRating(extensionId, extensionVersion);
+                    return ratable.getRating(extensionId, extensionVersion);
                 } catch (ResolveException e) {
                     setError(e);
                     // Keep looking. Maybe there's another repository with the same extension.
-                    continue;
                 }
             }
         }

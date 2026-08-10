@@ -63,6 +63,23 @@ public class LinkTreeElement extends DocumentTreeElement
     }
 
     /**
+     * Wait until the node to create a new page under the given reference is present. The tree is opened
+     * asynchronously to the currently edited page and jstree loads the nodes progressively (a per-node loading
+     * indicator that is not reflected by the tree's {@code aria-busy} attribute that {@link #waitForIt()} relies on),
+     * so the creation node (a child of that page's node) may appear slightly after the tree reports it is no longer
+     * busy.
+     *
+     * @param reference the parent reference of the creation node
+     * @return this tree element
+     * @since 18.6.0RC1
+     */
+    public LinkTreeElement waitForNewPageCreation(EntityReference reference)
+    {
+        getDriver().waitUntilCondition(driver -> hasNewPageCreation(reference));
+        return this;
+    }
+
+    /**
      * Create a new page node under the given origin, using the given name, and then open the created node.
      *
      * @param origin the parent node where to locate the new node

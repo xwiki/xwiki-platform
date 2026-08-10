@@ -63,17 +63,21 @@ define('xwiki-wysiwyg-macro-service', [
     parameters = {},
     sourceDocumentReference = XWiki.currentDocument.documentReference,
     inputSyntax = undefined,
+    outputSyntaxId = undefined
   ) {
     if (Object.keys(parameters).length) {
       let url = new XWiki.Document(sourceDocumentReference).getURL('get', $.param({
         language: $('html').attr('lang'),
         sheet: 'XWiki.WYSIWYG.MacroService',
       }));
+      const outputSyntax = resolveSyntax(outputSyntaxId) || getSyntaxFromMacroId(macroId);
       parameters = await $.post(url, {
         data: 'macroParameters',
         macroId,
         macroParameters: JSON.stringify(parameters),
-        inputSyntax
+        inputSyntax,
+        outputSyntax: outputSyntax?.type,
+        outputSyntaxVersion: outputSyntax?.version
       });
       if (typeof parameters === 'object' && parameters !== null) {
         return parameters;
@@ -84,6 +88,25 @@ define('xwiki-wysiwyg-macro-service', [
       return parameters;
     }
   };
+
+  function resolveSyntax(syntaxId) {
+    if (syntaxId) {
+      const versionStart = syntaxId.lastIndexOf('/');
+      if (versionStart > 0) {
+        return {type: syntaxId.substring(0, versionStart), version: syntaxId.substring(versionStart + 1)};
+      } else {
+        return {type: syntaxId, version: undefined};
+      }
+    }
+  }
+
+  function getSyntaxFromMacroId(macroId) {
+    const syntaxStart = macroId.indexOf('/');
+    if (syntaxStart > 0) {
+      const syntaxId = macroId.substring(syntaxStart + 1);
+      return resolveSyntax(syntaxId);
+    }
+  }
 
   const macrosBySyntax = {};
 

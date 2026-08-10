@@ -101,7 +101,7 @@ public class LocationPicker extends BaseElement
     public WebElement getAddButton()
     {
         return getDriver()
-            .findElementWithoutWaiting(By.cssSelector(".paths input[name='" + this.name + "'] + a[href='#path-add']"));
+            .findElementWithoutWaiting(By.cssSelector(".paths input[name='" + this.name + "'] + button.path-add"));
     }
 
     public WebElement getRemoveButton(String value)

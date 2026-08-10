@@ -1386,7 +1386,7 @@ class VersionIT
         // one more version for the class migration
         assertEquals(7, historyPane.getNumberOfVersions());
         assertEquals("7.1", historyPane.getCurrentVersion());
-        assertEquals(String.format("Migrated property [mypass] from class [%s]",
+        assertEquals(String.format("Migrated class [%s]",
                 testUtils.serializeLocalReference(xclassReference)),
             historyPane.getCurrentVersionComment());
 

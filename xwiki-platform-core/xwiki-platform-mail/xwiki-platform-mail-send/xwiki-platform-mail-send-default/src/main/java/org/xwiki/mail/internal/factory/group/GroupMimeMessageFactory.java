@@ -64,9 +64,8 @@ public class GroupMimeMessageFactory extends AbstractIteratorMimeMessageFactory
 
         MimeMessageFactory factory = getInternalMimeMessageFactory(factoryHint);
 
-        GroupMimeMessageIterator iterator = new GroupMimeMessageIterator(groupReference, factory, parameters,
+        return new GroupMimeMessageIterator(groupReference, factory, parameters,
             this.componentManagerProvider.get());
-        return iterator;
     }
 
 }

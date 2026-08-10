@@ -55,7 +55,7 @@ public abstract class InspectInvitationsPage extends BasePage
     public String getStatusAndMemo()
     {
         List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.id("message-status-and-memo"));
-        if (elements.size() > 0) {
+        if (!elements.isEmpty()) {
             return elements.get(0).getText();
         }
         return null;

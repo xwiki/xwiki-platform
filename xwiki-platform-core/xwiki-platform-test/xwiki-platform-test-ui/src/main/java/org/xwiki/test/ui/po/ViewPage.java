@@ -312,7 +312,7 @@ public class ViewPage extends BasePage
 
     public boolean isInlinePage()
     {
-        return getDriver().findElements(By.xpath("//form[@id = 'inline']")).size() > 0;
+        return !getDriver().findElements(By.xpath("//form[@id = 'inline']")).isEmpty();
     }
 
     /**
@@ -384,6 +384,16 @@ public class ViewPage extends BasePage
         return getElementCSSValue(By.id("document-title"), "font-family");
     }
 
+    /**
+     * @return the color of the page's text, i.e. the color set on the {@code body} element and inherited by all the
+     *     text of the page that doesn't define a color of its own
+     * @since 18.7.0RC1
+     */
+    public String getTextColor()
+    {
+        return getElementCSSValue(By.tagName("body"), "color");
+    }
+
     private String getElementCSSValue(By locator, String attribute)
     {
         return getDriver().findElement(locator).getCssValue(attribute);
@@ -428,5 +438,21 @@ public class ViewPage extends BasePage
         getDriver().waitUntilCondition(driver -> reviewButton.isEnabled());
         reviewButton.click();
         return new RequiredRightsModal();
+    }
+
+    /**
+     * @return the content of the copyright section in the page footer
+     */
+    public String getFooterCopyright()
+    {
+        return getDriver().findElement(By.id("xwikilicence")).getText();
+    }
+
+    /**
+     * @return the content of the version section in the page footer
+     */
+    public String getFooterVersion()
+    {
+        return getDriver().findElement(By.id("xwikiplatformversion")).getText();
     }
 }

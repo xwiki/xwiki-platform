@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
@@ -160,7 +161,8 @@ public abstract class AbstractSkin implements Skin
         try {
             return Syntax.valueOf(syntax);
         } catch (ParseException e) {
-            logger.warn("Failed to parse the syntax [{}] configured by the skin [{}].", syntax, skin.getId());
+            logger.warn("Failed to parse the syntax [{}] configured by the skin [{}]. Root cause is [{}]", syntax,
+                skin.getId(), ExceptionUtils.getRootCauseMessage(e));
         }
 
         // let getOutputSyntax() do the proper fallback

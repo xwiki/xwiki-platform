@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * 
  * @version $Id$
  */
-public class BaseObjectsTest
+class BaseObjectsTest
 {
     private static final class TestBaseObject extends BaseObject
     {

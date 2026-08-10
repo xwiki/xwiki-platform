@@ -244,6 +244,15 @@ public class EditPage extends BasePage
     }
 
     /**
+     * @return the background color of the "Cancel" button, which uses the default button style
+     * @since 18.7.0RC1
+     */
+    public String getCancelButtonBackgroundColor()
+    {
+        return this.cancel.getCssValue("background-color");
+    }
+
+    /**
      * @return the editor being used on this page
      */
     public Editor getEditor()
@@ -465,6 +474,17 @@ public class EditPage extends BasePage
     public void clickForceSaveCSRFButton()
     {
         this.forceSaveCSRFButton.click();
+    }
+
+    /**
+     * @return {@code true} if the button to resubmit in case of CSRF warning is displayed.
+     * @since 18.6.0RC1
+     * @since 17.10.10
+     * @since 18.4.3
+     */
+    public boolean hasForceSaveCSRFButton()
+    {
+        return this.forceSaveCSRFButton.isDisplayed();
     }
 
     /**

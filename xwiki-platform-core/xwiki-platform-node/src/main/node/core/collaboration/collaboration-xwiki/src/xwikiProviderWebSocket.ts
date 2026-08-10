@@ -43,7 +43,7 @@ function registerClient(websocketProvider: WebsocketProvider) {
 /**
  * Decode the client id from a message handler of index 4.
  *
- * @param handlerDecoder - the decoder, usually provided by the hander
+ * @param handlerDecoder - the decoder, usually provided by the handler
  */
 function readClientId(handlerDecoder: decoding.Decoder) {
   const decoder = decoding.createDecoder(handlerDecoder.arr);

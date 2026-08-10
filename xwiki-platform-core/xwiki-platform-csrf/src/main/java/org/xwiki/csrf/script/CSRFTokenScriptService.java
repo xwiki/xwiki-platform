@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Script service wrapping a {@link CSRFToken} component.
@@ -64,6 +65,20 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
     public String getResubmissionURL()
     {
         return this.csrf.getResubmissionURL();
+    }
+
+    /**
+     * @return {@code true} if a request identified by the given id can be resubmitted.
+     * @param srid the request identifier
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    @Unstable
+    @Override
+    public boolean isResubmitAllowedForRequestId(String srid)
+    {
+        return this.csrf.isResubmitAllowedForRequestId(srid);
     }
 
     @Override

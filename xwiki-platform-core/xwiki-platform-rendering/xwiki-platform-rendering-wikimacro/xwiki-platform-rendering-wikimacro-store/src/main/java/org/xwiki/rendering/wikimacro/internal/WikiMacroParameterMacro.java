@@ -93,7 +93,7 @@ public class WikiMacroParameterMacro extends AbstractMacro<WikiMacroParameterMac
     {
         Map<String, String> placeholderParameters = new LinkedHashMap<>();
         placeholderParameters.put("data-wikimacro-id", ID);
-        placeholderParameters.put("name", parameters.getName());
+        placeholderParameters.put("data-wikimacro-parameter-name", parameters.getName());
 
         if (context.isInline()) {
             return Collections

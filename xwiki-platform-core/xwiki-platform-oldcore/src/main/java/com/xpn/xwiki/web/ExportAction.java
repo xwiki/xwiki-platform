@@ -70,6 +70,8 @@ import com.xpn.xwiki.util.Util;
 @Singleton
 public class ExportAction extends XWikiAction
 {
+    private static final String EXCEPTION = "exception";
+
     /**
      * Define the different format supported by the export.
      */
@@ -121,7 +123,7 @@ public class ExportAction extends XWikiAction
         // down or even block the PDF export
         //
         // Ideally we should ask for a CSRF token, but this would break backwards compatibility. We can't rely on the
-        // Accept HTTP header either becuse it includes */* most of the time, even when the request originates from a
+        // Accept HTTP header either because it includes */* most of the time, even when the request originates from a
         // script or image HTML tag. The best option seems to be to rely on the Sec-Fetch-Dest header which is set by
         // modern browsers to indicate the context in which the request is made.
         // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Dest
@@ -190,7 +192,7 @@ public class ExportAction extends XWikiAction
         handleRevision(context);
 
         // We currently use the PDF export infrastructure but we have to redesign the export code.
-        XWikiURLFactory urlFactory = new OfficeExporterURLFactory();
+        XWikiURLFactory urlFactory = new OfficeExporterURLFactory(true);
         PdfExport exporter = new OfficeExporter();
         // Check if the office exporter supports the specified format.
         ExportType exportType = ((OfficeExporter) exporter).getExportType(format);
@@ -202,7 +204,7 @@ public class ExportAction extends XWikiAction
             exportType = ExportType.PDF;
         } else if (exportType == null) {
             context.put("message", "core.export.formatUnknown");
-            return "exception";
+            return EXCEPTION;
         }
 
         urlFactory.init(context);
@@ -216,7 +218,7 @@ public class ExportAction extends XWikiAction
         // a directory hierarchy but a file name
         EntityReferenceSerializer<String> serializer =
             Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "path");
-        String filename = serializer.serialize(doc.getDocumentReference()).replaceAll("/", "_");
+        String filename = serializer.serialize(doc.getDocumentReference()).replace("/", "_");
         // Make sure we don't go over 255 chars since several filesystems don't support filename longer than that!
         filename = StringUtils.abbreviateMiddle(filename, "__", 255);
         context.getResponse().addHeader("Content-disposition",
@@ -248,18 +250,18 @@ public class ExportAction extends XWikiAction
     {
         if (!context.getWiki().getRightService().hasWikiAdminRights(context)) {
             context.put("message", "needadminrights");
-            return "exception";
+            return EXCEPTION;
         }
 
         XWikiRequest request = context.getRequest();
 
         String name = request.get("name");
         String description = request.get("description");
-        boolean history = Boolean.valueOf(request.get("history"));
+        boolean history = Boolean.parseBoolean(request.get("history"));
         boolean attachmentJRCS =
             getBooleanProperty("attachment_jrcs", "xwiki.action.export.xar.attachment.jrcs", true, context);
         boolean optimized = getBooleanProperty("optimized", "xwiki.action.export.xar.optimized", true, context);
-        boolean backup = Boolean.valueOf(request.get("backup"));
+        boolean backup = Boolean.parseBoolean(request.get("backup"));
         String author = request.get("author");
         String licence = request.get("licence");
         String version = request.get("version");
@@ -358,7 +360,7 @@ public class ExportAction extends XWikiAction
             PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi("package", context));
             if (export == null) {
                 // No Packaging plugin configured
-                return "exception";
+                return EXCEPTION;
             }
 
             export.setWithVersions(history);

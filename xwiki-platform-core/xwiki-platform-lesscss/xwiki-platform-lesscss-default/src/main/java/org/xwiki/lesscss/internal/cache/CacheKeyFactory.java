@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
@@ -33,7 +34,6 @@ import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.internal.skin.SkinReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
-import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 
@@ -82,14 +82,17 @@ public class CacheKeyFactory
             Request request = container.getRequest();
             List<String> excludes = Arrays.asList("skin", "colorTheme", "colorThemeVersion", "language", "docVersion",
                 XWiki.CACHE_VERSION);
-            if (request instanceof ServletRequest) {
-                Map<String, String[]> parameters = ((ServletRequest) request).getHttpServletRequest().getParameterMap();
+            if (request instanceof ServletRequest servletRequest) {
+                Map<String, String[]> parameters = servletRequest.getHttpServletRequest().getParameterMap();
+                StringBuilder resultBuilder = new StringBuilder(result);
                 for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
                     if (!excludes.contains(entry.getKey())) {
                         String[] values = entry.getValue();
-                        result += CACHE_KEY_SEPARATOR + entry.getKey() + ":" + StringUtils.join(values, "|");
+                        resultBuilder.append(CACHE_KEY_SEPARATOR).append(entry.getKey()).append(":")
+                            .append(StringUtils.join(values, "|"));
                     }
                 }
+                result = resultBuilder.toString();
             }
 
             String xcontext = xcontextCacheKeyFactory.getCacheKey();

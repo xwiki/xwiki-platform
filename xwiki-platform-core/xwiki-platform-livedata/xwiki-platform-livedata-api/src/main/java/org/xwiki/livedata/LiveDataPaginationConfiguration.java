@@ -19,6 +19,7 @@
  */
 package org.xwiki.livedata;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -83,7 +84,7 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
      */
     public void setPageSizes(List<Integer> pageSizes)
     {
-        this.pageSizes = pageSizes;
+        this.pageSizes = pageSizes == null ? null : new ArrayList<>(pageSizes);
     }
 
     /**

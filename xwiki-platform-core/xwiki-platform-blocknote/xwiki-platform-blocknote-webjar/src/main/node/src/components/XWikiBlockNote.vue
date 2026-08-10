@@ -25,7 +25,7 @@
         ref="editor"
         :editor-props
         :editor-content
-        :container
+        :deps-container="container"
         :macros
         :collaboration
         @instant-change="dirty = true"
@@ -77,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
@@ -91,10 +92,10 @@ import {
   useTemplateRef,
 } from "vue";
 import { resolver } from "xwiki-platform-localization-webjar";
+import type { BlockNoteProcessor } from "../services/blocknote/BlockNoteProcessor";
 import type { ImageWizard } from "../services/image/ImageWizard";
 import type { BlockNoteMacroWizard } from "../services/macros/MacroWizard";
 import type { XWikiMeta } from "../services/meta/XWikiMeta";
-import type { UniAstProcessor } from "../services/uniast/UniAstProcessor";
 import type { CristalApp } from "@xwiki/platform-api";
 import type {
   Collaboration,
@@ -102,27 +103,27 @@ import type {
   CollaborationManagerProvider,
 } from "@xwiki/platform-collaboration-api";
 import type {
-  BlockOfType,
+  BlockNoteViewWrapperProps,
+  BlockType,
   EditorLanguage,
-  ImageUpdateResult,
+  ImageEditionOverrideFn,
 } from "@xwiki/platform-editors-blocknote-react";
-import type {
-  MacroWithUnknownParamsType,
-  UnknownMacroParamsType,
-} from "@xwiki/platform-macros-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { SyntaxConfig } from "@xwiki/platform-syntaxes-config";
-import type { UniAst } from "@xwiki/platform-uniast-api";
 import type { Ref } from "vue";
 
 //
 // Injected
 //
 const container = inject<Container>("container")!;
-const uniAstProcessor: UniAstProcessor = container.get("UniAstProcessor", {
-  name: "XWiki",
-});
+const blockNoteProcessor: BlockNoteProcessor = container.get(
+  "BlockNoteProcessor",
+  {
+    name: "XWiki",
+  },
+);
 const xwikiMeta: XWikiMeta = container.get("XWikiMeta");
 const modelReferenceParser = container
   .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
@@ -136,7 +137,7 @@ const {
   initialValue = "",
   form = undefined,
   disabled = false,
-  inputSyntax = "uniast/1.0",
+  inputSyntax = "blocknote/1.0",
   outputSyntax = "xwiki/2.1",
   collaborationURL = undefined,
   documentReference = XWiki.Model.serialize(
@@ -186,6 +187,8 @@ const value = ref(initialValue);
 const dirty = ref(false);
 const isLoading = ref(true);
 
+let blockNoteDocument: BlockNoteDocument | undefined;
+
 // This is passed to the BlockNote editor component.
 const editorContent = ref();
 
@@ -200,25 +203,44 @@ if (docRef && docRef.locale === undefined) {
   docRef.locale = actualLocale;
 }
 
-const imageEdition = (
-  image: BlockOfType<"image">["props"],
-  update: (updateResult: ImageUpdateResult) => void,
-) => {
+const imageEdition: ImageEditionOverrideFn = (block, update) => {
   const imageWizard: ImageWizard = container.get("ImageWizard");
-  imageWizard.edit(image, {
-    submit: (updatedProps: Partial<BlockOfType<"image">["props"]>) =>
-      update({ type: "update", updatedProps }),
-    cancel: () => update({ type: "aborted" }),
-  });
+  // The XWiki resource reference is kept as block metadata (outside the BlockNote schema), so we pass it to the image
+  // wizard and update it on submit, because the user may have selected a different image.
+  const reference = blockNoteDocument?.getMetadata(block.id)?.xwikiReference as
+    | ResourceReference
+    | undefined;
+  imageWizard.edit(
+    { ...block.props, reference },
+    {
+      submit: ({ reference: newReference, ...updatedProps }) => {
+        if (newReference) {
+          blockNoteDocument!.getMetadata(block.id, true)!.xwikiReference =
+            newReference;
+        }
+        update({ type: "update", updatedProps });
+      },
+      cancel: () => update({ type: "aborted" }),
+    },
+  );
 };
 
 const syntaxes = container.getAll<SyntaxConfig>(
   SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
 );
 
-const syntax =
-  syntaxes.find((conf) => conf.id === outputSyntax) ??
-  syntaxes.find((conf) => conf.id === MINIMAL_SYNTAX_NAME);
+let syntax = syntaxes.find((conf) => conf.id === outputSyntax);
+
+if (!syntax) {
+  // Falling back to the minimal syntax disables most editor features (headings, tables, images,
+  // lists, macros, ...). Warn so that a missing / mismatched syntax config doesn't silently cripple
+  // the editor.
+  console.warn(
+    `No syntax configuration registered for '${outputSyntax}', falling back to the minimal ` +
+      "syntax: most editor features will be disabled.",
+  );
+  syntax = syntaxes.find((conf) => conf.id === MINIMAL_SYNTAX_NAME);
+}
 
 if (!syntax) {
   throw new Error(
@@ -250,7 +272,8 @@ let collaborationManager: CollaborationManager | undefined = undefined;
 const collaborationKey: Ref<string | undefined> = ref();
 
 onBeforeMount(async () => {
-  editorContent.value = uniAstProcessor.load(initialValue);
+  blockNoteDocument = blockNoteProcessor.load(initialValue);
+  editorContent.value = blockNoteDocument.content;
 
   editorProps.value.label =
     (await resolver.resolve(["platform.blocknote.editor.label"])).translations[
@@ -276,27 +299,41 @@ onUnmounted(() => {
   collaborationManager?.leave();
 });
 
-// This is passed to the BlockNote editor component.
-const macros = {
-  list: container.getAll<MacroWithUnknownParamsType>("Macro"),
+// This is passed to the BlockNote editor component. Macros are inserted / edited directly as the server-rendered
+// xwikiMacroBlock / xwikiInlineMacro blocks: the wizard operates on macro invocations, and the editor stores the
+// resulting invocation in the block. The list of client-rendered macros is left empty (they are not used here).
+const macros: BlockNoteViewWrapperProps["macros"] = {
   ctx: {
-    openParamsEditor: async (
-      macro: MacroWithUnknownParamsType,
-      parameters: UnknownMacroParamsType,
-      update: (newProps: UnknownMacroParamsType) => void,
-    ) => {
+    openParamsEditor: async (invocation, update) => {
       try {
         const macroWizard: BlockNoteMacroWizard = container.get(
           "BlockNoteMacroWizard",
         );
         update(
-          await macroWizard.insertOrUpdate(macro, parameters, {
+          await macroWizard.insertOrUpdate(invocation, {
             syntax: outputSyntax,
             inlineParametersSyntax: inputSyntax,
           }),
         );
       } catch (error) {
-        console.error("Failed to edit the macro", error);
+        if (error) {
+          console.error("Failed to edit the macro", error);
+        }
+      }
+    },
+
+    openInsertionEditor: async (prefill, insert) => {
+      try {
+        const macroWizard: BlockNoteMacroWizard = container.get(
+          "BlockNoteMacroWizard",
+        );
+        insert(
+          await macroWizard.insert(prefill.kind, prefill.params, prefill.body),
+        );
+      } catch (error) {
+        if (error) {
+          console.error("Failed to insert the macro", error);
+        }
       }
     },
   },
@@ -313,7 +350,7 @@ const editorInstance =
 // Methods
 //
 // eslint-disable-next-line max-statements
-async function updateValue(editorContent?: UniAst | Error): Promise<string> {
+function updateValue(editorContent?: BlockType[]): string {
   if (!dirty.value) {
     // The value is already up-to-date.
     return value.value;
@@ -321,11 +358,12 @@ async function updateValue(editorContent?: UniAst | Error): Promise<string> {
 
   const instantUpdate = !editorContent;
   editorContent = editorContent || editorInstance.value?.getContent();
-  if (!editorContent || editorContent instanceof Error) {
-    throw editorContent || new Error("Could not get the editor content.");
+  if (!editorContent) {
+    throw new Error("Could not get the editor content.");
   }
 
-  const newValue = uniAstProcessor.save(editorContent);
+  blockNoteDocument!.content = editorContent;
+  const newValue = blockNoteProcessor.save(blockNoteDocument!);
 
   value.value = newValue;
   dirty.value = false;
@@ -347,15 +385,6 @@ defineExpose({
 
 <style>
 .xwiki-blocknote {
-  --cr-base-font-size: unset;
-  --cr-base-text-color: unset;
-  --cr-font-sans: unset;
-  --cr-font-size-x-large: 24px; /* --font-size-h2 */
-  --cr-font-size-large: 20px; /* --font-size-h3 */
-  --cr-font-size-medium: 17px; /* --font-size-h4 */
-  --cr-font-weight-normal: var(--font-weight-regular);
-  --cr-line-height-normal: unset;
-
   .bn-container {
     --bn-font-family: unset;
     --mantine-font-size-md: inherit;

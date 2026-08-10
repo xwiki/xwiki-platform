@@ -22,7 +22,6 @@ package org.xwiki.notifications.filters.internal;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
@@ -39,7 +38,6 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -86,7 +84,7 @@ class DefaultNotificationFilterPreferenceManagerTest
     }
 
     @Test
-    void filterPreferencesWithFilter() throws Exception
+    void filterPreferencesWithFilter()
     {
         NotificationFilterPreference filterPreference1 = mock(NotificationFilterPreference.class);
         when(filterPreference1.getFilterName()).thenReturn("someFilter");
@@ -100,14 +98,14 @@ class DefaultNotificationFilterPreferenceManagerTest
         when(fakeFilter.getName()).thenReturn("fakeFilter");
 
         Collection<NotificationFilterPreference> resultSet = this.filterPreferenceManager
-            .getFilterPreferences(filterPreferences, fakeFilter).collect(Collectors.toList());
+            .getFilterPreferences(filterPreferences, fakeFilter).toList();
 
         assertTrue(resultSet.contains(filterPreference2));
         assertEquals(1, resultSet.size());
     }
 
     @Test
-    void filterPreferencesWithFilterAndFilterType() throws Exception
+    void filterPreferencesWithFilterAndFilterType()
     {
         NotificationFilterPreference filterPreference1 = mock(NotificationFilterPreference.class);
         when(filterPreference1.getFilterName()).thenReturn("someFilter");
@@ -130,7 +128,7 @@ class DefaultNotificationFilterPreferenceManagerTest
 
         Collection<NotificationFilterPreference> resultSet = this.filterPreferenceManager
             .getFilterPreferences(filterPreferences, fakeFilter, NotificationFilterType.INCLUSIVE)
-            .collect(Collectors.toList());
+            .toList();
 
         assertTrue(resultSet.contains(filterPreference4));
         assertEquals(1, resultSet.size());
@@ -169,7 +167,7 @@ class DefaultNotificationFilterPreferenceManagerTest
         this.filterPreferenceManager.setStartDateForUser(user, date);
 
         // Checks
-        verify(this.filterPreferencesModelBridge).setStartDateForUser(eq(user), eq(date));
+        verify(this.filterPreferencesModelBridge).setStartDateForUser(user, date);
     }
 
     @Test

@@ -116,8 +116,8 @@ public class WikiDocument
     public boolean equals(Object obj)
     {
         boolean equals = false;
-        if (obj instanceof WikiDocument) {
-            equals = ((WikiDocument) obj).getDocumentReference().equals(getDocumentReference());
+        if (obj instanceof WikiDocument wikiDocument) {
+            equals = wikiDocument.getDocumentReference().equals(getDocumentReference());
         }
         return equals;
     }

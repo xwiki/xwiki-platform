@@ -278,6 +278,8 @@ viewers.Comments = Class.create({
       }
       // Insert the form on top of that comment's discussion
       item.up(this.xcommentSelector).next('.commentthread').insert({'top': this.form});
+      // Expand the thread
+      item.adjacent('.thread-toggle[aria-expanded="false"]')[0]?.click();
 
       this.reloadEditor({
         callback: function () {
@@ -317,7 +319,7 @@ viewers.Comments = Class.create({
           formData.set('xpage', 'xpart');
           formData.set('vm', 'commentsinline.vm');
           formData.set('skin', XWiki.skin);
-          // Strip form parameters from the form action query string to prevent them from being overwriten.
+          // Strip form parameters from the form action query string to prevent them from being overwritten.
           var queryStringParams = $H(form.action.toQueryParams());
           formData.keys().each(queryStringParams.unset.bind(queryStringParams));
           var url = form.action.replace(/\?.*/, '?' + queryStringParams.toQueryString());
@@ -360,7 +362,19 @@ viewers.Comments = Class.create({
               this.destroyEditor("[name='" + name + "']");
 
               if (this.requestSucceeded) {
+                // We save the current state of the comment container.
+                // We don't need to keep this state on full page refresh so we can do it here.
+                // Right now, this state is only whether or not each thread is expanded.
+                let expandedThreadsIDs = [];
+                $$('.commentthread.collapse.in').forEach((thread) => expandedThreadsIDs.push(thread.id));
+                // Restore the state of the comment container.
                 this.container.update(response.responseText);
+                expandedThreadsIDs.forEach(threadID => {
+                  document.getElementById(threadID).classList.add('in');
+                  let toggle = document.querySelector(`.thread-toggle[aria-controls="${threadID}"`);
+                  toggle.setAttribute('aria-expanded','true');
+                  toggle.classList.remove('collapsed');
+                });
 
                 // If a content is found in submittedcomment that means the submission was not valid.
                 // For instance, the captcha was not accepted.
@@ -686,7 +700,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var notification;
     /**
      * Ajax request made for deleting the comment.
-     * Delete the HTML element on succes (replace it with a small notification message).
+     * Delete the HTML element on success (replace it with a box message).
      * Display error message on failure.
      * Disable the delete button before the request is send, so the user cannot resend it in case it takes longer.
      */
@@ -728,7 +742,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    * Just a simple message box that is used as a placeholder for a deleted comment.
    */
   var createNotification = function(message) {
-    var msg = new Element('div', {'class' : 'notification' });
+    var msg = new Element('div', {'class' : 'box infomessage' });
     msg.update(message);
     return msg;
   };

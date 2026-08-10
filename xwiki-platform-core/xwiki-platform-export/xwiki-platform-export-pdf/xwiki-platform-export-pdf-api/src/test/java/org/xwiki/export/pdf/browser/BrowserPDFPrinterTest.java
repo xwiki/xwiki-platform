@@ -49,8 +49,8 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -113,12 +113,8 @@ class BrowserPDFPrinterTest
     @Test
     void printWithoutPreviewURL()
     {
-        try {
-            this.printer.print(null);
-            fail();
-        } catch (IOException e) {
-            assertEquals("Print preview URL missing.", e.getMessage());
-        }
+        IOException e = assertThrows(IOException.class, () -> this.printer.print(null));
+        assertEquals("Print preview URL missing.", e.getMessage());
     }
 
     @Test
@@ -181,13 +177,10 @@ class BrowserPDFPrinterTest
         when(this.configuration.isXWikiURISpecified()).thenReturn(false);
         when(this.browserManager.createIncognitoTab()).thenReturn(this.browserTab);
 
-        try {
-            this.printer.print(new URL("http://external:9293/xwiki/bin/export/Some/Page?x=y#z"));
-            fail();
-        } catch (IOException e) {
-            assertEquals("Couldn't find an alternative print preview URL "
-                + "that the web browser used for PDF printing can access.", e.getMessage());
-        }
+        URL printPreviewURL = new URL("http://external:9293/xwiki/bin/export/Some/Page?x=y#z");
+        IOException e = assertThrows(IOException.class, () -> this.printer.print(printPreviewURL));
+        assertEquals("Couldn't find an alternative print preview URL "
+            + "that the web browser used for PDF printing can access.", e.getMessage());
 
         verify(this.browserTab).navigate(toStrEq(new URL("http://external:9293/xwiki/rest/client?media=json")));
         verify(this.browserTab).navigate(toStrEq(new URL("http://xwiki-host:9293/xwiki/rest/client?media=json")));
@@ -271,7 +264,7 @@ class BrowserPDFPrinterTest
         when(this.browserManager.isConnected()).thenThrow(exception);
         assertFalse(this.printer.isAvailable());
 
-        verify(this.logger).warn("Failed to connect to the web browser used for server-side PDF printing.", exception);
+        verify(this.logger).warn("Failed to connect to the web browser used for server-side PDF printing", exception);
     }
 
     @Test

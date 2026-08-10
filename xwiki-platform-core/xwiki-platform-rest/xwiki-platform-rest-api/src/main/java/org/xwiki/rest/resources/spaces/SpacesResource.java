@@ -34,8 +34,18 @@ import org.xwiki.rest.model.jaxb.Spaces;
 @Path("/wikis/{wikiName}/spaces")
 public interface SpacesResource
 {
-    // FIXME: Write Javadoc describing the REST API parameters
-    @SuppressWarnings("checkstyle:MissingJavadocMethod")
+    /**
+     * Lists the spaces of a given wiki that the current user is allowed to view.
+     *
+     * @param wikiName the identifier of the wiki to list the spaces from, for example {@code xwiki} for the main wiki
+     * @param start the 0-based index of the first space to return, used together with {@code number} for pagination;
+     *  defaults to {@code 0}
+     * @param number the maximum number of spaces to return; when {@code null} the wiki's configured REST query limit
+     *  is used, and a value that is negative or larger than that limit is rejected with a {@code 400} response
+     * @return the spaces the current user is allowed to view (hidden spaces excluded), within the requested pagination
+     *  window
+     * @throws XWikiRestException if the spaces cannot be retrieved
+     */
     @GET Spaces getSpaces(
             @PathParam("wikiName") String wikiName,
             @QueryParam("start") @DefaultValue("0") Integer start,

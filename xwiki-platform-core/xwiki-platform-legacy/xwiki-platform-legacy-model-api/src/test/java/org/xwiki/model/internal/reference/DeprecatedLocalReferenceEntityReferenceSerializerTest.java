@@ -37,7 +37,7 @@ import org.xwiki.model.reference.WikiReference;
  * 
  * @version $Id$
  */
-public class DeprecatedLocalReferenceEntityReferenceSerializerTest
+class DeprecatedLocalReferenceEntityReferenceSerializerTest
 {
     private EntityReferenceSerializer<EntityReference> serializer;
 

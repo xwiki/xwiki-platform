@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
 {
     // class to avoid synchronization (Init on demand)
-    static class SyncAvoid
+    static final class SyncAvoid
     {
         /**
          * Unmodifiable list of available locales.
@@ -60,6 +60,11 @@ public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
             }
             AVAILABLE_LOCALE_LIST = Collections.unmodifiableList(list);
             AVAILABLE_LOCALE_SET = Collections.unmodifiableSet(new HashSet<>(list));
+        }
+
+        private SyncAvoid()
+        {
+            // Utility class, no instantiation.
         }
     }
 

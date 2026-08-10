@@ -30,6 +30,7 @@ import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
 import org.xwiki.tool.extension.ExtensionOverride;
 
@@ -83,6 +84,8 @@ public class TestConfiguration
 
     private boolean office;
 
+    private boolean standardFlavor;
+
     private List<ServletEngine> forbiddenServletEngines;
 
     private Properties databaseCommands;
@@ -90,6 +93,8 @@ public class TestConfiguration
     private PropertiesMerger propertiesMerger = new PropertiesMerger();
 
     private boolean saveDatabaseData;
+
+    private boolean testExtensionRepository;
 
     private boolean savePermanentDirectoryData;
 
@@ -109,6 +114,8 @@ public class TestConfiguration
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
      */
+    // This is a flat sequence of one merge call per configuration option; splitting it would only hurt readability.
+    @SuppressWarnings("ExecutableStatementCount")
     public void merge(TestConfiguration testConfiguration) throws DockerTestException
     {
         mergeBrowser(testConfiguration.getBrowser());
@@ -131,9 +138,11 @@ public class TestConfiguration
         mergeSSHPorts(testConfiguration.getSSHPorts());
         mergeProfiles(testConfiguration.getProfiles());
         mergeOffice(testConfiguration.isOffice());
+        mergeStandardFlavor(testConfiguration.isStandardFlavor());
         mergeForbiddenServletEngines(testConfiguration.getForbiddenServletEngines());
         mergeDatabaseCommands(testConfiguration.getDatabaseCommands());
         mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
+        mergeTestExtensionRepository(testConfiguration.isTestExtensionRepository());
         mergeSavePermanentDirectoryData(testConfiguration.isPermanentDirectoryDataSaved());
         mergeServletEngineNetworkAliases(testConfiguration.getServletEngineNetworkAliases());
         mergeBlobStore(testConfiguration.blobStore);
@@ -288,6 +297,13 @@ public class TestConfiguration
         }
     }
 
+    private void mergeStandardFlavor(boolean standardFlavor)
+    {
+        if (!isStandardFlavor() && standardFlavor) {
+            this.standardFlavor = true;
+        }
+    }
+
     private void mergeProperties(Properties properties) throws DockerTestException
     {
         this.properties = this.propertiesMerger.merge(getProperties(), properties, false);
@@ -354,6 +370,13 @@ public class TestConfiguration
     {
         if (!isDatabaseDataSaved() && saveDatabaseData) {
             this.saveDatabaseData = true;
+        }
+    }
+
+    private void mergeTestExtensionRepository(boolean testExtensionRepository)
+    {
+        if (!isTestExtensionRepository() && testExtensionRepository) {
+            this.testExtensionRepository = true;
         }
     }
 
@@ -784,13 +807,17 @@ public class TestConfiguration
      */
     public String getName()
     {
-        return String.format("%s-%s-%s-%s-%s-%s",
+        // Note: the standardFlavor mode is part of the name so that the minimal-WAR and standard-flavor variants get
+        // distinct output directories (and thus distinct build.marker files). Otherwise switching modes for the same
+        // db/servlet/browser combination would reuse a stale WAR.
+        return String.format("%s-%s-%s-%s-%s-%s%s",
             getDatabase().name().toLowerCase(),
             StringUtils.isEmpty(getDatabaseTag()) ? DEFAULT : getDatabaseTag(),
             StringUtils.isEmpty(getJDBCDriverVersion()) ? DEFAULT : getDatabaseTag(),
             getServletEngine().name().toLowerCase(),
             StringUtils.isEmpty(getServletEngineTag()) ? DEFAULT : getServletEngineTag(),
-            getBrowser().name().toLowerCase());
+            getBrowser().name().toLowerCase(),
+            isStandardFlavor() ? "-standardflavor" : "");
     }
 
     /**
@@ -837,6 +864,46 @@ public class TestConfiguration
     }
 
     /**
+     * @return true to make the test instance equivalent to an XWiki installed from the standard flavor
+     *         distribution: the WAR's {@code WEB-INF/lib} is built from the standard distribution WAR
+     *         dependencies (instead of the minimal set) and the standard flavor
+     *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically. See
+     *         {@link org.xwiki.test.docker.junit5.UITest#standardFlavor()}.
+     * @since 18.6.0RC1
+     */
+    public boolean isStandardFlavor()
+    {
+        return this.standardFlavor;
+    }
+
+    /**
+     * @param standardFlavor see {@link #isStandardFlavor()}
+     * @since 18.6.0RC1
+     */
+    public void setStandardFlavor(boolean standardFlavor)
+    {
+        this.standardFlavor = standardFlavor;
+    }
+
+    /**
+     * @return the artifactId (in the {@code org.xwiki.platform} groupId) of the {@code pom} artifact whose
+     *         dependencies define the JARs to put in the WAR's {@code WEB-INF/lib}: the full standard distribution
+     *         dependencies when {@link #isStandardFlavor()} is true (the {@code legacy} variant when the
+     *         {@code legacy} profile is active), or the minimal set otherwise. Used by both the WAR builder and the
+     *         extension installer so that they agree on what is bundled versus provisioned.
+     * @since 18.6.0RC1
+     */
+    public String getWARDependenciesRootArtifactId()
+    {
+        if (!isStandardFlavor()) {
+            return "xwiki-platform-minimaldependencies";
+        }
+        return getProfiles().contains("legacy")
+            ? "xwiki-platform-distribution-war-legacydependencies"
+            : "xwiki-platform-distribution-war-dependencies";
+    }
+
+    /**
      * @return the list of Servlet Engines on which this test must not be executed. If the Servlet Engine is selected
      *         then the test will be skipped
      * @since 10.11RC1
@@ -862,6 +929,25 @@ public class TestConfiguration
     public boolean isDatabaseDataSaved()
     {
         return this.saveDatabaseData;
+    }
+
+    /**
+     * @return true if the extensions declared in the resources of the module executing the test are made available to
+     *     the XWiki instances as an extension repository
+     * @since 18.7.0RC1
+     */
+    public boolean isTestExtensionRepository()
+    {
+        return this.testExtensionRepository;
+    }
+
+    /**
+     * @param testExtensionRepository see {@link #isTestExtensionRepository()}
+     * @since 18.7.0RC1
+     */
+    public void setTestExtensionRepository(boolean testExtensionRepository)
+    {
+        this.testExtensionRepository = testExtensionRepository;
     }
 
     /**
@@ -1018,5 +1104,16 @@ public class TestConfiguration
     public boolean isCluster()
     {
         return getXWikiInstances().value() > 1;
+    }
+
+    /**
+     * @return true if the database is embedded in the XWiki instance, false if it runs in its own Docker container.
+     *         Only HSQLDB can be embedded and only when there's a single XWiki instance since an embedded database
+     *         cannot be shared: in a cluster it runs in server mode instead.
+     * @since 18.7.0RC1
+     */
+    public boolean isDatabaseEmbedded()
+    {
+        return getDatabase() == Database.HSQLDB && !isCluster();
     }
 }

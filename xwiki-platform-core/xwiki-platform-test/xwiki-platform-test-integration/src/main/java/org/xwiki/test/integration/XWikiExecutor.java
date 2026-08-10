@@ -59,7 +59,7 @@ public class XWikiExecutor
      * allows the build to start XWiki (this is the case for example when running functional tests with Docker).
      */
     private static final boolean SHOULD_START_XWIKI =
-        Boolean.valueOf(System.getProperty("xwiki.test.startXWiki", "true"));
+        Boolean.parseBoolean(System.getProperty("xwiki.test.startXWiki", "true"));
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutor.class);
 
@@ -102,7 +102,7 @@ public class XWikiExecutor
     private static final long PROCESS_FINISH_TIMEOUT = 5 * 60L * 1000L;
 
     private static final int VERIFY_RUNNING_XWIKI_AT_START_TIMEOUT =
-        Integer.valueOf(System.getProperty("xwiki.test.verifyRunningXWikiAtStartTimeout", "15"));
+        Integer.parseInt(System.getProperty("xwiki.test.verifyRunningXWikiAtStartTimeout", "15"));
 
     private static final int DEBUG_PORT = 5005;
 
@@ -144,7 +144,7 @@ public class XWikiExecutor
 
     private XWikiWatchdog watchdog = new XWikiWatchdog();
 
-    private long startTimeout = Long.valueOf(System.getProperty("xwikiExecutionStartTimeout", "120"));
+    private long startTimeout = Long.parseLong(System.getProperty("xwikiExecutionStartTimeout", "120"));
 
     private int debugPort ;
 
@@ -242,7 +242,12 @@ public class XWikiExecutor
         }
     }
 
-    private static int resolvePort(int index)
+    /**
+     * @param index the index of the XWiki instance
+     * @return the port on which the XWiki instance with the passed index listens
+     * @since 18.7.0RC1
+     */
+    public static int resolvePort(int index)
     {
         String portString = System.getProperty("xwikiPort" + index);
         return portString != null ? Integer.valueOf(portString) : (Integer.valueOf(DEFAULT_PORT) + index);
@@ -515,7 +520,8 @@ public class XWikiExecutor
         if (response.timedOut) {
             String message = String.format("Failed to start XWiki in [%s] seconds, last error code [%s], message [%s]",
                 timeout, response.responseCode, response.responseBody);
-            LOGGER.info(message);
+            LOGGER.info("Failed to start XWiki in [{}] seconds, last error code [{}], message [{}]", timeout,
+                response.responseCode, response.responseBody);
             stop();
             throw new RuntimeException(message);
         } else {
@@ -676,11 +682,8 @@ public class XWikiExecutor
 
     private void saveProperties(String path, Properties properties) throws Exception
     {
-        FileOutputStream fos = new FileOutputStream(path);
-        try {
+        try (FileOutputStream fos = new FileOutputStream(path)) {
             properties.store(fos, null);
-        } finally {
-            fos.close();
         }
     }
 

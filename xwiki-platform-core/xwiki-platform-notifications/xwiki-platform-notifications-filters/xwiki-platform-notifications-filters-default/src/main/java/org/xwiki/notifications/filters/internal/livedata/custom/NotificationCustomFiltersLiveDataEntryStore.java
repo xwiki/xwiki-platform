@@ -156,7 +156,7 @@ public class NotificationCustomFiltersLiveDataEntryStore extends AbstractNotific
             case PAGE ->
                 this.entityReferenceResolver.resolve(filterPreference.getPageOnly(), EntityType.DOCUMENT);
         };
-        // TODO: Create an improvment ticket for having a displayer
+        // TODO: Create an improvement ticket for having a displayer
         ScriptContext currentScriptContext = this.scriptContextManager.getCurrentScriptContext();
         currentScriptContext.setAttribute("location", location, ScriptContext.ENGINE_SCOPE);
         return this.templateManager.renderNoException(LOCATION_TEMPLATE);

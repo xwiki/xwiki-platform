@@ -738,7 +738,7 @@ require([
   // This could probably be done at the xwiki tree macro level but it would cause regressions 
   // and doing it here only is enough for now.
   // The proper solution would be to actually make the ".jstree-node" a treeitem from JStree itself.
-  // Like other places in JSTree, there is a lot of semantic markup but it's used approximatively.
+  // Like other places in JSTree, there is a lot of semantic markup but it's used approximately.
   // This poor markup leaves no place where JStree actions could be added correctly.
   function fixNodeMarkup($node) {
     let $anchor = $node.children('.jstree-anchor');
@@ -840,7 +840,7 @@ require([
         // here because top level pages are always nested.
         return topLevelSpaceName.replaceAll('%', '%25').replaceAll('/', '%2F').replaceAll('+', '%2B');
       });
-    // We need to ensure to never send a unique value to the server to avoid having a unique string splitted using
+    // We need to ensure to never send a unique value to the server to avoid having a unique string split using
     // standard separators. See also XWIKI-22885
     if (pinnedTopLevelPages.length &gt; 0) {
       pinnedTopLevelPages.push('');

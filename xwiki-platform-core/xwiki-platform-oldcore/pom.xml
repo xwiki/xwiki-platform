@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -136,7 +136,7 @@
     </dependency>
 
     <!-- Used by parse groovy from page -->
-    <!-- Note: We only depend on the miniumum required to compile oldcore since the distributions will depend on
+    <!-- Note: We only depend on the minimum required to compile oldcore since the distributions will depend on
          xwiki-commons-groovy which has dependencies on all the various groovy jars and thus they'll be bundled -->
     <dependency>
       <groupId>org.apache.groovy</groupId>

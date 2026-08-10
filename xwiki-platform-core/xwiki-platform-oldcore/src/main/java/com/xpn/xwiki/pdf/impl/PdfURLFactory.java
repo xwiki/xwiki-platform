@@ -49,6 +49,24 @@ public class PdfURLFactory extends FileSystemURLFactory
      */
     private XWikiServletURLFactory servletURLFactory = new XWikiServletURLFactory();
 
+    /**
+     * PdfURLFactory constructor.
+     */
+    public PdfURLFactory()
+    {
+    }
+
+    /**
+     * @param checkAccess true if the access to linked resources should be verified against the context user
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    public PdfURLFactory(boolean checkAccess)
+    {
+        super(checkAccess);
+    }
+
     @Override
     public void init(XWikiContext context)
     {

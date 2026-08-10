@@ -22,12 +22,23 @@ package org.xwiki.rendering.script;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
@@ -43,6 +54,13 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.SyntaxRegistry;
+import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.rendering.transformation.XWikiTransformationContext;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -52,18 +70,29 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.test.mockito.StringReaderMatcher;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.xwiki.rendering.syntax.Syntax.PLAIN_1_0;
 import static org.xwiki.rendering.syntax.Syntax.XHTML_1_0;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_1_0;
 import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
@@ -110,6 +139,22 @@ class RenderingScriptServiceTest
 
     @MockComponent
     private SyntaxRegistry syntaxRegistry;
+
+    @MockComponent
+    private TransformationManager transformationManager;
+
+    @MockComponent
+    private ContextualAuthorizationManager authorization;
+
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
+
+    @MockComponent
+    private AuthorExecutor authorExecutor;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -318,5 +363,310 @@ class RenderingScriptServiceTest
         MacroId macroId = new MacroId("macroId");
         this.renderingScriptService.getMacroCategories(macroId);
         verify(this.macroCategoryManager).getMacroCategories(macroId);
+    }
+
+    @Test
+    void createTransformationContext()
+    {
+        assertNotNull(this.renderingScriptService.createTransformationContext());
+    }
+
+    @Test
+    void transform() throws Exception
+    {
+        DocumentReference currentUser = new DocumentReference("xwiki", "XWiki", "CurrentUser");
+        when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(currentUser);
+        executeCallable();
+
+        DocumentReference contentDocument = new DocumentReference("wiki", "Space", "Page");
+        XWikiTransformationContext transformationContext = new XWikiTransformationContext();
+        transformationContext.setContentEntityReference(contentDocument);
+        Block block = new WordBlock("content");
+
+        this.renderingScriptService.transform(block, transformationContext);
+
+        verify(this.authorization).checkAccess(Right.PROGRAM);
+        verify(this.transformationManager).performTransformations(block, transformationContext);
+        verify(this.authorExecutor).call(any(), eq(currentUser), eq(contentDocument));
+    }
+
+    @Test
+    void transformWithoutContentEntityReference() throws Exception
+    {
+        DocumentReference currentUser = new DocumentReference("xwiki", "XWiki", "CurrentUser");
+        when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(currentUser);
+        executeCallable();
+
+        XWikiTransformationContext transformationContext = new XWikiTransformationContext();
+        Block block = new WordBlock("content");
+
+        this.renderingScriptService.transform(block, transformationContext);
+
+        verify(this.transformationManager).performTransformations(block, transformationContext);
+        verify(this.authorExecutor).call(any(), eq(currentUser), isNull());
+    }
+
+    @Test
+    void transformWithoutProgrammingRight() throws Exception
+    {
+        AccessDeniedException accessDeniedException = new AccessDeniedException(Right.PROGRAM, null, null);
+        doThrow(accessDeniedException).when(this.authorization).checkAccess(Right.PROGRAM);
+
+        XWikiTransformationContext transformationContext = new XWikiTransformationContext();
+        Block block = new WordBlock("content");
+
+        AccessDeniedException thrown = assertThrows(AccessDeniedException.class,
+            () -> this.renderingScriptService.transform(block, transformationContext));
+        assertSame(accessDeniedException, thrown);
+        verifyNoInteractions(this.transformationManager, this.authorExecutor);
+    }
+
+    @Test
+    void transformPropagatesTransformationException() throws Exception
+    {
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("xwiki", "XWiki", "CurrentUser"));
+        executeCallable();
+
+        XWikiTransformationContext transformationContext = new XWikiTransformationContext();
+        Block block = new WordBlock("content");
+        TransformationException transformationException = new TransformationException("failed");
+        doThrow(transformationException).when(this.transformationManager)
+            .performTransformations(block, transformationContext);
+
+        TransformationException thrown = assertThrows(TransformationException.class,
+            () -> this.renderingScriptService.transform(block, transformationContext));
+        assertSame(transformationException, thrown);
+    }
+
+    @Test
+    void transformWrapsUnexpectedException() throws Exception
+    {
+        when(this.documentAccessBridge.getCurrentUserReference())
+            .thenReturn(new DocumentReference("xwiki", "XWiki", "CurrentUser"));
+        RuntimeException runtimeException = new RuntimeException("boom");
+        doThrow(runtimeException).when(this.authorExecutor).call(any(), any(), any());
+
+        XWikiTransformationContext transformationContext = new XWikiTransformationContext();
+        Block block = new WordBlock("content");
+
+        TransformationException thrown = assertThrows(TransformationException.class,
+            () -> this.renderingScriptService.transform(block, transformationContext));
+        assertEquals("Failed to perform transformations", thrown.getMessage());
+        assertSame(runtimeException, thrown.getCause());
+    }
+
+    @Test
+    void convertWithDocumentContentAuthor() throws Exception
+    {
+        String source = "the content";
+        XDOM xdom = setupConversion(source, "rendered");
+
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        DocumentModelBridge document = mock();
+        when(this.documentAccessBridge.getDocumentInstance(documentReference)).thenReturn(document);
+        when(document.getContent()).thenReturn(source);
+        DocumentAuthors authors = mock();
+        when(document.getAuthors()).thenReturn(authors);
+        UserReference contentAuthor = mock();
+        when(authors.getContentAuthor()).thenReturn(contentAuthor);
+        DocumentReference authorReference = new DocumentReference("wiki", "XWiki", "Author");
+        when(this.userReferenceSerializer.serialize(contentAuthor)).thenReturn(authorReference);
+        executeCallable();
+
+        XWikiTransformationContext transformationContext = transformationContext(documentReference);
+
+        assertEquals("rendered", this.renderingScriptService.convert(source, transformationContext));
+
+        verify(this.authorization).checkAccess(Right.PROGRAM);
+        // The parsed content is made available to the transformations through the context.
+        assertSame(xdom, transformationContext.getXDOM());
+        verify(this.transformationManager).performTransformations(xdom, transformationContext);
+        verify(this.authorExecutor).call(any(), eq(authorReference), eq(documentReference));
+    }
+
+    @Test
+    void convertWithModifiedDocumentContent() throws Exception
+    {
+        String source = "the modified content";
+        setupConversion(source, "rendered");
+
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        DocumentModelBridge document = mock();
+        when(this.documentAccessBridge.getDocumentInstance(documentReference)).thenReturn(document);
+        when(document.getContent()).thenReturn("the stored content");
+        DocumentReference currentUser = new DocumentReference("wiki", "XWiki", "CurrentUser");
+        when(this.userReferenceSerializer.serialize(CurrentUserReference.INSTANCE)).thenReturn(currentUser);
+        executeCallable();
+
+        XWikiTransformationContext transformationContext = transformationContext(documentReference);
+
+        assertEquals("rendered", this.renderingScriptService.convert(source, transformationContext));
+
+        // Since the content was modified, it is attributed to the current user, not the content author.
+        verify(document, never()).getAuthors();
+        verify(this.authorExecutor).call(any(), eq(currentUser), eq(documentReference));
+    }
+
+    @Test
+    void convertWithObjectPropertyAuthor() throws Exception
+    {
+        String source = "the property content";
+        XDOM xdom = setupConversion(source, "rendered");
+
+        ObjectPropertyReference propertyReference =
+            new ObjectPropertyReference("wiki", "Space", "Page", "MyClass", "content");
+        when(this.documentAccessBridge.getProperty(propertyReference)).thenReturn(source);
+        DocumentModelBridge document = mock();
+        when(this.documentAccessBridge.getDocumentInstance(propertyReference)).thenReturn(document);
+        DocumentAuthors authors = mock();
+        when(document.getAuthors()).thenReturn(authors);
+        UserReference metadataAuthor = mock();
+        when(authors.getEffectiveMetadataAuthor()).thenReturn(metadataAuthor);
+        DocumentReference authorReference = new DocumentReference("wiki", "XWiki", "Author");
+        when(this.userReferenceSerializer.serialize(metadataAuthor)).thenReturn(authorReference);
+        executeCallable();
+
+        XWikiTransformationContext transformationContext = transformationContext(propertyReference);
+
+        assertEquals("rendered", this.renderingScriptService.convert(source, transformationContext));
+
+        verify(this.transformationManager).performTransformations(xdom, transformationContext);
+        verify(this.authorExecutor).call(any(), eq(authorReference),
+            eq(new DocumentReference("wiki", "Space", "Page")));
+    }
+
+    @Test
+    void convertWithNullReference() throws Exception
+    {
+        String source = "content";
+        setupConversion(source, "rendered");
+        DocumentReference currentUser = new DocumentReference("wiki", "XWiki", "CurrentUser");
+        when(this.userReferenceSerializer.serialize(CurrentUserReference.INSTANCE)).thenReturn(currentUser);
+        executeCallable();
+
+        XWikiTransformationContext transformationContext = transformationContext(null);
+
+        assertEquals("rendered", this.renderingScriptService.convert(source, transformationContext));
+
+        verify(this.authorExecutor).call(any(), eq(currentUser), isNull());
+    }
+
+    @Test
+    void convertWithUnrecognizedReference() throws Exception
+    {
+        String source = "content";
+        setupConversion(source, "rendered");
+        DocumentReference currentUser = new DocumentReference("wiki", "XWiki", "CurrentUser");
+        when(this.userReferenceSerializer.serialize(CurrentUserReference.INSTANCE)).thenReturn(currentUser);
+        executeCallable();
+
+        XWikiTransformationContext transformationContext = transformationContext(new WikiReference("wiki"));
+
+        TransformationException exception = assertThrows(TransformationException.class, () ->
+            this.renderingScriptService.convert(source, transformationContext));
+
+        assertEquals("Unsupported content entity reference type [WIKI]", exception.getMessage());
+    }
+
+    @Test
+    void convertWithoutProgrammingRight() throws Exception
+    {
+        AccessDeniedException accessDeniedException = new AccessDeniedException(Right.PROGRAM, null, null);
+        doThrow(accessDeniedException).when(this.authorization).checkAccess(Right.PROGRAM);
+
+        AccessDeniedException thrown = assertThrows(AccessDeniedException.class,
+            () -> this.renderingScriptService.convert("content", transformationContext(null)));
+        assertSame(accessDeniedException, thrown);
+        verifyNoInteractions(this.transformationManager);
+    }
+
+    @Test
+    void convertWithNullSource()
+    {
+        NullPointerException thrown = assertThrows(NullPointerException.class,
+            () -> this.renderingScriptService.convert(null, transformationContext(null)));
+        assertEquals("The source text to convert must be specified", thrown.getMessage());
+    }
+
+    @Test
+    void convertWithNullContext()
+    {
+        NullPointerException thrown = assertThrows(NullPointerException.class,
+            () -> this.renderingScriptService.convert("content", null));
+        assertEquals("The transformation context must be specified", thrown.getMessage());
+    }
+
+    @Test
+    void convertWithoutSourceSyntax()
+    {
+        XWikiTransformationContext transformationContext = new XWikiTransformationContext();
+        transformationContext.setTargetSyntax(XWIKI_2_0);
+
+        NullPointerException thrown = assertThrows(NullPointerException.class,
+            () -> this.renderingScriptService.convert("content", transformationContext));
+        assertEquals("The source syntax must be specified in the transformation context", thrown.getMessage());
+    }
+
+    @Test
+    void convertWithoutTargetSyntax()
+    {
+        XWikiTransformationContext transformationContext = new XWikiTransformationContext();
+        transformationContext.setSyntax(PLAIN_1_0);
+
+        NullPointerException thrown = assertThrows(NullPointerException.class,
+            () -> this.renderingScriptService.convert("content", transformationContext));
+        assertEquals("The target syntax must be specified in the transformation context", thrown.getMessage());
+    }
+
+    @Test
+    void convertWrapsUnexpectedException() throws Exception
+    {
+        String source = "content";
+        when(this.parser.parse(argThat(new StringReaderMatcher(source)))).thenThrow(new ParseException("bad"));
+
+        XWikiTransformationContext transformationContext = transformationContext(null);
+
+        TransformationException thrown = assertThrows(TransformationException.class,
+            () -> this.renderingScriptService.convert(source, transformationContext));
+        assertEquals(ParseException.class, thrown.getCause().getClass());
+    }
+
+    @Test
+    void convertWithUnknownSourceSyntax()
+    {
+        XWikiTransformationContext transformationContext = new XWikiTransformationContext();
+        // No parser is registered for this syntax.
+        transformationContext.setSyntax(XWIKI_2_1);
+        transformationContext.setTargetSyntax(XWIKI_2_0);
+
+        assertThrows(ComponentLookupException.class,
+            () -> this.renderingScriptService.convert("content", transformationContext));
+    }
+
+    private void executeCallable() throws Exception
+    {
+        doAnswer(invocation -> invocation.getArgument(0, Callable.class).call())
+            .when(this.authorExecutor).call(any(), any(), any());
+    }
+
+    private XWikiTransformationContext transformationContext(EntityReference contentReference)
+    {
+        XWikiTransformationContext transformationContext = new XWikiTransformationContext();
+        transformationContext.setSyntax(PLAIN_1_0);
+        transformationContext.setTargetSyntax(XWIKI_2_0);
+        transformationContext.setContentEntityReference(contentReference);
+        return transformationContext;
+    }
+
+    private XDOM setupConversion(String source, String rendered) throws Exception
+    {
+        XDOM xdom = new XDOM(List.of(new WordBlock("parsed")));
+        when(this.parser.parse(argThat(new StringReaderMatcher(source)))).thenReturn(xdom);
+        doAnswer(invocation -> {
+            ((WikiPrinter) invocation.getArgument(1)).print(rendered);
+            return null;
+        }).when(this.blockRenderer).render(eq(xdom), any());
+        return xdom;
     }
 }

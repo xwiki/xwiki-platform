@@ -37,13 +37,13 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   $(function() {
 
     /**
-     * Function that expand a breadcumb on some events.
+     * Function that expand a breadcrumb on some events.
      */
     var expandBreadCrumb = function(event) {
       event.preventDefault();
       var ellipsis = $(this).parent('li');
       ellipsis.addClass('loading');
-      // Get the full breadcumb with an AJAX call
+      // Get the full breadcrumb with an AJAX call
       var breadcrumb = $(this).parents('.breadcrumb-expandable');
       var breadcrumbURL = new XWiki.Document(XWiki.Model.resolve(breadcrumb.data('entity'), XWiki.EntityType.DOCUMENT))
         .getURL('get', 'xpage=hierarchy_reference');

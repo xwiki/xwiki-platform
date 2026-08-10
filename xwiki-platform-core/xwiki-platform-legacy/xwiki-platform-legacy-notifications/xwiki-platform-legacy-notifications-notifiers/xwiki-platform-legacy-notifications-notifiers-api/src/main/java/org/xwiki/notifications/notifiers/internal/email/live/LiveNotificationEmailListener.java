@@ -145,7 +145,7 @@ public class LiveNotificationEmailListener extends AbstractEventListener
                 }
 
             } catch (EventStreamException e) {
-                logger.warn("Unable to retrieve a full list of RecordableEventDescriptor.", e);
+                logger.warn("Unable to retrieve a full list of RecordableEventDescriptor", e);
             }
         }
     }

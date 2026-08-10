@@ -27,9 +27,12 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -60,6 +63,9 @@ class UIExtensionScriptServiceTest
 
     @Mock
     private ComponentManager componentManager;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void verifyExtensionsAreSortedAlphabeticallyById() throws Exception
@@ -94,5 +100,25 @@ class UIExtensionScriptServiceTest
         assertEquals("id1", extensions.get(0).getId());
         assertEquals("id2", extensions.get(1).getId());
         assertEquals("id3", extensions.get(2).getId());
+    }
+
+    @Test
+    void getExtensionsWhenUnknownFilterHint() throws Exception
+    {
+        UIExtension uix = mock(UIExtension.class, "uix1");
+        List<UIExtension> epExtensions = List.of(uix);
+
+        when(this.uiExtensionManager.get("epId")).thenReturn(epExtensions);
+        when(this.contextComponentManagerProvider.get()).thenReturn(this.contextComponentManager);
+        when(this.contextComponentManager.getInstance(UIExtensionFilter.class, "unknownFilter"))
+            .thenThrow(new ComponentLookupException("error!"));
+
+        // The unknown filter is skipped and the extensions are returned unfiltered.
+        assertEquals(epExtensions,
+            this.uiExtensionScriptService.getExtensions("epId", Map.of("unknownFilter", "id1")));
+
+        assertEquals("Unable to find a UIExtensionFilter for hint [unknownFilter] while getting UIExtensions for "
+            + "extension point [epId]. Root cause is [ComponentLookupException: error!]",
+            this.logCapture.getMessage(0));
     }
 }

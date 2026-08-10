@@ -72,12 +72,42 @@ public class AllIT
     }
 
     @Nested
+    class NestedUserAndGroupClassFieldSubWikiIT extends UserAndGroupClassFieldSubWikiIT
+    {
+    }
+
+    @Nested
     class NestedClassEditorIT extends ClassEditorIT
     {
     }
 
     @Nested
     class NestedWithoutScriptRightIT extends WithoutScriptRightIT
+    {
+    }
+
+    @Nested
+    class NestedDBListClassFieldIT extends DBListClassFieldIT
+    {
+    }
+
+    @Nested
+    class NestedDateClassFieldIT extends DateClassFieldIT
+    {
+    }
+
+    @Nested
+    class NestedPageClassFieldIT extends PageClassFieldIT
+    {
+    }
+
+    @Nested
+    class NestedLiveTableEditorIT extends LiveTableEditorIT
+    {
+    }
+
+    @Nested
+    class NestedApplicationsPanelEntryIT extends ApplicationsPanelEntryIT
     {
     }
 }

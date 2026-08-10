@@ -128,7 +128,7 @@ public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
                     this.attachmentPartFactory.create(attachment, Collections.<String, Object>emptyMap()));
             } catch (MessagingException e) {
                 // There is no reason to fail the whole mail for a broken attachment
-                this.logger.warn("Failed to add attachment [{}@{}] to the mail: {}",
+                this.logger.warn("Failed to add attachment [{}@{}] to the mail: [{}]",
                     attachment.getDocument().getDocumentReference(), attachment.getFilename(),
                     ExceptionUtils.getRootCauseMessage(e));
             }

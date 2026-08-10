@@ -200,7 +200,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
     /**
      * Several changes can be received very closely (for example, when several switches are updated in the same time),
      * so we save only the last received event.
-     * For that we postpone the save action (300ms is clone enought for the user) and we cancel it if an other event
+     * For that we postpone the save action (300ms is close enough for the user) and we cancel it if an other event
      * happens in the meantime.
      */
     var nextSave = 0;

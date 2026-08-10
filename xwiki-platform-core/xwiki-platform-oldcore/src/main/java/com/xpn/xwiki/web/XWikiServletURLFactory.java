@@ -63,6 +63,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletURLFactory.class);
 
+    private static final String HTML_AMPERSAND = "&amp;";
+
+    private static final String UTF8 = "UTF-8";
+
     private EntityReferenceResolver<String> relativeEntityReferenceResolver;
 
     private EntityReferenceResolver<String> currentEntityReferenceResolver;
@@ -124,10 +128,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // Set the configured home URL for the main wiki
         setDefaultURL(null, homepageConfigration);
 
-        // Check if the request is a deamon thread request
+        // Check if the request is a daemon thread request
         XWikiRequest request = context.getRequest();
-        this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub
-            && ((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon();
+        this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub stub
+            && stub.isDaemon();
 
         // Remember initial request base URL for path for last resort
         if (homepageConfigration != null && context.isMainWiki()) {
@@ -149,7 +153,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     defaultWikiURL =
                         new URL(protocolConfiguration, this.originalURL.getHost(), this.originalURL.getPort(), "");
                 } catch (MalformedURLException e) {
-                    LOGGER.warn("The configured protocol [{}] produce an invalid URL: {}", protocolConfiguration,
+                    LOGGER.warn("The configured protocol [{}] produces an invalid URL: [{}]", protocolConfiguration,
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
@@ -168,7 +172,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             try {
                 url = xcontext.getWiki().getServerURL(xcontext.getWikiId(), xcontext);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Can't get the standard URL for wiki [{}]: {}", xcontext.getWikiId(),
+                LOGGER.warn("Can't get the standard URL for wiki [{}]: [{}]", xcontext.getWikiId(),
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
@@ -230,7 +234,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             try {
                 return normalizeURL(surl, context);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter: {}. Ignoring parameter.", surl);
+                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter [{}]. Ignoring parameter. "
+                    + "Root cause is [{}]", surl, ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
@@ -326,7 +331,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
         }
 
         if (!StringUtils.isEmpty(anchor)) {
@@ -429,7 +434,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * {@code http://localhost:8080/xwiki/bin/view/A'/B}. This would generate a HTML of
      * {@code <a href='http://localhost:8080/xwiki/bin/view/A'/B'} which would generated a wrong link to
      * {@code http://localhost:8080/xwiki/bin/view/A}... Thus if we were only encoding the characters that require
-     * encoding, we would need HMTL writers to encode the received URL and right now we don't do that anywhere in our
+     * encoding, we would need HTML writers to encode the received URL and right now we don't do that anywhere in our
      * code. Thus in order to not introduce any problem and keep it safe we just handle the {@code +} character
      * specially and encode the rest.
      *
@@ -450,39 +455,16 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         String encodedName;
         try {
-            encodedName = URLEncoder.encode(name, "UTF-8");
+            encodedName = URLEncoder.encode(name, UTF8);
         } catch (Exception e) {
             // Should not happen (UTF-8 is always available)
             throw new RuntimeException("Missing charset [UTF-8]", e);
         }
 
         // The previous call will convert " " into "+" (and "+" into "%2B") so we need to convert "+" into "%20"
-        encodedName = encodedName.replaceAll("\\+", "%20");
+        encodedName = encodedName.replace("+", "%20");
 
         return encodedName;
-    }
-
-    /**
-     * Same rationale as {@link #encodeWithinPath(String, XWikiContext)}. Note that we also encode spaces as {@code %20}
-     * even though we could also have encoded them as {@code +}. We do this for consistency (it allows to have the same
-     * implementation for both URL paths and query string).
-     *
-     * @param name the query string part to encode
-     * @return the URL-encoded query string part
-     */
-    private String encodeWithinQuery(String name)
-    {
-        // Note: Ideally the following would have been the correct way of writing this method but it causes the issues
-        // mentioned in the javadoc of this method
-        // String encodedName;
-        // try {
-        // encodedName = URIUtil.encodeWithinQuery(name, "UTF-8");
-        // } catch (URIException e) {
-        // throw new RuntimeException("Missing charset [UTF-8]", e);
-        // }
-        // return encodedName;
-
-        return encodeWithinPath(name);
     }
 
     /**
@@ -523,10 +505,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     private void appendQueryParameter(String key, Object paramValue, StringBuilder stringBuilder)
         throws UnsupportedEncodingException
     {
-        if (paramValue instanceof String) {
-            stringBuilder.append(URLEncoder.encode(key, "UTF-8"));
+        if (paramValue instanceof String stringValue) {
+            stringBuilder.append(URLEncoder.encode(key, UTF8));
             stringBuilder.append('=');
-            stringBuilder.append(URLEncoder.encode((String) paramValue, "UTF-8"));
+            stringBuilder.append(URLEncoder.encode(stringValue, UTF8));
         } else if (paramValue.getClass().isArray()) {
             Class ofArray = paramValue.getClass().getComponentType();
             if (ofArray.isPrimitive()) {
@@ -547,8 +529,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     }
                 }
             }
-        } else if (paramValue instanceof Collection) {
-            Collection zeCollection = (Collection) paramValue;
+        } else if (paramValue instanceof Collection zeCollection) {
             int index = 0;
             for (Object paramValueElement : zeCollection) {
                 appendQueryParameter(key, paramValueElement.toString(), stringBuilder);
@@ -761,7 +742,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(querystring)) {
             path.append("?");
-            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+            path.append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
         }
 
         try {
@@ -864,7 +845,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     String querystring = url.getQuery();
                     if (!StringUtils.isEmpty(querystring)) {
                         relativeURLBuilder.append("?")
-                            .append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), "&amp;"));
+                            .append(Strings.CS.removeEnd(StringUtils.removeEnd(querystring, "&"), HTML_AMPERSAND));
                     }
 
                     String anchor = url.getRef();

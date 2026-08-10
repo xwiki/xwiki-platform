@@ -332,6 +332,20 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </scmconnection>
+      <scmtag>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>scmtag</name>
+        <number>28</number>
+        <picker>0</picker>
+        <prettyName>Source tag</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </scmtag>
       <scmdevconnection>
         <contenttype>PureText</contenttype>
         <customDisplay/>
@@ -490,6 +504,9 @@
     </property>
     <property>
       <scmdevconnection/>
+    </property>
+    <property>
+      <scmtag/>
     </property>
     <property>
       <source/>

@@ -90,7 +90,7 @@ public class LiveTableElement extends BaseElement
         List<WebElement> elements = getDriver().findElementsWithoutWaiting(
             By.xpath("//th[contains(@class, 'xwiki-livetable-display-header-text') and normalize-space(.) = '"
                 + columnTitle + "']"));
-        return elements.size() > 0;
+        return !elements.isEmpty();
     }
 
     public void filterColumn(String inputId, String filterValue)
@@ -152,7 +152,7 @@ public class LiveTableElement extends BaseElement
     {
         List<WebElement> elements = getRows(columnTitle);
 
-        boolean result = elements.size() > 0;
+        boolean result = !elements.isEmpty();
         boolean match = false;
         if (result) {
             for (WebElement element : elements) {

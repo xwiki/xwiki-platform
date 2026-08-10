@@ -226,5 +226,9 @@ class PanelsAdministrationIT
         assertTrue(pageWithPanels.hasPanelInRightColumn("Welcome"));
         assertTrue(pageWithPanels.hasPanelInLeftColumn("Applications"));
         assertFalse(pageWithPanels.hasPanelInRightColumn("QuickLinks"));
+
+        // Clean up the page created by this test because its top level page interferes with the navigation panel
+        // administration test (which asserts the exact list of top level pages).
+        setup.deletePage(testReference);
     }
 }

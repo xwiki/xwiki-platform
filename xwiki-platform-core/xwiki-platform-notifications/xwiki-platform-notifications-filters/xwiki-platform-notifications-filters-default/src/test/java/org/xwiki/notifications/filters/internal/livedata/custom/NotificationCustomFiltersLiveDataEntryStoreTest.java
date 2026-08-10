@@ -334,7 +334,6 @@ class NotificationCustomFiltersLiveDataEntryStoreTest
         when(filterPref3.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.EMAIL,
             NotificationFormat.ALERT));
         String pageOnly = "xwiki:XWiki.User1";
-        DocumentReference pageOnlyRef = new DocumentReference("xwiki", "XWiki", "User1");
         when(filterPref3.getPageOnly()).thenReturn(pageOnly);
         when(filterPref3.getFilterType()).thenReturn(NotificationFilterType.EXCLUSIVE);
         when(filterPref3.isEnabled()).thenReturn(true);

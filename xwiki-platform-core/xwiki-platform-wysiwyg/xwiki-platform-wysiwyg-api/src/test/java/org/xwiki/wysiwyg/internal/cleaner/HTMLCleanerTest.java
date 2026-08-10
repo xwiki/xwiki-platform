@@ -64,7 +64,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 18.0.0RC1
  */
-public class HTMLCleanerTest
+class HTMLCleanerTest
 {
     private static final String DEFAULT_PATTERN = ".*\\.test";
 
@@ -303,8 +303,7 @@ public class HTMLCleanerTest
     private String[] readTestDataFromResource(String testResourceName) throws IOException
     {
         InputStream source = getClass().getResourceAsStream('/' + testResourceName + ".test");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(source));
-        try {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(source))) {
             StringBuilder input = new StringBuilder();
             String line = reader.readLine();
             while (line != null && !INPUT_EXPECTED_SEPARATOR.equals(line)) {
@@ -319,8 +318,6 @@ public class HTMLCleanerTest
                 line = reader.readLine();
             }
             return new String[] {testResourceName, input.toString(), expected.toString()};
-        } finally {
-            reader.close();
         }
     }
 

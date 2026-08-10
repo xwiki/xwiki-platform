@@ -99,7 +99,7 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
         }
         // We need to replace the / from the cachekey so it won't appear encoded in the URL
         // since it not necessarily supported, in particular for Tomcat standard configuration.
-        return Arrays.asList("notifications", queryType, this.cacheKey.replaceAll("/", "_"));
+        return Arrays.asList("notifications", queryType, this.cacheKey.replace("/", "_"));
     }
 
     @Override

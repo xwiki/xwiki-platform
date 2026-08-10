@@ -66,11 +66,23 @@ public class Utils
     private static final String PLACEHOLDERS_ENABLED_CONTEXT_KEY = Utils.class.getCanonicalName()
         + "_placeholders_enabled";
 
+    private static final String CACHE_CONTROL_HEADER = "Cache-Control";
+
+    private static final String NO_CACHE = "no-cache";
+
     /**
      * The component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}. It is useful
      * for any non component code that need to initialize/access components.
      */
     private static ComponentManager rootComponentManager;
+
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private Utils()
+    {
+        // Utility class
+    }
 
     /**
      * Generate the response by parsing a velocity template and printing the result to the {@link XWikiResponse
@@ -127,42 +139,38 @@ public class Utils
         if (cacheSetting == -1) {
             cacheSetting = 1;
         }
-        if ((!"download".equals(action)) && (!"skin".equals(action))) {
-            if (context.getResponse() instanceof XWikiServletResponse) {
-                // Add a last modified to tell when the page was last updated
-                if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 0, context) != 0) {
-                    if (context.getDoc() != null) {
-                        response.setDateHeader("Last-Modified", context.getDoc().getDate().getTime());
-                    }
-                }
-                // Set a nocache to make sure the page is reloaded after an edit
-                if (cacheSetting == 1) {
-                    response.setHeader("Pragma", "no-cache");
-                    response.setHeader("Cache-Control", "no-cache");
-                } else if (cacheSetting == 2) {
-                    response.setHeader("Pragma", "no-cache");
-                    response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
-                } else if (cacheSetting == 3) {
-                    response.setHeader("Cache-Control", "private");
-                } else if (cacheSetting == 4) {
-                    response.setHeader("Cache-Control", "public");
-                }
+        if ((!"download".equals(action)) && (!"skin".equals(action))
+            && context.getResponse() instanceof XWikiServletResponse) {
+            // Add a last modified to tell when the page was last updated
+            if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 0, context) != 0
+                && context.getDoc() != null) {
+                response.setDateHeader("Last-Modified", context.getDoc().getDate().getTime());
+            }
+            // Set a nocache to make sure the page is reloaded after an edit
+            if (cacheSetting == 1) {
+                response.setHeader("Pragma", NO_CACHE);
+                response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
+            } else if (cacheSetting == 2) {
+                response.setHeader("Pragma", NO_CACHE);
+                response.setHeader(CACHE_CONTROL_HEADER, "max-age=0, no-cache, no-store");
+            } else if (cacheSetting == 3) {
+                response.setHeader(CACHE_CONTROL_HEADER, "private");
+            } else if (cacheSetting == 4) {
+                response.setHeader(CACHE_CONTROL_HEADER, "public");
+            }
 
-                // Set an expires in one month
-                long expires = context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
-                if (expires == -1) {
-                    response.setDateHeader("Expires", -1);
-                } else if (expires != 0) {
-                    response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
-                }
+            // Set an expires in one month
+            long expires = context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
+            if (expires == -1) {
+                response.setDateHeader("Expires", -1);
+            } else if (expires != 0) {
+                response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
             }
         }
 
-        if (("download".equals(action)) || ("skin".equals(action))) {
-            // Set a nocache to make sure these files are not cached by proxies
-            if (cacheSetting == 1 || cacheSetting == 2) {
-                response.setHeader("Cache-Control", "no-cache");
-            }
+        // Set a nocache to make sure these files are not cached by proxies
+        if ((("download".equals(action)) || ("skin".equals(action))) && (cacheSetting == 1 || cacheSetting == 2)) {
+            response.setHeader(CACHE_CONTROL_HEADER, NO_CACHE);
         }
 
         context.getWiki().getPluginManager().beginParsing(context);
@@ -201,7 +209,8 @@ public class Utils
                 try {
                     response.setContentLength(content.getBytes(context.getWiki().getEncoding()).length);
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Failed to compute the content length using encoding [{}]",
+                        context.getWiki().getEncoding(), e);
                 }
             }
 
@@ -514,7 +523,7 @@ public class Utils
     }
 
     /**
-     * Convert a byte character value to the corresponding hexidecimal digit value.
+     * Convert a byte character value to the corresponding hexadecimal digit value.
      * <p>
      * Code borrowed from Apache Tomcat 5.0
      * </p>
@@ -577,7 +586,7 @@ public class Utils
     public static String SQLFilter(String text)
     {
         try {
-            return text.replaceAll("'", "''");
+            return text.replace("'", "''");
         } catch (Exception e) {
             return text;
         }

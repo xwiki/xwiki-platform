@@ -83,8 +83,8 @@ public class ComponentCreatedListener extends AbstractEventListener
     {
         ComponentManager componentManager = provider.get();
 
-        if (componentManager instanceof AbstractEntityComponentManager) {
-            ((AbstractEntityComponentManager) componentManager).onComponentAdded();
+        if (componentManager instanceof AbstractEntityComponentManager entityComponentManager) {
+            entityComponentManager.onComponentAdded();
         }
     }
 }

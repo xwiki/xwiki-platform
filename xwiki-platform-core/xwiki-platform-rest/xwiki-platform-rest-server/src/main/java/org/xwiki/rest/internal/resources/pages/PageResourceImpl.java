@@ -97,12 +97,13 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
     }
 
     @Override
-    public void deletePage(String wikiName, String spaceName, String pageName) throws XWikiRestException
+    public void deletePage(String wikiName, String spaceName, String pageName, Boolean skipRecycleBin)
+        throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);
 
-            deletePage(documentInfo);
+            deletePage(documentInfo, skipRecycleBin);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

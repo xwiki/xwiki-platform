@@ -35,7 +35,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 
 @ComponentTest
 @AllComponents
-public class StringsTest
+class StringsTest
 {
     @InjectComponentManager
     private MockitoComponentManager componentManager;

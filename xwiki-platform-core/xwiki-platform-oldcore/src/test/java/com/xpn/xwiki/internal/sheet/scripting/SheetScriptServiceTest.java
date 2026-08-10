@@ -123,7 +123,7 @@ class SheetScriptServiceTest
      * Unit test for {@link SheetScriptService#getDocuments(DocumentReference)}.
      */
     @Test
-    void getDocuments() throws Exception
+    void getDocuments()
     {
         DocumentReference sheetReference = new DocumentReference("wiki", "Space", "Sheet");
         DocumentReference publicDocumentReference = new DocumentReference("wiki", "Space", "PublicPage");

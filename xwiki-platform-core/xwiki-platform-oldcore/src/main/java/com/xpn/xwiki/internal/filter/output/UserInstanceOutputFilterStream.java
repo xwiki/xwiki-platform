@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.TreeSet;
 
@@ -391,7 +392,8 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
     private void updateGroupObjects(XWikiDocument groupDocument, DocumentReference groupClass, boolean overwrite,
             XWikiContext xcontext) throws FilterException
     {
-        List<BaseObject> existingObjects = groupDocument.getXObjects(groupClass);
+        List<BaseObject> existingObjects = groupDocument.getXObjects(groupClass)
+                .stream().filter(Objects::nonNull).toList();
         Queue<BaseObject> membersToDrop = new ArrayDeque<>();
 
         // We determine which members to add are already there and which members to remove

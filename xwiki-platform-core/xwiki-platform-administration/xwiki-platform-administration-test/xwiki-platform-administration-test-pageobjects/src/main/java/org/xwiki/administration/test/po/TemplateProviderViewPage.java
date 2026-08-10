@@ -28,6 +28,7 @@ import org.xwiki.test.ui.po.ViewPage;
 /**
  * Represents a template provider page in view mode.
  *
+ * @since 17.10.10
  * @since 18.3.0RC1
  */
 public class TemplateProviderViewPage extends ViewPage

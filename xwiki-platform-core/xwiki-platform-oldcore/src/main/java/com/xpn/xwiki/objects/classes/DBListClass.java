@@ -96,8 +96,8 @@ public class DBListClass extends ListClass
             // were empty strings). This means we need to check for NULL and ignore NULL entries
             // from the list.
             if (item != null) {
-                if (item instanceof String) {
-                    result.add(new ListItem((String) item));
+                if (item instanceof String string) {
+                    result.add(new ListItem(string));
                 } else {
                     Object[] res = (Object[]) item;
                     if (res.length == 1) {
@@ -188,7 +188,7 @@ public class DBListClass extends ListClass
     {
         List<ListItem> list = getDBList(context);
         Map<String, ListItem> result = new LinkedHashMap<>();
-        if ((list == null) || (list.size() == 0)) {
+        if ((list == null) || (list.isEmpty())) {
             return result;
         }
 
@@ -332,7 +332,7 @@ public class DBListClass extends ListClass
                 // Let's create the complete query
                 select.append(" from ");
                 select.append(StringUtils.join(fromStatements.iterator(), ", "));
-                if (whereStatements.size() > 0) {
+                if (!whereStatements.isEmpty()) {
                     select.append(" where ");
                     select.append(StringUtils.join(whereStatements.iterator(), " and "));
                 }
@@ -427,7 +427,8 @@ public class DBListClass extends ListClass
     // return first or second column from user query
     public String returnCol(String hqlQuery, boolean first)
     {
-        String firstCol = "-", secondCol = "-";
+        String firstCol = "-";
+        String secondCol = "-";
         if (StringUtils.isEmpty(hqlQuery)) {
             return firstCol;
         }
@@ -460,11 +461,13 @@ public class DBListClass extends ListClass
 
                 if (words.get(comma).compareTo("(") == 0) {
                     int i = comma + 1;
+                    StringBuilder secondColBuilder = new StringBuilder(secondCol);
                     while (words.get(i).compareTo(")") != 0) {
-                        secondCol += words.get(i);
+                        secondColBuilder.append(words.get(i));
                         i++;
                     }
-                    secondCol += ")";
+                    secondColBuilder.append(")");
+                    secondCol = secondColBuilder.toString();
                 } else {
                     secondCol = words.get(comma).trim();
                 }
@@ -474,7 +477,7 @@ public class DBListClass extends ListClass
                 firstCol = StringUtils.substringAfterLast(beforeFrom.trim(), " ");
             }
         }
-        if (first == true) {
+        if (first) {
             return firstCol;
         } else {
             return secondCol;
@@ -545,7 +548,8 @@ public class DBListClass extends ListClass
                 String classname = this.getObject().getName();
                 String fieldname = this.getName();
                 String hibquery = this.getSql();
-                String secondCol = "-", firstCol = "-";
+                String secondCol = "-";
+                String firstCol = "-";
 
                 if (hibquery != null && !hibquery.isEmpty()) {
                     firstCol = returnCol(hibquery, true);
@@ -581,14 +585,14 @@ public class DBListClass extends ListClass
                 }
             }
 
-            if (changeInputName == true) {
+            if (changeInputName) {
                 input.setName(prefix + name + "_suggest");
                 input.setID(prefix + name + "_suggest");
             } else {
                 input.setName(prefix + name);
                 input.setID(prefix + name);
             }
-            if (setInpVal == true) {
+            if (setInpVal) {
                 input.setValue(value);
             }
 
@@ -621,8 +625,8 @@ public class DBListClass extends ListClass
             return;
         }
 
-        if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
+        if (prop instanceof ListProperty listProperty) {
+            selectlist = listProperty.getList();
             List<String> newlist = new ArrayList<>();
             for (String entry : selectlist) {
                 newlist.add(getDisplayValue(entry, name, map, context));

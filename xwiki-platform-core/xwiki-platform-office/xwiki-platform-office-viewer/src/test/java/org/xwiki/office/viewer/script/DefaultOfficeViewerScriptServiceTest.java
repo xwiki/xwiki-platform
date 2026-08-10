@@ -140,6 +140,6 @@ class DefaultOfficeViewerScriptServiceTest
         when(execution.getContext()).thenReturn(executionContext);
         assertNull(scriptService.view(null));
 
-        assertEquals("Failed to view office document: null", this.logCapture.getMessage(0));
+        assertEquals("Failed to view office document [null]", this.logCapture.getMessage(0));
     }
 }

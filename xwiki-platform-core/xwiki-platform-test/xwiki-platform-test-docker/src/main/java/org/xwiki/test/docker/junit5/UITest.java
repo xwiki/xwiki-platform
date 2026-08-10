@@ -35,6 +35,7 @@ import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.junit5.ValidateConsoleExtension;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -69,7 +70,7 @@ public @interface UITest
      * @return the database to use, see {@link Database}
      * @since 10.9
      */
-    Database database() default Database.HSQLDB_EMBEDDED;
+    Database database() default Database.HSQLDB;
 
     /**
      * @return the Servlet Engine to use, see {@link ServletEngine}
@@ -197,6 +198,18 @@ public @interface UITest
     boolean office() default false;
 
     /**
+     * @return true to make the test instance equivalent to an XWiki installed from the standard flavor
+     *         distribution. When true, two things happen: (1) the generated WAR contains the full set of core
+     *         extensions of the standard XWiki distribution WAR (i.e. the {@code WEB-INF/lib} JARs resolved from
+     *         {@code xwiki-platform-distribution-war-dependencies}) instead of the minimal set (resolved from
+     *         {@code xwiki-platform-minimaldependencies}); and (2) the standard flavor
+     *         ({@code xwiki-platform-distribution-flavor-mainwiki}) is installed automatically, so the test does
+     *         not need to declare it as a dependency. False by default.
+     * @since 18.6.0RC1
+     */
+    boolean standardFlavor() default false;
+
+    /**
      * @return the list of Servlet Engines on which this test must not be executed. If the Servlet Engine is selected
      *         then the test will be skipped
      * @since 10.11RC1
@@ -216,6 +229,14 @@ public @interface UITest
      * @since 10.10RC1
      */
     boolean saveDatabaseData() default false;
+
+    /**
+     * @return true if the extensions declared in the resources of the module executing the test must be made available
+     *     to the XWiki instances as an extension repository, so that the test can ask XWiki to install them (see
+     *     {@code src/test/resources/packagefile} and {@code src/test/resources/repository})
+     * @since 18.7.0RC1
+     */
+    boolean testExtensionRepository() default false;
 
     /**
      * @return true if the XWiki permanent directory should be preserved after the test is finished and the XWiki
@@ -266,7 +287,7 @@ public @interface UITest
     String remoteSolrTag() default "";
 
     /**
-     * @return the number of instances to run during tests.
+     * @return the instances to run during tests.
      * @since 18.3.0RC1
      */
     XWikiInstances xwikiInstances() default @XWikiInstances;

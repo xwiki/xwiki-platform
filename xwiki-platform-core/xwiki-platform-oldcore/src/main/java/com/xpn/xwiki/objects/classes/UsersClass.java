@@ -52,6 +52,16 @@ public class UsersClass extends ListClass
      */
     @Unstable
     public static final String PROPERTY_TYPE = "Users";
+
+    /**
+     * The meta property that specifies whether the picker should also suggest inactive (disabled) users. When not set
+     * (the default) only active users are suggested.
+     *
+     * @since 18.6.0RC1
+     */
+    @Unstable
+    public static final String META_PROPERTY_INCLUDE_INACTIVE_USERS = "includeInactiveUsers";
+
     private static final long serialVersionUID = 1L;
 
     /** Logging helper object. */
@@ -102,7 +112,7 @@ public class UsersClass extends ListClass
             return (List<String>) context.getWiki().getGroupService(context)
                 .getAllMatchedUsers(null, false, 0, 0, null, context);
         } catch (XWikiException e) {
-            LOGGER.warn("Failed to retrieve the list of users.", e);
+            LOGGER.warn("Failed to retrieve the list of users", e);
             return Collections.emptyList();
         }
     }
@@ -114,7 +124,7 @@ public class UsersClass extends ListClass
         // return an iterator instead that gets users by batches.
         Map<String, ListItem> result;
         List<String> users = getList(context);
-        if (users != null && users.size() > 0) {
+        if (users != null && !users.isEmpty()) {
             result = new LinkedHashMap<>();
             for (String userName : users) {
                 // Get the user name for pretty display
@@ -150,6 +160,17 @@ public class UsersClass extends ListClass
     public void setUsesList(boolean usesList)
     {
         setIntValue(META_PROPERTY_USES_LIST, usesList ? 1 : 0);
+    }
+
+    /**
+     * @return {@code true} if disabled (inactive) users should also be suggested by the picker, {@code false} (the
+     *         default) to suggest only active users
+     * @since 18.6.0RC1
+     */
+    @Unstable
+    public boolean isIncludeInactiveUsers()
+    {
+        return getIntValue(META_PROPERTY_INCLUDE_INACTIVE_USERS) == 1;
     }
 
     @Override

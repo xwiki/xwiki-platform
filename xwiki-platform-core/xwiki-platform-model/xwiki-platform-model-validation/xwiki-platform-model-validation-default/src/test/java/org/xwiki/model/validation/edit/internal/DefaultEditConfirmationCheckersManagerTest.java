@@ -22,6 +22,7 @@ package org.xwiki.model.validation.edit.internal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.inject.Named;
@@ -55,6 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -212,5 +214,23 @@ class DefaultEditConfirmationCheckersManagerTest
         verify(this.session).getAttribute("force_edit_xwiki:Page.Space_cached_warn2");
         verify(this.session).removeAttribute("force_edit_xwiki:Page.Space_cached_warn2");
         verify(this.session).setAttribute(eq("force_edit_xwiki:Page.Space_forced_warn2"), any());
+    }
+
+    @Test
+    void checkWithSkip() throws Exception
+    {
+        // TreeMap is used to make the order in which the components are evaluated deterministic, making it easier
+        // to assert the results.
+        Map<String, EditConfirmationChecker> componentsMap = new TreeMap<>();
+        componentsMap.put("warn", this.editConfirmationCheckerWarn);
+        componentsMap.put("warn2", this.editConfirmationCheckerWarn2);
+        when(this.componentManager.<EditConfirmationChecker>getInstanceMap(EditConfirmationChecker.class))
+            .thenReturn(componentsMap);
+        EditConfirmationCheckerResults expected = new EditConfirmationCheckerResults();
+        expected.append(WARNING_MESSAGE_2);
+        assertEquals(expected, this.manager.check(Set.of("warn")));
+        verify(this.editConfirmationCheckerWarn2).check();
+        verify(this.editConfirmationCheckerWarn, never()).check();
+        verify(this.session).removeAttribute("force_edit_xwiki:Page.Space_cached_warn");
     }
 }

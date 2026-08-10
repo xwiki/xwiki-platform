@@ -126,7 +126,7 @@ public class PaginationFilterPane extends BaseElement
      */
     public boolean hasNextPage()
     {
-        return getDriver().findElements(By.className(NEXT_PAGE_CLASS_NAME)).size() > 0;
+        return !getDriver().findElements(By.className(NEXT_PAGE_CLASS_NAME)).isEmpty();
     }
 
     /**
@@ -145,7 +145,7 @@ public class PaginationFilterPane extends BaseElement
      */
     public boolean hasPreviousPage()
     {
-        return getDriver().findElements(By.className(PREVIOUS_PAGE_CLASS_NAME)).size() > 0;
+        return !getDriver().findElements(By.className(PREVIOUS_PAGE_CLASS_NAME)).isEmpty();
     }
 
     /**

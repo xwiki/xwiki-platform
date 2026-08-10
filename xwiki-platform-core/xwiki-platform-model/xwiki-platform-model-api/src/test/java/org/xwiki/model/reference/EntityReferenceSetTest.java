@@ -147,11 +147,6 @@ class EntityReferenceSetTest
         excludes(reference, EntityType.SPACE);
     }
 
-    private void excludesDocument(String reference) throws Exception
-    {
-        excludes(reference, EntityType.DOCUMENT);
-    }
-
     // Tests
 
     @Test

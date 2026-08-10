@@ -162,7 +162,7 @@ public class HTMLVelocityMacroFilter implements VelocityMacroFilter, Initializab
 
                     continue;
                 } else if (Character.isWhitespace(array[i])) {
-                    if (!filterContext.removeWhiteSpaces && contentBuffer.length() > 0) {
+                    if (!filterContext.removeWhiteSpaces && !contentBuffer.isEmpty()) {
                         filterContext.foundWhiteSpace = true;
                     }
 
@@ -171,7 +171,7 @@ public class HTMLVelocityMacroFilter implements VelocityMacroFilter, Initializab
                     continue;
                 }
             } catch (InvalidVelocityException e) {
-                this.logger.debug("Not a valid velocity keyword at char [" + i + "]", e);
+                this.logger.debug("Not a valid velocity keyword at char [{}]", i, e);
             }
 
             flushWhiteSpaces(contentBuffer, filterContext, false);
@@ -204,7 +204,7 @@ public class HTMLVelocityMacroFilter implements VelocityMacroFilter, Initializab
 
         if (context.getType() != VelocityType.COMMENT) {
             if (context.getType() == VelocityType.DIRECTIVE) {
-                if (filterContext.wsGroup.length() == 0) {
+                if (filterContext.wsGroup.isEmpty()) {
                     flushWhiteSpaces(filterContext.wsGroup, filterContext, false);
                 }
 
@@ -264,7 +264,7 @@ public class HTMLVelocityMacroFilter implements VelocityMacroFilter, Initializab
      */
     private void flushWhiteSpaces(StringBuffer contentBuffer, FilterContext filterContext, boolean forceNoSpace)
     {
-        if (filterContext.wsGroup.length() > 0) {
+        if (!filterContext.wsGroup.isEmpty()) {
             boolean space = filterContext.wsGroup.charAt(0) == ' ';
 
             if (forceNoSpace && space) {

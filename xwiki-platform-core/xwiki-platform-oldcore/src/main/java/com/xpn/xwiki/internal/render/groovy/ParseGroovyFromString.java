@@ -82,7 +82,7 @@ public class ParseGroovyFromString
             this.classCache = this.cacheManager.createNewLocalCache(configuration);
         } catch (CacheException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
-                "Failed to initilize caches", e);
+                "Failed to initialize caches", e);
         }
     }
 

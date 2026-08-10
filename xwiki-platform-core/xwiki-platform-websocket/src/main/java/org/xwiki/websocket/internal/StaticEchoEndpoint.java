@@ -76,7 +76,7 @@ public class StaticEchoEndpoint implements EndpointComponent
                     session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT,
                         "We don't accept connections from guest users. Please login first."));
                 } catch (IOException e) {
-                    this.logger.warn("Failed to close the session.", e);
+                    this.logger.warn("Failed to close the session", e);
                 }
             }
         });

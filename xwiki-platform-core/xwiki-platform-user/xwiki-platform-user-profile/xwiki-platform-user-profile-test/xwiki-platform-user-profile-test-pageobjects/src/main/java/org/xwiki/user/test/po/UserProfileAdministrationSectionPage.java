@@ -31,6 +31,8 @@ import org.xwiki.test.ui.po.ViewPage;
  * own {@code save} submit button) on plain view.
  *
  * @version $Id$
+ * @since 17.10.10
+ * @since 18.4.3
  * @since 18.5.0RC1
  */
 public class UserProfileAdministrationSectionPage extends ViewPage

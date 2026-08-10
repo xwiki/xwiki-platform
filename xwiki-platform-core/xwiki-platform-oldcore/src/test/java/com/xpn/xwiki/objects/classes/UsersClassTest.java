@@ -83,6 +83,16 @@ class UsersClassTest
     }
 
     @Test
+    void isIncludeInactiveUsers()
+    {
+        UsersClass usersClass = new UsersClass();
+        assertEquals(false, usersClass.isIncludeInactiveUsers());
+
+        usersClass.setIntValue(UsersClass.META_PROPERTY_INCLUDE_INACTIVE_USERS, 1);
+        assertEquals(true, usersClass.isIncludeInactiveUsers());
+    }
+
+    @Test
     void fromList()
     {
         BaseProperty baseProperty = mock(LargeStringProperty.class);

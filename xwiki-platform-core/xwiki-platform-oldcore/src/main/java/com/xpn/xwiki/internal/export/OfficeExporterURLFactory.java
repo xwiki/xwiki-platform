@@ -38,6 +38,24 @@ import com.xpn.xwiki.pdf.impl.FileSystemURLFactory;
  */
 public class OfficeExporterURLFactory extends FileSystemURLFactory
 {
+    /**
+     * OfficeExporterURLFactory constructor.
+     */
+    public OfficeExporterURLFactory()
+    {
+    }
+
+    /**
+     * @param checkAccess true if the access to linked resources should be verified against the context user
+     * @since 18.6.0RC1
+     * @since 18.4.3
+     * @since 17.10.10
+     */
+    public OfficeExporterURLFactory(boolean checkAccess)
+    {
+        super(checkAccess);
+    }
+
     @Override
     public String getURL(URL url, XWikiContext context)
     {

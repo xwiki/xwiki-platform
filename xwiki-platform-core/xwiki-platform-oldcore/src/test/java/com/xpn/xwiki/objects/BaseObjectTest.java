@@ -72,7 +72,7 @@ class BaseObjectTest
     private MergeManager mergeManager;
     
     @Test
-    void testSetDocumentReference() throws Exception
+    void testSetDocumentReference()
     {
         BaseObject baseObject = new BaseObject();
 
@@ -83,7 +83,7 @@ class BaseObjectTest
     }
 
     @Test
-    void testSetName() throws Exception
+    void testSetName()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseObject baseObject = new BaseObject();
@@ -96,7 +96,7 @@ class BaseObjectTest
     }
 
     @Test
-    void testSetNameAloneWithChangingContext() throws Exception
+    void testSetNameAloneWithChangingContext()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseObject baseObject = new BaseObject();
@@ -190,7 +190,7 @@ class BaseObjectTest
             .merge(previousObject, nextObject, mergeConfiguration, this.oldcore.getXWikiContext(), mergeResult);
 
         List<LogEvent> errors = mergeResult.getLog().getLogsFrom(LogLevel.ERROR);
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             fail("Found error or warning during the merge (" + errors.get(0) + ")");
         }
 
@@ -246,7 +246,7 @@ class BaseObjectTest
         object.setXClassReference(classReference);
         object.setOwnerDocument(ownerDocument);
 
-        XWikiContext context = this.oldcore.getXWikiContext();;
+        XWikiContext context = this.oldcore.getXWikiContext();
         String fieldName = "myField";
         String value = "myValue";
 
@@ -298,7 +298,7 @@ class BaseObjectTest
         object.setXClassReference(classReference);
         object.setOwnerDocument(ownerDocument);
 
-        XWikiContext context = this.oldcore.getXWikiContext();;
+        XWikiContext context = this.oldcore.getXWikiContext();
         String fieldName = "myField";
         Object value = 4545;
 

@@ -24,11 +24,9 @@ import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RiExternalLinkLine, RiPencilLine } from "react-icons/ri";
 import type { BlockOfType } from "../../blocknote";
-import type { LinkEditionContext } from "../../misc/linkSuggest";
 
 type CustomImageToolbarProps = {
   currentBlock: BlockOfType<"image">;
-  linkEditionCtx: LinkEditionContext;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
 };
 
@@ -39,7 +37,7 @@ type CustomImageToolbarProps = {
  * @beta
  */
 type ImageEditionOverrideFn = (
-  image: BlockOfType<"image">["props"],
+  block: BlockOfType<"image">,
   update: (updateResult: ImageUpdateResult) => void,
 ) => void;
 
@@ -55,7 +53,6 @@ type ImageUpdateResult =
 
 export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
   currentBlock,
-  linkEditionCtx,
   imageEditionOverrideFn,
 }) => {
   const Components = useComponentsContext()!;
@@ -85,7 +82,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
 
   const openEditor = useCallback(() => {
     if (imageEditionOverrideFn) {
-      imageEditionOverrideFn(currentBlock.props, updateImageProps);
+      imageEditionOverrideFn(currentBlock, updateImageProps);
     } else {
       setShowImageEditor(true);
     }
@@ -109,10 +106,7 @@ export const CustomImageToolbar: React.FC<CustomImageToolbarProps> = ({
           className="bn-popover-content bn-form-popover"
           variant="form-popover"
         >
-          <ImageFilePanel
-            linkEditionCtx={linkEditionCtx}
-            currentBlock={currentBlock}
-          />
+          <ImageFilePanel currentBlock={currentBlock} />
         </Components.Generic.Popover.Content>
       </Components.Generic.Popover.Root>
 

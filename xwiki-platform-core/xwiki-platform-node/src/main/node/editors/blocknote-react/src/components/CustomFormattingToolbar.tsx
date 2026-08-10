@@ -20,7 +20,10 @@
 
 import { CustomImageToolbar } from "./images/CustomImageToolbar";
 import { CustomCreateLinkButton } from "./links/CustomCreateLinkButton";
+import { CustomInsertMacroButton } from "./links/CustomInsertMacroButton";
+import { CustomMacroEditButton } from "./links/CustomMacroEditButton";
 import { useEditor } from "../hooks";
+import { selectionHasInlineContent } from "../selection";
 import {
   AddCommentButton,
   AddTiptapCommentButton,
@@ -37,31 +40,91 @@ import {
   TableCellMergeButton,
   TextAlignButton,
   UnnestBlockButton,
+  blockTypeSelectItems,
+  useBlockNoteEditor,
   useComponentsContext,
+  useDictionary,
+  useEditorState,
 } from "@blocknote/react";
+import { useTranslation } from "react-i18next";
+import { RiSubscript, RiSuperscript } from "react-icons/ri";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
-import type { LinkEditionContext } from "../misc/linkSuggest";
+import type { ContextForMacros } from "../blocknote/utils";
+import type { LinkEditionHandler } from "./links/linkEdition";
 import type {
   BlockTypeSelectItem,
   FormattingToolbarProps,
 } from "@blocknote/react";
 import type { JSX } from "react";
 
+const BooleanStyleButton: React.FC<{
+  style: string;
+  icon: React.ReactNode;
+  label: string;
+}> = ({ style, icon, label }) => {
+  const Components = useComponentsContext()!;
+  const editor = useBlockNoteEditor();
+  const state = useEditorState({
+    editor,
+    selector: ({ editor }) => {
+      if (!editor.isEditable) {
+        return undefined;
+      }
+      if (!selectionHasInlineContent(editor)) {
+        return undefined;
+      }
+      return { active: style in editor.getActiveStyles() };
+    },
+  });
+
+  if (state === undefined) {
+    return null;
+  }
+  return (
+    <Components.FormattingToolbar.Button
+      className="bn-button"
+      data-test={style}
+      onClick={() => {
+        editor.focus();
+        editor.toggleStyles({ [style]: true } as never);
+      }}
+      isSelected={state.active}
+      label={label}
+      mainTooltip={label}
+      icon={icon}
+    />
+  );
+};
+
 type CustomFormattingToolbarProps = {
   formattingToolbarProps: FormattingToolbarProps;
-  linkEditionCtx: LinkEditionContext;
+  additionalBlockTypes: BlockTypeSelectItem[];
+  macros: { ctx: ContextForMacros } | false;
+  linkEditionHandler: LinkEditionHandler;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
 };
 
 export const CustomFormattingToolbar: React.FC<
   CustomFormattingToolbarProps
-> = ({ formattingToolbarProps, linkEditionCtx, imageEditionOverrideFn }) => {
+> = ({
+  formattingToolbarProps,
+  additionalBlockTypes,
+  imageEditionOverrideFn,
+  macros,
+  linkEditionHandler,
+}) => {
   const Components = useComponentsContext()!;
+  const dict = useDictionary();
+  const { t } = useTranslation();
 
   const editor = useEditor();
 
   // TODO: check if there is a need to update the selection in realtime?
   const currentBlock = editor.getTextCursorPosition().block;
+
+  const combinedBlockTypeSelectItems = (
+    formattingToolbarProps.blockTypeSelectItems ?? blockTypeSelectItems(dict)
+  ).concat(additionalBlockTypes);
 
   return (
     <Components.FormattingToolbar.Root
@@ -71,14 +134,15 @@ export const CustomFormattingToolbar: React.FC<
       {currentBlock.type === "image" ? (
         <CustomImageToolbar
           currentBlock={currentBlock}
-          linkEditionCtx={linkEditionCtx}
           imageEditionOverrideFn={imageEditionOverrideFn}
         />
       ) : (
         // For others, simply show the "normal", default toolbar
         getDefaultFormattingToolbarItems(
-          formattingToolbarProps.blockTypeSelectItems,
-          linkEditionCtx,
+          combinedBlockTypeSelectItems,
+          macros,
+          linkEditionHandler,
+          t,
         )
       )}
     </Components.FormattingToolbar.Root>
@@ -87,7 +151,9 @@ export const CustomFormattingToolbar: React.FC<
 
 const getDefaultFormattingToolbarItems = (
   blockTypeSelectItems: BlockTypeSelectItem[] | undefined,
-  linkEditionCtx: LinkEditionContext,
+  macros: { ctx: ContextForMacros } | false,
+  linkEditorHandler: LinkEditionHandler,
+  t: (key: string) => string,
 ): JSX.Element[] =>
   // NOTE: This should return **exactly** the same items as BlockNote's default toolbar
   // So, when BlockNote updates theirs, we should update ours
@@ -113,6 +179,18 @@ const getDefaultFormattingToolbarItems = (
       basicTextStyle={"strike"}
       key={"strikeStyleButton"}
     />,
+    <BooleanStyleButton
+      style="subscript"
+      icon={<RiSubscript />}
+      label={t("blocknote.toolbar.subscript")}
+      key={"subscriptStyleButton"}
+    />,
+    <BooleanStyleButton
+      style="superscript"
+      icon={<RiSuperscript />}
+      label={t("blocknote.toolbar.superscript")}
+      key={"superscriptStyleButton"}
+    />,
     <TextAlignButton textAlignment={"left"} key={"textAlignLeftButton"} />,
     <TextAlignButton textAlignment={"center"} key={"textAlignCenterButton"} />,
     <TextAlignButton textAlignment={"right"} key={"textAlignRightButton"} />,
@@ -123,10 +201,28 @@ const getDefaultFormattingToolbarItems = (
     // But brings a custom popover to support XWiki references
     <CustomCreateLinkButton
       key={"createLinkButton"}
-      linkEditionCtx={linkEditionCtx}
+      linkEditionHandler={linkEditorHandler}
     />,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,
-  ];
+  ].concat(
+    macros
+      ? [
+          <CustomMacroEditButton
+            key={"macroEditButton"}
+            ctxForMacros={macros.ctx}
+          />,
+          // Hide the insert action when no insertion editor is available.
+          ...(macros.ctx.openInsertionEditor
+            ? [
+                <CustomInsertMacroButton
+                  key={"insertMacroButton"}
+                  openEditor={macros.ctx.openInsertionEditor}
+                />,
+              ]
+            : []),
+        ]
+      : [],
+  );
 
 export type { CustomFormattingToolbarProps };

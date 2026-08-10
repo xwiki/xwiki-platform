@@ -69,6 +69,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
+    private static final String INTERNAL = "internal";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseClass.class);
 
     private static final long serialVersionUID = 1L;
@@ -188,10 +190,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         if (element != null) {
             Set<String> properties = getPropertyList();
-            if (!properties.contains(name)) {
-                if (((BaseCollection) element).getNumber() == 0) {
-                    ((BaseCollection) element).setNumber(properties.size() + 1);
-                }
+            if (!properties.contains(name) && ((BaseCollection) element).getNumber() == 0) {
+                ((BaseCollection) element).setNumber(properties.size() + 1);
             }
 
             super.addField(name, element);
@@ -412,8 +412,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             Object formvalues = map.get(name);
             if (formvalues != null) {
                 BaseProperty objprop;
-                if (formvalues instanceof String[]) {
-                    objprop = property.fromStringArray(((String[]) formvalues));
+                if (formvalues instanceof String[] stringArray) {
+                    objprop = property.fromStringArray(stringArray);
                 } else if (formvalues instanceof String) {
                     objprop = property.fromString(formvalues.toString());
                 } else {
@@ -515,11 +515,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return false;
         }
 
-        if (!getNameField().equals(bclass.getNameField())) {
-            return false;
-        }
-
-        return true;
+        return getNameField().equals(bclass.getNameField());
     }
 
     public void merge(BaseClass bclass)
@@ -530,12 +526,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public void fromXML(Element element) throws XWikiException
     {
         super.fromXML(element);
-    }
-
-    @Override
-    public void fromXML(String xml) throws XWikiException
-    {
-        super.fromXML(xml);
     }
 
     public boolean addTextField(String fieldName, String fieldPrettyName, int size)
@@ -821,8 +811,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
         TextAreaClass textAreaClass;
         PropertyInterface field = get(fieldName);
-        if (field instanceof TextAreaClass) {
-            textAreaClass = (TextAreaClass) field;
+        if (field instanceof TextAreaClass existingTextAreaClass) {
+            textAreaClass = existingTextAreaClass;
         } else {
             // Remove the field if it already exist
             if (field != null) {
@@ -1224,7 +1214,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public String getCustomMapping()
     {
         if ("XWiki.XWikiPreferences".equals(getName())) {
-            return "internal";
+            return INTERNAL;
         }
 
         if (this.customMapping == null) {
@@ -1245,12 +1235,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         String cMapping = getCustomMapping();
 
-        return (cMapping != null) && (!"".equals(cMapping)) && (!"internal".equals(cMapping));
+        return (cMapping != null) && (!"".equals(cMapping)) && (!INTERNAL.equals(cMapping));
     }
 
     public boolean hasInternalCustomMapping()
     {
-        return "internal".equals(this.customMapping);
+        return INTERNAL.equals(this.customMapping);
     }
 
     public boolean isCustomMappingValid(XWikiContext context) throws XWikiException
@@ -1260,7 +1250,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean isCustomMappingValid(String custommapping, XWikiContext context) throws XWikiException
     {
-        if ((custommapping != null) && (custommapping.trim().length() > 0)) {
+        if ((custommapping != null) && (!custommapping.trim().isEmpty())) {
             return context.getWiki().getStore().isCustomMappingValid(this, custommapping, context);
         } else {
             return true;
@@ -1270,7 +1260,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public List<String> getCustomMappingPropertyList(XWikiContext context)
     {
         String custommapping1 = getCustomMapping();
-        if ((custommapping1 != null) && (custommapping1.trim().length() > 0)) {
+        if ((custommapping1 != null) && (!custommapping1.trim().isEmpty())) {
             return context.getWiki().getStore().getCustomMappingPropertyList(this);
         } else {
             return new ArrayList<>();
@@ -1323,7 +1313,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             } else {
                 Object[] args = { customClass };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
-                    XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}", e,
+                    XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instantiate custom class {0}", e,
                     args);
             }
         }
@@ -1364,9 +1354,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = context.getWiki().getClass(className, context);
-        BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
-
-        return object;
+        return (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
     }
 
     public String getDefaultWeb()

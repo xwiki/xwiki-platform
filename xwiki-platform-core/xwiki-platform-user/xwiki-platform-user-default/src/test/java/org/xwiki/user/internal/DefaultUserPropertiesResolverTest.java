@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultUserPropertiesResolverTest
+class DefaultUserPropertiesResolverTest
 {
     @InjectMockComponents
     private DefaultUserPropertiesResolver resolver;
@@ -85,7 +85,8 @@ public class DefaultUserPropertiesResolverTest
     void resolve() throws Exception
     {
         UserPropertiesResolver customPropertiesResolver = mock(UserPropertiesResolver.class);
-        when(customPropertiesResolver.resolve(any(TestUserReference.class))).thenReturn(mock(UserProperties.class));
+        UserProperties userPropertiesMock = mock(UserProperties.class);
+        when(customPropertiesResolver.resolve(any(TestUserReference.class))).thenReturn(userPropertiesMock);
 
         when(this.contextComponentManager.getInstance(UserPropertiesResolver.class,
             "user/" + TestUserReference.class.getName())).thenReturn(customPropertiesResolver);
@@ -100,7 +101,8 @@ public class DefaultUserPropertiesResolverTest
         when(this.currentUserReferenceUserReferenceResolver.resolve(null)).thenReturn(testUserReference);
 
         UserPropertiesResolver customPropertiesResolver = mock(UserPropertiesResolver.class);
-        when(customPropertiesResolver.resolve(testUserReference)).thenReturn(mock(UserProperties.class));
+        UserProperties userPropertiesMock2 = mock(UserProperties.class);
+        when(customPropertiesResolver.resolve(testUserReference)).thenReturn(userPropertiesMock2);
 
         when(this.contextComponentManager.getInstance(UserPropertiesResolver.class,
             "user/" + TestUserReference.class.getName())).thenReturn(customPropertiesResolver);
@@ -115,7 +117,8 @@ public class DefaultUserPropertiesResolverTest
         when(this.currentUserReferenceUserReferenceResolver.resolve(null)).thenReturn(testUserReference);
 
         UserPropertiesResolver customPropertiesResolver = mock(UserPropertiesResolver.class);
-        when(customPropertiesResolver.resolve(testUserReference)).thenReturn(mock(UserProperties.class));
+        UserProperties userPropertiesMock3 = mock(UserProperties.class);
+        when(customPropertiesResolver.resolve(testUserReference)).thenReturn(userPropertiesMock3);
 
         when(this.contextComponentManager.getInstance(UserPropertiesResolver.class,
             "user/" + TestUserReference.class.getName())).thenReturn(customPropertiesResolver);

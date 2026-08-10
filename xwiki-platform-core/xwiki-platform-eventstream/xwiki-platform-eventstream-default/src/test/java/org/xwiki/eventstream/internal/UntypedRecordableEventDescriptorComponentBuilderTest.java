@@ -75,9 +75,12 @@ class UntypedRecordableEventDescriptorComponentBuilderTest
         when(this.queryManager.createQuery(any(), any())).thenReturn(query);
         when(query.execute()).thenReturn(List.of("e1", "e2", "e3"));
 
-        when(this.documentReferenceResolver.resolve("e1")).thenReturn(mock(DocumentReference.class));
-        when(this.documentReferenceResolver.resolve("e2")).thenReturn(mock(DocumentReference.class));
-        when(this.documentReferenceResolver.resolve("e3")).thenReturn(mock(DocumentReference.class));
+        DocumentReference documentReferenceMock = mock(DocumentReference.class);
+        when(this.documentReferenceResolver.resolve("e1")).thenReturn(documentReferenceMock);
+        DocumentReference documentReferenceMock2 = mock(DocumentReference.class);
+        when(this.documentReferenceResolver.resolve("e2")).thenReturn(documentReferenceMock2);
+        DocumentReference documentReferenceMock3 = mock(DocumentReference.class);
+        when(this.documentReferenceResolver.resolve("e3")).thenReturn(documentReferenceMock3);
     }
 
     @Test

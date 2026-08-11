@@ -118,7 +118,7 @@ class TranslationDocumentObjectRequiredRightAnalyzerTest
 
     @ParameterizedTest
     @CsvSource(value = {"GLOBAL, programming", "WIKI, admin", "USER, script" })
-    void analyze(String scope, Right requiredRight) throws RequiredRightsException
+    void analyze(String scope, Right requiredRight)
     {
         when(this.object.getStringValue("scope")).thenReturn(scope);
 

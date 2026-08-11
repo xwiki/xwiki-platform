@@ -58,12 +58,12 @@ class EntityReferenceSetTest
         assertFalse(this.set.matches(reference));
     }
 
-    private void assertMatches(String reference, EntityType type) throws Exception
+    private void assertMatches(String reference, EntityType type)
     {
         assertMatches(this.resolver.resolve(reference, type));
     }
 
-    private void assertNotMatches(String reference, EntityType type) throws Exception
+    private void assertNotMatches(String reference, EntityType type)
     {
         assertNotMatches(this.resolver.resolve(reference, type));
     }
@@ -105,7 +105,7 @@ class EntityReferenceSetTest
         this.set.includes(reference);
     }
 
-    private void includes(String reference, EntityType type) throws Exception
+    private void includes(String reference, EntityType type)
     {
         includes(this.resolver.resolve(reference, type));
     }
@@ -132,7 +132,7 @@ class EntityReferenceSetTest
         this.set.excludes(reference);
     }
 
-    private void excludes(String reference, EntityType type) throws Exception
+    private void excludes(String reference, EntityType type)
     {
         excludes(this.resolver.resolve(reference, type));
     }

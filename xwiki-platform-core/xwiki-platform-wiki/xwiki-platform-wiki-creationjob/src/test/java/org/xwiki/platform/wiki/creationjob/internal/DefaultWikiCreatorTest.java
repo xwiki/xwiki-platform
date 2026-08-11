@@ -85,7 +85,7 @@ class DefaultWikiCreatorTest
     }
 
     @Test
-    void getJobStatus() throws Exception
+    void getJobStatus()
     {
         // Mocks
         Job job = mock(Job.class);

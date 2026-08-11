@@ -181,7 +181,7 @@ class SuggestPageTest extends PageTest
         assertEquals(0, resultElements.getLength());
     }
 
-    private void mockEmailObfuscation(boolean shallObfuscate) throws Exception
+    private void mockEmailObfuscation(boolean shallObfuscate)
     {
         when(generalMailConfiguration.shouldObfuscate()).thenReturn(shallObfuscate);
     }

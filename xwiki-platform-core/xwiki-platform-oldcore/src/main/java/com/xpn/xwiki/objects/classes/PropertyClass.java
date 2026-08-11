@@ -666,9 +666,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
 
     /**
      * @param context the current context, used to resolve the translation
-     * @return the {@link #ARIA_LABEL} text alternative fallback value for this property's edit widget, to explain
-     *         what it is about. If the widget has already been labelled in another way, this fallback will be
-     *         ignored by Assistive Techs
+     * @return the {@link #ARIA_LABEL} text alternative fallback value for this property's edit widget
      */
     protected String getAriaLabelFallback(XWikiContext context)
     {
@@ -676,8 +674,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     /**
-     * Sets the {@link #ARIA_LABEL} text alternative fallback (see {@link #getAriaLabelFallback(XWikiContext)}) on
-     * the given edit widget.
+     * Sets the {@link #ARIA_LABEL} text alternative fallback on the given edit widget.
      *
      * @param element the edit widget on which to set the fallback
      * @param context the current context, used to resolve the translation

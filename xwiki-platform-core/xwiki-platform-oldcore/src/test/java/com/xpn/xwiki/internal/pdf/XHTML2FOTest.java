@@ -62,6 +62,9 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -135,9 +138,9 @@ class XHTML2FOTest
             </div>""");
 
         String transformedXML = getTransformedXML(xml);
-        assertFalse(transformedXML.contains("box-sizing"), "Generated FO shouldn't contain 'box-sizing'");
-        assertFalse(transformedXML.contains("text-justify"), "Generated FO shouldn't contain 'text-justify'");
-        assertFalse(transformedXML.contains("text-autospace"), "Generated FO shouldn't contain 'text-autospace'");
+        assertThat(transformedXML, not(containsString("box-sizing")));
+        assertThat(transformedXML, not(containsString("text-justify")));
+        assertThat(transformedXML, not(containsString("text-autospace")));
     }
 
     /**
@@ -155,14 +158,11 @@ class XHTML2FOTest
             </p>""");
 
         String transformedXML = getTransformedXML(xml);
-        assertTrue(transformedXML.contains("background-color=\"transparent\""),
-            "The fully transparent #RGBA background should have been converted to 'transparent'");
-        assertTrue(transformedXML.contains("color=\"#f00\""),
-            "The alpha channel should have been dropped from the #RGBA text color");
-        assertTrue(transformedXML.contains("border=\"1pt solid #123456\""),
-            "The alpha channel should have been dropped from the #RRGGBBAA border color");
-        assertFalse(transformedXML.contains("#11223300"),
-            "The fully transparent #RRGGBBAA background should have been converted to 'transparent'");
+        // The fully transparent colors become the 'transparent' keyword, the others just lose their alpha channel.
+        assertThat(transformedXML, containsString("background-color=\"transparent\""));
+        assertThat(transformedXML, containsString("color=\"#f00\""));
+        assertThat(transformedXML, containsString("border=\"1pt solid #123456\""));
+        assertThat(transformedXML, not(containsString("#11223300")));
     }
 
     private String constructXML(String xmlContent)

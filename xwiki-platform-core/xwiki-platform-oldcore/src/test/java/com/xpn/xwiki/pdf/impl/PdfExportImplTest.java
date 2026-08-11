@@ -63,8 +63,9 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -243,8 +244,8 @@ class PdfExportImplTest
     {
         String styledHTML = this.pdfExport.applyCSS(this.htmlContent, "p { background: none; }", this.context);
 
-        assertTrue(styledHTML.contains("<p style=\"background-image: none; "), styledHTML);
-        assertTrue(styledHTML.contains("background-color: #0000; \">"), styledHTML);
+        assertThat(styledHTML, containsString("<p style=\"background-image: none; "));
+        assertThat(styledHTML, containsString("background-color: #0000; \">"));
     }
 
     /**

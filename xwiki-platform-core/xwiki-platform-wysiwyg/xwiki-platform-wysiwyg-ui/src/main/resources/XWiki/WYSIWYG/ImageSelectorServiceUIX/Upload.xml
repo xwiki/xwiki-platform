@@ -133,11 +133,9 @@
 ], function ($, imageSelector, translations, resource) {
   function init(element) {
     const uploadForm = element.find(".upload form");
-    /*
-     * This is called for every element of every xwiki:dom:updated event, most of which have nothing to do with the
-     * image selector, so leave immediately when there is no upload form to initialize. Failing to do so and throwing
-     * from here would prevent the remaining listeners of that event from running.
-     */
+    // This is called for every element of every xwiki:dom:updated event, most of which have nothing to do with the
+    // image selector, so leave immediately when there is no upload form to initialize. Failing to do so and throwing
+    // from here would prevent the remaining listeners of that event from running.
     if (!uploadForm.length) {
       return;
     }
@@ -145,20 +143,16 @@
     const uploadButton = uploadForm.find("input.button");
     const fileInput = uploadForm.find("input[type='file']");
 
-    /*
-     * The form has no action and is submitted with JavaScript only, so submitting it natively would simply reload the
-     * current page with the file field in the query string, losing the editor and its unsaved content. The button is
-     * thus disabled in the HTML, and stays that way until this code has been loaded and a file has been selected.
-     * Prevent the native submit as well, in case the form is submitted with the Enter key.
-     */
+    // The form has no action and is submitted with JavaScript only, so submitting it natively would simply reload the
+    // current page with the file field in the query string, losing the editor and its unsaved content. The button is
+    // thus disabled in the HTML, and stays that way until this code has been loaded and a file has been selected.
+    // Prevent the native submit as well, in case the form is submitted with the Enter key.
     uploadForm.on('submit', function (event) {
       event.preventDefault();
     });
 
-    /*
-     * Compute the state from the file field rather than only toggling it on change: the file may have been selected
-     * before this code was loaded, in which case the change event has been lost and the button would stay disabled.
-     */
+    // Compute the state from the file field rather than only toggling it on change: the file may have been selected
+    // before this code was loaded, in which case the change event has been lost and the button would stay disabled.
     const refreshUploadButton = function () {
       uploadButton.prop("disabled", !fileInput.prop('files')?.length);
     };
@@ -371,10 +365,8 @@
   &lt;/dl&gt;
   &lt;p&gt;
     &lt;span class="buttonwrapper"&gt;
-#*
-  Disabled until the JavaScript extension has been loaded and a file has been selected: this form is submitted with
-  JavaScript only, so a native submit would just reload the page and close the editor.
-*#
+      ## Disabled until the JavaScript extension has been loaded and a file has been selected: this form is submitted
+      ## with JavaScript only, so a native submit would just reload the page and close the editor.
       &lt;input class="button" type="submit" disabled="disabled"
         value="$escapetool.xml($services.localization.render('wysiwyg.imageSelector.uploadTab.uploadButton'))"/&gt;
     &lt;/span&gt;

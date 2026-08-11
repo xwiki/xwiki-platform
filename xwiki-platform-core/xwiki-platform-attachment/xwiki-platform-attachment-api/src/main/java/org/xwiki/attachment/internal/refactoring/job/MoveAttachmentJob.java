@@ -146,9 +146,13 @@ public class MoveAttachmentJob
         XWiki wiki)
     {
         XWikiContext context = this.xcontextProvider.get();
+        boolean sameDocument = Objects.equals(source.getParent(), destination.getParent());
         try {
             XWikiDocument sourceDocument = wiki.getDocument(source.getParent(), context).clone();
-            XWikiDocument targetDocument = wiki.getDocument(destination.getParent(), context).clone();
+            // When the source and the destination are the same document, the removal of the old attachment and the
+            // addition of the new one must be performed on the single document instance that is saved below.
+            XWikiDocument targetDocument =
+                sameDocument ? sourceDocument : wiki.getDocument(destination.getParent(), context).clone();
             XWikiAttachment sourceAttachment = sourceDocument.getExactAttachment(source.getName());
 
             // Update the author of the source and target documents.
@@ -170,7 +174,7 @@ public class MoveAttachmentJob
                 initializeAutoRedirection(source, destination, sourceDocument);
             }
 
-            if (Objects.equals(source.getParent(), destination.getParent())) {
+            if (sameDocument) {
                 wiki.saveDocument(sourceDocument,
                     this.contextualLocalizationManager.getTranslationPlain("attachment.job.saveDocument.inPlace",
                         source.getName(), destination.getName()), context);

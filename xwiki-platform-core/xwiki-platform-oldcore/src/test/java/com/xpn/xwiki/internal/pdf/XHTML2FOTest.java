@@ -140,6 +140,31 @@ class XHTML2FOTest
         assertFalse(transformedXML.contains("text-autospace"), "Generated FO shouldn't contain 'text-autospace'");
     }
 
+    /**
+     * CSS4J computes {@code background: none} into {@code background-color: #0000}, i.e. a CSS Color Level 4 hex
+     * notation with an alpha channel, which FOP doesn't support.
+     *
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-24582">XWIKI-24582</a>
+     */
+    @Test
+    void transformWithTransparentColors() throws Exception
+    {
+        String xml = constructXML("""
+            <p style="background-color: #0000; color: #f00c; ">
+              <span style="border: 1pt solid #12345678; background-color: #11223300; color: #0000; ">Test</span>
+            </p>""");
+
+        String transformedXML = getTransformedXML(xml);
+        assertTrue(transformedXML.contains("background-color=\"transparent\""),
+            "The fully transparent #RGBA background should have been converted to 'transparent'");
+        assertTrue(transformedXML.contains("color=\"#f00\""),
+            "The alpha channel should have been dropped from the #RGBA text color");
+        assertTrue(transformedXML.contains("border=\"1pt solid #123456\""),
+            "The alpha channel should have been dropped from the #RRGGBBAA border color");
+        assertFalse(transformedXML.contains("#11223300"),
+            "The fully transparent #RRGGBBAA background should have been converted to 'transparent'");
+    }
+
     private String constructXML(String xmlContent)
     {
         return """

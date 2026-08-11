@@ -126,7 +126,7 @@ class DefaultNotificationsResourceTest
 
     @ParameterizedTest
     @ValueSource(ints = { -1, 1001 })
-    void getgetNotificationsRSSLimitErrors(int limit) throws Exception
+    void getgetNotificationsRSSLimitErrors(int limit)
     {
         String userId = "XWiki.Admin";
         DocumentReference userIdDocReference = mock("userIdDocReference");
@@ -142,7 +142,7 @@ class DefaultNotificationsResourceTest
 
     @ParameterizedTest
     @ValueSource(ints = { -1, 1001 })
-    void getNotificationsLimitErrors(int limit) throws Exception
+    void getNotificationsLimitErrors(int limit)
     {
         String userId = "XWiki.Admin";
         DocumentReference userIdDocReference = mock("userIdDocReference");
@@ -175,7 +175,7 @@ class DefaultNotificationsResourceTest
 
     @ParameterizedTest
     @ValueSource(ints = { -1, 1001 })
-    void getNotificationsCountLimitErrors(int limit) throws Exception
+    void getNotificationsCountLimitErrors(int limit)
     {
         String userId = "XWiki.Admin";
         DocumentReference userIdDocReference = mock("userIdDocReference");

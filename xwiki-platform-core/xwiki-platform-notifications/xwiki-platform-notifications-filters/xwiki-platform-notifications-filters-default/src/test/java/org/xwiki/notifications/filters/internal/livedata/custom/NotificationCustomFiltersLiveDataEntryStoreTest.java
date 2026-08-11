@@ -313,7 +313,6 @@ class NotificationCustomFiltersLiveDataEntryStoreTest
         when(filterPref1.getEventTypes()).thenReturn(Set.of("event foo"));
         when(filterPref1.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.EMAIL));
         String user = "xwiki:XWiki.User1";
-        //DocumentReference user1DocRef = new DocumentReference("xwiki", "XWiki", "User1");
         when(filterPref1.getUser()).thenReturn(user);
         when(filterPref1.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
         when(filterPref1.isEnabled()).thenReturn(false);
@@ -323,7 +322,6 @@ class NotificationCustomFiltersLiveDataEntryStoreTest
         when(filterPref2.getEventTypes()).thenReturn(Set.of());
         when(filterPref2.getNotificationFormats()).thenReturn(Set.of(NotificationFormat.ALERT));
         String wikiFilter2 = "bla";
-        //WikiReference wikiReferenceFilter = new WikiReference(wikiFilter2);
         when(filterPref2.getWiki()).thenReturn(wikiFilter2);
         when(filterPref2.getFilterType()).thenReturn(NotificationFilterType.INCLUSIVE);
         when(filterPref2.isEnabled()).thenReturn(true);

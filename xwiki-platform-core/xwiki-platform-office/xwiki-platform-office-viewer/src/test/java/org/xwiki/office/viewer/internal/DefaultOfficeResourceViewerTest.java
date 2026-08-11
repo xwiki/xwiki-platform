@@ -512,7 +512,7 @@ class DefaultOfficeResourceViewerTest
     }
 
     @Test
-    void viewURLWithLocalFile() throws AccessDeniedException
+    void viewURLWithLocalFile()
     {
         ResourceReference resourceReference = new ResourceReference("file://resource", ResourceType.URL);
         when(this.resourceReferenceTypeSerializer.serialize(resourceReference)).thenReturn(

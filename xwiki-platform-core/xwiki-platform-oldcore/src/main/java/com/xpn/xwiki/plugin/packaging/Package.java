@@ -395,28 +395,28 @@ public class Package
         return add(doc, action, context);
     }
 
-    public boolean add(String docFullName, int DefaultAction, XWikiContext context) throws XWikiException
+    public boolean add(String docFullName, int defaultAction, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
-        add(doc, DefaultAction, context);
+        add(doc, defaultAction, context);
         List<String> languages = doc.getTranslationList(context);
         for (String language : languages) {
             if (!((language == null) || (language.isEmpty()) || (doc.getDefaultLanguage().equals(language)))) {
-                add(doc.getTranslatedDocument(language, context), DefaultAction, context);
+                add(doc.getTranslatedDocument(language, context), defaultAction, context);
             }
         }
 
         return true;
     }
 
-    public boolean add(String docFullName, String language, int DefaultAction, XWikiContext context)
+    public boolean add(String docFullName, String language, int defaultAction, XWikiContext context)
         throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
         if ((language == null) || (language.isEmpty())) {
-            add(doc, DefaultAction, context);
+            add(doc, defaultAction, context);
         } else {
-            add(doc.getTranslatedDocument(language, context), DefaultAction, context);
+            add(doc.getTranslatedDocument(language, context), defaultAction, context);
         }
 
         return true;

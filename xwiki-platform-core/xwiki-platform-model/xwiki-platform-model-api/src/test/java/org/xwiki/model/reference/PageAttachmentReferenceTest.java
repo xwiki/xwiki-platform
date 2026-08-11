@@ -36,8 +36,9 @@ class PageAttachmentReferenceTest
     @Test
     void testInvalidType()
     {
+        EntityReference reference = new EntityReference("filename", EntityType.PAGE);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new PageAttachmentReference(new EntityReference("filename", EntityType.PAGE)));
+            () -> new PageAttachmentReference(reference));
 
         assertEquals("Invalid type [PAGE] for an attachment reference", e.getMessage());
     }
@@ -54,8 +55,10 @@ class PageAttachmentReferenceTest
     @Test
     void testInvalidParentType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new PageAttachmentReference(
-            new EntityReference("filename", EntityType.PAGE_ATTACHMENT, new WikiReference("wiki"))));
+        EntityReference reference = new EntityReference("filename", EntityType.PAGE_ATTACHMENT,
+            new WikiReference("wiki"));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new PageAttachmentReference(reference));
 
         assertEquals("Invalid parent reference [Wiki wiki] in an attachment reference", e.getMessage());
     }

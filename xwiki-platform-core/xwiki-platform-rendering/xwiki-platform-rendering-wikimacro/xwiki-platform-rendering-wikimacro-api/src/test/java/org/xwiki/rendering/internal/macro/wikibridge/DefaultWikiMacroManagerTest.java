@@ -318,7 +318,7 @@ class DefaultWikiMacroManagerTest
             + "to insufficient privileges", exception.getMessage());
     }
 
-    private WikiMacro generateWikiMacro(WikiMacroVisibility visibility) throws Exception
+    private WikiMacro generateWikiMacro(WikiMacroVisibility visibility)
     {
         DocumentReference wikiMacroDocReference = new DocumentReference("wiki", Arrays.asList("space"), "space");
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor.Builder().id(new MacroId("testwikimacro"))

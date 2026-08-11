@@ -73,8 +73,7 @@ class UnboundedEntityCacheManagerTest
 
     private EventListener listener;
 
-    private void assertCreate(boolean invalidateOnUpdate) throws ComponentLookupException, MalformedObjectNameException,
-        IntrospectionException, InstanceNotFoundException, ReflectionException
+    private void assertCreate(boolean invalidateOnUpdate) throws ComponentLookupException
     {
         Map<EntityReference, String> cache = this.manager.createCache("cache", invalidateOnUpdate);
 

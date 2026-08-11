@@ -247,7 +247,7 @@ class DefaultCSRFTokenTest
      * Test that the resubmission URL is correct.
      */
     @Test
-    void resubmissionURLWhenPost() throws Exception
+    void resubmissionURLWhenPost()
     {
         userIsLogged();
 
@@ -266,7 +266,7 @@ class DefaultCSRFTokenTest
      * Test that the resubmission URL is correct.
      */
     @Test
-    void resubmissionURLWhenGet() throws Exception
+    void resubmissionURLWhenGet()
     {
         userIsLogged();
 

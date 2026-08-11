@@ -5971,9 +5971,9 @@ public class XWiki implements EventListener
         return this.engine_context;
     }
 
-    public void setEngineContext(XWikiEngineContext engine_context)
+    public void setEngineContext(XWikiEngineContext engineContext)
     {
-        this.engine_context = engine_context;
+        this.engine_context = engineContext;
     }
 
     public void setAuthService(XWikiAuthService authService)
@@ -8044,10 +8044,10 @@ public class XWiki implements EventListener
      * @deprecated since 6.1M3, use {@link #XWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
     @Deprecated
-    public XWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
+    public XWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engineContext, boolean noupdate)
         throws XWikiException
     {
-        initXWiki(config, context, engine_context, noupdate);
+        initXWiki(config, context, engineContext, noupdate);
     }
 
     /**
@@ -8063,11 +8063,11 @@ public class XWiki implements EventListener
      * @deprecated use {@link #XWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
     @Deprecated
-    public XWiki(String xwikicfgpath, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
+    public XWiki(String xwikicfgpath, XWikiContext context, XWikiEngineContext engineContext, boolean noupdate)
         throws XWikiException
     {
         try {
-            initXWiki(new XWikiConfig(new FileInputStream(xwikicfgpath)), context, engine_context, noupdate);
+            initXWiki(new XWikiConfig(new FileInputStream(xwikicfgpath)), context, engineContext, noupdate);
         } catch (FileNotFoundException e) {
             Object[] args = { xwikicfgpath };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG, XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND,
@@ -8079,9 +8079,9 @@ public class XWiki implements EventListener
      * @deprecated use {@link #XWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
     @Deprecated
-    public XWiki(InputStream is, XWikiContext context, XWikiEngineContext engine_context) throws XWikiException
+    public XWiki(InputStream is, XWikiContext context, XWikiEngineContext engineContext) throws XWikiException
     {
-        initXWiki(new XWikiConfig(is), context, engine_context, true);
+        initXWiki(new XWikiConfig(is), context, engineContext, true);
     }
 
     /**
@@ -8119,13 +8119,13 @@ public class XWiki implements EventListener
      * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
      */
     @Deprecated
-    public String Param(String key, String default_value)
+    public String Param(String key, String defaultValue)
     {
         if (getConfiguration() != null) {
-            return getConfiguration().getProperty(key, default_value);
+            return getConfiguration().getProperty(key, defaultValue);
         }
 
-        return default_value;
+        return defaultValue;
     }
 
     /**
@@ -8141,9 +8141,9 @@ public class XWiki implements EventListener
      * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
      */
     @Deprecated
-    public long ParamAsLong(String key, long default_value)
+    public long ParamAsLong(String key, long defaultValue)
     {
-        return getConfiguration().getProperty(key, default_value);
+        return getConfiguration().getProperty(key, defaultValue);
     }
 
     /**

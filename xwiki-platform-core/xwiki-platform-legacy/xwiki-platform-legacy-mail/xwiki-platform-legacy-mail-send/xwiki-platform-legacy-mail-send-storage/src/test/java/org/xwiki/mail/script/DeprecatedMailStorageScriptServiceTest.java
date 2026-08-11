@@ -166,7 +166,7 @@ class DeprecatedMailStorageScriptServiceTest
     }
 
     @Test
-    void loadWhenNotAuthorized() throws Exception
+    void loadWhenNotAuthorized()
     {
         when(this.authorizationManager.hasAccess(Right.ADMIN)).thenReturn(false);
 

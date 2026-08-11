@@ -70,7 +70,7 @@ class DefaultWatchedEntitiesConfigurationTest
     }
 
     @Test
-    void getAutomaticWatchMode() throws Exception
+    void getAutomaticWatchMode()
     {
         // Default value
         assertEquals(AutomaticWatchMode.MAJOR, watchedEntitiesConfiguration.getAutomaticWatchMode(CURRENT_USER));
@@ -85,7 +85,7 @@ class DefaultWatchedEntitiesConfigurationTest
     }
 
     @Test
-    void getDefaultAutomaticWatchMode() throws Exception
+    void getDefaultAutomaticWatchMode()
     {
         // Default value
         assertEquals(AutomaticWatchMode.MAJOR, watchedEntitiesConfiguration.getDefaultAutomaticWatchMode(CURRENT_WIKI));

@@ -364,17 +364,17 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         return getIntValue(name, 0);
     }
 
-    public int getIntValue(String name, int default_value)
+    public int getIntValue(String name, int defaultValue)
     {
         try {
             NumberProperty prop = (NumberProperty) safeget(name);
             if (prop == null) {
-                return default_value;
+                return defaultValue;
             } else {
                 return ((Number) prop.getValue()).intValue();
             }
         } catch (Exception e) {
-            return default_value;
+            return defaultValue;
         }
     }
 

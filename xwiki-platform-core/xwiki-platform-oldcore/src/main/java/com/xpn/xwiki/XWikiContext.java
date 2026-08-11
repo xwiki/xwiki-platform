@@ -271,9 +271,9 @@ public class XWikiContext extends Hashtable<Object, Object>
         return this.engine_context;
     }
 
-    public void setEngineContext(XWikiEngineContext engine_context)
+    public void setEngineContext(XWikiEngineContext engineContext)
     {
-        this.engine_context = engine_context;
+        this.engine_context = engineContext;
     }
 
     /**
@@ -762,9 +762,9 @@ public class XWikiContext extends Hashtable<Object, Object>
         return this.URLFactory;
     }
 
-    public void setURLFactory(XWikiURLFactory URLFactory)
+    public void setURLFactory(XWikiURLFactory urlFactory)
     {
-        this.URLFactory = URLFactory;
+        this.URLFactory = urlFactory;
     }
 
     public XWikiForm getForm()

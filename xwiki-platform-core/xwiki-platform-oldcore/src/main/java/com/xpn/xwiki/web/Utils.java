@@ -402,14 +402,14 @@ public class Utils
 
     @Deprecated(since = "17.0.0RC1")
     public static XWikiContext prepareContext(String action, XWikiRequest request, XWikiResponse response,
-        XWikiEngineContext engine_context) throws XWikiException
+        XWikiEngineContext engineContext) throws XWikiException
     {
         XWikiContext context = new XWikiContext();
         String dbname = "xwiki";
         URL url = XWiki.getRequestURL(request);
         context.setURL(url);
 
-        context.setEngineContext(engine_context);
+        context.setEngineContext(engineContext);
         context.setRequest(request);
         context.setResponse(response);
         context.setAction(action);

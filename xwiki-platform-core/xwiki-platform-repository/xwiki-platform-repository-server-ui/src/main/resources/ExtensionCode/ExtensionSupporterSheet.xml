@@ -65,7 +65,8 @@
   #end
   {{html}}
     &lt;form&gt;
-      &lt;input type="text" name="ExtensionCode.ExtensionSupportPlanClass_0_name"/&gt;
+      &lt;label class="sr-only" for="extensionsupportplan_0_name"&gt;$escapetool.xml($services.localization.render('ExtensionCode.ExtensionSupportPlanClass_doc.title'))&lt;/label&gt;
+      &lt;input type="text" id="extensionsupportplan_0_name" name="ExtensionCode.ExtensionSupportPlanClass_0_name"/&gt;
       &lt;button name="add_plan" class="btn btn-primary"&gt;$escapetool.xml($services.localization.render('repository.supporter.sheet.createplan'))&lt;/button&gt;
     &lt;/form&gt;
   {{/html}}

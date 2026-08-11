@@ -237,18 +237,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     private void initValidColumTypes()
     {
-        String[] string_types = {"string", "text", "clob"};
-        String[] number_types =
+        String[] stringTypes = {"string", "text", "clob"};
+        String[] numberTypes =
             {"integer", "long", "float", "double", "big_decimal", "big_integer", "yes_no", "true_false"};
-        String[] date_types = {"date", "time", "timestamp"};
-        String[] boolean_types = {"boolean", "yes_no", "true_false", "integer"};
+        String[] dateTypes = {"date", "time", "timestamp"};
+        String[] booleanTypes = {"boolean", "yes_no", "true_false", "integer"};
         this.validTypesMap = new HashMap<>();
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.StringClass", string_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.TextAreaClass", string_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.PasswordClass", string_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.NumberClass", number_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.DateClass", date_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.BooleanClass", boolean_types);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.StringClass", stringTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.TextAreaClass", stringTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.PasswordClass", stringTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.NumberClass", numberTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.DateClass", dateTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.BooleanClass", booleanTypes);
     }
 
     @Override

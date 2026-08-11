@@ -159,11 +159,9 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     private boolean shouldFilterBeSelectedBasedOnStatus(boolean filterActivation, boolean onlyEnabled)
     {
         boolean result = false;
-        // if we don't care to get only the enabled one, we can return all of them.
-        if (!onlyEnabled) {
-            result = true;
+        // if we don't care to get only the enabled one, we can return all of them,
         // else we just need to ensure that the filter is activated
-        } else if (filterActivation) {
+        if (!onlyEnabled || filterActivation) {
             result = true;
         }
         return result;

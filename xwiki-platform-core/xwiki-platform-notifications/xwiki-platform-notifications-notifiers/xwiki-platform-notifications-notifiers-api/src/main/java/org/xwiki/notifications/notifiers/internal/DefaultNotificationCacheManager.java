@@ -163,9 +163,9 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
         if (this.configuration.isRestCacheEnabled()) {
             if (count && composite) {
                 result = this.longCompositeEventCountCache.get(cacheKey);
-            } else if (count && !composite) {
+            } else if (count) {
                 result = this.longIndividualEventCountCache.get(cacheKey);
-            } else if (!count && composite) {
+            } else if (composite) {
                 result = this.longCompositeEventCache.get(cacheKey);
             } else {
                 result = this.longEventCache.get(cacheKey);
@@ -187,9 +187,9 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
         if (this.configuration.isRestCacheEnabled()) {
             if (count && composite) {
                 this.longCompositeEventCountCache.set(cacheKey, events.size());
-            } else if (count && !composite) {
+            } else if (count) {
                 this.longIndividualEventCountCache.set(cacheKey, events.size());
-            } else if (!count && composite) {
+            } else if (composite) {
                 this.longCompositeEventCache.set(cacheKey, events);
             } else {
                 this.longEventCache.set(cacheKey, events);

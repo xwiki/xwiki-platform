@@ -128,6 +128,45 @@ class MoveAttachmentIT
         assertEquals("[[attach:newname.txt]]", setup.rest().<Page>get(targetPage).getContent());
     }
 
+    @Test
+    @Order(2)
+    void renameAttachmentInSameDocument(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        DocumentReference page = new DocumentReference("RenameSameDocument", testReference.getLastSpaceReference());
+
+        setup.loginAsSuperAdmin();
+        setup.deletePage(page);
+        setup.createPage(page, "");
+
+        setup.gotoPage(page);
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        attachmentsPane.setFileToUpload(buildMovemePath(testConfiguration, "v0"));
+        attachmentsPane.waitForUploadToFinish(SOURCE_FILENAME);
+
+        // Rename the attachment without changing its location, i.e. move it inside the document it is already in.
+        AttachmentPane movePane = AttachmentPane.moveAttachment(SOURCE_FILENAME);
+        movePane.setName(TARGET_FILENAME);
+        movePane.setRedirect(true);
+        movePane.submit();
+        movePane.waitForJobDone();
+
+        // The page must hold exactly one attachment, the renamed one, i.e. the attachment must not be lost by the
+        // rename.
+        setup.gotoPage(page);
+        AttachmentsPane attachmentsPaneAfterRename = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(1, attachmentsPaneAfterRename.getNumberOfAttachments());
+        assertEquals(TARGET_FILENAME, attachmentsPaneAfterRename.getAttachmentNameByIndex(1));
+
+        // Verify that the content of the renamed attachment is preserved.
+        AttachmentHistoryPage attachmentHistoryPage = attachmentsPaneAfterRename.goToAttachmentHistory(TARGET_FILENAME);
+        assertEquals("Move me (v0).", attachmentHistoryPage.geAttachmentContent(1));
+
+        // Verify that the redirection object has been created on the page.
+        Object object = setup.rest().object(page, setup.serializeReference(REFERENCE));
+        assertNotNull(object);
+    }
+
     private String buildMovemePath(TestConfiguration testConfiguration, String dirName)
     {
         return new File(new File(testConfiguration.getBrowser().getTestResourcesPath(), dirName), SOURCE_FILENAME)

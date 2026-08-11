@@ -233,7 +233,10 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractSystem
         if (baseObject != null) {
             BaseProperty property = (BaseProperty) baseObject.getField(propertyName);
 
-            Object value = property != null ? (text ? property.toText() : property.getValue()) : null;
+            Object value = null;
+            if (property != null) {
+                value = text ? property.toText() : property.getValue();
+            }
 
             // TODO: In the future we would need the notion of initialized/not-initialized property values in the wiki.
             // When this is implemented modify the code below.

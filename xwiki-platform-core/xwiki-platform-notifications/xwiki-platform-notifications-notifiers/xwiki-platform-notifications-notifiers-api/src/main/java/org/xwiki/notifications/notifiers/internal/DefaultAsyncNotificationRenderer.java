@@ -105,11 +105,11 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
     @Override
     public AsyncRendererResult render(boolean async, boolean cached) throws RenderingException
     {
-        // Get the epoch before the events are retrieved below, so that the result is not cached if the events change
-        // in the meantime.
+        // Get the epoch before the events are retrieved below, so that the result is not cached for the current epoch
+        // if the events change in the meantime.
         long epoch = this.notificationCacheManager.getEpoch();
         Object fromCache =
-            this.notificationCacheManager.getFromCache(this.cacheKey, this.configuration.isCount(), true);
+            this.notificationCacheManager.getFromCache(this.cacheKey, this.configuration.isCount(), true, epoch);
 
         NotificationParameters notificationParameters = this.configuration.getNotificationParameters();
         List<CompositeEvent> events = null;

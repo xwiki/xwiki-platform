@@ -23,11 +23,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
+import org.xwiki.cache.internal.MapCache;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -43,9 +49,13 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,18 +77,19 @@ class DefaultNotificationCacheManagerTest
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-    private Cache longEventCache;
-    private Cache longCountCache;
-    private Cache longCompositeEventCountCache;
-    private Cache longCompositeEventCache;
+    private Cache<Object> longEventCache;
+    private Cache<Object> longCountCache;
+    private Cache<Object> longCompositeEventCountCache;
+    private Cache<Object> longCompositeEventCache;
 
     @BeforeComponent
     public void setupComponents(MockitoComponentManager componentManager) throws Exception
     {
-        this.longEventCache = mock(Cache.class);
-        this.longCountCache = mock(Cache.class);
-        this.longCompositeEventCountCache = mock(Cache.class);
-        this.longCompositeEventCache = mock(Cache.class);
+        // Use actual caches so that the effect of the epoch on the cache keys can be observed.
+        this.longEventCache = spy(new MapCache<>());
+        this.longCountCache = spy(new MapCache<>());
+        this.longCompositeEventCountCache = spy(new MapCache<>());
+        this.longCompositeEventCache = spy(new MapCache<>());
 
         when(this.configuration.isRestCacheEnabled()).thenReturn(true);
         CacheManager cacheManager = componentManager.registerMockComponent(CacheManager.class);
@@ -103,13 +114,15 @@ class DefaultNotificationCacheManagerTest
     @Test
     void getFromCache()
     {
-        this.defaultNotificationCacheManager.getFromCache("anykey", true, false);
-        verify(this.longCountCache).get("anykey");
-        verify(this.longEventCache, never()).get("anykey");
+        long epoch = this.defaultNotificationCacheManager.getEpoch();
 
-        this.defaultNotificationCacheManager.getFromCache("anotherkey", false, false);
-        verify(this.longEventCache).get("anotherkey");
-        verify(this.longCountCache, never()).get("anotherkey");
+        this.defaultNotificationCacheManager.getFromCache("anykey", true, false, epoch);
+        verify(this.longCountCache).get("anykey/0");
+        verify(this.longEventCache, never()).get("anykey/0");
+
+        this.defaultNotificationCacheManager.getFromCache("anotherkey", false, false, epoch);
+        verify(this.longEventCache).get("anotherkey/0");
+        verify(this.longCountCache, never()).get("anotherkey/0");
 
         // 2 for the method getFromCache + 1 for the initialize
         verify(this.configuration, times(3)).isRestCacheEnabled();
@@ -123,15 +136,17 @@ class DefaultNotificationCacheManagerTest
         long epoch = this.defaultNotificationCacheManager.getEpoch();
 
         this.defaultNotificationCacheManager.setInCache("mykey", events, false, false, epoch);
-        verify(this.longEventCache).set("mykey", events);
-        verify(this.longCountCache, never()).set("mykey", events);
+        verify(this.longEventCache).set("mykey/0", events);
+        verify(this.longCountCache, never()).set("mykey/0", events);
+        assertEquals(events, this.defaultNotificationCacheManager.getFromCache("mykey", false, false, epoch));
 
         this.defaultNotificationCacheManager.setInCache("anotherkey", events, true, false, epoch);
-        verify(this.longEventCache, never()).set("anotherkey", 3);
-        verify(this.longCountCache).set("anotherkey", 3);
+        verify(this.longEventCache, never()).set("anotherkey/0", 3);
+        verify(this.longCountCache).set("anotherkey/0", 3);
+        assertEquals(3, this.defaultNotificationCacheManager.getFromCache("anotherkey", true, false, epoch));
 
-        // 2 for the method setInCache + 1 for the initialize
-        verify(this.configuration, times(3)).isRestCacheEnabled();
+        // 2 for the method setInCache + 2 for the method getFromCache + 1 for the initialize
+        verify(this.configuration, times(5)).isRestCacheEnabled();
     }
 
     @Test
@@ -152,10 +167,63 @@ class DefaultNotificationCacheManagerTest
         verify(this.longEventCache, never()).set(any(), any());
         verify(this.longCountCache, never()).set(any(), any());
 
-        // The results computed before the flush are refused, but the ones computed after it are accepted.
-        this.defaultNotificationCacheManager.setInCache("mykey", events, false, true,
-            this.defaultNotificationCacheManager.getEpoch());
-        verify(this.longCompositeEventCache).set("mykey", events);
+        // The results computed before the flush are refused, but the ones computed after it are accepted and stored
+        // under the new epoch.
+        long newEpoch = this.defaultNotificationCacheManager.getEpoch();
+        assertNotEquals(epoch, newEpoch);
+        this.defaultNotificationCacheManager.setInCache("mykey", events, false, true, newEpoch);
+        verify(this.longCompositeEventCache).set("mykey/" + newEpoch, events);
+        assertEquals(events, this.defaultNotificationCacheManager.getFromCache("mykey", false, true, newEpoch));
+    }
+
+    /**
+     * Ensure that a result whose storage in the cache is interleaved with a flush isn't returned anymore, even though
+     * it is stored after the caches have been emptied.
+     */
+    @Test
+    void setInCacheDuringFlush() throws Exception
+    {
+        List<Object> events = Arrays.asList(mock(Event.class), mock(Event.class));
+        long epoch = this.defaultNotificationCacheManager.getEpoch();
+
+        CompletableFuture<Void> storageStarted = new CompletableFuture<>();
+        CompletableFuture<Void> flushFinished = new CompletableFuture<>();
+
+        // Block the storing thread inside the cache, i.e., after the epoch has been checked but before the value has
+        // actually been stored.
+        doAnswer(invocation -> {
+            storageStarted.complete(null);
+            flushFinished.get(10, TimeUnit.SECONDS);
+            return invocation.callRealMethod();
+        }).when(this.longCompositeEventCache).set(any(), any());
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        try {
+            Future<?> storageFuture = executorService.submit(
+                () -> this.defaultNotificationCacheManager.setInCache("mykey", events, false, true, epoch));
+
+            storageStarted.get(10, TimeUnit.SECONDS);
+
+            // Flush the cache after the set-call arrived in the cache, and thus after it verified the epoch.
+            this.defaultNotificationCacheManager.flushLongCache();
+
+            // Unblock the set call so it can complete normally and wait for it.
+            flushFinished.complete(null);
+            storageFuture.get(10, TimeUnit.SECONDS);
+        } finally {
+            executorService.shutdown();
+        }
+
+        assertTrue(executorService.awaitTermination(10, TimeUnit.SECONDS));
+
+        // The outdated result did land in the cache after it has been emptied, but under the previous epoch.
+        long newEpoch = this.defaultNotificationCacheManager.getEpoch();
+        assertNotEquals(epoch, newEpoch);
+        assertEquals(events, this.longCompositeEventCache.get("mykey/" + epoch));
+
+        // Therefore, it isn't returned anymore.
+        assertNull(this.defaultNotificationCacheManager.getFromCache("mykey", false, true, newEpoch));
     }
 
     @Test

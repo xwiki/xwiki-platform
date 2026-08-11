@@ -34,7 +34,7 @@
     #set ($attributes.disabled = 'disabled')
   #end
   #if ("$!parameters.get('aria-label')" != '')
-    #set ($attributes.aria-label = $parameters.get('aria-label'))
+    #set ($discard = $attributes.put('aria-label', $parameters.get('aria-label')))
   #end
   #set ($attributes.data-restricted = "$!parameters.restricted" == 'true')
 #end

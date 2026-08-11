@@ -8667,10 +8667,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             for (int i = sectionNumber; i < numberOfSections; i++) {
                 DocumentSection nextSection = getDocumentSection(i + 1); // get next section
                 String nextSectionLevel = nextSection.getSectionLevel();
-                if (sectionLevel.equals(nextSectionLevel)) {
-                    nextSectionIndex = nextSection.getSectionIndex();
-                    break;
-                } else if (sectionLevel.length() > nextSectionLevel.length()) {
+                if (sectionLevel.equals(nextSectionLevel) || sectionLevel.length() > nextSectionLevel.length()) {
                     nextSectionIndex = nextSection.getSectionIndex();
                     break;
                 }

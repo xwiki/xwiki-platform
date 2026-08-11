@@ -68,7 +68,7 @@ public class SpaceNormalizerContentAlterer extends AbstractContentAlterer
             c = sequence.charAt(i);
             boolean isWhitespace = !whitespaceFilter.accept(c);
             // if either it's a non-whitespace or it's a whitespace but it's the first whitespace after some characters
-            if (!isWhitespace || (isWhitespace && !isInWhitespace)) {
+            if (!isWhitespace || !isInWhitespace) {
                 // update the whitespace printing state according to the the type of the current character
                 isInWhitespace = isWhitespace;
 

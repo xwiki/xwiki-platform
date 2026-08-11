@@ -21,6 +21,7 @@ package org.xwiki.blocknote.test.po;
 
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
@@ -149,11 +150,47 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea clickImage(int index)
     {
-        // The image might not be loaded yet, so wait until it's clickable before clicking on it.
-        WebElement image = this.container.findElements(By.tagName("img")).get(index);
+        // Note that this doesn't wait for the image to be loaded: an image that is still being fetched (or that failed
+        // to load, which some tests do on purpose) is already clickable, with the height of a single text line.
+        WebElement image = getImage(index);
         getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(image));
         image.click();
         return this;
+    }
+
+    /**
+     * Returns the image with the specified index in the rich text area.
+     *
+     * @param index the index of the image to return, starting from 0
+     * @return the image element
+     * @since 18.6.0
+     */
+    public WebElement getImage(int index)
+    {
+        return this.container.findElements(By.tagName("img")).get(index);
+    }
+
+    /**
+     * Waits until the image with the specified index has been loaded successfully, i.e. until its size reflects the
+     * image content rather than the size of a not yet loaded image. Don't call this for an image that is expected to
+     * fail to load, e.g. one pointing to a missing attachment.
+     *
+     * @param index the index of the image to wait for, starting from 0
+     * @return the image element
+     * @since 18.7.0RC1
+     */
+    public WebElement waitUntilImageIsLoaded(int index)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return (Boolean) getDriver()
+                    .executeScript("return arguments[0].complete && arguments[0].naturalWidth > 0", getImage(index));
+            } catch (StaleElementReferenceException | IndexOutOfBoundsException e) {
+                // The editor is re-rendering the image, e.g. because its source has just been changed.
+                return false;
+            }
+        });
+        return getImage(index);
     }
 
     /**

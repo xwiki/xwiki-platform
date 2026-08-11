@@ -116,11 +116,13 @@ class AttachmentIT
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
 
         // Upload two attachments and check them
+        // Also assert the localized size displayed in the upload notification (see XWIKI-22126), using the known
+        // size of the fixture files (27 and 33 bytes).
         attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, FIRST_ATTACHMENT).getAbsolutePath());
-        attachmentsPane.waitForUploadToFinish(FIRST_ATTACHMENT);
+        attachmentsPane.waitForUploadToFinish(FIRST_ATTACHMENT, "27B");
         attachmentsPane.clickHideProgress();
         attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, SECOND_ATTACHMENT).getAbsolutePath());
-        attachmentsPane.waitForUploadToFinish(SECOND_ATTACHMENT);
+        attachmentsPane.waitForUploadToFinish(SECOND_ATTACHMENT, "33B");
         attachmentsPane.clickHideProgress();
         assertEquals(2, attachmentsPane.getNumberOfAttachments());
         assertTrue(attachmentsPane.attachmentExistsByFileName(FIRST_ATTACHMENT));

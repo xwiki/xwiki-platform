@@ -182,6 +182,19 @@ public class AttachmentsPane extends BaseElement
     }
 
     /**
+     * Wait for the upload of a specific file to be finished, also asserting the localized size displayed next to the
+     * file name.
+     *
+     * @param fileName the name of the attachment
+     * @param expectedSize the expected localized size displayed in the upload notification (e.g. {@code "27B"})
+     * @since 18.7.0RC1
+     */
+    public void waitForUploadToFinish(String fileName, String expectedSize)
+    {
+        waitForNotificationSuccessMessage(String.format("Attachment uploaded: %s (%s)", fileName, expectedSize));
+    }
+
+    /**
      * Close the progress displayed after uploading one or multiple files.
      */
     public void clickHideProgress()

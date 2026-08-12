@@ -29,9 +29,9 @@ systemd-sysusers
 own_directory /var/lib/xwiki/data
 
 # Make sure XWiki is able to write in the log, tmp and work directories
-prepare_directory /var/log/xwiki
-prepare_directory /var/lib/xwiki/tmp
-prepare_directory /var/lib/xwiki/work
+prepare_directory [[debian.jetty.log.path]]
+prepare_directory [[debian.jetty.tmp.path]]
+prepare_directory [[debian.jetty.work.path]]
 
 #########################
 # Reload the service

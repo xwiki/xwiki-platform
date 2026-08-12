@@ -163,6 +163,12 @@ public final class XWikiRepositoryModel
     public static final String PROP_EXTENSION_ID = "id";
 
     /**
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     */
+    public static final String PROP_PROJECT_ID = PROP_EXTENSION_ID;
+
+    /**
      * @since 15.0RC1
      * @since 14.10.2
      */
@@ -349,20 +355,24 @@ public final class XWikiRepositoryModel
 
     // Consolidation
 
-    public static final String PROP_EXTENSION_LASTVERSION = "lastVersion";
+    /**
+     * @since 18.7.0RC1
+     * @since 18.4.4
+     */
+    public static final String PROP_LASTVERSION = "lastVersion";
 
     public static final String PROP_EXTENSION_VALIDEXTENSION = "validExtension";
 
     // Solr
-
-    public static final String SOLRPROP_EXTENSION_VALIDEXTENSION =
-        toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, "boolean");
 
     public static final String SOLR_STRING = "string";
 
     public static final String SOLR_INTEGER = "int";
 
     public static final String SOLR_BOOLEAN = "boolean";
+
+    public static final String SOLRPROP_EXTENSION_VALIDEXTENSION =
+        toExtensionClassSolrPropertyName(PROP_EXTENSION_VALIDEXTENSION, SOLR_BOOLEAN);
 
     public static final Map<String, SolrField> SOLR_FIELDS = new HashMap<>();
 
@@ -429,7 +439,7 @@ public final class XWikiRepositoryModel
         // Not very interesting for fulltext search
         SOLR_FIELDS.put(Extension.FIELD_AUTHOR, new ExtensionSolrField(PROP_EXTENSION_AUTHORS, null));
         SOLR_FIELDS.put(Extension.FIELD_AUTHORS, SOLR_FIELDS.get(Extension.FIELD_AUTHOR));
-        SOLR_FIELDS.put(Extension.FIELD_VERSION, new ExtensionSolrField(PROP_EXTENSION_LASTVERSION, null));
+        SOLR_FIELDS.put(Extension.FIELD_VERSION, new ExtensionSolrField(PROP_LASTVERSION, null));
         SOLR_FIELDS.put(Extension.FIELD_LICENSE, new ExtensionSolrField(PROP_EXTENSION_LICENSENAME, null));
         SOLR_FIELDS.put(Extension.FIELD_LICENSES, SOLR_FIELDS.get(Extension.FIELD_LICENSE));
         SOLR_FIELDS.put(Extension.FIELD_SCM, new ExtensionSolrField(PROP_EXTENSION_SCMURL, null));
@@ -542,7 +552,7 @@ public final class XWikiRepositoryModel
             try {
                 reposiories.add(toRepositoryDescriptor(stringRepository, factory));
             } catch (URISyntaxException e) {
-                LOGGER.warn("Failed to parse repository descriptor [{}]", stringRepository,
+                LOGGER.warn("Failed to parse repository descriptor [{}]. Root cause is [{}]", stringRepository,
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }

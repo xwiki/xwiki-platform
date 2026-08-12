@@ -32,10 +32,10 @@ import org.securityfilter.filter.SecurityFilter;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
+import org.xwiki.security.authentication.UserAuthenticatedEventNotifier;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier;
 import com.xpn.xwiki.web.Utils;
 
 public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAuthenticator

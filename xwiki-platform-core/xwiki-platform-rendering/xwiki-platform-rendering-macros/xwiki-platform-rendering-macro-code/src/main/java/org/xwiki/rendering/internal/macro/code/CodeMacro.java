@@ -222,7 +222,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
                 parser = componentManager.getInstance(HighlightParser.class, language);
                 return parser.highlight(language, new StringReader(source.getContent()));
             } catch (ComponentLookupException e) {
-                this.logger.error("Faild to load highlighting parser for language [{}]", language, e);
+                this.logger.error("Failed to load highlighting parser for language [{}]", language, e);
             }
         }
 

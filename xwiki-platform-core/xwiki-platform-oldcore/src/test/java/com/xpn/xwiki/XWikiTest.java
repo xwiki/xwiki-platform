@@ -49,6 +49,7 @@ import org.xwiki.query.QueryExecutor;
 import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
@@ -311,6 +312,30 @@ class XWikiTest
         assertFalse(this.xwiki.getDocument(mySkinReference, this.oldcore.getXWikiContext()).isNew());
         assertEquals(skinDocument, this.xwiki.getDocument(mySkinReference, this.oldcore.getXWikiContext()));
         assertEquals("parsing a field", this.xwiki.parseTemplate("template.vm", this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void parseTemplateFromSkinWhenRenderingContextIsNotMutable() throws Exception
+    {
+        // A RenderingContext which is not a MutableRenderingContext, i.e. for which the target syntax cannot be
+        // forced to XHTML 1.0.
+        this.oldcore.getMocker().registerMockComponent(RenderingContext.class);
+
+        DocumentReference skinReference =
+            new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "XWikiSkins");
+        XWikiDocument skinClass = new XWikiDocument(skinReference);
+        skinClass.getXClass().addTextAreaField("template.vm", "template", 80, 20);
+        this.xwiki.saveDocument(skinClass, this.oldcore.getXWikiContext());
+
+        DocumentReference mySkinReference =
+            new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "Skin");
+        XWikiDocument skinDocument = new XWikiDocument(mySkinReference);
+        BaseObject obj = skinDocument.newXObject(skinReference, this.oldcore.getXWikiContext());
+        obj.setLargeStringValue("template.vm", "parsing a field");
+        this.xwiki.saveDocument(skinDocument, this.oldcore.getXWikiContext());
+
+        assertEquals("parsing a field",
+            this.xwiki.parseTemplate("template.vm", "XWiki.Skin", this.oldcore.getXWikiContext()));
     }
 
     @Test
@@ -1119,8 +1144,9 @@ class XWikiTest
         String expectedResult = "2024/06/20 12:45";
         this.oldcore.getMockWikiConfigurationSource().setProperty("default_language", "fr_CA");
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.timezone", "BRT");
+        UserProperties userPropertiesMock = mock(UserProperties.class);
         when(this.oldcore.getMockAllUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE))
-            .thenReturn(mock(UserProperties.class));
+            .thenReturn(userPropertiesMock);
         assertEquals(expectedResult, this.xwiki.formatDate(date, null, this.oldcore.getXWikiContext()));
 
         String format = "EEEE dd MMMM YYYY HH:mm:ss";

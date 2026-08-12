@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.security.Principal;
 
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,11 +35,15 @@ import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
+import org.xwiki.csrf.CSRFToken;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
+import org.xwiki.security.authentication.UserAuthenticatedEventNotifier;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier;
+import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.web.Utils;
 
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
@@ -155,9 +160,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 principal = authenticate(username, password, context);
 
                 if (principal != null) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("User [{}] has been authentified from cookie", principal.getName());
-                    }
+                    LOGGER.debug("User [{}] has been authentified from cookie", principal.getName());
 
                     // make sure the Principal contains wiki name information
                     if (!StringUtils.contains(principal.getName(), ':')) {
@@ -208,9 +211,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             Utils.getComponent(AuthenticationFailureManager.class);
         if (principal != null && authenticationFailureManager.validateForm(username, request)) {
             // login successful
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("User [{}] has been logged-in", principal.getName());
-            }
+            LOGGER.info("User [{}] has been logged-in", principal.getName());
 
             authenticationFailureManager.resetAuthenticationFailureCounter(username);
 
@@ -249,9 +250,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         } else {
             // login failed
             // set response status and forward to error page
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("User [{}] login has failed", username);
-            }
+            LOGGER.info("User [{}] login has failed", username);
 
             authenticationFailureManager.recordAuthenticationFailure(username, request);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -289,10 +288,49 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
     public boolean processLogout(SecurityRequestWrapper securityRequestWrapper,
         HttpServletResponse httpServletResponse, URLPatternMatcher urlPatternMatcher) throws Exception
     {
-        boolean result = super.processLogout(securityRequestWrapper, httpServletResponse, urlPatternMatcher);
-        if (result && this.persistentLoginManager != null) {
-            this.persistentLoginManager.forgetLogin(securityRequestWrapper, httpServletResponse);
+        Principal requestPrincipal = securityRequestWrapper.getUserPrincipal();
+        String requestFormToken = securityRequestWrapper.getParameter("form_token");
+        boolean result = false;
+
+        if (requestPrincipal != null && requestFormToken != null) {
+            XWikiContext xcontext = Utils.<Provider<XWikiContext>>getComponent(XWikiContext.TYPE_PROVIDER).get();
+            CSRFToken csrfToken = Utils.getComponent(CSRFToken.class);
+            DocumentReferenceResolver<String> resolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
+            DocumentReference userReference = resolver.resolve(requestPrincipal.getName());
+
+            // In theory, this should always be null, but we still store it for safety.
+            DocumentReference oldUserReference = xcontext.getUserReference();
+
+            try {
+                User user = xcontext.getWiki().getUser(userReference, xcontext);
+                // If the user is disabled, it should not be set in the context and use guest's CSRF token instead.
+                if (!user.isDisabled()) {
+                    // We need to set the user in the context to be able to verify the CSRF token.
+                    xcontext.setUserReference(userReference);
+                }
+
+                // Only attempt to log out if the CSRF token is present and valid.
+                // This check is called for any logged-in request, not just logouts, so we need to account for requests
+                // that do not normally use a CSRF token to not log false positives token mismatches.
+                // The error key can be safely set either way since only LogoutAction will actually use it.
+                if (requestFormToken != null && csrfToken.isTokenValid(requestFormToken)) {
+                    // This method is the one that will check if the currently requested URL matches a logout action,
+                    // and return false if not. As a consequence, even though the current method is called
+                    // `processLogout`, it's actually executed on any logged-in request received, not just logouts.
+                    result = super.processLogout(securityRequestWrapper, httpServletResponse, urlPatternMatcher);
+                    if (result && this.persistentLoginManager != null) {
+                        this.persistentLoginManager.forgetLogin(securityRequestWrapper, httpServletResponse);
+                    }
+                } else {
+                    xcontext.put("core.logout.error.invalidCSRF", true);
+                }
+            } finally {
+                // Reset the context user.
+                xcontext.setUserReference(oldUserReference);
+            }
         }
+
         return result;
     }
 }

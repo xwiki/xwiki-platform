@@ -267,6 +267,14 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- The icon webjar provides the 'xwiki-icon' RequireJS module which is used by JavaScript code that needs to
+      display icons, including JavaScript code from the XWiki WAR. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Servlets for Resource API -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

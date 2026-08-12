@@ -26,6 +26,7 @@ import java.io.InputStream;
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
@@ -66,7 +67,7 @@ public class XWikiConfigurationService
             try (InputStream xwikicfgis = getStream(context)) {
                 config = new XWikiConfig(xwikicfgis);
             } catch (Exception e) {
-                LOGGER.error("Faile to lod configuration", e);
+                LOGGER.error("Failed to load the configuration", e);
 
                 config = new XWikiConfig();
             }
@@ -88,20 +89,21 @@ public class XWikiConfigurationService
         } catch (Exception e) {
             // Error loading the file. Most likely, the Security Manager prevented it.
             // We'll try loading it as a resource below.
-            LOGGER.debug(
-                "Failed to load the file [" + configurationLocation + "] using direct " + "file access. The error was ["
-                    + e.getMessage() + "]. Trying to load it " + "as a resource using the Servlet Context...");
+            LOGGER.debug("Failed to load the file [{}] using direct file access. The error was [{}]. Trying to load "
+                + "it as a resource using the Servlet Context...", configurationLocation,
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         // Second, try loading it as a resource using the Servlet Context
         if (context != null) {
             InputStream xwikicfgis = context.getResourceAsStream(configurationLocation);
-            LOGGER.debug("Failed to load the file [" + configurationLocation + "] as a resource "
-                + "using the Servlet Context. Trying to load it as classpath resource...");
 
             if (xwikicfgis != null) {
                 return xwikicfgis;
             }
+
+            LOGGER.debug("Failed to load the file [{}] as a resource using the Servlet Context. Trying to load it as "
+                + "classpath resource...", configurationLocation);
         } else {
             LOGGER.debug("No Servlet Context available. Trying to load it as classpath resource...");
         }

@@ -33,6 +33,10 @@
   <description>Makes the Extension Manager work properly in a cluster environment.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+
+    <!-- The remote observation manager only looks for event converters in the root component manager, so this
+         extension is useless when installed in a wiki -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <dependency>

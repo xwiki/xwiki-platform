@@ -44,7 +44,7 @@
       <LivedataDisplayer :property-id="property.id" :entry="entry" />
     </td>
 
-    <td v-if="logic.isEditMode()">
+    <td v-if="logic.isEditMode()" class="actions-column">
       <template v-if="entry._new">
         <button
           type="button"
@@ -146,8 +146,16 @@ export default {
   height: 100%;
 }
 
-.layout-table tbody tr:first-child td.cell {
-  /* Removes the top border on the first line of the table, it's unecessary since the header itself has a background color */
-  border-top: 0;
+.layout-table tbody {
+  tr:first-child td.cell {
+    /* Removes the top border on the first line of the table, it's unnecessary since the header itself has a background color */
+    border-top: 0;
+  }
+
+  td.actions-column {
+    /* Ensures the actions column has a fixed width as long as its content does not change. */
+    width: 1%;
+    white-space: nowrap;
+  }
 }
 </style>

@@ -71,6 +71,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 public class XWikiContext extends Hashtable<Object, Object>
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Type instance for {@code Provider<XWikiContext>}.
      *
@@ -269,9 +271,9 @@ public class XWikiContext extends Hashtable<Object, Object>
         return this.engine_context;
     }
 
-    public void setEngineContext(XWikiEngineContext engine_context)
+    public void setEngineContext(XWikiEngineContext engineContext)
     {
-        this.engine_context = engine_context;
+        this.engine_context = engineContext;
     }
 
     /**
@@ -594,7 +596,7 @@ public class XWikiContext extends Hashtable<Object, Object>
             setUserReference(null);
         } else if (user.endsWith(XWikiRightService.GUEST_USER_FULLNAME) || user.equals(XWikiRightService.GUEST_USER)) {
             setUserReference(null);
-            // retro-compatibilty hack: some code does not give the same meaning to null XWikiUser and XWikiUser
+            // retro-compatibility hack: some code does not give the same meaning to null XWikiUser and XWikiUser
             // containing guest user
             put(USER_KEY, new XWikiUser(user, main));
         } else {
@@ -760,9 +762,9 @@ public class XWikiContext extends Hashtable<Object, Object>
         return this.URLFactory;
     }
 
-    public void setURLFactory(XWikiURLFactory URLFactory)
+    public void setURLFactory(XWikiURLFactory urlFactory)
     {
-        this.URLFactory = URLFactory;
+        this.URLFactory = urlFactory;
     }
 
     public XWikiForm getForm()
@@ -779,7 +781,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * Define if a response has been already sent or not.
      * Note that contrary to {@link #isResponseSent()} this method will ensure that the template is executed even if the
      * result of the execution is not sent. See {@link Utils#parseTemplate(String, boolean, XWikiContext)} for details.
-     * @return {@code true} if the response has been sent and no new reponse should be sent anymore.
+     * @return {@code true} if the response has been sent and no new response should be sent anymore.
      */
     public boolean isFinished()
     {
@@ -799,7 +801,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * Define if a response has been already sent or not and if the template parsing should be done.
      * Note that contrary to {@link #isFinished()} this method will always prevent the execution of the template.
      * See {@link Utils#parseTemplate(String, boolean, XWikiContext)} for details.
-     * @return {@code true} if the response has been sent, no new reponse should be sent anymore
+     * @return {@code true} if the response has been sent, no new response should be sent anymore
      *          and the template should not be parsed.
      * @since 13.3RC1
      */
@@ -994,7 +996,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * <p>
      * Once dropped, permissions cannot be regained for the duration of the request.
      * <p>
-     * If you are interested in a more flexable sandboxing method which sandboxed code only for the remainder of the
+     * If you are interested in a more flexible sandboxing method which sandboxed code only for the remainder of the
      * rendering cycle, consider using {@link com.xpn.xwiki.api.Document#dropPermissions()}.
      *
      * @since 3.0M3

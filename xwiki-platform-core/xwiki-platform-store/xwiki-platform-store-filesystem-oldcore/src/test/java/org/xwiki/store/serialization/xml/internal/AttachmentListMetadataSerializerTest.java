@@ -39,34 +39,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class AttachmentListMetadataSerializerTest
 {
-    private static final String TEST_CONTENT =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-      + "<attachment-list serializer=\"attachment-list-meta/1.0\">\n"
-      + " <attachment serializer=\"attachment-meta/1.0\">\n"
-      + "  <filename>file1</filename>\n"
-      + "  <filesize>10</filesize>\n"
-      + "  <author>me</author>\n"
-      + "  <version>1.1</version>\n"
-      + "  <comment>something whitty</comment>\n"
-      + "  <date>1293045632168</date>\n"
-      + " </attachment>\n"
-      + " <attachment serializer=\"attachment-meta/1.0\">\n"
-      + "  <filename>file1</filename>\n"
-      + "  <filesize>5</filesize>\n"
-      + "  <author>you</author>\n"
-      + "  <version>1.2</version>\n"
-      + "  <comment>a comment</comment>\n"
-      + "  <date>1293789456868</date>\n"
-      + " </attachment>\n"
-      + " <attachment serializer=\"attachment-meta/1.0\">\n"
-      + "  <filename>file1</filename>\n"
-      + "  <filesize>20</filesize>\n"
-      + "  <author>them</author>\n"
-      + "  <version>1.3</version>\n"
-      + "  <comment>i saved it</comment>\n"
-      + "  <date>1293012345668</date>\n"
-      + " </attachment>\n"
-      + "</attachment-list>";
+    private static final String TEST_CONTENT = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <attachment-list serializer="attachment-list-meta/1.0">
+         <attachment serializer="attachment-meta/1.0">
+          <filename>file1</filename>
+          <filesize>10</filesize>
+          <author>me</author>
+          <version>1.1</version>
+          <comment>something whitty</comment>
+          <date>1293045632168</date>
+         </attachment>
+         <attachment serializer="attachment-meta/1.0">
+          <filename>file1</filename>
+          <filesize>5</filesize>
+          <author>you</author>
+          <version>1.2</version>
+          <comment>a comment</comment>
+          <date>1293789456868</date>
+         </attachment>
+         <attachment serializer="attachment-meta/1.0">
+          <filename>file1</filename>
+          <filesize>20</filesize>
+          <author>them</author>
+          <version>1.3</version>
+          <comment>i saved it</comment>
+          <date>1293012345668</date>
+         </attachment>
+        </attachment-list>""";
 
     private AttachmentListMetadataSerializer serializer;
 

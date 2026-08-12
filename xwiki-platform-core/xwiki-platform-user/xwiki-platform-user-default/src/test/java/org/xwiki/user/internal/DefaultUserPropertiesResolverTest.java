@@ -85,7 +85,8 @@ class DefaultUserPropertiesResolverTest
     void resolve() throws Exception
     {
         UserPropertiesResolver customPropertiesResolver = mock(UserPropertiesResolver.class);
-        when(customPropertiesResolver.resolve(any(TestUserReference.class))).thenReturn(mock(UserProperties.class));
+        UserProperties userPropertiesMock = mock(UserProperties.class);
+        when(customPropertiesResolver.resolve(any(TestUserReference.class))).thenReturn(userPropertiesMock);
 
         when(this.contextComponentManager.getInstance(UserPropertiesResolver.class,
             "user/" + TestUserReference.class.getName())).thenReturn(customPropertiesResolver);
@@ -100,7 +101,8 @@ class DefaultUserPropertiesResolverTest
         when(this.currentUserReferenceUserReferenceResolver.resolve(null)).thenReturn(testUserReference);
 
         UserPropertiesResolver customPropertiesResolver = mock(UserPropertiesResolver.class);
-        when(customPropertiesResolver.resolve(testUserReference)).thenReturn(mock(UserProperties.class));
+        UserProperties userPropertiesMock2 = mock(UserProperties.class);
+        when(customPropertiesResolver.resolve(testUserReference)).thenReturn(userPropertiesMock2);
 
         when(this.contextComponentManager.getInstance(UserPropertiesResolver.class,
             "user/" + TestUserReference.class.getName())).thenReturn(customPropertiesResolver);
@@ -115,7 +117,8 @@ class DefaultUserPropertiesResolverTest
         when(this.currentUserReferenceUserReferenceResolver.resolve(null)).thenReturn(testUserReference);
 
         UserPropertiesResolver customPropertiesResolver = mock(UserPropertiesResolver.class);
-        when(customPropertiesResolver.resolve(testUserReference)).thenReturn(mock(UserProperties.class));
+        UserProperties userPropertiesMock3 = mock(UserProperties.class);
+        when(customPropertiesResolver.resolve(testUserReference)).thenReturn(userPropertiesMock3);
 
         when(this.contextComponentManager.getInstance(UserPropertiesResolver.class,
             "user/" + TestUserReference.class.getName())).thenReturn(customPropertiesResolver);
@@ -129,9 +132,8 @@ class DefaultUserPropertiesResolverTest
         when(this.contextComponentManager.getInstance(UserPropertiesResolver.class,
             "user/" + TestUserReference.class.getName())).thenThrow(new ComponentLookupException("error"));
 
-        Throwable exception = assertThrows(RuntimeException.class, () -> {
-            this.resolver.resolve(new TestUserReference());
-        });
+        TestUserReference userReference = new TestUserReference();
+        Throwable exception = assertThrows(RuntimeException.class, () -> this.resolver.resolve(userReference));
         assertEquals("Failed to find user properties resolver for role "
             + "[org.xwiki.user.UserPropertiesResolver] and hint "
             + "[user/org.xwiki.user.internal.DefaultUserPropertiesResolverTest$TestUserReference]",

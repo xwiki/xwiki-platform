@@ -201,7 +201,7 @@ public class UntypedEventListener extends AbstractEventListener
             return "true".equals(render);
 
         } catch (Exception e) {
-            logger.warn("Unable to render a notification validation template.", e);
+            logger.warn("Unable to render a notification validation template", e);
             return false;
         }
     }
@@ -230,7 +230,7 @@ public class UntypedEventListener extends AbstractEventListener
             }
 
         } catch (Exception e) {
-            logger.warn("Unable to render the target template.", e);
+            logger.warn("Unable to render the target template", e);
         }
 
         // Fallback to empty set

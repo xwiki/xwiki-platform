@@ -29,8 +29,6 @@
   </parent>
   <artifactId>xwiki-platform-ckeditor-test-docker</artifactId>
   <name>XWiki Platform - CKEditor - Tests - Docker</name>
-  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
@@ -99,14 +97,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
       <type>xar</type>
-    </dependency>
-    <!-- Provide an implementation for the HTMLDisplayer (needed by MacroDescriptorUIFactory to get the edit template for
-      macro parameters). -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-display-html</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <!-- Provides the attachment mimetype validation step (and its mandatory XClass initializer) so that we can test
       that uploads rejected because of a mimetype restriction are reported correctly by the editor. It is declared here

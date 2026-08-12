@@ -31,6 +31,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -120,7 +121,7 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
         } else if (event instanceof XarExtensionUninstalledEvent) {
             removeExtensionDocuments((ExtensionEvent) event, (InstalledExtension) source);
         } else if (event instanceof XarExtensionUpgradedEvent) {
-            ((Collection<InstalledExtension>) data).stream().forEach(
+            ((Collection<InstalledExtension>) data).forEach(
                 oldInstalledExtension -> removeExtensionDocuments((ExtensionEvent) event, oldInstalledExtension));
             addExtensionDocuments((ExtensionEvent) event, (InstalledExtension) source);
         }
@@ -136,7 +137,7 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
     {
         // Add extension documents from the XAR extensions installed on the specified wiki.
         String namespace = "wiki:" + wiki;
-        this.xarRepositoryProvider.get().getInstalledExtensions(namespace).stream()
+        this.xarRepositoryProvider.get().getInstalledExtensions(namespace)
             .forEach(installedExtension -> addExtensionDocuments(
                 new XarExtensionInstalledEvent(new ExtensionInstalledEvent(installedExtension.getId(), namespace)),
                 installedExtension));
@@ -162,7 +163,7 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
         Consumer<DocumentReference> action)
     {
         if (extensionEvent.hasNamespace() && installedExtension instanceof XarInstalledExtension xarExtension) {
-            getExtensionDocuments(xarExtension, extensionEvent.getNamespace()).stream()
+            getExtensionDocuments(xarExtension, extensionEvent.getNamespace())
                 .forEach(action);
         }
     }
@@ -197,7 +198,8 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
             return new HashSet<>(this.packagerProvider.get()
                 .getDocumentReferences(xarInstalledExtension.getXarPackage().getEntries(), configuration));
         } catch (UnsupportedNamespaceException e) {
-            this.logger.warn("Unsupported namespace [{}].", namespace);
+            this.logger.warn("Unsupported namespace [{}]. Root cause is [{}].", namespace,
+                ExceptionUtils.getRootCauseMessage(e));
         } catch (Exception e) {
             this.logger.error("Failed to retrieve the list of documents from the XAR package [{}].",
                 xarInstalledExtension.getId(), e);

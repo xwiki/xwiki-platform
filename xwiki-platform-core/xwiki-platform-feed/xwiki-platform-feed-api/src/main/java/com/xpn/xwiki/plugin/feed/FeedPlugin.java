@@ -36,6 +36,7 @@ import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -415,7 +416,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     }
                     map.put(feedDocName, e);
                     // and log it
-                    LOGGER.error("Failed to update feeds in document " + feedDocName, e);
+                    LOGGER.error("Failed to update feeds in document [{}]", feedDocName, e);
                 }
             }
         }
@@ -680,7 +681,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             // If some day wiki syntax is supported in document titles, we might want to convert to wiki syntax instead.
             title = this.stripHtmlTags(entry.getTitle());
         } catch (ConversionException e) {
-            LOGGER.warn("Failed to strip HTML tags from entry title : " + e.getMessage());
+            LOGGER.warn("Failed to strip HTML tags from entry title: [{}]", ExceptionUtils.getRootCauseMessage(e));
             // Nevermind, we will use the original title
             title = entry.getTitle();
         }
@@ -691,7 +692,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         StringBuffer categs = new StringBuffer("");
         if (categList != null) {
             for (SyndCategory categ : categList) {
-                if (categs.length() != 0) {
+                if (!categs.isEmpty()) {
                     categs.append(", ");
                 }
                 categs.append(categ.getName());
@@ -706,7 +707,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         List<SyndContent> contentList = entry.getContents();
         if (contentList != null && !contentList.isEmpty()) {
             for (SyndContent content : contentList) {
-                if (contents.length() != 0) {
+                if (!contents.isEmpty()) {
                     contents.append("\n");
                 }
                 contents.append(content.getValue());
@@ -782,9 +783,12 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 "select distinct obj.number, obj.name from BaseObject as obj, StringProperty as prop , LargeStringProperty as lprop "
                     + "where obj.className='XWiki.FeedEntryClass' and obj.id=prop.id.id and obj.id=lprop.id.id ";
 
+            StringBuilder sqlBuilder = new StringBuilder(sql);
             for (int i = 0; i < queryTab.length; i++) {
-                sql += " and (prop.value LIKE '%" + queryTab[i] + "%' or lprop.value LIKE '%" + queryTab[i] + "%')";
+                sqlBuilder.append(" and (prop.value LIKE '%").append(queryTab[i])
+                    .append("%' or lprop.value LIKE '%").append(queryTab[i]).append("%')");
             }
+            sql = sqlBuilder.toString();
             List<Object[]> res = context.getWiki().search(sql, context);
 
             if (res == null) {
@@ -995,7 +999,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             writer.close();
             return writer.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to serialize the feed to the [{}] format", type, e);
             return "";
         }
     }

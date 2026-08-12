@@ -90,7 +90,6 @@ import org.xwiki.store.UnexpectedException;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -215,44 +214,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private Optional<Set<EntityReference>> optimizedObjectClasses;
 
     /**
-     * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
-     * in the WEB-INF directory.
-     *
-     * @param xwiki
-     * @param context
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateStore(XWiki xwiki, XWikiContext context)
-    {
-        super(xwiki, context);
-        initValidColumTypes();
-    }
-
-    /**
-     * Initialize the storage engine with a specific path. This is used for tests.
-     *
-     * @param hibpath
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateStore(String hibpath)
-    {
-        super(hibpath);
-        initValidColumTypes();
-    }
-
-    /**
-     * @see #XWikiHibernateStore(XWiki, XWikiContext)
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateStore(XWikiContext context)
-    {
-        this(context.getWiki(), context);
-    }
-
-    /**
      * Empty constructor needed for component manager.
      */
     public XWikiHibernateStore()
@@ -275,18 +236,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     private void initValidColumTypes()
     {
-        String[] string_types = {"string", "text", "clob"};
-        String[] number_types =
+        String[] stringTypes = {"string", "text", "clob"};
+        String[] numberTypes =
             {"integer", "long", "float", "double", "big_decimal", "big_integer", "yes_no", "true_false"};
-        String[] date_types = {"date", "time", "timestamp"};
-        String[] boolean_types = {"boolean", "yes_no", "true_false", "integer"};
+        String[] dateTypes = {"date", "time", "timestamp"};
+        String[] booleanTypes = {"boolean", "yes_no", "true_false", "integer"};
         this.validTypesMap = new HashMap<>();
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.StringClass", string_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.TextAreaClass", string_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.PasswordClass", string_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.NumberClass", number_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.DateClass", date_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.BooleanClass", boolean_types);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.StringClass", stringTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.TextAreaClass", stringTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.PasswordClass", stringTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.NumberClass", numberTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.DateClass", dateTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.BooleanClass", booleanTypes);
     }
 
     @Override
@@ -599,7 +560,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     Session session = getSession(context);
                     session.setHibernateFlushMode(FlushMode.COMMIT);
 
-                    // These informations will allow to not look for attachments and objects on loading
+                    // This information will allow to not look for attachments and objects on loading
                     doc.setElement(XWikiDocument.HAS_ATTACHMENTS, !doc.getAttachmentList().isEmpty());
                     doc.setElement(XWikiDocument.HAS_OBJECTS, !doc.getXObjects().isEmpty());
 
@@ -768,10 +729,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 if (this.logger.isDebugEnabled()) {
                                     this.logger.debug("saveXWikiDoc:");
                                     this.logger.debug("    - document: [{}]", doc.getDocumentReferenceWithLocale());
-                                    this.logger.debug(
-                                        "    - optimizedObjects: {} (doc.isNew: {} doc.isChangeTracked: {}, isClassOptimized: {})",
-                                        optimizedObjects, doc.isNew(), doc.isChangeTracked(),
-                                        isClassOptimized(entry.getKey()));
+                                    this.logger.debug("    - optimizedObjects: [{}] (doc.isNew: [{}], "
+                                        + "doc.isChangeTracked: [{}], isClassOptimized: [{}])", optimizedObjects,
+                                        doc.isNew(), doc.isChangeTracked(), isClassOptimized(entry.getKey()));
                                     this.logger.debug("    - saved xobjects: [{}]", count);
                                 }
                             }
@@ -1027,7 +987,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 executeWrite(context, session -> {
                     saveXWikiDoc(newDocument, context, false);
 
-                    // Since the save documment is called without a commit, the information are not flushed
+                    // Since the save document is called without a commit, the information is not flushed
                     // in the session either. However we need the new information in the session for the delete
                     // in particular to know the possible changes made in the spaces.
                     session.flush();
@@ -2550,7 +2510,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         XWikiContext context) throws XWikiException
     {
         String sql = createSQLQuery(SELECT_DISTINCT_DOC_FULLNAME, wheresql);
-        return searchDocumentReferencesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
+        return searchDocumentReferencesInternal(sql, nb, start, Collections.emptyList(), context);
     }
 
     @Override
@@ -2558,7 +2518,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         XWikiContext context) throws XWikiException
     {
         String sql = createSQLQuery(SELECT_DISTINCT_DOC_FULLNAME, wheresql);
-        return searchDocumentsNamesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
+        return searchDocumentsNamesInternal(sql, nb, start, Collections.emptyList(), context);
     }
 
     @Override
@@ -3276,7 +3236,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * is to simply replace all instances of \ with \\ which makes the first backslash escape the second.
      *
      * @param sql the uncleaned sql.
-     * @return same as sql except it is guarenteed not to contain groups of odd numbers of backslashes.
+     * @return same as sql except it is guaranteed not to contain groups of odd numbers of backslashes.
      * @since 2.4M1
      */
     private String filterSQL(String sql)

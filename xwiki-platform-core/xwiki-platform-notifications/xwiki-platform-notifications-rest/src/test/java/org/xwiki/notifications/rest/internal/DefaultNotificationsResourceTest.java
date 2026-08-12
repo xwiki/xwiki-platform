@@ -20,7 +20,7 @@
 package org.xwiki.notifications.rest.internal;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -126,7 +126,7 @@ class DefaultNotificationsResourceTest
 
     @ParameterizedTest
     @ValueSource(ints = { -1, 1001 })
-    void getgetNotificationsRSSLimitErrors(int limit) throws Exception
+    void getgetNotificationsRSSLimitErrors(int limit)
     {
         String userId = "XWiki.Admin";
         DocumentReference userIdDocReference = mock("userIdDocReference");
@@ -142,7 +142,7 @@ class DefaultNotificationsResourceTest
 
     @ParameterizedTest
     @ValueSource(ints = { -1, 1001 })
-    void getNotificationsLimitErrors(int limit) throws Exception
+    void getNotificationsLimitErrors(int limit)
     {
         String userId = "XWiki.Admin";
         DocumentReference userIdDocReference = mock("userIdDocReference");
@@ -175,7 +175,7 @@ class DefaultNotificationsResourceTest
 
     @ParameterizedTest
     @ValueSource(ints = { -1, 1001 })
-    void getNotificationsCountLimitErrors(int limit) throws Exception
+    void getNotificationsCountLimitErrors(int limit)
     {
         String userId = "XWiki.Admin";
         DocumentReference userIdDocReference = mock("userIdDocReference");
@@ -199,7 +199,8 @@ class DefaultNotificationsResourceTest
         DocumentReference userIdDocReference = mock(DocumentReference.class);
         when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
 
-        when(this.context.getUserReference()).thenReturn(mock(DocumentReference.class));
+        DocumentReference documentReferenceMock = mock();
+        when(this.context.getUserReference()).thenReturn(documentReferenceMock);
         assertNull(this.notificationsResource.getNotificationsRSS(null, userId, null, null, null, null, null, null,
             null, null, null, null, null, null, null, null));
         verify(this.response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -220,7 +221,8 @@ class DefaultNotificationsResourceTest
         String tags = "foo";
         String currentWiki = "xwiki";
 
-        Map<DefaultNotificationParametersFactory.ParametersKey, String> parametersMap = new HashMap<>();
+        Map<DefaultNotificationParametersFactory.ParametersKey, String> parametersMap =
+            new EnumMap<>(DefaultNotificationParametersFactory.ParametersKey.class);
         parametersMap.put(DefaultNotificationParametersFactory.ParametersKey.USE_USER_PREFERENCES, useUserPreferences);
         parametersMap.put(DefaultNotificationParametersFactory.ParametersKey.USER_ID, userId);
         parametersMap.put(DefaultNotificationParametersFactory.ParametersKey.UNTIL_DATE, untilDate);

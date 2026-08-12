@@ -103,7 +103,7 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
         try {
             return context.getWiki().exists(classReference, context);
         } catch (XWikiException e) {
-            this.logger.warn("Failed to check the existence of the class with reference [{}]: {}", classReference,
+            this.logger.warn("Failed to check the existence of the class with reference [{}]: [{}]", classReference,
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
@@ -131,7 +131,7 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
                 try {
                     migrateDocument(userDocument);
                 } catch (XWikiException e) {
-                    logger.warn("Failed to migrate document [{}].", result, e);
+                    logger.warn("Failed to migrate document [{}]", result, e);
                 }
             }
 

@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.integration;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
@@ -84,7 +85,7 @@ public class XWikiWatchdog
 
                 try (CloseableHttpResponse httpResponse = httpclient.execute(httpGet, httpContext)) {
                     HttpEntity entity = httpResponse.getEntity();
-                    response.responseBody = IOUtils.toString(entity.getContent(), "UTF-8");
+                    response.responseBody = IOUtils.toString(entity.getContent(), StandardCharsets.UTF_8);
                     if (DEBUG) {
                         LOGGER.info("Result of pinging [{}] = [{}], Message = [{}]", url, response.responseCode,
                             response.responseBody);

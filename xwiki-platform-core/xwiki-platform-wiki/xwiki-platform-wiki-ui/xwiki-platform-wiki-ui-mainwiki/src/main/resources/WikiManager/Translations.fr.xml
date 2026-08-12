@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Liste de tous les wikis
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Espaces de travail (obsolète)
 rendering.macro.workspaces.description=Cette macro est dépréciée et ne doit plus être utilisée pour des raisons de compatibilité. Merci de la remplacer par un macro "wikis".
-
-## Browse
-platform.wiki.browse=Annuaire des wikis
 platform.wiki.browse.emptyvalue=Sans objet
 platform.wiki.browse.wikiprettyname=Nom
 platform.wiki.browse.description=Description
@@ -300,6 +297,9 @@ platform.wiki.create.wizard.step.provisioning.finalize=Terminer
 #######################################
 platform.wiki.delete.confirmation.yes=Oui, supprimer ce wiki !
 platform.wiki.delete.confirmation.no=Non, revenir en arrière !
+
+## Browse
+platform.wiki.browse=Annuaire des wikis
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

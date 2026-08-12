@@ -21,13 +21,13 @@ package com.xpn.xwiki.plugin;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import com.xpn.xwiki.XWikiContext;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 /**
  * Unit tests for {@link XWikiPluginManager}.
@@ -76,7 +76,7 @@ class XWikiPluginManagerTest
     {
         this.manager = new XWikiPluginManager();
         this.manager.initInterface();
-        this.context = Mockito.mock(XWikiContext.class);
+        this.context = mock(XWikiContext.class);
     }
 
     @SuppressWarnings("unchecked")

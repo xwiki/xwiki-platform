@@ -294,7 +294,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
                 }
             }
         } catch (Exception e) {
-            this.logger.warn("Failed to parse Solr configuration at [{}]: {}", solrconfigFile,
+            this.logger.warn("Failed to parse Solr configuration at [{}]: [{}]", solrconfigFile,
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
@@ -329,7 +329,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
                 }
             }
         } catch (Exception e) {
-            this.logger.warn("Failed to parse Solr configuration at [{}]: {}", schemaFile,
+            this.logger.warn("Failed to parse Solr configuration at [{}]: [{}]", schemaFile,
                 ExceptionUtils.getRootCauseMessage(e));
         }
 

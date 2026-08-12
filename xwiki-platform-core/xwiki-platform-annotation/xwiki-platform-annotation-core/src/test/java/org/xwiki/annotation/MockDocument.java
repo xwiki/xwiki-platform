@@ -111,6 +111,6 @@ public class MockDocument
     public String getSyntax()
     {
         String sourceSyntax = (String) properties.get("sourceSyntax");
-        return sourceSyntax == null || sourceSyntax.length() == 0 ? "xwiki/2.0" : sourceSyntax;
+        return sourceSyntax == null || sourceSyntax.isEmpty() ? "xwiki/2.0" : sourceSyntax;
     }
 }

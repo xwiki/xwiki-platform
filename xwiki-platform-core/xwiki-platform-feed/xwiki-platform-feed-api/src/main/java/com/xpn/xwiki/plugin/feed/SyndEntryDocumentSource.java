@@ -556,9 +556,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         String[] array = strRep.substring(1, strRep.length() - 1).split(",");
         if (array.length > 0) {
             List<Object> list = new ArrayList<>();
-            for (int i = 0; i < array.length; i++) {
-                list.add(array[i]);
-            }
+            Collections.addAll(list, array);
             return list;
         } else {
             return Collections.emptyList();

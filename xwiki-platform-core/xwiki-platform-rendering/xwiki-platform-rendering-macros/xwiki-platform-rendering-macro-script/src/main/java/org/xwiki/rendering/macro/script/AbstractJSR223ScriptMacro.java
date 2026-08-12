@@ -329,7 +329,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * @param engine the script engine
      * @param scriptContext the script context
      * @return The value returned from the execution of the script.
-     * @throws ScriptException if an error occurrs in script. ScriptEngines should create and throw
+     * @throws ScriptException if an error occurs in script. ScriptEngines should create and throw
      *             <code>ScriptException</code> wrappers for checked Exceptions thrown by underlying scripting
      *             implementations.
      */

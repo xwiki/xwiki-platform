@@ -237,7 +237,7 @@ public class WysiwygEditorScriptService implements ScriptService
             // results. We do this because the main caller of this method is the CKEditor extension and it needs to
             // work with several version of XWiki (including versions older than 11.9RC1 - in which this new method
             // signature was added) and for simplicity reasons is currently passing null.
-            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and reomve this
+            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and remove this
             // fallback.
             EntityReference resolvedSourceReference = sourceReference;
             if (resolvedSourceReference == null) {
@@ -301,8 +301,11 @@ public class WysiwygEditorScriptService implements ScriptService
     @Deprecated
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
-        XWikiContext xwikiContext = this.xcontextProvider.get();
-        return toAnnotatedXHTML(source, getSyntax(syntaxId), xwikiContext.getDoc().getDocumentReference());
+        XWikiDocument currentDocument = this.xcontextProvider.get().getDoc();
+        // Pass a null source reference when there's no current document and let the overload below handle it, so that
+        // the null case is handled in a single place.
+        EntityReference sourceReference = currentDocument == null ? null : currentDocument.getDocumentReference();
+        return toAnnotatedXHTML(source, getSyntax(syntaxId), sourceReference);
     }
 
     /**
@@ -336,6 +339,12 @@ public class WysiwygEditorScriptService implements ScriptService
      */
     public String toAnnotatedXHTML(String source, Syntax syntax, EntityReference sourceReference, boolean restricted)
     {
+        if (sourceReference == null) {
+            // Without a source reference, we can't resolve either the author to execute as, or the document to convert
+            // against. Thus we return the source unchanged, as is also done when the conversion fails below.
+            return source;
+        }
+
         XWikiDocument securityDocument = createSecurityDocument();
         XWikiDocument originalSecurityDocument = setSecurityDocument(securityDocument);
 
@@ -484,7 +493,7 @@ public class WysiwygEditorScriptService implements ScriptService
         try {
             return this.officeAttachmentImporter.toHTML(attachmentReference, parameters);
         } catch (Exception e) {
-            this.logger.warn("Failed to import office attachment [{}]. Root cause is: {}",
+            this.logger.warn("Failed to import office attachment [{}]. Root cause is [{}]",
                 this.entityReferenceSerializer.serialize(attachmentReference), ExceptionUtils.getRootCauseMessage(e));
             return null;
         }

@@ -97,7 +97,7 @@ class DefaultOfficeViewerScriptServiceTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    void isMimeTypeSupported() throws Exception
+    void isMimeTypeSupported()
     {
         OfficeConverter officeConverter = mock(OfficeConverter.class);
         when(officeServer.getConverter()).thenReturn(officeConverter);
@@ -140,6 +140,6 @@ class DefaultOfficeViewerScriptServiceTest
         when(execution.getContext()).thenReturn(executionContext);
         assertNull(scriptService.view(null));
 
-        assertEquals("Failed to view office document: null", this.logCapture.getMessage(0));
+        assertEquals("Failed to view office document [null]", this.logCapture.getMessage(0));
     }
 }

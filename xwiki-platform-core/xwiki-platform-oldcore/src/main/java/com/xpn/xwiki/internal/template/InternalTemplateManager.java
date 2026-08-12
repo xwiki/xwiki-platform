@@ -1062,7 +1062,7 @@ public class InternalTemplateManager implements Initializable, Disposable
                         template = null;
                     }
                 } catch (Exception e) {
-                    this.logger.warn("Failed to get the instant for resource with idenfier [{}]: {}", id,
+                    this.logger.warn("Failed to get the instant for resource with identifier [{}]: [{}]", id,
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }

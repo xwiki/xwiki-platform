@@ -98,7 +98,8 @@ class UserPreferencesConfigurationSourceTest
     {
         DocumentReference userDocumentReference = new DocumentReference("wiki", "space", "user");
         when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(userDocumentReference);
-        when(this.userReferenceResolver.resolve(userDocumentReference)).thenReturn(mock(UserReference.class));
+        UserReference userReferenceMock = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(userDocumentReference)).thenReturn(userReferenceMock);
 
         this.source.getProperty("key");
 

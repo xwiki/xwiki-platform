@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.mentions.events.MentionEventParams;
 
 /**
- * Provides the operations to serialize and unserializa objects that holds mentions notifications datas.
+ * Provides the operations to serialize and unserializa objects that holds mentions notifications data.
  *
  * @version $Id$
  * @since 12.5RC1

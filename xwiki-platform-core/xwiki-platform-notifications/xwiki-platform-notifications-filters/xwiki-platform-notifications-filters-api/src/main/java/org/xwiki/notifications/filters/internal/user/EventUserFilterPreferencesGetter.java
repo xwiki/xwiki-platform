@@ -132,7 +132,7 @@ public class EventUserFilterPreferencesGetter
                     && matchAllEvents(pref)
             );
         } catch (Exception e) {
-            logger.warn("Failed to get the list of UserFilter notification preferences.", e);
+            logger.warn("Failed to get the list of UserFilter notification preferences", e);
             return Stream.empty();
         }
     }

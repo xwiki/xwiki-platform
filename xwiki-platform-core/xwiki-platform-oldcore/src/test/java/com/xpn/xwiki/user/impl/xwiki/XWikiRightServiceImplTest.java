@@ -408,7 +408,7 @@ class XWikiRightServiceImplTest
 
         assertFalse(this.rightService.hasAccessLevel("view",
             XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), true, this.context),
-            "Guest has wiew right on the document");
+            "Guest has view right on the document");
 
         // direct user rights
 
@@ -455,7 +455,6 @@ class XWikiRightServiceImplTest
      */
     @Test
     void programmingRightsAfterDropPermissionsForRenderingCycle(MockitoComponentManager componentManager)
-        throws Exception
     {
         final Document doc =
             new Document(new XWikiDocument(new DocumentReference("XWiki", "Test", "Permissions")), this.context);

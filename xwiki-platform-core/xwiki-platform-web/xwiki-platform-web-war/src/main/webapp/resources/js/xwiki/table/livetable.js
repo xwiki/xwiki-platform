@@ -447,7 +447,7 @@ XWiki.widgets.LiveTable = Class.create({
     var container = td;
     if (descriptor.link && row['doc_viewable']) {
       const link = new Element(descriptor.link === 'editor' ? 'span' : 'a');
-      // Automatic: the link URL is in JSON results, with the '_url' sufix.
+      // Automatic: the link URL is in JSON results, with the '_url' suffix.
       if (descriptor.link === 'auto') {
         link.href = row[fieldName + '_url'] || row['doc_url'];
       } else if (descriptor.link === 'field') {
@@ -920,7 +920,7 @@ var LiveTablePagination = Class.create({
          });
          this.pagesNodes.invoke("insert", " ");
       }
-      // alwyas display the last page.
+      // always display the last page.
       if (i<pages) {
         if (i+1 < pages) {
           this.pagesNodes.invoke("insert", " ... ");

@@ -1134,6 +1134,7 @@ public privileged aspect XWikiCompatibilityAspect
             try {
                 this.xwiki.resetRenderingEngine(getXWikiContext());
             } catch (XWikiException e) {
+                LOGGER.debug("Failed to reset the rendering engine.", e);
             }
         }
     }

@@ -175,8 +175,7 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
                 provider.savePreferences(entry.getValue());
 
             } catch (ComponentLookupException e) {
-                logger.error("Unable to retrieve the notification preference provide for hint {}: {}",
-                        providerHint, e);
+                logger.error("Unable to retrieve the notification preference provider for hint [{}]", providerHint, e);
             }
         }
     }

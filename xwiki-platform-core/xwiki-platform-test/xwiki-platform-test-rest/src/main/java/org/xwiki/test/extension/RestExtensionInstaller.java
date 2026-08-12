@@ -165,7 +165,7 @@ public class RestExtensionInstaller
 
         JobExecutor jobExecutor = new JobExecutor();
         JobRequest request = getModelFactory().toRestJobRequest(installRequest);
-        LOGGER.info("Provisioning the extensions...", request);
+        LOGGER.info("Provisioning the extensions...");
         jobExecutor.execute(InstallJob.JOBTYPE, request, xwikiRESTURL, credentials);
     }
 

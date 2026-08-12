@@ -20,6 +20,7 @@
 package org.xwiki.webjars.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -101,9 +102,7 @@ public class FilesystemResourceReferenceSerializer
         }
 
         pathSegments.add(WEBJAR_PATH);
-        for (String resourceSegment : StringUtils.split(reference.getResourceName(), '/')) {
-            pathSegments.add(resourceSegment);
-        }
+        Collections.addAll(pathSegments, StringUtils.split(reference.getResourceName(), '/'));
 
         return new RelativeExtendedURL(pathSegments);
     }

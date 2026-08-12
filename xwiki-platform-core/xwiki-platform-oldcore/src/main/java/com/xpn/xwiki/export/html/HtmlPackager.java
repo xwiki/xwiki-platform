@@ -224,7 +224,7 @@ public class HtmlPackager
         // otherwise on some OS we wouldn't be able to unzip if there are pages having a path longer than 255 chars...
         String zipname = "pages/" + this.pathEntityReferenceSerializer.serialize(pageReference);
         String language = doc.getLanguage();
-        if (language != null && language.length() != 0) {
+        if (language != null && !language.isEmpty()) {
             zipname += POINT + language;
         }
         zipname += ".html";
@@ -499,9 +499,7 @@ public class HtmlPackager
     private static void addDirToZip(File directory, FileFilter filter, ZipOutputStream out, String basePath,
         Collection<String> exportedSkinFiles) throws IOException
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
-        }
+        LOGGER.debug("Adding dir [{}] to the Zip file being generated.", directory.getPath());
 
         if (!directory.isDirectory()) {
             return;

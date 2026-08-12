@@ -107,7 +107,7 @@ type MacroWizardOptions = {
  */
 interface MacroWizard {
   /**
-   * Inserts a new macro call or updates an existing one based on the provided options. If the given macro call doen't
+   * Inserts a new macro call or updates an existing one based on the provided options. If the given macro call doesn't
    * specify the macro name the user will be asked to select a macro first. Even if the macro name is specified, the
    * user can still change the macro. This means the output macro call can have a different macro name than the input
    * one.

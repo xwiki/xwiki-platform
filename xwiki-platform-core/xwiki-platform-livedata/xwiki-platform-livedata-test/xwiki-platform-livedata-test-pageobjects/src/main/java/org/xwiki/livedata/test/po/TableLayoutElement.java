@@ -923,6 +923,56 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Starts editing the nth cell of a column by clicking the inline edit button on the cell's popover, without waiting
+     * for the editor to appear. This is useful when clicking the edit button may trigger an edit confirmation modal
+     * before the editor is shown.
+     *
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row to edit (the first line is number 1)
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    public void clickEditCell(String columnLabel, int rowNumber)
+    {
+        int columnIndex = getColumnIndex(columnLabel);
+        WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+        By editButton = By.cssSelector(".displayer-action-list span[title='Edit']");
+        // Hover on the property and click on the edit button on the displayed popover. We first move the mouse away
+        // from the cell so that moving back onto it reliably triggers the popover, in particular when re-editing a
+        // cell right after closing an edit confirmation modal (the mouse might still be over the cell from the
+        // previous attempt). We then move slightly at the right of the center of the targeted element and back towards
+        // the center, simulating the mouse trajectory of a real user hovering the cell above the one to edit.
+        new Actions(getDriver().getWrappedDriver())
+            .moveToElement(getRoot())
+            .moveToElement(element, 50, 0)
+            .moveToElement(element, 0, 0)
+            .perform();
+        // The popover holding the edit button is displayed asynchronously after hovering, so wait for it before
+        // clicking instead of failing immediately when it is not there yet.
+        getDriver().waitUntilElementIsVisible(element, editButton);
+        element.findElement(editButton).click();
+    }
+
+    /**
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row (the first line is number 1)
+     * @param fieldName the name of the edited XClass property
+     * @return {@code true} if the inline editor for the given XObject property cell is currently displayed
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.3
+     * @since 18.6.0
+     */
+    public boolean isCellEditing(String columnLabel, int rowNumber, String fieldName)
+    {
+        int columnIndex = getColumnIndex(columnLabel);
+        WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
+        return !element.findElements(By.cssSelector(String.format("[name$='_%s']", fieldName))).isEmpty();
+    }
+
+    /**
      * Returns a single {@link WebElement} found by passing {@code by} to {@link WebElement#findElement(By)} on the
      * {@link WebElement} of the requested row.
      *
@@ -1118,15 +1168,8 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
 
-        // Hover on the property and click on the edit button on the displayed popover. We move slightly at the right of
-        // the center of the targeted element, then slightly to the left, towards the center of the element. This
-        // simulates the mouse trajectory of a real user hovering the cell above the one he/she wants to edit.
-        new Actions(getDriver().getWrappedDriver())
-            .moveToElement(element, 50, 0)
-            .moveToElement(element, 0, 0)
-            .perform();
-
-        element.findElement(By.cssSelector(".displayer-action-list span[title='Edit']")).click();
+        // Hover on the property and click on the edit button on the displayed popover.
+        clickEditCell(columnLabel, rowNumber);
 
         // Selector of the edited field.
         By selector;
@@ -1144,10 +1187,19 @@ public class TableLayoutElement extends BaseElement
         // Waits for the text input to be displayed.
         getDriver().waitUntilElementIsVisible(element, selector);
 
-        // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements
-        // displayed in the live data (they are the same as the one of the inline edit mode).
-        new FormContainerElement(By.cssSelector(".livedata-displayer .edit"))
-            .setFieldValue(element.findElement(selector), newValue);
+        WebElement field = element.findElement(selector);
+        if (isPlainTextField(field)) {
+            // Do not clear the field with FormContainerElement#setFieldValue here: it uses WebElement#clear(), which
+            // releases the focus of the field, and the Live Data cell editor saves and closes as soon as it is
+            // blurred, destroying the input before the new value can be typed. We instead clear the field with the
+            // keyboard.
+            field.sendKeys(Keys.chord(Keys.CONTROL, "a") + Keys.DELETE);
+            field.sendKeys(newValue);
+        } else {
+            // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements
+            // displayed in the live data (they are the same as the one of the inline edit mode).
+            new FormContainerElement(By.cssSelector(".livedata-displayer .edit")).setFieldValue(field, newValue);
+        }
 
         if (save) {
             // Clicks somewhere outside the edited cell. We use the h1 tag because it is present on all pages.
@@ -1179,6 +1231,17 @@ public class TableLayoutElement extends BaseElement
     private String[] getClasses(WebElement element)
     {
         return StringUtils.defaultString(element.getAttribute(ATTRIBUTE_CLASS)).split("\\s+");
+    }
+
+    private boolean isPlainTextField(WebElement field)
+    {
+        // Date pickers are actually text inputs.
+        if ("input".equals(field.getTagName()) && !List.of(getClasses(field)).contains("datetime")) {
+            String type = field.getAttribute("type");
+            return type == null
+                || List.of("text", "email", "password", "number", "tel", "search", "url").contains(type);
+        }
+        return false;
     }
 
     private String urlWithoutFormToken(EntityReference entityReference, String action)

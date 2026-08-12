@@ -203,7 +203,7 @@ class XWikiHibernateStoreTest
     }
 
     @Test
-    void getColumnsForSelectStatement() throws Exception
+    void getColumnsForSelectStatement()
     {
         assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
         assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
@@ -277,7 +277,7 @@ class XWikiHibernateStoreTest
     }
 
     @Test
-    void createHibernateSequenceIfRequiredWhenNotInUpdateCommands() throws Exception
+    void createHibernateSequenceIfRequiredWhenNotInUpdateCommands()
     {
         Session session = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
@@ -297,7 +297,7 @@ class XWikiHibernateStoreTest
      * We verify that the sequence is not created if it's already in the update script.
      */
     @Test
-    void createHibernateSequenceIfRequiredWhenInUpdateCommands() throws Exception
+    void createHibernateSequenceIfRequiredWhenInUpdateCommands()
     {
         Session session = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
@@ -330,8 +330,9 @@ class XWikiHibernateStoreTest
 
         // Query to check if the object exists already (save versus update).
         when(xcontext.get("hibsession")).thenReturn(session);
+        Query queryMock = mock(Query.class);
         when(session.createQuery("select obj.id from BaseObject as obj where obj.id = :id", Long.class))
-            .thenReturn(mock(Query.class));
+            .thenReturn(queryMock);
 
         // Save each object property.
         String propertyName = "query";

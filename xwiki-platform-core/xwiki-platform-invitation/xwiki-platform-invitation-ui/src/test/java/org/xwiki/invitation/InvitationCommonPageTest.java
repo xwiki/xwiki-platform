@@ -258,12 +258,13 @@ class InvitationCommonPageTest extends PageTest
         BaseObject invitationMailXObject = page.newXObject(invitationMailClassDocumentReference, this.context);
         invitationMailXObject.set("messageBody", "<strong>message body</strong>", this.context);
         page.setSyntax(XWIKI_2_1);
-        page.setContent("{{include reference=\"Invitation.InvitationCommon\"/}}\n"
-            + "\n"
-            + "{{velocity}}\n"
-            + "$mail.class\n"
-            + "#displayMessage($mail)\n"
-            + "{{/velocity}}");
+        page.setContent("""
+            {{include reference="Invitation.InvitationCommon"/}}
+
+            {{velocity}}
+            $mail.class
+            #displayMessage($mail)
+            {{/velocity}}""");
 
         this.scriptContext.setAttribute("mail", new Object(invitationMailXObject, this.context), GLOBAL_SCOPE);
 

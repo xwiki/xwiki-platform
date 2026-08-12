@@ -294,7 +294,7 @@ public class DBTreeListClass extends DBListClass
     {
         for (ListItem tmpItem : treeList) {
             if (item.equals(tmpItem.getId())) {
-                if (tmpItem.getParent().length() > 0) {
+                if (!tmpItem.getParent().isEmpty()) {
                     getItemPath(tmpItem.getParent(), treeList, resList);
                 }
                 resList.add(tmpItem);
@@ -543,7 +543,7 @@ public class DBTreeListClass extends DBListClass
         try {
             sql = context.getWiki().parseContent(sql, context);
         } catch (Exception e) {
-            LOGGER.error("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
+            LOGGER.error("Failed to parse SQL script [{}]. Continuing with non-rendered script.", sql, e);
         }
         return sql;
     }

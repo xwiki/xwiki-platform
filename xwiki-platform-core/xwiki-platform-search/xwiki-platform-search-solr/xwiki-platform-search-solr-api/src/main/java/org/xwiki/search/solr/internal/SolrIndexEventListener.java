@@ -176,7 +176,10 @@ public class SolrIndexEventListener implements EventListener
                 }
             }
         } catch (Exception e) {
-            this.logger.error("Failed to handle event [{}] with source [{}]", event, source.toString(), e);
+            // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+            // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and the source is
+            // an arbitrary object whose graph would be written out and read back as null if it cannot be resolved.
+            this.logger.error("Failed to handle event [{}] with source [{}]", event, String.valueOf(source), e);
         }
     }
 
@@ -199,7 +202,7 @@ public class SolrIndexEventListener implements EventListener
 
         try {
             // Index the rest of the available translations.
-            document.getTranslationLocales(xcontext).stream()
+            document.getTranslationLocales(xcontext)
                 .forEach(locale -> indexer.index(new DocumentReference(documentReferenceWithoutLocale, locale), false));
         } catch (XWikiException e) {
             this.logger.warn("Failed to index the translations of [{}]. Root cause is [{}].",

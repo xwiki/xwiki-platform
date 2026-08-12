@@ -119,7 +119,7 @@ public class TagNotificationFilter implements NotificationFilter
             return value(EventProperty.PAGE).inStrings(pagesHoldingTags)
                     .and(value(EventProperty.WIKI).eq(value(currentWiki)));
         } catch (QueryException e) {
-            logger.warn("Failed to get the list of documents holding some tags.", e);
+            logger.warn("Failed to get the list of documents holding some tags", e);
             return null;
         }
     }

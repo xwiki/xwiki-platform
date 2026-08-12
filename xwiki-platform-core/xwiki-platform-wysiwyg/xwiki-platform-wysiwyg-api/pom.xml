@@ -78,6 +78,14 @@
       <artifactId>xwiki-commons-displayer</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Provides the HTMLDisplayer implementation used by MacroDescriptorUIFactory to compute the edit template of the
+      macro parameters. Without it, the macro parameters are displayed with a degraded fallback template. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-display-html</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-velocity</artifactId>

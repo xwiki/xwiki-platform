@@ -93,8 +93,8 @@ public class DefaultCoreConfiguration implements CoreConfiguration
         try {
             syntax = Syntax.valueOf(syntaxId);
         } catch (ParseException e) {
-            this.logger.warn("Invalid default document Syntax [{}], defaulting to [{}] instead", syntaxId,
-                Syntax.XWIKI_2_1.toIdString(),  e);
+            this.logger.warn("Invalid default document Syntax [{}], defaulting to [{}] instead",
+                syntaxId, Syntax.XWIKI_2_1.toIdString(), e);
             syntax = Syntax.XWIKI_2_1;
         }
 

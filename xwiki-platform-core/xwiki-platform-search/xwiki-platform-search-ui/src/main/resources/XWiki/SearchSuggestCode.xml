@@ -39,7 +39,7 @@
   <content>{{velocity output="false"}}
 #if ($xcontext.action == 'get')
 ## Iterate over the sources defined in the configuration document, and create a source array to be passed to the
-## search suggest contructor.
+## search suggest constructor.
 #set ($sources = [])
 #set ($searchSuggestConfig = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
 #foreach ($source in $searchSuggestConfig.getObjects('XWiki.SearchSuggestSourceClass'))

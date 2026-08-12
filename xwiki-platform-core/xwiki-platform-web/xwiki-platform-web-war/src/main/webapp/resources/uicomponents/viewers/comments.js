@@ -319,7 +319,7 @@ viewers.Comments = Class.create({
           formData.set('xpage', 'xpart');
           formData.set('vm', 'commentsinline.vm');
           formData.set('skin', XWiki.skin);
-          // Strip form parameters from the form action query string to prevent them from being overwriten.
+          // Strip form parameters from the form action query string to prevent them from being overwritten.
           var queryStringParams = $H(form.action.toQueryParams());
           formData.keys().each(queryStringParams.unset.bind(queryStringParams));
           var url = form.action.replace(/\?.*/, '?' + queryStringParams.toQueryString());
@@ -708,7 +708,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var notification;
     /**
      * Ajax request made for deleting the comment.
-     * Delete the HTML element on succes (replace it with a box message).
+     * Delete the HTML element on success (replace it with a box message).
      * Display error message on failure.
      * Disable the delete button before the request is send, so the user cannot resend it in case it takes longer.
      */

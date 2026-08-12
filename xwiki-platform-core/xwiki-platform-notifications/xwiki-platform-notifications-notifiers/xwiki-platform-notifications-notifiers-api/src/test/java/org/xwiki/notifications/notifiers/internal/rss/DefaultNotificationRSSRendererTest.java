@@ -30,7 +30,6 @@ import javax.script.ScriptContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.xwiki.eventstream.Event;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.Translation;
@@ -108,12 +107,14 @@ class DefaultNotificationRSSRendererTest
             when(testEvent1.getDocumentTitle()).thenReturn("EventDocumentTitle");
         }
         if (!unknownTitle) {
-            when(this.contextualLocalizationManager.getTranslation("EventTitle")).thenReturn(mock(Translation.class));
+            Translation translationMock = mock(Translation.class);
+            when(this.contextualLocalizationManager.getTranslation("EventTitle")).thenReturn(translationMock);
         } else {
             when(this.contextualLocalizationManager.getTranslation("EventTitle")).thenReturn(null);
         }
 
-        when(this.templateManager.getTemplate(ArgumentMatchers.any())).thenReturn(Mockito.mock(Template.class));
+        Template templateMock = mock(Template.class);
+        when(this.templateManager.getTemplate(ArgumentMatchers.any())).thenReturn(templateMock);
 
         CompositeEvent testCompositeEvent = mock(CompositeEvent.class);
         when(testCompositeEvent.getEvents()).thenReturn(Arrays.asList(testEvent1));
@@ -133,7 +134,8 @@ class DefaultNotificationRSSRendererTest
     @Test
     void renderNotification() throws Exception
     {
-        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(Mockito.mock(ScriptContext.class));
+        ScriptContext scriptContextMock = mock(ScriptContext.class);
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(scriptContextMock);
 
         CompositeEvent testCompositeEvent = this.mockEvent(false, false, false, false);
         SyndEntry resultEntry = this.defaultNotificationRSSRenderer.renderNotification(testCompositeEvent);
@@ -211,8 +213,10 @@ class DefaultNotificationRSSRendererTest
     @Test
     void renderNotificationUsesEventMatchingCompositeType() throws Exception
     {
-        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(Mockito.mock(ScriptContext.class));
-        when(this.templateManager.getTemplate(ArgumentMatchers.any())).thenReturn(Mockito.mock(Template.class));
+        ScriptContext scriptContextMock2 = mock(ScriptContext.class);
+        when(this.scriptContextManager.getCurrentScriptContext()).thenReturn(scriptContextMock2);
+        Template templateMock2 = mock(Template.class);
+        when(this.templateManager.getTemplate(ArgumentMatchers.any())).thenReturn(templateMock2);
 
         // Technical update event triggered by the comment save: it shares the comment date and can end up first in
         // the composite.
@@ -226,7 +230,8 @@ class DefaultNotificationRSSRendererTest
         when(commentEvent.getType()).thenReturn("addComment");
         when(commentEvent.getTitle()).thenReturn("EventTitle");
         when(commentEvent.getDocumentTitle()).thenReturn("EventDocumentTitle");
-        when(this.contextualLocalizationManager.getTranslation("EventTitle")).thenReturn(mock(Translation.class));
+        Translation translationMock2 = mock(Translation.class);
+        when(this.contextualLocalizationManager.getTranslation("EventTitle")).thenReturn(translationMock2);
 
         CompositeEvent compositeEvent = mock(CompositeEvent.class);
         // The update event is first (as it would be after a date tie), the comment event second.

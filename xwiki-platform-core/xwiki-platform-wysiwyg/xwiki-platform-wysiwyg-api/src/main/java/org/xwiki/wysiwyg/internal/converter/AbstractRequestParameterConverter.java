@@ -168,7 +168,7 @@ public abstract class AbstractRequestParameterConverter implements RequestParame
                         + "might need to add the domain related to this request in the list of trusted domains in "
                         + "the configuration: it can be configured in xwiki.properties in url.trustedDomains.",
                     unsafeURL);
-                this.logger.debug("Original error preventing the redirect: ", e);
+                this.logger.debug("Original error preventing the redirect:", e);
                 ((HttpServletResponse) res).sendError(400, "The error redirect URI isn't considered safe.");
             }
         }

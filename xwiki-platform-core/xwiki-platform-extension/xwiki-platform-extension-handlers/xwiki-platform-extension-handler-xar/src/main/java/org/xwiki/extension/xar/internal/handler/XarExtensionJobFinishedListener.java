@@ -149,15 +149,11 @@ public class XarExtensionJobFinishedListener implements EventListener
                         rootNextPages = Collections.emptyMap();
                     }
 
-                    ////////////////////
                     // Delete pages
-                    ////////////////////
 
                     maybeDeletePages(jobFinishingEvent, xarExtensionPlan, previousXAREntries, (Job) source);
 
-                    ////////////////////////////////////////
                     // Invalidate security cache
-                    ////////////////////////////////////////
 
                     invalidateSecurityCache(previousXAREntries, rootPreviousPages, nextXAREntries, rootNextPages);
                 }

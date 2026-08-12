@@ -161,7 +161,8 @@ public class PackageAPI extends Api
      * Sets the flag for the packager to import or not history revisions included in the archive when installing with
      * {@link #install()}. This flag will be ignored if {@link #isWithVersions()} flag is set to true. This means it's
      * not possible to import with versions, preserving the existing document history. The behavior of the packager in
-     * this case fall backs on just adding a new version to the exsting history (ignoring the history from the package).
+     * this case fall backs on just adding a new version to the existing history (ignoring the history from the
+     * package).
      *
      * @param withVersions should the versions contained in the archive (if any) be imported when installing.
      */
@@ -187,9 +188,9 @@ public class PackageAPI extends Api
         return apiFiles;
     }
 
-    public boolean add(String docFullName, int DefaultAction) throws XWikiException
+    public boolean add(String docFullName, int defaultAction) throws XWikiException
     {
-        return this.pack.add(docFullName, DefaultAction, getXWikiContext());
+        return this.pack.add(docFullName, defaultAction, getXWikiContext());
     }
 
     public boolean add(String docFullName) throws XWikiException

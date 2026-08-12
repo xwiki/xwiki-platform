@@ -128,9 +128,9 @@ class MergeDocumentResultTest
         assertNull(mergeDocumentResult.getMergeResult(MergeDocumentResult.DocumentPart.CONTENT));
         mergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, new MergeManagerResult());
         assertNotNull(mergeDocumentResult.getMergeResult(MergeDocumentResult.DocumentPart.CONTENT));
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
-            mergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, new MergeManagerResult());
-        });
+        MergeManagerResult mergeManagerResult = new MergeManagerResult();
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+            () -> mergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, mergeManagerResult));
         assertEquals("The merge result of document part [CONTENT] has already been put.", exception.getMessage());
     }
 

@@ -66,7 +66,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -119,7 +119,8 @@ class HqlQueryExecutorTest
     public void afterComponent()
     {
         when(this.hibernateStore.getConfiguration()).thenReturn(new Configuration());
-        when(this.hibernateStore.getConfigurationMetadata()).thenReturn(mock(Metadata.class));
+        Metadata metadataMock = mock(Metadata.class);
+        when(this.hibernateStore.getConfigurationMetadata()).thenReturn(metadataMock);
 
         when(this.xwikiproperties.getProperty("query.hql.safe", List.class))
             .thenReturn(List.of("select normallynotallowed from XWikiDocument as doc where 1=\\d+"));
@@ -296,18 +297,14 @@ class HqlQueryExecutorTest
         when(this.store.executeRead(any(XWikiContext.class), any(XWikiHibernateBaseStore.HibernateCallback.class)))
             .thenThrow(exception);
 
-        try {
-            execute("statement", null);
-            fail("Should have thrown an exception here");
-        } catch (QueryException expected) {
-            assertEquals("Exception while executing query. Query statement = [statement]", expected.getMessage());
-            // Verify nested exception!
-            assertEquals("nestedmessage", expected.getCause().getMessage());
-        }
+        QueryException expected = assertThrows(QueryException.class, () -> execute("statement", null));
+        assertEquals("Exception while executing query. Query statement = [statement]", expected.getMessage());
+        // Verify nested exception!
+        assertEquals("nestedmessage", expected.getCause().getMessage());
     }
 
     @Test
-    void createNamedNativeHibernateQuery() throws Exception
+    void createNamedNativeHibernateQuery()
     {
         DefaultQuery query = new DefaultQuery("queryName", this.executor);
 
@@ -338,7 +335,7 @@ class HqlQueryExecutorTest
     }
 
     @Test
-    void createHibernateQueryWhenFilter() throws Exception
+    void createHibernateQueryWhenFilter()
     {
         Session session = mock(Session.class);
 
@@ -378,7 +375,8 @@ class HqlQueryExecutorTest
 
         when(this.contextComponentMannager.getInstance(QueryFilter.class, "escapeLikeParameters")).thenReturn(filter);
 
-        when(session.createQuery(anyString())).thenReturn(mock(org.hibernate.query.Query.class));
+        org.hibernate.query.Query queryMock = mock(org.hibernate.query.Query.class);
+        when(session.createQuery(anyString())).thenReturn(queryMock);
 
         this.executor.createHibernateQuery(session, query);
 
@@ -432,54 +430,41 @@ class HqlQueryExecutorTest
     // Not allowed
 
     @Test
-    void executeWhenNotAllowedSelect() throws Exception
+    void executeWhenNotAllowedSelect()
     {
-        try {
-            execute("select notallowed.name from NotAllowedTable notallowed", false);
-            fail("Should have thrown an exception here");
-        } catch (QueryException expected) {
-            assertEquals(
-                "The query requires programming right."
-                    + " Query statement = [select notallowed.name from NotAllowedTable notallowed]",
-                expected.getCause().getMessage());
-        }
+        QueryException expected = assertThrows(QueryException.class,
+            () -> execute("select notallowed.name from NotAllowedTable notallowed", false));
+        assertEquals(
+            "The query requires programming right."
+                + " Query statement = [select notallowed.name from NotAllowedTable notallowed]",
+            expected.getCause().getMessage());
     }
 
     @Test
-    void executeDeleteWithoutProgrammingRight() throws Exception
+    void executeDeleteWithoutProgrammingRight()
     {
-        try {
-            execute("delete from XWikiDocument as doc", false);
-            fail("Should have thrown an exception here");
-        } catch (QueryException expected) {
-            assertEquals("The query requires programming right. Query statement = [delete from XWikiDocument as doc]",
-                expected.getCause().getMessage());
-        }
+        QueryException expected =
+            assertThrows(QueryException.class, () -> execute("delete from XWikiDocument as doc", false));
+        assertEquals("The query requires programming right. Query statement = [delete from XWikiDocument as doc]",
+            expected.getCause().getMessage());
     }
 
     @Test
-    void executeNamedQueryWithoutProgrammingRight() throws Exception
+    void executeNamedQueryWithoutProgrammingRight()
     {
-        try {
-            executeNamed("somename", false);
-            fail("Should have thrown an exception here");
-        } catch (QueryException expected) {
-            assertEquals("Named queries requires programming right. Named query = [somename]",
-                expected.getCause().getMessage());
-        }
+        QueryException expected = assertThrows(QueryException.class, () -> executeNamed("somename", false));
+        assertEquals("Named queries requires programming right. Named query = [somename]",
+            expected.getCause().getMessage());
     }
 
     @Test
-    void executeUpdateWithoutProgrammingRight() throws Exception
+    void executeUpdateWithoutProgrammingRight()
     {
-        try {
-            execute("update XWikiDocument set name='name'", false);
-            fail("Should have thrown an exception here");
-        } catch (QueryException expected) {
-            assertEquals(
-                "The query requires programming right. Query statement = [update XWikiDocument set name='name']",
-                expected.getCause().getMessage());
-        }
+        QueryException expected =
+            assertThrows(QueryException.class, () -> execute("update XWikiDocument set name='name'", false));
+        assertEquals(
+            "The query requires programming right. Query statement = [update XWikiDocument set name='name']",
+            expected.getCause().getMessage());
     }
 
     @Test

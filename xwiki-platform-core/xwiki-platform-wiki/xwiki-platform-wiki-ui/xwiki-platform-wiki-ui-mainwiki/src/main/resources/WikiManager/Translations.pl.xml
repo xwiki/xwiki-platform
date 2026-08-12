@@ -163,9 +163,6 @@ rendering.macro.wikis.description=Lista wiki
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Obszary robocze (starsze)
 rendering.macro.workspaces.description=Nieaktualne makro, którego nie należy tutaj używać ze względu na kompatybilność. Zamiast tego użyj makro "wiki".
-
-## Browse
-platform.wiki.browse=Przeglądaj wiki
 platform.wiki.browse.emptyvalue=N/D
 platform.wiki.browse.wikiprettyname=Nazwa
 platform.wiki.browse.description=Opis
@@ -226,7 +223,6 @@ platform.wiki.create.wizard.step.dw=Po kliknięciu na "utwórz" wiki zostanie ut
 platform.wiki.create.wizard.step.previous=Poprzedni krok
 platform.wiki.create.wizard.step.next=Przejdź do następnego kroku
 platform.wiki.create.wizard.step.create=Utwórz
-
 platform.wiki.create.wizard.step.creation=Tworzenie Wiki
 platform.wiki.create.wizard.step.creation.wait=Zaczekaj aż wiki zostanie utworzone.
 platform.wiki.create.wizard.step.creation.complete=Wiki {0} zostało pomyślnie utworzone. Może się już zalogować.
@@ -302,6 +298,10 @@ platform.wiki.create.wizard.step.provisioning.finalize=Finalizuj
 platform.wiki.delete.confirmation.yes=Tak
 platform.wiki.delete.confirmation.no=Nie
 
+## Browse
+platform.wiki.browse=Przeglądaj wiki
+
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

@@ -38,7 +38,6 @@
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
   <modules>
-    <module>xwiki-platform-extension-test-tests</module>
     <module>xwiki-platform-extension-test-pageobjects</module>
     <module>xwiki-platform-extension-test-utils</module>
   </modules>

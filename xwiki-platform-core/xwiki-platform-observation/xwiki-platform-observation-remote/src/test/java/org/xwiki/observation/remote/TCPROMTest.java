@@ -100,11 +100,11 @@ class TCPROMTest extends AbstractROMTestCase
 
         verify(localListener).onEvent(same(event), eq("some source"), eq("some data"));
         verify(localListener).onEvent(same(event), same(unserializable), same(unserializable));
-        verify(remoteListener).onEvent(eq(event), eq("some source"), eq("some data"));
+        verify(remoteListener).onEvent(event, "some source", "some data");
     }
 
     @Test
-    void members() throws Exception
+    void members()
     {
         NetworkChannel channel1 = this.rom1.getChannels().iterator().next();
         NetworkChannel channel2 = this.rom2.getChannels().iterator().next();

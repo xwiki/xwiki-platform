@@ -179,7 +179,10 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             if (e.getMessage() != null) {
                 this.context.put(ERROR_KEY, e.getMessage());
             }
-            LOGGER.error("Failed to send email [" + mail.toString() + "]", e);
+            // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+            // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and a Mail holds the
+            // body and the attachments, none of which its toString() prints.
+            LOGGER.error("Failed to send email [{}]", mail.toString(), e);
             result = -1;
         }
 
@@ -203,8 +206,11 @@ public class MailSenderPluginApi extends PluginApi<MailSenderPlugin> implements 
             if (e.getMessage() != null) {
                 this.context.put(ERROR_KEY, e.getMessage());
             }
-            LOGGER.error("Failed to send email [" + mail.toString() + "] using mail configuration ["
-                + mailConfiguration.toString() + "]", e);
+            // Build the Strings on purpose: log arguments are kept as objects in the captured LogEvent and
+            // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons). A Mail holds the body
+            // and the attachments, and MailConfiguration.toString() masks the SMTP password that the object carries.
+            LOGGER.error("Failed to send email [{}] using mail configuration [{}]", mail.toString(),
+                mailConfiguration.toString(), e);
             result = -1;
         }
 

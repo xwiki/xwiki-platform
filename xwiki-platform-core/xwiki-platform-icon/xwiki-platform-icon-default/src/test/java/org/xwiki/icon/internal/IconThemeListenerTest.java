@@ -39,7 +39,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -75,7 +74,7 @@ class IconThemeListenerTest
         when(doc.getDocumentReference()).thenReturn(docRef);
 
         LocalDocumentReference iconThemeClassRef = new LocalDocumentReference("IconThemesCode", "IconThemeClass");
-        when(doc.getXObjects(eq(iconThemeClassRef))).thenReturn(list);
+        when(doc.getXObjects(iconThemeClassRef)).thenReturn(list);
 
         // Tests
         this.listener.onEvent(null, doc, null);
@@ -107,7 +106,7 @@ class IconThemeListenerTest
         List<BaseObject> list = new ArrayList<>();
 
         LocalDocumentReference iconThemeClassRef = new LocalDocumentReference("IconThemesCode", "IconThemeClass");
-        when(doc.getXObjects(eq(iconThemeClassRef))).thenReturn(list);
+        when(doc.getXObjects(iconThemeClassRef)).thenReturn(list);
 
         // Tests
         this.listener.onEvent(null, doc, null);

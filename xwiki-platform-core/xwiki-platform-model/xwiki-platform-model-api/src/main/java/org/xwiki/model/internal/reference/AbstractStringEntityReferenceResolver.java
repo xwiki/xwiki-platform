@@ -298,7 +298,7 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
         Object... parameters)
     {
         EntityReference newReference;
-        if (representation.length() > 0) {
+        if (!representation.isEmpty()) {
             String name = representation.toString();
             if (unescape) {
                 name = unescape(name);

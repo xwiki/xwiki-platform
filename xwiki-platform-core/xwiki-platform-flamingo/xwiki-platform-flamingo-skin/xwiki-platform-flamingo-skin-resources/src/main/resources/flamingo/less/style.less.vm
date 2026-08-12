@@ -47,7 +47,6 @@
 @import "tables";
 @import "tree";
 @import "type";
-@import "users";
 @import "vertical-menus";
 @import "xlist";
 // In order to let custom skins easily override styling, we import a custom.less that is empty by default.
@@ -67,7 +66,7 @@
   $themeObj.getValue('lessCode')
 #end
 
-// We re-inject the variables from the flamingo theme so they can interract with the content of @lessCode.
+// We re-inject the variables from the flamingo theme so they can interact with the content of @lessCode.
 // This way, it's also consistent with the Flamingo Theme preview (See: https://jira.xwiki.org/browse/XWIKI-12672)
 #if ("$!themeObj" != '')
   #_initFromFlamingoTheme()

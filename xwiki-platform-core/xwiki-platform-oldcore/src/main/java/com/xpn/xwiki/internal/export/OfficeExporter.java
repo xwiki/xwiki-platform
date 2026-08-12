@@ -125,7 +125,7 @@ public class OfficeExporter extends PdfExportImpl
                 // Embedded files are placed in the same folder as the HTML input file during office conversion.
                 inputStreams.put(file.getName(), new FileInputStream(file));
             } catch (Exception e) {
-                LOGGER.warn(String.format("Failed to embed %s in the office export.", file.getName()), e);
+                LOGGER.warn("Failed to embed [{}] in the office export", file.getName(), e);
             }
         }
     }

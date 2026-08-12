@@ -162,7 +162,7 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
                 }
             }
         } catch (Exception e) {
-            throw new MailStoreException("Failed to extract temporary file refernces from headers", e);
+            throw new MailStoreException("Failed to extract temporary file references from headers", e);
         }
 
         return temporaryFiles;

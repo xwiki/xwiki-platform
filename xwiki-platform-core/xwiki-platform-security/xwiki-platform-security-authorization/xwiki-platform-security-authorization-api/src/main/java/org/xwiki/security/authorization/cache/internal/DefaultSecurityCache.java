@@ -258,9 +258,14 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                         + "available in the cache.",
                     entry.getReference(), entry, wiki));
             }
-            SecurityCacheEntry parent2 = (isSelf) ? parent1
-                : (wiki != null) ? DefaultSecurityCache.this.getShadowEntry(entry.getUserReference(), wiki)
-                    : DefaultSecurityCache.this.getEntry(entry.getUserReference());
+            SecurityCacheEntry parent2;
+            if (isSelf) {
+                parent2 = parent1;
+            } else if (wiki != null) {
+                parent2 = DefaultSecurityCache.this.getShadowEntry(entry.getUserReference(), wiki);
+            } else {
+                parent2 = DefaultSecurityCache.this.getEntry(entry.getUserReference());
+            }
             if (parent2 == null) {
                 throw new ParentEntryEvictedException(String.format(
                     "The second parent with reference [%s] for the entry [%s] with wiki [%s] is no longer available "
@@ -495,9 +500,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             if (children != null) {
                 for (SecurityCacheEntry child : children) {
                     if (!child.disposed) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Cascaded removal of entry [{}] from cache.", child.getKey());
-                        }
+                        logger.debug("Cascaded removal of entry [{}] from cache.", child.getKey());
                         child.dispose();
                     }
                 }
@@ -530,9 +533,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         {
             if (this.children != null) {
                 this.children.remove(entry);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Remove child [{}] from [{}].", entry.getKey(), getKey());
-                }
+                logger.debug("Remove child [{}] from [{}].", entry.getKey(), getKey());
             }
         }
 

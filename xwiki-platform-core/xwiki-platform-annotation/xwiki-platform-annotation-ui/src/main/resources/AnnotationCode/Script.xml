@@ -913,7 +913,7 @@ XWiki.Annotation = Class.create({
         }.bind(this),
 
         onSuccess: function(response) {
-          // check the response to make sure it suceeded
+          // check the response to make sure it succeeded
           if (this.checkResponseCodeAndFail(response)) {
             return;
           }
@@ -981,7 +981,7 @@ XWiki.Annotation = Class.create({
       return false;
     }
     var annDOMRange = this.getDOMRange(this.annotatedElement, plainTextStartOffset.value, plainTextEndOffset.value);
-    // Since the annotation could start at a specific offset, the node is splitted for not wrapping the whole text and
+    // Since the annotation could start at a specific offset, the node is split for not wrapping the whole text and
     // a new range is created to recalculate the new ends.
     var strictRange = this.fixRangeEndPoints(annDOMRange);
 

@@ -51,7 +51,6 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.Solr;
@@ -112,7 +111,7 @@ class EmbeddedSolrInitializationTest
         });
     }
 
-    private void getInstanceAndAssertHomeDirectory(String expected) throws ComponentLookupException, Exception
+    private void getInstanceAndAssertHomeDirectory(String expected) throws Exception
     {
         Solr instance = this.componentManager.getInstance(Solr.class, EmbeddedSolr.TYPE);
         assertNotNull(instance);
@@ -228,7 +227,7 @@ class EmbeddedSolrInitializationTest
         }
         String dataDir = properties.getProperty("dataDir");
         assertNotNull(dataDir, "dataDir property from properties file was null: " + file.toString());
-        assertTrue(dataDir.contains(File.separator), "File seperators were not escaped properly in the "
+        assertTrue(dataDir.contains(File.separator), "File separators were not escaped properly in the "
             + "cache path!: \"" + dataDir + "\" does not contain '" + File.separator + "'!");
 
     }

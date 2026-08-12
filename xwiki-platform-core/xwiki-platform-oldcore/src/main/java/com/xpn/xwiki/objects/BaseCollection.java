@@ -299,7 +299,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             try {
                 baseClass = context.getWiki().getXClass(classReference, context);
             } catch (Exception e) {
-                LOGGER.error("Failed to get class [" + classReference + "]", e);
+                LOGGER.error("Failed to get class [{}]", classReference, e);
             }
         }
 
@@ -364,17 +364,17 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         return getIntValue(name, 0);
     }
 
-    public int getIntValue(String name, int default_value)
+    public int getIntValue(String name, int defaultValue)
     {
         try {
             NumberProperty prop = (NumberProperty) safeget(name);
             if (prop == null) {
-                return default_value;
+                return defaultValue;
             } else {
                 return ((Number) prop.getValue()).intValue();
             }
         } catch (Exception e) {
-            return default_value;
+            return defaultValue;
         }
     }
 
@@ -821,7 +821,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * Return a XML version of this collection.
      * <p>
-     * The XML is not formated. to get formatted XML you can use {@link #toXMLString(boolean)} instead.
+     * The XML is not formatted. to get formatted XML you can use {@link #toXMLString(boolean)} instead.
      * 
      * @return the XML as a String
      */

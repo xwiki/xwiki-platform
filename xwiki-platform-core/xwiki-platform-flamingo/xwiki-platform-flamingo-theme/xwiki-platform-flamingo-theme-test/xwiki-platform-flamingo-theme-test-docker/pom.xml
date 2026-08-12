@@ -29,8 +29,6 @@
   </parent>
   <artifactId>xwiki-platform-flamingo-theme-test-docker</artifactId>
   <name>XWiki Platform - Flamingo - Theme - Tests  - Functional Docker Tests</name>
-  <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
-       see https://jira.xwiki.org/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
   <description>XWiki Platform - Flamingo - Theme - Tests  - Functional Tests in Docker</description>
   <properties>
@@ -57,6 +55,14 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-icon-default</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <!-- Needed by the attachment picker used to select the theme logo: it uploads the selected image as a temporary
+           attachment through the XWiki.WYSIWYG.FileUploader page. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
     </dependency>
     <!-- ================================
          Test only dependencies

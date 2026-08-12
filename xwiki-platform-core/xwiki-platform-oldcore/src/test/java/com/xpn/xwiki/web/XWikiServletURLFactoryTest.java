@@ -142,7 +142,7 @@ class XWikiServletURLFactoryTest
      * @param wikiName the wiki name
      * @throws XWikiException if creating the wiki fails
      */
-    private void createWiki(String wikiName) throws XWikiException, WikiManagerException
+    private void createWiki(String wikiName) throws WikiManagerException
     {
         WikiDescriptor wikidescriptor = new WikiDescriptor(wikiName, wikiName + "server");
 
@@ -465,7 +465,7 @@ class XWikiServletURLFactoryTest
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
-        // Set a deamon request
+        // Set a daemon request
         initDaemonRequest("request", 42);
 
         this.oldcore.getXWikiContext().setWikiId("wiki1");

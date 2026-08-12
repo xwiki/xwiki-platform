@@ -78,7 +78,8 @@ class ZipExplorerTest
 
         Provider<XWikiContext> xwikiContextProvider =
             componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xwikiContextProvider.get()).thenReturn(mock(XWikiContext.class));
+        XWikiContext xWikiContextMock = mock();
+        when(xwikiContextProvider.get()).thenReturn(xWikiContextMock);
     }
 
     @Test
@@ -220,7 +221,7 @@ class ZipExplorerTest
     }
 
     @Test
-    void getFileLink() throws Exception
+    void getFileLink()
     {
         XWikiDocument xwikiDocument = mock(XWikiDocument.class);
         when(xwikiDocument.getAttachmentURL(eq("zipfile.zip"), any(XWikiContext.class))).thenReturn(

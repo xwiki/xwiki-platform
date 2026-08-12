@@ -149,7 +149,7 @@ public class MergeManagerResult<R, C>
     }
 
     /**
-     * @return {@code true} if at least one conflict occured during the merge operation.
+     * @return {@code true} if at least one conflict occurred during the merge operation.
      */
     public boolean hasConflicts()
     {

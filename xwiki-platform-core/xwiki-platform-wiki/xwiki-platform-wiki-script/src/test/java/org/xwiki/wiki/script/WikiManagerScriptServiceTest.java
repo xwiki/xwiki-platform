@@ -58,7 +58,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -155,8 +154,7 @@ class WikiManagerScriptServiceTest
     {
         WikiReference wiki = new WikiReference("mainWiki");
         Exception exception = new AccessDeniedException(Right.PROGRAM, this.currentUserRef, wiki);
-        doThrow(exception).when(this.authorizationManager).checkAccess(eq(Right.PROGRAM), eq(this.currentUserRef),
-            eq(wiki));
+        doThrow(exception).when(this.authorizationManager).checkAccess(Right.PROGRAM, this.currentUserRef, wiki);
 
         return exception;
     }
@@ -168,8 +166,7 @@ class WikiManagerScriptServiceTest
     {
         WikiReference wiki = new WikiReference("mainWiki");
         Exception exception = new AccessDeniedException(Right.CREATE_WIKI, this.currentUserRef, wiki);
-        doThrow(exception).when(this.authorizationManager).checkAccess(eq(Right.CREATE_WIKI), eq(this.currentUserRef),
-            eq(wiki));
+        doThrow(exception).when(this.authorizationManager).checkAccess(Right.CREATE_WIKI, this.currentUserRef, wiki);
 
         return exception;
     }
@@ -420,7 +417,7 @@ class WikiManagerScriptServiceTest
     }
 
     @Test
-    void getCurrentWikiId() throws Exception
+    void getCurrentWikiId()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("currentWiki");
         String result = this.wikiManagerScriptService.getCurrentWikiId();
@@ -477,8 +474,8 @@ class WikiManagerScriptServiceTest
         when(this.wikiDescriptorManager.getById(oldDescriptor.getId())).thenReturn(oldDescriptor);
 
         // Local admin.
-        when(this.authorizationManager.hasAccess(eq(Right.ADMIN), eq(this.currentUserRef),
-            eq(new WikiReference("wikiId")))).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.ADMIN, this.currentUserRef,
+            new WikiReference("wikiId"))).thenReturn(true);
 
         // Changing some value, not the owner.
         WikiDescriptor descriptor = new WikiDescriptor(oldDescriptor.getId(), "wikiAlias");
@@ -487,8 +484,7 @@ class WikiManagerScriptServiceTest
         assertTrue(result);
 
         // The right has been checked
-        verify(this.authorizationManager).hasAccess(eq(Right.ADMIN), eq(this.currentUserRef),
-            eq(new WikiReference("wikiId")));
+        verify(this.authorizationManager).hasAccess(Right.ADMIN, this.currentUserRef, new WikiReference("wikiId"));
         // The descriptor has been saved
         verify(this.wikiDescriptorManager).saveDescriptor(descriptor);
     }
@@ -500,8 +496,8 @@ class WikiManagerScriptServiceTest
         oldDescriptor.setOwnerId("SomeUser");
         when(this.wikiDescriptorManager.getById(oldDescriptor.getId())).thenReturn(oldDescriptor);
 
-        when(this.authorizationManager.hasAccess(eq(Right.ADMIN), eq(this.currentUserRef),
-            eq(new WikiReference("wikiId")))).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.ADMIN, this.currentUserRef,
+            new WikiReference("wikiId"))).thenReturn(false);
 
         // Changing some value, not the owner.
         WikiDescriptor descriptor = new WikiDescriptor(oldDescriptor.getId(), "wikiAlias");
@@ -532,8 +528,7 @@ class WikiManagerScriptServiceTest
         assertFalse(result);
 
         // The right has been checked
-        verify(this.authorizationManager).hasAccess(eq(Right.ADMIN), eq(this.currentUserRef),
-            eq(new WikiReference("wikiId")));
+        verify(this.authorizationManager).hasAccess(Right.ADMIN, this.currentUserRef, new WikiReference("wikiId"));
 
         // The descriptor has not been saved
         verify(this.wikiDescriptorManager, never()).saveDescriptor(descriptor);
@@ -573,8 +568,7 @@ class WikiManagerScriptServiceTest
         assertFalse(result);
 
         // Verify the rights have been checked
-        verify(this.authorizationManager).hasAccess(eq(Right.ADMIN), eq(this.currentUserRef),
-            eq(new WikiReference("mainWiki")));
+        verify(this.authorizationManager).hasAccess(Right.ADMIN, this.currentUserRef, new WikiReference("mainWiki"));
 
         // The descriptor has not been saved
         verify(this.wikiDescriptorManager, never()).saveDescriptor(descriptor);
@@ -594,8 +588,7 @@ class WikiManagerScriptServiceTest
         assertTrue(result);
 
         // Verify the rights have been checked
-        verify(this.authorizationManager).hasAccess(eq(Right.ADMIN), eq(this.currentUserRef),
-            eq(new WikiReference("mainWiki")));
+        verify(this.authorizationManager).hasAccess(Right.ADMIN, this.currentUserRef, new WikiReference("mainWiki"));
 
         // The descriptor has been saved
         verify(this.wikiDescriptorManager).saveDescriptor(descriptor);

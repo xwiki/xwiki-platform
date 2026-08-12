@@ -486,6 +486,12 @@ class SimpleEventQueryTest
     }
 
     @Test
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which object is the receiver and which argument
+    // it gets, including null. Using assertEquals()/assertNotEquals() would move that into JUnit's
+    // internals and would invite a later SonarQube S3415 "swap these arguments" change that silently stops
+    // testing the contract.
+    @SuppressWarnings("java:S5785")
     void equalsandhascode()
     {
         SimpleEventQuery query1 = new SimpleEventQuery();
@@ -506,22 +512,22 @@ class SimpleEventQueryTest
         SimpleEventQuery query4bis = new SimpleEventQuery();
         query4bis.eq("prop", "value");
 
-        assertEquals(query1, query1);
-        assertEquals(query1bis, query1bis);
+        assertTrue(query1.equals(query1));
+        assertTrue(query1bis.equals(query1bis));
 
-        assertEquals(query2, query2);
-        assertEquals(query2bis, query2bis);
+        assertTrue(query2.equals(query2));
+        assertTrue(query2bis.equals(query2bis));
 
-        assertEquals(query3, query3);
-        assertEquals(query3bis, query3bis);
+        assertTrue(query3.equals(query3));
+        assertTrue(query3bis.equals(query3bis));
 
-        assertEquals(query4, query4);
-        assertEquals(query4bis, query4bis);
+        assertTrue(query4.equals(query4));
+        assertTrue(query4bis.equals(query4bis));
 
-        assertNotEquals(query1, query2);
-        assertNotEquals(query1, query3);
-        assertNotEquals(query1, query4);
-        assertNotEquals(query1, null);
+        assertFalse(query1.equals(query2));
+        assertFalse(query1.equals(query3));
+        assertFalse(query1.equals(query4));
+        assertFalse(query1.equals(null));
     }
 
     @Test

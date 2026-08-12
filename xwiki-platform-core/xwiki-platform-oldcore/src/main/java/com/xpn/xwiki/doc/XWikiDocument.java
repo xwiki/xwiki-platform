@@ -73,6 +73,7 @@ import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.io.DocumentResult;
 import org.dom4j.io.OutputFormat;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.Diff;
@@ -2736,7 +2737,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             // may be null (tests)
             // To maintain the behavior of this method we can't throw an exception.
             // Formerly, null was returned if there was no SoftReference.
-            LOGGER.warn("Could not get document archive", e);
+            LOGGER.warn("Failed to get the archive of document [{}]", getDocumentReference(), e);
             return null;
         }
     }
@@ -3327,8 +3328,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 return getXObject(resolvedClassReference);
             }
 
-            LOGGER.warn("Exception while accessing objects for document [{}]: {}", getDocumentReference(),
-                e.getMessage(), e);
+            LOGGER.warn("Failed to access the objects of document [{}]", getDocumentReference(), e);
             return null;
         }
     }
@@ -3673,8 +3673,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
             result = display(fieldname, object, context);
         } catch (Exception e) {
-            LOGGER.error("Failed to display field [" + fieldname + "] of document ["
-                + getDefaultEntityReferenceSerializer().serialize(getDocumentReference()) + "]", e);
+            LOGGER.error("Failed to display field [{}] of document [{}]", fieldname,
+                getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), e);
         }
 
         return result;
@@ -4024,8 +4024,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         } catch (Exception ex) {
             // TODO: It would better to check if the field exists rather than catching an exception
             // raised by a NPE as this is currently the case here...
-            LOGGER.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object of Class ["
-                + getDefaultEntityReferenceSerializer().serialize(obj.getDocumentReference()) + "]", ex);
+            LOGGER.warn("Failed to display field [{}] in [{}] mode for Object of Class [{}]",
+                fieldname, type, getDefaultEntityReferenceSerializer().serialize(obj.getDocumentReference()), ex);
             return "";
         } finally {
             if (!backup.isEmpty()) {
@@ -4191,7 +4191,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     String data = display(propertyName, object, context);
                     data = data.trim();
                     data = data.replace("\n", " ");
-                    if (data.length() == 0) {
+                    if (data.isEmpty()) {
                         result.append("&nbsp;");
                     } else {
                         result.append(data);
@@ -4315,8 +4315,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             syntax = getSyntaxRegistry().resolveSyntax(syntaxId);
         } catch (ParseException e) {
             syntax = getDefaultDocumentSyntax();
-            LOGGER.warn("Failed to set syntax [{}] for [{}], setting syntax [{}] instead.", syntaxId,
-                getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), syntax.toIdString(), e);
+            LOGGER.warn("Failed to set syntax [{}] for [{}], setting syntax [{}] instead",
+                syntaxId, getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), syntax.toIdString(),
+                e);
         }
         return syntax;
     }
@@ -4846,12 +4847,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private void copyAttachment(XWikiAttachment attachment, boolean reset) throws XWikiException
     {
-        XWikiAttachment newAttachment = attachment.cloneWithActualContent(getXWikiContext());
+        XWikiContext xcontext = getXWikiContext();
+        XWikiAttachment newAttachment = attachment.cloneWithActualContent(xcontext);
 
         if (reset) {
             // Reset the meta data that is specific to the original attachment (version, author, date).
             newAttachment.setRCSVersion(null);
-            newAttachment.setAuthorReference(getXWikiContext().getUserReference());
+            newAttachment.setAuthorReference(xcontext == null ? null : xcontext.getUserReference());
             newAttachment.setDate(new Date());
         }
 
@@ -4888,7 +4890,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             try {
                 attachment.loadAttachmentContent(context);
             } catch (XWikiException e) {
-                LOGGER.warn("Failed to load attachment [{}]: {}", attachment.getReference(),
+                LOGGER.warn("Failed to load attachment [{}]: [{}]", attachment.getReference(),
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
@@ -4977,7 +4979,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             return false;
         }
 
-        // Datas
+        // Data
 
         // We consider that 2 documents are still equal even when they have different original
         // documents (see getOriginalDocument() for more details as to what is an original
@@ -4987,14 +4989,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * Same as {@link #equals(Object)} but only for actual datas of the document.
+     * Same as {@link #equals(Object)} but only for actual data of the document.
      * <p>
      * The goal being to compare two versions of the same document this method skip every version/reference/author
      * related information. For example it allows to compare a document coming from a another wiki and easily check if
-     * thoses actually are the same thing whatever the plumbing differences.
+     * those actually are the same thing whatever the plumbing differences.
      *
      * @param otherDocument the document to compare
-     * @return true if bith documents have the same datas
+     * @return true if bith documents have the same data
      * @since 4.1.1
      */
     public boolean equalsData(XWikiDocument otherDocument)
@@ -5329,7 +5331,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param bWithRendering include the rendered content
      * @param bWithAttachmentContent include attachments content
      * @param bWithVersions include archived versions
-     * @param format true if the XML should be formated
+     * @param format true if the XML should be formatted
      * @param encoding the encoding to use to write the XML
      * @throws XWikiException when an errors occurs during wiki operations
      * @since 9.0RC1
@@ -5705,7 +5707,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             throw new XWikiException("Failed to load backlinks for reference [" + getDocumentReference() + "]", e);
         }
 
-        Set<DocumentReference> documentReferences = new HashSet<>(references.size());
+        Set<DocumentReference> documentReferences = HashSet.newHashSet(references.size());
         for (EntityReference entityReference : references) {
             // Resolve the DOCUMENT reference
             DocumentReference linkReference = context.getWiki().getDocumentReference(entityReference, context);
@@ -5765,7 +5767,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             links = new LinkedHashSet<>(getStore(context).loadLinks(getId(), context, true));
         } else {
             Set<String> linkedPages = getUniqueLinkedPages(context);
-            links = new LinkedHashSet<>(linkedPages.size());
+            links = LinkedHashSet.newLinkedHashSet(linkedPages.size());
             for (String linkedPage : linkedPages) {
                 XWikiLink wikiLink = new XWikiLink();
 
@@ -5794,7 +5796,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
         try {
             List<String> list = context.getUtil().getUniqueMatches(getContent(), "\\[(.*?)\\]", 1);
-            pageNames = new HashSet<>(list.size());
+            pageNames = HashSet.newHashSet(list.size());
 
             DocumentReference currentDocumentReference = getDocumentReference();
             for (String name : list) {
@@ -5896,8 +5898,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
                 // XObjects
                 for (List<BaseObject> xobjects : getXObjects().values()) {
-                    xobjects.stream()
-                        .forEach(xobject -> getUniqueLinkedEntityReferences(xobject, entityTypes, references, context));
+                    xobjects.forEach(
+                        xobject -> getUniqueLinkedEntityReferences(xobject, entityTypes, references, context));
                 }
             }
         } finally {
@@ -5929,7 +5931,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                         XDOM dom = parseContent(getSyntax(), largeField.getValue(), getDocumentReference());
                         getUniqueLinkedEntityReferences(dom, entityTypes, references);
                     } catch (XWikiException e) {
-                        LOGGER.warn("Failed to extract links from xobject property [{}], skipping it. Error: {}",
+                        LOGGER.warn("Failed to extract links from xobject property [{}], skipping it. Error: [{}]",
                             largeField.getReference(), ExceptionUtils.getRootCauseMessage(e));
                     }
                 }
@@ -5959,7 +5961,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         Set<EntityReference> references = getUniqueLinkedEntityReferences(context,
             Map.of(EntityType.DOCUMENT, Set.of(ResourceType.SPACE, ResourceType.DOCUMENT, ResourceType.ATTACHMENT),
                 EntityType.PAGE, Set.of(ResourceType.PAGE, ResourceType.PAGE_ATTACHMENT)));
-        Set<String> documentNames = new LinkedHashSet<>(references.size());
+        Set<String> documentNames = LinkedHashSet.newLinkedHashSet(references.size());
 
         XWikiDocument contextDoc = context.getDoc();
         String contextWiki = context.getWikiId();
@@ -6289,7 +6291,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
             return list;
         } catch (Exception e) {
-            LOGGER.error("Failed to extract include target from provided content [" + content + "]", e);
+            LOGGER.error("Failed to extract include target from provided content [{}]", content, e);
 
             return null;
         }
@@ -6951,7 +6953,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     return tdoc;
                 }
             } catch (Exception e) {
-                LOGGER.error("Error when loading document {} for locale {}", getDocumentReference(), locale, e);
+                LOGGER.error("Error when loading document [{}] for locale [{}]", getDocumentReference(), locale, e);
             }
 
             tdoc = getTranslatedDocument(LocaleUtils.getParentLocale(locale), context);
@@ -7020,7 +7022,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      *
      * @param context the XWiki context
      * @return the locales of the translations
-     * @throws XWikiException if retriving the translations from the database failed
+     * @throws XWikiException if retrieving the translations from the database failed
      */
     public List<Locale> getTranslationLocales(XWikiContext context) throws XWikiException
     {
@@ -7686,6 +7688,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
         String language = "";
         XWikiDocument tdoc = (XWikiDocument) context.get(CKEY_TDOC);
+        // Fall back to this document when no translated document is set in the context.
+        if (tdoc == null) {
+            tdoc = this;
+        }
         String realLang = tdoc.getRealLanguage(context);
         if (xwiki.isMultiLingual(context) && (!"".equals(realLang))) {
             language = realLang;
@@ -8401,6 +8407,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      *
      * @return the XWiki context for the current thread
      */
+    @Nullable
     private XWikiContext getXWikiContext()
     {
         Provider<XWikiContext> xcontextProvider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
@@ -8462,10 +8469,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 if (currentBlock instanceof SectionBlock) {
                     // The next children block is a HeaderBlock but we check to be on the safe side...
                     Block nextChildrenBlock = currentBlock.getChildren().get(0);
-                    if (nextChildrenBlock instanceof HeaderBlock headerBlock) {
-                        if (headerBlock.getLevel().getAsInt() <= sectionDepth) {
-                            filteredHeaders.add(headerBlock);
-                        }
+                    if (nextChildrenBlock instanceof HeaderBlock headerBlock
+                        && headerBlock.getLevel().getAsInt() <= sectionDepth) {
+                        filteredHeaders.add(headerBlock);
                     }
                     currentBlock = nextChildrenBlock;
                 } else {
@@ -8661,10 +8667,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             for (int i = sectionNumber; i < numberOfSections; i++) {
                 DocumentSection nextSection = getDocumentSection(i + 1); // get next section
                 String nextSectionLevel = nextSection.getSectionLevel();
-                if (sectionLevel.equals(nextSectionLevel)) {
-                    nextSectionIndex = nextSection.getSectionIndex();
-                    break;
-                } else if (sectionLevel.length() > nextSectionLevel.length()) {
+                if (sectionLevel.equals(nextSectionLevel) || sectionLevel.length() > nextSectionLevel.length()) {
                     nextSectionIndex = nextSection.getSectionIndex();
                     break;
                 }
@@ -8949,6 +8952,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     public static void backupContext(Map<String, Object> backup, XWikiContext context)
     {
+        // There's nothing to back up without a context and all the data below is read from it.
+        Objects.requireNonNull(context);
+
         // The XWiki Context isn't recreated when the Execution Context is cloned so we have to backup some of its data.
         // Backup the current document on the XWiki Context.
         backup.put("doc", context.getDoc());
@@ -9408,7 +9414,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @param newDocument the next version of the document
      * @param configuration the configuration of the merge indicates how to deal with some conflicts use cases, etc.
      * @param context the XWiki context
-     * @return a repport of what happen during the merge (errors, etc.)
+     * @return a report of what happen during the merge (errors, etc.)
      * @since 3.2M1
      * @deprecated use
      *             {@link MergeManager#mergeDocument(DocumentModelBridge, DocumentModelBridge, DocumentModelBridge, MergeConfiguration)}
@@ -9436,7 +9442,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     /**
      * Apply modification coming from provided document.
      * <p>
-     * Thid method does not take into account versions and author related informations and the provided document should
+     * This method does not take into account versions and author related information and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
      * this method is dealing with "real" data and should not change anything related to version management and document
      * identifier.
@@ -9456,7 +9462,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     /**
      * Apply modification coming from provided document.
      * <p>
-     * Thid method does not take into account versions and author related informations and the provided document should
+     * This method does not take into account versions and author related information and the provided document should
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
      * this method is dealing with "real" data and should not change everything related to version management and
      * document identifier.
@@ -9657,6 +9663,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      *
      * @return the serialization of the displayed author reference.
      */
+    // This method is not unused; it's used by hibernate as can be seen in the xwiki.hbml.xml mapping:
+    //     <property name="originalMetadataAuthorReference">
+    @SuppressWarnings("java:S1144")
     private String getOriginalMetadataAuthorReference()
     {
         if (this.getAuthors().getOriginalMetadataAuthor() == null
@@ -9673,6 +9682,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      *
      * @param serializedUserReference the serialization of the displayed author reference.
      */
+    // This method is not unused; it's used by hibernate as can be seen in the xwiki.hbml.xml mapping:
+    //     <property name="originalMetadataAuthorReference">
+    @SuppressWarnings("java:S1144")
     private void setOriginalMetadataAuthorReference(String serializedUserReference)
     {
         if (!StringUtils.isEmpty(serializedUserReference)) {

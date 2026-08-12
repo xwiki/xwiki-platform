@@ -144,7 +144,7 @@ public abstract class AbstractClassPropertyValuesProvider<T> implements ClassPro
      * @param filter the text filter
      * @param propertyDefinition the property definition
      * @return value of {@see getValueFromQueryResult} with the first query result or null if no results.
-     * @throws QueryException if an error occured during the query execution
+     * @throws QueryException if an error occurred during the query execution
      */
     protected PropertyValue getValue(Query query, String filter, T propertyDefinition) throws QueryException
     {

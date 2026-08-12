@@ -112,7 +112,6 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     @Override
     public AsyncRendererJobStatus getAsyncStatus(List<String> id, String clientId)
     {
-        //////////////////////////////////////////////
         // Try running job
 
         Job job = this.executor.getJob(id);
@@ -125,7 +124,6 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             }
         }
 
-        //////////////////////////////////////////////
         // Try cache
 
         AsyncRendererJobStatus status = this.cache.getAsync(clientId);
@@ -194,7 +192,6 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             }
         }
 
-        ////////////////////////////////
         // Execute the renderer
 
         AsyncRendererExecutorResponse response;

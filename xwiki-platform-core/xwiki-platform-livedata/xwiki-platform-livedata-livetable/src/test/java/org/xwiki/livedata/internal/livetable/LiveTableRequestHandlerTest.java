@@ -179,7 +179,7 @@ class LiveTableRequestHandlerTest
     }
 
     @Test
-    void getLiveTableResultsFromResponse() throws Exception
+    void getLiveTableResultsFromResponse()
     {
         assertEquals("JSON from response", this.handler.getLiveTableResults(new LiveDataQuery(), () -> {
             ArgumentCaptor<XWikiResponse> responseCaptor = ArgumentCaptor.forClass(XWikiResponse.class);

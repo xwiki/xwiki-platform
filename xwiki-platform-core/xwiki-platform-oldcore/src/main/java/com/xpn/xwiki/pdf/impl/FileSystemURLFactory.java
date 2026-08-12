@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,6 +65,12 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     /** Segment separator used in the collision-free key generation. */
     private static final char SEPARATOR = '/';
 
+    /** Context key under which the resource-key-to-temporary-file mapping is stored during the export. */
+    private static final String FILE_MAPPING_KEY = "pdfexport-file-mapping";
+
+    /** Logged when an attachment cannot be copied to the temporary export folder. */
+    private static final String SAVE_IMAGE_ERROR = "Failed to save image for PDF export";
+
     private LegacySpaceResolver legacySpaceResolver = Utils.getComponent(LegacySpaceResolver.class);
 
     private ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
@@ -95,7 +102,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             return getURL(wiki, spaces, name, filename, null, context);
         } catch (Exception ex) {
-            LOGGER.warn("Failed to save image for PDF export", ex);
+            LOGGER.warn(SAVE_IMAGE_ERROR, ex);
             return super.createAttachmentURL(filename, spaces, name, action, null, wiki, context);
         }
     }
@@ -107,7 +114,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         try {
             return getURL(wiki, spaces, name, filename, revision, context);
         } catch (Exception ex) {
-            LOGGER.warn("Failed to save image for PDF export: " + ex.getMessage());
+            LOGGER.warn(SAVE_IMAGE_ERROR, ex);
             return super.createAttachmentRevisionURL(filename, spaces, name, revision, wiki, context);
         }
     }
@@ -317,15 +324,21 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     }
 
     /**
-     * Retrieve the Map that relates resource keys to their corresponding temporary file.
+     * Retrieve the Map that relates resource keys to their corresponding temporary file, creating and storing it in the
+     * context when it's not there yet so that callers can always rely on a non-null, mutable mapping whose entries
+     * persist in the context.
      *
      * @param context the current request context
-     * @return the mapping as it was found in the context (read-write)
+     * @return the mapping stored in the context (read-write)
      */
     private Map<String, File> getFileMapping(XWikiContext context)
     {
         @SuppressWarnings("unchecked")
-        Map<String, File> usedFiles = (Map<String, File>) context.get("pdfexport-file-mapping");
+        Map<String, File> usedFiles = (Map<String, File>) context.get(FILE_MAPPING_KEY);
+        if (usedFiles == null) {
+            usedFiles = new HashMap<>();
+            context.put(FILE_MAPPING_KEY, usedFiles);
+        }
         return usedFiles;
     }
 

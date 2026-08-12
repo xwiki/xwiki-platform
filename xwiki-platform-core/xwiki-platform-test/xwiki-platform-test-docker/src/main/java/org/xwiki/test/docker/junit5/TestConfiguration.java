@@ -30,6 +30,7 @@ import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
 import org.xwiki.tool.extension.ExtensionOverride;
 
@@ -93,6 +94,8 @@ public class TestConfiguration
 
     private boolean saveDatabaseData;
 
+    private boolean testExtensionRepository;
+
     private boolean savePermanentDirectoryData;
 
     private List<String> servletEngineNetworkAliases;
@@ -139,6 +142,7 @@ public class TestConfiguration
         mergeForbiddenServletEngines(testConfiguration.getForbiddenServletEngines());
         mergeDatabaseCommands(testConfiguration.getDatabaseCommands());
         mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
+        mergeTestExtensionRepository(testConfiguration.isTestExtensionRepository());
         mergeSavePermanentDirectoryData(testConfiguration.isPermanentDirectoryDataSaved());
         mergeServletEngineNetworkAliases(testConfiguration.getServletEngineNetworkAliases());
         mergeBlobStore(testConfiguration.blobStore);
@@ -366,6 +370,13 @@ public class TestConfiguration
     {
         if (!isDatabaseDataSaved() && saveDatabaseData) {
             this.saveDatabaseData = true;
+        }
+    }
+
+    private void mergeTestExtensionRepository(boolean testExtensionRepository)
+    {
+        if (!isTestExtensionRepository() && testExtensionRepository) {
+            this.testExtensionRepository = true;
         }
     }
 
@@ -921,6 +932,25 @@ public class TestConfiguration
     }
 
     /**
+     * @return true if the extensions declared in the resources of the module executing the test are made available to
+     *     the XWiki instances as an extension repository
+     * @since 18.7.0RC1
+     */
+    public boolean isTestExtensionRepository()
+    {
+        return this.testExtensionRepository;
+    }
+
+    /**
+     * @param testExtensionRepository see {@link #isTestExtensionRepository()}
+     * @since 18.7.0RC1
+     */
+    public void setTestExtensionRepository(boolean testExtensionRepository)
+    {
+        this.testExtensionRepository = testExtensionRepository;
+    }
+
+    /**
      * @param saveDatabaseData see {@link #isDatabaseDataSaved()}
      */
     public void setSaveDatabaseData(boolean saveDatabaseData)
@@ -1074,5 +1104,16 @@ public class TestConfiguration
     public boolean isCluster()
     {
         return getXWikiInstances().value() > 1;
+    }
+
+    /**
+     * @return true if the database is embedded in the XWiki instance, false if it runs in its own Docker container.
+     *         Only HSQLDB can be embedded and only when there's a single XWiki instance since an embedded database
+     *         cannot be shared: in a cluster it runs in server mode instead.
+     * @since 18.7.0RC1
+     */
+    public boolean isDatabaseEmbedded()
+    {
+        return getDatabase() == Database.HSQLDB && !isCluster();
     }
 }

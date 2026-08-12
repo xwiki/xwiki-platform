@@ -97,7 +97,7 @@ public class SpaceSolrReferenceResolver extends AbstractSolrReferenceResolver
             try {
                 this.documentResolverProvider.get().getReferences(documentReference).forEach(result::add);
             } catch (Exception e) {
-                this.logger.error("Failed to resolve references for document [" + documentReference + "]", e);
+                this.logger.error("Failed to resolve references for document [{}]", documentReference, e);
             }
         }
 

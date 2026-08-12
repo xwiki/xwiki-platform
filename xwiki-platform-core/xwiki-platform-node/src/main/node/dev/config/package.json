@@ -14,15 +14,15 @@
     "url": "https://jira.xwiki.org/projects/XWIKI/"
   },
   "type": "module",
-  "files": [
-    "dist"
-  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     }
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "clean": "rimraf dist"

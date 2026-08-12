@@ -301,7 +301,7 @@ define('xwiki-wysiwyg-image-editor', [
        * and a ratio of 0.5, the result is 15px.
        * @param field the field type ('width' or 'height')
        * @param inputvalue the input value of the updated field (e.g., 100, or 33px)
-       * @returns {*|jQuery} a Defered, resolved with the computed value
+       * @returns {*|jQuery} a Deferred, resolved with the computed value
        */
       function updateRatio(field, inputvalue) {
         return loadImage(modal).then(function (image) {

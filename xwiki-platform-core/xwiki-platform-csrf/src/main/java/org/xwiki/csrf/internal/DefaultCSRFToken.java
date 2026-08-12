@@ -35,6 +35,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -117,7 +118,8 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         } catch (NoSuchAlgorithmException e) {
             // use the default implementation then
             this.random = new SecureRandom();
-            this.logger.warn("Using default implementation of SecureRandom for CSRF token");
+            this.logger.warn("Using default implementation of SecureRandom for CSRF token. Root cause is [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
         }
         byte[] seed = this.random.generateSeed(TOKEN_LENGTH);
         this.random.setSeed(seed);

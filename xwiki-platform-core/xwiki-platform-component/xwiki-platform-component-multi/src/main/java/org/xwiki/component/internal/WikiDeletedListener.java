@@ -86,7 +86,7 @@ public class WikiDeletedListener implements EventListener
             try {
                 disposable.dispose();
             } catch (ComponentLifecycleException e) {
-                this.logger.error(String.format("Failed to dispose component manager for wiki [%s]", wiki), e);
+                this.logger.error("Failed to dispose component manager for wiki [{}]", wiki, e);
             }
         }
     }

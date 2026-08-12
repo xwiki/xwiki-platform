@@ -92,7 +92,7 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
         }
         StringBuilder entriesString = new StringBuilder();
         for (String entry : contextEntries) {
-            if (entriesString.length() > 0) {
+            if (!entriesString.isEmpty()) {
                 entriesString.append('|');
             }
             entriesString.append(entry);

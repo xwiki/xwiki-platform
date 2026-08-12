@@ -76,11 +76,12 @@ class StackTraceLogParserTest
     @Test
     void parseWithLeadingStacktrace()
     {
-        String log = "date - line1\n"
-            + "date - line2\n"
-            + "date - \tat x\n"
-            + "date - Caused by: x\n"
-            + "date - test";
+        String log = """
+            date - line1
+            date - line2
+            date - \tat x
+            date - Caused by: x
+            date - test""";
         StackTraceLogParser parser = new StackTraceLogParser();
         List<String> results = parser.parse(log);
 
@@ -109,10 +110,10 @@ class StackTraceLogParserTest
     @Test
     void parseWithNoPrefixedLogs()
     {
-        String log = ""
-            + "WARN  - stacktrace\n"
-            + "java.lang.Exception: exception\n"
-            + "\tat doSomething(ValidateConsoleExtensionTest.java:94)";
+        String log = """
+            WARN  - stacktrace
+            java.lang.Exception: exception
+            \tat doSomething(ValidateConsoleExtensionTest.java:94)""";
         StackTraceLogParser parser = new StackTraceLogParser();
         List<String> results = parser.parse(log);
 

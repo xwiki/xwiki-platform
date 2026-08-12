@@ -593,7 +593,7 @@ function setBooleanPropertyFromLiveCheckbox(self, saveDocumentURL, configuration
 }
 
 /*
- * Depricated Since 2.3M1
+ * Deprecated Since 2.3M1
  * Use setBooleanPropertyFromLiveCheckbox
  */
 function setGuestExtendedRights(self)

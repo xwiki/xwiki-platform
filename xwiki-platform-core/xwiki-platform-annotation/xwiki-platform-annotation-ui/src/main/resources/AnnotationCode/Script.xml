@@ -1606,15 +1606,16 @@ XWiki.Annotation = Class.create({
       closeButton.observe('click', () => this.hideBubble(container));
     }
     // Forward the click to the button in the comment tab instead of handling it in the bubble.
-    var threadToggleButton = container.down('.thread-toggle');
+    let threadToggleButton = container.querySelector('.thread-toggle');
     if (threadToggleButton) {
-      var threadToggleInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' .thread-toggle')[0];
+      let threadToggleInTab = document.querySelector('#Commentspane #xwikicomment_' + annotationId + ' .thread-toggle');
       if (!threadToggleInTab) {
-        threadToggleButton.hide();
+        threadToggleButton.style.display = 'none';
       } else {
-        threadToggleButton.observe('click', function(event) {
-          event.stop();
-          threadToggleInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' .thread-toggle')[0];
+        threadToggleButton.addEventListener('click', function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          threadToggleInTab = document.querySelector('#Commentspane #xwikicomment_' + annotationId + ' .thread-toggle');
           threadToggleInTab.click();
           threadToggleInTab.scrollIntoView();
           container.blur();

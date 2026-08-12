@@ -29,6 +29,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
@@ -77,6 +78,8 @@ public class ObjectEditPage extends EditPage
 
         final By objectsLocator = By.cssSelector("[id='xclass_" + className + "'] .xobject");
         final int initialObjectCount = getDriver().findElementsWithoutWaiting(objectsLocator).size();
+        // The button is only enabled once the object editor JavaScript has bound the handler that adds the object.
+        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(this.classNameSubmit));
         this.classNameSubmit.click();
 
         // Make sure we wait for the element to appear since there's no page refresh.

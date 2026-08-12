@@ -234,7 +234,10 @@
     })
     #classPicker($classPickerParameters)
     <span class="buttonwrapper">
-      <input type="submit" name="action_objectadd" class="button xobject-add-control"
+      ## The button is disabled by default because adding an object is only supported through JavaScript: submitting the
+      ## form without it would leave the object editor. It is enabled again by the object editor JavaScript, once the
+      ## click handler performing the actual addition has been bound.
+      <input type="submit" name="action_objectadd" class="button xobject-add-control" disabled="disabled"
         value="$services.localization.render('core.editors.object.add.submit')"/>
     </span>
   </div>

@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.internal.verification.api.VerificationData;
 import org.mockito.verification.VerificationMode;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventFactory;
@@ -116,7 +115,7 @@ class MessageStreamTest
         verify(this.mockEventStore).saveEvent(event);
     }
 
-    private Event setupForPublicMessage() throws Exception
+    private Event setupForPublicMessage()
     {
         Event e = setupForNewMessage();
 
@@ -125,7 +124,7 @@ class MessageStreamTest
         return e;
     }
 
-    private Event setupForPersonalMessage() throws Exception
+    private Event setupForPersonalMessage()
     {
         Event e = setupForNewMessage();
 

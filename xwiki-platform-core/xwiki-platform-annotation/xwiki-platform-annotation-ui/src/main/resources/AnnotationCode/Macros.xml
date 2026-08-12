@@ -232,7 +232,7 @@
   #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'dd/MM/yyyy hh:mm'))
   $!xwiki.getUserName($ann.author)
 ## Do not indent this, or the comma will be misplaced
-#if("$!{ann.date}" != '')&lt;span class="annotationDate"&gt;$xwiki.formatDate($ann.date, $dateFormat)&lt;/span&gt;#end
+#if("$!{ann.date}" != '')#set($annotationISODate = $xwiki.formatDate($ann.date, "yyyy-MM-dd'T'HH:mm:ssXXX"))#set($annotationFullDate = $xwiki.formatDate($ann.date, 'EEEE d MMMM yyyy HH:mm:ss'))&lt;time class="annotationDate" datetime="$escapetool.xml($annotationISODate)" title="$escapetool.xml($annotationFullDate)"&gt;$xwiki.formatDate($ann.date, $dateFormat)&lt;/time&gt;#end
 #end
 ##
 ##

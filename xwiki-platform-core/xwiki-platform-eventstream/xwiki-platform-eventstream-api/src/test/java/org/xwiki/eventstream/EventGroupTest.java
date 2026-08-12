@@ -235,7 +235,7 @@ class EventGroupTest
         this.g.addEvents(this.event1, this.event2);
 
         Set<Event> events = this.g.getEvents();
-        assertThrows(UnsupportedOperationException.class, () -> events.clear());
+        assertThrows(UnsupportedOperationException.class, events::clear);
     }
 
     @Test

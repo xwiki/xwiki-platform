@@ -232,7 +232,7 @@ class DefaultWikiMacroManagerTest
     }
 
     @Test
-    void registerWikiMacroWhenGlobalVisibilityAndNotAllowed() throws Exception
+    void registerWikiMacroWhenGlobalVisibilityAndNotAllowed()
     {
         WikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.GLOBAL);
 
@@ -287,7 +287,7 @@ class DefaultWikiMacroManagerTest
     }
 
     @Test
-    void registerWikiMacroWhenWikiVisibilityAndNotAllowed() throws Exception
+    void registerWikiMacroWhenWikiVisibilityAndNotAllowed()
     {
         WikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.WIKI);
 
@@ -303,7 +303,7 @@ class DefaultWikiMacroManagerTest
     }
 
     @Test
-    void registerWikiMacroWhenUserVisibilityAndNotAllowed() throws Exception
+    void registerWikiMacroWhenUserVisibilityAndNotAllowed()
     {
         WikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.USER);
 

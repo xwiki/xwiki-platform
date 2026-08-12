@@ -66,7 +66,6 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
-import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.XWikiTempDir;

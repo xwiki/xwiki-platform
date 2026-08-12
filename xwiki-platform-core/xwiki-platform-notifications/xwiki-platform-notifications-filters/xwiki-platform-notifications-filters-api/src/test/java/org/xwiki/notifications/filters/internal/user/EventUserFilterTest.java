@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
@@ -140,7 +139,7 @@ class EventUserFilterTest
     }
 
     @Test
-    void filterEvent() throws Exception
+    void filterEvent()
     {
         Collection<NotificationFilterPreference> filterPreferences = mockPreferences();
 
@@ -172,7 +171,7 @@ class EventUserFilterTest
     }
 
     @Test
-    void generateFilterExpressionWithPreferences() throws Exception
+    void generateFilterExpressionWithPreferences()
     {
         Collection<NotificationFilterPreference> filterPreferences = mockPreferences();
 
@@ -183,7 +182,7 @@ class EventUserFilterTest
     }
 
     @Test
-    void generateFilterExpression() throws Exception
+    void generateFilterExpression()
     {
         Collection<NotificationFilterPreference> filterPreferences = mockPreferences();
 

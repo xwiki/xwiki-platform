@@ -21,11 +21,6 @@ package org.xwiki.notifications.preferences.internal.cache;
 
 import java.util.Map;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
-import javax.management.MalformedObjectNameException;
-import javax.management.ReflectionException;
-
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -116,15 +111,13 @@ class UnboundedEntityCacheManagerTest
     }
 
     @Test
-    void createWithoutInvalidationOnUpdate() throws ComponentLookupException, MalformedObjectNameException,
-        IntrospectionException, InstanceNotFoundException, ReflectionException
+    void createWithoutInvalidationOnUpdate() throws ComponentLookupException
     {
         assertCreate(false);
     }
 
     @Test
-    void createWithInvalidationOnUpdate() throws ComponentLookupException, MalformedObjectNameException,
-        IntrospectionException, InstanceNotFoundException, ReflectionException
+    void createWithInvalidationOnUpdate() throws ComponentLookupException
     {
         assertCreate(true);
     }

@@ -519,9 +519,10 @@ class InplaceEditIT
         viewPage.cancel();
         WikiEditPage wikiEditPage = WikiEditPage.gotoPage(testReference);
         String content = wikiEditPage.getContent();
-        assertEquals("{{velocity wiki=\"false\"}}\n"
-            + "#set($discard = $NULL)\n"
-            + "{{/velocity}}", content);
+        assertEquals("""
+            {{velocity wiki="false"}}
+            #set($discard = $NULL)
+            {{/velocity}}""", content);
         wikiEditPage.clickCancel();
     }
 

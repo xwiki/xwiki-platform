@@ -21,7 +21,7 @@
 import { createLinkEditionContext } from "../linkSuggest.js";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
-import { listEnabledLinkTargetTypeExtensions } from "@xwiki/platform-link-type-api";
+import { listLinkTargetTypeExtensions } from "@xwiki/platform-link-type-api";
 import { computed, markRaw, provide } from "vue";
 import { useI18n } from "vue-i18n";
 import type { LinkData } from "@xwiki/platform-link-type-api";
@@ -38,21 +38,15 @@ provide("linkEditionCtx", createLinkEditionContext(props.depsContainer));
 
 const linkData = typedRef(props.current);
 
-// The list of registered, enabled link target types (built-in and 3rd-party), resolved synchronously from the
-// same `depsContainer` used for every other domain service (see `createLinkEditionContext` above), and shared
-// with `LinkConfig.vue` (rendered nested inside whichever configuration component is active below) so it can
-// build the link type selector from it.
-const extensions = computed(() =>
-  listEnabledLinkTargetTypeExtensions(props.depsContainer),
-);
+const linkExtensions = listLinkTargetTypeExtensions(props.depsContainer);
 
-provide("linkTargetTypeExtensions", extensions);
+provide("linkTargetTypeExtensions", linkExtensions);
 
 // The configuration component for the currently selected link target type. `markRaw()` excludes it from Vue's
 // reactivity tracking (mirrors `LivedataDisplayer.vue`'s own use of `markRaw()` for the same reason, for a
 // dynamically registered component).
 const activeConfigComponent = computed(() => {
-  const extension = extensions.value.find(
+  const extension = linkExtensions.find(
     (e) => e.type === linkData.value.target.type,
   );
 

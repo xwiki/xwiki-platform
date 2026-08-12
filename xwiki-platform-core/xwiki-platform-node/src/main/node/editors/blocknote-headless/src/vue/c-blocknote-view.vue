@@ -203,7 +203,11 @@ function currentLinkTarget(current: LinkEditionData): LinkTarget {
 
   const target =
     current.reference &&
-    resourceReferenceToLinkTarget(current.reference, depsContainer, referenceCtx);
+    resourceReferenceToLinkTarget(
+      current.reference,
+      depsContainer,
+      referenceCtx,
+    );
 
   return (
     target ??

@@ -94,7 +94,12 @@ describe("AttachmentLinkTargetType", () => {
     const modelReferenceSerializer = mock<ModelReferenceSerializer>();
 
     const config = extension.tryParseReference?.(
-      { type: "attach", typed: true, reference: "Some.Page@file.png", parameters: {} },
+      {
+        type: "attach",
+        typed: true,
+        reference: "Some.Page@file.png",
+        parameters: {},
+      },
       { modelReferenceParser, modelReferenceSerializer },
     );
 

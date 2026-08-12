@@ -75,30 +75,6 @@ type LinkTargetReferenceContext = {
  * modal (e.g., a link to a page, to an attachment, to an URL, to an e-mail address, or any other kind contributed
  * by an extension).
  *
- * Implementations are registered against the shared `depsContainer`, using {@link linkTargetTypeExtensionRole}
- * as an unconstrained (multi-)binding — mirroring how `@xwiki/platform-markdown-syntax-config` and its siblings
- * each contribute their own `"SyntaxConfig"` binding:
- *
- * ```ts
- * class ComponentInit {
- *   constructor(container: Container) {
- *     container.bind(linkTargetTypeExtensionRole).to(MyLinkTargetType);
- *   }
- * }
- * ```
- *
- * There is no priority/override mechanism: every bound implementation is returned by
- * `container.getAll(linkTargetTypeExtensionRole)`. To offer a reduced or replaced set of built-in types, a
- * consumer simply does not instantiate `@xwiki/platform-link-type-default`'s `ComponentInit` (or provides its
- * own alternative), the same way any other `ComponentInit` in this codebase is opted into (or out of) by whoever
- * assembles the `depsContainer`. To conditionally hide an already-registered type without removing its
- * registration, use {@link isEnabled} instead.
- *
- * Implementations must be usable with a no-argument constructor (`@injectable()`, no `@inject(...)` constructor
- * parameters): they are resolved directly from `depsContainer`, but nothing about their own construction is
- * expected to depend on other bindings — anything an implementation needs beyond its own logic must be received
- * as an explicit argument (see {@link LinkTargetUrlContext}) rather than through constructor injection.
- *
  * @typeParam TConfig - the shape of this link target type's configuration
  *
  * @since 18.7.0RC1
@@ -182,15 +158,6 @@ interface LinkTargetTypeExtension<TConfig = unknown> {
     config: TConfig,
     ctx: LinkTargetReferenceContext,
   ): ResourceReference | undefined;
-
-  /**
-   * @returns whether this link target type is currently offered to the user for creating/switching to a new
-   *   link. Defaults to always enabled when unset. This only affects the type selector, not the ability to
-   *   correctly display and re-submit a link that already uses this type ({@link tryParseUrl}/
-   *   {@link serializeUrl} are always available regardless of this flag) — this is the supported way to
-   *   conditionally hide a link target type (including a built-in one) without un-registering it.
-   */
-  isEnabled?(): boolean;
 }
 
 export { linkTargetTypeExtensionRole };

@@ -19,7 +19,6 @@
  */
 import {
   linkTargetToResourceReference,
-  listEnabledLinkTargetTypeExtensions,
   parseLinkTarget,
   resourceReferenceToLinkTarget,
   serializeLinkTarget,
@@ -108,19 +107,6 @@ class NoReferenceSupportExtension
   };
   tryParseUrl = () => null;
   serializeUrl = (config: { ref: string }) => config.ref;
-}
-
-@injectable()
-class DisabledExtension implements LinkTargetTypeExtension<unknown> {
-  readonly type = "disabled";
-  getLabel = () => "Disabled";
-  createDefaultConfig = () => undefined;
-  component = () => {
-    throw new Error("not used in this test");
-  };
-  tryParseUrl = () => null;
-  serializeUrl = () => "";
-  isEnabled = () => false;
 }
 
 function buildContainer(
@@ -218,7 +204,12 @@ describe("resourceReferenceToLinkTarget", () => {
     const container = buildContainer([PageExtension]);
 
     const target = resourceReferenceToLinkTarget(
-      { type: "interwiki", typed: true, reference: "wiki:Space.Page", parameters: {} },
+      {
+        type: "interwiki",
+        typed: true,
+        reference: "wiki:Space.Page",
+        parameters: {},
+      },
       container,
       referenceCtx,
     );
@@ -267,19 +258,5 @@ describe("linkTargetToResourceReference", () => {
     );
 
     expect(reference).toBeUndefined();
-  });
-});
-
-describe("listEnabledLinkTargetTypeExtensions", () => {
-  it("excludes extensions whose isEnabled() returns false", () => {
-    const container = buildContainer([
-      CatchAllExtension,
-      PageExtension,
-      DisabledExtension,
-    ]);
-
-    const enabled = listEnabledLinkTargetTypeExtensions(container);
-
-    expect(enabled.map((e) => e.type).sort()).toEqual(["page", "url"]);
   });
 });

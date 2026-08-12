@@ -24,8 +24,8 @@ import type {
   LinkTargetTypeExtension,
   LinkTargetUrlContext,
 } from "./linkTargetType";
-import type { Container } from "inversify";
 import type { ResourceReference } from "@xwiki/platform-rendering-api";
+import type { Container } from "inversify";
 
 /**
  * @param container - the `depsContainer` to look up registered {@link LinkTargetTypeExtension}s from
@@ -42,25 +42,6 @@ function listLinkTargetTypeExtensions(
   );
 
   return [...extensions].sort((a, b) => (a.order ?? 1000) - (b.order ?? 1000));
-}
-
-/**
- * @param container - the `depsContainer` to look up registered {@link LinkTargetTypeExtension}s from
- * @returns the registered link target type extensions whose {@link LinkTargetTypeExtension.isEnabled} returns
- *   `true` (or is unset), sorted by ascending {@link LinkTargetTypeExtension.order}. Intended for populating
- *   the link type selector — {@link parseLinkTarget}/{@link serializeLinkTarget} deliberately consider *every*
- *   registered extension (see {@link listLinkTargetTypeExtensions}), so that a link using a type that was
- *   disabled after being created can still be displayed and re-submitted correctly.
- *
- * @since 18.7.0RC1
- * @beta
- */
-function listEnabledLinkTargetTypeExtensions(
-  container: Container,
-): LinkTargetTypeExtension[] {
-  return listLinkTargetTypeExtensions(container).filter(
-    (extension) => extension.isEnabled?.() ?? true,
-  );
 }
 
 /**
@@ -138,9 +119,6 @@ function serializeLinkTarget(
  * {@link LinkTargetTypeExtension.order} (see {@link LinkTargetTypeExtension.tryParseReference}). The
  * reverse of {@link linkTargetToResourceReference}.
  *
- * Every registered extension is considered, not just the enabled ones (see
- * {@link listLinkTargetTypeExtensions}), for the same reason as {@link parseLinkTarget}.
- *
  * @param reference - the reference of the linked resource
  * @param container - the `depsContainer` to look up registered link target types from
  * @param ctx - services needed by extensions to inspect the reference
@@ -199,7 +177,6 @@ function linkTargetToResourceReference(
 
 export {
   linkTargetToResourceReference,
-  listEnabledLinkTargetTypeExtensions,
   listLinkTargetTypeExtensions,
   parseLinkTarget,
   resourceReferenceToLinkTarget,

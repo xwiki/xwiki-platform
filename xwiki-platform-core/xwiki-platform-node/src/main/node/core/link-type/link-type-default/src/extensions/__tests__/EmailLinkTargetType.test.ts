@@ -71,6 +71,10 @@ describe("EmailLinkTargetType", () => {
 
     expect(url).toBe("mailto:jdoe@example.org");
   });
+});
+
+describe("EmailLinkTargetType reference conversion", () => {
+  const extension = new EmailLinkTargetType();
 
   it("parses a mailto reference", () => {
     expect(

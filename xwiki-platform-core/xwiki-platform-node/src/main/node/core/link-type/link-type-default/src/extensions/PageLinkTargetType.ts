@@ -17,8 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { entityResourceReference, parseEntityReference } from "./referenceHelpers";
 import { labelFromTranslations } from "./labels";
+import {
+  entityResourceReference,
+  parseEntityReference,
+} from "./referenceHelpers";
 import PageConfig from "../vue/PageConfig.vue";
 import { tryFallible } from "@xwiki/platform-fn-utils";
 import { EntityType } from "@xwiki/platform-model-api";

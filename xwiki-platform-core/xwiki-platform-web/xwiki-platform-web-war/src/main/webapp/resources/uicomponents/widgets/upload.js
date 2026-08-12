@@ -82,11 +82,11 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
      * Convert bytes to a human-readable, localized size format.
      *
      * @param bytes the number of bytes to convert
-     * @param perSecond whether the value represents a data rate (appends a localized "per second" unit)
+     * @param isRate whether the value represents a data rate (appends a localized "per second" unit)
      * @return a string representing the size (or rate) in bytes, kilobytes, megabytes or gigabytes, localized using
      *         the page language, with 1 decimal precision
      */
-    static bytesToSize(bytes, perSecond = false)
+    static bytesToSize(bytes, isRate = false)
     {
       if (bytes === 0) return 'N/A';
       let units = ['byte', 'kilobyte', 'megabyte', 'gigabyte'];
@@ -96,7 +96,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
         value /= 1000;
         unitIndex++;
       }
-      let unit = units[unitIndex] + (perSecond ? '-per-second' : '');
+      let unit = units[unitIndex] + (isRate ? '-per-second' : '');
       return new Intl.NumberFormat(document.documentElement.lang || undefined,
           {style: 'unit', unit, unitDisplay: 'narrow', maximumFractionDigits: 1}).format(value);
     }

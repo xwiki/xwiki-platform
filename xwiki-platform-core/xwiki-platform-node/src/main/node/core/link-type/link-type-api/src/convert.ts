@@ -43,25 +43,6 @@ function listLinkTargetTypeExtensions(
 }
 
 /**
- * @param container - the `depsContainer` to look up registered {@link LinkTargetTypeExtension}s from
- * @returns the registered link target type extensions whose {@link LinkTargetTypeExtension.isEnabled} returns
- *   `true` (or is unset), sorted by ascending {@link LinkTargetTypeExtension.order}. Intended for populating
- *   the link type selector — {@link parseLinkTarget}/{@link serializeLinkTarget} deliberately consider *every*
- *   registered extension (see {@link listLinkTargetTypeExtensions}), so that a link using a type that was
- *   disabled after being created can still be displayed and re-submitted correctly.
- *
- * @since 18.7.0RC1
- * @beta
- */
-function listEnabledLinkTargetTypeExtensions(
-  container: Container,
-): LinkTargetTypeExtension[] {
-  return listLinkTargetTypeExtensions(container).filter(
-    (extension) => extension.isEnabled?.() ?? true,
-  );
-}
-
-/**
  * Parse a link target from a raw URL, by trying each registered {@link LinkTargetTypeExtension} in ascending
  * {@link LinkTargetTypeExtension.order}, and keeping the first one that matches (see
  * {@link LinkTargetTypeExtension.tryParseUrl}).
@@ -130,9 +111,4 @@ function serializeLinkTarget(
   return extension.serializeUrl(target.config, ctx);
 }
 
-export {
-  listEnabledLinkTargetTypeExtensions,
-  listLinkTargetTypeExtensions,
-  parseLinkTarget,
-  serializeLinkTarget,
-};
+export { listLinkTargetTypeExtensions, parseLinkTarget, serializeLinkTarget };

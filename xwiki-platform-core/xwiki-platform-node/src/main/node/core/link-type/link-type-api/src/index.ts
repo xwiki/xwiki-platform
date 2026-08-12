@@ -20,7 +20,6 @@
 
 export type { LinkData, LinkTarget } from "./data/linkType";
 export {
-  listEnabledLinkTargetTypeExtensions,
   listLinkTargetTypeExtensions,
   parseLinkTarget,
   serializeLinkTarget,

@@ -17,11 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  listEnabledLinkTargetTypeExtensions,
-  parseLinkTarget,
-  serializeLinkTarget,
-} from "../convert";
+import { parseLinkTarget, serializeLinkTarget } from "../convert";
 import { linkTargetTypeExtensionRole } from "../linkTargetType";
 import { Container, injectable } from "inversify";
 import { describe, expect, it } from "vitest";
@@ -74,7 +70,6 @@ class DisabledExtension implements LinkTargetTypeExtension<unknown> {
   };
   tryParseUrl = () => null;
   serializeUrl = () => "";
-  isEnabled = () => false;
 }
 
 function buildContainer(
@@ -137,19 +132,5 @@ describe("serializeLinkTarget", () => {
     expect(() =>
       serializeLinkTarget({ type: "email", config: {} }, container, ctx),
     ).toThrow();
-  });
-});
-
-describe("listEnabledLinkTargetTypeExtensions", () => {
-  it("excludes extensions whose isEnabled() returns false", () => {
-    const container = buildContainer([
-      CatchAllExtension,
-      PageExtension,
-      DisabledExtension,
-    ]);
-
-    const enabled = listEnabledLinkTargetTypeExtensions(container);
-
-    expect(enabled.map((e) => e.type).sort()).toEqual(["page", "url"]);
   });
 });

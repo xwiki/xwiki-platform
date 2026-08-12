@@ -35,7 +35,6 @@ import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.RequiredRightsModal;
 import org.xwiki.test.ui.po.ViewPage;
@@ -365,8 +364,6 @@ class InplaceEditIT
     }
 
     @Test
-    @IgnoreBrowser(value = "firefox", reason = "Page Down/Up key is ignored inside a TextArea without vertical scroll "
-        + "bar once the host page has vertical scroll bar. See https://jira.xwiki.org/browse/XWIKI-24488 .")
     @Order(7)
     void selectionRestoreOnSwitchToSource(TestUtils setup, TestReference testReference)
     {
@@ -455,8 +452,8 @@ class InplaceEditIT
         assertEquals("50", sourceTextArea.getDomProperty("value").substring(selectionStart, selectionEnd));
 
         // Verify that the restored selection is visible (inside the viewport).
-        // Note that we have to subtract 4 from the height because the floating toolbar is overlapping the text area.
-        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 4));
+        // Note that we have to subtract 7 from the height because the floating toolbar is overlapping the text area.
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 7));
 
         viewPage.cancel();
     }

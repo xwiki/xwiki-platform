@@ -304,16 +304,19 @@
       &lt;/a&gt;##
     #end
     #if ($hasAdmin || ($hasEdit &amp;&amp; $isUserComment))
-      #set ($queryString = $escapetool.url({
-        'form_token': $services.csrf.token,
-        'classname': $annotationClassDocName,
-        'classid': $ann.id,
-        'xredirect': $doc.getURL('view')}))
-      #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${ann.id}"))
-      &lt;a class="delete btn btn-default errormessage" data-toggle="modal" data-target="#deleteModal" rel="nofollow"
-      href="$deleteURL" title="$services.localization.render('core.viewers.comments.delete')"&gt;
-      $services.icon.renderHTML('trash') $!escapetool.xml($services.localization.render('core.viewers.comments.delete'))
-      &lt;/a&gt;
+      ## Delete mutates state, so it's a real POST form (not a link) - a link's href can be followed by a
+      ## crawler, prefetched, opened in a new tab, or navigated to directly if JavaScript never attaches.
+      #set ($deleteActionURL = $xwiki.getURL($doc.fullName, 'objectremove'))
+      &lt;form class="delete-form" method="post" action="$deleteActionURL"&gt;
+        &lt;input type="hidden" name="form_token" value="$escapetool.xml($services.csrf.token)"/&gt;
+        &lt;input type="hidden" name="classname" value="$escapetool.xml($annotationClassDocName)"/&gt;
+        &lt;input type="hidden" name="classid" value="$escapetool.xml($ann.id)"/&gt;
+        &lt;input type="hidden" name="xredirect" value="$escapetool.xml($doc.getURL('view'))"/&gt;
+        &lt;button type="submit" class="delete btn btn-default errormessage"
+          title="$services.localization.render('core.viewers.comments.delete')"&gt;
+          $services.icon.renderHTML('trash') $!escapetool.xml($services.localization.render('core.viewers.comments.delete'))
+        &lt;/button&gt;
+      &lt;/form&gt;
     #end
   #else
     ## Wikis can configure a different backing class for annotations (AnnotationCode.AnnotationConfig,

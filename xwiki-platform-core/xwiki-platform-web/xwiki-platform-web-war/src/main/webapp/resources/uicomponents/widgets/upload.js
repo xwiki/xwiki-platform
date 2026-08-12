@@ -79,7 +79,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     }
 
     /**
-     * Convert bytes to a human-readable, localized size (or data rate) format.
+     * Convert bytes to a human-readable, localized size format.
      *
      * @param bytes the number of bytes to convert
      * @param perSecond whether the value represents a data rate (appends a localized "per second" unit)

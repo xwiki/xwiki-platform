@@ -178,7 +178,7 @@ public class AttachmentsPane extends BaseElement
      */
     public void waitForUploadToFinish(String fileName)
     {
-        waitForNotificationSuccessMessage("Attachment uploaded: " + fileName);
+        waitForUploadToFinish(fileName, null);
     }
 
     /**
@@ -186,12 +186,16 @@ public class AttachmentsPane extends BaseElement
      * file name.
      *
      * @param fileName the name of the attachment
-     * @param expectedSize the expected localized size displayed in the upload notification (e.g. {@code "27B"})
+     * @param expectedSize the expected localized size displayed in the upload notification (e.g. {@code "27B"}), or
+     *     {@code null} to not check the size
      * @since 18.7.0RC1
      */
     public void waitForUploadToFinish(String fileName, String expectedSize)
     {
-        waitForNotificationSuccessMessage(String.format("Attachment uploaded: %s (%s)", fileName, expectedSize));
+        String message = expectedSize != null
+            ? String.format("Attachment uploaded: %s (%s)", fileName, expectedSize)
+            : "Attachment uploaded: " + fileName;
+        waitForNotificationSuccessMessage(message);
     }
 
     /**

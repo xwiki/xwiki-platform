@@ -680,12 +680,32 @@ require(['jquery'], function($) {
     window.location = $('#permalinkModal').find('.form-control').val();
   });
   /**
-   * Copy the permalink to the clipboard.
+   * Copy the permalink to the clipboard, preferring the modern Clipboard API and falling back to the deprecated
+   * execCommand('copy') when it's unavailable or fails - e.g. because the document isn't focused, which is common
+   * in browsers automated by Selenium/WebDriver.
    */
   $(document).on('click', '#permalink-copy-button', function() {
-    $('#permalinkModal').find('.form-control').select();
-    document.execCommand('copy');
-    new XWiki.widgets.Notification($(this).data('copiedMessage'), 'info');
+    var button = this;
+    var permalinkField = $('#permalinkModal').find('.form-control');
+    var notifyCopied = function() {
+      new XWiki.widgets.Notification($(button).data('copiedMessage'), 'info');
+    };
+    var notifyFailed = function() {
+      new XWiki.widgets.Notification($(button).data('copyFailedMessage'), 'error');
+    };
+    var copyWithExecCommand = function() {
+      permalinkField.select();
+      try {
+        document.execCommand('copy') ? notifyCopied() : notifyFailed();
+      } catch (e) {
+        notifyFailed();
+      }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(permalinkField.val()).then(notifyCopied, copyWithExecCommand);
+    } else {
+      copyWithExecCommand();
+    }
   });
 });
 

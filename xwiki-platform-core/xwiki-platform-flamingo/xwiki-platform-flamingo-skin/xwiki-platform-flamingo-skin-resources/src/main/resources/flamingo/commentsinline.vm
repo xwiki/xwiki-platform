@@ -346,7 +346,8 @@ $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.rend
             <span class="input-group-btn">
               <button type="button" id="permalink-copy-button" class="btn btn-default"
                 title="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.copyButton'))"
-                data-copied-message="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.copied'))">
+                data-copied-message="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.copied'))"
+                data-copy-failed-message="$escapetool.xml($services.localization.render('core.viewers.comments.permalink.copyFailed'))">
                 $services.icon.renderHTML('paste')
               </button>
             </span>

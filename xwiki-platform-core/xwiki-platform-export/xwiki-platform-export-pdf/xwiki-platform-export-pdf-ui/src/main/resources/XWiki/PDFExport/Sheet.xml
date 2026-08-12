@@ -1546,8 +1546,12 @@ require([
 
   .pdf-toc li {
     margin: .5em 0;
-    /* Make sure the fake dotted leader doesn't overflow. */
-    overflow-x: hidden;
+    /* Clip the fake dotted leader at the right edge of the table of contents entry. We use 'clip' rather than 'hidden'
+      because 'hidden' would turn the list item into a scroll container, and a scroll container is monolithic, i.e. it
+      can't be split between print pages. Since the table of contents is a tree, where the child entries are nested
+      inside their parent list item, this would make an entire subtree unbreakable, so a table of contents that doesn't
+      fit a single print page would end up truncated. */
+    overflow-x: clip;
   }
   .pdf-toc &gt; ul &gt; li &gt; span {
     font-size: 110%;

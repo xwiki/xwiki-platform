@@ -68,7 +68,7 @@ define('xwiki-realtime-toolbar', [
         return;
       }
       // The Done button saves the document directly.
-      this._doneButton.addEventListener('click', event => {
+      this._doneButton.addEventListener('click', async event => {
         event.preventDefault();
         // FIXME: We can't rely on the save status to determine whether to save or cancel (e.g. to prevent creating a
         // new version when there are no changes and the document is not new) because:
@@ -87,7 +87,13 @@ define('xwiki-realtime-toolbar', [
         //   this._config.save();
         // }
         //
-        this._config.save();
+        try {
+          await this._config.save();
+        } catch (error) {
+          // The failure is already logged by the saver and reported to the user by the save notification. We only need
+          // to catch it in order to avoid an unhandled promise rejection.
+          console.debug('Failed to save.', error);
+        }
       });
     }
 

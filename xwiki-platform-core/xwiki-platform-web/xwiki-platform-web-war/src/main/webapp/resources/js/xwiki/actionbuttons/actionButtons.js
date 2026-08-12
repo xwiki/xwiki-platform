@@ -746,16 +746,22 @@ var XWiki = (function(XWiki) {
       this.enableEditors();
       this.savingBox.replace(this.failedBox);
       this.progressBox.replace(this.failedBox);
-      if (response.getHeader('Content-Type').match(/^\s*text\/plain/)) {
-        // Regard the body of plain text responses as custom status messages.
-        $('ajaxRequestFailureReason').update(response.responseText);
-      } else if (response.statusText) {
-        $('ajaxRequestFailureReason').update(response.statusText);
-      } else {
-        $('ajaxRequestFailureReason').update('Server not responding');
+      try {
+        // There is no Content-Type header when the request fails before receiving a response from the server (e.g. when
+        // the network is down or when the request is blocked by the browser).
+        if (response.getHeader('Content-Type')?.match(/^\s*text\/plain/)) {
+          // Regard the body of plain text responses as custom status messages.
+          $('ajaxRequestFailureReason').update(response.responseText);
+        } else if (response.statusText) {
+          $('ajaxRequestFailureReason').update(response.statusText);
+        } else {
+          $('ajaxRequestFailureReason').update('Server not responding');
+        }
+      } finally {
+        // Announce that a document save attempt has failed, even if we failed to display the reason. Otherwise the code
+        // waiting for the save result (e.g. the in-place editor or the realtime auto-save) would wait forever.
+        state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
       }
-      // Announce that a document save attempt has failed
-      state.saveButton.fire("xwiki:document:saveFailed", {'response' : response});
     },
     startStatusReport : function(statusUrl) {
       updateStatus(0);

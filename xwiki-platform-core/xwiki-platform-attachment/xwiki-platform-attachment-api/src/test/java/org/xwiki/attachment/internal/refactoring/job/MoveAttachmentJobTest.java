@@ -209,7 +209,7 @@ class MoveAttachmentJobTest
         verifySave(TARGET_LOCATION, TARGET_SAVE_COMMENT);
 
         verify(this.modelBridge).setContextUserReference(AUTHOR_REFERENCE);
-        verifyRemoveExistingRedirection(TARGET_LOCATION);
+        verifyRemoveExistingRedirection(TARGET_LOCATION, "newName");
         assertCachedSourceDocumentNotModified();
     }
 
@@ -231,10 +231,42 @@ class MoveAttachmentJobTest
 
         XWikiDocument sourceDocument = getDocument(SOURCE_LOCATION);
         assertAttachment(sourceDocument, "oldName");
-        assertRedirection(sourceDocument, "xwiki:Space.Target");
         assertNull(getDocument(TARGET_LOCATION).getExactAttachment("newName"),
             "The attachment has been added to the target document even though its save failed.");
-        verifyRemoveExistingRedirection(TARGET_LOCATION);
+        verifyRemoveExistingRedirection(TARGET_LOCATION, "newName");
+        // The redirection added to the source document before the failed save of the target document must be
+        // removed on rollback, since it would otherwise point to a target attachment that was never created.
+        verifyRemoveExistingRedirection(SOURCE_LOCATION, "oldName");
+        assertCachedSourceDocumentNotModified();
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals(
+            "Failed to move attachment [Attachment xwiki:Space.Source@oldName] to "
+                + "[Attachment xwiki:Space.Target@newName]. Cause: [XWikiException: Error number 0 in 0]",
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void processTargetSaveFailWithoutAutoRedirect() throws Exception
+    {
+        initializeRequest(TARGET_ATTACHMENT_LOCATION, AUTHOR_REFERENCE, false);
+        doThrow(new XWikiException()).when(this.oldcore.getSpyXWiki())
+            .saveDocument(argThat(document -> TARGET_LOCATION.equals(document.getDocumentReference())), anyString(),
+                any(XWikiContext.class));
+
+        this.job.process(SOURCE_ATTACHMENT_LOCATION);
+
+        XWikiDocument sourceDocument = getDocument(SOURCE_LOCATION);
+        assertAttachment(sourceDocument, "oldName");
+        assertNull(sourceDocument.getXObject(RedirectAttachmentClassDocumentInitializer.REFERENCE),
+            "A redirection has been added even though auto-redirect is disabled.");
+        assertNull(getDocument(TARGET_LOCATION).getExactAttachment("newName"),
+            "The attachment has been added to the target document even though its save failed.");
+        verifyRemoveExistingRedirection(TARGET_LOCATION, "newName");
+        // Auto-redirect is disabled, so the job never added a redirection to the source document, and none must be
+        // removed from it on rollback.
+        verify(this.attachmentsManager, never()).removeExistingRedirection(eq("oldName"), any(XWikiDocument.class));
         assertCachedSourceDocumentNotModified();
 
         assertEquals(1, this.logCapture.size());
@@ -270,7 +302,7 @@ class MoveAttachmentJobTest
             any(XWikiContext.class));
 
         verify(this.modelBridge).setContextUserReference(AUTHOR_REFERENCE);
-        verifyRemoveExistingRedirection(SOURCE_LOCATION);
+        verifyRemoveExistingRedirection(SOURCE_LOCATION, "newName");
         assertCachedSourceDocumentNotModified();
     }
 
@@ -315,9 +347,15 @@ class MoveAttachmentJobTest
 
     private void initializeRequest(AttachmentReference destination, DocumentReference userReference)
     {
+        initializeRequest(destination, userReference, true);
+    }
+
+    private void initializeRequest(AttachmentReference destination, DocumentReference userReference,
+        boolean autoRedirect)
+    {
         this.request.setEntityReferences(singletonList(SOURCE_ATTACHMENT_LOCATION));
         this.request.setProperty(MoveAttachmentRequest.DESTINATION, destination);
-        this.request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, true);
+        this.request.setProperty(MoveAttachmentRequest.AUTO_REDIRECT, autoRedirect);
         this.request.setInteractive(false);
         this.request.setUserReference(userReference);
         this.request.setAuthorReference(AUTHOR_REFERENCE);
@@ -335,10 +373,10 @@ class MoveAttachmentJobTest
             any(XWikiContext.class));
     }
 
-    private void verifyRemoveExistingRedirection(DocumentReference documentReference)
+    private void verifyRemoveExistingRedirection(DocumentReference documentReference, String attachmentName)
     {
         ArgumentCaptor<XWikiDocument> documentCaptor = ArgumentCaptor.forClass(XWikiDocument.class);
-        verify(this.attachmentsManager).removeExistingRedirection(eq("newName"), documentCaptor.capture());
+        verify(this.attachmentsManager).removeExistingRedirection(eq(attachmentName), documentCaptor.capture());
         assertEquals(documentReference, documentCaptor.getValue().getDocumentReference());
     }
 

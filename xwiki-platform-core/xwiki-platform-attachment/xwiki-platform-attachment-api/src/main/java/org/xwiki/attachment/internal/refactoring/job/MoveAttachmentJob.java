@@ -180,7 +180,7 @@ public class MoveAttachmentJob
                         source.getName(), destination.getName()), context);
             } else {
                 transactionalMove(wiki, sourceDocument, targetDocument, sourceAttachment.getFilename(),
-                    destination.getName());
+                    destination.getName(), autoRedirect);
             }
         } catch (XWikiException | IOException e) {
             this.logger.warn("Failed to move attachment [{}] to [{}]. Cause: [{}]", source, destination,
@@ -197,12 +197,14 @@ public class MoveAttachmentJob
      * @param targetDocument the target document, in which to move the attachment
      * @param sourceFileName the file name of the source attachment
      * @param targetFileName the file name of the target attachment
+     * @param autoRedirect whether a redirection was added to the source document, and therefore needs to be removed
+     *     if the move is rolled back
      * @throws XWikiException in case of error when save the document
      * @throws IOException in case of error when putting back the attachment in the source document during the
      *     rollback
      */
     private void transactionalMove(XWiki wiki, XWikiDocument sourceDocument, XWikiDocument targetDocument,
-        String sourceFileName, String targetFileName) throws XWikiException, IOException
+        String sourceFileName, String targetFileName, boolean autoRedirect) throws XWikiException, IOException
     {
         String sourceSerialized = this.referenceSerializer.serialize(sourceDocument.getDocumentReference());
         String destinationSerialized = this.referenceSerializer.serialize(targetDocument.getDocumentReference());
@@ -222,6 +224,11 @@ public class MoveAttachmentJob
             XWikiAttachment attachment = targetDocument.getExactAttachment(targetFileName);
             addAttachment(sourceDocument, attachment, sourceFileName);
             targetDocument.removeAttachment(attachment);
+            if (autoRedirect) {
+                // Remove the redirection added to the source document before this method was called: the target
+                // attachment it points to was never created, since the save of the target document failed.
+                this.attachmentsManager.removeExistingRedirection(sourceFileName, sourceDocument);
+            }
             String historyMessageRollbackTarget =
                 this.contextualLocalizationManager.getTranslationPlain("attachment.job.rollbackDocument.target",
                     sourceFileName, sourceSerialized);

@@ -1138,7 +1138,9 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                 <xsl:when test="starts-with($name, '-')"/>
                 <xsl:otherwise>
                     <xsl:attribute name="{$name}">
-                        <xsl:value-of select="$value"/>
+                        <xsl:call-template name="process-color-alpha">
+                            <xsl:with-param name="value" select="$value"/>
+                        </xsl:call-template>
                     </xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
@@ -1150,6 +1152,45 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
                 <xsl:with-param name="style" select="$rest"/>
             </xsl:call-template>
         </xsl:if>
+    </xsl:template>
+
+    <!-- FOP only understands the #RGB and #RRGGBB hexadecimal color notations. It doesn't just ignore the CSS Color
+         Level 4 notations that carry an alpha channel (#RGBA and #RRGGBBAA), it fails on them with a
+         StringIndexOutOfBoundsException, which aborts the whole export. Since CSS4J does produce such values (it
+         computes, e.g., 'background: none' into 'background-color: #0000'), we rewrite them here: a fully transparent
+         color becomes the 'transparent' keyword, any other one simply loses its alpha channel. Values are processed
+         space-separated token by token as colors also appear inside shorthand values such as 'border'. -->
+    <xsl:template name="process-color-alpha">
+        <xsl:param name="value"/>
+        <xsl:choose>
+            <!-- Process each token of a compound value (e.g. "1pt solid #12345678") separately. -->
+            <xsl:when test="contains($value, ' ')">
+                <xsl:call-template name="process-color-alpha">
+                    <xsl:with-param name="value" select="substring-before($value, ' ')"/>
+                </xsl:call-template>
+                <xsl:text> </xsl:text>
+                <xsl:call-template name="process-color-alpha">
+                    <xsl:with-param name="value" select="substring-after($value, ' ')"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="(string-length($value) = 5 or string-length($value) = 9)
+                            and starts-with($value, '#')
+                            and not(translate(substring($value, 2), '0123456789abcdefABCDEF', ''))">
+                <!-- The alpha channel is the last digit of #RGBA and the last two digits of #RRGGBBAA. -->
+                <xsl:variable name="alphaLength" select="(string-length($value) - 1) div 4"/>
+                <xsl:variable name="alpha"
+                              select="substring($value, string-length($value) - $alphaLength + 1)"/>
+                <xsl:choose>
+                    <xsl:when test="translate($alpha, '0', '') = ''">transparent</xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="substring($value, 1, string-length($value) - $alphaLength)"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$value"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
 

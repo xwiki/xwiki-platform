@@ -47,8 +47,10 @@ public class AnnotationsLabel extends BaseElement
 
     private void hoverOnAnnotationById(String annotationId)
     {
-        // The toggle button (id="ID<n>") that opens the bubble is visually hidden (sr-only, for accessibility) and
-        // has no on-screen position for a native WebDriver click to scroll to - dispatch the click via JavaScript.
+        // The toggle button (id="ID<n>") is hidden via .sr-only's clip:rect(0,0,0,0). WebDriver's own visibility
+        // check detects that and refuses to click it (ElementNotInteractableException), so the test calls
+        // .click() directly through JavaScript instead, which has no such check and still works despite the
+        // lack of clickable area.
         getDriver().executeJavascript("arguments[0].click();", getDriver().findElement(By.id(annotationId)));
         getDriver().waitUntilElementIsVisible(By.className("annotation-box-view"));
     }

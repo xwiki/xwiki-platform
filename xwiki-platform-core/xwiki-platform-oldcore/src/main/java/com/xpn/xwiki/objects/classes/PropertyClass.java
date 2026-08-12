@@ -68,12 +68,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * The name of the HTML attribute used to provide a text alternative for an edit widget, as an accessibility
      * fallback for the cases when the widget is not already associated with a visible {@code <label>}.
      */
-    protected static final String ARIA_LABEL = "aria-label";
+    static final String ARIA_LABEL = "aria-label";
 
     /**
      * The translation key used to compute the {@link #ARIA_LABEL} fallback value.
      */
-    protected static final String ARIA_LABEL_TRANSLATION_KEY =
+    static final String ARIA_LABEL_TRANSLATION_KEY =
         "core.model.xclass.editClassProperty.textAlternative";
 
     private static final long serialVersionUID = 1L;
@@ -667,9 +667,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     /**
      * @param context the current context, used to resolve the translation
      * @return the {@link #ARIA_LABEL} text alternative fallback value for this property's edit widget
-     * @since 18.7.0RC1
      */
-    protected String getAriaLabelFallback(XWikiContext context)
+    String getAriaLabelFallback(XWikiContext context)
     {
         return localizePlainOrKey(ARIA_LABEL_TRANSLATION_KEY, getTranslatedPrettyName(context));
     }
@@ -679,9 +678,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      *
      * @param element the edit widget on which to set the fallback
      * @param context the current context, used to resolve the translation
-     * @since 18.7.0RC1
      */
-    protected void setAriaLabelFallback(ConcreteElement element, XWikiContext context)
+    void setAriaLabelFallback(ConcreteElement element, XWikiContext context)
     {
         element.addAttribute(ARIA_LABEL, getAriaLabelFallback(context));
     }

@@ -354,7 +354,6 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
       return value.split(',');
     }
     return [value];
-
   },
 
   getParameterValue = function (valueInputs, originalValue, isCaseInsensitive) {

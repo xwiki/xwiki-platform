@@ -90,9 +90,12 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     {
       if (bytes === 0) return 'N/A';
       let units = ['byte', 'kilobyte', 'megabyte', 'gigabyte'];
-      let unitIndex = Math.min(Math.max(0,
-          Number.parseInt(Math.floor(Math.log(bytes) / Math.log(1000)))), units.length - 1);
-      let value = bytes / Math.pow(1000, unitIndex);
+      let unitIndex = 0;
+      let value = bytes;
+      while (value >= 1000 && unitIndex < units.length - 1) {
+        value /= 1000;
+        unitIndex++;
+      }
       let unit = units[unitIndex] + (perSecond ? '-per-second' : '');
       return new Intl.NumberFormat(document.documentElement.lang || undefined,
           {style: 'unit', unit, unitDisplay: 'narrow', maximumFractionDigits: 1}).format(value);

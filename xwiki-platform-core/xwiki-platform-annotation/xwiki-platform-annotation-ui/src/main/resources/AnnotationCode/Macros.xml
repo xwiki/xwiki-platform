@@ -266,7 +266,7 @@
   ## $hasAdmin/$hasEdit are normally bound by the calling template (xwikivars.vm) - true when this macro is
   ## reached from the Comments tab, but NOT when the annotation bubble fetches its own content via
   ## AnnotationCode.DisplayForm (rendered through the lightweight "get" action, which never runs that template).
-  ## Compute them locally so the Edit/Delete/Solve actions are gated correctly regardless of which caller reached
+  ## Compute them locally so the Edit/Delete actions are gated correctly regardless of which caller reached
   ## this macro.
   #set($hasAdmin = $services.security.authorization.hasAccess('admin', $docRef))
   #set($hasEdit = $services.security.authorization.hasAccess('edit', $docRef))
@@ -296,17 +296,6 @@
     #if($xwiki.hasAccessLevel('comment') &amp;&amp; ($hasAdmin || $isUserComment))
       &lt;a class="edit btn btn-default infomessage" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${ann.id}&amp;xredirect=$doc.getURL('view')")"&gt;##
       $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
-      &lt;/a&gt;##
-    #end
-    #if ("$!ann.selection" != '' &amp;&amp; ($hasAdmin || ($hasEdit &amp;&amp; $isUserComment)))
-      ## Converts the annotation into a plain comment by blanking its anchoring fields, the same way Delete uses a
-      ## plain core action (objectremove) rather than the annotation module's own service layer.
-      #set ($commentClassPrefix = "${annotationClassDocName}_${ann.id}")
-      #set ($solveQueryString = "form_token=${escapetool.url($services.csrf.token)}&amp;xredirect=${escapetool.url($doc.getURL('view'))}&amp;${commentClassPrefix}_target=&amp;${commentClassPrefix}_selection=&amp;${commentClassPrefix}_selectionLeftContext=&amp;${commentClassPrefix}_selectionRightContext=&amp;${commentClassPrefix}_originalSelection=&amp;${commentClassPrefix}_state=")
-      #set ($solveURL = $xwiki.getURL($doc.fullName, 'save', $solveQueryString, "xwikicomment_${ann.id}"))
-      &lt;a class="solve btn btn-default infomessage" rel="nofollow" href="$solveURL"
-        title="$services.localization.render('annotations.action.solve.tooltip')"&gt;
-        $services.icon.renderHTML('check') $!escapetool.xml($services.localization.render('annotations.action.solve.text'))
       &lt;/a&gt;##
     #end
     #if ($hasAdmin || ($hasEdit &amp;&amp; $isUserComment))

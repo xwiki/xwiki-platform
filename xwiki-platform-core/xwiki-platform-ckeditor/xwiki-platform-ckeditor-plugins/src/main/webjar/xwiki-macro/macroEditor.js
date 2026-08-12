@@ -340,6 +340,18 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     return output;
   },
 
+  normalizeSelectValue = function (value, valueInputs) {
+    if (Array.isArray(value)) {
+      return value;
+    }
+
+    const isMultiSelect = valueInputs.prop('type') === 'select-multiple';
+    if (isMultiSelect) {
+      return value.split(',');
+    }
+    return [value];
+  },
+
   getParameterValue = function (valueInputs, originalValue, isCaseInsensitive) {
     let matchesParameterValue = function(value) {
       return function() {
@@ -366,7 +378,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
       valueInputs = valueInputs.first();
       // For select inputs we should add the value to the list of options if it's missing.
       if (value && valueInputs.is('select')) {
-        value = valueInputs.prop('type') === 'select-multiple' ? value.split(',') : [value];
+        value = normalizeSelectValue(value, valueInputs);
         value.forEach(function (val, index) {
           let matchedOption = valueInputs.find('option').filter(matchesParameterValue(val));
           if (matchedOption.length > 0) {

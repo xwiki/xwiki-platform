@@ -21,7 +21,6 @@
 export type { LinkData, LinkTarget } from "./data/linkType";
 export {
   linkTargetToResourceReference,
-  listEnabledLinkTargetTypeExtensions,
   listLinkTargetTypeExtensions,
   parseLinkTarget,
   resourceReferenceToLinkTarget,

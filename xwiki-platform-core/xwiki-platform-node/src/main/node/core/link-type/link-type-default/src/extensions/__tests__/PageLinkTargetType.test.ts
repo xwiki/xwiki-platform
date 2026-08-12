@@ -120,7 +120,12 @@ describe("PageLinkTargetType", () => {
 
     expect(
       extension.tryParseReference?.(
-        { type: "attach", typed: true, reference: "Some.Page@file.png", parameters: {} },
+        {
+          type: "attach",
+          typed: true,
+          reference: "Some.Page@file.png",
+          parameters: {},
+        },
         { modelReferenceParser, modelReferenceSerializer },
       ),
     ).toBeNull();

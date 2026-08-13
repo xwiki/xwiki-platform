@@ -41,7 +41,8 @@ const IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER = "#imageSuggestionHack";
 // constant for its `subtext` property.
 //
 // In order to access all items' URL to render them, they *must* be provided
-// through the items' `subtext` property.
+// through the items' `subtext` property. Items with no `subtext` (e.g. a "search
+// isn't supported" message) are rendered as plain, non-clickable text instead.
 
 // eslint-disable-next-line max-statements
 function ImageSuggestionMenu(
@@ -76,11 +77,11 @@ function ImageSuggestionMenu(
 
   if (
     suggestionItems.find(
-      (item) => !item.subtext || !item.subtext.startsWith("http"),
+      (item) => item.subtext !== undefined && !item.subtext.startsWith("http"),
     )
   ) {
     throw new Error(
-      "Expected all image suggestion items to have URLs as subtexts",
+      "Expected image suggestion items to either have no subtext (a message item) or a URL as their subtext",
     );
   }
 
@@ -101,10 +102,12 @@ function ImageSuggestionMenu(
             props.selectedIndex === index + 1 ? "selected" : ""
           }`}
           onClick={() => {
-            onSelected(item.subtext!);
+            if (item.subtext) {
+              onSelected(item.subtext);
+            }
           }}
         >
-          <img src={item.subtext} />
+          {item.subtext && <img src={item.subtext} />}
           <span>{item.title}</span>
         </div>
       ))}

@@ -719,10 +719,10 @@ class IncludeMacroTest
     {
         MacroTransformationContext context = new MacroTransformationContext();
         context.setInline(isInline);
-        MacroBlock includeMacro =
+        MacroBlock includeMacroBlock =
             new MacroBlock("include", Collections.singletonMap("reference", documentName), isInline);
-        XDOM xdom = new XDOM(List.of(includeMacro));
-        context.setCurrentMacroBlock(includeMacro);
+        XDOM xdom = new XDOM(List.of(includeMacroBlock));
+        context.setCurrentMacroBlock(includeMacroBlock);
         context.setXDOM(xdom);
 
         return context;

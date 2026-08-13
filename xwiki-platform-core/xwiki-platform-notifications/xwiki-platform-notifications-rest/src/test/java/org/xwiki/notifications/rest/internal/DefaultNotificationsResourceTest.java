@@ -166,11 +166,11 @@ class DefaultNotificationsResourceTest
         when(this.context.getUserReference()).thenReturn(wikiUserRef);
         DocumentReference userIdDocReference = mock("userIdDocReference");
         when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
-        Response response = this.notificationsResource.getNotifications(
+        Response actualResponse = this.notificationsResource.getNotifications(
                 null, userId, null, true, null, null, null, null, null, "10", null,
                 null, null, null, null, null, null, null, null, null
         );
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, actualResponse.getStatus());
     }
 
     @ParameterizedTest

@@ -20,10 +20,15 @@
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
-import { LinkModal, parseLinkTarget } from "@xwiki/platform-link-modal-ui";
+import { LinkModal } from "@xwiki/platform-link-modal-ui";
+import {
+  parseLinkTarget,
+  serializeLinkTarget,
+} from "@xwiki/platform-link-type-api";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
+  computed,
   onBeforeUnmount,
   onMounted,
   onUnmounted,
@@ -40,7 +45,7 @@ import type {
   EditorType,
   LinkEditionHandlerProps,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { LinkData } from "@xwiki/platform-link-modal-ui";
+import type { LinkData } from "@xwiki/platform-link-type-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type {
   RemoteURLParserProvider,
@@ -144,18 +149,11 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
 };
 
-const submitEditedLink = ({
-  displayText,
-  target: { type, config },
-}: LinkData) => {
-  // TODO: support
-
-  const url =
-    type === "url"
-      ? config.url
-      : type === "email"
-        ? `mailto:${config.address}`
-        : remoteURLSerializer.serialize(config.ref!)!;
+const submitEditedLink = ({ displayText, target }: LinkData) => {
+  const url = serializeLinkTarget(target, depsContainer, {
+    remoteURLParser,
+    remoteURLSerializer,
+  });
 
   editingLink.value?.onSubmit({
     title: displayText,
@@ -171,6 +169,20 @@ const linkModalContainer = useTemplateRef<HTMLElement>("link-modal-container");
 const mountedBlockNote = ref<{ unmount: () => void }>();
 
 const editingLink = shallowRef<LinkEditionHandlerProps | null>(null);
+
+const currentLinkData = computed<LinkData | null>(() => {
+  if (!editingLink.value) {
+    return null;
+  }
+
+  return {
+    displayText: editingLink.value.current.title,
+    target: parseLinkTarget(editingLink.value.current.url, depsContainer, {
+      remoteURLParser,
+      remoteURLSerializer,
+    }),
+  };
+});
 
 function handleLinkEditorOutsideClick(e: MouseEvent) {
   if (!editingLink.value || !linkModalContainer.value) {
@@ -211,12 +223,9 @@ onUnmounted(() => {
 <template>
   <div ref="blocknote-container" />
 
-  <div ref="link-modal-container" v-if="editingLink">
+  <div ref="link-modal-container" v-if="currentLinkData">
     <LinkModal
-      :current="{
-        displayText: editingLink.current.title,
-        target: parseLinkTarget(editingLink.current.url, remoteURLParser),
-      }"
+      :current="currentLinkData"
       :deps-container="depsContainer"
       @submit="submitEditedLink"
       @cancel="editingLink = null"

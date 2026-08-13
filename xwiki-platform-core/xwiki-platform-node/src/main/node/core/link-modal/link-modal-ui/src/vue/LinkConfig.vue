@@ -19,9 +19,13 @@
 -->
 <script setup lang="ts">
 import { translations } from "../translations";
-import { ref, watch } from "vue";
+import { inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import type { LinkData, LinkTarget } from "../data/linkType";
+import type {
+  LinkData,
+  LinkTargetTypeExtension,
+} from "@xwiki/platform-link-type-api";
+import type { Ref } from "vue";
 
 const props = defineProps<{ linkData: LinkData }>();
 
@@ -31,36 +35,33 @@ defineSlots<{
 }>();
 
 // TODO: use modern localization system (server-side)
-const { t } = useI18n({ messages: translations });
+const { t, locale } = useI18n({ messages: translations });
 
-const targetTypes: { label: string; default: LinkTarget }[] = [
-  {
-    label: t("link-modal.target-types.page.label"),
-    default: { type: "page", config: { ref: null } },
-  },
-  {
-    label: t("link-modal.target-types.url.label"),
-    default: { type: "url", config: { url: "" } },
-  },
-  {
-    label: t("link-modal.target-types.attachment.label"),
-    default: { type: "attachment", config: { ref: null } },
-  },
-  {
-    label: t("link-modal.target-types.email.label"),
-    default: { type: "email", config: { address: "" } },
-  },
-];
+// Provided by `LinkModal.vue`: the list of registered, enabled link target types, already resolved from the
+// shared component manager — see `@xwiki/platform-link-type-api`'s `LinkTargetTypeExtension`.
+const extensions = inject<Ref<LinkTargetTypeExtension[]>>(
+  "linkTargetTypeExtensions",
+)!;
 
 const linkData = ref(props.linkData);
 
 const linkTargetTypeSelect = ref(
-  targetTypes.find((c) => c.default.type === linkData.value.target.type)!.label,
+  extensions.value
+    .find((extension) => extension.type === linkData.value.target.type)
+    ?.getLabel(locale.value) ?? "",
 );
 
 watch(linkTargetTypeSelect, (label) => {
-  const targetType = targetTypes.find((c) => c.label === label)!;
-  linkData.value.target = targetType.default;
+  const extension = extensions.value.find(
+    (extension) => extension.getLabel(locale.value) === label,
+  );
+
+  if (extension) {
+    linkData.value.target = {
+      type: extension.type,
+      config: extension.createDefaultConfig(),
+    };
+  }
 });
 </script>
 
@@ -78,7 +79,7 @@ watch(linkTargetTypeSelect, (label) => {
     v-bind="{ 'data-test': 'linkTargetType' }"
     :label="t('link-modal.config.target-type')"
     v-model="linkTargetTypeSelect"
-    :items="targetTypes.map((t) => t.label)"
+    :items="extensions.map((extension) => extension.getLabel(locale))"
     required
   />
 

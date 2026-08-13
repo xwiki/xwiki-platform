@@ -4,33 +4,73 @@
 
 ```ts
 
-import { AttachmentReference } from '@xwiki/platform-model-api';
+import { AllowedComponentProps } from 'vue';
+import { AttachmentsService } from '@xwiki/platform-attachments-api';
+import { ComponentCustomProps } from 'vue';
+import { ComponentOptionsBase } from 'vue';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
 import { Container } from 'inversify';
+import { CreateComponentPublicInstanceWithMixins } from 'vue';
 import { DefineComponent } from 'vue';
-import { DocumentReference } from '@xwiki/platform-model-api';
+import { DocumentService } from '@xwiki/platform-document-api';
+import { GlobalComponents } from 'vue';
+import { GlobalDirectives } from 'vue';
+import { LinkData } from '@xwiki/platform-link-type-api';
+import { LinkSuggestService } from '@xwiki/platform-link-suggest-api';
+import { LinkType } from '@xwiki/platform-link-suggest-api';
+import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
+import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
+import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
 import { PublicProps } from 'vue';
 import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
+import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
+import { ShallowUnwrapRef } from 'vue';
+import { VNode } from 'vue';
+import { VNodeProps } from 'vue';
 
 // @beta
-export type LinkAttachmentConfig = {
-    ref: AttachmentReference | null;
-    queryString?: string;
-};
+export function createLinkSuggestor(input: LinkEditionContext): LinkSuggestor | null;
 
 // @beta
-export type LinkData = {
-    displayText: string;
-    newTab?: boolean;
-    target: LinkTarget;
-};
+export const LinkConfig: {
+    new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<{
+    linkData: LinkData;
+    }> & Readonly<{}>, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, PublicProps, {}, false, {}, {}, GlobalComponents, GlobalDirectives, string, {}, any, ComponentProvideOptions, {
+    P: {};
+    B: {};
+    D: {};
+    C: {};
+    M: {};
+    Defaults: {};
+    }, Readonly<{
+    linkData: LinkData;
+    }> & Readonly<{}>, {}, {}, {}, {}, {}>;
+    __isFragment?: never;
+    __isTeleport?: never;
+    __isSuspense?: never;
+} & ComponentOptionsBase<Readonly<{
+linkData: LinkData;
+}> & Readonly<{}>, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, {}, {}, string, {}, GlobalComponents, GlobalDirectives, string, ComponentProvideOptions> & VNodeProps & AllowedComponentProps & ComponentCustomProps & (new () => {
+    $slots: Readonly<{
+        config(): void;
+        options(): void;
+    }> & {
+        config(): void;
+        options(): void;
+    };
+});
 
 // @beta
-export type LinkEmailConfig = {
-    address: string;
-    messageSubject?: string;
-    messageBody?: string;
+export type LinkEditionContext = {
+    linkSuggestService: LinkSuggestService | null;
+    modelReferenceParser: ModelReferenceParser;
+    modelReferenceSerializer: ModelReferenceSerializer;
+    modelReferenceHandler: ModelReferenceHandler;
+    remoteURLParser: RemoteURLParser;
+    remoteURLSerializer: RemoteURLSerializer;
+    attachmentsService: AttachmentsService;
+    documentService: DocumentService;
 };
 
 // @beta
@@ -49,34 +89,60 @@ onCancel?: (() => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {}, HTMLDivElement>;
 
 // @beta
-export type LinkPageConfig = {
-    ref: DocumentReference | null;
-    queryString?: string;
-    anchor?: string;
-};
-
-// @beta
-export type LinkTarget = {
-    type: "page";
-    config: LinkPageConfig;
-} | {
-    type: "attachment";
-    config: LinkAttachmentConfig;
-} | {
-    type: "url";
-    config: LinkUrlConfig;
-} | {
-    type: "email";
-    config: LinkEmailConfig;
-};
-
-// @beta
-export type LinkUrlConfig = {
+export type LinkSuggestion = {
+    title: string;
+    segments: string[];
+    reference: string;
     url: string;
+    type: LinkType;
 };
 
 // @beta
-export function parseLinkTarget(url: string, remoteURLParser: RemoteURLParser): LinkTarget;
+export type LinkSuggestor = (params: {
+    query: string;
+    type?: LinkType;
+}) => Promise<LinkSuggestion[]>;
+
+// @beta
+export const SearchBox: <T, U>(__VLS_props: NonNullable<Awaited<typeof __VLS_setup>>["props"], __VLS_ctx?: {
+    slots: Readonly<{
+        renderSuggestion(suggestion: SearchLinkSuggestion<T, U>): unknown;
+    }> & {
+        renderSuggestion(suggestion: SearchLinkSuggestion<T, U>): unknown;
+    };
+    attrs: any;
+    emit: (evt: "select", suggestion: T) => void;
+}, __VLS_expose?: NonNullable<Awaited<typeof __VLS_setup>>["expose"], __VLS_setup?: Promise<{
+    props: {
+        readonly onSelect?: ((suggestion: T) => any) | undefined;
+        label: string;
+        initialValue: string | null;
+        placeholder?: string | undefined;
+        getSuggestions: SearchLinkSuggestor<T, U>;
+        trySubmitRaw?: ((raw: string) => boolean) | undefined;
+    } & PublicProps;
+    expose(exposed: ShallowUnwrapRef<    {}>): void;
+    attrs: any;
+    slots: Readonly<{
+        renderSuggestion(suggestion: SearchLinkSuggestion<T, U>): unknown;
+    }> & {
+        renderSuggestion(suggestion: SearchLinkSuggestion<T, U>): unknown;
+    };
+    emit: (evt: "select", suggestion: T) => void;
+}>) => VNode & {
+    __ctx?: Awaited<typeof __VLS_setup>;
+};
+
+// @beta (undocumented)
+export type SearchLinkSuggestion<T, U> = {
+    value: T;
+    renderingData: U;
+    key: string;
+    equivalentQuery: string;
+};
+
+// @beta (undocumented)
+export type SearchLinkSuggestor<T, U> = (query: string) => Promise<SearchLinkSuggestion<T, U>[] | false>;
 
 // (No @packageDocumentation comment for this package)
 

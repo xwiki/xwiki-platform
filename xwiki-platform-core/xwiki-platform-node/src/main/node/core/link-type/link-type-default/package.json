@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-link-modal-ui",
+  "name": "@xwiki/platform-link-type-default",
   "version": "18.7.0-SNAPSHOT",
   "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-type/link-type-default",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -38,16 +38,14 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@blocknote/core": "catalog:",
-    "@xwiki/platform-attachments-api": "workspace:*",
-    "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-dsapi": "workspace:*",
+    "@xwiki/platform-icons": "workspace:*",
+    "@xwiki/platform-link-modal-ui": "workspace:*",
     "@xwiki/platform-link-suggest-api": "workspace:*",
     "@xwiki/platform-link-type-api": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
-    "lodash-es": "catalog:",
     "vue-i18n": "catalog:"
   },
   "peerDependencies": {
@@ -57,9 +55,8 @@
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
-    "@types/lodash-es": "catalog:",
-    "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
+    "@xwiki/platform-fn-utils": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",

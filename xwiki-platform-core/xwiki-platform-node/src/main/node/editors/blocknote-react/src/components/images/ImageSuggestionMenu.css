@@ -1,0 +1,36 @@
+.slash-menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.slash-menu-upload {
+  background: red;
+}
+
+.slash-menu-item {
+  background-color: white;
+  border-radius: 2px;
+  box-shadow: 0 0 4px #dddddd;
+
+  cursor: pointer;
+
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+
+  padding: 0.5rem;
+}
+
+.slash-menu-item:hover,
+.slash-menu-item.selected {
+  background-color: rgb(215, 214, 214);
+}
+
+.slash-menu-item img {
+  width: 10rem;
+  max-height: 10rem;
+}
+
+.slash-menu-item span {
+  padding-left: 1rem;
+}

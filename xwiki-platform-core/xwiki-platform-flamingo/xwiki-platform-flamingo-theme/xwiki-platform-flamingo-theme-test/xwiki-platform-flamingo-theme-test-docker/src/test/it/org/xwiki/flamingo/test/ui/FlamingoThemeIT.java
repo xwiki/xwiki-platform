@@ -29,7 +29,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.support.Color;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.ThemesAdministrationSectionPage;
@@ -63,6 +65,16 @@ class FlamingoThemeIT
     private static final String COLOR_THEME_PREFERENCE = "colorTheme";
 
     private static final String LOGO_NAME = "logo.png";
+
+    /**
+     * The brand colors set by {@link #changeBaseBrandColors}. They are dark enough to keep a proper contrast with the
+     * light backgrounds and texts they are combined with.
+     */
+    private static final String BRAND_PRIMARY = "#1a4d80";
+
+    private static final String BRAND_INFO = "#0b5c73";
+
+    private static final String BRAND_DANGER = "#a11212";
 
     @AfterEach
     void verify(LogCaptureConfiguration logCaptureConfiguration)
@@ -155,6 +167,49 @@ class FlamingoThemeIT
             // The logo URL also carries the revision of the attachment, which is not relevant here.
             assertEquals(setup.getURL(logoReference, "download", null),
                 StringUtils.substringBefore(viewPage.getLogoImageURL(), "?"));
+        } finally {
+            // Restore the color theme that was in use so that this test doesn't affect the other tests.
+            setup.setWikiPreference(COLOR_THEME_PREFERENCE, Objects.toString(previousColorTheme, ""));
+        }
+    }
+
+    @Test
+    @Order(3)
+    void changeBaseBrandColors(TestUtils setup, TestInfo info) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        // First make sure the theme we'll create doesn't exist
+        String themeName = info.getTestMethod().get().getName();
+        setup.deletePage(THEMES_SPACE, themeName);
+
+        // Set the brand colors of the "Base colors" category in a new theme.
+        EditThemePage editThemePage = ThemeApplicationWebHomePage.gotoPage().createNewTheme(themeName);
+        // Disable the auto refresh of the preview because it slows down the test.
+        editThemePage.setAutoRefresh(false);
+        editThemePage.selectVariableCategory("Base colors");
+        editThemePage.setVariableValue("brand-primary", BRAND_PRIMARY);
+        editThemePage.setVariableValue("brand-info", BRAND_INFO);
+        editThemePage.setVariableValue("brand-danger", BRAND_DANGER);
+        editThemePage.clickSaveAndView();
+
+        // The brand info and brand danger colors are exposed to wiki pages through the color theme variables they are
+        // mapped to, so use these variables to color some text. The brand primary color is not exposed as a color theme
+        // variable, but the skin uses it for the "text-primary" style.
+        DocumentReference testPage =
+            new DocumentReference("xwiki", info.getTestClass().get().getSimpleName(), themeName);
+        setup.createPage(testPage, "{{velocity}}\n"
+            + "(% id=\"brandPrimary\" class=\"text-primary\" %)brand primary\n\n"
+            + "(% id=\"brandInfo\" style=\"color: $theme.notificationInfoColor\" %)brand info\n\n"
+            + "(% id=\"brandDanger\" style=\"color: $theme.notificationErrorColor\" %)brand danger\n"
+            + "{{/velocity}}");
+
+        String previousColorTheme = setup.setWikiPreference(COLOR_THEME_PREFERENCE, THEMES_SPACE + '.' + themeName);
+        try {
+            ViewPage viewPage = setup.gotoPage(testPage);
+            assertColor(BRAND_PRIMARY, viewPage.getElementCSSValue(By.id("brandPrimary"), "color"));
+            assertColor(BRAND_INFO, viewPage.getElementCSSValue(By.id("brandInfo"), "color"));
+            assertColor(BRAND_DANGER, viewPage.getElementCSSValue(By.id("brandDanger"), "color"));
         } finally {
             // Restore the color theme that was in use so that this test doesn't affect the other tests.
             setup.setWikiPreference(COLOR_THEME_PREFERENCE, Objects.toString(previousColorTheme, ""));
@@ -278,6 +333,16 @@ class FlamingoThemeIT
         // Test 'lessCode' is correctly handled, the title being inside the ".main" block it colors.
         assertColor(0, 0, 255, page.getTitleColor());
         assertEquals("monospace", page.getTitleFontFamily().toLowerCase());
+    }
+
+    /**
+     * @param expectedColor the expected color, in any CSS notation (e.g. {@code #1a4d80})
+     * @param obtainedColor the obtained color, in any CSS notation (e.g. {@code rgb(26, 77, 128)})
+     */
+    private void assertColor(String expectedColor, String obtainedColor)
+    {
+        assertEquals(Color.fromString(expectedColor), Color.fromString(obtainedColor),
+            String.format("Wrong color [expected = %s | obtained = %s]", expectedColor, obtainedColor));
     }
 
     private void assertColor(int red, int green, int blue, String obtainedValue)

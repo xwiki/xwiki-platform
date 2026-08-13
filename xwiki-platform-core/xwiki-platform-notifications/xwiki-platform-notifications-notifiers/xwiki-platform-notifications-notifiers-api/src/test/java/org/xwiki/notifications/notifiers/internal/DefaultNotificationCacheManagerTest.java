@@ -117,12 +117,12 @@ class DefaultNotificationCacheManagerTest
         long epoch = this.defaultNotificationCacheManager.getEpoch();
 
         this.defaultNotificationCacheManager.getFromCache("anykey", true, false, epoch);
-        verify(this.longCountCache).get("anykey/0");
-        verify(this.longEventCache, never()).get("anykey/0");
+        verify(this.longCountCache).get("anykey/" + epoch);
+        verify(this.longEventCache, never()).get("anykey/" + epoch);
 
         this.defaultNotificationCacheManager.getFromCache("anotherkey", false, false, epoch);
-        verify(this.longEventCache).get("anotherkey/0");
-        verify(this.longCountCache, never()).get("anotherkey/0");
+        verify(this.longEventCache).get("anotherkey/" + epoch);
+        verify(this.longCountCache, never()).get("anotherkey/" + epoch);
 
         // 2 for the method getFromCache + 1 for the initialize
         verify(this.configuration, times(3)).isRestCacheEnabled();
@@ -136,13 +136,13 @@ class DefaultNotificationCacheManagerTest
         long epoch = this.defaultNotificationCacheManager.getEpoch();
 
         this.defaultNotificationCacheManager.setInCache("mykey", events, false, false, epoch);
-        verify(this.longEventCache).set("mykey/0", events);
-        verify(this.longCountCache, never()).set("mykey/0", events);
+        verify(this.longEventCache).set("mykey/" + epoch, events);
+        verify(this.longCountCache, never()).set("mykey/" + epoch, events);
         assertEquals(events, this.defaultNotificationCacheManager.getFromCache("mykey", false, false, epoch));
 
         this.defaultNotificationCacheManager.setInCache("anotherkey", events, true, false, epoch);
-        verify(this.longEventCache, never()).set("anotherkey/0", 3);
-        verify(this.longCountCache).set("anotherkey/0", 3);
+        verify(this.longEventCache, never()).set("anotherkey/" + epoch, 3);
+        verify(this.longCountCache).set("anotherkey/" + epoch, 3);
         assertEquals(3, this.defaultNotificationCacheManager.getFromCache("anotherkey", true, false, epoch));
 
         // 2 for the method setInCache + 2 for the method getFromCache + 1 for the initialize

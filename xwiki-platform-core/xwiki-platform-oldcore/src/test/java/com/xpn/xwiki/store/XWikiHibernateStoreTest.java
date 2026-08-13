@@ -279,17 +279,17 @@ class XWikiHibernateStoreTest
     @Test
     void createHibernateSequenceIfRequiredWhenNotInUpdateCommands()
     {
-        Session session = mock(Session.class);
+        Session sessionMock = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
         when(this.hibernateStore.getDialect()).thenReturn(dialect);
         when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
         NativeQuery sqlQuery = mock(NativeQuery.class);
-        when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(sessionMock.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
-        this.store.createHibernateSequenceIfRequired(new String[] {}, "schema", session);
+        this.store.createHibernateSequenceIfRequired(new String[] {}, "schema", sessionMock);
 
-        verify(session).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(sessionMock).createSQLQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery).executeUpdate();
     }
 
@@ -299,18 +299,18 @@ class XWikiHibernateStoreTest
     @Test
     void createHibernateSequenceIfRequiredWhenInUpdateCommands()
     {
-        Session session = mock(Session.class);
+        Session sessionMock = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
         when(this.hibernateStore.getDialect()).thenReturn(dialect);
         when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
         NativeQuery sqlQuery = mock(NativeQuery.class);
-        when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(sessionMock.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
         this.store.createHibernateSequenceIfRequired(
-            new String[] {"whatever", "create sequence schema.hibernate_sequence"}, "schema", session);
+            new String[] {"whatever", "create sequence schema.hibernate_sequence"}, "schema", sessionMock);
 
-        verify(session, never()).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(sessionMock, never()).createSQLQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery, never()).executeUpdate();
     }
 

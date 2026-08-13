@@ -961,10 +961,10 @@ class DefaultReferenceUpdaterTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(xWiki.getDocument(newReference, this.xcontext)).thenReturn(document);
 
-        ComponentManager componentManager = mock(ComponentManager.class);
-        when(this.componentManagerProvider.get()).thenReturn(componentManager);
+        ComponentManager componentManagerMock = mock(ComponentManager.class);
+        when(this.componentManagerProvider.get()).thenReturn(componentManagerMock);
         when(document.getSyntax()).thenReturn(Syntax.MARKDOWN_1_1);
-        when(componentManager.hasComponent(BlockRenderer.class, Syntax.MARKDOWN_1_1.toIdString()))
+        when(componentManagerMock.hasComponent(BlockRenderer.class, Syntax.MARKDOWN_1_1.toIdString()))
             .thenReturn(false);
 
         DocumentReference oldReference = new DocumentReference("xwiki", "XWiki", "old");

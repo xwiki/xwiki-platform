@@ -126,11 +126,11 @@ class XWikiRightServiceImplTest
         when(this.groupService.getAllGroupsReferencesForMember(eq(this.user.getDocumentReference()), anyInt(), 
             anyInt(), eq(this.context)))
             .thenAnswer(invocationOnMock -> {
-            XWikiContext context = invocationOnMock.getArgument(3);
+            XWikiContext invocationContext = invocationOnMock.getArgument(3);
 
-            if (context.getWikiId().equals(group.getWikiName())) {
+            if (invocationContext.getWikiId().equals(group.getWikiName())) {
                 return Collections.singleton(group.getDocumentReference());
-            } else if (context.getWikiId().equals(group2.getWikiName())) {
+            } else if (invocationContext.getWikiId().equals(group2.getWikiName())) {
                 return Collections.singleton(group2.getDocumentReference());
             } else {
                 return Collections.emptyList();

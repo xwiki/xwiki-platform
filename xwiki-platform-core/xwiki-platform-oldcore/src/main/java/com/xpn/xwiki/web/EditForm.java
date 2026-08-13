@@ -144,19 +144,19 @@ public class EditForm extends XWikiForm
             this.tags = null;
             return;
         }
-        StringBuilder tags = new StringBuilder();
+        StringBuilder tagsBuilder = new StringBuilder();
         boolean first = true;
         for (int i = 0; i < parameter.length; ++i) {
             if (!"".equals(parameter[i])) {
                 if (first) {
                     first = false;
                 } else {
-                    tags.append("|");
+                    tagsBuilder.append("|");
                 }
-                tags.append(parameter[i]);
+                tagsBuilder.append(parameter[i]);
             }
         }
-        this.tags = tags.toString();
+        this.tags = tagsBuilder.toString();
     }
 
     public String getTags()
@@ -216,9 +216,9 @@ public class EditForm extends XWikiForm
         Map<String, String[]> allParameters = getRequest().getParameterMap();
         Map<String, String[]> result = new HashMap<>();
         for (Map.Entry<String, String[]> entry : allParameters.entrySet()) {
-            String name = entry.getKey();
-            if (name.startsWith(prefix + "_")) {
-                String newname = name.substring(prefix.length() + 1);
+            String parameterName = entry.getKey();
+            if (parameterName.startsWith(prefix + "_")) {
+                String newname = parameterName.substring(prefix.length() + 1);
                 result.put(newname, entry.getValue());
             }
         }

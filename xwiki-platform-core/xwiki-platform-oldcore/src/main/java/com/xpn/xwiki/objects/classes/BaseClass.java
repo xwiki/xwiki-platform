@@ -1295,14 +1295,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      */
     public BaseObject newCustomClassInstance(boolean fallback) throws XWikiException
     {
-        String customClass = getCustomClass();
+        String customClassName = getCustomClass();
 
         try {
-            if (StringUtils.isEmpty(customClass)) {
+            if (StringUtils.isEmpty(customClassName)) {
                 return new BaseObject();
             } else {
                 return (BaseObject) Class
-                    .forName(customClass, true, Thread.currentThread().getContextClassLoader()).newInstance();
+                    .forName(customClassName, true, Thread.currentThread().getContextClassLoader()).newInstance();
             }
         } catch (Exception e) {
             if (fallback) {
@@ -1311,7 +1311,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
                 return new BaseObject();
             } else {
-                Object[] args = { customClass };
+                Object[] args = { customClassName };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
                     XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instantiate custom class {0}", e,
                     args);

@@ -785,14 +785,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     private synchronized Scheduler getDefaultSchedulerInstance() throws SchedulerPluginException
     {
-        Scheduler scheduler;
+        Scheduler defaultScheduler;
         try {
-            scheduler = StdSchedulerFactory.getDefaultScheduler();
+            defaultScheduler = StdSchedulerFactory.getDefaultScheduler();
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_GET_SCHEDULER,
                 "Error getting default Scheduler instance", e);
         }
-        return scheduler;
+        return defaultScheduler;
     }
 
     /**

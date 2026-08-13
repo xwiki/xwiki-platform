@@ -167,4 +167,27 @@ class LinkIT extends AbstractCKEditorIT
 
             [[Another>>doc:.SubPage.Another.WebHome]]""");
     }
+
+    @Test
+    @Order(4)
+    void createLinkToExistingPageUsingItsFullReference(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // The name of the target page has multiple words so that the search performed by the link suggester matches it
+        // exactly, which means the suggester doesn't propose to create a page with the given reference.
+        SpaceReference targetSpaceReference = new SpaceReference("My Test Page", testReference.getLastSpaceReference());
+        DocumentReference targetReference = new DocumentReference("WebHome", targetSpaceReference);
+        setup.createPage(targetReference, "", "My Test Page");
+        setup.createPage(testReference, "", "createLinkToExistingPageUsingItsFullReference");
+        // The link suggester relies on Solr, so wait for the target page to be indexed.
+        waitForSolrIndexing(setup);
+
+        edit(setup, testReference, false);
+        LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
+        linkDialog.setResourceReference(setup.serializeLocalReference(targetReference));
+        linkDialog.getResourceSuggestInput().selectByVisibleText("My Test Page");
+        linkDialog.submit();
+
+        // Verify that the content matches what we did using CKEditor.
+        assertSourceEquals("[[My Test Page>>doc:.My Test Page.WebHome]]");
+    }
 }

@@ -2877,18 +2877,18 @@ public class Document extends Api
 
     private void saveDocument(String comment, boolean minorEdit, boolean checkSaving) throws XWikiException
     {
-        XWikiDocument doc = getDoc();
+        XWikiDocument xdoc = getDoc();
 
         UserReference currentUserReference = getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE);
-        doc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
+        xdoc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
 
-        if (doc.isNew()) {
-            doc.getAuthors().setCreator(currentUserReference);
+        if (xdoc.isNew()) {
+            xdoc.getAuthors().setCreator(currentUserReference);
         }
 
         XWikiContext xWikiContext = getXWikiContext();
         if (checkSaving) {
-            DocumentReference author = doc.getAuthorReference();
+            DocumentReference author = xdoc.getAuthorReference();
 
             XWikiDocument secureDocument = xWikiContext.getSecureDocument();
             if (secureDocument != null) {
@@ -2896,15 +2896,15 @@ public class Document extends Api
                 // this shouldn't rely on the current user but the script author.
                 // The existing required rights on doc have already been verified by the edit right check.
                 // If required rights shall be changed, they are checked by a listener in checkSavingDocument() below.
-                checkRequiredRightsForSaving(secureDocument, doc, xWikiContext.getAuthorReference());
+                checkRequiredRightsForSaving(secureDocument, xdoc, xWikiContext.getAuthorReference());
             }
 
             // Make sure the user is allowed to make this modification
-            xWikiContext.getWiki().checkSavingDocument(author, doc, comment, minorEdit,
+            xWikiContext.getWiki().checkSavingDocument(author, xdoc, comment, minorEdit,
                 xWikiContext);
         }
 
-        xWikiContext.getWiki().saveDocument(doc, comment, minorEdit, xWikiContext);
+        xWikiContext.getWiki().saveDocument(xdoc, comment, minorEdit, xWikiContext);
         this.initialDoc = this.doc;
     }
 

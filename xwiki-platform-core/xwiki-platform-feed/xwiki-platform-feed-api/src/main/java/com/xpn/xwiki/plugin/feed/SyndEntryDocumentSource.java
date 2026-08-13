@@ -610,15 +610,15 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      */
     protected Map<String, Object> joinParams(Map<String, Object> base, Map<String, Object> extra)
     {
-        Map<String, Object> params = new HashMap<>();
-        params.putAll(base);
+        Map<String, Object> mergedParams = new HashMap<>();
+        mergedParams.putAll(base);
 
         for (Map.Entry<String, Object> entry : extra.entrySet()) {
-            if (params.get(entry.getKey()) == null) {
-                params.put(entry.getKey(), entry.getValue());
+            if (mergedParams.get(entry.getKey()) == null) {
+                mergedParams.put(entry.getKey(), entry.getValue());
             }
         }
-        return params;
+        return mergedParams;
     }
 
     /**

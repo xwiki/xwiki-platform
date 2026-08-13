@@ -1491,21 +1491,21 @@ public class XWiki implements EventListener
 
     public XWikiStoreInterface getNotCacheStore()
     {
-        XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiCacheStoreInterface cacheStore) {
-            store = cacheStore.getStore();
+        XWikiStoreInterface resolvedStore = getStore();
+        if (resolvedStore instanceof XWikiCacheStoreInterface cacheStore) {
+            resolvedStore = cacheStore.getStore();
         }
-        return store;
+        return resolvedStore;
     }
 
     public XWikiHibernateStore getHibernateStore()
     {
-        XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiHibernateStore hibernateStore) {
+        XWikiStoreInterface resolvedStore = getStore();
+        if (resolvedStore instanceof XWikiHibernateStore hibernateStore) {
             return hibernateStore;
-        } else if (store instanceof XWikiCacheStoreInterface cacheStore) {
-            store = cacheStore.getStore();
-            if (store instanceof XWikiHibernateStore hibernateStore) {
+        } else if (resolvedStore instanceof XWikiCacheStoreInterface cacheStore) {
+            resolvedStore = cacheStore.getStore();
+            if (resolvedStore instanceof XWikiHibernateStore hibernateStore) {
                 return hibernateStore;
             } else {
                 return null;
@@ -3636,8 +3636,8 @@ public class XWiki implements EventListener
         }
 
         // If we use the Cache Store layer.. we need to flush it
-        XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiCacheStoreInterface) {
+        XWikiStoreInterface currentStore = getStore();
+        if (currentStore instanceof XWikiCacheStoreInterface) {
             ((XWikiCacheStoreInterface) getStore()).flushCache();
         }
         // Flush renderers.. Groovy renderer has a cache
@@ -4454,7 +4454,7 @@ public class XWiki implements EventListener
 
     public String include(String topic, boolean isForm, XWikiContext context) throws XWikiException
     {
-        String database = null;
+        String databaseName = null;
         String incdatabase = null;
         String prefixedTopic;
         String localTopic;
@@ -4476,7 +4476,7 @@ public class XWiki implements EventListener
             int i0 = topic.indexOf(':');
             if (i0 != -1) {
                 incdatabase = topic.substring(0, i0);
-                database = context.getWikiId();
+                databaseName = context.getWikiId();
                 context.setWikiId(incdatabase);
                 prefixedTopic = topic;
                 localTopic = topic.substring(i0 + 1);
@@ -4523,8 +4523,8 @@ public class XWiki implements EventListener
             String result;
             if (isForm) {
                 // We do everything in the context of the including document
-                if (database != null) {
-                    context.setWikiId(database);
+                if (databaseName != null) {
+                    context.setWikiId(databaseName);
                 }
 
                 // Note: the Script macro in the new rendering checks for programming rights for the document in
@@ -4554,8 +4554,8 @@ public class XWiki implements EventListener
             }
             return result;
         } finally {
-            if (database != null) {
-                context.setWikiId(database);
+            if (databaseName != null) {
+                context.setWikiId(databaseName);
             }
 
             if (currentAPIdoc != null && scontext != null) {
@@ -7926,10 +7926,10 @@ public class XWiki implements EventListener
      */
     private DocumentReference getPreferencesDocumentReference(XWikiContext context)
     {
-        String database = context.getWikiId();
+        String wikiId = context.getWikiId();
         EntityReference spaceReference;
-        if (database != null) {
-            spaceReference = new EntityReference(SYSTEM_SPACE, EntityType.SPACE, new WikiReference(database));
+        if (wikiId != null) {
+            spaceReference = new EntityReference(SYSTEM_SPACE, EntityType.SPACE, new WikiReference(wikiId));
         } else {
             spaceReference = getCurrentMixedEntityReferenceResolver().resolve(SYSTEM_SPACE, EntityType.SPACE);
         }

@@ -244,14 +244,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     @Deprecated
     public void setClassName(String name)
     {
-        EntityReference xClassReference = null;
+        EntityReference classReference = null;
         // Handle backward compatibility: In the past, for statistics objects we used to use a special class name
         // of "internal". We now check for a null Class Reference instead wherever we were previously checking for
         // "internal".
         if (!StringUtils.isEmpty(name) && !"internal".equals(name)) {
-            xClassReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
+            classReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
         }
-        setXClassReference(xClassReference);
+        setXClassReference(classReference);
     }
 
     @Override
@@ -659,9 +659,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
         collection.setXClassReference(getRelativeXClassReference());
         collection.setNumber(getNumber());
-        Map<String, Object> fields = getFields();
+        Map<String, Object> sourceFields = getFields();
         Map<String, Object> cfields = new LinkedHashMap<>();
-        for (Map.Entry<String, Object> objEntry : fields.entrySet()) {
+        for (Map.Entry<String, Object> objEntry : sourceFields.entrySet()) {
             PropertyInterface prop = (PropertyInterface) ((BaseElement) objEntry.getValue()).clone(true);
             prop.setObject(collection);
             cfields.put(objEntry.getKey(), prop);

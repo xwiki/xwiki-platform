@@ -396,9 +396,17 @@ public class ViewPage extends BasePage
         return getElementCSSValue(By.tagName("body"), "color");
     }
 
-    private String getElementCSSValue(By locator, String attribute)
+    /**
+     * @param locator the locator of an element of the page
+     * @param propertyName the name of a CSS property, e.g. {@code color}
+     * @return the computed value of that CSS property for that element
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.7.0RC1
+     */
+    public String getElementCSSValue(By locator, String propertyName)
     {
-        return getDriver().findElement(locator).getCssValue(attribute);
+        return getDriver().findElement(locator).getCssValue(propertyName);
     }
 
     /**

@@ -58,6 +58,7 @@
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@types/lodash-es": "catalog:",
+    "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-fn-utils": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",

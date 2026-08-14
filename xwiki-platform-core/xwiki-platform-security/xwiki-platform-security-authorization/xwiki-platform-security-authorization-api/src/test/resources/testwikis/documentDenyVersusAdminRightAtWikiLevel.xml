@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<!-- Used by DefaultAuthorizationManagerIntegrationTest#documentDenyVersusAdminRightAtWikiLevel() -->
+<wikis>
+  <wiki name="wiki" mainWiki="true" alt="Main Wiki granting the admin right to userAdmin">
+    <user name="userA" alt="a simple user, creator of the documents below" />
+    <user name="userB" alt="a simple user" />
+    <user name="userAdmin" alt="a user having the admin right at wiki level" />
+
+    <allowUser name="userAdmin" type="admin" />
+
+    <space name="any space" alt="a space without any rule">
+      <document name="any document" />
+    </space>
+
+    <space name="space" alt="any space">
+      <document name="docDenyingView" creator="userA"
+        alt="a document created by userA, denying the view right to userAdmin and to userB">
+        <denyUser name="userAdmin" type="view" />
+        <denyUser name="userB" type="view" />
+      </document>
+
+      <document name="docAllowingCreatorOnly" creator="userA"
+        alt="a document created by userA, allowing the view right to userA and denying it to userAdmin">
+        <allowUser name="userA" type="view" />
+        <denyUser name="userAdmin" type="view" />
+      </document>
+    </space>
+  </wiki>
+</wikis>

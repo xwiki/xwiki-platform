@@ -842,6 +842,35 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             getXDoc("userBdoc", "space"));
     }
 
+    /**
+     * Check that denying the comment right to a user on a document, typically from the page administration, takes that
+     * right away from that user on that document only, leaving the other rights of that user and the other users
+     * untouched. In particular, the edit right, which the user keeps, doesn't imply the comment right.
+     */
+    @Test
+    void userDenyCommentAtDocumentLevel() throws Exception
+    {
+        initialiseWikiMock("userDenyCommentAtDocumentLevel");
+
+        // Without any rule, userA can comment the documents of the wiki.
+        assertAccessTrue("userA should have comment access on a document without rules", COMMENT, getXUser("userA"),
+            getXDoc("any document", "space"));
+
+        // The document level deny takes the comment right away from userA on that document...
+        assertAccessFalse("userA should not have comment access on the document denying it", COMMENT,
+            getXUser("userA"), getXDoc("docDenyCommentToUserA", "space"));
+
+        // ...without touching its other rights, the edit right included.
+        assertAccessTrue("userA should have view access on the document denying it the comment right", VIEW,
+            getXUser("userA"), getXDoc("docDenyCommentToUserA", "space"));
+        assertAccessTrue("userA should have edit access on the document denying it the comment right", EDIT,
+            getXUser("userA"), getXDoc("docDenyCommentToUserA", "space"));
+
+        // The deny only targets userA: userB keeps the comment right on that document.
+        assertAccessTrue("userB should have comment access on the document denying the comment right to userA",
+            COMMENT, getXUser("userB"), getXDoc("docDenyCommentToUserA", "space"));
+    }
+
     @Test
     void ownerAccess() throws Exception
     {

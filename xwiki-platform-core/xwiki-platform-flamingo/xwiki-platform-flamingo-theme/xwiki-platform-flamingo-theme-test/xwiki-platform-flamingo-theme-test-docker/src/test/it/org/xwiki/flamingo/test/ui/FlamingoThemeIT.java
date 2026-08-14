@@ -270,15 +270,13 @@ class FlamingoThemeIT
         editThemePage.setVariableValue("xwiki-page-content-bg", "#ffdada");
         // Again...
         editThemePage.selectVariableCategory("Typography");
-        // Verify that setting only "Font Family Sans Serif" (and leaving "Font Family Base" empty) is enough for
-        // the custom font to be applied, since Bootstrap LESS makes @font-family-base fall back to
-        // @font-family-sans-serif by default (see: https://jira.xwiki.org/browse/XWIKI-24593).
+        // Verify that setting only "Font Family Sans Serif" (and leaving "Font Family Base" empty) is enough for the
+        // custom font to be applied, since Bootstrap's LESS makes @font-family-base fall back to
+        // @font-family-sans-serif. Note that "math" is a CSS generic font family and not a font name: the assertion
+        // below reads the computed CSS value, so no matching font needs to be installed on the OS running the browser.
+        // Avoid the "fantasy" generic family here since Firefox doesn't support it on Linux.
         editThemePage.setVariableValue("font-family-sans-serif", "math");
-        try {
-            editThemePage.refreshPreview();
-        } catch (TimeoutException e) {
-            editThemePage.refreshPreview();
-        }
+        refreshPreviewWithRetry(editThemePage);
         previewBox = editThemePage.getPreviewBox();
         assertFalse(previewBox.hasError());
         assertEquals("math", previewBox.getTitleFontFamily().toLowerCase());
@@ -289,19 +287,24 @@ class FlamingoThemeIT
         editThemePage.selectVariableCategory("Advanced");
         editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; }");
         // Refresh
-        // From time-to-time the preview does not load on Firefox certainly because of some JS race condition.
-        // Right now we cannot get the javascript console logs because of a geckodriver limitation, so it's hard to
-        // fix properly. For now, I'm trying to just trigger once again the refresh in case of first timeout.
-        try {
-            editThemePage.refreshPreview();
-        } catch (TimeoutException e) {
-            editThemePage.refreshPreview();
-        }
+        refreshPreviewWithRetry(editThemePage);
         previewBox = editThemePage.getPreviewBox();
         // Verify that there is still no errors
         assertFalse(previewBox.hasError());
         // Verify colors
         assertCustomThemeColors(previewBox);
         previewBox.switchToDefaultContent();
+    }
+
+    // From time-to-time the preview does not load on Firefox certainly because of some JS race condition.
+    // Right now we cannot get the javascript console logs because of a geckodriver limitation, so it's hard to
+    // fix properly. For now, we just trigger once again the refresh in case of first timeout.
+    private void refreshPreviewWithRetry(EditThemePage editThemePage)
+    {
+        try {
+            editThemePage.refreshPreview();
+        } catch (TimeoutException e) {
+            editThemePage.refreshPreview();
+        }
     }
 }

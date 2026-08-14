@@ -734,6 +734,35 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             getWiki("wikiGroupUserDenyAllowNoAdmin"));
     }
 
+    /**
+     * Check that the rules set on a document, typically by its creator, cannot take a right away from a user having
+     * the admin right at wiki level: the admin right implies the view right and, contrary to the view right itself, it
+     * is not overridden by the rules defined at a lower level.
+     */
+    @Test
+    void documentDenyVersusAdminRightAtWikiLevel() throws Exception
+    {
+        initialiseWikiMock("documentDenyVersusAdminRightAtWikiLevel");
+
+        // The document level deny takes the view right away from userB, which is a simple user...
+        assertAccessTrue("userB should have view access on a document of a space without rules", VIEW,
+            getXUser("userB"), getXDoc("any document", "any space"));
+        assertAccessFalse("userB should not have view access on the document denying it", VIEW,
+            getXUser("userB"), getXDoc("docDenyingView", "space"));
+
+        // ...but not from userAdmin, whose admin right at wiki level implies the view right.
+        assertAccessTrue("userAdmin should have view access on the document denying it", VIEW,
+            getXUser("userAdmin"), getXDoc("docDenyingView", "space"));
+
+        // Restricting the view right to the creator of the document doesn't lock userAdmin out either.
+        assertAccessTrue("userA should have view access on the document it created", VIEW,
+            getXUser("userA"), getXDoc("docAllowingCreatorOnly", "space"));
+        assertAccessFalse("userB should not have view access on the document allowing view to userA only", VIEW,
+            getXUser("userB"), getXDoc("docAllowingCreatorOnly", "space"));
+        assertAccessTrue("userAdmin should have view access on the document allowing view to userA only", VIEW,
+            getXUser("userAdmin"), getXDoc("docAllowingCreatorOnly", "space"));
+    }
+
     @Test
     void documentCreator() throws Exception
     {

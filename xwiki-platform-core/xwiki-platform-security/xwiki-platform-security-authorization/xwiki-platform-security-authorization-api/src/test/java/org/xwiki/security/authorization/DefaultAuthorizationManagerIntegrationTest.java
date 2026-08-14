@@ -871,6 +871,35 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
         assertNotNull(securityCache.get(userA));
     }
 
+    /**
+     * Check that denying the edit right to a group on a document, typically from the page administration, takes that
+     * right away from the members of that group on that document only, leaving their other rights and the users which
+     * are not members of that group untouched.
+     */
+    @Test
+    void groupDenyEditAtDocumentLevel() throws Exception
+    {
+        initialiseWikiMock("groupDenyEditAtDocumentLevel");
+
+        // Without any rule, userA, a member of groupA, can edit the documents of the wiki.
+        assertAccessTrue("userA should have edit access on a document without rules", EDIT, getXUser("userA"),
+            getXDoc("any document", "space"));
+
+        // The document level deny takes the edit right away from userA, as a member of groupA, on that document...
+        assertAccessFalse("userA should not have edit access on the document denying it to its group", EDIT,
+            getXUser("userA"), getXDoc("docDenyEditToGroupA", "space"));
+
+        // ...without touching its other rights.
+        assertAccessTrue("userA should have view access on the document denying its group the edit right", VIEW,
+            getXUser("userA"), getXDoc("docDenyEditToGroupA", "space"));
+        assertAccessTrue("userA should have comment access on the document denying its group the edit right", COMMENT,
+            getXUser("userA"), getXDoc("docDenyEditToGroupA", "space"));
+
+        // The deny only targets the members of groupA: userB keeps the edit right on that document.
+        assertAccessTrue("userB should have edit access on the document denying the edit right to groupA", EDIT,
+            getXUser("userB"), getXDoc("docDenyEditToGroupA", "space"));
+    }
+
     @Test
     void checkAccess() throws Exception
     {

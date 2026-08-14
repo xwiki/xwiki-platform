@@ -188,9 +188,18 @@ class FlamingoThemeIT
         // Disable the auto refresh of the preview because it slows down the test.
         editThemePage.setAutoRefresh(false);
         editThemePage.selectVariableCategory("Base colors");
-        editThemePage.setVariableValue("brand-primary", BRAND_PRIMARY);
+        // Set the first color with the color picker, to check that the picker is there and works, and the remaining
+        // ones by typing their value directly, which is faster.
+        editThemePage.pickVariableColor("brand-primary", BRAND_PRIMARY);
         editThemePage.setVariableValue("brand-info", BRAND_INFO);
         editThemePage.setVariableValue("brand-danger", BRAND_DANGER);
+
+        // The preview box next to each input is only filled in by the color picker, so these assertions also verify
+        // that the picker is initialized for the variables whose value was typed directly.
+        assertColor(BRAND_PRIMARY, editThemePage.getColorPreview("brand-primary"));
+        assertColor(BRAND_INFO, editThemePage.getColorPreview("brand-info"));
+        assertColor(BRAND_DANGER, editThemePage.getColorPreview("brand-danger"));
+
         editThemePage.clickSaveAndView();
 
         // The brand info and brand danger colors are exposed to wiki pages through the color theme variables they are

@@ -245,6 +245,8 @@ public class EditPage extends BasePage
 
     /**
      * @return the background color of the "Cancel" button, which uses the default button style
+     * @since 17.10.13
+     * @since 18.4.5
      * @since 18.7.0RC1
      */
     public String getCancelButtonBackgroundColor()

@@ -90,6 +90,8 @@ public class EditThemePage extends EditPage
      *
      * @param variableName the name of the color variable (e.g. {@code brand-primary})
      * @param color the color to set, as a hexadecimal value (e.g. {@code #1a4d80})
+     * @since 17.10.13
+     * @since 18.4.5
      * @since 18.7.0RC1
      */
     public void pickVariableColor(String variableName, String color)
@@ -114,6 +116,8 @@ public class EditThemePage extends EditPage
      * @param variableName the name of a color variable (e.g. {@code brand-primary})
      * @return the background color of the preview box displayed next to the variable's input, which is only filled in
      *         by the color picker, and thus tells whether the color picker got initialized
+     * @since 17.10.13
+     * @since 18.4.5
      * @since 18.7.0RC1
      */
     public String getColorPreview(String variableName)
@@ -143,6 +147,8 @@ public class EditThemePage extends EditPage
      *
      * @param variableName the name of the image variable to set
      * @param filePath the absolute path of the image to upload, as seen by the browser
+     * @since 17.10.13
+     * @since 18.4.5
      * @since 18.7.0RC1
      */
     public void setImageVariableValue(String variableName, String filePath)
@@ -159,6 +165,8 @@ public class EditThemePage extends EditPage
     /**
      * @param variableName the name of the image variable
      * @return the file name of the image currently selected for the passed variable
+     * @since 17.10.13
+     * @since 18.4.5
      * @since 18.7.0RC1
      */
     public String getImageVariableValue(String variableName)

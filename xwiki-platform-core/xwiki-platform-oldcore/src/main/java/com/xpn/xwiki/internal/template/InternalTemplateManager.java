@@ -105,6 +105,7 @@ import org.xwiki.template.TemplateRequirementsException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.internal.skin.AbstractSkinResource;
+import com.xpn.xwiki.internal.skin.EnvironmentSkinResource;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiResource;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -980,7 +981,7 @@ public class InternalTemplateManager implements Initializable, Disposable
     {
         String templatePath = TEMPLATE_RESOURCE_SUFFIX + templateName;
 
-        String templateId = TemplateSkinResource.createId(templatePath);
+        String templateId = EnvironmentSkinResource.createId(templatePath);
 
         // Check if a template already been cached for this identifier
         Template template = getCachedTemplate(templateId);

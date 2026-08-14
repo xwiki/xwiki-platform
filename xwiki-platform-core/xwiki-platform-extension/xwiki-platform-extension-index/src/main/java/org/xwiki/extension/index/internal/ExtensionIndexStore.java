@@ -280,7 +280,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
+        solrQuery.addFilterQuery(AbstractSolrCoreInitializer.SOLR_FIELD_ID + ':'
             + this.utils.toCompleteFilterQueryString(this.extensionIndexSolrUtil.toSolrId(extensionId)));
 
         if (local != null) {
@@ -303,7 +303,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
             this.extensionIndexSolrUtil.toSolrId(extensionId), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, ExtensionIndexSolrCoreInitializer.SOLR_FIELD_LAST,
@@ -324,7 +324,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
             this.extensionIndexSolrUtil.toSolrId(extensionId), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RemoteExtension.FIELD_SUPPORT_PLANS,
@@ -413,7 +413,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         // Get the version to copy
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.addFilterQuery(
-            ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':' + this.utils.toCompleteFilterQueryString(
+            AbstractSolrCoreInitializer.SOLR_FIELD_ID + ':' + this.utils.toCompleteFilterQueryString(
                 this.extensionIndexSolrUtil.toSolrId(new ExtensionId(extensionId.getId(), copyVersion))));
         solrQuery.setFields(RemoteExtension.FIELD_SUPPORT_PLANS, RemoteExtension.FIELD_RECOMMENDED,
             RatingExtension.FIELD_TOTAL_VOTES, RatingExtension.FIELD_AVERAGE_VOTE);
@@ -430,7 +430,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
 
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
             this.extensionIndexSolrUtil.toSolrId(extensionId), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, RemoteExtension.FIELD_SUPPORT_PLANS,
@@ -464,7 +464,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
             this.extensionIndexSolrUtil.toSolrId(extensionId), document);
 
         // Update installed
@@ -500,7 +500,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
             this.extensionIndexSolrUtil.toSolrId(extensionId), document);
 
         updateCompatible(document, namespace, compatible, incompatible);
@@ -532,7 +532,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.addFilterQuery(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID + ':'
+        solrQuery.addFilterQuery(AbstractSolrCoreInitializer.SOLR_FIELD_ID + ':'
             + this.utils.toCompleteFilterQueryString(this.extensionIndexSolrUtil.toSolrId(extensionId)));
 
         solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_COMPATIBLE_NAMESPACES,
@@ -576,7 +576,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID,
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
             this.extensionIndexSolrUtil.toSolrId(extension.getId()), document);
 
         this.utils.set(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_EXTENSIONID, extension.getId().getId(), document);
@@ -643,7 +643,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         this.client.add(document);
 
         // Remember the modified entry
-        addMofiedId((String) document.getFieldValue(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID));
+        addMofiedId((String) document.getFieldValue(AbstractSolrCoreInitializer.SOLR_FIELD_ID));
 
         // Check if it should be auto committed
         ++this.documentsToStore;
@@ -984,7 +984,7 @@ public class ExtensionIndexStore implements Initializable, Disposable
         if (solrQuery.getRows() == null) {
             solrQuery.setRows(Integer.MAX_VALUE);
         }
-        solrQuery.setFields(ExtensionIndexSolrCoreInitializer.SOLR_FIELD_ID);
+        solrQuery.setFields(AbstractSolrCoreInitializer.SOLR_FIELD_ID);
 
         QueryResponse response = search(solrQuery);
 

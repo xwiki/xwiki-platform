@@ -20,13 +20,15 @@
 package org.xwiki.security.authorization;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 
-import org.apache.commons.collections4.set.AbstractSetTest;
+import org.apache.commons.collections4.collection.AbstractCollectionTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test Set interface of RightSet.
@@ -34,7 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @version $Id$
  * @since 4.0M2
  */
-class RightSetTest extends AbstractSetTest<Right>
+// AbstractCollectionTest rather than AbstractSetTest: the set-specific tests of the latter feed a String to the
+// collection under test, which a RightSet cannot hold, and they are package private and therefore not overridable from
+// here. The two checks they bring are reproduced below, over Right elements.
+class RightSetTest extends AbstractCollectionTest<Right>
 {
     @Override
     public RightSet makeObject()
@@ -43,13 +48,13 @@ class RightSetTest extends AbstractSetTest<Right>
     }
 
     @Override
-    public Set<Right> makeConfirmedCollection()
+    public Collection<Right> makeConfirmedCollection()
     {
         return new RightSet();
     }
 
     @Override
-    public Set<Right> makeConfirmedFullCollection()
+    public Collection<Right> makeConfirmedFullCollection()
     {
         return new RightSet(Arrays.asList(getFullElements()));
     }
@@ -78,26 +83,45 @@ class RightSetTest extends AbstractSetTest<Right>
         return false;
     }
 
-    // Methods we need to override because AbstractSetTest use Strings to validate the Set
+    @Override
+    public boolean isEqualsCheckable()
+    {
+        return true;
+    }
+
+    /**
+     * Adds to the collection level verifications the set specific ones: the two collections are equal, they have the
+     * same hash code, and the iterator returns each element only once.
+     */
+    @Override
+    public void verify()
+    {
+        super.verify();
+
+        assertEquals(getConfirmed(), getCollection(), "Sets should be equal");
+        assertEquals(getConfirmed().hashCode(), getCollection().hashCode(), "Sets should have equal hashCodes");
+        Collection<Right> set = makeConfirmedCollection();
+        for (Right element : getCollection()) {
+            assertTrue(set.add(element), "Set.iterator should only return unique elements");
+        }
+    }
 
     /**
      * Tests {@link Set#equals(Object)}.
      */
     @Test
-    @Override
     // This method verifies the equals() contract itself, so the assertions deliberately call equals()
     // explicitly: the boolean form is what makes visible which set is the receiver and which argument it
     // gets. Using assertNotEquals() would move that into JUnit's internals and would invite a later
     // SonarQube S3415 "swap these arguments" change that silently stops testing the contract.
     @SuppressWarnings("java:S5785")
-    public void testSetEquals()
+    void setEquals()
     {
         resetEmpty();
         assertEquals(getCollection(), getConfirmed(), "Empty sets should be equal");
         verify();
 
-        final Set<Right> set2 = makeConfirmedCollection();
-        // CUSTOM: the standard #testSetEquals add a String here, which does not make any sense for RightSet
+        Collection<Right> set2 = makeConfirmedCollection();
         set2.add(Right.VIEW);
         assertFalse(getCollection().equals(set2), "Empty set shouldn't equal nonempty set");
 
@@ -108,5 +132,18 @@ class RightSetTest extends AbstractSetTest<Right>
         set2.clear();
         set2.addAll(Arrays.asList(getOtherElements()));
         assertFalse(getCollection().equals(set2), "Sets with different contents shouldn't be equal");
+    }
+
+    /**
+     * Tests {@link Set#hashCode()}.
+     */
+    @Test
+    void setHashCode()
+    {
+        resetEmpty();
+        assertEquals(getCollection().hashCode(), getConfirmed().hashCode(), "Empty sets have equal hashCodes");
+
+        resetFull();
+        assertEquals(getCollection().hashCode(), getConfirmed().hashCode(), "Equal sets have equal hashCodes");
     }
 }

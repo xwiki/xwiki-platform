@@ -21,6 +21,7 @@ package org.xwiki.blocknote.test.po;
 
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -101,6 +102,7 @@ public class BlockNoteRichTextArea extends BaseElement
     {
         // Click on the top left corner of the rich text area to place the caret at the beginning of the content.
         getDriver().createActions().moveToElement(this.container, 0, 0).click().perform();
+        waitUntilFocused();
         return this;
     }
 
@@ -350,6 +352,23 @@ public class BlockNoteRichTextArea extends BaseElement
             }
             """;
         getDriver().waitUntilCondition(driver -> (boolean) getDriver().executeScript(script, this.container));
+        return this;
+    }
+
+    /**
+     * Selects content with the keyboard. The specified range is relative to the start of the current line.
+     *
+     * @param offset how far from the start of the current line to move the caret (the selection start)
+     * @param length the selection length (the distance from the selection start to the selection end)
+     * @return this rich text area instance
+     * @since 18.7.0RC1
+     */
+    public BlockNoteRichTextArea select(int offset, int length)
+    {
+        sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(offset));
+        if (length > 0) {
+            sendKeys(Keys.chord(Keys.SHIFT, Keys.ARROW_RIGHT.toString().repeat(length)));
+        }
         return this;
     }
 }

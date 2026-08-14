@@ -43,7 +43,7 @@ import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.input.XARInputProperties.SourceType;
-import org.xwiki.filter.xar.internal.XARDocumentModel;
+import org.xwiki.filter.xar.internal.XARDocumentParameters;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 import org.xwiki.filter.xar.internal.input.AttachmentReader.WikiAttachmentInputSource;
 import org.xwiki.filter.xar.internal.input.ClassReader.WikiClass;
@@ -256,7 +256,7 @@ public class DocumentLocaleReader extends AbstractReader
                 result = true;
             } else {
                 result = this.currentDocumentReference != null
-                    && this.currentDocumentParameters.size() == XARDocumentModel.DOCUMENT_PARAMETERS.size()
+                    && this.currentDocumentParameters.size() == XARDocumentParameters.DOCUMENT_PARAMETERS.size()
                     && this.properties.getEntities() == null;
             }
         }
@@ -291,8 +291,8 @@ public class DocumentLocaleReader extends AbstractReader
             if (force) {
                 result = true;
             } else {
-                result = this.currentDocumentLocale != null
-                    && this.currentDocumentLocaleParameters.size() == XARDocumentModel.DOCUMENTLOCALE_PARAMETERS.size();
+                result = this.currentDocumentLocale != null && this.currentDocumentLocaleParameters
+                    .size() == XARDocumentParameters.DOCUMENTLOCALE_PARAMETERS.size();
             }
         }
         return result;
@@ -339,7 +339,7 @@ public class DocumentLocaleReader extends AbstractReader
             } else {
                 result = this.currentDocumentRevision != null
                     && this.currentDocumentRevisionParameters.size()
-                    == XARDocumentModel.DOCUMENTREVISION_PARAMETERS.size();
+                    == XARDocumentParameters.DOCUMENTREVISION_PARAMETERS.size();
             }
         }
         return result;
@@ -565,7 +565,7 @@ public class DocumentLocaleReader extends AbstractReader
     private void readDocumentParameter(XMLStreamReader xmlReader, String elementName)
         throws FilterException, XMLStreamException
     {
-        EventParameter parameter = XARDocumentModel.DOCUMENT_PARAMETERS.get(elementName);
+        EventParameter parameter = XARDocumentParameters.DOCUMENT_PARAMETERS.get(elementName);
 
         if (parameter != null) {
             Object wsValue = convert(parameter.type, xmlReader.getElementText());
@@ -573,7 +573,7 @@ public class DocumentLocaleReader extends AbstractReader
                 this.currentDocumentParameters.put(parameter.name, wsValue);
             }
         } else {
-            parameter = XARDocumentModel.DOCUMENTLOCALE_PARAMETERS.get(elementName);
+            parameter = XARDocumentParameters.DOCUMENTLOCALE_PARAMETERS.get(elementName);
 
             if (parameter != null) {
                 Object wsValue = convert(parameter.type, xmlReader.getElementText());
@@ -590,7 +590,7 @@ public class DocumentLocaleReader extends AbstractReader
         throws XMLStreamException, FilterException
     {
         EventParameter parameter;
-        parameter = XARDocumentModel.DOCUMENTREVISION_PARAMETERS.get(elementName);
+        parameter = XARDocumentParameters.DOCUMENTREVISION_PARAMETERS.get(elementName);
 
         if (parameter != null) {
             Object objectValue;
@@ -604,7 +604,7 @@ public class DocumentLocaleReader extends AbstractReader
             if (objectValue != null) {
                 this.currentDocumentRevisionParameters.put(parameter.name, objectValue);
             }
-        } else if (!XARDocumentModel.DOCUMENT_SKIPPEDPARAMETERS.contains(elementName)) {
+        } else if (!XARDocumentParameters.DOCUMENT_SKIPPEDPARAMETERS.contains(elementName)) {
             unknownElement(xmlReader);
         } else {
             StAXUtils.skipElement(xmlReader);

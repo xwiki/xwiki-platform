@@ -32,11 +32,11 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiObjectFilter;
 import org.xwiki.filter.xar.input.XARInputProperties;
-import org.xwiki.filter.xar.internal.XARClassModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 import org.xwiki.filter.xar.internal.XARObjectModel;
-import org.xwiki.filter.xar.internal.XARObjectPropertyModel;
 import org.xwiki.filter.xar.internal.input.ClassReader.WikiClass;
+import org.xwiki.xar.internal.model.XarClassModel;
+import org.xwiki.xar.internal.model.XarObjectPropertyModel;
 
 /**
  * @version $Id$
@@ -115,9 +115,9 @@ public class WikiObjectReader extends AbstractWikiObjectPropertyReader
 
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
-            if (elementName.equals(XARClassModel.ELEMENT_CLASS)) {
+            if (elementName.equals(XarClassModel.ELEMENT_CLASS)) {
                 wikiObject.wikiClass = this.classReader.read(xmlReader, properties);
-            } else if (elementName.equals(XARObjectPropertyModel.ELEMENT_PROPERTY)) {
+            } else if (elementName.equals(XarObjectPropertyModel.ELEMENT_PROPERTY)) {
                 wikiObject.properties.add(readObjectProperty(xmlReader, properties, wikiObject.wikiClass));
             } else {
                 EventParameter parameter = XARObjectModel.OBJECT_PARAMETERS.get(elementName);

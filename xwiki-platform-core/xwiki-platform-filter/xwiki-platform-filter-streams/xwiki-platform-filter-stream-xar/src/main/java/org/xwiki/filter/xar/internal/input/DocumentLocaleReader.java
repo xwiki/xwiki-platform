@@ -29,6 +29,7 @@ import java.util.Queue;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -42,11 +43,8 @@ import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.input.XARInputProperties.SourceType;
-import org.xwiki.filter.xar.internal.XARAttachmentModel;
-import org.xwiki.filter.xar.internal.XARClassModel;
 import org.xwiki.filter.xar.internal.XARDocumentModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
-import org.xwiki.filter.xar.internal.XARObjectModel;
 import org.xwiki.filter.xar.internal.input.AttachmentReader.WikiAttachmentInputSource;
 import org.xwiki.filter.xar.internal.input.ClassReader.WikiClass;
 import org.xwiki.filter.xar.internal.input.WikiObjectReader.WikiObject;
@@ -56,7 +54,10 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.xar.internal.model.XarAttachmentModel;
+import org.xwiki.xar.internal.model.XarClassModel;
 import org.xwiki.xar.internal.model.XarDocumentModel;
+import org.xwiki.xar.internal.model.XarObjectModel;
 import org.xwiki.xml.stax.StAXUtils;
 
 /**
@@ -458,16 +459,16 @@ public class DocumentLocaleReader extends AbstractReader
     private void readDocument(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
-        xmlReader.require(XMLStreamReader.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
+        xmlReader.require(XMLStreamConstants.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
 
         this.currentSourceType = SourceType.DOCUMENT;
 
         // Initialize with a few defaults (thing that don't exist in old XAR format)
-        this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_SYNTAX, Syntax.XWIKI_1_0);
-        this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_HIDDEN, false);
+        this.currentDocumentRevisionParameters.put(WikiDocumentFilter.PARAMETER_SYNTAX, Syntax.XWIKI_1_0);
+        this.currentDocumentRevisionParameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, false);
 
         // Reference
-        String referenceString = xmlReader.getAttributeValue(null, XARDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);
+        String referenceString = xmlReader.getAttributeValue(null, XarDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);
         if (StringUtils.isNotEmpty(referenceString)) {
             this.currentDocumentReference = this.relativeResolver.resolve(referenceString, EntityType.DOCUMENT);
             this.currentSpaceReference = this.currentDocumentReference.getParent();
@@ -477,7 +478,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
 
         // Locale
-        String localeString = xmlReader.getAttributeValue(null, XARDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE);
+        String localeString = xmlReader.getAttributeValue(null, XarDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE);
         if (localeString != null) {
             this.currentDocumentLocale = toLocale(localeString);
             this.localeFromLegacy = false;
@@ -499,11 +500,11 @@ public class DocumentLocaleReader extends AbstractReader
     {
         String elementName = xmlReader.getLocalName();
 
-        if (elementName.equals(XARAttachmentModel.ELEMENT_ATTACHMENT)) {
+        if (elementName.equals(XarAttachmentModel.ELEMENT_ATTACHMENT)) {
             readAttachment(xmlReader, filter, proxyFilter);
-        } else if (elementName.equals(XARObjectModel.ELEMENT_OBJECT)) {
+        } else if (elementName.equals(XarObjectModel.ELEMENT_OBJECT)) {
             readObject(xmlReader, filter, proxyFilter);
-        } else if (elementName.equals(XARClassModel.ELEMENT_CLASS)) {
+        } else if (elementName.equals(XarClassModel.ELEMENT_CLASS)) {
             readClass(xmlReader, filter, proxyFilter);
         } else {
             if (XarDocumentModel.ELEMENT_SPACE.equals(elementName)) {

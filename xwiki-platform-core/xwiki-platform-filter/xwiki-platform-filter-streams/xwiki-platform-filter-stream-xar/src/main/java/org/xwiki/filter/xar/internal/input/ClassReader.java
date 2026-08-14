@@ -35,6 +35,7 @@ import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARClassModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 import org.xwiki.filter.xar.internal.input.ClassPropertyReader.WikiClassProperty;
+import org.xwiki.xar.internal.model.XarClassModel;
 
 /**
  * @version $Id$
@@ -111,7 +112,7 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
 
-            if (wikiClass.name == null && XARClassModel.ELEMENT_NAME.equals(elementName)) {
+            if (wikiClass.name == null && XarClassModel.ELEMENT_NAME.equals(elementName)) {
                 wikiClass.name = xmlReader.getElementText();
                 wikiClass.parameters.put(WikiClassFilter.PARAMETER_NAME, wikiClass.name);
             } else if (XARClassModel.CLASS_PARAMETERS.containsKey(elementName)) {

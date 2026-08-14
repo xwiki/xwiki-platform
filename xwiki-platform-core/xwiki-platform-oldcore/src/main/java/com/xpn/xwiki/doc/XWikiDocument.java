@@ -205,7 +205,7 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateAttachmentStore;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -9608,7 +9608,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     private XWikiAttachmentStoreInterface getXWikiAttachmentStoreInterface(String storeType)
     {
-        if (storeType != null && !storeType.equals(XWikiHibernateAttachmentStore.HINT)) {
+        if (storeType != null && !storeType.equals(XWikiHibernateBaseStore.HINT)) {
             try {
                 return Utils.getContextComponentManager().getInstance(XWikiAttachmentStoreInterface.class, storeType);
             } catch (ComponentLookupException e) {

@@ -771,6 +771,35 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
     }
 
     /**
+     * Check that denying the edit right to a user on a document, typically from the page administration, takes that
+     * right away from that user on that document only, leaving the other rights of that user and the other users
+     * untouched.
+     */
+    @Test
+    void userDenyEditAtDocumentLevel() throws Exception
+    {
+        initialiseWikiMock("userDenyEditAtDocumentLevel");
+
+        // Without any rule, userA can edit the documents of the wiki.
+        assertAccessTrue("userA should have edit access on a document without rules", EDIT, getXUser("userA"),
+            getXDoc("any document", "space"));
+
+        // The document level deny takes the edit right away from userA on that document...
+        assertAccessFalse("userA should not have edit access on the document denying it", EDIT, getXUser("userA"),
+            getXDoc("docDenyEditToUserA", "space"));
+
+        // ...without touching its other rights.
+        assertAccessTrue("userA should have view access on the document denying it the edit right", VIEW,
+            getXUser("userA"), getXDoc("docDenyEditToUserA", "space"));
+        assertAccessTrue("userA should have comment access on the document denying it the edit right", COMMENT,
+            getXUser("userA"), getXDoc("docDenyEditToUserA", "space"));
+
+        // The deny only targets userA: userB keeps the edit right on that document.
+        assertAccessTrue("userB should have edit access on the document denying the edit right to userA", EDIT,
+            getXUser("userB"), getXDoc("docDenyEditToUserA", "space"));
+    }
+
+    /**
      * Check that the rules set on a document, typically by its creator, cannot take a right away from a user having
      * the admin right at wiki level: the admin right implies the view right and, contrary to the view right itself, it
      * is not overridden by the rules defined at a lower level.

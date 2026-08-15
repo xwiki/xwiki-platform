@@ -7971,10 +7971,8 @@ public class XWiki implements EventListener
         for (int i = 0; i < results.size(); i++) {
             String filename = (String) results.get(i)[0];
             String docFullName = (String) results.get(i)[1];
-            if (!filenamesByDocFullName.containsKey(docFullName)) {
-                filenamesByDocFullName.put(docFullName, new ArrayList<>());
-            }
-            filenamesByDocFullName.get(docFullName).add(filename);
+            filenamesByDocFullName.computeIfAbsent(docFullName, name -> new ArrayList<>())
+                .add(filename);
         }
 
         List<XWikiAttachment> out = new ArrayList<>();

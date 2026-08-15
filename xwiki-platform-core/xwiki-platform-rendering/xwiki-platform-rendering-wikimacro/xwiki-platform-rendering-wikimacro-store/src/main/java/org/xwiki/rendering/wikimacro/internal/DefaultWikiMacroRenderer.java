@@ -216,8 +216,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             && metaDataBlock.getMetaData().getMetaData(MetaData.NON_GENERATED_CONTENT) != null;
 
     private static final Pattern HTML_PLACEHOLDER_PATTERN =
-        Pattern.compile("<(span|div) data-wikimacro-id=(?:[\"'])([^\"']+)(?:[\"'])"
-            + "(?: data-wikimacro-parameter-name=(?:[\"'])([^\"']+)(?:[\"']))?(?:\\/>|><\\/(?:span|div)>)");
+        Pattern.compile("<(span|div) data-wikimacro-id=[\"']([^\"']+)[\"']"
+            + "(?: data-wikimacro-parameter-name=[\"']([^\"']+)[\"'])?(?:\\/>|><\\/(?:span|div)>)");
 
     @Inject
     private AsyncContext asyncContext;

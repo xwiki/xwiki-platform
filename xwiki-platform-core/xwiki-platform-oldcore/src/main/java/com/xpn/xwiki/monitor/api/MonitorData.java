@@ -183,11 +183,8 @@ public class MonitorData
                 this.timerList.add(timer);
             }
             this.timers.remove(timername);
-            MonitorTimerSummary tsummary = this.timerSummaries.get(timername);
-            if (tsummary == null) {
-                tsummary = new MonitorTimerSummary(timername);
-                this.timerSummaries.put(timername, tsummary);
-            }
+            MonitorTimerSummary tsummary =
+                this.timerSummaries.computeIfAbsent(timername, name -> new MonitorTimerSummary(timername));
             tsummary.addTimer(timer.getDuration());
             LOGGER.debug("MONITOR page [{}], action [{}], timer [{}]: [{}]ms, details [{}]", this.wikiPage,
                 this.action, timer.getName(), timer.getDuration(), timer.getDetails());

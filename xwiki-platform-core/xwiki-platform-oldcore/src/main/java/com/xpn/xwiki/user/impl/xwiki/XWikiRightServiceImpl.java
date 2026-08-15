@@ -427,11 +427,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
         LOGGER.debug("Searching for matching rights at group level");
 
         // Didn't found right at this level.. Let's go to group level
-        Map<String, Collection<String>> grouplistcache = (Map<String, Collection<String>>) context.get(GROUP_LIST_CONTEXT_KEY);
-        if (grouplistcache == null) {
-            grouplistcache = new HashMap<>();
-            context.put(GROUP_LIST_CONTEXT_KEY, grouplistcache);
-        }
+        Map<String, Collection<String>> grouplistcache = (Map<String, Collection<String>>) context
+            .computeIfAbsent(GROUP_LIST_CONTEXT_KEY, key -> new HashMap<String, Collection<String>>());
 
         Collection<String> grouplist = new HashSet<>();
 
@@ -475,11 +472,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
     {
         XWikiGroupService groupService = context.getWiki().getGroupService(context);
 
-        Map<String, Collection<String>> grouplistcache = (Map<String, Collection<String>>) context.get(GROUP_LIST_CONTEXT_KEY);
-        if (grouplistcache == null) {
-            grouplistcache = new HashMap<>();
-            context.put(GROUP_LIST_CONTEXT_KEY, grouplistcache);
-        }
+        Map<String, Collection<String>> grouplistcache = (Map<String, Collection<String>>) context
+            .computeIfAbsent(GROUP_LIST_CONTEXT_KEY, key -> new HashMap<String, Collection<String>>());
 
         // the key is for the entity <code>prefixedFullName</code> in current wiki
         String key = wiki + ":" + prefixedFullName;

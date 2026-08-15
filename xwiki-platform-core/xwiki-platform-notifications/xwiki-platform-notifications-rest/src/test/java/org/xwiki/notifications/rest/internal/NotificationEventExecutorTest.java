@@ -98,7 +98,8 @@ class NotificationEventExecutorTest
         when(this.notificationConfiguration.getRESTPoolSize()).thenReturn(1);
         Cache<Object> shortCache = new MapCache<>();
         when(this.cacheManager.<Object>createNewCache(any())).thenReturn(shortCache);
-        when(this.xcontextProvider.get()).thenReturn(mock(XWikiContext.class));
+        XWikiContext xcontextMock = mock();
+        when(this.xcontextProvider.get()).thenReturn(xcontextMock);
         when(this.notificationCacheManager.getEpoch()).thenAnswer(invocation -> this.epoch.get());
     }
 

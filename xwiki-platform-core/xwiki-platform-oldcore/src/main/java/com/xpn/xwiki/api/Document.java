@@ -2395,7 +2395,7 @@ public class Document extends Api
      */
     public Map<String, Map<String, java.lang.Object>> getTOC(int init, int max, boolean numbered)
     {
-        getXWikiContext().put("tocNumbered", new Boolean(numbered));
+        getXWikiContext().put("tocNumbered", Boolean.valueOf(numbered));
         return TOCGenerator.generateTOC(getContent(), init, max, numbered, getXWikiContext());
     }
 

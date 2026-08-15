@@ -175,7 +175,7 @@ class MessageStreamTest
     // Tests
 
     @Test
-    void postPublicMessage() throws Exception
+    void postPublicMessage()
     {
         Event postedMessage = setupForPublicMessage();
 
@@ -188,7 +188,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPublicMessageWithNullMessage() throws Exception
+    void postPublicMessageWithNullMessage()
     {
         Event postedMessage = setupForPublicMessage();
 
@@ -198,7 +198,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPublicMessageWithEmptyMessage() throws Exception
+    void postPublicMessageWithEmptyMessage()
     {
         Event postedMessage = setupForPublicMessage();
 
@@ -208,7 +208,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPublicMessageWithLongMessage() throws Exception
+    void postPublicMessageWithLongMessage()
     {
         Event postedMessage = setupForPublicMessage();
 
@@ -218,7 +218,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPersonalMessage() throws Exception
+    void postPersonalMessage()
     {
         Event postedMessage = setupForPersonalMessage();
 
@@ -231,7 +231,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPersonalMessageWithNullMessage() throws Exception
+    void postPersonalMessageWithNullMessage()
     {
         Event postedMessage = setupForPersonalMessage();
 
@@ -241,7 +241,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPersonalMessageWithEmptyMessage() throws Exception
+    void postPersonalMessageWithEmptyMessage()
     {
         Event postedMessage = setupForPersonalMessage();
 
@@ -251,7 +251,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPersonalMessageWithLongMessage() throws Exception
+    void postPersonalMessageWithLongMessage()
     {
         Event postedMessage = setupForPersonalMessage();
 

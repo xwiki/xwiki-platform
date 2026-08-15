@@ -386,13 +386,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private Map<String, Object> getVelocityVariables()
     {
-        Object velocityVariables = this.factoryParameters.get(VELOCITY_VARIABLES);
-        if (velocityVariables == null) {
-            velocityVariables = new HashMap<String, Object>();
-            this.factoryParameters.put(VELOCITY_VARIABLES, velocityVariables);
-        }
-
-        return (Map<String, Object>) velocityVariables;
+        return (Map<String, Object>) this.factoryParameters.computeIfAbsent(VELOCITY_VARIABLES,
+            key -> new HashMap<String, Object>());
     }
 
     private String getUserEmail(DocumentReference user)

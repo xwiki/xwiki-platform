@@ -20,6 +20,7 @@
 package org.xwiki.activeinstalls2;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.activeinstalls2.internal.data.Ping;
 import org.xwiki.component.annotation.Role;
@@ -59,4 +60,40 @@ public interface DataManager
      * @since 14.4RC1
      */
     long countInstalls(String jsonQuery) throws Exception;
+
+    /**
+     * Counts the distinct XWiki instances having sent a matching ping. Contrary to {@link #countInstalls(String)},
+     * which counts pings, this counts installs: an instance sends a ping every day but also every time it's
+     * restarted, and thus matches several pings.
+     *
+     * @param jsonQuery the Elastic Search JSON query used to search for installs. Passing an empty or null json
+     *      string results in counting the instances found in the whole index (i.e no query constraint)
+     * @return the number of distinct instances
+     * @throws Exception when an error happens while retrieving the data, or when the implementation doesn't support
+     *      counting distinct installs
+     * @since 18.7.0RC1
+     */
+    default long countDistinctInstalls(String jsonQuery) throws Exception
+    {
+        throw new Exception(String.format("[%s] doesn't support counting distinct installs",
+            getClass().getName()));
+    }
+
+    /**
+     * Counts, for each extension, the distinct XWiki instances having that extension installed and having sent a
+     * matching ping. This is computed with a single query, and is thus much cheaper than calling
+     * {@link #countDistinctInstalls(String)} once per extension.
+     *
+     * @param jsonQuery the Elastic Search JSON query used to search for installs. Passing an empty or null json
+     *      string results in counting the instances found in the whole index (i.e no query constraint)
+     * @return the number of distinct instances, keyed by extension id
+     * @throws Exception when an error happens while retrieving the data, when there are more extensions than can be
+     *      returned in a single query, or when the implementation doesn't support counting distinct installs
+     * @since 18.7.0RC1
+     */
+    default Map<String, Long> countDistinctInstallsByExtension(String jsonQuery) throws Exception
+    {
+        throw new Exception(String.format("[%s] doesn't support counting distinct installs per extension",
+            getClass().getName()));
+    }
 }

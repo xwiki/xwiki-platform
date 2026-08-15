@@ -138,7 +138,6 @@ public class DocumentInfo
                     return this.installable;
                 }
             } catch (XWikiException e) {
-                this.installable = INSTALL_IMPOSSIBLE;
                 return this.installable;
             }
             this.installable = INSTALL_OK;

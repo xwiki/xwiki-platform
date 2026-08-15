@@ -75,6 +75,11 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     private static final String LIQUIBASE_RESOURCE = "liquibase-xwiki/";
 
     /**
+     * The liquibase change log top level element close tag.
+     */
+    private static final String LIQUIBASE_CHANGELOG_FOOTER = "</databaseChangeLog>";
+
+    /**
      * Name for which the change log is served.
      */
     public static final String CHANGELOG_NAME = "liquibase.xml";
@@ -281,7 +286,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         final StringBuilder changeLogs = new StringBuilder(10000);
         changeLogs.append(getLiquibaseChangeLogHeader());
         changeLogs.append(liquibaseChangeLogs);
-        changeLogs.append(getLiquibaseChangeLogFooter());
+        changeLogs.append(LIQUIBASE_CHANGELOG_FOOTER);
 
         final XWikiHibernateBaseStore store = getBaseStore();
 
@@ -335,15 +340,6 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             + "    xmlns:ext=\"http://www.liquibase.org/xml/ns/dbchangelog-ext\"\n"
             + "    xsi:schemaLocation=\"http://www.liquibase.org/xml/ns/dbchangelog "
             + "http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd\">";
-    }
-
-    /**
-     * @return the liquibase change log top level element close tag
-     * @since 4.0M1
-     */
-    private String getLiquibaseChangeLogFooter()
-    {
-        return "</databaseChangeLog>";
     }
 
     @Override

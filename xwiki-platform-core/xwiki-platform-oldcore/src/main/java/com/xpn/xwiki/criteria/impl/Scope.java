@@ -47,6 +47,13 @@ public class Scope
     public static final int GLOBAL_SCOPE = 4;
 
     /**
+     * The pattern used in the case of a {@link #GLOBAL_SCOPE}
+     *
+     * @see #getPattern()
+     */
+    private static final String GLOBAL_PATTERN = "";
+
+    /**
      * The type of the scope. It can be {@link #PAGE_SCOPE}, {@link #SPACE_SCOPE}, {@link #WIKI_SCOPE} or
      * {@link #GLOBAL_SCOPE}
      */
@@ -120,7 +127,7 @@ public class Scope
             case SPACE_SCOPE:
                 return getSpacePattern();
             default:
-                return getGlobalPattern();
+                return GLOBAL_PATTERN;
         }
     }
 
@@ -151,14 +158,5 @@ public class Scope
             return this.name + ".%";
         }
         return this.name;
-    }
-
-    /**
-     * @return The pattern used in the case of a {@link #GLOBAL_SCOPE}
-     * @see #getPattern()
-     */
-    private String getGlobalPattern()
-    {
-        return "";
     }
 }

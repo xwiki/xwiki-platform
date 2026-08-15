@@ -67,7 +67,7 @@ public class LiveDataPropertyDescriptor implements InitializableLiveDataElement
          */
         public FilterDescriptor(String id)
         {
-            setId(id);
+            super.setId(id);
         }
 
         /**
@@ -191,7 +191,7 @@ public class LiveDataPropertyDescriptor implements InitializableLiveDataElement
          */
         public OperatorDescriptor(String id, String name)
         {
-            setId(id);
+            super.setId(id);
             setName(name);
         }
 
@@ -266,7 +266,7 @@ public class LiveDataPropertyDescriptor implements InitializableLiveDataElement
          */
         public DisplayerDescriptor(String id)
         {
-            setId(id);
+            super.setId(id);
         }
     }
 

@@ -76,7 +76,7 @@ public class DefaultLESSCompiler extends AbstractCachedCompiler<String> implemen
     @Override
     protected String cloneResult(String toClone)
     {
-        return new String(toClone);
+        return toClone;
     }
 
     @Override

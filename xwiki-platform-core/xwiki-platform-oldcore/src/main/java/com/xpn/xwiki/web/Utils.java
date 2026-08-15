@@ -847,7 +847,7 @@ public class Utils
     public static void enablePlaceholders(XWikiContext context)
     {
         context.put(PLACEHOLDERS_CONTEXT_KEY, new HashMap<String, String>());
-        context.put(PLACEHOLDERS_ENABLED_CONTEXT_KEY, new Boolean(true));
+        context.put(PLACEHOLDERS_ENABLED_CONTEXT_KEY, Boolean.TRUE);
     }
 
     /**

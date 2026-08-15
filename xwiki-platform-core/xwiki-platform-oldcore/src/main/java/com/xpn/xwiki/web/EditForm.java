@@ -514,19 +514,12 @@ public class EditForm extends XWikiForm
                         parameter.getKey());
                     continue;
                 }
-                SortedMap<Integer, Map<String, String[]>> objectMap = this.updateOrCreateMap.get(className);
-                if (objectMap == null) {
-                    objectMap = new TreeMap<>();
-                    this.updateOrCreateMap.put(className, objectMap);
-                }
+                SortedMap<Integer, Map<String, String[]>> objectMap =
+                    this.updateOrCreateMap.computeIfAbsent(className, name -> new TreeMap<>());
                 // Get the property from the right object #objectNumber of type 'objectName';
                 // create it if they don't exist
-                Map<String, String[]> object = objectMap.get(classNumber);
-                if (object == null) {
-                    object = new HashMap<>();
-                    objectMap.put(classNumber, object);
-                }
-                object.put(classPropertyName, parameter.getValue());
+                objectMap.computeIfAbsent(classNumber, number -> new HashMap<>())
+                    .put(classPropertyName, parameter.getValue());
             }
         } else {
             this.updateOrCreateMap = Collections.emptyMap();

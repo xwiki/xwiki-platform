@@ -300,12 +300,9 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      */
     protected void initializeRequestListIfNeeded(XWikiContext context)
     {
-        if (!context.containsKey(this.contextKey)) {
-            context.put(this.contextKey, new LinkedHashSet<String>());
-        }
-        if (!context.containsKey(this.parametersContextKey)) {
-            context.put(this.parametersContextKey, new HashMap<String, Map<String, Object>>());
-        }
+        context.computeIfAbsent(this.contextKey, key -> new LinkedHashSet<String>());
+        context.computeIfAbsent(this.parametersContextKey,
+            key -> new HashMap<String, Map<String, Object>>());
     }
 
     /**

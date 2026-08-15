@@ -951,12 +951,7 @@ public class Package
     private List<String> getStringList(String name, XWikiContext context)
     {
         @SuppressWarnings("unchecked")
-        List<String> list = (List<String>) context.get(name);
-
-        if (list == null) {
-            list = new ArrayList<>();
-            context.put(name, list);
-        }
+        List<String> list = (List<String>) context.computeIfAbsent(name, key -> new ArrayList<String>());
 
         return list;
     }
@@ -1106,11 +1101,11 @@ public class Package
         wr.write(el);
 
         el = new DOMElement("backupPack");
-        el.addText(new Boolean(this.backupPack).toString());
+        el.addText(Boolean.toString(this.backupPack));
         wr.write(el);
 
         el = new DOMElement("preserveVersion");
-        el.addText(new Boolean(this.preserveVersion).toString());
+        el.addText(Boolean.toString(this.preserveVersion));
         wr.write(el);
 
         Element elfiles = new DOMElement(FILES_PROPERTY);

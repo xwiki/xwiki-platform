@@ -172,10 +172,6 @@ public class R160500000XWIKI22271DataMigration extends AbstractHibernateDataMigr
     private boolean isFilterAboutExistingWiki(DefaultNotificationFilterPreference filterPreference,
         Collection<String> wikiIds)
     {
-        if (filterPreference.getWikiId().isPresent()) {
-            return wikiIds.contains(filterPreference.getWikiId().get());
-        } else {
-            return false;
-        }
+        return filterPreference.getWikiId().map(wikiIds::contains).orElse(false);
     }
 }

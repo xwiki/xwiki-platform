@@ -86,7 +86,7 @@ catalog:
   "@playwright/experimental-ct-react": 1.61.1
   "@playwright/experimental-ct-vue": 1.61.1
   "@playwright/test": 1.61.1
-  "@tsconfig/node24": 24.0.4
+  "@tsconfig/node24": 24.0.5
   "@types/jquery": 4.0.1
   "@types/jsdom": 28.0.3
   "@types/lodash-es": 4.17.12

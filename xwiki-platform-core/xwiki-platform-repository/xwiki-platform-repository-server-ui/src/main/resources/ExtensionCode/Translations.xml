@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="ExtensionCode.Translations" locale="">
+<xwikidoc version="1.7" reference="ExtensionCode.Translations" locale="">
   <web>ExtensionCode</web>
   <name>Translations</name>
   <language/>
@@ -104,6 +104,16 @@ repository.extension.sheet.documentation=Documentation
 repository.extension.sheet.sources=Sources
 repository.extension.sheet.issues=Issues
 repository.extension.sheet.download=Download v{0}
+repository.extension.sheet.installOffline=Install Offline
+repository.extension.sheet.installOffline.help=You can use a XIP package to install this extension offline. A XIP is a ZIP file containing XWiki extensions (usually an extension with all its transitive dependencies) formatted like the local XWiki extension repository.
+repository.extension.sheet.installOffline.xwikiVersion=XWiki Version
+repository.extension.sheet.installOffline.xwikiVersionHint=Select the version of the XWiki instance where you want to install the extension.
+repository.extension.sheet.installOffline.exportXIP=Export XIP
+repository.extension.sheet.installOffline.inProgress=Generating XIP package...
+repository.extension.sheet.installOffline.failed=Failed to generate XIP package
+repository.extension.sheet.installOffline.canceling=Canceling XIP export...
+repository.extension.sheet.installOffline.canceled=XIP export canceled
+repository.extension.sheet.installOffline.cancelFailed=Failed to cancel XIP export
 repository.extension.sheet.toc=Table of contents
 repository.extension.sheet.documentationHelp=Documentation Help
 repository.extension.sheet.rulesIntro=Here are some rules to follow when contributing an extension:
@@ -176,7 +186,7 @@ repository.extension.sheet.wrongObject=This class sheet must be applied on a doc
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <property>
+    <property type="String">
       <scope>WIKI</scope>
     </property>
   </object>

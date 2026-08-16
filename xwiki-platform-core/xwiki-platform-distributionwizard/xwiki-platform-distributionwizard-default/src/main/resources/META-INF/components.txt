@@ -1,0 +1,8 @@
+org.xwiki.distributionwizard.internal.steps.FirstAdminUserStep
+org.xwiki.distributionwizard.internal.steps.FlavorChoiceStep
+org.xwiki.distributionwizard.internal.steps.FlavorInstallStep
+org.xwiki.distributionwizard.internal.steps.ReportStep
+org.xwiki.distributionwizard.internal.steps.WelcomeStep
+org.xwiki.distributionwizard.internal.DefaultDistributionWizardManager
+org.xwiki.distributionwizard.internal.FlavorHelper
+org.xwiki.distributionwizard.script.DistributionWizardScriptService

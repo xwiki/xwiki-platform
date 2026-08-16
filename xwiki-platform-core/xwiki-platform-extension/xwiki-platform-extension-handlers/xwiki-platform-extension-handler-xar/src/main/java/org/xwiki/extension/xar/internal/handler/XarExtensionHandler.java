@@ -321,6 +321,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 configuration.setConflictAction(ConflictType.MERGE_FAILURE,
                     request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_FAILURE),
                     configuration.isInteractive() ? GlobalAction.ASK : GlobalAction.MERGED);
+                configuration.setForceOverwrite(
+                    request.<Boolean>getProperty("extension.xar.packager.forceOverwrite", false));
 
                 // If user requested to be asked about conflict behavior
                 XarExtensionPlan xarExtensionPlan = getXARExtensionPlan();

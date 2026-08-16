@@ -1420,10 +1420,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         session.update("com.xpn.xwiki.objects.BaseObject", object);
                     }
                 }
-                /*
-                 * if (stats) session.saveOrUpdate(object); else
-                 * session.saveOrUpdate((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
-                 */
                 BaseClass bclass = object.getXClass(context);
                 List<String> handledProps = new ArrayList<>();
                 if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
@@ -1438,8 +1434,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     } else {
                         session.update(bclass.getName(), objmap);
                     }
-
-                    // dynamicSession.saveOrUpdate((String) bclass.getName(), objmap);
                 }
 
                 if (object.getXClassReference() != null) {

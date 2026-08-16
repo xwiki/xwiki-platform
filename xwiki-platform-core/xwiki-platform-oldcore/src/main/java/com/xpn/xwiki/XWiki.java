@@ -391,23 +391,23 @@ public class XWiki implements EventListener
     private Environment environment;
 
     /** Lock object used for the lazy initialization of the authentication service. */
-    private final Object AUTH_SERVICE_LOCK = new Object();
+    private final Object authServiceLock = new Object();
 
     /** Lock object used for the lazy initialization of the authorization service. */
-    private final Object RIGHT_SERVICE_LOCK = new Object();
+    private final Object rightServiceLock = new Object();
 
     /** Lock object used for the lazy initialization of the group management service. */
-    private final Object GROUP_SERVICE_LOCK = new Object();
+    private final Object groupServiceLock = new Object();
 
     /** Lock object used for the lazy initialization of the statistics service. */
-    private final Object STATS_SERVICE_LOCK = new Object();
+    private final Object statsServiceLock = new Object();
 
 
     private MetaClass metaclass;
 
     private String version;
 
-    private XWikiEngineContext engine_context;
+    private XWikiEngineContext engineContext;
 
     private String database;
 
@@ -5360,8 +5360,11 @@ public class XWiki implements EventListener
                             }
                         }
 
-                        return new URL(protocol != null ? protocol : (port == 443 ? HTTPS : "http"), server, port,
-                            "");
+                        if (protocol == null) {
+                            protocol = port == 443 ? HTTPS : "http";
+                        }
+
+                        return new URL(protocol, server, port, "");
                     }
                 }
             } catch (WikiManagerException e) {
@@ -5968,12 +5971,12 @@ public class XWiki implements EventListener
 
     public XWikiEngineContext getEngineContext()
     {
-        return this.engine_context;
+        return this.engineContext;
     }
 
     public void setEngineContext(XWikiEngineContext engineContext)
     {
-        this.engine_context = engineContext;
+        this.engineContext = engineContext;
     }
 
     public void setAuthService(XWikiAuthService authService)
@@ -5988,7 +5991,7 @@ public class XWiki implements EventListener
 
     public XWikiGroupService getGroupService(XWikiContext context) throws XWikiException
     {
-        synchronized (this.GROUP_SERVICE_LOCK) {
+        synchronized (this.groupServiceLock) {
             if (this.groupService == null) {
                 String groupClass = getConfiguration().getProperty("xwiki.authentication.groupclass",
                     "com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl");
@@ -6039,7 +6042,7 @@ public class XWiki implements EventListener
 
     public XWikiAuthService getAuthService()
     {
-        synchronized (this.AUTH_SERVICE_LOCK) {
+        synchronized (this.authServiceLock) {
             if (this.authService == null) {
                 LOGGER.info("Initializing AuthService...");
 
@@ -6099,7 +6102,7 @@ public class XWiki implements EventListener
 
     public XWikiRightService getRightService()
     {
-        synchronized (this.RIGHT_SERVICE_LOCK) {
+        synchronized (this.rightServiceLock) {
             if (this.rightService == null) {
                 LOGGER.info("Initializing RightService...");
 
@@ -6148,7 +6151,7 @@ public class XWiki implements EventListener
 
     public XWikiStatsService getStatsService(XWikiContext context)
     {
-        synchronized (this.STATS_SERVICE_LOCK) {
+        synchronized (this.statsServiceLock) {
             if (this.statsService == null && "1".equals(getConfiguration().getProperty("xwiki.stats", "1"))) {
                 String storeClass = getConfiguration().getProperty("xwiki.stats.class",
                     "com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl");

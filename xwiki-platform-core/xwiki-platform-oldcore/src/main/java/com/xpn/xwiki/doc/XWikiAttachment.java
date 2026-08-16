@@ -146,7 +146,7 @@ public class XWikiAttachment implements Cloneable
 
     private XWikiAttachmentContent content;
 
-    private XWikiAttachmentArchive attachment_archive;
+    private XWikiAttachmentArchive attachmentArchive;
 
     private boolean isMetaDataDirty = false;
 
@@ -885,12 +885,12 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachmentArchive getAttachment_archive()
     {
-        return this.attachment_archive;
+        return this.attachmentArchive;
     }
 
     public void setAttachment_archive(XWikiAttachmentArchive attachmentArchive)
     {
-        this.attachment_archive = attachmentArchive;
+        this.attachmentArchive = attachmentArchive;
     }
 
     /**
@@ -1002,10 +1002,10 @@ public class XWikiAttachment implements Cloneable
     @Deprecated
     public Archive getArchive()
     {
-        if (this.attachment_archive == null) {
+        if (this.attachmentArchive == null) {
             return null;
         } else {
-            return this.attachment_archive.getRCSArchive();
+            return this.attachmentArchive.getRCSArchive();
         }
     }
 
@@ -1015,22 +1015,22 @@ public class XWikiAttachment implements Cloneable
     @Deprecated
     public void setArchive(Archive archive)
     {
-        if (this.attachment_archive == null) {
-            this.attachment_archive = new XWikiAttachmentArchive();
-            this.attachment_archive.setAttachment(this);
+        if (this.attachmentArchive == null) {
+            this.attachmentArchive = new XWikiAttachmentArchive();
+            this.attachmentArchive.setAttachment(this);
         }
 
-        this.attachment_archive.setRCSArchive(archive);
+        this.attachmentArchive.setRCSArchive(archive);
     }
 
     public void setArchive(String data) throws XWikiException
     {
-        if (this.attachment_archive == null) {
-            this.attachment_archive = new XWikiAttachmentArchive();
-            this.attachment_archive.setAttachment(this);
+        if (this.attachmentArchive == null) {
+            this.attachmentArchive = new XWikiAttachmentArchive();
+            this.attachmentArchive.setAttachment(this);
         }
 
-        this.attachment_archive.setArchive(data);
+        this.attachmentArchive.setArchive(data);
     }
 
     public synchronized Version[] getVersions()
@@ -1162,7 +1162,7 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachmentArchive loadArchive(XWikiContext xcontext)
     {
-        if (this.attachment_archive == null) {
+        if (this.attachmentArchive == null) {
             WikiReference currentWiki = xcontext.getWikiReference();
 
             try {
@@ -1175,7 +1175,7 @@ public class XWikiAttachment implements Cloneable
                 try {
                     AttachmentVersioningStore store = getAttachmentVersioningStore(xcontext);
 
-                    this.attachment_archive = store.loadArchive(this, xcontext, true);
+                    this.attachmentArchive = store.loadArchive(this, xcontext, true);
                 } catch (Exception e) {
                     LOGGER.warn("Failed to load archive for attachment [{}@{}]. This attachment is broken, please "
                         + "consider re-uploading it",
@@ -1188,7 +1188,7 @@ public class XWikiAttachment implements Cloneable
             }
         }
 
-        return this.attachment_archive;
+        return this.attachmentArchive;
     }
 
     public void updateContentArchive(XWikiContext context) throws XWikiException

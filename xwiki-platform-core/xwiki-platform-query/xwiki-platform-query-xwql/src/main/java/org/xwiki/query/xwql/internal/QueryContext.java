@@ -226,5 +226,5 @@ public class QueryContext
         return documents.keySet();
     }
 
-    String DocumentFromName = "Document";
+    String documentFromName = "Document";
 }

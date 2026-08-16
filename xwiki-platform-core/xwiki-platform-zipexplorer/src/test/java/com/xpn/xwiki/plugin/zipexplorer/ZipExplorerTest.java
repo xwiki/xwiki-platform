@@ -278,7 +278,6 @@ class ZipExplorerTest
         when(attachment.getContent(any(XWikiContext.class))).thenReturn((content == null) ? new byte[0] : content);
         when(attachment.getContentInputStream(any(XWikiContext.class))).thenReturn(
             new ByteArrayInputStream((content == null) ? new byte[0] : content));
-//        when(attachment.getReference()).thenReturn(new AttachmentReference(filename, document.getDocumentReference()));
         when(attachment.getReference()).thenReturn(
             new AttachmentReference(filename, new DocumentReference("wiki", "Main", "Document")));
 

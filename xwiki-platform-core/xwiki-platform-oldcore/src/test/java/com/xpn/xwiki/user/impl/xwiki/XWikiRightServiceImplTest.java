@@ -459,9 +459,6 @@ class XWikiRightServiceImplTest
         final Document doc =
             new Document(new XWikiDocument(new DocumentReference("XWiki", "Test", "Permissions")), this.context);
 
-       // doc.setContentAuthor(XWikiRightService.SUPERADMIN_USER_FULLNAME);
-
-        //this.context.setDoc(doc);
         this.context.setUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
 
         assertTrue(this.rightService.hasProgrammingRights(this.context),

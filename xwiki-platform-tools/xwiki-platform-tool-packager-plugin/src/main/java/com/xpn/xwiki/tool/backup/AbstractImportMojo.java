@@ -77,10 +77,9 @@ public abstract class AbstractImportMojo extends AbstractOldCoreMojo
     {
         // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an ordered
         // LinkedHashSet behind the scene)
-        List<Artifact> dependenciesFirstArtifacts = new ArrayList<>(this.project.getArtifacts());
-        Collections.reverse(dependenciesFirstArtifacts);
+        List<Artifact> artifacts = new ArrayList<>(this.project.getArtifacts());
 
-        for (Artifact artifact : dependenciesFirstArtifacts) {
+        for (Artifact artifact : artifacts.reversed()) {
             if (!artifact.isOptional() && "xar".equals(artifact.getType())) {
                 installXAR(artifact, importer, this.oldCoreHelper.getXWikiContext());
             }

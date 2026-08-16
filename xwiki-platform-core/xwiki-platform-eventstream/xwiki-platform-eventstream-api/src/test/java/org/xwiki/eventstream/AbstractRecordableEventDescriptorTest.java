@@ -95,11 +95,6 @@ class AbstractRecordableEventDescriptorTest
         when(contextualLocalizationManager.getTranslationPlain("applicationKey"))
                 .thenReturn("My nice application name");
 
-//        // On main wiki
-//        assertEquals("My nice description",
-//                fakeRecordableEventDescriptor.getDescription());
-//        assertEquals("My nice application name",
-//                fakeRecordableEventDescriptor.getApplicationName());
 
         // On sub wiki
         when(((NamespacedComponentManager) componentManager).getNamespace())

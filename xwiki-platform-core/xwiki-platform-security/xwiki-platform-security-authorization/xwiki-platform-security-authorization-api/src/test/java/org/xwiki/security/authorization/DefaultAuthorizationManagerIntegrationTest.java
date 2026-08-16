@@ -275,7 +275,6 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
                     return compareReferenceNullSafe(userOrGroup, reference.getOriginalDocumentReference());
                 }
             });
-            // when(mockedRule.match(any(GroupSecurityReference.class))).thenReturn(false);
         } else {
             when(mockedRule.match(any(GroupSecurityReference.class))).thenAnswer(new Answer<Boolean>()
             {
@@ -286,7 +285,6 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
                     return compareReferenceNullSafe(userOrGroup, reference.getOriginalDocumentReference());
                 }
             });
-            // when(mockedRule.match(any(UserSecurityReference.class))).thenReturn(false);
         }
         return mockedRule;
     }

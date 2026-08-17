@@ -40,7 +40,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @since 5.0M2
  */
 @Component
-@Named("XWiki.XWikiServerClass")
+@Named(XWikiServerClassDocumentInitializer.SERVER_CLASS_STRING)
 @Singleton
 public class XWikiServerClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
@@ -48,6 +48,16 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryClassI
      * The name of the mandatory document.
      */
     public static final String DOCUMENT_NAME = "XWikiServerClass";
+
+    /**
+     * The String reference of the server class.
+     *
+     * @since 16.10.19
+     * @since 17.10.11
+     * @since 18.4.4
+     * @since 18.7.0RC1
+     */
+    public static final String SERVER_CLASS_STRING = XWiki.SYSTEM_SPACE + '.' + DOCUMENT_NAME;
 
     /**
      * Reference to the server class.

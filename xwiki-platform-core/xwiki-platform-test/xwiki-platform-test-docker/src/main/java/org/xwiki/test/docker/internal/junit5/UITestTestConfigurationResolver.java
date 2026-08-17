@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.Extension;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.WikiDescriptorTarget;
 import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
@@ -100,6 +101,8 @@ public class UITestTestConfigurationResolver
 
     private static final String SERVLET_ENGINE_NETWORK_ALIASES_PROPERTY = "xwiki.test.ui.servletEngineNetworkAliases";
 
+    private static final String WIKIDESCRIPTORTARGET_PROPERTY = "xwiki.test.ui.wikiDescriptorTarget";
+
     /**
      * @param uiTestAnnotation the annotation from which to extract the configuration
      * @return the constructed {@link TestConfiguration} object containing the full test configuration
@@ -146,6 +149,7 @@ public class UITestTestConfigurationResolver
         configuration.setSolrMode(resolveSolrMode(uiTestAnnotation.solrMode()));
         configuration.setRemoteSolrTag(resolveRemoteSolrTag(uiTestAnnotation.remoteSolrTag()));
         configuration.setXWikiInstances(uiTestAnnotation.xwikiInstances());
+        configuration.setWikiDescriptorTarget(resolveWikiDescriptorTarget(uiTestAnnotation.wikiDescriptorTarget()));
 
         return configuration;
     }
@@ -399,5 +403,10 @@ public class UITestTestConfigurationResolver
     private String resolveRemoteSolrTag(String resolveRemoTag)
     {
         return resolve(resolveRemoTag, REMOTESOLRTAG_PROPERTY);
+    }
+
+    private WikiDescriptorTarget resolveWikiDescriptorTarget(WikiDescriptorTarget wikiDescriptorTarget)
+    {
+        return resolve(WikiDescriptorTarget.class, wikiDescriptorTarget, WIKIDESCRIPTORTARGET_PROPERTY);
     }
 }

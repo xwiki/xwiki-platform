@@ -1504,8 +1504,6 @@ XWiki.Annotation = Class.create({
     if (!this.safeUpdate(container, content)) {
       return;
     }
-    // remove the mouseout listener (if any), edit form should stay on
-    container.stopObserving('mouseout');
     // add the delete and validate listeners to the respective delete buttons
     const deleteButton = container.querySelector('.delete');
     if (deleteButton) {

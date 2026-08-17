@@ -788,7 +788,7 @@ function noaccent(txt) {
     temp = temp.replace(/[\u0179\u017b\u017d]/g,"Z");
     temp = temp.replace(/[\u017a\u017c\u017e]/g,"z");
     temp = temp.replace(/[\u00df]/g,"SS");
-    temp = temp.replace(/[^a-zA-Z0-9_]/g,"");
+    temp = temp.replace(/\W/g,"");
     return temp;
 }
 
@@ -1077,39 +1077,39 @@ function BrowserDetect() {
 
     // rendering engine versions
     this.geckoVersion = ( (this.isGecko) ? ua.substring( (ua.lastIndexOf('gecko/') + 6), (ua.lastIndexOf('gecko/') + 14) ) : -1 );
-    this.equivalentMozilla = ( (this.isGecko) ? parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) ) : -1 );
-    this.appleWebKitVersion = ( (this.isAppleWebKit) ? parseFloat( ua.substring( ua.indexOf('applewebkit/') + 12) ) : -1 );
+    this.equivalentMozilla = ( (this.isGecko) ? Number.parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) ) : -1 );
+    this.appleWebKitVersion = ( (this.isAppleWebKit) ? Number.parseFloat( ua.substring( ua.indexOf('applewebkit/') + 12) ) : -1 );
 
     // browser version
-    this.versionMinor = parseFloat(navigator.appVersion);
+    this.versionMinor = Number.parseFloat(navigator.appVersion);
 
     // correct version number
     if (this.isGecko && !this.isMozilla) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('/', ua.indexOf('gecko/') + 6) + 1 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('/', ua.indexOf('gecko/') + 6) + 1 ) );
     }
     else if (this.isMozilla) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) );
     }
     else if (this.isIE && this.versionMinor >= 4) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('msie ') + 5 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('msie ') + 5 ) );
     }
     else if (this.isKonqueror) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('konqueror/') + 10 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('konqueror/') + 10 ) );
     }
     else if (this.isSafari) {
-        this.versionMinor = parseFloat( ua.substring( ua.lastIndexOf('safari/') + 7 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.lastIndexOf('safari/') + 7 ) );
     }
     else if (this.isOmniweb) {
-        this.versionMinor = parseFloat( ua.substring( ua.lastIndexOf('omniweb/') + 8 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.lastIndexOf('omniweb/') + 8 ) );
     }
     else if (this.isOpera) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('opera') + 6 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('opera') + 6 ) );
     }
     else if (this.isIcab) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('icab') + 5 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('icab') + 5 ) );
     }
 
-    this.versionMajor = parseInt(this.versionMinor);
+    this.versionMajor = Number.parseInt(this.versionMinor);
 
     // dom support
     this.isDOM1 = (document.getElementById);
@@ -1146,7 +1146,7 @@ function BrowserDetect() {
     this.isIE4xMac = (this.isIE4x && this.isMac);
 
     var trident = /trident\/(\d+)/.exec(ua);
-    this.isIE11up = trident && parseInt(trident[1]) >= 7;
+    this.isIE11up = trident && Number.parseInt(trident[1]) >= 7;
 }
 var browser = new BrowserDetect();
 
@@ -1631,10 +1631,10 @@ document.observe("xwiki:dom:loaded", function() {
       makeFixed(menu, 0, menuLeft, menuWidth);
       if (menu.__fm_extra) {
         makeFixed(menu.__fm_extra, menuHeight, menuLeft, (menuWidth -
-          menu.__fm_extra.getStyle('border-left-width').replace(/[^0-9]/g,'') -
-          menu.__fm_extra.getStyle('border-right-width').replace(/[^0-9]/g,'') -
-          menu.__fm_extra.getStyle('padding-right').replace(/[^0-9]/g,'') -
-          menu.__fm_extra.getStyle('padding-left').replace(/[^0-9]/g,'')));
+          menu.__fm_extra.getStyle('border-left-width').replace(/\D/g,'') -
+          menu.__fm_extra.getStyle('border-right-width').replace(/\D/g,'') -
+          menu.__fm_extra.getStyle('padding-right').replace(/\D/g,'') -
+          menu.__fm_extra.getStyle('padding-left').replace(/\D/g,'')));
       }
     } else {
       makeScrollable(menu);

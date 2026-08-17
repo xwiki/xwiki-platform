@@ -267,10 +267,14 @@
   ## reached from the Comments tab, but NOT when the annotation bubble fetches its own content via
   ## AnnotationCode.DisplayForm (rendered through the lightweight "get" action, which never runs that template).
   ## Compute them locally so the Edit/Delete actions are gated correctly regardless of which caller reached
-  ## this macro.
+  ## this macro. $hasComment is computed the same way rather than through $xwiki.hasAccessLevel('comment'), which
+  ## checks $xcontext.doc and so isn't reliable either for the same reason.
   #set($hasAdmin = $services.security.authorization.hasAccess('admin', $docRef))
   #set($hasEdit = $services.security.authorization.hasAccess('edit', $docRef))
+  #set($hasComment = $services.security.authorization.hasAccess('comment', $docRef))
   #if ($annotationClassDocName == 'XWiki.XWikiComments')
+    ## Same reasoning as $hasAdmin/$hasEdit above: use $annoDoc rather than the calling template's $doc, since
+    ## it isn't guaranteed to point at the annotated document (or to be bound at all) for every caller.
     #set($annoDoc = $xwiki.getDocument($docRef))
     #set($repliesList = $annoDoc.getObjects($annotationClassDocName, 'replyto', $ann.id))
     #set($threadCount = $repliesList.size())
@@ -284,21 +288,21 @@
         $services.icon.renderHTML('comments') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
       &lt;/button&gt;##
     #end
-    #if($xwiki.hasAccessLevel('comment'))
+    #if($hasComment)
       &lt;a class="commentreply btn btn-default infomessage" rel="nofollow" href="$xredirect.replaceAll('&amp;?replyto=\d++', '')&amp;replyto=${ann.id}#xwikicomment_${ann.id}"#if("$!replyTo" == "${ann.id}") style="display: none;"#end&gt;##
       $services.icon.renderHTML('comment') $!escapetool.xml($services.localization.render('core.viewers.comments.reply'))
       &lt;/a&gt;##
     #end
     &lt;a class="permalink btn btn-default infomessage" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
-      href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${ann.id}"&gt;##
+      href="$annoDoc.getURL('view', 'viewer=comments')#xwikicomment_${ann.id}"&gt;##
       $services.icon.renderHTML('link') $!escapetool.xml($services.localization.render('core.viewers.comments.share'))
     &lt;/a&gt;##
-    #if($xwiki.hasAccessLevel('comment') &amp;&amp; ($hasAdmin || $isUserComment))
+    #if($hasComment &amp;&amp; ($hasAdmin || $isUserComment))
       #set ($editQueryString = $escapetool.url({
         'viewer': 'comments',
         'number': $ann.id,
-        'xredirect': $doc.getURL('view')}))
-      #set ($editURL = $doc.getURL('view', $editQueryString))
+        'xredirect': $annoDoc.getURL('view')}))
+      #set ($editURL = $annoDoc.getURL('view', $editQueryString))
       &lt;a class="edit btn btn-default infomessage" rel="nofollow" href="$editURL"&gt;##
       $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
       &lt;/a&gt;##
@@ -306,12 +310,12 @@
     #if ($hasAdmin || ($hasEdit &amp;&amp; $isUserComment))
       ## Delete mutates state, so it's a real POST form (not a link) - a link's href can be followed by a
       ## crawler, prefetched, opened in a new tab, or navigated to directly if JavaScript never attaches.
-      #set ($deleteActionURL = $xwiki.getURL($doc.fullName, 'objectremove'))
+      #set ($deleteActionURL = $xwiki.getURL($annoDoc.fullName, 'objectremove'))
       &lt;form class="delete-form" method="post" action="$escapetool.xml($deleteActionURL)"&gt;
         &lt;input type="hidden" name="form_token" value="$escapetool.xml($services.csrf.token)"/&gt;
         &lt;input type="hidden" name="classname" value="$escapetool.xml($annotationClassDocName)"/&gt;
         &lt;input type="hidden" name="classid" value="$escapetool.xml($ann.id)"/&gt;
-        &lt;input type="hidden" name="xredirect" value="$escapetool.xml($doc.getURL('view'))"/&gt;
+        &lt;input type="hidden" name="xredirect" value="$escapetool.xml($annoDoc.getURL('view'))"/&gt;
         &lt;button type="submit" class="delete btn btn-default errormessage"
           title="$escapetool.xml($services.localization.render('core.viewers.comments.delete'))"&gt;
           $services.icon.renderHTML('trash') $!escapetool.xml($services.localization.render('core.viewers.comments.delete'))

@@ -179,12 +179,7 @@ public class DBTreeListClass extends DBListClass
 
     protected void addToList(Map<String, List<ListItem>> map, String key, ListItem item)
     {
-        List<ListItem> list = map.get(key);
-        if (list == null) {
-            list = new ArrayList<>();
-            map.put(key, list);
-        }
-        list.add(item);
+        map.computeIfAbsent(key, k -> new ArrayList<>()).add(item);
     }
 
     @Override

@@ -32,9 +32,9 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiClassFilter;
 import org.xwiki.filter.xar.input.XARInputProperties;
-import org.xwiki.filter.xar.internal.XARClassModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 import org.xwiki.filter.xar.internal.input.ClassPropertyReader.WikiClassProperty;
+import org.xwiki.xar.internal.model.XarClassModel;
 
 /**
  * @version $Id$
@@ -44,6 +44,18 @@ import org.xwiki.filter.xar.internal.input.ClassPropertyReader.WikiClassProperty
 @Singleton
 public class ClassReader extends AbstractReader implements XARXMLReader<ClassReader.WikiClass>
 {
+    /**
+     * Parameters to be used when reading a class.
+     */
+    private static final Map<String, EventParameter> CLASS_PARAMETERS =
+        Map.of(XarClassModel.ELEMENT_CUSTOMCLASS, new EventParameter(WikiClassFilter.PARAMETER_CUSTOMCLASS),
+            XarClassModel.ELEMENT_CUSTOMMAPPING, new EventParameter(WikiClassFilter.PARAMETER_CUSTOMMAPPING),
+            XarClassModel.ELEMENT_SHEET_DEFAULTVIEW, new EventParameter(WikiClassFilter.PARAMETER_SHEET_DEFAULTVIEW),
+            XarClassModel.ELEMENT_SHEET_DEFAULTEDIT, new EventParameter(WikiClassFilter.PARAMETER_SHEET_DEFAULTEDIT),
+            XarClassModel.ELEMENT_DEFAULTSPACE, new EventParameter(WikiClassFilter.PARAMETER_DEFAULTSPACE),
+            XarClassModel.ELEMENT_NAMEFIELD, new EventParameter(WikiClassFilter.PARAMETER_NAMEFIELD),
+            XarClassModel.ELEMENT_VALIDATIONSCRIPT, new EventParameter(WikiClassFilter.PARAMETER_VALIDATIONSCRIPT));
+
     @Inject
     private XARXMLReader<ClassPropertyReader.WikiClassProperty> propertyReader;
 
@@ -94,6 +106,7 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
 
         /**
          * Put a new property indexed by its name.
+         * 
          * @param property the property to be added.
          */
         public void addProperty(WikiClassProperty property)
@@ -111,13 +124,13 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
 
-            if (wikiClass.name == null && XARClassModel.ELEMENT_NAME.equals(elementName)) {
+            if (wikiClass.name == null && XarClassModel.ELEMENT_NAME.equals(elementName)) {
                 wikiClass.name = xmlReader.getElementText();
                 wikiClass.parameters.put(WikiClassFilter.PARAMETER_NAME, wikiClass.name);
-            } else if (XARClassModel.CLASS_PARAMETERS.containsKey(elementName)) {
+            } else if (CLASS_PARAMETERS.containsKey(elementName)) {
                 String value = xmlReader.getElementText();
 
-                EventParameter parameter = XARClassModel.CLASS_PARAMETERS.get(elementName);
+                EventParameter parameter = CLASS_PARAMETERS.get(elementName);
 
                 if (parameter != null) {
                     Object wsValue = convert(parameter.type, value);

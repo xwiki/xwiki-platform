@@ -1576,15 +1576,15 @@ public class XWiki extends Api
      * @param xwikiname user to send the email to
      * @param password password to put in the mail
      * @param email email to send to
-     * @param add_message Additional message to send to the user
+     * @param addMessage Additional message to send to the user
      * @param contentfield Preference field to use as a mail template
      * @throws XWikiException if the mail was not send successfully
      */
-    public void sendConfirmationMail(String xwikiname, String password, String email, String add_message,
+    public void sendConfirmationMail(String xwikiname, String password, String email, String addMessage,
         String contentfield) throws XWikiException
     {
         if (hasProgrammingRights()) {
-            this.xwiki.sendConfirmationEmail(xwikiname, password, email, add_message, contentfield, getXWikiContext());
+            this.xwiki.sendConfirmationEmail(xwikiname, password, email, addMessage, contentfield, getXWikiContext());
         }
     }
 

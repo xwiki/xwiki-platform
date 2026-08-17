@@ -47,16 +47,18 @@ class PageObjectReferenceTest
     @Test
     void testInvalidType()
     {
+        EntityReference reference = new EntityReference("className", EntityType.PAGE);
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
-            () -> new PageObjectReference(new EntityReference("className", EntityType.PAGE)));
+            () -> new PageObjectReference(reference));
         assertEquals("Invalid type [PAGE] for an object reference", expected.getMessage());
     }
 
     @Test
     void testInvalidNullParent()
     {
+        EntityReference reference = new EntityReference("className", EntityType.PAGE_OBJECT);
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
-            () -> new PageObjectReference(new EntityReference("className", EntityType.PAGE_OBJECT)));
+            () -> new PageObjectReference(reference));
         assertEquals("Invalid parent reference [null] in an object reference", expected.getMessage());
     }
 
@@ -66,9 +68,10 @@ class PageObjectReferenceTest
     @Test
     void testInvalidParentType()
     {
+        EntityReference reference = new EntityReference("className", EntityType.PAGE_OBJECT,
+            new EntityReference("wiki", EntityType.WIKI));
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
-            () -> new PageObjectReference(new EntityReference("className", EntityType.PAGE_OBJECT,
-                new EntityReference("wiki", EntityType.WIKI))));
+            () -> new PageObjectReference(reference));
         assertEquals("Invalid parent reference [Wiki wiki] in an object reference", expected.getMessage());
     }
 

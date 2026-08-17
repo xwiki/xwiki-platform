@@ -71,7 +71,7 @@ class LiveNotificationEmailSenderTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Test
-    void sendMail() throws Exception
+    void sendMail()
     {
         CompositeEvent event1 = mock(CompositeEvent.class);
 

@@ -94,6 +94,9 @@ export type {
 } from "./blocknote/utils";
 
 export type {
+  LinkEditionData,
   LinkEditionHandler,
   LinkEditionHandlerProps,
 } from "./components/links/linkEdition";
+
+export type { LinkEditionHooks } from "./components/links/linkEditionHooks";

@@ -32,6 +32,7 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.hibernate.HibernateException;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Environment;
 import org.hibernate.service.UnknownUnwrapTypeException;
 import org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator;
@@ -122,33 +123,33 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
             Properties dbcpProperties = new Properties();
 
             // DriverClass & url
-            String jdbcDriverClass = (String) props.get(Environment.DRIVER);
+            String jdbcDriverClass = (String) props.get(AvailableSettings.DRIVER);
             // Some drivers register themselves automatically using the Service Loader mechanism and thus we don't need
             // to set the Hibernate "driverClassName" property.
             if (jdbcDriverClass != null) {
                 dbcpProperties.put("driverClassName", jdbcDriverClass);
             }
 
-            String jdbcUrl = System.getProperty(Environment.URL);
+            String jdbcUrl = System.getProperty(AvailableSettings.URL);
             if (jdbcUrl == null) {
-                jdbcUrl = (String) props.get(Environment.URL);
+                jdbcUrl = (String) props.get(AvailableSettings.URL);
             }
             dbcpProperties.put("url", jdbcUrl);
 
             // Username / password. Only put username and password if they're not null. This allows
             // external authentication support (OS authenticated). It'll thus work if the hibernate
             // config does not specify a username and/or password.
-            String username = (String) props.get(Environment.USER);
+            String username = (String) props.get(AvailableSettings.USER);
             if (username != null) {
                 dbcpProperties.put("username", username);
             }
-            String password = (String) props.get(Environment.PASS);
+            String password = (String) props.get(AvailableSettings.PASS);
             if (password != null) {
                 dbcpProperties.put("password", password);
             }
 
             // Isolation level
-            String isolationLevel = (String) props.get(Environment.ISOLATION);
+            String isolationLevel = (String) props.get(AvailableSettings.ISOLATION);
             if ((isolationLevel != null) && (!isolationLevel.trim().isEmpty())) {
                 dbcpProperties.put("defaultTransactionIsolation", isolationLevel);
             }
@@ -163,7 +164,7 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
             }
 
             // Pool size
-            String poolSize = (String) props.get(Environment.POOL_SIZE);
+            String poolSize = (String) props.get(AvailableSettings.POOL_SIZE);
             if ((poolSize != null) && (!poolSize.trim().isEmpty()) && (Integer.parseInt(poolSize) > 0)) {
                 dbcpProperties.put("maxTotal", poolSize);
             }

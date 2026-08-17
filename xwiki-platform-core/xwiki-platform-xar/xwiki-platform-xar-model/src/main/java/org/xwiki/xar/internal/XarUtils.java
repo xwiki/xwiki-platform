@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.util.Locale;
 
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -106,7 +107,7 @@ public final class XarUtils
 
             xmlReader.nextTag();
 
-            xmlReader.require(XMLStreamReader.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
+            xmlReader.require(XMLStreamConstants.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
 
             // Reference
             String referenceString = xmlReader.getAttributeValue(null, XarDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);

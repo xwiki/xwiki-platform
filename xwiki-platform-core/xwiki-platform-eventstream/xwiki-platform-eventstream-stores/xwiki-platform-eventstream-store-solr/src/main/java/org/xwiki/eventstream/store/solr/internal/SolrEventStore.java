@@ -80,6 +80,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
@@ -256,7 +257,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Event.FIELD_PREFILTERED, true, document);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Event.FIELD_PREFILTERING_DATE, new Date(), document);
@@ -281,7 +282,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, eventId, document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, eventId, document);
 
         this.utils.setAtomic(
             read ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
@@ -303,7 +304,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, eventId, document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, eventId, document);
 
         this.utils.setAtomic(
             add ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
@@ -325,7 +326,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
 
         this.utils.set(Event.FIELD_APPLICATION, event.getApplication(), document);
         this.utils.set(Event.FIELD_BODY, event.getBody(), document);
@@ -433,7 +434,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.addFilterQuery(serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_ID,
+        solrQuery.addFilterQuery(serializeInCondition(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
             events.stream().map(Event::getId).toList()));
 
         solrQuery.addFilterQuery(serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS, entityIds)
@@ -481,7 +482,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         DefaultEvent event = new DefaultEvent();
 
-        event.setId(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_ID, document));
+        event.setId(this.utils.get(AbstractSolrCoreInitializer.SOLR_FIELD_ID, document));
 
         event.setApplication(this.utils.get(Event.FIELD_APPLICATION, document));
         event.setBody(this.utils.get(Event.FIELD_BODY, document));

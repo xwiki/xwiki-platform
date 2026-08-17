@@ -67,7 +67,7 @@ class WikiTemplatePropertyGroupProviderTest
     private XWiki xwiki;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         this.xcontext = mock(XWikiContext.class);
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);

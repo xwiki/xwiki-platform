@@ -409,11 +409,10 @@ public class PackageMojo extends AbstractOldCoreMojo
 
             // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an
             // ordered LinkedHashSet behind the scene)
-            List<Artifact> dependenciesFirstArtifacts = new ArrayList<>(xarArtifacts);
-            Collections.reverse(dependenciesFirstArtifacts);
+            List<Artifact> artifacts = new ArrayList<>(xarArtifacts);
 
             // Import the xars
-            for (Artifact xarArtifact : dependenciesFirstArtifacts) {
+            for (Artifact xarArtifact : artifacts.reversed()) {
                 getLog().info("  ... Importing XAR file: " + xarArtifact.getFile());
 
                 try {

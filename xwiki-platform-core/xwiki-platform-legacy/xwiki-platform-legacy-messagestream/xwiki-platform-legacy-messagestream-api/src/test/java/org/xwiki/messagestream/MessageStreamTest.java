@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.internal.verification.api.VerificationData;
 import org.mockito.verification.VerificationMode;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventFactory;
@@ -99,7 +98,7 @@ class MessageStreamTest
         when(this.mockEventStore.saveEvent(any())).thenReturn(CompletableFuture.completedFuture(null));
     }
 
-    private Event setupForNewMessage() throws Exception
+    private Event setupForNewMessage()
     {
         Event event = new DefaultEvent();
         event.setId(UUID.randomUUID().toString());
@@ -116,7 +115,7 @@ class MessageStreamTest
         verify(this.mockEventStore).saveEvent(event);
     }
 
-    private Event setupForPublicMessage() throws Exception
+    private Event setupForPublicMessage()
     {
         Event e = setupForNewMessage();
 
@@ -125,7 +124,7 @@ class MessageStreamTest
         return e;
     }
 
-    private Event setupForPersonalMessage() throws Exception
+    private Event setupForPersonalMessage()
     {
         Event e = setupForNewMessage();
 
@@ -134,7 +133,7 @@ class MessageStreamTest
         return e;
     }
 
-    private Event setupForDirectMessage() throws ComponentLookupException, Exception
+    private Event setupForDirectMessage() throws Exception
     {
         Event e = setupForNewMessage();
 
@@ -143,7 +142,7 @@ class MessageStreamTest
         return e;
     }
 
-    private Event setupForGroupMessage() throws ComponentLookupException, Exception
+    private Event setupForGroupMessage() throws Exception
     {
         Event e = setupForNewMessage();
 
@@ -176,7 +175,7 @@ class MessageStreamTest
     // Tests
 
     @Test
-    void postPublicMessage() throws Exception
+    void postPublicMessage()
     {
         Event postedMessage = setupForPublicMessage();
 
@@ -189,7 +188,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPublicMessageWithNullMessage() throws Exception
+    void postPublicMessageWithNullMessage()
     {
         Event postedMessage = setupForPublicMessage();
 
@@ -199,7 +198,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPublicMessageWithEmptyMessage() throws Exception
+    void postPublicMessageWithEmptyMessage()
     {
         Event postedMessage = setupForPublicMessage();
 
@@ -209,7 +208,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPublicMessageWithLongMessage() throws Exception
+    void postPublicMessageWithLongMessage()
     {
         Event postedMessage = setupForPublicMessage();
 
@@ -219,7 +218,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPersonalMessage() throws Exception
+    void postPersonalMessage()
     {
         Event postedMessage = setupForPersonalMessage();
 
@@ -232,7 +231,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPersonalMessageWithNullMessage() throws Exception
+    void postPersonalMessageWithNullMessage()
     {
         Event postedMessage = setupForPersonalMessage();
 
@@ -242,7 +241,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPersonalMessageWithEmptyMessage() throws Exception
+    void postPersonalMessageWithEmptyMessage()
     {
         Event postedMessage = setupForPersonalMessage();
 
@@ -252,7 +251,7 @@ class MessageStreamTest
     }
 
     @Test
-    void postPersonalMessageWithLongMessage() throws Exception
+    void postPersonalMessageWithLongMessage()
     {
         Event postedMessage = setupForPersonalMessage();
 

@@ -51,8 +51,9 @@ class ObjectPropertyReferenceTest
     @Test
     void testInvalidType()
     {
+        EntityReference reference = new EntityReference("space.page", EntityType.DOCUMENT);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new ObjectPropertyReference(new EntityReference("space.page", EntityType.DOCUMENT)));
+            () -> new ObjectPropertyReference(reference));
 
         assertEquals("Invalid type [DOCUMENT] for an object property reference", e.getMessage());
     }
@@ -60,8 +61,9 @@ class ObjectPropertyReferenceTest
     @Test
     void testInvalidNullParent()
     {
+        EntityReference reference = new EntityReference("property", EntityType.OBJECT_PROPERTY);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY)));
+            () -> new ObjectPropertyReference(reference));
 
         assertEquals("Invalid parent reference [null] in an object property reference", e.getMessage());
     }
@@ -72,9 +74,10 @@ class ObjectPropertyReferenceTest
     @Test
     void testInvalidParentType()
     {
+        EntityReference reference = new EntityReference("property", EntityType.OBJECT_PROPERTY,
+            new EntityReference("Space", EntityType.SPACE));
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new ObjectPropertyReference(new EntityReference("property", EntityType.OBJECT_PROPERTY,
-                new EntityReference("Space", EntityType.SPACE))));
+            () -> new ObjectPropertyReference(reference));
 
         assertEquals("Invalid parent reference [Space Space] in an object property reference", e.getMessage());
     }

@@ -163,11 +163,11 @@ class SyndEntryDocumentSourceTest
 
     protected BaseClass initArticleClass() throws XWikiException
     {
-        XWikiDocument doc =
+        XWikiDocument classDoc =
             this.oldcore.getXWikiContext().getWiki().getDocument(ARTICLE_CLASS_NAME, this.oldcore.getXWikiContext());
-        boolean needsUpdate = doc.isNew();
+        boolean needsUpdate = classDoc.isNew();
 
-        BaseClass bclass = doc.getXClass();
+        BaseClass bclass = classDoc.getXClass();
         bclass.setName(ARTICLE_CLASS_NAME);
 
         needsUpdate |= bclass.addTextField("title", "Title", 64);
@@ -175,7 +175,7 @@ class SyndEntryDocumentSourceTest
         needsUpdate |= bclass.addTextField("category", "Category", 64);
 
         if (needsUpdate) {
-            this.oldcore.getXWikiContext().getWiki().saveDocument(doc, this.oldcore.getXWikiContext());
+            this.oldcore.getXWikiContext().getWiki().saveDocument(classDoc, this.oldcore.getXWikiContext());
         }
         return bclass;
     }

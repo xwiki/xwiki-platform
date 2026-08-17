@@ -107,8 +107,9 @@ class MacroBlockSignatureVerifierTest
     @Test
     void incompatibleBlockVerification()
     {
+        WordBlock block = new WordBlock("macro");
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-            () -> this.verifier.verify(BLOCK_SIGNATURE, new WordBlock("macro"), CERT_PROVIDER));
+            () -> this.verifier.verify(BLOCK_SIGNATURE, block, CERT_PROVIDER));
         assertEquals("Unsupported block [org.xwiki.rendering.block.WordBlock].", exception.getMessage());
     }
 }

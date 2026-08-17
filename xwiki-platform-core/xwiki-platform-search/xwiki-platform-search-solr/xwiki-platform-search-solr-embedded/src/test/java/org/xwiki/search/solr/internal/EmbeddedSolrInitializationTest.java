@@ -51,7 +51,6 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.Solr;
@@ -112,7 +111,7 @@ class EmbeddedSolrInitializationTest
         });
     }
 
-    private void getInstanceAndAssertHomeDirectory(String expected) throws ComponentLookupException, Exception
+    private void getInstanceAndAssertHomeDirectory(String expected) throws Exception
     {
         Solr instance = this.componentManager.getInstance(Solr.class, EmbeddedSolr.TYPE);
         assertNotNull(instance);

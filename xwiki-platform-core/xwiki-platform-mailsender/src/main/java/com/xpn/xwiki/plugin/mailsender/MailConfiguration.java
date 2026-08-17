@@ -71,12 +71,12 @@ public class MailConfiguration
             setHost(smtpServer);
         }
 
-        int port = this.mailSenderConfiguration.getPort();
-        setPort(port);
+        int configuredPort = this.mailSenderConfiguration.getPort();
+        setPort(configuredPort);
 
-        String from = this.mailSenderConfiguration.getFromAddress();
-        if (!StringUtils.isBlank(from)) {
-            setFrom(from);
+        String configuredFrom = this.mailSenderConfiguration.getFromAddress();
+        if (!StringUtils.isBlank(configuredFrom)) {
+            setFrom(configuredFrom);
         }
 
         String smtpServerUsername = this.mailSenderConfiguration.getUsername();

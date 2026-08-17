@@ -104,10 +104,12 @@ public class R140300001XWIKI19571DataMigration extends AbstractHibernateDataMigr
                 String changeSet = "";
                 if (exists(databaseMetaData, tableName)) {
                     saveTasks(session, persistentClass, tableName);
-                    changeSet = String.format("<changeSet author=\"xwikiorg\" id=\"%s0\">\n"
-                        + "  <dropTable tableName=\"%s\"/>"
-                        + "\n</changeSet>\n"
-                        + "\n", HINT, tableName);
+                    changeSet = String.format("""
+                        <changeSet author="xwikiorg" id="%s0">
+                          <dropTable tableName="%s"/>
+                        </changeSet>
+
+                        """, HINT, tableName);
                 }
                 return changeSet;
             }

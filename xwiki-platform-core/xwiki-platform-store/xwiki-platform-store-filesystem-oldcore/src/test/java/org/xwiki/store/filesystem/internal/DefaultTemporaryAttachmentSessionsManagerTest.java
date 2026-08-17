@@ -117,7 +117,7 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     private ServletSession servletSession;
 
     @BeforeEach
-    void setup(MockitoComponentManager mockitoComponentManager) throws Exception
+    void setup(MockitoComponentManager mockitoComponentManager)
     {
         when(this.contextProvider.get()).thenReturn(this.context);
         Utils.setComponentManager(mockitoComponentManager);

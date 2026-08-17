@@ -229,22 +229,22 @@ public class BooleanClass extends PropertyClass
         select.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
             getTranslatedPrettyName(context)));
 
-        String String0 = getDisplayValue(context, 0);
-        String String1 = getDisplayValue(context, 1);
+        String string0 = getDisplayValue(context, 0);
+        String string1 = getDisplayValue(context, 1);
         int nb1 = 1;
         int nb2 = 2;
 
         option[] options;
 
         if (getDefaultValue() == -1) {
-            options = new option[] { new option("---", ""), new option(String1, "1"), new option(String0, "0") };
+            options = new option[] { new option("---", ""), new option(string1, "1"), new option(string0, "0") };
             options[0].addElement("---");
-            options[1].addElement(XMLUtils.escape(String1));
-            options[2].addElement(XMLUtils.escape(String0));
+            options[1].addElement(XMLUtils.escape(string1));
+            options[2].addElement(XMLUtils.escape(string0));
         } else {
-            options = new option[] { new option(String1, "1"), new option(String0, "0") };
-            options[0].addElement(XMLUtils.escape(String1));
-            options[1].addElement(XMLUtils.escape(String0));
+            options = new option[] { new option(string1, "1"), new option(string0, "0") };
+            options[0].addElement(XMLUtils.escape(string1));
+            options[1].addElement(XMLUtils.escape(string0));
             nb1 = 0;
             nb2 = 1;
         }
@@ -269,9 +269,9 @@ public class BooleanClass extends PropertyClass
     public void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        String StringNone = getDisplayValue(context, 2);
-        String StringTrue = getDisplayValue(context, 1);
-        String StringFalse = getDisplayValue(context, 0);
+        String stringNone = getDisplayValue(context, 2);
+        String stringTrue = getDisplayValue(context, 1);
+        String stringFalse = getDisplayValue(context, 0);
         div[] inputs;
 
         input radioNone = new input(input.radio, prefix + name, "");
@@ -290,13 +290,13 @@ public class BooleanClass extends PropertyClass
         div divTrue = new div();
         div divFalse = new div();
         labelNone.addElement(radioNone);
-        labelNone.addElement(StringNone);
+        labelNone.addElement(stringNone);
         divNone.addElement(labelNone);
         labelTrue.addElement(radioTrue);
-        labelTrue.addElement(StringTrue);
+        labelTrue.addElement(stringTrue);
         divTrue.addElement(labelTrue);
         labelFalse.addElement(radioFalse);
-        labelFalse.addElement(StringFalse);
+        labelFalse.addElement(stringFalse);
         divFalse.addElement(labelFalse);
 
         radioNone.setID(prefix + name + "_none");

@@ -21,6 +21,7 @@ package org.xwiki.rest.internal.resources.attachments;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Named;
@@ -66,9 +67,7 @@ public class AttachmentHistoryResourceImpl extends XWikiResource implements Atta
 
             Version[] versions = xwikiAttachment.getVersions();
             List<Version> versionList = new ArrayList<>();
-            for (Version version : versions) {
-                versionList.add(version);
-            }
+            Collections.addAll(versionList, versions);
 
             RangeIterable<Version> ri = new RangeIterable<>(versionList, start, limit);
 

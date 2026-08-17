@@ -417,7 +417,7 @@ class WikiManagerScriptServiceTest
     }
 
     @Test
-    void getCurrentWikiId() throws Exception
+    void getCurrentWikiId()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("currentWiki");
         String result = this.wikiManagerScriptService.getCurrentWikiId();

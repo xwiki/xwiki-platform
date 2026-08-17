@@ -18,6 +18,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
+
+/**
+ * The data describing a link being created or edited.
+ *
+ * @since 18.7.0RC1
+ * @beta
+ */
+type LinkEditionData = {
+  /**
+   * The link label.
+   */
+  title: string;
+
+  /**
+   * The link URL, as written into the edited content.
+   */
+  url: string;
+
+  /**
+   * The reference of the linked resource, when the integration provides one. The URL is a rendering
+   * of this reference, so the reference is the authoritative link target.
+   */
+  reference?: ResourceReference;
+};
+
 /**
  * Function called to open the link editor
  *
@@ -33,9 +59,9 @@ type LinkEditionHandler = (props: LinkEditionHandlerProps) => void;
  * @beta
  */
 type LinkEditionHandlerProps = {
-  current: { title: string; url: string };
-  onSubmit: (link: { title: string; url: string }) => void;
+  current: LinkEditionData;
+  onSubmit: (link: LinkEditionData) => void;
   mode: "createNew" | "editExisting";
 };
 
-export type { LinkEditionHandler, LinkEditionHandlerProps };
+export type { LinkEditionData, LinkEditionHandler, LinkEditionHandlerProps };

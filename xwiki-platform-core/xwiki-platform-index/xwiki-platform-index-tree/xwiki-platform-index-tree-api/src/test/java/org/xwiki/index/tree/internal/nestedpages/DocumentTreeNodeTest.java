@@ -247,12 +247,12 @@ class DocumentTreeNodeTest
     @Test
     void getParentForTerminalPage()
     {
-        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        DocumentReference pageReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.Page"))
-            .thenReturn(documentReference);
+            .thenReturn(pageReference);
 
         when(this.entityTreeNodeIdConverter.convert(String.class,
-            new DocumentReference("WebHome", documentReference.getLastSpaceReference())))
+            new DocumentReference("WebHome", pageReference.getLastSpaceReference())))
                 .thenReturn("document:wiki:Path.To.WebHome");
 
         assertEquals("document:wiki:Path.To.WebHome", this.documentTreeNode.getParent("document:wiki:Path.To.Page"));
@@ -261,9 +261,9 @@ class DocumentTreeNodeTest
     @Test
     void getParentForNestedPage()
     {
-        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
+        DocumentReference pageReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
         when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.WebHome"))
-            .thenReturn(documentReference);
+            .thenReturn(pageReference);
 
         when(this.entityTreeNodeIdConverter.convert(String.class, new DocumentReference("wiki", "Path", "WebHome")))
             .thenReturn("document:wiki:Path.WebHome");
@@ -274,9 +274,9 @@ class DocumentTreeNodeTest
     @Test
     void getParentForTopLevelPage()
     {
-        DocumentReference documentReference = new DocumentReference("wiki", "Path", "WebHome");
+        DocumentReference pageReference = new DocumentReference("wiki", "Path", "WebHome");
         when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.WebHome"))
-            .thenReturn(documentReference);
+            .thenReturn(pageReference);
 
         when(this.entityTreeNodeIdConverter.convert(String.class, new WikiReference("wiki"))).thenReturn("wiki:wiki");
 

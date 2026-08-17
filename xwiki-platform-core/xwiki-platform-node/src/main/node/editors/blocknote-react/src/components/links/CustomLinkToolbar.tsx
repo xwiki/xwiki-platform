@@ -25,17 +25,20 @@ import {
   RiExternalLinkLine,
   RiPencilLine,
 } from "react-icons/ri";
-import type { LinkEditionHandler } from "./linkEdition";
+import type { LinkEditionData, LinkEditionHandler } from "./linkEdition";
+import type { LinkEditionHooks } from "./linkEditionHooks";
 import type { LinkToolbarProps } from "@blocknote/react";
 
 export type CustomLinkToolbarProps = {
   linkToolbarProps: LinkToolbarProps;
-  linkEditionFn: LinkEditionHandler;
+  linkEditionHandler: LinkEditionHandler;
+  linkEditionHooks?: LinkEditionHooks;
 };
 
 export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
   linkToolbarProps,
-  linkEditionFn,
+  linkEditionHandler,
+  linkEditionHooks,
 }) => {
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
@@ -49,18 +52,31 @@ export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
         data-test="editLink"
         label={t("blocknote.linkToolbar.buttons.edit")}
         icon={<RiPencilLine />}
-        onClick={() =>
-          linkEditionFn({
-            current: {
-              url: linkToolbarProps.url,
-              title: linkToolbarProps.text,
-            },
+        onClick={() => {
+          // The link data exactly as stored in the content. beforeEdit may transform what the link
+          // editor is pre-filled with (e.g. hide the synthetic id carried by the URL), but
+          // beforeUpdate needs the untransformed data to be able to recover that id, so keep it
+          // aside.
+          const previous: LinkEditionData = {
+            url: linkToolbarProps.url,
+            title: linkToolbarProps.text,
+          };
+
+          linkEditionHandler({
+            current: linkEditionHooks?.beforeEdit?.(previous) ?? previous,
             mode: "editExisting",
-            onSubmit({ url, title }) {
-              editLink(url, title, linkToolbarProps.range.from);
+            onSubmit(linkData) {
+              const updatedLinkData =
+                linkEditionHooks?.beforeUpdate?.(linkData, previous) ??
+                linkData;
+              editLink(
+                updatedLinkData.url,
+                updatedLinkData.title,
+                linkToolbarProps.range.from,
+              );
             },
-          })
-        }
+          });
+        }}
       />
 
       <Components.FormattingToolbar.Button

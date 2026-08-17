@@ -20,7 +20,12 @@
 <script setup lang="ts">
 import "@xwiki/platform-editors-blocknote-react/dist/platform-editors-blocknote-react.css";
 import { mountBlockNote } from "@xwiki/platform-editors-blocknote-react";
-import { LinkModal, parseLinkTarget } from "@xwiki/platform-link-modal-ui";
+import {
+  LinkModal,
+  linkTargetToResourceReference,
+  parseLinkTarget,
+  resourceReferenceToLinkTarget,
+} from "@xwiki/platform-link-modal-ui";
 import { Container } from "inversify";
 import { debounce } from "lodash-es";
 import {
@@ -38,10 +43,15 @@ import type {
   BlockType,
   ContextForMacros,
   EditorType,
+  LinkEditionData,
   LinkEditionHandlerProps,
 } from "@xwiki/platform-editors-blocknote-react";
-import type { LinkData } from "@xwiki/platform-link-modal-ui";
+import type { LinkData, LinkTarget } from "@xwiki/platform-link-modal-ui";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
+import type {
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/platform-model-reference-api";
 import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
@@ -104,6 +114,14 @@ const remoteURLSerializer = depsContainer
   .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
   .get()!;
 
+const modelReferenceParser = depsContainer
+  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+  .get()!;
+
+const modelReferenceSerializer = depsContainer
+  .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+  .get()!;
+
 function getContent(): BlockType[] {
   return editorRef.value!.document;
 }
@@ -144,10 +162,22 @@ const initializedEditorProps: Omit<BlockNoteViewWrapperProps, "content"> = {
   },
 };
 
-const submitEditedLink = ({
-  displayText,
-  target: { type, config },
-}: LinkData) => {
+/**
+ * The reference of the linked resource is the authoritative link target (the URL is only a rendering
+ * of it), so build the target to configure in the link modal from that reference when the
+ * integration provides one, and fall back on reverse-engineering the URL otherwise.
+ */
+function currentLinkTarget(current: LinkEditionData): LinkTarget {
+  return (
+    (current.reference &&
+      resourceReferenceToLinkTarget(current.reference, modelReferenceParser)) ??
+    parseLinkTarget(current.url, remoteURLParser)
+  );
+}
+
+const submitEditedLink = ({ displayText, target }: LinkData) => {
+  const { type, config } = target;
+
   // TODO: support
 
   const url =
@@ -160,6 +190,7 @@ const submitEditedLink = ({
   editingLink.value?.onSubmit({
     title: displayText,
     url,
+    reference: linkTargetToResourceReference(target, modelReferenceSerializer),
   });
 
   editingLink.value = null;
@@ -215,7 +246,7 @@ onUnmounted(() => {
     <LinkModal
       :current="{
         displayText: editingLink.current.title,
-        target: parseLinkTarget(editingLink.current.url, remoteURLParser),
+        target: currentLinkTarget(editingLink.current),
       }"
       :deps-container="depsContainer"
       @submit="submitEditedLink"

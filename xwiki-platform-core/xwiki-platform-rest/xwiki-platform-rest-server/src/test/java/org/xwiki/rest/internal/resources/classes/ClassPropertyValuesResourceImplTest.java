@@ -140,7 +140,7 @@ class ClassPropertyValuesResourceImplTest
     }
 
     @Test
-    void getClassPropertyValuesNotFound() throws Exception
+    void getClassPropertyValuesNotFound()
     {
         WebApplicationException expected = assertThrows(WebApplicationException.class,
             () -> this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, List.of("text"), false));

@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 import javax.inject.Inject;
 
 import org.xwiki.context.Execution;
-import org.xwiki.extension.script.ExtensionManagerScriptService;
+import org.xwiki.extension.script.AbstractExtensionScriptService;
 import org.xwiki.script.safe.AbstractSafeObject;
 import org.xwiki.script.safe.ScriptSafeProvider;
 
@@ -83,7 +83,7 @@ public abstract class AbstractNoExceptionSafeObject<T> extends AbstractSafeObjec
      */
     public Exception getLastError()
     {
-        return (Exception) this.execution.getContext().getProperty(ExtensionManagerScriptService.EXTENSIONERROR_KEY);
+        return (Exception) this.execution.getContext().getProperty(AbstractExtensionScriptService.EXTENSIONERROR_KEY);
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class AbstractNoExceptionSafeObject<T> extends AbstractSafeObjec
      */
     protected void setError(Exception e)
     {
-        this.execution.getContext().setProperty(ExtensionManagerScriptService.EXTENSIONERROR_KEY, e);
+        this.execution.getContext().setProperty(AbstractExtensionScriptService.EXTENSIONERROR_KEY, e);
     }
 
     /**

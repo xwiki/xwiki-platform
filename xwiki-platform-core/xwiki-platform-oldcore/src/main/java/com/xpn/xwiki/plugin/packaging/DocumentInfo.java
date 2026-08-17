@@ -78,12 +78,12 @@ public class DocumentInfo
         return this.doc.isNew();
     }
 
-    public void changeSpace(String Space)
+    public void changeSpace(String space)
     {
         if (this.doc.getSpace().compareTo("XWiki") != 0) {
             return;
         }
-        this.doc.setSpace(Space);
+        this.doc.setSpace(space);
         this.installable = INSTALL_IMPOSSIBLE;
     }
 

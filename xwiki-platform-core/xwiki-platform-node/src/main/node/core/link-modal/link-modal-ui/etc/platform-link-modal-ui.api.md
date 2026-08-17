@@ -10,8 +10,11 @@ import { ComponentProvideOptions } from 'vue';
 import { Container } from 'inversify';
 import { DefineComponent } from 'vue';
 import { DocumentReference } from '@xwiki/platform-model-api';
+import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
+import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
 import { PublicProps } from 'vue';
 import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
+import { ResourceReference } from '@xwiki/platform-rendering-api';
 
 // @beta
 export type LinkAttachmentConfig = {
@@ -71,12 +74,18 @@ export type LinkTarget = {
 };
 
 // @beta
+export function linkTargetToResourceReference(target: LinkTarget, modelReferenceSerializer: ModelReferenceSerializer): ResourceReference | undefined;
+
+// @beta
 export type LinkUrlConfig = {
     url: string;
 };
 
 // @beta
 export function parseLinkTarget(url: string, remoteURLParser: RemoteURLParser): LinkTarget;
+
+// @beta
+export function resourceReferenceToLinkTarget(reference: ResourceReference, modelReferenceParser: ModelReferenceParser): LinkTarget | undefined;
 
 // (No @packageDocumentation comment for this package)
 

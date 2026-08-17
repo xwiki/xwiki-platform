@@ -38,7 +38,7 @@ class SimilarityCalculatorTest
     private SimilarityCalculator sq;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         this.sq = new SimilarityCalculator();
     }

@@ -20,6 +20,8 @@
 package org.xwiki.xar.internal.model;
 
 /**
+ * Helper class holding constants of the XAR XML model for the attachment element.
+ * 
  * @version $Id$
  * @since 5.4M1
  */

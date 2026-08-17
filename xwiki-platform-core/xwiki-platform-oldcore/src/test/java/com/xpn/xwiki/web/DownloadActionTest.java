@@ -714,9 +714,9 @@ class DownloadActionTest
         when(attachment.getMimeType(xcontext)).thenReturn("mimetype");
 
         // Set the current doc
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(document.getAttachment("file.ext")).thenReturn(attachment);
-        xcontext.setDoc(document);
+        XWikiDocument documentMock = mock(XWikiDocument.class);
+        when(documentMock.getAttachment("file.ext")).thenReturn(attachment);
+        xcontext.setDoc(documentMock);
 
         // Set the Plugin Manager
         XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);
@@ -753,9 +753,9 @@ class DownloadActionTest
             .thenReturn("http://localhost:8080/xwiki/bin/download/space/page/file.ext/some/path");
 
         // Set the current doc and current wiki
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(document.getAttachment("path")).thenReturn(null);
-        xcontext.setDoc(document);
+        XWikiDocument documentMock = mock(XWikiDocument.class);
+        when(documentMock.getAttachment("path")).thenReturn(null);
+        xcontext.setDoc(documentMock);
         xcontext.setWikiId("wiki");
         xcontext.setAction("download");
 

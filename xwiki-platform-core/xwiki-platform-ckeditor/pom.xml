@@ -38,6 +38,11 @@
   </modules>
   <properties>
     <ckeditor.version>4.22.1</ckeditor.version>
+    <!-- The copyright year of the CKEditor sources of ${ckeditor.version}, i.e. the year in
+         "Copyright (c) 2003-<year>, CKSource Holding sp. z o.o.". CKBuilder replaces it with the year the build runs
+         in, which the WebJar module puts back so that the build stays reproducible. Update it together with
+         ${ckeditor.version}. -->
+    <ckeditor.copyright.year>2023</ckeditor.copyright.year>
   </properties>
   <profiles>
     <profile>

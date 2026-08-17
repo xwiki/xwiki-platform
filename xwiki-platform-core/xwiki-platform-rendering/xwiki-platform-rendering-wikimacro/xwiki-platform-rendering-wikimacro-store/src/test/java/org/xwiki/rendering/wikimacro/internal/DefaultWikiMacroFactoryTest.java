@@ -257,7 +257,7 @@ class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    void isAllowed() throws Exception
+    void isAllowed()
     {
         assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.USER));
         assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));
@@ -313,7 +313,7 @@ class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    void createWikiMacroWithEmptyCode() throws Exception
+    void createWikiMacroWithEmptyCode()
     {
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CODE_PROPERTY, "");
         saveDocument();

@@ -64,7 +64,7 @@ class AttachmentURLStreamHandlerTest
     {
         URL url = new URL(null, "http://invalid/url", this.handler);
 
-        RuntimeException expected = assertThrows(RuntimeException.class, () -> url.openConnection());
+        RuntimeException expected = assertThrows(RuntimeException.class, url::openConnection);
         assertEquals("An attachment JAR URL should start with [attachmentjar://], got [http://invalid/url]",
             expected.getMessage());
     }

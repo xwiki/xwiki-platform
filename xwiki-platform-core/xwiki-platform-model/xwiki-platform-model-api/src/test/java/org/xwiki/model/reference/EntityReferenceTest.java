@@ -454,8 +454,9 @@ class EntityReferenceTest
 
         EntityReference space = new EntityReference(SPACE_NAME, EntityType.SPACE, wiki);
 
+        EntityReference reference = new EntityReference("nowiki", EntityType.WIKI);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> space.replaceParent(new EntityReference("nowiki", EntityType.WIKI), wiki2));
+            () -> space.replaceParent(reference, wiki2));
 
         assertEquals(
             "The old reference [Wiki nowiki] does not belong to the parents chain of the reference [Wiki wiki]",
@@ -465,8 +466,10 @@ class EntityReferenceTest
     @Test
     void constructorCloneNullReference()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new EntityReference(null,
-            new EntityReference(WIKI_NAME, EntityType.WIKI), new EntityReference("wiki2", EntityType.WIKI)));
+        EntityReference wikiReference = new EntityReference(WIKI_NAME, EntityType.WIKI);
+        EntityReference wiki2Reference = new EntityReference("wiki2", EntityType.WIKI);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new EntityReference(null, wikiReference, wiki2Reference));
 
         assertEquals("Cloned reference must not be null", e.getMessage());
     }

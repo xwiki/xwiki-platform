@@ -34,6 +34,7 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.event.AbstractCacheEntryListener;
 import org.xwiki.cache.event.CacheEntryEvent;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
@@ -147,7 +148,7 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
         cacheConfig.setConfigurationId(this.id);
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
         lru.setMaxEntries(DEFAULT_CAPACITY);
-        cacheConfig.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+        cacheConfig.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
         try {
             this.cache = this.cacheManager.createNewCache(cacheConfig);
             this.cache.addCacheEntryListener(this);

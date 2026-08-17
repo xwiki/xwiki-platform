@@ -102,9 +102,7 @@ public class ObjectAddAction extends XWikiAction
         Collection<PropertyClass> fields = baseclass.getFieldList();
         for (PropertyClass property : fields) {
             String name = property.getName();
-            if (objmap.get(name) == null) {
-                objmap.put(name, EMPTY_PROPERTY);
-            }
+            objmap.putIfAbsent(name, EMPTY_PROPERTY);
         }
 
         // Load the object properties that are defined in the request.

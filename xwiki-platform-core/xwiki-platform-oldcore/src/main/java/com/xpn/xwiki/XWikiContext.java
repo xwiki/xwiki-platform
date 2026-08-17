@@ -150,7 +150,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private XWiki wiki;
 
-    private XWikiEngineContext engine_context;
+    private XWikiEngineContext engineContext;
 
     private XWikiRequest request;
 
@@ -160,7 +160,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private String action;
 
-    private String orig_wikiId;
+    private String origWikiId;
 
     private WikiReference wikiReference;
 
@@ -180,7 +180,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private URL url;
 
-    private XWikiURLFactory URLFactory;
+    private XWikiURLFactory urlFactory;
 
     private int cacheDuration = 0;
 
@@ -268,12 +268,12 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiEngineContext getEngineContext()
     {
-        return this.engine_context;
+        return this.engineContext;
     }
 
-    public void setEngineContext(XWikiEngineContext engine_context)
+    public void setEngineContext(XWikiEngineContext engineContext)
     {
-        this.engine_context = engine_context;
+        this.engineContext = engineContext;
     }
 
     /**
@@ -385,8 +385,8 @@ public class XWikiContext extends Hashtable<Object, Object>
         } else {
             super.put(WIKI_KEY, this.wikiReference.getName());
 
-            if (this.orig_wikiId == null) {
-                this.orig_wikiId = this.wikiReference.getName();
+            if (this.origWikiId == null) {
+                this.origWikiId = this.wikiReference.getName();
                 super.put(ORIGINAL_WIKI_KEY, this.wikiReference.getName());
             }
         }
@@ -501,7 +501,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     public String getOriginalWikiId()
     {
-        return this.orig_wikiId;
+        return this.origWikiId;
     }
 
     /**
@@ -522,7 +522,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     public void setOriginalWikiId(String wikiId)
     {
-        this.orig_wikiId = wikiId;
+        this.origWikiId = wikiId;
         if (wikiId == null) {
             remove(ORIGINAL_WIKI_KEY);
         } else {
@@ -759,12 +759,12 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiURLFactory getURLFactory()
     {
-        return this.URLFactory;
+        return this.urlFactory;
     }
 
-    public void setURLFactory(XWikiURLFactory URLFactory)
+    public void setURLFactory(XWikiURLFactory urlFactory)
     {
-        this.URLFactory = URLFactory;
+        this.urlFactory = urlFactory;
     }
 
     public XWikiForm getForm()

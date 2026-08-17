@@ -154,8 +154,8 @@ class XWikiLinkSuggestService implements LinkSuggestService {
     name: string;
     reference: string;
   }) {
-    const reference = result.reference;
     const type = result.type;
+    const reference = this.stripEntityTypePrefix(result.reference, type);
     const xwikiURL =
       this.remoteURLSerializerProvider
         .get()
@@ -183,6 +183,22 @@ class XWikiLinkSuggestService implements LinkSuggestService {
         hint: label,
       };
     }
+  }
+
+  /**
+   * The Solr "reference" field is the serialized entity reference prefixed with the (lower case) entity type, e.g.
+   * "document:wiki:Space.Page", while a link reference is a plain entity reference. Drop that prefix: the entity
+   * reference resolver parses from the right, so it would otherwise take "document:wiki" for the wiki name.
+   *
+   * @param reference - the value of the Solr "reference" field
+   * @param type - the value of the Solr "type" field
+   * @returns the entity reference the given Solr reference designates
+   */
+  private stripEntityTypePrefix(reference: string, type: string): string {
+    const prefix = `${type.toLowerCase()}:`;
+    return reference.startsWith(prefix)
+      ? reference.substring(prefix.length)
+      : reference;
   }
 
   private async getCredentials(): Promise<{ Authorization?: string }> {

@@ -309,8 +309,10 @@ public class LogCaptureValidator
             }
         }
         if (!notMatchingLines.isEmpty()) {
-            LOGGER.warn("The following {} were not matched and could be candidates for removal "
-                + "(beware of configs): [\n{}\n]", missingType, StringUtils.join(notMatchingLines, NL));
+            LOGGER.warn("""
+                The following {} were not matched and could be candidates for removal (beware of configs): [
+                {}
+                ]""", missingType, StringUtils.join(notMatchingLines, NL));
         }
     }
 

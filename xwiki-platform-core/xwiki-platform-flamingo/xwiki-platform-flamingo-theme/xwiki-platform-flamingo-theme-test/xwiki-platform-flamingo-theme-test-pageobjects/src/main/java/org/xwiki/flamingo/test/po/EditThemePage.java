@@ -29,6 +29,7 @@ import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.editor.EditPage;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
+import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOf;
 
 public class EditThemePage extends EditPage
 {
@@ -84,11 +85,70 @@ public class EditThemePage extends EditPage
     }
 
     /**
+     * Set the value of a color variable with its color picker: click the input to display the picker, type the color in
+     * the picker's hexadecimal field and submit it.
+     *
+     * @param variableName the name of the color variable (e.g. {@code brand-primary})
+     * @param color the color to set, as a hexadecimal value (e.g. {@code #1a4d80})
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.7.0RC1
+     */
+    public void pickVariableColor(String variableName, String color)
+    {
+        // The color picker marks the input it is attached to as active when it gets displayed.
+        getDriver().findElement(By.id("var-" + variableName)).click();
+        getDriver().waitUntilElementIsVisible(By.cssSelector("input#var-" + variableName + ".active"));
+
+        WebElement colorPicker = getDisplayedColorPicker();
+        WebElement hexField = colorPicker.findElement(By.cssSelector(".colpick_hex_field input"));
+        hexField.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.BACK_SPACE);
+        // The picker's field holds the hexadecimal digits alone, and it takes the new color into account when it fires
+        // a change event, which Enter triggers.
+        hexField.sendKeys(color.startsWith("#") ? color.substring(1) : color, Keys.ENTER);
+        colorPicker.findElement(By.cssSelector(".colpick_submit")).click();
+
+        // Submitting the color hides the picker.
+        getDriver().waitUntilCondition(invisibilityOf(colorPicker));
+    }
+
+    /**
+     * @param variableName the name of a color variable (e.g. {@code brand-primary})
+     * @return the background color of the preview box displayed next to the variable's input, which is only filled in
+     *         by the color picker, and thus tells whether the color picker got initialized
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.7.0RC1
+     */
+    public String getColorPreview(String variableName)
+    {
+        return getDriver()
+            .findElementWithoutWaiting(By.xpath("//input[@id = 'var-" + variableName
+                + "']/following-sibling::span//span[@class = 'color-preview']"))
+            .getCssValue("background-color");
+    }
+
+    /**
+     * @return the color picker that is currently displayed; the color pickers of all the color variables are appended
+     *         to the body, but only one of them is displayed at a time
+     */
+    private WebElement getDisplayedColorPicker()
+    {
+        return getDriver().waitUntilCondition(driver -> getDriver()
+            .findElementsWithoutWaiting(By.cssSelector("body > div.colpick")).stream()
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElse(null));
+    }
+
+    /**
      * Set the value of an image variable (e.g. {@code logo}) by uploading a new image with the attachment picker.
      * The uploaded image is only attached to the theme document when the theme is saved.
      *
      * @param variableName the name of the image variable to set
      * @param filePath the absolute path of the image to upload, as seen by the browser
+     * @since 17.10.13
+     * @since 18.4.5
      * @since 18.7.0RC1
      */
     public void setImageVariableValue(String variableName, String filePath)
@@ -105,6 +165,8 @@ public class EditThemePage extends EditPage
     /**
      * @param variableName the name of the image variable
      * @return the file name of the image currently selected for the passed variable
+     * @since 17.10.13
+     * @since 18.4.5
      * @since 18.7.0RC1
      */
     public String getImageVariableValue(String variableName)

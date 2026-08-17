@@ -164,7 +164,7 @@ class LegacyDefaultNotificationFilterManagerTest
     }
 
     @Test
-    void getFiltersWithMatchingFilters() throws Exception
+    void getFiltersWithMatchingFilters()
     {
         NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
 
@@ -180,7 +180,7 @@ class LegacyDefaultNotificationFilterManagerTest
     }
 
     @Test
-    void getFiltersWithOneBadFilter() throws Exception
+    void getFiltersWithOneBadFilter()
     {
         NotificationFilter fakeFilter1 = mock(NotificationFilter.class);
 

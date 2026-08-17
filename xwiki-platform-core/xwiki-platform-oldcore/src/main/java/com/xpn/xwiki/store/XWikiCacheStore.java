@@ -36,6 +36,7 @@ import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.cache.event.CacheEntryEvent;
 import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.cache.internal.CacheLoader;
+import org.xwiki.cache.internal.CacheLoaderGroup;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -111,7 +112,14 @@ public class XWikiCacheStore extends AbstractXWikiStore
      */
     private Cache<Integer> limitSizePropertyCache;
 
-    private CacheLoader<XWikiDocument, XWikiException> cacheLoader = new CacheLoader();
+    /**
+     * The document cache and the page exist cache use the same keys, so they need to be invalidated together.
+     */
+    private final CacheLoaderGroup cacheLoaderGroup = new CacheLoaderGroup();
+
+    private final CacheLoader<XWikiDocument, XWikiException> cacheLoader = new CacheLoader<>(this.cacheLoaderGroup);
+
+    private final CacheLoader<Boolean, XWikiException> existsCacheLoader = new CacheLoader<>(this.cacheLoaderGroup);
 
     /**
      * Default constructor generally used by the Component Manager.
@@ -296,7 +304,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
 
     private void invalidateCache(String key)
     {
-        this.cacheLoader.invalidate(key, k -> {
+        this.cacheLoaderGroup.invalidate(key, k -> {
             Cache<XWikiDocument> documentCache = getCache();
             if (documentCache != null) {
                 documentCache.remove(k);
@@ -312,7 +320,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     @Override
     public void flushCache()
     {
-        this.cacheLoader.invalidateAll(() -> {
+        this.cacheLoaderGroup.invalidateAll(() -> {
             getCache().removeAll();
             getPageExistCache().removeAll();
         });
@@ -822,12 +830,21 @@ public class XWikiCacheStore extends AbstractXWikiStore
                     return result;
                 }
             } catch (Exception e) {
+                this.logger.error("Failed to get the existence of the document [{}] from the cache", key, e);
             }
 
-            boolean result = this.store.exists(doc, context);
-            getPageExistCache().set(key, Boolean.valueOf(result));
-
-            return result;
+            // Load through the cache loader to ensure that the loaded value isn't stored anymore when the document
+            // has been modified while the existence was loaded from the database. This cache loader shares the group
+            // with the document cache loader, so a single invalidation stops the running loads of both of them.
+            return this.existsCacheLoader.loadAndStoreInCache(key, k -> this.store.exists(doc, context),
+                (k, result) -> getPageExistCache().set(k, result));
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof XWikiException xwikiException) {
+                throw xwikiException;
+            } else {
+                throw new XWikiException("Error checking the existence of the document [%s]"
+                    .formatted(getKey(doc, context)), e);
+            }
         } finally {
             restoreExecutionXContext();
         }

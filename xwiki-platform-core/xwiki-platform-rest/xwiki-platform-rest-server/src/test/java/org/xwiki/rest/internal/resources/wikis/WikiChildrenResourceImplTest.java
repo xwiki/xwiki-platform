@@ -118,7 +118,7 @@ class WikiChildrenResourceImplTest
     }
 
     @Test
-    void getChildrenNoRights() throws Exception
+    void getChildrenNoRights()
     {
         WebApplicationException e = assertThrows(WebApplicationException.class,
             () -> this.wikiChildrenResource.getChildren("wiki", 0, 10, "foo"));

@@ -112,7 +112,7 @@ class ContextExtendedURLURLNormalizerTest
     }
 
     @Test
-    void normalizeWhenNoConfigurationPropertyButEnvironment() throws Exception
+    void normalizeWhenNoConfigurationPropertyButEnvironment()
     {
         ServletContext sc = mock(ServletContext.class);
         when(this.environment.getServletContext()).thenReturn(sc);
@@ -123,7 +123,7 @@ class ContextExtendedURLURLNormalizerTest
     }
 
     @Test
-    void normalizeWhenNoConfigurationPropertyButEnvironmentWithMultiLevelContextPath() throws Exception
+    void normalizeWhenNoConfigurationPropertyButEnvironmentWithMultiLevelContextPath()
     {
         ServletContext sc = mock(ServletContext.class);
         when(this.environment.getServletContext()).thenReturn(sc);
@@ -134,7 +134,7 @@ class ContextExtendedURLURLNormalizerTest
     }
 
     @Test
-    void normalizeWhenNoConfigurationPropertyButEnvironmentWithRootContext() throws Exception
+    void normalizeWhenNoConfigurationPropertyButEnvironmentWithRootContext()
     {
         ServletContext sc = mock(ServletContext.class);
         when(this.environment.getServletContext()).thenReturn(sc);

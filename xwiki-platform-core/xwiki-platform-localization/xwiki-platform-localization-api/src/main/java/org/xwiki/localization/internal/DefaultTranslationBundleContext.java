@@ -123,15 +123,8 @@ public class DefaultTranslationBundleContext implements TranslationBundleContext
     {
         String currentWiki = getCurrentWiki();
         Map<String, SortedSet<TranslationBundle>> bundlesMap = getBundlesInternal();
-        SortedSet<TranslationBundle> currentBundles = bundlesMap.get(currentWiki);
-
-        if (currentBundles == null) {
-            // The context wiki has changed, initialize the bundles for the new current wiki.
-            currentBundles = initializeCurrentBundles();
-            bundlesMap.put(currentWiki, currentBundles);
-        }
-
-        return currentBundles;
+        // When the context wiki has changed, initialize the bundles for the new current wiki.
+        return bundlesMap.computeIfAbsent(currentWiki, wiki -> initializeCurrentBundles());
     }
 
     @Override

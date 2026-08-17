@@ -97,7 +97,7 @@ class DefaultOfficeViewerScriptServiceTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    void isMimeTypeSupported() throws Exception
+    void isMimeTypeSupported()
     {
         OfficeConverter officeConverter = mock(OfficeConverter.class);
         when(officeServer.getConverter()).thenReturn(officeConverter);

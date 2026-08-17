@@ -105,10 +105,10 @@ class HibernateStoreTest
     {
         Field field = ReflectionUtils.getField(this.store.getClass(), "configuration");
         field.setAccessible(true);
-        Configuration configuration = (Configuration) field.get(this.store);
+        Configuration storeConfiguration = (Configuration) field.get(this.store);
         Properties properties = new Properties();
         properties.setProperty("hibernate.connection.url", "jdbc:mysql://localhost/xwiki?useSSL=false");
-        configuration.addProperties(properties);
+        storeConfiguration.addProperties(properties);
 
         assertEquals(DatabaseProduct.MYSQL, this.store.getDatabaseProductName());
     }

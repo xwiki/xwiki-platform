@@ -43,6 +43,7 @@ import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
@@ -396,8 +397,8 @@ class XWikiAttachmentTest
 
         // Expected because the attachment content is not set. The attachment content is normally set by the
         // loadAttachmentContent call we verify below.
-        assertThrows(NullPointerException.class,
-            () -> attachment.getContentInputStream(this.oldCore.getXWikiContext()));
+        XWikiContext context = this.oldCore.getXWikiContext();
+        assertThrows(NullPointerException.class, () -> attachment.getContentInputStream(context));
     }
 
     @Test

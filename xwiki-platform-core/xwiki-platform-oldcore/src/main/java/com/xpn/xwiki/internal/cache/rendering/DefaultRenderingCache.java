@@ -33,6 +33,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -102,7 +103,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(this.configuration.getSize());
             lru.setLifespan(this.configuration.getDuration());
-            cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+            cacheConfiguration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
 
             try {
                 this.cache.create(cacheConfiguration);

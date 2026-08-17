@@ -97,7 +97,7 @@ class TextMimeMessageFactoryTest
     }
 
     @Test
-    void createMessageWithNonLatinSubjectEncodedAsUTF8() throws MessagingException, IOException
+    void createMessageWithNonLatinSubjectEncodedAsUTF8() throws MessagingException
     {
         String source = "Some mail content";
         // Russian for "Notification".

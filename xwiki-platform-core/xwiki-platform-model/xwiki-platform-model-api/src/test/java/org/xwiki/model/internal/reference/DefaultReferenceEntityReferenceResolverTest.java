@@ -158,10 +158,10 @@ class DefaultReferenceEntityReferenceResolverTest implements TestConstants
     @Test
     void resolveDocumentReferenceWhenInvalidReference()
     {
-        InvalidEntityReferenceException expected =
-            assertThrows(InvalidEntityReferenceException.class, () -> this.resolver.resolve(
-                new EntityReference("document", EntityType.DOCUMENT,
-                    new EntityReference("filename", EntityType.ATTACHMENT)), EntityType.DOCUMENT));
+        EntityReference reference = new EntityReference("document", EntityType.DOCUMENT,
+            new EntityReference("filename", EntityType.ATTACHMENT));
+        InvalidEntityReferenceException expected = assertThrows(InvalidEntityReferenceException.class,
+            () -> this.resolver.resolve(reference, EntityType.DOCUMENT));
         assertEquals("Invalid reference [Document filename???document]", expected.getMessage());
     }
 

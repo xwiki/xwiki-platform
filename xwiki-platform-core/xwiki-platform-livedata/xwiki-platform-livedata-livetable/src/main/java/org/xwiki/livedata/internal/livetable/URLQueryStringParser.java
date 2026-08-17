@@ -55,12 +55,7 @@ public class URLQueryStringParser
                 continue;
             }
             String value = parts.length == 2 ? URLDecoder.decode(parts[1], UTF8) : "";
-            List<String> values = parameters.get(key);
-            if (values == null) {
-                values = new ArrayList<>();
-                parameters.put(key, values);
-            }
-            values.add(value);
+            parameters.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
         }
         return parameters;
     }

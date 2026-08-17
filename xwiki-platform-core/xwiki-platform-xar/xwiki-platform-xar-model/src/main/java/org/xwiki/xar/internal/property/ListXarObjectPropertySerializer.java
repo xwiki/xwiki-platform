@@ -98,11 +98,9 @@ public class ListXarObjectPropertySerializer implements XarObjectPropertySeriali
         if (value instanceof List) {
             List<String> list = (List<String>) value;
             for (String element : list) {
-                if (value != null) {
-                    writer.writeStartElement(ELEMENT_VALUE);
-                    writer.writeCharacters(element);
-                    writer.writeEndElement();
-                }
+                writer.writeStartElement(ELEMENT_VALUE);
+                writer.writeCharacters(element);
+                writer.writeEndElement();
             }
         } else if (value != null) {
             writer.writeCharacters(value.toString());

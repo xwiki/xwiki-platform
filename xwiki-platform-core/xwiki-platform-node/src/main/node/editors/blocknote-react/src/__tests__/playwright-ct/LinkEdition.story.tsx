@@ -21,42 +21,54 @@ import { BlockNoteForTest } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
 import { useState } from "react";
 import type { BlockType } from "../../blocknote";
+import type { LinkEditionData } from "../../components/links/linkEdition";
 
 /**
- * Renders the editor with link edition hooks defined natively (i.e. running in the browser). The hooks
- * are declared here rather than passed as test props because Playwright component test function props
- * are proxied to Node, which breaks the synchronous return value the hooks rely on.
+ * Renders the editor with link edition hooks and a link editor defined natively (i.e. running in the
+ * browser). They are declared here rather than passed as test props because Playwright component test
+ * function props are proxied to Node, which breaks the synchronous return value the hooks rely on.
+ *
+ * The link editor is scripted: opening it immediately submits {@link submit} (or, when it is not set,
+ * the link data it was pre-filled with).
  */
 export const BlockNoteWithLinkEditionHooks: React.FC<{
   content: BlockType[];
-  // When set, beforeEdit returns the current link data with this title, to pre-fill the popover.
+  // When set, beforeEdit returns the current link data with this title, to pre-fill the link editor.
   beforeEditTitle?: string;
-  // When set, beforeUpdate returns the current link data with this url, to change what is persisted.
+  // The link data submitted by the scripted link editor.
+  submit?: LinkEditionData;
+  // When set, beforeUpdate returns the submitted link data with this url, to change what is persisted.
   beforeUpdateUrl?: string;
-  // When true, beforeUpdate renders the received resource reference so tests can assert on it.
-  captureReference?: boolean;
-}> = ({ content, beforeEditTitle, beforeUpdateUrl, captureReference }) => {
-  const [capturedReference, setCapturedReference] = useState<string>();
+}> = ({ content, beforeEditTitle, submit, beforeUpdateUrl }) => {
+  // The link data the scripted link editor was opened with, and the arguments beforeUpdate received,
+  // rendered so that the tests can assert on them.
+  const [editorInput, setEditorInput] = useState<string>();
+  const [updateInput, setUpdateInput] = useState<string>();
 
   return (
     <>
-      {capturedReference !== undefined && (
-        <div data-test="capturedReference">{capturedReference}</div>
+      {editorInput !== undefined && (
+        <div data-test="linkEditorInput">{editorInput}</div>
+      )}
+      {updateInput !== undefined && (
+        <div data-test="beforeUpdateInput">{updateInput}</div>
       )}
       <BlockNoteForTest
         content={content}
         macros={false}
         syntax={FULL_SYNTAX}
+        linkEditionHandler={({ current, onSubmit }) => {
+          setEditorInput(JSON.stringify(current));
+          onSubmit(submit ?? current);
+        }}
         overrides={{
           linkEdition: {
             beforeEdit:
               beforeEditTitle === undefined
                 ? undefined
                 : (linkData) => ({ ...linkData, title: beforeEditTitle }),
-            beforeUpdate: (linkData) => {
-              if (captureReference) {
-                setCapturedReference(JSON.stringify(linkData.reference));
-              }
+            beforeUpdate: (linkData, previous) => {
+              setUpdateInput(JSON.stringify({ linkData, previous }));
               return beforeUpdateUrl === undefined
                 ? linkData
                 : { ...linkData, url: beforeUpdateUrl };

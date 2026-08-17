@@ -70,7 +70,7 @@ class EventStreamWikiCleanerJobTest
     private ExecutionContextManager executionContextManager;
 
     @BeforeEach
-    void beforeEach() throws Exception
+    void beforeEach()
     {
         when(this.executionProvider.get()).thenReturn(this.execution);
         this.executionContextManager = mock(ExecutionContextManager.class);
@@ -105,7 +105,7 @@ class EventStreamWikiCleanerJobTest
     }
 
     @Test
-    void getType() throws Exception
+    void getType()
     {
         assertEquals("EventStreamWikiCleanerJob", this.job.getType());
     }

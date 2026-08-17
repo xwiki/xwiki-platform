@@ -49,6 +49,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { RiSubscript, RiSuperscript } from "react-icons/ri";
 import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
+import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type { ContextForMacros } from "../blocknote/utils";
 import type { LinkEditionHandler } from "./links/linkEdition";
 import type {
@@ -102,6 +103,7 @@ type CustomFormattingToolbarProps = {
   macros: { ctx: ContextForMacros } | false;
   linkEditionHandler: LinkEditionHandler;
   imageEditionOverrideFn?: ImageEditionOverrideFn;
+  linkEditionHooks?: LinkEditionHooks;
 };
 
 export const CustomFormattingToolbar: React.FC<
@@ -110,6 +112,7 @@ export const CustomFormattingToolbar: React.FC<
   formattingToolbarProps,
   additionalBlockTypes,
   imageEditionOverrideFn,
+  linkEditionHooks,
   macros,
   linkEditionHandler,
 }) => {
@@ -143,6 +146,7 @@ export const CustomFormattingToolbar: React.FC<
           macros,
           linkEditionHandler,
           t,
+          linkEditionHooks,
         )
       )}
     </Components.FormattingToolbar.Root>
@@ -154,6 +158,7 @@ const getDefaultFormattingToolbarItems = (
   macros: { ctx: ContextForMacros } | false,
   linkEditorHandler: LinkEditionHandler,
   t: (key: string) => string,
+  linkEditionHooks?: LinkEditionHooks,
 ): JSX.Element[] =>
   // NOTE: This should return **exactly** the same items as BlockNote's default toolbar
   // So, when BlockNote updates theirs, we should update ours
@@ -202,6 +207,7 @@ const getDefaultFormattingToolbarItems = (
     <CustomCreateLinkButton
       key={"createLinkButton"}
       linkEditionHandler={linkEditorHandler}
+      linkEditionHooks={linkEditionHooks}
     />,
     <AddCommentButton key={"addCommentButton"} />,
     <AddTiptapCommentButton key={"addTiptapCommentButton"} />,

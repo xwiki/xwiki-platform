@@ -132,7 +132,7 @@ class PDFTocMacroTest
     private DocumentReference aliceReference = new DocumentReference("test", "Users", "Alice");
 
     @BeforeComponent
-    void setup() throws Exception
+    void setup()
     {
         when(this.contextComponentManager.get()).thenReturn(this.componentManager);
     }

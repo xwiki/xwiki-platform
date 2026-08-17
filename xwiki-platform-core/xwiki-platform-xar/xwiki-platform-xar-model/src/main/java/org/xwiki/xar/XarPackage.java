@@ -663,9 +663,7 @@ public class XarPackage
 
     private void updateEntry(XarEntry packageFile)
     {
-        if (this.entries.containsKey(packageFile)) {
-            this.entries.put(packageFile, packageFile);
-        }
+        this.entries.replace(packageFile, packageFile);
     }
 
     private String getElementText(Element element, String tagName, boolean ignoreEmpty)

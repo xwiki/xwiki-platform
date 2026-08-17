@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -410,9 +409,7 @@ public class ExtensionIndexJob extends AbstractJob<ExtensionIndexRequest, Defaul
         }
 
         // Need to invert the list
-        for (ListIterator<Version> it = versionList.listIterator(versionList.size()); it.hasPrevious();) {
-            Version version = it.previous();
-
+        for (Version version : versionList.reversed()) {
             // Don't try lower than the stop version
             if (stopVersion != null && stopVersion.compareTo(version) >= 0) {
                 break;

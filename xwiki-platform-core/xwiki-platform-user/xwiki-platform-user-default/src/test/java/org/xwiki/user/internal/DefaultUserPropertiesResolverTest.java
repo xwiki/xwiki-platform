@@ -132,9 +132,8 @@ class DefaultUserPropertiesResolverTest
         when(this.contextComponentManager.getInstance(UserPropertiesResolver.class,
             "user/" + TestUserReference.class.getName())).thenThrow(new ComponentLookupException("error"));
 
-        Throwable exception = assertThrows(RuntimeException.class, () -> {
-            this.resolver.resolve(new TestUserReference());
-        });
+        TestUserReference userReference = new TestUserReference();
+        Throwable exception = assertThrows(RuntimeException.class, () -> this.resolver.resolve(userReference));
         assertEquals("Failed to find user properties resolver for role "
             + "[org.xwiki.user.UserPropertiesResolver] and hint "
             + "[user/org.xwiki.user.internal.DefaultUserPropertiesResolverTest$TestUserReference]",

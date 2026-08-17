@@ -62,12 +62,35 @@ public class PageWithTour extends ViewPage
 
     public String getStepTitle()
     {
-        return getDriver().findElement(By.className("popover-title")).getText();
+        return getShownStepElement(By.className("popover-title"));
     }
 
     public String getStepDescription()
     {
-        return getDriver().findElement(By.className("popover-content")).getText();
+        return getShownStepElement(By.className("popover-content"));
+    }
+
+    /**
+     * Read the text of an element of the step popover, waiting for it to be displayed first.
+     * <p>
+     * The step popover is shown by the tour's JavaScript right after the target page has been loaded, so a lookup for
+     * it is typically issued while that navigation is still settling. The implicit wait must not be relied on in that
+     * situation: a single {@code findElement} spanning a navigation keeps polling the document we're leaving and
+     * fails after its full timeout, even though the popover is on screen the whole time. An explicit wait issues a
+     * new lookup on every poll, so each poll runs against the current document. Waiting for the element to be
+     * <em>displayed</em> also covers the moment where the popover is already in the DOM but not shown yet, in which
+     * case {@code getText()} would return an empty string. Note that when we start a new tour from the tour home page,
+     * there are actually two page loads: one that contains startTour=true and then the tour's JavaScript code
+     * redirects to the same URL without that parameter as this is the URL recorded in the tour. It is this second page
+     * load that causes the aforementioned issues as we're not explicitly waiting for it.
+     *
+     * @param locator the locator of the popover element to read
+     * @return the text of the element, once it is displayed
+     */
+    private String getShownStepElement(By locator)
+    {
+        getDriver().waitUntilElementIsVisible(locator);
+        return getDriver().findElementWithoutWaiting(locator).getText();
     }
 
     public boolean hasPreviousStep()

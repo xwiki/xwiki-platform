@@ -44,6 +44,7 @@ import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
  * @version $Id$
  * @since 17.10.9
  * @since 18.5.0RC1
+ * @since 18.4.4
  */
 @Component
 @Named(R171009000XWIKI24390DataMigration.HINT)

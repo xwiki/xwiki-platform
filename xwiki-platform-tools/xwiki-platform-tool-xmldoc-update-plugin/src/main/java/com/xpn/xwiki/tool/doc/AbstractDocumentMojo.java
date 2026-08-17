@@ -23,8 +23,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
+import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -64,6 +68,13 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
      */
     @Parameter(defaultValue = "${project.build.outputDirectory}")
     protected File outputDirectory;
+
+    /**
+     * The timestamp to date the produced documents and attachments with, so that the build is reproducible. When it is
+     * not set, the documents are dated with the current time.
+     */
+    @Parameter(defaultValue = "${project.build.outputTimestamp}")
+    protected String outputTimestamp;
 
     /**
      * An empty context that will hold the base classes encountered in the passed XML document. This is needed in order
@@ -154,6 +165,17 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
      */
     protected void writeToXML(XWikiDocument doc, File file) throws MojoExecutionException
     {
+        // A document loaded from a XAR source carries no dates at all - the XAR plugin's format mojo strips both the
+        // document dates and the attachment dates - so XWikiDocument and XWikiAttachment fall back to the current
+        // time, which would end up in the generated XML and make the XAR different on every build. Date everything
+        // with the build output timestamp instead when there is one.
+        getOutputDate().ifPresent(date -> {
+            doc.setCreationDate(date);
+            doc.setDate(date);
+            doc.setContentUpdateDate(date);
+            doc.getAttachmentList().forEach(attachment -> attachment.setDate(date));
+        });
+
         try (FileWriter fw = new FileWriter(file)) {
 
             this.context.setWiki(new XWiki());
@@ -166,6 +188,20 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
             fw.write(xml);
         } catch (Exception e) {
             throw new MojoExecutionException("Error writing XML for XWikiDocument [" + file + "]", e);
+        }
+    }
+
+    /**
+     * @return the date to use for everything the build generates, empty when reproducible builds are not enabled
+     * @throws MojoExecutionException when the configured output timestamp cannot be parsed
+     */
+    protected Optional<Date> getOutputDate() throws MojoExecutionException
+    {
+        try {
+            Optional<Instant> instant = MavenArchiver.parseBuildOutputTimestamp(this.outputTimestamp);
+            return instant.map(Date::from);
+        } catch (IllegalArgumentException e) {
+            throw new MojoExecutionException("Invalid project.build.outputTimestamp [" + this.outputTimestamp + "]", e);
         }
     }
 

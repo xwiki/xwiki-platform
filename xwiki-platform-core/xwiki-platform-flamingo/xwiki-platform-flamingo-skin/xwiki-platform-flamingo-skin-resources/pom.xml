@@ -257,6 +257,24 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <aggregations>
+            <!-- Aggregate every CSS file that has been converted from LESS to plain CSS (i.e. that doesn't need to go
+              through the LESS compiler) so that style.css can include them all at once. Adding a new converted file
+              is just a matter of dropping it in the css/ folder, no need to touch this configuration or style.css. -->
+            <aggregation>
+              <insertNewLine>true</insertNewLine>
+              <inputDir>${project.build.outputDirectory}/flamingo/css</inputDir>
+              <output>${project.build.outputDirectory}/flamingo/css/converted.min.css</output>
+              <includes>
+                <include>*.min.css</include>
+              </includes>
+              <excludes>
+                <exclude>converted.min.css</exclude>
+              </excludes>
+            </aggregation>
+          </aggregations>
+        </configuration>
       </plugin>
       <!-- Unpack Bootstrap jar in order to add LESS sources in Flamingo -->
       <plugin>

@@ -186,7 +186,7 @@ public class DefaultWikiComponentMethodExecutor implements WikiComponentMethodEx
                     "Error while executing wiki component macro transformation for method [%s]", method.getName()), e);
             }
 
-            if (!"void".equals(method.getReturnType().getName())) {
+            if (!void.class.equals(method.getReturnType())) {
                 if (methodContext.get(OUTPUT_KEY) != null
                     && ((WikiMethodOutputHandler)
                     methodContext.get(OUTPUT_KEY)).getValue() != null) {

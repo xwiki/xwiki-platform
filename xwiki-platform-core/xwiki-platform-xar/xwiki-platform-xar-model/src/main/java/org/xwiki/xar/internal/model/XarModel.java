@@ -20,6 +20,8 @@
 package org.xwiki.xar.internal.model;
 
 /**
+ * Helper class holding constants of the XAR package format.
+ * 
  * @version $Id$
  * @since 5.4M1
  */

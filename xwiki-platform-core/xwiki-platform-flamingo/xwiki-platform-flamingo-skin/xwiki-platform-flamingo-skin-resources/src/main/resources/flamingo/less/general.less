@@ -65,6 +65,26 @@ table {
   height: 1em;
 }
 
+// Badges & Labels ============================================================
+.badge,
+.label {
+  // Horizontal spacing from surrounding text, in em like Bootstrap's own
+  // .label padding, so it stays proportional to the font size.
+  margin: 0 .2em;
+}
+
+.badge {
+  // Overrides Bootstrap 3's default vertical-align: middle, which sits a
+  // bit low inline in text; raise it slightly instead.
+  vertical-align: 0.1em;
+}
+
+.label {
+  // Bootstrap 3 already uses vertical-align: baseline here, but it still
+  // sits a bit low; raise it slightly too, smaller offset than .badge.
+  vertical-align: 0.05em;
+}
+
 // Code =======================================================================
 
 pre {

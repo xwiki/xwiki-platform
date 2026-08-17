@@ -105,8 +105,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 )
 class ExtensionIT
 {
-    private static RepositoryUtils repositoryUtils;
-
     private static RepositoryTestUtils repositoryTestUtils;
 
     private static org.xwiki.extension.test.junit5.ExtensionTestUtils extensionTestUtils;
@@ -114,14 +112,11 @@ class ExtensionIT
     @BeforeAll
     static void beforeAll(TestUtils setup) throws Exception
     {
-        repositoryUtils = new RepositoryUtils();
-
         setup.loginAsSuperAdmin();
         setup.recacheSecretToken();
         setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
 
-        repositoryTestUtils =
-            new RepositoryTestUtils(setup, repositoryUtils, new SolrTestUtils(setup));
+        repositoryTestUtils = new RepositoryTestUtils(setup, new SolrTestUtils(setup));
         // init() calls repositoryUtils.setup() which generates the test extension files
         repositoryTestUtils.init();
         extensionTestUtils = new org.xwiki.extension.test.junit5.ExtensionTestUtils(setup);

@@ -42,7 +42,7 @@ public class XWikiPluginManager
 
     private Vector<String> pluginClassNames = new Vector<>();
 
-    private Map<String, XWikiPluginInterface> plugins_classes = new HashMap<>();
+    private Map<String, XWikiPluginInterface> pluginsClasses = new HashMap<>();
 
     private Map<String, Vector<XWikiPluginInterface>> functionList = new HashMap<>();
 
@@ -83,7 +83,7 @@ public class XWikiPluginManager
             XWikiPluginInterface plugin = pluginClass.getConstructor(classes).newInstance(args);
             if (plugin != null) {
                 this.plugins.add(plugin.getName());
-                this.plugins_classes.put(plugin.getName(), plugin);
+                this.pluginsClasses.put(plugin.getName(), plugin);
                 this.pluginClassNames.add(className);
                 initPlugin(plugin, pluginClass, context);
             }
@@ -96,8 +96,8 @@ public class XWikiPluginManager
     public void removePlugin(String className)
     {
         this.plugins.remove(className);
-        Object plugin = this.plugins_classes.get(className);
-        this.plugins_classes.remove(className);
+        Object plugin = this.pluginsClasses.get(className);
+        this.pluginsClasses.remove(className);
 
         this.functionList.values().forEach(pluginList -> pluginList.remove(plugin));
     }
@@ -116,7 +116,7 @@ public class XWikiPluginManager
 
     public XWikiPluginInterface getPlugin(String className)
     {
-        return this.plugins_classes.get(className);
+        return this.pluginsClasses.get(className);
     }
 
     public Vector<String> getPlugins()

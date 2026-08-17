@@ -30,13 +30,18 @@ import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.xar.internal.model.XarAttachmentModel;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 
 /**
+ * Helper class holding the parameters names and configuration to convert between the XAR XML and Filter events for the
+ * root document element. It extends {@link XarAttachmentModel} because it mostly reuse the same values for parameters
+ * names.
+ * 
  * @version $Id$
- * @since 6.2M1
+ * @since 18.7.0RC1
  */
-public class XARDocumentModel extends XarDocumentModel
+public class XARDocumentParameters extends XarDocumentModel
 {
     /**
      * The parameters to be used for reading a document.

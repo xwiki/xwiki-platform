@@ -189,7 +189,7 @@ class FileSaveTransactionRunnableTest
     }
 
     @Test
-    void rollbackWithNonexistantOriginalTest() throws Exception
+    void rollbackWithNonexistantOriginalTest()
     {
         this.toSave.delete();
         assertFalse(this.toSave.exists());

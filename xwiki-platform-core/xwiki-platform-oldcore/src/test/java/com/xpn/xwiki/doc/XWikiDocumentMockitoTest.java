@@ -269,20 +269,20 @@ class XWikiDocumentMockitoTest
      */
     private BaseClass generateFakeClass() throws XWikiException
     {
-        BaseClass baseClass = this.document.getXClass();
-        baseClass.addTextField("string", "String", 30);
-        baseClass.addTextAreaField("area", "Area", 10, 10);
-        baseClass.addTextAreaField("puretextarea", "Pure text area", 10, 10);
+        BaseClass fakeClass = this.document.getXClass();
+        fakeClass.addTextField("string", "String", 30);
+        fakeClass.addTextAreaField("area", "Area", 10, 10);
+        fakeClass.addTextAreaField("puretextarea", "Pure text area", 10, 10);
         // set the text areas an non interpreted content
-        ((TextAreaClass) baseClass.getField("puretextarea")).setContentType("puretext");
-        baseClass.addPasswordField("passwd", "Password", 30);
-        baseClass.addBooleanField("boolean", "Boolean", "yesno");
-        baseClass.addNumberField("int", "Int", 10, "integer");
-        baseClass.addStaticListField("stringlist", "StringList", 1, true, "value1, value2");
+        ((TextAreaClass) fakeClass.getField("puretextarea")).setContentType("puretext");
+        fakeClass.addPasswordField("passwd", "Password", 30);
+        fakeClass.addBooleanField("boolean", "Boolean", "yesno");
+        fakeClass.addNumberField("int", "Int", 10, "integer");
+        fakeClass.addStaticListField("stringlist", "StringList", 1, true, "value1, value2");
 
         // Save the xclass since it's used for xobject creation.
         this.oldcore.getSpyXWiki().saveDocument(this.document, this.oldcore.getXWikiContext());
-        return baseClass;
+        return fakeClass;
     }
 
     /**
@@ -292,7 +292,7 @@ class XWikiDocumentMockitoTest
      */
     private void generateFakeObjects() throws ComponentLookupException
     {
-        BaseObject baseObject = null, baseObject2 = null, baseObject3 = null;
+        BaseObject xobject1 = null, xobject2 = null, xobject3 = null;
 
         // The resolver is used by BaseCollection#getXClassReference.
         DocumentReferenceResolver<EntityReference> currentDocumentReferenceResolver =
@@ -300,22 +300,22 @@ class XWikiDocumentMockitoTest
         when(currentDocumentReferenceResolver.resolve(any(EntityReference.class),
             eq(this.document.getDocumentReference()))).thenReturn(this.document.getDocumentReference());
         try {
-            baseObject = this.document.newXObject(this.document.getDocumentReference(), this.oldcore.getXWikiContext());
-            baseObject2 =
+            xobject1 = this.document.newXObject(this.document.getDocumentReference(), this.oldcore.getXWikiContext());
+            xobject2 =
                 this.document.newXObject(this.document.getDocumentReference(), this.oldcore.getXWikiContext());
-            baseObject3 =
+            xobject3 =
                 this.document.newXObject(this.document.getDocumentReference(), this.oldcore.getXWikiContext());
         } catch (XWikiException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
         }
-        baseObject.setStringValue("string", "string");
-        baseObject.setIntValue("int", 42);
-        baseObject2.setStringValue("string", "string2");
-        baseObject2.setIntValue("int", 42);
-        baseObject3.setStringValue("string", "string3");
-        baseObject3.setIntValue("int", 42);
+        xobject1.setStringValue("string", "string");
+        xobject1.setIntValue("int", 42);
+        xobject2.setStringValue("string", "string2");
+        xobject2.setIntValue("int", 42);
+        xobject3.setStringValue("string", "string3");
+        xobject3.setIntValue("int", 42);
     }
 
     /**
@@ -337,7 +337,7 @@ class XWikiDocumentMockitoTest
             mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
         Map<String, String[]> parameters = generateFakeRequestMap();
-        BaseClass baseClass = generateFakeClass();
+        BaseClass fakeClass = generateFakeClass();
         generateFakeObjects();
         EditForm eform = new EditForm();
 
@@ -357,22 +357,22 @@ class XWikiDocumentMockitoTest
         eform.readRequest();
         this.document.readObjectsFromFormUpdateOrCreate(eform, context);
 
-        assertEquals(43, this.document.getXObjectSize(baseClass.getDocumentReference()));
+        assertEquals(43, this.document.getXObjectSize(fakeClass.getDocumentReference()));
         assertEquals("bloublou",
-            this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
-        assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 0).getIntValue("int"));
-        assertEquals("string2", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
-        assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 1).getIntValue("int"));
-        assertEquals("string3", this.document.getXObject(baseClass.getDocumentReference(), 2).getStringValue("string"));
-        assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 2).getIntValue("int"));
-        assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 3));
-        assertEquals("blabla", this.document.getXObject(baseClass.getDocumentReference(), 3).getStringValue("string"));
-        assertEquals(13, this.document.getXObject(baseClass.getDocumentReference(), 3).getIntValue("int"));
-        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 4));
-        assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
+            this.document.getXObject(fakeClass.getDocumentReference(), 0).getStringValue("string"));
+        assertEquals(42, this.document.getXObject(fakeClass.getDocumentReference(), 0).getIntValue("int"));
+        assertEquals("string2", this.document.getXObject(fakeClass.getDocumentReference(), 1).getStringValue("string"));
+        assertEquals(7, this.document.getXObject(fakeClass.getDocumentReference(), 1).getIntValue("int"));
+        assertEquals("string3", this.document.getXObject(fakeClass.getDocumentReference(), 2).getStringValue("string"));
+        assertEquals(42, this.document.getXObject(fakeClass.getDocumentReference(), 2).getIntValue("int"));
+        assertNotNull(this.document.getXObject(fakeClass.getDocumentReference(), 3));
+        assertEquals("blabla", this.document.getXObject(fakeClass.getDocumentReference(), 3).getStringValue("string"));
+        assertEquals(13, this.document.getXObject(fakeClass.getDocumentReference(), 3).getIntValue("int"));
+        assertNull(this.document.getXObject(fakeClass.getDocumentReference(), 4));
+        assertNotNull(this.document.getXObject(fakeClass.getDocumentReference(), 42));
         assertEquals("bloublou",
-            this.document.getXObject(baseClass.getDocumentReference(), 42).getStringValue("string"));
-        assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 42).getIntValue("int"));
+            this.document.getXObject(fakeClass.getDocumentReference(), 42).getStringValue("string"));
+        assertEquals(7, this.document.getXObject(fakeClass.getDocumentReference(), 42).getIntValue("int"));
     }
 
     /**
@@ -394,7 +394,7 @@ class XWikiDocumentMockitoTest
             mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
         Map<String, String[]> parameters = generateFakeRequestMap();
-        BaseClass baseClass = generateFakeClass();
+        BaseClass fakeClass = generateFakeClass();
         generateFakeObjects();
         EditForm eform = new EditForm();
 
@@ -415,19 +415,19 @@ class XWikiDocumentMockitoTest
         eform.readRequest();
         this.document.readAddedUpdatedAndRemovedObjectsFromForm(eform, context);
 
-        assertEquals(43, this.document.getXObjectSize(baseClass.getDocumentReference()));
+        assertEquals(43, this.document.getXObjectSize(fakeClass.getDocumentReference()));
         assertEquals("bloublou",
-            this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
-        assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 0).getIntValue("int"));
-        assertEquals("string2", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
-        assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 1).getIntValue("int"));
-        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 2));
-        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 3));
-        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 4));
-        assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
+            this.document.getXObject(fakeClass.getDocumentReference(), 0).getStringValue("string"));
+        assertEquals(42, this.document.getXObject(fakeClass.getDocumentReference(), 0).getIntValue("int"));
+        assertEquals("string2", this.document.getXObject(fakeClass.getDocumentReference(), 1).getStringValue("string"));
+        assertEquals(7, this.document.getXObject(fakeClass.getDocumentReference(), 1).getIntValue("int"));
+        assertNull(this.document.getXObject(fakeClass.getDocumentReference(), 2));
+        assertNull(this.document.getXObject(fakeClass.getDocumentReference(), 3));
+        assertNull(this.document.getXObject(fakeClass.getDocumentReference(), 4));
+        assertNotNull(this.document.getXObject(fakeClass.getDocumentReference(), 42));
         assertEquals("bloublou",
-            this.document.getXObject(baseClass.getDocumentReference(), 42).getStringValue("string"));
-        assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 42).getIntValue("int"));
+            this.document.getXObject(fakeClass.getDocumentReference(), 42).getStringValue("string"));
+        assertEquals(7, this.document.getXObject(fakeClass.getDocumentReference(), 42).getIntValue("int"));
     }
 
     @Test
@@ -654,7 +654,7 @@ class XWikiDocumentMockitoTest
     @Test
     void testCloneNullObjects()
     {
-        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
+        XWikiDocument testDocument = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
 
         EntityReference relativeClassReference =
             new EntityReference(DOCNAME, EntityType.DOCUMENT, new EntityReference(DOCSPACE, EntityType.SPACE));
@@ -662,34 +662,35 @@ class XWikiDocumentMockitoTest
         DocumentReference duplicatedClassReference = new DocumentReference("otherwiki", DOCSPACE, DOCNAME);
 
         // no object
-        XWikiDocument clonedDocument = document.clone();
+        XWikiDocument clonedDocument = testDocument.clone();
         assertTrue(clonedDocument.getXObjects().isEmpty());
 
-        XWikiDocument duplicatedDocument = document.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
+        XWikiDocument duplicatedDocument =
+            testDocument.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
         assertTrue(duplicatedDocument.getXObjects().isEmpty());
 
         // 1 null object
 
-        document.addXObject(classReference, null);
+        testDocument.addXObject(classReference, null);
 
-        clonedDocument = document.clone();
+        clonedDocument = testDocument.clone();
         assertEquals(1, clonedDocument.getXObjects(classReference).size());
-        assertEquals(document.getXObjects(classReference), clonedDocument.getXObjects(classReference));
+        assertEquals(testDocument.getXObjects(classReference), clonedDocument.getXObjects(classReference));
 
-        duplicatedDocument = document.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
+        duplicatedDocument = testDocument.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
         assertTrue(duplicatedDocument.getXObjects().isEmpty());
 
         // 1 null object and 1 object
 
         BaseObject object = new BaseObject();
         object.setXClassReference(relativeClassReference);
-        document.addXObject(object);
+        testDocument.addXObject(object);
 
-        clonedDocument = document.clone();
+        clonedDocument = testDocument.clone();
         assertEquals(2, clonedDocument.getXObjects(classReference).size());
-        assertEquals(document.getXObjects(classReference), clonedDocument.getXObjects(classReference));
+        assertEquals(testDocument.getXObjects(classReference), clonedDocument.getXObjects(classReference));
 
-        duplicatedDocument = document.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
+        duplicatedDocument = testDocument.duplicate(new DocumentReference("otherwiki", DOCSPACE, DOCNAME));
         assertEquals(2, duplicatedDocument.getXObjects(duplicatedClassReference).size());
     }
 
@@ -823,11 +824,11 @@ class XWikiDocumentMockitoTest
     @Test
     void testSetXObjectWhithNoPreviousObject()
     {
-        XWikiDocument document = new XWikiDocument(this.document.getDocumentReference());
+        XWikiDocument testDocument = new XWikiDocument(this.document.getDocumentReference());
 
-        document.setXObject(this.baseObject.getXClassReference(), 0, this.baseObject);
+        testDocument.setXObject(this.baseObject.getXClassReference(), 0, this.baseObject);
 
-        assertEquals(Arrays.asList(this.baseObject), document.getXObjects(this.baseObject.getXClassReference()));
+        assertEquals(Arrays.asList(this.baseObject), testDocument.getXObjects(this.baseObject.getXClassReference()));
     }
 
     /**
@@ -1133,11 +1134,11 @@ class XWikiDocumentMockitoTest
     @SuppressWarnings("java:S5785")
     void testEqualsDatas()
     {
-        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        XWikiDocument otherDocument = document.clone();
+        XWikiDocument testDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        XWikiDocument otherDocument = testDocument.clone();
 
-        assertTrue(document.equals(otherDocument));
-        assertTrue(document.equalsData(otherDocument));
+        assertTrue(testDocument.equals(otherDocument));
+        assertTrue(testDocument.equalsData(otherDocument));
 
         otherDocument.setAuthorReference(new DocumentReference("wiki", "space", "otherauthor"));
         otherDocument.setContentAuthorReference(otherDocument.getAuthorReference());
@@ -1146,10 +1147,10 @@ class XWikiDocumentMockitoTest
         otherDocument.setComment("other comment");
         otherDocument.setMinorEdit(true);
 
-        document.setMinorEdit(false);
+        testDocument.setMinorEdit(false);
 
-        assertFalse(document.equals(otherDocument));
-        assertTrue(document.equalsData(otherDocument));
+        assertFalse(testDocument.equals(otherDocument));
+        assertTrue(testDocument.equalsData(otherDocument));
     }
 
     @Test
@@ -1161,48 +1162,48 @@ class XWikiDocumentMockitoTest
     @SuppressWarnings("java:S5785")
     void testEqualsAttachments() throws XWikiException
     {
-        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        XWikiDocument otherDocument = document.clone();
+        XWikiDocument testDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        XWikiDocument otherDocument = testDocument.clone();
 
-        document.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
+        testDocument.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
         XWikiAttachment otherAttachment =
             otherDocument.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
 
-        assertTrue(document.equals(otherDocument));
-        assertTrue(document.equalsData(otherDocument));
+        assertTrue(testDocument.equals(otherDocument));
+        assertTrue(testDocument.equalsData(otherDocument));
 
         otherAttachment.setContent(new byte[] {1, 2, 3});
 
-        assertFalse(document.equals(otherDocument));
-        assertFalse(document.equalsData(otherDocument));
+        assertFalse(testDocument.equals(otherDocument));
+        assertFalse(testDocument.equalsData(otherDocument));
     }
 
     @Test
     void testSetMetadataDirtyWhenAttachmenListChanges() throws XWikiException
     {
-        XWikiDocument document = new XWikiDocument();
+        XWikiDocument testDocument = new XWikiDocument();
 
-        document.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
+        testDocument.addAttachment("file", new byte[] {1, 2}, this.oldcore.getXWikiContext());
 
         // Force the metadata not dirty.
-        document.setMetaDataDirty(false);
+        testDocument.setMetaDataDirty(false);
 
-        List<XWikiAttachment> attachments = document.getAttachmentList();
+        List<XWikiAttachment> attachments = testDocument.getAttachmentList();
         // Modify (clear) the attachments list)
         attachments.clear();
 
         // Check that the the metadata is now dirty as a result.
-        assertTrue(document.isMetaDataDirty());
+        assertTrue(testDocument.isMetaDataDirty());
 
         // Check adding to list
-        document.setMetaDataDirty(false);
+        testDocument.setMetaDataDirty(false);
         attachments.add(new XWikiAttachment());
-        assertTrue(document.isMetaDataDirty());
+        assertTrue(testDocument.isMetaDataDirty());
 
         // Check removing from the list
-        document.setMetaDataDirty(false);
+        testDocument.setMetaDataDirty(false);
         attachments.remove(0);
-        assertTrue(document.isMetaDataDirty());
+        assertTrue(testDocument.isMetaDataDirty());
     }
 
     @Test
@@ -1414,8 +1415,8 @@ class XWikiDocumentMockitoTest
 
         // Verify that the object references point to the doc in which it's cloned.
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : doc.getXObjects().entrySet()) {
-            for (BaseObject baseObject : entry.getValue()) {
-                assertEquals(doc.getDocumentReference(), baseObject.getDocumentReference());
+            for (BaseObject xobject : entry.getValue()) {
+                assertEquals(doc.getDocumentReference(), xobject.getDocumentReference());
             }
         }
     }
@@ -1429,8 +1430,8 @@ class XWikiDocumentMockitoTest
     {
         List<String> originalGuids = new ArrayList<String>();
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : this.document.getXObjects().entrySet()) {
-            for (BaseObject baseObject : entry.getValue()) {
-                originalGuids.add(baseObject.getGuid());
+            for (BaseObject xobject : entry.getValue()) {
+                originalGuids.add(xobject.getGuid());
             }
         }
 
@@ -1444,11 +1445,11 @@ class XWikiDocumentMockitoTest
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : doc.getXObjects().entrySet()) {
             // Verify that the class reference and the target document reference have the same wiki component.
             assertEquals(doc.getDocumentReference().getWikiReference(), entry.getKey().getWikiReference());
-            for (BaseObject baseObject : entry.getValue()) {
+            for (BaseObject xobject : entry.getValue()) {
                 // Verify that the object references point to the doc in which it's cloned.
-                assertEquals(doc.getDocumentReference(), baseObject.getDocumentReference());
+                assertEquals(doc.getDocumentReference(), xobject.getDocumentReference());
                 // Verify that GUIDs are not the same as the original ones
-                assertFalse(originalGuids.contains(baseObject.getGuid()), "Non unique object GUID found!");
+                assertFalse(originalGuids.contains(xobject.getGuid()), "Non unique object GUID found!");
             }
         }
     }
@@ -1532,8 +1533,8 @@ class XWikiDocumentMockitoTest
 
         List<String> originalGuids = new ArrayList<String>();
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : this.document.getXObjects().entrySet()) {
-            for (BaseObject baseObject : entry.getValue()) {
-                originalGuids.add(baseObject.getGuid());
+            for (BaseObject xobject : entry.getValue()) {
+                originalGuids.add(xobject.getGuid());
             }
         }
 
@@ -1542,8 +1543,8 @@ class XWikiDocumentMockitoTest
 
         // Verify that the cloned objects have different GUIDs
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : copy.getXObjects().entrySet()) {
-            for (BaseObject baseObject : entry.getValue()) {
-                assertFalse(originalGuids.contains(baseObject.getGuid()), "Non unique object GUID found!");
+            for (BaseObject xobject : entry.getValue()) {
+                assertFalse(originalGuids.contains(xobject.getGuid()), "Non unique object GUID found!");
             }
         }
     }
@@ -1724,10 +1725,10 @@ class XWikiDocumentMockitoTest
         this.baseObject2.removeField("passwd");
         this.oldcore.getSpyXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
 
-        Document document = this.document.toXMLDocument(this.oldcore.getXWikiContext());
+        Document xmlDocument = this.document.toXMLDocument(this.oldcore.getXWikiContext());
 
         XWikiDocument newDocument = new XWikiDocument(this.document.getDocumentReference());
-        newDocument.fromXML(document, false);
+        newDocument.fromXML(xmlDocument, false);
 
         assertEquals(this.document, newDocument);
         // Assert that the document restored from XML is restricted in contrast to the original document.
@@ -1956,40 +1957,40 @@ class XWikiDocumentMockitoTest
     @Test
     void getXClassDoesNotChangeDirtyFlagWhenEmpty()
     {
-        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
+        XWikiDocument testDocument = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
 
-        document.setMetaDataDirty(false);
-        document.setContentDirty(false);
+        testDocument.setMetaDataDirty(false);
+        testDocument.setContentDirty(false);
 
-        BaseClass xClass = document.getXClass();
+        BaseClass xClass = testDocument.getXClass();
 
         assertNotNull(xClass);
 
         assertFalse(xClass.isDirty());
-        assertFalse(document.isMetaDataDirty());
-        assertFalse(document.isContentDirty());
+        assertFalse(testDocument.isMetaDataDirty());
+        assertFalse(testDocument.isContentDirty());
     }
 
     @Test
     void hidden()
     {
-        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
+        XWikiDocument testDocument = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
 
-        document.setHidden(false);
-        document.setMetaDataDirty(false);
+        testDocument.setHidden(false);
+        testDocument.setMetaDataDirty(false);
 
-        assertFalse(document.isHidden());
-        assertFalse(document.isMetaDataDirty());
+        assertFalse(testDocument.isHidden());
+        assertFalse(testDocument.isMetaDataDirty());
 
-        document.setHidden(true);
+        testDocument.setHidden(true);
 
-        assertTrue(document.isMetaDataDirty());
+        assertTrue(testDocument.isMetaDataDirty());
 
-        document.setMetaDataDirty(false);
+        testDocument.setMetaDataDirty(false);
 
-        document.setHidden(true);
+        testDocument.setHidden(true);
 
-        assertFalse(document.isMetaDataDirty());
+        assertFalse(testDocument.isMetaDataDirty());
     }
 
     @ParameterizedTest

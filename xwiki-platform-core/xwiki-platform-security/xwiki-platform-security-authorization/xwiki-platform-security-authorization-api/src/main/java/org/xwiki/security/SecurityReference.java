@@ -142,11 +142,13 @@ public class SecurityReference extends EntityReference
      */
     public WikiReference getOriginalWikiReference()
     {
-        return (this.getType() == EntityType.WIKI)
-            ? (this.originalReference instanceof WikiReference wikiReference)
-                ? wikiReference
-                : new WikiReference(this.originalReference)
-            : null;
+        if (this.getType() != EntityType.WIKI) {
+            return null;
+        }
+
+        return this.originalReference instanceof WikiReference wikiReference
+            ? wikiReference
+            : new WikiReference(this.originalReference);
     }
 
     /**
@@ -155,11 +157,13 @@ public class SecurityReference extends EntityReference
      */
     public SpaceReference getOriginalSpaceReference()
     {
-        return (this.getType() == EntityType.SPACE)
-            ? (this.originalReference instanceof SpaceReference spaceReference)
-                ? spaceReference
-                : new SpaceReference(this.originalReference)
-            : null;
+        if (this.getType() != EntityType.SPACE) {
+            return null;
+        }
+
+        return this.originalReference instanceof SpaceReference spaceReference
+            ? spaceReference
+            : new SpaceReference(this.originalReference);
     }
 
     /**
@@ -168,10 +172,12 @@ public class SecurityReference extends EntityReference
      */
     public DocumentReference getOriginalDocumentReference()
     {
-        return (this.getType() == EntityType.DOCUMENT)
-            ? (this.originalReference instanceof DocumentReference documentReference)
-                ? documentReference
-                : new DocumentReference(this.originalReference)
-            : null;
+        if (this.getType() != EntityType.DOCUMENT) {
+            return null;
+        }
+
+        return this.originalReference instanceof DocumentReference documentReference
+            ? documentReference
+            : new DocumentReference(this.originalReference);
     }
 }

@@ -103,49 +103,53 @@ public class BlockNoteLinkModal extends BaseElement
      * search box is only available when the target type is set to {@code Page}.
      *
      * @param query the text to type in the page reference search box
-     * @param suggestionText the text (or part of it) of the suggestion to select
+     * @param suggestionTitle the title of the suggestion to select
      */
-    public void setPageReference(String query, String suggestionText)
+    public void setPageReference(String query, String suggestionTitle)
     {
-        setSuggestBoxQueryAndSelectSuggestion("linkPageReference", query, suggestionText);
+        setSuggestBoxQueryAndSelectSuggestion("linkPageReference", query, suggestionTitle, null);
     }
 
     /**
      * Selects the {@code Page} target type, sets the page reference (using the search box) and submits the modal.
      *
      * @param query the text to type in the page reference search box
-     * @param suggestionText the text (or part of it) of the suggestion to select
+     * @param suggestionTitle the title of the suggestion to select
      */
-    public void setPageTargetAndSubmit(String query, String suggestionText)
+    public void setPageTargetAndSubmit(String query, String suggestionTitle)
     {
         selectTargetType("Page");
-        setPageReference(query, suggestionText);
+        setPageReference(query, suggestionTitle);
         submit();
     }
 
     /**
-     * Types the given query in the attachment reference search box and selects the suggestion matching the given
-     * text. The search box is only available when the target type is set to {@code Attachment}.
+     * Types the given query in the attachment reference search box and selects the suggestion matching the given text.
+     * The search box is only available when the target type is set to {@code Attachment}.
      *
      * @param query the text to type in the attachment reference search box
-     * @param suggestionText the text (or part of it) of the suggestion to select
+     * @param suggestionTitle the title of the suggestion to select
+     * @param suggestionHint a fragment of the hint of the suggestion to select, used to disambiguate between
+     *            suggestions with the same title
      */
-    public void setAttachmentReference(String query, String suggestionText)
+    public void setAttachmentReference(String query, String suggestionTitle, String suggestionHint)
     {
-        setSuggestBoxQueryAndSelectSuggestion("linkAttachmentReference", query, suggestionText);
+        setSuggestBoxQueryAndSelectSuggestion("linkAttachmentReference", query, suggestionTitle, suggestionHint);
     }
 
     /**
-     * Selects the {@code Attachment} target type, sets the attachment reference (using the search box) and submits
-     * the modal.
+     * Selects the {@code Attachment} target type, sets the attachment reference (using the search box) and submits the
+     * modal.
      *
      * @param query the text to type in the attachment reference search box
-     * @param suggestionText the text (or part of it) of the suggestion to select
+     * @param suggestionTitle the title of the suggestion to select
+     * @param suggestionHint a fragment of the hint of the suggestion to select, used to disambiguate between
+     *            suggestions with the same title
      */
-    public void setAttachmentTargetAndSubmit(String query, String suggestionText)
+    public void setAttachmentTargetAndSubmit(String query, String suggestionTitle, String suggestionHint)
     {
         selectTargetType("Attachment");
-        setAttachmentReference(query, suggestionText);
+        setAttachmentReference(query, suggestionTitle, suggestionHint);
         submit();
     }
 
@@ -212,24 +216,30 @@ public class BlockNoteLinkModal extends BaseElement
     private void setSuggestBoxQuery(String dataTest, String query)
     {
         WebElement queryInput = getDriver().findElement(By.cssSelector("[data-test='" + dataTest + "'] input"));
-        queryInput.click();
-        queryInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        queryInput.clear();
         queryInput.sendKeys(query);
     }
 
     /**
      * Types the given query in the search box (page or attachment reference) identified by the given {@code
-     * data-test} attribute and waits for the suggestion matching the given text to appear, then clicks on it.
+     * data-test} attribute and waits for the suggestion with the given title to appear, then clicks on it.
      *
      * @param dataTest the {@code data-test} attribute identifying the search box
      * @param query the text to type in the search box
-     * @param suggestionText the text (or part of it) of the suggestion to select
+     * @param suggestionTitle the title of the suggestion to select
+     * @param suggestionHint a fragment of the hint of the suggestion to select, used to disambiguate between
+     *            suggestions with the same title
      */
-    private void setSuggestBoxQueryAndSelectSuggestion(String dataTest, String query, String suggestionText)
+    private void setSuggestBoxQueryAndSelectSuggestion(String dataTest, String query, String suggestionTitle,
+        String suggestionHint)
     {
-        By suggestionLocator = By.xpath(String.format(
-            "//*[@data-test='%s']//li[contains(concat(' ', normalize-space(@class), ' '), ' suggestion ') "
-                + "and contains(., '%s')]", dataTest, suggestionText));
+        String suggestionXPath = String.format("//*[@data-test = '%s']//li[contains(@class, 'suggestion')]"
+            + "[.//span[contains(@class, 'suggestion-title') and . = '%s']]", dataTest, suggestionTitle);
+        if (suggestionHint != null) {
+            suggestionXPath +=
+                String.format("[.//span[contains(@class, 'segment') and contains(., '%s')]]", suggestionHint);
+        }
+        By suggestionLocator = By.xpath(suggestionXPath);
         // There's a race between the target page/attachment being saved and its indexing actually being queued, so
         // the search can return no results even though the Solr indexing queue was observed empty right before
         // typing the query. Retry the search (by retyping the query, which is required to trigger a new one) for up

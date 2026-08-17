@@ -118,10 +118,10 @@ public abstract class AbstractSkin implements Skin
             // Make sure to not try several times the same skin
             Set<String> skins = new HashSet<>();
             skins.add(getId());
-            for (ResourceRepository parent = getParent(); parent != null && resource == null
-                && !skins.contains(parent.getId()); parent = parent.getParent()) {
-                resource = parent.getLocalResource(resourceName);
-                skins.add(parent.getId());
+            for (ResourceRepository repository = getParent(); repository != null && resource == null
+                && !skins.contains(repository.getId()); repository = repository.getParent()) {
+                resource = repository.getLocalResource(resourceName);
+                skins.add(repository.getId());
             }
         }
 
@@ -142,9 +142,9 @@ public abstract class AbstractSkin implements Skin
             }
         }
 
-        Skin parent = getParent();
-        if (parent != null) {
-            targetSyntax = parent.getOutputSyntax();
+        Skin parentSkin = getParent();
+        if (parentSkin != null) {
+            targetSyntax = parentSkin.getOutputSyntax();
         }
 
         // Fallback to the XHTML 1.0 syntax for backward compatibility

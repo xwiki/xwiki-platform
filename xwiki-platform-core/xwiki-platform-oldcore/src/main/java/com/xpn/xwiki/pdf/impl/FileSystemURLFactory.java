@@ -334,11 +334,8 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     private Map<String, File> getFileMapping(XWikiContext context)
     {
         @SuppressWarnings("unchecked")
-        Map<String, File> usedFiles = (Map<String, File>) context.get(FILE_MAPPING_KEY);
-        if (usedFiles == null) {
-            usedFiles = new HashMap<>();
-            context.put(FILE_MAPPING_KEY, usedFiles);
-        }
+        Map<String, File> usedFiles =
+            (Map<String, File>) context.computeIfAbsent(FILE_MAPPING_KEY, key -> new HashMap<String, File>());
         return usedFiles;
     }
 

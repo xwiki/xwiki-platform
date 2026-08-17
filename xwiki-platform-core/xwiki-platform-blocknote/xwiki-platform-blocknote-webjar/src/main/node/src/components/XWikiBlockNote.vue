@@ -78,11 +78,17 @@
 
 <script setup lang="ts">
 import { BlockNoteDocument } from "../services/blocknote/BlockNoteProcessor";
+import {
+  extractLinkId,
+  injectLinkId,
+  stripLinkId,
+} from "../services/blocknote/linkId";
 import { collaborationManagerProviderName } from "@xwiki/platform-collaboration-api";
 import { BlocknoteEditor } from "@xwiki/platform-editors-blocknote-headless";
 import { MINIMAL_SYNTAX_NAME } from "@xwiki/platform-minimal-syntax-config";
 import { SYNTAX_CONFIG_COMPONENT_GROUP_NAME } from "@xwiki/platform-syntaxes-config";
 import { Container } from "inversify";
+import { uuidv4 } from "lib0/random";
 import {
   inject,
   onBeforeMount,
@@ -107,6 +113,7 @@ import type {
   BlockType,
   EditorLanguage,
   ImageEditionOverrideFn,
+  LinkEditionHooks,
 } from "@xwiki/platform-editors-blocknote-react";
 import type { DocumentReference } from "@xwiki/platform-model-api";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
@@ -225,6 +232,63 @@ const imageEdition: ImageEditionOverrideFn = (block, update) => {
   );
 };
 
+const linkEdition: LinkEditionHooks = {
+  // Runs before the link editor is opened on an existing link. The reference of the linked resource is kept as link
+  // metadata (outside the BlockNote schema), mapped to a synthetic id stored in the link url, so we resolve it here
+  // and inject it into the link data to pre-fill the link editor. The synthetic id is stripped from the url passed to
+  // the link editor; beforeUpdate recovers it from the previous link data.
+  beforeEdit: (linkData) => {
+    const id = extractLinkId(linkData.url);
+    if (!id) {
+      // The link doesn't have associated metadata (e.g. a resource reference) so we return the link data as-is. Calling
+      // stripLinkId when the ID is missing is safe but the URL gets normalized by the URL constructor (e.g. a trailing
+      // slash is added). We prefer to avoid that in order to keep the link URL exactly as the user entered it.
+      return linkData;
+    }
+    return {
+      ...linkData,
+      url: stripLinkId(linkData.url),
+      reference: blockNoteDocument?.getMetadata(id)?.xwikiReference as
+        | ResourceReference
+        | undefined,
+    };
+  },
+
+  // Runs right before the link is written into the content (i.e. before createLink / editLink). We store the (possibly
+  // updated) resource reference as link metadata, mapped to a synthetic id that we carry in the link url. When editing,
+  // we reuse the id of the edited link (taken from the previous link data) so that the other link metadata (parameters,
+  // freestanding flag) is preserved even when the target changes; when creating, we mint a new id.
+  beforeUpdate: (linkData, previous) => {
+    if (!linkData.reference) {
+      // Without a reference the link is saved from its url, so leave that url exactly as the link editor produced it:
+      // storing a synthetic id in it would round-trip it through the URL constructor, normalizing it (e.g. adding a
+      // trailing slash).
+      return linkData;
+    }
+    const id = extractLinkId(previous?.url ?? "") ?? uuidv4();
+    const metadata = blockNoteDocument!.getMetadata(id, true)!;
+    const previousReference = metadata.xwikiReference as
+      | ResourceReference
+      | undefined;
+    // Preserve the previous reference (with its parameters) when the link still points to the same resource, otherwise
+    // report the new one, so that the edited link points to the newly selected resource.
+    metadata.xwikiReference = isSameResourceReference(
+      previousReference,
+      linkData.reference,
+    )
+      ? previousReference
+      : linkData.reference;
+    return { ...linkData, url: injectLinkId(stripLinkId(linkData.url), id) };
+  },
+};
+
+function isSameResourceReference(
+  alice?: ResourceReference,
+  bob?: ResourceReference,
+): boolean {
+  return alice?.type === bob?.type && alice?.reference === bob?.reference;
+}
+
 const syntaxes = container.getAll<SyntaxConfig>(
   SYNTAX_CONFIG_COMPONENT_GROUP_NAME,
 );
@@ -262,6 +326,7 @@ const editorProps = shallowRef<
   label: defaultLabel,
   overrides: {
     imageEdition,
+    linkEdition,
   },
   syntax,
 });

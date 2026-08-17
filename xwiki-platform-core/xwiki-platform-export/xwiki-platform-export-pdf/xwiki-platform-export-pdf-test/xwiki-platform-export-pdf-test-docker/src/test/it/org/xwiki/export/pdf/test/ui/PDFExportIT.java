@@ -19,7 +19,9 @@
  */
 package org.xwiki.export.pdf.test.ui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -1683,6 +1685,57 @@ class PDFExportIT
 
             assertEquals(Map.of("link", "HHeading"), pdf.getLinksFromPage(3));
             assertEquals(Map.of("link", "HHeading-1"), pdf.getLinksFromPage(4));
+        }
+    }
+
+    /**
+     * Verify that a table of contents tree that doesn't fit a single print page is split between print pages without
+     * losing any entry.
+     */
+    @Test
+    @Order(36)
+    void longTableOfContents(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // The number of headings is high enough for the table of contents to not fit a single print page.
+        int headingCount = 60;
+        List<String> headings = new ArrayList<>();
+        StringBuilder content = new StringBuilder("= Start =\n");
+        for (int i = 1; i <= headingCount; i++) {
+            // One of the headings has a long title, in order to have a table of contents entry that spans multiple
+            // lines of text. Note that we don't use any punctuation in the heading titles because we want to be able to
+            // compute the section anchors by simply removing the white space.
+            String heading = "Heading " + i + (i == headingCount / 2 ? " with a rather long title that does not fit on"
+                + " a single line of text and that therefore needs to be wrapped" : "");
+            headings.add(heading);
+            content.append("== ").append(heading).append(" ==\n");
+        }
+
+        ViewPage viewPage = setup.createPage(testReference, content.toString(), "Long Table of Contents");
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions)) {
+            List<String> expectedAnchors = new ArrayList<>();
+            expectedAnchors.add("HStart");
+            headings.stream().map(heading -> "H" + heading.replace(" ", "")).forEach(expectedAnchors::add);
+
+            // The table of contents entries are the only links in the exported PDF (the exported content has only
+            // headings), so we can use them to verify that no entry is lost when the table of contents is split
+            // between print pages.
+            List<String> actualAnchors = new ArrayList<>();
+            // The number of print pages holding the table of contents.
+            int tocPageCount = 0;
+            // Skip the cover page.
+            for (int i = 1; i < pdf.getNumberOfPages(); i++) {
+                Collection<String> anchors = pdf.getLinksFromPage(i).values();
+                if (!anchors.isEmpty()) {
+                    tocPageCount++;
+                    actualAnchors.addAll(anchors);
+                }
+            }
+
+            // Make sure we're actually testing a table of contents that is split between print pages.
+            assertTrue(tocPageCount > 1, "The table of contents is not split between print pages.");
+            assertEquals(expectedAnchors, actualAnchors);
         }
     }
 

@@ -685,22 +685,22 @@ require(['jquery'], function($) {
    * in browsers automated by Selenium/WebDriver.
    */
   $(document).on('click', '#permalink-copy-button', function() {
-    var button = this;
-    var permalinkField = $('#permalinkModal').find('.form-control');
-    var notifyCopied = function() {
+    const button = this;
+    const permalinkField = $('#permalinkModal').find('.form-control');
+    function notifyCopied() {
       new XWiki.widgets.Notification($(button).data('copiedMessage'), 'info');
-    };
-    var notifyFailed = function() {
+    }
+    function notifyFailed() {
       new XWiki.widgets.Notification($(button).data('copyFailedMessage'), 'error');
-    };
-    var copyWithExecCommand = function() {
+    }
+    function copyWithExecCommand() {
       permalinkField.select();
       try {
         document.execCommand('copy') ? notifyCopied() : notifyFailed();
       } catch (e) {
         notifyFailed();
       }
-    };
+    }
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(permalinkField.val()).then(notifyCopied, copyWithExecCommand);
     } else {

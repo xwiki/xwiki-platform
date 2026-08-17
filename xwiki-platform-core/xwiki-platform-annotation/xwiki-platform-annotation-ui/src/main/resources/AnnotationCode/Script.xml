@@ -1274,7 +1274,7 @@ XWiki.Annotation = Class.create({
     // to the page rather than returning JSON, so it's submitted as a plain (non-AJAX) request once confirmed.
     // The plain-link markup (custom annotation classes, see the other branch in Macros.xml) still goes through
     // the annotation REST API and is deleted via AJAX so the bubble/list can be updated without a page reload.
-    var form = item.up('form');
+    const form = item.closest('form');
     item.observe('click', function(event) {
       item.blur();
       event.stop();
@@ -1616,7 +1616,7 @@ XWiki.Annotation = Class.create({
     }
     let closeButton = container.down('.annotation-bubble-close button');
     if (closeButton &amp;&amp; inBubble) {
-      closeButton.observe('click', () => this.hideBubble(container));
+      closeButton.observe('click', () =&gt; this.hideBubble(container));
     }
     // Forward the click to the button in the comment tab instead of handling it in the bubble.
     let threadToggleButton = container.querySelector('.thread-toggle');

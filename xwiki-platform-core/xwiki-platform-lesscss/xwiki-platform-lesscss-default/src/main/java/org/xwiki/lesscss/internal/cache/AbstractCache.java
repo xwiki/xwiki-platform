@@ -29,8 +29,8 @@ import javax.inject.Inject;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
-import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.internal.skin.SkinReference;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 
 /**
  * Default and abstract implementation of {@link org.xwiki.lesscss.internal.cache.LESSCache}.

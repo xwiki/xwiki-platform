@@ -19,13 +19,13 @@
  */
 package org.xwiki.invitation.test.po;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.TableElement;
 

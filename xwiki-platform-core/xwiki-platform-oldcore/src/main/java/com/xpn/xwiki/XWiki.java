@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki;
 
-import com.google.common.base.Suppliers;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -193,6 +191,7 @@ import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.xml.XMLUtils;
 
+import com.google.common.base.Suppliers;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;

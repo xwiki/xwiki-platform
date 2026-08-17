@@ -30,12 +30,11 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.input.DefaultURLInputSource;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
-import org.xwiki.test.junit5.mockito.InjectMockComponents;
-
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 

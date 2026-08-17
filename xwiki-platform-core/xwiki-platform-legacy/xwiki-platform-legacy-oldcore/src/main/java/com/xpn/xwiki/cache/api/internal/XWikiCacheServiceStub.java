@@ -21,8 +21,8 @@ package com.xpn.xwiki.cache.api.internal;
 
 import java.util.Properties;
 
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;

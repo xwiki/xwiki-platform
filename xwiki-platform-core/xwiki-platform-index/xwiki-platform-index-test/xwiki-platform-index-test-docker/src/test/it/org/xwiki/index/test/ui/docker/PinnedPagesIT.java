@@ -19,8 +19,6 @@
  */
 package org.xwiki.index.test.ui.docker;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +37,8 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Functional tests for the pinned pages feature.

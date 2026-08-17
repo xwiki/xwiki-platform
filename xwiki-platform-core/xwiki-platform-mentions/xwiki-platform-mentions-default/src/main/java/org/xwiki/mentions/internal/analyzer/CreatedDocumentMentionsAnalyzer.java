@@ -45,8 +45,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.LargeStringProperty;
 
-import static org.xwiki.mentions.MentionLocation.TEXT_FIELD;
 import static org.xwiki.mentions.MentionLocation.DOCUMENT;
+import static org.xwiki.mentions.MentionLocation.TEXT_FIELD;
 
 /**
  * Analyzes the new mentions on newly created documents.

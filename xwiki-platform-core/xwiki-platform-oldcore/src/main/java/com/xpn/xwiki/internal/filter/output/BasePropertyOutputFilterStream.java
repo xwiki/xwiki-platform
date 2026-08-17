@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.internal.filter.output;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -34,9 +37,6 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StringClass;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 /**
  * @version $Id$

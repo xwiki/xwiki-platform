@@ -22,8 +22,8 @@ package com.xpn.xwiki.plugin.mailsender;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.mail.MailSenderConfiguration;

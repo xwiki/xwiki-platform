@@ -19,6 +19,9 @@
  */
 package org.xwiki.internal.objects;
 
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiException;
@@ -26,9 +29,6 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PasswordProperty;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.meta.PasswordMetaClass;
-
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 
 /**
  * Component implementation for password property.

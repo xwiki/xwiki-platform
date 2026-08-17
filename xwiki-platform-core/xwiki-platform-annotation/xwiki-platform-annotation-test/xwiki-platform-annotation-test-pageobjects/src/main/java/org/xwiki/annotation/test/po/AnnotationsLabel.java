@@ -81,7 +81,9 @@ public class AnnotationsLabel extends BaseElement
     public void deleteAnnotationById(String idText)
     {
         this.showAnnotationById(idText);
-        getDriver().findElement(By.cssSelector(".annotation-bubble a.delete")).click();
+        // The Comments annotation class renders Delete as a form button, other annotation classes as a plain
+        // link - match both.
+        getDriver().findElement(By.cssSelector(".annotation-bubble .delete")).click();
         // Delete asks for confirmation via XWiki.widgets.ConfirmedAjaxRequest, a JS-generated dialog (not a native
         // browser confirm).
         confirmAction();

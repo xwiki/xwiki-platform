@@ -1270,22 +1270,30 @@ XWiki.Annotation = Class.create({
   },
 
   addDeleteListener : function(item, inBubble, container) {
-    // The button-in-a-form markup (Comments) carries its request URL/parameters in the form itself; the plain-link
-    // markup (custom annotation classes, see the other branch in Macros.xml) still carries everything in its href.
+    // The button-in-a-form markup (Comments) posts straight to the objectremove action, which redirects back
+    // to the page rather than returning JSON, so it's submitted as a plain (non-AJAX) request once confirmed.
+    // The plain-link markup (custom annotation classes, see the other branch in Macros.xml) still goes through
+    // the annotation REST API and is deleted via AJAX so the bubble/list can be updated without a page reload.
     var form = item.up('form');
-    var requestUrl = form ? form.action : item.href;
-    var requestParameters = this.prepareRequestParameters(form ? Form.serialize(form, true) : new Hash());
     item.observe('click', function(event) {
       item.blur();
       event.stop();
       if (item.disabled) {
         // Do nothing if the button was already clicked and it's waiting for a response from the server.
         return;
+      } else if (form) {
+        new XWiki.widgets.ConfirmationBox({
+          onYes : function() {
+            form.submit();
+          }
+        }, {
+          confirmationText: "$services.localization.render('annotations.action.delete.confirm')"
+        });
       } else {
         new XWiki.widgets.ConfirmedAjaxRequest(
-          requestUrl,
+          item.href,
           {
-            parameters: requestParameters,
+            parameters: this.prepareRequestParameters(new Hash()),
             onCreate : function() {
               // Disable the button, to avoid a cascade of clicks from impatient users
               item.disabled = true;

@@ -48,7 +48,7 @@ class DeprecatedLocalReferenceEntityReferenceSerializerTest
     }
 
     @Test
-    void testSerializeDocumentReference() throws Exception
+    void testSerializeDocumentReference()
     {
         EntityReference reference = this.serializer.serialize(new DocumentReference("wiki", "space", "page"));
 

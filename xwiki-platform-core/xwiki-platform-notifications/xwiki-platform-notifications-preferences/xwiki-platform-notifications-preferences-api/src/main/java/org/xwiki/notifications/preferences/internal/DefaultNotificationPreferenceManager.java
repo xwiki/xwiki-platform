@@ -157,11 +157,8 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
             String providerHint = notificationPreference.getProviderHint();
             if (componentManager.hasComponent(NotificationPreferenceProvider.class, providerHint)) {
 
-                if (!preferencesMapping.containsKey(providerHint)) {
-                    preferencesMapping.put(providerHint, new ArrayList<>());
-                }
-
-                preferencesMapping.get(providerHint).add(notificationPreference);
+                preferencesMapping.computeIfAbsent(providerHint, hint -> new ArrayList<>())
+                    .add(notificationPreference);
             }
         }
 

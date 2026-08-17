@@ -176,11 +176,7 @@ public class MentionNotificationParameters implements Serializable
     private void addToMap(String type, MentionNotificationParameter mentionedActorReference,
         Map<String, Set<MentionNotificationParameter>> mentionsMap)
     {
-        if (!mentionsMap.containsKey(type)) {
-            mentionsMap.put(type, new HashSet<>());
-        }
-
-        mentionsMap.get(type).add(mentionedActorReference);
+        mentionsMap.computeIfAbsent(type, key -> new HashSet<>()).add(mentionedActorReference);
     }
 
     @Override

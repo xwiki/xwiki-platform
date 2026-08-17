@@ -104,7 +104,7 @@ class TCPROMTest extends AbstractROMTestCase
     }
 
     @Test
-    void members() throws Exception
+    void members()
     {
         NetworkChannel channel1 = this.rom1.getChannels().iterator().next();
         NetworkChannel channel2 = this.rom2.getChannels().iterator().next();

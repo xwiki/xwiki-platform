@@ -37,8 +37,8 @@ class SpaceReferenceTest
     @Test
     void testInvalidType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new SpaceReference(new EntityReference("space", EntityType.WIKI)));
+        EntityReference reference = new EntityReference("space", EntityType.WIKI);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new SpaceReference(reference));
 
         assertEquals("Invalid type [WIKI] for a space reference", e.getMessage());
     }
@@ -55,8 +55,9 @@ class SpaceReferenceTest
     @Test
     void testInvalidParentType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new SpaceReference(
-            new EntityReference("space", EntityType.SPACE, new EntityReference("whatever", EntityType.DOCUMENT))));
+        EntityReference reference = new EntityReference("space", EntityType.SPACE,
+            new EntityReference("whatever", EntityType.DOCUMENT));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new SpaceReference(reference));
 
         assertEquals("Invalid parent reference [Document whatever] in a space reference", e.getMessage());
     }

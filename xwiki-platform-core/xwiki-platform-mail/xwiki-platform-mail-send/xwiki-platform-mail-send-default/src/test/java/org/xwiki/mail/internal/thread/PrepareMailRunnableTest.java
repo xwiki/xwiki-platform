@@ -253,7 +253,7 @@ class PrepareMailRunnableTest
             this.componentManager.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,
                 PrepareMailQueueItem.class));
 
-        MailQueueManager sendMailQueueManager =
+        MailQueueManager sendQueueManager =
             this.componentManager.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,
                 SendMailQueueItem.class));
 
@@ -270,7 +270,7 @@ class PrepareMailRunnableTest
             SendMailQueueItem item = (SendMailQueueItem) args[0];
             ((UpdateableMailStatusResult) item.getListener().getMailStatusResult()).incrementCurrentSize();
             return true;
-        }).when(sendMailQueueManager).addMessageToQueue(any(SendMailQueueItem.class), anyLong(), any(TimeUnit.class));
+        }).when(sendQueueManager).addMessageToQueue(any(SendMailQueueItem.class), anyLong(), any(TimeUnit.class));
 
 
         // Prepare 2 mails. Both will fail, but we want to verify that the second one is processed even though the first

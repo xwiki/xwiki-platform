@@ -180,6 +180,17 @@ define('xwiki-wysiwyg-resource-picker', [
     return resourcePicker.data('options')?.base;
   }
 
+  function serializeEntityReference(resourceType, reference, base) {
+    // Resource types that don't point to an entity (e.g. url, mailto) have no entity reference to serialize.
+    if (!reference || !$resource.types[resourceType]?.entityType) {
+      return null;
+    }
+    return XWiki.Model.serialize($resource.convertResourceReferenceToEntityReference({
+      type: resourceType,
+      reference
+    }, base));
+  }
+
   function selectResource(resourcePicker, resource) {
     // Update the original resource reference input which is used to get the resource picker value.
     const input = resourcePicker.prev('input');
@@ -300,6 +311,13 @@ define('xwiki-wysiwyg-resource-picker', [
       maxItems: 1,
       // Use a dedicated search field to avoid matching 'WebHome' for document resources.
       searchField: ['searchValue', 'label', 'hint'],
+      // The search fields don't hold the full entity reference, so give the maximum score to the suggestion the input
+      // points to precisely, in order to keep it (and show it first) when the input is a full entity reference.
+      score: function(query) {
+        const score = this.getScoreFunction(query);
+        const value = serializeEntityReference(data.newValue, query, getBaseEntityReference(resourcePicker));
+        return option => option.value === value ? 1 : score(option);
+      },
       shouldLoad: () => true,
       load: (resourceReference, callback) => {
         suggester.retrieve({

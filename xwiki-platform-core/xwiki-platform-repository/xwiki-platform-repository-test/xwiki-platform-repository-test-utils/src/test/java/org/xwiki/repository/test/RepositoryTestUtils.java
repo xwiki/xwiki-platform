@@ -248,6 +248,14 @@ public class RepositoryTestUtils
 
     private SolrTestUtils solrUtils;
 
+    /**
+     * @since 18.7.0RC1
+     */
+    public RepositoryTestUtils(TestUtils testUtils, SolrTestUtils solrUtils)
+    {
+        this(testUtils, new RepositoryUtils(), solrUtils);
+    }
+
     public RepositoryTestUtils(TestUtils testUtils, RepositoryUtils repositoryUtil, SolrTestUtils solrUtils)
     {
         this.testUtils = testUtils;

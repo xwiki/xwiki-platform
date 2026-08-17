@@ -584,8 +584,9 @@ class RenderingScriptServiceTest
     @Test
     void convertWithNullSource()
     {
+        XWikiTransformationContext context = transformationContext(null);
         NullPointerException thrown = assertThrows(NullPointerException.class,
-            () -> this.renderingScriptService.convert(null, transformationContext(null)));
+            () -> this.renderingScriptService.convert(null, context));
         assertEquals("The source text to convert must be specified", thrown.getMessage());
     }
 

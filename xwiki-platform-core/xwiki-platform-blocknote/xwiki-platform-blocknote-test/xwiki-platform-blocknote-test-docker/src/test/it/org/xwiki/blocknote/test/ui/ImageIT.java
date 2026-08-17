@@ -144,7 +144,9 @@ class ImageIT extends AbstractBlockNoteIT
         imageEditModal.switchToAdvancedTab().selectEndAlignment();
         imageEditModal.clickInsert();
 
-        assertEquals("127", textArea.getImage(0).getDomProperty("offsetHeight"));
+        // The image we just selected replaces the previous one, so we have to wait for it to be loaded before its
+        // height reflects the configured width and the image aspect ratio.
+        assertEquals("127", textArea.waitUntilImageIsLoaded(0).getDomProperty("offsetHeight"));
 
         // Save and check the source.
         page.save();

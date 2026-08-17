@@ -303,11 +303,11 @@ class WebJarsResourceReferenceHandlerTest
     @Test
     void handleVerifyResourceIsClosed() throws Exception
     {
-        NamespaceURLClassLoader classLoader = mock(NamespaceURLClassLoader.class);
+        NamespaceURLClassLoader classLoaderMock = mock(NamespaceURLClassLoader.class);
         InputStream inputStream = mock(InputStream.class);
 
-        when(this.classLoaderManager.getURLClassLoader("nsTest", true)).thenReturn(classLoader);
-        when(classLoader.getResourceAsStream("META-INF/resources/webjars/seg1/seg2")).thenReturn(inputStream);
+        when(this.classLoaderManager.getURLClassLoader("nsTest", true)).thenReturn(classLoaderMock);
+        when(classLoaderMock.getResourceAsStream("META-INF/resources/webjars/seg1/seg2")).thenReturn(inputStream);
 
         this.handler.handle(new WebJarsResourceReference("nsTest", asList("seg1", "seg2")),
             mock(ResourceReferenceHandlerChain.class));

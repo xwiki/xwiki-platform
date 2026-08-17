@@ -463,7 +463,7 @@ class IncludeMacroTest
     }
 
     @Test
-    void executeWithRecursiveIncludeContextCurrent() throws Exception
+    void executeWithRecursiveIncludeContextCurrent()
     {
         MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
         // Add an Include Macro MarkerBlock as a parent of the include Macro block since this is what would have
@@ -719,10 +719,10 @@ class IncludeMacroTest
     {
         MacroTransformationContext context = new MacroTransformationContext();
         context.setInline(isInline);
-        MacroBlock includeMacro =
+        MacroBlock includeMacroBlock =
             new MacroBlock("include", Collections.singletonMap("reference", documentName), isInline);
-        XDOM xdom = new XDOM(List.of(includeMacro));
-        context.setCurrentMacroBlock(includeMacro);
+        XDOM xdom = new XDOM(List.of(includeMacroBlock));
+        context.setCurrentMacroBlock(includeMacroBlock);
         context.setXDOM(xdom);
 
         return context;

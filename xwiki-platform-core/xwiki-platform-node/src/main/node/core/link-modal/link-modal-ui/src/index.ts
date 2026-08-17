@@ -37,4 +37,8 @@ export type {
   LinkUrlConfig,
 } from "./data/linkType";
 
-export { parseLinkTarget } from "./convert";
+export {
+  linkTargetToResourceReference,
+  parseLinkTarget,
+  resourceReferenceToLinkTarget,
+} from "./convert";

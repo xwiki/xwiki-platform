@@ -47,6 +47,7 @@
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
+    "@xwiki/platform-rendering-api": "workspace:*",
     "lodash-es": "catalog:",
     "vue-i18n": "catalog:"
   },

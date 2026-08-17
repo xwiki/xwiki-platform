@@ -45,7 +45,8 @@ class TransactionRunnableTest
     void infiniloopTest()
     {
         TransactionRunnable transactionRunnable = new TransactionRunnable();
-        assertThrows(IllegalArgumentException.class, () -> this.testCase.runIn(transactionRunnable.runIn(this.testCase)));
+        TransactionRunnable chainedRunnable = transactionRunnable.runIn(this.testCase);
+        assertThrows(IllegalArgumentException.class, () -> this.testCase.runIn(chainedRunnable));
     }
 
     /**

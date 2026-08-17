@@ -141,7 +141,9 @@ public abstract class AbstractXWikiPreferencesConfigurationSource extends Abstra
         if (baseObject != null) {
             BaseProperty property = (BaseProperty) baseObject.getField(propertyName);
 
-            return property != null ? (text ? property.toText() : property.getValue()) : null;
+            if (property != null) {
+                return text ? property.toText() : property.getValue();
+            }
         }
 
         return null;

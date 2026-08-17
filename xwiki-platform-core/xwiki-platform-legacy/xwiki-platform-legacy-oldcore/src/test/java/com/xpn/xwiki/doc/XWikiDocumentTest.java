@@ -304,7 +304,6 @@ class XWikiDocumentTest
         XWikiDocument targetDocument = this.document.duplicate(targetReference);
 
         when(this.xWiki.copyDocument(any(), any(), any())).thenReturn(true);
-        //FIXME: this.mockXWiki.stubs().method("copyDocument").will(returnValue(true));
         when(this.xWiki.getDocument(targetReference, this.oldcore.getXWikiContext())).thenReturn(targetDocument);
 
         this.document.rename(targetReference,

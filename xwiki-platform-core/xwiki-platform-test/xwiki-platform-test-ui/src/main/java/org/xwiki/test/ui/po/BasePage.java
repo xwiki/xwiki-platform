@@ -544,6 +544,8 @@ public class BasePage extends BaseElement
 
     /**
      * @return the URL of the image displayed as the wiki logo in the page header
+     * @since 17.10.13
+     * @since 18.4.5
      * @since 18.7.0RC1
      */
     public String getLogoImageURL()

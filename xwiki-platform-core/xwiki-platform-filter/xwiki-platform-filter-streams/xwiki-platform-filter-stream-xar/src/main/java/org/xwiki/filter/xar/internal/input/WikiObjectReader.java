@@ -21,6 +21,7 @@ package org.xwiki.filter.xar.internal.input;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,11 +33,11 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiObjectFilter;
 import org.xwiki.filter.xar.input.XARInputProperties;
-import org.xwiki.filter.xar.internal.XARClassModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
-import org.xwiki.filter.xar.internal.XARObjectModel;
-import org.xwiki.filter.xar.internal.XARObjectPropertyModel;
 import org.xwiki.filter.xar.internal.input.ClassReader.WikiClass;
+import org.xwiki.xar.internal.model.XarClassModel;
+import org.xwiki.xar.internal.model.XarObjectModel;
+import org.xwiki.xar.internal.model.XarObjectPropertyModel;
 
 /**
  * @version $Id$
@@ -47,6 +48,16 @@ import org.xwiki.filter.xar.internal.input.ClassReader.WikiClass;
 public class WikiObjectReader extends AbstractWikiObjectPropertyReader
     implements XARXMLReader<WikiObjectReader.WikiObject>
 {
+    /**
+     * The list of parameters to be used when reading an object.
+     */
+    private static final Map<String, EventParameter> OBJECT_PARAMETERS = Map.of(
+        XarObjectModel.ELEMENT_NAME, new EventParameter(WikiObjectFilter.PARAMETER_NAME),
+        XarObjectModel.ELEMENT_CLASSNAME, new EventParameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE),
+        XarObjectModel.ELEMENT_GUID, new EventParameter(WikiObjectFilter.PARAMETER_GUID),
+        XarObjectModel.ELEMENT_NUMBER, new EventParameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class)
+    );
+
     @Inject
     private XARXMLReader<ClassReader.WikiClass> classReader;
 
@@ -115,12 +126,12 @@ public class WikiObjectReader extends AbstractWikiObjectPropertyReader
 
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
-            if (elementName.equals(XARClassModel.ELEMENT_CLASS)) {
+            if (elementName.equals(XarClassModel.ELEMENT_CLASS)) {
                 wikiObject.wikiClass = this.classReader.read(xmlReader, properties);
-            } else if (elementName.equals(XARObjectPropertyModel.ELEMENT_PROPERTY)) {
+            } else if (elementName.equals(XarObjectPropertyModel.ELEMENT_PROPERTY)) {
                 wikiObject.properties.add(readObjectProperty(xmlReader, properties, wikiObject.wikiClass));
             } else {
-                EventParameter parameter = XARObjectModel.OBJECT_PARAMETERS.get(elementName);
+                EventParameter parameter = OBJECT_PARAMETERS.get(elementName);
 
                 if (parameter != null) {
                     Object wsValue = convert(parameter.type, xmlReader.getElementText());

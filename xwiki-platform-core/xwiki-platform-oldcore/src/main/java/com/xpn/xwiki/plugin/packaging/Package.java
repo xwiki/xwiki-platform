@@ -395,28 +395,28 @@ public class Package
         return add(doc, action, context);
     }
 
-    public boolean add(String docFullName, int DefaultAction, XWikiContext context) throws XWikiException
+    public boolean add(String docFullName, int defaultAction, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
-        add(doc, DefaultAction, context);
+        add(doc, defaultAction, context);
         List<String> languages = doc.getTranslationList(context);
         for (String language : languages) {
             if (!((language == null) || (language.isEmpty()) || (doc.getDefaultLanguage().equals(language)))) {
-                add(doc.getTranslatedDocument(language, context), DefaultAction, context);
+                add(doc.getTranslatedDocument(language, context), defaultAction, context);
             }
         }
 
         return true;
     }
 
-    public boolean add(String docFullName, String language, int DefaultAction, XWikiContext context)
+    public boolean add(String docFullName, String language, int defaultAction, XWikiContext context)
         throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
         if ((language == null) || (language.isEmpty())) {
-            add(doc, DefaultAction, context);
+            add(doc, defaultAction, context);
         } else {
-            add(doc.getTranslatedDocument(language, context), DefaultAction, context);
+            add(doc.getTranslatedDocument(language, context), defaultAction, context);
         }
 
         return true;
@@ -513,7 +513,7 @@ public class Package
     {
         ZipArchiveInputStream zis;
         ArchiveEntry entry;
-        Document description = null;
+        Document descriptionDocument = null;
 
         try {
             zis = new ZipArchiveInputStream(file, XAR_FILENAME_ENCODING, false);
@@ -530,7 +530,7 @@ public class Package
                     continue;
                 } else if (entry.getName().compareTo(DefaultPackageFileName) == 0) {
                     // The entry is the manifest (package.xml). Read this differently.
-                    description = fromXml(new CloseShieldInputStream(zis));
+                    descriptionDocument = fromXml(new CloseShieldInputStream(zis));
                 } else {
                     XWikiDocument doc = null;
                     try {
@@ -556,7 +556,7 @@ public class Package
                 }
             }
             // Make sure a manifest was included in the package...
-            if (description == null) {
+            if (descriptionDocument == null) {
                 throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "Could not find the package definition");
             }
             /*
@@ -564,7 +564,7 @@ public class Package
              * a warning and add them to the skipped list.
              */
             for (XWikiDocument doc : docsToLoad) {
-                if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description)) {
+                if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), descriptionDocument)) {
                     this.add(doc, context);
                 } else {
                     LOGGER.warn("Document [{}] does not exist in the package definition. It will not be installed.",
@@ -575,7 +575,7 @@ public class Package
                 }
             }
 
-            updateFileInfos(description);
+            updateFileInfos(descriptionDocument);
         } catch (DocumentException e) {
             throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "Error when reading the XML");
         }
@@ -731,19 +731,19 @@ public class Package
     {
         // Register the package as extension if it's one
         if (isInstallExtension() && StringUtils.isNotEmpty(getExtensionId()) && StringUtils.isNotEmpty(getVersion())) {
-            ExtensionId extensionId = new ExtensionId(getExtensionId(), getVersion());
+            ExtensionId xarExtensionId = new ExtensionId(getExtensionId(), getVersion());
 
             try {
                 LocalExtensionRepository localRepository = Utils.getComponent(LocalExtensionRepository.class);
 
-                LocalExtension localExtension = localRepository.getLocalExtension(extensionId);
+                LocalExtension localExtension = localRepository.getLocalExtension(xarExtensionId);
                 if (localExtension == null) {
                     Extension extension;
                     try {
                         // Try to find and download the extension from a repository
-                        extension = Utils.getComponent(ExtensionRepositoryManager.class).resolve(extensionId);
+                        extension = Utils.getComponent(ExtensionRepositoryManager.class).resolve(xarExtensionId);
                     } catch (ResolveException e) {
-                        LOGGER.debug("Can't find extension [{}]", extensionId, e);
+                        LOGGER.debug("Can't find extension [{}]", xarExtensionId, e);
 
                         // FIXME: Create a dummy extension. Need support for partial/lazy extension.
                         return;
@@ -777,7 +777,7 @@ public class Package
                 Utils.getComponent(ObservationManager.class)
                     .notify(new ExtensionInstalledEvent(installedExtension.getId(), namespace), installedExtension);
             } catch (Exception e) {
-                LOGGER.error("Failed to register extension [{}] from the XAR", extensionId, e);
+                LOGGER.error("Failed to register extension [{}] from the XAR", xarExtensionId, e);
             }
         }
     }
@@ -951,12 +951,7 @@ public class Package
     private List<String> getStringList(String name, XWikiContext context)
     {
         @SuppressWarnings("unchecked")
-        List<String> list = (List<String>) context.get(name);
-
-        if (list == null) {
-            list = new ArrayList<>();
-            context.put(name, list);
-        }
+        List<String> list = (List<String>) context.computeIfAbsent(name, key -> new ArrayList<String>());
 
         return list;
     }
@@ -1106,11 +1101,11 @@ public class Package
         wr.write(el);
 
         el = new DOMElement("backupPack");
-        el.addText(new Boolean(this.backupPack).toString());
+        el.addText(Boolean.toString(this.backupPack));
         wr.write(el);
 
         el = new DOMElement("preserveVersion");
-        el.addText(new Boolean(this.preserveVersion).toString());
+        el.addText(Boolean.toString(this.preserveVersion));
         wr.write(el);
 
         Element elfiles = new DOMElement(FILES_PROPERTY);
@@ -1373,12 +1368,12 @@ public class Package
      */
     public int readFromDir(File dir, XWikiContext context, Document description) throws IOException, XWikiException
     {
-        File[] files = dir.listFiles();
+        File[] dirFiles = dir.listFiles();
 
         SAXReader reader = getSAXReader();
 
         int count = 0;
-        for (File file : files) {
+        for (File file : dirFiles) {
             if (file.isDirectory()) {
                 count += readFromDir(file, context, description);
             } else {
@@ -1436,11 +1431,11 @@ public class Package
         int count = 0;
         try {
             File infofile = new File(dir, DefaultPackageFileName);
-            Document description = fromXml(new FileInputStream(infofile));
+            Document descriptionDocument = fromXml(new FileInputStream(infofile));
 
-            count = readFromDir(dir, context, description);
+            count = readFromDir(dir, context, descriptionDocument);
 
-            updateFileInfos(description);
+            updateFileInfos(descriptionDocument);
         } catch (DocumentException e) {
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Error when reading the XML");
         }
@@ -1469,7 +1464,7 @@ public class Package
         infos.put(VERSION_PROPERTY, this.version);
         infos.put("backup", this.isBackupPack());
 
-        Map<String, Map<String, List<Map<String, String>>>> files = new HashMap<>();
+        Map<String, Map<String, List<Map<String, String>>>> filesBySpace = new HashMap<>();
 
         for (DocumentInfo docInfo : this.files) {
             Map<String, String> fileInfos = new HashMap<>();
@@ -1478,23 +1473,23 @@ public class Package
             fileInfos.put("fullName", docInfo.getFullName());
 
             // If the space does not exist in the map of spaces, we create it.
-            if (files.get(docInfo.getDoc().getSpace()) == null) {
-                files.put(docInfo.getDoc().getSpace(), new HashMap<>());
+            if (filesBySpace.get(docInfo.getDoc().getSpace()) == null) {
+                filesBySpace.put(docInfo.getDoc().getSpace(), new HashMap<>());
             }
 
             // If the document name does not exist in the space map of docs, we create it.
-            if (files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()) == null) {
-                files.get(docInfo.getDoc().getSpace()).put(docInfo.getDoc().getName(),
+            if (filesBySpace.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()) == null) {
+                filesBySpace.get(docInfo.getDoc().getSpace()).put(docInfo.getDoc().getName(),
                     new ArrayList<Map<String, String>>());
             }
 
             // Finally we add the file infos (language, fullname and action) to the list of translations
             // for that document.
-            files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()).add(fileInfos);
+            filesBySpace.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()).add(fileInfos);
         }
 
         json.put(INFOS_PROPERTY, infos);
-        json.put(FILES_PROPERTY, files);
+        json.put(FILES_PROPERTY, filesBySpace);
 
         return json;
     }

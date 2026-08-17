@@ -43,7 +43,6 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.store.hibernate.HibernateStoreException;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.AbstractXWikiStore;

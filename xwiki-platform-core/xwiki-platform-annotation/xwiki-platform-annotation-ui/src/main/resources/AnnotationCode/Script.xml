@@ -1507,18 +1507,19 @@ XWiki.Annotation = Class.create({
     // remove the mouseout listener (if any), edit form should stay on
     container.stopObserving('mouseout');
     // add the delete and validate listeners to the respective delete buttons
-    var deleteButton = container.down('.delete');
+    const deleteButton = container.querySelector('.delete');
     if (deleteButton) {
       this.addDeleteListener(deleteButton, inBubble, container);
     }
-    var validateButton = container.down('a.validate');
+    const validateButton = container.querySelector('a.validate');
     if (validateButton) {
       this.addValidateListener(validateButton, annotationId, container, inBubble);
     }
-    container.down('form').focusFirstElement();
+    container.querySelector('form').focusFirstElement();
     // and add the button listeners
-    container.down('button.tool-submit').observe('click', this.onAnnotationEdit.bindAsEventListener(this, container, annotationId, inBubble));
-    container.down('button.tool-cancel').observe('click', function(event) {
+    container.querySelector('button.tool-submit').addEventListener('click',
+      event =&gt; this.onAnnotationEdit(event, container, annotationId, inBubble));
+    container.querySelector('button.tool-cancel').addEventListener('click', () =&gt; {
       if (inBubble) {
         // close this bubble.
         this.hideBubble(container);
@@ -1526,7 +1527,7 @@ XWiki.Annotation = Class.create({
         // reload the original content on cancel
         this.fillViewPanel(container, container.originalContentHTML, annotationId, false);
       }
-    }.bindAsEventListener(this));
+    });
   },
 
   onAnnotationEdit : function(event, container, annotationId, inBubble) {
@@ -1602,21 +1603,21 @@ XWiki.Annotation = Class.create({
       return;
     }
     // add the delete listener to the delete button
-    var deleteButton = container.down('.delete');
+    const deleteButton = container.querySelector('.delete');
     if (deleteButton) {
       this.addDeleteListener(deleteButton, inBubble, container);
     }
-    var validateButton = container.down('a.validate');
+    const validateButton = container.querySelector('a.validate');
     if (validateButton) {
       this.addValidateListener(validateButton, annotationId, container, inBubble);
     }
-    var editButton = container.down('a.edit');
+    const editButton = container.querySelector('a.edit');
     if (editButton) {
       this.addEditListener(editButton, annotationId, container, inBubble);
     }
-    let closeButton = container.down('.annotation-bubble-close button');
+    let closeButton = container.querySelector('.annotation-bubble-close button');
     if (closeButton &amp;&amp; inBubble) {
-      closeButton.observe('click', () =&gt; this.hideBubble(container));
+      closeButton.addEventListener('click', () =&gt; this.hideBubble(container));
     }
     // Forward the click to the button in the comment tab instead of handling it in the bubble.
     let threadToggleButton = container.querySelector('.thread-toggle');
@@ -1636,25 +1637,26 @@ XWiki.Annotation = Class.create({
       }
     }
     // Annotations can have a reply button when they are merged with comments (and thus stored as comments). Custom annotations will not have this button displayed.
-    var replyButton = container.down('a.reply');
+    const replyButton = container.querySelector('a.commentreply');
     if (replyButton) {
       // When a click is done on this button, fire a click on the corresponding button in the comments tab.
 
       // Locate the button in the comments tab.
-      var replyButtonInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply')[0];
+      let replyButtonInTab = document.querySelector('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply');
 
       // If the replyButtonInTab is not found, then the comments tab is not visible so we hide the reply button as well, otherwise it just does not work.
       if (!replyButtonInTab) {
-        replyButton.hide();
+        replyButton.style.display = 'none';
       } else {
         // When the reply button from the bubble is clicked, also click the reply button from the comments tab.
-        replyButton.observe('click', function(event) {
+        replyButton.addEventListener('click', function(event) {
           // Stop the bubble click event.
-          event.stop();
+          event.preventDefault();
+          event.stopPropagation();
 
           // The content of the Comments tab is reloaded when a comment is added so we can't cache the reference to the
           // reply button.
-          replyButtonInTab = $$('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply')[0];
+          replyButtonInTab = document.querySelector('#Commentspane #xwikicomment_' + annotationId + ' a.commentreply');
           // Ensure to have the focus on the right button on which we click:
           // it avoids to have CKEditor focusing again on the original button we clicked once loaded.
           replyButtonInTab.focus();
@@ -1823,12 +1825,10 @@ XWiki.Annotation = Class.create({
       return;
     }
     // Set the focus in the first element of type input, useful when not using the WYSIWYG editor CKEditor.
-    this.createPanel.select('form').first().focusFirstElement();
+    this.createPanel.querySelector('form').focusFirstElement();
     // and add the button observers
-    this.createPanel.down('button.tool-submit').observe('click', this.onAnnotationAdd.bindAsEventListener(this));
-    this.createPanel.down('button.tool-cancel').observe('click', function() {
-      this.hideAnnotationCreationForm();
-    }.bind(this));
+    this.createPanel.querySelector('button.tool-submit').addEventListener('click', this.onAnnotationAdd.bind(this));
+    this.createPanel.querySelector('button.tool-cancel').addEventListener('click', () =&gt; this.hideAnnotationCreationForm());
   },
 
   hideAnnotationCreationForm : function(skipSelectionHighlightClear) {

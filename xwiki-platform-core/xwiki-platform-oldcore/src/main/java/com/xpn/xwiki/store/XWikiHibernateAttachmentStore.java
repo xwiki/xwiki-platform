@@ -26,8 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.hibernate.Session;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;

@@ -39,6 +39,7 @@ import org.xwiki.rest.resources.classes.ClassesResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
 import org.xwiki.test.ui.TestUtils;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

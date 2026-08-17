@@ -21,6 +21,7 @@ package org.xwiki.panels.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 
 /**

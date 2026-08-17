@@ -28,8 +28,8 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.vfs.internal.AbstractVfsResourceReferenceSerializer;
 import org.xwiki.vfs.VfsResourceReference;
+import org.xwiki.vfs.internal.AbstractVfsResourceReferenceSerializer;
 
 /**
  * Converts a {@link VfsResourceReference} using the {@code attach} scheme into a relative {@link ExtendedURL}

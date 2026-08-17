@@ -26,8 +26,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import com.xpn.xwiki.api.User;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.messagestream.GroupMessageDescriptor;
@@ -36,6 +34,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.User;
 
 /**
  * Filter that make sure a group message (to a group) from the message stream is visible only to members of this group.

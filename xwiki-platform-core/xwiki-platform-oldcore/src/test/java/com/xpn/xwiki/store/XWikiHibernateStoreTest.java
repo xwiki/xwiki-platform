@@ -51,8 +51,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
-import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -87,8 +87,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**

@@ -19,8 +19,8 @@
  */
 package org.xwiki.security.authorization;
 
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Exception raised by the AuthorizationManager when denying access.

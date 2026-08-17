@@ -20,6 +20,7 @@
 package com.xpn.xwiki.plugin.mailsender;
 
 import java.util.List;
+
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.api.Attachment;

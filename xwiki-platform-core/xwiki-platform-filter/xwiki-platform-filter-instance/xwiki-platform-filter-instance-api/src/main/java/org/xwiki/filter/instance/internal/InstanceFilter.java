@@ -21,8 +21,8 @@
 package org.xwiki.filter.instance.internal;
 
 import org.xwiki.filter.UnknownFilter;
-import org.xwiki.filter.event.model.WikiFarmFilter;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
+import org.xwiki.filter.event.model.WikiFarmFilter;
 import org.xwiki.filter.event.model.WikiFilter;
 import org.xwiki.filter.event.model.WikiSpaceFilter;
 

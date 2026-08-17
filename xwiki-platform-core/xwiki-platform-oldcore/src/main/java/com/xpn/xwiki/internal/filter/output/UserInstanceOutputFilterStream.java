@@ -35,7 +35,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import com.xpn.xwiki.XWiki;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -53,6 +52,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;

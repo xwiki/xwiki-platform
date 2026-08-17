@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.Translation;
+import org.xwiki.localization.TranslationBundle;
 
 /**
  * Default implementation of {@link LocalizedTranslationBundle}.

@@ -26,6 +26,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import jakarta.inject.Singleton;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -40,8 +42,6 @@ import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.XWikiSolrCore;
-
-import jakarta.inject.Singleton;
 
 /**
  * Migration of documents after introducing {@link Event#FIELD_PREFILTERING_DATE}.

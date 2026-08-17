@@ -19,8 +19,8 @@
  */
 package org.xwiki.chart.plot;
 
-import org.xwiki.chart.dataset.DatasetType;
 import org.xwiki.chart.axis.AxisType;
+import org.xwiki.chart.dataset.DatasetType;
 
 /**
  * Enumeration of supported plot types.

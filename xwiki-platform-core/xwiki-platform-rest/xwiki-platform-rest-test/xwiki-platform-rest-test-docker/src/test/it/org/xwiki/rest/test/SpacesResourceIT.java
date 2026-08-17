@@ -46,11 +46,12 @@ import org.xwiki.rest.resources.spaces.SpaceSearchResource;
 import org.xwiki.rest.resources.spaces.SpacesResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SpacesResourceIT extends AbstractHttpIT
 {

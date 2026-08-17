@@ -19,10 +19,10 @@
  */
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import org.jfree.data.general.Dataset;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.general.Dataset;
 import org.junit.jupiter.api.Test;
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.test.junit5.mockito.ComponentTest;

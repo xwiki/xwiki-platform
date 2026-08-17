@@ -28,7 +28,6 @@ import java.util.Optional;
 import javax.inject.Provider;
 import javax.servlet.http.Part;
 
-import ch.qos.logback.classic.Level;
 import jakarta.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -59,6 +58,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
+
+import ch.qos.logback.classic.Level;
 
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
 import static java.nio.charset.StandardCharsets.UTF_8;

@@ -1270,10 +1270,10 @@ XWiki.Annotation = Class.create({
   },
 
   addDeleteListener : function(item, inBubble, container) {
-    // The button-in-a-form markup (Comments) posts straight to the objectremove action, which redirects back
-    // to the page rather than returning JSON, so it's submitted as a plain (non-AJAX) request once confirmed.
-    // The plain-link markup (custom annotation classes, see the other branch in Macros.xml) still goes through
-    // the annotation REST API and is deleted via AJAX so the bubble/list can be updated without a page reload.
+    // The button-in-a-form markup (Comments) posts to the objectremove action; the plain-link markup (custom
+    // annotation classes, see the other branch in Macros.xml) goes through the annotation REST API instead.
+    // Both are submitted as a confirmed AJAX request (rather than following the link/submitting the form
+    // natively) so the bubble/list can be updated in place, without a page reload.
     const form = item.closest('form');
     item.observe('click', function(event) {
       item.blur();
@@ -1281,51 +1281,48 @@ XWiki.Annotation = Class.create({
       if (item.disabled) {
         // Do nothing if the button was already clicked and it's waiting for a response from the server.
         return;
-      } else if (form) {
-        new XWiki.widgets.ConfirmationBox({
-          onYes : function() {
-            form.submit();
-          }
-        }, {
-          confirmationText: "$services.localization.render('annotations.action.delete.confirm')"
-        });
-      } else {
-        new XWiki.widgets.ConfirmedAjaxRequest(
-          item.href,
-          {
-            parameters: this.prepareRequestParameters(new Hash()),
-            onCreate : function() {
-              // Disable the button, to avoid a cascade of clicks from impatient users
-              item.disabled = true;
-            },
-            onSuccess : function(response) {
-              // check the response to see if all went fine
-              if (this.checkResponseCodeAndFail(response)) {
-                return;
-              }
-              // hide the bubble if the delete takes place in a bubble
-              if (inBubble) {
-                this.hideBubble(container);
-              }
-              this.fetchedAnnotations = true;
-              // Reload the received annotations forcing update so that deleting last annotation is reflected in the
-              // list of annotations, with scroll to tab if not in bubble.
-              this.loadAnnotations(response.responseJSON.annotatedContent, this.displayingAnnotations, !inBubble, true);
-            }.bind(this),
-            onComplete : function() {
-              // In the end: re-enable the button
-              item.disabled = false;
-            }
-          },
-          /* Interaction parameters */
-          {
-             confirmationText: "$services.localization.render('annotations.action.delete.confirm')",
-             progressMessageText : "$services.localization.render('annotations.action.delete.inProgress')",
-             successMessageText : "$services.localization.render('annotations.action.delete.done')",
-             failureMessageText : "$services.localization.render('annotations.action.delete.failed')"
-          }
-        );
       }
+      new XWiki.widgets.ConfirmedAjaxRequest(
+        form ? form.action : item.href,
+        {
+          method : form ? 'post' : 'get',
+          parameters: this.prepareRequestParameters(form ? new Hash(form.serialize(true)) : new Hash()),
+          onCreate : function() {
+            // Disable the button, to avoid a cascade of clicks from impatient users
+            item.disabled = true;
+          },
+          onSuccess : function(response) {
+            // objectremove (form branch) doesn't return the annotation REST API's JSON payload, so it can't be
+            // checked/reused the same way.
+            if (!form &amp;&amp; this.checkResponseCodeAndFail(response)) {
+              return;
+            }
+            // hide the bubble if the delete takes place in a bubble
+            if (inBubble) {
+              this.hideBubble(container);
+            }
+            this.fetchedAnnotations = true;
+            if (form) {
+              // Refetch the annotations, forcing update so that deleting the last annotation is reflected in the
+              // list of annotations, with scroll to tab if not in bubble.
+              this.fetchAnnotations(this.displayingAnnotations, true);
+            } else {
+              this.loadAnnotations(response.responseJSON.annotatedContent, this.displayingAnnotations, !inBubble, true);
+            }
+          }.bind(this),
+          onComplete : function() {
+            // In the end: re-enable the button
+            item.disabled = false;
+          }
+        },
+        /* Interaction parameters */
+        {
+           confirmationText: "$services.localization.render('annotations.action.delete.confirm')",
+           progressMessageText : "$services.localization.render('annotations.action.delete.inProgress')",
+           successMessageText : "$services.localization.render('annotations.action.delete.done')",
+           failureMessageText : "$services.localization.render('annotations.action.delete.failed')"
+        }
+      );
     }.bindAsEventListener(this));
   },
 

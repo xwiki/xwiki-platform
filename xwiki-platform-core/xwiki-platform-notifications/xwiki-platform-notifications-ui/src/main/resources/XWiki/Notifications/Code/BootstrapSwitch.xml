@@ -175,23 +175,6 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
       $(this).parent().find(
         '.bootstrap-switch-handle-on, .bootstrap-switch-handle-off, .bootstrap-switch-label'
       ).attr('aria-hidden', 'true');
-      // Bootstrap Switch supports a third, "indeterminate" state (bootstrapSwitch('indeterminate', true)), backed by
-      // the native input's "indeterminate" DOM property. That property alone isn't exposed to the accessibility tree,
-      // so screen readers never learn about it; expose it explicitly via aria-checked="mixed" instead, which is the
-      // standard way to convey a mixed/tri-state checkbox (native checked/unchecked semantics are used otherwise).
-      var $input = $(this);
-      var syncIndeterminateAria = function() {
-        if ($input.prop('indeterminate')) {
-          $input.attr('aria-checked', 'mixed');
-        } else {
-          $input.removeAttr('aria-checked');
-        }
-      };
-      syncIndeterminateAria();
-      if (!$input.data('xwikiIndeterminateAriaBound')) {
-        $input.data('xwikiIndeterminateAriaBound', true);
-        $input.on('switchChange.bootstrapSwitch', syncIndeterminateAria);
-      }
     });
     return result;
   };

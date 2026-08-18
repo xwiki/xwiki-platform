@@ -103,12 +103,12 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
       addButton.attr('class', "attachmentActionButton add-file-input");
       this.addDiv = $("<div></div>");
       this.addDiv.append(addButton);
-      addButton.on('click', (e) => this.addField.apply(this, [e]));
+      addButton.on('click', (e) => this.addField(e));
       this.defaultFileDiv.after(this.addDiv);
     }
     /** Add a submit listener that prevents submitting the form if no file was specified. */
     blockEmptySubmit() {
-      this.form.first().on('submit', (e) => this.onSubmit.apply(this, [e]));
+      this.form.first().on('submit', (e) => this.onSubmit(e));
     }
     /** Add a reset listener that resets the number of file fields to 1. */
     resetOnCancel() {

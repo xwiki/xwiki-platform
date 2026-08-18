@@ -150,7 +150,7 @@ function onDragStart(el, x, y) {
     el.placeholder.style.display = "block";
     addClass(allPanels, "dropTarget");
   } else {
-    realParent.replaceChild(dragel, el);
+    el.replaceWith(dragel);
   }
   // Make the current absolute
   el.style.position = "absolute";
@@ -193,7 +193,7 @@ function onDrag(el, x, y) {
     } else if (parentNode !== allPanels) {
       parentNode.appendChild( dragel);
     } else {
-      dragel.parentNode.removeChild(dragel);
+      dragel.remove();
     }
   }
 }
@@ -409,7 +409,7 @@ function releasePanels(column) {
 }
 
 function releasePanel(el) {
-  el.parentNode.removeChild(el);
+  el.remove();
   el.placeholder.parentNode.replaceChild(el, el.placeholder);
   el.placeholder = undefined;
 }

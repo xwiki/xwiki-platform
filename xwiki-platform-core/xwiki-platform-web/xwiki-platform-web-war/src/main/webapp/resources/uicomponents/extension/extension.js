@@ -573,11 +573,11 @@ XWiki.ExtensionBehaviour = Class.create({
 
         // Update the summary
         this.container.select('#summary-' + diffItemBlock.id).each(function(diffSummaryLi) {
-          diffSummaryLi.parentNode.removeChild(diffSummaryLi);
+          diffSummaryLi.remove();
         });
 
         // Remove the document from the details
-        diffItemBlock.parentNode.removeChild(diffItemBlock);
+        diffItemBlock.remove();
       }.bind(this),
       onFailure : function(response) {
         // Stop loading

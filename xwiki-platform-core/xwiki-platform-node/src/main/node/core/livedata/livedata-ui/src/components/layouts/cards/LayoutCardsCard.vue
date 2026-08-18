@@ -197,6 +197,7 @@ export default {
   border: 1px solid var(--table-border-color);
   border-radius: var(--border-radius-base);
 }
+
 .layout-cards .draggable-container {
   padding: 0;
   display: flex;

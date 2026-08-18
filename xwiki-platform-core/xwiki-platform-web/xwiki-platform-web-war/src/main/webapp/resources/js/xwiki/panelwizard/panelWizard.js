@@ -166,7 +166,7 @@ function onDrag(el, x, y) {
   window.parentNode = getClosestDropTarget(x,y, el.offsetWidth, el.offsetHeight);
   if (parentNode !== prevcolumn) {
     if (prevcolumn !== allPanels) {
-      prevcolumn.removeChild(dragel);
+      dragel.remove();
     }
     if (parentNode !== allPanels) {
       parentNode.appendChild(dragel);
@@ -207,7 +207,7 @@ function onDragEnd(el, x, y) {
     el.placeholder = undefined;
     rmClass(allPanels, "dropTarget");
   } else{
-    parentNode.replaceChild(el, dragel);
+    dragel.replaceWith(el);
   }
   dragel.style.display = "none";
   updatePanelLayout();

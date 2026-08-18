@@ -199,7 +199,6 @@ export default {
 }
 
 .layout-cards .draggable-container {
-  padding: 0;
   display: flex;
   flex-flow: column;
   gap: 2px;

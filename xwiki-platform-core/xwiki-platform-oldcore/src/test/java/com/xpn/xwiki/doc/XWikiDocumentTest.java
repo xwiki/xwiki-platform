@@ -705,7 +705,7 @@ class XWikiDocumentTest
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
         assertEquals(
-            "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' aria-label='core.model.xclass.editClassProperty.textAlternative' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
+            "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' aria-label='String' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
             this.document.display("string", "edit", this.oldcore.getXWikiContext()));
 
         assertEquals("string", this.document.display("string", "view", this.oldcore.getXWikiContext()));
@@ -741,7 +741,7 @@ class XWikiDocumentTest
 
         assertEquals("string", this.document.display("string", "view", this.oldcore.getXWikiContext()));
         assertEquals(
-            "{pre}<input size='30' id='Space.Page_0_string' aria-label='core.model.xclass.editClassProperty.textAlternative' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
+            "{pre}<input size='30' id='Space.Page_0_string' aria-label='String' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
             this.document.display("string", "edit", this.oldcore.getXWikiContext()));
 
         assertEquals("<p>area</p>", this.document.display("area", "view", this.oldcore.getXWikiContext()));
@@ -758,7 +758,7 @@ class XWikiDocumentTest
 
         assertEquals("string", this.document.display("string", "view", this.oldcore.getXWikiContext()));
         assertEquals(
-            "<input size='30' id='Space.Page_0_string' aria-label='core.model.xclass.editClassProperty.textAlternative' value='string' name='Space.Page_0_string' type='text'/>",
+            "<input size='30' id='Space.Page_0_string' aria-label='String' value='string' name='Space.Page_0_string' type='text'/>",
             this.document.display("string", "edit", this.oldcore.getXWikiContext()));
 
         assertEquals("<p>area</p>", this.document.display("area", "view", this.oldcore.getXWikiContext()));

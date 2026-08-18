@@ -181,14 +181,16 @@ class WikiSkinIT
     private void assertFavicon(TestUtils setup, String linkSelector, String attachmentName, byte[] expectedContent)
         throws Exception
     {
-        // Path of the skin action serving the attachment, e.g. "bin/skin/XWiki/DefaultSkin/icons.xwiki.favicon.svg".
-        String path = stripQueryString(setup.getPath(getAttachmentReference(attachmentName), "skin", null));
+        // URL of the skin action serving the attachment, e.g.
+        // "http://localhost:8080/xwiki/bin/skin/XWiki/DefaultSkin/icons.xwiki.favicon.svg".
+        String url = stripQueryString(setup.getURL(getAttachmentReference(attachmentName), "skin", null));
 
-        // The <link> element points to that path, instead of to the resource shipped in the WAR.
-        assertEquals(setup.getBaseURL() + path, stripQueryString(getFaviconURL(setup, linkSelector)));
+        // The <link> element points to that URL, instead of to the resource shipped in the WAR.
+        assertEquals(url, stripQueryString(getFaviconURL(setup, linkSelector)));
 
         // And the skin action serves there the image that was attached. Note that getInputStream() already asserts
-        // that the resource is served with a 200 status code.
+        // that the resource is served with a 200 status code, and that it expects a path relative to the base URL.
+        String path = url.substring(setup.getBaseURL().length());
         assertArrayEquals(expectedContent, IOUtils.toByteArray(setup.getInputStream(path, null)),
             String.format("Wrong content served for the [%s] skin resource", attachmentName));
     }

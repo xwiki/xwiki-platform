@@ -64,13 +64,10 @@ import com.xpn.xwiki.web.Utils;
 public class PropertyClass extends BaseCollection<ClassPropertyReference>
     implements PropertyClassInterface, Comparable<PropertyClass>
 {
-    /**
-     * The name of the HTML attribute used to set an accessible name on a property's edit widget ({@link
-     * #displayView} has no equivalent need). It takes precedence over any existing {@code <label>}, so {@link
-     * #getAriaLabelFallback(XWikiContext)} uses the bare pretty name to match it rather than override it.
-     */
+    /** HTML attribute for a property edit widget's accessible name; takes precedence over any {@code <label>}. */
     static final String ARIA_LABEL = "aria-label";
 
+    /** Serialization identifier. */
     private static final long serialVersionUID = 1L;
 
     /**

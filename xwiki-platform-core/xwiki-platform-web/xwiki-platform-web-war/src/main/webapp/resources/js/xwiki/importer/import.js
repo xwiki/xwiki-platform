@@ -85,7 +85,7 @@ var XWiki = (function(XWiki){
             'progressAutohide': true,
             'responseContainer': $('packagelistcontainer'),
             'responseURL': window.docgeturl + '?xpage=packagelist&forceTestRights=1',
-            'maxFilesize': parseInt(input.readAttribute('data-max-file-size'))
+            'maxFilesize': Number.parseInt(input.readAttribute('data-max-file-size'))
           });
           form.observe("xwiki:html5upload:done", hookRichImporterUI);
           html5Uploader.hideFormButtons();

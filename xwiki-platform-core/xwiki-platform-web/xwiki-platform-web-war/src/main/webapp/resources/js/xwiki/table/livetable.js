@@ -545,7 +545,7 @@ XWiki.widgets.LiveTable = Class.create({
   {
     for(var i in this.fetchedRows) {
       if(i >= indx)
-      this.fetchedRows[i] = this.fetchedRows[''+(parseInt(i)+1)];
+      this.fetchedRows[i] = this.fetchedRows[''+(Number.parseInt(i)+1)];
     }
   },
 
@@ -804,7 +804,7 @@ var LiveTableHash = Class.create({
    * Get helpers, private
    */
   getParam: function(name) { return this.params[name]; },
-  getIntParam: function(name) { return parseInt(this.params[name]); },
+  getIntParam: function(name) { return Number.parseInt(this.params[name]); },
 
   /**
    * Return individual parameter from permlinks hash
@@ -987,14 +987,14 @@ var LiveTablePagination = Class.create({
     },
     gotoPage: function(page)
     {
-      this.table.showRows(((parseInt(page) - 1 )* this.table.limit) + 1, this.table.limit);
+      this.table.showRows(((Number.parseInt(page) - 1 )* this.table.limit) + 1, this.table.limit);
     },
     gotoPrevPage: function(ev) {
       ev.stop();
       var currentPage = Math.floor( this.table.lastOffset / this.table.limit) + 1;
       var prevPage = currentPage - 1;
       if (prevPage > 0) {
-        this.table.showRows(((parseInt(prevPage) - 1) * this.table.limit) + 1, this.table.limit);
+        this.table.showRows(((Number.parseInt(prevPage) - 1) * this.table.limit) + 1, this.table.limit);
       }
     },
     gotoNextPage: function(ev) {
@@ -1003,7 +1003,7 @@ var LiveTablePagination = Class.create({
       var pages = Math.ceil(this.table.totalRows / this.table.limit);
       var nextPage = currentPage + 1;
       if (nextPage <= pages) {
-        this.table.showRows(((parseInt(nextPage) - 1) * this.table.limit) + 1, this.table.limit);
+        this.table.showRows(((Number.parseInt(nextPage) - 1) * this.table.limit) + 1, this.table.limit);
       }
     }
 });
@@ -1070,7 +1070,7 @@ var LiveTablePagination = Class.create({
    * Change the page size of the table
    **/
   changePageSize: function(event) {
-    var newLimit =  parseInt($F(Event.element(event)));
+    var newLimit =  Number.parseInt($F(Event.element(event)));
     this.table.setPageSize(newLimit);
   }
 });
@@ -1298,7 +1298,7 @@ var LiveTableTagCloud = Class.create({
    displayTagCloud: function(){
       this.domNode.down('.xwiki-livetable-tagcloud').innerHTML = "";
       var cloud = new Element("ol", {'class':'tagCloud'});
-      var levels = this.map ? this.map.keys().sortBy(function(k){return parseInt(k)}).reverse() : [];
+      var levels = this.map ? this.map.keys().sortBy(function(k){return Number.parseInt(k)}).reverse() : [];
       var liClass;
       for (var i=0;i<this.tags.length;i++) {
          liClass = "";

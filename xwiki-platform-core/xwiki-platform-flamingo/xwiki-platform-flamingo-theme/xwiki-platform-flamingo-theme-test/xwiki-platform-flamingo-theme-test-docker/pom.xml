@@ -60,9 +60,9 @@
     </dependency>
     <dependency>
       <!-- Needed by the attachment picker used to select the theme logo: it uploads the selected image as a temporary
-           attachment through the XWiki.WYSIWYG.FileUploader page. -->
+           attachment through the CKEditor.FileUploader page. -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-ui</artifactId>
+      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>

@@ -52,6 +52,8 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -116,6 +118,19 @@ class PropertyClassTest
         this.oldCore.getXWikiContext().setDoc(new XWikiDocument(contextDocumentReference));
 
         when(this.renderingContext.getTargetSyntax()).thenReturn(Syntax.HTML_5_0);
+    }
+
+    @Test
+    void displayEditSetsAriaLabel()
+    {
+        PropertyClass propertyClass = new PropertyClass();
+        propertyClass.setPrettyName("Summary");
+        BaseObject object = new BaseObject();
+        StringBuffer buffer = new StringBuffer();
+
+        propertyClass.displayEdit(buffer, "summary", "prefix_", object, null);
+
+        assertThat(buffer.toString(), containsString("aria-label='Summary'"));
     }
 
     /** Test the {@link PropertyClass#compareTo(PropertyClass)} method. */

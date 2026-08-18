@@ -337,8 +337,10 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
 }
 
 /* Bootstrap Switch hides the real checkbox/radio input with "visibility: hidden", which also removes it from the
-  tab order and the accessibility tree. Restore its visibility (it stays invisible thanks to the opacity and
-  z-index rules) so that it remains keyboard and screen-reader accessible. */
+  tab order and the accessibility tree. Restore its visibility so that it remains keyboard and screen-reader
+  accessible. This doesn't introduce any visual change because Bootstrap Switch already makes the input fully
+  transparent (opacity: 0) and stacks it behind the switch (z-index: -1, while .bootstrap-switch itself establishes
+  a stacking context with z-index: 0), so it never actually paints. */
 .bootstrap-switch input[type='radio'],
 .bootstrap-switch input[type='checkbox'] {
   visibility: visible;

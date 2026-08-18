@@ -22,12 +22,15 @@ package com.xpn.xwiki.objects.classes;
 import org.junit.jupiter.api.Test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -44,6 +47,19 @@ class NumberClassTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @Test
+    void displayEditSetsAriaLabel()
+    {
+        NumberClass nc = new NumberClass();
+        nc.setPrettyName("Quantity");
+        BaseObject object = new BaseObject();
+        StringBuffer buffer = new StringBuffer();
+
+        nc.displayEdit(buffer, "quantity", "prefix_", object, null);
+
+        assertThat(buffer.toString(), containsString("aria-label='Quantity'"));
+    }
 
     /** Test the fromString method. */
     @Test

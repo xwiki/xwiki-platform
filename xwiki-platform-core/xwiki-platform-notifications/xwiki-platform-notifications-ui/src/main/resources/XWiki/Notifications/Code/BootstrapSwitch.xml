@@ -327,6 +327,12 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
 .bootstrap-switch input[type='radio'],
 .bootstrap-switch input[type='checkbox'] {
   visibility: visible;
+}
+
+/* The default focus border color (--input-border-focus) falls under the WCAG 1.4.11 3:1 contrast requirement.
+  Use the theme's info color instead, scoped to the switch only. */
+.bootstrap-switch.bootstrap-switch-focused {
+  border-color: var(--brand-info);
 }</code>
     </property>
     <property>

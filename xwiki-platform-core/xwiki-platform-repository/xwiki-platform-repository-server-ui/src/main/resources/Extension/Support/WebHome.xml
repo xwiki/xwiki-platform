@@ -46,8 +46,10 @@
   #end
   {{html}}
     &lt;form&gt;
-      &lt;label class="sr-only" for="extensionsupporter_0_name"&gt;$escapetool.xml($services.localization.render('ExtensionCode.ExtensionSupporterClass_doc.title'))&lt;/label&gt;
-      &lt;input type="text" id="extensionsupporter_0_name" name="ExtensionCode.ExtensionSupporterClass_0_name"/&gt;
+      ## The live table's "doc.title" column label is reused here since this input's value becomes the new
+      ## supporter page's title (passed as title= in the redirect above).
+      &lt;label class="sr-only" for="ExtensionCode.ExtensionSupporterClass_0_name"&gt;$escapetool.xml($services.localization.render('ExtensionCode.ExtensionSupporterClass_doc.title'))&lt;/label&gt;
+      &lt;input type="text" id="ExtensionCode.ExtensionSupporterClass_0_name" name="ExtensionCode.ExtensionSupporterClass_0_name"/&gt;
       &lt;button name="register_supporter" class="btn btn-primary"&gt;$escapetool.xml($services.localization.render('repository.support.createsupporter'))&lt;/button&gt;
     &lt;/form&gt;
   {{/html}}

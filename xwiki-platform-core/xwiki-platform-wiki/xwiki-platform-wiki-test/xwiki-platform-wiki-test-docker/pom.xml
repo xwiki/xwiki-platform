@@ -82,7 +82,9 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- WikiManagerRestIT#checkTableRowFormat() reads the store APIs from a Groovy script -->
+    <!-- WikiManagerRestIT#checkTableRowFormat() reads the store APIs from a Groovy script, and the
+         ExtensionTest.Service page, used by ExtensionTestUtils to install extensions and to query the installed ones, is
+         written in Groovy -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
@@ -91,6 +93,12 @@
     </dependency>
 
     <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-test-utils</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-docker</artifactId>

@@ -352,49 +352,51 @@
       <cache>forbid</cache>
     </property>
     <property type="LargeString">
-      <code>.Navigation {
-  .jstree {
-    ul.jstree-children {
-      width: 100%;
-    }
-
-    &amp;.jstree-xwiki {
-      /* Allows text wrapping in containers and resets native nowrap */
-      ul.jstree-children,
-      .jstree-node {
-        white-space: normal;
+      <code>.panels { /* .panels and .Navigation parents to isolate the rules /*
+  .Navigation {
+    .jstree {
+      ul.jstree-children {
+        width: 100%;
       }
 
-      .jstree-node {
-        display: flex;
-        gap: 4px;
-        flex-flow: row wrap; /* Allows sub-lists (ul) to drop down to the next line */
-        align-items: flex-start;
-
-        i.jstree-ocl {
-          padding: 2px;
-          flex-shrink: 0; /* Prevents the expand/collapse button from shrinking */
+      &amp;.jstree-xwiki {
+        /* Allows text wrapping in containers and resets native nowrap */
+        ul.jstree-children,
+        .jstree-node {
+          white-space: normal;
         }
 
-        a {
-          display: flex;          /* Makes the link flex to align inner icon + text */
-          align-items: flex-start;/* Aligns the file icon with the 1st line of text */
-          flex: 1;                /* Takes up all remaining space on the line */
-          width: 100%;
-          height: auto;           /* Allows the link to grow vertically if text wraps */
-          min-height: 24px;
-          padding: 2px 4px;
-          white-space: normal;    /* Ensures line breaking for link text */
-          word-break: break-word; /* Prevents long words from overflowing the layout */
+        .jstree-node {
+          display: flex;
+          gap: 4px;
+          flex-flow: row wrap; /* Allows sub-lists (ul) to drop down to the next line */
+          align-items: flex-start;
 
-          &amp;.jstree-clicked {
-            text-shadow: 0 0 0.5px currentColor, 0 0 0.5px currentColor;
+          i.jstree-ocl {
+            padding: 2px;
+            flex-shrink: 0; /* Prevents the expand/collapse button from shrinking */
           }
-        }
 
-        /* Ensures sub-lists (ul) occupy a full line below the parent node */
-        &gt; ul.jstree-children {
-          flex: 0 0 100%;
+          a {
+            display: flex;          /* Makes the link flex to align inner icon + text */
+            align-items: flex-start;/* Aligns the file icon with the 1st line of text */
+            flex: 1;                /* Takes up all remaining space on the line */
+            width: 100%;
+            height: auto;           /* Allows the link to grow vertically if text wraps */
+            min-height: 24px;
+            padding: 2px 4px;
+            white-space: normal;    /* Ensures line breaking for link text */
+            word-break: break-word; /* Prevents long words from overflowing the layout */
+
+            &amp;.jstree-clicked {
+              text-shadow: 0 0 0.5px currentColor, 0 0 0.5px currentColor;
+            }
+          }
+
+          /* Ensures sub-lists (ul) occupy a full line below the parent node */
+          &gt; ul.jstree-children {
+            flex: 0 0 100%;
+          }
         }
       }
     }

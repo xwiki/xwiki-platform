@@ -3649,7 +3649,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         XWikiContext context)
     {
         try {
-            PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
+            BaseClass xclass = obj.getXClass(context);
+
+            // Returns the empty string if the xclass cannot be resolved (e.g., the context is null) as we do below in
+            // case of exception.
+            if (xclass == null) {
+                return "";
+            }
+
+            PropertyClass pclass = (PropertyClass) xclass.get(fieldname);
+
+            // Returns the empty string if the property class cannot be resolve as we do below in case of exception.
+            if (pclass == null) {
+                return "";
+            }
+
             String dprettyName = "";
             if (showMandatory) {
                 dprettyName = context.getWiki().addMandatory(context);
@@ -5878,6 +5892,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         }
 
         BaseClass xclass = xobject.getXClass(xcontext);
+
+        // Early exit if the xclass cannot be resolved (e.g., content is null).
+        if (xclass == null) {
+            return;
+        }
 
         for (Object fieldClass : xclass.getProperties()) {
             // Wiki content stored in xobjects

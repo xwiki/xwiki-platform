@@ -342,6 +342,24 @@ public class XWikiDocumentTest
     }
 
     @Test
+    void getUniqueLinkedPagesWhenXObjectXClassIsNull() throws XWikiException
+    {
+        XWikiDocument contextDocument = new XWikiDocument(new DocumentReference("xwiki", "Space", "Page"));
+        this.oldcore.getXWikiContext().setDoc(contextDocument);
+
+        this.document.setSyntax(Syntax.XWIKI_2_1);
+        this.document.setContent("[[TargetPage]]");
+        this.baseObject.setLargeStringValue("area", "[[ObjectTargetPage]]");
+
+        when(this.xWiki.getXClass(any(), any())).thenReturn(null);
+
+        Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
+
+        // Only the links from the document content are returned, the xobjects are skipped.
+        assertEquals(Set.of("Space.TargetPage.WebHome"), linkedPages);
+    }
+
+    @Test
     public void getSections10() throws XWikiException
     {
         this.document.setContent(
@@ -680,6 +698,29 @@ public class XWikiDocumentTest
         assertEquals("{{html clean=\"false\" wiki=\"false\"}}"
                 + "&#123;&#123;/html }}content&#123;&#123;/html}}&#123;&#123;html wiki=\"true\"}}{{/html}}",
             this.document.display("mock", "view", object, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void displayPrettyName()
+    {
+        assertEquals("String",
+            this.document.displayPrettyName("string", this.baseObject, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void displayPrettyNameWhenXClassIsNull()
+    {
+        BaseObject object = mock(BaseObject.class);
+        when(object.getXClass(this.oldcore.getXWikiContext())).thenReturn(null);
+
+        assertEquals("", this.document.displayPrettyName("string", object, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void displayPrettyNameWhenPropertyIsNull()
+    {
+        assertEquals("",
+            this.document.displayPrettyName("unknown", this.baseObject, this.oldcore.getXWikiContext()));
     }
 
     @Test

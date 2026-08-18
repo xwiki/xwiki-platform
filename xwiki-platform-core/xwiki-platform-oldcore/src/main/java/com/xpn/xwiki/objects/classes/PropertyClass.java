@@ -65,12 +65,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     implements PropertyClassInterface, Comparable<PropertyClass>
 {
     /**
-     * The name of the HTML attribute used to set an accessible name on a property's edit widget (there is no
-     * equivalent need in view mode, where {@link #displayView} only outputs the plain value). Per the HTML
-     * accessible name computation, this attribute takes precedence over any {@code <label>} that may already
-     * target the widget, which is why {@link #getAriaLabelFallback(XWikiContext)} returns the bare translated
-     * pretty name: it then matches the visible label's text wherever one already exists (e.g. the object editor),
-     * and still provides a usable name where none does.
+     * The name of the HTML attribute used to set an accessible name on a property's edit widget ({@link
+     * #displayView} has no equivalent need). It takes precedence over any existing {@code <label>}, so {@link
+     * #getAriaLabelFallback(XWikiContext)} uses the bare pretty name to match it rather than override it.
      */
     static final String ARIA_LABEL = "aria-label";
 

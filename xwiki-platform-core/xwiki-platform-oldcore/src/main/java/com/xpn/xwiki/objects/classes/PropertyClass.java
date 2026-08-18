@@ -65,16 +65,14 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     implements PropertyClassInterface, Comparable<PropertyClass>
 {
     /**
-     * The name of the HTML attribute used to provide a text alternative for an edit widget, as an accessibility
-     * fallback for the cases when the widget is not already associated with a visible {@code <label>}.
+     * The name of the HTML attribute used to set an accessible name on a property's edit widget (there is no
+     * equivalent need in view mode, where {@link #displayView} only outputs the plain value). Per the HTML
+     * accessible name computation, this attribute takes precedence over any {@code <label>} that may already
+     * target the widget, which is why {@link #getAriaLabelFallback(XWikiContext)} returns the bare translated
+     * pretty name: it then matches the visible label's text wherever one already exists (e.g. the object editor),
+     * and still provides a usable name where none does.
      */
     static final String ARIA_LABEL = "aria-label";
-
-    /**
-     * The translation key used to compute the {@link #ARIA_LABEL} fallback value.
-     */
-    static final String ARIA_LABEL_TRANSLATION_KEY =
-        "core.model.xclass.editClassProperty.textAlternative";
 
     private static final long serialVersionUID = 1L;
 
@@ -434,7 +432,10 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
                 ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("object", new com.xpn.xwiki.api.Object(object, context), ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("type", type, ScriptContext.ENGINE_SCOPE);
-            scontext.setAttribute(ARIA_LABEL, getAriaLabelFallback(context), ScriptContext.ENGINE_SCOPE);
+            // Named "ariaLabel", not ARIA_LABEL ("aria-label"): a Velocity binding with a dash isn't reachable as
+            // $aria-label (parsed as $aria minus label), so a custom displayer wanting this value has to use
+            // $ariaLabel.
+            scontext.setAttribute("ariaLabel", getAriaLabelFallback(context), ScriptContext.ENGINE_SCOPE);
 
             BaseProperty prop = (BaseProperty) object.safeget(fieldName);
             if (prop != null) {
@@ -665,19 +666,19 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     /**
-     * @param context the current context, used to resolve the translation
-     * @return the {@link #ARIA_LABEL} text alternative fallback value for this property's edit widget
+     * @param context the current context, used to resolve the translated pretty name
+     * @return the {@link #ARIA_LABEL} value to use for this property's edit widget
      */
     String getAriaLabelFallback(XWikiContext context)
     {
-        return localizePlainOrKey(ARIA_LABEL_TRANSLATION_KEY, getTranslatedPrettyName(context));
+        return getTranslatedPrettyName(context);
     }
 
     /**
-     * Sets the {@link #ARIA_LABEL} text alternative fallback on the given edit widget.
+     * Sets the {@link #ARIA_LABEL} attribute on the given edit widget.
      *
-     * @param element the edit widget on which to set the fallback
-     * @param context the current context, used to resolve the translation
+     * @param element the edit widget on which to set the attribute
+     * @param context the current context, used to resolve the translated pretty name
      */
     void setAriaLabelFallback(ConcreteElement element, XWikiContext context)
     {

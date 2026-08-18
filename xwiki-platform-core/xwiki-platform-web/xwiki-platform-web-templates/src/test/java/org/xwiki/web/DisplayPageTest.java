@@ -82,8 +82,11 @@ class DisplayPageTest extends PageTest
     private static final String VALUE_1 = "value1";
 
     private static final String DEFAULT_SELECT =
+        // PageTest's localization stub returns every key as its own translation (see LocalizationSetup), so this
+        // resolves the property's full name instead of falling back to its untranslated pretty name as it would in
+        // a real wiki.
         "<select size='1' id='space.page_0_testField' "
-        + "aria-label='core.model.xclass.editClassProperty.textAlternative [space.page_testField]' "
+        + "aria-label='space.page_testField' "
         + "name='space.page_0_testField'>"
         + "<option selected='selected' value='' label='space.page_testField_'>space.page_testField_</option>"
         + "<option value='value1' label='space.page_testField_value1'>space.page_testField_value1</option></select>"

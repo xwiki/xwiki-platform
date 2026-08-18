@@ -40,6 +40,11 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -103,10 +108,21 @@ class LevelsClassTest
 
         // View and edit should be selected even despite the weird case in edit right
         // Comment should not be selected since there's a space before it
-        String expectedString = "<select size='6' id='authorizationrights' "
-            + "aria-label='core.model.xclass.editClassProperty.textAlternative' "
-            + "name='authorizationrights'>"
-            + "<option value='admin' label='admin'>admin</option>"
+        String actual = stringBuffer.toString();
+        int selectOpeningTagEnd = actual.indexOf('>') + 1;
+
+        // org.apache.ecs.xhtml.select stores its attributes in a java.util.Hashtable, whose iteration order shifts
+        // whenever an attribute is added or removed. Assert the opening tag's attributes are present rather than
+        // relying on a specific order, so the next attribute added here doesn't break this test again.
+        assertThat(actual.substring(0, selectOpeningTagEnd), allOf(
+            startsWith("<select "),
+            endsWith(">"),
+            containsString(" size='6' "),
+            containsString(" id='authorizationrights' "),
+            containsString(" aria-label='Levels List' "),
+            containsString(" name='authorizationrights'")));
+
+        String expectedRest = "<option value='admin' label='admin'>admin</option>"
             + "<option value='programming' label='programming'>programming</option>"
             + "<option selected='selected' value='edit' label='edit'>edit</option>"
             + "<option selected='selected' value='view' label='view'>view</option>"
@@ -114,7 +130,7 @@ class LevelsClassTest
             + "<option value='script' label='script'>script</option>"
             + "<option value='delete' label='delete'>delete</option>"
             + "</select><input name='authorizationrights' type='hidden'/>";
-        assertEquals(expectedString, stringBuffer.toString());
+        assertEquals(expectedRest, actual.substring(selectOpeningTagEnd));
     }
 
     @Test

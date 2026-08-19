@@ -41,6 +41,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.event.model.WikiAttachmentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.filter.input.AbstractInputStreamInputSource;
 import org.xwiki.filter.input.InputSource;
@@ -61,17 +62,17 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
      * The map of parameters to be used when reading attachments.
      */
     private static final Map<String, EventParameter> ATTACHMENT_PARAMETERS = Map.of(
-        XarAttachmentModel.ELEMENT_MIMETYPE, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE),
-        XarAttachmentModel.ELEMENT_CHARSET, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_CHARSET),
-        XarAttachmentModel.ELEMENT_VERSION, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION),
+        XarAttachmentModel.ELEMENT_MIMETYPE, new EventParameter(WikiAttachmentFilter.PARAMETER_MIMETYPE),
+        XarAttachmentModel.ELEMENT_CHARSET, new EventParameter(WikiAttachmentFilter.PARAMETER_CHARSET),
+        XarAttachmentModel.ELEMENT_VERSION, new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION),
         XarAttachmentModel.ELEMENT_REVISION_AUTHOR,
-            new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR),
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR),
         XarAttachmentModel.ELEMENT_REVISION_DATE,
-            new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE, Date.class),
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_DATE, Date.class),
         XarAttachmentModel.ELEMENT_REVISION_COMMENT,
-            new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT),
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT),
         XarAttachmentModel.ELEMENT_REVISION_CONTENT_ALIAS,
-            new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_CONTENT_ALIAS),
+            new EventParameter(WikiAttachmentFilter.PARAMETER_REVISION_CONTENT_ALIAS),
         XarAttachmentModel.ELEMENT_JRCSVERSIONS, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
 
     /**

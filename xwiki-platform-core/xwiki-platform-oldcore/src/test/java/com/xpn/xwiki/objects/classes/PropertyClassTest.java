@@ -139,8 +139,8 @@ class PropertyClassTest
             two.setNumber(n2);
 
             if (n1 == n2) {
-                assertEquals(Math.signum(one.compareTo(two)), -1.0);
-                assertEquals(Math.signum(two.compareTo(one)), 1.0);
+                assertEquals(-1.0, Math.signum(one.compareTo(two)));
+                assertEquals(1.0, Math.signum(two.compareTo(one)));
             } else {
                 assertEquals(0, Float.compare(Math.signum(one.compareTo(two)), Math.signum(n1 - n2)));
                 assertEquals(0, Float.compare(Math.signum(two.compareTo(one)), Math.signum(n2 - n1)));
@@ -150,8 +150,8 @@ class PropertyClassTest
         // Also test that the comparison takes into account the name in case the two numbers are identical
         one.setNumber(42);
         two.setNumber(42);
-        assertEquals(Math.signum(one.compareTo(two)), -1.0);
-        assertEquals(Math.signum(two.compareTo(one)), 1.0);
+        assertEquals(-1.0, Math.signum(one.compareTo(two)));
+        assertEquals(1.0, Math.signum(two.compareTo(one)));
     }
 
     @Test

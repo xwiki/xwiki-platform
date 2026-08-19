@@ -353,7 +353,7 @@
     </property>
     <property type="LargeString">
       <code>.panels { /* .panels and .Navigation parents to isolate the rules */
-  .Navigation {
+  .PanelsNavigation {
     .jstree {
       ul.jstree-children {
         width: 100%;

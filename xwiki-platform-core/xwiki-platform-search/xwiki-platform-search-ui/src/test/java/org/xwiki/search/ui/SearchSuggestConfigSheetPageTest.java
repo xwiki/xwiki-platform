@@ -106,7 +106,7 @@ class SearchSuggestConfigSheetPageTest extends PageTest
         // Minimal icon environment: only IconManager#renderHTML() is actually exercised by these tests.
         this.componentManager.registerMockComponent(IconSetManager.class);
         this.componentManager.registerMockComponent(IconRenderer.class);
-        IconManager iconManager = this.componentManager.registerMockComponent(IconManager.class);
+        this.componentManager.registerMockComponent(IconManager.class);
 
         this.xwiki.initializeMandatoryDocuments(this.context);
         loadPage(SEARCH_SUGGEST_SOURCE_CLASS);

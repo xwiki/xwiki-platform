@@ -352,7 +352,7 @@
       <cache>forbid</cache>
     </property>
     <property type="LargeString">
-      <code>.panels { /* .panels and .Navigation parents to isolate the rules /*
+      <code>.panels { /* .panels and .Navigation parents to isolate the rules */
   .Navigation {
     .jstree {
       ul.jstree-children {

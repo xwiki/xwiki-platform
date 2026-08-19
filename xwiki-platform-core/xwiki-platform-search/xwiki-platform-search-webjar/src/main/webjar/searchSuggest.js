@@ -139,8 +139,8 @@ var XWiki = (function (XWiki) {
      * Keeps the href in sync with the text currently typed in the search field.
      */
     updateAllResultsLink: function() {
-      var form = this.searchInput.up('form');
-      var params = new URLSearchParams(new FormData(form));
+      const form = this.searchInput.up('form');
+      const params = new URLSearchParams(new FormData(form));
       this.allResultsLink.href = `${form.action}?${params.toString()}`;
     },
 

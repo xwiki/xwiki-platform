@@ -543,7 +543,7 @@
 
 {{html}}
 &lt;div class="registration-success-headline"&gt;
-  &lt;h2&gt;$headline &lt;/h2&gt;
+  &lt;h2&gt;$headline&lt;/h2&gt;
 &lt;/div&gt;
 &lt;p class="registration-success-hint"&gt;
   $escapetool.xml($successAndLogin)

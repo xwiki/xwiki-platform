@@ -19,12 +19,12 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
-import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
@@ -36,10 +36,11 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.user.SuperAdminUserReference;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
 
 /**
  * Manager for the event stream cleaning feature. The cleaning consist in deleting old events to prevent infinite

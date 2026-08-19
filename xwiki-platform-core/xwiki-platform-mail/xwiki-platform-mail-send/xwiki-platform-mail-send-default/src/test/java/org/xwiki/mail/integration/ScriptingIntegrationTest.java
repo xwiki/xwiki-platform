@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.inject.Provider;
+
 import jakarta.mail.BodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;

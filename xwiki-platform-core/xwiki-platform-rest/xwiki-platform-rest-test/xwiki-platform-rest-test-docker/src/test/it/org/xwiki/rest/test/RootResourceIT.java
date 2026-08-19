@@ -27,6 +27,7 @@ import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Xwiki;
 import org.xwiki.rest.resources.RootResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

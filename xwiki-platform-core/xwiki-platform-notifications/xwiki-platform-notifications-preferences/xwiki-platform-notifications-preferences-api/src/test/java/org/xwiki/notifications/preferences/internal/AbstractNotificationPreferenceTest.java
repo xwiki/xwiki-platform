@@ -24,9 +24,9 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
-import org.xwiki.notifications.preferences.NotificationPreference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki;
 
-import com.google.common.base.Suppliers;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -193,6 +191,7 @@ import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.xml.XMLUtils;
 
+import com.google.common.base.Suppliers;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
@@ -5316,6 +5315,28 @@ public class XWiki implements EventListener
         return getConfiguration().getProperty("xwiki.encoding", DEFAULT_ENCODING);
     }
 
+    /**
+     * Get the configured canonical URL of a wiki, based on trusted server-side configuration only: the
+     * {@code xwiki.home} configuration property for the main wiki, or the wiki descriptor's default alias for other
+     * wikis (for a path-based (sub)wiki, the main wiki's own configuration is used instead, since path-based wikis
+     * share the same server URL). The current request is only ever consulted to fill in the protocol and port when
+     * they aren't otherwise configured, and only for the wiki that was used to reach the server for the current
+     * request; the host itself is never taken from the request.
+     * <p>
+     * Contrary to {@link com.xpn.xwiki.web.XWikiURLFactory#getServerURL(XWikiContext)}, this method never returns a
+     * URL derived from client-controlled data such as the {@code Host} or {@code X-Forwarded-Host} request headers,
+     * which makes it the appropriate choice whenever the resulting URL may be used outside of the current
+     * request/response cycle (e.g., sent by email, or used in a server-side fetch), where trusting request data could
+     * allow an attacker to redirect the generated URL to a server of their choosing.
+     *
+     * @param wikiId the identifier of the wiki for which to get the server URL, if {@code null} the current wiki (as
+     *            indicated by {@link XWikiContext#getWikiId()}) is used
+     * @param xcontext the XWiki context, used to resolve the current/main wiki and, when relevant, the wiki
+     *            descriptor
+     * @return the trusted server URL for the given wiki (protocol, host and, if applicable, port), or {@code null} if
+     *         no canonical URL is configured for that wiki
+     * @throws MalformedURLException if the configured {@code xwiki.home} property is not a valid URL
+     */
     public URL getServerURL(String wikiId, XWikiContext xcontext) throws MalformedURLException
     {
         // In path based the base URL is the same for all wikis

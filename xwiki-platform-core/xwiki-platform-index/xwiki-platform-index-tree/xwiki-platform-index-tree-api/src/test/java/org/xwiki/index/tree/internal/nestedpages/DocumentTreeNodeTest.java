@@ -19,9 +19,6 @@
  */
 package org.xwiki.index.tree.internal.nestedpages;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,6 +44,9 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.tree.TreeNode;
 import org.xwiki.tree.internal.DefaultCompositeTreeNodeGroup;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DocumentTreeNode}.

@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.refactoring.WikiDocument;
-import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
 import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
+import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
 
 /**
  * Component interface for splitting a {@link WikiDocument} into multiple documents.

@@ -23,10 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.ratings.internal.averagerating.AverageRatingManager.AverageRatingQueryField;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
-
-import org.xwiki.ratings.internal.averagerating.AverageRatingManager.AverageRatingQueryField;
 
 /**
  * Solr Core initializer for Average rating data.

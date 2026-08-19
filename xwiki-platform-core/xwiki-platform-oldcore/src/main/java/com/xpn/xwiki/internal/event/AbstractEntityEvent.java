@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.EntityReference;
-
 import java.util.Objects;
+
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Base class for all entity {@link org.xwiki.observation.event.Event events}.

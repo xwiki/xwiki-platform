@@ -838,9 +838,9 @@ var XWiki = (function(XWiki){
     // Now that we have found all matches for all possible fragments, we iterate over them
     // to construct the final "output String" that will be injected as a suggestion item,
     // with all matches emphasized
-    Object.keys(matches).sortBy(function(s){return parseInt(s)}).each(function(key){
-      var before = output.substring(0, parseInt(key) + offset);
-      var after = output.substring(parseInt(key) + matches[key].length + offset);
+    Object.keys(matches).sortBy(function(s){return Number.parseInt(s)}).each(function(key){
+      var before = output.substring(0, Number.parseInt(key) + offset);
+      var after = output.substring(Number.parseInt(key) + matches[key].length + offset);
       // Emphasize the match in the output string that will be displayed
       output = before + "<em>" + matches[key] + "</em>" + after;
       // Increase the offset by 9, which correspond to the number of chars in the opening and closing "em" tags

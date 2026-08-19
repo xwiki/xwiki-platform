@@ -24,10 +24,10 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mentions.events.MentionEvent;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.store.internal.AbstractLegacyEventConverter;
 import org.xwiki.eventstream.store.internal.LegacyEvent;
+import org.xwiki.mentions.events.MentionEvent;
 
 import static java.util.Collections.singletonMap;
 

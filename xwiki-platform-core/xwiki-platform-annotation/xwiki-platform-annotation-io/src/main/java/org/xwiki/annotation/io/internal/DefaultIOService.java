@@ -365,7 +365,6 @@ public class DefaultIOService implements IOService
             XWikiDocument document = deprecatedContext.getWiki().getDocument(docName, deprecatedContext);
             // Avoid modifying the cached document
             document = document.clone();
-            List<String> updateNotifs = new ArrayList<>();
             boolean updated = false;
             for (Annotation annotation : annotations) {
                 // parse annotation id as string. If cannot parse, then ignore annotation, is not valid
@@ -383,7 +382,6 @@ public class DefaultIOService implements IOService
                 // Attach the temporary uploaded files to the same document instance that is going to be saved, so
                 // they are persisted even when the uploaded image is the only change made to the annotation.
                 updated = attachTemporaryUploadedFiles(document, annotation) || updated;
-                updateNotifs.add(annotation.getId());
             }
             if (updated) {
                 // set the author of the document to the current user

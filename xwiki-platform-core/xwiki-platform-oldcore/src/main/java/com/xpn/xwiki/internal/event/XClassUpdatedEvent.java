@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import com.xpn.xwiki.objects.PropertyInterface;
 import org.xwiki.model.reference.DocumentReference;
+
+import com.xpn.xwiki.objects.PropertyInterface;
 
 
 /**

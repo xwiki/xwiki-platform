@@ -19,8 +19,8 @@
  */
 package org.xwiki.model.internal.reference;
 
-import javax.inject.Singleton;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;

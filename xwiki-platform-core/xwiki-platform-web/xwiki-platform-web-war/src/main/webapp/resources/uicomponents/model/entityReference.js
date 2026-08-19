@@ -408,10 +408,10 @@ class EntityReferenceResolver {
   resolve(value, type, defaultValueProvider) {
     // Create a char array from the input string (as an equivalent to Java's StringBuilder).
     var representation = (value || '').split('');
-    type = parseInt(type);
+    type = Number.parseInt(type);
 
     // First, check if the given entity type is valid.
-    if (isNaN(type) || type < 0 || type >= SEPARATORS.length) {
+    if (Number.isNaN(type) || type < 0 || type >= SEPARATORS.length) {
       throw 'No parsing definition found for Entity Type [' + type + ']';
     }
 

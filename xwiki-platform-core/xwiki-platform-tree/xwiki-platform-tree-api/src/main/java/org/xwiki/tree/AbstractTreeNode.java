@@ -147,7 +147,7 @@ public abstract class AbstractTreeNode implements TreeNode
         }
 
         int start = Math.clamp(offset, 0, list.size());
-        int end = Math.clamp(start + limit, start, list.size());
+        int end = Math.clamp((long) start + limit, start, list.size());
         return list.subList(start, end);
     }
 

@@ -79,7 +79,7 @@ var XWiki = (function(XWiki){
       /** Attach the HTML5 uploader, if available */
       var form = $('AddAttachment');
       require(['xwiki-upload'], function(FileUploader) {
-        if (form && typeof (FileUploader) != 'undefined') {
+        if (form && FileUploader !== undefined) {
           var input = form.down("input[type='file']");
           var html5Uploader = new FileUploader(input, {
             'progressAutohide': true,

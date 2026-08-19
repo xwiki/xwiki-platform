@@ -616,11 +616,9 @@ var XWiki = (function(XWiki){
           }
         }
       }
-    } else {
+    } else if (this.resultContainer.down("ul")) {
       // In mono-source mode, reset the list if present
-      if (this.resultContainer.down("ul")) {
-        this.resultContainer.down("ul").remove();
-      }
+      this.resultContainer.down("ul").remove();
     }
 
     var withEnableButton = typeof this.options.hideButton !== "undefined"

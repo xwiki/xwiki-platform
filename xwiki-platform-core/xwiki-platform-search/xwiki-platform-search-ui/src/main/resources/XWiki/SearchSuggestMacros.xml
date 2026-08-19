@@ -49,7 +49,7 @@
   #set ($iconHTML = '')
   #set ($isIconThemeIcon = $icon.startsWith('icon:'))
   #if ($isIconThemeIcon)
-    #set ($iconHTML = $services.icon.renderHTML($icon.substring(5)))
+    #set ($iconHTML = "$!services.icon.renderHTML($rawIcon.substring(5))")
     #set ($icon = '')
   #end
 #end

@@ -330,9 +330,9 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
 }
 
 /* The default focus border color (--input-border-focus) falls under the WCAG 1.4.11 3:1 contrast requirement.
-  Use the theme's info color instead, scoped to the switch only. */
+  Use the theme's primary color instead, scoped to the switch only. */
 .bootstrap-switch.bootstrap-switch-focused {
-  border-color: var(--brand-info);
+  border-color: var(--brand-primary);
 }</code>
     </property>
     <property>

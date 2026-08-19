@@ -45,6 +45,18 @@ import static org.xwiki.test.ui.TestUtils.ADMIN_CREDENTIALS;
  */
 public class ExtensionSecurityTest extends AbstractTest
 {
+    /**
+     * CVEs impacting dependencies that are not updated on stable-16.10.x.
+     */
+    private static final List<String> IGNORED_CVES = List.of(
+        // Jetty related CVEs.
+        "CVE-2026-1605",
+        "CVE-2026-10050",
+        "CVE-2026-6790",
+        "CVE-2026-10051",
+        "CVE-2026-8384"
+    );
+
     @Rule
     public AdminAuthenticationRule adminAuthenticationRule = new AdminAuthenticationRule(getUtil());
 
@@ -67,8 +79,7 @@ public class ExtensionSecurityTest extends AbstractTest
 
         List<String> cveIDs = extensionVulnerabilitiesAdminPage.getCveIDsToReview()
             .stream()
-            // CVE-2026-1605 impacts jetty, that we are not updating on stable-16.10.x
-            .filter(cve -> !"CVE-2026-1605".equals(cve))
+            .filter(cve -> !IGNORED_CVES.contains(cve))
             .toList();
 
         assertTrue(cveIDs.isEmpty(), () -> {

@@ -71,19 +71,19 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Icon script service, used to render icon theme icons in the search suggest sources. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-page</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
-    </dependency>
-    <!-- Icon script service, used to test rendering icon theme icons in the search suggest sources. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-icon-script</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

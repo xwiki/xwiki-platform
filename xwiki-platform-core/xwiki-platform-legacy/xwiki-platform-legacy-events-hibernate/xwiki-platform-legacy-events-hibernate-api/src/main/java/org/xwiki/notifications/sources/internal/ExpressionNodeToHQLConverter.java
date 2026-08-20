@@ -221,7 +221,7 @@ public class ExpressionNodeToHQLConverter
                     parseBlock(operator.getRightOperand(), result));
         } else if (operator instanceof OrNode) {
             returnValue = String.format("(%s) OR (%s)", parseBlock(operator.getLeftOperand(), result),
-                    parseBlock(operator.getRightOperand(), result), result);
+                    parseBlock(operator.getRightOperand(), result));
         } else if (operator instanceof EqualsNode) {
             returnValue = String.format("%s = %s", parseValue((AbstractValueNode) operator.getLeftOperand(), result),
                     parseValue((AbstractValueNode) operator.getRightOperand(), result));

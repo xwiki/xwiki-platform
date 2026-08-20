@@ -100,7 +100,7 @@ public class DefaultClassPropertyValuesProvider implements ClassPropertyValuesPr
                     this.entityReferenceSerializer.serialize(propertyReference)));
             }
         } catch (XWikiException e) {
-            throw new XWikiRestException(String.format("Failed to determine the property type for [{}].",
+            throw new XWikiRestException(String.format("Failed to determine the property type for [%s].",
                 this.entityReferenceSerializer.serialize(propertyReference)));
         }
     }

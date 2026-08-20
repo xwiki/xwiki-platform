@@ -65,7 +65,7 @@ require(['jquery'], function ($) {
     }
 
     _unescapeLineBreaks(text) {
-      return text.replace(/\\n/g, '\n');
+      return text.replaceAll('\\n', '\n');
     }
 
     _initTextarea(configElement, self) {

@@ -96,11 +96,7 @@ public class EditThemePage extends EditPage
      */
     public void pickVariableColor(String variableName, String color)
     {
-        // The color picker marks the input it is attached to as active when it gets displayed.
-        getDriver().findElement(By.id("var-" + variableName)).click();
-        getDriver().waitUntilElementIsVisible(By.cssSelector("input#var-" + variableName + ".active"));
-
-        WebElement colorPicker = getDisplayedColorPicker();
+        WebElement colorPicker = displayColorPicker(variableName);
         WebElement hexField = colorPicker.findElement(By.cssSelector(".colpick_hex_field input"));
         hexField.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.BACK_SPACE);
         // The picker's field holds the hexadecimal digits alone, and it takes the new color into account when it fires
@@ -129,16 +125,34 @@ public class EditThemePage extends EditPage
     }
 
     /**
-     * @return the color picker that is currently displayed; the color pickers of all the color variables are appended
-     *         to the body, but only one of them is displayed at a time
+     * @param variableName the name of a color variable (e.g. {@code brand-primary})
+     * @return the color picker of the passed variable, once it is displayed
+     */
+    private WebElement displayColorPicker(String variableName)
+    {
+        WebElement input = getDriver().findElement(By.id("var-" + variableName));
+        input.click();
+        return getDriver().waitUntilCondition(driver -> {
+            WebElement colorPicker = getDisplayedColorPicker();
+            if (colorPicker == null) {
+                // The color theme editor hides the picker when the variables are scrolled, and clicking the input can
+                // scroll it into view, so the picker may have been closed right after being displayed.
+                input.click();
+            }
+            return colorPicker;
+        });
+    }
+
+    /**
+     * @return the color picker that is currently displayed, {@code null} if there is none; the color pickers of all the
+     *         color variables are appended to the body, but only one of them is displayed at a time
      */
     private WebElement getDisplayedColorPicker()
     {
-        return getDriver().waitUntilCondition(driver -> getDriver()
-            .findElementsWithoutWaiting(By.cssSelector("body > div.colpick")).stream()
+        return getDriver().findElementsWithoutWaiting(By.cssSelector("body > div.colpick")).stream()
             .filter(WebElement::isDisplayed)
             .findFirst()
-            .orElse(null));
+            .orElse(null);
     }
 
     /**

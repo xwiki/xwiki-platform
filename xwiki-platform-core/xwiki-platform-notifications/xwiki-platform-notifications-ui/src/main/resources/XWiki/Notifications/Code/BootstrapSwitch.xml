@@ -168,7 +168,15 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
       // The caller wants to set multiple options, including the label.
       option.labelText = fixLabel(option.labelText);
     }
-    return this.bootstrapSwitchOrig.apply(this, arguments);
+    const result = this.bootstrapSwitchOrig.apply(this, arguments);
+    // The handle and label spans only duplicate the state already carried by the underlying (still focusable)
+    // checkbox/radio input, so screen readers shouldn't announce them as separate interactive elements.
+    this.each(function() {
+      $(this).parent().find(
+        '.bootstrap-switch-handle-on, .bootstrap-switch-handle-off, .bootstrap-switch-label'
+      ).attr('aria-hidden', 'true');
+    });
+    return result;
   };
 
   // Copy data (such as default configuration, constructor) from the original Bootstrap Switch function.
@@ -309,6 +317,22 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
     displays the switch badly when inside a table with .hyphenate style. Moreover, the standard Bootstrap Switch styles
     add a zero-width-space before all descendant SPANs (why?) which increases the height of the switch in Firefox. */
   white-space: nowrap;
+}
+
+/* Bootstrap Switch hides the real checkbox/radio input with "visibility: hidden", which also removes it from the
+  tab order and the accessibility tree. Restore its visibility so that it remains keyboard and screen-reader
+  accessible. This doesn't introduce any visual change because Bootstrap Switch already makes the input fully
+  transparent (opacity: 0) and stacks it behind the switch (z-index: -1, while .bootstrap-switch itself establishes
+  a stacking context with z-index: 0), so it never actually paints. */
+.bootstrap-switch input[type='radio'],
+.bootstrap-switch input[type='checkbox'] {
+  visibility: visible;
+}
+
+/* The default focus border color (--input-border-focus) falls under the WCAG 1.4.11 3:1 contrast requirement.
+  Use the theme's primary color instead, scoped to the switch only. */
+.bootstrap-switch.bootstrap-switch-focused {
+  border-color: var(--brand-primary);
 }</code>
     </property>
     <property>

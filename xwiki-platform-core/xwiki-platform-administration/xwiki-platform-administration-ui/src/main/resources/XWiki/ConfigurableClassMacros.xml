@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.ConfigurableClassMacros" locale="">
+<xwikidoc version="1.7" reference="XWiki.ConfigurableClassMacros" locale="">
   <web>XWiki</web>
   <name>ConfigurableClassMacros</name>
   <language/>
@@ -281,7 +281,7 @@
         ## Set the icon for this section as the attachment URL.
         #set ($appSection.iconReference = "${appName}@$attachment.getFilename()")
       #elseif (!$appSection.iconReference)
-        #set ($appSection.iconReference = 'XWiki.ConfigurableClass@DefaultAdminSectionIcon.png')
+        #set ($appSection.iconReference = 'XWiki.ConfigurableClass@DefaultAdminSectionIcon.svg')
       #end
       ##
       ## If the user doesn't have edit access to the application, we want to show a message on the icon

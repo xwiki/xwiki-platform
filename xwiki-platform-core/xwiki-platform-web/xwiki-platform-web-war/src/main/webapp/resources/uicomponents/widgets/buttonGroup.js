@@ -88,7 +88,7 @@ widgets.ButtonGroup = Class.create({
    */
   _scheduleClose : function(event) {
     // In case of an item being clicked we just delay the close.
-    var forceClose = event && event.type == 'click';
+    var forceClose = event?.type == 'click';
     // We let the focus event cancel the close if it follows immediately after the blur (e.g. when navigating through
     // the menu items using the Tab key).
     this._closing = true;

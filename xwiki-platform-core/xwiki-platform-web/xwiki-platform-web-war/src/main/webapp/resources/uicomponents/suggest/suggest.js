@@ -616,8 +616,7 @@ var XWiki = (function(XWiki){
           }
         }
       }
-    } else if (this.resultContainer.down("ul")) {
-      // In mono-source mode, reset the list if present
+    } else if (this.resultContainer.down("ul")) { // In mono-source mode, reset the list if present
       this.resultContainer.down("ul").remove();
     }
 

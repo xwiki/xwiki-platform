@@ -831,7 +831,7 @@ var LiveTableHash = Class.create({
    */
   serializeParams: function(newParams)
   {
-    var params = $H(newParams ?? this.params);
+    var params = $H(newParams || this.params);
     params = params.inject({}, function(params, pair) {
       params[pair.key] = encodeURIComponent(pair.value);
       return params;

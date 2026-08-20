@@ -450,7 +450,7 @@ class EntityReferenceResolver {
         }
         var parent = this._getNewReference(i, representation, currentType, defaultValueProvider);
         reference = this._appendNewReference(reference, parent);
-        currentType = parentType ?? DEFAULT_PARENT[currentType];
+        currentType = parentType || DEFAULT_PARENT[currentType];
         typeSetup = REFERENCE_SETUP[currentType];
     } while (typeSetup != null);
 

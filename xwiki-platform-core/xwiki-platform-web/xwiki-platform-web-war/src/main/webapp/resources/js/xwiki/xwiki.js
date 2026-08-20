@@ -891,7 +891,7 @@ window.shortcut = new Object({
         require(["$services.webjars.url('org.webjars:Keypress', 'keypress.min.js')", 'jquery'], function(keypress) {
 
             // If no options are defined, create a blank map
-            opt = opt ?? {};
+            opt = opt || {};
 
             var shortcut_descriptor = {
                 "keys": shortcut._format_shortcut_combination(shortcut_combination),

@@ -761,10 +761,10 @@ function noaccent(txt) {
     temp = temp.replace(/[\u0125\u0127\u021f]/g,"h");
     temp = temp.replace(/[\u00cc\u00cd\u00ce\u00cf\u0128\u012a\u012c\u012e\u0130\u01cf\u0208\u020a]/g,"I");
     temp = temp.replace(/[\u00ec\u00ed\u00ee\u00ef\u0129\u012b\u012d\u012f\u0131\u01d0\u0209\u020b]/g,"i");
-    temp = temp.replace(/[\u0132]/g,"IJ");
-    temp = temp.replace(/[\u0133]/g,"ij");
-    temp = temp.replace(/[\u0134]/g,"J");
-    temp = temp.replace(/[\u0135]/g,"j");
+    temp = temp.replaceAll("\u0132","IJ");
+    temp = temp.replaceAll("\u0133","ij");
+    temp = temp.replaceAll("\u0134","J");
+    temp = temp.replaceAll("\u0135","j");
     temp = temp.replace(/[\u0136\u01e8]/g,"K");
     temp = temp.replace(/[\u0137\u0138\u01e9]/g,"k");
     temp = temp.replace(/[\u0139\u013b\u013d\u013f\u0141]/g,"L");
@@ -781,14 +781,14 @@ function noaccent(txt) {
     temp = temp.replace(/[\u00fe\u0163\u0165\u0167\u021b\u0236]/g,"t");
     temp = temp.replace(/[\u00d9\u00da\u00db\u00dc\u0168\u016a\u016c\u016e\u0170\u0172\u01d3\u01d5\u01d7\u01d9\u01db\u0214\u0216]/g,"U");
     temp = temp.replace(/[\u00f9\u00fa\u00fb\u00fc\u0169\u016b\u016d\u016f\u0171\u0173\u01d4\u01d6\u01d8\u01da\u01dc\u0215\u0217]/g,"u");
-    temp = temp.replace(/[\u0174]/g,"W");
-    temp = temp.replace(/[\u0175]/g,"w");
+    temp = temp.replaceAll("\u0174","W");
+    temp = temp.replaceAll("\u0175","w");
     temp = temp.replace(/[\u00dd\u0176\u0178\u0232]/g,"Y");
     temp = temp.replace(/[\u00fd\u00ff\u0177\u0233]/g,"y");
     temp = temp.replace(/[\u0179\u017b\u017d]/g,"Z");
     temp = temp.replace(/[\u017a\u017c\u017e]/g,"z");
-    temp = temp.replace(/[\u00df]/g,"SS");
-    temp = temp.replace(/[^a-zA-Z0-9_]/g,"");
+    temp = temp.replaceAll("\u00df","SS");
+    temp = temp.replace(/\W/g,"");
     return temp;
 }
 
@@ -891,7 +891,7 @@ window.shortcut = new Object({
         require(["$services.webjars.url('org.webjars:Keypress', 'keypress.min.js')", 'jquery'], function(keypress) {
 
             // If no options are defined, create a blank map
-            opt = (opt) ? opt : {};
+            opt = opt || {};
 
             var shortcut_descriptor = {
                 "keys": shortcut._format_shortcut_combination(shortcut_combination),
@@ -1041,7 +1041,7 @@ window.shortcut = new Object({
      * @private
      */
     _format_shortcut_combination: function(combination) {
-        return combination.toLowerCase().replace(/\+/g, ' ');
+        return combination.toLowerCase().replaceAll('+', ' ');
     }
 });
 
@@ -1077,39 +1077,39 @@ function BrowserDetect() {
 
     // rendering engine versions
     this.geckoVersion = ( (this.isGecko) ? ua.substring( (ua.lastIndexOf('gecko/') + 6), (ua.lastIndexOf('gecko/') + 14) ) : -1 );
-    this.equivalentMozilla = ( (this.isGecko) ? parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) ) : -1 );
-    this.appleWebKitVersion = ( (this.isAppleWebKit) ? parseFloat( ua.substring( ua.indexOf('applewebkit/') + 12) ) : -1 );
+    this.equivalentMozilla = ( (this.isGecko) ? Number.parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) ) : -1 );
+    this.appleWebKitVersion = ( (this.isAppleWebKit) ? Number.parseFloat( ua.substring( ua.indexOf('applewebkit/') + 12) ) : -1 );
 
     // browser version
-    this.versionMinor = parseFloat(navigator.appVersion);
+    this.versionMinor = Number.parseFloat(navigator.appVersion);
 
     // correct version number
     if (this.isGecko && !this.isMozilla) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('/', ua.indexOf('gecko/') + 6) + 1 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('/', ua.indexOf('gecko/') + 6) + 1 ) );
     }
     else if (this.isMozilla) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('rv:') + 3 ) );
     }
     else if (this.isIE && this.versionMinor >= 4) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('msie ') + 5 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('msie ') + 5 ) );
     }
     else if (this.isKonqueror) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('konqueror/') + 10 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('konqueror/') + 10 ) );
     }
     else if (this.isSafari) {
-        this.versionMinor = parseFloat( ua.substring( ua.lastIndexOf('safari/') + 7 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.lastIndexOf('safari/') + 7 ) );
     }
     else if (this.isOmniweb) {
-        this.versionMinor = parseFloat( ua.substring( ua.lastIndexOf('omniweb/') + 8 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.lastIndexOf('omniweb/') + 8 ) );
     }
     else if (this.isOpera) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('opera') + 6 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('opera') + 6 ) );
     }
     else if (this.isIcab) {
-        this.versionMinor = parseFloat( ua.substring( ua.indexOf('icab') + 5 ) );
+        this.versionMinor = Number.parseFloat( ua.substring( ua.indexOf('icab') + 5 ) );
     }
 
-    this.versionMajor = parseInt(this.versionMinor);
+    this.versionMajor = Number.parseInt(this.versionMinor);
 
     // dom support
     this.isDOM1 = (document.getElementById);
@@ -1146,7 +1146,7 @@ function BrowserDetect() {
     this.isIE4xMac = (this.isIE4x && this.isMac);
 
     var trident = /trident\/(\d+)/.exec(ua);
-    this.isIE11up = trident && parseInt(trident[1]) >= 7;
+    this.isIE11up = trident && Number.parseInt(trident[1]) >= 7;
 }
 var browser = new BrowserDetect();
 
@@ -1631,10 +1631,10 @@ document.observe("xwiki:dom:loaded", function() {
       makeFixed(menu, 0, menuLeft, menuWidth);
       if (menu.__fm_extra) {
         makeFixed(menu.__fm_extra, menuHeight, menuLeft, (menuWidth -
-          menu.__fm_extra.getStyle('border-left-width').replace(/[^0-9]/g,'') -
-          menu.__fm_extra.getStyle('border-right-width').replace(/[^0-9]/g,'') -
-          menu.__fm_extra.getStyle('padding-right').replace(/[^0-9]/g,'') -
-          menu.__fm_extra.getStyle('padding-left').replace(/[^0-9]/g,'')));
+          menu.__fm_extra.getStyle('border-left-width').replace(/\D/g,'') -
+          menu.__fm_extra.getStyle('border-right-width').replace(/\D/g,'') -
+          menu.__fm_extra.getStyle('padding-right').replace(/\D/g,'') -
+          menu.__fm_extra.getStyle('padding-left').replace(/\D/g,'')));
       }
     } else {
       makeScrollable(menu);

@@ -34,6 +34,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -163,14 +164,9 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
         List<Block> result;
         try {
             if (LANGUAGE_NONE.equalsIgnoreCase(parameters.getLanguage())) {
-                if (StringUtils.isEmpty(source.getContent())) {
-                    result = Collections.emptyList();
-                } else {
-                    result = this.plainTextParser.parse(new StringReader(source.getContent())).getChildren().get(0)
-                        .getChildren();
-                }
+                result = parsePlainText(source.getContent());
             } else {
-                result = highlight(parameters, source);
+                result = highlightOrFallbackToPlainText(parameters, source);
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to highlight content", e);
@@ -196,9 +192,44 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
         return result;
     }
 
+    private List<Block> parsePlainText(String content) throws ParseException
+    {
+        if (StringUtils.isEmpty(content)) {
+            return Collections.emptyList();
+        }
+
+        return this.plainTextParser.parse(new StringReader(content)).getChildren().get(0).getChildren();
+    }
+
+    /**
+     * Highlighting is a best effort: displaying the code unhighlighted is a much better outcome than failing the whole
+     * macro and thus breaking the page it's on. Some lexers recurse once per character of the content and give up on
+     * long inputs, and the language is not always under the control of the user reading the page, so there isn't
+     * necessarily a workaround.
+     *
+     * @param parameters the code macro parameters
+     * @param source the source to highlight
+     * @return the highlighted content, or the plain text content when highlighting failed
+     * @throws ParseException when even parsing the content as plain text failed
+     */
+    private List<Block> highlightOrFallbackToPlainText(CodeMacroParameters parameters, CodeMacroSource source)
+        throws ParseException
+    {
+        try {
+            return highlight(parameters, source);
+        } catch (Exception e) {
+            // Only log the root cause message: the failure can come from a very deep recursion in the lexer, whose
+            // stack trace is thousands of frames long, and the page may be rendered often.
+            this.logger.warn("Failed to highlight the content with language [{}], displaying it unhighlighted."
+                + " Cause: [{}]", parameters.getLanguage(), ExceptionUtils.getRootCauseMessage(e));
+
+            return parsePlainText(source.getContent());
+        }
+    }
+
     /**
      * Return a highlighted version of the provided content.
-     * 
+     *
      * @param parameters the code macro parameters.
      * @param source the source to highlight.
      * @return the highlighted version of the provided content.

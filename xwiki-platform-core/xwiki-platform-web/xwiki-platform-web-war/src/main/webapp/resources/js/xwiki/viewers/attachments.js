@@ -80,7 +80,7 @@ require(['jquery', 'xwiki-upload', 'xwiki-events-bridge'], function($, FileUploa
     }
     /** If available in the current browser, enable HTML5 upload for a given file input */
     attachHTML5Uploader(input) {
-      if (typeof(FileUploader) != 'undefined') {
+      if (FileUploader !== undefined) {
         input.attr('multiple','');
         // Since the attachments liveData is refreshed on file upload, we skip updating the attachments container.
         return new FileUploader(input[0], {

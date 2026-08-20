@@ -125,7 +125,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
         String defaultQualityParam = context.getWiki().Param(DEFAULT_QUALITY_PARAM);
         if (!StringUtils.isBlank(defaultQualityParam)) {
             try {
-                this.defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
+                this.defaultQuality = Math.clamp(Float.parseFloat(defaultQualityParam.trim()), 0, 1);
             } catch (NumberFormatException e) {
                 LOGGER.warn("Failed to parse [{}] configuration parameter. Using [{}] as the default image quality. "
                     + "Root cause is [{}].", DEFAULT_QUALITY_PARAM, this.defaultQuality,

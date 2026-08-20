@@ -409,8 +409,7 @@ XWiki.ExtensionBehaviour = Class.create({
   /**
    * Schedule a new refresh if the extension has a job running.
    */
-  _maybeScheduleRefresh : function(timeout) {
-    timeout = timeout || 1;
+  _maybeScheduleRefresh : function(timeout = 1) {
     this.container.hasClassName('extension-item-loading') && !this.container.down('button[value="continue"]') && this._refresh.bind(this).delay(timeout);
   },
 

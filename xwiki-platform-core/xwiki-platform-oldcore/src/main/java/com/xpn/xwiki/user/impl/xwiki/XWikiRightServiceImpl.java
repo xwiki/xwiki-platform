@@ -427,8 +427,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         LOGGER.debug("Searching for matching rights at group level");
 
         // Didn't found right at this level.. Let's go to group level
-        Map<String, Collection<String>> grouplistcache = (Map<String, Collection<String>>) context
-            .computeIfAbsent(GROUP_LIST_CONTEXT_KEY, key -> new HashMap<String, Collection<String>>());
+        context.computeIfAbsent(GROUP_LIST_CONTEXT_KEY, key -> new HashMap<String, Collection<String>>());
 
         Collection<String> grouplist = new HashSet<>();
 

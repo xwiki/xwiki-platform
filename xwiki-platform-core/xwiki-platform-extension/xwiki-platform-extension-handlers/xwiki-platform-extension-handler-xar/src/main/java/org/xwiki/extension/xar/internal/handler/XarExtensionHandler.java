@@ -87,6 +87,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
     private static final String SESSIONKEY_PACKAGECONFIGURATION = "extension.xar.packageconfiguration";
 
+    private static final String ERROR_SESSIONINIT = "Failed to initialize extension plan index";
+
     @Inject
     private Packager packager;
 
@@ -174,13 +176,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         try {
             initializeSessionConfiguration(request);
-        } catch (Exception e) {
-            if (e instanceof InterruptedException) {
-                // Restore interrupted state
-                Thread.currentThread().interrupt();
-            }
+        } catch (InterruptedException e) {
+            // Restore interrupted state
+            Thread.currentThread().interrupt();
 
-            throw new InstallException("Failed to initialize extension plan index", e);
+            throw new InstallException(ERROR_SESSIONINIT, e);
+        } catch (Exception e) {
+            throw new InstallException(ERROR_SESSIONINIT, e);
         }
 
         // import xar into wiki (add new version when the page already exists)
@@ -199,13 +201,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         try {
             initializeSessionConfiguration(request);
-        } catch (Exception e) {
-            if (e instanceof InterruptedException) {
-                // Restore interrupted state
-                Thread.currentThread().interrupt();
-            }
+        } catch (InterruptedException e) {
+            // Restore interrupted state
+            Thread.currentThread().interrupt();
 
-            throw new UninstallException("Failed to initialize extension plan index", e);
+            throw new UninstallException(ERROR_SESSIONINIT, e);
+        } catch (Exception e) {
+            throw new UninstallException(ERROR_SESSIONINIT, e);
         }
 
         // Only remove XAR when it's a local order (otherwise it will be deleted several times and the wiki will

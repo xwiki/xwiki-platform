@@ -22,6 +22,7 @@ package org.xwiki.wysiwyg.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
  * Page Object for the macro edition modal.
@@ -109,6 +110,32 @@ public class MacroDialogEditModal extends BaseElement
         return getDriver().findElementWithoutWaitingWithoutScrolling(
             // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
             By.cssSelector("[class*=-editor-modal] .macro-parameter-field input[name='" + name + "']"));
+    }
+
+    /**
+     * Retrieves the picker used to edit a macro parameter. Parameters whose type has a picker (e.g. a list of document
+     * references) are edited with a suggestion input rather than with a plain text input, so
+     * {@link #getMacroParameterInput(String)} can't be used for them.
+     *
+     * @param name the macro parameter name
+     * @return the picker used to edit the specified macro parameter
+     * @since 18.7.0RC1
+     */
+    public SuggestInputElement getMacroParameterPicker(String name)
+    {
+        return new SuggestInputElement(getMacroParameterSelect(name));
+    }
+
+    /**
+     * @param name the macro parameter name
+     * @return the select element behind the picker used to edit the specified macro parameter
+     * @since 18.7.0RC1
+     */
+    public WebElement getMacroParameterSelect(String name)
+    {
+        return getDriver().findElementWithoutWaitingWithoutScrolling(
+            // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+            By.cssSelector("[class*=-editor-modal] .macro-parameter-field select[name='" + name + "']"));
     }
 
     /**

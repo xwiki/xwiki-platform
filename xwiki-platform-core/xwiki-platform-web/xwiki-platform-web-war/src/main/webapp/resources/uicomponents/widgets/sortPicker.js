@@ -54,7 +54,7 @@ require(['jquery'], function($) {
   };
 
   var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+    var container = $(data?.elements || document);
     container.find('.sortPicker').sortPicker();
   };
 

@@ -75,7 +75,7 @@ public class NumberPropertyParser extends AbstractObjectPropertyParser
             default:
                 throw new XWikiException(
                     XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    String.format("Invalid role hint [{}] is not a supported type number.", descriptor.getRoleHint()));
+                    String.format("Invalid role hint [%s] is not a supported type number.", descriptor.getRoleHint()));
         }
 
         return numberClass;

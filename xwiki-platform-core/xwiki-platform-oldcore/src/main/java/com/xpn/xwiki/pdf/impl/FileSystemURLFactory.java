@@ -201,7 +201,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
                 }
 
                 File file = getTemporaryFile(key, context);
-                LOGGER.debug("Temporary PDF export file [{}]", file.toString());
+                LOGGER.debug("Temporary PDF export file [{}]", file);
 
                 if (StringUtils.isNotEmpty(revision)) {
                     attachment = attachment.getAttachmentRevision(revision, context);

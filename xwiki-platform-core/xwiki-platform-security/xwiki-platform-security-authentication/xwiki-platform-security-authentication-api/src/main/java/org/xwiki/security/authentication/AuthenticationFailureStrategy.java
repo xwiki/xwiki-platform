@@ -62,6 +62,11 @@ public interface AuthenticationFailureStrategy
      * @deprecated use {@link #validateForm(String, HttpServletRequest)} instead
      */
     @Deprecated(since = "17.0.0RC1")
+    // This default implementation and the default implementation of #validateForm(String, HttpServletRequest)
+    // delegate to each other on purpose, as a bridge between the deprecated javax method and the current jakarta
+    // one: an implementation is expected to override at least one of the two, so this never actually recurses
+    // infinitely at runtime.
+    @SuppressWarnings("javabugs:S2190")
     default boolean validateForm(String username, javax.servlet.http.HttpServletRequest request)
     {
         return validateForm(username, JakartaServletBridge.toJakarta(request));

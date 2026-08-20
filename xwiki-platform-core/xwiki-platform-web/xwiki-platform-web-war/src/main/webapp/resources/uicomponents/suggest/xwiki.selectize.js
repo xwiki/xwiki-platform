@@ -390,7 +390,7 @@ require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {
   $.fn.xwikiSelectize.initialized = true;
 
   var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+    var container = $(data?.elements || document);
     container.find('.xwiki-selectize').xwikiSelectize();
   };
 

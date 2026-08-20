@@ -175,7 +175,7 @@ widgets.DynamicButtonGroup = Class.create({
 });
 
 var init = function(event) {
-  ((event && event.memo.elements) || [$('body')]).each(function(element) {
+  (event?.memo.elements || [$('body')]).each(function(element) {
     element.select('.button-group').each(function(buttonGroup) {
       if (!buttonGroup.hasClassName('initialized')) {
         new XWiki.widgets.ButtonGroup(buttonGroup);

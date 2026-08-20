@@ -146,11 +146,11 @@ function onDragStart(el, x, y) {
     } else {
       el.placeholder.style.height = (el.offsetHeight ? (el.offsetHeight-2) : el.displayHeight) + "px";
     }
-    realParent.replaceChild(el.placeholder, el);
+    el.replaceWith(el.placeholder);
     el.placeholder.style.display = "block";
     addClass(allPanels, "dropTarget");
   } else {
-    realParent.replaceChild(dragel, el);
+    el.replaceWith(dragel);
   }
   // Make the current absolute
   el.style.position = "absolute";
@@ -193,7 +193,7 @@ function onDrag(el, x, y) {
     } else if (parentNode !== allPanels) {
       parentNode.appendChild( dragel);
     } else {
-      dragel.parentNode.removeChild(dragel);
+      dragel.remove();
     }
   }
 }
@@ -203,7 +203,7 @@ function onDragEnd(el, x, y) {
   window.isDraggingPanel = false;
   el.style.position = "static";
   if (parentNode === allPanels) {
-    el.placeholder.parentNode.replaceChild(el, el.placeholder);
+    el.placeholder.replaceWith(el);
     el.placeholder = undefined;
     rmClass(allPanels, "dropTarget");
   } else{
@@ -296,7 +296,7 @@ function start1() {
         }
         el.placeholder.style.height = (el.displayHeight) +"px";
         el.placeholder.style.display = "block";
-        panelsInList[i].parentNode.replaceChild(el.placeholder, panelsInList[i]);
+        panelsInList[i].replaceWith(el.placeholder);
       }
     }
     pos = window.allPanelsPlace[i]['right'];
@@ -314,7 +314,7 @@ function start1() {
         el.placeholder.style.height = (el.displayHeight) +"px";
         el.placeholder.style.display = "block";
         if (panelsInList[i].parentNode) {
-          panelsInList[i].parentNode.replaceChild(el.placeholder, panelsInList[i]);
+          panelsInList[i].replaceWith(el.placeholder);
         }
       }
     }
@@ -409,8 +409,8 @@ function releasePanels(column) {
 }
 
 function releasePanel(el) {
-  el.parentNode.removeChild(el);
-  el.placeholder.parentNode.replaceChild(el, el.placeholder);
+  el.remove();
+  el.placeholder.replaceWith(el);
   el.placeholder = undefined;
 }
 
@@ -438,7 +438,7 @@ function restorePanel(el, column) {
     el.placeholder.style.height = (el.offsetHeight ? (el.offsetHeight-2) : 0);
   }
   el.placeholder.style.display = "block";
-  el.parentNode.replaceChild(el.placeholder, el);
+  el.replaceWith(el.placeholder);
   column.appendChild(el);
 }
 

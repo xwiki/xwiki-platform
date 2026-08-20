@@ -457,7 +457,7 @@ var XWiki = (function(XWiki) {
       // We don't rely on window.location.reload(true) either since it's unclear if it's properly supported by
       // all browsers. Instead we rely on a query parameter with the current date.
       var params = new URLSearchParams(window.location.search);
-      params.set("timestamp", new Date().getTime());
+      params.set("timestamp", Date.now());
       window.location.search = "?" + params.toString();
     },
     // 401 happens when the user is not authorized to do that: can be a logout or a change in perm

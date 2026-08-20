@@ -87,7 +87,7 @@ require(['xwiki-tree'], function($) {
 });
 
 // Document Tree Picker
-require(['jquery', 'xwiki-meta'], function($, xm) {
+require(['jquery', 'xwiki-meta', 'xwiki-tree'], function($, xm) {
   $('.location-picker').each(function() {
     var picker = $(this);
     // The wiki field can be either a select (drop down) or an input (text or hidden).
@@ -109,7 +109,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     });
 
     picker.find('.modal').on('xwiki:locationTreePicker:select', function(event, data) {
-      var selectedNodeId = data.tree.get_selected()[0];
+      var selectedNodeId = $.fn.xtree.unescapeNodeId(data.tree.get_selected()[0]);
       var separatorIndex = selectedNodeId.indexOf(':');
       var nodeType = selectedNodeId.substr(0, separatorIndex);
       var nodeStringReference = selectedNodeId.substr(separatorIndex + 1);

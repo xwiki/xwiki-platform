@@ -98,12 +98,17 @@ define('xwiki-wysiwyg-entity-resource-picker', [
         }).on('xtree.runJob', function (event, promise, action, node, params) {
           if (action === 'create') {
             promise.then(function (promiseData) {
-              if (createdNodes[params.id] === undefined) {
-                createdNodes[params.id] = {};
+              // The parent node id is already escaped (it comes from the tree's own model), but params.id was
+              // unescaped by #execute() before being sent to the server, so we use the parent node id instead in
+              // order to match what #refresh_node.jstree reads later from data.node.id.
+              if (createdNodes[node.id] === undefined) {
+                createdNodes[node.id] = {};
               }
               if (promiseData instanceof Array) {
-                let newNode = promiseData[0];
-                createdNodes[params.id][newNode.id] = newNode;
+                // The job response carries the raw, unescaped, id of the newly created node, so we need to escape it
+                // before it can be inserted into the tree.
+                let newNode = $.fn.xtree.escapeNodeId(promiseData[0]);
+                createdNodes[node.id][newNode.id] = newNode;
               }
             });
           }
@@ -159,9 +164,10 @@ define('xwiki-wysiwyg-entity-resource-picker', [
   };
 
   var getEntityReference = function(node) {
-    var separatorIndex = node.id.indexOf(':');
-    var nodeType = node.id.substr(0, separatorIndex);
-    var nodeStringReference = node.id.substr(separatorIndex + 1);
+    var nodeId = $.fn.xtree.unescapeNodeId(node.id);
+    var separatorIndex = nodeId.indexOf(':');
+    var nodeType = nodeId.substr(0, separatorIndex);
+    var nodeStringReference = nodeId.substr(separatorIndex + 1);
     return XWiki.Model.resolve(nodeStringReference, XWiki.EntityType.byName(nodeType));
   };
 

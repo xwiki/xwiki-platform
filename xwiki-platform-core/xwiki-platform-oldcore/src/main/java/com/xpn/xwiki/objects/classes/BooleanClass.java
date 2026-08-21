@@ -224,10 +224,7 @@ public class BooleanClass extends PropertyClass
         select.setName(prefix + name);
         select.setID(prefix + name);
         select.setDisabled(isDisabled());
-        // This is a text alternative fallback to explain what the select is about. If the select has already been
-        // labelled in another way, this fallback will be ignored by Assistive Techs.
-        select.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
-            getTranslatedPrettyName(context)));
+        setAriaLabelFallback(select, context);
 
         String string0 = getDisplayValue(context, 0);
         String string1 = getDisplayValue(context, 1);
@@ -335,6 +332,7 @@ public class BooleanClass extends PropertyClass
         check.setAttributeFilter(new XMLAttributeValueFilter());
         check.setID(prefix + name);
         check.setDisabled(isDisabled());
+        setAriaLabelFallback(check, context);
         // If the (visible) checkbox is unchecked, it will not post anything back so the hidden input by the same
         // name will post back 0 and the save function will save the first entry it finds.
         org.apache.ecs.xhtml.input checkNo = new input(input.hidden, prefix + name, 0);

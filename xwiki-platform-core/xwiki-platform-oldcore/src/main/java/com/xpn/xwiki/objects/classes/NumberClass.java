@@ -79,6 +79,8 @@ public class NumberClass extends PropertyClass
 
     private static final long serialVersionUID = 1L;
 
+    // The "number" literal is intentionally repeated below, once for the XClass name and once for the HTML input
+    // type: the two happen to share the same value but represent unrelated concepts.
     @SuppressWarnings("checkstyle:MultipleStringLiterals")
     private static final String XCLASSNAME = "number";
     private static final String INPUT_TYPE_NUMBER = "number";

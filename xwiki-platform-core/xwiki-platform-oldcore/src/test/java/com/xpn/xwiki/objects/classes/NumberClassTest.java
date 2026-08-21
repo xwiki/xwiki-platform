@@ -34,6 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link NumberClass} class.
@@ -87,5 +90,38 @@ class NumberClassTest
         p = nc.fromString("4");
         assertNotNull(p);
         assertEquals(4, Integer.parseInt(p.getValue().toString()));
+    }
+
+    /** Test that displayEdit() sets the HTML5 validation attributes matching the number type. */
+    @Test
+    void displayEdit()
+    {
+        NumberClass nc = new NumberClass();
+        BaseClass bc = new BaseClass();
+        bc.setName("Some.Class");
+        nc.setObject(bc);
+        nc.setName("number1");
+        nc.setNumberType(NumberClass.TYPE_LONG);
+
+        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidformat"))
+            .thenReturn("Please enter a valid number.");
+        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.outofrange",
+            String.valueOf(Long.MIN_VALUE), String.valueOf(Long.MAX_VALUE))).thenReturn("Out of range.");
+
+        StringBuffer buffer = new StringBuffer();
+        nc.displayEdit(buffer, "number1", "prefix_", bc, this.oldcore.getXWikiContext());
+        String html = buffer.toString();
+
+        assertTrue(html.contains("step='1'"), html);
+        assertTrue(html.contains("min='" + Long.MIN_VALUE + "'"), html);
+        assertTrue(html.contains("max='" + Long.MAX_VALUE + "'"), html);
+        assertTrue(html.contains("data-validation-bad-input='Please enter a valid number.'"), html);
+        assertTrue(html.contains("data-validation-step-mismatch='Please enter a valid number.'"), html);
+        assertTrue(html.contains("data-validation-range-overflow='Out of range.'"), html);
+        assertTrue(html.contains("data-validation-range-underflow='Out of range.'"), html);
+
+        verify(this.contextualLocalizationManager).getTranslationPlain("core.validation.number.message.invalidformat");
+        verify(this.contextualLocalizationManager).getTranslationPlain("core.validation.number.message.outofrange",
+            String.valueOf(Long.MIN_VALUE), String.valueOf(Long.MAX_VALUE));
     }
 }

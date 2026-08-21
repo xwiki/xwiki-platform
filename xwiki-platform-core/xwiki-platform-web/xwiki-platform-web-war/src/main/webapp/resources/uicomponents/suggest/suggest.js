@@ -260,7 +260,7 @@ var XWiki = (function(XWiki){
     }
 
     // Stop propagation for the keys we have handled, unless otherwise specified in the options.
-    if (checkPropagation && this.options.propagateEventKeyCodes && this.options.propagateEventKeyCodes.indexOf(key) == -1) {
+    if (checkPropagation && this.options.propagateEventKeyCodes && !this.options.propagateEventKeyCodes.includes(key)) {
       Event.stop(event);
     }
   },
@@ -380,7 +380,7 @@ var XWiki = (function(XWiki){
    */
   doAjaxRequest: function (source, requestId, ajaxRequestParameters)
   {
-    var url = source.script + (source.script.indexOf('?') < 0 ? '?' : '&') + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
+    var url = source.script + (source.script.includes('?') ? '&' : '?') + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
     var method = source.method || "get";
     var headers = {};
     if (source.json) {
@@ -701,7 +701,7 @@ var XWiki = (function(XWiki){
     }
 
     // Ensure any previous list of results for this source gets removed
-    sourceContainer.down('ul') && sourceContainer.down('ul').remove();
+    sourceContainer.down('ul')?.remove();
 
     // Show the "hide suggestions" buttons
     this.container.select('.hide-button-wrapper').invoke('show');
@@ -790,7 +790,7 @@ var XWiki = (function(XWiki){
     }
     // If the search result contains an icon information, we insert this icon in the result entry.
     if (data.icon) {
-      if (data.icon.indexOf('.') >= 0 || data.icon.indexOf('/') >= 0) {
+      if (data.icon.includes('.') || data.icon.includes('/')) {
         // The icon is specified as a file path.
         var iconElement = new Element('img', {'src': data.icon, 'class': 'icon'});
       } else {
@@ -950,7 +950,7 @@ var XWiki = (function(XWiki){
 
   highlightFirst: function()
   {
-    if (this.suggest && this.suggest.down('ul')) {
+    if (this.suggest?.down('ul')) {
       var first = this.suggest.down('ul').down('li');
       if (first) {
         this.setHighlight(first);
@@ -1058,7 +1058,7 @@ var XWiki = (function(XWiki){
     this.isActive = false;
     var ele = $(this.container);
     var pointer = this;
-    if (ele && ele.parentNode) {
+    if (ele?.parentNode) {
       if (this.options.fadeOnClear && window.Effect) {
         new Effect.Fade(ele, {duration: "0.25", afterFinish : function() {
           if($(pointer.container)) {

@@ -107,16 +107,16 @@ Object.extend(XWiki, {
 
     fromEntityReference : function(reference, anchor) {
         var wiki = reference.extractReference(XWiki.EntityType.WIKI);
-        wiki = (wiki && wiki.name) || XWiki.currentWiki;
+        wiki = wiki?.name || XWiki.currentWiki;
 
         var space = reference.extractReference(XWiki.EntityType.SPACE);
-        space = (space && space.name) || XWiki.currentSpace;
+        space = space?.name || XWiki.currentSpace;
 
         var page = reference.extractReference(XWiki.EntityType.DOCUMENT);
-        page = (page && page.name) || XWiki.currentPage;
+        page = page?.name || XWiki.currentPage;
 
         var attachment = reference.extractReference(XWiki.EntityType.ATTACHMENT);
-        attachment = (attachment && attachment.name) || '';
+        attachment = attachment?.name || '';
 
         var documentReference = new XWiki.DocumentReference(wiki, space, page);
         var fullName = XWiki.Model.serialize(documentReference.relativeTo(new XWiki.WikiReference(wiki)));
@@ -204,7 +204,7 @@ Object.extend(XWiki, {
      //   1. Call dhtmlSwitch()
      //   2. If the function call has been triggered by an event : reset location.href to #extraID
      //      (because when the link has been first clicked the anchor was not loaded)
-     if ($(extraID + "pane").className.indexOf("empty") != -1) {
+     if ($(extraID + "pane").className.includes("empty")) {
         if (window.activeDocExtraPane != null) {
             window.activeDocExtraPane.className="invisible";
         }
@@ -907,7 +907,7 @@ window.shortcut = new Object({
 
             var listener = shortcut._get_or_create_listener(listener_target, listener_group, keypress);
 
-            if ('type' in opt && Object.values(shortcut.type).indexOf(opt['type']) > -1) {
+            if ('type' in opt && Object.values(shortcut.type).includes(opt['type'])) {
                 switch (opt['type']) {
                     case shortcut.type.COUNTING:
                         shortcut_descriptor["is_counting"] = true;
@@ -934,7 +934,7 @@ window.shortcut = new Object({
             // Log deprecation warnings for opt parameters
             var allowedOptParameters = ['target', 'disable_in_input', 'type'];
             Object.keys(opt).forEach(function (key) {
-                if (allowedOptParameters.indexOf(key) === -1) {
+                if (!allowedOptParameters.includes(key)) {
                     console.warn('The parameter [' + key + '] for the shortcut [' + shortcut_combination
                         + '] is deprecated.');
                 }
@@ -1478,7 +1478,7 @@ document.observe('xwiki:dom:loaded', function() {
 ['xwiki:dom:loaded', 'xwiki:dom:updated'].each(function(eventName) {
   document.observe(eventName, function(event) {
     if (typeof(XWiki.widgets.Suggest) != "undefined") {
-      var elements = event.memo && event.memo.elements || [document.documentElement];
+      var elements = event.memo?.elements || [document.documentElement];
       elements.each(function(element) {
         element.select(".suggested").each(function(item) {
           item.setAttribute("autocomplete", "off");
@@ -1618,7 +1618,7 @@ document.observe("xwiki:dom:loaded", function() {
   function handleScroll() {
     var menuExtras = $$('.annotationsettings');
     var extraHeight = 0;
-    if (menuExtras && menuExtras.length) {
+    if (menuExtras?.length) {
       menu.__fm_extra = menuExtras[0];
       createGhost(menu.__fm_extra);
       extraHeight = menu.__fm_extra.getHeight();
@@ -1725,7 +1725,7 @@ document.observe("xwiki:dom:loaded", function() {
         loadedResources = getLoadedResources();
       }
       var url = resource.getAttribute('href') || resource.getAttribute('src');
-      if(loadedResources.indexOf(url) < 0) {
+      if(!loadedResources.includes(url)) {
         if (resource.getAttribute('src') && !resource.hasAttribute('async')) {
           // Scripts that are dynamically created and added to the document are async by default, which means there are
           // no guarantees they will execute in the same order they were added.

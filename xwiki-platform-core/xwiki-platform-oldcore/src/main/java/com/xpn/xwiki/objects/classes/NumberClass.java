@@ -199,7 +199,8 @@ public class NumberClass extends PropertyClass
                 }
             }
         } catch (NumberFormatException e) {
-            String message = String.format("The value [%s] is not a valid number of type [%s]", value, ntype);
+            String message =
+                localizePlainOrKey("core.model.xclass.classProperty.error.invalidNumberFormat", value, ntype);
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
                 XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID, message, e);
         }

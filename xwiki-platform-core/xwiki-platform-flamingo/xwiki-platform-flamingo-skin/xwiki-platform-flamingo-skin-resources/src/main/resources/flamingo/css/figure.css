@@ -1,0 +1,10 @@
+figure img {
+  margin-bottom: 5px;
+  line-height: 1;
+}
+
+figcaption {
+  font-size: var(--figure-caption-font-size);
+  color: var(--figure-caption-color);
+  margin-bottom: var(--figure-caption-margin-bottom);
+}

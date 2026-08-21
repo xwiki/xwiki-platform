@@ -828,11 +828,11 @@ function checkAdvancedContent(message) {
     var data = document.forms.edit.content.value;
     var myRE = new RegExp("</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>", "ig");
     var results = data.match(myRE);
-    var result = results && results.length;
+    var result = results?.length;
 
     var myRE2 = new RegExp("(#(set|include|if|end|for)|#(#) Advanced content|public class|/\* Advanced content \*/)", "ig");
     results = data.match(myRE2);
-    result = result || (results && results.length);
+    result = result || results?.length;
 
     if (result) {
         return confirm(message);

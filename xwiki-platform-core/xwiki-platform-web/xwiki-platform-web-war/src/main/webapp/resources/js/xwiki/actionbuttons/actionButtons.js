@@ -288,10 +288,10 @@ var XWiki = (function(XWiki) {
         return;
       }
 
-      var isCreateFromTemplate = (this.form.template && this.form.template.value);
+      var isCreateFromTemplate = this.form.template?.value;
 
       // Handle explicitly requested synchronous operations (mainly for backwards compatibility).
-      var isAsync = (this.form.async && this.form.async.value === 'true');
+      var isAsync = this.form.async?.value === 'true';
 
       // Avoid template asynchronous handling of templates for synchronous or custom forms.
       if (!isAsync) {

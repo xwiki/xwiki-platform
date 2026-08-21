@@ -86,6 +86,15 @@ public class NumberClass extends PropertyClass
     private static final String INPUT_TYPE_NUMBER = "number";
     private static final String SIZE = "size";
     private static final String NUMBER_TYPE = "numberType";
+    private static final String STEP = "step";
+    private static final String STEP_ANY = "any";
+    private static final String STEP_INTEGER = "1";
+    private static final String MIN = "min";
+    private static final String MAX = "max";
+    private static final String DATA_VALIDATION_BAD_INPUT = "data-validation-bad-input";
+    private static final String DATA_VALIDATION_STEP_MISMATCH = "data-validation-step-mismatch";
+    private static final String DATA_VALIDATION_RANGE_OVERFLOW = "data-validation-range-overflow";
+    private static final String DATA_VALIDATION_RANGE_UNDERFLOW = "data-validation-range-underflow";
 
     /**
      * Constructor with a meta class.
@@ -190,7 +199,7 @@ public class NumberClass extends PropertyClass
                 }
             }
         } catch (NumberFormatException e) {
-            String message = localizePlainOrKey("core.validation.number.message.invalidFormat", value, ntype);
+            String message = String.format("The value [%s] is not a valid number of type [%s]", value, ntype);
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
                 XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID, message, e);
         }
@@ -215,7 +224,36 @@ public class NumberClass extends PropertyClass
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setSize(getSize());
+        // The "size" attribute is ignored by browsers on type="number" inputs, so we approximate the same width
+        // with an inline style instead.
+        input.addAttribute("style", "width: " + getSize() + "ch;");
         input.setDisabled(isDisabled());
+
+        String ntype = getNumberType();
+        String invalidFormatMessage = localizePlainOrKey("core.validation.number.message.invalidformat");
+        input.addAttribute(DATA_VALIDATION_BAD_INPUT, invalidFormatMessage);
+        input.addAttribute(DATA_VALIDATION_STEP_MISMATCH, invalidFormatMessage);
+        if (TYPE_FLOAT.equals(ntype) || TYPE_DOUBLE.equals(ntype)) {
+            // Without an explicit step, the HTML5 default (step=1) makes any decimal value a stepMismatch.
+            input.addAttribute(STEP, STEP_ANY);
+        } else {
+            input.addAttribute(STEP, STEP_INTEGER);
+            String min;
+            String max;
+            if (TYPE_INTEGER.equals(ntype)) {
+                min = String.valueOf(Integer.MIN_VALUE);
+                max = String.valueOf(Integer.MAX_VALUE);
+            } else {
+                min = String.valueOf(Long.MIN_VALUE);
+                max = String.valueOf(Long.MAX_VALUE);
+            }
+            input.addAttribute(MIN, min);
+            input.addAttribute(MAX, max);
+            String outOfRangeMessage = localizePlainOrKey("core.validation.number.message.outofrange", min, max);
+            input.addAttribute(DATA_VALIDATION_RANGE_OVERFLOW, outOfRangeMessage);
+            input.addAttribute(DATA_VALIDATION_RANGE_UNDERFLOW, outOfRangeMessage);
+        }
+
         buffer.append(input.toString());
     }
 

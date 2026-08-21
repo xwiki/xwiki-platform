@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -123,10 +124,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                             session.createSQLQuery("update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
 
                     for (Object[] result : rs) {
-                        if (R4359XWIKI1459DataMigration.this.logger.isInfoEnabled()) {
-                            R4359XWIKI1459DataMigration.this.logger
-                                    .info("Updating document [{}]...", result[2].toString());
-                        }
+                        R4359XWIKI1459DataMigration.this.logger.info("Updating document [{}]...", result[2].toString());
                         long docId = Long.parseLong(result[0].toString());
                         String sArchive = result[1].toString();
 
@@ -142,7 +140,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                                 R4359XWIKI1459DataMigration.this.logger.warn(
                                     "The RCS archive for [{}] is broken. Internal error [{}]."
                                         + " The history for this document has been reset.",
-                                    result[2].toString(), e.getMessage());
+                                    result[2].toString(), ExceptionUtils.getRootCauseMessage(e));
                             }
                             getVersioningStore().saveXWikiDocArchive(docArchive, true, context);
                         } else {

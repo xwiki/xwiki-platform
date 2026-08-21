@@ -114,10 +114,8 @@ public class DocumentInfo
 
     public int testInstall(boolean isAdmin, XWikiContext context)
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Package test install document " + ((this.doc == null) ? "" : getFullName()) + " "
-                + ((this.doc == null) ? "" : getLanguage()));
-        }
+        LOGGER.debug("Package test install document [{}] [{}]", (this.doc == null) ? "" : getFullName(),
+            (this.doc == null) ? "" : getLanguage());
 
         this.installable = INSTALL_IMPOSSIBLE;
 
@@ -146,10 +144,8 @@ public class DocumentInfo
             this.installable = INSTALL_OK;
             return this.installable;
         } finally {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Package test install document " + ((this.doc == null) ? "" : getFullName()) + " "
-                    + ((this.doc == null) ? "" : getLanguage()) + " result " + this.installable);
-            }
+            LOGGER.debug("Package test install document [{}] [{}] result [{}]",
+                (this.doc == null) ? "" : getFullName(), (this.doc == null) ? "" : getLanguage(), this.installable);
         }
     }
 

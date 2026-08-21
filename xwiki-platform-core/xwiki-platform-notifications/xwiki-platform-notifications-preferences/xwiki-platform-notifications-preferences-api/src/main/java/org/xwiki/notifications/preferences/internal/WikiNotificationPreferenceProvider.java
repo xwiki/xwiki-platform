@@ -85,7 +85,7 @@ public class WikiNotificationPreferenceProvider extends AbstractDocumentNotifica
                     preferences);
         } else {
             logger.warn("Preference's target [{}] is not a wiki reference. The corresponding preference will not be"
-                    + " saved.");
+                    + " saved.", target);
         }
     }
 }

@@ -31,7 +31,7 @@ import com.xpn.xwiki.pdf.impl.PdfURLFactory;
 
 public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiURLFactoryService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiURLFactoryServiceImpl.class);
 
     private Map<Integer, Class<? extends XWikiURLFactory>> factoryMap;
 
@@ -57,13 +57,13 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
         String urlFactoryClassName = xwiki.Param(propertyName);
         if (urlFactoryClassName != null) {
             try {
-                LOGGER.debug("Using custom url factory [" + urlFactoryClassName + "]");
+                LOGGER.debug("Using custom url factory [{}]", urlFactoryClassName);
                 @SuppressWarnings("unchecked")
                 Class<? extends XWikiURLFactory> urlFactoryClass =
                     (Class<? extends XWikiURLFactory>) Class.forName(urlFactoryClassName);
                 this.factoryMap.put(mode, urlFactoryClass);
             } catch (Exception e) {
-                LOGGER.error("Failed to load custom url factory class [" + urlFactoryClassName + "]");
+                LOGGER.error("Failed to load custom url factory class [{}]", urlFactoryClassName);
             }
         }
     }

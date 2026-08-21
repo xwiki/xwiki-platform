@@ -103,7 +103,7 @@ var XWiki = (function(XWiki){
     // Default is null, which falls back on the input itself. This option is used only when unifiedLoader is true.
     loaderNode: null,
     // A list of key codes for which to propagate the keyboard event.
-    // Useful when another keyboard event listener exists on the input field, even if it may be registered at a diferent level.
+    // Useful when another keyboard event listener exists on the input field, even if it may be registered at a different level.
     // By default, the handled key events do not propagate, the rest do. See #onKeyDown
     propagateEventKeyCodes : []
   },
@@ -161,7 +161,7 @@ var XWiki = (function(XWiki){
 
     // Initialize a request number that will keep track of the latest request being fired.
     // This will help to discard potential non-last requests callbacks ; this in order to have better performance
-    // (less unneccessary DOM manipulation, and less unneccessary highlighting computation).
+    // (less unnecessary DOM manipulation, and less unnecessary highlighting computation).
     this.latestRequest = 0;
 
   },
@@ -505,7 +505,7 @@ var XWiki = (function(XWiki){
       var pos = $(this.options.parentContainer).tagName.toLowerCase() == 'body' ? this.fld.cumulativeOffset() : this.fld.positionedOffset();
 
       // Container width is passed as an option, or field width if no width provided.
-      // The 2px substracted correspond to one pixel of border on each side of the field,
+      // The 2px subtracted correspond to one pixel of border on each side of the field,
       // this allows to have the suggestion box borders well aligned with the field borders.
       // FIXME this should be computed instead, since border might not always be 1px.
       var fieldWidth = this.fld.offsetWidth - 2;

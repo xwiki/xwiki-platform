@@ -61,7 +61,7 @@ public class CssExtension implements Extension
                 compressor.compress(out, -1);
                 return out.toString();
             } catch (IOException ex) {
-                LOGGER.warn("Exception compressing SSX code", ex);
+                LOGGER.warn("Failed to compress the SSX code", ex);
             }
             return source;
         };

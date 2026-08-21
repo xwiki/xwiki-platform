@@ -156,7 +156,8 @@ class WikiDescriptorMigratorTest
         // Verify
         verify(this.logger).warn(
             "Failed to get or save the wiki descriptor document [{}]. You"
-                + " will not see the corresponding wiki in the Wiki Index unless you give it a Pretty Name manually. {}",
+                + " will not see the corresponding wiki in the Wiki Index unless you give it a Pretty Name manually."
+                + " Root cause is [{}]",
             documentList.getFirst(), ExceptionUtils.getRootCauseMessage(exception));
     }
 

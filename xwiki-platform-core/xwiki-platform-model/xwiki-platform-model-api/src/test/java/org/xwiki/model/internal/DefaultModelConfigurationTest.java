@@ -21,7 +21,6 @@ package org.xwiki.model.internal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
@@ -76,7 +75,7 @@ class DefaultModelConfigurationTest
     }
 
     @Test
-    void testGetDefaultReferenceNameWhenNotDefinedInConfiguration() throws ComponentLookupException
+    void testGetDefaultReferenceNameWhenNotDefinedInConfiguration()
     {
         assertEquals("xwiki", this.configuration.getDefaultReferenceValue(EntityType.WIKI));
         assertEquals("WebHome", this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT));

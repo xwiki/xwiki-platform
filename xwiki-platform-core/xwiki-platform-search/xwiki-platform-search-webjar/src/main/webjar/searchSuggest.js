@@ -133,7 +133,7 @@ var XWiki = (function (XWiki) {
     },
 
     /**
-     * Creates the underlaying suggest widget.
+     * Creates the underlying suggest widget.
      */
     createSuggest: function() {
       // Create dummy suggestion node to hold the "Go to search page..." option.

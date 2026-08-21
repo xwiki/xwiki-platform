@@ -104,9 +104,7 @@ public class RefererStats extends XWikiStats
         try {
             url = new URL(getReferer());
         } catch (MalformedURLException e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Failed to construct URL from referer", e);
-            }
+            LOGGER.debug("Failed to construct URL from referer [{}]", getReferer(), e);
         }
 
         return url;

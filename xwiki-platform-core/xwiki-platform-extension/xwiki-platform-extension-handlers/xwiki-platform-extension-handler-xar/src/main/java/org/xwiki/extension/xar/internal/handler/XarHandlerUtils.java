@@ -31,7 +31,7 @@ public final class XarHandlerUtils
 
     private XarHandlerUtils()
     {
-        // Utlity class
+        // Utility class
     }
     
     /**

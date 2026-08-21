@@ -17,14 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cluster.test;
+package org.xwiki.cluster.test.ui.docker;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
-import org.xwiki.cluster.test.framework.AbstractClusterHttpIT;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -32,19 +30,26 @@ import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.resources.attachments.AttachmentsResource;
-import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.docker.junit5.XWikiInstances;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Verify the document cache update based on distributed events.
  * 
  * @version $Id$
  */
-public class DocumentCacheIT extends AbstractClusterHttpIT
+@UITest(xwikiInstances = @XWikiInstances(2))
+class DocumentCacheIT
 {
     private static final String TEST_SPACE = "Test";
 
     @Test
-    public void documentModifiedCacheSync() throws Exception
+    void documentModifiedCacheSync(TestUtils setup) throws Exception
     {
         Page page = new Page();
         page.setSpace(TEST_SPACE);
@@ -53,23 +58,23 @@ public class DocumentCacheIT extends AbstractClusterHttpIT
         LocalDocumentReference documentReference = new LocalDocumentReference(page.getSpace(), page.getName());
 
         // 1) Edit a page on XWiki 0
-        AbstractTest.getUtil().switchExecutor(0);
+        setup.switchExecutor(0);
         page.setContent("content");
-        AbstractTest.getUtil().rest().save(page);
-        assertEquals("content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
+        setup.rest().save(page);
+        assertEquals("content", setup.rest().<Page>get(documentReference).getContent());
 
         // 2) Modify content of the page on XWiki 1
-        AbstractTest.getUtil().switchExecutor(1);
+        setup.switchExecutor(1);
         page.setContent("modified content");
-        AbstractTest.getUtil().rest().save(page);
-        assertEquals("modified content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
+        setup.rest().save(page);
+        assertEquals("modified content", setup.rest().<Page>get(documentReference).getContent());
 
         // ASSERT) The content in XWiki 0 should be the one set than in XWiki 1
         // Since it can take time for the Cluster to propagate the change, we need to wait and set up a timeout.
-        AbstractTest.getUtil().switchExecutor(0);
+        setup.switchExecutor(0);
         assertEqualsWithTimeout("modified content", () -> {
             try {
-                return AbstractTest.getUtil().rest().<Page>get(documentReference).getContent();
+                return setup.rest().<Page>get(documentReference).getContent();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -77,7 +82,7 @@ public class DocumentCacheIT extends AbstractClusterHttpIT
     }
 
     @Test
-    public void documentDeletedCacheSync() throws Exception
+    void documentDeletedCacheSync(TestUtils setup) throws Exception
     {
         Page page = new Page();
         page.setSpace(TEST_SPACE);
@@ -86,24 +91,24 @@ public class DocumentCacheIT extends AbstractClusterHttpIT
         LocalDocumentReference documentReference = new LocalDocumentReference(page.getSpace(), page.getName());
 
         // 1) Make sure page exist on XWiki 0
-        AbstractTest.getUtil().switchExecutor(0);
+        setup.switchExecutor(0);
         page.setContent("content");
-        AbstractTest.getUtil().rest().save(page);
-        assertEquals("content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
+        setup.rest().save(page);
+        assertEquals("content", setup.rest().<Page>get(documentReference).getContent());
 
         // 2) Delete page on XWiki 1
-        AbstractTest.getUtil().switchExecutor(1);
+        setup.switchExecutor(1);
         // Need superadmin to delete document
-        AbstractTest.getUtil().loginAsSuperAdmin();
-        AbstractTest.getUtil().rest().delete(documentReference);
-        assertFalse(AbstractTest.getUtil().rest().exists(documentReference));
+        setup.loginAsSuperAdmin();
+        setup.rest().delete(documentReference);
+        assertFalse(setup.rest().exists(documentReference));
 
         // ASSERT) The document should be deleted on XWiki 0
         // Since it can take time for the Cluster to propagate the change, we need to wait and set up a timeout.
-        AbstractTest.getUtil().switchExecutor(0);
+        setup.switchExecutor(0);
         assertTrueWithTimeout("Document should not exist anymore", () -> {
             try {
-                return AbstractTest.getUtil().rest().exists(documentReference);
+                return setup.rest().exists(documentReference);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -111,40 +116,40 @@ public class DocumentCacheIT extends AbstractClusterHttpIT
     }
 
     @Test
-    public void documentCacheSyncForAttachments() throws Exception
+    void documentCacheSyncForAttachments(TestUtils setup) throws Exception
     {
         Page page = new Page();
         page.setSpace(TEST_SPACE);
         page.setName("AttachementCacheSync");
 
         AttachmentReference attachmentReference = new AttachmentReference("file.ext",
-            new DocumentReference(AbstractTest.getUtil().getCurrentWiki(), page.getSpace(), page.getName()));
+            new DocumentReference(setup.getCurrentWiki(), page.getSpace(), page.getName()));
 
         // 1) Edit a page on XWiki 0
-        AbstractTest.getUtil().switchExecutor(0);
+        setup.switchExecutor(0);
         page.setContent("content");
-        AbstractTest.getUtil().rest().save(page);
+        setup.rest().save(page);
 
         // 2) Add attachment to the page on XWiki 1
-        AbstractTest.getUtil().switchExecutor(1);
-        AbstractTest.getUtil().rest().attachFile(attachmentReference, "content".getBytes(), true);
+        setup.switchExecutor(1);
+        setup.rest().attachFile(attachmentReference, "content".getBytes(), true);
 
         // ASSERT) The content in XWiki 0 should be the one set than in XWiki 1
         // Since it can take time for the Cluster to propagate the change, we need to wait and set up a timeout.
-        AbstractTest.getUtil().switchExecutor(0);
+        setup.switchExecutor(0);
         assertTrueWithTimeout("Failed to find attachment", () -> {
             try {
-                return !hasAttachment(attachmentReference);
+                return !hasAttachment(attachmentReference, setup);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
-    private boolean hasAttachment(AttachmentReference attachmentReference) throws Exception
+    private boolean hasAttachment(AttachmentReference attachmentReference, TestUtils setup) throws Exception
     {
         Attachments attachments =
-            AbstractTest.getUtil().rest().get(AttachmentsResource.class, attachmentReference.getDocumentReference());
+            setup.rest().get(AttachmentsResource.class, attachmentReference.getDocumentReference());
         for (Attachment attachment : attachments.getAttachments()) {
             System.out.println(attachment.getName());
             if (attachment.getName().equals(attachmentReference.getName())) {
@@ -155,8 +160,7 @@ public class DocumentCacheIT extends AbstractClusterHttpIT
         return false;
     }
 
-    private void assertTrueWithTimeout(String failMessage, BooleanSupplier booleanSupplier)
-        throws InterruptedException
+    private void assertTrueWithTimeout(String failMessage, BooleanSupplier booleanSupplier) throws InterruptedException
     {
         long t2;
         long t1 = System.currentTimeMillis();

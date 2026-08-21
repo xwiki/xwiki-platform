@@ -82,7 +82,7 @@ class LocalUidStringEntityReferenceSerializerTest
     }
 
     @Test
-    void serializeAttachmentReference() throws Exception
+    void serializeAttachmentReference()
     {
         EntityReference reference = resolver.resolve("wiki:space.page@filename", EntityType.ATTACHMENT);
         assertEquals("5:space4:page8:filename", serializer.serialize(reference));

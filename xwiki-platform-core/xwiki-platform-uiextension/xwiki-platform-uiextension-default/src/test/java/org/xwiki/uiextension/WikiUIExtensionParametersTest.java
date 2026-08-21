@@ -186,14 +186,14 @@ class WikiUIExtensionParametersTest
     {
         when(this.velocityEngine
             .evaluate(any(VelocityContext.class), any(StringWriter.class), eq("id:key"), eq("value")))
-            .thenThrow(new XWikiVelocityException(""));
+            .thenThrow(new XWikiVelocityException("evaluation failure"));
         BaseObject mockUIX = constructMockUIXObject("key=value");
         WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
 
         // It put a warning in the logs and return the not-evaluated value.
         assertEquals("value", parameters.get().get("key"));
-        assertEquals("Failed to evaluate UI extension data value, key [key], value [value]. Reason: []",
-            this.logCapture.getMessage(0));
+        assertEquals("Failed to evaluate UI extension data value, key [key], value [value]. Reason: "
+            + "[XWikiVelocityException: evaluation failure]", this.logCapture.getMessage(0));
     }
 
     @Test
@@ -297,7 +297,8 @@ class WikiUIExtensionParametersTest
 
         when(result.getStringValue(WikiUIExtensionConstants.ID_PROPERTY)).thenReturn("id");
         when(result.getStringValue(WikiUIExtensionConstants.PARAMETERS_PROPERTY)).thenReturn(parameters);
-        when(result.getOwnerDocument()).thenReturn(mock(XWikiDocument.class));
+        XWikiDocument xWikiDocumentMock = mock();
+        when(result.getOwnerDocument()).thenReturn(xWikiDocumentMock);
         when(result.getOwnerDocument().getAuthorReference()).thenReturn(WikiUIExtensionParametersTest.AUTHOR_REFERENCE);
         when(result.getDocumentReference()).thenReturn(WikiUIExtensionParametersTest.DOCUMENT_REFERENCE);
 

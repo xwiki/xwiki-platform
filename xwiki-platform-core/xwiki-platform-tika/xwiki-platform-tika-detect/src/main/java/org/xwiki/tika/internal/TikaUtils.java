@@ -52,7 +52,7 @@ public final class TikaUtils
         try {
             tika = new Tika(new TikaConfig(TikaUtils.class.getResource("/tika-config.xml")));
         } catch (Exception e) {
-            LOGGER.warn("Failed to load tika configuration (default configuration will be used): {}",
+            LOGGER.warn("Failed to load tika configuration (default configuration will be used): [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
 
             tika = new Tika();

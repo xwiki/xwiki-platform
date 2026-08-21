@@ -242,7 +242,12 @@ public class XWikiExecutor
         }
     }
 
-    private static int resolvePort(int index)
+    /**
+     * @param index the index of the XWiki instance
+     * @return the port on which the XWiki instance with the passed index listens
+     * @since 18.7.0RC1
+     */
+    public static int resolvePort(int index)
     {
         String portString = System.getProperty("xwikiPort" + index);
         return portString != null ? Integer.valueOf(portString) : (Integer.valueOf(DEFAULT_PORT) + index);
@@ -515,7 +520,8 @@ public class XWikiExecutor
         if (response.timedOut) {
             String message = String.format("Failed to start XWiki in [%s] seconds, last error code [%s], message [%s]",
                 timeout, response.responseCode, response.responseBody);
-            LOGGER.info(message);
+            LOGGER.info("Failed to start XWiki in [{}] seconds, last error code [{}], message [{}]", timeout,
+                response.responseCode, response.responseBody);
             stop();
             throw new RuntimeException(message);
         } else {

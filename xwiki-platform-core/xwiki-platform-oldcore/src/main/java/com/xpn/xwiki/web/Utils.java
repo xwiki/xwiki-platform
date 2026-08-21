@@ -209,7 +209,8 @@ public class Utils
                 try {
                     response.setContentLength(content.getBytes(context.getWiki().getEncoding()).length);
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Failed to compute the content length using encoding [{}]",
+                        context.getWiki().getEncoding(), e);
                 }
             }
 
@@ -522,7 +523,7 @@ public class Utils
     }
 
     /**
-     * Convert a byte character value to the corresponding hexidecimal digit value.
+     * Convert a byte character value to the corresponding hexadecimal digit value.
      * <p>
      * Code borrowed from Apache Tomcat 5.0
      * </p>

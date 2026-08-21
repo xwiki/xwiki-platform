@@ -34,7 +34,7 @@ import org.xwiki.model.reference.EntityReference;
 public interface RatingsConfiguration
 {
     /**
-     * @return {@code false} if a rating set to 0 shoud lead to the deletion of a previously made vote.
+     * @return {@code false} if a rating set to 0 should lead to the deletion of a previously made vote.
      *         {@code true} means that all ratings noted to 0 are stored. Note that this option will impact the
      *         average rating.
      */

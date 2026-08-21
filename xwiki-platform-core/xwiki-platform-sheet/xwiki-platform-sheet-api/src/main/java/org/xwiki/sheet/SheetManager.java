@@ -53,7 +53,7 @@ public interface SheetManager
     List<DocumentReference> getSheets(DocumentModelBridge document, String action);
 
     /**
-     * Indicate if the sheet system should be used (instead of old edit modes and #include based dispay). Generally
+     * Indicate if the sheet system should be used (instead of old edit modes and #include based display). Generally
      * controlled using the URL {@code sheet} parameter;
      * 
      * @return true if the sheet system should be used

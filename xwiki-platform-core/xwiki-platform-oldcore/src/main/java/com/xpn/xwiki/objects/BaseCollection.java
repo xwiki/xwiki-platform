@@ -299,7 +299,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             try {
                 baseClass = context.getWiki().getXClass(classReference, context);
             } catch (Exception e) {
-                LOGGER.error("Failed to get class [" + classReference + "]", e);
+                LOGGER.error("Failed to get class [{}]", classReference, e);
             }
         }
 
@@ -821,7 +821,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * Return a XML version of this collection.
      * <p>
-     * The XML is not formated. to get formatted XML you can use {@link #toXMLString(boolean)} instead.
+     * The XML is not formatted. to get formatted XML you can use {@link #toXMLString(boolean)} instead.
      * 
      * @return the XML as a String
      */

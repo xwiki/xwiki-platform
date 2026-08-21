@@ -799,7 +799,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * Add a field in the Solr schema.
      * 
      * @param name the name of the field to add
-     * @param type the tpe of the field to addd
+     * @param type the type of the field to add
      * @param dynamic true to create a dynamic field
      * @param attributes attributed to add to the field definition
      * @throws SolrException when failing to add the field

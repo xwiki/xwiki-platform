@@ -128,7 +128,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // Set the configured home URL for the main wiki
         setDefaultURL(null, homepageConfigration);
 
-        // Check if the request is a deamon thread request
+        // Check if the request is a daemon thread request
         XWikiRequest request = context.getRequest();
         this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub stub
             && stub.isDaemon();
@@ -153,7 +153,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     defaultWikiURL =
                         new URL(protocolConfiguration, this.originalURL.getHost(), this.originalURL.getPort(), "");
                 } catch (MalformedURLException e) {
-                    LOGGER.warn("The configured protocol [{}] produce an invalid URL: {}", protocolConfiguration,
+                    LOGGER.warn("The configured protocol [{}] produces an invalid URL: [{}]", protocolConfiguration,
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
@@ -172,7 +172,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             try {
                 url = xcontext.getWiki().getServerURL(xcontext.getWikiId(), xcontext);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Can't get the standard URL for wiki [{}]: {}", xcontext.getWikiId(),
+                LOGGER.warn("Can't get the standard URL for wiki [{}]: [{}]", xcontext.getWikiId(),
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
@@ -234,7 +234,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             try {
                 return normalizeURL(surl, context);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter: {}. Ignoring parameter.", surl);
+                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter [{}]. Ignoring parameter. "
+                    + "Root cause is [{}]", surl, ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
@@ -433,7 +434,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * {@code http://localhost:8080/xwiki/bin/view/A'/B}. This would generate a HTML of
      * {@code <a href='http://localhost:8080/xwiki/bin/view/A'/B'} which would generated a wrong link to
      * {@code http://localhost:8080/xwiki/bin/view/A}... Thus if we were only encoding the characters that require
-     * encoding, we would need HMTL writers to encode the received URL and right now we don't do that anywhere in our
+     * encoding, we would need HTML writers to encode the received URL and right now we don't do that anywhere in our
      * code. Thus in order to not introduce any problem and keep it safe we just handle the {@code +} character
      * specially and encode the rest.
      *

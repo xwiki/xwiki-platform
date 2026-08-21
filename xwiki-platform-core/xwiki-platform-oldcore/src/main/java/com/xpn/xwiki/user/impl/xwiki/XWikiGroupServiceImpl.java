@@ -70,7 +70,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     public static final EntityReference GROUPCLASS_REFERENCE = new EntityReference(CLASS_SUFFIX_XWIKIGROUPS,
         EntityType.DOCUMENT, new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiGroupServiceImpl.class);
 
     /**
      * Name of the "XWiki.XWikiUsers" class without the space name.
@@ -453,7 +453,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      *            <li>asc : a Boolean, if true the order is ascendent</li>
      *            </ul>
      * @param parameterValues the list of values to fill for use with HQL named request.
-     * @return the formated HQL named request.
+     * @return the formatted HQL named request.
      */
     protected String createMatchUserOrGroupWhereClause(boolean user, Object[][] matchFields, Object[][] order,
         List<Object> parameterValues)
@@ -484,18 +484,20 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
                     if (!fieldMap.containsKey(fieldName)) {
                         fieldPrefix = "field" + fieldIndex;
-                        from.append(", " + type + " as " + fieldPrefix);
+                        from.append(", ").append(type).append(" as ").append(fieldPrefix);
 
-                        where.append(" and obj.id=" + fieldPrefix + ".id.id");
+                        where.append(" and obj.id=").append(fieldPrefix).append(".id.id");
                         parameterValues.add(fieldName);
-                        where.append(" and " + fieldPrefix + ".name=?" + parameterValues.size());
+                        where.append(" and ").append(fieldPrefix).append(".name=?")
+                            .append(parameterValues.size());
                         ++fieldIndex;
                     } else {
                         fieldPrefix = fieldMap.get(fieldName);
                     }
 
                     parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
-                    where.append(" and lower(" + fieldPrefix + ".value) like ?" + parameterValues.size());
+                    where.append(" and lower(").append(fieldPrefix).append(".value) like ?")
+                        .append(parameterValues.size());
 
                     fieldMap.put(fieldName, fieldPrefix);
                 } else if (user && matchFields.length == 1 && "name".equals(fieldName)) {
@@ -503,10 +505,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                     // filtering on the first name or the last name of the user.
                     parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
                     from.append(", StringProperty firstName, StringProperty lastName");
-                    where.append(
-                        "and obj.id = firstName.id.id and firstName.id.name = 'first_name' "
-                      + "and obj.id = lastName.id.id and lastName.id.name = 'last_name' "
-                      + String.format("and (lower(doc.name) like ?%s or lower(firstName.value) like ?%s or "
+                    where.append("and obj.id = firstName.id.id and firstName.id.name = 'first_name' ")
+                        .append("and obj.id = lastName.id.id and lastName.id.name = 'last_name' ")
+                        .append(String.format("and (lower(doc.name) like ?%s or lower(firstName.value) like ?%s or "
                             + "lower(lastName.value) like ?%s)",
                             parameterValues.size(), parameterValues.size(), parameterValues.size()));
                 } else {
@@ -543,21 +544,22 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
                     if (!fieldMap.containsKey(fieldName)) {
                         fieldPrefix = "field" + fieldIndex;
-                        from.append(", " + type + " as " + fieldPrefix);
+                        from.append(", ").append(type).append(" as ").append(fieldPrefix);
 
-                        where.append(" and obj.id=" + fieldPrefix + ".id.id");
+                        where.append(" and obj.id=").append(fieldPrefix).append(".id.id");
 
                         parameterValues.add(fieldName);
-                        where.append(" and " + fieldPrefix + ".name=?" + parameterValues.size());
+                        where.append(" and ").append(fieldPrefix).append(".name=?")
+                            .append(parameterValues.size());
 
                         ++fieldIndex;
                     } else {
                         fieldPrefix = fieldMap.get(fieldName);
                     }
 
-                    orderString.append(" " + fieldPrefix + ".value");
+                    orderString.append(' ').append(fieldPrefix).append(".value");
                 } else {
-                    orderString.append(" doc." + fieldName);
+                    orderString.append(" doc.").append(fieldName);
                 }
 
                 orderString.append(asc == null || asc.booleanValue() ? " asc" : " desc");

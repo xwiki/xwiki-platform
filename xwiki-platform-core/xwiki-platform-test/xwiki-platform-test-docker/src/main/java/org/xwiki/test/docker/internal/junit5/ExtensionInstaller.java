@@ -186,7 +186,7 @@ public class ExtensionInstaller
         // System properties by the Maven Surefire or Failsafe plugins. If not defined, then read the dependencies from
         // the current POM and only take the ones not having a "test" scope and being of type "xar" or "jar".
         // Note that the use case for defining the system property is for the cases when you don't want to draw
-        // dependencies in your POM (can be useful when you want to test your extension on a vesion of XWiki for which
+        // dependencies in your POM (can be useful when you want to test your extension on a version of XWiki for which
         // it wasn't developed for).
         extensions.addAll(getProjectExtensionIds(distributionExtensionIds));
 

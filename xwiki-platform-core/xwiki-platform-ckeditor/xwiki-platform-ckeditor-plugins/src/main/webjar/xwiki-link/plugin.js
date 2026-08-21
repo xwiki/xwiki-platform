@@ -440,7 +440,7 @@
             '</button>',
       onLoad: function() {
         // Since we do not (and cannot without deeper changes) use the 'button' type, 
-        // we need to add this element explicitely to the Dialog focus list.
+        // we need to add this element explicitly to the Dialog focus list.
         // We need to hardcode the position since we do not have access to the setupFocus function to reorder the list
         // relative to native tab order.
         // The four elements before this button are: display link, page selection *3

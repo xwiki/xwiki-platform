@@ -104,7 +104,7 @@ public class WikiCreationJobScriptServices implements ScriptService
             
         } catch (WikiCreationException e) {
             setLastError(e);
-            logger.warn("Failed to create a new wiki.", e);
+            logger.error("Failed to create a new wiki.", e);
         } catch (AccessDeniedException e) {
             setLastError(e);
         }

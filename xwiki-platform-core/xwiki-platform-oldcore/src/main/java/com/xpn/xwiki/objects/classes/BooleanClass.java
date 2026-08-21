@@ -22,11 +22,14 @@ package com.xpn.xwiki.objects.classes;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ecs.xhtml.div;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.label;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.stability.Unstable;
 import org.xwiki.xml.XMLUtils;
 
@@ -40,6 +43,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class BooleanClass extends PropertyClass
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BooleanClass.class);
+
     /**
      * The type used as a hint to find the class.
      * @since 18.2.0RC1
@@ -376,7 +381,8 @@ public class BooleanClass extends PropertyClass
             }
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to get the display value of [{}] for property [{}]. Root cause is [{}]", value,
+                getFieldFullName(), ExceptionUtils.getRootCauseMessage(e));
             return "" + value;
         }
     }

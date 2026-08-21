@@ -78,7 +78,7 @@ public class XWikiMessageTool
     /**
      * Format string for the error message used to log load failures.
      */
-    private static final String LOAD_ERROR_MSG_FMT = "Failed to load internationalization document bundle [ %s ].";
+    private static final String LOAD_ERROR_MSG = "Failed to load internationalization document bundle [{}].";
 
     /**
      * The default Resource Bundle to fall back to if no document bundle is found when trying to get a key.
@@ -271,8 +271,8 @@ public class XWikiMessageTool
                     } else {
                         // The document listed as a document bundle doesn't exist. Do nothing
                         // and log.
-                        LOGGER.warn("The document [" + docBundle.getFullName() + "] is listed "
-                            + "as an internationalization document bundle but it does not " + "exist.");
+                        LOGGER.warn("The document [{}] is listed as an internationalization document bundle but it "
+                            + "does not exist.", docBundle.getFullName());
                     }
                 }
             }
@@ -305,7 +305,7 @@ public class XWikiMessageTool
                 // Error while loading the document.
                 // TODO: A runtime exception should be thrown that will bubble up till the
                 // topmost level. For now simply log the error
-                LOGGER.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
+                LOGGER.error(LOAD_ERROR_MSG, documentName, e);
                 docBundle = null;
             }
         }
@@ -346,7 +346,7 @@ public class XWikiMessageTool
                 // Error while loading the document.
                 // TODO: A runtime exception should be thrown that will bubble up till the
                 // topmost level. For now simply log the error
-                LOGGER.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
+                LOGGER.error(LOAD_ERROR_MSG, documentName, e);
             }
         }
 
@@ -364,7 +364,7 @@ public class XWikiMessageTool
         try {
             props.load(new StringReader(content));
         } catch (IOException e) {
-            LOGGER.error("Failed to parse content of document [" + docBundle + "] as translation content", e);
+            LOGGER.error("Failed to parse content of document [{}] as translation content", docBundle, e);
         }
 
         return props;

@@ -340,7 +340,7 @@ public class SolrRatingsManager implements RatingsManager
                 // Send the appropriate notification
                 this.observationManager.notify(event, this.getIdentifier(), result);
 
-                // If we store the average, we also compute the new informations for it.
+                // If we store the average, we also compute the new information for it.
                 if (storeAverage) {
                     if (oldRating == null) {
                         this.getAverageRatingManager().addVote(reference, vote);

@@ -328,8 +328,9 @@ class SolrAverageRatingManagerTest
 
         // rating2 have not the appropriate reference but the appropriate parent
         when(rating2.get("id")).thenReturn("rating2");
+        EntityReference entityReferenceMock = mock(EntityReference.class);
         when(this.solrUtils.get(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), rating2, EntityReference.class))
-            .thenReturn(mock(EntityReference.class));
+            .thenReturn(entityReferenceMock);
         when(this.solrUtils.getCollection(AverageRatingQueryField.PARENTS.getFieldName(), rating2,
             EntityReference.class))
             .thenReturn(Collections.singletonList(oldReference));
@@ -344,8 +345,9 @@ class SolrAverageRatingManagerTest
 
         // rating4 only contain the appropriate parent
         when(rating4.get("id")).thenReturn("rating4");
+        EntityReference entityReferenceMock2 = mock(EntityReference.class);
         when(this.solrUtils.get(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName(), rating4, EntityReference.class))
-            .thenReturn(mock(EntityReference.class));
+            .thenReturn(entityReferenceMock2);
         when(this.solrUtils.getCollection(AverageRatingQueryField.PARENTS.getFieldName(), rating4,
             EntityReference.class))
             .thenReturn(Arrays.asList(mock(EntityReference.class), mock(EntityReference.class), oldReference));

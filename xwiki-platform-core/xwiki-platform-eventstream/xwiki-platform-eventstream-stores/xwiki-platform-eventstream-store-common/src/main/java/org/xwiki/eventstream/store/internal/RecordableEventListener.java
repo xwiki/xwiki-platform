@@ -96,11 +96,11 @@ public class RecordableEventListener extends AbstractEventListener
         try {
             this.eventStore.saveEvent(convertEvent(event, source, data)).whenComplete((e, ex) -> {
                 if (ex != null) {
-                    logger.warn("Failed to save the event [{}].", event.getClass().getCanonicalName(), ex);
+                    logger.warn("Failed to save the event [{}]", event.getClass().getCanonicalName(), ex);
                 }
             });
         } catch (Exception e) {
-            logger.warn("Failed to convert event [{}].", event.getClass().getCanonicalName(), e);
+            logger.warn("Failed to convert event [{}]", event.getClass().getCanonicalName(), e);
         }
     }
 

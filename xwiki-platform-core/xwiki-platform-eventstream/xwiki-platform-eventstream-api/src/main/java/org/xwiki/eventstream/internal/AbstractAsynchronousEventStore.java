@@ -431,7 +431,7 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
             try {
                 this.contextStore.restore(task.context);
             } catch (ComponentLookupException e) {
-                this.logger.error("Failed to restore context of the event", output, e);
+                this.logger.error("Failed to restore context of the event [{}]", output, e);
             }
         }
 

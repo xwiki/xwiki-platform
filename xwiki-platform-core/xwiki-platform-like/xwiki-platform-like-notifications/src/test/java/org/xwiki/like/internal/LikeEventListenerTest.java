@@ -32,7 +32,6 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -65,7 +64,7 @@ class LikeEventListenerTest
         DocumentModelBridge documentModelBridge = mock(DocumentModelBridge.class);
         when(this.documentAccessBridge.getDocumentInstance(entityReference)).thenReturn(documentModelBridge);
         this.likeEventListener.onEvent(new LikeEvent(), null, entityReference);
-        verify(this.observationManager).notify(eq(new LikeRecordableEvent()), eq(LikeEventDescriptor.EVENT_SOURCE),
-            eq(documentModelBridge));
+        verify(this.observationManager).notify(new LikeRecordableEvent(), LikeEventDescriptor.EVENT_SOURCE,
+            documentModelBridge);
     }
 }

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.exception.VelocityException;
 import org.apache.velocity.runtime.resource.Resource;
@@ -87,7 +88,8 @@ public class XWikiWebappResourceLoader extends ResourceLoader
                 try {
                     this.rootPath = new File(root.toURI()).toString();
                 } catch (URISyntaxException e) {
-                    this.log.warn("Failed to find real path for root resource");
+                    this.log.warn("Failed to find real path for root resource. Root cause is [{}]",
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         }
@@ -161,9 +163,7 @@ public class XWikiWebappResourceLoader extends ResourceLoader
             } catch (Exception e) {
                 // Remember the first exception
                 if (exception == null) {
-                    if (this.log.isDebugEnabled()) {
-                        this.log.debug("Could not load [{}]", path, e);
-                    }
+                    this.log.debug("Could not load [{}]", path, e);
 
                     exception = e;
                 }

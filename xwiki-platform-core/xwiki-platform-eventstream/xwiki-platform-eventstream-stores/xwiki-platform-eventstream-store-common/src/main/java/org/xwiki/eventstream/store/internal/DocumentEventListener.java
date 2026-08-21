@@ -123,7 +123,7 @@ public class DocumentEventListener extends AbstractEventListener
             }
 
         } catch (Exception e) {
-            logger.warn("Failed to save the event [{}].", event.getClass().getCanonicalName(), e);
+            logger.error("Failed to save the event [{}].", event.getClass().getCanonicalName(), e);
         } finally {
             this.execution.getContext().removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
         }

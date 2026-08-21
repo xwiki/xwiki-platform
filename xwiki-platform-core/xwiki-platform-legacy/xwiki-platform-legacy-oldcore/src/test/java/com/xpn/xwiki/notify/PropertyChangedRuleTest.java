@@ -79,7 +79,7 @@ class PropertyChangedRuleTest implements XWikiDocChangeNotificationInterface
      * only returns the above mentioned classes on {@link XWiki#getClass(String, XWikiContext)}.
      */
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         this.context = this.oldcore.getXWikiContext();
 

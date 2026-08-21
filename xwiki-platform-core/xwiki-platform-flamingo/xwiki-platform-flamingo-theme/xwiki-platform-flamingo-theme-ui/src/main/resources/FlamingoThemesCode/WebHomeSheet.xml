@@ -177,7 +177,7 @@
   (((
     ## Display the mockup
     #themeMockup($themeObj)
-    ## Display the informations
+    ## Display the information
     (% class="theme-info" %)
     (((
       #set ($themeDocTitle = $services.rendering.escape($services.rendering.escape($themeDoc.displayTitle, 'xwiki/2.1'),

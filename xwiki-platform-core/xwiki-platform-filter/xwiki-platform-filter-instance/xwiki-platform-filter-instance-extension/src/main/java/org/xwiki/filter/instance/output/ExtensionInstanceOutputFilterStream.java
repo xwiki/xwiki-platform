@@ -185,7 +185,7 @@ public class ExtensionInstanceOutputFilterStream
             // Notify about the install
             this.observation.notify(new ExtensionInstalledEvent(localExtension.getId(), namespace), installedExtension);
         } catch (Exception e) {
-            this.logger.error("Failed to register extenion [{}] from the XAR", extensionId, e);
+            this.logger.error("Failed to register extension [{}] from the XAR", extensionId, e);
         }
     }
 }

@@ -57,7 +57,7 @@ public class ParameterTranslationMessageElement implements TranslationMessageEle
     private Parser plainParser;
 
     /**
-     * @param index the index of the paramater to return
+     * @param index the index of the parameter to return
      * @param plainParser used to parse the String content
      */
     public ParameterTranslationMessageElement(int index, Parser plainParser)

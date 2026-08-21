@@ -95,7 +95,7 @@
     };
 
     // Scripts are loaded only once and thus the load event is triggered only the first time a script is loaded, which is
-    // why we need to keep track of the URLs that are successfuly loaded.
+    // why we need to keep track of the URLs that are successfully loaded.
     const loadedURLs = new Set();
 
     /**

@@ -171,7 +171,7 @@ public class HTMLVelocityMacroFilter implements VelocityMacroFilter, Initializab
                     continue;
                 }
             } catch (InvalidVelocityException e) {
-                this.logger.debug("Not a valid velocity keyword at char [" + i + "]", e);
+                this.logger.debug("Not a valid velocity keyword at char [{}]", i, e);
             }
 
             flushWhiteSpaces(contentBuffer, filterContext, false);

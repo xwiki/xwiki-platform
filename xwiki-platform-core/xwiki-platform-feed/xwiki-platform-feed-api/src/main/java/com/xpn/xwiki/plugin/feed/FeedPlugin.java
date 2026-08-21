@@ -36,6 +36,7 @@ import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -415,7 +416,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     }
                     map.put(feedDocName, e);
                     // and log it
-                    LOGGER.error("Failed to update feeds in document " + feedDocName, e);
+                    LOGGER.error("Failed to update feeds in document [{}]", feedDocName, e);
                 }
             }
         }
@@ -680,7 +681,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             // If some day wiki syntax is supported in document titles, we might want to convert to wiki syntax instead.
             title = this.stripHtmlTags(entry.getTitle());
         } catch (ConversionException e) {
-            LOGGER.warn("Failed to strip HTML tags from entry title : " + e.getMessage());
+            LOGGER.warn("Failed to strip HTML tags from entry title: [{}]", ExceptionUtils.getRootCauseMessage(e));
             // Nevermind, we will use the original title
             title = entry.getTitle();
         }
@@ -998,7 +999,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             writer.close();
             return writer.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to serialize the feed to the [{}] format", type, e);
             return "";
         }
     }

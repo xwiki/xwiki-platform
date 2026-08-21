@@ -86,7 +86,7 @@ public class DocumentDeletedListener implements EventListener
             try {
                 disposable.dispose();
             } catch (ComponentLifecycleException e) {
-                this.logger.error(String.format("Failed to dispose component manager for document [%s]", document), e);
+                this.logger.error("Failed to dispose component manager for document [{}]", document, e);
             }
         }
     }

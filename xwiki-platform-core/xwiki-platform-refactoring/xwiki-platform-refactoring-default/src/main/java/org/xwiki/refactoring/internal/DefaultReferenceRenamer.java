@@ -225,7 +225,8 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
             return macroRefactoringLambda.call(macroRefactoring, macroBlock);
         } catch (MacroRefactoringException e) {
             this.logger.warn("Error while trying to refactor reference from [{}] to [{}] in macro [{}] of "
-                + "document [{}]", oldTarget, newTarget, macroBlock.getId(), currentDocumentReference);
+                + "document [{}]. Root cause is [{}]", oldTarget, newTarget, macroBlock.getId(),
+                currentDocumentReference, ExceptionUtils.getRootCauseMessage(e));
         } finally {
             // don't forget to pop the rendering context.
             if (this.renderingContext instanceof MutableRenderingContext mutableRenderingContext) {

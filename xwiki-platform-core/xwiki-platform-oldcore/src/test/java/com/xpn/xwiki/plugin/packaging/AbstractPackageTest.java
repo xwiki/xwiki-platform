@@ -174,7 +174,7 @@ public abstract class AbstractPackageTest
         sb.append("<author>XWiki.Admin</author>\n");
         sb.append("<backupPack>true</backupPack>\n");
 
-        // Add extension related informations
+        // Add extension related information
         if (extension != null) {
             sb.append("<extensionId>");
             sb.append(extension.getId());

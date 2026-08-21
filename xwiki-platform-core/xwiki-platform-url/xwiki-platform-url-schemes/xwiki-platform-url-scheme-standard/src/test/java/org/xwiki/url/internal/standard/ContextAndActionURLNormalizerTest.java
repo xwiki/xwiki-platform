@@ -170,7 +170,7 @@ class ContextAndActionURLNormalizerTest
     }
 
     @Test
-    void normalizePreservesParameters() throws Exception
+    void normalizePreservesParameters()
     {
         when(this.xwikiCfg.getProperty("xwiki.webapppath")).thenReturn("xwiki");
 

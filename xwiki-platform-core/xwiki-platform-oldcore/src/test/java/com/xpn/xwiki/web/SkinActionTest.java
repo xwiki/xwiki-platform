@@ -21,11 +21,12 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -34,21 +35,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.web.SkinAction} class.
- * 
+ *
  * @version $Id$
  */
+@ComponentTest
 class SkinActionTest
 {
+    @InjectMockComponents
     private SkinAction action;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
-
-    @BeforeEach
-    void setUp()
-    {
-        this.action = new SkinAction();
-    }
 
     @Test
     void isTextJavascriptJavaScriptMimetype()

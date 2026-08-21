@@ -30,7 +30,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 
 /**
- * Remove a non-null constraint from a colomn.
+ * Remove a non-null constraint from a column.
  *
  * @version $Id$
  * @since 9.11RC1

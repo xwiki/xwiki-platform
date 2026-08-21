@@ -101,7 +101,7 @@ class AuthenticationCookieFilterTest
     }
 
     @Test
-    void isFilterRequired() throws Exception
+    void isFilterRequired()
     {
         assertFalse(this.authCookieFilter.isFilterRequired());
 
@@ -113,7 +113,7 @@ class AuthenticationCookieFilterTest
     }
 
     @Test
-    void filter() throws Exception
+    void filter()
     {
         String ip = "172.17.0.3";
         when(this.cookieFilterContext.getClientIPAddress()).thenReturn(ip);
@@ -153,7 +153,7 @@ class AuthenticationCookieFilterTest
      * uses the previous approach it is safer to still support it and this test verifies that it actually works.
      */
     @Test
-    void filterAddHeader() throws Exception
+    void filterAddHeader()
     {
         when(this.cookieFilterContext.getClientIPAddress()).thenReturn("172.17.0.3");
         Cookie cookie = new Cookie("test", "before");
@@ -181,7 +181,7 @@ class AuthenticationCookieFilterTest
     }
 
     @Test
-    void filterWithoutAuthenticationCookies() throws Exception
+    void filterWithoutAuthenticationCookies()
     {
         when(this.cookieFilterContext.getClientIPAddress()).thenReturn("127.0.0.1");
         Cookie cookie = new Cookie("test", "before");

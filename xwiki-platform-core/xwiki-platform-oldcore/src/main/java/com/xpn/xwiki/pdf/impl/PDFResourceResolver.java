@@ -49,7 +49,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Resolves URIs sent by Apache FOP to embed images in the exported PDF. We bypass the standard resource resolver
- * provided for Resource that XWiki handles since that resolver simpy opens an un-authenticated URL Connection to get
+ * provided for Resource that XWiki handles since that resolver simply opens an un-authenticated URL Connection to get
  * the content and if the XWiki resource is protected (e.g. if an attachment is located in a document that requires
  * some permission to access), then the exported content in the PDF will be empty.
  *

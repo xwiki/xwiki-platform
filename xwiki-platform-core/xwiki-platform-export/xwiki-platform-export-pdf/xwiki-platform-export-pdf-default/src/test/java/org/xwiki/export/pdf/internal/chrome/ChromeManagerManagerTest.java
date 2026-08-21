@@ -40,7 +40,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.github.dockerjava.api.model.HostConfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -243,12 +243,9 @@ class ChromeManagerManagerTest
             this.configuration.getChromeDockerContainerName(), parameters, envVars, this.hostConfig))
                 .thenReturn(this.containerId);
 
-        try {
-            this.chromeManagerManager.get();
-            fail("Getting the Chrome manager should have failed.");
-        } catch (Exception e) {
-            assertEquals(exception, e.getCause());
-        }
+        Exception e = assertThrows(Exception.class, () -> this.chromeManagerManager.get(),
+            "Getting the Chrome manager should have failed.");
+        assertEquals(exception, e.getCause());
         assertEquals("Starting Chrome headless with sandbox mode disabled.", this.logCapture.getMessage(0));
 
         verify(this.containerManager, times(2)).startContainer(this.containerId);

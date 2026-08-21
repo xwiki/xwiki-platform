@@ -144,7 +144,7 @@ class XWikiContextContextStoreTest
 
     @SuppressWarnings("unchecked")
     @Test
-    void saveAndRestoreRequest() throws Exception
+    void saveAndRestoreRequest()
     {
         Map<String, String[]> parameters = new HashMap<>();
         parameters.put("param1", new String[] {"value1", "value2"});

@@ -125,7 +125,7 @@ public class XWikiServerXwikiDocumentInitializer extends AbstractMandatoryDocume
 
                 needsUpdate = true;
             } catch (XWikiException e) {
-                this.logger.error("Faied to initialize main wiki descriptor", e);
+                this.logger.error("Failed to initialize main wiki descriptor", e);
             }
         }
 

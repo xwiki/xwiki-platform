@@ -45,7 +45,7 @@ public interface MailSender
      * 
      * @param xwiki the XWiki object used to get the default values from the XWiki Preferences ("smtp_server" and
      *            "smtp_from").
-     * @return A mail server configuration, initialized with values from XWiki Preferences, but which can be overriden
+     * @return A mail server configuration, initialized with values from XWiki Preferences, but which can be overridden
      *         by users.
      */
     MailConfiguration createMailConfiguration(XWiki xwiki);

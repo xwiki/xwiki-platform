@@ -103,7 +103,7 @@ public class DownloadAction extends XWikiAction
     private static final String RANGE_HEADER_NAME = "Range";
 
     /** The format of a valid range header. */
-    private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=([0-9]+)?-([0-9]+)?");
+    private static final Pattern RANGE_HEADER_PATTERN = Pattern.compile("bytes=(\\d+)?-(\\d+)?");
 
     @Inject
     private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
@@ -488,9 +488,9 @@ public class DownloadAction extends XWikiAction
      * at least one of the ends must be specified, and if both are present, the range end must be greater than the range
      * start.
      *
-     * @param start the requested range start, i.e. the first byte to be transfered, or {@code null} if missing from the
-     *            Range header
-     * @param end the requested range end, i.e. the last byte to be transfered, or {@code null} if missing from the
+     * @param start the requested range start, i.e. the first byte to be transferred, or {@code null} if missing from
+     *            the Range header
+     * @param end the requested range end, i.e. the last byte to be transferred, or {@code null} if missing from the
      *            Range header
      * @return {@code true} if the range is valid, {@code false} otherwise
      */

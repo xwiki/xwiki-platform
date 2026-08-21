@@ -103,7 +103,7 @@
   #end
   #set($classname = "$!options.className")
   ##
-  ## Columns informations
+  ## Columns information
   ##
   #set ($dataColumns = [])
   #set ($classParams = {})

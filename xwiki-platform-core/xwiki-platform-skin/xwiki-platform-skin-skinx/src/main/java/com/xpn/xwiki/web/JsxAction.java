@@ -27,10 +27,11 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,15 +62,16 @@ public class JsxAction extends AbstractSxAction
     /** The extension type of this action. */
     public static final JsExtension JSX = new JsExtension();
 
-    /** Logging helper. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsxAction.class);
-
     private static final String SOURCE_MAPS_SESSION_ATTRIBUTE = JsxAction.class.getName() + ".sourceMaps";
 
     /**
      * We need to add minify=false so that we don't try to minify the source map.
      */
     private static final String SOURCE_MAP_PARAMS = "sourceMap=true&minify=false";
+
+    /** Logging helper. */
+    @Inject
+    private Logger logger;
 
     @Override
     public Extension getExtensionType()
@@ -80,7 +82,7 @@ public class JsxAction extends AbstractSxAction
     @Override
     protected Logger getLogger()
     {
-        return LOGGER;
+        return this.logger;
     }
 
     @Override
@@ -212,8 +214,8 @@ public class JsxAction extends AbstractSxAction
             }
             return objectMapper.writeValueAsString(sourceMap);
         } catch (Exception e) {
-            LOGGER.warn("Failed to fix the source path in the generated JavaScript source mapping. Root cause is [{}].",
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to fix the source path in the generated JavaScript source mapping. "
+                + "Root cause is [{}].", ExceptionUtils.getRootCauseMessage(e));
             return sourceMapJSON;
         }
     }
@@ -226,7 +228,7 @@ public class JsxAction extends AbstractSxAction
             // Try to return a relative source URL because this is going to be saved in the source map.
             return urlFactory.getURL(new URL(sourceURL), context);
         } catch (MalformedURLException e) {
-            LOGGER.warn("Failed to convert absolute source URL to relative URL. Root cause is [{}].",
+            this.logger.warn("Failed to convert absolute source URL to relative URL. Root cause is [{}].",
                 ExceptionUtils.getRootCauseMessage(e));
             return sourceURL;
         }

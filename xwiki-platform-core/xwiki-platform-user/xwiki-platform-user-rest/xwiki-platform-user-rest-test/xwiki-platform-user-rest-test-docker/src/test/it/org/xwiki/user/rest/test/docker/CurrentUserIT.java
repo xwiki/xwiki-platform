@@ -66,7 +66,7 @@ class CurrentUserIT
             User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getResponseBodyAsStream());
 
             assertEquals("XWiki.XWikiGuest", parsedUser.getId());
-            assertEquals("Guest", parsedUser.getDisplayName());
+            assertEquals("Unknown User", parsedUser.getDisplayName());
             assertTrue(parsedUser.getAvatarUrl().startsWith(
                     String.format("%s/resources/icons/xwiki/noavatar.png", this.baseURL)),
                 String.format("Avatar should be XWiki's default: <%s/resources/icons/xwiki/noavatar.png> but was <%s>",
@@ -79,6 +79,32 @@ class CurrentUserIT
 
     @Test
     @Order(2)
+    void testSuperAdmin(TestUtils setup) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        GetMethod get = setup.rest().executeGet(CurrentUserResource.class, "xwiki");
+
+        try {
+            assertEquals(HttpStatus.SC_OK, get.getStatusCode());
+
+            JAXBContext userContext = JAXBContext.newInstance(User.class);
+            User parsedUser = (User) userContext.createUnmarshaller().unmarshal(get.getResponseBodyAsStream());
+
+            assertEquals("XWiki.superadmin", parsedUser.getId());
+            assertEquals("superadmin", parsedUser.getDisplayName());
+            assertTrue(parsedUser.getAvatarUrl().startsWith(
+                    String.format("%s/resources/icons/xwiki/noavatar.png", this.baseURL)),
+                String.format("Avatar should be XWiki's default: <%s/resources/icons/xwiki/noavatar.png> but was <%s>",
+                    this.baseURL, parsedUser.getAvatarUrl()));
+            assertTrue(parsedUser.isGlobal(), "User should be global.");
+        } finally {
+            get.releaseConnection();
+        }
+    }
+
+    @Test
+    @Order(3)
     void testAuthenticatedUser(TestUtils setup) throws Exception
     {
         String user = "user";

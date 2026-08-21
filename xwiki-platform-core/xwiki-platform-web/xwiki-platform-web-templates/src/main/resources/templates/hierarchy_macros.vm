@@ -139,10 +139,10 @@
     #set ($discard = $xwiki.jsfx.use('uicomponents/hierarchy/hierarchy.js', {'forceSkinAction': true}))
     ## Tag the breadcrumb as expandable, so the JS can enable the 'expand' feature
     #set ($breadCrumbClassNames = "${breadCrumbClassNames} breadcrumb-expandable")
-    ## Store the entity reference into the breadcrumb, so the JS can retreive the full hierarchy
+    ## Store the entity reference into the breadcrumb, so the JS can retrieve the full hierarchy
     #set ($entityReferenceName = $services.model.serialize($entityReference, 'local'))
     #set ($breadCrumbParameters = "data-entity='$escapetool.xml($entityReferenceName)'")
-    ## Store the options into the breadcrumb, so the JS can have all informations
+    ## Store the options into the breadcrumb, so the JS can have all information
     #foreach ($option in $options.keySet())
       #set ($breadCrumbParameters = "$breadCrumbParameters data-${option.toLowerCase()}='$escapetool.xml($options.get($option))'")
     #end

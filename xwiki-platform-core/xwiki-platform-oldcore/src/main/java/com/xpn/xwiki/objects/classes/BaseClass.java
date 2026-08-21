@@ -1313,7 +1313,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             } else {
                 Object[] args = { customClass };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
-                    XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}", e,
+                    XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instantiate custom class {0}", e,
                     args);
             }
         }

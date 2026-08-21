@@ -677,7 +677,7 @@ public class MockitoOldcore
             @Override
             public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
             {
-                // The store is based on the contex for the wiki
+                // The store is based on the context for the wiki
                 DocumentReference reference = invocation.<XWikiDocument>getArgument(0).getDocumentReferenceWithLocale();
                 XWikiContext xcontext = invocation.getArgument(1);
                 if (!xcontext.getWikiReference().equals(reference.getWikiReference())) {

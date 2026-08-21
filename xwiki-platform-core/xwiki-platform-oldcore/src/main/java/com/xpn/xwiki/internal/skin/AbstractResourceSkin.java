@@ -51,7 +51,7 @@ public abstract class AbstractResourceSkin extends AbstractSkin
      * @param id the skin id (for instance, {@code "flamingo"})
      * @param skinManager the skin manager that instantiates this skin
      * @param configuration the skin internal configuration, used to access the default parent skin id
-     * @param logger a logger used to log warning in case of error when parsin a skin's syntax
+     * @param logger a logger used to log warning in case of error when parsing a skin's syntax
      */
     public AbstractResourceSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
         Logger logger)
@@ -114,7 +114,7 @@ public abstract class AbstractResourceSkin extends AbstractSkin
                 try {
                     this.properties = new Configurations().properties(url);
                 } catch (ConfigurationException e) {
-                    LOGGER.error("Failed to load skin [{}] properties file ({})", this.id, url, e);
+                    LOGGER.error("Failed to load skin [{}] properties file [{}]", this.id, url, e);
 
                     this.properties = new BaseConfiguration();
                 }

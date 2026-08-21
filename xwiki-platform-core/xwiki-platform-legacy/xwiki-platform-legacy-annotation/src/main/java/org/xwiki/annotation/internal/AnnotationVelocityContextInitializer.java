@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -77,7 +78,8 @@ public class AnnotationVelocityContextInitializer implements VelocityContextInit
         } catch (ComponentLookupException e) {
             this.logger.warn(
                 "Could not initialize the annotations velocity bridge, "
-                    + "annotations service will not be accessible in velocity context.");
+                    + "annotations service will not be accessible in velocity context. Root cause is [{}].",
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 }

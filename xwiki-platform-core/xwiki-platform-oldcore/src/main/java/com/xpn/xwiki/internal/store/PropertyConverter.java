@@ -87,8 +87,8 @@ public class PropertyConverter
                     try {
                         newProperty = modifiedPropertyClass.fromString(storedProperty.toText());
                     } catch (XWikiException ex) {
-                        this.logger.warn(errorLog,
-                            modifiedPropertyClass.getName(), modifiedPropertyClass.getClassName(), ex);
+                        this.logger.warn(errorLog, modifiedPropertyClass.getName(),
+                            modifiedPropertyClass.getClassName(), ex);
                     }
                 }
                 if (newProperty != null) {

@@ -118,7 +118,7 @@ class FilterIT extends AbstractCKEditorIT
         }
 
         this.textArea.sendKeys(" end");
-        // Verify that the origial style content is preserved.
+        // Verify that the original style content is preserved.
         assertSourceContains(source.toString() + " end");
     }
 

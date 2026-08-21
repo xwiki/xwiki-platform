@@ -100,7 +100,7 @@ class FileSystemURLFactoryTest
     }
 
     @Test
-    void createAttachmentURLWhenAttachmentDoesntExist() throws Exception
+    void createAttachmentURLWhenAttachmentDoesntExist()
     {
         Map<String, File> usedFiles = new HashMap<>();
         this.oldcore.getXWikiContext().put("pdfexport-file-mapping", usedFiles);
@@ -119,7 +119,7 @@ class FileSystemURLFactoryTest
     }
 
     @Test
-    void createAttachmentURLWhenAccessCheckIsDisabled(@TempDir File exportDir) throws Exception
+    void createAttachmentURLWhenAccessCheckIsDisabled(@TempDir File exportDir)
     {
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, ATTACHMENT_REFERENCE))
             .thenReturn(false);
@@ -135,7 +135,7 @@ class FileSystemURLFactoryTest
     }
 
     @Test
-    void createAttachmentURLWhenUserHasViewRight(@TempDir File exportDir) throws Exception
+    void createAttachmentURLWhenUserHasViewRight(@TempDir File exportDir)
     {
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, ATTACHMENT_REFERENCE))
             .thenReturn(true);
@@ -151,7 +151,7 @@ class FileSystemURLFactoryTest
     }
 
     @Test
-    void createAttachmentURLWhenUserHasNoViewRight(@TempDir File exportDir) throws Exception
+    void createAttachmentURLWhenUserHasNoViewRight(@TempDir File exportDir)
     {
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(Right.VIEW, ATTACHMENT_REFERENCE))
             .thenReturn(false);

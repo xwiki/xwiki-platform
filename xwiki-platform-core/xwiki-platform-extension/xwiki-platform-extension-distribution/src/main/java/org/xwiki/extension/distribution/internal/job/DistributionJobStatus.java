@@ -126,7 +126,7 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
         this.currentStateIndex = currentStateIndex;
     }
 
-    // Distribution informations
+    // Distribution information
 
     public ExtensionId getPreviousDistributionExtension()
     {

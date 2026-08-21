@@ -58,7 +58,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -115,7 +114,7 @@ class ScopeNotificationFilterTest
 
         when(this.resolver.resolve(entityStringValue, resultReference.getType())).thenReturn(resultReference);
 
-        when(this.serializer.serialize(eq(resultReference))).thenReturn(entityStringValue);
+        when(this.serializer.serialize(resultReference)).thenReturn(entityStringValue);
 
         when(preference.getStartingDate()).thenReturn(new Date(0));
 
@@ -123,7 +122,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void matchPreferenceWithCorrectPreference() throws Exception
+    void matchPreferenceWithCorrectPreference()
     {
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.DEFAULT);
@@ -134,7 +133,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void matchPreferenceWithIncorrectPreference() throws Exception
+    void matchPreferenceWithIncorrectPreference()
     {
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.SYSTEM);
@@ -143,13 +142,13 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void getName() throws Exception
+    void getName()
     {
         assertEquals(ScopeNotificationFilter.FILTER_NAME, this.scopeNotificationFilter.getName());
     }
 
     @Test
-    void complexCase1() throws Exception
+    void complexCase1()
     {
         // Preferences:
         //
@@ -241,7 +240,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void withTopLevelInclusiveFilters() throws Exception
+    void withTopLevelInclusiveFilters()
     {
         // Preferences:
         //
@@ -322,7 +321,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void filterExpressionWithSubQuery() throws Exception
+    void filterExpressionWithSubQuery()
     {
         NotificationPreference pref1 = mock(NotificationPreference.class);
         NotificationPreference pref2 = mock(NotificationPreference.class);

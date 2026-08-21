@@ -92,7 +92,7 @@ public abstract class AbstractRecordableEventDescriptor implements RecordableEve
                         () -> contextualLocalizationManager.getTranslationPlain(key));
                 } catch (Exception e) {
                     logger.warn("Failed to render the translation key [{}] in the namespace [{}] for the event "
-                            + "descriptor of [{}].", key, namespaceOfTheDescriptor, getEventType(), e);
+                        + "descriptor of [{}]", key, namespaceOfTheDescriptor, getEventType(), e);
                 }
             }
         }

@@ -269,7 +269,7 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Performs a click on the "edit acces rights" entry of the content menu.
+     * Performs a click on the "edit access rights" entry of the content menu.
      */
     public RightsEditPage editRights()
     {
@@ -737,7 +737,7 @@ public class BasePage extends BaseElement
             if (wcagContext.shouldWCAGStopOnError()) {
                 throw e;
             } else {
-                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
+                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag:", e);
             }
         }
     }

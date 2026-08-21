@@ -565,7 +565,7 @@ public class Context extends Api
     }
 
     /**
-     * Returns the form field validation status, which contains the exceptions or errors that may have occured during
+     * Returns the form field validation status, which contains the exceptions or errors that may have occurred during
      * the validation process performed during a <i>save</i>.
      *
      * @return The validation status.

@@ -190,7 +190,7 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
                 }
             }
         } catch (Exception e) {
-            logger.warn("Failed to get the email property [{}] for the user [{}].", propertyName, user, e);
+            logger.warn("Failed to get the email property [{}] for the user [{}]", propertyName, user, e);
         }
 
         return returnValue;

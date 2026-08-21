@@ -40,7 +40,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 /**
@@ -83,12 +83,10 @@ class DefaultPageChannelsResourceTest
     void getUnauthorized() throws Exception
     {
         when(this.authorization.hasAccess(Right.EDIT, documentReference)).thenReturn(false);
-        try {
-            this.resource.getChannels(wikiName, spaces, pageName, Collections.emptyList(), false);
-            fail("Access rights were not checked!");
-        } catch (WebApplicationException e) {
-            assertEquals(Status.UNAUTHORIZED.getStatusCode(), e.getResponse().getStatus());
-        }
+        WebApplicationException e = assertThrows(WebApplicationException.class,
+            () -> this.resource.getChannels(wikiName, spaces, pageName, Collections.emptyList(), false),
+            "Access rights were not checked!");
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), e.getResponse().getStatus());
     }
 
     @Test

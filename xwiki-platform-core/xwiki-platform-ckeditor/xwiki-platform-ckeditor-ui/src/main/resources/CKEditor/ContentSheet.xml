@@ -200,7 +200,7 @@
     </property>
     <property>
       <code>body[role="textbox"] {
-  /* We use padding (instead of margin) in order to support Bootstrap grid layouts and accomodate for the use of
+  /* We use padding (instead of margin) in order to support Bootstrap grid layouts and accommodate for the use of
   negative margins used by the .row class. */
   /* We need more space at the bottom in order to be sure that the magic line is visible all the time (see CKEDITOR-283:
     Cannot add content after a DIV located at the end of the document) */

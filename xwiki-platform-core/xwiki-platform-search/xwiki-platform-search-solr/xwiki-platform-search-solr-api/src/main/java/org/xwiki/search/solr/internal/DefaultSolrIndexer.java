@@ -241,8 +241,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 try {
                     dispatchQueueEntry(queueEntry);
                 } catch (Throwable e) {
-                    logger.warn("Failed to apply operation [{}] on root reference [{}]", queueEntry.operation,
-                        queueEntry.reference, e);
+                    logger.warn("Failed to apply operation [{}] on root reference [{}]",
+                        queueEntry.operation, queueEntry.reference, e);
                 } finally {
                     // Decrement only for entries submitted via addToQueue(); READY_MARKER entries come from
                     // waitReady() which does not increment pendingResolveItems.

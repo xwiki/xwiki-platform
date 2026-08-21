@@ -45,7 +45,7 @@ import org.xwiki.user.UserReferenceResolver;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Script service for manipulating Like informations.
+ * Script service for manipulating Like information.
  *
  * @version $Id$
  * @since 12.7RC1
@@ -81,7 +81,7 @@ public class LikeScriptService implements ScriptService
 
     /**
      * Check if current user is allowed to use Like on the given reference.
-     * Note that we explicitely deny the right for guests.
+     * Note that we explicitly deny the right for guests.
      * @param entityReference the reference on which to use like.
      * @return {@code true} only if current user is not guest and has Like right on the reference.
      */
@@ -133,8 +133,8 @@ public class LikeScriptService implements ScriptService
                 try {
                     return Optional.of(this.likeManager.saveLike(userReference, documentReference));
                 } catch (LikeException e) {
-                    this.logger.warn("Error while liking [{}] by [{}]", documentReference, currentUser,
-                        ExceptionUtils.getRootCause(e));
+                    this.logger.warn("Error while liking [{}] by [{}]. Root cause is [{}]", documentReference,
+                        currentUser, ExceptionUtils.getRootCauseMessage(e));
                 }
             } else {
                 this.logger.warn("[{}] is not authorized to like [{}].", currentUser, documentReference);
@@ -163,8 +163,8 @@ public class LikeScriptService implements ScriptService
                     this.likeManager.removeLike(userReference, entityReference);
                     return Optional.of(this.likeManager.getEntityLikes(entityReference));
                 } catch (LikeException e) {
-                    this.logger.warn("Error while unliking [{}] by [{}]", documentReference, currentUser,
-                        ExceptionUtils.getRootCause(e));
+                    this.logger.warn("Error while unliking [{}] by [{}]. Root cause is [{}]", documentReference,
+                        currentUser, ExceptionUtils.getRootCauseMessage(e));
                 }
             } else {
                 this.logger.warn("[{}] is not authorized to unlike [{}].", currentUser, documentReference);
@@ -186,8 +186,8 @@ public class LikeScriptService implements ScriptService
         try {
             return Optional.of(this.likeManager.getEntityLikes(entityReference));
         } catch (LikeException e) {
-            this.logger.warn("Error while getting like information for [{}]", entityReference,
-                ExceptionUtils.getRootCause(e));
+            this.logger.warn("Error while getting like information for [{}]. Root cause is [{}]", entityReference,
+                ExceptionUtils.getRootCauseMessage(e));
         }
         return Optional.empty();
     }
@@ -205,8 +205,8 @@ public class LikeScriptService implements ScriptService
         try {
             return this.likeManager.getUserLikes(userReference, offset, limit);
         } catch (LikeException e) {
-            this.logger.warn("Error while retrieving likes for user [{}]", userReference,
-                ExceptionUtils.getRootCause(e));
+            this.logger.warn("Error while retrieving likes for user [{}]. Root cause is [{}]", userReference,
+                ExceptionUtils.getRootCauseMessage(e));
         }
         return Collections.emptyList();
     }
@@ -224,8 +224,8 @@ public class LikeScriptService implements ScriptService
         try {
             result = Optional.of(this.likeManager.countUserLikes(userReference));
         } catch (LikeException e) {
-            this.logger.warn("Error while counting likes for user [{}]", userReference,
-                ExceptionUtils.getRootCause(e));
+            this.logger.warn("Error while counting likes for user [{}]. Root cause is [{}]", userReference,
+                ExceptionUtils.getRootCauseMessage(e));
         }
         return result;
     }
@@ -242,8 +242,8 @@ public class LikeScriptService implements ScriptService
         try {
             return this.likeManager.isLiked(userReference, entityReference);
         } catch (LikeException e) {
-            this.logger.warn("Error while checking if [{}] is liked by [{}]", entityReference, userReference,
-                ExceptionUtils.getRootCause(e));
+            this.logger.warn("Error while checking if [{}] is liked by [{}]. Root cause is [{}]", entityReference,
+                userReference, ExceptionUtils.getRootCauseMessage(e));
         }
         return false;
     }
@@ -262,7 +262,8 @@ public class LikeScriptService implements ScriptService
         try {
             return this.likeManager.getLikers(target, offset, limit);
         } catch (LikeException e) {
-            this.logger.warn("Error while checking getting likers for [{}]", target, ExceptionUtils.getRootCause(e));
+            this.logger.warn("Error while checking getting likers for [{}]. Root cause is [{}]", target,
+                ExceptionUtils.getRootCauseMessage(e));
         }
         return Collections.emptyList();
     }

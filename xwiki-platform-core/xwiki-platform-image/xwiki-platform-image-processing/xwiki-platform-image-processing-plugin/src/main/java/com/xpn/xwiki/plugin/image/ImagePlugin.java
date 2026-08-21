@@ -54,7 +54,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     /**
      * Logging helper object.
      */
-    private static final Logger LOG = LoggerFactory.getLogger(ImagePlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImagePlugin.class);
 
     /**
      * The name used for retrieving this plugin from the context.
@@ -127,8 +127,9 @@ public class ImagePlugin extends XWikiDefaultPlugin
             try {
                 this.defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
             } catch (NumberFormatException e) {
-                LOG.warn("Failed to parse [{}] configuration parameter. Using [{}] as the default image quality.",
-                    DEFAULT_QUALITY_PARAM, this.defaultQuality);
+                LOGGER.warn("Failed to parse [{}] configuration parameter. Using [{}] as the default image quality. "
+                    + "Root cause is [{}].", DEFAULT_QUALITY_PARAM, this.defaultQuality,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }
@@ -154,9 +155,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
                 try {
                     this.capacity = Integer.parseInt(capacityParam.trim());
                 } catch (NumberFormatException e) {
-                    LOG.warn(String.format(
-                        "Failed to parse xwiki.plugin.image.cache.capacity configuration parameter. "
-                            + "Using %s as the cache capacity.", this.capacity), e);
+                    LOGGER.warn("Failed to parse the [xwiki.plugin.image.cache.capacity] configuration parameter. "
+                        + "Using [{}] as the cache capacity", this.capacity, e);
                 }
             }
             lru.setMaxEntries(this.capacity);
@@ -164,7 +164,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
             try {
                 this.imageCache = Utils.getComponent(CacheManager.class).createNewLocalCache(configuration);
             } catch (CacheException e) {
-                LOG.error("Error initializing the image cache.", e);
+                LOGGER.error("Error initializing the image cache.", e);
             }
         }
     }
@@ -221,10 +221,10 @@ public class ImagePlugin extends XWikiDefaultPlugin
                     // Transform the image attachment before is it downloaded.
                     result = downloadImage(attachment, width, height, quality, context);
                 } catch (Exception e) {
-                    LOG.warn("Failed to transform image attachment [{}] for scaling, falling back to original "
+                    LOGGER.warn("Failed to transform image attachment [{}] for scaling, falling back to original "
                         + "attachment. Root error: [{}]", attachment.getFilename(),
                         ExceptionUtils.getRootCauseMessage(e));
-                    LOG.debug("Full stack trace for image attachment scaling error: ", e);
+                    LOGGER.debug("Full stack trace for image attachment scaling error:", e);
                 }
             }
         }

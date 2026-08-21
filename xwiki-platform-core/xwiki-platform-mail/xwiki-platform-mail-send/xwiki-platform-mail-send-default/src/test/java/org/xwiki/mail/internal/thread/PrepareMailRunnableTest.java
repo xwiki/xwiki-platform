@@ -109,7 +109,8 @@ class PrepareMailRunnableTest
     @BeforeEach
     void setUp()
     {
-        when(this.xwikiContextProvider.get()).thenReturn(mock(XWikiContext.class));
+        XWikiContext xWikiContextMock = mock(XWikiContext.class);
+        when(this.xwikiContextProvider.get()).thenReturn(xWikiContextMock);
     }
 
     @Test

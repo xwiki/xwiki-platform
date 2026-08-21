@@ -49,7 +49,7 @@ class ExplicitStringAttachmentReferenceResolverTest
     private AttachmentReferenceResolver<String> resolver;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         this.resolver = new ExplicitStringAttachmentReferenceResolver();
         ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver", this.entityReferenceResolver);

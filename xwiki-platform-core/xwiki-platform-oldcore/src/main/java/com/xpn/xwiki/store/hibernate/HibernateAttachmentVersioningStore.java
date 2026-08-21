@@ -22,9 +22,10 @@ package com.xpn.xwiki.store.hibernate;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import jakarta.inject.Inject;
+
 import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
@@ -46,17 +47,8 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore implements AttachmentVersioningStore
 {
     /** logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateAttachmentVersioningStore.class);
-
-    /**
-     * @param context the current context.
-     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentVersioningStore.class) instead.
-     */
-    @Deprecated
-    public HibernateAttachmentVersioningStore(XWikiContext context)
-    {
-        super(context.getWiki(), context);
-    }
+    @Inject
+    private Logger logger;
 
     /**
      * Empty constructor needed for component manager.
@@ -115,10 +107,8 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
                 return null;
             });
         } catch (Exception e) {
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn(String.format("Error deleting attachment archive [%s] of doc [%s]",
-                    attachment.getFilename(), attachment.getDoc().getDocumentReference()), e);
-            }
+            this.logger.warn("Error deleting attachment archive [{}] of doc [{}]", attachment.getFilename(),
+                attachment.getDoc().getDocumentReference(), e);
         }
     }
 }

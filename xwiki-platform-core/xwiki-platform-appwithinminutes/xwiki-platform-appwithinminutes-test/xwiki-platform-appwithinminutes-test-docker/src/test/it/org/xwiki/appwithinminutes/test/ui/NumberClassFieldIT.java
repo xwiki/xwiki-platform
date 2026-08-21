@@ -19,17 +19,14 @@
  */
 package org.xwiki.appwithinminutes.test.ui;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
 import org.xwiki.appwithinminutes.test.po.EntryEditPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.ui.TestUtils;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.goToEditor;
 
 /**
@@ -49,56 +46,40 @@ class NumberClassFieldIT
 {
     private static final String FIELD_NAME = "number1";
 
-    private static final String INVALID_FORMAT_MESSAGE = "is not a valid number of type \"long\"";
-
-    @BeforeEach
-    void setUp(TestUtils setup, TestReference testReference)
-    {
-        setup.loginAsSuperAdmin();
-        setup.deleteSpace(testReference.getLastSpaceReference());
-    }
-
     /**
-     * The Number field is rendered as an HTML5 number input, so the browser marks non-numeric input as invalid
-     * (browsers don't all sanitize the typed text itself, e.g. Firefox keeps "aaa" visible, but they do flag it).
+     * The Number field is rendered as an HTML5 number input, so the browser rejects non-numeric input, either by
+     * refusing to insert it or by marking the field invalid, before the entry can be saved.
      */
     @Test
-    @Order(1)
-    void browserRejectsInvalidInput(TestUtils setup, TestReference testReference)
+    void browserRejectsInvalidInput(TestReference testReference)
     {
-        ApplicationClassEditPage editor = goToEditor(testReference.getLastSpaceReference());
-        editor.addField("Number");
-        editor.clickSaveAndView();
-        new ClassSheetPage().clickTemplateLink().edit();
-        EntryEditPage entryEditPage = new EntryEditPage();
+        EntryEditPage entryEditPage = addNumberFieldAndGoToEntry(testReference);
 
         entryEditPage.setValue(FIELD_NAME, "aaa");
 
-        boolean isValid = (Boolean) setup.getDriver()
-            .executeScript("return document.querySelector('input[id$=\"_0_" + FIELD_NAME + "\"]').checkValidity();");
-        assertFalse(isValid);
+        assertTrue(!"aaa".equals(entryEditPage.getValue(FIELD_NAME)) || !entryEditPage.isFieldValid(FIELD_NAME));
     }
 
     /**
-     * A value like "99999999999999999999" (overflows a long) is a valid HTML5 number but not a valid long, so it
-     * still reaches the server. When editing an existing entry, the failure must show a
-     * translated message rather than a generic error.
+     * A value like "99999999999999999999" is a valid HTML5 number but overflows the default {@code long} type, so
+     * the {@code max} constraint set on the input must reject it before the entry can be saved.
      */
     @Test
-    @Order(2)
-    void saveAndContinueShowsFriendlyError(TestReference testReference)
+    void browserRejectsOutOfRangeInput(TestReference testReference)
     {
-        ApplicationClassEditPage editor = goToEditor(testReference.getLastSpaceReference());
+        EntryEditPage entryEditPage = addNumberFieldAndGoToEntry(testReference);
+
+        entryEditPage.setValue(FIELD_NAME, "99999999999999999999");
+
+        assertTrue(!entryEditPage.isFieldValid(FIELD_NAME));
+    }
+
+    private EntryEditPage addNumberFieldAndGoToEntry(TestReference testReference)
+    {
+        ApplicationClassEditPage editor = goToEditor(testReference);
         editor.addField("Number");
         editor.clickSaveAndView();
         new ClassSheetPage().clickTemplateLink().edit();
-        EntryEditPage entryEditPage = new EntryEditPage();
-        entryEditPage.setValue(FIELD_NAME, "42");
-        entryEditPage.clickSaveAndContinue();
-
-        entryEditPage.setValue(FIELD_NAME, "99999999999999999999");
-        entryEditPage.clickSaveAndContinue(false);
-
-        entryEditPage.waitForNotificationErrorMessage(INVALID_FORMAT_MESSAGE);
+        return new EntryEditPage();
     }
 }

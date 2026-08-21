@@ -50,7 +50,7 @@ public class JobExecutor
      * @param request the Job request to send
      * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhsot:8080/xwiki/rest})
      * @param credentials the xwiki user and password to use to connect for the REST endpoint
-     * @throws Exception if an error occured when connecting to the REST endpoint
+     * @throws Exception if an error occurred when connecting to the REST endpoint
      */
     public void execute(String jobType, JobRequest request, String xwikiRESTURL,
         UsernamePasswordCredentials credentials) throws Exception

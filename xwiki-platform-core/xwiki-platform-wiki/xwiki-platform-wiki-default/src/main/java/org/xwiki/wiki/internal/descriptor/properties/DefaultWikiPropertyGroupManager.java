@@ -57,7 +57,7 @@ public class DefaultWikiPropertyGroupManager implements WikiPropertyGroupManager
             try {
                 descriptor.addPropertyGroup(provider.get(wikiId));
             } catch (WikiPropertyGroupException e) {
-                logger.warn(String.format("Unable to load property groups [%s].", propertyGroupName), e);
+                logger.warn("Unable to load property groups [{}]", propertyGroupName, e);
             }
         }
     }

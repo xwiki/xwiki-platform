@@ -37,7 +37,7 @@ import com.xpn.xwiki.web.XWikiContextInitializationFilter;
  * Filter in charge of initializing the XWiki context before the handling of a REST request.
  * 
  * @version $Id$
- * @since 19.10.0RC1
+ * @since 17.10.0RC1
  */
 public class XWikiRESTContextInitializationFilter extends XWikiContextInitializationFilter
 {

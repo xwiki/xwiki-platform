@@ -21,6 +21,8 @@ package org.xwiki.blocknote.test.po;
 
 import org.jspecify.annotations.NonNull;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.test.ui.po.BaseElement;
@@ -100,6 +102,7 @@ public class BlockNoteRichTextArea extends BaseElement
     {
         // Click on the top left corner of the rich text area to place the caret at the beginning of the content.
         getDriver().createActions().moveToElement(this.container, 0, 0).click().perform();
+        waitUntilFocused();
         return this;
     }
 
@@ -174,11 +177,47 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea clickImage(int index)
     {
-        // The image might not be loaded yet, so wait until it's clickable before clicking on it.
-        WebElement image = this.container.findElements(By.tagName("img")).get(index);
+        // Note that this doesn't wait for the image to be loaded: an image that is still being fetched (or that failed
+        // to load, which some tests do on purpose) is already clickable, with the height of a single text line.
+        WebElement image = getImage(index);
         getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(image));
         image.click();
         return this;
+    }
+
+    /**
+     * Returns the image with the specified index in the rich text area.
+     *
+     * @param index the index of the image to return, starting from 0
+     * @return the image element
+     * @since 18.6.0
+     */
+    public WebElement getImage(int index)
+    {
+        return this.container.findElements(By.tagName("img")).get(index);
+    }
+
+    /**
+     * Waits until the image with the specified index has been loaded successfully, i.e. until its size reflects the
+     * image content rather than the size of a not yet loaded image. Don't call this for an image that is expected to
+     * fail to load, e.g. one pointing to a missing attachment.
+     *
+     * @param index the index of the image to wait for, starting from 0
+     * @return the image element
+     * @since 18.7.0RC1
+     */
+    public WebElement waitUntilImageIsLoaded(int index)
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return (Boolean) getDriver()
+                    .executeScript("return arguments[0].complete && arguments[0].naturalWidth > 0", getImage(index));
+            } catch (StaleElementReferenceException | IndexOutOfBoundsException e) {
+                // The editor is re-rendering the image, e.g. because its source has just been changed.
+                return false;
+            }
+        });
+        return getImage(index);
     }
 
     /**
@@ -190,14 +229,32 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public MacroDialogEditModal doubleClickMacro(int index)
     {
-        // The double click event listener is registered on the macro output wrapper which is the first child of the
-        // block content.
-        WebElement macro = this.container.findElements(By.cssSelector("""
-            .bn-block-content[data-content-type="Macro_xwikiMacroBlock"] > :first-child,
-            .bn-inline-content-section[data-inline-content-type="Macro_xwikiInlineMacro"] > :first-child"""))
-            .get(index);
+        WebElement macro = getMacro(index);
         getDriver().createActions().doubleClick(macro).perform();
         return new MacroDialogEditModal().waitUntilReady();
+    }
+
+    /**
+     * Single clicks on the macro with the specified index in the rich text area to select it (node selection). This is
+     * what makes the macro toolbar (e.g. the edit macro button) show up.
+     *
+     * @param index the index of the macro to select, starting from 0
+     * @return this rich text area instance
+     * @since 18.6.0
+     */
+    public BlockNoteRichTextArea selectMacro(int index)
+    {
+        getMacro(index).click();
+        return this;
+    }
+
+    private WebElement getMacro(int index)
+    {
+        // The double click event listener is registered on the macro output wrapper which is the first child of the
+        // block content.
+        return this.container.findElements(By.cssSelector("""
+            .bn-block-content[data-content-type="xwikiMacroBlock"] > :first-child,
+            .bn-inline-content-section[data-inline-content-type="xwikiInlineMacro"] > :first-child""")).get(index);
     }
 
     /**
@@ -295,6 +352,23 @@ public class BlockNoteRichTextArea extends BaseElement
             }
             """;
         getDriver().waitUntilCondition(driver -> (boolean) getDriver().executeScript(script, this.container));
+        return this;
+    }
+
+    /**
+     * Selects content with the keyboard. The specified range is relative to the start of the current line.
+     *
+     * @param offset how far from the start of the current line to move the caret (the selection start)
+     * @param length the selection length (the distance from the selection start to the selection end)
+     * @return this rich text area instance
+     * @since 18.7.0RC1
+     */
+    public BlockNoteRichTextArea select(int offset, int length)
+    {
+        sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(offset));
+        if (length > 0) {
+            sendKeys(Keys.chord(Keys.SHIFT, Keys.ARROW_RIGHT.toString().repeat(length)));
+        }
         return this;
     }
 }

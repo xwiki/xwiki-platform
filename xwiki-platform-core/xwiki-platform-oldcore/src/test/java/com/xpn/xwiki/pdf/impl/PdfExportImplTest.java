@@ -63,6 +63,8 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -229,6 +231,21 @@ class PdfExportImplTest
             + "</body></html>";
 
         assertEquals(expected, this.pdfExport.applyCSS(this.htmlContent, this.cssProperties, this.context));
+    }
+
+    /**
+     * Verify that a CSS rule resetting the background is computed by CSS4J into a fully transparent color using the
+     * CSS Color Level 4 hexadecimal notation, which the XSL-FO conversion then has to deal with.
+     *
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-24582">XWIKI-24582</a>
+     */
+    @Test
+    void applyCSSWithTransparentBackground()
+    {
+        String styledHTML = this.pdfExport.applyCSS(this.htmlContent, "p { background: none; }", this.context);
+
+        assertThat(styledHTML, containsString("<p style=\"background-image: none; "));
+        assertThat(styledHTML, containsString("background-color: #0000; \">"));
     }
 
     /**

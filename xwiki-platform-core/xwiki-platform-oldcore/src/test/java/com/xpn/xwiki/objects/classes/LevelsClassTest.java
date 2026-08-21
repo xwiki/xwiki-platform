@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
  */
 class LevelsClassTest
 {
-    private final static List<String> DEFAULT_LIST = Arrays.asList(
+    private static final List<String> DEFAULT_LIST = Arrays.asList(
         "admin",
         "programming",
         "edit",

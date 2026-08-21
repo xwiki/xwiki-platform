@@ -66,7 +66,7 @@ class ZipExplorerTest
     private ZipExplorerPlugin plugin;
 
     @BeforeEach
-    public void setUp(MockitoComponentManager componentManager) throws Exception
+    void setUp(MockitoComponentManager componentManager) throws Exception
     {
         this.plugin = new ZipExplorerPlugin("zipexplorer", ZipExplorerPlugin.class.getName(), null);
 
@@ -78,7 +78,8 @@ class ZipExplorerTest
 
         Provider<XWikiContext> xwikiContextProvider =
             componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xwikiContextProvider.get()).thenReturn(mock(XWikiContext.class));
+        XWikiContext xWikiContextMock = mock();
+        when(xwikiContextProvider.get()).thenReturn(xWikiContextMock);
     }
 
     @Test
@@ -220,7 +221,7 @@ class ZipExplorerTest
     }
 
     @Test
-    void getFileLink() throws Exception
+    void getFileLink()
     {
         XWikiDocument xwikiDocument = mock(XWikiDocument.class);
         when(xwikiDocument.getAttachmentURL(eq("zipfile.zip"), any(XWikiContext.class))).thenReturn(
@@ -277,7 +278,6 @@ class ZipExplorerTest
         when(attachment.getContent(any(XWikiContext.class))).thenReturn((content == null) ? new byte[0] : content);
         when(attachment.getContentInputStream(any(XWikiContext.class))).thenReturn(
             new ByteArrayInputStream((content == null) ? new byte[0] : content));
-//        when(attachment.getReference()).thenReturn(new AttachmentReference(filename, document.getDocumentReference()));
         when(attachment.getReference()).thenReturn(
             new AttachmentReference(filename, new DocumentReference("wiki", "Main", "Document")));
 

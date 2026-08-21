@@ -37,6 +37,14 @@ public class TOCGenerator
 
     public static final String TOC_DATA_TEXT = "text";
 
+    /**
+     * Utility class, so it should not be instantiated.
+     */
+    private TOCGenerator()
+    {
+        // Utility class
+    }
+
     public static Map<String, Map<String, Object>> generateTOC(String content, int init, int max, boolean numbered,
         XWikiContext context)
     {
@@ -89,7 +97,7 @@ public class TOCGenerator
 
                         // construct the string representation of the number
                         if (i <= level) {
-                            if ((number.length()) == 0) {
+                            if (number.isEmpty()) {
                                 // start new number
                                 number = num + number;
                                 currentNumber = num;

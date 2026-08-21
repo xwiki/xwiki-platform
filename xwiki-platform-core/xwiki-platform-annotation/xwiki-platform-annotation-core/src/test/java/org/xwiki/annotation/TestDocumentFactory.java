@@ -99,7 +99,7 @@ public class TestDocumentFactory
                 }
                 currentKey = line.substring(1);
             } else {
-                if (currentValue.length() > 0) {
+                if (!currentValue.isEmpty()) {
                     currentValue.append("\n");
                 }
                 currentValue.append(line);

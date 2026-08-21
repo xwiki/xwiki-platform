@@ -80,8 +80,7 @@ public class DocumentObjectPropertyCodeMacroSourceLoader implements EntityCodeMa
             }
 
             String language = null;
-            if (xclassProperty instanceof TextAreaClass) {
-                TextAreaClass textarea = (TextAreaClass) xclassProperty;
+            if (xclassProperty instanceof TextAreaClass textarea) {
 
                 ContentType contentType = ContentType.getByValue(textarea.getContentType());
                 if (contentType == ContentType.VELOCITY_CODE || contentType == ContentType.VELOCITYWIKI) {

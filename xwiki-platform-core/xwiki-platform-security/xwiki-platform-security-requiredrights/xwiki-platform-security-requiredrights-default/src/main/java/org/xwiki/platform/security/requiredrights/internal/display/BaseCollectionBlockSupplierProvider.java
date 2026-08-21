@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -84,14 +83,14 @@ public class BaseCollectionBlockSupplierProvider
                         p.displayView(p.getName(), object, context), true);
                 }
             })
-            .collect(Collectors.toList());
+            .toList();
 
         List<PropertyDisplay> deprecatedPropertyNamesValues;
 
         if (object instanceof BaseObject baseObject) {
             deprecatedPropertyNamesValues = xClass.getDeprecatedObjectProperties(baseObject).stream()
                 .map(p -> new PropertyDisplay(p.getName(), null, p.getValue().toString(), false))
-                .collect(Collectors.toList());
+                .toList();
         } else {
             deprecatedPropertyNamesValues = List.of();
         }

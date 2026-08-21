@@ -33,6 +33,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -102,7 +103,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(this.configuration.getSize());
             lru.setLifespan(this.configuration.getDuration());
-            cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+            cacheConfiguration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
 
             try {
                 this.cache.create(cacheConfiguration);
@@ -167,8 +168,8 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             for (String pluginName : pluginManager.getPlugins()) {
                 XWikiPluginInterface plugin = pluginManager.getPlugin(pluginName);
 
-                if (plugin instanceof RenderingCacheAware) {
-                    this.legacyRenderingCacheAware.add((RenderingCacheAware) plugin);
+                if (plugin instanceof RenderingCacheAware renderingCacheAware) {
+                    this.legacyRenderingCacheAware.add(renderingCacheAware);
                 }
             }
         }
@@ -245,7 +246,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             // If the parameter is the refresh parameter then ignore it
             if (!entry.getKey().equals(PARAMETER_REFRESH)) {
                 for (String value : entry.getValue()) {
-                    if (sb.length() > 0) {
+                    if (!sb.isEmpty()) {
                         sb.append('&');
                     }
                     try {

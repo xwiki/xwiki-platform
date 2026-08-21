@@ -50,7 +50,7 @@ public aspect SkinFileExtensionPluginApiCompatibilityAspect
     /**
      * Pointcut that catches all skin file extensions "use" join points.
      */
-    private pointcut sfxUse(String path) : execution(void SkinFileExtensionPluginApi.use(..)) && args(path, ..);
+    private pointcut sfxUse(String path) : execution(void SkinFileExtensionPluginApi.use(String)) && args(path);
 
     /**
      * Advice around skin file extensions "use" join points, that checks if the requested file is declared in the map of
@@ -60,14 +60,13 @@ public aspect SkinFileExtensionPluginApiCompatibilityAspect
     void around(String path): sfxUse(path)
     {
         if (compatibilityMap.containsKey(path)) {
-
             Logger logger = LoggerFactory.getLogger(thisJoinPoint.getSignature().getDeclaringType());
             logger.warn("Skin file extension with path [{}] is deprecated. Please use [{}] instead.", path,
                 compatibilityMap.get(path));
 
             proceed(compatibilityMap.get(path));
+        } else {
+            proceed(path);
         }
-
-        proceed(path);
     }
 }

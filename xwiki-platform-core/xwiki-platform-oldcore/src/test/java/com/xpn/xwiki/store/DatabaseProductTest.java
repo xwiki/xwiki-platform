@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link DatabaseProduct}.
@@ -96,7 +95,6 @@ class DatabaseProductTest
     void toProductDifference()
     {
         DatabaseProduct product = DatabaseProduct.toProduct("Oracle");
-        assertTrue(product != DatabaseProduct.DERBY);
         assertNotSame(DatabaseProduct.DERBY, product);
     }
 

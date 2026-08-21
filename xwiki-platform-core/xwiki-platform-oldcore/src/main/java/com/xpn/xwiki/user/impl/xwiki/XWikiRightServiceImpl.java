@@ -266,8 +266,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             }
         } catch (Exception e) {
             // This should not happen..
-            logDeny(username, doc.getFullName(), action, "access manager exception " + e.getMessage());
-            e.printStackTrace();
+            logDeny(username, doc.getFullName(), action, "access manager exception", e);
 
             return false;
         }
@@ -357,9 +356,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         List<BaseObject> rightObjects = doc.getXObjects(rightClassReference);
         if (rightObjects != null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Checking objects [{}]", rightObjects.size());
-            }
+            LOGGER.debug("Checking objects [{}]", rightObjects.size());
 
             for (int i = 0; i < rightObjects.size(); i++) {
                 LOGGER.debug("Checking object [{}]", i);
@@ -430,11 +427,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         LOGGER.debug("Searching for matching rights at group level");
 
         // Didn't found right at this level.. Let's go to group level
-        Map<String, Collection<String>> grouplistcache = (Map<String, Collection<String>>) context.get(GROUP_LIST_CONTEXT_KEY);
-        if (grouplistcache == null) {
-            grouplistcache = new HashMap<>();
-            context.put(GROUP_LIST_CONTEXT_KEY, grouplistcache);
-        }
+        context.computeIfAbsent(GROUP_LIST_CONTEXT_KEY, key -> new HashMap<String, Collection<String>>());
 
         Collection<String> grouplist = new HashSet<>();
 
@@ -447,9 +440,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 userOrGroupDocumentReference, grouplist, context);
         }
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Searching for matching rights for [{}] groups: [{}]", grouplist.size(), grouplist);
-        }
+        LOGGER.debug("Searching for matching rights for [{}] groups: [{}]", grouplist.size(), grouplist);
 
         for (String group : grouplist) {
             try {
@@ -461,7 +452,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 }
             } catch (XWikiRightNotFoundException e) {
             } catch (Exception e) {
-                LOGGER.error("Failed to check right [{}] for group [{}] on document [¶}]", accessLevel, group,
+                LOGGER.error("Failed to check right [{}] for group [{}] on document [{}]", accessLevel, group,
                     doc.getPrefixedFullName(), e);
             }
         }
@@ -480,11 +471,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
     {
         XWikiGroupService groupService = context.getWiki().getGroupService(context);
 
-        Map<String, Collection<String>> grouplistcache = (Map<String, Collection<String>>) context.get(GROUP_LIST_CONTEXT_KEY);
-        if (grouplistcache == null) {
-            grouplistcache = new HashMap<>();
-            context.put(GROUP_LIST_CONTEXT_KEY, grouplistcache);
-        }
+        Map<String, Collection<String>> grouplistcache = (Map<String, Collection<String>>) context
+            .computeIfAbsent(GROUP_LIST_CONTEXT_KEY, key -> new HashMap<String, Collection<String>>());
 
         // the key is for the entity <code>prefixedFullName</code> in current wiki
         String key = wiki + ":" + prefixedFullName;
@@ -537,7 +525,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         boolean deny = false;
         boolean allow = false;
-        boolean allow_found = false;
+        boolean allowFound = false;
         boolean isReadOnly = context.getWiki().isReadOnly();
         String database = context.getWikiId();
         XWikiDocument currentdoc = null;
@@ -655,7 +643,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             try {
                 currentdoc = currentdoc == null ? context.getWiki().getDocument(entityReference, context) : currentdoc;
                 allow = checkRight(userOrGroupName, currentdoc, accessLevel, user, true, false, context);
-                allow_found = true;
+                allowFound = true;
                 if (allow) {
                     logAllow(userOrGroupName, entityReference, accessLevel, "document level");
 
@@ -691,10 +679,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
                     // If a right was found at the previous level
                     // then we cannot check the web rights anymore
-                    if (!allow_found) {
+                    if (!allowFound) {
                         try {
                             allow = checkRight(userOrGroupName, webdoc, accessLevel, user, true, true, context);
-                            allow_found = true;
+                            allowFound = true;
                             if (allow) {
                                 logAllow(userOrGroupName, entityReference, accessLevel, "web level");
 
@@ -733,10 +721,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
             // If a right was found at the document or web level
             // then we cannot check the web rights anymore
-            if (!allow_found) {
+            if (!allowFound) {
                 try {
                     allow = checkRight(userOrGroupName, entityWikiPreferences, accessLevel, user, true, true, context);
-                    allow_found = true;
+                    allowFound = true;
                     if (allow) {
                         logAllow(userOrGroupName, entityReference, accessLevel, "xwiki level");
 
@@ -749,7 +737,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // If neither doc, web or topic had any allowed ACL
             // and that all users that were not denied
             // should be allowed.
-            if (!allow_found) {
+            if (!allowFound) {
                 // Delete must be denied by default.
                 if (DELETE.equals(accessLevel)) {
                     if (hasAccessLevel(ADMIN, userOrGroupName, entityReference, user, context)) {
@@ -774,7 +762,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         } catch (XWikiException e) {
             logDeny(userOrGroupName, entityReference, accessLevel, "global level (exception)", e);
-            e.printStackTrace();
 
             return false;
         } finally {

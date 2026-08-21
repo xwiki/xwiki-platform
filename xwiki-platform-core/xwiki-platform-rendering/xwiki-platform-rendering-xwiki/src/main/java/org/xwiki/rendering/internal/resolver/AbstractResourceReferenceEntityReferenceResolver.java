@@ -119,8 +119,8 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
     protected EntityReference getBaseReference(ResourceReference resourceReference, Object... parameters)
     {
-        EntityReference baseReference = (parameters.length > 0 && parameters[0] instanceof EntityReference)
-            ? (EntityReference) parameters[0] : null;
+        EntityReference baseReference = (parameters.length > 0 && parameters[0] instanceof EntityReference reference)
+            ? reference : null;
 
         if (!resourceReference.getBaseReferences().isEmpty()) {
             // If the passed reference has a base reference, resolve it first with a current resolver (it should
@@ -213,8 +213,8 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
         // Create space sibling
         EntityReference parentReference = reference.getParent().getParent();
-        if (parentReference instanceof SpaceReference) {
-            finalReference = new DocumentReference(reference.getName(), (SpaceReference) parentReference);
+        if (parentReference instanceof SpaceReference spaceReference) {
+            finalReference = new DocumentReference(reference.getName(), spaceReference);
 
             finalReference =
                 resolveDocumentReference(sourceReference, finalReference, baseReference, false, defaultDocumentName);

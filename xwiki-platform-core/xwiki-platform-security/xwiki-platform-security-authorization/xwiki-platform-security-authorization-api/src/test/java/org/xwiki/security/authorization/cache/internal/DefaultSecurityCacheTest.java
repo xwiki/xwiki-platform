@@ -64,11 +64,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -191,11 +191,10 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         if (groupUserRefs.contains(entry.getReference())) {
             final List<GroupSecurityReference> groups = new ArrayList<>();
             for (GroupSecurityReference group : groupRefs.keySet()) {
-                if (groupRefs.get(group).contains(entry.getReference())) {
-                    if (group.getOriginalReference().getWikiReference()
+                if (groupRefs.get(group).contains(entry.getReference())
+                    && group.getOriginalReference().getWikiReference()
                         .equals(entry.getReference().getOriginalDocumentReference().getWikiReference())) {
-                        groups.add(group);
-                    }
+                    groups.add(group);
                 }
             }
             AddUserEntry(entry, groups);
@@ -213,13 +212,11 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         if (groupUserRefs.contains(user.getReference())) {
             final List<GroupSecurityReference> groups = new ArrayList<>();
             for (GroupSecurityReference group : groupRefs.keySet()) {
-                if (groupRefs.get(group).contains(user.getReference())) {
-                    if (group.getOriginalReference().getWikiReference()
+                if (groupRefs.get(group).contains(user.getReference())
+                    && (group.getOriginalReference().getWikiReference()
                         .equals(user.getWikiReference().getOriginalWikiReference())
-                        || group.isGlobal())
-                    {
-                        groups.add(group);
-                    }
+                        || group.isGlobal())) {
+                    groups.add(group);
                 }
             }
             securityCache.add(user, groups, securityCache.getInvalidationCounter());
@@ -626,41 +623,27 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         }
 
         // Check a non-conflicting duplicate insertion
-        try {
-            AddRuleEntry(ruleEntries.getFirst());
-        } catch (ConflictingInsertionException e) {
-            fail("Inserting the same rule entry twice should NOT throw a ConflictingInsertionException.");
-        }
+        assertDoesNotThrow(() -> AddRuleEntry(ruleEntries.getFirst()),
+            "Inserting the same rule entry twice should NOT throw a ConflictingInsertionException.");
 
         // Check a conflicting duplicate insertion
-        try {
-            final SecurityReference ref = ruleEntries.getFirst().getReference();
-            SecurityRuleEntry entry =
-                mock(SecurityRuleEntry.class, "Another entry for " + ruleEntries.getFirst().getReference().toString());
-            when(entry.getReference()).thenReturn(ref);
+        final SecurityReference ref = ruleEntries.getFirst().getReference();
+        SecurityRuleEntry entry =
+            mock(SecurityRuleEntry.class, "Another entry for " + ruleEntries.getFirst().getReference().toString());
+        when(entry.getReference()).thenReturn(ref);
 
-            AddRuleEntry(entry);
-            fail("Inserting a different rule entry for the same reference should throw"
+        assertThrows(ConflictingInsertionException.class, () -> AddRuleEntry(entry),
+            "Inserting a different rule entry for the same reference should throw"
                 + " a ConflictingInsertionException.");
-        } catch (ConflictingInsertionException ignore) {
-            // Expected.
-        }
 
         // Check an insertion of an entry without inserting all its parents first
-        try {
-            AddRuleEntry(mockSecurityRuleEntry(aMissingParentRef));
-            fail("Inserting a rule entry without its parents should throw a ParentEntryEvictedException.");
-        } catch (ParentEntryEvictedException ignore) {
-            // Expected.
-        }
+        assertThrows(ParentEntryEvictedException.class, () -> AddRuleEntry(mockSecurityRuleEntry(aMissingParentRef)),
+            "Inserting a rule entry without its parents should throw a ParentEntryEvictedException.");
 
         // Check an insertion of a user without inserting all its groups first
-        try {
-            AddUserEntry(mockSecurityRuleEntry(aMissingUserRef), Arrays.asList(groupRef, aMissingGroupRef));
-            fail("Inserting a user entry without its parents should throw a ParentEntryEvictedException.");
-        } catch (ParentEntryEvictedException ignore) {
-            // Expected.
-        }
+        assertThrows(ParentEntryEvictedException.class,
+            () -> AddUserEntry(mockSecurityRuleEntry(aMissingUserRef), Arrays.asList(groupRef, aMissingGroupRef)),
+            "Inserting a user entry without its parents should throw a ParentEntryEvictedException.");
     }
 
     @Test
@@ -704,33 +687,24 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         }
 
         // Check a duplicate insertion
-        try {
-            AddUserEntry(allEntries.get(0));
-        } catch (ConflictingInsertionException e) {
-            fail("Inserting the same shadow entry twice should NOT throw a ConflictingInsertionException.");
-        }
+        assertDoesNotThrow(() -> AddUserEntry(allEntries.get(0)),
+            "Inserting the same shadow entry twice should NOT throw a ConflictingInsertionException.");
 
         // Check inserting a shadow for a missing user in an existing wiki
-        try {
-            AddUserEntry(mockSecurityShadowEntry(aMissingUserRef, wikiRef));
-            fail("Inserting a shadow entry without inserting its global user first should throw"
+        assertThrows(ParentEntryEvictedException.class,
+            () -> AddUserEntry(mockSecurityShadowEntry(aMissingUserRef, wikiRef)),
+            "Inserting a shadow entry without inserting its global user first should throw"
                 + " a ParentEntryEvictedException.");
-        } catch (ParentEntryEvictedException ignore) {
-            // Expected.
-        }
 
         // Check inserting a shadow for a existing user in a missing wiki
-        try {
-            AddUserEntry(mockSecurityShadowEntry(xuserRef, aMissingWikiRef));
-            fail("Inserting a shadow entry without inserting its wiki first should throw"
+        assertThrows(ParentEntryEvictedException.class,
+            () -> AddUserEntry(mockSecurityShadowEntry(xuserRef, aMissingWikiRef)),
+            "Inserting a shadow entry without inserting its wiki first should throw"
                 + " a ParentEntryEvictedException.");
-        } catch (ParentEntryEvictedException ignore) {
-            // Expected.
-        }
     }
 
     @Test
-    public void testAddSecurityAccessEntry() throws Exception
+    void testAddSecurityAccessEntry() throws Exception
     {
         InsertUsers();
         InsertEntities();
@@ -767,45 +741,32 @@ class DefaultSecurityCacheTest extends AbstractSecurityTestCase
         }
 
         // Check a non-conflicting duplicate insertion
-        try {
-            AddAccessEntry(allEntries.get(0));
-        } catch (ConflictingInsertionException e) {
-            fail("Inserting the same access entry twice should NOT throw a ConflictingInsertionException.");
-        }
+        assertDoesNotThrow(() -> AddAccessEntry(allEntries.get(0)),
+            "Inserting the same access entry twice should NOT throw a ConflictingInsertionException.");
 
         // Check a conflicting duplicate insertion
-        try {
-            final SecurityReference ref = allEntries.getFirst().getReference();
-            final UserSecurityReference user = allEntries.getFirst().getUserReference();
-            SecurityAccessEntry entry = mock(SecurityAccessEntry.class,
-                "Another access for " + allEntries.getFirst().getUserReference().toString()
-                    + " on " + allEntries.getFirst().getReference().toString());
-            when(entry.getUserReference()).thenReturn(user);
-            when(entry.getReference()).thenReturn(ref);
+        final SecurityReference ref = allEntries.getFirst().getReference();
+        final UserSecurityReference user = allEntries.getFirst().getUserReference();
+        SecurityAccessEntry entry = mock(SecurityAccessEntry.class,
+            "Another access for " + allEntries.getFirst().getUserReference().toString()
+                + " on " + allEntries.getFirst().getReference().toString());
+        when(entry.getUserReference()).thenReturn(user);
+        when(entry.getReference()).thenReturn(ref);
 
-            AddAccessEntry(entry);
-            fail("Inserting a different access entry for the same reference should throw"
+        assertThrows(ConflictingInsertionException.class, () -> AddAccessEntry(entry),
+            "Inserting a different access entry for the same reference should throw"
                 + " a ConflictingInsertionException.");
-        } catch (ConflictingInsertionException ignore) {
-            // Expected.
-        }
 
         // Check insertion of entries without inserting either the entity or the user first
-        try {
-            AddAccessEntry(mockSecurityAccessEntry(aMissingEntityRef, xuserRef));
-            fail("Inserting a access entry without inserting its entity first should throw"
+        assertThrows(ParentEntryEvictedException.class,
+            () -> AddAccessEntry(mockSecurityAccessEntry(aMissingEntityRef, xuserRef)),
+            "Inserting a access entry without inserting its entity first should throw"
                 + " a ParentEntryEvictedException.");
-        } catch (ParentEntryEvictedException ignore) {
-            // Expected.
-        }
 
-        try {
-            AddAccessEntry(mockSecurityAccessEntry(xdocRef, aMissingUserRef));
-            fail("Inserting a access entry without inserting its user first should throw"
+        assertThrows(ParentEntryEvictedException.class,
+            () -> AddAccessEntry(mockSecurityAccessEntry(xdocRef, aMissingUserRef)),
+            "Inserting a access entry without inserting its user first should throw"
                 + " a ParentEntryEvictedException.");
-        } catch (ParentEntryEvictedException ignore) {
-            // Expected.
-        }
     }
 
     @Test

@@ -40,7 +40,7 @@
   ## An action can have multiple  keyboard shortcuts associated (comma separated).
   #set ($values = $services.localization.render($entry.value).split('\s*,\s*'))
   #foreach ($value in $values)
-    ## Each keyboard shortcut is wrapped in quotes because it was (poorly) designed to be injected direcly in JavaScript,
+    ## Each keyboard shortcut is wrapped in quotes because it was (poorly) designed to be injected directly in JavaScript,
     ## which we don't do anymore. So we need to remove the quotes.
     #set ($discard = $values.set($foreach.index, $value.replaceAll('(^[''"])|([''"]$)', '')))
   #end
@@ -59,7 +59,7 @@ window.XWiki = window.XWiki || {};
 var widgets = XWiki.widgets = XWiki.widgets || {};
 // Make sure the ModalPopup class exist.
 if (!XWiki.widgets.ModalPopup) {
-  if (console && console.warn) {
+  if (console?.warn) {
     console.warn("[JumpToPage widget] Required class missing: XWiki.widgets.ModalPopup");
   }
 } else {

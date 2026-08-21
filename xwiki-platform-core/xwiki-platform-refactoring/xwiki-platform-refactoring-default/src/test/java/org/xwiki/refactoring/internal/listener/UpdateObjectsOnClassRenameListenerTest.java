@@ -93,7 +93,7 @@ class UpdateObjectsOnClassRenameListenerTest
     private DocumentReference newClassReference = new DocumentReference("foo", "Code", "NewClass");
 
     @BeforeEach
-    public void configure()
+    void configure()
     {
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         when(this.xcontext.getWiki()).thenReturn(this.wiki);

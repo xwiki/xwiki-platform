@@ -27,6 +27,7 @@ import {
 import { mock } from "vitest-mock-extended";
 import type { LinkSuggestServiceProvider } from "@xwiki/platform-link-suggest-api";
 import type {
+  ModelReferenceHandlerProvider,
   ModelReferenceParser,
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
@@ -88,6 +89,26 @@ export function depsContainerMock(): Container {
     }),
   } satisfies ModelReferenceSerializerProvider);
 
+  container.get.calledWith("ModelReferenceHandlerProvider").mockReturnValue({
+    get: () => ({
+      createDocumentReference(name, space) {
+        return new DocumentReference(name, space);
+      },
+
+      getTitle(reference) {
+        return reference.name;
+      },
+
+      getParentDocumentReference() {
+        return undefined;
+      },
+
+      getParentSpaceReference() {
+        return undefined;
+      },
+    }),
+  } satisfies ModelReferenceHandlerProvider);
+
   container.get.calledWith("LinkSuggestServiceProvider").mockReturnValue({
     get: () => ({
       async getLinks() {
@@ -114,7 +135,7 @@ export function depsContainerMock(): Container {
   } satisfies LinkSuggestServiceProvider);
 
   container.get.calledWith("AttachmentsService").mockReturnValue(null);
-  container.get.calledWith("DocumentsService").mockReturnValue(null);
+  container.get.calledWith("DocumentService").mockReturnValue(null);
 
   return container;
 }

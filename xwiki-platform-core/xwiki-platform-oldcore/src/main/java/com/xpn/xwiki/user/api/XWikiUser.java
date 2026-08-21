@@ -65,6 +65,8 @@ public class XWikiUser
     public static final LocalDocumentReference ACCOUNT_VALIDATION_DOCUMENT_REFERENCE =
         new LocalDocumentReference(XWiki.SYSTEM_SPACE, "AccountValidation");
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiUser.class);
+
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
      */
@@ -75,8 +77,6 @@ public class XWikiUser
     private ContextualLocalizationManager localization;
 
     private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
-
-    private Logger logger = LoggerFactory.getLogger(XWikiUser.class);
 
     private String fullName;
 
@@ -281,7 +281,7 @@ public class XWikiUser
                 // Default value of email_checked should be 1 (i.e. checked) if not set.
                 isChecked = userdoc.getIntValue(userClassReference, EMAIL_CHECKED_PROPERTY, 1) != 0;
             } catch (XWikiException e) {
-                this.logger.error("Error while checking email_checked status of user [{}]", getUser(), e);
+                LOGGER.error("Error while checking email_checked status of user [{}]", getUser(), e);
                 isChecked = true;
             }
         }
@@ -309,7 +309,7 @@ public class XWikiUser
                 context.getWiki().saveDocument(userdoc, localizePlainOrKey(
                     "core.users." + (checked ? EMAIL_CHECKED_PROPERTY : "email_unchecked") + ".saveComment"), context);
             } catch (XWikiException e) {
-                this.logger.error("Error while setting email_checked status of user [{}]", getUser(), e);
+                LOGGER.error("Error while setting email_checked status of user [{}]", getUser(), e);
             }
         }
     }
@@ -334,7 +334,7 @@ public class XWikiUser
                 // Default value of active should be 1 (i.e. active) if not set
                 disabled = userdoc.getIntValue(userClassReference, ACTIVE_PROPERTY, 1) == 0;
             } catch (XWikiException e) {
-                this.logger.error("Error while checking active status of user [{}]", getUser(), e);
+                LOGGER.error("Error while checking active status of user [{}]", getUser(), e);
                 disabled = false;
             }
         }
@@ -359,19 +359,20 @@ public class XWikiUser
 
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     ACTIVE_PROPERTY, activeFlag);
-                UserReference userReference =
+                UserReference authorReference =
                     getDocumentReferenceUserReferenceResolver().resolve(context.getUserReference());
                 // If there's no current user (ie if it's guest), then make the save as the new user for consistency
                 // since the user creation and other changes made to the user profile are currently done under the
                 // name of the new user.
-                if (GuestUserReference.INSTANCE.equals(userReference)) {
-                    userReference = getDocumentReferenceUserReferenceResolver().resolve(userdoc.getDocumentReference());
+                if (GuestUserReference.INSTANCE.equals(authorReference)) {
+                    authorReference = getDocumentReferenceUserReferenceResolver()
+                        .resolve(userdoc.getDocumentReference());
                 }
-                userdoc.getAuthors().setOriginalMetadataAuthor(userReference);
+                userdoc.getAuthors().setOriginalMetadataAuthor(authorReference);
                 context.getWiki().saveDocument(userdoc,
                     localizePlainOrKey("core.users." + (disable ? "disable" : "enable") + ".saveComment"), context);
             } catch (XWikiException e) {
-                this.logger.error("Error while setting active status of user [{}]", getUser(), e);
+                LOGGER.error("Error while setting active status of user [{}]", getUser(), e);
             }
         }
     }
@@ -388,7 +389,7 @@ public class XWikiUser
             XWikiDocument userdoc = getUserDocument(context);
             exists = !userdoc.isNew();
         } catch (XWikiException e) {
-            this.logger.error("Error while checking existing status of user [{}]", getUser(), e);
+            LOGGER.error("Error while checking existing status of user [{}]", getUser(), e);
         }
         return exists;
     }
@@ -459,9 +460,7 @@ public class XWikiUser
         }
 
         boolean equals;
-        if (obj instanceof XWikiUser) {
-            XWikiUser otherUser = (XWikiUser) obj;
-
+        if (obj instanceof XWikiUser otherUser) {
             equals = otherUser.main == this.main && Objects.equals(getUserReference(), otherUser.getUserReference());
         } else {
             equals = false;

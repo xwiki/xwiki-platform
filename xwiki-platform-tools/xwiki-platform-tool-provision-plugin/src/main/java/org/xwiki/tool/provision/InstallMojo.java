@@ -190,7 +190,7 @@ public class InstallMojo extends AbstractMojo
 
         // Get the job status
         JobStatus jobStatus = (JobStatus) unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
-        if (jobStatus.getErrorMessage() != null && jobStatus.getErrorMessage().length() > 0) {
+        if (jobStatus.getErrorMessage() != null && !jobStatus.getErrorMessage().isEmpty()) {
             throw new MojoExecutionException(
                 String.format("Job execution failed. Reason [%s]", jobStatus.getErrorMessage()));
         }

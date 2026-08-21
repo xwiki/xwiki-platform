@@ -91,8 +91,8 @@ public class NotificationFiltersScriptService implements ScriptService
         DocumentReference result;
         if (userReference == null || userReference == CurrentUserReference.INSTANCE) {
             result = documentAccessBridge.getCurrentUserReference();
-        } else if (userReference instanceof DocumentUserReference) {
-            result = ((DocumentUserReference) userReference).getReference();
+        } else if (userReference instanceof DocumentUserReference documentUserReference) {
+            result = documentUserReference.getReference();
         } else {
             throw new NotificationException(
                 String.format("This should only be used with DocumentUserReference, "

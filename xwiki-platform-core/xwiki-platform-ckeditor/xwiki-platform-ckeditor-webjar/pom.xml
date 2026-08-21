@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.8.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-webjar</artifactId>
@@ -125,28 +125,30 @@
           <overwrite>true</overwrite>
         </configuration>
       </plugin>
-      <!-- Add support for passing JVM arguments when running CKBuilder. -->
+      <!-- Derive the CKEDITOR.timestamp replacement from the reproducible build timestamp: it only has to be stable
+           for a given source tree and to change from one release to the next, since CKEditor uses it to bust the
+           browser cache of the resources it loads lazily. -->
       <plugin>
-        <groupId>com.google.code.maven-replacer-plugin</groupId>
-        <artifactId>replacer</artifactId>
-        <version>1.5.3</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>add-jvm-args</id>
-            <phase>process-resources</phase>
+            <id>ckeditor-build-timestamp</id>
+            <phase>initialize</phase>
             <goals>
-              <goal>replace</goal>
+              <goal>regex-properties</goal>
             </goals>
             <configuration>
-              <file>${ckeditor.builder.path}/build.sh</file>
-              <replacements>
-                <replacement>
-                  <!-- The arguments that appear before -jar are passed to the JVM while those that appear after are
-                    passed to the Java application (CKBuilder in this case). -->
-                  <token>java -jar</token>
-                  <value>java \$JVM_ARGS -jar</value>
-                </replacement>
-              </replacements>
+              <regexPropertySettings>
+                <regexPropertySetting>
+                  <name>ckeditor.build.timestamp</name>
+                  <value>${project.build.outputTimestamp}</value>
+                  <!-- 2024-07-25T00:00:00Z becomes 240725 -->
+                  <regex>^\d{2}(\d{2})-(\d{2})-(\d{2}).*$</regex>
+                  <replacement>$1$2$3</replacement>
+                  <failIfNoMatch>true</failIfNoMatch>
+                </regexPropertySetting>
+              </regexPropertySettings>
             </configuration>
           </execution>
         </executions>
@@ -183,6 +185,84 @@
                 <!-- Uncomment to see all the available configuration options. -->
                 <!--<argument>-&#45;help</argument>-->
               </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Add support for passing JVM arguments when running CKBuilder, and normalize the CKBuilder output.
+           IMPORTANT: this plugin must stay declared *after* the Exec Maven Plugin above. The
+           make-ckeditor-reproducible execution below is bound to the same phase as build-ckeditor
+           (process-classes), and Maven runs executions of the same phase in the order in which their plugins are
+           declared, so moving this block before the Exec Maven Plugin would run the replacements before CKBuilder
+           has produced anything. They would then silently match nothing, since the plugin does not fail when a
+           token is not found, and the WebJar would go back to changing on every hour and every year.
+           The add-jvm-args execution is not affected: it is bound to process-resources, an earlier phase, and
+           phase order always wins over declaration order. -->
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <version>1.5.3</version>
+        <executions>
+          <execution>
+            <id>add-jvm-args</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+            <configuration>
+              <file>${ckeditor.builder.path}/build.sh</file>
+              <replacements>
+                <replacement>
+                  <!-- The arguments that appear before -jar are passed to the JVM while those that appear after are
+                    passed to the Java application (CKBuilder in this case). -->
+                  <token>java -jar</token>
+                  <value>java \$JVM_ARGS -jar</value>
+                </replacement>
+              </replacements>
+            </configuration>
+          </execution>
+          <!-- Remove the two values CKBuilder derives from the wall clock, so that the WebJar only depends on its
+               sources. It has no option to pass either of them in. This runs right after build-ckeditor, which is
+               bound to the same phase, and before copy-ckeditor-resources (prepare-package) picks the files up -
+               see the ordering note on the plugin above.
+               The replacements below are longer than the values they replace, so they shift the columns of everything
+               that follows them in these single-line minified files. That is harmless today because CKBuilder emits
+               no source maps for its output (the only maps in this WebJar are for src/main/webjar/config.js and
+               src/main/webjar/styles.js, which are minified separately and contain none of these tokens). Should
+               CKBuilder ever be configured to generate source maps, they would need to be regenerated after these
+               replacements, or the mappings would be off. -->
+          <execution>
+            <id>make-ckeditor-reproducible</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+            <configuration>
+              <basedir>${ckeditor.builder.path}/release/ckeditor</basedir>
+              <includes>
+                <include>**/*.js</include>
+                <include>**/*.css</include>
+              </includes>
+              <encoding>UTF-8</encoding>
+              <replacements>
+                <replacement>
+                  <!-- CKEDITOR.timestamp is base 36 of the year, month, day and UTC hour the build ran in, so the
+                       WebJar would change every hour. -->
+                  <token>timestamp:"[0-9A-Z]{4}"</token>
+                  <value>timestamp:"${ckeditor.build.timestamp}"</value>
+                </replacement>
+                <replacement>
+                  <!-- The same value is the cache busting parameter of the icon sprites in the skin stylesheets. -->
+                  <token>\?t=[0-9A-Z]{4}\)</token>
+                  <value>?t=${ckeditor.build.timestamp})</value>
+                </replacement>
+                <replacement>
+                  <!-- CKBuilder rewrites the copyright year of the files it generates to the year the build ran in,
+                       so the WebJar would also change every year. Put the year of the sources back. -->
+                  <token>Copyright \(c\) 2003-[0-9]{4}</token>
+                  <value>Copyright (c) 2003-${ckeditor.copyright.year}</value>
+                </replacement>
+              </replacements>
             </configuration>
           </execution>
         </executions>

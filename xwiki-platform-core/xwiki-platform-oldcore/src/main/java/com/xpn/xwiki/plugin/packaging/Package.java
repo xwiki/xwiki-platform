@@ -99,21 +99,21 @@ public class Package
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Package.class);
 
-    private static final String INFOS = "infos";
+    private static final String INFOS_PROPERTY = "infos";
 
-    private static final String DESCRIPTION = "description";
+    private static final String DESCRIPTION_PROPERTY = "description";
 
-    private static final String LICENCE = "licence";
+    private static final String LICENCE_PROPERTY = "licence";
 
-    private static final String AUTHOR = "author";
+    private static final String AUTHOR_PROPERTY = "author";
 
-    private static final String VERSION = "version";
+    private static final String VERSION_PROPERTY = "version";
 
-    private static final String FILES = "files";
+    private static final String FILES_PROPERTY = "files";
 
-    private static final String LANGUAGE = "language";
+    private static final String LANGUAGE_PROPERTY = "language";
 
-    private static final String DEFAULT_ACTION = "defaultAction";
+    private static final String DEFAULT_ACTION_PROPERTY = "defaultAction";
 
     private String name = "My package";
 
@@ -326,8 +326,8 @@ public class Package
 
     public void addDocumentFilter(Object filter) throws PackageException
     {
-        if (filter instanceof DocumentFilter) {
-            this.documentFilters.add((DocumentFilter) filter);
+        if (filter instanceof DocumentFilter documentFilter) {
+            this.documentFilters.add(documentFilter);
         } else {
             throw new PackageException(PackageException.ERROR_PACKAGE_INVALID_FILTER, "Invalid Document Filter");
         }
@@ -377,7 +377,7 @@ public class Package
             }
             return true;
         } catch (ExcludeDocumentException e) {
-            LOGGER.info("Skip the document " + doc.getDocumentReference());
+            LOGGER.info("Skip the document [{}]", doc.getDocumentReference());
 
             return false;
         }
@@ -395,28 +395,28 @@ public class Package
         return add(doc, action, context);
     }
 
-    public boolean add(String docFullName, int DefaultAction, XWikiContext context) throws XWikiException
+    public boolean add(String docFullName, int defaultAction, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
-        add(doc, DefaultAction, context);
+        add(doc, defaultAction, context);
         List<String> languages = doc.getTranslationList(context);
         for (String language : languages) {
             if (!((language == null) || (language.isEmpty()) || (doc.getDefaultLanguage().equals(language)))) {
-                add(doc.getTranslatedDocument(language, context), DefaultAction, context);
+                add(doc.getTranslatedDocument(language, context), defaultAction, context);
             }
         }
 
         return true;
     }
 
-    public boolean add(String docFullName, String language, int DefaultAction, XWikiContext context)
+    public boolean add(String docFullName, String language, int defaultAction, XWikiContext context)
         throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
         if ((language == null) || (language.isEmpty())) {
-            add(doc, DefaultAction, context);
+            add(doc, defaultAction, context);
         } else {
-            add(doc.getTranslatedDocument(language, context), DefaultAction, context);
+            add(doc.getTranslatedDocument(language, context), defaultAction, context);
         }
 
         return true;
@@ -513,7 +513,7 @@ public class Package
     {
         ZipArchiveInputStream zis;
         ArchiveEntry entry;
-        Document description = null;
+        Document descriptionDocument = null;
 
         try {
             zis = new ZipArchiveInputStream(file, XAR_FILENAME_ENCODING, false);
@@ -530,15 +530,15 @@ public class Package
                     continue;
                 } else if (entry.getName().compareTo(DefaultPackageFileName) == 0) {
                     // The entry is the manifest (package.xml). Read this differently.
-                    description = fromXml(new CloseShieldInputStream(zis));
+                    descriptionDocument = fromXml(new CloseShieldInputStream(zis));
                 } else {
                     XWikiDocument doc = null;
                     try {
                         doc = readFromXML(new CloseShieldInputStream(zis));
                     } catch (Throwable e) {
-                        LOGGER.warn(
-                            "Failed to parse document [{}] from XML during import, thus it will not be installed. "
-                                + "The error was: " + ExceptionUtils.getRootCauseMessage(e));
+                        LOGGER.warn("Failed to parse document [{}] from XML during import, thus it will not be "
+                            + "installed. Root cause is [{}]", entry.getName(),
+                            ExceptionUtils.getRootCauseMessage(e));
                         // It will be listed in the "failed documents" section after the import.
                         addToErrors(entry.getName().replace("/", "."), context);
 
@@ -551,12 +551,12 @@ public class Package
                         this.filter(doc, context);
                         docsToLoad.add(doc);
                     } catch (ExcludeDocumentException e) {
-                        LOGGER.info("Skip the document '" + doc.getDocumentReference() + "'");
+                        LOGGER.info("Skip the document [{}]", doc.getDocumentReference());
                     }
                 }
             }
             // Make sure a manifest was included in the package...
-            if (description == null) {
+            if (descriptionDocument == null) {
                 throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "Could not find the package definition");
             }
             /*
@@ -564,18 +564,18 @@ public class Package
              * a warning and add them to the skipped list.
              */
             for (XWikiDocument doc : docsToLoad) {
-                if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description)) {
+                if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), descriptionDocument)) {
                     this.add(doc, context);
                 } else {
-                    LOGGER.warn("document " + doc.getDocumentReference() + " does not exist in package definition."
-                        + " It will not be installed.");
+                    LOGGER.warn("Document [{}] does not exist in the package definition. It will not be installed.",
+                        doc.getDocumentReference());
                     // It will be listed in the "skipped documents" section after the
                     // import.
                     addToSkipped(doc.getFullName(), context);
                 }
             }
 
-            updateFileInfos(description);
+            updateFileInfos(descriptionDocument);
         } catch (DocumentException e) {
             throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "Error when reading the XML");
         }
@@ -586,7 +586,7 @@ public class Package
     private boolean documentExistInPackageFile(String docName, String language, Document xml)
     {
         Element docFiles = xml.getRootElement();
-        Element infosFiles = docFiles.element(FILES);
+        Element infosFiles = docFiles.element(FILES_PROPERTY);
 
         @SuppressWarnings("unchecked")
         List<Element> fileList = infosFiles.elements("file");
@@ -596,7 +596,7 @@ public class Package
             if (tmpDocName.compareTo(docName) != 0) {
                 continue;
             }
-            String tmpLanguage = el.attributeValue(LANGUAGE);
+            String tmpLanguage = el.attributeValue(LANGUAGE_PROPERTY);
             if (tmpLanguage == null) {
                 tmpLanguage = "";
             }
@@ -611,13 +611,13 @@ public class Package
     private void updateFileInfos(Document xml)
     {
         Element docFiles = xml.getRootElement();
-        Element infosFiles = docFiles.element(FILES);
+        Element infosFiles = docFiles.element(FILES_PROPERTY);
 
         @SuppressWarnings("unchecked")
         List<Element> fileList = infosFiles.elements("file");
         for (Element el : fileList) {
-            String defaultAction = el.attributeValue(DEFAULT_ACTION);
-            String language = el.attributeValue(LANGUAGE);
+            String defaultAction = el.attributeValue(DEFAULT_ACTION_PROPERTY);
+            String language = el.attributeValue(LANGUAGE_PROPERTY);
             if (language == null) {
                 language = "";
             }
@@ -642,9 +642,7 @@ public class Package
 
     public int testInstall(boolean isAdmin, XWikiContext context)
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Package test install");
-        }
+        LOGGER.debug("Package test install");
 
         int result = DocumentInfo.INSTALL_IMPOSSIBLE;
         try {
@@ -662,9 +660,7 @@ public class Package
 
             return result;
         } finally {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Package test install result " + result);
-            }
+            LOGGER.debug("Package test install result [{}]", result);
         }
     }
 
@@ -735,19 +731,19 @@ public class Package
     {
         // Register the package as extension if it's one
         if (isInstallExtension() && StringUtils.isNotEmpty(getExtensionId()) && StringUtils.isNotEmpty(getVersion())) {
-            ExtensionId extensionId = new ExtensionId(getExtensionId(), getVersion());
+            ExtensionId xarExtensionId = new ExtensionId(getExtensionId(), getVersion());
 
             try {
                 LocalExtensionRepository localRepository = Utils.getComponent(LocalExtensionRepository.class);
 
-                LocalExtension localExtension = localRepository.getLocalExtension(extensionId);
+                LocalExtension localExtension = localRepository.getLocalExtension(xarExtensionId);
                 if (localExtension == null) {
                     Extension extension;
                     try {
                         // Try to find and download the extension from a repository
-                        extension = Utils.getComponent(ExtensionRepositoryManager.class).resolve(extensionId);
+                        extension = Utils.getComponent(ExtensionRepositoryManager.class).resolve(xarExtensionId);
                     } catch (ResolveException e) {
-                        LOGGER.debug("Can't find extension [{}]", extensionId, e);
+                        LOGGER.debug("Can't find extension [{}]", xarExtensionId, e);
 
                         // FIXME: Create a dummy extension. Need support for partial/lazy extension.
                         return;
@@ -781,7 +777,7 @@ public class Package
                 Utils.getComponent(ObservationManager.class)
                     .notify(new ExtensionInstalledEvent(installedExtension.getId(), namespace), installedExtension);
             } catch (Exception e) {
-                LOGGER.error("Failed to register extenion [{}] from the XAR", extensionId, e);
+                LOGGER.error("Failed to register extension [{}] from the XAR", xarExtensionId, e);
             }
         }
     }
@@ -818,9 +814,7 @@ public class Package
 
         int result = DocumentInfo.INSTALL_OK;
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Package installing document " + doc.getFullName() + " " + doc.getLanguage());
-        }
+        LOGGER.debug("Package installing document [{}] for language [{}]", doc.getFullName(), doc.getLanguage());
 
         if (doc.getAction() == DocumentInfo.ACTION_SKIP) {
             addToSkipped(doc.getFullName() + ":" + doc.getLanguage(), context);
@@ -842,7 +836,7 @@ public class Package
                     previousdoc = previousdoc.getTranslatedDocument(doc.getLanguage(), context);
                 }
                 // we should only delete the previous document
-                // if we are overridding the versions and/or if this is a backup pack
+                // if we are overriding the versions and/or if this is a backup pack
                 if (!this.preserveVersion || this.withVersions) {
                     try {
                         // This is not a real document delete, it's a upgrade. To be sure to not
@@ -852,12 +846,11 @@ public class Package
                         // let's log the error but not stop
                         result = DocumentInfo.INSTALL_ERROR;
                         addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
-                        if (LOGGER.isErrorEnabled()) {
-                            LOGGER.error("Failed to delete document " + previousdoc.getDocumentReference());
-                        }
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Failed to delete document " + previousdoc.getDocumentReference(), e);
-                        }
+                        // The stack trace is kept for the debug level: this runs once per document of the
+                        // package, so printing a trace for every failure would flood the log.
+                        String failedToDelete = "Failed to delete document [{}]";
+                        LOGGER.error(failedToDelete, previousdoc.getDocumentReference());
+                        LOGGER.debug(failedToDelete, previousdoc.getDocumentReference(), e);
                     }
                 } else if (previousdoc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
                     // We conserve the old attachments in the new documents
@@ -939,9 +932,7 @@ public class Package
 
             } catch (XWikiException e) {
                 addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Failed to save document " + doc.getFullName(), e);
-                }
+                LOGGER.error("Failed to save document [{}]", doc.getFullName(), e);
                 result = DocumentInfo.INSTALL_ERROR;
             }
         }
@@ -953,22 +944,14 @@ public class Package
      */
     private boolean documentContainsHistory(DocumentInfo doc)
     {
-        if ((doc.getDoc().getDocumentArchive() == null) || (doc.getDoc().getDocumentArchive().getNodes() == null)
-            || doc.getDoc().getDocumentArchive().getNodes().isEmpty()) {
-            return false;
-        }
-        return true;
+        return doc.getDoc().getDocumentArchive() != null && doc.getDoc().getDocumentArchive().getNodes() != null
+            && !doc.getDoc().getDocumentArchive().getNodes().isEmpty();
     }
 
     private List<String> getStringList(String name, XWikiContext context)
     {
         @SuppressWarnings("unchecked")
-        List<String> list = (List<String>) context.get(name);
-
-        if (list == null) {
-            list = new ArrayList<>();
-            context.put(name, list);
-        }
+        List<String> list = (List<String>) context.computeIfAbsent(name, key -> new ArrayList<String>());
 
         return list;
     }
@@ -1077,7 +1060,7 @@ public class Package
             toXML(baos, context);
             return baos.toString(context.getWiki().getEncoding());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to serialize the package descriptor of package [{}]", getName(), e);
             return "";
         }
     }
@@ -1094,44 +1077,44 @@ public class Package
         Element docel = new DOMElement("package");
         wr.writeOpen(docel);
 
-        Element elInfos = new DOMElement(INFOS);
+        Element elInfos = new DOMElement(INFOS_PROPERTY);
         wr.write(elInfos);
 
         Element el = new DOMElement("name");
         el.addText(this.name);
         wr.write(el);
 
-        el = new DOMElement(DESCRIPTION);
+        el = new DOMElement(DESCRIPTION_PROPERTY);
         el.addText(this.description);
         wr.write(el);
 
-        el = new DOMElement(LICENCE);
+        el = new DOMElement(LICENCE_PROPERTY);
         el.addText(this.licence);
         wr.write(el);
 
-        el = new DOMElement(AUTHOR);
+        el = new DOMElement(AUTHOR_PROPERTY);
         el.addText(this.authorName);
         wr.write(el);
 
-        el = new DOMElement(VERSION);
+        el = new DOMElement(VERSION_PROPERTY);
         el.addText(this.version);
         wr.write(el);
 
         el = new DOMElement("backupPack");
-        el.addText(new Boolean(this.backupPack).toString());
+        el.addText(Boolean.toString(this.backupPack));
         wr.write(el);
 
         el = new DOMElement("preserveVersion");
-        el.addText(new Boolean(this.preserveVersion).toString());
+        el.addText(Boolean.toString(this.preserveVersion));
         wr.write(el);
 
-        Element elfiles = new DOMElement(FILES);
+        Element elfiles = new DOMElement(FILES_PROPERTY);
         wr.writeOpen(elfiles);
 
         for (DocumentInfo docInfo : this.files) {
             Element elfile = new DOMElement("file");
-            elfile.addAttribute(DEFAULT_ACTION, String.valueOf(docInfo.getAction()));
-            elfile.addAttribute(LANGUAGE, String.valueOf(docInfo.getLanguage()));
+            elfile.addAttribute(DEFAULT_ACTION_PROPERTY, String.valueOf(docInfo.getAction()));
+            elfile.addAttribute(LANGUAGE_PROPERTY, String.valueOf(docInfo.getLanguage()));
             elfile.addText(docInfo.getFullName());
             wr.write(elfile);
         }
@@ -1141,7 +1124,7 @@ public class Package
      * Write the package.xml file to an OutputStream
      *
      * @param out the OutputStream to write to
-     * @param context curent XWikiContext
+     * @param context current XWikiContext
      * @throws IOException when an error occurs during streaming operation
      * @since 2.3M2
      */
@@ -1170,7 +1153,7 @@ public class Package
             toXML(zos, context);
             zos.closeArchiveEntry();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to add the package descriptor of package [{}] to the ZIP", getName(), e);
         }
     }
 
@@ -1284,7 +1267,7 @@ public class Package
             fos.flush();
             fos.close();
         } catch (ExcludeDocumentException e) {
-            LOGGER.info("Skip the document " + doc.getDocumentReference());
+            LOGGER.info("Skip the document [{}]", doc.getDocumentReference());
         } catch (Exception e) {
             Object[] args = new Object[1];
             args[0] = doc.getDocumentReference();
@@ -1304,7 +1287,7 @@ public class Package
             fos.flush();
             fos.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to write the package descriptor of package [{}] to directory [{}]", getName(), dir, e);
         }
     }
 
@@ -1331,16 +1314,16 @@ public class Package
 
         Element docEl = domdoc.getRootElement();
 
-        Element infosEl = docEl.element(INFOS);
+        Element infosEl = docEl.element(INFOS_PROPERTY);
 
         this.name = getElementText(infosEl, "name");
-        this.description = getElementText(infosEl, DESCRIPTION);
-        this.licence = getElementText(infosEl, LICENCE);
-        this.authorName = getElementText(infosEl, AUTHOR);
+        this.description = getElementText(infosEl, DESCRIPTION_PROPERTY);
+        this.licence = getElementText(infosEl, LICENCE_PROPERTY);
+        this.authorName = getElementText(infosEl, AUTHOR_PROPERTY);
         this.extensionId = getElementText(infosEl, "extensionId", null);
-        this.version = getElementText(infosEl, VERSION);
-        this.backupPack = new Boolean(getElementText(infosEl, "backupPack")).booleanValue();
-        this.preserveVersion = new Boolean(getElementText(infosEl, "preserveVersion")).booleanValue();
+        this.version = getElementText(infosEl, VERSION_PROPERTY);
+        this.backupPack = Boolean.parseBoolean(getElementText(infosEl, "backupPack"));
+        this.preserveVersion = Boolean.parseBoolean(getElementText(infosEl, "preserveVersion"));
 
         return domdoc;
     }
@@ -1385,12 +1368,12 @@ public class Package
      */
     public int readFromDir(File dir, XWikiContext context, Document description) throws IOException, XWikiException
     {
-        File[] files = dir.listFiles();
+        File[] dirFiles = dir.listFiles();
 
         SAXReader reader = getSAXReader();
 
         int count = 0;
-        for (File file : files) {
+        for (File file : dirFiles) {
             if (file.isDirectory()) {
                 count += readFromDir(file, context, description);
             } else {
@@ -1418,10 +1401,10 @@ public class Package
                                 "document " + doc.getDocumentReference() + " does not exist in package definition");
                         }
                     } catch (ExcludeDocumentException e) {
-                        LOGGER.info("Skip the document '" + doc.getDocumentReference() + "'");
+                        LOGGER.info("Skip the document [{}]", doc.getDocumentReference());
                     }
                 } else if (!file.getName().equals(DefaultPackageFileName)) {
-                    LOGGER.info(file.getAbsolutePath() + " is not a valid wiki document");
+                    LOGGER.info("File [{}] is not a valid wiki document", file.getAbsolutePath());
                 }
             }
         }
@@ -1448,16 +1431,16 @@ public class Package
         int count = 0;
         try {
             File infofile = new File(dir, DefaultPackageFileName);
-            Document description = fromXml(new FileInputStream(infofile));
+            Document descriptionDocument = fromXml(new FileInputStream(infofile));
 
-            count = readFromDir(dir, context, description);
+            count = readFromDir(dir, context, descriptionDocument);
 
-            updateFileInfos(description);
+            updateFileInfos(descriptionDocument);
         } catch (DocumentException e) {
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Error when reading the XML");
         }
 
-        LOGGER.info("Package read " + count + " documents");
+        LOGGER.info("Package read [{}] documents", count);
 
         return "";
     }
@@ -1475,38 +1458,38 @@ public class Package
 
         Map<String, Object> infos = new HashMap<>();
         infos.put("name", this.name);
-        infos.put(DESCRIPTION, this.description);
-        infos.put(LICENCE, this.licence);
-        infos.put(AUTHOR, this.authorName);
-        infos.put(VERSION, this.version);
+        infos.put(DESCRIPTION_PROPERTY, this.description);
+        infos.put(LICENCE_PROPERTY, this.licence);
+        infos.put(AUTHOR_PROPERTY, this.authorName);
+        infos.put(VERSION_PROPERTY, this.version);
         infos.put("backup", this.isBackupPack());
 
-        Map<String, Map<String, List<Map<String, String>>>> files = new HashMap<>();
+        Map<String, Map<String, List<Map<String, String>>>> filesBySpace = new HashMap<>();
 
         for (DocumentInfo docInfo : this.files) {
             Map<String, String> fileInfos = new HashMap<>();
-            fileInfos.put(DEFAULT_ACTION, String.valueOf(docInfo.getAction()));
-            fileInfos.put(LANGUAGE, String.valueOf(docInfo.getLanguage()));
+            fileInfos.put(DEFAULT_ACTION_PROPERTY, String.valueOf(docInfo.getAction()));
+            fileInfos.put(LANGUAGE_PROPERTY, String.valueOf(docInfo.getLanguage()));
             fileInfos.put("fullName", docInfo.getFullName());
 
             // If the space does not exist in the map of spaces, we create it.
-            if (files.get(docInfo.getDoc().getSpace()) == null) {
-                files.put(docInfo.getDoc().getSpace(), new HashMap<>());
+            if (filesBySpace.get(docInfo.getDoc().getSpace()) == null) {
+                filesBySpace.put(docInfo.getDoc().getSpace(), new HashMap<>());
             }
 
             // If the document name does not exist in the space map of docs, we create it.
-            if (files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()) == null) {
-                files.get(docInfo.getDoc().getSpace()).put(docInfo.getDoc().getName(),
+            if (filesBySpace.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()) == null) {
+                filesBySpace.get(docInfo.getDoc().getSpace()).put(docInfo.getDoc().getName(),
                     new ArrayList<Map<String, String>>());
             }
 
             // Finally we add the file infos (language, fullname and action) to the list of translations
             // for that document.
-            files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()).add(fileInfos);
+            filesBySpace.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()).add(fileInfos);
         }
 
-        json.put(INFOS, infos);
-        json.put(FILES, files);
+        json.put(INFOS_PROPERTY, infos);
+        json.put(FILES_PROPERTY, filesBySpace);
 
         return json;
     }

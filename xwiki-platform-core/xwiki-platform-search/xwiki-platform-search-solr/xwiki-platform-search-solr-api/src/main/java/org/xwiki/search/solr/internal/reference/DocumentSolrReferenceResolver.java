@@ -147,7 +147,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
             try {
                 this.attachmentResolverProvider.get().getReferences(attachmentReference).forEach(result::add);
             } catch (Exception e) {
-                this.logger.error("Failed to resolve references for attachment [" + attachmentReference + "]", e);
+                this.logger.error("Failed to resolve references for attachment [{}]", attachmentReference, e);
             }
         }
     }
@@ -167,7 +167,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
                     try {
                         this.objectResolverProvider.get().getReferences(objectReference).forEach(result::add);
                     } catch (Exception e) {
-                        this.logger.error("Failed to resolve references for object [" + objectReference + "]", e);
+                        this.logger.error("Failed to resolve references for object [{}]", objectReference, e);
                     }
                 }
             }

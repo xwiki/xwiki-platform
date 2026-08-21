@@ -23,6 +23,8 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import jakarta.inject.Named;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
@@ -56,8 +58,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-
-import jakarta.inject.Named;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -128,9 +128,10 @@ class DocumentUserManagerTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
         when(document.isNew()).thenReturn(false);
+        BaseObject baseObjectMock = mock(BaseObject.class);
         when(document.getXObject(
             new EntityReference("XWikiUsers", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE))))
-                .thenReturn(mock(BaseObject.class));
+                .thenReturn(baseObjectMock);
 
         assertTrue(this.userManager.exists(new DocumentUserReference(reference, true)));
     }

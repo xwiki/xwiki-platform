@@ -19,9 +19,6 @@
  */
 package org.xwiki.index.tree.internal.nestedpages;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,6 +44,9 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.tree.TreeNode;
 import org.xwiki.tree.internal.DefaultCompositeTreeNodeGroup;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DocumentTreeNode}.
@@ -108,7 +108,7 @@ class DocumentTreeNodeTest
     private DocumentReference terminalDocumentReference = new DocumentReference("wiki", "Some", "Page");
 
     @BeforeEach
-    public void before() throws Exception
+    void before()
     {
         when(this.translationsTreeNode.getType()).thenReturn("translations");
         when(this.attachmentsTreeNode.getType()).thenReturn("attachments");
@@ -138,7 +138,7 @@ class DocumentTreeNodeTest
      * @see "XWIKI-14643: Missing page in breadcrumbs treeview when treeview is expanded"
      */
     @Test
-    void pagination() throws Exception
+    void pagination()
     {
         this.documentTreeNode.getProperties().put("hierarchyMode", "reference");
         this.documentTreeNode.getProperties().put("showTranslations", true);
@@ -247,12 +247,12 @@ class DocumentTreeNodeTest
     @Test
     void getParentForTerminalPage()
     {
-        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        DocumentReference pageReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.Page"))
-            .thenReturn(documentReference);
+            .thenReturn(pageReference);
 
         when(this.entityTreeNodeIdConverter.convert(String.class,
-            new DocumentReference("WebHome", documentReference.getLastSpaceReference())))
+            new DocumentReference("WebHome", pageReference.getLastSpaceReference())))
                 .thenReturn("document:wiki:Path.To.WebHome");
 
         assertEquals("document:wiki:Path.To.WebHome", this.documentTreeNode.getParent("document:wiki:Path.To.Page"));
@@ -261,9 +261,9 @@ class DocumentTreeNodeTest
     @Test
     void getParentForNestedPage()
     {
-        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
+        DocumentReference pageReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
         when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.WebHome"))
-            .thenReturn(documentReference);
+            .thenReturn(pageReference);
 
         when(this.entityTreeNodeIdConverter.convert(String.class, new DocumentReference("wiki", "Path", "WebHome")))
             .thenReturn("document:wiki:Path.WebHome");
@@ -274,9 +274,9 @@ class DocumentTreeNodeTest
     @Test
     void getParentForTopLevelPage()
     {
-        DocumentReference documentReference = new DocumentReference("wiki", "Path", "WebHome");
+        DocumentReference pageReference = new DocumentReference("wiki", "Path", "WebHome");
         when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.WebHome"))
-            .thenReturn(documentReference);
+            .thenReturn(pageReference);
 
         when(this.entityTreeNodeIdConverter.convert(String.class, new WikiReference("wiki"))).thenReturn("wiki:wiki");
 

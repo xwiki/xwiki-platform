@@ -37,7 +37,7 @@ public class ValidateConsoleRule implements TestRule
 {
     private static final String SKIP_PROPERTY = "xwiki.test.validateconsole.skip";
 
-    private static final boolean SKIP = Boolean.valueOf(System.getProperty(SKIP_PROPERTY, "false"));
+    private static final boolean SKIP = Boolean.parseBoolean(System.getProperty(SKIP_PROPERTY, "false"));
 
     private LogCaptureConfiguration logCaptureConfiguration = new LogCaptureConfiguration();
 

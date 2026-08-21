@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @since 13.3RC1
  */
 @ComponentTest
-public class UserAddedEventListenerTest
+class UserAddedEventListenerTest
 {
     @InjectMockComponents
     private UserAddedEventListener userAddedEventListener;
@@ -84,8 +84,9 @@ public class UserAddedEventListenerTest
         XWikiDocument userDoc = mock(XWikiDocument.class);
         DocumentReference documentReference = new DocumentReference("foo", "XWiki", "User");
         when(userDoc.getDocumentReference()).thenReturn(documentReference);
+        BaseObject baseObjectMock = mock(BaseObject.class);
         when(userDoc.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE))
-            .thenReturn(mock(BaseObject.class));
+            .thenReturn(baseObjectMock);
         WikiReference wikiReference = new WikiReference("foo");
         WikiReference currentWikiReference = new WikiReference("current");
         when(this.xWikiContext.getWikiReference()).thenReturn(currentWikiReference);

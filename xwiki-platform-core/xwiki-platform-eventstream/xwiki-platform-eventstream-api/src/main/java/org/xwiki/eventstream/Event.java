@@ -507,7 +507,7 @@ public interface Event
         if (custom == null) {
             parameters = null;
         } else {
-            parameters = new HashMap<>(custom.size());
+            parameters = HashMap.newHashMap(custom.size());
             custom.forEach((k, v) -> parameters.put(k, v != null ? v.toString() : null));
         }
 

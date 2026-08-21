@@ -85,7 +85,7 @@ platform.wiki.create.button=विकी तयार करा
 platform.wiki.create.title=नवीन विकी तयार करा
 platform.wiki.create.members=सदस्य
 ### Missing: platform.wiki.create.prettyname.empty=Pretty name must not be empty
-### Missing: platform.wiki.create.error=Wiki \"{0}\" creation failed: {1}.
+### Missing: platform.wiki.create.error=Wiki "{0}" creation failed: {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=या अभिज्ञापकासह डेटाबेस आधीपासून विद्यमान आहे
 ### Missing: platform.wiki.create.error.wikiname.wikialreadyexists=This identifier is already used
 ### Missing: platform.wiki.create.error.wikiname.empty=Identifier can't be empty
@@ -163,9 +163,6 @@ platform.wiki.create.error.wikiname.databasealreadyexists=या अभिज्
 ## LegacyWorkspaces macro
 ### Missing: rendering.macro.workspaces.name=Workspaces (Legacy)
 ### Missing: rendering.macro.workspaces.description=Deprecated macro that should not be used here for compatibility reasons. Please use the "wikis" macro instead.
-
-## Browse
-### Missing: platform.wiki.browse=Browse Wikis
 ### Missing: platform.wiki.browse.emptyvalue=N/A
 ### Missing: platform.wiki.browse.wikiprettyname=Name
 ### Missing: platform.wiki.browse.description=Description
@@ -209,7 +206,7 @@ platform.wiki.create.error.wikiname.databasealreadyexists=या अभिज्
 ### Missing: platform.wiki.create.wizard.step.users.shortname=Users
 ### Missing: platform.wiki.create.wizard.step.cleaningUp=Cleaning Up
 ### Missing: platform.wiki.create.wizard.step.provisioning.cleanUp=Clean &amp; delete this wiki
-### Missing: platform.wiki.create.wizard.step.cleaningup.success=The wiki {0} has been successfuly deleted.
+platform.wiki.create.wizard.step.cleaningup.success=The wiki {0} has been successfuly deleted.
 ### Missing: platform.wiki.create.wizard.step.cleaningup.error=Error, the wiki {0} has not been deleted.
 ### Missing: platform.wiki.create.wizard.step.cleaningUp.confirmmessage=You are about to delete wiki {0}. Please confirm.
 ### Missing: platform.wiki.create.wizard.step.cleaningUp.confirm=Confirm
@@ -226,7 +223,6 @@ platform.wiki.create.error.wikiname.databasealreadyexists=या अभिज्
 ### Missing: platform.wiki.create.wizard.step.previous=Previous Step
 ### Missing: platform.wiki.create.wizard.step.next=Next step
 ### Missing: platform.wiki.create.wizard.step.create=Create
-
 ### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
 ### Missing: platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
 ### Missing: platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
@@ -242,15 +238,15 @@ platform.wiki.create.error.wikiname.databasealreadyexists=या अभिज्
 ### Missing: admin.wikis.rights=Creation Right
 
 ## XWikiServer Sheet
-### Missing: platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
-### Missing: platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
-### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exist.
+### Missing: platform.wiki.sheet.title=Descriptor of the wiki "{0}"
+### Missing: platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias "{0}" already exists.
+### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias "{0}" does not exist.
 ### Missing: platform.wiki.sheet.title.settings=Wiki properties
 ### Missing: platform.wiki.sheet.title.createnewalias=Create new alias
 ### Missing: platform.wiki.sheet.title.viewaliases=View aliases
 ### Missing: platform.wiki.sheet.desc.wikiprettyname=The display name of the wiki.
 ### Missing: platform.wiki.sheet.desc.owner=A user who will have all the rights on this wiki.
-### Missing: platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will start with \"https\".
+### Missing: platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will start with "https".
 ### Missing: platform.wiki.sheet.desc.port=The port to use for all this wiki's generated externals URLs. If not set it's inherited from the configuration and the main wiki. Only taken into account for domain based URLs.
 ### Missing: platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be used as a template when creating a new wiki.
 ### Missing: platform.wiki.sheet.desc.server=The alias used to access the wiki.
@@ -264,7 +260,7 @@ platform.wiki.create.error.wikiname.databasealreadyexists=या अभिज्
 ### Missing: platform.wiki.sheet.prop.server=Alias
 ### Missing: platform.wiki.sheet.prop.homepage=Homepage
 ### Missing: platform.wiki.sheet.prop.iswikitemplate=Wiki template
-### Missing: platform.wiki.sheet.descriptor=This page defines how to access the \"{0}\" wiki, and some properties about it. For more configurations, please go to the
+### Missing: platform.wiki.sheet.descriptor=This page defines how to access the "{0}" wiki, and some properties about it. For more configurations, please go to the
 ### Missing: platform.wiki.sheet.descriptor.admin=administration page of the wiki.
 ### Missing: platform.wiki.sheet.aliases=An alias is another name for the wiki. You can add aliases to create different URLs for the wiki.
 
@@ -302,6 +298,10 @@ platform.wiki.create.error.wikiname.databasealreadyexists=या अभिज्
 ### Missing: platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
 ### Missing: platform.wiki.delete.confirmation.no=No, take me back!
 
+## Browse
+### Missing: platform.wiki.browse=Browse Wikis
+
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

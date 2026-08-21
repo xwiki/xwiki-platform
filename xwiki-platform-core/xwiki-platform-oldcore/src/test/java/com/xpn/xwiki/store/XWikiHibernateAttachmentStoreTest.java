@@ -25,12 +25,12 @@ import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.suigeneris.jrcs.rcs.Archive;
-import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -66,7 +66,8 @@ class XWikiHibernateAttachmentStoreTest
         HibernateStore mockHibernateStore = this.oldcore.getMocker().getInstance(HibernateStore.class);
         this.mockSession = mock(Session.class);
         when(mockHibernateStore.getCurrentSession()).thenReturn(this.mockSession);
-        when(mockHibernateStore.getSessionFactory()).thenReturn(mock(SessionFactory.class));
+        SessionFactory sessionFactoryMock = mock(SessionFactory.class);
+        when(mockHibernateStore.getSessionFactory()).thenReturn(sessionFactoryMock);
 
         Query<Long> mockQuery = mock();
         when(this.mockSession.createQuery(anyString(), eq(Long.class))).thenReturn(mockQuery);

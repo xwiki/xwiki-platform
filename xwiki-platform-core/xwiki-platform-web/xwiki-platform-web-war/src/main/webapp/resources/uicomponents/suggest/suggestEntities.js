@@ -70,7 +70,7 @@ define('xwiki-entityTypeSwitch', ['jquery', 'xwiki-suggestPages', 'xwiki-suggest
     });
     var pickerFactory = entityTypeToPickerFactory[entityType];
     if (pickerFactory && typeof referenceField[pickerFactory] === 'function') {
-      referenceField[pickerFactory].call(referenceField);
+      referenceField[pickerFactory]();
     }
   };
 

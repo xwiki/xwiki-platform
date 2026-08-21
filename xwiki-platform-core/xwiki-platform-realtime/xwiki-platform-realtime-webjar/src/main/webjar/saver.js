@@ -51,6 +51,12 @@ define('xwiki-realtime-saver', [
   // the chances of concurrent saves (which often lead to merge conflicts).
   const SAVE_DELAY = 1000;
 
+  // How long to wait for the result of a save request before giving up. This is a safety net for the case where neither
+  // the save success nor the save failure event is fired, which would otherwise block the autosave forever. The value
+  // is well above any realistic save round-trip because on timeout the content remains dirty and is saved again, so a
+  // shorter value would risk saving twice (creating an extra version) when the request is only slow.
+  const SUBMIT_TIMEOUT = 120000;
+
   /**
    * Generic auto-saver that keeps track of local update count and schedules saves when the content is modified.
    */
@@ -74,6 +80,9 @@ define('xwiki-realtime-saver', [
         // instance higher priority than autosave.
         saving: 0,
       };
+
+      // Whether this saver was stopped, in which case no new save must be scheduled.
+      this._stopped = false;
     }
 
     /**
@@ -92,6 +101,10 @@ define('xwiki-realtime-saver', [
     _scheduleSave() {
       // Cancel the previous scheduled save.
       clearTimeout(this._saveTimer);
+      if (this._stopped) {
+        // Don't schedule a new save after the saver was stopped (e.g. when the user leaves the edit mode).
+        return;
+      }
       if (!this._dirtyTimestamp || Date.now() - this._dirtyTimestamp < SAVE_INTERVAL) {
         this._saveTimer = setTimeout(this._maybeSave.bind(this), SAVE_INTERVAL);
       } else {
@@ -141,7 +154,8 @@ define('xwiki-realtime-saver', [
 
     _maybeSave() {
       if (!this._isSomeoneSaving() && this._isSomeoneDirty()) {
-        this._save();
+        // The autosave failure is already logged by the saver and a new save attempt is scheduled.
+        this._save().catch(() => {});
       }
     }
 
@@ -180,23 +194,31 @@ define('xwiki-realtime-saver', [
       // Let the others know immediately that we are saving, in order to reduce concurrent saves.
       this._updateState(true, true);
 
-      const savingClientId = await this._getSavingClientId();
-      if (savingClientId === this._getClientId()) {
-        const savedUpdateCount = this._getUpdateCounts();
-        debug("Saving ", savedUpdateCount);
+      try {
+        const savingClientId = await this._getSavingClientId();
+        if (savingClientId === this._getClientId()) {
+          const savedUpdateCount = this._getUpdateCounts();
+          debug("Saving ", savedUpdateCount);
 
-        try {
           await this._submit(options);
           this._state.savedUpdateCount = savedUpdateCount;
-        } catch (error) {
-          warn("Failed to save.", error);
+        }
+      } catch (error) {
+        warn("Failed to save.", error);
+        // Let the caller know that the content has not been saved.
+        throw error;
+      } finally {
+        this._state.saving = 0;
+        // Propagate the state immediately after the save attempt because the user may leave the edit mode and this will
+        // close the WebSocket connection.
+        this._updateState(true, true);
+
+        if (this._state.dirty) {
+          // The content is still dirty, either because the save failed or because another client was elected to save
+          // and didn't manage to save yet. Schedule a new save attempt.
+          this._scheduleSave();
         }
       }
-
-      this._state.saving = 0;
-      // Propagate the state immediately after a successful save because the user may leave the edit mode and this will
-      // close the WebSocket connection.
-      this._updateState(true, true);
     }
 
     _getSavePriority() {
@@ -377,6 +399,7 @@ define('xwiki-realtime-saver', [
      * Stop the autosave when the user disallows realtime or when the WebSocket is disconnected.
      */
     async stop() {
+      this._stopped = true;
       // Cancel the scheduled save.
       clearTimeout(this._saveTimer);
 
@@ -425,7 +448,8 @@ define('xwiki-realtime-saver', [
         if (!this._state.saving) {
           event.preventDefault();
           event.stopImmediatePropagation();
-          this._save({button: event.target});
+          // The save failure is already logged by the saver and reported to the user by the save notification.
+          this._save({button: event.target}).catch(() => {});
         }
       };
       $(form).on('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
@@ -440,7 +464,7 @@ define('xwiki-realtime-saver', [
       const newAjaxSaveAndContinue = {
         // Prevent the save buttons from reloading the page. Instead, reset the editor's content.
         // FIXME: The in-place editor is also overriding reloadEditor, before this code is executed, so here we're
-        // actually overwritting in-place editor's behavior.
+        // actually overwriting in-place editor's behavior.
         reloadEditor: () => {
           xwikiDocument.reload();
           // HACK: Replicate the behavior from the in-place editor.
@@ -575,7 +599,7 @@ define('xwiki-realtime-saver', [
 
       const form = document.getElementById(this._config.formId);
       const removeListeners = [];
-      const submitResultPromise = this._getSubmitResult(form, removeListeners);
+      const submitResultPromise = this._getSubmitResult(form, removeListeners, SUBMIT_TIMEOUT);
 
       let savePrevented = true;
       $(button).on('xwiki:actions:save.realtime-saver', event => {
@@ -616,8 +640,24 @@ define('xwiki-realtime-saver', [
       return form.querySelector('input[name="action_save' + (continueEditing ? 'andcontinue' : '') + '"]');
     }
 
-    _getSubmitResult(form, removeListeners) {
+    /**
+     * @param {Element} form the edit form that is being submitted
+     * @param {Array<Function>} removeListeners the list of functions to call in order to stop waiting for the result
+     * @param {Number} [timeout] how long to wait for the save result before rejecting; when not specified we wait
+     *   indefinitely (e.g. while the user is dealing with the merge conflict modal)
+     * @returns {Promise} a promise that resolves with the save result or rejects if the save fails
+     */
+    _getSubmitResult(form, removeListeners, timeout) {
       return new Promise((resolve, reject) => {
+        if (timeout) {
+          const timer = setTimeout(() => {
+            // Stop waiting for the save result, including for the events that are part of the same group.
+            removeListeners.forEach(removeListener => removeListener());
+            reject(new Error('Timeout while waiting for the save result.'));
+          }, timeout);
+          // Disarm the timer as soon as we receive the save result.
+          removeListeners.push(() => clearTimeout(timer));
+        }
         this._once(form, removeListeners, 'xwiki:document:saved.realtime-saver', (event, data) => {
           resolve(data);
         });

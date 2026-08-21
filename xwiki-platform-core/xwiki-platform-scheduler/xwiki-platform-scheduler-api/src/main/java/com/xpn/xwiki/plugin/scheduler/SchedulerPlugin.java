@@ -150,14 +150,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         this.schedulersClassLoaderManager.setSchedulerPlugin(this);
 
         if (this.enabled) {
-            Thread thread = new Thread(new ExecutionContextRunnable(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    initAsync();
-                }
-            }, Utils.getComponentManager()));
+            Thread thread = new Thread(new ExecutionContextRunnable(this::initAsync,
+                Utils.getComponentManager()));
             thread.setName("XWiki Scheduler initialization");
             thread.setDaemon(true);
 
@@ -373,6 +367,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 
     private void register(BaseObject jobObj, XWikiContext context) throws SchedulerPluginException
     {
+        if (jobObj == null) {
+            return;
+        }
+
         String status = jobObj.getStringValue(STATUS);
         if (status.equals(JobState.STATE_NORMAL) || status.equals(JobState.STATE_PAUSED)) {
             scheduleJob(jobObj, context);
@@ -552,10 +550,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             saveStatus(PAUSED, object, context);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                "Error occured while trying to pause job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to pause job " + object.getStringValue(JOB_NAME), e);
         } catch (XWikiException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                "Error occured while trying to save status of job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to save status of job " + object.getStringValue(JOB_NAME), e);
         }
     }
 
@@ -575,10 +573,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             saveStatus(NORMAL, object, context);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_JOB,
-                "Error occured while trying to resume job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to resume job " + object.getStringValue(JOB_NAME), e);
         } catch (XWikiException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_JOB,
-                "Error occured while trying to save status of job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to save status of job " + object.getStringValue(JOB_NAME), e);
         }
     }
 
@@ -597,7 +595,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             getScheduler().triggerJob(new JobKey(job));
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_TRIGGER_JOB,
-                "Error occured while trying to trigger job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to trigger job " + object.getStringValue(JOB_NAME), e);
         }
     }
 
@@ -627,14 +625,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             getScheduler().deleteJob(new JobKey(job));
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                "Error occured while trying to pause job " + object.getStringValue(JOB_NAME), e);
+                "Error occurred while trying to pause job " + object.getStringValue(JOB_NAME), e);
         }
         this.schedulersClassLoaderManager.removeScheduler(object.getReference());
     }
 
 
     /**
-     * Re-create the job and put it back in the same state as now. Usefull when something change in the database or the
+     * Re-create the job and put it back in the same state as now. Useful when something change in the database or the
      * indicated class.
      * 
      * @param jobObject the xobject holder the job metadata
@@ -667,7 +665,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                 getScheduler().addJob(job, true);
             } catch (SchedulerException e) {
                 throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                    "Error occured while trying to unregistere the job [" + jobObject.getReference() + "]", e);
+                    "Error occurred while trying to unregister the job [" + jobObject.getReference() + "]", e);
             }
 
             // Put back the scheduler in the same state as before
@@ -688,7 +686,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                 }
             } catch (SchedulerException e) {
                 throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SCHEDULE_JOB,
-                    "Error occured while trying to put the job [" + jobObject.getReference()
+                    "Error occurred while trying to put the job [" + jobObject.getReference()
                         + "] in the same state as before",
                     e);
             }
@@ -787,14 +785,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     private synchronized Scheduler getDefaultSchedulerInstance() throws SchedulerPluginException
     {
-        Scheduler scheduler;
+        Scheduler defaultScheduler;
         try {
-            scheduler = StdSchedulerFactory.getDefaultScheduler();
+            defaultScheduler = StdSchedulerFactory.getDefaultScheduler();
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_GET_SCHEDULER,
                 "Error getting default Scheduler instance", e);
         }
-        return scheduler;
+        return defaultScheduler;
     }
 
     /**
@@ -910,7 +908,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                 try {
                     unregister(originalJobObj);
                 } catch (SchedulerPluginException e) {
-                    LOGGER.warn("Failed to register job in document [{}]: {}", document.getDocumentReference(),
+                    LOGGER.warn("Failed to unregister job in document [{}]: [{}]", document.getDocumentReference(),
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
@@ -924,7 +922,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 
                     register(jobObject, xcontext);
                 } catch (Exception e) {
-                    LOGGER.warn("Failed to register job in document [{}]: {}", document.getDocumentReference(),
+                    LOGGER.warn("Failed to register job in document [{}]: [{}]", document.getDocumentReference(),
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }

@@ -33,9 +33,9 @@ import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
 import org.xwiki.platform.wiki.creationjob.WikiCreator;
-import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -96,17 +96,15 @@ public class WikiCreationJobScriptServices implements ScriptService
             authorizationManager.checkAccess(Right.CREATE_WIKI, xcontext.getUserReference(), mainWikiReference);
             
             // Verify that if an extension id is provided, this extension is authorized.
-            if (request.getExtensionId() != null) {
-                if (!isAuthorizedExtension(request.getExtensionId())) {
-                    throw new WikiCreationException(String.format("The extension [%s] is not authorized.",
-                            request.getExtensionId()));
-                }
+            if (request.getExtensionId() != null && !isAuthorizedExtension(request.getExtensionId())) {
+                throw new WikiCreationException(String.format("The extension [%s] is not authorized.",
+                        request.getExtensionId()));
             }
             return wikiCreator.createWiki(request);
             
         } catch (WikiCreationException e) {
             setLastError(e);
-            logger.warn("Failed to create a new wiki.", e);
+            logger.error("Failed to create a new wiki.", e);
         } catch (AccessDeniedException e) {
             setLastError(e);
         }

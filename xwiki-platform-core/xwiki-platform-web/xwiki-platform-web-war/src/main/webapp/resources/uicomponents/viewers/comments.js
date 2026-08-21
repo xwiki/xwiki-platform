@@ -215,7 +215,7 @@ viewers.Comments = Class.create({
                 item._x_notification.replace(new XWiki.widgets.Notification(
                     "$services.localization.render('core.viewers.comments.editForm.fetch.failed')" + failureReason,
                     "error"));
-              }.bind(this),
+              },
               on0 : function (response) {
                 response.request.options.onFailure(response);
               },
@@ -319,7 +319,7 @@ viewers.Comments = Class.create({
           formData.set('xpage', 'xpart');
           formData.set('vm', 'commentsinline.vm');
           formData.set('skin', XWiki.skin);
-          // Strip form parameters from the form action query string to prevent them from being overwriten.
+          // Strip form parameters from the form action query string to prevent them from being overwritten.
           var queryStringParams = $H(form.action.toQueryParams());
           formData.keys().each(queryStringParams.unset.bind(queryStringParams));
           var url = form.action.replace(/\?.*/, '?' + queryStringParams.toQueryString());
@@ -342,7 +342,7 @@ viewers.Comments = Class.create({
               var failureReason = response.statusText || 'Server not responding';
               form._x_notification.replace(new XWiki.widgets.Notification(
                   "$services.localization.render('core.viewers.comments.add.failed')" + failureReason, "error"));
-            }.bind(this),
+            },
             on0 : function (response) {
               response.request.options.onFailure(response);
             },
@@ -497,7 +497,7 @@ viewers.Comments = Class.create({
           },
           onComplete: function (response) {
             form.previewButton.disabled = false;
-          }.bind(this)
+          }
         });
       } else {
         this.cancelPreview(form);
@@ -527,7 +527,7 @@ viewers.Comments = Class.create({
       commentElt.hide();
       $(form.previewButton).find('input')
         .val("$services.localization.render('core.viewers.comments.preview.button.back')");
-    }.bind(this))
+    })
   },
   /**
    * Display the comment textarea instead of the comment preview.
@@ -550,7 +550,7 @@ viewers.Comments = Class.create({
       if (commentElt) {
         commentElt.show();
       }
-    }.bind(this));
+    });
   },
   resetForm: function (event) {
     if (event) {
@@ -700,7 +700,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var notification;
     /**
      * Ajax request made for deleting the comment.
-     * Delete the HTML element on succes (replace it with a box message).
+     * Delete the HTML element on success (replace it with a box message).
      * Display error message on failure.
      * Disable the delete button before the request is send, so the user cannot resend it in case it takes longer.
      */

@@ -62,6 +62,9 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -135,9 +138,31 @@ class XHTML2FOTest
             </div>""");
 
         String transformedXML = getTransformedXML(xml);
-        assertFalse(transformedXML.contains("box-sizing"), "Generated FO shouldn't contain 'box-sizing'");
-        assertFalse(transformedXML.contains("text-justify"), "Generated FO shouldn't contain 'text-justify'");
-        assertFalse(transformedXML.contains("text-autospace"), "Generated FO shouldn't contain 'text-autospace'");
+        assertThat(transformedXML, not(containsString("box-sizing")));
+        assertThat(transformedXML, not(containsString("text-justify")));
+        assertThat(transformedXML, not(containsString("text-autospace")));
+    }
+
+    /**
+     * CSS4J computes {@code background: none} into {@code background-color: #0000}, i.e. a CSS Color Level 4 hex
+     * notation with an alpha channel, which FOP doesn't support.
+     *
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-24582">XWIKI-24582</a>
+     */
+    @Test
+    void transformWithTransparentColors() throws Exception
+    {
+        String xml = constructXML("""
+            <p style="background-color: #0000; color: #f00c; ">
+              <span style="border: 1pt solid #12345678; background-color: #11223300; color: #0000; ">Test</span>
+            </p>""");
+
+        String transformedXML = getTransformedXML(xml);
+        // The fully transparent colors become the 'transparent' keyword, the others just lose their alpha channel.
+        assertThat(transformedXML, containsString("background-color=\"transparent\""));
+        assertThat(transformedXML, containsString("color=\"#f00\""));
+        assertThat(transformedXML, containsString("border=\"1pt solid #123456\""));
+        assertThat(transformedXML, not(containsString("#11223300")));
     }
 
     private String constructXML(String xmlContent)

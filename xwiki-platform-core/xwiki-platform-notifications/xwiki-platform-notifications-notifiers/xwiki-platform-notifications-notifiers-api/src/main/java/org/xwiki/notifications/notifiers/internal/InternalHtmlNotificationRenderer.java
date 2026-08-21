@@ -156,7 +156,7 @@ public class InternalHtmlNotificationRenderer
      *                              than the list of events, then it won't be used.
      * @param loadMore if {@code true} add a final div in the rendered HTML with a dedicated class to allow a load more
      *                 button.
-     * @return a string contaning the HTML to display.
+     * @return a string containing the HTML to display.
      */
     public String render(List<CompositeEvent> compositeEvents, List<CompositeEventStatus> compositeEventStatuses,
         boolean loadMore)

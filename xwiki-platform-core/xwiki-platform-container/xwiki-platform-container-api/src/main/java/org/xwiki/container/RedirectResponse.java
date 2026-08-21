@@ -38,5 +38,6 @@ public interface RedirectResponse extends Response
      * @param location the redirect URL
      * @throws IOException if an error happens
      */
+    @Override
     void sendRedirect(String location) throws IOException;
 }

@@ -41,6 +41,8 @@ import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecuto
 import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
+import org.xwiki.test.docker.internal.junit5.solr.SolrContainerExecutor;
+import org.xwiki.test.docker.junit5.ServletEngineFileManager;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;
@@ -114,7 +116,7 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
     private static final String STOP_FILENAME = "stop.txt";
 
     private static final List<Class<?>> SUPPORTED_PARAMETER_TYPES = List.of(XWikiWebDriver.class, TestUtils.class,
-        TestConfiguration.class, ComponentManager.class, ExtensionTestUtils.class);
+        TestConfiguration.class, ComponentManager.class, ExtensionTestUtils.class, ServletEngineFileManager.class);
 
     private boolean isVncStarted;
 
@@ -146,6 +148,14 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
             enableVerboseLogs();
         }
 
+        // When the instances run outside of Docker they listen on the host, each on its own port: make sure that the
+        // ports of all of them are exposed to the containers (the port of the first one always is).
+        if (testConfiguration.getServletEngine().isOutsideDocker()) {
+            for (int index = 1; index < testConfiguration.getXWikiInstances().value(); ++index) {
+                testConfiguration.getSSHPorts().add(XWikiExecutor.resolvePort(index));
+            }
+        }
+
         // Expose ports for SSH port forwarding so that containers can communicate with the host using the
         // "host.testcontainers.internal" host name.
         Testcontainers.exposeHostPorts(Ints.toArray(testConfiguration.getSSHPorts()));
@@ -157,24 +167,30 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         MavenResolver mavenResolver =
             new MavenResolver(testConfiguration.getProfiles(), artifactResolver, repositoryResolver);
 
+        // If the Servlet Engine is external then consider XWiki is already configured, provisioned and running.
+        if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
+            // Start the containers which are shared by all the XWiki instances.
+
+            // Start the Database.
+            // Note: We start the database before the XWiki WAR is created because we need the IP of the docker
+            // container for the database when configuring the JDBC URL, in the case when the servlet container is
+            // running outside of docker and thus outside of the shared docker network...
+            startDatabase(testConfiguration, mavenResolver);
+
+            // Start the Blob Store container (if needed)
+            startBlobStore(testConfiguration);
+
+            // Start the Solr container (if needed)
+            startSolr(testConfiguration, mavenResolver);
+
+            // Generate the extension repository of the test (if needed)
+            generateTestExtensionRepository(testConfiguration);
+        }
+
         for (int index = 0; index < testConfiguration.getXWikiInstances().value(); ++index) {
-            // If the Servlet Engine is external then consider XWiki is already configured, provisioned and running.
             if (testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
                 beforeAllExternal(index, extensionContext);
             } else {
-                // Start the Database.
-                // Note: We start the database before the XWiki WAR is created because we need the IP of the docker
-                // container for the database when configuring the JDBC URL, in the case when the servlet container is
-                // running outside of docker and thus outside of the shared docker network...
-                LOGGER.info("(*) Starting database [{}]...", testConfiguration.getDatabase());
-                startDatabase(testConfiguration);
-
-                // Start the Blob Store container (if needed)
-                if (testConfiguration.getBlobStore() != null) {
-                    LOGGER.info("(*) Starting blob store [{}]...", testConfiguration.getBlobStore());
-                    startBlobStore(testConfiguration);
-                }
-
                 // Build the XWiki WAR
                 LOGGER.info("(*) Building custom XWiki WAR...");
                 ServletContainerExecutor containerExecutor = getServletContainerExecutor(index, testConfiguration,
@@ -194,7 +210,7 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
                 // Switch the context executor to the new one (so that extensions are provisioned on the right instance)
                 DockerTestUtils.setCurrentXWikiExecutor(index, extensionContext);
 
-                LOGGER.info("(*) Provision extensions for test...");
+                // Install required extensions
                 provisionExtensions(artifactResolver, mavenResolver, extensionContext);
             }
         }
@@ -353,17 +369,21 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
     {
         Class<?> type = parameterContext.getParameter().getType();
+        Object result;
         if (XWikiWebDriver.class.isAssignableFrom(type)) {
-            return loadXWikiWebDriver(extensionContext);
+            result = loadXWikiWebDriver(extensionContext);
         } else if (TestConfiguration.class.isAssignableFrom(type)) {
-            return loadTestConfiguration(extensionContext);
+            result = loadTestConfiguration(extensionContext);
         } else if (ComponentManager.class.isAssignableFrom(type)) {
-            return loadComponentManager(extensionContext);
+            result = loadComponentManager(extensionContext);
         } else if (ExtensionTestUtils.class.isAssignableFrom(type)) {
-            return loadExtensionTestUtils(extensionContext);
+            result = loadExtensionTestUtils(extensionContext);
+        } else if (ServletEngineFileManager.class.isAssignableFrom(type)) {
+            result = new ServletEngineFileManager(loadServletContainerExecutor(0, extensionContext));
         } else {
-            return loadPersistentTestContext(extensionContext).getUtil();
+            result = loadPersistentTestContext(extensionContext).getUtil();
         }
+        return result;
     }
 
     @Override
@@ -390,8 +410,8 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
             XWikiExecutor executor = DockerTestUtils.getCurrentXWikiExecutor(extensionContext);
             String url = executor.getHttpClientBaseURL();
 
-            LOGGER.info("XWiki is kept running for manual inspection ({}={}).", KEEP_RUNNING_PROPERTY, true);
-            LOGGER.info("Access XWiki at: {}", url);
+            LOGGER.info("XWiki is kept running for manual inspection ([{}]=[{}]).", KEEP_RUNNING_PROPERTY, true);
+            LOGGER.info("Access XWiki at: [{}]", url);
             LOGGER.info("You can log in as [{}] with password [{}]", SUPERADMIN, SUPERADMIN_PASSWORD);
 
             // Wait for the user to create the file "stop.txt" in the current directory.
@@ -409,19 +429,18 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
 
         // Only stop DB and Servlet Engine if we have started them
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
-            // Stop the Blob Store
-            if (testConfiguration.getBlobStore() != null) {
-                LOGGER.info("(*) Stopping blob store [{}]...", testConfiguration.getBlobStore());
-                stopBlobStore(testConfiguration);
-            }
-
-            // Stop the DB
-            LOGGER.info("(*) Stopping database [{}]...", testConfiguration.getDatabase());
-            stopDatabase(testConfiguration);
-
             // Stop the Servlet Engine
             LOGGER.info("(*) Stopping Servlet container(s) [{}]...", testConfiguration.getServletEngine());
             stopServletEngines(extensionContext);
+
+            // Stop the Blob Store
+            stopBlobStore(testConfiguration);
+
+            // Stop the Solr instance
+            stopSolr(testConfiguration);
+
+            // Stop the DB
+            stopDatabase(testConfiguration);
         }
     }
 
@@ -463,28 +482,67 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
         return webDriverContainer;
     }
 
-    private void startDatabase(TestConfiguration testConfiguration) throws Exception
+    private void generateTestExtensionRepository(TestConfiguration testConfiguration) throws Exception
     {
+        if (testConfiguration.isTestExtensionRepository()) {
+            LOGGER.info("(*) Generating the extension repository of the test...");
+            TestExtensionRepository.generate(testConfiguration);
+        }
+    }
+
+    private void startDatabase(TestConfiguration testConfiguration, MavenResolver mavenResolver) throws Exception
+    {
+        LOGGER.info("(*) Starting database [{}]...", testConfiguration.getDatabase());
         DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
-        executor.start(testConfiguration);
+        executor.start(testConfiguration, mavenResolver);
     }
 
     private void stopDatabase(TestConfiguration testConfiguration)
     {
+        LOGGER.info("(*) Stopping database [{}]...", testConfiguration.getDatabase());
+
         DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
         executor.stop(testConfiguration);
     }
 
     private void startBlobStore(TestConfiguration testConfiguration) throws Exception
     {
-        BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
-        executor.start(testConfiguration);
+        if (testConfiguration.getBlobStore() != null) {
+            LOGGER.info("(*) Starting blob store [{}]...", testConfiguration.getBlobStore());
+
+            BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
+            executor.start(testConfiguration);
+        }
     }
 
     private void stopBlobStore(TestConfiguration testConfiguration)
     {
-        BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
-        executor.stop(testConfiguration);
+        if (testConfiguration.getBlobStore() != null) {
+            LOGGER.info("(*) Stopping blob store [{}]...", testConfiguration.getBlobStore());
+
+            BlobStoreContainerExecutor executor = new BlobStoreContainerExecutor();
+            executor.stop(testConfiguration);
+        }
+    }
+
+    private void startSolr(TestConfiguration testConfiguration, MavenResolver mavenResolver) throws Exception
+    {
+        if (testConfiguration.getSolrMode() != null) {
+            LOGGER.info("(*) Starting Solr [{}]...", testConfiguration.getSolrMode());
+
+            SolrContainerExecutor executor = new SolrContainerExecutor();
+            executor.start(testConfiguration, mavenResolver);
+        }
+    }
+
+    private void stopSolr(TestConfiguration testConfiguration)
+    {
+        if (testConfiguration.getSolrMode() != null) {
+            LOGGER.info("(*) Stopping Solr [{}]...", testConfiguration.getSolrMode());
+
+            SolrContainerExecutor executor = new SolrContainerExecutor();
+            executor.stop(testConfiguration);
+        }
     }
 
     private ServletContainerExecutor getServletContainerExecutor(int index, TestConfiguration testConfiguration,
@@ -517,6 +575,8 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
     private void provisionExtensions(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
         ExtensionContext context) throws Exception
     {
+        LOGGER.info("(*) Provision extensions for test...");
+
         // Initialize an extension installer
         ExtensionInstaller extensionInstaller = new ExtensionInstaller(context, artifactResolver, mavenResolver);
         DockerTestUtils.setExtensionInstaller(context, extensionInstaller);

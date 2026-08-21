@@ -33,7 +33,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.ExtendedMimeMessage;
@@ -110,7 +109,8 @@ class PrepareMailRunnableTest
     @BeforeEach
     void setUp()
     {
-        when(this.xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+        XWikiContext xWikiContextMock = mock(XWikiContext.class);
+        when(this.xwikiContextProvider.get()).thenReturn(xWikiContextMock);
     }
 
     @Test
@@ -253,7 +253,7 @@ class PrepareMailRunnableTest
             this.componentManager.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,
                 PrepareMailQueueItem.class));
 
-        MailQueueManager sendMailQueueManager =
+        MailQueueManager sendQueueManager =
             this.componentManager.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,
                 SendMailQueueItem.class));
 
@@ -270,7 +270,7 @@ class PrepareMailRunnableTest
             SendMailQueueItem item = (SendMailQueueItem) args[0];
             ((UpdateableMailStatusResult) item.getListener().getMailStatusResult()).incrementCurrentSize();
             return true;
-        }).when(sendMailQueueManager).addMessageToQueue(any(SendMailQueueItem.class), anyLong(), any(TimeUnit.class));
+        }).when(sendQueueManager).addMessageToQueue(any(SendMailQueueItem.class), anyLong(), any(TimeUnit.class));
 
 
         // Prepare 2 mails. Both will fail, but we want to verify that the second one is processed even though the first

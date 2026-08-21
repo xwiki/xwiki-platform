@@ -72,7 +72,11 @@ class XWikiLinkSuggestService implements LinkSuggestService {
       query: fqs.map((it) => `fq=${it}`).join("\n"),
       nb: "20",
       media: "json",
-      input: `*${query}*`,
+      // Wildcard each word individually instead of the whole query: Solr wildcard terms are matched against
+      // the raw indexed tokens (bypassing the analyzer), so wrapping a multi-word or punctuated query (e.g., a
+      // file name like "image.gif") in a single "*...*" pattern fails to match the separately indexed tokens
+      // ("image", "gif"). Wildcarding word-by-word keeps partial/prefix matching working for each token.
+      input: this.wildcardQuery(query),
     };
 
     const getParams = new URLSearchParams(params).toString();
@@ -88,6 +92,18 @@ class XWikiLinkSuggestService implements LinkSuggestService {
     return await response.json();
   }
 
+  private wildcardQuery(query: string): string {
+    // Split on any run of non-alphanumeric characters, not just whitespace: the indexed content is tokenized
+    // the same way (e.g., a file name like "image.gif" is indexed as the two separate tokens "image" and
+    // "gif"), so a single word containing punctuation (like a file extension) needs splitting too.
+    return query
+      .trim()
+      .split(/[^\p{L}\p{N}]+/u)
+      .filter((word) => word.length > 0)
+      .map((word) => `*${word}*`)
+      .join(" ");
+  }
+
   private initializeSolrQueryParameters(
     type: LinkType | undefined,
     mimetype: string | undefined,
@@ -98,7 +114,7 @@ class XWikiLinkSuggestService implements LinkSuggestService {
       if (type == LinkType.ATTACHMENT) {
         fqs.push("type:ATTACHMENT");
       } else {
-        fqs.push("type:PAGE");
+        fqs.push("type:DOCUMENT");
       }
     }
 
@@ -138,8 +154,8 @@ class XWikiLinkSuggestService implements LinkSuggestService {
     name: string;
     reference: string;
   }) {
-    const reference = result.reference;
     const type = result.type;
+    const reference = this.stripEntityTypePrefix(result.reference, type);
     const xwikiURL =
       this.remoteURLSerializerProvider
         .get()
@@ -167,6 +183,22 @@ class XWikiLinkSuggestService implements LinkSuggestService {
         hint: label,
       };
     }
+  }
+
+  /**
+   * The Solr "reference" field is the serialized entity reference prefixed with the (lower case) entity type, e.g.
+   * "document:wiki:Space.Page", while a link reference is a plain entity reference. Drop that prefix: the entity
+   * reference resolver parses from the right, so it would otherwise take "document:wiki" for the wiki name.
+   *
+   * @param reference - the value of the Solr "reference" field
+   * @param type - the value of the Solr "type" field
+   * @returns the entity reference the given Solr reference designates
+   */
+  private stripEntityTypePrefix(reference: string, type: string): string {
+    const prefix = `${type.toLowerCase()}:`;
+    return reference.startsWith(prefix)
+      ? reference.substring(prefix.length)
+      : reference;
   }
 
   private async getCredentials(): Promise<{ Authorization?: string }> {

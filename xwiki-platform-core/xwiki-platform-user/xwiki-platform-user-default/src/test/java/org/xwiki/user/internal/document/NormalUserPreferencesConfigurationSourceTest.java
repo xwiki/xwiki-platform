@@ -42,8 +42,8 @@ import com.xpn.xwiki.objects.BaseProperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link NormalUserPreferencesConfigurationSource}.
@@ -71,7 +71,8 @@ class NormalUserPreferencesConfigurationSourceTest
     @BeforeComponent
     public void setup() throws Exception
     {
-        when(this.cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(mock(Cache.class));
+        Cache cacheMock = mock(Cache.class);
+        when(this.cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(cacheMock);
     }
 
     @Test

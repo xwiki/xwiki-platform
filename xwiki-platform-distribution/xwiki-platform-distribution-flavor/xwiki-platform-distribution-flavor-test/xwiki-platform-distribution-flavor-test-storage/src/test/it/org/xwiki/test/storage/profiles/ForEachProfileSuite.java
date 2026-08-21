@@ -82,7 +82,7 @@ public class ForEachProfileSuite extends ClasspathSuite
                 // All executors are #0 because they will not be run in parallel.
                 executorByProfile.put(((Class<Profile>) profiles.get(i)).newInstance(), new XWikiExecutor(0));
             } catch (Exception e) {
-                throw new RuntimeException("Failed to instanciate configuration profile.", e);
+                throw new RuntimeException("Failed to instantiate configuration profile.", e);
             }
         }
 

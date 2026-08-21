@@ -128,10 +128,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // Set the configured home URL for the main wiki
         setDefaultURL(null, homepageConfigration);
 
-        // Check if the request is a deamon thread request
+        // Check if the request is a daemon thread request
         XWikiRequest request = context.getRequest();
-        this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub
-            && ((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon();
+        this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub stub
+            && stub.isDaemon();
 
         // Remember initial request base URL for path for last resort
         if (homepageConfigration != null && context.isMainWiki()) {
@@ -153,7 +153,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     defaultWikiURL =
                         new URL(protocolConfiguration, this.originalURL.getHost(), this.originalURL.getPort(), "");
                 } catch (MalformedURLException e) {
-                    LOGGER.warn("The configured protocol [{}] produce an invalid URL: {}", protocolConfiguration,
+                    LOGGER.warn("The configured protocol [{}] produces an invalid URL: [{}]", protocolConfiguration,
                         ExceptionUtils.getRootCauseMessage(e));
                 }
             }
@@ -172,7 +172,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             try {
                 url = xcontext.getWiki().getServerURL(xcontext.getWikiId(), xcontext);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Can't get the standard URL for wiki [{}]: {}", xcontext.getWikiId(),
+                LOGGER.warn("Can't get the standard URL for wiki [{}]: [{}]", xcontext.getWikiId(),
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
@@ -234,7 +234,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             try {
                 return normalizeURL(surl, context);
             } catch (MalformedURLException e) {
-                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter: {}. Ignoring parameter.", surl);
+                LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter [{}]. Ignoring parameter. "
+                    + "Root cause is [{}]", surl, ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
@@ -259,6 +260,15 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * Get the url of the server EG: http://www.xwiki.org/ This function sometimes will return a URL with a trailing /
      * and other times not. This is because the xwiki.home param is recommended to have a trailing / but this.serverURL
      * never does.
+     * <p>
+     * When the requested wiki matches the wiki currently being displayed, this method primarily returns the base URL
+     * of the current request (see {@link #getDefaultURL(String, XWikiContext)}), only falling back on the trusted,
+     * server-side configured URL (see {@link com.xpn.xwiki.XWiki#getServerURL(String, XWikiContext)}) when no
+     * request-derived URL is available. This makes the result of this method suitable for building links meant to be
+     * followed by the same client that issued the current request (e.g., in-page navigation), but <strong>unsafe to
+     * use for URLs handed to a different party</strong> (e.g., emailed, or fetched server-side), since the request
+     * data it may rely on (the {@code Host} or {@code X-Forwarded-Host} headers) is client-controlled. See
+     * {@link XWikiURLFactory#getServerURL(XWikiContext)} for details.
      *
      * @param wikiId the identifier of the wiki, if null it is assumed to be the same as the wiki which we are currently
      *            displaying.
@@ -433,7 +443,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * {@code http://localhost:8080/xwiki/bin/view/A'/B}. This would generate a HTML of
      * {@code <a href='http://localhost:8080/xwiki/bin/view/A'/B'} which would generated a wrong link to
      * {@code http://localhost:8080/xwiki/bin/view/A}... Thus if we were only encoding the characters that require
-     * encoding, we would need HMTL writers to encode the received URL and right now we don't do that anywhere in our
+     * encoding, we would need HTML writers to encode the received URL and right now we don't do that anywhere in our
      * code. Thus in order to not introduce any problem and keep it safe we just handle the {@code +} character
      * specially and encode the rest.
      *
@@ -464,29 +474,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         encodedName = encodedName.replace("+", "%20");
 
         return encodedName;
-    }
-
-    /**
-     * Same rationale as {@link #encodeWithinPath(String, XWikiContext)}. Note that we also encode spaces as {@code %20}
-     * even though we could also have encoded them as {@code +}. We do this for consistency (it allows to have the same
-     * implementation for both URL paths and query string).
-     *
-     * @param name the query string part to encode
-     * @return the URL-encoded query string part
-     */
-    private String encodeWithinQuery(String name)
-    {
-        // Note: Ideally the following would have been the correct way of writing this method but it causes the issues
-        // mentioned in the javadoc of this method
-        // String encodedName;
-        // try {
-        // encodedName = URIUtil.encodeWithinQuery(name, "UTF-8");
-        // } catch (URIException e) {
-        // throw new RuntimeException("Missing charset [UTF-8]", e);
-        // }
-        // return encodedName;
-
-        return encodeWithinPath(name);
     }
 
     /**
@@ -527,10 +514,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     private void appendQueryParameter(String key, Object paramValue, StringBuilder stringBuilder)
         throws UnsupportedEncodingException
     {
-        if (paramValue instanceof String) {
+        if (paramValue instanceof String stringValue) {
             stringBuilder.append(URLEncoder.encode(key, UTF8));
             stringBuilder.append('=');
-            stringBuilder.append(URLEncoder.encode((String) paramValue, UTF8));
+            stringBuilder.append(URLEncoder.encode(stringValue, UTF8));
         } else if (paramValue.getClass().isArray()) {
             Class ofArray = paramValue.getClass().getComponentType();
             if (ofArray.isPrimitive()) {
@@ -551,8 +538,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     }
                 }
             }
-        } else if (paramValue instanceof Collection) {
-            Collection zeCollection = (Collection) paramValue;
+        } else if (paramValue instanceof Collection zeCollection) {
             int index = 0;
             for (Object paramValueElement : zeCollection) {
                 appendQueryParameter(key, paramValueElement.toString(), stringBuilder);

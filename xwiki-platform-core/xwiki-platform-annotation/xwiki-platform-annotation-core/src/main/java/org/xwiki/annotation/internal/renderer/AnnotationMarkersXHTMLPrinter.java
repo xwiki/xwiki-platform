@@ -191,7 +191,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
             // create the current chunk
             String currentChunk = text.substring(previous, index);
             // print the current chunk
-            if (currentChunk.length() > 0) {
+            if (!currentChunk.isEmpty()) {
                 printXML(currentChunk);
             }
             // handle all annotations at this position
@@ -213,7 +213,7 @@ public class AnnotationMarkersXHTMLPrinter extends XHTMLWikiPrinter
         }
         // print the last chunk of text
         String chunk = text.substring(previous);
-        if (chunk.length() > 0) {
+        if (!chunk.isEmpty()) {
             printXML(chunk);
         }
     }

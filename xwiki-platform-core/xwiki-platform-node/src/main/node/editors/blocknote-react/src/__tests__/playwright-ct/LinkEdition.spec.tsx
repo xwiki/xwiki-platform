@@ -17,46 +17,103 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { BlockNoteForTest } from "./BlockNote.story";
-import { FULL_SYNTAX } from "./syntax.mock";
+import { BlockNoteWithLinkEditionHooks } from "./LinkEdition.story";
 import { expect, test } from "@playwright/experimental-ct-react";
 import type { BlockType } from "../../blocknote";
+import type { Locator, Page } from "@playwright/test";
 
-// eslint-disable-next-line max-statements
-test("Editing the title of a link keeps the rest of the line intact", async ({
+// The url of the edited link carries a synthetic id, like the XWiki integration does to bind a link
+// to the metadata it can't store in the BlockNote schema.
+const LINK_URL = "https://xwiki.org/?id=42";
+
+test("beforeEdit transforms the link data used to pre-fill the link editor", async ({
   mount,
   page,
 }) => {
   const component = await mount(
-    <BlockNoteForTest
+    <BlockNoteWithLinkEditionHooks
       content={buildParagraphWithLink()}
-      macros={false}
-      syntax={FULL_SYNTAX}
+      beforeEditTitle="prefilled title"
+    />,
+  );
+
+  await editLink(component.locator(".bn-editor"), page);
+
+  // The link editor is opened with the link data returned by beforeEdit, not with the original one.
+  await expect(page.locator('[data-test="linkEditorInput"]')).toHaveText(
+    JSON.stringify({ url: LINK_URL, title: "prefilled title" }),
+  );
+});
+
+test("beforeUpdate receives the submitted link data and the previous one, as stored in the content", async ({
+  mount,
+  page,
+}) => {
+  const submit = {
+    title: "2nd",
+    url: "https://example.org/",
+    reference: {
+      type: "url",
+      typed: false,
+      reference: "https://example.org/",
+      parameters: {},
+    },
+  };
+
+  const component = await mount(
+    <BlockNoteWithLinkEditionHooks
+      content={buildParagraphWithLink()}
+      beforeEditTitle="prefilled title"
+      submit={submit}
+    />,
+  );
+
+  await editLink(component.locator(".bn-editor"), page);
+
+  // beforeUpdate gets the link data submitted by the link editor, together with the link data as it
+  // is stored in the content: not the one transformed by beforeEdit, so that the integration can
+  // recover from it the metadata (e.g. a synthetic id) it hides from the link editor.
+  await expect(page.locator('[data-test="beforeUpdateInput"]')).toHaveText(
+    JSON.stringify({
+      linkData: submit,
+      previous: { url: LINK_URL, title: "second" },
+    }),
+  );
+});
+
+test("beforeUpdate can rewrite the url written into the content", async ({
+  mount,
+  page,
+}) => {
+  const component = await mount(
+    <BlockNoteWithLinkEditionHooks
+      content={buildParagraphWithLink()}
+      submit={{ title: "second", url: "https://example.org/" }}
+      beforeUpdateUrl="https://rewritten.example/"
     />,
   );
 
   const editorEl = component.locator(".bn-editor");
-  const linkEl = editorEl.locator('a[href="https://xwiki.org"]');
-  await linkEl.waitFor({ state: "attached" });
+  await editLink(editorEl, page);
 
-  // Hover the link to trigger the link toolbar.
+  // The url written into the content is the one returned by beforeUpdate.
+  await expect(
+    editorEl.locator('a[href="https://rewritten.example/"]'),
+  ).toHaveText("second");
+});
+
+/**
+ * Hovers the link to trigger the link toolbar, then opens the link editor.
+ */
+async function editLink(editorEl: Locator, page: Page): Promise<void> {
+  const linkEl = editorEl.locator(`a[href="${LINK_URL}"]`);
+  await linkEl.waitFor({ state: "attached" });
   await linkEl.hover();
 
   const editLinkButtonEl = page.locator('button[data-test="editLink"]');
   await editLinkButtonEl.waitFor({ state: "attached" });
   await editLinkButtonEl.click();
-
-  const titleInputEl = page.locator('input[data-test="linkTitle"]');
-  await titleInputEl.waitFor({ state: "attached" });
-  await titleInputEl.fill("2nd");
-  await titleInputEl.press("Enter");
-
-  // The link title must be updated...
-  await expect(linkEl).toHaveText("2nd");
-
-  // ...and the rest of the line must be intact.
-  await expect(editorEl).toHaveText("First 2nd third fourth");
-});
+}
 
 function buildParagraphWithLink(): BlockType[] {
   return [
@@ -72,7 +129,7 @@ function buildParagraphWithLink(): BlockType[] {
         { type: "text", text: "First ", styles: {} },
         {
           type: "link",
-          href: "https://xwiki.org",
+          href: LINK_URL,
           content: [{ type: "text", text: "second", styles: {} }],
         },
         { type: "text", text: " third fourth", styles: {} },

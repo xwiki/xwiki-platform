@@ -409,11 +409,10 @@ public class PackageMojo extends AbstractOldCoreMojo
 
             // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an
             // ordered LinkedHashSet behind the scene)
-            List<Artifact> dependenciesFirstArtifacts = new ArrayList<>(xarArtifacts);
-            Collections.reverse(dependenciesFirstArtifacts);
+            List<Artifact> artifacts = new ArrayList<>(xarArtifacts);
 
             // Import the xars
-            for (Artifact xarArtifact : dependenciesFirstArtifacts) {
+            for (Artifact xarArtifact : artifacts.reversed()) {
                 getLog().info("  ... Importing XAR file: " + xarArtifact.getFile());
 
                 try {
@@ -777,8 +776,8 @@ public class PackageMojo extends AbstractOldCoreMojo
     {
         Map<String, Object> properties = new HashMap<>(getDefaultConfigurationProperties());
         final Properties projectProperties = this.project.getProperties();
-        for (Object key : projectProperties.keySet()) {
-            properties.put(key.toString(), projectProperties.get(key).toString());
+        for (Map.Entry<Object, Object> entry : projectProperties.entrySet()) {
+            properties.put(entry.getKey().toString(), entry.getValue().toString());
         }
 
         VelocityContext context = new VelocityContext(properties);

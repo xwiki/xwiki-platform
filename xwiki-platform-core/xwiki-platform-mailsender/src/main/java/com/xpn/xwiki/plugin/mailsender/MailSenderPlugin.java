@@ -101,6 +101,11 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     private static final String EMAIL_ENCODING = "UTF-8";
 
     /**
+     * Error message logged when a {@link MessagingException} occurs while sending emails.
+     */
+    private static final String MESSAGING_EXCEPTION_ERROR = "MessagingException has occurred.";
+
+    /**
      * Error code signaling that the mail template requested for
      * {@link #sendMailFromTemplate(String, String, String, String, String, String, VelocityContext, XWikiContext)} was
      * not found.
@@ -174,7 +179,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
      * Filters a list of emails : removes illegal addresses
      * 
      * @param email List of emails
-     * @return An Array containing the correct adresses
+     * @return An Array containing the correct addresses
      */
     private static InternetAddress[] toInternetAddresses(String email) throws AddressException
     {
@@ -345,7 +350,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             }
 
             // Loop over the attachments of the email, add images used from the HTML to the list of attachments to be
-            // embedded with the HTML part, add the other attachements to the list of attachments to be attached to the
+            // embedded with the HTML part, add the other attachments to the list of attachments to be attached to the
             // email.
             for (Attachment attachment : rawAttachments) {
                 if (foundEmbeddedImages.contains(attachment.getFilename())) {
@@ -416,10 +421,12 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 String header = m.group(1);
                 String value = m.group(2);
                 line = input.readLine();
+                StringBuilder valueBuilder = new StringBuilder(value);
                 while (line != null && (line.startsWith(" ") || line.startsWith("\t"))) {
-                    value += line;
+                    valueBuilder.append(line);
                     line = input.readLine();
                 }
+                value = valueBuilder.toString();
                 if (SUBJECT.equals(header)) {
                     toMail.setSubject(value);
                 } else if (FROM.equals(header)) {
@@ -629,6 +636,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
      * @param emails Mail Collection
      * @return True in any case (TODO ?)
      */
+    @SuppressWarnings("java:S2629")
     public boolean sendMails(Collection<Mail> emails, MailConfiguration mailConfiguration, XWikiContext context)
         throws MessagingException, UnsupportedEncodingException
     {
@@ -642,7 +650,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 count++;
 
                 Mail mail = emailIt.next();
-                LOGGER.info("Sending email: " + mail.toString());
+                // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+                // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and a Mail holds
+                // the body and the attachments, none of which its toString() prints.
+                LOGGER.info("Sending email [{}]", mail.toString());
 
                 if ((transport == null) || (session == null)) {
                     // initialize JavaMail Session and Transport
@@ -673,15 +684,16 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                                 transport.close();
                             }
                         } catch (MessagingException ex) {
-                            LOGGER.error("MessagingException has occured.", ex);
+                            LOGGER.error(MESSAGING_EXCEPTION_ERROR, ex);
                         }
                         transport = null;
                         session = null;
                     }
                 } catch (SendFailedException ex) {
                     sendFailedCount++;
-                    LOGGER.error("SendFailedException has occured.", ex);
-                    LOGGER.error("Detailed email information" + mail.toString());
+                    LOGGER.error("SendFailedException has occurred.", ex);
+                    // See the comment above about building the String rather than passing the Mail.
+                    LOGGER.error("Detailed email information: [{}]", mail.toString());
                     if (emailCount == 1) {
                         throw ex;
                     }
@@ -689,15 +701,16 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                         throw ex;
                     }
                 } catch (MessagingException mex) {
-                    LOGGER.error("MessagingException has occured.", mex);
-                    LOGGER.error("Detailed email information" + mail.toString());
+                    LOGGER.error(MESSAGING_EXCEPTION_ERROR, mex);
+                    // See the comment above about building the String rather than passing the Mail.
+                    LOGGER.error("Detailed email information: [{}]", mail.toString());
                     if (emailCount == 1) {
                         throw mex;
                     }
                 } catch (XWikiException e) {
-                    LOGGER.error("XWikiException has occured.", e);
+                    LOGGER.error("XWikiException has occurred.", e);
                 } catch (IOException e) {
-                    LOGGER.error("IOException has occured.", e);
+                    LOGGER.error("IOException has occurred.", e);
                 }
             }
         } finally {
@@ -706,10 +719,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                     transport.close();
                 }
             } catch (MessagingException ex) {
-                LOGGER.error("MessagingException has occured.", ex);
+                LOGGER.error(MESSAGING_EXCEPTION_ERROR, ex);
             }
 
-            LOGGER.info("sendEmails: Email count = " + emailCount + " sent count = " + count);
+            LOGGER.info("sendEmails: email count is [{}], sent count is [{}]", emailCount, count);
         }
         return true;
     }
@@ -746,7 +759,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", "en");
             }
             if (obj == null) {
-                LOGGER.error("No mail object found in the document " + templateDocFullName);
+                LOGGER.error("No mail object found in the document [{}]", templateDocFullName);
                 return ERROR_TEMPLATE_EMAIL_OBJECT_NOT_FOUND;
             }
             String subjectContent = obj.getStringValue("subject");
@@ -771,7 +784,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 sendMail(mail, context);
                 return 0;
             } catch (Exception e) {
-                LOGGER.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: " + updatedVelocityContext, e);
+                LOGGER.error("sendEmailFromTemplate: [{}] vcontext: [{}]", templateDocFullName,
+                    updatedVelocityContext, e);
                 return ERROR;
             }
         } finally {

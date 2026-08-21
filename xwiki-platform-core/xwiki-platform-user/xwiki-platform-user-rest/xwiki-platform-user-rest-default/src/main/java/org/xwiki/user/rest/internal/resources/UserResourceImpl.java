@@ -25,6 +25,10 @@ import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rest.XWikiResource;
@@ -34,16 +38,11 @@ import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.user.rest.internal.UserReferenceModelSerializer;
 import org.xwiki.user.rest.model.jaxb.User;
 import org.xwiki.user.rest.resources.UserResource;
 
 import com.xpn.xwiki.XWikiException;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
 
 /**
  * @since 18.2.0RC1
@@ -55,9 +54,6 @@ public class UserResourceImpl extends XWikiResource implements UserResource
 {
     @Inject
     private UserReferenceResolver<String> userReferenceResolver;
-
-    @Inject
-    private UserReferenceSerializer<String> stringUserReferenceSerializer;
 
     @Inject
     private Provider<UserReferenceModelSerializer> userReferenceModelSerializerProvider;
@@ -89,8 +85,7 @@ public class UserResourceImpl extends XWikiResource implements UserResource
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
-            return userReferenceModelSerializer.toRestUser(baseUri,
-                this.stringUserReferenceSerializer.serialize(userReference), userReference, preferences);
+            return userReferenceModelSerializer.toRestUser(baseUri, userReference, preferences);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         }

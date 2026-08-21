@@ -256,7 +256,7 @@ class XWikiMockitoTest
     @Test
     void deleteAllDocumentsAndWithoutSendingToTrash() throws Exception
     {
-        XWiki xwiki = new XWiki();
+        XWiki testXWiki = new XWiki();
 
         XWikiDocument document = mock(XWikiDocument.class);
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
@@ -264,15 +264,15 @@ class XWikiMockitoTest
 
         // Make sure we have a trash for the test.
         XWikiRecycleBinStoreInterface recycleBinStoreInterface = mock(XWikiRecycleBinStoreInterface.class);
-        xwiki.setRecycleBinStore(recycleBinStoreInterface);
+        testXWiki.setRecycleBinStore(recycleBinStoreInterface);
         when(xwikiCfgConfigurationSource.getProperty("xwiki.recyclebin", "1")).thenReturn("1");
 
         // Configure the mocked Store to later verify if it's called
         XWikiStoreInterface storeInterface = mock(XWikiStoreInterface.class);
-        xwiki.setStore(storeInterface);
+        testXWiki.setStore(storeInterface);
         XWikiContext xwikiContext = mock(XWikiContext.class);
 
-        xwiki.deleteAllDocuments(document, false, xwikiContext);
+        testXWiki.deleteAllDocuments(document, false, xwikiContext);
 
         // Verify that saveToRecycleBin is never called since otherwise it would mean the doc has been saved in the
         // trash

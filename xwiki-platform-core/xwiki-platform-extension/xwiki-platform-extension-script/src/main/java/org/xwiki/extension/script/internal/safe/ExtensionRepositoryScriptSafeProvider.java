@@ -64,22 +64,22 @@ public class ExtensionRepositoryScriptSafeProvider extends AbstractScriptSafePro
         ExtensionRepository safe;
 
         // TODO: convert all that to a proxy with "plugins"
-        if (unsafe instanceof CoreExtensionRepository) {
+        if (unsafe instanceof CoreExtensionRepository coreExtensionRepository) {
             safe =
-                new SafeCoreExtensionRepository<CoreExtensionRepository>((CoreExtensionRepository) unsafe,
+                new SafeCoreExtensionRepository<CoreExtensionRepository>(coreExtensionRepository,
                     this.defaultSafeProvider, this.execution, hasProgrammingRights());
-        } else if (unsafe instanceof InstalledExtensionRepository) {
+        } else if (unsafe instanceof InstalledExtensionRepository installedExtensionRepository) {
             safe =
                 new SafeInstalledExtensionRepository<InstalledExtensionRepository>(
-                    (InstalledExtensionRepository) unsafe, this.defaultSafeProvider, this.execution,
+                    installedExtensionRepository, this.defaultSafeProvider, this.execution,
                     hasProgrammingRights());
-        } else if (unsafe instanceof LocalExtensionRepository) {
+        } else if (unsafe instanceof LocalExtensionRepository localExtensionRepository) {
             safe =
-                new SafeLocalExtensionRepository<LocalExtensionRepository>((LocalExtensionRepository) unsafe,
+                new SafeLocalExtensionRepository<LocalExtensionRepository>(localExtensionRepository,
                     this.defaultSafeProvider, this.execution, hasProgrammingRights());
-        } else if (unsafe instanceof ExtensionIndex) {            
+        } else if (unsafe instanceof ExtensionIndex extensionIndex) {
             safe =
-                new SafeExtensionIndex<ExtensionIndex>((ExtensionIndex) unsafe,
+                new SafeExtensionIndex<ExtensionIndex>(extensionIndex,
                     this.defaultSafeProvider, this.execution, hasProgrammingRights());
         } else if (unsafe instanceof AdvancedSearchable) {
             if (unsafe instanceof Ratable) {

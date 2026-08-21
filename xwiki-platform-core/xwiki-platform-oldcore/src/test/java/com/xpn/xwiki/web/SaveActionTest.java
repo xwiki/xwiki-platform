@@ -19,17 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -75,6 +64,17 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link SaveAction}.
@@ -194,7 +194,8 @@ class SaveActionTest
     {
         when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("1.2"));
         when(mockClonedDocument.getComment()).thenReturn("My Changes");
-        when(mockClonedDocument.getLock(this.context)).thenReturn(mock(XWikiLock.class));
+        XWikiLock xWikiLockMock = mock(XWikiLock.class);
+        when(mockClonedDocument.getLock(this.context)).thenReturn(xWikiLockMock);
         when(mockForm.getTemplate()).thenReturn("");
 
         assertFalse(saveAction.save(this.context));
@@ -260,7 +261,8 @@ class SaveActionTest
         when(mockDocument.getRCSVersion()).thenReturn(new Version("1.2"));
         when(mockClonedDocument.getRCSVersion()).thenReturn(new Version("1.2"));
         when(mockClonedDocument.getComment()).thenReturn("My Changes");
-        when(mockClonedDocument.getLock(this.context)).thenReturn(mock(XWikiLock.class));
+        XWikiLock xWikiLockMock2 = mock(XWikiLock.class);
+        when(mockClonedDocument.getLock(this.context)).thenReturn(xWikiLockMock2);
         when(mockForm.getTemplate()).thenReturn("");
         when(this.propertiesConf.getProperty("edit.conflictChecking.enabled")).thenReturn(true);
         when(mockRequest.getParameter("previousVersion")).thenReturn("1.1");
@@ -270,7 +272,8 @@ class SaveActionTest
 
         when(mockDocument.getDate()).thenReturn(new Date(42));
         when(mockRequest.getParameter("editingVersionDate")).thenReturn("43");
-        when(this.documentRevisionProvider.getRevision(mockDocument, "1.1")).thenReturn(mock(XWikiDocument.class));
+        XWikiDocument xWikiDocumentMock = mock(XWikiDocument.class);
+        when(this.documentRevisionProvider.getRevision(mockDocument, "1.1")).thenReturn(xWikiDocumentMock);
         when(mockDocument.getContentDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());
         when(mockDocument.getMetaDataDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());
         when(mockDocument.getObjectDiff("1.1", "1.2", context)).thenReturn(Collections.emptyList());

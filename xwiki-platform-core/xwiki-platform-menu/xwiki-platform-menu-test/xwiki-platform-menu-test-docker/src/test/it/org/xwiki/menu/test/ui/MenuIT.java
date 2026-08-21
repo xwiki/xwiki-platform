@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 //  browser = Browser.CHROME, verbose = true)
 //@UITest(database = Database.POSTGRESQL, databaseTag = "9", servletEngine = ServletEngine.JETTY,
 //  servletEngineTag = "9", browser = Browser.CHROME, verbose = true)
-//@UITest(database = Database.HSQLDB_EMBEDDED, servletEngine = ServletEngine.JETTY_STANDALONE,
+//@UITest(database = Database.HSQLDB, servletEngine = ServletEngine.JETTY_STANDALONE,
 //  browser = Browser.FIREFOX, verbose = true)
 @UITest
 class MenuIT

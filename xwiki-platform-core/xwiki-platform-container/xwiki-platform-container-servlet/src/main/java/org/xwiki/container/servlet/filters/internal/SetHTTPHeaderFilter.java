@@ -56,8 +56,7 @@ public class SetHTTPHeaderFilter implements Filter
         throws IOException, ServletException
     {
         // If the response is an HTTP response
-        if (response instanceof HttpServletResponse) {
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
+        if (response instanceof HttpServletResponse httpResponse) {
             // Set the attribute
             httpResponse.addHeader(httpHeaderName, httpHeaderValue);
         }

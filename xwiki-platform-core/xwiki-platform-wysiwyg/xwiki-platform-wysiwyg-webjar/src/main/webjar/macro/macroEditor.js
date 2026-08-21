@@ -344,6 +344,18 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
     return output;
   },
 
+  normalizeSelectValue = function (value, valueInputs) {
+    if (Array.isArray(value)) {
+      return value;
+    }
+
+    const isMultiSelect = valueInputs.prop('type') === 'select-multiple';
+    if (isMultiSelect) {
+      return value.split(',');
+    }
+    return [value];
+  },
+
   getParameterValue = function (valueInputs, originalValue, isCaseInsensitive) {
     let matchesParameterValue = function(value) {
       return function() {
@@ -370,7 +382,7 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
       valueInputs = valueInputs.first();
       // For select inputs we should add the value to the list of options if it's missing.
       if (value && valueInputs.is('select')) {
-        value = valueInputs.prop('type') === 'select-multiple' ? value.split(',') : [value];
+        value = normalizeSelectValue(value, valueInputs);
         value.forEach(function (val, index) {
           let matchedOption = valueInputs.find('option').filter(matchesParameterValue(val));
           if (matchedOption.length > 0) {
@@ -641,7 +653,7 @@ define('xwiki-wysiwyg-macro-editor', [
         // Convert inline parameter values, if needed, and load the macro descriptor.
         try {
           const parameters = showInlineParameters ? await macroService.convertMacroParameters(macroId,
-            inlineParameters, sourceDocumentReference, inlineParametersSyntax) : {};
+            inlineParameters, sourceDocumentReference, inlineParametersSyntax, syntaxId) : {};
           try {
              const descriptor = await macroService.getMacroDescriptor(macroId, sourceDocumentReference);
              try {

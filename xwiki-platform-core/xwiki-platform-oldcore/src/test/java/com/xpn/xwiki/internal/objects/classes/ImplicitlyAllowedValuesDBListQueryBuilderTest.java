@@ -110,7 +110,8 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
         this.dbListClass.setClassname("Blog.CategoryClass");
 
         Query query = assertQuery("select distinct doc.fullName from XWikiDocument as doc, BaseObject as obj"
-            + " where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName");
+            + " where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
+            + " order by doc.fullName");
 
         verify(query).bindValue("className", "Blog.CategoryClass");
         verify(query).bindValue("templateName", "Blog.CategoryTemplate");
@@ -120,28 +121,34 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
     void buildWithId() throws Exception
     {
         this.dbListClass.setIdField("doc.name");
-        assertQuery("select distinct doc.fullName as unfilterable0, doc.name from XWikiDocument as doc");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.name from XWikiDocument as doc"
+            + " order by doc.name, doc.fullName");
 
         this.dbListClass.setIdField("obj.className");
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className "
-            + "from XWikiDocument as doc, BaseObject as obj " + "where doc.fullName = obj.name");
+            + "from XWikiDocument as doc, BaseObject as obj " + "where doc.fullName = obj.name"
+            + " order by obj.className, doc.fullName");
 
         this.dbListClass.setIdField("property");
-        assertQuery("select distinct doc.fullName as unfilterable0, doc.property from XWikiDocument as doc");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.property from XWikiDocument as doc"
+            + " order by doc.property, doc.fullName");
     }
 
     @Test
     void buildWithValue() throws Exception
     {
         this.dbListClass.setValueField("doc.name");
-        assertQuery("select distinct doc.fullName as unfilterable0, doc.name from XWikiDocument as doc");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.name from XWikiDocument as doc"
+            + " order by doc.name, doc.fullName");
 
         this.dbListClass.setValueField("obj.className");
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className "
-            + "from XWikiDocument as doc, BaseObject as obj " + "where doc.fullName = obj.name");
+            + "from XWikiDocument as doc, BaseObject as obj " + "where doc.fullName = obj.name"
+            + " order by obj.className, doc.fullName");
 
         this.dbListClass.setValueField("property");
-        assertQuery("select distinct doc.fullName as unfilterable0, doc.property from XWikiDocument as doc");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.property from XWikiDocument as doc"
+            + " order by doc.property, doc.fullName");
     }
 
     @Test
@@ -151,20 +158,23 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
         this.dbListClass.setIdField("doc.name");
         Query query = assertQuery(
             "select distinct doc.fullName as unfilterable0, doc.name " + "from XWikiDocument as doc, BaseObject as obj "
-                + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName");
+                + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
+                + " order by doc.name, doc.fullName");
         verify(query).bindValue("className", "XWiki.XWikiUsers");
         verify(query).bindValue("templateName", "XWiki.XWikiUsersTemplate");
 
         this.dbListClass.setIdField("obj.className");
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className "
             + "from XWikiDocument as doc, BaseObject as obj "
-            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName");
+            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
+            + " order by obj.className, doc.fullName");
 
         this.dbListClass.setIdField("property");
         query = assertQuery("select distinct doc.fullName as unfilterable0, idProp.value "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
-            + " and obj.id = idProp.id.id and idProp.id.name = :idProp");
+            + " and obj.id = idProp.id.id and idProp.id.name = :idProp"
+            + " order by idProp.value, doc.fullName");
         verify(query).bindValue("idProp", "property");
     }
 
@@ -173,49 +183,61 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
     {
         this.dbListClass.setIdField("doc.name");
         this.dbListClass.setValueField("doc.name");
-        assertQuery("select distinct doc.fullName as unfilterable0, doc.name from XWikiDocument as doc");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.name from XWikiDocument as doc"
+            + " order by doc.name, doc.fullName");
 
         this.dbListClass.setValueField("doc.creator");
-        assertQuery("select distinct doc.fullName as unfilterable0, doc.name, doc.creator from XWikiDocument as doc");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.name, doc.creator from XWikiDocument as doc"
+            + " order by doc.creator, doc.name, doc.fullName");
 
         this.dbListClass.setValueField("obj.className");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.name, obj.className "
-            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name");
+            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name"
+            + " order by obj.className, doc.name, doc.fullName");
 
         this.dbListClass.setValueField("property");
-        assertQuery("select distinct doc.fullName as unfilterable0, doc.name, doc.property from XWikiDocument as doc");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.name, doc.property from XWikiDocument as doc"
+            + " order by doc.property, doc.name, doc.fullName");
 
         this.dbListClass.setIdField("obj.className");
         this.dbListClass.setValueField("doc.name");
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className, doc.name "
-            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name");
+            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name"
+            + " order by doc.name, obj.className, doc.fullName");
 
         this.dbListClass.setValueField("obj.className");
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className "
-            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name");
+            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name"
+            + " order by obj.className, doc.fullName");
 
         this.dbListClass.setValueField("obj.id");
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className, obj.id "
-            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name");
+            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name"
+            + " order by obj.id, obj.className, doc.fullName");
 
         this.dbListClass.setValueField("property");
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className, doc.property "
-            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name");
+            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name"
+            + " order by doc.property, obj.className, doc.fullName");
 
         this.dbListClass.setIdField("property");
         this.dbListClass.setValueField("doc.name");
-        assertQuery("select distinct doc.fullName as unfilterable0, doc.property, doc.name from XWikiDocument as doc");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.property, doc.name from XWikiDocument as doc"
+            + " order by doc.name, doc.property, doc.fullName");
 
         this.dbListClass.setValueField("obj.className");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.property, obj.className "
-            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name");
+            + "from XWikiDocument as doc, BaseObject as obj where doc.fullName = obj.name"
+            + " order by obj.className, doc.property, doc.fullName");
 
         this.dbListClass.setValueField("property");
-        assertQuery("select distinct doc.fullName as unfilterable0, doc.property from XWikiDocument as doc");
+        assertQuery("select distinct doc.fullName as unfilterable0, doc.property from XWikiDocument as doc"
+            + " order by doc.property, doc.fullName");
 
         this.dbListClass.setValueField("otherProperty");
         assertQuery(
-            "select distinct doc.fullName as unfilterable0, doc.property, doc.otherProperty from XWikiDocument as doc");
+            "select distinct doc.fullName as unfilterable0, doc.property, doc.otherProperty from XWikiDocument as doc"
+                + " order by doc.otherProperty, doc.property, doc.fullName");
     }
 
     @Test
@@ -226,71 +248,83 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
         this.dbListClass.setValueField("doc.name");
         assertQuery(
             "select distinct doc.fullName as unfilterable0, doc.name " + "from XWikiDocument as doc, BaseObject as obj "
-                + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName");
+                + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
+                + " order by doc.name, doc.fullName");
 
         this.dbListClass.setValueField("doc.creator");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.name, doc.creator "
             + "from XWikiDocument as doc, BaseObject as obj "
-            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName");
+            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
+            + " order by doc.creator, doc.name, doc.fullName");
 
         this.dbListClass.setValueField("obj.className");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.name, obj.className "
             + "from XWikiDocument as doc, BaseObject as obj "
-            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName");
+            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
+            + " order by obj.className, doc.name, doc.fullName");
 
         this.dbListClass.setValueField("property");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.name, valueProp.value "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as valueProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
-            + "and obj.id = valueProp.id.id and valueProp.id.name = :valueProp");
+            + "and obj.id = valueProp.id.id and valueProp.id.name = :valueProp"
+            + " order by valueProp.value, doc.name, doc.fullName");
 
         this.dbListClass.setIdField("obj.className");
         this.dbListClass.setValueField("doc.name");
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className, doc.name "
             + "from XWikiDocument as doc, BaseObject as obj "
-            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName");
+            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
+            + " order by doc.name, obj.className, doc.fullName");
 
         this.dbListClass.setValueField("obj.className");
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className "
             + "from XWikiDocument as doc, BaseObject as obj "
-            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName");
+            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
+            + " order by obj.className, doc.fullName");
 
         this.dbListClass.setValueField("obj.id");
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className, obj.id "
             + "from XWikiDocument as doc, BaseObject as obj "
-            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName");
+            + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName"
+            + " order by obj.id, obj.className, doc.fullName");
 
         this.dbListClass.setValueField("property");
         assertQuery("select distinct doc.fullName as unfilterable0, obj.className, valueProp.value "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as valueProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
-            + "and obj.id = valueProp.id.id and valueProp.id.name = :valueProp");
+            + "and obj.id = valueProp.id.id and valueProp.id.name = :valueProp"
+            + " order by valueProp.value, obj.className, doc.fullName");
 
         this.dbListClass.setIdField("property");
         this.dbListClass.setValueField("doc.name");
         assertQuery("select distinct doc.fullName as unfilterable0, idProp.value, doc.name "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
-            + "and obj.id = idProp.id.id and idProp.id.name = :idProp");
+            + "and obj.id = idProp.id.id and idProp.id.name = :idProp"
+            + " order by doc.name, idProp.value, doc.fullName");
 
         this.dbListClass.setValueField("obj.className");
         assertQuery("select distinct doc.fullName as unfilterable0, idProp.value, obj.className "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
-            + "and obj.id = idProp.id.id and idProp.id.name = :idProp");
+            + "and obj.id = idProp.id.id and idProp.id.name = :idProp"
+            + " order by obj.className, idProp.value, doc.fullName");
 
         this.dbListClass.setValueField("property");
         assertQuery("select distinct doc.fullName as unfilterable0, idProp.value "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
-            + "and obj.id = idProp.id.id and idProp.id.name = :idProp");
+            + "and obj.id = idProp.id.id and idProp.id.name = :idProp"
+            + " order by idProp.value, doc.fullName");
 
         this.dbListClass.setValueField("otherProperty");
         assertQuery("select distinct doc.fullName as unfilterable0, idProp.value, valueProp.value "
             + "from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp, StringProperty as valueProp "
             + "where doc.fullName = obj.name and obj.className = :className and doc.fullName <> :templateName "
             + "and obj.id = idProp.id.id and idProp.id.name = :idProp "
-            + "and obj.id = valueProp.id.id and valueProp.id.name = :valueProp");
+            + "and obj.id = valueProp.id.id and valueProp.id.name = :valueProp"
+            + " order by valueProp.value, idProp.value, doc.fullName");
     }
 
     @Test
@@ -305,20 +339,20 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
 
         this.dbListClass.setIdField("doc.fullName");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.fullName, doc.fullName, doc.parent"
-            + " from XWikiDocument as doc");
+            + " from XWikiDocument as doc order by doc.fullName, doc.parent");
 
         this.dbListClass.setIdField("");
         this.dbListClass.setValueField("title");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.title, doc.title, doc.parent"
-            + " from XWikiDocument as doc");
+            + " from XWikiDocument as doc order by doc.title, doc.parent, doc.fullName");
 
         this.dbListClass.setIdField("title");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.title, doc.title, doc.parent"
-            + " from XWikiDocument as doc");
+            + " from XWikiDocument as doc order by doc.title, doc.parent, doc.fullName");
 
         this.dbListClass.setIdField("fullName");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.fullName, doc.title, doc.parent"
-            + " from XWikiDocument as doc");
+            + " from XWikiDocument as doc order by doc.title, doc.fullName, doc.parent");
 
         this.dbListClass.setClassname("XWiki.TagClass");
         assertQuery("select distinct doc.fullName as unfilterable0, idProp.value, valueProp.value, parentProp.value"
@@ -326,7 +360,8 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
             + " StringProperty as parentProp where doc.fullName = obj.name and obj.className = :className and"
             + " doc.fullName <> :templateName and obj.id = idProp.id.id and idProp.id.name = :idProp and"
             + " obj.id = valueProp.id.id and valueProp.id.name = :valueProp and obj.id = parentProp.id.id and"
-            + " parentProp.id.name = :parentProp");
+            + " parentProp.id.name = :parentProp"
+            + " order by valueProp.value, idProp.value, parentProp.value, doc.fullName");
     }
 
     @ParameterizedTest
@@ -389,7 +424,7 @@ class ImplicitlyAllowedValuesDBListQueryBuilderTest
                     "select distinct doc.fullName as unfilterable0, idProp.value from XWikiDocument as doc, "
                         + "BaseObject as obj, StringProperty as idProp where doc.fullName = obj.name and "
                         + "obj.className = :className and doc.fullName <> :templateName and obj.id = idProp.id.id "
-                        + "and idProp.id.name = :idProp");
+                        + "and idProp.id.name = :idProp order by idProp.value, doc.fullName");
             verify(query).bindValue("className", "Space.XClass");
             verify(query).bindValue("templateName", "Space.XTemplate");
             verify(query).bindValue("idProp", fieldName);

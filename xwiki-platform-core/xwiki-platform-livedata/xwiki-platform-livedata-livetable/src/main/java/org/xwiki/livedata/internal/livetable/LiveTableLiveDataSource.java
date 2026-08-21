@@ -52,8 +52,8 @@ public class LiveTableLiveDataSource extends WithParameters implements LiveDataS
     @Override
     public LiveDataEntryStore getEntries()
     {
-        if (this.entryStore instanceof WithParameters) {
-            ((WithParameters) this.entryStore).getParameters().putAll(this.getParameters());
+        if (this.entryStore instanceof WithParameters withParameters) {
+            withParameters.getParameters().putAll(this.getParameters());
         }
         return this.entryStore;
     }
@@ -61,8 +61,8 @@ public class LiveTableLiveDataSource extends WithParameters implements LiveDataS
     @Override
     public LiveDataPropertyDescriptorStore getProperties()
     {
-        if (this.propertyStore instanceof WithParameters) {
-            ((WithParameters) this.propertyStore).getParameters().putAll(this.getParameters());
+        if (this.propertyStore instanceof WithParameters withParameters) {
+            withParameters.getParameters().putAll(this.getParameters());
         }
         return this.propertyStore;
     }

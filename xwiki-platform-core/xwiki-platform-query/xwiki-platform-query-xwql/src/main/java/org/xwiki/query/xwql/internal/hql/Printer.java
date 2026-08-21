@@ -19,10 +19,10 @@
  */
 package org.xwiki.query.xwql.internal.hql;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.query.xwql.internal.QueryContext;
 import org.xwiki.query.xwql.internal.QueryContext.ObjectInfo;
 import org.xwiki.query.xwql.internal.QueryContext.PropertyInfo;
-import org.xwiki.bridge.DocumentAccessBridge;
 
 public class Printer
 {

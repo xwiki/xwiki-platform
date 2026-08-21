@@ -74,11 +74,6 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     private static final Pattern URI_PATTERN =
         Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
 
-    private static final String ERROR_TRANSFORMING_URI_LOG =
-        "Error while transforming redirect to [{}] to proper URI: [{}]";
-
-    private static final String FULL_STACK_TRACE = "Full stack trace:";
-
     @Inject
     private URLConfiguration urlConfiguration;
 
@@ -228,14 +223,16 @@ public class DefaultURLSecurityManager implements URLSecurityManager
                     result = false;
                 }
             } catch (MalformedURLException e) {
-                logger.error("Error while transforming URI [{}] to URL: [{}]", uri,
+                // An untrusted URI can be requested on every request, so only the root cause is logged by default and
+                // the stack trace is left to the debug level, to avoid flooding the logs.
+                this.logger.warn("Error while transforming URI [{}] to URL: [{}]", uri,
                     ExceptionUtils.getRootCauseMessage(e));
-                this.logger.debug("Full error stack trace of the URL resolution: ", e);
+                this.logger.debug("Full error stack trace of the URL resolution:", e);
                 result = false;
             } catch (URISyntaxException e) {
-                logger.error("Error while transforming URI [{}] to absolute URI with http scheme: [{}]", uri,
+                this.logger.warn("Error while transforming URI [{}] to absolute URI with http scheme: [{}]", uri,
                     ExceptionUtils.getRootCauseMessage(e));
-                this.logger.debug("Full error stack trace of the URI resolution: ", e);
+                this.logger.debug("Full error stack trace of the URI resolution:", e);
             }
         }
         return result;

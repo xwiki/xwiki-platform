@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -80,9 +79,7 @@ public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationB
         DefaultLocalizedTranslationBundle localeBundle = new DefaultLocalizedTranslationBundle(this, locale);
 
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
-                String key = (String) entry.getKey();
-                String message = (String) entry.getValue();
+            if (entry.getKey() instanceof String key && entry.getValue() instanceof String message) {
 
                 TranslationMessage translationMessage = this.parser.parse(message);
 
@@ -125,9 +122,7 @@ public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationB
 
         // Load resources in reverse order to give priority to first found resources (follow ClassLoader#getResource
         // behavior)
-        for (ListIterator<URL> it = urlList.listIterator(urlList.size()); it.hasPrevious();) {
-            URL url = it.previous();
-
+        for (URL url : urlList.reversed()) {
             try {
                 InputStream componentListStream = url.openStream();
 

@@ -44,10 +44,10 @@ import static org.mockito.Mockito.when;
  * @since 11.8RC1
  * @version $Id$
  */
-public class MergeDocumentResultTest
+class MergeDocumentResultTest
 {
     @Test
-    public void putMergeResult()
+    void putMergeResult()
     {
         MergeDocumentResult mergeDocumentResult = new MergeDocumentResult(null, null, null);
         assertFalse(mergeDocumentResult.isModified());
@@ -122,15 +122,15 @@ public class MergeDocumentResultTest
     }
 
     @Test
-    public void putMergeResultTwice()
+    void putMergeResultTwice()
     {
         MergeDocumentResult mergeDocumentResult = new MergeDocumentResult(null, null, null);
         assertNull(mergeDocumentResult.getMergeResult(MergeDocumentResult.DocumentPart.CONTENT));
         mergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, new MergeManagerResult());
         assertNotNull(mergeDocumentResult.getMergeResult(MergeDocumentResult.DocumentPart.CONTENT));
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
-            mergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, new MergeManagerResult());
-        });
+        MergeManagerResult mergeManagerResult = new MergeManagerResult();
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+            () -> mergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, mergeManagerResult));
         assertEquals("The merge result of document part [CONTENT] has already been put.", exception.getMessage());
     }
 

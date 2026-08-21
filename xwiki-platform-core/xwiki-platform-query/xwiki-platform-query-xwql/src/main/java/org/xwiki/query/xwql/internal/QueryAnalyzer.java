@@ -72,9 +72,9 @@ public class QueryAnalyzer extends DepthFirstAdapter
         String method = path[1];
         String className = unquote(node.getXClassName().toString().trim());
 
-        String alias = node.parent().parent() instanceof ARangeVariableDeclaration
+        String alias = node.parent().parent() instanceof ARangeVariableDeclaration arvd
             // used in from clause
-            ? ((ARangeVariableDeclaration) node.parent().parent()).getVariable().toString().trim()
+            ? arvd.getVariable().toString().trim()
             // used in where clause. unnamed.
             : null;
 

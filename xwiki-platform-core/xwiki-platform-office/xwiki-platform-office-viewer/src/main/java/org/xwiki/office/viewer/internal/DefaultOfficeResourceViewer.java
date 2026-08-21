@@ -254,8 +254,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
                         // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
                         temporaryFiles.add(tempFile);
                     } catch (Exception ex) {
-                        String message = "Error while processing artifact image [%s].";
-                        this.logger.error(String.format(message, imageReference), ex);
+                        this.logger.error("Error while processing artifact image [{}].", imageReference, ex);
                     }
                 }
             }
@@ -269,7 +268,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             block.getFirstBlock(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.ANCESTOR_OR_SELF);
         if (expandedMacro != null) {
             Block parent = expandedMacro.getParent();
-            if (!(parent instanceof MetaDataBlock) || !((MetaDataBlock) parent).getMetaData().contains(MODULE_NAME)) {
+            if (!(parent instanceof MetaDataBlock metaBlock) || !metaBlock.getMetaData().contains(MODULE_NAME)) {
                 MetaDataBlock metaData = new MetaDataBlock(Collections.emptyList());
                 // Use a syntax that supports relative path resource references (we use relative paths to include the
                 // temporary files).

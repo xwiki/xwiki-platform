@@ -68,7 +68,7 @@ class PropertyConverterTest
      * XWIKI-8649: Error when changing the number type of a field from an application
      */
     @Test
-    void doubleToInteger() throws Exception
+    void doubleToInteger()
     {
         // The number property whose type has changed from Double to Integer.
         NumberClass numberClass = mock(NumberClass.class);
@@ -84,7 +84,7 @@ class PropertyConverterTest
     }
 
     @Test
-    void unsetDoubleToInteger() throws Exception
+    void unsetDoubleToInteger()
     {
         NumberClass numberClass = mock(NumberClass.class);
         DoubleProperty unsetDoubleProperty = mock(DoubleProperty.class, "unset");
@@ -92,7 +92,7 @@ class PropertyConverterTest
     }
 
     @Test
-    void multipleToSingleSelectOnDBList() throws Exception
+    void multipleToSingleSelectOnDBList()
     {
         // The Database List property that was switched from multiple select to single select.
         DBListClass dbListClass = mock(DBListClass.class);
@@ -108,7 +108,7 @@ class PropertyConverterTest
     }
 
     @Test
-    void multipleToSingleSelectOnEmptyDBList() throws Exception
+    void multipleToSingleSelectOnEmptyDBList()
     {
         // The Database List property that was switched from multiple select to single select.
         DBListClass dbListClass = mock(DBListClass.class);
@@ -121,7 +121,7 @@ class PropertyConverterTest
     }
 
     @Test
-    void singleToMultipleSelectOnDBList() throws Exception
+    void singleToMultipleSelectOnDBList()
     {
         // The Database List property that was switched from single select to multiple select.
         DBListClass dbListClass = mock(DBListClass.class);
@@ -137,7 +137,7 @@ class PropertyConverterTest
     }
 
     @Test
-    void singleToMultipleSelectOnUnsetDBList() throws Exception
+    void singleToMultipleSelectOnUnsetDBList()
     {
         // The Database List property that was switched from single select to multiple select.
         DBListClass dbListClass = mock(DBListClass.class);
@@ -186,7 +186,7 @@ class PropertyConverterTest
     }
 
     @Test
-    void passwordToString() throws Exception
+    void passwordToString()
     {
         PasswordProperty passwordProperty = new PasswordProperty();
         passwordProperty.setId(45);

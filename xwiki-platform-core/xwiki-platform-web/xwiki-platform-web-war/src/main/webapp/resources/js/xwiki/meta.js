@@ -66,9 +66,9 @@ define(['jquery', 'xwiki-entityReference', 'xwiki-events-bridge'], function($, X
       } else {
         // Case 2: meta information are stored in deprecated <meta> tags
         // (in colibri)
-        const lookingFor = ['document', 'wiki', 'space', 'page', 'version', 'restURL', 'form_token']
+        const lookingFor = new Set(['document', 'wiki', 'space', 'page', 'version', 'restURL', 'form_token'])
         document.querySelectorAll('meta').forEach(metaTag => {
-          if (lookingFor.includes(metaTag.name)) {
+          if (lookingFor.has(metaTag.name)) {
             this[metaTag.name] = metaTag.content;
           }
         });
@@ -93,7 +93,7 @@ define(['jquery', 'xwiki-entityReference', 'xwiki-events-bridge'], function($, X
      */
     async refreshVersion(handle404) {
       // We put a timestamp in the JSON URL to avoid getting it from cache.
-      const pageInfoUrl = this.restURL + "?media=json&timestamp=" + new Date().getTime();
+      const pageInfoUrl = this.restURL + "?media=json&timestamp=" + Date.now();
       try {
         const response = await fetch(pageInfoUrl);
         if (!response.ok) {

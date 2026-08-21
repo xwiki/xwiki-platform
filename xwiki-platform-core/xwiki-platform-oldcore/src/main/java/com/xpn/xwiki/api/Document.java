@@ -236,7 +236,7 @@ public class Document extends Api
 
     /**
      * Get the XWikiDocument wrapped by this API. This function is accessible only if you have the programming rights
-     * give access to the priviledged API of the Document.
+     * give access to the privileged API of the Document.
      *
      * @return The XWikiDocument wrapped by this API.
      */
@@ -452,12 +452,12 @@ public class Document extends Api
         try {
             return this.doc.getRenderedTitle(Syntax.valueOf(syntaxId), getXWikiContext());
         } catch (ParseException e) {
-            LOGGER.error("Failed to parse provided syntax identifier [" + syntaxId + "]", e);
+            LOGGER.error("Failed to parse provided syntax identifier [{}]", syntaxId, e);
 
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to parse syntax identifier [" + syntaxId + "]", e);
         } catch (Exception e) {
-            LOGGER.error("Failed to render document [" + getPrefixedFullName() + "] title content", e);
+            LOGGER.error("Failed to render document [{}] title content", getPrefixedFullName(), e);
 
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to render document [" + getPrefixedFullName() + "] content title", e);
@@ -774,7 +774,7 @@ public class Document extends Api
     }
 
     /**
-     * @return the tranlated Document if the wiki is multilingual, the locale is first checked in the URL, the cookie,
+     * @return the translated Document if the wiki is multilingual, the locale is first checked in the URL, the cookie,
      *         the user profile and finally the wiki configuration if not, the locale is the one on the wiki
      *         configuration.
      */
@@ -2291,11 +2291,7 @@ public class Document extends Api
     {
         try {
             XWikiLock lock = this.doc.getLock(getXWikiContext());
-            if (lock != null && !getXWikiContext().getUser().equals(lock.getUserName())) {
-                return true;
-            } else {
-                return false;
-            }
+            return lock != null && !getXWikiContext().getUser().equals(lock.getUserName());
         } catch (Exception e) {
             return false;
         }
@@ -2391,7 +2387,7 @@ public class Document extends Api
     /**
      * Returns data needed for a generation of Table of Content for this document.
      *
-     * @param init an intial level where the TOC generation should start at
+     * @param init an initial level where the TOC generation should start at
      * @param max maximum level TOC is generated for
      * @param numbered if should generate numbering for headings
      * @return a map where an heading (title) ID is the key and value is another map with two keys: text, level and
@@ -2399,7 +2395,7 @@ public class Document extends Api
      */
     public Map<String, Map<String, java.lang.Object>> getTOC(int init, int max, boolean numbered)
     {
-        getXWikiContext().put("tocNumbered", new Boolean(numbered));
+        getXWikiContext().put("tocNumbered", Boolean.valueOf(numbered));
         return TOCGenerator.generateTOC(getContent(), init, max, numbered, getXWikiContext());
     }
 
@@ -2881,18 +2877,18 @@ public class Document extends Api
 
     private void saveDocument(String comment, boolean minorEdit, boolean checkSaving) throws XWikiException
     {
-        XWikiDocument doc = getDoc();
+        XWikiDocument xdoc = getDoc();
 
         UserReference currentUserReference = getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE);
-        doc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
+        xdoc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
 
-        if (doc.isNew()) {
-            doc.getAuthors().setCreator(currentUserReference);
+        if (xdoc.isNew()) {
+            xdoc.getAuthors().setCreator(currentUserReference);
         }
 
         XWikiContext xWikiContext = getXWikiContext();
         if (checkSaving) {
-            DocumentReference author = doc.getAuthorReference();
+            DocumentReference author = xdoc.getAuthorReference();
 
             XWikiDocument secureDocument = xWikiContext.getSecureDocument();
             if (secureDocument != null) {
@@ -2900,15 +2896,15 @@ public class Document extends Api
                 // this shouldn't rely on the current user but the script author.
                 // The existing required rights on doc have already been verified by the edit right check.
                 // If required rights shall be changed, they are checked by a listener in checkSavingDocument() below.
-                checkRequiredRightsForSaving(secureDocument, doc, xWikiContext.getAuthorReference());
+                checkRequiredRightsForSaving(secureDocument, xdoc, xWikiContext.getAuthorReference());
             }
 
             // Make sure the user is allowed to make this modification
-            xWikiContext.getWiki().checkSavingDocument(author, doc, comment, minorEdit,
+            xWikiContext.getWiki().checkSavingDocument(author, xdoc, comment, minorEdit,
                 xWikiContext);
         }
 
-        xWikiContext.getWiki().saveDocument(doc, comment, minorEdit, xWikiContext);
+        xWikiContext.getWiki().saveDocument(xdoc, comment, minorEdit, xWikiContext);
         this.initialDoc = this.doc;
     }
 
@@ -3492,8 +3488,7 @@ public class Document extends Api
         try {
             getDoc().convertSyntax(targetSyntaxId, this.context);
         } catch (Exception ex) {
-            LOGGER.error(
-                "Failed to convert document [" + getPrefixedFullName() + "] to syntax [" + targetSyntaxId + "]", ex);
+            LOGGER.error("Failed to convert document [{}] to syntax [{}]", getPrefixedFullName(), targetSyntaxId, ex);
 
             return false;
         } finally {

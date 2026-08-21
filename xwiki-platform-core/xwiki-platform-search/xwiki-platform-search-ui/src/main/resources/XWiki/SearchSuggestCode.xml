@@ -36,10 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity output="false"}}
+  <content>{{include reference="XWiki.SearchSuggestMacros" /}}
+{{velocity output="false"}}
 #if ($xcontext.action == 'get')
 ## Iterate over the sources defined in the configuration document, and create a source array to be passed to the
-## search suggest contructor.
+## search suggest constructor.
 #set ($sources = [])
 #set ($searchSuggestConfig = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
 #foreach ($source in $searchSuggestConfig.getObjects('XWiki.SearchSuggestSourceClass'))
@@ -66,10 +67,8 @@
         ## Evaluate the Velocity code for backward compatibility.
         #set ($name =  $evaluatedSource.name)
       #end
-      #set ($icon = $source.getProperty('icon').value)
-      #if ($icon.startsWith('icon:'))
-        #set ($icon = $xwiki.getSkinFile("icons/silk/${icon.substring(5)}.png"))
-      #elseif ("$!evaluatedSource" != '')
+      #resolveSearchSuggestSourceIcon($source.getProperty('icon').value)
+      #if (!$isIconThemeIcon &amp;&amp; "$!evaluatedSource" != '')
         ## Evaluate the Velocity code for backward compatibility.
         #set ($icon = $evaluatedSource.icon)
       #end
@@ -92,6 +91,7 @@
         'varname': 'input',
         'script': $service,
         'icon': $icon,
+        'iconHTML': $iconHTML,
         'highlight': $highlight
       }))
     #end

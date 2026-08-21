@@ -259,9 +259,8 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
                     xObject.getStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName());
                 String xobjectManagerId = xObject.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName());
 
-                if (StringUtils.isEmpty(xobjectReference) && StringUtils.isEmpty(xobjectManagerId)) {
-                    return xObject;
-                } else if (getIdentifier().equals(xobjectManagerId) && serializedReference.equals(xobjectReference)) {
+                if ((StringUtils.isEmpty(xobjectReference) && StringUtils.isEmpty(xobjectManagerId))
+                    || (getIdentifier().equals(xobjectManagerId) && serializedReference.equals(xobjectReference))) {
                     return xObject;
                 }
             }

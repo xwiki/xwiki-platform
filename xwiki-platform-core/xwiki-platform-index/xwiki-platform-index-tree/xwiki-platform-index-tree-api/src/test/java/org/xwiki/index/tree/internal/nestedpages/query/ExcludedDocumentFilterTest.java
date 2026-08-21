@@ -34,13 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 10.4
  */
 @ComponentTest
-public class ExcludedDocumentFilterTest
+class ExcludedDocumentFilterTest
 {
     @InjectMockComponents
     private ExcludedDocumentFilter excludedDocumentFilter;
 
     @Test
-    public void filterStatement()
+    void filterStatement()
     {
         String inputStatement = StringUtils.join("select xwikiPage.reference reference, xwikiPage.terminal terminal",
             "from (",

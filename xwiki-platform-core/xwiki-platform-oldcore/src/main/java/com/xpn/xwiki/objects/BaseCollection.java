@@ -244,16 +244,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     @Deprecated
     public void setClassName(String name)
     {
-        EntityReference xClassReference = null;
-        if (!StringUtils.isEmpty(name)) {
-            // Handle backward compatibility: In the past, for statistics objects we used to use a special class name
-            // of "internal". We now check for a null Class Reference instead wherever we were previously checking for
-            // "internal".
-            if (!"internal".equals(name)) {
-                xClassReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
-            }
+        EntityReference classReference = null;
+        // Handle backward compatibility: In the past, for statistics objects we used to use a special class name
+        // of "internal". We now check for a null Class Reference instead wherever we were previously checking for
+        // "internal".
+        if (!StringUtils.isEmpty(name) && !"internal".equals(name)) {
+            classReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
         }
-        setXClassReference(xClassReference);
+        setXClassReference(classReference);
     }
 
     @Override
@@ -272,8 +270,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     public void safeput(String name, PropertyInterface property)
     {
         addField(name, property);
-        if (property instanceof BaseProperty) {
-            ((BaseProperty) property).setName(name);
+        if (property instanceof BaseProperty baseProperty) {
+            baseProperty.setName(name);
         }
     }
 
@@ -301,7 +299,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             try {
                 baseClass = context.getWiki().getXClass(classReference, context);
             } catch (Exception e) {
-                LOGGER.error("Failed to get class [" + classReference + "]", e);
+                LOGGER.error("Failed to get class [{}]", classReference, e);
             }
         }
 
@@ -366,17 +364,17 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         return getIntValue(name, 0);
     }
 
-    public int getIntValue(String name, int default_value)
+    public int getIntValue(String name, int defaultValue)
     {
         try {
             NumberProperty prop = (NumberProperty) safeget(name);
             if (prop == null) {
-                return default_value;
+                return defaultValue;
             } else {
                 return ((Number) prop.getValue()).intValue();
             }
         } catch (Exception e) {
-            return default_value;
+            return defaultValue;
         }
     }
 
@@ -661,9 +659,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
         collection.setXClassReference(getRelativeXClassReference());
         collection.setNumber(getNumber());
-        Map<String, Object> fields = getFields();
+        Map<String, Object> sourceFields = getFields();
         Map<String, Object> cfields = new LinkedHashMap<>();
-        for (Map.Entry<String, Object> objEntry : fields.entrySet()) {
+        for (Map.Entry<String, Object> objEntry : sourceFields.entrySet()) {
             PropertyInterface prop = (PropertyInterface) ((BaseElement) objEntry.getValue()).clone(true);
             prop.setObject(collection);
             cfields.put(objEntry.getKey(), prop);
@@ -823,7 +821,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * Return a XML version of this collection.
      * <p>
-     * The XML is not formated. to get formatted XML you can use {@link #toXMLString(boolean)} instead.
+     * The XML is not formatted. to get formatted XML you can use {@link #toXMLString(boolean)} instead.
      * 
      * @return the XML as a String
      */
@@ -1011,8 +1009,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
             for (String propertyName : getPropertyList()) {
                 PropertyInterface property = getField(propertyName);
-                if (property instanceof BaseElement) {
-                    ((BaseElement) property).setOwnerDocument(ownerDocument);
+                if (property instanceof BaseElement baseElement) {
+                    baseElement.setOwnerDocument(ownerDocument);
                 }
             }
         }

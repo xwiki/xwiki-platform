@@ -22,8 +22,8 @@ package org.xwiki.test.ui.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 
 /**
  * Represents the actions possible on a static table.
@@ -57,7 +57,7 @@ public class TableElement extends BaseElement
         }
     }
 
-    /** @return true if there are no colums or no rows in the table. True if the table only contains headings. */
+    /** @return true if there are no columns or no rows in the table. True if the table only contains headings. */
     public boolean isEmpty()
     {
         if (empty == -1) {

@@ -36,6 +36,7 @@ import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.cache.event.CacheEntryEvent;
 import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.cache.internal.CacheLoader;
+import org.xwiki.cache.internal.CacheLoaderGroup;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -74,7 +75,8 @@ import com.xpn.xwiki.web.Utils;
 public class XWikiCacheStore extends AbstractXWikiStore
     implements XWikiCacheStoreInterface, EventListener, Initializable, CacheEntryListener<XWikiDocument>
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiCacheStore.class);
+    @Inject
+    private Logger logger;
 
     /**
      * Used to know if a received event is a local or remote one.
@@ -110,7 +112,14 @@ public class XWikiCacheStore extends AbstractXWikiStore
      */
     private Cache<Integer> limitSizePropertyCache;
 
-    private CacheLoader<XWikiDocument, XWikiException> cacheLoader = new CacheLoader();
+    /**
+     * The document cache and the page exist cache use the same keys, so they need to be invalidated together.
+     */
+    private final CacheLoaderGroup cacheLoaderGroup = new CacheLoaderGroup();
+
+    private final CacheLoader<XWikiDocument, XWikiException> cacheLoader = new CacheLoader<>(this.cacheLoaderGroup);
+
+    private final CacheLoader<Boolean, XWikiException> existsCacheLoader = new CacheLoader<>(this.cacheLoaderGroup);
 
     /**
      * Default constructor generally used by the Component Manager.
@@ -127,6 +136,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     {
         setStore(store);
 
+        this.logger = LoggerFactory.getLogger(XWikiCacheStore.class);
         this.remoteObservationManagerContext = Utils.getComponent(RemoteObservationManagerContext.class);
         this.observationManager = Utils.getComponent(ObservationManager.class);
         this.uidStringEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "uid");
@@ -294,7 +304,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
 
     private void invalidateCache(String key)
     {
-        this.cacheLoader.invalidate(key, k -> {
+        this.cacheLoaderGroup.invalidate(key, k -> {
             Cache<XWikiDocument> documentCache = getCache();
             if (documentCache != null) {
                 documentCache.remove(k);
@@ -310,7 +320,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     @Override
     public void flushCache()
     {
-        this.cacheLoader.invalidateAll(() -> {
+        this.cacheLoaderGroup.invalidateAll(() -> {
             getCache().removeAll();
             getPageExistCache().removeAll();
         });
@@ -393,13 +403,13 @@ public class XWikiCacheStore extends AbstractXWikiStore
             // Calculate the cache key
             String key = getKey(doc, context);
 
-            LOGGER.debug("Starting checking for Document [{}] in cache", key);
+            this.logger.debug("Starting checking for Document [{}] in cache", key);
 
             XWikiDocument cachedoc;
             try {
                 cachedoc = getCache().get(key);
             } catch (Exception e) {
-                LOGGER.error("Failed to get document [{}] from cache", key, e);
+                this.logger.error("Failed to get document [{}] from cache", key, e);
 
                 cachedoc = null;
             }
@@ -410,12 +420,12 @@ public class XWikiCacheStore extends AbstractXWikiStore
             if (cachedoc != null && !cachedoc.isMetaDataDirty()) {
                 cachedoc.setFromCache(true);
 
-                LOGGER.debug("Document [{}] was retrieved from cache", key);
+                this.logger.debug("Document [{}] was retrieved from cache", key);
             } else {
                 Boolean result = getPageExistCache().get(key);
 
                 if (result == Boolean.FALSE) {
-                    LOGGER.debug("Document [{}] doesn't exist in cache, returning an empty one", key);
+                    this.logger.debug("Document [{}] doesn't exist in cache, returning an empty one", key);
 
                     cachedoc = doc;
                     cachedoc.setNew(true);
@@ -429,11 +439,11 @@ public class XWikiCacheStore extends AbstractXWikiStore
                 } else {
                     cachedoc = this.cacheLoader.loadAndStoreInCache(key,
                         k -> {
-                            LOGGER.debug("Trying to get Document [{}] from persistent storage", key);
+                            this.logger.debug("Trying to get Document [{}] from persistent storage", key);
 
                             XWikiDocument databaseDocument = this.store.loadXWikiDoc(doc, context);
 
-                            LOGGER.debug("Document [{}] was retrieved from persistent storage", key);
+                            this.logger.debug("Document [{}] was retrieved from persistent storage", key);
                             return databaseDocument;
                         },
                         this::storeInCache
@@ -442,7 +452,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
             }
 
             cachedoc.setStore(this);
-            LOGGER.debug("Ending checking for Document [{}] in cache", key);
+            this.logger.debug("Ending checking for Document [{}] in cache", key);
 
             return cachedoc;
         } catch (ExecutionException e) {
@@ -469,7 +479,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
             }
         }
 
-        LOGGER.debug("Document [{}] was put in cache", key);
+        this.logger.debug("Document [{}] was put in cache", key);
     }
 
     @Override
@@ -820,12 +830,21 @@ public class XWikiCacheStore extends AbstractXWikiStore
                     return result;
                 }
             } catch (Exception e) {
+                this.logger.error("Failed to get the existence of the document [{}] from the cache", key, e);
             }
 
-            boolean result = this.store.exists(doc, context);
-            getPageExistCache().set(key, Boolean.valueOf(result));
-
-            return result;
+            // Load through the cache loader to ensure that the loaded value isn't stored anymore when the document
+            // has been modified while the existence was loaded from the database. This cache loader shares the group
+            // with the document cache loader, so a single invalidation stops the running loads of both of them.
+            return this.existsCacheLoader.loadAndStoreInCache(key, k -> this.store.exists(doc, context),
+                (k, result) -> getPageExistCache().set(k, result));
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof XWikiException xwikiException) {
+                throw xwikiException;
+            } else {
+                throw new XWikiException("Error checking the existence of the document [%s]"
+                    .formatted(getKey(doc, context)), e);
+            }
         } finally {
             restoreExecutionXContext();
         }

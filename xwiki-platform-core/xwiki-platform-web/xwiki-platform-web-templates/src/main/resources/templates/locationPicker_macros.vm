@@ -85,24 +85,29 @@
 #end
 
 #macro (locationPickerActions $options)
-  <div class="location-actions">
+  #set ($isTreePickerAvailable = $isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
+  <div class="location-actions btn-group">
     ## Tree picker toggle
-    #if ($isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
-      #documentPickerModal($options)
-      <a href="#" class="location-action location-action-pick"
-         title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.pick'))">
+    #if ($isTreePickerAvailable)
+      #set ($label = $escapetool.xml($services.localization.render('core.create.locationPreview.actions.pick')))
+      <button type="button" class="btn btn-default btn-xs location-action location-action-pick"
+         title="$label" aria-label="$label">
         $services.icon.renderHTML('chart-organisation')
-      </a>
+      </button>
     #end
     ## Location advanced edit button.
     #if ($isAdvancedUser && ($options.name.label || $options.parent.label ||
         ($options.wiki.label && $displayWikiFields)))
-      <a href="#" class="location-action location-action-edit"
-         title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.edit'))">
+      #set ($label = $escapetool.xml($services.localization.render('core.create.locationPreview.actions.edit')))
+      <button type="button" class="btn btn-default btn-xs location-action location-action-edit"
+         title="$label" aria-label="$label">
         $services.icon.renderHTML('pencil')
-      </a>
+      </button>
     #end
   </div>
+  #if ($isTreePickerAvailable)
+    #documentPickerModal($options)
+  #end
 #end
 
 #macro (locationAdvancedEdit $options)

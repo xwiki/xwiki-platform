@@ -27,7 +27,6 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -131,7 +130,7 @@ public class XWikiAttachmentArchive implements Cloneable
                 }
             })
             .filter(Objects::nonNull)
-            .collect(Collectors.toList()));
+            .toList());
         newArchive.setAttachment(attachment);
         return newArchive;
     }

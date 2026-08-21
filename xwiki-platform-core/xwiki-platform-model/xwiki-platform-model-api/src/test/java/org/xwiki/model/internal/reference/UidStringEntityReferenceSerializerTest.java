@@ -54,7 +54,7 @@ class UidStringEntityReferenceSerializerTest
     private EntityReferenceSerializer<String> serializer;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         this.serializer = new UidStringEntityReferenceSerializer();
     }

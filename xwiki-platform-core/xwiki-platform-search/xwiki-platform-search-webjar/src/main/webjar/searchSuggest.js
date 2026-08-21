@@ -97,7 +97,7 @@ var XWiki = (function (XWiki) {
       // search page.
       if (event.memo.container.select('.suggestItem').length === 1) {
         // Show the "No results!" message.
-        this.noResultsMessage.removeClassName('hidden').setStyle({'float': 'left'});
+        this.noResultsMessage.removeClassName('hidden');
       }
     },
 
@@ -133,7 +133,7 @@ var XWiki = (function (XWiki) {
     },
 
     /**
-     * Creates the underlaying suggest widget.
+     * Creates the underlying suggest widget.
      */
     createSuggest: function() {
       // Create dummy suggestion node to hold the "Go to search page..." option.
@@ -145,8 +145,7 @@ var XWiki = (function (XWiki) {
         .update(this._l10n['core.widgets.suggest.noResults'].escapeHTML());
       var gotoSearchPageMessage = new Element('div').update(this._l10n['core.widgets.suggest.showResults']
         .escapeHTML());
-      var content = new Element('div').insert(this.noResultsMessage).insert(gotoSearchPageMessage)
-        .insert(new Element('div', {'class': 'clearfloats'}));
+      var content = new Element('div').insert(this.noResultsMessage).insert(gotoSearchPageMessage);
       var allResultsNode = new XWiki.widgets.XList([
         new XWiki.widgets.XListItem( content, {
           containerClasses: 'suggestItem',

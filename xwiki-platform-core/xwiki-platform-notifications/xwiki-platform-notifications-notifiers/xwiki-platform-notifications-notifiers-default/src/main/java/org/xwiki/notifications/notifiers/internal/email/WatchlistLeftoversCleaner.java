@@ -19,6 +19,17 @@
  */
 package org.xwiki.notifications.notifiers.internal.email;
 
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -26,15 +37,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
-import org.slf4j.Logger;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.LocalDocumentReference;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Remove some mandatory documents created by the Watchlist Application that the notification email notifier replaces.

@@ -93,14 +93,14 @@ public class DefaultClassPropertyValuesProvider implements ClassPropertyValuesPr
             XWikiDocument document = xcontext.getWiki().getDocument(propertyReference.getParent(), xcontext);
             BaseClass xclass = document.getXClass();
             PropertyInterface xproperty = xclass.get(propertyReference.getName());
-            if (xproperty instanceof PropertyClass) {
-                return ((PropertyClass) xproperty).getClassType();
+            if (xproperty instanceof PropertyClass propertyClass) {
+                return propertyClass.getClassType();
             } else {
                 throw new XWikiRestException(String.format("No such property [%s].",
                     this.entityReferenceSerializer.serialize(propertyReference)));
             }
         } catch (XWikiException e) {
-            throw new XWikiRestException(String.format("Failed to determine the property type for [{}].",
+            throw new XWikiRestException(String.format("Failed to determine the property type for [%s].",
                 this.entityReferenceSerializer.serialize(propertyReference)));
         }
     }

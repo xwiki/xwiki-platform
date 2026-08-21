@@ -40,7 +40,7 @@
       // Configuration for the quick actions search.
       this.config.search = Object.assign({
         includeScore: true,
-        // Allow one character missmatch in 4 (i.e. match at least 3 characters when the input text is 4 characters).
+        // Allow one character mismatch in 4 (i.e. match at least 3 characters when the input text is 4 characters).
         // With the default distance parameter being 100 and location 0 this also means we're matching only the first 25
         // characters which is fine considering that we split the indexed information into tokens (by whitespace).
         threshold: 0.25,
@@ -363,14 +363,14 @@
 
   /**
    * Make CKEDITOR.tools.htmlEncode temporarily behave as CKEDITOR.tools.htmlEncodeAttr while the given action is
-   * executed. This is useful to enfore more strict HTML encoding, e.g. to encode quotes also.
+   * executed. This is useful to enforce more strict HTML encoding, e.g. to encode quotes also.
    *
    * @param {Function} action - the function to execute
    */
   const withStrictHTMLEncoding = function(action) {
     const originalHTMLEncode = CKEDITOR.tools.htmlEncode;
     try {
-      // Follow the implementation of CKEDITOR.tools.htmlEncodeAttr which we cannot call direcly because it calls
+      // Follow the implementation of CKEDITOR.tools.htmlEncodeAttr which we cannot call directly because it calls
       // CKEDITOR.tools.htmlEncode thus leading to an infinite recursion.
       CKEDITOR.tools.htmlEncode = function(text) {
         return originalHTMLEncode(text).replace(/"/g, '&quot;').replace(/'/g, '&#39;');

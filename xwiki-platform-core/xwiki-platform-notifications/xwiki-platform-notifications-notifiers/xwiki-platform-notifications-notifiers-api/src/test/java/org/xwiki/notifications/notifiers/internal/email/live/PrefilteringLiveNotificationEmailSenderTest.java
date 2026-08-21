@@ -29,7 +29,6 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.xwiki.eventstream.Event;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
@@ -74,7 +73,7 @@ class PrefilteringLiveNotificationEmailSenderTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Test
-    void testSendMail() throws Exception
+    void testSendMail()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
 
@@ -83,7 +82,8 @@ class PrefilteringLiveNotificationEmailSenderTest
 
         when(this.sessionFactory.create(ArgumentMatchers.any())).thenReturn(null);
 
-        when(this.mailListenerProvider.get()).thenReturn(Mockito.mock(MailListener.class));
+        MailListener mailListenerMock = mock(MailListener.class);
+        when(this.mailListenerProvider.get()).thenReturn(mailListenerMock);
 
         Event event1 = mock(Event.class);
         DocumentReference userReference = new DocumentReference("wiki", "XWiki", "user");

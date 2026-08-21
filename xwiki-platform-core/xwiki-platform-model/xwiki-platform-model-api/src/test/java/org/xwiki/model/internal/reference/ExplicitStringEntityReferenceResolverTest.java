@@ -121,8 +121,9 @@ class ExplicitStringEntityReferenceResolverTest
     @Test
     void resolveWithIncompleteExplicitReference()
     {
+        EntityReference reference = new EntityReference("wiki", EntityType.WIKI);
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
-            () -> this.resolver.resolve("", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI)));
+            () -> this.resolver.resolve("", EntityType.DOCUMENT, reference));
         assertEquals("The resolver parameter doesn't contain an Entity Reference of type [DOCUMENT]",
             expected.getMessage());
     }

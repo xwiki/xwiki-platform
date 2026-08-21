@@ -211,7 +211,7 @@ class ConfigurableClassPageTest extends PageTest
         this.xwiki.saveDocument(configClassDoc, this.context);
 
         XWikiDocument mySectionDoc = new XWikiDocument(MY_SECTION);
-        BaseObject configObject = mySectionDoc.newXObject(configClassRef, this.context);
+        mySectionDoc.newXObject(configClassRef, this.context);
         BaseObject object = mySectionDoc.newXObject(CONFIGURABLE_CLASS, this.context);
         object.setStringValue("displayInCategory", "other");
         object.setStringValue("displayInSection", "other");

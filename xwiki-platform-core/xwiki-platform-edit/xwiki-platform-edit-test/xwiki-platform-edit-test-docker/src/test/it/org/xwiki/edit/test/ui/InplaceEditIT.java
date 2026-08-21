@@ -35,7 +35,6 @@ import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.RequiredRightsModal;
 import org.xwiki.test.ui.po.ViewPage;
@@ -365,8 +364,6 @@ class InplaceEditIT
     }
 
     @Test
-    @IgnoreBrowser(value = "firefox", reason = "Page Down/Up key is ignored inside a TextArea without vertical scroll "
-        + "bar once the host page has vertical scroll bar. See https://jira.xwiki.org/browse/XWIKI-24488 .")
     @Order(7)
     void selectionRestoreOnSwitchToSource(TestUtils setup, TestReference testReference)
     {
@@ -455,8 +452,8 @@ class InplaceEditIT
         assertEquals("50", sourceTextArea.getDomProperty("value").substring(selectionStart, selectionEnd));
 
         // Verify that the restored selection is visible (inside the viewport).
-        // Note that we have to subtract 4 from the height because the floating toolbar is overlapping the text area.
-        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 4));
+        // Note that we have to subtract 7 from the height because the floating toolbar is overlapping the text area.
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 7));
 
         viewPage.cancel();
     }
@@ -522,9 +519,10 @@ class InplaceEditIT
         viewPage.cancel();
         WikiEditPage wikiEditPage = WikiEditPage.gotoPage(testReference);
         String content = wikiEditPage.getContent();
-        assertEquals("{{velocity wiki=\"false\"}}\n"
-            + "#set($discard = $NULL)\n"
-            + "{{/velocity}}", content);
+        assertEquals("""
+            {{velocity wiki="false"}}
+            #set($discard = $NULL)
+            {{/velocity}}""", content);
         wikiEditPage.clickCancel();
     }
 
@@ -532,10 +530,12 @@ class InplaceEditIT
     @Order(9)
     void editInplaceWithRequiredRightsEditWarning(TestUtils setup, TestReference testReference)
     {
-        // Create a page as superadmin with a Velocity macro.
+        // Create a page as superadmin with a Velocity macro. Add some text before the Velocity macro to ensure that 
+        // the cursor is initially not on the Velocity macro but on the plain text so we can directly change it later.
         setup.loginAsSuperAdmin();
-        ViewPage viewPage = setup.createPage(testReference, "{{velocity}}\nVelocity content\n{{/velocity}}", "");
-        assertEquals("Velocity content", viewPage.getContent());
+        ViewPage viewPage = 
+            setup.createPage(testReference, "Before\n\n{{velocity}}\nVelocity content\n{{/velocity}}", "");
+        assertEquals("Before\nVelocity content", viewPage.getContent());
 
         // Login as alice and we should get a warning that editing the page may break things due to missing rights.
         setup.loginAndGotoPage("alice", "pa$$word", setup.getURL(testReference));
@@ -553,7 +553,7 @@ class InplaceEditIT
         inplaceEditablePage.waitForInplaceEditor();
         CKEditor ckeditor = new CKEditor("content");
         RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
-        richTextArea.sendKeys(Keys.END, Keys.ENTER, "Edited content");
+        richTextArea.sendKeys(Keys.END, " Edited content");
         inplaceEditablePage.saveAndView();
 
         // We should have an error message that the Velocity macro failed to execute.

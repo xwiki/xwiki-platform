@@ -341,7 +341,7 @@ class JavascriptImportmapResolverTest
 
         this.javascriptImportmapResolver.getBlock();
 
-        assertEquals("Conflicting importmap resolution for key [vue]. Existing value: "
+        assertEquals("Conflicting [importmap] resolution for key [vue]. Existing value: "
             + "[/webjars/vue/1.2.3/index.js], new value: [/webjars/vue/1.2.3/other.js]",
             this.logCapture.getMessage(0));
     }
@@ -381,7 +381,7 @@ class JavascriptImportmapResolverTest
 
         this.javascriptImportmapResolver.getBlock();
 
-        assertEquals("Conflicting eager resolution for key [vue]. Existing value: "
+        assertEquals("Conflicting [eager] resolution for key [vue]. Existing value: "
             + "[/webjars/vue/1.2.3/index.js], new value: [/webjars/vue/1.2.3/other.js]",
             this.logCapture.getMessage(0));
     }

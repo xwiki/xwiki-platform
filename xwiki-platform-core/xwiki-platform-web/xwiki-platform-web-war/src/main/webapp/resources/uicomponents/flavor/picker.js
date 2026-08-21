@@ -136,7 +136,7 @@ require(['jquery'], function($) {
       // Rating
       var star = "$escapetool.javascript($services.icon.renderHTML('star'))";
       if (flavor.rating != null && flavor.rating > 0) {
-        label.append(Array(Math.round(flavor.rating)).join(star));
+        label.append(new Array(Math.round(flavor.rating)).join(star));
       }
 
       div.append(label);

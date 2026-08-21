@@ -655,7 +655,7 @@ define('paged-polyfill-patched', [
           // Rollback the font size change because it didn't increase the scale.
           table.style.fontSize = initialFontSize;
         } else if (scaleAfterFontSize &lt; 1) {
-          // There is still some overflow, possibly becuse the table contains images which are not affected by font
+          // There is still some overflow, possibly because the table contains images which are not affected by font
           // size. Apply a CSS transformation.
           const initialTransform = table.style.transform;
           const initialTransformOrigin = table.style.transformOrigin;
@@ -1098,7 +1098,7 @@ require([
         const rowWidth = this.parentNode.clientWidth;
         const relativeCellWidth = Math.floor(computedCellWidth / rowWidth * 10000) / 100;
         // We update the width at the end, after computing all relative cell widths, in order to trigger a single reflow
-        // and repaint operation, which is an expensive opration. Otherwise we would trigger one reflow and repaint for
+        // and repaint operation, which is an expensive operation. Otherwise we would trigger one reflow and repaint for
         // each table cell (because setting the width invalidates the clientWidth cache), which would slow the page
         // load, eventually triggering the page ready timeout.
         // See  https://dev.to/gopal1996/understanding-reflow-and-repaint-in-the-browser-1jbg
@@ -1124,7 +1124,7 @@ require([
   const preserveWhiteSpaceInCodeBlocks = () =&gt; {
     // Paged.js removes / skips the white-space-only text nodes that are direct children of a block element (a DIV in
     // our case) even if that element asks for white-space to be preserved (through CSS). The workaround we apply here
-    // is to wrapp all these white-space-only text nodes with a SPAN (so their parent is not a block element anymore).
+    // is to wrap all these white-space-only text nodes with a SPAN (so their parent is not a block element anymore).
     // See XWIKI-20553: The whitespace between two highlighted code tokens is lost when exporting to PDF
     // See also https://github.com/pagedjs/pagedjs/issues/45
     $('#xwikicontent div.box &gt; div.code').contents().filter(function() {
@@ -1546,8 +1546,12 @@ require([
 
   .pdf-toc li {
     margin: .5em 0;
-    /* Make sure the fake dotted leader doesn't overflow. */
-    overflow-x: hidden;
+    /* Clip the fake dotted leader at the right edge of the table of contents entry. We use 'clip' rather than 'hidden'
+      because 'hidden' would turn the list item into a scroll container, and a scroll container is monolithic, i.e. it
+      can't be split between print pages. Since the table of contents is a tree, where the child entries are nested
+      inside their parent list item, this would make an entire subtree unbreakable, so a table of contents that doesn't
+      fit a single print page would end up truncated. */
+    overflow-x: clip;
   }
   .pdf-toc &gt; ul &gt; li &gt; span {
     font-size: 110%;

@@ -17,61 +17,67 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { LinkEditor } from "./LinkEditor";
 import { LinkToolbarExtension } from "@blocknote/core/extensions";
 import { useComponentsContext, useExtension } from "@blocknote/react";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   RiDeleteBin6Line,
   RiExternalLinkLine,
   RiPencilLine,
 } from "react-icons/ri";
+import type { LinkEditionData, LinkEditionHandler } from "./linkEdition";
+import type { LinkEditionHooks } from "./linkEditionHooks";
 import type { LinkToolbarProps } from "@blocknote/react";
 
 export type CustomLinkToolbarProps = {
   linkToolbarProps: LinkToolbarProps;
+  linkEditionHandler: LinkEditionHandler;
+  linkEditionHooks?: LinkEditionHooks;
 };
 
 export const CustomLinkToolbar: React.FC<CustomLinkToolbarProps> = ({
   linkToolbarProps,
+  linkEditionHandler,
+  linkEditionHooks,
 }) => {
   const Components = useComponentsContext()!;
   const { t } = useTranslation();
 
   const { editLink, deleteLink } = useExtension(LinkToolbarExtension);
 
-  const [showLinkEditor, setShowLinkEditor] = useState(false);
-
   return (
     <>
-      <Components.Generic.Popover.Root open={showLinkEditor}>
-        <Components.Generic.Popover.Trigger>
-          {/* TODO: hide tooltip on click
-              (note: this comment is from BlockNote's source code but may remain relevant here) */}
-          <Components.FormattingToolbar.Button
-            className="bn-button"
-            data-test="editLink"
-            label={t("blocknote.linkToolbar.buttons.edit")}
-            icon={<RiPencilLine />}
-            onClick={() => setShowLinkEditor(true)}
-          />
-        </Components.Generic.Popover.Trigger>
-        <Components.Generic.Popover.Content
-          className="bn-popover-content bn-form-popover"
-          variant="form-popover"
-        >
-          <LinkEditor
-            current={{
-              url: linkToolbarProps.url,
-              title: linkToolbarProps.text,
-            }}
-            updateLink={({ url, title }) =>
-              editLink(url, title, linkToolbarProps.range.from)
-            }
-          />
-        </Components.Generic.Popover.Content>
-      </Components.Generic.Popover.Root>
+      <Components.FormattingToolbar.Button
+        className="bn-button"
+        data-test="editLink"
+        label={t("blocknote.linkToolbar.buttons.edit")}
+        icon={<RiPencilLine />}
+        onClick={() => {
+          // The link data exactly as stored in the content. beforeEdit may transform what the link
+          // editor is pre-filled with (e.g. hide the synthetic id carried by the URL), but
+          // beforeUpdate needs the untransformed data to be able to recover that id, so keep it
+          // aside.
+          const previous: LinkEditionData = {
+            url: linkToolbarProps.url,
+            title: linkToolbarProps.text,
+          };
+
+          linkEditionHandler({
+            current: linkEditionHooks?.beforeEdit?.(previous) ?? previous,
+            mode: "editExisting",
+            onSubmit(linkData) {
+              const updatedLinkData =
+                linkEditionHooks?.beforeUpdate?.(linkData, previous) ??
+                linkData;
+              editLink(
+                updatedLinkData.url,
+                updatedLinkData.title,
+                linkToolbarProps.range.from,
+              );
+            },
+          });
+        }}
+      />
 
       <Components.FormattingToolbar.Button
         className="bn-button"

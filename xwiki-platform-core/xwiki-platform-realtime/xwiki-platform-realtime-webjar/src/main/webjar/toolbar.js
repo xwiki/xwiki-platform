@@ -68,14 +68,14 @@ define('xwiki-realtime-toolbar', [
         return;
       }
       // The Done button saves the document directly.
-      this._doneButton.addEventListener('click', event => {
+      this._doneButton.addEventListener('click', async event => {
         event.preventDefault();
         // FIXME: We can't rely on the save status to determine whether to save or cancel (e.g. to prevent creating a
         // new version when there are no changes and the document is not new) because:
-        // * the save status takes into account only the fiels that are synchronized in realtime
-        // * not all form fiels are synchronized
-        // The document title is currenly not synchronized, so when someone changes the title the others don't know that
-        // the document is dirty and thus has to be saved.
+        // * the save status takes into account only the fields that are synchronized in realtime
+        // * not all form fields are synchronized
+        // The document title is currently not synchronized, so when someone changes the title the others don't know
+        // that the document is dirty and thus has to be saved.
         // We should catch changes on all non-hidden form fields (that the user can change) and synchronize them. Once
         // we do this we can use the following code:
         //
@@ -87,7 +87,13 @@ define('xwiki-realtime-toolbar', [
         //   this._config.save();
         // }
         //
-        this._config.save();
+        try {
+          await this._config.save();
+        } catch (error) {
+          // The failure is already logged by the saver and reported to the user by the save notification. We only need
+          // to catch it in order to avoid an unhandled promise rejection.
+          console.debug('Failed to save.', error);
+        }
       });
     }
 
@@ -363,19 +369,60 @@ define('xwiki-realtime-toolbar', [
     }
 
     onUserListChange(users) {
+      // The user data we receive also holds information that is not displayed on the toolbar, most notably the caret
+      // position of each user, which changes very often. Skip the update when nothing we display has changed, in order
+      // to avoid needless DOM churn. Recreating the coeditor elements every few seconds makes them visibly flicker
+      // (they briefly disappear and re-appear, both on the toolbar and in an open users dropdown), dismisses the
+      // avatar tooltip while it is being hovered, and invalidates any reference held on them (e.g. by the functional
+      // tests).
+      const signature = JSON.stringify(users.map(user => [user.id, user.reference, user.name, user.avatar]));
+      if (signature === this._userListSignature) {
+        return;
+      }
+      this._userListSignature = signature;
+
       const usersWrapper = this._toolbar.querySelector('.realtime-users');
-      usersWrapper.innerHTML = '';
       const limit = Number.parseInt(usersWrapper.dataset.limit) || 4;
-      users.slice(0, limit).forEach(user => {
-        usersWrapper.appendChild(this._displayUser(user, true));
-      });
+      this._updateUserList(usersWrapper, users.slice(0, limit), true);
+
       const usersDropdown = this._toolbar.querySelector('.realtime-users-dropdown');
       usersDropdown.hidden = users.length <= limit;
       if (!usersDropdown.hidden) {
         usersDropdown.querySelector('.dropdown-toggle').dataset.more = users.length - limit;
-        const menu = usersDropdown.querySelector('.dropdown-menu');
-        menu.innerHTML = '';
-        users.forEach(user => menu.appendChild(this._displayUser(user)));
+        this._updateUserList(usersDropdown.querySelector('.dropdown-menu'), users);
+      }
+    }
+
+    _updateUserList(listElement, users, compact = false) {
+      const existingWrappers = new Map();
+      listElement.querySelectorAll(':scope > li > .realtime-user').forEach(userElement => {
+        existingWrappers.set(userElement.dataset.id, userElement.parentElement);
+      });
+
+      // Reuse the element of a user that is already listed, rather than recreating it, so that its avatar is not
+      // reloaded and so that the references others may hold on it (e.g. the functional tests) remain valid.
+      let nextNode = listElement.firstChild;
+      users.forEach(user => {
+        let wrapper = existingWrappers.get(user.id);
+        if (wrapper) {
+          existingWrappers.delete(user.id);
+          this._updateUser(wrapper.firstElementChild, user);
+        } else {
+          wrapper = this._displayUser(user, compact);
+        }
+        if (wrapper === nextNode) {
+          nextNode = nextNode.nextSibling;
+        } else {
+          listElement.insertBefore(wrapper, nextNode);
+        }
+      });
+
+      // Whatever is left after the last user we placed is either a user that left the editing session or some leftover
+      // from the template (e.g. the placeholder list item).
+      while (nextNode) {
+        const nodeToRemove = nextNode;
+        nextNode = nextNode.nextSibling;
+        nodeToRemove.remove();
       }
     }
 
@@ -385,28 +432,38 @@ define('xwiki-realtime-toolbar', [
       if (compact) {
         userElement.classList.add('realtime-user-compact');
       }
+      this._updateUser(userElement, user);
+
+      const wrapper = document.createElement('li');
+      wrapper.appendChild(userElement);
+      return wrapper;
+    }
+
+    _updateUser(userElement, user) {
       userElement.href = new XWiki.Document(XWiki.Model.resolve(user.reference, XWiki.EntityType.DOCUMENT)).getURL();
       userElement.dataset.id = user.id;
       userElement.dataset.reference = user.reference;
-      $(userElement).on('click.realtime', event => {
+      $(userElement).off('click.realtime').on('click.realtime', event => {
         event.preventDefault();
         this._config.selectUser(user.id);
       });
 
       const avatar = userElement.querySelector('.realtime-user-avatar');
-      // Leave the default avatar if there's no avatar specified.
-      if (user.avatar) {
-        avatar.src = user.avatar;
-      }
+      // Fall back on the default avatar if there's no avatar specified.
+      avatar.setAttribute('src', user.avatar || this._getDefaultAvatarURL());
       avatar.alt = user.name;
       avatar.title = user.name;
       avatar.parentElement.dataset.abbr = this._getUserNameAbbreviation(user.name);
 
       userElement.querySelector('.realtime-user-name').textContent = user.name;
+    }
 
-      const wrapper = document.createElement('li');
-      wrapper.appendChild(userElement);
-      return wrapper;
+    _getDefaultAvatarURL() {
+      if (this._defaultAvatarURL === undefined) {
+        const template = document.querySelector('template#realtime-user');
+        this._defaultAvatarURL = template.content.querySelector('.realtime-user-avatar').getAttribute('src');
+      }
+      return this._defaultAvatarURL;
     }
 
     _getUserNameAbbreviation(name) {

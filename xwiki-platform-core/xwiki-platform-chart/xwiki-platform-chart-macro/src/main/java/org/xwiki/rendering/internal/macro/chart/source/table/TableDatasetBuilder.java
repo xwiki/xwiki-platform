@@ -82,7 +82,7 @@ public interface TableDatasetBuilder
     /**
      * Set wether the table should be transposed.
      *
-     * @param transpose Indicates that the table shoudl be transposed.
+     * @param transpose Indicates that the table should be transposed.
      */
     void setTranspose(boolean transpose);
 

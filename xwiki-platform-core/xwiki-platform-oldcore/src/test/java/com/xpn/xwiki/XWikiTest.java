@@ -49,6 +49,7 @@ import org.xwiki.query.QueryExecutor;
 import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
@@ -314,6 +315,30 @@ class XWikiTest
     }
 
     @Test
+    void parseTemplateFromSkinWhenRenderingContextIsNotMutable() throws Exception
+    {
+        // A RenderingContext which is not a MutableRenderingContext, i.e. for which the target syntax cannot be
+        // forced to XHTML 1.0.
+        this.oldcore.getMocker().registerMockComponent(RenderingContext.class);
+
+        DocumentReference skinReference =
+            new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "XWikiSkins");
+        XWikiDocument skinClass = new XWikiDocument(skinReference);
+        skinClass.getXClass().addTextAreaField("template.vm", "template", 80, 20);
+        this.xwiki.saveDocument(skinClass, this.oldcore.getXWikiContext());
+
+        DocumentReference mySkinReference =
+            new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "Skin");
+        XWikiDocument skinDocument = new XWikiDocument(mySkinReference);
+        BaseObject obj = skinDocument.newXObject(skinReference, this.oldcore.getXWikiContext());
+        obj.setLargeStringValue("template.vm", "parsing a field");
+        this.xwiki.saveDocument(skinDocument, this.oldcore.getXWikiContext());
+
+        assertEquals("parsing a field",
+            this.xwiki.parseTemplate("template.vm", "XWiki.Skin", this.oldcore.getXWikiContext()));
+    }
+
+    @Test
     void clearNameWithoutStripDotsWithoutAscii()
     {
         assertEquals("ee{&.txt", this.xwiki.clearName("éê{&.txt", false, false, this.oldcore.getXWikiContext()));
@@ -354,10 +379,10 @@ class XWikiTest
 
         verify(mockListener).getEvents();
 
-        XWikiDocument document = new XWikiDocument(ref);
-        document.setContent("the content");
+        XWikiDocument savedDocument = new XWikiDocument(ref);
+        savedDocument.setContent("the content");
 
-        this.xwiki.saveDocument(document, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(savedDocument, this.oldcore.getXWikiContext());
 
         // Ensure that the onEvent method has been called before and after the save
         verify(mockListener).onEvent(any(DocumentCreatingEvent.class), any(XWikiDocument.class),
@@ -380,9 +405,9 @@ class XWikiTest
         }).when(mockListener).onEvent(any(), any(), any());
 
         doAnswer(invocation -> {
-            XWikiDocument document = invocation.getArgument(0);
-            assertFalse(document.isMetaDataDirty());
-            assertFalse(document.isContentDirty());
+            XWikiDocument storedDocument = invocation.getArgument(0);
+            assertFalse(storedDocument.isMetaDataDirty());
+            assertFalse(storedDocument.isContentDirty());
 
             return null;
         }).when(this.oldcore.getMockStore()).saveXWikiDoc(any(), any());
@@ -390,12 +415,12 @@ class XWikiTest
         ObservationManager om = this.oldcore.getMocker().getInstance(ObservationManager.class);
         om.addListener(mockListener);
 
-        XWikiDocument document = new XWikiDocument(ref);
-        document.setContent("the content");
-        document.setMetaDataDirty(false);
-        document.setContentDirty(false);
+        XWikiDocument savedDocument = new XWikiDocument(ref);
+        savedDocument.setContent("the content");
+        savedDocument.setMetaDataDirty(false);
+        savedDocument.setContentDirty(false);
 
-        this.xwiki.saveDocument(document, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(savedDocument, this.oldcore.getXWikiContext());
 
         // Ensure that the onEvent method has been called
         verify(mockListener).onEvent(any(DocumentCreatingEvent.class), any(XWikiDocument.class),
@@ -418,9 +443,9 @@ class XWikiTest
         }).when(mockListener).onEvent(any(), any(), any());
 
         doAnswer(invocation -> {
-            XWikiDocument document = invocation.getArgument(0);
-            assertFalse(document.isMetaDataDirty());
-            assertFalse(document.isContentDirty());
+            XWikiDocument storedDocument = invocation.getArgument(0);
+            assertFalse(storedDocument.isMetaDataDirty());
+            assertFalse(storedDocument.isContentDirty());
 
             return null;
         }).when(this.oldcore.getMockStore()).saveXWikiDoc(any(), any());
@@ -428,10 +453,10 @@ class XWikiTest
         ObservationManager om = this.oldcore.getMocker().getInstance(ObservationManager.class);
         om.addListener(mockListener);
 
-        XWikiDocument document = new XWikiDocument(ref);
-        document.setContent("the content");
+        XWikiDocument savedDocument = new XWikiDocument(ref);
+        savedDocument.setContent("the content");
 
-        this.xwiki.saveDocument(document, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(savedDocument, this.oldcore.getXWikiContext());
 
         // Ensure that the onEvent method has been called
         verify(mockListener).onEvent(any(DocumentCreatingEvent.class), any(XWikiDocument.class),
@@ -493,14 +518,14 @@ class XWikiTest
 
         verify(mockListener).getEvents();
 
-        XWikiDocument document = new XWikiDocument(ref);
-        document.setContent("the content");
+        XWikiDocument savedDocument = new XWikiDocument(ref);
+        savedDocument.setContent("the content");
 
         // Not expectation on mock Listener since we're not subscribed to Document save events
 
-        this.xwiki.saveDocument(document, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(savedDocument, this.oldcore.getXWikiContext());
 
-        this.xwiki.deleteDocument(document, false, this.oldcore.getXWikiContext());
+        this.xwiki.deleteDocument(savedDocument, false, this.oldcore.getXWikiContext());
 
         // Ensure that the onEvent method has been called before and after the save
         verify(mockListener).onEvent(any(DocumentDeletingEvent.class), any(XWikiDocument.class),
@@ -690,13 +715,13 @@ class XWikiTest
 
         when(this.oldcore.getMockStore().loadXWikiDoc(notNull(), same(this.oldcore.getXWikiContext())))
             .then(invocation -> {
-                XWikiDocument document = invocation.getArgument(0);
-                if (!documents.containsKey(document.getDocumentReference())) {
-                    documents.put(document.getDocumentReference(), document);
+                XWikiDocument loadedDocument = invocation.getArgument(0);
+                if (!documents.containsKey(loadedDocument.getDocumentReference())) {
+                    documents.put(loadedDocument.getDocumentReference(), loadedDocument);
                 } else {
-                    document = documents.get(document.getDocumentReference());
+                    loadedDocument = documents.get(loadedDocument.getDocumentReference());
                 }
-                return document;
+                return loadedDocument;
             });
 
         this.xwiki.getPrefsClass(this.oldcore.getXWikiContext());
@@ -1119,8 +1144,9 @@ class XWikiTest
         String expectedResult = "2024/06/20 12:45";
         this.oldcore.getMockWikiConfigurationSource().setProperty("default_language", "fr_CA");
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.timezone", "BRT");
+        UserProperties userPropertiesMock = mock(UserProperties.class);
         when(this.oldcore.getMockAllUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE))
-            .thenReturn(mock(UserProperties.class));
+            .thenReturn(userPropertiesMock);
         assertEquals(expectedResult, this.xwiki.formatDate(date, null, this.oldcore.getXWikiContext()));
 
         String format = "EEEE dd MMMM YYYY HH:mm:ss";

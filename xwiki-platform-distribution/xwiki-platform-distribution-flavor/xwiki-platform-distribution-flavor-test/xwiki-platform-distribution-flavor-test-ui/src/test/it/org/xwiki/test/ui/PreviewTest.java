@@ -19,8 +19,6 @@
  */
 package org.xwiki.test.ui;
 
-import static org.junit.Assert.*;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.Keys;
@@ -33,6 +31,8 @@ import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.PreviewEditPage;
 import org.xwiki.test.ui.po.editor.PreviewableEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import static org.junit.Assert.*;
 
 /**
  * Various tests for verifying the preview mode of a page.

@@ -20,6 +20,8 @@
 package org.xwiki.xar.internal.model;
 
 /**
+ * Helper class holding constants of the XAR XML model for the document root element.
+ * 
  * @version $Id$
  * @since 5.4M1
  */
@@ -187,4 +189,12 @@ public class XarDocumentModel
     public static final String ELEMENT_REVISION_MINOR = "minorEdit";
 
     public static final String ELEMENT_REVISIONS = "versions";
+
+    /**
+     * Base class holding shared constants, extended by subclasses; not meant to be instantiated directly.
+     */
+    protected XarDocumentModel()
+    {
+        // Prevents direct instantiation while allowing subclasses to inherit the shared constants.
+    }
 }

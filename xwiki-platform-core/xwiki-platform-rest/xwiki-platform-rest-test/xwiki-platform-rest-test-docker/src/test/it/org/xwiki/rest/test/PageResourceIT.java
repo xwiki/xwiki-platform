@@ -35,8 +35,8 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -64,12 +64,12 @@ import org.xwiki.rest.test.framework.TestConstants;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isIn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PageResourceIT extends AbstractHttpIT
 {
@@ -768,10 +768,16 @@ class PageResourceIT extends AbstractHttpIT
         long time = System.currentTimeMillis();
         final String title = String.format("Title (%s)", UUID.randomUUID());
         final String content = String.format("Here is an attachment: image:Attachment.png (%d)", time);
+        // Build the expected attachment URL from the HTTP client base URL: the host and port depend on the (possibly
+        // containerized) instance and aren't necessarily localhost:8080, and the server renders the URL using the host
+        // of the incoming REST request (the HTTP client host), which isn't necessarily the browser-facing host either.
+        final String attachmentURL = String.format("%s%sdownload/%s/%s/Attachment.png",
+            getUtil().getCurrentExecutor().getHttpClientBaseURL(), getUtil().getBaseBinPath(null), this.space,
+            this.pageName);
         final String renderedContent = String.format("<p>Here is an attachment: <img "
-            + "src=\"http://localhost:8080/xwiki/bin/download/PageResourceIT/testGETRenderedContent/Attachment.png\" "
+            + "src=\"%s\" "
             + "class=\"wikimodel-freestanding wikigeneratedid\" id=\"IAttachment.png\" alt=\"Attachment.png\""
-            + "/>&nbsp;(%d)</p>", time);
+            + "/>&nbsp;(%d)</p>", attachmentURL, time);
         final String comment = String.format("Updated title and content (%d)", System.currentTimeMillis());
 
         Page originalPage = getFirstPage();

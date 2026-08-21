@@ -34,7 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Update XWiki.XWikiSkins document with all required informations.
+ * Update XWiki.XWikiSkins document with all required information.
  *
  * @version $Id$
  * @since 4.3M1

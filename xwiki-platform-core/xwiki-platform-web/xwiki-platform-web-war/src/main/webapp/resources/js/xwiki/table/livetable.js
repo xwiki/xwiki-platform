@@ -277,7 +277,7 @@ XWiki.widgets.LiveTable = Class.create({
   {
     var object = this.displayNode;
     while (object.hasChildNodes()) {
-      object.removeChild(object.firstChild);
+      object.firstChild.remove();
     }
   },
 
@@ -447,7 +447,7 @@ XWiki.widgets.LiveTable = Class.create({
     var container = td;
     if (descriptor.link && row['doc_viewable']) {
       const link = new Element(descriptor.link === 'editor' ? 'span' : 'a');
-      // Automatic: the link URL is in JSON results, with the '_url' sufix.
+      // Automatic: the link URL is in JSON results, with the '_url' suffix.
       if (descriptor.link === 'auto') {
         link.href = row[fieldName + '_url'] || row['doc_url'];
       } else if (descriptor.link === 'field') {
@@ -545,7 +545,7 @@ XWiki.widgets.LiveTable = Class.create({
   {
     for(var i in this.fetchedRows) {
       if(i >= indx)
-      this.fetchedRows[i] = this.fetchedRows[''+(parseInt(i)+1)];
+      this.fetchedRows[i] = this.fetchedRows[''+(Number.parseInt(i)+1)];
     }
   },
 
@@ -607,7 +607,7 @@ XWiki.widgets.LiveTable = Class.create({
       fragment += "&sort=" + column;
       var direction = this.getSortDirection();
       if( direction != null ) {
-        return fragment += "&dir=" + direction;
+        return fragment + "&dir=" + direction;
       }
     }
     return fragment;
@@ -804,7 +804,7 @@ var LiveTableHash = Class.create({
    * Get helpers, private
    */
   getParam: function(name) { return this.params[name]; },
-  getIntParam: function(name) { return parseInt(this.params[name]); },
+  getIntParam: function(name) { return Number.parseInt(this.params[name]); },
 
   /**
    * Return individual parameter from permlinks hash
@@ -831,7 +831,7 @@ var LiveTableHash = Class.create({
    */
   serializeParams: function(newParams)
   {
-    var params = $H((newParams) ? newParams : this.params);
+    var params = $H(newParams || this.params);
     params = params.inject({}, function(params, pair) {
       params[pair.key] = encodeURIComponent(pair.value);
       return params;
@@ -920,7 +920,7 @@ var LiveTablePagination = Class.create({
          });
          this.pagesNodes.invoke("insert", " ");
       }
-      // alwyas display the last page.
+      // always display the last page.
       if (i<pages) {
         if (i+1 < pages) {
           this.pagesNodes.invoke("insert", " ... ");
@@ -987,14 +987,14 @@ var LiveTablePagination = Class.create({
     },
     gotoPage: function(page)
     {
-      this.table.showRows(((parseInt(page) - 1 )* this.table.limit) + 1, this.table.limit);
+      this.table.showRows(((Number.parseInt(page) - 1 )* this.table.limit) + 1, this.table.limit);
     },
     gotoPrevPage: function(ev) {
       ev.stop();
       var currentPage = Math.floor( this.table.lastOffset / this.table.limit) + 1;
       var prevPage = currentPage - 1;
       if (prevPage > 0) {
-        this.table.showRows(((parseInt(prevPage) - 1) * this.table.limit) + 1, this.table.limit);
+        this.table.showRows(((Number.parseInt(prevPage) - 1) * this.table.limit) + 1, this.table.limit);
       }
     },
     gotoNextPage: function(ev) {
@@ -1003,7 +1003,7 @@ var LiveTablePagination = Class.create({
       var pages = Math.ceil(this.table.totalRows / this.table.limit);
       var nextPage = currentPage + 1;
       if (nextPage <= pages) {
-        this.table.showRows(((parseInt(nextPage) - 1) * this.table.limit) + 1, this.table.limit);
+        this.table.showRows(((Number.parseInt(nextPage) - 1) * this.table.limit) + 1, this.table.limit);
       }
     }
 });
@@ -1070,7 +1070,7 @@ var LiveTablePagination = Class.create({
    * Change the page size of the table
    **/
   changePageSize: function(event) {
-    var newLimit =  parseInt($F(Event.element(event)));
+    var newLimit =  Number.parseInt($F(Event.element(event)));
     this.table.setPageSize(newLimit);
   }
 });
@@ -1298,7 +1298,7 @@ var LiveTableTagCloud = Class.create({
    displayTagCloud: function(){
       this.domNode.down('.xwiki-livetable-tagcloud').innerHTML = "";
       var cloud = new Element("ol", {'class':'tagCloud'});
-      var levels = this.map ? this.map.keys().sortBy(function(k){return parseInt(k)}).reverse() : [];
+      var levels = this.map ? this.map.keys().sortBy(function(k){return Number.parseInt(k)}).reverse() : [];
       var liClass;
       for (var i=0;i<this.tags.length;i++) {
          liClass = "";

@@ -24,15 +24,17 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.XWikiInstances;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -87,6 +89,16 @@ class TestConfigurationTest
     {
     }
 
+    @UITest(xwikiInstances = @XWikiInstances(2))
+    class ClusterAnnotation
+    {
+    }
+
+    @UITest(database = Database.MYSQL, xwikiInstances = @XWikiInstances(2))
+    class ClusterWithMySQLAnnotation
+    {
+    }
+
     @BeforeEach
     void setUp()
     {
@@ -104,9 +116,23 @@ class TestConfigurationTest
         TestConfiguration configuration = resolver.resolve(uiTest);
         assertEquals(ServletEngine.JETTY_STANDALONE, configuration.getServletEngine());
         assertEquals(Browser.FIREFOX, configuration.getBrowser());
-        assertEquals(Database.HSQLDB_EMBEDDED, configuration.getDatabase());
+        assertEquals(Database.HSQLDB, configuration.getDatabase());
         assertNull(configuration.getServletEngineTag());
         assertNull(configuration.getDatabaseTag());
+    }
+
+    @Test
+    void isDatabaseEmbedded()
+    {
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+
+        // HSQLDB is embedded when there's a single XWiki instance...
+        assertTrue(resolver.resolve(EmptyAnnotation.class.getAnnotation(UITest.class)).isDatabaseEmbedded());
+        // ... and in server mode when several instances need to share it.
+        assertFalse(resolver.resolve(ClusterAnnotation.class.getAnnotation(UITest.class)).isDatabaseEmbedded());
+        // Other databases always run in their own container.
+        assertFalse(resolver.resolve(ClusterWithMySQLAnnotation.class.getAnnotation(UITest.class))
+            .isDatabaseEmbedded());
     }
 
     @Test

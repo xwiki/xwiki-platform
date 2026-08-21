@@ -20,12 +20,12 @@
 package org.xwiki.invitation.test.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
- * Represents the actions possible on the confirmation dialog for the invitation appliaction.
+ * Represents the actions possible on the confirmation dialog for the invitation application.
  *
  * @version $Id$
  * @since 4.2M1

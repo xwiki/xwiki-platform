@@ -168,10 +168,12 @@ class R140300001XWIKI19571DataMigrationTest
             now
         }));
 
-        assertEquals("<changeSet author=\"xwikiorg\" id=\"R140300001XWIKI195710\">\n"
-            + "  <dropTable tableName=\"XWIKIDOCUMENTINDEXINGQUEUE\"/>\n"
-            + "</changeSet>\n"
-            + "\n", this.dataMigration.getPreHibernateLiquibaseChangeLog());
+        assertEquals("""
+            <changeSet author="xwikiorg" id="R140300001XWIKI195710">
+              <dropTable tableName="XWIKIDOCUMENTINDEXINGQUEUE"/>
+            </changeSet>
+
+            """, this.dataMigration.getPreHibernateLiquibaseChangeLog());
 
         this.dataMigration.hibernateMigrate();
         XWikiDocumentIndexingTask expected = new XWikiDocumentIndexingTask();
@@ -203,10 +205,12 @@ class R140300001XWIKI19571DataMigrationTest
             "testinstanceid",
             now
         }));
-        assertEquals("<changeSet author=\"xwikiorg\" id=\"R140300001XWIKI195710\">\n"
-            + "  <dropTable tableName=\"XWIKIDOCUMENTINDEXINGQUEUE\"/>\n"
-            + "</changeSet>\n"
-            + "\n", this.dataMigration.getPreHibernateLiquibaseChangeLog());
+        assertEquals("""
+            <changeSet author="xwikiorg" id="R140300001XWIKI195710">
+              <dropTable tableName="XWIKIDOCUMENTINDEXINGQUEUE"/>
+            </changeSet>
+
+            """, this.dataMigration.getPreHibernateLiquibaseChangeLog());
         verify(this.hibernateStore).setWiki(this.session);
     }
 

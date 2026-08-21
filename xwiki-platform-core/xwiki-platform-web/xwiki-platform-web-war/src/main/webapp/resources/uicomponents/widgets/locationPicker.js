@@ -131,7 +131,6 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
 require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-async'], function($, xm) {
   $('.location-picker').each(function() {
     var picker = $(this);
-    var form = picker.closest('form');
 
     var titleInput = picker.find('input.location-title-field');
     // The wiki field can be either a select (drop down) or an input (text or hidden).
@@ -233,7 +232,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
 
     var updateLocationFromTitleOrNameInput = function() {
       var title = titleInput.val();
-      updateLocationLastElement(title ? title : nameInput.val());
+      updateLocationLastElement(title || nameInput.val());
     };
 
     /**
@@ -311,7 +310,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
 
     // Synchronize the location fields while the user types.
     // We catch the change event because we want to make sure everything's updated when the user change fields
-    // (particulary useful in our automated tests).
+    // (particularly useful in our automated tests).
     titleInput.on('input change', scheduleUpdateOfLocationAndNameFromTitleInput);
     wikiField.on('change', updateLocationFromWikiField);
     nameInput.on('input change', updateLocationFromNameInput);
@@ -408,7 +407,7 @@ require(['jquery'], function($) {
         failureMessage: l10n['core.validation.spacevalidation.message.invalidreference'],
         against: function(value) {
           if (typeof value === 'string') {
-            let separatorsOnly = value.strip().replace(/\\\\/g, 'x').replace(/\\./g, 'x');
+            let separatorsOnly = value.strip().replaceAll(/\\\\/g, 'x').replaceAll(/\\./g, 'x');
             return separatorsOnly.search(dotRegex) === -1;
           } else {
             return true;
@@ -534,7 +533,7 @@ require(['jquery'], function($) {
 
       var allowedSpaces = [];
       var allowedSpacesData = input.attr('data-allowed-spaces');
-      // Read the alowed spaces specified by the template provider, unless they are just suggestions in which case they
+      // Read the allowed spaces specified by the template provider, unless they are just suggestions in which case they
       // should be ignored by validation.
       if (!restrictionsAreSuggestions && allowedSpacesData) {
         allowedSpaces = JSON.parse(input.attr('data-allowed-spaces'));

@@ -384,9 +384,29 @@ public class ViewPage extends BasePage
         return getElementCSSValue(By.id("document-title"), "font-family");
     }
 
-    private String getElementCSSValue(By locator, String attribute)
+    /**
+     * @return the color of the page's text, i.e. the color set on the {@code body} element and inherited by all the
+     *     text of the page that doesn't define a color of its own
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.7.0RC1
+     */
+    public String getTextColor()
     {
-        return getDriver().findElement(locator).getCssValue(attribute);
+        return getElementCSSValue(By.tagName("body"), "color");
+    }
+
+    /**
+     * @param locator the locator of an element of the page
+     * @param propertyName the name of a CSS property, e.g. {@code color}
+     * @return the computed value of that CSS property for that element
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.7.0RC1
+     */
+    public String getElementCSSValue(By locator, String propertyName)
+    {
+        return getDriver().findElement(locator).getCssValue(propertyName);
     }
 
     /**

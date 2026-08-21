@@ -32,11 +32,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
+// RegexEntityReference.equals() is an asymmetric matcher: it runs the regex only when the regex
+// reference is the receiver. The assertions below therefore call equals() explicitly, so that the
+// receiver is visible at the call site. Using assertEquals()/assertNotEquals() would move the call into
+// JUnit's internals and would invite a later SonarQube S3415 "swap these arguments" change, which would
+// call the concrete reference's equals() instead and skip regex matching altogether. That is why those
+// methods carry @SuppressWarnings("java:S5785").
 class RegexEntityReferenceTest
 {
     private static final DocumentReference REFERENCETOMATCH = new DocumentReference("wiki", "space", "page");
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWhenExact()
     {
         EntityReference wikiReference =
@@ -53,6 +60,7 @@ class RegexEntityReferenceTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWithOnlyPage()
     {
         EntityReference reference =
@@ -62,6 +70,7 @@ class RegexEntityReferenceTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWithOnlyWiki()
     {
         EntityReference reference =
@@ -72,6 +81,7 @@ class RegexEntityReferenceTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWithPattern()
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("p.*"), EntityType.DOCUMENT);
@@ -80,6 +90,7 @@ class RegexEntityReferenceTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWhenPatternNotMatching()
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("space"), EntityType.DOCUMENT);
@@ -88,6 +99,7 @@ class RegexEntityReferenceTest
     }
 
     @Test
+    @SuppressWarnings("java:S5785")
     void equalsWhenNonRegexParent()
     {
         EntityReference reference =

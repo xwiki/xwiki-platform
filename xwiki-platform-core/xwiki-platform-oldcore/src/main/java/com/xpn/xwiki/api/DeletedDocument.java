@@ -209,7 +209,7 @@ public class DeletedDocument extends Api
             return cal.before(Calendar.getInstance());
         } catch (Exception ex) {
             // Public APIs should not throw exceptions
-            LOGGER.warn("Exception while checking if entry [{}] can be removed from the recycle bin", getId(), ex);
+            LOGGER.warn("Failed to check if entry [{}] can be removed from the recycle bin", getId(), ex);
             return false;
         }
     }
@@ -236,7 +236,7 @@ public class DeletedDocument extends Api
             try {
                 return new Document(this.deletedDoc.restoreDocument(null, this.context), this.context);
             } catch (XWikiException e) {
-                LOGGER.warn("Failed to parse deleted document [{}]", getFullName(), e);
+                LOGGER.warn("Failed to restore deleted document [{}]", getFullName(), e);
             }
         }
 

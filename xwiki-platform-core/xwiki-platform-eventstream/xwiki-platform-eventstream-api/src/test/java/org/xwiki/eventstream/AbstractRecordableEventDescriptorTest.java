@@ -70,13 +70,13 @@ class AbstractRecordableEventDescriptorTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    void getApplicationIcon() throws Exception
+    void getApplicationIcon()
     {
         assertEquals("applicationIcon :)", fakeRecordableEventDescriptor.getApplicationIcon());
     }
 
     @Test
-    void getEventType() throws Exception
+    void getEventType()
     {
         assertEquals("fake", fakeRecordableEventDescriptor.getEventType());
     }
@@ -95,11 +95,6 @@ class AbstractRecordableEventDescriptorTest
         when(contextualLocalizationManager.getTranslationPlain("applicationKey"))
                 .thenReturn("My nice application name");
 
-//        // On main wiki
-//        assertEquals("My nice description",
-//                fakeRecordableEventDescriptor.getDescription());
-//        assertEquals("My nice application name",
-//                fakeRecordableEventDescriptor.getApplicationName());
 
         // On sub wiki
         when(((NamespacedComponentManager) componentManager).getNamespace())
@@ -138,12 +133,14 @@ class AbstractRecordableEventDescriptorTest
                 fakeRecordableEventDescriptor.getDescription());
         assertEquals(1, this.logCapture.size());
         assertEquals("Failed to render the translation key [descriptionKey] in the namespace [wiki:subwiki] "
-                + "for the event descriptor of [fake].", this.logCapture.getMessage(0));
+                + "for the event descriptor of [fake]",
+            this.logCapture.getMessage(0));
         assertEquals("My nice application name",
                 fakeRecordableEventDescriptor.getApplicationName());
         assertEquals(2, this.logCapture.size());
         assertEquals("Failed to render the translation key [applicationKey] in the namespace [wiki:subwiki] "
-                + "for the event descriptor of [fake].", this.logCapture.getMessage(1));
+                + "for the event descriptor of [fake]",
+            this.logCapture.getMessage(1));
     }
 
     private class OtherFakeRecordableEventDescriptor extends AbstractRecordableEventDescriptor
@@ -185,6 +182,12 @@ class AbstractRecordableEventDescriptorTest
     }
 
     @Test
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which object is the receiver and which argument
+    // it gets, including an instance of a foreign class. Using assertEquals()/assertNotEquals() would move
+    // that into JUnit's internals and would invite a later SonarQube S3415 "swap these arguments" change
+    // that silently stops testing the contract.
+    @SuppressWarnings("java:S5785")
     void equalsAndHashCodeTest()
     {
         OtherFakeRecordableEventDescriptor descriptor1 = new OtherFakeRecordableEventDescriptor(

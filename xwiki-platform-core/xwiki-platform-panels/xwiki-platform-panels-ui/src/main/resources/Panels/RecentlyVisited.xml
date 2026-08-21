@@ -128,7 +128,7 @@
 #if ($recentlyViewed.size() &gt; 0 || $showEmptyPanels)
   #navigationPanelHeader($services.localization.render('panels.recentlyVisited.title'))
   #foreach ($docName in $recentlyViewed)
-    #if ($xwiki.hasAccessLevel('view', $docName))
+    #if ($xwiki.exists($docName) &amp;&amp; $xwiki.hasAccessLevel('view', $docName))
       #set ($recentDoc = $xwiki.getDocument($docName).getTranslatedDocument())
       ## We use HTML here because we don't have a tool to escape wiki syntax in document title.
       * {{html}}&lt;a href="$recentDoc.getURL()"&gt;$escapetool.xml($recentDoc.plainTitle)&lt;/a&gt;{{/html}}

@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Unit tests for {@link EntityReference}.
@@ -147,6 +146,12 @@ class EntityReferenceTest
     }
 
     @Test
+    // This method verifies the equals() contract itself, so the assertions deliberately call equals()
+    // explicitly: the boolean form is what makes visible which object is the receiver and which argument
+    // it gets. Using assertEquals()/assertNotEquals() would move that into JUnit's internals and would
+    // invite a later SonarQube S3415 "swap these arguments" change that silently stops testing the
+    // contract.
+    @SuppressWarnings("java:S5785")
     void validateEquals()
     {
         EntityReference reference1 = new EntityReference(PAGE_NAME, EntityType.DOCUMENT,
@@ -242,6 +247,10 @@ class EntityReferenceTest
     }
 
     @Test
+    // This method verifies the hashCode() contract itself, so the assertions deliberately compare the two
+    // hashCode() values explicitly rather than through assertEquals()/assertNotEquals(), which would move
+    // the comparison into JUnit's internals and hide which value comes from which reference.
+    @SuppressWarnings("java:S5785")
     void validateHashCode()
     {
         EntityReference reference1 = new EntityReference(PAGE_NAME, EntityType.DOCUMENT,
@@ -362,34 +371,25 @@ class EntityReferenceTest
     @Test
     void nullTypeInConstructor()
     {
-        try {
-            new EntityReference("name", null);
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("An Entity Reference type cannot be null", expected.getMessage());
-        }
+        IllegalArgumentException expected =
+            assertThrows(IllegalArgumentException.class, () -> new EntityReference("name", null));
+        assertEquals("An Entity Reference type cannot be null", expected.getMessage());
     }
 
     @Test
     void nullNameInConstructor()
     {
-        try {
-            new EntityReference(null, EntityType.WIKI);
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("An Entity Reference name cannot be null or empty", expected.getMessage());
-        }
+        IllegalArgumentException expected =
+            assertThrows(IllegalArgumentException.class, () -> new EntityReference(null, EntityType.WIKI));
+        assertEquals("An Entity Reference name cannot be null or empty", expected.getMessage());
     }
 
     @Test
     void emptyNameInConstructor()
     {
-        try {
-            new EntityReference("", EntityType.WIKI);
-            fail("Should have thrown an exception here");
-        } catch (IllegalArgumentException expected) {
-            assertEquals("An Entity Reference name cannot be null or empty", expected.getMessage());
-        }
+        IllegalArgumentException expected =
+            assertThrows(IllegalArgumentException.class, () -> new EntityReference("", EntityType.WIKI));
+        assertEquals("An Entity Reference name cannot be null or empty", expected.getMessage());
     }
 
     @Test
@@ -454,8 +454,9 @@ class EntityReferenceTest
 
         EntityReference space = new EntityReference(SPACE_NAME, EntityType.SPACE, wiki);
 
+        EntityReference reference = new EntityReference("nowiki", EntityType.WIKI);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> space.replaceParent(new EntityReference("nowiki", EntityType.WIKI), wiki2));
+            () -> space.replaceParent(reference, wiki2));
 
         assertEquals(
             "The old reference [Wiki nowiki] does not belong to the parents chain of the reference [Wiki wiki]",
@@ -465,8 +466,10 @@ class EntityReferenceTest
     @Test
     void constructorCloneNullReference()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new EntityReference(null,
-            new EntityReference(WIKI_NAME, EntityType.WIKI), new EntityReference("wiki2", EntityType.WIKI)));
+        EntityReference wikiReference = new EntityReference(WIKI_NAME, EntityType.WIKI);
+        EntityReference wiki2Reference = new EntityReference("wiki2", EntityType.WIKI);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+            () -> new EntityReference(null, wikiReference, wiki2Reference));
 
         assertEquals("Cloned reference must not be null", e.getMessage());
     }

@@ -147,8 +147,7 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
         List<File> temporaryFiles = new ArrayList<>();
         try {
             Object content = message.getContent();
-            if (content instanceof Multipart) {
-                Multipart multipart = (Multipart) content;
+            if (content instanceof Multipart multipart) {
                 for (int i = 0; i < multipart.getCount(); i++) {
                     Part part = multipart.getBodyPart(i);
                     String[] temporaryFileLocations =
@@ -163,7 +162,7 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
                 }
             }
         } catch (Exception e) {
-            throw new MailStoreException("Failed to extract temporary file refernces from headers", e);
+            throw new MailStoreException("Failed to extract temporary file references from headers", e);
         }
 
         return temporaryFiles;

@@ -21,6 +21,7 @@ package org.xwiki.notifications.preferences.internal;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -97,8 +98,8 @@ public class NotificationEmailPreferenceDocumentInitializer extends AbstractMand
         xclass.addStaticListField(FIELD_INTERVAL, "Notification interval", 1, false,
             "hourly=Hourly|daily=Daily|weekly=Weekly|live=Live", SELECT, SEPARATORS);
 
-        String values = Arrays.stream(NotificationEmailDiffType.values()).map(v -> v.name())
-            .reduce((v1, v2) -> String.format("%s|%s", v1, v2)).get();
+        String values = Arrays.stream(NotificationEmailDiffType.values()).map(Enum::name)
+            .collect(Collectors.joining("|"));
 
         xclass.addStaticListField(FIELD_DIFF_TYPE, "Diff Type", 1, false, values, SELECT, SEPARATORS);
     }

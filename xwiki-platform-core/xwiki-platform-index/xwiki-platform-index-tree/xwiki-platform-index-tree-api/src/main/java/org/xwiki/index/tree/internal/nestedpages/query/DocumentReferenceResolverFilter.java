@@ -85,10 +85,10 @@ public class DocumentReferenceResolverFilter implements QueryFilter
 
     protected boolean toBoolean(Object value)
     {
-        if (value instanceof Boolean) {
-            return (Boolean) value;
-        } else if (value instanceof Number) {
-            return ((Number) value).intValue() != 0;
+        if (value instanceof Boolean booleanValue) {
+            return booleanValue;
+        } else if (value instanceof Number number) {
+            return number.intValue() != 0;
         } else {
             return false;
         }

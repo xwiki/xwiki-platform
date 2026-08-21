@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export-pdf-test</artifactId>
-    <version>18.6.0-SNAPSHOT</version>
+    <version>18.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-export-pdf-test-content</artifactId>
   <name>XWiki Platform - Export - PDF - Test - Content</name>
@@ -56,7 +56,7 @@
       <type>xar</type>
     </dependency>
     <dependency>
-      <!-- Used to test how floating images (with left / right aligment) are exported to PDF. -->
+      <!-- Used to test how floating images (with left / right alignment) are exported to PDF. -->
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-image-style-ui</artifactId>
       <version>${project.version}</version>

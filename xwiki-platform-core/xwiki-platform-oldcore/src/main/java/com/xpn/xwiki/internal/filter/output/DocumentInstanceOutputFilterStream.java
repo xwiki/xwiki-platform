@@ -84,8 +84,6 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
     private boolean firstVersion;
 
-    private FilterEventParameters currentLocaleParameters;
-
     private FilterEventParameters currentRevisionParameters;
 
     @Override
@@ -113,7 +111,6 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     @Override
     public void beginWikiDocument(String name, FilterEventParameters parameters) throws FilterException
     {
-        this.currentLocaleParameters = parameters;
         this.currentRevisionParameters = parameters;
 
         // Init the first version marker
@@ -127,14 +124,12 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
         // Reset
         this.currentRevisionParameters = null;
-        this.currentLocaleParameters = null;
         this.firstVersion = false;
     }
 
     @Override
     public void beginWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws FilterException
     {
-        this.currentLocaleParameters = parameters;
         this.currentRevisionParameters = parameters;
 
         // Init the first version marker
@@ -148,7 +143,6 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
         // Reset
         this.currentRevisionParameters = null;
-        this.currentLocaleParameters = null;
         this.firstVersion = false;
     }
 

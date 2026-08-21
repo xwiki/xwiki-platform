@@ -179,7 +179,7 @@ export default {
     // More detail about u-node can be found at:
     // https://github.com/ananthakumaran/u
     // The keys of the properties are the computed property names defined above,
-    // so that we can retreive the computed property and use it to get and set
+    // so that we can retrieve the computed property and use it to get and set
     // the values during encoding and decoding
     encodingSpecsV1() {
       return {
@@ -214,8 +214,8 @@ export default {
 
     // The coders that are going to be used for encoding the config
     // It is an array so that we can specify several encoding specs.
-    // Using several encoding specs can be usefull to keep backward
-    // compability between two different versions of encodings.
+    // Using several encoding specs can be useful to keep backward
+    // compatibility between two different versions of encodings.
     coders() {
       return [
         // the first parameter is the encoding version
@@ -248,7 +248,7 @@ export default {
 
   watch: {
     // Watch for any changes from the data we want to save
-    // We are watching for the encoded config chagnes, because
+    // We are watching for the encoded config changes, because
     // it means that the data to save has changed too
     // On changes, either save or delete config
     encodedConfig() {
@@ -268,7 +268,7 @@ export default {
     //   much less space
     // - Second: compresse the encoded config using lz-string. The resulted
     //   string might be a bit longer, but any plain text is now hashed
-    // On error, return emty string, that will delete existing config.
+    // On error, return empty string, that will delete existing config.
     encodeConfig(config) {
       try {
         const encoded = encode(this.coders[this.coders.length - 1], config);

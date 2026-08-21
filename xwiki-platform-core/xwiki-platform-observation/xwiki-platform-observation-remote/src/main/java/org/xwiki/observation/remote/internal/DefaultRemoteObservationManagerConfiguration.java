@@ -65,7 +65,7 @@ public class DefaultRemoteObservationManagerConfiguration
     {
         Boolean enabled = this.configurationSource.getProperty("observation.remote.enabled", Boolean.class);
 
-        return enabled != null ? enabled : false;
+        return enabled != null && enabled;
     }
 
     @Override

@@ -43,7 +43,6 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.store.hibernate.HibernateStoreException;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.AbstractXWikiStore;
@@ -83,39 +82,6 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     /** Need to get the xcontext to get the path to the hibernate.cfg.xml. */
     @Inject
     private Execution execution;
-
-    /**
-     * THis allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
-     * in the WEB-INF directory.
-     *
-     * @param xwiki
-     * @param context
-     * @deprecated 1.6M1. Use ComponentManager.lookup(String) instead.
-     */
-    @Deprecated
-    public XWikiHibernateBaseStore(XWiki xwiki, XWikiContext context)
-    {
-        String path = xwiki.Param("xwiki.store.hibernate.path", "/WEB-INF/hibernate.cfg.xml");
-        LOGGER.debug("Hibernate configuration file: [{}]", path);
-
-        this.hibernateConfiguration = new HibernateConfiguration();
-
-        setPath(path);
-    }
-
-    /**
-     * Initialize the storage engine with a specific path This is used for tests.
-     *
-     * @param hibpath
-     * @deprecated 1.6M1. Use ComponentManager.lookup(String) instead.
-     */
-    @Deprecated
-    public XWikiHibernateBaseStore(String hibpath)
-    {
-        this.hibernateConfiguration = new HibernateConfiguration();
-
-        setPath(hibpath);
-    }
 
     /**
      * Empty constructor needed for component manager.
@@ -632,14 +598,16 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      *
      * @param inputxcontext
      */
+    @SuppressWarnings("java:S2629")
     public void cleanUp(XWikiContext inputxcontext)
     {
         try {
             Session session = this.store.getCurrentSession();
             if (session != null) {
-                if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("Cleanup of session was needed: {}", session.toString());
-                }
+                // Build the String on purpose: log arguments are kept as objects in the captured LogEvent and
+                // XStream-serialized into the job log (see SafeMessageConverter in xwiki-commons), and a Session is
+                // a live resource that implements Serializable, so it would be walked field by field.
+                LOGGER.warn("Cleanup of session was needed: [{}]", session.toString());
 
                 this.store.endTransaction(false);
             }
@@ -864,9 +832,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                         try {
                             this.store.endTransaction(commit);
                         } catch (Exception e) {
-                            if (LOGGER.isErrorEnabled()) {
-                                LOGGER.error("Exception while close transaction", e);
-                            }
+                            LOGGER.error("Exception while closing the transaction", e);
                         }
                     }
                 }

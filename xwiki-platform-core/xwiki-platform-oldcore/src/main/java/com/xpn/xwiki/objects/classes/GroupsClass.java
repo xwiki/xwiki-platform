@@ -102,7 +102,7 @@ public class GroupsClass extends ListClass
             return (List<String>) context.getWiki().getGroupService(context)
                 .getAllMatchedGroups(null, false, 0, 0, null, context);
         } catch (XWikiException e) {
-            LOGGER.warn("Failed to retrieve the list of groups.", e);
+            LOGGER.warn("Failed to retrieve the list of groups", e);
             return Collections.emptyList();
         }
     }

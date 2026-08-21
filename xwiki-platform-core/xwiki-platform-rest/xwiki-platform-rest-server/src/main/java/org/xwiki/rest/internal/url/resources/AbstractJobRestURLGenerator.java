@@ -43,7 +43,7 @@ public abstract class AbstractJobRestURLGenerator<T> extends AbstractParametrize
         StringBuilder builder = new StringBuilder();
 
         for (String idElement : id) {
-            if (builder.length() > 0) {
+            if (!builder.isEmpty()) {
                 builder.append('/');
             }
             try {

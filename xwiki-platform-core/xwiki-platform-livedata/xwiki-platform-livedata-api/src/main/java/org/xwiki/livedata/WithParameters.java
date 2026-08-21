@@ -77,8 +77,7 @@ public class WithParameters
             return true;
         }
 
-        if (obj instanceof WithParameters) {
-            WithParameters other = (WithParameters) obj;
+        if (obj instanceof WithParameters other) {
             return new EqualsBuilder().append(getParameters(), other.getParameters()).build();
         }
 

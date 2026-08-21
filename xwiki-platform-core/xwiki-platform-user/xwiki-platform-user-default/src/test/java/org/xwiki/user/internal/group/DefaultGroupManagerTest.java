@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -128,10 +127,10 @@ class DefaultGroupManagerTest
 
         WikiDescriptorManager wikiManager = this.oldcore.getWikiDescriptorManager();
 
-        when(wikiManager.getAllIds()).thenAnswer((invocation) -> {
+        when(wikiManager.getAllIds()).thenAnswer(invocation -> {
             return wikis;
         });
-        when(wikiManager.getCurrentWikiId()).thenAnswer((invocation) -> {
+        when(wikiManager.getCurrentWikiId()).thenAnswer(invocation -> {
             return oldcore.getXWikiContext().getWikiId();
         });
 
@@ -191,7 +190,7 @@ class DefaultGroupManagerTest
     {
         try {
             when(this.groupService.getAllMembersNamesForGroup(eq(group.toString()), anyInt(), anyInt(), any()))
-                .thenReturn(groups.stream().map(DocumentReference::toString).collect(Collectors.toList()));
+                .thenReturn(groups.stream().map(DocumentReference::toString).toList());
         } catch (XWikiException e) {
             // Cannot happen
         }

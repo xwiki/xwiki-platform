@@ -26,6 +26,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
@@ -114,7 +115,8 @@ public class RecordableEventMigrator extends AbstractHibernateDataMigration
                 return null;
             });
         } catch (XWikiException e) {
-            this.logger.warn("Failed to update the event [{}].", event.getEventId());
+            this.logger.warn("Failed to update the event [{}]. Root cause is [{}].", event.getEventId(),
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 }

@@ -38,7 +38,7 @@ import org.xwiki.repository.Resources;
 public class RepositoryRESTResource extends AbstractExtensionRESTResource
 {
     /**
-     * @return the root repository informations
+     * @return the root repository information
      */
     @GET
     public Repository get()

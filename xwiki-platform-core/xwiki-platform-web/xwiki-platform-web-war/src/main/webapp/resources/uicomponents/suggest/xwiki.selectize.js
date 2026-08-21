@@ -51,7 +51,7 @@ define('xwiki-selectize', [
     var output = $(optionTemplate);
     var value = (option && typeof option === 'object') ? option.value : option;
     output.attr('data-value', value);
-    var icon = option && option.icon;
+    var icon = option?.icon;
     if (typeof icon === 'object') {
       // Set the icon set type in case it was missing.
       if (!icon.iconSetType && icon.url) {
@@ -71,7 +71,7 @@ define('xwiki-selectize', [
     } else {
       output.find('.xwiki-selectize-option-icon').remove();
     }
-    var url = option && option.url;
+    var url = option?.url;
     if (typeof url === 'string') {
       var anchor = $('<a class="xwiki-selectize-option-label"></a>').attr('href', url);
       output.find('.xwiki-selectize-option-label').replaceWith(anchor);
@@ -89,7 +89,7 @@ define('xwiki-selectize', [
     // the suggestions are displayed on separate lines in the drop down list. We don't need to center the icon for the
     // selected suggestions because they are displayed in-line so the labels don't have to be aligned.
     output.find('.xwiki-selectize-option-icon').wrap('<span class="xwiki-selectize-option-icon-wrapper"></span>');
-    var hint = option && option.hint;
+    var hint = option?.hint;
     if (typeof hint === 'string' && hint !== '') {
       output.append($('<div class="xwiki-selectize-option-hint"></div>').text(hint));
     }
@@ -98,7 +98,7 @@ define('xwiki-selectize', [
 
   var renderItem = function(option) {
     var output = renderCommon(option);
-    var hint = option && option.hint;
+    var hint = option?.hint;
     if (typeof hint === 'string' && hint !== '') {
       output.attr('title', hint);
     }
@@ -246,7 +246,7 @@ define('xwiki-selectize', [
   // This started as a hack needed in order to be able to access internal selectize fields that are prefixed with $ when
   // the JavaScript is minified, because this code is parsed with Velocity. Otherwise, if we access these fields directly
   // by their name (e.g. selectize.$control) then we might get a Velocity syntax error on the minified JavaScript file.
-  // We keept this after replacing selectize.js with Tom Select in order to keep backwards compatibility.
+  // We kept this after replacing selectize.js with Tom Select in order to keep backwards compatibility.
   TomSelect.prototype.get$ = function(key) {
     return $(this[key]);
   };
@@ -310,7 +310,26 @@ define('xwiki-selectize', [
     // Save the width before the input is hidden.
     $(input).data('initialWidth', $(input).width());
 
+    // Remember the original tabindex attribute. Tom Select restores the tabIndex DOM property on destroy(), which
+    // defaults to 0 and gets reflected back as a tabindex="0" attribute even when the input never had one.
+    const hadTabIndex = input.hasAttribute('tabindex');
+    const originalTabIndex = input.getAttribute('tabindex');
+
     const tomSelect = new TomSelect(input, getSettings($(input), settings));
+
+    // Tom Select sets input.tabIndex (see above) AFTER firing its own 'destroy' event, so a 'destroy' listener runs
+    // too early to fix this up (it would get overwritten right after). Wrap destroy() itself so our fix runs
+    // strictly after Tom Select's own tabIndex restoration.
+    const originalDestroy = tomSelect.destroy;
+    tomSelect.destroy = function(...args) {
+      const result = originalDestroy.apply(tomSelect, args);
+      if (hadTabIndex) {
+        input.setAttribute('tabindex', originalTabIndex);
+      } else {
+        input.removeAttribute('tabindex');
+      }
+      return result;
+    };
 
     // We expose the TomSelect instance through the 'selectize' property / data on the target input / select that is
     // being enhanced, in order to preserve backwards compatibility. We can do this because TomSelect is a fork of
@@ -371,7 +390,7 @@ require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {
   $.fn.xwikiSelectize.initialized = true;
 
   var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+    var container = $(data?.elements || document);
     container.find('.xwiki-selectize').xwikiSelectize();
   };
 

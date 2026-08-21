@@ -162,7 +162,7 @@ public class ModelBridge
         DocumentReference classReference, Map<String, DocumentReference> propertyClassReferences)
         throws AccessDeniedException, XWikiException, LiveDataException
     {
-        updateAll(properties, documentReference, classReference, propertyClassReferences, 0);
+        updateAll(properties, documentReference, classReference, propertyClassReferences, 0, false);
     }
 
     /**
@@ -175,21 +175,30 @@ public class ModelBridge
      * @param classReference the default type of XObject to update
      * @param propertyClassReferences optional mapping that specifies the XClass for each property
      * @param objectNumber the index of the XObject to update
+     * @param create specifies if a new document needs to be created
      * @throws AccessDeniedException in case the current user is not allow to edit the document
      * @throws XWikiException in case of error when loading or saving the updated document
      * @throws LiveDataException in case of error when validating the document
      * @see #updateAll(Map, DocumentReference, DocumentReference, Map, int)
      */
     public void updateAll(Map<String, Object> properties, DocumentReference documentReference,
-        DocumentReference classReference, Map<String, DocumentReference> propertyClassReferences, int objectNumber)
+        DocumentReference classReference, Map<String, DocumentReference> propertyClassReferences, int objectNumber,
+        boolean create)
         throws AccessDeniedException, XWikiException, LiveDataException
     {
         this.authorization.checkAccess(Right.EDIT, documentReference);
         XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
 
-        if (document.isNew()) {
+        if (document.isNew() && !create) {
             throw new LiveDataException(NEW_DOCUMENT_UPDATE_ERROR);
+        } else if (create) {
+            if (!document.isNew()) {
+                throw new LiveDataException(
+                    String.format("Cannot create the page [%s] because it already exists.", documentReference));
+            }
+            UserReference currentUser = this.userReferenceResolver.resolve(CurrentUserReference.INSTANCE);
+            document.getAuthors().setCreator(currentUser);
         }
 
         // Avoid modifying the cache document
@@ -358,5 +367,19 @@ public class ModelBridge
             }
         }
         return changedValue;
+    }
+
+    /**
+     * Check whether a document already exists on the wiki.
+     *
+     * @param documentReference the reference of the document to check
+     * @return true if the document already exists
+     * @throws XWikiException if there was a problem during lookup
+     * @since 18.7.0RC1
+     */
+    public boolean exists(DocumentReference documentReference) throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        return xcontext.getWiki().exists(documentReference, xcontext);
     }
 }

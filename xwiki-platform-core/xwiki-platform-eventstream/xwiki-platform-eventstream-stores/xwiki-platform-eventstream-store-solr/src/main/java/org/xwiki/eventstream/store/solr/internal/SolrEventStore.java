@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -81,6 +80,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.SolrUtils;
@@ -257,7 +257,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
 
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Event.FIELD_PREFILTERED, true, document);
         this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Event.FIELD_PREFILTERING_DATE, new Date(), document);
@@ -282,7 +282,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, eventId, document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, eventId, document);
 
         this.utils.setAtomic(
             read ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
@@ -304,7 +304,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, eventId, document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, eventId, document);
 
         this.utils.setAtomic(
             add ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
@@ -326,7 +326,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         SolrInputDocument document = new SolrInputDocument();
 
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
+        this.utils.set(AbstractSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
 
         this.utils.set(Event.FIELD_APPLICATION, event.getApplication(), document);
         this.utils.set(Event.FIELD_BODY, event.getBody(), document);
@@ -434,8 +434,8 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         SolrQuery solrQuery = new SolrQuery();
 
-        solrQuery.addFilterQuery(serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_ID,
-            events.stream().map(Event::getId).collect(Collectors.toList())));
+        solrQuery.addFilterQuery(serializeInCondition(AbstractSolrCoreInitializer.SOLR_FIELD_ID,
+            events.stream().map(Event::getId).toList()));
 
         solrQuery.addFilterQuery(serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS, entityIds)
             + SOLR_OR + serializeInCondition(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS, entityIds));
@@ -482,7 +482,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         DefaultEvent event = new DefaultEvent();
 
-        event.setId(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_ID, document));
+        event.setId(this.utils.get(AbstractSolrCoreInitializer.SOLR_FIELD_ID, document));
 
         event.setApplication(this.utils.get(Event.FIELD_APPLICATION, document));
         event.setBody(this.utils.get(Event.FIELD_BODY, document));
@@ -519,19 +519,17 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             fields.forEach(solrQuery::setFields);
         }
 
-        if (query instanceof PageableEventQuery) {
-            applyPageable(solrQuery, (PageableEventQuery) query);
+        if (query instanceof PageableEventQuery pageableQuery) {
+            applyPageable(solrQuery, pageableQuery);
         }
 
-        if (query instanceof SortableEventQuery) {
-            for (SortClause sort : ((SortableEventQuery) query).getSorts()) {
+        if (query instanceof SortableEventQuery sortableQuery) {
+            for (SortClause sort : sortableQuery.getSorts()) {
                 solrQuery.addSort(toSolrFieldName(sort), sort.getOrder() == Order.ASC ? ORDER.asc : ORDER.desc);
             }
         }
 
-        if (query instanceof SimpleEventQuery) {
-            SimpleEventQuery simpleQuery = (SimpleEventQuery) query;
-
+        if (query instanceof SimpleEventQuery simpleQuery) {
             addConditions(simpleQuery.isOr() && simpleQuery.getConditions().size() > 1
                 ? Collections.singletonList(simpleQuery) : simpleQuery.getConditions(), solrQuery);
         }
@@ -572,16 +570,16 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     {
         String conditionString;
 
-        if (condition instanceof CompareQueryCondition) {
-            conditionString = serializeCompareCondition((CompareQueryCondition) condition);
-        } else if (condition instanceof StatusQueryCondition) {
-            conditionString = serializeStatusCondition((StatusQueryCondition) condition);
-        } else if (condition instanceof MailEntityQueryCondition) {
-            conditionString = serializeMailCondition((MailEntityQueryCondition) condition);
-        } else if (condition instanceof InQueryCondition) {
-            conditionString = serializeInCondition((InQueryCondition) condition);
-        } else if (condition instanceof GroupQueryCondition) {
-            conditionString = serializeGroupCondition((GroupQueryCondition) condition);
+        if (condition instanceof CompareQueryCondition compareCondition) {
+            conditionString = serializeCompareCondition(compareCondition);
+        } else if (condition instanceof StatusQueryCondition statusCondition) {
+            conditionString = serializeStatusCondition(statusCondition);
+        } else if (condition instanceof MailEntityQueryCondition mailCondition) {
+            conditionString = serializeMailCondition(mailCondition);
+        } else if (condition instanceof InQueryCondition inCondition) {
+            conditionString = serializeInCondition(inCondition);
+        } else if (condition instanceof GroupQueryCondition groupCondition) {
+            conditionString = serializeGroupCondition(groupCondition);
         } else {
             conditionString = null;
         }
@@ -731,10 +729,10 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     private Type resolveCustomType(AbstractPropertyQueryCondition condition)
     {
         Object value = null;
-        if (condition instanceof CompareQueryCondition) {
-            value = ((CompareQueryCondition) condition).getValue();
-        } else if (condition instanceof InQueryCondition) {
-            List<Object> values = ((InQueryCondition) condition).getValues();
+        if (condition instanceof CompareQueryCondition compareCondition) {
+            value = compareCondition.getValue();
+        } else if (condition instanceof InQueryCondition inCondition) {
+            List<Object> values = inCondition.getValues();
             if (values != null && !values.isEmpty()) {
                 value = values.getFirst();
             }

@@ -53,8 +53,8 @@ import com.xpn.xwiki.web.XWikiServletResponseStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -163,11 +163,11 @@ class SyndEntryDocumentSourceTest
 
     protected BaseClass initArticleClass() throws XWikiException
     {
-        XWikiDocument doc =
+        XWikiDocument classDoc =
             this.oldcore.getXWikiContext().getWiki().getDocument(ARTICLE_CLASS_NAME, this.oldcore.getXWikiContext());
-        boolean needsUpdate = doc.isNew();
+        boolean needsUpdate = classDoc.isNew();
 
-        BaseClass bclass = doc.getXClass();
+        BaseClass bclass = classDoc.getXClass();
         bclass.setName(ARTICLE_CLASS_NAME);
 
         needsUpdate |= bclass.addTextField("title", "Title", 64);
@@ -175,7 +175,7 @@ class SyndEntryDocumentSourceTest
         needsUpdate |= bclass.addTextField("category", "Category", 64);
 
         if (needsUpdate) {
-            this.oldcore.getXWikiContext().getWiki().saveDocument(doc, this.oldcore.getXWikiContext());
+            this.oldcore.getXWikiContext().getWiki().saveDocument(classDoc, this.oldcore.getXWikiContext());
         }
         return bclass;
     }
@@ -211,7 +211,7 @@ class SyndEntryDocumentSourceTest
      * Tests if two successive calls of the source method with the same argument have the same result.
      */
     @Test
-    public void testSourceConsistency()
+    void testSourceConsistency()
     {
         assertEquals(source(this.doc), source(this.doc), INCONSISTENCY);
     }
@@ -221,7 +221,7 @@ class SyndEntryDocumentSourceTest
      * document, irrespective of its type: {@link XWikiDocument}, {@link Document}, and {@link String}.
      */
     @Test
-    public void testSourcePolymorphism()
+    void testSourcePolymorphism()
     {
         SyndEntryImpl fromXDoc = source(this.doc);
         SyndEntryImpl fromDoc = source(this.doc.newDocument(this.oldcore.getXWikiContext()));
@@ -237,17 +237,14 @@ class SyndEntryDocumentSourceTest
      * @throws XWikiException
      */
     @Test
-    public void testSourceAccessRights() throws XWikiException
+    void testSourceAccessRights() throws XWikiException
     {
         // odd user name length implies no access rights
         this.oldcore.getXWikiContext().setUser("XWiki.Albatross");
-        try {
-            this.source.source(new SyndEntryImpl(), doc, Collections.EMPTY_MAP, this.oldcore.getXWikiContext());
-            fail(ACCESS_RIGHTS_VIOLATED);
-        } catch (XWikiException expected) {
-            // we should get an exception
-            assertEquals(XWikiException.ERROR_XWIKI_ACCESS_DENIED, expected.getCode());
-        }
+        XWikiException expected = assertThrows(XWikiException.class,
+            () -> this.source.source(new SyndEntryImpl(), doc, Collections.EMPTY_MAP, this.oldcore.getXWikiContext()),
+            ACCESS_RIGHTS_VIOLATED);
+        assertEquals(XWikiException.ERROR_XWIKI_ACCESS_DENIED, expected.getCode());
         // even user name length implies all access rights
         this.oldcore.getXWikiContext().setUser("Condor");
         this.source.source(new SyndEntryImpl(), doc, Collections.EMPTY_MAP, this.oldcore.getXWikiContext());
@@ -258,7 +255,7 @@ class SyndEntryDocumentSourceTest
      * Tests if {@link SyndEntryDocumentSource#CONTENT_TYPE} parameter is used correctly.
      */
     @Test
-    public void testSourceContentType()
+    void testSourceContentType()
     {
         Map instanceParams = new HashMap();
         instanceParams.put(SyndEntryDocumentSource.CONTENT_TYPE, SVG_MIME_TYPE);
@@ -276,7 +273,7 @@ class SyndEntryDocumentSourceTest
      * {@link SyndEntryDocumentSource#CONTENT_TYPE} is <i>text/plain</i>.
      */
     @Test
-    public void testArticleSourcePlainContentLength()
+    void testArticleSourcePlainContentLength()
     {
         int maxLength = 15;
         Map params = new HashMap();
@@ -295,7 +292,7 @@ class SyndEntryDocumentSourceTest
      * {@link SyndEntryDocumentSource#CONTENT_TYPE} is <i>text/html</i>.
      */
     @Test
-    public void testArticleSourceHTMLContentLength()
+    void testArticleSourceHTMLContentLength()
     {
         int maxLength = 16;
         Map params = new HashMap();
@@ -311,7 +308,7 @@ class SyndEntryDocumentSourceTest
     }
 
     @Test
-    public void testArticleSourceXMLContentLength()
+    void testArticleSourceXMLContentLength()
     {
         int maxLength = 17;
         Map params = new HashMap();
@@ -327,7 +324,7 @@ class SyndEntryDocumentSourceTest
     }
 
     @Test
-    public void testPreviewContentEncoding()
+    void testPreviewContentEncoding()
     {
         String snippet = "<p>Test ê</p>";
         String transformedHTML = SyndEntryDocumentSource.getHTMLPreview(snippet, 10);

@@ -159,7 +159,7 @@ public class ArtifactResolver
             DependencyNode node = collectResult.getRoot();
 
             if (this.isVerbose) {
-                LOGGER.info("collect = {} ms", (System.currentTimeMillis() - t1));
+                LOGGER.info("collect = [{}] ms", (System.currentTimeMillis() - t1));
                 node.accept(new FilteringDependencyVisitor(new DebuggingDependencyVisitor(), filter));
             }
 
@@ -168,7 +168,7 @@ public class ArtifactResolver
             DependencyResult dependencyResult = this.repositoryResolver.getSystem().resolveDependencies(
                 this.repositoryResolver.getSession(), request);
             if (this.isVerbose) {
-                LOGGER.info("resolve = {} ms", (System.currentTimeMillis() - t1));
+                LOGGER.info("resolve = [{}] ms", (System.currentTimeMillis() - t1));
             }
 
             if (!dependencyResult.getCollectExceptions().isEmpty()) {

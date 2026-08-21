@@ -51,7 +51,7 @@ platform.appwithinminutes.homePageTitle=App Within Minutes
 platform.appwithinminutes.appPanelCreateEntry=Create your own!
 
 ### Wizard step
-### Missing: platform.appwithinminutes.wizardStepHeading=Step {0} \u2014 {1}
+### Missing: platform.appwithinminutes.wizardStepHeading=Step {0} — {1}
 ### Missing: appWithinMinutes.wizardStep.name.name=Name
 ### Missing: appWithinMinutes.wizardStep.name.title=Name your application
 ### Missing: appWithinMinutes.wizardStep.name.description=Choose the application name
@@ -191,7 +191,9 @@ platform.appwithinminutes.liveTableEditorActionsColumnName=Actions
 ### Missing: platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop to change the order
 ### Missing: platform.appwithinminutes.liveTableEditorDeleteColumnHint=Delete
 ### Missing: platform.appwithinminutes.liveTableEditorAddColumnHint=Add selected column
-### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarningMessage=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them?
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsRemove=Remove deprecated columns
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsKeep=Keep them
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 
@@ -267,5 +269,6 @@ platform.appwithinminutes.wizardStep2Description=Describe the application data
 ### Missing: platform.appwithinminutes.appsLiveTable.doc.space=Application name
 appWithinMinutes.classEditor.title={0} Structure
 ### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries
+### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
 </content>
 </xwikidoc>

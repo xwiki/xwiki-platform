@@ -21,13 +21,13 @@ package org.xwiki.csrf;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.util.Random;
-import java.security.SecureRandom;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -247,7 +247,7 @@ class DefaultCSRFTokenTest
      * Test that the resubmission URL is correct.
      */
     @Test
-    void resubmissionURLWhenPost() throws Exception
+    void resubmissionURLWhenPost()
     {
         userIsLogged();
 
@@ -266,7 +266,7 @@ class DefaultCSRFTokenTest
      * Test that the resubmission URL is correct.
      */
     @Test
-    void resubmissionURLWhenGet() throws Exception
+    void resubmissionURLWhenGet()
     {
         userIsLogged();
 

@@ -120,7 +120,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         List<TableBlock> tableBlocks = xdom.getBlocks(new ClassBlockMatcher(TableBlock.class), Block.Axes.DESCENDANT);
         TableBlock result = null;
         this.logger.debug("Table id is [{}], there are [{}] tables in the document [{}]",
-            new Object[]{this.tableId, tableBlocks.size(), this.documentReference});
+            this.tableId, tableBlocks.size(), this.documentReference);
         if (null != tableId) {
             for (TableBlock tableBlock : tableBlocks) {
                 String id = tableBlock.getParameter("id");
@@ -167,7 +167,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
                 xdom = this.documentDisplayer.display(document, parameters);
             } catch (Exception e) {
                 throw new MacroExecutionException(String.format("Error getting Chart table from document [%s]",
-                    this.documentReference, e));
+                    this.documentReference), e);
             }
         }
         return xdom;

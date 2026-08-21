@@ -40,10 +40,10 @@ import static org.mockito.Mockito.mock;
  * @since 11.8RC1
  * @version $Id$
  */
-public class MergeManagerResultTest
+class MergeManagerResultTest
 {
     @Test
-    public void hasConflict()
+    void hasConflict()
     {
         MergeManagerResult mergeManagerResult = new MergeManagerResult();
         assertFalse(mergeManagerResult.isModified());

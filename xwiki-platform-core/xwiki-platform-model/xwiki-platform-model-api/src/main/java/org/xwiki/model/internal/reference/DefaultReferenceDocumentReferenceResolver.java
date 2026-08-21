@@ -52,8 +52,8 @@ public class DefaultReferenceDocumentReferenceResolver implements DocumentRefere
     @Override
     public DocumentReference resolve(EntityReference documentReferenceRepresentation, Object... parameters)
     {
-        if (documentReferenceRepresentation instanceof DocumentReference) {
-            return (DocumentReference) documentReferenceRepresentation;
+        if (documentReferenceRepresentation instanceof DocumentReference documentReference) {
+            return documentReference;
         }
 
         return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,

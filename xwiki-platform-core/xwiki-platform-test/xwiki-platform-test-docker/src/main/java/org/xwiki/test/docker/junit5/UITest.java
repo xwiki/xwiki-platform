@@ -35,6 +35,7 @@ import org.xwiki.test.docker.junit5.blobstore.BlobStore;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.docker.junit5.solr.SolrMode;
 import org.xwiki.test.integration.junit5.ValidateConsoleExtension;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -69,7 +70,7 @@ public @interface UITest
      * @return the database to use, see {@link Database}
      * @since 10.9
      */
-    Database database() default Database.HSQLDB_EMBEDDED;
+    Database database() default Database.HSQLDB;
 
     /**
      * @return the Servlet Engine to use, see {@link ServletEngine}
@@ -230,6 +231,14 @@ public @interface UITest
     boolean saveDatabaseData() default false;
 
     /**
+     * @return true if the extensions declared in the resources of the module executing the test must be made available
+     *     to the XWiki instances as an extension repository, so that the test can ask XWiki to install them (see
+     *     {@code src/test/resources/packagefile} and {@code src/test/resources/repository})
+     * @since 18.7.0RC1
+     */
+    boolean testExtensionRepository() default false;
+
+    /**
      * @return true if the XWiki permanent directory should be preserved after the test is finished and the XWiki
      *         container stopped (doesn't make sense for Servlet containers running outside of Docker). Can be useful
      *         for debugging purposes
@@ -278,7 +287,7 @@ public @interface UITest
     String remoteSolrTag() default "";
 
     /**
-     * @return the number of instances to run during tests.
+     * @return the instances to run during tests.
      * @since 18.3.0RC1
      */
     XWikiInstances xwikiInstances() default @XWikiInstances;

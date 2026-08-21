@@ -31,13 +31,13 @@ import { PropSchema } from '@blocknote/core';
 import { ReactCustomBlockImplementation } from '@blocknote/react';
 import { ReactInlineContentImplementation } from '@blocknote/react';
 import { ReactNode } from 'react';
+import { ResourceReference } from '@xwiki/platform-rendering-api';
 import { StyledText } from '@blocknote/core';
 import { StyleImplementation } from '@blocknote/core';
 import { StyleSchema } from '@blocknote/core';
 import { StyleSchemaFromSpecs } from '@blocknote/core';
 import { StyleSpec } from '@blocknote/core';
 import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
-import { UnknownMacroParamsType } from '@xwiki/platform-macros-api';
 
 // @beta
 export type BlockNoteViewWrapperProps = {
@@ -48,14 +48,16 @@ export type BlockNoteViewWrapperProps = {
     label: string;
     content: BlockType[];
     macros: {
-        list: MacroWithUnknownParamsType[];
+        list?: MacroWithUnknownParamsType[];
         ctx: ContextForMacros;
     } | false;
     collaboration?: Collaboration;
     onChange?: (editor: EditorType) => void;
     depsContainer: Container;
+    linkEditionHandler: LinkEditionHandler;
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
+        linkEdition?: LinkEditionHooks;
     };
     syntax: SyntaxConfig;
     refs?: {
@@ -76,7 +78,7 @@ export function buildMacroRawContent(content: string): InlineContent<DefaultInli
 
 // @beta
 export type ContextForMacros = {
-    openParamsEditor?(macro: MacroWithUnknownParamsType, params: UnknownMacroParamsType, update: (newProps: UnknownMacroParamsType) => void): void;
+    openParamsEditor?(invocation: MacroBlockInvocation | InlineMacroInvocation, update: (updated: MacroBlockInvocation | InlineMacroInvocation) => void): void;
     openInsertionEditor?(prefill: MacroInsertionEditorPrefillData, insert: (macro: MacroBlockInvocation | InlineMacroInvocation) => void): void;
 };
 
@@ -115,7 +117,7 @@ export type EditorType = BlockNoteEditor<EditorBlockSchema, EditorInlineContentS
 export function extractMacroRawContent(content: InlineContent<DefaultInlineContentSchema, DefaultStyleSchema>[]): string;
 
 // @beta
-export type ImageEditionOverrideFn = (image: BlockOfType<"image">["props"], update: (updateResult: ImageUpdateResult) => void) => void;
+export type ImageEditionOverrideFn = (block: BlockOfType<"image">, update: (updateResult: ImageUpdateResult) => void) => void;
 
 // @beta
 export type ImageUpdateResult = {
@@ -132,7 +134,7 @@ export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorS
 export type InlineMacroInvocation = {
     kind: "inline";
     id: string;
-    params: UnknownMacroParamsType;
+    params: MacroCallParams;
     body: {
         type: "inlineContent";
         content: InlineContentType;
@@ -145,13 +147,36 @@ export type InlineMacroInvocation = {
 };
 
 // @beta
+export type LinkEditionData = {
+    title: string;
+    url: string;
+    reference?: ResourceReference;
+};
+
+// @beta
+export type LinkEditionHandler = (props: LinkEditionHandlerProps) => void;
+
+// @beta
+export type LinkEditionHandlerProps = {
+    current: LinkEditionData;
+    onSubmit: (link: LinkEditionData) => void;
+    mode: "createNew" | "editExisting";
+};
+
+// @beta
+export type LinkEditionHooks = {
+    beforeEdit?: (linkData: LinkEditionData) => LinkEditionData | void;
+    beforeUpdate?: (linkData: LinkEditionData, previous?: LinkEditionData) => LinkEditionData | void;
+};
+
+// @beta
 export const MACRO_NAME_PREFIX = "Macro_";
 
 // @beta
 export type MacroBlockInvocation = {
     kind: "block";
     id: string;
-    params: UnknownMacroParamsType;
+    params: MacroCallParams;
     body: {
         type: "inlineContents";
         content: InlineContentType[];
@@ -164,10 +189,20 @@ export type MacroBlockInvocation = {
 };
 
 // @beta
+export type MacroCall = {
+    name: string;
+    parameters: Record<string, unknown>;
+    content?: unknown;
+};
+
+// @beta
+export type MacroCallParams = Record<string, boolean | number | string>;
+
+// @beta
 export type MacroInsertionEditorPrefillData = {
     kind: "block" | "inline";
     id: string | null;
-    params: UnknownMacroParamsType | null;
+    params: MacroCallParams | null;
     body: MacroBlockInvocation["body"] | InlineMacroInvocation["body"] | null;
 };
 

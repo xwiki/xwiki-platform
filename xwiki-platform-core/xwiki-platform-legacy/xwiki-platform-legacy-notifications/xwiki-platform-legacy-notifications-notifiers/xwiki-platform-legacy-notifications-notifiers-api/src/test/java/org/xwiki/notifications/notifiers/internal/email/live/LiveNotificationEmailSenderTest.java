@@ -71,19 +71,22 @@ class LiveNotificationEmailSenderTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Test
-    void sendMail() throws Exception
+    void sendMail()
     {
         CompositeEvent event1 = mock(CompositeEvent.class);
 
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
 
-        when(this.notificationUserIteratorProvider.get()).thenReturn(mock(NotificationUserIterator.class));
+        NotificationUserIterator notificationUserIteratorMock = mock();
+        when(this.notificationUserIteratorProvider.get()).thenReturn(notificationUserIteratorMock);
 
-        when(this.liveMimeMessageIteratorProvider.get()).thenReturn(mock(LiveMimeMessageIterator.class));
+        LiveMimeMessageIterator liveMimeMessageIteratorMock = mock();
+        when(this.liveMimeMessageIteratorProvider.get()).thenReturn(liveMimeMessageIteratorMock);
 
         when(this.sessionFactory.create(any())).thenReturn(null);
 
-        when(this.mailListenerProvider.get()).thenReturn(mock(MailListener.class));
+        MailListener mailListenerMock = mock();
+        when(this.mailListenerProvider.get()).thenReturn(mailListenerMock);
 
         this.sender.sendEmails(event1);
 

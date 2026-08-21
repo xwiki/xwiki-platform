@@ -95,16 +95,15 @@ class RssLikeRecordableEventPageTest extends PageTest
         testEvent.setDocument(TEST_DOCUMENT_REFERENCE);
         this.scriptContext.setAttribute("event", new CompositeEvent(testEvent), ScriptContext.GLOBAL_SCOPE);
         String result = this.templateManager.render(RSS_TEMPLATE);
-        assertThat(result.trim(), equalToCompressingWhiteSpace(
-            "<p>\n"
-                + "  <strong>like.application.name</strong>\n"
-                + "    <a href=\"http://null:0/xwiki/bin/view/Test/\">Hello &amp; Co</a>\n"
-                + "  .<br/>\n"
-                + "    notifications.events.org.xwiki.like.events.LikeRecordableEvent.description.by.1user"
-                + " [First &amp; Name]\n"
-                + "</p>\n"
-                + "<p>\n"
-                + "  &#60;formattedDate&#62;\n"
-                + "</p>"));
+        assertThat(result.trim(), equalToCompressingWhiteSpace("""
+            <p>
+              <strong>like.application.name</strong>
+                <a href="http://null:0/xwiki/bin/view/Test/">Hello &amp; Co</a>
+              .<br/>
+                notifications.events.org.xwiki.like.events.LikeRecordableEvent.description.by.1user [First &amp; Name]
+            </p>
+            <p>
+              &#60;formattedDate&#62;
+            </p>"""));
     }
 }

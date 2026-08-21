@@ -238,7 +238,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
                         userReference,
                         this.interval,
                         ExceptionUtils.getRootCauseMessage(e));
-                this.logger.debug("Root cause of the error was: ", e);
+                this.logger.debug("Root cause of the error was:", e);
             }
         } else {
             this.logger.warn("Cannot find a NotificationEmailGroupingStrategy with hint [{}] for user [{}] "
@@ -300,7 +300,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         try {
             this.factoryParameters.put(FROM, new InternetAddress(this.mailSenderConfiguration.getFromAddress()));
         } catch (AddressException | NullPointerException e) {
-            this.logger.warn("No default email address is configured in the administration.");
+            this.logger.warn("No default email address is configured in the administration. Root cause is [{}].",
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         this.factoryParameters.put(TO, this.currentUserEmail);
@@ -350,7 +351,7 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
         try {
             getAttachments().add(this.logoAttachmentExtractor.getLogo());
         } catch (Exception e) {
-            this.logger.warn("Failed to get the logo.", e);
+            this.logger.warn("Failed to get the logo", e);
         }
     }
 
@@ -378,20 +379,15 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
             try {
                 attachments.add(userAvatarAttachmentExtractor.getUserAvatar(userAvatar, 32));
             } catch (Exception e) {
-                this.logger.warn("Failed to add the avatar of [{}] in the email.", userAvatar, e);
+                this.logger.warn("Failed to add the avatar of [{}] in the email", userAvatar, e);
             }
         }
     }
 
     private Map<String, Object> getVelocityVariables()
     {
-        Object velocityVariables = this.factoryParameters.get(VELOCITY_VARIABLES);
-        if (velocityVariables == null) {
-            velocityVariables = new HashMap<String, Object>();
-            this.factoryParameters.put(VELOCITY_VARIABLES, velocityVariables);
-        }
-
-        return (Map<String, Object>) velocityVariables;
+        return (Map<String, Object>) this.factoryParameters.computeIfAbsent(VELOCITY_VARIABLES,
+            key -> new HashMap<String, Object>());
     }
 
     private String getUserEmail(DocumentReference user)

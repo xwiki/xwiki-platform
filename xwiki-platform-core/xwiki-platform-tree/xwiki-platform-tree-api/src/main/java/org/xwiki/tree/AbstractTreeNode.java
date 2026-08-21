@@ -121,16 +121,16 @@ public abstract class AbstractTreeNode implements TreeNode
     private List<TreeFilter> getFilters()
     {
         return ((List<?>) getProperties().getOrDefault(PROPERTY_FILTERS, Collections.emptyList())).stream()
-            .map(this::getFilter).filter(Objects::nonNull).collect(Collectors.toList());
+            .map(this::getFilter).filter(Objects::nonNull).toList();
     }
 
     private TreeFilter getFilter(Object filter)
     {
-        if (filter instanceof TreeFilter) {
-            return (TreeFilter) filter;
-        } else if (filter instanceof String) {
+        if (filter instanceof TreeFilter treeFilter) {
+            return treeFilter;
+        } else if (filter instanceof String string) {
             try {
-                return this.contextComponentManagerProvider.get().getInstance(TreeFilter.class, (String) filter);
+                return this.contextComponentManagerProvider.get().getInstance(TreeFilter.class, string);
             } catch (ComponentLookupException e) {
                 this.logger.warn("Skipping tree filter [{}]. Root cause is [{}].", filter,
                     ExceptionUtils.getRootCauseMessage(e));
@@ -146,8 +146,8 @@ public abstract class AbstractTreeNode implements TreeNode
             return Collections.emptyList();
         }
 
-        int start = Math.min(Math.max(offset, 0), list.size());
-        int end = Math.max(Math.min(start + limit, list.size()), start);
+        int start = Math.clamp(offset, 0, list.size());
+        int end = Math.clamp((long) start + limit, start, list.size());
         return list.subList(start, end);
     }
 

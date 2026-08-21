@@ -89,12 +89,7 @@ public abstract class AbstractTableBlockDataSource extends AbstractDataSource
      * Pattern matching the cell range.
      */
     private static final Pattern RANGE_PATTERN =
-        Pattern.compile("^([A-Z]+|\\.)([0-9]+|\\.)-([A-Z]+|\\.)([0-9]+|\\.)$");
-
-    /**
-     * The name of the category dataset.
-     */
-    private static final String CATEGORY_DATASET = "category";
+        Pattern.compile("^([A-Z]+|\\.)(\\d+|\\.)-([A-Z]+|\\.)(\\d+|\\.)$");
 
     /**
      * The range parameter.

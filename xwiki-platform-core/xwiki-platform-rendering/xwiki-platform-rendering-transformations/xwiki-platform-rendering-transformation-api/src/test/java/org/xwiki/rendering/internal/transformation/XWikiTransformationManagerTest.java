@@ -21,26 +21,17 @@ package org.xwiki.rendering.internal.transformation;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.inject.Provider;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.XWikiTransformationContext;
-import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -50,13 +41,6 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -79,18 +63,8 @@ class XWikiTransformationManagerTest
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
-    @MockComponent
-    private AuthorExecutor authorExecutor;
-
-    @MockComponent
-    private DocumentAccessBridge documentAccessBridge;
-
     @Mock
     private Request request;
-
-    private DocumentReference currentUserReference = new DocumentReference("xwiki", "XWiki", "CurrentUser");
-
-    private DocumentReference contentDocumentReference = new DocumentReference("xwiki", "Test", "ContentDocument");
 
     @BeforeComponent
     void before() throws Exception
@@ -98,12 +72,6 @@ class XWikiTransformationManagerTest
         Provider<ComponentManager> componentManagerProvider = this.componentManager.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(componentManagerProvider.get()).thenReturn(this.componentManager);
-    }
-
-    @BeforeEach
-    void beforeEach()
-    {
-        when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(this.currentUserReference);
     }
 
     @Test
@@ -155,34 +123,5 @@ class XWikiTransformationManagerTest
 
         List<Transformation> transformations = this.transformationManager.getTransformations();
         assertEquals(0, transformations.size());
-    }
-
-    @Test
-    @SuppressWarnings("null")
-    void performTransformations() throws Exception
-    {
-        XWikiTransformationManager transformationManagerSpy = spy(this.transformationManager);
-        doNothing().when(transformationManagerSpy).superPerformTransformations(any(), any());
-
-        doAnswer(invocation -> {
-            return invocation.getArgument(0, Callable.class).call();
-        }).when(this.authorExecutor).call(any(), eq(this.currentUserReference), eq(this.contentDocumentReference));
-
-        XDOM xdom = new XDOM(List.of(new WordBlock("content")));
-
-        // Call with a generic transformation context.
-        TransformationContext transformationContext = new TransformationContext();
-        transformationManagerSpy.performTransformations(xdom, transformationContext);
-
-        verify(transformationManagerSpy).superPerformTransformations(xdom, transformationContext);
-        verify(this.authorExecutor, never()).call(any(), any(), any());
-
-        // Call with an XWiki transformation context.
-        XWikiTransformationContext xwikiTransformationContext = new XWikiTransformationContext();
-        xwikiTransformationContext.setContentDocumentReference(this.contentDocumentReference);
-        transformationManagerSpy.performTransformations(xdom, xwikiTransformationContext);
-
-        verify(transformationManagerSpy).superPerformTransformations(xdom, xwikiTransformationContext);
-        verify(this.authorExecutor).call(any(), eq(this.currentUserReference), eq(this.contentDocumentReference));
     }
 }

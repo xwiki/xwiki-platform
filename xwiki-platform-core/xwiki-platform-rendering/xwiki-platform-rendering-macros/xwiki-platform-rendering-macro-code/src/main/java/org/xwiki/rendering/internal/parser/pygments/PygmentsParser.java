@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
@@ -104,7 +105,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     private Parser plainTextParser;
 
     /**
-     * Pygments highligh parser configuration.
+     * Pygments highlight parser configuration.
      */
     @Inject
     private PygmentsParserConfiguration configuration;
@@ -128,7 +129,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         InputStream is = getClass().getResourceAsStream("/pygments/code.py");
         if (is != null) {
             try {
-                this.script = IOUtils.toString(is, "UTF8");
+                this.script = IOUtils.toString(is, StandardCharsets.UTF_8);
             } catch (Exception e) {
                 throw new InitializationException("Failed to read resource /pygments/code.py resource", e);
             } finally {
@@ -165,7 +166,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
             throw new ParseException("Failed to read source", e);
         }
 
-        if (code.length() == 0) {
+        if (code.isEmpty()) {
             return Collections.emptyList();
         }
 

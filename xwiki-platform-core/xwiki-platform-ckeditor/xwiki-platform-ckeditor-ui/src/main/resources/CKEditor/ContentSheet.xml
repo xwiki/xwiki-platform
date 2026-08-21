@@ -200,7 +200,7 @@
     </property>
     <property>
       <code>body[role="textbox"] {
-  /* We use padding (instead of margin) in order to support Bootstrap grid layouts and accomodate for the use of
+  /* We use padding (instead of margin) in order to support Bootstrap grid layouts and accommodate for the use of
   negative margins used by the .row class. */
   /* We need more space at the bottom in order to be sure that the magic line is visible all the time (see CKEDITOR-283:
     Cannot add content after a DIV located at the end of the document) */
@@ -232,8 +232,8 @@ a[data-linktype="create"]::after {
 [contenteditable="true"] [data-xwiki-focusedplaceholder]::before {
   /* Show the value of the focused line placeholder attribute */
   position: absolute;
-  opacity: .8;
-  color: #aaa;
+  color: var(--text-muted);
+  font-style: italic;
   content: attr(data-xwiki-focusedplaceholder);
 }
 

@@ -523,7 +523,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   #end
   #set ($countAverage = $mathtool.div($totalTagNumber, $tagCountListSorted.size()))
   ##
-  ## Build popularity map using the difference between minimum / maximum tag occurrences counts, and the average tag occurences count.
+  ## Build popularity map using the difference between minimum / maximum tag occurrences counts, and the average tag occurrences count.
   #set ($firstHalfIntervalSize = $mathtool.div($mathtool.sub($countAverage, $minCount), $levelsHalf))
   #set ($secondHalfIntervalSize = $mathtool.div($mathtool.sub($maxCount, $countAverage), $levelsHalf))
   ##

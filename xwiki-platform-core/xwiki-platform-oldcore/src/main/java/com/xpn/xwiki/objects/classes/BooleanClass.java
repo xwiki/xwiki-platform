@@ -22,11 +22,14 @@ package com.xpn.xwiki.objects.classes;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ecs.xhtml.div;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.label;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.stability.Unstable;
 import org.xwiki.xml.XMLUtils;
 
@@ -40,6 +43,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class BooleanClass extends PropertyClass
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BooleanClass.class);
+
     /**
      * The type used as a hint to find the class.
      * @since 18.2.0RC1
@@ -224,22 +229,22 @@ public class BooleanClass extends PropertyClass
         select.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
             getTranslatedPrettyName(context)));
 
-        String String0 = getDisplayValue(context, 0);
-        String String1 = getDisplayValue(context, 1);
+        String string0 = getDisplayValue(context, 0);
+        String string1 = getDisplayValue(context, 1);
         int nb1 = 1;
         int nb2 = 2;
 
         option[] options;
 
         if (getDefaultValue() == -1) {
-            options = new option[] { new option("---", ""), new option(String1, "1"), new option(String0, "0") };
+            options = new option[] { new option("---", ""), new option(string1, "1"), new option(string0, "0") };
             options[0].addElement("---");
-            options[1].addElement(XMLUtils.escape(String1));
-            options[2].addElement(XMLUtils.escape(String0));
+            options[1].addElement(XMLUtils.escape(string1));
+            options[2].addElement(XMLUtils.escape(string0));
         } else {
-            options = new option[] { new option(String1, "1"), new option(String0, "0") };
-            options[0].addElement(XMLUtils.escape(String1));
-            options[1].addElement(XMLUtils.escape(String0));
+            options = new option[] { new option(string1, "1"), new option(string0, "0") };
+            options[0].addElement(XMLUtils.escape(string1));
+            options[1].addElement(XMLUtils.escape(string0));
             nb1 = 0;
             nb2 = 1;
         }
@@ -264,9 +269,9 @@ public class BooleanClass extends PropertyClass
     public void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        String StringNone = getDisplayValue(context, 2);
-        String StringTrue = getDisplayValue(context, 1);
-        String StringFalse = getDisplayValue(context, 0);
+        String stringNone = getDisplayValue(context, 2);
+        String stringTrue = getDisplayValue(context, 1);
+        String stringFalse = getDisplayValue(context, 0);
         div[] inputs;
 
         input radioNone = new input(input.radio, prefix + name, "");
@@ -285,13 +290,13 @@ public class BooleanClass extends PropertyClass
         div divTrue = new div();
         div divFalse = new div();
         labelNone.addElement(radioNone);
-        labelNone.addElement(StringNone);
+        labelNone.addElement(stringNone);
         divNone.addElement(labelNone);
         labelTrue.addElement(radioTrue);
-        labelTrue.addElement(StringTrue);
+        labelTrue.addElement(stringTrue);
         divTrue.addElement(labelTrue);
         labelFalse.addElement(radioFalse);
-        labelFalse.addElement(StringFalse);
+        labelFalse.addElement(stringFalse);
         divFalse.addElement(labelFalse);
 
         radioNone.setID(prefix + name + "_none");
@@ -376,7 +381,8 @@ public class BooleanClass extends PropertyClass
             }
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to get the display value of [{}] for property [{}]. Root cause is [{}]", value,
+                getFieldFullName(), ExceptionUtils.getRootCauseMessage(e));
             return "" + value;
         }
     }

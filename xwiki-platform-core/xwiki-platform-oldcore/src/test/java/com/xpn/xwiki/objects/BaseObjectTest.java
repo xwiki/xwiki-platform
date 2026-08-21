@@ -72,7 +72,7 @@ class BaseObjectTest
     private MergeManager mergeManager;
     
     @Test
-    void testSetDocumentReference() throws Exception
+    void testSetDocumentReference()
     {
         BaseObject baseObject = new BaseObject();
 
@@ -83,7 +83,7 @@ class BaseObjectTest
     }
 
     @Test
-    void testSetName() throws Exception
+    void testSetName()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseObject baseObject = new BaseObject();
@@ -96,7 +96,7 @@ class BaseObjectTest
     }
 
     @Test
-    void testSetNameAloneWithChangingContext() throws Exception
+    void testSetNameAloneWithChangingContext()
     {
         String database = this.oldcore.getXWikiContext().getWikiId();
         BaseObject baseObject = new BaseObject();

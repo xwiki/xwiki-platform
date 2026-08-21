@@ -122,13 +122,13 @@ class IncludedPagesDocumentInformationPageTest extends PageTest
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "Test"));
         document.setSyntax(Syntax.XWIKI_2_0);
-        document.setContent("{{velocity}}\n"
-            + "{{html}}\n"
-            + "#foreach ($extension in $services.uix.getExtensions('org.xwiki.platform.panels.documentInformation'))\n"
-            + "  $services.rendering.render($extension.execute(), 'html/5.0')\n"
-            + "#end\n"
-            + "{{/html}}"
-            + "{{/velocity}}");
+        document.setContent("""
+            {{velocity}}
+            {{html}}
+            #foreach ($extension in $services.uix.getExtensions('org.xwiki.platform.panels.documentInformation'))
+              $services.rendering.render($extension.execute(), 'html/5.0')
+            #end
+            {{/html}}{{/velocity}}""");
         return document;
     }
 }

@@ -199,18 +199,15 @@ public class DocumentSelectionResolver
                 wikiName = entry.getKey().getWikiReference().getName();
             }
 
-            Object[] query = queriesByWiki.get(wikiName);
-            if (query == null) {
-                query = new Object[] {new StringBuilder(), new ArrayList<>()};
-                queriesByWiki.put(wikiName, query);
-            }
+            Object[] query = queriesByWiki.computeIfAbsent(wikiName,
+                wiki -> new Object[] {new StringBuilder(), new ArrayList<>()});
 
             StringBuilder statement = (StringBuilder) query[0];
             List<Object> parameters = (List<Object>) query[1];
 
             List<String> constraints = extendQuery(entry.getKey(), entry.getValue(), parameters);
             if (!constraints.isEmpty()) {
-                statement.append(statement.length() == 0 ? "where (" : " or (");
+                statement.append(statement.isEmpty() ? "where (" : " or (");
                 statement.append(StringUtils.join(constraints, " and "));
                 statement.append(')');
             }
@@ -370,8 +367,8 @@ public class DocumentSelectionResolver
     {
         Set<DocumentReference> excludedDocumentReferences = new LinkedHashSet<>();
         exclusions.forEach(excludedEntityReference -> {
-            if (excludedEntityReference instanceof DocumentReference) {
-                excludedDocumentReferences.add((DocumentReference) excludedEntityReference);
+            if (excludedEntityReference instanceof DocumentReference documentReference) {
+                excludedDocumentReferences.add(documentReference);
             }
         });
         return excludedDocumentReferences;

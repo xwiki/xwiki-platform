@@ -52,7 +52,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class XWikiExtensionValidatorTest
+class XWikiExtensionValidatorTest
 {
     private static final DocumentReference USER_REFERENCE = new DocumentReference("wiki", "XWiki", "user");
 
@@ -99,7 +99,7 @@ public class XWikiExtensionValidatorTest
     }
 
     @BeforeEach
-    public void beforeEach() throws AccessDeniedException
+    void beforeEach() throws AccessDeniedException
     {
         when(this.resolver.resolve(USER_REFERENCE_STRING, EntityType.DOCUMENT)).thenReturn(USER_REFERENCE);
 
@@ -109,7 +109,7 @@ public class XWikiExtensionValidatorTest
     // Tests
 
     @Test
-    public void checkRightDisabled() throws InstallException
+    void checkRightDisabled() throws InstallException
     {
         assertCheckInstallPass();
 
@@ -129,7 +129,7 @@ public class XWikiExtensionValidatorTest
     }
 
     @Test
-    public void checkRight() throws AccessDeniedException, InstallException
+    void checkRight() throws AccessDeniedException, InstallException
     {
         this.request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS, true);
         this.request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS_USER, true);
@@ -152,7 +152,7 @@ public class XWikiExtensionValidatorTest
     }
 
     @Test
-    public void checkRightOnUserNamespace() throws InstallException, AccessDeniedException
+    void checkRightOnUserNamespace() throws InstallException, AccessDeniedException
     {
         this.request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS, true);
         this.request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS_USER, true);

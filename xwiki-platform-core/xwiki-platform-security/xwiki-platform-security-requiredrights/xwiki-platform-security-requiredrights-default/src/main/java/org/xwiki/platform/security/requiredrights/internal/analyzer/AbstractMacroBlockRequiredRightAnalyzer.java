@@ -153,8 +153,8 @@ public abstract class AbstractMacroBlockRequiredRightAnalyzer
     {
         // Keep whatever metadata was present on the XDOM.
         MetaData metaData = null;
-        if (macroBlock.getRoot() instanceof XDOM) {
-            metaData = new MetaData(((XDOM) macroBlock.getRoot()).getMetaData().getMetaData());
+        if (macroBlock.getRoot() instanceof XDOM xdom) {
+            metaData = new MetaData(xdom.getMetaData().getMetaData());
         }
         MacroTransformationContext transformationContext = getTransformationContext(macroBlock);
         try {
@@ -185,9 +185,8 @@ public abstract class AbstractMacroBlockRequiredRightAnalyzer
                 Block.Axes.ANCESTOR);
 
         if (metaDataBlock != null && metaDataBlock.getMetaData()
-            .getMetaData(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA) instanceof EntityReference) {
-            result = (EntityReference) metaDataBlock.getMetaData()
-                .getMetaData(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA);
+            .getMetaData(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA) instanceof EntityReference entityRef) {
+            result = entityRef;
         } else {
             metaDataBlock = source.getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Block.Axes.ANCESTOR);
             if (metaDataBlock != null) {

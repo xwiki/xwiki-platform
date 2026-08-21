@@ -48,6 +48,7 @@ function initWrapper() {
             },
           },
           changeLayout: changeLayout,
+          hasEditMode: () => false,
         },
       },
       mocks: {

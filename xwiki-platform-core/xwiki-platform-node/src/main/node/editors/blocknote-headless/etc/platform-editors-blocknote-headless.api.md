@@ -5,6 +5,7 @@
 ```ts
 
 import { BlockNoteViewWrapperProps } from '@xwiki/platform-editors-blocknote-react';
+import { BlockType } from '@xwiki/platform-editors-blocknote-react';
 import { Collaboration } from '@xwiki/platform-collaboration-api';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
@@ -14,37 +15,37 @@ import { DefineComponent } from 'vue';
 import { EditorType } from '@xwiki/platform-editors-blocknote-react';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
 import { PublicProps } from 'vue';
-import { UniAst } from '@xwiki/platform-uniast-api';
 
 // @beta (undocumented)
 export const BlocknoteEditor: DefineComponent<    {
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
+editorProps: Omit<BlockNoteViewWrapperProps, "depsContainer" | "content" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
 macros: {
-list: MacroWithUnknownParamsType[];
+list?: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
-editorContent: UniAst | Error;
+editorContent: BlockType[];
 collaboration?: Collaboration;
 depsContainer: Container;
 }, {
-getContent: () => UniAst | Error;
+getContent: () => BlockType[];
 }, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {
 "instant-change": () => any;
-"debounced-change": (content: UniAst) => any;
+"debounced-change": (content: BlockType[]) => any;
 }, string, PublicProps, Readonly<{
-editorProps: Omit<BlockNoteViewWrapperProps, "content" | "macros" | "depsContainer">;
+editorProps: Omit<BlockNoteViewWrapperProps, "depsContainer" | "content" | "linkEditionHandler" | "macroAstToReactJsxConverter" | "macros">;
 macros: {
-list: MacroWithUnknownParamsType[];
+list?: MacroWithUnknownParamsType[];
 ctx: ContextForMacros;
 } | false;
-editorContent: UniAst | Error;
+editorContent: BlockType[];
 collaboration?: Collaboration;
 depsContainer: Container;
 }> & Readonly<{
 "onInstant-change"?: (() => any) | undefined;
-"onDebounced-change"?: ((content: UniAst) => any) | undefined;
+"onDebounced-change"?: ((content: BlockType[]) => any) | undefined;
 }>, {}, {}, {}, {}, string, ComponentProvideOptions, false, {
 'blocknote-container': HTMLDivElement;
+'link-modal-container': HTMLDivElement;
 }, any>;
 
 export { ContextForMacros }

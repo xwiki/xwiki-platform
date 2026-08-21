@@ -412,8 +412,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             Object formvalues = map.get(name);
             if (formvalues != null) {
                 BaseProperty objprop;
-                if (formvalues instanceof String[]) {
-                    objprop = property.fromStringArray(((String[]) formvalues));
+                if (formvalues instanceof String[] stringArray) {
+                    objprop = property.fromStringArray(stringArray);
                 } else if (formvalues instanceof String) {
                     objprop = property.fromString(formvalues.toString());
                 } else {
@@ -515,11 +515,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return false;
         }
 
-        if (!getNameField().equals(bclass.getNameField())) {
-            return false;
-        }
-
-        return true;
+        return getNameField().equals(bclass.getNameField());
     }
 
     public void merge(BaseClass bclass)
@@ -532,21 +528,15 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         super.fromXML(element);
     }
 
-    @Override
-    public void fromXML(String xml) throws XWikiException
-    {
-        super.fromXML(xml);
-    }
-
     public boolean addTextField(String fieldName, String fieldPrettyName, int size)
     {
         if (get(fieldName) == null) {
-            StringClass text_class = new StringClass();
-            text_class.setName(fieldName);
-            text_class.setPrettyName(fieldPrettyName);
-            text_class.setSize(size);
-            text_class.setObject(this);
-            put(fieldName, text_class);
+            StringClass textClass = new StringClass();
+            textClass.setName(fieldName);
+            textClass.setPrettyName(fieldPrettyName);
+            textClass.setSize(size);
+            textClass.setObject(this);
+            put(fieldName, textClass);
 
             return true;
         }
@@ -681,13 +671,13 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addUsersField(String fieldName, String fieldPrettyName, int size, boolean multiSelect)
     {
         if (get(fieldName) == null) {
-            UsersClass users_class = new UsersClass();
-            users_class.setName(fieldName);
-            users_class.setPrettyName(fieldPrettyName);
-            users_class.setSize(size);
-            users_class.setMultiSelect(multiSelect);
-            users_class.setObject(this);
-            put(fieldName, users_class);
+            UsersClass usersClass = new UsersClass();
+            usersClass.setName(fieldName);
+            usersClass.setPrettyName(fieldPrettyName);
+            usersClass.setSize(size);
+            usersClass.setMultiSelect(multiSelect);
+            usersClass.setObject(this);
+            put(fieldName, usersClass);
 
             return true;
         }
@@ -703,13 +693,13 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addLevelsField(String fieldName, String fieldPrettyName, int size)
     {
         if (get(fieldName) == null) {
-            LevelsClass levels_class = new LevelsClass();
-            levels_class.setName(fieldName);
-            levels_class.setPrettyName(fieldPrettyName);
-            levels_class.setSize(size);
-            levels_class.setMultiSelect(true);
-            levels_class.setObject(this);
-            put(fieldName, levels_class);
+            LevelsClass levelsClass = new LevelsClass();
+            levelsClass.setName(fieldName);
+            levelsClass.setPrettyName(fieldPrettyName);
+            levelsClass.setSize(size);
+            levelsClass.setMultiSelect(true);
+            levelsClass.setObject(this);
+            put(fieldName, levelsClass);
 
             return true;
         }
@@ -725,13 +715,13 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addGroupsField(String fieldName, String fieldPrettyName, int size)
     {
         if (get(fieldName) == null) {
-            GroupsClass groups_class = new GroupsClass();
-            groups_class.setName(fieldName);
-            groups_class.setPrettyName(fieldPrettyName);
-            groups_class.setSize(size);
-            groups_class.setMultiSelect(true);
-            groups_class.setObject(this);
-            put(fieldName, groups_class);
+            GroupsClass groupsClass = new GroupsClass();
+            groupsClass.setName(fieldName);
+            groupsClass.setPrettyName(fieldPrettyName);
+            groupsClass.setSize(size);
+            groupsClass.setMultiSelect(true);
+            groupsClass.setObject(this);
+            put(fieldName, groupsClass);
 
             return true;
         }
@@ -821,8 +811,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
         TextAreaClass textAreaClass;
         PropertyInterface field = get(fieldName);
-        if (field instanceof TextAreaClass) {
-            textAreaClass = (TextAreaClass) field;
+        if (field instanceof TextAreaClass existingTextAreaClass) {
+            textAreaClass = existingTextAreaClass;
         } else {
             // Remove the field if it already exist
             if (field != null) {
@@ -947,30 +937,30 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         String freeText, boolean largeStorage)
     {
         if (get(fieldName) == null) {
-            StaticListClass list_class = new StaticListClass();
-            list_class.setName(fieldName);
-            list_class.setPrettyName(fieldPrettyName);
-            list_class.setSize(size);
-            list_class.setMultiSelect(multiSelect);
-            list_class.setRelationalStorage(relationalStorage);
-            list_class.setValues(values);
+            StaticListClass listClass = new StaticListClass();
+            listClass.setName(fieldName);
+            listClass.setPrettyName(fieldPrettyName);
+            listClass.setSize(size);
+            listClass.setMultiSelect(multiSelect);
+            listClass.setRelationalStorage(relationalStorage);
+            listClass.setValues(values);
             if (displayType != null) {
-                list_class.setDisplayType(displayType);
+                listClass.setDisplayType(displayType);
             }
             if (separators != null) {
-                list_class.setSeparators(separators);
-                list_class.setSeparator(separators.substring(0, 1));
+                listClass.setSeparators(separators);
+                listClass.setSeparator(separators.substring(0, 1));
             }
             if (defaultValue != null) {
-                list_class.setDefaultValue(defaultValue);
+                listClass.setDefaultValue(defaultValue);
             }
-            list_class.setFreeText(freeText);
+            listClass.setFreeText(freeText);
             if (!ListClass.FREE_TEXT_FORBIDDEN.equals(freeText)) {
-                list_class.setPicker(true);
+                listClass.setPicker(true);
             }
-            list_class.setLargeStorage(largeStorage);
-            list_class.setObject(this);
-            put(fieldName, list_class);
+            listClass.setLargeStorage(largeStorage);
+            listClass.setObject(this);
+            put(fieldName, listClass);
 
             return true;
         }
@@ -1008,13 +998,13 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addNumberField(String fieldName, String fieldPrettyName, int size, String type)
     {
         if (get(fieldName) == null) {
-            NumberClass number_class = new NumberClass();
-            number_class.setName(fieldName);
-            number_class.setPrettyName(fieldPrettyName);
-            number_class.setSize(size);
-            number_class.setNumberType(type);
-            number_class.setObject(this);
-            put(fieldName, number_class);
+            NumberClass numberClass = new NumberClass();
+            numberClass.setName(fieldName);
+            numberClass.setPrettyName(fieldPrettyName);
+            numberClass.setSize(size);
+            numberClass.setNumberType(type);
+            numberClass.setObject(this);
+            put(fieldName, numberClass);
 
             return true;
         }
@@ -1035,15 +1025,15 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addDateField(String fieldName, String fieldPrettyName, String dformat, int emptyIsToday)
     {
         if (get(fieldName) == null) {
-            DateClass date_class = new DateClass();
-            date_class.setName(fieldName);
-            date_class.setPrettyName(fieldPrettyName);
+            DateClass dateClass = new DateClass();
+            dateClass.setName(fieldName);
+            dateClass.setPrettyName(fieldPrettyName);
             if (dformat != null) {
-                date_class.setDateFormat(dformat);
+                dateClass.setDateFormat(dformat);
             }
-            date_class.setObject(this);
-            date_class.setEmptyIsToday(emptyIsToday);
-            put(fieldName, date_class);
+            dateClass.setObject(this);
+            dateClass.setEmptyIsToday(emptyIsToday);
+            put(fieldName, dateClass);
 
             return true;
         }
@@ -1068,15 +1058,15 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         boolean relationalStorage, String sql)
     {
         if (get(fieldName) == null) {
-            DBListClass list_class = new DBListClass();
-            list_class.setName(fieldName);
-            list_class.setPrettyName(fieldPrettyName);
-            list_class.setSize(size);
-            list_class.setMultiSelect(multiSelect);
-            list_class.setRelationalStorage(relationalStorage);
-            list_class.setSql(sql);
-            list_class.setObject(this);
-            put(fieldName, list_class);
+            DBListClass listClass = new DBListClass();
+            listClass.setName(fieldName);
+            listClass.setPrettyName(fieldPrettyName);
+            listClass.setSize(size);
+            listClass.setMultiSelect(multiSelect);
+            listClass.setRelationalStorage(relationalStorage);
+            listClass.setSql(sql);
+            listClass.setObject(this);
+            put(fieldName, listClass);
 
             return true;
         }
@@ -1102,15 +1092,15 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         boolean relationalStorage, String sql)
     {
         if (get(fieldName) == null) {
-            DBTreeListClass list_class = new DBTreeListClass();
-            list_class.setName(fieldName);
-            list_class.setPrettyName(fieldPrettyName);
-            list_class.setSize(size);
-            list_class.setMultiSelect(multiSelect);
-            list_class.setRelationalStorage(relationalStorage);
-            list_class.setSql(sql);
-            list_class.setObject(this);
-            put(fieldName, list_class);
+            DBTreeListClass listClass = new DBTreeListClass();
+            listClass.setName(fieldName);
+            listClass.setPrettyName(fieldPrettyName);
+            listClass.setSize(size);
+            listClass.setMultiSelect(multiSelect);
+            listClass.setRelationalStorage(relationalStorage);
+            listClass.setSql(sql);
+            listClass.setObject(this);
+            put(fieldName, listClass);
 
             return true;
         }
@@ -1260,7 +1250,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean isCustomMappingValid(String custommapping, XWikiContext context) throws XWikiException
     {
-        if ((custommapping != null) && (custommapping.trim().length() > 0)) {
+        if ((custommapping != null) && (!custommapping.trim().isEmpty())) {
             return context.getWiki().getStore().isCustomMappingValid(this, custommapping, context);
         } else {
             return true;
@@ -1270,7 +1260,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public List<String> getCustomMappingPropertyList(XWikiContext context)
     {
         String custommapping1 = getCustomMapping();
-        if ((custommapping1 != null) && (custommapping1.trim().length() > 0)) {
+        if ((custommapping1 != null) && (!custommapping1.trim().isEmpty())) {
             return context.getWiki().getStore().getCustomMappingPropertyList(this);
         } else {
             return new ArrayList<>();
@@ -1305,14 +1295,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      */
     public BaseObject newCustomClassInstance(boolean fallback) throws XWikiException
     {
-        String customClass = getCustomClass();
+        String customClassName = getCustomClass();
 
         try {
-            if (StringUtils.isEmpty(customClass)) {
+            if (StringUtils.isEmpty(customClassName)) {
                 return new BaseObject();
             } else {
                 return (BaseObject) Class
-                    .forName(customClass, true, Thread.currentThread().getContextClassLoader()).newInstance();
+                    .forName(customClassName, true, Thread.currentThread().getContextClassLoader()).newInstance();
             }
         } catch (Exception e) {
             if (fallback) {
@@ -1321,9 +1311,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
                 return new BaseObject();
             } else {
-                Object[] args = { customClass };
+                Object[] args = { customClassName };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
-                    XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}", e,
+                    XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instantiate custom class {0}", e,
                     args);
             }
         }

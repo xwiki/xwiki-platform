@@ -71,6 +71,9 @@ public class XWiki extends Api
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
 
+    /** Value returned when Groovy parsing is denied because of missing programming rights. */
+    private static final String GROOVY_MISSINGRIGHTS = "groovy_missingrights";
+
     /** The internal object wrapped by this API. */
     private com.xpn.xwiki.XWiki xwiki;
 
@@ -100,8 +103,6 @@ public class XWiki extends Api
      */
     private EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer;
 
-    private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
-
     private DocumentRevisionProvider documentRevisionProvider;
 
     private HQLStatementValidator hqlValidator;
@@ -129,16 +130,6 @@ public class XWiki extends Api
         }
 
         return this.currentMixedDocumentReferenceResolver;
-    }
-
-    private DocumentReferenceResolver<EntityReference> getCurrentgetdocumentResolver()
-    {
-        if (this.currentgetdocumentResolver == null) {
-            this.currentgetdocumentResolver =
-                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
-        }
-
-        return this.currentgetdocumentResolver;
     }
 
     private DocumentReferenceResolver<String> getDefaultDocumentReferenceResolver()
@@ -494,7 +485,7 @@ public class XWiki extends Api
             }
             return result;
         } catch (Exception ex) {
-            LOGGER.warn("Failed to retrieve deleted attachments", ex);
+            LOGGER.warn("Failed to retrieve the deleted attachments of document [{}]", docName, ex);
         }
         return Collections.emptyList();
     }
@@ -525,7 +516,8 @@ public class XWiki extends Api
             }
             return result;
         } catch (Exception ex) {
-            LOGGER.warn("Failed to retrieve deleted attachments", ex);
+            LOGGER.warn("Failed to retrieve the deleted attachments named [{}] of document [{}]",
+                filename, docName, ex);
         }
         return Collections.emptyList();
     }
@@ -544,7 +536,7 @@ public class XWiki extends Api
                 return new DeletedAttachment(attachment, this.context);
             }
         } catch (Exception ex) {
-            LOGGER.warn("Failed to retrieve deleted attachment", ex);
+            LOGGER.warn("Failed to retrieve the deleted attachment with id [{}]", id, ex);
         }
         return null;
     }
@@ -675,7 +667,7 @@ public class XWiki extends Api
             LOGGER.info("Access denied for loading revision [{}] of document [{}]: [{}]", revision, reference,
                 ExceptionUtils.getRootCauseMessage(e));
         } catch (Exception e) {
-            LOGGER.error("Failed to access revision [{}] of document {}", revision, reference, e);
+            LOGGER.error("Failed to access revision [{}] of document [{}]", revision, reference, e);
         }
 
         return null;
@@ -811,7 +803,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API allowing to search for documents allowing to have mutliple entries per locale
+     * API allowing to search for documents allowing to have multiple entries per locale
      *
      * @param wheresql query to use similar to searchDocuments(wheresql)
      * @param distinctbylocale true to return multiple rows per locale
@@ -999,12 +991,11 @@ public class XWiki extends Api
         if (docs != null) {
             for (java.lang.Object obj : docs) {
                 try {
-                    if (obj instanceof XWikiDocument) {
-                        XWikiDocument doc = (XWikiDocument) obj;
+                    if (obj instanceof XWikiDocument doc) {
                         Document wrappedDoc = doc.newDocument(getXWikiContext());
                         result.add(wrappedDoc);
-                    } else if (obj instanceof Document) {
-                        result.add((Document) obj);
+                    } else if (obj instanceof Document document) {
+                        result.add(document);
                     } else if (obj instanceof String) {
                         Document doc = getDocument(obj.toString());
                         if (doc != null) {
@@ -1585,15 +1576,15 @@ public class XWiki extends Api
      * @param xwikiname user to send the email to
      * @param password password to put in the mail
      * @param email email to send to
-     * @param add_message Additional message to send to the user
+     * @param addMessage Additional message to send to the user
      * @param contentfield Preference field to use as a mail template
      * @throws XWikiException if the mail was not send successfully
      */
-    public void sendConfirmationMail(String xwikiname, String password, String email, String add_message,
+    public void sendConfirmationMail(String xwikiname, String password, String email, String addMessage,
         String contentfield) throws XWikiException
     {
         if (hasProgrammingRights()) {
-            this.xwiki.sendConfirmationEmail(xwikiname, password, email, add_message, contentfield, getXWikiContext());
+            this.xwiki.sendConfirmationEmail(xwikiname, password, email, addMessage, contentfield, getXWikiContext());
         }
     }
 
@@ -1659,7 +1650,7 @@ public class XWiki extends Api
      *
      * @param docname source document
      * @param targetdocname target document
-     * @return true if the copy was sucessfull
+     * @return true if the copy was successful
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname) throws XWikiException
@@ -1673,7 +1664,7 @@ public class XWiki extends Api
      * @param docname source document
      * @param targetdocname target document
      * @param wikilocale locale to copy
-     * @return true if the copy was sucessfull
+     * @return true if the copy was successful
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname, String wikilocale) throws XWikiException
@@ -1688,7 +1679,7 @@ public class XWiki extends Api
      * @param sourceWiki source wiki
      * @param targetWiki target wiki
      * @param wikilocale locale to copy
-     * @return true if the copy was sucessfull
+     * @return true if the copy was successful
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String sourceWiki, String targetWiki, String wikilocale)
@@ -1706,7 +1697,7 @@ public class XWiki extends Api
      * @param targetWiki target wiki
      * @param wikilocale locale to copy
      * @param reset true to reset versions
-     * @return true if the copy was sucessfull
+     * @return true if the copy was successful
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
@@ -1726,7 +1717,7 @@ public class XWiki extends Api
      * @param wikilocale locale to copy
      * @param reset true to reset versions
      * @param force true to overwrite the previous document
-     * @return true if the copy was sucessfull
+     * @return true if the copy was successful
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
@@ -1756,7 +1747,7 @@ public class XWiki extends Api
      * @param wikilocale locale to copy
      * @param resetHistory {@code true} to reset versions
      * @param overwrite {@code true} to overwrite the previous document
-     * @return {@code true} if the copy was sucessful
+     * @return {@code true} if the copy was successful
      * @throws XWikiException if the document was not copied properly
      * @since 3.0M3
      */
@@ -1853,7 +1844,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to execute a form in the context of an including topic, optionnaly surrounding the content with {pre}{/pre}
+     * API to execute a form in the context of an including topic, optionally surrounding the content with {pre}{/pre}
      * to avoid future wiki rendering The rendering is evaluated in the context of the including topic All velocity
      * variables are the one of the including topic This api is usually called using #includeForm in a page, which
      * modifies the behavior of "Edit this page" button to direct for Form mode (inline).
@@ -2173,7 +2164,7 @@ public class XWiki extends Api
 
     /**
      * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
-     * wiki where the user is registered. The formating is done using the format parameter which can contain velocity
+     * wiki where the user is registered. The formatting is done using the format parameter which can contain velocity
      * scripting and access all properties of the User profile using variables ($first_name $last_name $email $city)
      *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
@@ -2203,7 +2194,7 @@ public class XWiki extends Api
 
     /**
      * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
-     * local wiki even if the user is registered on a different wiki. The formating is done using the format parameter
+     * local wiki even if the user is registered on a different wiki. The formatting is done using the format parameter
      * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
      * $last_name $email $city)
      *
@@ -2237,7 +2228,7 @@ public class XWiki extends Api
     /**
      * API to retrieve a text representing the user with a custom view With the link param set to false it will not link
      * to the user page. With the link param set to true, the link will link to the page on the wiki where the user was
-     * registered. The formating is done using the format parameter which can contain velocity scripting and access all
+     * registered. The formatting is done using the format parameter which can contain velocity scripting and access all
      * properties of the User profile using variables ($first_name $last_name $email $city)
      *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
@@ -2269,10 +2260,11 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view. The formating is done using the format parameter
-     * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
-     * $last_name $email $city). With the link param set to false it will not link to the user page. With the link param
-     * set to true, the link will link to the page on the local wiki even if the user is registered on a different wiki.
+     * API to retrieve a text representing the user with a custom view. The formatting is done using the format
+     * parameter which can contain velocity scripting and access all properties of the User profile using variables
+     * ($first_name $last_name $email $city). With the link param set to false it will not link to the user page. With
+     * the link param set to true, the link will link to the page on the local wiki even if the user is registered on
+     * a different wiki.
      *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -2315,7 +2307,7 @@ public class XWiki extends Api
      * 'dateformat' parameter of the XWiki Preferences
      *
      * @param date date object to format
-     * @return A string with the date formating from the default Wiki setting
+     * @return A string with the date formatting from the default Wiki setting
      */
     public String formatDate(Date date)
     {
@@ -2411,7 +2403,7 @@ public class XWiki extends Api
         try {
             return this.xwiki.getURLContent(surl, username, password, this.context);
         } catch (Exception e) {
-            LOGGER.warn("Failed to retrieve content from [" + surl + "]", e);
+            LOGGER.warn("Failed to retrieve content from [{}]", surl, e);
             return "";
         }
     }
@@ -2433,7 +2425,7 @@ public class XWiki extends Api
         try {
             return this.xwiki.getURLContent(surl, this.context);
         } catch (Exception e) {
-            LOGGER.warn("Failed to retrieve content from [" + surl + "]", e);
+            LOGGER.warn("Failed to retrieve content from [{}]", surl, e);
             return "";
         }
     }
@@ -2567,7 +2559,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledge API to regenerate the links/backlinks table Normally links and backlinks are stored when a page is
+     * Privilege API to regenerate the links/backlinks table Normally links and backlinks are stored when a page is
      * modified This function will regenerate all the backlinks This function can be long to run
      *
      * @throws XWikiException exception if the generation fails
@@ -2686,7 +2678,7 @@ public class XWiki extends Api
         if (hasProgrammingRights()) {
             return this.xwiki.parseGroovyFromString(script, getXWikiContext());
         }
-        return "groovy_missingrights";
+        return GROOVY_MISSINGRIGHTS;
     }
 
     /**
@@ -2703,15 +2695,15 @@ public class XWiki extends Api
         if (this.xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext())) {
             return this.xwiki.parseGroovyFromString(doc.getContent(), jarWikiPage, getXWikiContext());
         }
-        return "groovy_missingrights";
+        return GROOVY_MISSINGRIGHTS;
     }
 
     /**
-     * Privileged API to retrieve an object instanciated from groovy code in a String Groovy scripts compilation is
+     * Privileged API to retrieve an object instantiated from groovy code in a String Groovy scripts compilation is
      * cached
      *
      * @param fullname // script containing a Groovy class definition (public class MyClass { ... })
-     * @return An object instanciating this class
+     * @return An object instantiating this class
      * @throws XWikiException
      */
     public java.lang.Object parseGroovyFromPage(String fullname) throws XWikiException
@@ -2720,7 +2712,7 @@ public class XWiki extends Api
         if (this.xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext())) {
             return this.xwiki.parseGroovyFromString(doc.getContent(), getXWikiContext());
         }
-        return "groovy_missingrights";
+        return GROOVY_MISSINGRIGHTS;
     }
 
     /**
@@ -2896,9 +2888,9 @@ public class XWiki extends Api
     }
 
     /**
-     * Check authentication from request and set according persitent login information If it fails user is unlogged
+     * Check authentication from request and set according persistent login information If it fails user is unlogged
      *
-     * @return null if failed, non null XWikiUser if sucess
+     * @return null if failed, non null XWikiUser if success
      * @throws XWikiException
      */
     public XWikiUser checkAuth() throws XWikiException
@@ -2907,13 +2899,13 @@ public class XWiki extends Api
     }
 
     /**
-     * Check authentication from username and password and set according persitent login information If it fails user is
-     * unlogged
+     * Check authentication from username and password and set according persistent login information If it fails user
+     * is unlogged
      *
      * @param username username to check
      * @param password password to check
-     * @param rememberme "1" if you want to remember the login accross navigator restart
-     * @return null if failed, non null XWikiUser if sucess
+     * @param rememberme "1" if you want to remember the login across navigator restart
+     * @return null if failed, non null XWikiUser if success
      * @throws XWikiException
      */
     public XWikiUser checkAuth(String username, String password, String rememberme) throws XWikiException
@@ -3015,7 +3007,7 @@ public class XWiki extends Api
                         break;
                     }
                 } else {
-                    // TODO: improve version comparaison since it does not work when comparing 2.0 and 10.0 for example.
+                    // TODO: improve version comparison since it does not work when comparing 2.0 and 10.0 for example.
                     // We
                     // should have a Version which implements Comparable like we have SyntaxId in Syntax
                     if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)

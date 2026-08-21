@@ -275,7 +275,6 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
                     return compareReferenceNullSafe(userOrGroup, reference.getOriginalDocumentReference());
                 }
             });
-            // when(mockedRule.match(any(GroupSecurityReference.class))).thenReturn(false);
         } else {
             when(mockedRule.match(any(GroupSecurityReference.class))).thenAnswer(new Answer<Boolean>()
             {
@@ -286,7 +285,6 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
                     return compareReferenceNullSafe(userOrGroup, reference.getOriginalDocumentReference());
                 }
             });
-            // when(mockedRule.match(any(UserSecurityReference.class))).thenReturn(false);
         }
         return mockedRule;
     }
@@ -734,6 +732,99 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             getWiki("wikiGroupUserDenyAllowNoAdmin"));
     }
 
+    /**
+     * Check that rights granted to a group at space level take precedence over a right denied at wiki level to a user
+     * member of that group. Contrary to {@link #tieResolutionPolicy()}, where the user rule wins over the group rule
+     * because both are defined at the same level, here the group rule wins because it is defined at a lower level.
+     */
+    @Test
+    void groupRightsAtSpaceLevelVersusUserDenyAtWikiLevel() throws Exception
+    {
+        initialiseWikiMock("groupRightsAtSpaceLevelVersusUserDenyAtWikiLevel");
+
+        // Where no lower level rule grants the edit right back, the wiki level deny applies to userA. The other
+        // rights are left untouched.
+        assertAccessTrue("userA should have view access on a document of a space without rules", VIEW,
+            getXUser("userA"), getXDoc("any document", "any space"));
+        assertAccessTrue("userA should have comment access on a document of a space without rules", COMMENT,
+            getXUser("userA"), getXDoc("any document", "any space"));
+        assertAccessFalse("userA should not have edit access on a document of a space without rules", EDIT,
+            getXUser("userA"), getXDoc("any document", "any space"));
+
+        // The space level rules granted to groupA take precedence over the wiki level deny for userA.
+        assertAccessTrue("userA should have view access on a document of the space allowed to its group", VIEW,
+            getXUser("userA"), getXDoc("any document", "spaceAllowGroupA"));
+        assertAccessTrue("userA should have comment access on a document of the space allowed to its group", COMMENT,
+            getXUser("userA"), getXDoc("any document", "spaceAllowGroupA"));
+        assertAccessTrue("userA should have edit access on a document of the space allowed to its group", EDIT,
+            getXUser("userA"), getXDoc("any document", "spaceAllowGroupA"));
+
+        // Granting the rights to groupA at space level restricts them to that group: userB, which is not a member,
+        // loses them even though no rule denies them to it.
+        assertAccessTrue("userB should have edit access on a document of a space without rules", EDIT,
+            getXUser("userB"), getXDoc("any document", "any space"));
+        assertAccessFalse("userB should not have edit access on a document of the space allowed to groupA", EDIT,
+            getXUser("userB"), getXDoc("any document", "spaceAllowGroupA"));
+    }
+
+    /**
+     * Check that denying the edit right to a user on a document, typically from the page administration, takes that
+     * right away from that user on that document only, leaving the other rights of that user and the other users
+     * untouched.
+     */
+    @Test
+    void userDenyEditAtDocumentLevel() throws Exception
+    {
+        initialiseWikiMock("userDenyEditAtDocumentLevel");
+
+        // Without any rule, userA can edit the documents of the wiki.
+        assertAccessTrue("userA should have edit access on a document without rules", EDIT, getXUser("userA"),
+            getXDoc("any document", "space"));
+
+        // The document level deny takes the edit right away from userA on that document...
+        assertAccessFalse("userA should not have edit access on the document denying it", EDIT, getXUser("userA"),
+            getXDoc("docDenyEditToUserA", "space"));
+
+        // ...without touching its other rights.
+        assertAccessTrue("userA should have view access on the document denying it the edit right", VIEW,
+            getXUser("userA"), getXDoc("docDenyEditToUserA", "space"));
+        assertAccessTrue("userA should have comment access on the document denying it the edit right", COMMENT,
+            getXUser("userA"), getXDoc("docDenyEditToUserA", "space"));
+
+        // The deny only targets userA: userB keeps the edit right on that document.
+        assertAccessTrue("userB should have edit access on the document denying the edit right to userA", EDIT,
+            getXUser("userB"), getXDoc("docDenyEditToUserA", "space"));
+    }
+
+    /**
+     * Check that the rules set on a document, typically by its creator, cannot take a right away from a user having
+     * the admin right at wiki level: the admin right implies the view right and, contrary to the view right itself, it
+     * is not overridden by the rules defined at a lower level.
+     */
+    @Test
+    void documentDenyVersusAdminRightAtWikiLevel() throws Exception
+    {
+        initialiseWikiMock("documentDenyVersusAdminRightAtWikiLevel");
+
+        // The document level deny takes the view right away from userB, which is a simple user...
+        assertAccessTrue("userB should have view access on a document of a space without rules", VIEW,
+            getXUser("userB"), getXDoc("any document", "any space"));
+        assertAccessFalse("userB should not have view access on the document denying it", VIEW,
+            getXUser("userB"), getXDoc("docDenyingView", "space"));
+
+        // ...but not from userAdmin, whose admin right at wiki level implies the view right.
+        assertAccessTrue("userAdmin should have view access on the document denying it", VIEW,
+            getXUser("userAdmin"), getXDoc("docDenyingView", "space"));
+
+        // Restricting the view right to the creator of the document doesn't lock userAdmin out either.
+        assertAccessTrue("userA should have view access on the document it created", VIEW,
+            getXUser("userA"), getXDoc("docAllowingCreatorOnly", "space"));
+        assertAccessFalse("userB should not have view access on the document allowing view to userA only", VIEW,
+            getXUser("userB"), getXDoc("docAllowingCreatorOnly", "space"));
+        assertAccessTrue("userAdmin should have view access on the document allowing view to userA only", VIEW,
+            getXUser("userAdmin"), getXDoc("docAllowingCreatorOnly", "space"));
+    }
+
     @Test
     void documentCreator() throws Exception
     {
@@ -747,6 +838,35 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
             getXDoc("userAdoc", "space"));
         assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userB"),
             getXDoc("userBdoc", "space"));
+    }
+
+    /**
+     * Check that denying the comment right to a user on a document, typically from the page administration, takes that
+     * right away from that user on that document only, leaving the other rights of that user and the other users
+     * untouched. In particular, the edit right, which the user keeps, doesn't imply the comment right.
+     */
+    @Test
+    void userDenyCommentAtDocumentLevel() throws Exception
+    {
+        initialiseWikiMock("userDenyCommentAtDocumentLevel");
+
+        // Without any rule, userA can comment the documents of the wiki.
+        assertAccessTrue("userA should have comment access on a document without rules", COMMENT, getXUser("userA"),
+            getXDoc("any document", "space"));
+
+        // The document level deny takes the comment right away from userA on that document...
+        assertAccessFalse("userA should not have comment access on the document denying it", COMMENT,
+            getXUser("userA"), getXDoc("docDenyCommentToUserA", "space"));
+
+        // ...without touching its other rights, the edit right included.
+        assertAccessTrue("userA should have view access on the document denying it the comment right", VIEW,
+            getXUser("userA"), getXDoc("docDenyCommentToUserA", "space"));
+        assertAccessTrue("userA should have edit access on the document denying it the comment right", EDIT,
+            getXUser("userA"), getXDoc("docDenyCommentToUserA", "space"));
+
+        // The deny only targets userA: userB keeps the comment right on that document.
+        assertAccessTrue("userB should have comment access on the document denying the comment right to userA",
+            COMMENT, getXUser("userB"), getXDoc("docDenyCommentToUserA", "space"));
     }
 
     @Test
@@ -840,6 +960,35 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
         securityCache.remove(subwikiGroupC);
         assertNull(securityCache.get(userA, docC));
         assertNotNull(securityCache.get(userA));
+    }
+
+    /**
+     * Check that denying the edit right to a group on a document, typically from the page administration, takes that
+     * right away from the members of that group on that document only, leaving their other rights and the users which
+     * are not members of that group untouched.
+     */
+    @Test
+    void groupDenyEditAtDocumentLevel() throws Exception
+    {
+        initialiseWikiMock("groupDenyEditAtDocumentLevel");
+
+        // Without any rule, userA, a member of groupA, can edit the documents of the wiki.
+        assertAccessTrue("userA should have edit access on a document without rules", EDIT, getXUser("userA"),
+            getXDoc("any document", "space"));
+
+        // The document level deny takes the edit right away from userA, as a member of groupA, on that document...
+        assertAccessFalse("userA should not have edit access on the document denying it to its group", EDIT,
+            getXUser("userA"), getXDoc("docDenyEditToGroupA", "space"));
+
+        // ...without touching its other rights.
+        assertAccessTrue("userA should have view access on the document denying its group the edit right", VIEW,
+            getXUser("userA"), getXDoc("docDenyEditToGroupA", "space"));
+        assertAccessTrue("userA should have comment access on the document denying its group the edit right", COMMENT,
+            getXUser("userA"), getXDoc("docDenyEditToGroupA", "space"));
+
+        // The deny only targets the members of groupA: userB keeps the edit right on that document.
+        assertAccessTrue("userB should have edit access on the document denying the edit right to groupA", EDIT,
+            getXUser("userB"), getXDoc("docDenyEditToGroupA", "space"));
     }
 
     @Test

@@ -33,7 +33,6 @@
 @import "breadcrumbs";
 @import "drawer";
 @import "edit";
-@import "figure";
 @import "forms";
 @import "general";
 @import "grid";

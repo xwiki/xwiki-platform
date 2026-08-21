@@ -1056,24 +1056,24 @@ function BrowserDetect() {
     var ua = navigator.userAgent.toLowerCase();
 
     // browser engine name
-    this.isGecko       = (ua.indexOf('gecko') != -1 && ua.indexOf('safari') == -1);
-    this.isAppleWebKit = (ua.indexOf('applewebkit') != -1);
+    this.isGecko       = ua.includes('gecko') && !ua.includes('safari');
+    this.isAppleWebKit = ua.includes('applewebkit');
 
     // browser name
-    this.isKonqueror   = (ua.indexOf('konqueror') != -1);
-    this.isSafari      = (ua.indexOf('safari') != - 1);
-    this.isOmniweb     = (ua.indexOf('omniweb') != - 1);
-    this.isOpera       = (ua.indexOf('opera') != -1);
-    this.isIcab        = (ua.indexOf('icab') != -1);
-    this.isAol         = (ua.indexOf('aol') != -1);
-    this.isIE          = (ua.indexOf('msie') != -1 && !this.isOpera && (ua.indexOf('webtv') == -1) );
+    this.isKonqueror   = ua.includes('konqueror');
+    this.isSafari      = ua.includes('safari');
+    this.isOmniweb     = ua.includes('omniweb');
+    this.isOpera       = ua.includes('opera');
+    this.isIcab        = ua.includes('icab');
+    this.isAol         = ua.includes('aol');
+    this.isIE          = ua.includes('msie') && !this.isOpera && !ua.includes('webtv');
     this.isMozilla     = (this.isGecko && ua.indexOf('gecko/') + 14 == ua.length);
-    this.isFirefox     = (ua.indexOf('firefox/') != -1 || ua.indexOf('firebird/') != -1);
-    this.isNS          = ( (this.isGecko) ? (ua.indexOf('netscape') != -1) : ( (ua.indexOf('mozilla') != -1) && !this.isOpera && !this.isSafari && (ua.indexOf('spoofer') == -1) && (ua.indexOf('compatible') == -1) && (ua.indexOf('webtv') == -1) && (ua.indexOf('hotjava') == -1) ) );
+    this.isFirefox     = ua.includes('firefox/') || ua.includes('firebird/');
+    this.isNS          = this.isGecko ? ua.includes('netscape') : (ua.includes('mozilla') && !this.isOpera && !this.isSafari && !ua.includes('spoofer') && !ua.includes('compatible') && !ua.includes('webtv') && !ua.includes('hotjava'));
 
     // spoofing and compatible browsers
-    this.isIECompatible = ( (ua.indexOf('msie') != -1) && !this.isIE);
-    this.isNSCompatible = ( (ua.indexOf('mozilla') != -1) && !this.isNS && !this.isMozilla);
+    this.isIECompatible = ua.includes('msie') && !this.isIE;
+    this.isNSCompatible = ua.includes('mozilla') && !this.isNS && !this.isMozilla;
 
     // rendering engine versions
     this.geckoVersion = ( (this.isGecko) ? ua.substring( (ua.lastIndexOf('gecko/') + 6), (ua.lastIndexOf('gecko/') + 14) ) : -1 );
@@ -1119,11 +1119,11 @@ function BrowserDetect() {
     this.mode = document.compatMode ? document.compatMode : 'BackCompat';
 
     // platform
-    this.isWin    = (ua.indexOf('win') != -1);
-    this.isWin32  = (this.isWin && ( ua.indexOf('95') != -1 || ua.indexOf('98') != -1 || ua.indexOf('nt') != -1 || ua.indexOf('win32') != -1 || ua.indexOf('32bit') != -1 || ua.indexOf('xp') != -1) );
-    this.isMac    = (ua.indexOf('mac') != -1);
-    this.isUnix   = (ua.indexOf('unix') != -1 || ua.indexOf('sunos') != -1 || ua.indexOf('bsd') != -1 || ua.indexOf('x11') != -1);
-    this.isLinux  = (ua.indexOf('linux') != -1);
+    this.isWin    = ua.includes('win');
+    this.isWin32  = this.isWin && (ua.includes('95') || ua.includes('98') || ua.includes('nt') || ua.includes('win32') || ua.includes('32bit') || ua.includes('xp'));
+    this.isMac    = ua.includes('mac');
+    this.isUnix   = ua.includes('unix') || ua.includes('sunos') || ua.includes('bsd') || ua.includes('x11');
+    this.isLinux  = ua.includes('linux');
 
     // specific browser shortcuts
     this.isNS4x = (this.isNS && this.versionMajor == 4);

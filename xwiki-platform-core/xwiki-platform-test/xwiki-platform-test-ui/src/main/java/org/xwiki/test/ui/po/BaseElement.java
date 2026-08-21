@@ -112,8 +112,28 @@ public class BaseElement
     }
 
     /**
+     * @since 18.7.0RC1
+     */
+    public void waitForNotificationInfoMessage(String message)
+    {
+        waitForNotificationMessage("info", message);
+    }
+
+    /**
+     * Confirms a {@code XWiki.widgets.ConfirmationBox} dialog by clicking its "Yes" button.
+     *
+     * @since 18.7.0RC1
+     */
+    public void confirmAction()
+    {
+        By yesButtonLocator = By.cssSelector(".xdialog-box-confirmation .buttons input");
+        getDriver().waitUntilElementIsVisible(yesButtonLocator);
+        getDriver().findElement(yesButtonLocator).click();
+    }
+
+    /**
      * Waits for a notification message of the specified type with the given message to be displayed.
-     * 
+     *
      * @param level the notification type (one of error, warning, done)
      * @param message the notification message
      * @see 4.3

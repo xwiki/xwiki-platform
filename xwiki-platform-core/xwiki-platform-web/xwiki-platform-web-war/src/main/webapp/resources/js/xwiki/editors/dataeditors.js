@@ -416,6 +416,10 @@
             }
           });
         });
+
+        // The add button is disabled in the template as adding an object requires JavaScript. Now that the click
+        // handler performing the addition is bound, the button can be enabled.
+        element.find('input.xobject-add-control').prop('disabled', false);
       }
 
       // ------------------------------------
@@ -529,6 +533,8 @@
             let proptype = $('#proptype').val();
             item.blur();
             event.stopPropagation();
+            // The property is added through AJAX below, submitting the form would leave the class editor.
+            event.preventDefault();
             if (!item.prop('disabled') && propname !== '' && proptype !== '') {
               let editURL = self.editedDocument.getURL(xm.action, Object.toQueryString({
                 xpage: 'editclass',
@@ -563,6 +569,10 @@
               });
             }
           });
+
+          // The add button is disabled in the template as adding a property requires JavaScript. Now that the click
+          // handler performing the addition is bound, the button can be enabled.
+          item.prop('disabled', false);
         });
       }
 

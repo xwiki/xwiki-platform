@@ -131,11 +131,12 @@ class NotificationsIT
     }
 
     @AfterEach
-    public void tearDown(TestUtils setup)
+    public void tearDown(TestUtils setup) throws Exception
     {
-        setup.loginAsSuperAdmin();
-        setup.deletePage("XWiki", FIRST_USER_NAME);
-        setup.deletePage("XWiki", SECOND_USER_NAME);
+        // Clean up through REST: it's faster.
+        setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+        setup.rest().deletePage("XWiki", FIRST_USER_NAME);
+        setup.rest().deletePage("XWiki", SECOND_USER_NAME);
         setup.forceGuestUser();
     }
 
@@ -417,9 +418,11 @@ class NotificationsIT
             NotificationsTrayPage tray = new NotificationsTrayPage();
             assertEquals("This is a test template", tray.getNotificationRawContent(0));
         } finally {
-            setup.loginAsSuperAdmin();
-            setup.deletePage(testReference.getLastSpaceReference().getName(), "NotificationDisplayerClassTest");
-            setup.deletePage(testReference.getLastSpaceReference().getName(), "ARandomPageThatShouldBeModified");
+            // Clean up through REST so that the browser stays on the page on which the test failed, which makes the
+            // screenshot taken on failure useful.
+            setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+            setup.rest().deletePage(testReference.getLastSpaceReference().getName(), "NotificationDisplayerClassTest");
+            setup.rest().deletePage(testReference.getLastSpaceReference().getName(), "ARandomPageThatShouldBeModified");
         }
     }
 

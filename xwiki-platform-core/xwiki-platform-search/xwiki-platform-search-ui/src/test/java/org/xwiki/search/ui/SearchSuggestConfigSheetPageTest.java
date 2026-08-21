@@ -106,7 +106,7 @@ class SearchSuggestConfigSheetPageTest extends PageTest
         // Minimal icon environment: only IconManager#renderHTML() is actually exercised by these tests.
         this.componentManager.registerMockComponent(IconSetManager.class);
         this.componentManager.registerMockComponent(IconRenderer.class);
-        IconManager iconManager = this.componentManager.registerMockComponent(IconManager.class);
+        this.componentManager.registerMockComponent(IconManager.class);
 
         this.xwiki.initializeMandatoryDocuments(this.context);
         loadPage(SEARCH_SUGGEST_SOURCE_CLASS);
@@ -150,8 +150,14 @@ class SearchSuggestConfigSheetPageTest extends PageTest
     {
         when(this.oldcore.getMockDocumentAuthorizationManager()
             .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE, TEST_PAGE)).thenReturn(false);
-        
-        this.testPageDocument.getXObject(SEARCH_SUGGEST_SOURCE_CLASS).setStringValue("icon", "icon:user");
+
+        // Add a second source using an icon-theme icon, next to the legacy one created in setUp(), so both the
+        // legacy and the icon-theme rendering paths are checked in the same render.
+        BaseObject iconThemeSource = this.testPageDocument.newXObject(SEARCH_SUGGEST_SOURCE_CLASS, this.context);
+        iconThemeSource.setStringValue("name", this.testString);
+        iconThemeSource.setStringValue("icon", "icon:user");
+        iconThemeSource.setStringValue("resultsNumber", this.testString);
+        iconThemeSource.setStringValue("engine", this.testString);
         this.xwiki.saveDocument(this.testPageDocument, this.context);
         String iconHTML = "<span class=\"fa fa-user\"></span>";
         IconManager iconManager = this.componentManager.getInstance(IconManager.class);
@@ -160,23 +166,29 @@ class SearchSuggestConfigSheetPageTest extends PageTest
         this.context.setDoc(this.testPageDocument);
         Document result = renderHTMLPage(this.searchSuggestConfigSheetDocument);
 
-        verify(this.oldcore.getMockDocumentAuthorizationManager()).hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
-            AUTHOR_REFERENCE, TEST_PAGE);
+        verify(this.oldcore.getMockDocumentAuthorizationManager(), times(2)).hasAccess(Right.SCRIPT,
+            EntityType.DOCUMENT, AUTHOR_REFERENCE, TEST_PAGE);
         verify(this.velocityEngine, never()).evaluate(any(), any(), any(), eq(this.testString));
 
         Element presentationLink =
             result.getElementsByAttributeValue("role", "presentation").get(0).getElementsByTag("a").get(0);
-        // Escaping tests only.
+        // Escaping tests only. Both sources share the same engine, so there is still a single tab.
         assertEquals("#" + this.testString + "SearchSuggestSources", presentationLink.attr("href"));
         assertEquals(this.testString, presentationLink.text());
         assertEquals(this.testString + "SearchSuggestSources", presentationLink.attr("aria-controls"));
         assertEquals(this.testString + "SearchSuggestSources", result.getElementsByClass("tab-pane").get(0).attr("id"));
-        assertEquals(this.testString, result.getElementsByClass("limit").text());
-        
-        assertEquals(this.testString, result.getElementsByClass("name").text());
+        for (Element limitElement : result.getElementsByClass("limit")) {
+            assertEquals(this.testString, limitElement.text());
+        }
+        for (Element nameElement : result.getElementsByClass("name")) {
+            assertEquals(this.testString, nameElement.text());
+        }
 
-        // The icon is rendered as expected.
-        assertEquals(0, result.getElementsByClass("icon").size());
+        // The legacy icon value (not prefixed with "icon:") is not evaluated.
+        assertEquals(1, result.getElementsByClass("icon").size());
+        assertEquals(this.testString, result.getElementsByClass("icon").get(0).attr("src"));
+
+        // The icon-theme icon is rendered as expected.
         assertEquals(1, result.getElementsByClass("fa-user").size());
     }
 

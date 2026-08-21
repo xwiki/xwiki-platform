@@ -21,8 +21,8 @@ package org.xwiki.cluster.test.ui.docker;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.docker.junit5.XWikiInstances;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.XWikiInstances;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

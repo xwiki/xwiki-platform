@@ -41,8 +41,8 @@ import org.xwiki.test.docker.internal.junit5.blobstore.BlobStoreContainerExecuto
 import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
-import org.xwiki.test.docker.junit5.ServletEngineFileManager;
 import org.xwiki.test.docker.internal.junit5.solr.SolrContainerExecutor;
+import org.xwiki.test.docker.junit5.ServletEngineFileManager;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.XWikiExecutor;

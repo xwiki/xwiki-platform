@@ -201,7 +201,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
                 }
 
                 File file = getTemporaryFile(key, context);
-                LOGGER.debug("Temporary PDF export file [{}]", file.toString());
+                LOGGER.debug("Temporary PDF export file [{}]", file);
 
                 if (StringUtils.isNotEmpty(revision)) {
                     attachment = attachment.getAttachmentRevision(revision, context);
@@ -334,11 +334,8 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     private Map<String, File> getFileMapping(XWikiContext context)
     {
         @SuppressWarnings("unchecked")
-        Map<String, File> usedFiles = (Map<String, File>) context.get(FILE_MAPPING_KEY);
-        if (usedFiles == null) {
-            usedFiles = new HashMap<>();
-            context.put(FILE_MAPPING_KEY, usedFiles);
-        }
+        Map<String, File> usedFiles =
+            (Map<String, File>) context.computeIfAbsent(FILE_MAPPING_KEY, key -> new HashMap<String, File>());
         return usedFiles;
     }
 

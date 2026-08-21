@@ -70,13 +70,13 @@ class ProvidingTransactionRunnableTest
 
     private static class ImplementationWithDataA1 implements MyInterfaceWithDataA1
     {
-        private final DBTransaction DBTrans;
+        private final DBTransaction dbTrans;
 
         private final String dataA1;
 
         public ImplementationWithDataA1(final DBTransaction transact, final String dataA1)
         {
-            this.DBTrans = transact;
+            this.dbTrans = transact;
             this.dataA1 = dataA1;
         }
 
@@ -87,7 +87,7 @@ class ProvidingTransactionRunnableTest
 
         public String getConnection()
         {
-            return this.DBTrans.getConnection();
+            return this.dbTrans.getConnection();
         }
     }
 

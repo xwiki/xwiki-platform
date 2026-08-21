@@ -21,7 +21,6 @@ package com.xpn.xwiki.internal.objects.classes;
 
 import java.util.Arrays;
 
-import com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,6 +34,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener;
 import com.xpn.xwiki.internal.store.PropertyConverter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;

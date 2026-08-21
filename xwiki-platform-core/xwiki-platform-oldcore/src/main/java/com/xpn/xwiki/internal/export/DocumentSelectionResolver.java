@@ -199,11 +199,8 @@ public class DocumentSelectionResolver
                 wikiName = entry.getKey().getWikiReference().getName();
             }
 
-            Object[] query = queriesByWiki.get(wikiName);
-            if (query == null) {
-                query = new Object[] {new StringBuilder(), new ArrayList<>()};
-                queriesByWiki.put(wikiName, query);
-            }
+            Object[] query = queriesByWiki.computeIfAbsent(wikiName,
+                wiki -> new Object[] {new StringBuilder(), new ArrayList<>()});
 
             StringBuilder statement = (StringBuilder) query[0];
             List<Object> parameters = (List<Object>) query[1];

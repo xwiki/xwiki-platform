@@ -139,6 +139,9 @@ ul.xlist li.showAllResults {
   margin-left:10px;
 }
 
+/* Indent the source's icon/name/results from the left edge, while its border-top separator still spans the full
+   width; that separator is cancelled below on sourceName/showAllResults. The 12px value is a visual value tuned
+   against the design mockup, it is not derived from another token. */
 div.suggestItems.searchSuggest div.resultContainer div.results {
   padding-left: 12px;
   border-top: 1px solid var(--xwiki-border-color);

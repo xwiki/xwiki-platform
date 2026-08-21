@@ -117,9 +117,9 @@ class ScopeNotificationFilterPreferenceTest
     @Test
     void getScopeReference()
     {
-        assertEquals(this.sp1.getScopeReference(), WIKI_REFERENCE);
-        assertEquals(this.sp2.getScopeReference(), SPACE_REFERENCE);
-        assertEquals(this.sp3.getScopeReference(), DOCUMENT_REFERENCE);
+        assertEquals(WIKI_REFERENCE, this.sp1.getScopeReference());
+        assertEquals(SPACE_REFERENCE, this.sp2.getScopeReference());
+        assertEquals(DOCUMENT_REFERENCE, this.sp3.getScopeReference());
     }
 
     @Test

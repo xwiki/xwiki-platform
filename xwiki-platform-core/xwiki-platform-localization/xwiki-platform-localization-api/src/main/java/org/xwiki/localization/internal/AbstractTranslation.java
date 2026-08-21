@@ -22,9 +22,9 @@ package org.xwiki.localization.internal;
 import java.util.Collection;
 import java.util.Locale;
 
+import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
-import org.xwiki.localization.Translation;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.rendering.block.Block;
 

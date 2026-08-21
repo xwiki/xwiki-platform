@@ -467,7 +467,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
   // 32MB is the default maximum size used inside the FileUploadPlugin.
   // There's no easy way of getting that internal value, so we just assume it didn't change.
   // 32MB = 33554432 Bytes 
-  maxAttachmentSize = parseInt(maxAttachmentSize || 33554432);
+  maxAttachmentSize = Number.parseInt(maxAttachmentSize || 33554432);
   
   /**
    * HTML5 file uploader associated with an input of type file.

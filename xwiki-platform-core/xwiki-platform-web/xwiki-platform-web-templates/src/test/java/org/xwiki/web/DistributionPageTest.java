@@ -63,7 +63,7 @@ class DistributionPageTest extends PageTest
     private TemplateManager templateManager;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         doReturn("test").when(this.oldcore.getSpyXWiki()).getUserPreference("colorTheme", this.context);
     }

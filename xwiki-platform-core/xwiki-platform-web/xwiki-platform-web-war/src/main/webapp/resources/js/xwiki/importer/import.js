@@ -79,13 +79,13 @@ var XWiki = (function(XWiki){
       /** Attach the HTML5 uploader, if available */
       var form = $('AddAttachment');
       require(['xwiki-upload'], function(FileUploader) {
-        if (form && typeof (FileUploader) != 'undefined') {
+        if (form && FileUploader !== undefined) {
           var input = form.down("input[type='file']");
           var html5Uploader = new FileUploader(input, {
             'progressAutohide': true,
             'responseContainer': $('packagelistcontainer'),
             'responseURL': window.docgeturl + '?xpage=packagelist&forceTestRights=1',
-            'maxFilesize': parseInt(input.readAttribute('data-max-file-size'))
+            'maxFilesize': Number.parseInt(input.readAttribute('data-max-file-size'))
           });
           form.observe("xwiki:html5upload:done", hookRichImporterUI);
           html5Uploader.hideFormButtons();

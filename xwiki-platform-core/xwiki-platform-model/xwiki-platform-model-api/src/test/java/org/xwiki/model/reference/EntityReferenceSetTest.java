@@ -58,42 +58,42 @@ class EntityReferenceSetTest
         assertFalse(this.set.matches(reference));
     }
 
-    private void assertMatches(String reference, EntityType type) throws Exception
+    private void assertMatches(String reference, EntityType type)
     {
         assertMatches(this.resolver.resolve(reference, type));
     }
 
-    private void assertNotMatches(String reference, EntityType type) throws Exception
+    private void assertNotMatches(String reference, EntityType type)
     {
         assertNotMatches(this.resolver.resolve(reference, type));
     }
 
-    private void assertMatchesWiki(String reference) throws Exception
+    private void assertMatchesWiki(String reference)
     {
         assertMatches(reference, EntityType.WIKI);
     }
 
-    private void assertNotMatchesWiki(String reference) throws Exception
+    private void assertNotMatchesWiki(String reference)
     {
         assertNotMatches(reference, EntityType.WIKI);
     }
 
-    private void assertMatchesSpace(String reference) throws Exception
+    private void assertMatchesSpace(String reference)
     {
         assertMatches(reference, EntityType.SPACE);
     }
 
-    private void assertNotMatchesSpace(String reference) throws Exception
+    private void assertNotMatchesSpace(String reference)
     {
         assertNotMatches(reference, EntityType.SPACE);
     }
 
-    private void assertMatchesDocument(String reference) throws Exception
+    private void assertMatchesDocument(String reference)
     {
         assertMatches(reference, EntityType.DOCUMENT);
     }
 
-    private void assertNotMatchesDocument(String reference) throws Exception
+    private void assertNotMatchesDocument(String reference)
     {
         assertNotMatches(reference, EntityType.DOCUMENT);
     }
@@ -105,22 +105,22 @@ class EntityReferenceSetTest
         this.set.includes(reference);
     }
 
-    private void includes(String reference, EntityType type) throws Exception
+    private void includes(String reference, EntityType type)
     {
         includes(this.resolver.resolve(reference, type));
     }
 
-    private void includesWiki(String reference) throws Exception
+    private void includesWiki(String reference)
     {
         includes(reference, EntityType.WIKI);
     }
 
-    private void includesSpace(String reference) throws Exception
+    private void includesSpace(String reference)
     {
         includes(reference, EntityType.SPACE);
     }
 
-    private void includesDocument(String reference) throws Exception
+    private void includesDocument(String reference)
     {
         includes(reference, EntityType.DOCUMENT);
     }
@@ -132,17 +132,17 @@ class EntityReferenceSetTest
         this.set.excludes(reference);
     }
 
-    private void excludes(String reference, EntityType type) throws Exception
+    private void excludes(String reference, EntityType type)
     {
         excludes(this.resolver.resolve(reference, type));
     }
 
-    private void excludesWiki(String reference) throws Exception
+    private void excludesWiki(String reference)
     {
         excludes(reference, EntityType.WIKI);
     }
 
-    private void excludesSpace(String reference) throws Exception
+    private void excludesSpace(String reference)
     {
         excludes(reference, EntityType.SPACE);
     }
@@ -150,7 +150,7 @@ class EntityReferenceSetTest
     // Tests
 
     @Test
-    void includeWiki() throws Exception
+    void includeWiki()
     {
         includesWiki("wiki");
 
@@ -170,7 +170,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void includeSpace() throws Exception
+    void includeSpace()
     {
         includesSpace("wiki:space");
 
@@ -189,7 +189,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void includeNestedSpace() throws Exception
+    void includeNestedSpace()
     {
         includesSpace("wiki:space.nested");
 
@@ -213,7 +213,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void includePartialOnlySpace() throws Exception
+    void includePartialOnlySpace()
     {
         includesSpace("space");
 
@@ -225,7 +225,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void includeDocument() throws Exception
+    void includeDocument()
     {
         includesDocument("wiki:space.document");
 
@@ -256,7 +256,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void includeDocumentInNestedSpace() throws Exception
+    void includeDocumentInNestedSpace()
     {
         includesDocument("wiki:space.nestedspace.document");
 
@@ -271,7 +271,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void includeDocumentsInNestedSpacesWithShortAfterLong() throws Exception
+    void includeDocumentsInNestedSpacesWithShortAfterLong()
     {
         includesDocument("wiki:space.nestedspace.document");
         includesDocument("wiki:space.document");
@@ -287,7 +287,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void includeDocumentsInNestedSpacesWithLongAfterShort() throws Exception
+    void includeDocumentsInNestedSpacesWithLongAfterShort()
     {
         includesDocument("wiki:space.document");
         includesDocument("wiki:space.nestedspace.document");
@@ -303,7 +303,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void excludeWiki() throws Exception
+    void excludeWiki()
     {
         excludesWiki("wiki");
 
@@ -323,7 +323,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void excludeSpace() throws Exception
+    void excludeSpace()
     {
         excludesSpace("wiki:space");
 
@@ -335,7 +335,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void excludeNestedSpace() throws Exception
+    void excludeNestedSpace()
     {
         excludesSpace("wiki:space.nested");
 
@@ -350,7 +350,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void excludePartial() throws Exception
+    void excludePartial()
     {
         excludesSpace("space");
 
@@ -404,7 +404,7 @@ class EntityReferenceSetTest
     }
 
     @Test
-    void includeDocumentInDeeplyNestedSpaceFiltersSiblingSpaces() throws Exception
+    void includeDocumentInDeeplyNestedSpaceFiltersSiblingSpaces()
     {
         // Include a single document in a deeply nested space
         includesDocument("wiki:A.B.C.D.document");

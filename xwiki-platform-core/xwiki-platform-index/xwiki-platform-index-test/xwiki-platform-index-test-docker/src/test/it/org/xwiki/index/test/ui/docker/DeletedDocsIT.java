@@ -19,9 +19,6 @@
  */
 package org.xwiki.index.test.ui.docker;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -33,6 +30,9 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.DeletePageConfirmationPage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for Deleted Pages tab from Page Index (XWiki.AllDocs).

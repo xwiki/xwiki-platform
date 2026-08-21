@@ -80,7 +80,7 @@ class DefaultPageChannelsResourceTest
     }
 
     @Test
-    void getUnauthorized() throws Exception
+    void getUnauthorized()
     {
         when(this.authorization.hasAccess(Right.EDIT, documentReference)).thenReturn(false);
         WebApplicationException e = assertThrows(WebApplicationException.class,

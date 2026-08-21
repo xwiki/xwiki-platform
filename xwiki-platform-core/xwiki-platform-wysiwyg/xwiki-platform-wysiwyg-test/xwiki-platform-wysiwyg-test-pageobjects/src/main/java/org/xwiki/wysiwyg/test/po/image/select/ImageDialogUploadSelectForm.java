@@ -51,6 +51,10 @@ public class ImageDialogUploadSelectForm extends BaseElement
             fileInput.sendKeys(getUtil().getResourceFile(path).getAbsolutePath());
             WebElement uploadButton = getDriver()
                 .findElementWithoutWaitingWithoutScrolling(By.cssSelector("input[type=submit][value=Upload]"));
+            // The upload button is disabled until the JavaScript that performs the upload has been loaded and has seen
+            // the selected file. Clicking before that submits the form natively, which reloads the page and thus closes
+            // the image dialog.
+            getDriver().waitUntilElementIsEnabled(uploadButton);
             uploadButton.click();
             waitForNotificationSuccessMessage("File upload succeeded.");
         } finally {

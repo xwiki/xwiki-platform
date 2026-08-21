@@ -37,28 +37,4 @@ public class EditBean
     {
         this.xWikiDoc = xWikiDoc;
     }
-
-    /*
-    public String[] getLanguages()
-    {
-        return languages;
-    }
-    
-    public void setLanguages(String[] languages)
-    {
-        this.languages = languages;   
-    }
-
-    // Convenience method to simplify repopulation of select lists
-    public Properties getLanguagesAsMap()
-    {
-        Properties p = new Properties();
-        if (languages != null)
-        {
-            for (int i = 0; i < languages.length; i++)
-                p.setProperty((String)languages[i], "SELECTED");
-        }            
-        return p;
-    } 
-    */
 }

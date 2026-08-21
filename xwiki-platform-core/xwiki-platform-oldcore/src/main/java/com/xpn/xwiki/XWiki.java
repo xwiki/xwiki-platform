@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki;
 
-import com.google.common.base.Suppliers;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -193,6 +191,7 @@ import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.xml.XMLUtils;
 
+import com.google.common.base.Suppliers;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
@@ -391,23 +390,23 @@ public class XWiki implements EventListener
     private Environment environment;
 
     /** Lock object used for the lazy initialization of the authentication service. */
-    private final Object AUTH_SERVICE_LOCK = new Object();
+    private final Object authServiceLock = new Object();
 
     /** Lock object used for the lazy initialization of the authorization service. */
-    private final Object RIGHT_SERVICE_LOCK = new Object();
+    private final Object rightServiceLock = new Object();
 
     /** Lock object used for the lazy initialization of the group management service. */
-    private final Object GROUP_SERVICE_LOCK = new Object();
+    private final Object groupServiceLock = new Object();
 
     /** Lock object used for the lazy initialization of the statistics service. */
-    private final Object STATS_SERVICE_LOCK = new Object();
+    private final Object statsServiceLock = new Object();
 
 
     private MetaClass metaclass;
 
     private String version;
 
-    private XWikiEngineContext engine_context;
+    private XWikiEngineContext engineContext;
 
     private String database;
 
@@ -1491,21 +1490,21 @@ public class XWiki implements EventListener
 
     public XWikiStoreInterface getNotCacheStore()
     {
-        XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiCacheStoreInterface cacheStore) {
-            store = cacheStore.getStore();
+        XWikiStoreInterface resolvedStore = getStore();
+        if (resolvedStore instanceof XWikiCacheStoreInterface cacheStore) {
+            resolvedStore = cacheStore.getStore();
         }
-        return store;
+        return resolvedStore;
     }
 
     public XWikiHibernateStore getHibernateStore()
     {
-        XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiHibernateStore hibernateStore) {
+        XWikiStoreInterface resolvedStore = getStore();
+        if (resolvedStore instanceof XWikiHibernateStore hibernateStore) {
             return hibernateStore;
-        } else if (store instanceof XWikiCacheStoreInterface cacheStore) {
-            store = cacheStore.getStore();
-            if (store instanceof XWikiHibernateStore hibernateStore) {
+        } else if (resolvedStore instanceof XWikiCacheStoreInterface cacheStore) {
+            resolvedStore = cacheStore.getStore();
+            if (resolvedStore instanceof XWikiHibernateStore hibernateStore) {
                 return hibernateStore;
             } else {
                 return null;
@@ -3636,8 +3635,8 @@ public class XWiki implements EventListener
         }
 
         // If we use the Cache Store layer.. we need to flush it
-        XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiCacheStoreInterface) {
+        XWikiStoreInterface currentStore = getStore();
+        if (currentStore instanceof XWikiCacheStoreInterface) {
             ((XWikiCacheStoreInterface) getStore()).flushCache();
         }
         // Flush renderers.. Groovy renderer has a cache
@@ -4454,7 +4453,7 @@ public class XWiki implements EventListener
 
     public String include(String topic, boolean isForm, XWikiContext context) throws XWikiException
     {
-        String database = null;
+        String databaseName = null;
         String incdatabase = null;
         String prefixedTopic;
         String localTopic;
@@ -4476,7 +4475,7 @@ public class XWiki implements EventListener
             int i0 = topic.indexOf(':');
             if (i0 != -1) {
                 incdatabase = topic.substring(0, i0);
-                database = context.getWikiId();
+                databaseName = context.getWikiId();
                 context.setWikiId(incdatabase);
                 prefixedTopic = topic;
                 localTopic = topic.substring(i0 + 1);
@@ -4523,8 +4522,8 @@ public class XWiki implements EventListener
             String result;
             if (isForm) {
                 // We do everything in the context of the including document
-                if (database != null) {
-                    context.setWikiId(database);
+                if (databaseName != null) {
+                    context.setWikiId(databaseName);
                 }
 
                 // Note: the Script macro in the new rendering checks for programming rights for the document in
@@ -4554,8 +4553,8 @@ public class XWiki implements EventListener
             }
             return result;
         } finally {
-            if (database != null) {
-                context.setWikiId(database);
+            if (databaseName != null) {
+                context.setWikiId(databaseName);
             }
 
             if (currentAPIdoc != null && scontext != null) {
@@ -5316,6 +5315,28 @@ public class XWiki implements EventListener
         return getConfiguration().getProperty("xwiki.encoding", DEFAULT_ENCODING);
     }
 
+    /**
+     * Get the configured canonical URL of a wiki, based on trusted server-side configuration only: the
+     * {@code xwiki.home} configuration property for the main wiki, or the wiki descriptor's default alias for other
+     * wikis (for a path-based (sub)wiki, the main wiki's own configuration is used instead, since path-based wikis
+     * share the same server URL). The current request is only ever consulted to fill in the protocol and port when
+     * they aren't otherwise configured, and only for the wiki that was used to reach the server for the current
+     * request; the host itself is never taken from the request.
+     * <p>
+     * Contrary to {@link com.xpn.xwiki.web.XWikiURLFactory#getServerURL(XWikiContext)}, this method never returns a
+     * URL derived from client-controlled data such as the {@code Host} or {@code X-Forwarded-Host} request headers,
+     * which makes it the appropriate choice whenever the resulting URL may be used outside of the current
+     * request/response cycle (e.g., sent by email, or used in a server-side fetch), where trusting request data could
+     * allow an attacker to redirect the generated URL to a server of their choosing.
+     *
+     * @param wikiId the identifier of the wiki for which to get the server URL, if {@code null} the current wiki (as
+     *            indicated by {@link XWikiContext#getWikiId()}) is used
+     * @param xcontext the XWiki context, used to resolve the current/main wiki and, when relevant, the wiki
+     *            descriptor
+     * @return the trusted server URL for the given wiki (protocol, host and, if applicable, port), or {@code null} if
+     *         no canonical URL is configured for that wiki
+     * @throws MalformedURLException if the configured {@code xwiki.home} property is not a valid URL
+     */
     public URL getServerURL(String wikiId, XWikiContext xcontext) throws MalformedURLException
     {
         // In path based the base URL is the same for all wikis
@@ -5360,8 +5381,11 @@ public class XWiki implements EventListener
                             }
                         }
 
-                        return new URL(protocol != null ? protocol : (port == 443 ? HTTPS : "http"), server, port,
-                            "");
+                        if (protocol == null) {
+                            protocol = port == 443 ? HTTPS : "http";
+                        }
+
+                        return new URL(protocol, server, port, "");
                     }
                 }
             } catch (WikiManagerException e) {
@@ -5968,12 +5992,12 @@ public class XWiki implements EventListener
 
     public XWikiEngineContext getEngineContext()
     {
-        return this.engine_context;
+        return this.engineContext;
     }
 
-    public void setEngineContext(XWikiEngineContext engine_context)
+    public void setEngineContext(XWikiEngineContext engineContext)
     {
-        this.engine_context = engine_context;
+        this.engineContext = engineContext;
     }
 
     public void setAuthService(XWikiAuthService authService)
@@ -5988,7 +6012,7 @@ public class XWiki implements EventListener
 
     public XWikiGroupService getGroupService(XWikiContext context) throws XWikiException
     {
-        synchronized (this.GROUP_SERVICE_LOCK) {
+        synchronized (this.groupServiceLock) {
             if (this.groupService == null) {
                 String groupClass = getConfiguration().getProperty("xwiki.authentication.groupclass",
                     "com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl");
@@ -6039,7 +6063,7 @@ public class XWiki implements EventListener
 
     public XWikiAuthService getAuthService()
     {
-        synchronized (this.AUTH_SERVICE_LOCK) {
+        synchronized (this.authServiceLock) {
             if (this.authService == null) {
                 LOGGER.info("Initializing AuthService...");
 
@@ -6099,7 +6123,7 @@ public class XWiki implements EventListener
 
     public XWikiRightService getRightService()
     {
-        synchronized (this.RIGHT_SERVICE_LOCK) {
+        synchronized (this.rightServiceLock) {
             if (this.rightService == null) {
                 LOGGER.info("Initializing RightService...");
 
@@ -6148,7 +6172,7 @@ public class XWiki implements EventListener
 
     public XWikiStatsService getStatsService(XWikiContext context)
     {
-        synchronized (this.STATS_SERVICE_LOCK) {
+        synchronized (this.statsServiceLock) {
             if (this.statsService == null && "1".equals(getConfiguration().getProperty("xwiki.stats", "1"))) {
                 String storeClass = getConfiguration().getProperty("xwiki.stats.class",
                     "com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl");
@@ -7926,10 +7950,10 @@ public class XWiki implements EventListener
      */
     private DocumentReference getPreferencesDocumentReference(XWikiContext context)
     {
-        String database = context.getWikiId();
+        String wikiId = context.getWikiId();
         EntityReference spaceReference;
-        if (database != null) {
-            spaceReference = new EntityReference(SYSTEM_SPACE, EntityType.SPACE, new WikiReference(database));
+        if (wikiId != null) {
+            spaceReference = new EntityReference(SYSTEM_SPACE, EntityType.SPACE, new WikiReference(wikiId));
         } else {
             spaceReference = getCurrentMixedEntityReferenceResolver().resolve(SYSTEM_SPACE, EntityType.SPACE);
         }
@@ -7971,10 +7995,8 @@ public class XWiki implements EventListener
         for (int i = 0; i < results.size(); i++) {
             String filename = (String) results.get(i)[0];
             String docFullName = (String) results.get(i)[1];
-            if (!filenamesByDocFullName.containsKey(docFullName)) {
-                filenamesByDocFullName.put(docFullName, new ArrayList<>());
-            }
-            filenamesByDocFullName.get(docFullName).add(filename);
+            filenamesByDocFullName.computeIfAbsent(docFullName, name -> new ArrayList<>())
+                .add(filename);
         }
 
         List<XWikiAttachment> out = new ArrayList<>();
@@ -8044,10 +8066,10 @@ public class XWiki implements EventListener
      * @deprecated since 6.1M3, use {@link #XWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
     @Deprecated
-    public XWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
+    public XWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engineContext, boolean noupdate)
         throws XWikiException
     {
-        initXWiki(config, context, engine_context, noupdate);
+        initXWiki(config, context, engineContext, noupdate);
     }
 
     /**
@@ -8063,11 +8085,11 @@ public class XWiki implements EventListener
      * @deprecated use {@link #XWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
     @Deprecated
-    public XWiki(String xwikicfgpath, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
+    public XWiki(String xwikicfgpath, XWikiContext context, XWikiEngineContext engineContext, boolean noupdate)
         throws XWikiException
     {
         try {
-            initXWiki(new XWikiConfig(new FileInputStream(xwikicfgpath)), context, engine_context, noupdate);
+            initXWiki(new XWikiConfig(new FileInputStream(xwikicfgpath)), context, engineContext, noupdate);
         } catch (FileNotFoundException e) {
             Object[] args = { xwikicfgpath };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG, XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND,
@@ -8079,9 +8101,9 @@ public class XWiki implements EventListener
      * @deprecated use {@link #XWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
     @Deprecated
-    public XWiki(InputStream is, XWikiContext context, XWikiEngineContext engine_context) throws XWikiException
+    public XWiki(InputStream is, XWikiContext context, XWikiEngineContext engineContext) throws XWikiException
     {
-        initXWiki(new XWikiConfig(is), context, engine_context, true);
+        initXWiki(new XWikiConfig(is), context, engineContext, true);
     }
 
     /**
@@ -8119,13 +8141,13 @@ public class XWiki implements EventListener
      * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
      */
     @Deprecated
-    public String Param(String key, String default_value)
+    public String Param(String key, String defaultValue)
     {
         if (getConfiguration() != null) {
-            return getConfiguration().getProperty(key, default_value);
+            return getConfiguration().getProperty(key, defaultValue);
         }
 
-        return default_value;
+        return defaultValue;
     }
 
     /**
@@ -8141,9 +8163,9 @@ public class XWiki implements EventListener
      * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
      */
     @Deprecated
-    public long ParamAsLong(String key, long default_value)
+    public long ParamAsLong(String key, long defaultValue)
     {
-        return getConfiguration().getProperty(key, default_value);
+        return getConfiguration().getProperty(key, defaultValue);
     }
 
     /**

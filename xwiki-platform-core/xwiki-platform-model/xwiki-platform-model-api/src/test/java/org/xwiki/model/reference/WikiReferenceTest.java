@@ -36,8 +36,9 @@ class WikiReferenceTest
     @Test
     void testInvalidType()
     {
+        EntityReference reference = new EntityReference("wiki", EntityType.DOCUMENT);
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
-            () -> new WikiReference(new EntityReference("wiki", EntityType.DOCUMENT)));
+            () -> new WikiReference(reference));
         assertEquals("Invalid type [DOCUMENT] for a wiki reference", expected.getMessage());
     }
 
@@ -45,8 +46,9 @@ class WikiReferenceTest
     void testInvalidParent()
     {
         EntityReference badParent = new EntityReference("other", EntityType.DOCUMENT);
+        EntityReference reference = new EntityReference("wiki", EntityType.WIKI, badParent);
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
-            () -> new WikiReference(new EntityReference("wiki", EntityType.WIKI, badParent)));
+            () -> new WikiReference(reference));
         assertEquals("Unexpected parent [" + badParent + "] in a wiki reference", expected.getMessage());
     }
 }

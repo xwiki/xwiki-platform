@@ -64,10 +64,10 @@ class ReferenceUserIteratorTest
     @Test
     void getMembersWhenNoExecutionContext()
     {
-        Execution execution = mock(Execution.class);
+        Execution executionMock = mock(Execution.class);
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "userpage");
         try {
-            new ReferenceUserIterator(userReference, null, execution).next();
+            new ReferenceUserIterator(userReference, null, executionMock).next();
         } catch (RuntimeException expected) {
             assertEquals("Aborting member extraction from passed references [[userwiki:XWiki.userpage]] since no "
                 + "XWiki Context was found", expected.getMessage());
@@ -77,11 +77,11 @@ class ReferenceUserIteratorTest
     @Test
     void getMembersWhenNoXWikiContext()
     {
-        Execution execution = mock(Execution.class);
-        when(execution.getContext()).thenReturn(new ExecutionContext());
+        Execution executionMock = mock(Execution.class);
+        when(executionMock.getContext()).thenReturn(new ExecutionContext());
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "userpage");
         try {
-            new ReferenceUserIterator(userReference, null, execution).next();
+            new ReferenceUserIterator(userReference, null, executionMock).next();
         } catch (RuntimeException expected) {
             assertEquals("Aborting member extraction from passed references [[userwiki:XWiki.userpage]] since no "
                 + "XWiki Context was found", expected.getMessage());

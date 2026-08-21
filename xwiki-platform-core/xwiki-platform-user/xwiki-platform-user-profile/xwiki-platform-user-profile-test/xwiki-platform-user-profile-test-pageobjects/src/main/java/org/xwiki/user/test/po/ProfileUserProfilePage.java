@@ -65,7 +65,7 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
     @FindBy(xpath = "//dd[preceding-sibling::dt[1]/label[. = 'Blog Feed']]//a")
     private WebElement userBlogFeed;
 
-    @FindBy(xpath = "//div[@id='avatar']//a")
+    @FindBy(xpath = "//div[@id='avatar']//button[contains(@class, 'attachment-picker-start')]")
     private WebElement changeAvatar;
 
     @FindBy(css = ".activity-follow .notificationWatchUserFollowing")

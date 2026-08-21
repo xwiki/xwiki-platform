@@ -49,8 +49,8 @@ class PageReferenceTest
     @Test
     void testInvalidType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new PageReference(new EntityReference("page", EntityType.DOCUMENT)));
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new PageReference(reference));
 
         assertEquals("Invalid type [DOCUMENT] for a page reference", e.getMessage());
     }
@@ -67,8 +67,9 @@ class PageReferenceTest
     @Test
     void testInvalidParentType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new PageReference(
-            new EntityReference("page", EntityType.PAGE, new EntityReference("document", EntityType.DOCUMENT))));
+        EntityReference reference = new EntityReference("page", EntityType.PAGE,
+            new EntityReference("document", EntityType.DOCUMENT));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new PageReference(reference));
 
         assertEquals("Invalid parent reference [Document document] in a page reference", e.getMessage());
     }

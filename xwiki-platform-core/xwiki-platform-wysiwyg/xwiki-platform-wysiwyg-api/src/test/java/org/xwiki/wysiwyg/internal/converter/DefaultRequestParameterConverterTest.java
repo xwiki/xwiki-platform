@@ -156,13 +156,13 @@ class DefaultRequestParameterConverterTest
         when(this.contextComponentManager.getInstanceMap(RequestParameterConverter.class)).thenReturn(instanceMap);
 
         when(converter1.convert(any(ServletRequest.class))).then(invocationOnMock -> {
-            ServletRequest request = invocationOnMock.getArgument(0);
-            assertEquals("converted content", request.getParameter("test"));
-            assertEquals("Other content", request.getParameter("testHtml"));
-            assertEquals(2, request.getParameterMap().size());
+            ServletRequest passedRequest = invocationOnMock.getArgument(0);
+            assertEquals("converted content", passedRequest.getParameter("test"));
+            assertEquals("Other content", passedRequest.getParameter("testHtml"));
+            assertEquals(2, passedRequest.getParameterMap().size());
 
             JakartaRequestParameterConversionResult result = mock(JakartaRequestParameterConversionResult.class);
-            when(result.getRequest()).thenReturn((MutableJakartaServletRequest) request);
+            when(result.getRequest()).thenReturn((MutableJakartaServletRequest) passedRequest);
             when(result.getErrors()).thenReturn(Map.of());
             when(result.getOutput()).thenReturn(Map.of(
                 "testHtml", "modified html content",
@@ -171,13 +171,13 @@ class DefaultRequestParameterConverterTest
             return result;
         });
         when(converter2.convert(any(ServletRequest.class))).then(invocationOnMock -> {
-            ServletRequest request = invocationOnMock.getArgument(0);
-            assertEquals("converted content", request.getParameter("test"));
-            assertEquals("Other content", request.getParameter("testHtml"));
-            assertEquals(2, request.getParameterMap().size());
+            ServletRequest passedRequest = invocationOnMock.getArgument(0);
+            assertEquals("converted content", passedRequest.getParameter("test"));
+            assertEquals("Other content", passedRequest.getParameter("testHtml"));
+            assertEquals(2, passedRequest.getParameterMap().size());
 
             JakartaRequestParameterConversionResult result = mock(JakartaRequestParameterConversionResult.class);
-            when(result.getRequest()).thenReturn((MutableJakartaServletRequest) request);
+            when(result.getRequest()).thenReturn((MutableJakartaServletRequest) passedRequest);
             when(result.getErrors()).thenReturn(Map.of());
             when(result.getOutput()).thenReturn(Map.of());
             return result;

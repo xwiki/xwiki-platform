@@ -186,7 +186,7 @@ XWiki.Gallery = Class.create({
 });
 
 function init(event) {
-  var elements = (event && event.memo.elements) || [$('body')];
+  var elements = event?.memo.elements || [$('body')];
   elements.forEach(function(element) {
     var galleries = element.hasClassName('gallery') ? [element] : element.select('.gallery');
     galleries.forEach(function (gallery) {

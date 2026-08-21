@@ -74,7 +74,7 @@ class LinkIT extends AbstractBlockNoteIT
     {
         // Start fresh.
         setup.deletePage(testReference);
-        setup.createPage(testReference, "First second third fourth");
+        setup.createPage(testReference, "first second third", "");
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -82,19 +82,18 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard.
-        textArea.click();
-        selectWord(textArea, 6, 6);
+        textArea.click().select(6, 6);
 
         // Create a link targeting a URL from the selection.
         editor.getToolBar().createLink().setTargetAndSubmit("https://xwiki.org");
 
         // The link must be inserted on the selected word without touching the rest of the line.
-        textArea.waitUntilTextIs("First second third fourth");
+        textArea.waitUntilTextIs("first second third");
 
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First [[second>>https://xwiki.org]] third fourth", wikiEditor.getContent());
+        assertEquals("first [[second>>https://xwiki.org]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -103,31 +102,26 @@ class LinkIT extends AbstractBlockNoteIT
     {
         // Start fresh.
         setup.deletePage(testReference);
-        setup.createPage(testReference, "First [[second>>https://xwiki.org]] third fourth");
+        setup.createPage(testReference, "first [[second>>https://xwiki.org]] third");
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
-
         BlockNoteEditor editor = new BlockNoteEditor("content");
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar (we can't click the link
         // because the browser would follow it, and hovering it with synthetic mouse events is not reliable), then
-        // change the link title. We wait for the rich text area to be focused before sending the keys, otherwise
-        // they can be silently dropped (e.g. the HOME key) if sent right after the click, before the click's focus
-        // has actually settled.
+        // change the link title.
         textArea.click();
-        textArea.waitUntilFocused();
-        textArea.sendKeys(Keys.HOME);
-        textArea.sendKeys(Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
         editor.getToolBar().editLink().setTitleAndSubmit("2nd");
 
         // The link title must be updated without touching the rest of the line.
-        textArea.waitUntilTextIs("First 2nd third fourth");
+        textArea.waitUntilTextIs("first 2nd third");
 
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First [[2nd>>https://xwiki.org]] third fourth", wikiEditor.getContent());
+        assertEquals("first [[2nd>>https://xwiki.org]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -136,7 +130,7 @@ class LinkIT extends AbstractBlockNoteIT
     {
         // Start fresh.
         setup.deletePage(testReference);
-        setup.createPage(testReference, "First second third fourth");
+        setup.createPage(testReference, "first second third");
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -144,8 +138,7 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard.
-        textArea.click();
-        selectWord(textArea, 6, 6);
+        textArea.click().select(6, 6);
 
         // Open the link modal, fill it in, but cancel it instead of submitting.
         BlockNoteLinkModal linkModal = editor.getToolBar().createLink();
@@ -154,14 +147,14 @@ class LinkIT extends AbstractBlockNoteIT
         linkModal.cancel();
 
         // The content must be left untouched.
-        textArea.waitUntilTextIs("First second third fourth");
+        textArea.waitUntilTextIs("first second third");
 
         // Save and check the source: since nothing was actually changed in the editor, the page content is left
         // untouched (i.e. it is not even round-tripped through the editor, hence the lack of style annotation that a
         // real edit would introduce).
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First second third fourth", wikiEditor.getContent());
+        assertEquals("first second third", wikiEditor.getContent());
     }
 
     @Test
@@ -170,7 +163,7 @@ class LinkIT extends AbstractBlockNoteIT
     {
         // Start fresh.
         setup.deletePage(testReference);
-        setup.createPage(testReference, "First [[second>>https://xwiki.org]] third fourth");
+        setup.createPage(testReference, "first [[second>>https://xwiki.org]] third");
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -178,26 +171,22 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal,
-        // change the title, but cancel the modal instead of submitting. We wait for the rich text area to be
-        // focused before sending the keys, otherwise they can be silently dropped (e.g. the HOME key) if sent right
-        // after the click, before the click's focus has actually settled.
+        // change the title, but cancel the modal instead of submitting.
         textArea.click();
-        textArea.waitUntilFocused();
-        textArea.sendKeys(Keys.HOME);
-        textArea.sendKeys(Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
         BlockNoteLinkModal linkModal = editor.getToolBar().editLink();
         linkModal.setDisplayText("2nd");
         linkModal.cancel();
 
         // The link title must be left untouched.
-        textArea.waitUntilTextIs("First second third fourth");
+        textArea.waitUntilTextIs("first second third");
 
         // Save and check the source: since nothing was actually changed in the editor, the page content is left
         // untouched (i.e. it is not even round-tripped through the editor, hence the lack of style annotation that a
         // real edit would introduce).
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First [[second>>https://xwiki.org]] third fourth", wikiEditor.getContent());
+        assertEquals("first [[second>>https://xwiki.org]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -213,7 +202,7 @@ class LinkIT extends AbstractBlockNoteIT
 
         // Start fresh.
         setup.deletePage(testReference);
-        setup.createPage(testReference, "First second third fourth");
+        setup.createPage(testReference, "first second third");
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -221,20 +210,19 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard.
-        textArea.click();
-        selectWord(textArea, 6, 6);
+        textArea.click().select(6, 6);
 
         // Create a link targeting a page from the selection. Search by title since suggestions are matched (and
         // rendered) using the page title, not its reference.
         editor.getToolBar().createLink().setPageTargetAndSubmit("Page Link Target", "Page Link Target");
 
         // The link must be inserted on the selected word without touching the rest of the line.
-        textArea.waitUntilTextIs("First second third fourth");
+        textArea.waitUntilTextIs("first second third");
 
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First [[second>>doc:%s]] third fourth".formatted(setup.serializeReference(targetPage)),
+        assertEquals("first [[second>>doc:%s]] third".formatted(setup.serializeReference(targetPage)),
             wikiEditor.getContent());
     }
 
@@ -247,14 +235,14 @@ class LinkIT extends AbstractBlockNoteIT
         DocumentReference targetPage =
             new DocumentReference("AttachmentLinkTarget", testReference.getLastSpaceReference());
         setup.deletePage(targetPage);
-        setup.createPage(targetPage, "", "Attachment Link Target");
+        setup.createPage(targetPage, "", "");
         String attachmentName = "image.gif";
         setup.attachFile(targetPage, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
         new SolrTestUtils(setup).waitEmptyQueue();
 
         // Start fresh.
         setup.deletePage(testReference);
-        setup.createPage(testReference, "First second third fourth");
+        setup.createPage(testReference, "first second third", "");
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -262,21 +250,21 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard.
-        textArea.click();
-        selectWord(textArea, 6, 6);
+        textArea.click().select(6, 6);
 
         // Create a link targeting an attachment from the selection. Search by filename (as a real user would), but
-        // disambiguate the suggestion to select using the target page name, since other tests running in the same
-        // wiki may also attach a file with the same name.
-        editor.getToolBar().createLink().setAttachmentTargetAndSubmit(attachmentName, targetPage.getName());
+        // disambiguate the suggestion to select using the test page name, since other tests running in the same wiki
+        // may also attach a file with the same name.
+        editor.getToolBar().createLink().setAttachmentTargetAndSubmit(attachmentName, attachmentName,
+            testReference.getLastSpaceReference().getName());
 
         // The link must be inserted on the selected word without touching the rest of the line.
-        textArea.waitUntilTextIs("First second third fourth");
+        textArea.waitUntilTextIs("first second third");
 
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First [[second>>attach:%s@%s]] third fourth".formatted(setup.serializeReference(targetPage),
+        assertEquals("first [[second>>attach:%s@%s]] third".formatted(setup.serializeReference(targetPage),
             attachmentName), wikiEditor.getContent());
     }
 
@@ -286,7 +274,7 @@ class LinkIT extends AbstractBlockNoteIT
     {
         // Start fresh.
         setup.deletePage(testReference);
-        setup.createPage(testReference, "First second third fourth");
+        setup.createPage(testReference, "first second third");
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -294,19 +282,18 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Select the word "second" using the keyboard.
-        textArea.click();
-        selectWord(textArea, 6, 6);
+        textArea.click().select(6, 6);
 
         // Create a link targeting an e-mail address from the selection.
         editor.getToolBar().createLink().setEmailTargetAndSubmit("second@xwiki.org");
 
         // The link must be inserted on the selected word without touching the rest of the line.
-        textArea.waitUntilTextIs("First second third fourth");
+        textArea.waitUntilTextIs("first second third");
 
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First [[second>>mailto:second@xwiki.org]] third fourth", wikiEditor.getContent());
+        assertEquals("first [[second>>mailto:second@xwiki.org]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -315,7 +302,7 @@ class LinkIT extends AbstractBlockNoteIT
     {
         // Start fresh.
         setup.deletePage(testReference);
-        setup.createPage(testReference, "First [[second>>https://xwiki.org]] third fourth");
+        setup.createPage(testReference, "first [[second>>https://xwiki.org]] third");
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -323,22 +310,18 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
-        // and switch the target type from URL to E-mail. We wait for the rich text area to be focused before
-        // sending the keys, otherwise they can be silently dropped (e.g. the HOME key) if sent right after the
-        // click, before the click's focus has actually settled.
+        // and switch the target type from URL to E-mail.
         textArea.click();
-        textArea.waitUntilFocused();
-        textArea.sendKeys(Keys.HOME);
-        textArea.sendKeys(Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
         editor.getToolBar().editLink().setEmailTargetAndSubmit("second@xwiki.org");
 
         // The link text must be left untouched.
-        textArea.waitUntilTextIs("First second third fourth");
+        textArea.waitUntilTextIs("first second third");
 
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First [[second>>mailto:second@xwiki.org]] third fourth", wikiEditor.getContent());
+        assertEquals("first [[second>>mailto:second@xwiki.org]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -347,7 +330,7 @@ class LinkIT extends AbstractBlockNoteIT
     {
         // Start fresh.
         setup.deletePage(testReference);
-        setup.createPage(testReference, "First [[second>>https://xwiki.org]] third fourth");
+        setup.createPage(testReference, "first [[second>>https://xwiki.org]] third");
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -355,22 +338,18 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
-        // and change the target URL. We wait for the rich text area to be focused before sending the keys,
-        // otherwise they can be silently dropped (e.g. the HOME key) if sent right after the click, before the
-        // click's focus has actually settled.
+        // and change the target URL.
         textArea.click();
-        textArea.waitUntilFocused();
-        textArea.sendKeys(Keys.HOME);
-        textArea.sendKeys(Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
         editor.getToolBar().editLink().setTargetAndSubmit("https://example.org");
 
         // The link text must be left untouched.
-        textArea.waitUntilTextIs("First second third fourth");
+        textArea.waitUntilTextIs("first second third");
 
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First [[second>>https://example.org]] third fourth", wikiEditor.getContent());
+        assertEquals("first [[second>>https://example.org]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -393,7 +372,7 @@ class LinkIT extends AbstractBlockNoteIT
         // Start fresh.
         setup.deletePage(testReference);
         setup.createPage(testReference,
-            "First [[second>>doc:%s]] third fourth".formatted(setup.serializeReference(oldTargetPage)));
+            "first [[second>>doc:%s]] third".formatted(setup.serializeReference(oldTargetPage)));
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -402,22 +381,18 @@ class LinkIT extends AbstractBlockNoteIT
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
         // and change the target page. Search by title since suggestions are matched (and rendered) using the page
-        // title, not its reference. We wait for the rich text area to be focused before sending the keys, otherwise
-        // they can be silently dropped (e.g. the HOME key) if sent right after the click, before the click's focus
-        // has actually settled.
+        // title, not its reference.
         textArea.click();
-        textArea.waitUntilFocused();
-        textArea.sendKeys(Keys.HOME);
-        textArea.sendKeys(Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
         editor.getToolBar().editLink().setPageTargetAndSubmit("New Page Link Target", "New Page Link Target");
 
         // The link text must be left untouched.
-        textArea.waitUntilTextIs("First second third fourth");
+        textArea.waitUntilTextIs("first second third");
 
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First [[second>>doc:%s]] third fourth".formatted(setup.serializeReference(newTargetPage)),
+        assertEquals("first [[second>>doc:%s]] third".formatted(setup.serializeReference(newTargetPage)),
             wikiEditor.getContent());
     }
 
@@ -425,26 +400,22 @@ class LinkIT extends AbstractBlockNoteIT
     @Order(12)
     void editAttachmentLink(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Create the page holding the attachment currently linked to (the "old" target) and the page holding the
-        // attachment we're going to switch the link to (the "new" target), and wait for the new one to be indexed,
-        // since the attachment link suggestions are based on Solr indexation.
+        // Create the page holding the attachment we're going to switch the link to (the "new" target), and wait for it
+        // be indexed, since the attachment link suggestions are based on Solr indexation.
         String attachmentName = "image.gif";
         DocumentReference oldTargetPage =
             new DocumentReference("OldAttachmentLinkTarget", testReference.getLastSpaceReference());
-        setup.deletePage(oldTargetPage);
-        setup.createPage(oldTargetPage, "", "Old Attachment Link Target");
-        setup.attachFile(oldTargetPage, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
         DocumentReference newTargetPage =
             new DocumentReference("NewAttachmentLinkTarget", testReference.getLastSpaceReference());
         setup.deletePage(newTargetPage);
-        setup.createPage(newTargetPage, "", "New Attachment Link Target");
+        setup.createPage(newTargetPage, "", "");
         setup.attachFile(newTargetPage, attachmentName, getClass().getResourceAsStream('/' + attachmentName), false);
         new SolrTestUtils(setup).waitEmptyQueue();
 
         // Start fresh.
         setup.deletePage(testReference);
         setup.createPage(testReference,
-            "First [[second>>attach:%s@%s]] third fourth".formatted(setup.serializeReference(oldTargetPage), attachmentName));
+            "first [[second>>attach:%s@%s]] third".formatted(setup.serializeReference(oldTargetPage), attachmentName));
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -452,24 +423,21 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
-        // and change the target attachment. Search by filename (as a real user would), but disambiguate the
-        // suggestion to select using the target page name, since other tests running in the same wiki may also
-        // attach a file with the same name. We wait for the rich text area to be focused before sending the keys,
-        // otherwise they can be silently dropped (e.g. the HOME key) if sent right after the click, before the
-        // click's focus has actually settled.
+        // and change the target attachment. Search by filename (as a real user would), but disambiguate the suggestion
+        // to select using the test page name, since other tests running in the same wiki may also attach a file with
+        // the same name.
         textArea.click();
-        textArea.waitUntilFocused();
-        textArea.sendKeys(Keys.HOME);
-        textArea.sendKeys(Keys.ARROW_RIGHT.toString().repeat(8));
-        editor.getToolBar().editLink().setAttachmentTargetAndSubmit(attachmentName, newTargetPage.getName());
+        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
+        editor.getToolBar().editLink().setAttachmentTargetAndSubmit(attachmentName, attachmentName,
+            testReference.getLastSpaceReference().getName());
 
         // The link text must be left untouched.
-        textArea.waitUntilTextIs("First second third fourth");
+        textArea.waitUntilTextIs("first second third");
 
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First [[second>>attach:%s@%s]] third fourth".formatted(setup.serializeReference(newTargetPage),
+        assertEquals("first [[second>>attach:%s@%s]] third".formatted(setup.serializeReference(newTargetPage),
             attachmentName), wikiEditor.getContent());
     }
 
@@ -479,7 +447,7 @@ class LinkIT extends AbstractBlockNoteIT
     {
         // Start fresh.
         setup.deletePage(testReference);
-        setup.createPage(testReference, "First [[second>>mailto:second@xwiki.org]] third fourth");
+        setup.createPage(testReference, "first [[second>>mailto:second@xwiki.org]] third");
 
         InplaceEditablePage page = new InplaceEditablePage().editInplace();
 
@@ -487,22 +455,18 @@ class LinkIT extends AbstractBlockNoteIT
         BlockNoteRichTextArea textArea = editor.getRichTextArea();
 
         // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
-        // and change the target e-mail address. We wait for the rich text area to be focused before sending the
-        // keys, otherwise they can be silently dropped (e.g. the HOME key) if sent right after the click, before
-        // the click's focus has actually settled.
+        // and change the target e-mail address.
         textArea.click();
-        textArea.waitUntilFocused();
-        textArea.sendKeys(Keys.HOME);
-        textArea.sendKeys(Keys.ARROW_RIGHT.toString().repeat(8));
+        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
         editor.getToolBar().editLink().setEmailTargetAndSubmit("other@xwiki.org");
 
         // The link text must be left untouched.
-        textArea.waitUntilTextIs("First second third fourth");
+        textArea.waitUntilTextIs("first second third");
 
         // Save and check the source.
         page.save();
         WikiEditPage wikiEditor = page.editWiki();
-        assertEquals("First [[second>>mailto:other@xwiki.org]] third fourth", wikiEditor.getContent());
+        assertEquals("first [[second>>mailto:other@xwiki.org]] third", wikiEditor.getContent());
     }
 
     @Test
@@ -531,20 +495,39 @@ class LinkIT extends AbstractBlockNoteIT
         assertEquals("one [[Alize>>Users.Alice]] two [[Users.Bob]] three", wikiEditor.getContent());
     }
 
-    /**
-     * Selects a word with the keyboard, assuming the caret is at the start of the line.
-     *
-     * @param textArea the rich text area to select in
-     * @param wordOffset the number of characters between the start of the line and the word
-     * @param wordLength the length of the word
-     */
-    private void selectWord(BlockNoteRichTextArea textArea, int wordOffset, int wordLength)
+    @Test
+    @Order(15)
+    void preserveLinkParametersWhenChangingTarget(TestUtils setup, TestReference testReference) throws Exception
     {
-        // Wait for the rich text area to be focused before sending the keys, otherwise they can be silently dropped
-        // (e.g. the HOME key) if sent right after the click, before the click's focus has actually settled.
-        textArea.waitUntilFocused();
-        textArea.sendKeys(Keys.HOME);
-        textArea.sendKeys(Keys.ARROW_RIGHT.toString().repeat(wordOffset));
-        textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.ARROW_RIGHT.toString().repeat(wordLength)));
+        // Create the page we're going to switch the link to and wait for it to be indexed, since the page link
+        // suggestions are based on Solr indexation.
+        DocumentReference newTargetPage = new DocumentReference("NewLinkTarget", testReference.getLastSpaceReference());
+        setup.deletePage(newTargetPage);
+        setup.createPage(newTargetPage, "", "New Link Target");
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        // Start fresh, with a link that has custom parameters. They are not part of the BlockNote schema so they are
+        // kept aside, bound to the link, and must survive a change of the link target.
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "first [[second>>doc:Users.Alice||class=\"foo\"]] third");
+
+        InplaceEditablePage page = new InplaceEditablePage().editInplace();
+        BlockNoteEditor editor = new BlockNoteEditor("content");
+        BlockNoteRichTextArea textArea = editor.getRichTextArea();
+
+        // Move the caret inside the link, using the keyboard, to trigger the link toolbar, then open the link modal
+        // and change the target page.
+        textArea.click();
+        textArea.sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(8));
+        editor.getToolBar().editLink().setPageTargetAndSubmit("New Link Target", "New Link Target");
+
+        // The link text must be left untouched.
+        textArea.waitUntilTextIs("first second third");
+
+        // Save and check the source.
+        page.save();
+        WikiEditPage wikiEditor = page.editWiki();
+        assertEquals("first [[second>>doc:%s||class=\"foo\"]] third".formatted(setup.serializeReference(newTargetPage)),
+            wikiEditor.getContent());
     }
 }

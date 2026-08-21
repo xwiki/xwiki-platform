@@ -30,12 +30,12 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.RecordableEventDescriptor;
-import org.xwiki.mentions.events.MentionEvent;
-import org.xwiki.mentions.events.MentionEventParams;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.RecordableEventConverter;
+import org.xwiki.eventstream.RecordableEventDescriptor;
+import org.xwiki.mentions.events.MentionEvent;
+import org.xwiki.mentions.events.MentionEventParams;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 

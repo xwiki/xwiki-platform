@@ -21,6 +21,7 @@ package com.xpn.xwiki.stats.impl.xwiki;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -99,9 +100,7 @@ public class XWikiStatsReader
                 Object[] actionsarray = actions.toArray();
                 CollectionUtils.reverseArray(actionsarray);
                 int nb = Math.min(actions.size(), size);
-                for (int i = 0; i < nb; i++) {
-                    list.add(actionsarray[i]);
-                }
+                list.addAll(Arrays.asList(actionsarray).subList(0, nb));
             }
         }
 

@@ -51,8 +51,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
-import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -87,8 +87,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -279,17 +279,17 @@ class XWikiHibernateStoreTest
     @Test
     void createHibernateSequenceIfRequiredWhenNotInUpdateCommands()
     {
-        Session session = mock(Session.class);
+        Session sessionMock = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
         when(this.hibernateStore.getDialect()).thenReturn(dialect);
         when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
         NativeQuery sqlQuery = mock(NativeQuery.class);
-        when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(sessionMock.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
-        this.store.createHibernateSequenceIfRequired(new String[] {}, "schema", session);
+        this.store.createHibernateSequenceIfRequired(new String[] {}, "schema", sessionMock);
 
-        verify(session).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(sessionMock).createSQLQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery).executeUpdate();
     }
 
@@ -299,18 +299,18 @@ class XWikiHibernateStoreTest
     @Test
     void createHibernateSequenceIfRequiredWhenInUpdateCommands()
     {
-        Session session = mock(Session.class);
+        Session sessionMock = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
         when(this.hibernateStore.getDialect()).thenReturn(dialect);
         when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
         NativeQuery sqlQuery = mock(NativeQuery.class);
-        when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(sessionMock.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
         this.store.createHibernateSequenceIfRequired(
-            new String[] {"whatever", "create sequence schema.hibernate_sequence"}, "schema", session);
+            new String[] {"whatever", "create sequence schema.hibernate_sequence"}, "schema", sessionMock);
 
-        verify(session, never()).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(sessionMock, never()).createSQLQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery, never()).executeUpdate();
     }
 

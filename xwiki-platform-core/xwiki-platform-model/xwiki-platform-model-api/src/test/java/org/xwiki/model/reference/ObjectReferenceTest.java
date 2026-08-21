@@ -49,8 +49,8 @@ class ObjectReferenceTest
     @Test
     void testInvalidType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new ObjectReference(new EntityReference("className", EntityType.DOCUMENT)));
+        EntityReference reference = new EntityReference("className", EntityType.DOCUMENT);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new ObjectReference(reference));
 
         assertEquals("Invalid type [DOCUMENT] for an object reference", e.getMessage());
     }
@@ -58,8 +58,8 @@ class ObjectReferenceTest
     @Test
     void testInvalidNullParent()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-            () -> new ObjectReference(new EntityReference("className", EntityType.OBJECT)));
+        EntityReference reference = new EntityReference("className", EntityType.OBJECT);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new ObjectReference(reference));
 
         assertEquals("Invalid parent reference [null] in an object reference", e.getMessage());
     }
@@ -70,8 +70,9 @@ class ObjectReferenceTest
     @Test
     void testInvalidParentType()
     {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new ObjectReference(
-            new EntityReference("className", EntityType.OBJECT, new EntityReference("Space", EntityType.SPACE))));
+        EntityReference reference = new EntityReference("className", EntityType.OBJECT,
+            new EntityReference("Space", EntityType.SPACE));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> new ObjectReference(reference));
 
         assertEquals("Invalid parent reference [Space Space] in an object reference", e.getMessage());
     }

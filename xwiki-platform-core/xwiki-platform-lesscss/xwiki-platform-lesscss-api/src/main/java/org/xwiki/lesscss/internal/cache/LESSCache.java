@@ -20,8 +20,8 @@
 package org.xwiki.lesscss.internal.cache;
 
 import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
-import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.internal.skin.SkinReference;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 
 /**
  * Component to cache objects computed from a LESS files contained in the skin.

@@ -30,6 +30,7 @@ import org.xwiki.rest.model.jaxb.PropertyValue;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.text.StringUtils;
 
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
@@ -54,8 +55,8 @@ public class StaticListClassPropertyValuesProvider extends AbstractListClassProp
     protected PropertyValues getAllowedValues(StaticListClass propertyDefinition, int limit, String filter)
     {
         final PropertyValues result = new PropertyValues();
-        List<String> allValues = StaticListClass.getListFromString(propertyDefinition.getValues());
-        Map<String, ListItem> valueMap = StaticListClass.getMapFromString(propertyDefinition.getValues());
+        List<String> allValues = ListClass.getListFromString(propertyDefinition.getValues());
+        Map<String, ListItem> valueMap = ListClass.getMapFromString(propertyDefinition.getValues());
 
         allValues.stream().map(id -> addLabelIfDifferent(new PropertyValue(id), propertyDefinition, valueMap))
             // Filter both by key and by (translated) label (that's why we construct a PropertyValue first)
@@ -82,7 +83,7 @@ public class StaticListClassPropertyValuesProvider extends AbstractListClassProp
         PropertyValue value = super.getValueFromQueryResult(result, propertyDefinition);
 
         if (value != null && value.getValue() instanceof String) {
-            Map<String, ListItem> valueMap = StaticListClass.getMapFromString(propertyDefinition.getValues());
+            Map<String, ListItem> valueMap = ListClass.getMapFromString(propertyDefinition.getValues());
             addLabelIfDifferent(value, propertyDefinition, valueMap);
         }
 

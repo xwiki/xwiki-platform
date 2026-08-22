@@ -20,6 +20,7 @@
 package org.xwiki.activeinstalls2.script;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -76,5 +77,41 @@ public class ActiveInstallsScriptService implements ScriptService
     public List<Ping> searchInstalls(String jsonQuery) throws Exception
     {
         return this.dataManager.searchInstalls(jsonQuery);
+    }
+
+    /**
+     * Counts the distinct XWiki instances having sent a matching ping. Contrary to {@link #countInstalls(String)},
+     * which counts pings, this counts installs: an instance sends a ping every day but also every time it's
+     * restarted, and thus matches several pings. For example:
+     * <pre>{@code
+     *     {
+     *         "range": { "date.current": { "gte": "now-1d" } }
+     *     }
+     * }</pre>
+     *
+     * @param jsonQuery the Elastic Search JSON query used to search for installs
+     * @return the number of distinct instances
+     * @throws Exception when an error happens while retrieving the data
+     * @since 18.7.0RC1
+     */
+    public long countDistinctInstalls(String jsonQuery) throws Exception
+    {
+        return this.dataManager.countDistinctInstalls(jsonQuery);
+    }
+
+    /**
+     * Counts, for each extension, the distinct XWiki instances having that extension installed and having sent a
+     * matching ping. This is computed with a single query, and is thus much cheaper than calling
+     * {@link #countDistinctInstalls(String)} once per extension.
+     *
+     * @param jsonQuery the Elastic Search JSON query used to search for installs
+     * @return the number of distinct instances, keyed by extension id
+     * @throws Exception when an error happens while retrieving the data, or when there are more extensions than can
+     *      be returned in a single query
+     * @since 18.7.0RC1
+     */
+    public Map<String, Long> countDistinctInstallsByExtension(String jsonQuery) throws Exception
+    {
+        return this.dataManager.countDistinctInstallsByExtension(jsonQuery);
     }
 }

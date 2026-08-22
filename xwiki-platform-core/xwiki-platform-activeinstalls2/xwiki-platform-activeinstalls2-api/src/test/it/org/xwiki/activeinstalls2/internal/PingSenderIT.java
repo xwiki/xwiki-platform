@@ -23,6 +23,7 @@ import java.sql.DatabaseMetaData;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -250,6 +251,23 @@ class PingSenderIT
         // Verify that a search query works with an non-empty json
         pings = this.dataManager.searchInstalls(jsonString);
         assertEquals(2, pings.size());
+
+        // Verify that the 2 pings sent above are counted as a single install since they come from the same instance,
+        // with and without a query.
+        assertEquals(1, this.dataManager.countDistinctInstalls(null));
+        assertEquals(1, this.dataManager.countDistinctInstalls(jsonString));
+
+        // Verify that the distinct installs are also counted per extension, and that an extension is not counted
+        // twice when the same instance pings several times.
+        assertEquals(Map.of("extensionId1", 1L, "extensionId2", 1L),
+            this.dataManager.countDistinctInstallsByExtension(null));
+        assertEquals(Map.of("extensionId1", 1L, "extensionId2", 1L),
+            this.dataManager.countDistinctInstallsByExtension(jsonString));
+
+        // Verify that a query not matching any ping leads to no count at all.
+        String noMatchJsonString = "{ \"term\" : { \"distribution.instanceId\" : \"nomatch\" } }";
+        assertEquals(0, this.dataManager.countDistinctInstalls(noMatchJsonString));
+        assertEquals(Map.of(), this.dataManager.countDistinctInstallsByExtension(noMatchJsonString));
 
         Ping ping = pings.get(0);
 

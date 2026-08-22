@@ -187,7 +187,7 @@ require(['jquery'], function($) {
 
   var filterFlavor = function(flavor, filterString) {
     var match = flavor.find('input[name="match"]').attr('value');
-    if (match.toLowerCase().indexOf(filterString) > -1) {
+    if (match.toLowerCase().includes(filterString)) {
       flavor.removeClass('hidden');
     } else {
       flavor.addClass('hidden');

@@ -20,6 +20,8 @@
 package com.xpn.xwiki.objects.classes;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -32,10 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link NumberClass} class.
- * 
+ *
  * @version $Id$
  */
 @OldcoreTest
@@ -44,6 +49,9 @@ class NumberClassTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @MockComponent
+    private ContextualLocalizationManager contextualLocalizationManager;
 
     /** Test the fromString method. */
     @Test
@@ -55,15 +63,29 @@ class NumberClassTest
         bc.setName("Some.Class");
         nc.setObject(bc);
 
-        // A String value containing non-numeric characters can not be represented as a numeric value, so this sould
-        // throw an exception
+        when(this.contextualLocalizationManager.getTranslationPlain(
+            "core.model.xclass.classProperty.error.invalidNumberFormat", "asd", "long"))
+                .thenReturn("The value \"asd\" is not a valid number of type \"long\".");
+        when(this.contextualLocalizationManager.getTranslationPlain(
+            "core.model.xclass.classProperty.error.invalidNumberFormat", "1111111111111111111111111111111111",
+            "long")).thenReturn("The value \"1111111111111111111111111111111111\" is not a valid number of type "
+                + "\"long\".");
+
+        // A String value containing non-numeric characters can not be represented as a numeric value, so this
+        // should throw an exception
         XWikiException xWikiException = assertThrows(XWikiException.class, () -> nc.fromString("asd"));
-        assertEquals("Error number 0 in 0: Error when parsing [asd] to type [long]",  xWikiException.getMessage());
+        assertEquals(XWikiException.MODULE_XWIKI_CLASSES, xWikiException.getModule());
+        assertEquals(XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID, xWikiException.getCode());
+        verify(this.contextualLocalizationManager)
+            .getTranslationPlain("core.model.xclass.classProperty.error.invalidNumberFormat", "asd", "long");
 
         // A much too long number cannot be represented as a long value, so this should throw an exception
         xWikiException = assertThrows(XWikiException.class, () -> nc.fromString("1111111111111111111111111111111111"));
-        assertEquals("Error number 0 in 0: Error when parsing [1111111111111111111111111111111111] to type [long]",
-            xWikiException.getMessage());
+        assertEquals(XWikiException.MODULE_XWIKI_CLASSES, xWikiException.getModule());
+        assertEquals(XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID, xWikiException.getCode());
+        verify(this.contextualLocalizationManager).getTranslationPlain(
+            "core.model.xclass.classProperty.error.invalidNumberFormat", "1111111111111111111111111111111111",
+            "long");
 
         BaseProperty p;
 
@@ -81,5 +103,38 @@ class NumberClassTest
         p = nc.fromString("4");
         assertNotNull(p);
         assertEquals(4, Integer.parseInt(p.getValue().toString()));
+    }
+
+    /** Test that displayEdit() sets the HTML5 validation attributes matching the number type. */
+    @Test
+    void displayEdit()
+    {
+        NumberClass nc = new NumberClass();
+        BaseClass bc = new BaseClass();
+        bc.setName("Some.Class");
+        nc.setObject(bc);
+        nc.setName("number1");
+        nc.setNumberType(NumberClass.TYPE_LONG);
+
+        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidformat"))
+            .thenReturn("Please enter a valid number.");
+        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.outofrange",
+            String.valueOf(Long.MIN_VALUE), String.valueOf(Long.MAX_VALUE))).thenReturn("Out of range.");
+
+        StringBuffer buffer = new StringBuffer();
+        nc.displayEdit(buffer, "number1", "prefix_", bc, this.oldcore.getXWikiContext());
+        String html = buffer.toString();
+
+        assertTrue(html.contains("step='1'"), html);
+        assertTrue(html.contains("min='" + Long.MIN_VALUE + "'"), html);
+        assertTrue(html.contains("max='" + Long.MAX_VALUE + "'"), html);
+        assertTrue(html.contains("data-validation-bad-input='Please enter a valid number.'"), html);
+        assertTrue(html.contains("data-validation-step-mismatch='Please enter a valid number.'"), html);
+        assertTrue(html.contains("data-validation-range-overflow='Out of range.'"), html);
+        assertTrue(html.contains("data-validation-range-underflow='Out of range.'"), html);
+
+        verify(this.contextualLocalizationManager).getTranslationPlain("core.validation.number.message.invalidformat");
+        verify(this.contextualLocalizationManager).getTranslationPlain("core.validation.number.message.outofrange",
+            String.valueOf(Long.MIN_VALUE), String.valueOf(Long.MAX_VALUE));
     }
 }

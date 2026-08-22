@@ -5364,7 +5364,7 @@ public class XWiki implements EventListener
                     String server = wikiDescriptor.getDefaultAlias();
                     if (server != null) {
                         String protocol = getWikiProtocol(wikiDescriptor);
-                        int port = getWikiPort(wikiDescriptor, xcontext);
+                        int port = getWikiPort(wikiDescriptor);
 
                         if (protocol == null && port == -1) {
                             // If request is a "real" one keep using the same protocol/port (if asking for the same wiki)
@@ -5430,7 +5430,7 @@ public class XWiki implements EventListener
         return null;
     }
 
-    private int getWikiPort(WikiDescriptor wikiDescriptor, XWikiContext context)
+    private int getWikiPort(WikiDescriptor wikiDescriptor)
     {
         // Try wiki descriptor
         int port = wikiDescriptor.getPort();
@@ -6231,7 +6231,7 @@ public class XWiki implements EventListener
         return new ZipOutputStream(context.getResponse().getOutputStream());
     }
 
-    private Map<String, SearchEngineRule> getSearchEngineRules(XWikiContext context)
+    private Map<String, SearchEngineRule> getSearchEngineRules()
     {
         // We currently hardcode the rules
         // We will put them in the preferences soon
@@ -6248,7 +6248,7 @@ public class XWiki implements EventListener
     {
         try {
             URL url = new URL(referer);
-            Map<String, SearchEngineRule> searchengines = getSearchEngineRules(context);
+            Map<String, SearchEngineRule> searchengines = getSearchEngineRules();
             if (searchengines != null) {
                 for (SearchEngineRule senginerule : searchengines.values()) {
                     String host = url.getHost();

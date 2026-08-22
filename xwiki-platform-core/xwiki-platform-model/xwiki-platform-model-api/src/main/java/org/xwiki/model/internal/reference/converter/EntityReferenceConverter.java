@@ -81,17 +81,17 @@ public class EntityReferenceConverter extends AbstractConverter<EntityReference>
                     logger.warn("The type [{}] cannot be converted natively to EntityReference, "
                         + "falling back on using toString to convert it. Root cause is [{}].",
                         value.getClass().getName(), ExceptionUtils.getRootCauseMessage(e));
-                    result = convertToType(type, value.toString());
+                    result = convertToType(value.toString());
                 }
             } else {
-                result = convertToType(type, value.toString());
+                result = convertToType(value.toString());
             }
         }
 
         return result;
     }
 
-    private EntityReference convertToType(Type type, String value)
+    private EntityReference convertToType(String value)
     {
         Namespace namespace = NamespaceUtils.toNamespace(value);
 

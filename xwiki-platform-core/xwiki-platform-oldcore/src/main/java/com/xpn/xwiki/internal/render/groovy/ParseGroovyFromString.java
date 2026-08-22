@@ -71,10 +71,10 @@ public class ParseGroovyFromString
         } catch (Exception e) {
         }
 
-        initCache(classCacheSize, xcontext);
+        initCache(classCacheSize);
     }
 
-    private void initCache(int iClassCapacity, XWikiContext context) throws XWikiException
+    private void initCache(int iClassCapacity) throws XWikiException
     {
         try {
             CacheConfiguration configuration = new LRUCacheConfiguration("xwiki.groovy.class", iClassCapacity);

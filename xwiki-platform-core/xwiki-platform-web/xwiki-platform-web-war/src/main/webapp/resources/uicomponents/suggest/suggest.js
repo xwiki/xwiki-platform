@@ -86,7 +86,10 @@ var XWiki = (function(XWiki){
       positions: [ "top" ],
       text: "$escapetool.javascript($services.localization.render('core.widgets.suggest.hide'))"
     },
+    // A node to insert before the suggestions
     insertBeforeSuggestions: null,
+    // A node to insert after the suggestions
+    insertAfterSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
     // Display value prefix text
@@ -626,11 +629,14 @@ var XWiki = (function(XWiki){
       this.resultContainer.down("ul").remove();
     }
 
-    var withEnableButton = typeof this.options.hideButton !== "undefined"
+    if (this.options.insertAfterSuggestions && !this.options.insertAfterSuggestions.parentNode) {
+      this.resultContainer.insert(this.options.insertAfterSuggestions);
+    }
+
+    var withEnableButton = this.options.hideButton
                         && typeof this.options.hideButton.positions === "object"
                         && this.options.hideButton.positions.length > 0;
     if (withEnableButton && !this.container.down('.hide-button')) {
-      // TODO: replace the label "hide suggestions" to an icon (see XWIKI-24324).
       var positions = this.options.hideButton.positions;
       for (var i=0; i< positions.length; i++) {
         var hideButton = new Element('button', {'class' : 'hide-button', 'type' : 'button'})

@@ -46,7 +46,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-tree'], function($, xm) {
             // For free pages, we can rely on the state of the "freePage" node
             answerProperties.selectAllFreePages = true;
           } else {
-            answerProperties.selectedDocuments.push(node.id);
+            answerProperties.selectedDocuments.push($.fn.xtree.unescapeNodeId(node.id));
           }
         }
 

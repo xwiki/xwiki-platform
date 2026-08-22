@@ -44,9 +44,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-tree'], function($, xm) {
         for (var i = 0; i < selectedNodes.length; ++i) {
           var node = selectedNodes[i];
           if (node.data.type == 'extension') {
-            answerProperties.selectedExtensions.push(node.id);
+            answerProperties.selectedExtensions.push($.fn.xtree.unescapeNodeId(node.id));
           } else if (node.data.type == 'page') {
-            answerProperties.selectedDocuments.push(node.id);
+            answerProperties.selectedDocuments.push($.fn.xtree.unescapeNodeId(node.id));
           } else if (node.id == 'freePages') {
             // For free pages, we can rely on the state of the "freePage" node
             answerProperties.selectAllFreePages = true;

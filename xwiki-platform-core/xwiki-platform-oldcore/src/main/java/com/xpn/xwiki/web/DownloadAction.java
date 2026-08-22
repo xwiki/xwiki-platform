@@ -250,7 +250,7 @@ public class DownloadAction extends XWikiAction
                 end = attachment.getContentLongSize(context) - 1L;
             }
             end = Math.min(end, attachment.getContentLongSize(context) - 1L);
-            writeByteRange(attachment, start, end, request, response, context);
+            writeByteRange(attachment, start, end, response, context);
             return true;
         }
         return false;
@@ -263,13 +263,12 @@ public class DownloadAction extends XWikiAction
      * @param attachment the attachment to get content from
      * @param start the first byte to write
      * @param end the last byte to write
-     * @param request the current client request
      * @param response the response to write to.
      * @param context the current request context
      * @throws XWikiException if the attachment content cannot be retrieved
      * @throws IOException if the response cannot be written
      */
-    private void writeByteRange(final XWikiAttachment attachment, Long start, Long end, final XWikiRequest request,
+    private void writeByteRange(final XWikiAttachment attachment, Long start, Long end,
         final XWikiResponse response, final XWikiContext context) throws XWikiException, IOException
     {
         if (start >= 0 && start < attachment.getContentLongSize(context)) {

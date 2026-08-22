@@ -187,11 +187,11 @@ public class DocumentLocaleReader extends AbstractReader
     private void switchWikiSpace(XARInputFilter proxyFilter, boolean force) throws FilterException
     {
         if (canSendEndWikiSpace(force)) {
-            sendEndWikiSpace(proxyFilter, force);
+            sendEndWikiSpace(proxyFilter);
         }
 
         if (canSendBeginWikiSpace(force)) {
-            sendBeginWikiSpace(proxyFilter, force);
+            sendBeginWikiSpace(proxyFilter);
         }
     }
 
@@ -201,7 +201,7 @@ public class DocumentLocaleReader extends AbstractReader
             && (force || this.properties.getEntities() == null);
     }
 
-    private void sendBeginWikiSpace(XARInputFilter proxyFilter, boolean force) throws FilterException
+    private void sendBeginWikiSpace(XARInputFilter proxyFilter) throws FilterException
     {
         int sentSize = this.sentSpaceReference != null ? this.sentSpaceReference.size() : 0;
         int size = this.currentSpaceReference != null ? this.currentSpaceReference.size() : 0;
@@ -224,7 +224,7 @@ public class DocumentLocaleReader extends AbstractReader
             && (force || this.properties.getEntities() == null);
     }
 
-    private void sendEndWikiSpace(XARInputFilter proxyFilter, boolean force) throws FilterException
+    private void sendEndWikiSpace(XARInputFilter proxyFilter) throws FilterException
     {
         List<EntityReference> sentSpaces = this.sentSpaceReference.getReversedReferenceChain();
         List<EntityReference> currentSpaces = this.currentSpaceReference.getReversedReferenceChain();
@@ -423,26 +423,26 @@ public class DocumentLocaleReader extends AbstractReader
         if (this.currentSourceType != null) {
             switch (this.currentSourceType) {
                 case ATTACHMENT:
-                    readAttachment(xmlReader, filter, proxyFilter);
+                    readAttachment(xmlReader, proxyFilter);
                     break;
 
                 case CLASS:
-                    readClass(xmlReader, filter, proxyFilter);
+                    readClass(xmlReader, proxyFilter);
 
                     break;
 
                 case CLASSPROPERTY:
-                    readClassProperty(xmlReader, filter, proxyFilter);
+                    readClassProperty(xmlReader, proxyFilter);
 
                     break;
 
                 case OBJECT:
-                    readObject(xmlReader, filter, proxyFilter);
+                    readObject(xmlReader, proxyFilter);
 
                     break;
 
                 case OBJECTPROPERTY:
-                    readObjectProperty(xmlReader, filter, proxyFilter);
+                    readObjectProperty(xmlReader, proxyFilter);
 
                     break;
 
@@ -501,11 +501,11 @@ public class DocumentLocaleReader extends AbstractReader
         String elementName = xmlReader.getLocalName();
 
         if (elementName.equals(XarAttachmentModel.ELEMENT_ATTACHMENT)) {
-            readAttachment(xmlReader, filter, proxyFilter);
+            readAttachment(xmlReader, proxyFilter);
         } else if (elementName.equals(XarObjectModel.ELEMENT_OBJECT)) {
-            readObject(xmlReader, filter, proxyFilter);
+            readObject(xmlReader, proxyFilter);
         } else if (elementName.equals(XarClassModel.ELEMENT_CLASS)) {
-            readClass(xmlReader, filter, proxyFilter);
+            readClass(xmlReader, proxyFilter);
         } else {
             if (XarDocumentModel.ELEMENT_SPACE.equals(elementName)) {
                 readSpace(xmlReader, proxyFilter);
@@ -611,7 +611,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void readObject(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
+    private void readObject(XMLStreamReader xmlReader, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
         if (this.currentSourceType == SourceType.DOCUMENT) {
@@ -627,13 +627,13 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void readObjectProperty(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
+    private void readObjectProperty(XMLStreamReader xmlReader, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
         this.objectPropertyReader.read(xmlReader, this.properties).send(proxyFilter);
     }
 
-    private void readClass(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
+    private void readClass(XMLStreamReader xmlReader, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
         if (this.currentSourceType == SourceType.DOCUMENT) {
@@ -647,13 +647,13 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void readClassProperty(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
+    private void readClassProperty(XMLStreamReader xmlReader, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
         this.classPropertyReader.read(xmlReader, this.properties).send(proxyFilter);
     }
 
-    private void readAttachment(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
+    private void readAttachment(XMLStreamReader xmlReader, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
         if (this.currentSourceType == SourceType.DOCUMENT) {

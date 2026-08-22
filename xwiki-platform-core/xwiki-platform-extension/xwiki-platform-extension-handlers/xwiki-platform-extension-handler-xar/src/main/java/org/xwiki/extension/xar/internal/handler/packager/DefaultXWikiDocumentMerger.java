@@ -112,7 +112,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         if (type != null) {
             switch (type) {
                 case OVERWRITE:
-                    return OVERWRITE(currentDocument, previousDocument, nextDocument, configuration);
+                    return OVERWRITE(previousDocument, nextDocument, configuration);
                 case SKIP:
                     return SKIP(currentDocument, previousDocument, nextDocument, configuration);
                 case SKIP_ALLWAYS:
@@ -175,7 +175,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         return result;
     }
 
-    private XWikiDocument OVERWRITE(XWikiDocument currentDocument, XWikiDocument previousDocument,
+    private XWikiDocument OVERWRITE(XWikiDocument previousDocument,
         XWikiDocument nextDocument, XWikiDocumentMergerConfiguration configuration)
     {
         // Always install new version no matter what

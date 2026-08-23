@@ -42,7 +42,7 @@ import org.xwiki.model.reference.DocumentReference;
  *
  * @version $Id$
  * @since 6.4M3
- * @deprecated starting with 6.4.2 this is replaced by the {@code usersandroups} Mime Message Factory
+ * @deprecated this is replaced by the {@code usersandroups} Mime Message Factory
  */
 @Deprecated(since = "6.4.2")
 public class UsersMimeMessageIterator extends AbstractMessageIterator

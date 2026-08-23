@@ -38,7 +38,7 @@ public class MoveRequest extends AbstractCopyOrMoveRequest
     /**
      * @see #isDeleteSource()
      *
-     * @deprecated Since 10.11 the MoveRequest does not handle copy anymore. So it should always delete the source.
+     * @deprecated The MoveRequest does not handle copy anymore. So it should always delete the source.
      */
     @Deprecated(since = "10.11")
     private static final String PROPERTY_DELETE_SOURCE = "deleteSource";
@@ -76,7 +76,7 @@ public class MoveRequest extends AbstractCopyOrMoveRequest
      *         {@code false} otherwise; in a standard move operation the source is deleted but sometimes you may want to
      *         keep the source as a backup; this option can also be used to perform a copy instead of a move; note that
      *         the difference between a copy and a standard move without delete is that the back-links are not updated
-     * @deprecated Since 10.11 the MoveRequest does not handle copy anymore. So it should always delete the source.
+     * @deprecated The MoveRequest does not handle copy anymore. So it should always delete the source.
      */
     @Deprecated(since = "10.11")
     public boolean isDeleteSource()
@@ -88,7 +88,7 @@ public class MoveRequest extends AbstractCopyOrMoveRequest
      * Sets whether the source entities specified by {@link #getEntityReferences()} should be deleted or not.
      * 
      * @param deleteSource {@code true} to delete the source, {@code false} to keep it as a backup
-     * @deprecated Since 10.11 the MoveRequest does not handle copy anymore. So it should always delete the source.
+     * @deprecated The MoveRequest does not handle copy anymore. So it should always delete the source.
      */
     @Deprecated(since = "10.11")
     public void setDeleteSource(boolean deleteSource)

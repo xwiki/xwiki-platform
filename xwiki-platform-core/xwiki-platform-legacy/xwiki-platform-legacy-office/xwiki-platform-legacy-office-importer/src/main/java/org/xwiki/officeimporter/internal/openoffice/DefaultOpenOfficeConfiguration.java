@@ -31,7 +31,7 @@ import org.xwiki.officeimporter.server.OfficeServerConfiguration;
  * 
  * @version $Id$
  * @since 1.8RC3
- * @deprecated since 5.0M2, use {@link OfficeServerConfiguration} instead
+ * @deprecated use {@link OfficeServerConfiguration} instead
  */
 @Component
 @Singleton

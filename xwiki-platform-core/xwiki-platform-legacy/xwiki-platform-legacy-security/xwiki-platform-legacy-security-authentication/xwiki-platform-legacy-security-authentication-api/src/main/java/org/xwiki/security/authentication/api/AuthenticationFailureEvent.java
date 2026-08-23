@@ -33,7 +33,7 @@ import org.xwiki.observation.event.Event;
  *
  * @version $Id$
  * @since 11.6RC1
- * @deprecated Since 13.1RC1, use {@link org.xwiki.security.authentication.AuthenticationFailureEvent}.
+ * @deprecated Use {@link org.xwiki.security.authentication.AuthenticationFailureEvent}.
  */
 @Deprecated(since = "13.1RC1")
 public class AuthenticationFailureEvent implements Event

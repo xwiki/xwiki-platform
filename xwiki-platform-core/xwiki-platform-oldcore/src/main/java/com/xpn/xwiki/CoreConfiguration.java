@@ -38,7 +38,7 @@ public interface CoreConfiguration
     /**
      * @return the default syntax to use for new documents
      * @since 2.3M1
-     * @deprecated starting with 11.0, use
+     * @deprecated use
      *     {@link org.xwiki.rendering.configuration.ExtendedRenderingConfiguration#getDefaultContentSyntax()}
      */
     @Deprecated(since = "11.0")

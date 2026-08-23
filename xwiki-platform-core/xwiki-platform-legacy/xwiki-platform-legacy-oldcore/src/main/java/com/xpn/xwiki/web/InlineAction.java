@@ -28,7 +28,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 /**
- * @deprecated use {@link EditAction} with {@code editor=inline} in the query string instead since 3.2
+ * @deprecated use {@link EditAction} with {@code editor=inline} in the query string instead
  *
  * @version $Id$
  */

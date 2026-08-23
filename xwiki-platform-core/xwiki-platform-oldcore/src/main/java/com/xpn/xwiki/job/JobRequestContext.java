@@ -40,7 +40,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  * 
  * @version $Id$
  * @since 8.3RC1
- * @deprecated since 10.9RC1, use {@link ContextStore} instead
+ * @deprecated use {@link ContextStore} instead
  */
 @Deprecated(since = "10.9RC1")
 public class JobRequestContext implements Serializable

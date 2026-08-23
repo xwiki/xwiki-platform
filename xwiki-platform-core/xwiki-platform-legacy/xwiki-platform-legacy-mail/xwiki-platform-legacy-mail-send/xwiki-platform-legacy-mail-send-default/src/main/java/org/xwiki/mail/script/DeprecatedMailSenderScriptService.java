@@ -53,7 +53,7 @@ import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
  *
  * @version $Id$
  * @since 6.1M2
- * @deprecated since 12.4RC1, use {@link MailSenderScriptService} instead
+ * @deprecated use {@link MailSenderScriptService} instead
  */
 @Component
 @Named("mailsender")

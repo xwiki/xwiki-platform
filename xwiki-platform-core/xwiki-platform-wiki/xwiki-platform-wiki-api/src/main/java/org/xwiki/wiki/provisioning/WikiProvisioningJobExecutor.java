@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Role;
  *
  * @since 5.3M3
  * @version $Id$
- * @deprecated since 7.0M2
+ * @deprecated
  */
 @Deprecated(since = "7.0M2")
 @Role

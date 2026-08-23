@@ -193,7 +193,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving an XObject.
      *
-     * @deprecated since 2.2M2 use {@link #getXClassReference()} instead
+     * @deprecated use {@link #getXClassReference()} instead
      */
     @Deprecated(since = "2.2M2")
     public String getClassName()
@@ -239,7 +239,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading an XObject.
      *
-     * @deprecated since 2.2.3 use {@link #setXClassReference(EntityReference)} ()} instead
+     * @deprecated use {@link #setXClassReference(EntityReference)} ()} instead
      */
     @Deprecated(since = "2.2.3")
     public void setClassName(String name)
@@ -785,7 +785,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     /**
-     * @deprecated since 9.0RC1, use {@link #toXML()} instead
+     * @deprecated use {@link #toXML()} instead
      */
     @Override
     @Deprecated(since = "9.0RC1")

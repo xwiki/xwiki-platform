@@ -33,7 +33,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * @version $Id$
  * @since 2.3M1
  * @see org.xwiki.model.internal.DefaultModelConfiguration
- * @deprecated since 7.1M2, used {@link DefaultEntityReferenceProvider} instead
+ * @deprecated used {@link DefaultEntityReferenceProvider} instead
  */
 @Component
 @Singleton

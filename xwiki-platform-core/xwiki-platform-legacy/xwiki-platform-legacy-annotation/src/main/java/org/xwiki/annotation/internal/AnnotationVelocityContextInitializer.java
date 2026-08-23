@@ -37,7 +37,7 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * 
  * @version $Id$
  * @since 2.3M1
- * @deprecated starting with 3.0RC1 use directly the Annotation Script Service from scripts
+ * @deprecated use directly the Annotation Script Service from scripts
  */
 @Component
 @Named("annotations")

@@ -60,7 +60,7 @@ public interface OfficeServerConfiguration
 
     /**
      * @return the port number used for connecting to the office server instance
-     * @deprecated Since 12.1RC1. Now use {@link #getServerPorts()}.
+     * @deprecated Now use {@link #getServerPorts()}.
      */
     @Deprecated(since = "12.1RC1")
     int getServerPort();

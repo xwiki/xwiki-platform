@@ -105,7 +105,7 @@ public class VfsResourceReference extends EntityResourceReference
      * @param fullURI the full opaque URI containing both the reference to the archive and the path to the entry inside
      * it, e.g. {@code attach:space.page@attachment/path/to/file}. Note that this constructor requires that the
      * full URL to be URL-encoded.
-     * @deprecated Since 12.4RC1, this constructor shouldn't be used anymore, in particular not for internal
+     * @deprecated This constructor shouldn't be used anymore, in particular not for internal
      * references such as {@code attach:space.page@attachment/path/to/file}, {@link #VfsResourceReference(String)}
      * should be used instead
      */
@@ -145,7 +145,7 @@ public class VfsResourceReference extends EntityResourceReference
 
     /**
      * @return the URI to the VFS (e.g. {@code attach:space.page@file.zip}, {@code http://server/path/to/zip})
-     * @deprecated Since 12.4RC1 this method shouldn't be used anymore, in favor of {@link #getReference}.
+     * @deprecated This method shouldn't be used anymore, in favor of {@link #getReference}.
      */
     @Deprecated(since = "12.4RC1")
     public URI getURI()

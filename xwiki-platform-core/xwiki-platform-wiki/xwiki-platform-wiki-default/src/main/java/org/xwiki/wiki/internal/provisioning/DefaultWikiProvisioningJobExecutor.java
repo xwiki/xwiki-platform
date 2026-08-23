@@ -49,7 +49,7 @@ import com.xpn.xwiki.XWikiContext;
  *
  * @since 6.0M1
  * @version $Id$
- * @deprecated since 7.0M2
+ * @deprecated
  */
 @Deprecated(since = "7.0M2")
 @Component

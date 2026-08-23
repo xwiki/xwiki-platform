@@ -348,7 +348,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     /**
-     * @deprecated since 4.0M1, use {@link com.xpn.xwiki.doc.XWikiDocument#getKey()}
+     * @deprecated use {@link com.xpn.xwiki.doc.XWikiDocument#getKey()}
      */
     @Deprecated(since = "4.0M1")
     public String getKey(XWikiDocument doc)
@@ -370,7 +370,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     /**
-     * @deprecated since 4.0M1, use {@link com.xpn.xwiki.doc.XWikiDocument#getKey()}
+     * @deprecated use {@link com.xpn.xwiki.doc.XWikiDocument#getKey()}
      */
     @Deprecated(since = "4.0M1")
     public String getKey(String fullName, String language, XWikiContext context)
@@ -382,7 +382,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     /**
-     * @deprecated since 4.0M1, use {@link com.xpn.xwiki.doc.XWikiDocument#getKey()}
+     * @deprecated use {@link com.xpn.xwiki.doc.XWikiDocument#getKey()}
      */
     @Deprecated(since = "4.0M1")
     public String getKey(final String wiki, final String fullName, final String language)

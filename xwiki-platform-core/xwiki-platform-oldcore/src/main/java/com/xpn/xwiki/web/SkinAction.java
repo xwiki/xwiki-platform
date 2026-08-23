@@ -568,7 +568,7 @@ public class SkinAction extends XWikiAction
      * @param mimetype The mimetype of the file. Used in the "Content-Type" header.
      * @param lastChanged The date of the last change of the file. Used in the "Last-Modified" header.
      * @param length The length of the content (in bytes). Used in the "Content-Length" header.
-     * @deprecated since 11.10RC1, use {@link #setupHeaders(XWikiResponse, String, Date, long)} instead
+     * @deprecated use {@link #setupHeaders(XWikiResponse, String, Date, long)} instead
      */
     @Deprecated(since = "11.10RC1")
     protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, int length)

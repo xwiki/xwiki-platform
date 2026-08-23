@@ -200,7 +200,7 @@ public class WikiTemplateManagerScript implements ScriptService
      * @param ownerId Id of the wiki owner
      * @param failOnExist fail the creation of the wiki id if not available
      * @return true if it succeed
-     * @deprecated since 7.0M2, use
+     * @deprecated use
      *             {@code org.xwiki.platform.wiki.creationjob.script.WikiCreationJobScriptServices#createWiki} instead
      */
     @Deprecated(since = "7.0M2")
@@ -248,7 +248,7 @@ public class WikiTemplateManagerScript implements ScriptService
 
     /**
      * @return the last exception, or null if there is not.
-     * @deprecated since 5.4RC1 use {@link #getLastError()} ()} instead
+     * @deprecated use {@link #getLastError()} ()} instead
      */
     @Deprecated(since = "5.4RC1")
     public Exception getLastException()
@@ -261,7 +261,7 @@ public class WikiTemplateManagerScript implements ScriptService
      *
      * @param jobId id of the provisioning job.
      * @return the status of the job
-     * @deprecated since 7.0M2
+     * @deprecated
      */
     @Deprecated(since = "7.0M2")
     public JobStatus getWikiProvisioningJobStatus(List<String> jobId)

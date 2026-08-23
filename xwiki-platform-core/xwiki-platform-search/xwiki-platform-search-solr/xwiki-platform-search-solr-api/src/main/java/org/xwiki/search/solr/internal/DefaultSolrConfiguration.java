@@ -73,7 +73,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     /**
      * Default component type.
      * 
-     * @deprecated since 11.9RC1, use {@link #SOLR_TYPE_DEFAULT} instead.
+     * @deprecated use {@link #SOLR_TYPE_DEFAULT} instead.
      */
     @Deprecated(since = "11.9RC1")
     public static final String DEFAULT_SOLR_TYPE = SOLR_TYPE_DEFAULT;

@@ -65,7 +65,7 @@ import com.xpn.xwiki.util.Util;
  *
  * @version $Id$
  * @since 2.4M1
- * @deprecated Use the "tmp" resource reference handler instead since 8.3
+ * @deprecated Use the "tmp" resource reference handler instead
  */
 @Component
 @Named("temp")

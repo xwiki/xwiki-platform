@@ -32,7 +32,7 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
  *
  * @version $Id$
  * @since 4.3M1
- * @deprecated since 9.0RC1, use {@link com.xpn.xwiki.doc.AbstractMandatoryDocumentInitializer} instead
+ * @deprecated use {@link com.xpn.xwiki.doc.AbstractMandatoryDocumentInitializer} instead
  */
 @Deprecated(since = "9.0RC1")
 public abstract class AbstractMandatoryDocumentInitializer extends AbstractMandatoryClassInitializer

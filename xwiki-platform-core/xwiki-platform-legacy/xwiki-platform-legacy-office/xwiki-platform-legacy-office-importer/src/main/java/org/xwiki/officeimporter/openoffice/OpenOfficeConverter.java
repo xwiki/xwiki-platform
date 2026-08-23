@@ -27,7 +27,7 @@ import java.util.Map;
  * 
  * @version $Id$
  * @since 2.2M1
- * @deprecated since 5.0M2, use the {@link org.xwiki.officeimporter.converter.OfficeConverter} instead
+ * @deprecated use the {@link org.xwiki.officeimporter.converter.OfficeConverter} instead
  */
 @Deprecated(since = "5.0M2")
 public interface OpenOfficeConverter

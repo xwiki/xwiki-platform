@@ -77,7 +77,7 @@ public class ScriptMailResult implements MailResult
     /**
      * @return true if all the mails from this batch have been processed (sent successfully or not) or false otherwise
      * @since 6.4RC1
-     * @deprecated since 7.1M2 use {@link MailStatusResult#isProcessed()} instead. Kept to not break
+     * @deprecated use {@link MailStatusResult#isProcessed()} instead. Kept to not break
      *             script backward compatibility
      */
     @Deprecated(since = "7.1M2")

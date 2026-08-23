@@ -30,7 +30,7 @@ import org.xwiki.officeimporter.server.OfficeServerConfiguration;
  * 
  * @version $Id$
  * @since 1.8RC3
- * @deprecated since 5.0M2, use the {@link OfficeServerConfiguration} instead.
+ * @deprecated use the {@link OfficeServerConfiguration} instead.
  */
 @Role
 @Deprecated(since = "5.0M2")

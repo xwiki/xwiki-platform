@@ -23,7 +23,7 @@ import com.xpn.xwiki.plugin.PluginException;
 
 /**
  * @version $Id$
- * @deprecated since 5.2, use Filter framework instead
+ * @deprecated use Filter framework instead
  */
 @Deprecated(since = "5.2")
 public class PackageException extends PluginException

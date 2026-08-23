@@ -87,7 +87,7 @@ public class EntityRequest extends AbstractCheckRightsRequest
     /**
      * @return the type of job that should perform this request; this is useful when different jobs use the same type of
      *         request
-     * @deprecated since 9.2RC1, use {@link EntityJobStatus#getJobType()} instead
+     * @deprecated use {@link EntityJobStatus#getJobType()} instead
      */
     @Deprecated(since = "9.2RC1")
     public String getJobType()

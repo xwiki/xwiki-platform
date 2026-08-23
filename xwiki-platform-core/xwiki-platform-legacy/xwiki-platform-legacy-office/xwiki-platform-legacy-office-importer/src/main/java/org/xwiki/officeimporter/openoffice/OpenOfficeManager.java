@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.Role;
  * 
  * @version $Id$
  * @since 1.8RC3
- * @deprecated since 5.0M2, use {@link org.xwiki.officeimporter.server.OfficeServer} instead
+ * @deprecated use {@link org.xwiki.officeimporter.server.OfficeServer} instead
  */
 @Role
 @Deprecated(since = "5.0M2")

@@ -337,7 +337,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 
     /**
      * @return the current HTTP servlet request, used to take the cookies from
-     * @deprecated since 17.4.0RC1
+     * @deprecated
      */
     @Deprecated(since = "17.4.0RC1")
     protected abstract javax.servlet.http.HttpServletRequest getRequest();

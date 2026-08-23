@@ -263,7 +263,7 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * @return the number of bytes in this attachment content
-     * @deprecated since 9.0RC1, use {@link #getLongSize()} instead
+     * @deprecated use {@link #getLongSize()} instead
      */
     @Deprecated(since = "9.0RC1")
     public int getFilesize()
@@ -277,7 +277,7 @@ public class XWikiAttachment implements Cloneable
      * Set cached filesize of the attachment that will be stored as metadata.
      *
      * @param filesize the number of bytes in this attachment content
-     * @deprecated since 9.0RC1, use {@link #setLongSize(long)} instead
+     * @deprecated use {@link #setLongSize(long)} instead
      */
     @Deprecated(since = "9.0RC1")
     public void setFilesize(int filesize)
@@ -327,7 +327,7 @@ public class XWikiAttachment implements Cloneable
      * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
      * @throws XWikiException
      * @since 2.3M2
-     * @deprecated since 9.0RC1, use {@link #getContentLongSize(XWikiContext)} instead
+     * @deprecated use {@link #getContentLongSize(XWikiContext)} instead
      */
     @Deprecated(since = "9.0RC1")
     public int getContentSize(XWikiContext context) throws XWikiException
@@ -412,7 +412,7 @@ public class XWikiAttachment implements Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 6.4M1 use {@link #getAuthorReference()} instead
+     * @deprecated use {@link #getAuthorReference()} instead
      */
     @Deprecated(since = "6.4M1")
     public String getAuthor()
@@ -427,7 +427,7 @@ public class XWikiAttachment implements Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
-     * @deprecated since 6.4M1 use {@link #setAuthorReference} instead
+     * @deprecated use {@link #setAuthorReference} instead
      */
     @Deprecated(since = "6.4M1")
     public void setAuthor(String author)
@@ -997,7 +997,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     * @deprecated please do not use this, it is bound to a jrcs based implementation.
      */
     @Deprecated(since = "2.6M1")
     public Archive getArchive()
@@ -1010,7 +1010,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     * @deprecated please do not use this, it is bound to a jrcs based implementation.
      */
     @Deprecated(since = "2.6M1")
     public void setArchive(Archive archive)
@@ -1145,7 +1145,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @deprecated since 9.11RC1, use {@link #loadAttachmentContent(XWikiContext)} instead
+     * @deprecated use {@link #loadAttachmentContent(XWikiContext)} instead
      */
     @Deprecated(since = "9.11RC1")
     public void loadContent(XWikiContext xcontext)

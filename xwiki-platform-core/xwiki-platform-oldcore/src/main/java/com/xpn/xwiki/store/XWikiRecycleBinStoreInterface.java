@@ -82,7 +82,7 @@ public interface XWikiRecycleBinStoreInterface
      * @param context - used while loading
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException if error while loading
-     * @deprecated since 9.4RC1. The document parameter is useless and gets in the way. Use
+     * @deprecated The document parameter is useless and gets in the way. Use
      *             {@link #restoreFromRecycleBin(long, XWikiContext, boolean)} instead.
      */
     @Deprecated(since = "9.4RC1")
@@ -113,7 +113,7 @@ public interface XWikiRecycleBinStoreInterface
      * @param context - used while loading
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException if error while loading
-     * @deprecated since 9.4RC1. The document parameter is useless and gets in the way. Use
+     * @deprecated The document parameter is useless and gets in the way. Use
      *             {@link #getDeletedDocument(long, XWikiContext, boolean)} instead.
      */
     @Deprecated(since = "9.4RC1")
@@ -212,7 +212,7 @@ public interface XWikiRecycleBinStoreInterface
      * @param context - used for environment
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException if any error
-     * @deprecated since 9.4RC1. The document parameter is useless and gets in the way. Use
+     * @deprecated The document parameter is useless and gets in the way. Use
      *             {@link #deleteFromRecycleBin(long, XWikiContext, boolean)} instead.
      */
     @Deprecated(since = "9.4RC1")

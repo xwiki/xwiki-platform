@@ -532,7 +532,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * Render content in the current document's context with the rights of the given user.
      *
      * @since 8.3M2
-     * @deprecated since 10.11RC1, use
+     * @deprecated use
      *             {@link #renderContentInContext(String, String, DocumentReference, DocumentReference, XWikiContext)}
      *             instead
      */
@@ -760,7 +760,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * Sets the property class type.
      *
      * @param type the class type
-     * @deprecated since 4.3M1, the property class type cannot be modified
+     * @deprecated the property class type cannot be modified
      */
     @Deprecated(since = "4.3M1")
     public void setClassType(String type)

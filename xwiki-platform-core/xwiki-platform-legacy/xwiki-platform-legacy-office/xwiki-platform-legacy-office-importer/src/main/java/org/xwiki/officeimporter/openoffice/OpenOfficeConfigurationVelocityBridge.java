@@ -27,7 +27,7 @@ import org.xwiki.script.service.ScriptService;
  * 
  * @version $Id$
  * @since 1.9RC1
- * @deprecated since 4.1M1 use the {@link ScriptService} with hint "officemanager" instead; the office manager script
+ * @deprecated use the {@link ScriptService} with hint "officemanager" instead; the office manager script
  *             service has a method to retrieve the configuration, {@link OfficeServerScriptService#getConfig()}
  */
 @Deprecated(since = "4.1M1")

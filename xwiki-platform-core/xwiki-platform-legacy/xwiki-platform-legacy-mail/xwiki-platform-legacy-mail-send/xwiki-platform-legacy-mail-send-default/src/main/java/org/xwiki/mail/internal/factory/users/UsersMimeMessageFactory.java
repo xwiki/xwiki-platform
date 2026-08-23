@@ -39,7 +39,7 @@ import org.xwiki.model.reference.DocumentReference;
  *
  * @version $Id$
  * @since 6.4.1
- * @deprecated starting with 6.4.2 this is replaced by the {@code usersandroups} Mime Message Factory
+ * @deprecated this is replaced by the {@code usersandroups} Mime Message Factory
  */
 @Component
 @Named("users")

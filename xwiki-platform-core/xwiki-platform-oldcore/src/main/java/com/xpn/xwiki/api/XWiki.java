@@ -434,7 +434,7 @@ public class XWiki extends Api
      * @param index - {@link XWikiDocument#getId()}
      * @return the specified document from the recycle bin
      * @throws XWikiException if any error
-     * @deprecated since 9.4RC1. Use {@link #getDeletedDocument(String)} instead.
+     * @deprecated Use {@link #getDeletedDocument(String)} instead.
      */
     @Deprecated(since = "9.4RC1")
     public DeletedDocument getDeletedDocument(String fullname, String locale, String index) throws XWikiException
@@ -1015,7 +1015,7 @@ public class XWiki extends Api
      *
      * @param content
      * @return evaluated content if the content contains velocity scripts
-     * @deprecated Since 7.2M1. Use specific rendering/parsing options for the content type you want to parse/render.
+     * @deprecated Use specific rendering/parsing options for the content type you want to parse/render.
      */
     @Deprecated(since = "7.2M1")
     public String parseContent(String content)
@@ -1352,7 +1352,7 @@ public class XWiki extends Api
      * Same as {@link #getLocalePreference()} but as a String.
      *
      * @return the locale to use
-     * @deprecated since 8.0M1, use {@link #getLocalePreference()} instead
+     * @deprecated use {@link #getLocalePreference()} instead
      */
     @Deprecated(since = "8.0M1")
     public String getLanguagePreference()
@@ -1379,7 +1379,7 @@ public class XWiki extends Api
      * Same as {@link #getInterfaceLocalePreference()} but as a String.
      *
      * @return the document locale preference for the request
-     * @deprecated since 8.0M1, use {@link #getInterfaceLocalePreference()} instead
+     * @deprecated use {@link #getInterfaceLocalePreference()} instead
      */
     @Deprecated(since = "8.0M1")
     public String getInterfaceLanguagePreference()

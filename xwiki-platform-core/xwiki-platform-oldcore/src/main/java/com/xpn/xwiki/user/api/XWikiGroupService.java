@@ -38,19 +38,19 @@ public interface XWikiGroupService
     void init(XWiki xwiki, XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 10.8RC1, use GroupManager component instead
+     * @deprecated use GroupManager component instead
      */
     @Deprecated(since = "10.8RC1")
     void initCache(XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 10.8RC1, use GroupManager component instead
+     * @deprecated use GroupManager component instead
      */
     @Deprecated(since = "10.8RC1")
     void initCache(int iCapacity, XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 10.8RC1, use GroupManager component instead
+     * @deprecated use GroupManager component instead
      */
     @Deprecated(since = "10.8RC1")
     void flushCache();

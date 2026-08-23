@@ -235,7 +235,7 @@ public class Context extends Api
      *
      * @return The locale of the current request.
      * @see #getInterfaceLanguage()
-     * @deprecated since 6.0M1, use {@link #getLocale()} instead
+     * @deprecated use {@link #getLocale()} instead
      */
     @Deprecated(since = "6.0M1")
     public String getLanguage()
@@ -262,7 +262,7 @@ public class Context extends Api
      *
      * @return The interface locale preference of the current user.
      * @see #getLanguage()
-     * @deprecated since 6.0M1, use {@link #getInterfaceLocale()} instead
+     * @deprecated use {@link #getInterfaceLocale()} instead
      */
     @Deprecated(since = "6.0M1")
     public String getInterfaceLanguage()
@@ -423,7 +423,7 @@ public class Context extends Api
      * Returns the list of TextArea fields that use the WYSIWYG editor. This list is automatically built when displaying
      * TextArea properties.
      *
-     * @deprecated since 8.2RC1 when we started using the Edit Module to load the configured WYSIWYG editor
+     * @deprecated when we started using the Edit Module to load the configured WYSIWYG editor
      * @return a string containing a comma-separated list of TextArea field names for which the WYSIWYG editor should be
      *         enabled
      */

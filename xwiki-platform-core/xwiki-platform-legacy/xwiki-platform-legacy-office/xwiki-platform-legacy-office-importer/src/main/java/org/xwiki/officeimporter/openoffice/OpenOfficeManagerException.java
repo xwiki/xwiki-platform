@@ -24,7 +24,7 @@ package org.xwiki.officeimporter.openoffice;
  * 
  * @version $Id$
  * @since 1.8RC3
- * @deprecated since 5.0M2, use {@link org.xwiki.officeimporter.server.OfficeServerException} instead.
+ * @deprecated use {@link org.xwiki.officeimporter.server.OfficeServerException} instead.
  */
 @Deprecated(since = "5.0M2")
 public class OpenOfficeManagerException extends Exception

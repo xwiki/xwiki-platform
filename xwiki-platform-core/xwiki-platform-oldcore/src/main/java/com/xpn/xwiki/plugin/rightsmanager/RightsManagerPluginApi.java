@@ -202,7 +202,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @param member the name of the member (user or group).
      * @return the {@link Collection} of {@link String} containing group name.
      * @throws XWikiException error when browsing groups.
-     * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
+     * @deprecated use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
     @Deprecated(since = "10.8RC1")
     public Collection<String> getAllGroupsNamesForMember(String member) throws XWikiException
@@ -226,7 +226,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @param group the name of the group.
      * @return the {@link Collection} of {@link String} containing member (user or group) name.
      * @throws XWikiException error when browsing groups.
-     * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
+     * @deprecated use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
     @Deprecated(since = "10.8RC1")
     public Collection<String> getAllMembersNamesForGroup(String group) throws XWikiException
@@ -242,7 +242,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @param start the index of the first found user to return.
      * @return the {@link Collection} of {@link String} containing member (user or group) name.
      * @throws XWikiException error when browsing groups.
-     * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
+     * @deprecated use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
     @Deprecated(since = "10.8RC1")
     public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start) throws XWikiException
@@ -305,7 +305,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @param member the name of the member (user or group).
      * @return the number of groups.
      * @throws XWikiException error when getting number of users.
-     * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
+     * @deprecated use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
     @Deprecated(since = "10.8RC1")
     public int countAllGroupsNamesForMember(String member) throws XWikiException
@@ -327,7 +327,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @param group the name of the group.
      * @return the number of members.
      * @throws XWikiException error when getting number of groups.
-     * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
+     * @deprecated use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
     @Deprecated(since = "10.8RC1")
     public int countAllMembersNamesForGroup(String group) throws XWikiException

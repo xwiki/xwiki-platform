@@ -27,7 +27,7 @@ import org.xwiki.observation.event.filter.EventFilter;
  * Base class for all document {@link Event events}.
  * 
  * @version $Id$
- * @deprecated since 2.7RC1 use {@link org.xwiki.bridge.event.AbstractDocumentEvent} instead
+ * @deprecated use {@link org.xwiki.bridge.event.AbstractDocumentEvent} instead
  */
 @Deprecated(since = "2.7RC1")
 public abstract class AbstractDocumentEvent extends AbstractFilterableEvent

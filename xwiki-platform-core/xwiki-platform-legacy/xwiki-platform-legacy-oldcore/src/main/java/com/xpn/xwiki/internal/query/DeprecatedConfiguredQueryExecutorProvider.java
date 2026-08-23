@@ -32,7 +32,7 @@ import org.xwiki.query.QueryExecutor;
  * 
  * @version $Id$
  * @since 3.2M2
- * @deprecated since 4.0M1 use the provider with default hint
+ * @deprecated use the provider with default hint
  */
 @Component
 @Named("queryExecutor")

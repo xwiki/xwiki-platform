@@ -2161,7 +2161,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 3.0M3 use {@link #getAuthorReference()} instead
+     * @deprecated use {@link #getAuthorReference()} instead
      */
     @Deprecated(since = "3.0M3")
     public String getAuthor()

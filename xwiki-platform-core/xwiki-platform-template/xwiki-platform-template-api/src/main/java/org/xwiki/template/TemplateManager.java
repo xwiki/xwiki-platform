@@ -404,7 +404,7 @@ public interface TemplateManager
      * @return the template
      * @throws Exception if an error occurred during template instantiation
      * @since 9.6RC1
-     * @deprecated since 14.0CR1, use {@link #createStringTemplate(String, DocumentReference, DocumentReference)}
+     * @deprecated CR1, use {@link #createStringTemplate(String, DocumentReference, DocumentReference)}
      *             instead
      */
     @Deprecated(since = "14.0")

@@ -24,7 +24,7 @@ package org.xwiki.rendering.macro.script;
  * 
  * @version $Id$
  * @since 2.5M1
- * @deprecated starting with 4.1M1 use {@link MacroPermissionPolicy} instead
+ * @deprecated use {@link MacroPermissionPolicy} instead
  */
 @Deprecated(since = "4.1M1")
 public interface PrivilegedScriptMacro extends ScriptMacro

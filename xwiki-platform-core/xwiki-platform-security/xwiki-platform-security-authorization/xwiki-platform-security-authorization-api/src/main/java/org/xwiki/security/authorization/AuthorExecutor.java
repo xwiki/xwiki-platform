@@ -41,7 +41,7 @@ public interface AuthorExecutor
      * @return computed result
      * @throws Exception if unable to compute a result
      * @param <V> the result type of method {@code call}
-     * @deprecated since 10.11RC1, use {@link #call(Callable, DocumentReference, DocumentReference)} instead
+     * @deprecated use {@link #call(Callable, DocumentReference, DocumentReference)} instead
      */
     @Deprecated(since = "10.11RC1")
     <V> V call(Callable<V> callable, DocumentReference authorReference) throws Exception;
@@ -78,7 +78,7 @@ public interface AuthorExecutor
      * @param authorReference the user to check rights on
      * @return the context to restore
      * @see #after(AutoCloseable)
-     * @deprecated since 10.11RC1, use {@link #before(DocumentReference, DocumentReference)} instead
+     * @deprecated use {@link #before(DocumentReference, DocumentReference)} instead
      */
     @Deprecated(since = "10.11RC1")
     AutoCloseable before(DocumentReference authorReference);

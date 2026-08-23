@@ -116,7 +116,7 @@ public class GroupsClass extends ListClass
     /**
      * @return {@code true} if the list box that is used to select the groups should be filled with all the available
      *         groups, {@code false} otherwise
-     * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
+     * @deprecated this meta property is not used anymore because we changed the default displayer
      */
     @Deprecated(since = "4.3M2")
     public boolean isUsesList()
@@ -130,7 +130,7 @@ public class GroupsClass extends ListClass
      *
      * @param usesList {@code true} to fill the list box that is used to select the groups with all the available
      *            groups, {@code false} otherwise
-     * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
+     * @deprecated this meta property is not used anymore because we changed the default displayer
      */
     @Deprecated(since = "4.3M2")
     public void setUsesList(boolean usesList)

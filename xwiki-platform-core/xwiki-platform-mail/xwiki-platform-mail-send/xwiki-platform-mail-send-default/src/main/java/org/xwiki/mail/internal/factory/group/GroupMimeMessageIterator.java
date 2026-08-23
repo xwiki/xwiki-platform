@@ -47,7 +47,7 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  * @since 6.4M3
- * @deprecated starting with 6.4.2 this is replaced by the {@code usersandroups} Mime Message Factory
+ * @deprecated this is replaced by the {@code usersandroups} Mime Message Factory
  */
 @Deprecated(since = "6.4.2")
 public class GroupMimeMessageIterator extends AbstractMessageIterator

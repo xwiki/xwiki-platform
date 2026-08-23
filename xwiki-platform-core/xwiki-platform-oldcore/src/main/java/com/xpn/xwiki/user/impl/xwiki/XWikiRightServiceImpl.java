@@ -56,7 +56,7 @@ import com.xpn.xwiki.web.Utils;
  * Default implementation of {@link XWikiRightService}.
  *
  * @version $Id$
- * @deprecated since 4.0, use XWikiCachingRightService instead
+ * @deprecated use XWikiCachingRightService instead
  */
 @Deprecated(since = "4.0")
 public class XWikiRightServiceImpl implements XWikiRightService

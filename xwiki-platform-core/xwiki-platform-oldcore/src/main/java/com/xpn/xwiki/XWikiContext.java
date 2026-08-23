@@ -327,7 +327,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 6.1M1, use {@link #getWikiId()} instead
+     * @deprecated use {@link #getWikiId()} instead
      */
     @Deprecated(since = "6.1M1")
     public String getDatabase()
@@ -355,7 +355,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     /**
      * @param wikiId the current wiki id
-     * @deprecated since 6.1M1, use {@link #setWikiId(String)} instead
+     * @deprecated use {@link #setWikiId(String)} instead
      */
     @Deprecated(since = "6.1M1")
     public void setDatabase(String wikiId)
@@ -484,7 +484,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * switched to load some piece of data, this will remember what it should be switched back to.
      *
      * @return the wiki id originally requested by the user.
-     * @deprecated since 6.1M1, use {@link #getOriginalWikiId()} instead
+     * @deprecated use {@link #getOriginalWikiId()} instead
      */
     @Deprecated(since = "6.1M1")
     public String getOriginalDatabase()
@@ -505,7 +505,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 6.1M1, use {@link #setOriginalWikiId(String)} instead
+     * @deprecated use {@link #setOriginalWikiId(String)} instead
      */
     @Deprecated(since = "6.1M1")
     public void setOriginalDatabase(String wikiId)
@@ -614,7 +614,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 3.1M1 use {@link #setUserReference(DocumentReference)} instead
+     * @deprecated use {@link #setUserReference(DocumentReference)} instead
      */
     @Deprecated(since = "3.1M1")
     public void setUser(String user)
@@ -623,7 +623,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
+     * @deprecated use {@link #getUserReference()} instead
      */
     @Deprecated(since = "3.1M1")
     public String getUser()
@@ -641,7 +641,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
+     * @deprecated use {@link #getUserReference()} instead
      */
     @Deprecated(since = "3.1M1")
     public String getLocalUser()
@@ -654,7 +654,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 3.1M1 use {@link #getUserReference()} instead
+     * @deprecated use {@link #getUserReference()} instead
      */
     @Deprecated(since = "3.1M1")
     public XWikiUser getXWikiUser()
@@ -668,7 +668,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 4.3M1 use {@link #getLocale()} instead
+     * @deprecated use {@link #getLocale()} instead
      */
     @Deprecated(since = "4.3M1")
     public String getLanguage()
@@ -677,7 +677,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 4.3M1 use {@link #setLocale(Locale)} instead
+     * @deprecated use {@link #setLocale(Locale)} instead
      */
     @Deprecated(since = "4.3M1")
     public void setLanguage(String language)
@@ -711,7 +711,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 6.0M1, use {@link #getInterfaceLocale()} instead
+     * @deprecated use {@link #getInterfaceLocale()} instead
      */
     @Deprecated(since = "6.0M1")
     public String getInterfaceLanguage()
@@ -928,7 +928,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 4.3M2 use {@link org.xwiki.localization.ContextualLocalizationManager} component instead
+     * @deprecated use {@link org.xwiki.localization.ContextualLocalizationManager} component instead
      */
     @Deprecated(since = "4.3M2")
     public XWikiMessageTool getMessageTool()
@@ -966,7 +966,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * Returns the list of TextArea fields that use the WYSIWYG editor. This list is automatically built when displaying
      * TextArea properties.
      *
-     * @deprecated since 8.2RC1 when we started using the Edit Module to load the configured WYSIWYG editor
+     * @deprecated when we started using the Edit Module to load the configured WYSIWYG editor
      * @return a string containing a comma-separated list of TextArea field names for which the WYSIWYG editor should be
      *         enabled
      */

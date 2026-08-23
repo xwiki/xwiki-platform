@@ -396,7 +396,7 @@ public class XWikiException extends Exception
     }
 
     /**
-     * @deprecated since 5.2M2, use {@link #getCause()} instead
+     * @deprecated use {@link #getCause()} instead
      */
     @Deprecated(since = "5.2M2")
     public Throwable getException()
@@ -405,7 +405,7 @@ public class XWikiException extends Exception
     }
 
     /**
-     * @deprecated since 5.2M2, use {@link #initCause(Throwable)} instead
+     * @deprecated use {@link #initCause(Throwable)} instead
      */
     @Deprecated(since = "5.2M2")
     public void setException(Throwable exception)
@@ -460,7 +460,7 @@ public class XWikiException extends Exception
     /**
      * Has no effect.
      *
-     * @deprecated since 5.2M2, the message should be passed to the constructor
+     * @deprecated the message should be passed to the constructor
      */
     @Deprecated(since = "5.2M2")
     public void setMessage(String message)

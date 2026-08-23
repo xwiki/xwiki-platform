@@ -42,7 +42,7 @@ import com.xpn.xwiki.XWikiConfig;
  * 
  * @version $Id$
  * @since 1.9.1
- * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
+ * @deprecated use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
  */
 @Deprecated(since = "6.1M2")
 public class XWikiConfigurationService

@@ -50,7 +50,7 @@ import com.xpn.xwiki.XWikiContext;
  *
  * @version $Id$
  * @since 6.4M3
- * @deprecated since 12.4RC1, use {@link MailStorageScriptService} instead
+ * @deprecated use {@link MailStorageScriptService} instead
  */
 @Component
 @Named("mailstorage")

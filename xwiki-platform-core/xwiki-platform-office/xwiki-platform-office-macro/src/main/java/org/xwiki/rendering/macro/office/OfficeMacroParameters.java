@@ -74,7 +74,7 @@ public class OfficeMacroParameters
 
     /**
      * @return a string reference to the office attachment to be viewed
-     * @deprecated since 5.4.6, use {@link #getReference()} instead
+     * @deprecated use {@link #getReference()} instead
      */
     @Deprecated(since = "5.4.6")
     public String getAttachment()

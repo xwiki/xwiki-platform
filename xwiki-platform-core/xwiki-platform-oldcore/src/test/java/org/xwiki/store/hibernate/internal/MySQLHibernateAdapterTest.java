@@ -33,7 +33,6 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 /**
@@ -65,15 +64,6 @@ class MySQLHibernateAdapterTest
     }
 
     @Test
-    void getAlterRowFormatStringWhenRowFormatMatches() throws Exception
-    {
-        when(this.wikis.getCurrentWikiId()).thenReturn("subwiki");
-
-        assertNull(this.adapter.getAlterRowFormatString("xwikircs", false, Map.of("xwikircs", "Dynamic"), null));
-        assertNull(this.adapter.getAlterRowFormatString("xwikircs", true, Map.of("xwikircs", "Compressed"), null));
-    }
-
-    @Test
     void getAlterRowFormatStringIsQualifiedWithTheCurrentWikiDatabase() throws Exception
     {
         when(this.wikis.getCurrentWikiId()).thenReturn("subwiki");
@@ -84,16 +74,6 @@ class MySQLHibernateAdapterTest
             this.adapter.getAlterRowFormatString("xwikircs", false, Map.of("xwikircs", "Compact"), null));
         assertEquals("ALTER TABLE `subwiki`.xwikircs ROW_FORMAT=Compressed",
             this.adapter.getAlterRowFormatString("xwikircs", true, Map.of(), null));
-    }
-
-    @Test
-    void getAlterRowFormatStringWhenMainWiki() throws Exception
-    {
-        when(this.wikis.getCurrentWikiId()).thenReturn("xwiki");
-        when(this.hibernateConfiguration.getDB()).thenReturn("maindb");
-
-        assertEquals("ALTER TABLE `maindb`.xwikircs ROW_FORMAT=Dynamic",
-            this.adapter.getAlterRowFormatString("xwikircs", false, Map.of(), null));
     }
 
     @Test

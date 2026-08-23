@@ -102,7 +102,7 @@ public interface GroupFilter
      * @param name the name of the group
      * @param parameters the parameters of the group
      * @throws FilterException when failing to send event
-     * @deprecated since 7.4.5, 8.2.2, 8.3M1 because it's conflicting with Rendering Listener events, use
+     * @deprecated because it's conflicting with Rendering Listener events, use
      *             {@link #beginGroupContainer(String, FilterEventParameters)} instead
      */
     @Name("groupContainer")
@@ -114,7 +114,7 @@ public interface GroupFilter
      * @param name the name of the group
      * @param parameters the parameters of the group
      * @throws FilterException when failing to send event
-     * @deprecated since 7.4.5, 8.2.2, 8.3M1 because it's conflicting with Rendering Listener events, use
+     * @deprecated because it's conflicting with Rendering Listener events, use
      *             {@link #beginGroupContainer(String, FilterEventParameters)} instead
      */
     @Name("groupContainer")

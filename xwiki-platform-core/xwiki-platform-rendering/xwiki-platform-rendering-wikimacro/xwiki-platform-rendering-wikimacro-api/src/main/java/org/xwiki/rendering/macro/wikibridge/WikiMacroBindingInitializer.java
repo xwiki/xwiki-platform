@@ -29,8 +29,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  *
  * @version $Id$
  * @since 10.6RC1
- * @deprecated Since 11.6RC1, 10.11.9, 11.3.2.
- *              Use {@link org.xwiki.rendering.macro.wikibridge.binding.WikiMacroBindingInitializer} instead.
+ * @deprecated Use {@link org.xwiki.rendering.macro.wikibridge.binding.WikiMacroBindingInitializer} instead.
  */
 @Role
 @Deprecated(since = "11.3.2")

@@ -52,7 +52,7 @@ public class WikiDocument
      * @param fullName full name of the target wiki page
      * @param xdom {@link XDOM} for the target wiki page
      * @param parent the parent {@link WikiDocument} of this document
-     * @deprecated since 14.10.2, 15.0RC1 use {@link #WikiDocument(DocumentReference, XDOM, WikiDocument)} instead
+     * @deprecated use {@link #WikiDocument(DocumentReference, XDOM, WikiDocument)} instead
      */
     @Deprecated(since = "15.0RC1")
     public WikiDocument(String fullName, XDOM xdom, WikiDocument parent)
@@ -78,7 +78,7 @@ public class WikiDocument
 
     /**
      * @return full name of the target wiki page
-     * @deprecated since 14.10.2, 15.0RC1 use {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
     @Deprecated(since = "15.0RC1")
     public String getFullName()

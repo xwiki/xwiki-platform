@@ -84,7 +84,7 @@ public class HeadingNameNamingCriterion extends AbstractNamingCriterion
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
      * @param plainTextRenderer the renderer to convert to plain text
      * @param prependBasePageName a flag indicating if each generated page name should be prepended with base page name.
-     * @deprecated since 14.10.2, 15.0RC1 inject this as a component instead and set the base reference through
+     * @deprecated inject this as a component instead and set the base reference through
      *             {@link #getParameters()}
      */
     @Deprecated(since = "15.0RC1")

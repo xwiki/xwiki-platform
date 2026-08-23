@@ -58,7 +58,7 @@ public interface XDOMOfficeDocumentSplitter
      *         name for the corresponding xdom office document
      * @throws OfficeImporterException if an error occurs while splitting
      * @since 2.2M1
-     * @deprecated since 14.10.2 / 15.0RC1 use {@link #split(XDOMOfficeDocument, OfficeDocumentSplitterParameters)}
+     * @deprecated use {@link #split(XDOMOfficeDocument, OfficeDocumentSplitterParameters)}
      *             instead
      */
     @Deprecated(since = "15.0RC1")

@@ -104,7 +104,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     /**
      * The key under which macro context will be available in the XWikiContext for scripts.
      * 
-     * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
+     * @deprecated {@link WikiMacroBinding} should now be used.
      */
     @Deprecated(since = "10.11.8")
     private static final String MACRO_KEY = "macro";
@@ -127,7 +127,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     /**
      * The key under which macro body will be available inside macro context.
      * 
-     * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
+     * @deprecated {@link WikiMacroBinding} should now be used.
      */
     @Deprecated(since = "10.11.8")
     private static final String MACRO_CONTENT_KEY = "content";
@@ -135,7 +135,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     /**
      * The key under which macro parameters will be available inside macro context.
      * 
-     * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
+     * @deprecated {@link WikiMacroBinding} should now be used.
      */
     @Deprecated(since = "10.11.8")
     private static final String MACRO_PARAMS_KEY = "params";
@@ -143,7 +143,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     /**
      * The key under which macro transformation context will be available inside macro context.
      * 
-     * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
+     * @deprecated {@link WikiMacroBinding} should now be used.
      */
     @Deprecated(since = "10.11.8")
     private static final String MACRO_CONTEXT_KEY = "context";
@@ -151,7 +151,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     /**
      * The key under which macro descriptor will be available inside macro context.
      * 
-     * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
+     * @deprecated {@link WikiMacroBinding} should now be used.
      */
     @Deprecated(since = "10.11.8")
     private static final String MACRO_DESCRIPTOR_KEY = "descriptor";

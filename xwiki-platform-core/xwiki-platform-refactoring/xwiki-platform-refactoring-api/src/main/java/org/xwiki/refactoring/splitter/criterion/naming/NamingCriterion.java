@@ -43,7 +43,7 @@ public interface NamingCriterion
      * 
      * @param newDoc the {@link XDOM} representing the newly split document
      * @return the name generated for the new document
-     * @deprecated since 14.10.2, 15.0RC1 use {@link #getDocumentReference(XDOM)} instead
+     * @deprecated use {@link #getDocumentReference(XDOM)} instead
      */
     @Deprecated(since = "15.0RC1")
     default String getDocumentName(XDOM newDoc)

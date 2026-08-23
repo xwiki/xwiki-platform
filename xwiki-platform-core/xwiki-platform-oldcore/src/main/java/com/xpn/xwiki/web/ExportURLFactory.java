@@ -196,7 +196,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * @param exportedPages the pages that will be exported.
      * @param exportDir the directory where to copy exported objects (attachments).
      * @param context the XWiki context.
-     * @deprecated starting with 8.4.5/9.0, use {@link #init(Collection, File, FilesystemExportContext, XWikiContext)}
+     * @deprecated use {@link #init(Collection, File, FilesystemExportContext, XWikiContext)}
      */
     @Deprecated(since = "9.0")
     public void init(Collection<String> exportedPages, File exportDir, XWikiContext context)

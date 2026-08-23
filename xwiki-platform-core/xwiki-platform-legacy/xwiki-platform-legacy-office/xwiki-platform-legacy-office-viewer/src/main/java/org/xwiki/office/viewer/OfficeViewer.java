@@ -30,7 +30,7 @@ import org.xwiki.rendering.block.XDOM;
  * 
  * @since 2.5M2
  * @version $Id$
- * @deprecated since 5.4.6/6.2.2, use {@link OfficeResourceViewer} instead
+ * @deprecated use {@link OfficeResourceViewer} instead
  */
 @Role
 @Deprecated(since = "6.2.2")

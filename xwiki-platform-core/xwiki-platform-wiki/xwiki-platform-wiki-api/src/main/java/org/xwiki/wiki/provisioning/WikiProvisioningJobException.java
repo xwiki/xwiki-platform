@@ -24,9 +24,9 @@ package org.xwiki.wiki.provisioning;
  *
  * @version $Id$
  * @since 5.3M2
- * @deprecated since 7.0M2
+ * @deprecated
  */
-@Deprecated
+@Deprecated(since = "7.0M2")
 public class WikiProvisioningJobException extends Exception
 {
     /**

@@ -170,9 +170,9 @@ public class ConflictQuestion
     private Map<Conflict<?>, ConflictDecision<?>> conflictDecisions;
 
     /**
-     * @deprecated since 9.2RC1, use
+     * @deprecated use
      */
-    @Deprecated
+    @Deprecated(since = "9.2RC1")
     public ConflictQuestion(XWikiDocument currentDocument, XWikiDocument previousDocument, XWikiDocument nextDocument,
         XWikiDocument mergedDocument)
     {

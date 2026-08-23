@@ -199,11 +199,11 @@ public class OfficeServerScriptService implements ScriptService
 
     /**
      * @return current status of the office server process as a string
-     * @deprecated Since 12.3 this method shouldn't be used anymore: if the goal is to know if the server is connected
+     * @deprecated This method shouldn't be used anymore: if the goal is to know if the server is connected
      *              or not, then {@link #isConnected()} should be used instead. If the goal is to display the state of
      *              the server then {@link #displayServerState()} should be used.
      */
-    @Deprecated
+    @Deprecated(since = "12.3")
     public String getServerState()
     {
         this.officeServer.refreshState();

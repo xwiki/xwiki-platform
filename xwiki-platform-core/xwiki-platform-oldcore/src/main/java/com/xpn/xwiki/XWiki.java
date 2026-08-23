@@ -420,9 +420,9 @@ public class XWiki implements EventListener
     private boolean isReadOnly = false;
 
     /**
-     * @deprecated since 6.1M2, use {@link XWikiCfgConfigurationSource#CFG_ENV_NAME} instead
+     * @deprecated use {@link XWikiCfgConfigurationSource#CFG_ENV_NAME} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M2")
     public static final String CFG_ENV_NAME = XWikiCfgConfigurationSource.CFG_ENV_NAME;
 
     public static final String MACROS_FILE = "/templates/macros.txt";
@@ -1318,9 +1318,9 @@ public class XWiki implements EventListener
      * @param noupdate true if the whole initialization should be done (create mandatory xlcasses, initialize stats
      *            service), i.e. if this is not an update, and false otherwise
      * @throws XWikiException if an error happened during initialization (failure to initialize some cache for example)
-     * @deprecated since 6.1M2, use {@link #initXWiki(XWikiContext, XWikiEngineContext, boolean)} instead
+     * @deprecated use {@link #initXWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M2")
     public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engineContext, boolean noupdate)
         throws XWikiException
     {
@@ -1517,9 +1517,9 @@ public class XWiki implements EventListener
     /**
      * @param wikiId the id of the wiki
      * @param context see {@link XWikiContext}
-     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean, XWikiContext)} instead
+     * @deprecated use {@link #initializeWiki(String, boolean, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.4RC1")
     public void updateDatabase(String wikiId, XWikiContext context) throws HibernateException, XWikiException
     {
         updateDatabase(wikiId, false, context);
@@ -1528,9 +1528,9 @@ public class XWiki implements EventListener
     /**
      * @param wikiId the id of the wiki
      * @param context see {@link XWikiContext}
-     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean, XWikiContext)} instead
+     * @deprecated use {@link #initializeWiki(String, boolean, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.4RC1")
     public void updateDatabase(String wikiId, boolean force, XWikiContext context)
         throws HibernateException, XWikiException
     {
@@ -1542,9 +1542,9 @@ public class XWiki implements EventListener
      * @param force if the update of the database should be forced
      * @param initDocuments if mandatory document and plugin should be initialized for passed wiki
      * @param context see {@link XWikiContext}
-     * @deprecated since 8.4RC1, use {@link #initializeWiki(String, boolean, XWikiContext)} instead
+     * @deprecated use {@link #initializeWiki(String, boolean, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.4RC1")
     public void updateDatabase(String wikiId, boolean force, boolean initDocuments, XWikiContext context)
         throws HibernateException, XWikiException
     {
@@ -1573,9 +1573,9 @@ public class XWiki implements EventListener
      *         Note: the wiki name is commonly also the name of the database where the wiki's data is stored. However,
      *         if configured accordingly, the database can be different from the wiki name, like for example when
      *         setting a wiki database prefix.
-     * @deprecated since 5.3, use {@link WikiDescriptorManager#getAllIds()} instead
+     * @deprecated use {@link WikiDescriptorManager#getAllIds()} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.3")
     public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
     {
         WikiDescriptorManager descriptorManager = Utils.getComponent(WikiDescriptorManager.class);
@@ -1826,9 +1826,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 9.9RC1, use {@link #getDefaultAttachmentContentStore()} instead
+     * @deprecated use {@link #getDefaultAttachmentContentStore()} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     public XWikiAttachmentStoreInterface getAttachmentStore()
     {
         return getDefaultAttachmentContentStore();
@@ -1853,9 +1853,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 9.9RC1, use {@link #getDefaultAttachmentArchiveStore()} instead
+     * @deprecated use {@link #getDefaultAttachmentArchiveStore()} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     public AttachmentVersioningStore getAttachmentVersioningStore()
     {
         return getDefaultAttachmentArchiveStore();
@@ -2343,9 +2343,9 @@ public class XWiki implements EventListener
     /**
      * @param fullname the reference of the document as String
      * @param context see {@link XWikiContext}
-     * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead
+     * @deprecated use {@link #getDocument(DocumentReference, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public XWikiDocument getDocument(String fullname, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
@@ -2357,9 +2357,9 @@ public class XWiki implements EventListener
      * @param spaces the reference of the space as String
      * @param fullname the reference of the document as String
      * @param context see {@link XWikiContext}
-     * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead
+     * @deprecated use {@link #getDocument(DocumentReference, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     public XWikiDocument getDocument(String spaces, String fullname, XWikiContext context) throws XWikiException
     {
         int dotPosition = fullname.lastIndexOf('.');
@@ -2405,9 +2405,9 @@ public class XWiki implements EventListener
 
     /**
      * @see com.xpn.xwiki.api.XWiki#getDeletedDocument(String, String, String)
-     * @deprecated since 9.4RC1. Use {@link #getDeletedDocument(long, XWikiContext)} instead.
+     * @deprecated Use {@link #getDeletedDocument(long, XWikiContext)} instead.
      */
-    @Deprecated
+    @Deprecated(since = "9.4RC1")
     public XWikiDeletedDocument getDeletedDocument(String fullname, String locale, int index, XWikiContext context)
         throws XWikiException
     {
@@ -2556,9 +2556,9 @@ public class XWiki implements EventListener
     /**
      * @param content the content to parse
      * @param context see {@link XWikiContext}
-     * @deprecated Since 7.2M1. Use specific rendering/parsing options for the content type you want to parse/render.
+     * @deprecated Use specific rendering/parsing options for the content type you want to parse/render.
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     public String parseContent(String content, XWikiContext context)
     {
         return getOldRendering().parseContent(content, context);
@@ -2591,9 +2591,9 @@ public class XWiki implements EventListener
      * @return the return of the velocity script
      * @throws IOException failed to get the template content
      * @since 2.2.2
-     * @deprecated since 7.0M1, use {@link TemplateManager#render(String)} instead
+     * @deprecated use {@link TemplateManager#render(String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.0M1")
     public String evaluateTemplate(String template, XWikiContext context) throws IOException
     {
         try {
@@ -2614,9 +2614,9 @@ public class XWiki implements EventListener
      * @param template the name of the template
      * @param skinId the id of the skin from which to load the template
      * @param context see {@link XWikiContext}
-     * @deprecated since 7.0M1, use {@link TemplateManager#renderFromSkin} instead
+     * @deprecated use {@link TemplateManager#renderFromSkin} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.0M1")
     public String parseTemplate(String template, String skinId, XWikiContext context)
     {
         MutableRenderingContext mutableRenderingContext = getMutableRenderingContext();
@@ -2832,9 +2832,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 7.0M1, use {@link SkinManager#getCurrentSkin(boolean)} instead
+     * @deprecated use {@link SkinManager#getCurrentSkin(boolean)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.0M1")
     public String getSkin(XWikiContext context)
     {
         String skin;
@@ -2871,27 +2871,27 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 7.0M1, use {@link SkinManager#getDefaultParentSkin()} instead
+     * @deprecated use {@link SkinManager#getDefaultParentSkin()} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.0M1")
     public String getDefaultBaseSkin(XWikiContext context)
     {
         return getInternalSkinManager().getDefaultParentSkinId();
     }
 
     /**
-     * @deprecated since 7.0M1
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "7.0M1")
     public String getBaseSkin(XWikiContext context)
     {
         return getBaseSkin(context, false);
     }
 
     /**
-     * @deprecated since 7.0M1
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "7.0M1")
     public String getBaseSkin(XWikiContext context, boolean fromRenderSkin)
     {
         String baseskin = "";
@@ -2912,9 +2912,9 @@ public class XWiki implements EventListener
      * @return if found, the name of the base skin the asked skin inherits from. If not found, returns an empty string.
      * @since 2.0.2
      * @since 2.1M1
-     * @deprecated since 7.0M1, use {@link SkinManager#getCurrentSkin(boolean)} and {@link Skin#getParent()} instead
+     * @deprecated use {@link SkinManager#getCurrentSkin(boolean)} and {@link Skin#getParent()} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.0M1")
     public String getBaseSkin(String skin, XWikiContext context)
     {
         String baseSkin = getInternalSkinManager().getParentSkin(skin);
@@ -3254,9 +3254,9 @@ public class XWiki implements EventListener
      * is defined use the default locale.
      *
      * @return the locale to use
-     * @deprecated since 8.0M1, use {@link #getLocalePreference(XWikiContext)} instead
+     * @deprecated use {@link #getLocalePreference(XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getLanguagePreference(XWikiContext context)
     {
         return getLocalePreference(context).toString();
@@ -3287,9 +3287,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 5.1M2 use {@link #getDefaultLocale(XWikiContext)} instead
+     * @deprecated use {@link #getDefaultLocale(XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.1M2")
     public String getDefaultLanguage(XWikiContext xcontext)
     {
         return getDefaultLocale(xcontext).toString();
@@ -3368,9 +3368,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 8.0M1, use {@link #getDocLocalePreferenceNew(XWikiContext)} instead
+     * @deprecated use {@link #getDocLocalePreferenceNew(XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     // TODO: move implementation to #getDocLocalePreferenceNew
     public String getDocLanguagePreferenceNew(XWikiContext context)
     {
@@ -3471,9 +3471,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 8.0M1, use {@link #getInterfaceLocalePreference(XWikiContext)} instead
+     * @deprecated use {@link #getInterfaceLocalePreference(XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     // TODO: move implementation to #getInterfaceLocalePreference
     public String getInterfaceLanguagePreference(XWikiContext context)
     {
@@ -3688,9 +3688,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 9.9RC1, use {@link #setDefaultAttachmentContentStore(XWikiAttachmentStoreInterface)} instead
+     * @deprecated use {@link #setDefaultAttachmentContentStore(XWikiAttachmentStoreInterface)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     public void setAttachmentStore(XWikiAttachmentStoreInterface attachmentStore)
     {
         this.defaultAttachmentContentStore = attachmentStore;
@@ -3706,9 +3706,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 9.10RC1, use {@link #setDefaultAttachmentArchiveStore(AttachmentVersioningStore)} instead
+     * @deprecated use {@link #setDefaultAttachmentArchiveStore(AttachmentVersioningStore)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.10RC1")
     public void setAttachmentVersioningStore(AttachmentVersioningStore attachmentArchiveStore)
     {
         setDefaultAttachmentArchiveStore(attachmentArchiveStore);
@@ -3790,10 +3790,10 @@ public class XWiki implements EventListener
      * @param context see {@link XWikiContext}
      * @return the SheetClass Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the database
-     * @deprecated since 3.1M2 edit mode class should be used for this purpose, not the sheet class
+     * @deprecated edit mode class should be used for this purpose, not the sheet class
      * @see #getEditModeClass(XWikiContext)
      */
-    @Deprecated
+    @Deprecated(since = "3.1M2")
     public BaseClass getSheetClass(XWikiContext context) throws XWikiException
     {
         return getMandatoryClass(context, new DocumentReference(context.getWikiId(), SYSTEM_SPACE, "SheetClass"));
@@ -4193,10 +4193,10 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 2.4RC1 use
+     * @deprecated use
      *             {@link #createUser(String, Map, EntityReference, String, Syntax, String, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.4RC1")
     public int createUser(String userName, Map<String, ?> map, String parent, String content, String syntaxId,
         String userRights, XWikiContext context) throws XWikiException
     {
@@ -4373,9 +4373,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 11.8RC1 prefer using {@link #getUser(DocumentReference, XWikiContext)}.
+     * @deprecated prefer using {@link #getUser(DocumentReference, XWikiContext)}.
      */
-    @Deprecated
+    @Deprecated(since = "11.8RC1")
     public User getUser(String username, XWikiContext context)
     {
         XWikiUser xwikiUser = new XWikiUser(username);
@@ -5275,9 +5275,9 @@ public class XWiki implements EventListener
      * @param context see {@link XWikiContext}
      * @return the number of copied documents
      * @throws XWikiException failed to copy wiki
-     * @deprecated since 5.3, use {@link WikiManager#copy(String, String, String, boolean, boolean, boolean)} instead
+     * @deprecated use {@link WikiManager#copy(String, String, String, boolean, boolean, boolean)} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.3")
     public int copyWiki(String sourceWiki, String targetWiki, String locale, XWikiContext context) throws XWikiException
     {
         return copyWiki(sourceWiki, targetWiki, locale, false, context);
@@ -5293,9 +5293,9 @@ public class XWiki implements EventListener
      * @param context see {@link XWikiContext}
      * @return the number of copied documents
      * @throws XWikiException failed to copy wiki
-     * @deprecated since 5.3, use {@link WikiManager#copy(String, String, String, boolean, boolean, boolean)} instead
+     * @deprecated use {@link WikiManager#copy(String, String, String, boolean, boolean, boolean)} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.3")
     public int copyWiki(String sourceWiki, String targetWiki, String locale, boolean clean, XWikiContext context)
         throws XWikiException
     {
@@ -5576,9 +5576,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 2.2.1 use {@link #getURL(DocumentReference, String, String, String, XWikiContext)}
+     * @deprecated use {@link #getURL(DocumentReference, String, String, String, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2.1")
     public String getURL(String fullname, String action, String queryString, String anchor, XWikiContext context)
     {
         return getURL(getCurrentMixedDocumentReferenceResolver().resolve(fullname), action, queryString, anchor,
@@ -5599,9 +5599,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 2.3M2 use {@link #getURL(DocumentReference, String, XWikiContext)}
+     * @deprecated use {@link #getURL(DocumentReference, String, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.3M2")
     public String getURL(String fullname, String action, XWikiContext context)
     {
         return getURL(fullname, action, null, null, context);
@@ -5741,18 +5741,18 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 11.8RC1 prefer using {@link XWikiUser#isDisabled(XWikiContext)}.
+     * @deprecated prefer using {@link XWikiUser#isDisabled(XWikiContext)}.
      */
-    @Deprecated
+    @Deprecated(since = "11.8RC1")
     public int checkActive(XWikiContext context) throws XWikiException
     {
         return checkActive(context.getUser(), context);
     }
 
     /**
-     * @deprecated since 11.8RC1 prefer using {@link XWikiUser#isDisabled(XWikiContext)}.
+     * @deprecated prefer using {@link XWikiUser#isDisabled(XWikiContext)}.
      */
-    @Deprecated
+    @Deprecated(since = "11.8RC1")
     public int checkActive(String user, XWikiContext context) throws XWikiException
     {
         XWikiUser xWikiUser = new XWikiUser(user);
@@ -5969,9 +5969,9 @@ public class XWiki implements EventListener
 
     /**
      * @since 2.3M1
-     * @deprecated since 8.3M1, use {@link #setPhonyDocument(DocumentReference, XWikiContext)} instead
+     * @deprecated use {@link #setPhonyDocument(DocumentReference, XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.3M1")
     public void setPhonyDocument(DocumentReference reference, XWikiContext context, VelocityContext vcontext)
     {
         setPhonyDocument(reference, context);
@@ -5982,9 +5982,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 2.3M1 use {@link #setPhonyDocument(DocumentReference, XWikiContext, VelocityContext)}
+     * @deprecated use {@link #setPhonyDocument(DocumentReference, XWikiContext, VelocityContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.3M1")
     public void setPhonyDocument(String docName, XWikiContext context, VelocityContext vcontext)
     {
         setPhonyDocument(getCurrentMixedDocumentReferenceResolver().resolve(docName), context, vcontext);
@@ -6577,9 +6577,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 2.2.1 use {@link #exists(DocumentReference, XWikiContext)}
+     * @deprecated use {@link #exists(DocumentReference, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2.1")
     public boolean exists(String fullname, XWikiContext context) throws XWikiException
     {
         return exists(getCurrentMixedDocumentReferenceResolver().resolve(fullname), context);
@@ -7067,9 +7067,9 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #getXClass(DocumentReference, XWikiContext)}
+     * @deprecated use {@link #getXClass(DocumentReference, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public BaseClass getClass(String fullName, XWikiContext context) throws XWikiException
     {
         DocumentReference reference = null;
@@ -7442,9 +7442,9 @@ public class XWiki implements EventListener
      * @param context see {@link XWikiContext}
      * @throws XWikiException when failing to restore document
      * @since 5.4RC1
-     * @deprecated since 9.4RC1. Use {@link #restoreFromRecycleBin(long, String, XWikiContext)} instead.
+     * @deprecated Use {@link #restoreFromRecycleBin(long, String, XWikiContext)} instead.
      */
-    @Deprecated
+    @Deprecated(since = "9.4RC1")
     public void restoreFromRecycleBin(final XWikiDocument doc, long index, String comment, XWikiContext context)
         throws XWikiException
     {
@@ -7975,9 +7975,9 @@ public class XWiki implements EventListener
      * @throws XWikiException in case of error while performing the query
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, int, int, java.util.List, XWikiContext)
      * @since 5.0M2
-     * @deprecated since 9.7RC1, use the QueryManager instead along with the "attachment" query filter
+     * @deprecated use the QueryManager instead along with the "attachment" query filter
      */
-    @Deprecated
+    @Deprecated(since = "9.7RC1")
     public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause, boolean checkRight, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {
@@ -8045,27 +8045,27 @@ public class XWiki implements EventListener
     // Deprecated
 
     /**
-     * @deprecated since 6.1M2, use {@link XWikiCfgConfigurationSource#getConfigPath()} instead
+     * @deprecated use {@link XWikiCfgConfigurationSource#getConfigPath()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M2")
     public static String getConfigPath() throws NamingException
     {
         return XWikiCfgConfigurationSource.getConfigPath();
     }
 
     /**
-     * @deprecated since 6.1M3, use {@link #XWiki(XWikiContext)} instead
+     * @deprecated use {@link #XWiki(XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M3")
     public XWiki(XWikiConfig config, XWikiContext context) throws XWikiException
     {
         this(config, context, null, false);
     }
 
     /**
-     * @deprecated since 6.1M3, use {@link #XWiki(XWikiContext, XWikiEngineContext, boolean)} instead
+     * @deprecated use {@link #XWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M3")
     public XWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engineContext, boolean noupdate)
         throws XWikiException
     {
@@ -8107,18 +8107,18 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
+     * @deprecated use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M2")
     public XWikiConfig getConfig()
     {
         return new XWikiConfigDelegate(getConfiguration());
     }
 
     /**
-     * @deprecated since 6.1M2
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "6.1M2")
     public void setConfig(XWikiConfig config)
     {
         ConfigurationSource configuration = getConfiguration();
@@ -8129,18 +8129,18 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
+     * @deprecated use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M2")
     public String Param(String key)
     {
         return Param(key, null);
     }
 
     /**
-     * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
+     * @deprecated use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M2")
     public String Param(String key, String defaultValue)
     {
         if (getConfiguration() != null) {
@@ -8151,18 +8151,18 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
+     * @deprecated use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M2")
     public long ParamAsLong(String key)
     {
         return getConfiguration().getProperty(key, long.class);
     }
 
     /**
-     * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
+     * @deprecated use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M2")
     public long ParamAsLong(String key, long defaultValue)
     {
         return getConfiguration().getProperty(key, defaultValue);

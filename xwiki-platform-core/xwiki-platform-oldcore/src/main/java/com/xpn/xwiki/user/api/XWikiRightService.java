@@ -107,11 +107,11 @@ public interface XWikiRightService
      * @param context the xwiki context in which to perform the verification
      * @return {@code true} if the user has the specified right on the document, {@code false} otherwise
      * @throws XWikiException if something goes wrong during the rights checking process
-     * @deprecated since 4.0M2, use
+     * @deprecated use
      *             {@link org.xwiki.security.authorization.AuthorizationManager#hasAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.EntityReference)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "4.0M2")
     boolean hasAccessLevel(String right, String username, String docname, XWikiContext context) throws XWikiException;
 
     /**
@@ -120,11 +120,11 @@ public interface XWikiRightService
      *
      * @param context the xwiki context of this request
      * @return {@code true} if the author of the context document has programming rights, {@code false} otherwise.
-     * @deprecated since 6.1RC1, use
+     * @deprecated use
      *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1RC1")
     boolean hasProgrammingRights(XWikiContext context);
 
     /**
@@ -134,11 +134,11 @@ public interface XWikiRightService
      * @param doc the document to check programming rights for
      * @param context the xwiki context of this request
      * @return {@code true} if the author of {@code doc} has programming rights, {@code false} otherwise.
-     * @deprecated since 6.1RC1, use
+     * @deprecated use
      *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.EntityReference)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1RC1")
     boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context);
 
     /**
@@ -147,11 +147,11 @@ public interface XWikiRightService
      *
      * @param context the xwiki context of this request
      * @return {@code true} if the current user in the context has the {@code admin} right, {@code false} otherwise
-     * @deprecated since 6.1RC1, use
+     * @deprecated use
      *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1RC1")
     boolean hasAdminRights(XWikiContext context);
 
     /**
@@ -161,11 +161,11 @@ public interface XWikiRightService
      * @param context the xwiki context of this request
      * @return {@code true} if the current user in the context has the {@code admin} right, {@code false} otherwise
      * @since 3.2M3
-     * @deprecated since 6.1RC1, use
+     * @deprecated use
      *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.EntityReference)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1RC1")
     boolean hasWikiAdminRights(XWikiContext context);
 
     /**

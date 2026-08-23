@@ -370,9 +370,9 @@ public class XWikiAttachmentContent implements Cloneable
     /**
      * @return the true size of the content of the attachment.
      * @since 2.3M2
-     * @deprecated since 9.0RC1, use {@link #getLongSize()} instead
+     * @deprecated use {@link #getLongSize()} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public int getSize()
     {
         long longSize = getLongSize();

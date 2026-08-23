@@ -28,14 +28,14 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 /**
- * @deprecated use {@link EditAction} with {@code editor=inline} in the query string instead since 3.2
+ * @deprecated use {@link EditAction} with {@code editor=inline} in the query string instead
  *
  * @version $Id$
  */
 @Component
 @Named("inline")
 @Singleton
-@Deprecated
+@Deprecated(since = "3.2")
 public class InlineAction extends EditAction
 {
     @Override

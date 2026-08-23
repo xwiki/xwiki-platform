@@ -87,7 +87,7 @@ public class ComponentScriptService implements ScriptService
      * @deprecated use {@link #getContextComponentManager()} or
      *             {@link #getContextComponentManager()} instead
      */
-    @Deprecated(since = "6.2.6")
+    @Deprecated(since = "6.4.1,6.2.6")
     public ComponentManager getComponentManager()
     {
         return this.contextualAuthorizationManager.hasAccess(PROGRAM) ? this.contextrootComponentManagerProvider.get()

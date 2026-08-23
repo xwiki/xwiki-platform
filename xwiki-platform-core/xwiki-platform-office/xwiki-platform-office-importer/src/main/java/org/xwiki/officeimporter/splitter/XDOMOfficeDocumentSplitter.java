@@ -61,7 +61,7 @@ public interface XDOMOfficeDocumentSplitter
      * @deprecated use {@link #split(XDOMOfficeDocument, OfficeDocumentSplitterParameters)}
      *             instead
      */
-    @Deprecated(since = "15.0RC1")
+    @Deprecated(since = "15.0RC1,14.10.2")
     default Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
         int[] headingLevelsToSplit, String namingCriterionHint, DocumentReference baseDocumentReference)
         throws OfficeImporterException

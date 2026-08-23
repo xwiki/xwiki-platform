@@ -45,7 +45,7 @@ public interface NamingCriterion
      * @return the name generated for the new document
      * @deprecated use {@link #getDocumentReference(XDOM)} instead
      */
-    @Deprecated(since = "15.0RC1")
+    @Deprecated(since = "15.0RC1,14.10.2")
     default String getDocumentName(XDOM newDoc)
     {
         return getDocumentReference(newDoc).toString();

@@ -53,7 +53,7 @@ public class PageIndexNamingCriterion extends AbstractNamingCriterion
      * @deprecated inject this as a component instead and set the base reference through
      *             {@link #getParameters()}
      */
-    @Deprecated(since = "15.0RC1")
+    @Deprecated(since = "15.0RC1,14.10.2")
     public PageIndexNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge)
     {
         getParameters().setBaseDocumentReference(RefactoringUtils.resolveDocumentReference(baseDocumentName));

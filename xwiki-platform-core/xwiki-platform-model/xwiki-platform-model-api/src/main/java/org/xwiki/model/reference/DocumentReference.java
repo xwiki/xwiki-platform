@@ -350,7 +350,7 @@ public class DocumentReference extends AbstractLocalizedEntityReference
      * @since 8.3
      * @deprecated use {@link #getLocalDocumentReference()} instead
      */
-    @Deprecated(since = "8.4.5")
+    @Deprecated(since = "9.3RC1,8.4.5")
     public LocalDocumentReference getLocaleDocumentReference()
     {
         return getLocalDocumentReference();

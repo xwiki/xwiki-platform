@@ -106,7 +106,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
      */
-    @Deprecated
+    @Deprecated(since = "10.11.8")
     private static final String MACRO_KEY = "macro";
 
     /**
@@ -129,7 +129,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
      */
-    @Deprecated
+    @Deprecated(since = "10.11.8")
     private static final String MACRO_CONTENT_KEY = "content";
 
     /**
@@ -137,7 +137,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
      */
-    @Deprecated
+    @Deprecated(since = "10.11.8")
     private static final String MACRO_PARAMS_KEY = "params";
 
     /**
@@ -145,7 +145,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
      */
-    @Deprecated
+    @Deprecated(since = "10.11.8")
     private static final String MACRO_CONTEXT_KEY = "context";
 
     /**
@@ -153,7 +153,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
      */
-    @Deprecated
+    @Deprecated(since = "10.11.8")
     private static final String MACRO_DESCRIPTOR_KEY = "descriptor";
 
     /**

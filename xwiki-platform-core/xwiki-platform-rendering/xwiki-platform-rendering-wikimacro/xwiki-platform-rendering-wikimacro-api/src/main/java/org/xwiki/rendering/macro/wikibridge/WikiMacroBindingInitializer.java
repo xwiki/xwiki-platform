@@ -33,7 +33,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  *              Use {@link org.xwiki.rendering.macro.wikibridge.binding.WikiMacroBindingInitializer} instead.
  */
 @Role
-@Deprecated
+@Deprecated(since = "11.3.2")
 public interface WikiMacroBindingInitializer
 {
     /**

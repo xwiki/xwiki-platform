@@ -198,7 +198,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * @param context the XWiki context.
      * @deprecated starting with 8.4.5/9.0, use {@link #init(Collection, File, FilesystemExportContext, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "9.0")
     public void init(Collection<String> exportedPages, File exportDir, XWikiContext context)
     {
         Provider<FilesystemExportContext> exportContextProvider = Utils.getComponent(

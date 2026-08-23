@@ -106,7 +106,7 @@ public interface GroupFilter
      *             {@link #beginGroupContainer(String, FilterEventParameters)} instead
      */
     @Name("groupContainer")
-    @Deprecated
+    @Deprecated(since = "8.3M1")
     void beginGroup(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 
@@ -118,7 +118,7 @@ public interface GroupFilter
      *             {@link #beginGroupContainer(String, FilterEventParameters)} instead
      */
     @Name("groupContainer")
-    @Deprecated
+    @Deprecated(since = "8.3M1")
     void endGroup(String name, @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters)
         throws FilterException;
 }

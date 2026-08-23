@@ -33,7 +33,7 @@ import org.xwiki.rendering.block.XDOM;
  * @deprecated since 5.4.6/6.2.2, use {@link OfficeResourceViewer} instead
  */
 @Role
-@Deprecated
+@Deprecated(since = "6.2.2")
 public interface OfficeViewer
 {
     /**

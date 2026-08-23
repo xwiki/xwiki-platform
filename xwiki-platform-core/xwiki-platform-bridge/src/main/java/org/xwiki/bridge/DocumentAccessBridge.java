@@ -80,7 +80,7 @@ public interface DocumentAccessBridge
      * @return the document object matching the passed document name
      * @throws Exception when the storage cannot be accessed
      * @since 2.2M1
-     * @deprecated deprecated use {@link #getTranslatedDocumentInstance(DocumentReference)} instead
+     * @deprecated use {@link #getTranslatedDocumentInstance(DocumentReference)} instead
      */
     @Deprecated(since = "10.2RC1")
     DocumentModelBridge getDocument(DocumentReference documentReference) throws Exception;

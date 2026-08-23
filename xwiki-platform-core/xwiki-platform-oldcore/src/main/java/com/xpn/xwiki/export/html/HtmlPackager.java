@@ -149,7 +149,7 @@ public class HtmlPackager
      * @param page the name of the page to export.
      * @deprecated use {@link #addPageReference(DocumentReference)} instead
      */
-    @Deprecated(since = "9.0,8.4.5")
+    @Deprecated(since = "8.4.5,9.0")
     public void addPage(String page)
     {
         this.pageReferences.add(resolvePage(page));
@@ -161,7 +161,7 @@ public class HtmlPackager
      * @param pages a range of pages to export.
      * @deprecated use {@link #addPageReferences(Collection)} instead
      */
-    @Deprecated(since = "9.0,8.4.5")
+    @Deprecated(since = "8.4.5,9.0")
     public void addPages(Collection<String> pages)
     {
         for (String page : pages) {

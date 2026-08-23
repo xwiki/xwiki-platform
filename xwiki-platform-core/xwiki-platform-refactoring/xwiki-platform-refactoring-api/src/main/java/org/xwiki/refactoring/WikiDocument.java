@@ -54,7 +54,7 @@ public class WikiDocument
      * @param parent the parent {@link WikiDocument} of this document
      * @deprecated use {@link #WikiDocument(DocumentReference, XDOM, WikiDocument)} instead
      */
-    @Deprecated(since = "15.0RC1,14.10.2")
+    @Deprecated(since = "14.10.2,15.0RC1")
     public WikiDocument(String fullName, XDOM xdom, WikiDocument parent)
     {
         this(RefactoringUtils.resolveDocumentReference(fullName, parent.getDocumentReference()), xdom, parent);
@@ -80,7 +80,7 @@ public class WikiDocument
      * @return full name of the target wiki page
      * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated(since = "15.0RC1,14.10.2")
+    @Deprecated(since = "14.10.2,15.0RC1")
     public String getFullName()
     {
         return this.documentReference.toString();

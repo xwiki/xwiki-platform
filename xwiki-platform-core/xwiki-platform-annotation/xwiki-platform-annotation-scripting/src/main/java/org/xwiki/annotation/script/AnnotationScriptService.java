@@ -312,7 +312,7 @@ public class AnnotationScriptService implements ScriptService
      *         {@code false} otherwise
      * @deprecated since 7.2M3, use {@link #canEditAnnotation(String, DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.2M3")
     public boolean canEditAnnotation(String annotationId, String wiki, String space, String page)
     {
         return canEditAnnotation(annotationId, new DocumentReference(wiki, space, page));
@@ -346,7 +346,7 @@ public class AnnotationScriptService implements ScriptService
      * @see #canEditAnnotation(String, String, String, String)
      * @deprecated since 7.2M3, use {@link #canAddAnnotation(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.2M3")
     public boolean canAddAnnotation(String wiki, String space, String page)
     {
         return canAddAnnotation(new DocumentReference(wiki, space, page));

@@ -33,7 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @deprecated since 7.0M2
  */
-@Deprecated
+@Deprecated(since = "7.0M2")
 public class WikiProvisioningJobRequest extends AbstractRequest
 {
     /**

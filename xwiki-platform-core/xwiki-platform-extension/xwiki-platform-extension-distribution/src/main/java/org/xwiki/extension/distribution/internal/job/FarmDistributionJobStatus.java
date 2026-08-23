@@ -33,7 +33,7 @@ import org.xwiki.observation.ObservationManager;
  * @since 5.0M1
  * @deprecated since 9.1RC1, use {@link DistributionJobStatus} instead
  */
-@Deprecated
+@Deprecated(since = "9.1RC1")
 public class FarmDistributionJobStatus extends DistributionJobStatus
 {
     /**

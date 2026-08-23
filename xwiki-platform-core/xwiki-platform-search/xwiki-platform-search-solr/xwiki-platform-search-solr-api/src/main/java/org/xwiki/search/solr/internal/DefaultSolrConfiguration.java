@@ -75,7 +75,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
      * 
      * @deprecated since 11.9RC1, use {@link #SOLR_TYPE_DEFAULT} instead.
      */
-    @Deprecated
+    @Deprecated(since = "11.9RC1")
     public static final String DEFAULT_SOLR_TYPE = SOLR_TYPE_DEFAULT;
 
     /**

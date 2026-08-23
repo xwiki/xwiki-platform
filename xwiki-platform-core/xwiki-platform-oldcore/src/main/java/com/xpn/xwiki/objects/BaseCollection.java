@@ -195,7 +195,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      *
      * @deprecated since 2.2M2 use {@link #getXClassReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public String getClassName()
     {
         String xClassAsString;
@@ -241,7 +241,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      *
      * @deprecated since 2.2.3 use {@link #setXClassReference(EntityReference)} ()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2.3")
     public void setClassName(String name)
     {
         EntityReference classReference = null;
@@ -788,7 +788,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * @deprecated since 9.0RC1, use {@link #toXML()} instead
      */
     @Override
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public Element toXML(BaseClass bclass)
     {
         // Set passed class in the context so that the input event generator finds it

@@ -92,7 +92,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
      *
      * @deprecated since 6.2RC1, use {link #getExportURLFactoryContext} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     protected Set<String> exportedPages = new HashSet<>();
 
     /**
@@ -100,7 +100,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
      *
      * @deprecated since 6.2RC1, use {link #getExportURLFactoryContext} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     protected File exportDir;
 
     private boolean checkAccess;
@@ -137,7 +137,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * @return the list skins names used.
      * @deprecated since 6.2RC1, use {@link #getFilesystemExportContext()}
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     public Collection<String> getNeededSkins()
     {
         return getFilesystemExportContext().getNeededSkins();
@@ -147,7 +147,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * @return the list of custom skin files.
      * @deprecated since 6.2RC1, use {@link #getFilesystemExportContext()}
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     public Collection<String> getExportedSkinFiles()
     {
         return getFilesystemExportContext().getExportedSkinFiles();

@@ -44,7 +44,7 @@ import org.xwiki.model.reference.DocumentReference;
 @Component
 @Named("users")
 @Singleton
-@Deprecated
+@Deprecated(since = "6.4.2")
 public class UsersMimeMessageFactory extends AbstractIteratorMimeMessageFactory
 {
     private static final String HINT = "hint";

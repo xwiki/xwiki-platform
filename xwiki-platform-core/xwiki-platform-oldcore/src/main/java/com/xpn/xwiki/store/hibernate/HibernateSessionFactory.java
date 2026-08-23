@@ -31,7 +31,7 @@ import org.xwiki.component.annotation.Role;
  * @deprecated since 11.5RC1
  */
 @Role
-@Deprecated
+@Deprecated(since = "11.5RC1")
 public interface HibernateSessionFactory
 {
     /**

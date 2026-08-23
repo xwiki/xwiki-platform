@@ -122,7 +122,7 @@ public class XWikiUser
      * @param user the full name of the user on the form {@code XWiki.Foo}.
      * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference)}.
      */
-    @Deprecated
+    @Deprecated(since = "11.6RC1")
     public XWikiUser(String user)
     {
         this(user, false);
@@ -135,7 +135,7 @@ public class XWikiUser
      * @param main true if the user is global (i.e. registered in the main wiki)
      * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference, boolean)}.
      */
-    @Deprecated
+    @Deprecated(since = "11.6RC1")
     public XWikiUser(String user, boolean main)
     {
         setUser(user);
@@ -173,7 +173,7 @@ public class XWikiUser
      * @return user fullname
      * @deprecated since 11.6RC1 use {@link #getFullName()}.
      */
-    @Deprecated
+    @Deprecated(since = "11.6RC1")
     public String getUser()
     {
         return getFullName();

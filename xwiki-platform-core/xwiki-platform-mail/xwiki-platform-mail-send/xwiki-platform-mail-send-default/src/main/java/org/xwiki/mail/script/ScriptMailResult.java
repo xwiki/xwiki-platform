@@ -80,7 +80,7 @@ public class ScriptMailResult implements MailResult
      * @deprecated since 7.1M2 use {@link MailStatusResult#isProcessed()} instead. Kept to not break
      *             script backward compatibility
      */
-    @Deprecated
+    @Deprecated(since = "7.1M2")
     public boolean isProcessed()
     {
         return getStatusResult().isProcessed();

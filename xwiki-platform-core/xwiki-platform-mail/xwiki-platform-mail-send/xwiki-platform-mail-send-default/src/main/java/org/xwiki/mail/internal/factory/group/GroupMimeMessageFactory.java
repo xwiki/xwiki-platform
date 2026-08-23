@@ -43,7 +43,7 @@ import org.xwiki.model.reference.DocumentReference;
 @Component
 @Named("group")
 @Singleton
-@Deprecated
+@Deprecated(since = "6.4.2")
 public class GroupMimeMessageFactory extends AbstractIteratorMimeMessageFactory
 {
     private static final String HINT = "hint";

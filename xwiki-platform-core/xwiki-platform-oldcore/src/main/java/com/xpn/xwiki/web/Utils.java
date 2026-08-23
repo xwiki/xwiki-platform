@@ -577,7 +577,7 @@ public class Utils
      * @return a new escaped <code>String</code>, <code>null</code> if null input
      * @deprecated starting with 2.7 use {@link XMLUtils#escape(Object) $services.xml.escape(content)}
      */
-    @Deprecated
+    @Deprecated(since = "2.7")
     public static String formEncode(String value)
     {
         return XMLUtils.escape(value);
@@ -595,7 +595,7 @@ public class Utils
     /**
      * @deprecated replaced by {@link com.xpn.xwiki.util.Util#encodeURI(String, XWikiContext)} since 1.3M2
      */
-    @Deprecated
+    @Deprecated(since = "1.3M2")
     public static String encode(String text, XWikiContext context)
     {
         return Util.encodeURI(text, context);
@@ -604,7 +604,7 @@ public class Utils
     /**
      * @deprecated replaced by {@link com.xpn.xwiki.util.Util#decodeURI(String, XWikiContext)} since 1.3M2
      */
-    @Deprecated
+    @Deprecated(since = "1.3M2")
     public static String decode(String text, XWikiContext context)
     {
         return Util.decodeURI(text, context);
@@ -659,7 +659,7 @@ public class Utils
      *         {@link #getComponent(Class, String)}
      * @deprecated since 6.1M1, use {@link #getContextComponentManager()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M1")
     public static ComponentManager getComponentManager()
     {
         ComponentManager contextComponentManager;
@@ -710,7 +710,7 @@ public class Utils
      *             initialized
      * @deprecated since 4.0M1 use {@link #getComponent(Type, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public static <T> T getComponent(Class<T> role, String hint)
     {
         return getComponent((Type) role, hint);
@@ -725,7 +725,7 @@ public class Utils
      *             initialized
      * @deprecated since 4.0M1 use {@link #getComponent(Type)} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public static <T> T getComponent(Class<T> role)
     {
         return getComponent((Type) role);
@@ -741,7 +741,7 @@ public class Utils
      *             initialized
      * @deprecated starting with 4.1M2 use the Component Script Service instead
      */
-    @Deprecated
+    @Deprecated(since = "4.1M2")
     public static <T> T getComponent(Type roleType, String roleHint)
     {
         T component;
@@ -772,7 +772,7 @@ public class Utils
      *             initialized
      * @deprecated starting with 4.1M2 use the Component Script Service instead
      */
-    @Deprecated
+    @Deprecated(since = "4.1M2")
     public static <T> T getComponent(Type roleType)
     {
         return getComponent(roleType, "default");
@@ -787,7 +787,7 @@ public class Utils
      * @since 2.0M3
      * @deprecated since 4.0M1 use {@link #getComponentManager()} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public static <T> List<T> getComponentList(Class<T> role)
     {
         List<T> components;

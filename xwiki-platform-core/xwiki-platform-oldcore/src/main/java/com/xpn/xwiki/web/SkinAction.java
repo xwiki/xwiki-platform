@@ -570,7 +570,7 @@ public class SkinAction extends XWikiAction
      * @param length The length of the content (in bytes). Used in the "Content-Length" header.
      * @deprecated since 11.10RC1, use {@link #setupHeaders(XWikiResponse, String, Date, long)} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.10RC1")
     protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, int length)
     {
         setupHeaders(response, mimetype, lastChanged, (long) length);

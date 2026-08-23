@@ -178,7 +178,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * @return the XHTML result of rendering the given HTML fragment
      * @deprecated since 11.9RC1, use {@link #parseAndRender(String, Syntax, EntityReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.9RC1")
     public String parseAndRender(String html, String syntaxId)
     {
         return parseAndRender(html, getSyntax(syntaxId), null);
@@ -298,7 +298,7 @@ public class WysiwygEditorScriptService implements ScriptService
      * @return the annotated XHTML result of the conversion
      * @deprecated since 11.9RC1 use
      */
-    @Deprecated
+    @Deprecated(since = "11.9RC1")
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
         XWikiDocument currentDocument = this.xcontextProvider.get().getDoc();

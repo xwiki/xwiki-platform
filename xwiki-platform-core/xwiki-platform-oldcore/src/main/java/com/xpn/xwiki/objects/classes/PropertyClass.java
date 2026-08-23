@@ -536,7 +536,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      *             {@link #renderContentInContext(String, String, DocumentReference, DocumentReference, XWikiContext)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "10.11RC1")
     protected String renderContentInContext(final String content, final String syntax,
         DocumentReference authorReference, final XWikiContext context) throws Exception
     {
@@ -762,7 +762,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * @param type the class type
      * @deprecated since 4.3M1, the property class type cannot be modified
      */
-    @Deprecated
+    @Deprecated(since = "4.3M1")
     public void setClassType(String type)
     {
         LOGGER.warn("The property class type cannot be modified!");

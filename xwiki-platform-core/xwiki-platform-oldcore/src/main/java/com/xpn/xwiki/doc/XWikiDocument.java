@@ -2163,7 +2163,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      *
      * @deprecated since 3.0M3 use {@link #getAuthorReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.0M3")
     public String getAuthor()
     {
         return userReferenceToString(getAuthorReference());

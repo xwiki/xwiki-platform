@@ -203,7 +203,7 @@ public class WikiTemplateManagerScript implements ScriptService
      * @deprecated since 7.0M2, use
      *             {@code org.xwiki.platform.wiki.creationjob.script.WikiCreationJobScriptServices#createWiki} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.0M2")
     public boolean createWikiFromTemplate(String newWikiId, String newWikiAlias,
             String templateId, String ownerId, boolean failOnExist)
     {
@@ -250,7 +250,7 @@ public class WikiTemplateManagerScript implements ScriptService
      * @return the last exception, or null if there is not.
      * @deprecated since 5.4RC1 use {@link #getLastError()} ()} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.4RC1")
     public Exception getLastException()
     {
         return (Exception) this.execution.getContext().getProperty(CONTEXT_LASTEXCEPTION);
@@ -263,7 +263,7 @@ public class WikiTemplateManagerScript implements ScriptService
      * @return the status of the job
      * @deprecated since 7.0M2
      */
-    @Deprecated
+    @Deprecated(since = "7.0M2")
     public JobStatus getWikiProvisioningJobStatus(List<String> jobId)
     {
         try {

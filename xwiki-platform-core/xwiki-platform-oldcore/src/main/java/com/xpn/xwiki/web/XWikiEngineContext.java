@@ -38,12 +38,12 @@ public interface XWikiEngineContext
     /**
      * @deprecated since 3.5M1, use {@link Environment#getResource(String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.5M1")
     URL getResource(String name) throws MalformedURLException;
 
     /**
      * @deprecated since 3.5M1, use {@link Environment#getResourceAsStream(String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.5M1")
     InputStream getResourceAsStream(String name);
 }

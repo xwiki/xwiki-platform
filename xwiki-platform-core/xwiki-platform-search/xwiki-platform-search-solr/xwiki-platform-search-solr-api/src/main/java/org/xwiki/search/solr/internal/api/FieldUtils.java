@@ -101,7 +101,7 @@ public final class FieldUtils
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-12594">XWIKI-12594: The path of a nested document is not
      *      properly matched</a>
      */
-    @Deprecated
+    @Deprecated(since = "7.2")
     public static final String SPACE = "space";
 
     /**

@@ -44,7 +44,7 @@ import com.xpn.xwiki.XWikiConfig;
  * @since 1.9.1
  * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
  */
-@Deprecated
+@Deprecated(since = "6.1M2")
 public class XWikiConfigurationService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiConfigurationService.class);

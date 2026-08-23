@@ -70,7 +70,7 @@ import com.xpn.xwiki.util.Util;
 @Component
 @Named("temp")
 @Singleton
-@Deprecated
+@Deprecated(since = "8.3")
 public class TempResourceAction extends XWikiAction
 {
     /**

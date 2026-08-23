@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Role;
  * @version $Id$
  * @deprecated since 7.0M2
  */
-@Deprecated
+@Deprecated(since = "7.0M2")
 @Role
 public interface WikiProvisioningJobExecutor
 {

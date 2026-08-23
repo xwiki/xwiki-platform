@@ -67,7 +67,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      * 
      * @deprecated not used since 10.1RC1 because the bug has been fixed in Groovy
      */
-    @Deprecated
+    @Deprecated(since = "10.1RC1")
     public static final String BINDING_OUT = "out";
 
     /**

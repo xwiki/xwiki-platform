@@ -39,7 +39,7 @@ public interface HTMLConverter
      * @return the HTML result of the conversion
      * @deprecated since 11.9RC1, use {@link #toHTML(String, Syntax, EntityReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.9RC1")
     String toHTML(String source, String syntaxId);
 
     /**
@@ -91,7 +91,7 @@ public interface HTMLConverter
      * @return the XHTML result of rendering the given HTML fragment
      * @deprecated since 11.9RC1, use {@link #parseAndRender(String, Syntax, EntityReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.9RC1")
     String parseAndRender(String html, String syntax);
 
     /**

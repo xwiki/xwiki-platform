@@ -39,7 +39,7 @@ import org.xwiki.script.service.ScriptService;
 @Component
 @Named("xarextension")
 @Singleton
-@Deprecated
+@Deprecated(since = "5.3M1")
 public class DeprecatedXarExtensionScriptService implements ScriptService, Initializable
 {
     @Inject

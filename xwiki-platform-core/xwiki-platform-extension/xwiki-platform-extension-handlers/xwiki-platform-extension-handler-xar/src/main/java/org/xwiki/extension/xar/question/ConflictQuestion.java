@@ -172,7 +172,7 @@ public class ConflictQuestion
     /**
      * @deprecated since 9.2RC1, use
      */
-    @Deprecated
+    @Deprecated(since = "9.2RC1")
     public ConflictQuestion(XWikiDocument currentDocument, XWikiDocument previousDocument, XWikiDocument nextDocument,
         XWikiDocument mergedDocument)
     {

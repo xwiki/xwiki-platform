@@ -41,7 +41,7 @@ import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
  * @deprecated Since 13.1RC1. This component is only provided to allow injecting the deprecated role,
  * but should not be used.
  */
-@Deprecated
+@Deprecated(since = "13.1RC1")
 @Component(hints = {"captcha", "disableAccount"})
 @Singleton
 public class LegacyAuthenticationFailureStrategy implements AuthenticationFailureStrategy, Initializable

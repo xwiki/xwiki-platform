@@ -34,7 +34,7 @@ import org.xwiki.logging.event.LogEvent;
  * @since 3.2M1
  * @deprecated Since 11.8RC1, prefer using {@link org.xwiki.store.merge.MergeManagerResult}.
  */
-@Deprecated
+@Deprecated(since = "11.8RC1")
 public class MergeResult
 {
     /**

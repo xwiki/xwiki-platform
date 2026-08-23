@@ -37,7 +37,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  */
 @Component
 @Singleton
-@Deprecated
+@Deprecated(since = "7.1M2")
 public class DefaultEntityReferenceValueProvider implements EntityReferenceValueProvider
 {
     /**

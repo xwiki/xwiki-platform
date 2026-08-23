@@ -34,7 +34,7 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
  * @since 4.3M1
  * @deprecated since 9.0RC1, use {@link com.xpn.xwiki.doc.AbstractMandatoryDocumentInitializer} instead
  */
-@Deprecated
+@Deprecated(since = "9.0RC1")
 public abstract class AbstractMandatoryDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**

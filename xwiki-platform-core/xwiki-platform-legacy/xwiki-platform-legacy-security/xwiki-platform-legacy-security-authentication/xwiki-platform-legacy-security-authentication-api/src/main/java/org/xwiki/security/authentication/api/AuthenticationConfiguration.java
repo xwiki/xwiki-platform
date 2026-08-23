@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Role;
  * @version $Id$
  * @deprecated Since 13.1RC1, use {@link org.xwiki.security.authentication.AuthenticationConfiguration}.
  */
-@Deprecated
+@Deprecated(since = "13.1RC1")
 @Role
 public interface AuthenticationConfiguration
 {

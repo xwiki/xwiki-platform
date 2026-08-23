@@ -73,7 +73,7 @@ public interface WikiTemplateManager
      *             {@code org.xwiki.platform.wiki.creationjob.WikiCreator#createWiki(WikiCreationRequest request)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "7.0M2")
     WikiProvisioningJob createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId, String ownerId,
         boolean failOnExist) throws WikiTemplateManagerException;
 
@@ -88,7 +88,7 @@ public interface WikiTemplateManager
      * @since 5.4RC1
      * @deprecated since 7.0M2
      */
-    @Deprecated
+    @Deprecated(since = "7.0M2")
     WikiProvisioningJob applyTemplate(String wikiId, String templateId) throws WikiTemplateManagerException;
 
     /**
@@ -99,6 +99,6 @@ public interface WikiTemplateManager
      * @throws WikiTemplateManagerException if problem occurs
      * @deprecated since 7.0M2
      */
-    @Deprecated
+    @Deprecated(since = "7.0M2")
     WikiProvisioningJob getWikiProvisioningJob(List<String> jobId) throws WikiTemplateManagerException;
 }

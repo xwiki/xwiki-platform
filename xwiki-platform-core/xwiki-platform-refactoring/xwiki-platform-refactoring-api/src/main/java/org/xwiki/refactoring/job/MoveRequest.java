@@ -40,7 +40,7 @@ public class MoveRequest extends AbstractCopyOrMoveRequest
      *
      * @deprecated Since 10.11 the MoveRequest does not handle copy anymore. So it should always delete the source.
      */
-    @Deprecated
+    @Deprecated(since = "10.11")
     private static final String PROPERTY_DELETE_SOURCE = "deleteSource";
 
     /**
@@ -78,7 +78,7 @@ public class MoveRequest extends AbstractCopyOrMoveRequest
      *         the difference between a copy and a standard move without delete is that the back-links are not updated
      * @deprecated Since 10.11 the MoveRequest does not handle copy anymore. So it should always delete the source.
      */
-    @Deprecated
+    @Deprecated(since = "10.11")
     public boolean isDeleteSource()
     {
         return getProperty(PROPERTY_DELETE_SOURCE, true);
@@ -90,7 +90,7 @@ public class MoveRequest extends AbstractCopyOrMoveRequest
      * @param deleteSource {@code true} to delete the source, {@code false} to keep it as a backup
      * @deprecated Since 10.11 the MoveRequest does not handle copy anymore. So it should always delete the source.
      */
-    @Deprecated
+    @Deprecated(since = "10.11")
     public void setDeleteSource(boolean deleteSource)
     {
         setProperty(PROPERTY_DELETE_SOURCE, deleteSource);

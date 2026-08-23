@@ -41,7 +41,7 @@ import org.xwiki.security.authorization.AuthorExecutor;
  */
 @Component(roles = SUExecutor.class)
 @Singleton
-@Deprecated
+@Deprecated(since = "8.3RC1")
 public class SUExecutor
 {
     /**

@@ -344,7 +344,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      *             {@link #DeletedAttachment(long, String, String, String, String, Date, DeletedAttachmentContent)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     protected void setAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         this.content = new HibernateDeletedAttachmentContent(attachment);
@@ -362,7 +362,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      *             {@link XWikiAttachment#fromXML(String)}.
      * @deprecated since 9.9RC1, use {@link #restoreAttachment(XWikiAttachment)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     public XWikiAttachment restoreAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         return restoreAttachment(attachment);

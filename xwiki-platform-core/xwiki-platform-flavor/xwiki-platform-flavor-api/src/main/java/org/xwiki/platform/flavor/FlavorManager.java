@@ -47,7 +47,7 @@ public interface FlavorManager
      * @throws SearchException error when trying to search provided query
      * @deprecated since 8.0RC1, use {@link #searchFlavors(FlavorQuery)} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0RC1")
     IterableResult<Extension> getFlavors(FlavorQuery query) throws SearchException;
 
     /**

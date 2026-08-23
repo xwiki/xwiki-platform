@@ -37,7 +37,7 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
  */
 @Component
 @Singleton
-@Deprecated
+@Deprecated(since = "11.5RC1")
 public class DefaultHibernateSessionFactory implements HibernateSessionFactory
 {
     @Inject

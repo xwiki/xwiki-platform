@@ -156,7 +156,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @return the database product name
      * @deprecated since 4.0M1 use {@link #getDatabaseProductName()}
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public DatabaseProduct getDatabaseProductName(XWikiContext context)
     {
         return getDatabaseProductName();
@@ -309,7 +309,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @throws HibernateException
      * @deprecated do nothing since 11.5RC1
      */
-    @Deprecated
+    @Deprecated(since = "11.5RC1")
     public String[] getSchemaUpdateScript(Configuration config, XWikiContext inputxcontext) throws HibernateException
     {
         return null;
@@ -334,7 +334,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @since 5.2RC1
      * @deprecated since 11.5RC1
      */
-    @Deprecated
+    @Deprecated(since = "11.5RC1")
     protected void createHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
     {
         // There's no issue when in database mode, only in schema mode.
@@ -380,7 +380,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @param inputxcontext
      * @deprecated since 11.5RC1
      */
-    @Deprecated
+    @Deprecated(since = "11.5RC1")
     public void updateSchema(String[] createSQL, XWikiContext inputxcontext) throws HibernateException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
@@ -531,7 +531,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @throws XWikiException if an error occurs while retrieving or creating a new session and transaction.
      * @deprecated since 4.0M1, use {@link #beginTransaction(SessionFactory, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public boolean beginTransaction(boolean withTransaction, XWikiContext context) throws XWikiException
     {
         return this.store.beginTransaction();
@@ -547,7 +547,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @throws XWikiException if an error occurs while retrieving or creating a new session and transaction.
      * @deprecated since 4.0M1, use {@link #beginTransaction(SessionFactory, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public boolean beginTransaction(SessionFactory sfactory, boolean withTransaction, XWikiContext context)
         throws XWikiException
     {
@@ -576,7 +576,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @throws HibernateException
      * @deprecated since 4.0M1, use {@link #endTransaction(XWikiContext, boolean)}
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public void endTransaction(XWikiContext context, boolean commit, boolean withTransaction) throws HibernateException
     {
         this.store.endTransaction(commit);
@@ -623,7 +623,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     /**
      * @deprecated does not do anything since 11.5RC1
      */
-    @Deprecated
+    @Deprecated(since = "11.5RC1")
     public void setSessionFactory(SessionFactory sessionFactory)
     {
         // Do nothing
@@ -645,7 +645,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     /**
      * @deprecated since 9.9RC1
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     public Map<String, String> getConnections()
     {
         return Collections.emptyMap();
@@ -654,7 +654,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     /**
      * @deprecated since 9.9RC1
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     public int getNbConnections()
     {
         return -1;
@@ -663,7 +663,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     /**
      * @deprecated since 9.9RC1
      */
-    @Deprecated
+    @Deprecated(since = "9.9RC1")
     public void setNbConnections(int nbConnections)
     {
         // Don't do anything anymore
@@ -691,7 +691,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @since 4.0M1
      * @deprecated since 11.5RC1
      */
-    @Deprecated
+    @Deprecated(since = "11.5RC1")
     protected Configuration getMapping(String className, String customMapping)
     {
         Configuration hibconfig = new Configuration();
@@ -745,7 +745,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @deprecated since 4.0M1, use {@link #execute(XWikiContext, boolean, HibernateCallback)} or
      *             {@link #failSafeExecute(XWikiContext, boolean, HibernateCallback)}
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public <T> T execute(XWikiContext context, boolean bTransaction, boolean doCommit, HibernateCallback<T> cb)
         throws XWikiException
     {
@@ -859,7 +859,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @deprecated since 4.0M1, use {@link #executeRead(XWikiContext, HibernateCallback)} or
      *             {@link #failSafeExecuteRead(XWikiContext, HibernateCallback)}
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public <T> T executeRead(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb) throws XWikiException
     {
         return execute(context, false, cb);
@@ -905,7 +905,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @deprecated since 4.0M1, use {@link #executeWrite(XWikiContext, HibernateCallback)} or
      *             {@link #failSafeExecuteWrite(XWikiContext, HibernateCallback)}
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public <T> T executeWrite(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb) throws XWikiException
     {
         return execute(context, true, cb);

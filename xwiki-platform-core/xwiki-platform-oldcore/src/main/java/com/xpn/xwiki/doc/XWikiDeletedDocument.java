@@ -211,7 +211,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      * @return {@link XWikiDocument#getLanguage()}
      * @deprecated since 8.0M1, use {@link #getLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getLanguage()
     {
         return getLocale().toString();
@@ -230,7 +230,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      * @param locale - {@link XWikiDocument#getLanguage()} to set
      * @deprecated since 8.0M1
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     protected void setLanguage(String locale)
     {
         this.locale = LocaleUtils.toLocale(Util.normalizeLanguage(locale), Locale.ROOT);
@@ -340,7 +340,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      *             {@link XWikiDeletedDocument#XWikiDeletedDocument(String, Locale, String, String, Date, XWikiDeletedDocumentContent)
      *             instead}
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     protected void setDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         this.content = new XWikiHibernateDeletedDocumentContent(doc);

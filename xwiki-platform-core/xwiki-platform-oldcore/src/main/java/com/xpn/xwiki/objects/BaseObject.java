@@ -82,7 +82,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      *
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     @Override
     public String getName()
     {
@@ -97,7 +97,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      *
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     @Override
     public void setName(String name)
     {

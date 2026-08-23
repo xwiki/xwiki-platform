@@ -47,7 +47,7 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
 @Component
 @Named("com.xpn.xwiki.internal.job.JobRequestContextInitializer")
 @Singleton
-@Deprecated
+@Deprecated(since = "10.9RC1")
 public class JobRequestContextInitializer extends AbstractEventListener
 {
     @Inject

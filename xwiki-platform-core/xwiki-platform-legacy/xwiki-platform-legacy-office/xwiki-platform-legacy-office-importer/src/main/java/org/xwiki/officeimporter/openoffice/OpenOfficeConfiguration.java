@@ -33,7 +33,7 @@ import org.xwiki.officeimporter.server.OfficeServerConfiguration;
  * @deprecated since 5.0M2, use the {@link OfficeServerConfiguration} instead.
  */
 @Role
-@Deprecated
+@Deprecated(since = "5.0M2")
 public interface OpenOfficeConfiguration
 {
     /**

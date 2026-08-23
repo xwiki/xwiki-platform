@@ -28,7 +28,7 @@ import org.xwiki.extension.ExtensionException;
  * @since 9.3rc1
  * @deprecated since 10.5RC1, use {@link XarExtensionException} instead
  */
-@Deprecated
+@Deprecated(since = "10.5RC1")
 public class XarExtensionExtension extends ExtensionException
 {
     /**

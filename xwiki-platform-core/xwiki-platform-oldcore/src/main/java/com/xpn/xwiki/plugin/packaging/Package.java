@@ -82,7 +82,7 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  * @deprecated since 5.2, use Filter framework instead
  */
-@Deprecated
+@Deprecated(since = "5.2")
 public class Package
 {
     public static final int OK = 0;

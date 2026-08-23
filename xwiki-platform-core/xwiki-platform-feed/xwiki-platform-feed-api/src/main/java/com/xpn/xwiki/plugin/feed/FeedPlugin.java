@@ -640,7 +640,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
      * @throws XWikiException if loading the class definition fails
      * @deprecated since 11.10RC1
      */
-    @Deprecated
+    @Deprecated(since = "11.10RC1")
     public BaseClass getAggregatorURLClass(XWikiContext context) throws XWikiException
     {
         return context.getWiki().getDocument(AggregatorURLClassDocumentInitializer.REFERENCE, context).getXClass();
@@ -655,7 +655,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
      * @throws XWikiException if loading the class definition fails
      * @deprecated since 11.10RC1
      */
-    @Deprecated
+    @Deprecated(since = "11.10RC1")
     public BaseClass getFeedEntryClass(XWikiContext context) throws XWikiException
     {
         return context.getWiki().getDocument(FeedEntryClassDocumentInitializer.REFERENCE, context).getXClass();

@@ -55,7 +55,7 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("mailstorage")
 @Singleton
-@Deprecated
+@Deprecated(since = "12.4RC1")
 public class DeprecatedMailStorageScriptService extends AbstractMailScriptService
 {
     /**

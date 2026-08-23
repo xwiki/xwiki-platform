@@ -33,7 +33,7 @@ import org.xwiki.model.EntityType;
  * @deprecated since 7.2M1, use {@link EntityReferenceProvider} instead
  */
 @Role
-@Deprecated
+@Deprecated(since = "7.2M1")
 public interface EntityReferenceValueProvider
 {
     /**

@@ -35,7 +35,7 @@ import org.xwiki.officeimporter.server.OfficeServerConfiguration;
  */
 @Component
 @Singleton
-@Deprecated
+@Deprecated(since = "5.0M2")
 public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
 {
     /**

@@ -40,7 +40,7 @@ import com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore;
 @Component
 @Named(FileSystemStoreUtils.HINT)
 @Singleton
-@Deprecated
+@Deprecated(since = "9.10RC1")
 public class FilesystemAttachmentRecycleBinStore extends HibernateAttachmentRecycleBinStore
 {
     @Inject

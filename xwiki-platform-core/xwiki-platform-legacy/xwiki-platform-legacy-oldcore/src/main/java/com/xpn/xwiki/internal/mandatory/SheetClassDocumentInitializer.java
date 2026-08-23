@@ -39,7 +39,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("XWiki.SheetClass")
 @Singleton
-@Deprecated
+@Deprecated(since = "3.1M2")
 public class SheetClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**

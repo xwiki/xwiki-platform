@@ -34,7 +34,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @since 2.2.3
  * @deprecated you may use {@link EntityReference#removeParent(org.xwiki.model.reference.EntityReference)} since 4.0M2
  */
-@Deprecated
+@Deprecated(since = "4.0M2")
 @Component
 @Named("local/reference")
 @Singleton

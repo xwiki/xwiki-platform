@@ -624,7 +624,7 @@ public class XWikiExecutor
     /**
      * @deprecated since 4.2M1 use {@link #getPropertiesConfiguration(String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.2M1")
     private Properties getProperties(String path) throws Exception
     {
         Properties properties = new Properties();
@@ -666,7 +666,7 @@ public class XWikiExecutor
     /**
      * @deprecated since 4.2M1 use {@link #saveXWikiProperties()} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.2M1")
     public void saveXWikiProperties(Properties properties) throws Exception
     {
         saveProperties(getXWikiPropertiesPath(), properties);

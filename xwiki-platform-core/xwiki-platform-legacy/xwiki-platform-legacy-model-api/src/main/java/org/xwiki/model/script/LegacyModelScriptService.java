@@ -51,7 +51,7 @@ public class LegacyModelScriptService extends ModelScriptService
      * @since 4.3M1
      * @deprecated since 7.2M1, use {@link #getEntityReference(EntityType, String)}
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     public String getEntityReferenceValue(EntityType type, String hint)
     {
         if (type == null) {

@@ -204,7 +204,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @throws XWikiException error when browsing groups.
      * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
-    @Deprecated
+    @Deprecated(since = "10.8RC1")
     public Collection<String> getAllGroupsNamesForMember(String member) throws XWikiException
     {
         Collection<String> memberList;
@@ -228,7 +228,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @throws XWikiException error when browsing groups.
      * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
-    @Deprecated
+    @Deprecated(since = "10.8RC1")
     public Collection<String> getAllMembersNamesForGroup(String group) throws XWikiException
     {
         return getAllMembersNamesForGroup(group, 0, 0);
@@ -244,7 +244,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @throws XWikiException error when browsing groups.
      * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
-    @Deprecated
+    @Deprecated(since = "10.8RC1")
     public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start) throws XWikiException
     {
         return getAllMatchedMembersNamesForGroup(group, null, nb, start, null);
@@ -307,7 +307,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @throws XWikiException error when getting number of users.
      * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
-    @Deprecated
+    @Deprecated(since = "10.8RC1")
     public int countAllGroupsNamesForMember(String member) throws XWikiException
     {
         int count = 0;
@@ -329,7 +329,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @throws XWikiException error when getting number of groups.
      * @deprecated since 10.8RC1, use org.xwiki.user.script.GroupScriptService ($services.user.group) instead
      */
-    @Deprecated
+    @Deprecated(since = "10.8RC1")
     public int countAllMembersNamesForGroup(String group) throws XWikiException
     {
         int count = 0;

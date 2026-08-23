@@ -27,7 +27,7 @@ import org.xwiki.observation.event.filter.EventFilter;
  * @version $Id$
  * @deprecated since 2.7RC1 use {@link org.xwiki.bridge.event.DocumentCreatedEvent} instead
  */
-@Deprecated
+@Deprecated(since = "2.7RC1")
 public class DocumentSaveEvent extends AbstractDocumentEvent
 {
     /**

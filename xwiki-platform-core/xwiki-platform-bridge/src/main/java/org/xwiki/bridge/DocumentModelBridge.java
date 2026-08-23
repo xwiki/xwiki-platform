@@ -78,7 +78,7 @@ public interface DocumentModelBridge
      *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
      * @deprecated since 3.0M1 use {@link #getSyntax()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.0M1")
     String getSyntaxId();
 
     /**
@@ -92,7 +92,7 @@ public interface DocumentModelBridge
      * @return the page to which the document belongs to (eg "WebHome")
      * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     String getPageName();
     
     /**
@@ -102,7 +102,7 @@ public interface DocumentModelBridge
      * @return the space to which the document belongs to (eg "Main")
      * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     String getSpaceName();
 
     /**
@@ -111,7 +111,7 @@ public interface DocumentModelBridge
      * @return A <code>String</code> representation of the document's wiki name.
      * @deprecated since 2.2M1 use {@link #getDocumentReference()}  instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     String getWikiName();
 
     /**
@@ -168,7 +168,7 @@ public interface DocumentModelBridge
      * @since 7.2M1
      * @deprecated since 14.0RC1 rely on {@link #getAuthors()}.
      */
-    @Deprecated
+    @Deprecated(since = "14.0RC1")
     DocumentReference getContentAuthorReference();
 
     /**

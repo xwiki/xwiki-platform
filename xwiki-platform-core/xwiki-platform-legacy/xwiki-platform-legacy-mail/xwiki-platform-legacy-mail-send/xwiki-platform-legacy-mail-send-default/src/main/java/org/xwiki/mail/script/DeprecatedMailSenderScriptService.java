@@ -58,7 +58,7 @@ import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
 @Component
 @Named("mailsender")
 @Singleton
-@Deprecated
+@Deprecated(since = "12.4RC1")
 public class DeprecatedMailSenderScriptService extends AbstractMailScriptService
 {
     /**

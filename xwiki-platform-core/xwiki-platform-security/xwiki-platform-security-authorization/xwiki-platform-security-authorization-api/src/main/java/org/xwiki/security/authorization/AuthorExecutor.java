@@ -43,7 +43,7 @@ public interface AuthorExecutor
      * @param <V> the result type of method {@code call}
      * @deprecated since 10.11RC1, use {@link #call(Callable, DocumentReference, DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "10.11RC1")
     <V> V call(Callable<V> callable, DocumentReference authorReference) throws Exception;
 
     /**
@@ -80,7 +80,7 @@ public interface AuthorExecutor
      * @see #after(AutoCloseable)
      * @deprecated since 10.11RC1, use {@link #before(DocumentReference, DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "10.11RC1")
     AutoCloseable before(DocumentReference authorReference);
 
     /**

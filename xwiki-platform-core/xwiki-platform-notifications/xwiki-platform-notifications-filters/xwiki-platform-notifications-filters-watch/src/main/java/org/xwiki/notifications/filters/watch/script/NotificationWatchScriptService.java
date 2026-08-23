@@ -220,7 +220,7 @@ public class NotificationWatchScriptService implements ScriptService
      * @deprecated Since 13.2RC1: the various API using DocumentReference for users should be refactored
      *              to use UserReference directly.
      */
-    @Deprecated
+    @Deprecated(since = "13.2RC1")
     private DocumentReference convertReference(UserReference userReference) throws NotificationException
     {
         DocumentReference result;

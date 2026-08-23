@@ -165,7 +165,7 @@ public class XARInputProperties extends XMLInputProperties
      */
     @PropertyName("Force document")
     @PropertyDescription("Force considering the input stream as a document")
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public boolean isForceDocument()
     {
         return this.sourceType == SourceType.DOCUMENT;
@@ -175,7 +175,7 @@ public class XARInputProperties extends XMLInputProperties
      * @param forceDocument true if the input should be forced as document
      * @deprecated since 9.0RC1, use {@link #setSourceType(SourceType)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public void setForceDocument(boolean forceDocument)
     {
         if (forceDocument) {

@@ -53,7 +53,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("current")
 @Singleton
-@Deprecated
+@Deprecated(since = "7.2M1")
 public class CurrentEntityReferenceValueProvider extends DefaultEntityReferenceValueProvider
 {
     @Inject

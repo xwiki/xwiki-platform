@@ -109,7 +109,7 @@ public class VfsResourceReference extends EntityResourceReference
      * references such as {@code attach:space.page@attachment/path/to/file}, {@link #VfsResourceReference(String)}
      * should be used instead
      */
-    @Deprecated
+    @Deprecated(since = "12.4RC1")
     public VfsResourceReference(URI fullURI)
     {
         // Find the first "/" and consider that everything after is the path
@@ -147,7 +147,7 @@ public class VfsResourceReference extends EntityResourceReference
      * @return the URI to the VFS (e.g. {@code attach:space.page@file.zip}, {@code http://server/path/to/zip})
      * @deprecated Since 12.4RC1 this method shouldn't be used anymore, in favor of {@link #getReference}.
      */
-    @Deprecated
+    @Deprecated(since = "12.4RC1")
     public URI getURI()
     {
         if (this.uri == null) {

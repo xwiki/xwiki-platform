@@ -51,7 +51,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @deprecated since 7.0M2
  */
-@Deprecated
+@Deprecated(since = "7.0M2")
 @Component
 @Singleton
 public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobExecutor, Initializable

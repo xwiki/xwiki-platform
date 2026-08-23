@@ -407,7 +407,7 @@ public interface TemplateManager
      * @deprecated since 14.0CR1, use {@link #createStringTemplate(String, DocumentReference, DocumentReference)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "14.0")
     default Template createStringTemplate(String content, DocumentReference author) throws Exception
     {
         throw new UnsupportedOperationException(

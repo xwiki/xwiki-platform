@@ -270,7 +270,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      * @return the title XDOM
      * @deprecated since 7.0M1
      */
-    @Deprecated
+    @Deprecated(since = "7.0M1")
     protected abstract XDOM extractTitleFromContent(DocumentModelBridge document,
         DocumentDisplayerParameters parameters);
 

@@ -32,7 +32,7 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 /**
  * @deprecated since 6.1M2, use {@link XWikiCfgConfigurationSource} component instead
  */
-@Deprecated
+@Deprecated(since = "6.1M2")
 public class XWikiConfig extends Properties
 {
     public XWikiConfig()

@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Role;
  * @deprecated since 5.0M2, use {@link org.xwiki.officeimporter.server.OfficeServer} instead
  */
 @Role
-@Deprecated
+@Deprecated(since = "5.0M2")
 public interface OpenOfficeManager
 {
     /**

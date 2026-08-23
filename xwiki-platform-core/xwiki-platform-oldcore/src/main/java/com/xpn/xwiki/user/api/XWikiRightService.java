@@ -111,7 +111,7 @@ public interface XWikiRightService
      *             {@link org.xwiki.security.authorization.AuthorizationManager#hasAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.EntityReference)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "4.0M2")
     boolean hasAccessLevel(String right, String username, String docname, XWikiContext context) throws XWikiException;
 
     /**
@@ -124,7 +124,7 @@ public interface XWikiRightService
      *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1RC1")
     boolean hasProgrammingRights(XWikiContext context);
 
     /**
@@ -138,7 +138,7 @@ public interface XWikiRightService
      *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.EntityReference)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1RC1")
     boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context);
 
     /**
@@ -151,7 +151,7 @@ public interface XWikiRightService
      *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1RC1")
     boolean hasAdminRights(XWikiContext context);
 
     /**
@@ -165,7 +165,7 @@ public interface XWikiRightService
      *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.EntityReference)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1RC1")
     boolean hasWikiAdminRights(XWikiContext context);
 
     /**

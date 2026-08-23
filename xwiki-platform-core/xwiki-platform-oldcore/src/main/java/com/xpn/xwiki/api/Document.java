@@ -323,7 +323,7 @@ public class Document extends Api
      * @see #getDocumentReference()
      * @deprecated since 11.0, use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.0")
     public String getName()
 {
     return this.doc.getDocumentReference().getName();
@@ -614,7 +614,7 @@ public class Document extends Api
      * @return The syntax id representing the syntax used for the document.
      * @deprecated since 2.3M1 use {@link #getSyntax()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.3M1")
     public String getSyntaxId()
     {
         return this.doc.getSyntax().toIdString();
@@ -626,7 +626,7 @@ public class Document extends Api
      * @return the locale of the document.
      * @deprecated since 5.4M1 use {@link #getLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.4M1")
     public String getLanguage()
     {
         return this.doc.getLanguage();
@@ -663,7 +663,7 @@ public class Document extends Api
      * @return the real locale
      * @deprecated since 8.0M1, use {@link #getRealLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getRealLanguage() throws XWikiException
     {
         return this.doc.getRealLanguage(getXWikiContext());
@@ -688,7 +688,7 @@ public class Document extends Api
      * @return the locale of the default document
      * @deprecated since 8.0M1, use {@link #getDefaultLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getDefaultLanguage()
     {
         return this.doc.getDefaultLanguage();
@@ -851,7 +851,7 @@ public class Document extends Api
      * @return the given text rendered in the context of this document
      * @deprecated since 1.6M1 use {@link #getRenderedContent(String, String)}
      */
-    @Deprecated
+    @Deprecated(since = "1.6M1")
     public String getRenderedContent(String text) throws XWikiException
     {
         return getRenderedContent(text, Syntax.XWIKI_1_0.toIdString());

@@ -89,7 +89,7 @@ public class EntityRequest extends AbstractCheckRightsRequest
      *         request
      * @deprecated since 9.2RC1, use {@link EntityJobStatus#getJobType()} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.2RC1")
     public String getJobType()
     {
         return getProperty(PROPERTY_JOB_TYPE);

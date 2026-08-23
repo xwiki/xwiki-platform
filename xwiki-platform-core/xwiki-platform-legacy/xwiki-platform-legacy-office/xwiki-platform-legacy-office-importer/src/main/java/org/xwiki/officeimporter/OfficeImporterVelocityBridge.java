@@ -38,7 +38,7 @@ import org.xwiki.script.service.ScriptService;
  * @since 1.8M1
  * @deprecated since 4.1M1 use the {@link ScriptService} with hint "officeimporter" instead
  */
-@Deprecated
+@Deprecated(since = "4.1M1")
 public class OfficeImporterVelocityBridge
 {
     /**

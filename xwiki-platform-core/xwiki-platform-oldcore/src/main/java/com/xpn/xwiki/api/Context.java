@@ -237,7 +237,7 @@ public class Context extends Api
      * @see #getInterfaceLanguage()
      * @deprecated since 6.0M1, use {@link #getLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.0M1")
     public String getLanguage()
     {
         return getXWikiContext().getLanguage();
@@ -264,7 +264,7 @@ public class Context extends Api
      * @see #getLanguage()
      * @deprecated since 6.0M1, use {@link #getInterfaceLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.0M1")
     public String getInterfaceLanguage()
     {
         return getXWikiContext().getInterfaceLanguage();
@@ -427,7 +427,7 @@ public class Context extends Api
      * @return a string containing a comma-separated list of TextArea field names for which the WYSIWYG editor should be
      *         enabled
      */
-    @Deprecated
+    @Deprecated(since = "8.2RC1")
     public String getEditorWysiwyg()
     {
         return getXWikiContext().getEditorWysiwyg();

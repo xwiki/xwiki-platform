@@ -37,7 +37,7 @@ import org.xwiki.query.QueryExecutor;
 @Component
 @Named("queryExecutor")
 @Singleton
-@Deprecated
+@Deprecated(since = "4.0M1")
 public class DeprecatedConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
 {
     @Inject

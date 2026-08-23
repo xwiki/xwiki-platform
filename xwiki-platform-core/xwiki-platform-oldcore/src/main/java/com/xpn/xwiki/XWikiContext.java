@@ -329,7 +329,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 6.1M1, use {@link #getWikiId()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M1")
     public String getDatabase()
     {
         return getWikiId();
@@ -357,7 +357,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * @param wikiId the current wiki id
      * @deprecated since 6.1M1, use {@link #setWikiId(String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M1")
     public void setDatabase(String wikiId)
     {
         setWikiId(wikiId);
@@ -486,7 +486,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * @return the wiki id originally requested by the user.
      * @deprecated since 6.1M1, use {@link #getOriginalWikiId()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M1")
     public String getOriginalDatabase()
     {
         return getOriginalWikiId();
@@ -507,7 +507,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 6.1M1, use {@link #setOriginalWikiId(String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M1")
     public void setOriginalDatabase(String wikiId)
     {
         setOriginalWikiId(wikiId);
@@ -616,7 +616,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 3.1M1 use {@link #setUserReference(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.1M1")
     public void setUser(String user)
     {
         setUserInternal(user, false);
@@ -625,7 +625,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 3.1M1 use {@link #getUserReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.1M1")
     public String getUser()
     {
         if (this.userReference != null) {
@@ -643,7 +643,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 3.1M1 use {@link #getUserReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.1M1")
     public String getLocalUser()
     {
         if (this.userReference != null) {
@@ -656,7 +656,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 3.1M1 use {@link #getUserReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.1M1")
     public XWikiUser getXWikiUser()
     {
         if (this.userReference != null) {
@@ -670,7 +670,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 4.3M1 use {@link #getLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M1")
     public String getLanguage()
     {
         return this.locale != null ? this.locale.toString() : null;
@@ -679,7 +679,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 4.3M1 use {@link #setLocale(Locale)} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M1")
     public void setLanguage(String language)
     {
         setLocale(LocaleUtils.toLocale(Util.normalizeLanguage(language)));
@@ -713,7 +713,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 6.0M1, use {@link #getInterfaceLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.0M1")
     public String getInterfaceLanguage()
     {
         return this.interfaceLocale != null ? this.interfaceLocale.toString() : null;
@@ -930,7 +930,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 4.3M2 use {@link org.xwiki.localization.ContextualLocalizationManager} component instead
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public XWikiMessageTool getMessageTool()
     {
         XWikiMessageTool msg = ((XWikiMessageTool) get("msg"));
@@ -970,7 +970,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * @return a string containing a comma-separated list of TextArea field names for which the WYSIWYG editor should be
      *         enabled
      */
-    @Deprecated
+    @Deprecated(since = "8.2RC1")
     public String getEditorWysiwyg()
     {
         return (String) get("editor_wysiwyg");

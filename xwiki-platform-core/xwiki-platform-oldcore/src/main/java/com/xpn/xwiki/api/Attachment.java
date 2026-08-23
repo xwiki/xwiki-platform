@@ -81,7 +81,7 @@ public class Attachment extends Api
      * @return the Attachment size
      * @deprecated since 9.0RC1, use {@link #getLongSize()} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public int getFilesize()
     {
         long longSize = getLongSize();

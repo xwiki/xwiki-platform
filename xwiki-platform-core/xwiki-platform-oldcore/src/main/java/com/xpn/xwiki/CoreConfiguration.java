@@ -41,6 +41,6 @@ public interface CoreConfiguration
      * @deprecated starting with 11.0, use
      *     {@link org.xwiki.rendering.configuration.ExtendedRenderingConfiguration#getDefaultContentSyntax()}
      */
-    @Deprecated
+    @Deprecated(since = "11.0")
     Syntax getDefaultDocumentSyntax();
 }

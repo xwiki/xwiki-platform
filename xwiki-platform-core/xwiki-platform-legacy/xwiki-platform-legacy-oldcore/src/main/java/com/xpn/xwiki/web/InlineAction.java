@@ -35,7 +35,7 @@ import com.xpn.xwiki.XWikiException;
 @Component
 @Named("inline")
 @Singleton
-@Deprecated
+@Deprecated(since = "3.2")
 public class InlineAction extends EditAction
 {
     @Override

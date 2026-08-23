@@ -118,7 +118,7 @@ public class GroupsClass extends ListClass
      *         groups, {@code false} otherwise
      * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public boolean isUsesList()
     {
         return getIntValue(META_PROPERTY_USES_LIST) == 1;
@@ -132,7 +132,7 @@ public class GroupsClass extends ListClass
      *            groups, {@code false} otherwise
      * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public void setUsesList(boolean usesList)
     {
         setIntValue(META_PROPERTY_USES_LIST, usesList ? 1 : 0);

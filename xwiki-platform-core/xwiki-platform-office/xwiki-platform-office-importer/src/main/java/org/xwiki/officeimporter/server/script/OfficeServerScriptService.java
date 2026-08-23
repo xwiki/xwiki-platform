@@ -203,7 +203,7 @@ public class OfficeServerScriptService implements ScriptService
      *              or not, then {@link #isConnected()} should be used instead. If the goal is to display the state of
      *              the server then {@link #displayServerState()} should be used.
      */
-    @Deprecated
+    @Deprecated(since = "12.3")
     public String getServerState()
     {
         this.officeServer.refreshState();

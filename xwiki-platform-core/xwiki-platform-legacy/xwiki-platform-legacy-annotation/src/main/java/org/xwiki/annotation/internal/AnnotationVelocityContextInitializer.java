@@ -42,7 +42,7 @@ import org.xwiki.velocity.VelocityContextInitializer;
 @Component
 @Named("annotations")
 @Singleton
-@Deprecated
+@Deprecated(since = "3.0RC1")
 public class AnnotationVelocityContextInitializer implements VelocityContextInitializer
 {
     /**

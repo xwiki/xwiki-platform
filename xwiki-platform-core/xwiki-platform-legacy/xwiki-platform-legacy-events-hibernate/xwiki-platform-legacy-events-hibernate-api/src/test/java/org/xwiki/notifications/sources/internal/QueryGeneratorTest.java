@@ -49,7 +49,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -112,8 +111,8 @@ class QueryGeneratorTest extends AbstractQueryGeneratorTest
             + "ORDER BY event.date DESC", Query.HQL);
         verify(this.query).bindValue(this.startDateParamName, this.startDate);
         verify(this.query).bindValue(this.pref1StartDateParamName, this.pref1StartDate);
-        verify(this.query).bindValue(eq("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799"),
-            eq("create"));
+        verify(this.query).bindValue("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799",
+            "create");
 
     }
 
@@ -146,9 +145,9 @@ class QueryGeneratorTest extends AbstractQueryGeneratorTest
                 + "AND ((event.type = :value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799) "
                 + "AND (event.date >= :" + this.pref1StartDateParamName + ")) " + "ORDER BY event.date DESC",
             Query.HQL);
-        verify(this.query).bindValue(eq(this.startDateParamName), eq(this.startDate));
-        verify(this.query).bindValue(eq("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799"),
-            eq("create"));
+        verify(this.query).bindValue(this.startDateParamName, this.startDate);
+        verify(this.query).bindValue("value_fa8847b0c33183273f5945508b31c3208a9e4ece58ca47233a05628d8dba3799",
+            "create");
         verify(this.query).bindValue(this.pref1StartDateParamName, this.pref1StartDate);
     }
 

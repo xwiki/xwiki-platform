@@ -122,7 +122,8 @@ class DefaultLiveDataEntryResourceTest
     {
 
         FieldUtils.writeField(this.defaultLiveDataEntryPropertyResource, "uriInfo", uriInfo, true);
-        when(uriInfo.getQueryParameters()).thenReturn(mock(MultivaluedMap.class));
+        MultivaluedMap<String, String> multivaluedMapMock = mock();
+        when(uriInfo.getQueryParameters()).thenReturn(multivaluedMapMock);
 
         LiveDataQuery query = new LiveDataQuery();
         query.setSource(this.source);

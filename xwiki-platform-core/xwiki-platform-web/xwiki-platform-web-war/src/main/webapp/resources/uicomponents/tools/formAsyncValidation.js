@@ -33,7 +33,7 @@ define('xwiki-form-validation-async', ['jquery'], function($) {
 
   const hasValidationsWithState = function(validations, states) {
     return validations.some(validation => {
-      return states.indexOf(validation.__state) >= 0;
+      return states.includes(validation.__state);
     });
   };
 

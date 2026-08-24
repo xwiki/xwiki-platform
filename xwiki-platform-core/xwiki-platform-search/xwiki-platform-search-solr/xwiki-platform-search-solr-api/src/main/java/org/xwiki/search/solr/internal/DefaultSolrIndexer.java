@@ -35,7 +35,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.bridge.internal.DocumentContextExecutor;
@@ -242,8 +241,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 try {
                     dispatchQueueEntry(queueEntry);
                 } catch (Throwable e) {
-                    logger.warn("Failed to apply operation [{}] on root reference [{}]. Root cause is [{}]",
-                        queueEntry.operation, queueEntry.reference, ExceptionUtils.getRootCauseMessage(e));
+                    logger.warn("Failed to apply operation [{}] on root reference [{}]",
+                        queueEntry.operation, queueEntry.reference, e);
                 } finally {
                     // Decrement only for entries submitted via addToQueue(); READY_MARKER entries come from
                     // waitReady() which does not increment pendingResolveItems.
@@ -303,8 +302,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 queueEntry = resolveQueue.take();
                 DefaultSolrIndexer.this.resolveQueueRemovalCounter.incrementAndGet();
             } catch (InterruptedException e) {
-                logger.warn("The SOLR resolve thread has been interrupted. Root cause is [{}]",
-                    ExceptionUtils.getRootCauseMessage(e));
+                logger.warn("The SOLR resolve thread has been interrupted", e);
                 queueEntry = RESOLVE_QUEUE_ENTRY_STOP;
             }
             return queueEntry;
@@ -524,8 +522,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
             try {
                 queueEntry = this.indexQueue.take();
             } catch (InterruptedException e) {
-                this.logger.warn("The SOLR index thread has been interrupted. Root cause is [{}]",
-                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("The SOLR index thread has been interrupted", e);
 
                 queueEntry = INDEX_QUEUE_ENTRY_STOP;
             }
@@ -759,8 +756,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         try {
             result = this.componentManager.getInstance(SolrMetadataExtractor.class, entityType.name().toLowerCase());
         } catch (ComponentLookupException e) {
-            this.logger.warn("Unsupported entity type: [{}]. Root cause is [{}]", entityType,
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Unsupported entity type: [{}]", entityType, e);
         }
 
         return result;

@@ -321,9 +321,9 @@ public class Document extends Api
      *         {@code getDocumentReference().getParent().getName()}.
      * @see #getPageReference()
      * @see #getDocumentReference()
-     * @deprecated since 11.0, use {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.0")
     public String getName()
 {
     return this.doc.getDocumentReference().getName();
@@ -612,9 +612,9 @@ public class Document extends Api
      * version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
      *
      * @return The syntax id representing the syntax used for the document.
-     * @deprecated since 2.3M1 use {@link #getSyntax()} instead
+     * @deprecated use {@link #getSyntax()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.3M1")
     public String getSyntaxId()
     {
         return this.doc.getSyntax().toIdString();
@@ -624,9 +624,9 @@ public class Document extends Api
      * Same as {@link #getLocale()} but as String.
      *
      * @return the locale of the document.
-     * @deprecated since 5.4M1 use {@link #getLocale()} instead
+     * @deprecated use {@link #getLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.4M1")
     public String getLanguage()
     {
         return this.doc.getLanguage();
@@ -661,9 +661,9 @@ public class Document extends Api
      * Same as {@link #getRealLocale()} but as String.
      *
      * @return the real locale
-     * @deprecated since 8.0M1, use {@link #getRealLocale()} instead
+     * @deprecated use {@link #getRealLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getRealLanguage() throws XWikiException
     {
         return this.doc.getRealLanguage(getXWikiContext());
@@ -686,9 +686,9 @@ public class Document extends Api
      * Same as {@link #getDefaultLocale()} but as String.
      * 
      * @return the locale of the default document
-     * @deprecated since 8.0M1, use {@link #getDefaultLocale()} instead
+     * @deprecated use {@link #getDefaultLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getDefaultLanguage()
     {
         return this.doc.getDefaultLanguage();
@@ -849,9 +849,9 @@ public class Document extends Api
     /**
      * @param text the text to render
      * @return the given text rendered in the context of this document
-     * @deprecated since 1.6M1 use {@link #getRenderedContent(String, String)}
+     * @deprecated use {@link #getRenderedContent(String, String)}
      */
-    @Deprecated
+    @Deprecated(since = "1.6M1")
     public String getRenderedContent(String text) throws XWikiException
     {
         return getRenderedContent(text, Syntax.XWIKI_1_0.toIdString());
@@ -2395,7 +2395,7 @@ public class Document extends Api
      */
     public Map<String, Map<String, java.lang.Object>> getTOC(int init, int max, boolean numbered)
     {
-        getXWikiContext().put("tocNumbered", new Boolean(numbered));
+        getXWikiContext().put("tocNumbered", Boolean.valueOf(numbered));
         return TOCGenerator.generateTOC(getContent(), init, max, numbered, getXWikiContext());
     }
 
@@ -2877,18 +2877,18 @@ public class Document extends Api
 
     private void saveDocument(String comment, boolean minorEdit, boolean checkSaving) throws XWikiException
     {
-        XWikiDocument doc = getDoc();
+        XWikiDocument xdoc = getDoc();
 
         UserReference currentUserReference = getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE);
-        doc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
+        xdoc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
 
-        if (doc.isNew()) {
-            doc.getAuthors().setCreator(currentUserReference);
+        if (xdoc.isNew()) {
+            xdoc.getAuthors().setCreator(currentUserReference);
         }
 
         XWikiContext xWikiContext = getXWikiContext();
         if (checkSaving) {
-            DocumentReference author = doc.getAuthorReference();
+            DocumentReference author = xdoc.getAuthorReference();
 
             XWikiDocument secureDocument = xWikiContext.getSecureDocument();
             if (secureDocument != null) {
@@ -2896,15 +2896,15 @@ public class Document extends Api
                 // this shouldn't rely on the current user but the script author.
                 // The existing required rights on doc have already been verified by the edit right check.
                 // If required rights shall be changed, they are checked by a listener in checkSavingDocument() below.
-                checkRequiredRightsForSaving(secureDocument, doc, xWikiContext.getAuthorReference());
+                checkRequiredRightsForSaving(secureDocument, xdoc, xWikiContext.getAuthorReference());
             }
 
             // Make sure the user is allowed to make this modification
-            xWikiContext.getWiki().checkSavingDocument(author, doc, comment, minorEdit,
+            xWikiContext.getWiki().checkSavingDocument(author, xdoc, comment, minorEdit,
                 xWikiContext);
         }
 
-        xWikiContext.getWiki().saveDocument(doc, comment, minorEdit, xWikiContext);
+        xWikiContext.getWiki().saveDocument(xdoc, comment, minorEdit, xWikiContext);
         this.initialDoc = this.doc;
     }
 

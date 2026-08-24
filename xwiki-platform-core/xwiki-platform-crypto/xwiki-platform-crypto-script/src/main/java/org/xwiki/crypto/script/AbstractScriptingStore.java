@@ -40,7 +40,7 @@ public abstract class AbstractScriptingStore
      * @deprecated use {@link StandardCharsets#UTF_8} instead
      */
     @Deprecated
-    protected static final Charset UTF8 = Charset.forName("UTF-8");
+    protected static final Charset UTF8 = StandardCharsets.UTF_8;
 
     protected StoreReference storeReference;
 

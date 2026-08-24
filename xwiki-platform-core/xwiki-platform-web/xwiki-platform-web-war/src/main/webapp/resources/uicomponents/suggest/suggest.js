@@ -585,9 +585,14 @@ var XWiki = (function(XWiki){
             sourceContainer.addClassName('hidden').addClassName('loading');
           }
 
-          if (typeof source.icon != 'undefined') {
-            // If there is an icon for this source group, set it as background image
-            // TODO: Replace with the use of the icon theme (see XWIKI-24323).
+          if (source.iconHTML) {
+            // Use the icon theme currently configured on the wiki to display the source group icon.
+            sourceHeader.insert({top: source.iconHTML});
+            sourceHeader.addClassName('withIcon');
+          } else if (source.icon) {
+            // Fallback for sources that specify a plain icon URL (e.g. for backward compatibility): set it as
+            // background image. Note that an empty icon (e.g. because the icon theme lookup failed) must not reach
+            // this branch, otherwise the empty src would make the browser fetch the current page as an "image".
             var iconImage = new Image();
             iconImage.onload = function(){
               this.sourceHeader.setStyle({
@@ -616,11 +621,9 @@ var XWiki = (function(XWiki){
           }
         }
       }
-    } else {
+    } else if (this.resultContainer.down("ul")) {
       // In mono-source mode, reset the list if present
-      if (this.resultContainer.down("ul")) {
-        this.resultContainer.down("ul").remove();
-      }
+      this.resultContainer.down("ul").remove();
     }
 
     var withEnableButton = typeof this.options.hideButton !== "undefined"
@@ -838,9 +841,9 @@ var XWiki = (function(XWiki){
     // Now that we have found all matches for all possible fragments, we iterate over them
     // to construct the final "output String" that will be injected as a suggestion item,
     // with all matches emphasized
-    Object.keys(matches).sortBy(function(s){return parseInt(s)}).each(function(key){
-      var before = output.substring(0, parseInt(key) + offset);
-      var after = output.substring(parseInt(key) + matches[key].length + offset);
+    Object.keys(matches).sortBy(function(s){return Number.parseInt(s)}).each(function(key){
+      var before = output.substring(0, Number.parseInt(key) + offset);
+      var after = output.substring(Number.parseInt(key) + matches[key].length + offset);
       // Emphasize the match in the output string that will be displayed
       output = before + "<em>" + matches[key] + "</em>" + after;
       // Increase the offset by 9, which correspond to the number of chars in the opening and closing "em" tags

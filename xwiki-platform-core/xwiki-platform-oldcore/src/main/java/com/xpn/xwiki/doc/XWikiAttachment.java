@@ -146,7 +146,7 @@ public class XWikiAttachment implements Cloneable
 
     private XWikiAttachmentContent content;
 
-    private XWikiAttachmentArchive attachment_archive;
+    private XWikiAttachmentArchive attachmentArchive;
 
     private boolean isMetaDataDirty = false;
 
@@ -202,6 +202,7 @@ public class XWikiAttachment implements Cloneable
 
     public void setDocId(long id)
     {
+        // Nothing to do, the document identifier is derived from the document itself.
     }
 
     public long getDocId()
@@ -211,6 +212,7 @@ public class XWikiAttachment implements Cloneable
 
     public void setId(long id)
     {
+        // Nothing to do, the identifier is computed from the document and the file name.
     }
 
     @Override
@@ -263,9 +265,9 @@ public class XWikiAttachment implements Cloneable
 
     /**
      * @return the number of bytes in this attachment content
-     * @deprecated since 9.0RC1, use {@link #getLongSize()} instead
+     * @deprecated use {@link #getLongSize()} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public int getFilesize()
     {
         long longSize = getLongSize();
@@ -277,9 +279,9 @@ public class XWikiAttachment implements Cloneable
      * Set cached filesize of the attachment that will be stored as metadata.
      *
      * @param filesize the number of bytes in this attachment content
-     * @deprecated since 9.0RC1, use {@link #setLongSize(long)} instead
+     * @deprecated use {@link #setLongSize(long)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public void setFilesize(int filesize)
     {
         // There is no way to tell Hibernate to not call #setFilesize and we don't want to break the size if it's bigger
@@ -327,9 +329,9 @@ public class XWikiAttachment implements Cloneable
      * @return the real filesize in byte of the attachment. We cannot trust the metadata that may be publicly changed.
      * @throws XWikiException
      * @since 2.3M2
-     * @deprecated since 9.0RC1, use {@link #getContentLongSize(XWikiContext)} instead
+     * @deprecated use {@link #getContentLongSize(XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public int getContentSize(XWikiContext context) throws XWikiException
     {
         long longSize = getContentLongSize(context);
@@ -404,17 +406,17 @@ public class XWikiAttachment implements Cloneable
 
         // Log this since it's probably a mistake so that we find who is doing bad things
         if (this.authorReference != null && this.authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake. "
-                + "Call stack is [{}]", ExceptionUtils.getStackTrace(new Exception()));
+            LOGGER.warn("A reference to XWikiGuest user has been set instead of null. This is probably a mistake.",
+                new Exception("See stack trace"));
         }
     }
 
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 6.4M1 use {@link #getAuthorReference()} instead
+     * @deprecated use {@link #getAuthorReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.4M1")
     public String getAuthor()
     {
         if (this.author == null) {
@@ -427,9 +429,9 @@ public class XWikiAttachment implements Cloneable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
-     * @deprecated since 6.4M1 use {@link #setAuthorReference} instead
+     * @deprecated use {@link #setAuthorReference} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.4M1")
     public void setAuthor(String author)
     {
         if (!Objects.equals(getAuthor(), author)) {
@@ -835,9 +837,9 @@ public class XWikiAttachment implements Cloneable
         return this.content;
     }
 
-    public void setAttachment_content(XWikiAttachmentContent attachment_content)
+    public void setAttachment_content(XWikiAttachmentContent attachmentContent)
     {
-        this.content = attachment_content;
+        this.content = attachmentContent;
 
         if (this.content != null) {
             this.content.setAttachment(this);
@@ -885,12 +887,12 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachmentArchive getAttachment_archive()
     {
-        return this.attachment_archive;
+        return this.attachmentArchive;
     }
 
-    public void setAttachment_archive(XWikiAttachmentArchive attachment_archive)
+    public void setAttachment_archive(XWikiAttachmentArchive attachmentArchive)
     {
-        this.attachment_archive = attachment_archive;
+        this.attachmentArchive = attachmentArchive;
     }
 
     /**
@@ -997,40 +999,40 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     * @deprecated please do not use this, it is bound to a jrcs based implementation.
      */
-    @Deprecated
+    @Deprecated(since = "2.6M1")
     public Archive getArchive()
     {
-        if (this.attachment_archive == null) {
+        if (this.attachmentArchive == null) {
             return null;
         } else {
-            return this.attachment_archive.getRCSArchive();
+            return this.attachmentArchive.getRCSArchive();
         }
     }
 
     /**
-     * @deprecated since 2.6M1 please do not use this, it is bound to a jrcs based implementation.
+     * @deprecated please do not use this, it is bound to a jrcs based implementation.
      */
-    @Deprecated
+    @Deprecated(since = "2.6M1")
     public void setArchive(Archive archive)
     {
-        if (this.attachment_archive == null) {
-            this.attachment_archive = new XWikiAttachmentArchive();
-            this.attachment_archive.setAttachment(this);
+        if (this.attachmentArchive == null) {
+            this.attachmentArchive = new XWikiAttachmentArchive();
+            this.attachmentArchive.setAttachment(this);
         }
 
-        this.attachment_archive.setRCSArchive(archive);
+        this.attachmentArchive.setRCSArchive(archive);
     }
 
     public void setArchive(String data) throws XWikiException
     {
-        if (this.attachment_archive == null) {
-            this.attachment_archive = new XWikiAttachmentArchive();
-            this.attachment_archive.setAttachment(this);
+        if (this.attachmentArchive == null) {
+            this.attachmentArchive = new XWikiAttachmentArchive();
+            this.attachmentArchive.setAttachment(this);
         }
 
-        this.attachment_archive.setArchive(data);
+        this.attachmentArchive.setArchive(data);
     }
 
     public synchronized Version[] getVersions()
@@ -1145,9 +1147,9 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * @deprecated since 9.11RC1, use {@link #loadAttachmentContent(XWikiContext)} instead
+     * @deprecated use {@link #loadAttachmentContent(XWikiContext)} instead
      */
-    @Deprecated
+    @Deprecated(since = "9.11RC1")
     public void loadContent(XWikiContext xcontext)
     {
         try {
@@ -1162,7 +1164,7 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachmentArchive loadArchive(XWikiContext xcontext)
     {
-        if (this.attachment_archive == null) {
+        if (this.attachmentArchive == null) {
             WikiReference currentWiki = xcontext.getWikiReference();
 
             try {
@@ -1175,13 +1177,11 @@ public class XWikiAttachment implements Cloneable
                 try {
                     AttachmentVersioningStore store = getAttachmentVersioningStore(xcontext);
 
-                    this.attachment_archive = store.loadArchive(this, xcontext, true);
+                    this.attachmentArchive = store.loadArchive(this, xcontext, true);
                 } catch (Exception e) {
-                    LOGGER.warn(
-                        "Failed to load archive for attachment [{}@{}]. "
-                            + "This attachment is broken, please consider re-uploading it. Root cause is [{}]",
-                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(),
-                        ExceptionUtils.getRootCauseMessage(e));
+                    LOGGER.warn("Failed to load archive for attachment [{}@{}]. This attachment is broken, please "
+                        + "consider re-uploading it",
+                        this.doc != null ? this.doc.getDocumentReference() : "<unknown>", getFilename(), e);
                 }
             } finally {
                 if (currentWiki != null) {
@@ -1190,7 +1190,7 @@ public class XWikiAttachment implements Cloneable
             }
         }
 
-        return this.attachment_archive;
+        return this.attachmentArchive;
     }
 
     public void updateContentArchive(XWikiContext context) throws XWikiException

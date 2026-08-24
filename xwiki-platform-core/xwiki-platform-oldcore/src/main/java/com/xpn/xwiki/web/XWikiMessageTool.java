@@ -59,9 +59,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * modified, its content is cached again next time a key is asked.
  *
  * @version $Id$
- * @deprecated since 4.3M2 use the {@link org.xwiki.localization.LocalizationManager} component instead
+ * @deprecated use the {@link org.xwiki.localization.LocalizationManager} component instead
  */
-@Deprecated
+@Deprecated(since = "4.3M2")
 public class XWikiMessageTool
 {
     /**
@@ -219,17 +219,17 @@ public class XWikiMessageTool
      */
     protected List<String> getDocumentBundleNames()
     {
-        XWikiContext context = getXWikiContext();
+        XWikiContext xcontext = getXWikiContext();
 
-        if (context == null) {
+        if (xcontext == null) {
             return Collections.emptyList();
         }
 
         List<String> docNamesList;
 
-        String docNames = context.getWiki().getXWikiPreference(KEY, context);
+        String docNames = xcontext.getWiki().getXWikiPreference(KEY, xcontext);
         if (docNames == null || "".equals(docNames)) {
-            docNames = context.getWiki().Param("xwiki." + KEY);
+            docNames = xcontext.getWiki().Param("xwiki." + KEY);
         }
 
         if (docNames == null) {
@@ -247,13 +247,13 @@ public class XWikiMessageTool
      */
     public List<XWikiDocument> getDocumentBundles()
     {
-        XWikiContext context = getXWikiContext();
+        XWikiContext xcontext = getXWikiContext();
 
-        if (context == null) {
+        if (xcontext == null) {
             return Collections.emptyList();
         }
 
-        String defaultLanguage = context.getWiki().getDefaultLanguage(context);
+        String defaultLanguage = xcontext.getWiki().getDefaultLanguage(xcontext);
         List<XWikiDocument> result = new ArrayList<>();
         for (String docName : getDocumentBundleNames()) {
             for (XWikiDocument docBundle : getDocumentBundles(docName.trim(), defaultLanguage)) {
@@ -294,12 +294,12 @@ public class XWikiMessageTool
 
         if (!documentName.isEmpty()) {
             try {
-                XWikiContext context = getXWikiContext();
+                XWikiContext xcontext = getXWikiContext();
 
-                if (context != null) {
+                if (xcontext != null) {
                     // First, looks for a document suffixed by the language
-                    docBundle = context.getWiki().getDocument(documentName, context);
-                    docBundle = docBundle.getTranslatedDocument(context);
+                    docBundle = xcontext.getWiki().getDocument(documentName, xcontext);
+                    docBundle = docBundle.getTranslatedDocument(xcontext);
                 }
             } catch (XWikiException e) {
                 // Error while loading the document.
@@ -328,15 +328,15 @@ public class XWikiMessageTool
 
         if (!documentName.isEmpty()) {
             try {
-                XWikiContext context = getXWikiContext();
+                XWikiContext xcontext = getXWikiContext();
 
-                if (context != null) {
+                if (xcontext != null) {
                     // First, looks for a document suffixed by the language
-                    XWikiDocument docBundle = context.getWiki().getDocument(documentName, context);
-                    XWikiDocument tdocBundle = docBundle.getTranslatedDocument(context);
+                    XWikiDocument docBundle = xcontext.getWiki().getDocument(documentName, xcontext);
+                    XWikiDocument tdocBundle = docBundle.getTranslatedDocument(xcontext);
                     list.add(tdocBundle);
                     if (!tdocBundle.getRealLanguage().equals(defaultLanguage)) {
-                        XWikiDocument defdocBundle = docBundle.getTranslatedDocument(defaultLanguage, context);
+                        XWikiDocument defdocBundle = docBundle.getTranslatedDocument(defaultLanguage, xcontext);
                         if (tdocBundle != defdocBundle) {
                             list.add(defdocBundle);
                         }

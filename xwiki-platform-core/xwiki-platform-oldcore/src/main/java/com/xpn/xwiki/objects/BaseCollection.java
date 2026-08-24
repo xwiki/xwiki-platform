@@ -207,9 +207,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * Note that this method cannot be removed for now since it's used by Hibernate for saving an XObject.
      *
      * @return the string serialized version of the XClass reference, or an empty string if there's none
-     * @deprecated since 2.2M2 use {@link #getXClassReference()} instead
+     * @deprecated use {@link #getXClassReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     public String getClassName()
     {
         String xClassAsString;
@@ -254,9 +254,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * Note that this method cannot be removed for now since it's used by Hibernate for loading an XObject.
      *
      * @param name the string serialized version of the XClass reference
-     * @deprecated since 2.2.3 use {@link #setXClassReference(EntityReference)} ()} instead
+     * @deprecated use {@link #setXClassReference(EntityReference)} ()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2.3")
     public void setClassName(String name)
     {
         EntityReference resolvedXClassReference = null;
@@ -964,10 +964,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     /**
-     * @deprecated since 9.0RC1, use {@link #toXML()} instead
+     * @deprecated use {@link #toXML()} instead
      */
     @Override
-    @Deprecated
+    @Deprecated(since = "9.0RC1")
     public Element toXML(BaseClass bclass)
     {
         // Set passed class in the context so that the input event generator finds it

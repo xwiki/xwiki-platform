@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>18.7.0-SNAPSHOT</version>
+    <version>18.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-extension-handler-xar</artifactId>
   <name>XWiki Platform - Legacy - Extension Handler XAR</name>
@@ -88,6 +88,16 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <!-- Exclude AspectJ's builddef.lst file form the generated JAR since it's not useful there. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/builddef.lst</exclude>
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

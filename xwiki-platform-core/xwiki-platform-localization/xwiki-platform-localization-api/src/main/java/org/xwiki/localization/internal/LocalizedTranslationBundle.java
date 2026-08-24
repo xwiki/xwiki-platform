@@ -21,8 +21,8 @@ package org.xwiki.localization.internal;
 
 import java.util.Locale;
 
-import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.Translation;
+import org.xwiki.localization.TranslationBundle;
 
 /**
  * A translations bundle in a specific {@link Locale}.

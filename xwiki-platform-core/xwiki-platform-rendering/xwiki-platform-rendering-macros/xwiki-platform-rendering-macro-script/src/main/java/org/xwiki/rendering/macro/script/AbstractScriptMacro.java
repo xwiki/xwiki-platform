@@ -66,10 +66,10 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     /**
      * Used to find if the current document's author has programming rights.
      *
-     * @deprecated since 2.5M1 (not used any more)
+     * @deprecated (not used any more)
      */
     @Inject
-    @Deprecated
+    @Deprecated(since = "2.5M1")
     protected org.xwiki.bridge.DocumentAccessBridge documentAccessBridge;
 
     /**
@@ -236,10 +236,10 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * @param context the context of the macro transformation.
      * @return the result of script execution.
      * @throws MacroExecutionException failed to evaluate provided content.
-     * @deprecated since 2.4M2 use {@link #evaluateString(ScriptMacroParameters, String, MacroTransformationContext)}
+     * @deprecated use {@link #evaluateString(ScriptMacroParameters, String, MacroTransformationContext)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "2.4M2")
     protected String evaluate(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {

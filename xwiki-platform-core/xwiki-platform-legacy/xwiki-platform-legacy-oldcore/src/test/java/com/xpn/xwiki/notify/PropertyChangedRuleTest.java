@@ -22,8 +22,6 @@ package com.xpn.xwiki.notify;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
-import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
-
 import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.XWiki;
@@ -33,6 +31,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -79,7 +78,7 @@ class PropertyChangedRuleTest implements XWikiDocChangeNotificationInterface
      * only returns the above mentioned classes on {@link XWiki#getClass(String, XWikiContext)}.
      */
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         this.context = this.oldcore.getXWikiContext();
 

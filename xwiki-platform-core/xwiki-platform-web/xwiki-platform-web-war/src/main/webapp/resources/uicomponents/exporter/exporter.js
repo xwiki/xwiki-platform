@@ -307,7 +307,7 @@ define('xwiki-export-tree-filter', ['jquery', 'bootstrap', 'xwiki-export-tree'],
   var filterRegex = /filters=(\w*)/;
   var getCurrentFilter = function(url) {
     var result = filterRegex.exec(url);
-    return (result && result[1]) || '';
+    return result?.[1] || '';
   };
 
   var saveFilterData = function(exportTree) {

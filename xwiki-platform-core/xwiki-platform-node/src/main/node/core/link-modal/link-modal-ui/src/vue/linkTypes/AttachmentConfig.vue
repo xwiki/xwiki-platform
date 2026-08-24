@@ -131,20 +131,24 @@ watch(query, async (query) => {
         <template
           #renderSuggestion="{ renderingData: { reference, title, segments } }"
         >
-          <c-icon name="file-earmark" :size="Size.Small" />
-          {{ reference.substring(reference.lastIndexOf("@") + 1) }}
-          <br />
-
-          <!-- TODO: 'WebHome' is treated as a special hardcoded value for now, until https://jira.xwiki.org/browse/XWIKI-24366 -->
-          <span
-            v-for="segment in title !== 'WebHome'
-              ? segments.concat([title])
-              : segments"
-            :key="segment"
-            class="segment"
-          >
-            {{ segment }}
-          </span>
+          <div class="suggestion-label">
+            <c-icon name="file-earmark" :size="Size.Small" />
+            <span class="suggestion-title">
+              {{ reference.substring(reference.lastIndexOf("@") + 1) }}
+            </span>
+          </div>
+          <div class="suggestion-hint">
+            <!-- TODO: 'WebHome' is treated as a special hardcoded value for now, until https://jira.xwiki.org/browse/XWIKI-24366 -->
+            <span
+              v-for="segment in title !== 'WebHome'
+                ? segments.concat([title])
+                : segments"
+              :key="segment"
+              class="segment"
+            >
+              {{ segment }}
+            </span>
+          </div>
         </template>
       </search-box>
     </template>

@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.plugin.zipexplorer;
 
-import java.io.ByteArrayInputStream;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -229,7 +229,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
                 if (i == aUrl.length - 1 && !url.endsWith(URL_SEPARATOR)) {
                     buf.append(aUrl[i]);
                 } else {
-                    buf.append(aUrl[i] + URL_SEPARATOR);
+                    buf.append(aUrl[i]).append(URL_SEPARATOR);
                 }
                 ListItem item = new ListItem(buf.toString(), aUrl[i], parentBuf);
                 if (!fileTree.containsKey(buf.toString())) {

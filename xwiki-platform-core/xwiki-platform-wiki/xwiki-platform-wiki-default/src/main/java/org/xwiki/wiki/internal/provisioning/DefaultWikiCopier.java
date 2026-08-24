@@ -115,7 +115,7 @@ public class DefaultWikiCopier implements WikiCopier
         } catch (QueryException e) {
             WikiManagerException thrownException =
                 new WikiManagerException("Unable to get the list of wiki documents to copy.", e);
-            logger.error("Unable to get the list of wiki documents to copy", thrownException);
+            logger.error(thrownException.getMessage(), thrownException);
             throw thrownException;
         } catch (XWikiException e) {
             WikiManagerException thrownException = new WikiManagerException("Failed to copy documents.", e);

@@ -325,8 +325,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         try {
             return getBrowserManager().isConnected();
         } catch (Exception e) {
-            this.logger.warn("Failed to connect to the web browser used for server-side PDF printing. "
-                + "Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to connect to the web browser used for server-side PDF printing", e);
             return false;
         }
     }
@@ -338,9 +337,9 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 
     /**
      * @return the current HTTP servlet request, used to take the cookies from
-     * @deprecated since 17.4.0RC1
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "17.4.0RC1")
     protected abstract javax.servlet.http.HttpServletRequest getRequest();
 
     protected HttpServletRequest getJakartaRequest()

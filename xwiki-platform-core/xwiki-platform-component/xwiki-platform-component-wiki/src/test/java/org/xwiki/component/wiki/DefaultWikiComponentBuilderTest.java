@@ -54,7 +54,7 @@ class DefaultWikiComponentBuilderTest implements WikiComponentConstants
     private WikiComponentBridge bridge;
 
     @Test
-    void buildComponentsWithoutProgrammingRights() throws Exception
+    void buildComponentsWithoutProgrammingRights()
     {
         WikiComponentException expected = assertThrows(WikiComponentException.class, () -> this.builder.buildComponents(DOC_REFERENCE));
 

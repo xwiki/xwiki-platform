@@ -31,6 +31,7 @@ import { PropSchema } from '@blocknote/core';
 import { ReactCustomBlockImplementation } from '@blocknote/react';
 import { ReactInlineContentImplementation } from '@blocknote/react';
 import { ReactNode } from 'react';
+import { ResourceReference } from '@xwiki/platform-rendering-api';
 import { StyledText } from '@blocknote/core';
 import { StyleImplementation } from '@blocknote/core';
 import { StyleSchema } from '@blocknote/core';
@@ -56,6 +57,7 @@ export type BlockNoteViewWrapperProps = {
     linkEditionHandler: LinkEditionHandler;
     overrides?: {
         imageEdition?: ImageEditionOverrideFn;
+        linkEdition?: LinkEditionHooks;
     };
     syntax: SyntaxConfig;
     refs?: {
@@ -145,19 +147,26 @@ export type InlineMacroInvocation = {
 };
 
 // @beta
+export type LinkEditionData = {
+    title: string;
+    url: string;
+    reference?: ResourceReference;
+};
+
+// @beta
 export type LinkEditionHandler = (props: LinkEditionHandlerProps) => void;
 
 // @beta
 export type LinkEditionHandlerProps = {
-    current: {
-        title: string;
-        url: string;
-    };
-    onSubmit: (link: {
-        title: string;
-        url: string;
-    }) => void;
+    current: LinkEditionData;
+    onSubmit: (link: LinkEditionData) => void;
     mode: "createNew" | "editExisting";
+};
+
+// @beta
+export type LinkEditionHooks = {
+    beforeEdit?: (linkData: LinkEditionData) => LinkEditionData | void;
+    beforeUpdate?: (linkData: LinkEditionData, previous?: LinkEditionData) => LinkEditionData | void;
 };
 
 // @beta

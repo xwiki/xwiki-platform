@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
@@ -104,7 +105,8 @@ public class RatingDeletedEntityListener extends AbstractEventListener
                 manager.removeRatings(deletedReference);
             }
         } catch (RatingsException e) {
-            logger.error("Error while removing ratings related to reference [{}] from ratings", deletedReference, e);
+            logger.error("Error while removing ratings related to reference [{}] from ratings: [{}]",
+                deletedReference, ExceptionUtils.getRootCause(e));
         }
     }
 }

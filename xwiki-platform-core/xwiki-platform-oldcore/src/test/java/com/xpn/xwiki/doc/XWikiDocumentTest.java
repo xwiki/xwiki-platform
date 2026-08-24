@@ -342,6 +342,24 @@ class XWikiDocumentTest
     }
 
     @Test
+    void getUniqueLinkedPagesWhenXObjectXClassIsNull() throws XWikiException
+    {
+        XWikiDocument contextDocument = new XWikiDocument(new DocumentReference("xwiki", "Space", "Page"));
+        this.oldcore.getXWikiContext().setDoc(contextDocument);
+
+        this.document.setSyntax(Syntax.XWIKI_2_1);
+        this.document.setContent("[[TargetPage]]");
+        this.baseObject.setLargeStringValue("area", "[[ObjectTargetPage]]");
+
+        when(this.xWiki.getXClass(any(), any())).thenReturn(null);
+
+        Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
+
+        // Only the links from the document content are returned, the xobjects are skipped.
+        assertEquals(Set.of("Space.TargetPage.WebHome"), linkedPages);
+    }
+
+    @Test
     void getSections10() throws XWikiException
     {
         this.document.setContent("""
@@ -790,6 +808,29 @@ class XWikiDocumentTest
     }
 
     @Test
+    void displayPrettyName()
+    {
+        assertEquals("String",
+            this.document.displayPrettyName("string", this.baseObject, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void displayPrettyNameWhenXClassIsNull()
+    {
+        BaseObject object = mock(BaseObject.class);
+        when(object.getXClass(this.oldcore.getXWikiContext())).thenReturn(null);
+
+        assertEquals("", this.document.displayPrettyName("string", object, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void displayPrettyNameWhenPropertyIsNull()
+    {
+        assertEquals("",
+            this.document.displayPrettyName("unknown", this.baseObject, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
     void convertSyntax() throws XWikiException
     {
         this.document.setSyntax(Syntax.HTML_4_01);
@@ -877,8 +918,8 @@ class XWikiDocumentTest
 
         assertEquals("Page", this.document.getRenderedTitle(this.oldcore.getXWikiContext()));
 
-        assertEquals("Failed to interpret title of document [Wiki:Space.Page]. Root cause is "
-            + "[XWikiVelocityException: message]", this.logCapture.getLogEvent(0).getFormattedMessage());
+        assertEquals("Failed to interpret title of document [Wiki:Space.Page]",
+            this.logCapture.getLogEvent(0).getFormattedMessage());
     }
 
     /**

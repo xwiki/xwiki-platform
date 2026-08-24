@@ -48,7 +48,7 @@ class ExplicitStringDocumentReferenceResolverTest
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
     {
         this.documentReferenceResolver = new ExplicitStringDocumentReferenceResolver();
         ReflectionUtils.setFieldValue(this.documentReferenceResolver, "entityReferenceResolver", 

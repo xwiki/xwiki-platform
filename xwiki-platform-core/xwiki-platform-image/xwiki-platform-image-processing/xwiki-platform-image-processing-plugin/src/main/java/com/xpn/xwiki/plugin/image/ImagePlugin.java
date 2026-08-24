@@ -125,7 +125,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
         String defaultQualityParam = context.getWiki().Param(DEFAULT_QUALITY_PARAM);
         if (!StringUtils.isBlank(defaultQualityParam)) {
             try {
-                this.defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
+                this.defaultQuality = Math.clamp(Float.parseFloat(defaultQualityParam.trim()), 0, 1);
             } catch (NumberFormatException e) {
                 LOGGER.warn("Failed to parse [{}] configuration parameter. Using [{}] as the default image quality. "
                     + "Root cause is [{}].", DEFAULT_QUALITY_PARAM, this.defaultQuality,
@@ -156,8 +156,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
                     this.capacity = Integer.parseInt(capacityParam.trim());
                 } catch (NumberFormatException e) {
                     LOGGER.warn("Failed to parse the [xwiki.plugin.image.cache.capacity] configuration parameter. "
-                        + "Using [{}] as the cache capacity. Root cause is [{}]", this.capacity,
-                        ExceptionUtils.getRootCauseMessage(e));
+                        + "Using [{}] as the cache capacity", this.capacity, e);
                 }
             }
             lru.setMaxEntries(this.capacity);

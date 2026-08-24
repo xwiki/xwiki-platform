@@ -26,10 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -47,6 +44,9 @@ import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Default implementation for {@link NotificationEmailUserPreferenceManager}.
@@ -191,8 +191,7 @@ public class DefaultNotificationEmailUserPreferenceManager implements Notificati
                 }
             }
         } catch (Exception e) {
-            logger.warn("Failed to get the email property [{}] for the user [{}]. Root cause is [{}]", propertyName,
-                user, ExceptionUtils.getRootCauseMessage(e));
+            logger.warn("Failed to get the email property [{}] for the user [{}]", propertyName, user, e);
         }
 
         return returnValue;

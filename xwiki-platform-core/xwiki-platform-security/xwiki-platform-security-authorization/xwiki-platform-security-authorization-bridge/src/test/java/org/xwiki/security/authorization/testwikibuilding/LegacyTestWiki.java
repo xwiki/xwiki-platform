@@ -518,14 +518,14 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         Collection<String> getGroupsForUser(DocumentReference userDoc)
         {
-            Set<String> groups;
+            Set<String> userGroups;
             if (userDoc.getWikiReference().getName().equals(getName())) {
-                groups = this.groupsForUser.get(userDoc.getName());
+                userGroups = this.groupsForUser.get(userDoc.getName());
             } else {
-                groups = this.groupsForUser.get(entityReferenceSerializer.serialize(userDoc));
+                userGroups = this.groupsForUser.get(entityReferenceSerializer.serialize(userDoc));
             }
 
-            return groups == null ? Collections.<String>emptySet() : groups;
+            return userGroups == null ? Collections.<String>emptySet() : userGroups;
         }
 
         void notifyCreatedDocument(XWikiDocument document)
@@ -614,8 +614,8 @@ public class LegacyTestWiki extends AbstractTestWiki
             DocumentReference groupDoc = documentReferenceResolver.resolve(groupName, userSpaceReference);
             if (groups.containsKey(groupDoc.getName())) {
                 groups.remove(groupDoc.getName());
-                for (Set<String> groups : groupsForUser.values()) {
-                    groups.remove(groupDoc.getName());
+                for (Set<String> userGroups : groupsForUser.values()) {
+                    userGroups.remove(groupDoc.getName());
                 }
 
                 // Make sure group document is removed
@@ -809,7 +809,7 @@ public class LegacyTestWiki extends AbstractTestWiki
                 .thenAnswer(invocation -> new Vector<>(memberObjects.values()));
         }
 
-        private BaseObject mockGroupBaseObject(String user)
+        private BaseObject mockGroupBaseObject()
         {
             ++objectNumber;
             return mock(BaseObject.class, getName() + objectNumber);
@@ -849,7 +849,7 @@ public class LegacyTestWiki extends AbstractTestWiki
 
             testWiki.groups.get(getName()).add(uname);
 
-            this.memberObjects.put(uname, mockGroupBaseObject(uname));
+            this.memberObjects.put(uname, mockGroupBaseObject());
         }
 
         public void removeUser(String userName)

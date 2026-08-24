@@ -20,6 +20,8 @@
 package org.xwiki.xar.internal.model;
 
 /**
+ * Helper class holding constants of the XAR XML model for the document root element.
+ * 
  * @version $Id$
  * @since 5.4M1
  */
@@ -106,9 +108,9 @@ public class XarDocumentModel
     public static final String ATTRIBUTE_DOCUMENT_LOCALE = "locale";
 
     /**
-     * @deprecated starting with 7.2M1, use {@link #ATTRIBUTE_DOCUMENT_SPECVERSION} instead
+     * @deprecated use {@link #ATTRIBUTE_DOCUMENT_SPECVERSION} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     public static final String ATTRIBUTE_STREAMVERSION = ATTRIBUTE_DOCUMENT_SPECVERSION;
 
     public static final String ELEMENT_SPACE = "web";

@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Stack;
 
 import org.apache.commons.codec.binary.Base64OutputStream;
@@ -64,7 +65,8 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     /**
      * Platform dependent line separator.
      */
-    private static final byte[] NEWLINE;
+    private static final byte[] NEWLINE =
+        System.getProperty("line.separator").getBytes(StandardCharsets.UTF_8);
 
     /**
      * If the last character written is this then it is safe to indent the next tag.
@@ -88,15 +90,6 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * The underlying writer which is not cast to Writer.
      */
     private LastCharWriter lcWriter;
-
-    // Need to catch this exception so this has to be done in an initializer block.
-    static {
-        try {
-            NEWLINE = System.getProperty("line.separator").getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("No UTF-8, this Java VM is not standards compliant!", e);
-        }
-    }
 
     /**
      * Default constructor used by <code>{@link DOMXMLWriter}</code>.

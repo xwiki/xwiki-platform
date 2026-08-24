@@ -402,14 +402,14 @@ public class Utils
 
     @Deprecated(since = "17.0.0RC1")
     public static XWikiContext prepareContext(String action, XWikiRequest request, XWikiResponse response,
-        XWikiEngineContext engine_context) throws XWikiException
+        XWikiEngineContext engineContext) throws XWikiException
     {
         XWikiContext context = new XWikiContext();
         String dbname = "xwiki";
         URL url = XWiki.getRequestURL(request);
         context.setURL(url);
 
-        context.setEngineContext(engine_context);
+        context.setEngineContext(engineContext);
         context.setRequest(request);
         context.setResponse(response);
         context.setAction(action);
@@ -575,9 +575,9 @@ public class Utils
      *
      * @param value the text to escape, may be null
      * @return a new escaped <code>String</code>, <code>null</code> if null input
-     * @deprecated starting with 2.7 use {@link XMLUtils#escape(Object) $services.xml.escape(content)}
+     * @deprecated use {@link XMLUtils#escape(Object) $services.xml.escape(content)}
      */
-    @Deprecated
+    @Deprecated(since = "2.7")
     public static String formEncode(String value)
     {
         return XMLUtils.escape(value);
@@ -593,18 +593,18 @@ public class Utils
     }
 
     /**
-     * @deprecated replaced by {@link com.xpn.xwiki.util.Util#encodeURI(String, XWikiContext)} since 1.3M2
+     * @deprecated replaced by {@link com.xpn.xwiki.util.Util#encodeURI(String, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "1.3M2")
     public static String encode(String text, XWikiContext context)
     {
         return Util.encodeURI(text, context);
     }
 
     /**
-     * @deprecated replaced by {@link com.xpn.xwiki.util.Util#decodeURI(String, XWikiContext)} since 1.3M2
+     * @deprecated replaced by {@link com.xpn.xwiki.util.Util#decodeURI(String, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "1.3M2")
     public static String decode(String text, XWikiContext context)
     {
         return Util.decodeURI(text, context);
@@ -657,9 +657,9 @@ public class Utils
     /**
      * @return the contextual component manager used by {@link #getComponent(Class)} and
      *         {@link #getComponent(Class, String)}
-     * @deprecated since 6.1M1, use {@link #getContextComponentManager()} instead
+     * @deprecated use {@link #getContextComponentManager()} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1M1")
     public static ComponentManager getComponentManager()
     {
         ComponentManager contextComponentManager;
@@ -708,9 +708,9 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
-     * @deprecated since 4.0M1 use {@link #getComponent(Type, String)} instead
+     * @deprecated use {@link #getComponent(Type, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public static <T> T getComponent(Class<T> role, String hint)
     {
         return getComponent((Type) role, hint);
@@ -723,9 +723,9 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
-     * @deprecated since 4.0M1 use {@link #getComponent(Type)} instead
+     * @deprecated use {@link #getComponent(Type)} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public static <T> T getComponent(Class<T> role)
     {
         return getComponent((Type) role);
@@ -739,9 +739,9 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
-     * @deprecated starting with 4.1M2 use the Component Script Service instead
+     * @deprecated use the Component Script Service instead
      */
-    @Deprecated
+    @Deprecated(since = "4.1M2")
     public static <T> T getComponent(Type roleType, String roleHint)
     {
         T component;
@@ -770,9 +770,9 @@ public class Utils
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
      *             initialized
-     * @deprecated starting with 4.1M2 use the Component Script Service instead
+     * @deprecated use the Component Script Service instead
      */
-    @Deprecated
+    @Deprecated(since = "4.1M2")
     public static <T> T getComponent(Type roleType)
     {
         return getComponent(roleType, "default");
@@ -785,9 +785,9 @@ public class Utils
      * @throws RuntimeException if some of the components cannot be found/initialized, or if the component manager is
      *             not initialized
      * @since 2.0M3
-     * @deprecated since 4.0M1 use {@link #getComponentManager()} instead
+     * @deprecated use {@link #getComponentManager()} instead
      */
-    @Deprecated
+    @Deprecated(since = "4.0M1")
     public static <T> List<T> getComponentList(Class<T> role)
     {
         List<T> components;
@@ -847,7 +847,7 @@ public class Utils
     public static void enablePlaceholders(XWikiContext context)
     {
         context.put(PLACEHOLDERS_CONTEXT_KEY, new HashMap<String, String>());
-        context.put(PLACEHOLDERS_ENABLED_CONTEXT_KEY, new Boolean(true));
+        context.put(PLACEHOLDERS_ENABLED_CONTEXT_KEY, Boolean.TRUE);
     }
 
     /**

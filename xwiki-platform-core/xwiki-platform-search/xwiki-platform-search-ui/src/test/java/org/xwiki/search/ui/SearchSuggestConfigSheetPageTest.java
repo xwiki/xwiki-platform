@@ -27,6 +27,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.evaluation.internal.DefaultObjectEvaluator;
 import org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator;
+import org.xwiki.icon.IconManager;
+import org.xwiki.icon.IconManagerScriptService;
+import org.xwiki.icon.IconRenderer;
+import org.xwiki.icon.IconSetManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
@@ -63,6 +67,7 @@ import static org.mockito.Mockito.when;
     VelocityObjectPropertyEvaluator.class,
     SearchSuggestSourceObjectEvaluator.class,
     TestNoScriptMacro.class,
+    IconManagerScriptService.class,
 })
 class SearchSuggestConfigSheetPageTest extends PageTest
 {
@@ -73,6 +78,9 @@ class SearchSuggestConfigSheetPageTest extends PageTest
 
     private static final DocumentReference SEARCH_SUGGEST_SOURCE_CLASS =
         new DocumentReference(WIKI_NAME, "XWiki", "SearchSuggestSourceClass");
+
+    private static final DocumentReference SEARCH_SUGGEST_MACROS =
+        new DocumentReference(WIKI_NAME, "XWiki", "SearchSuggestMacros");
 
     private static final DocumentReference TEST_PAGE =
         new DocumentReference(WIKI_NAME, "Test", "TestDocument");
@@ -95,8 +103,14 @@ class SearchSuggestConfigSheetPageTest extends PageTest
     @BeforeEach
     void setUp() throws Exception
     {
+        // Minimal icon environment: only IconManager#renderHTML() is actually exercised by these tests.
+        this.componentManager.registerMockComponent(IconSetManager.class);
+        this.componentManager.registerMockComponent(IconRenderer.class);
+        this.componentManager.registerMockComponent(IconManager.class);
+
         this.xwiki.initializeMandatoryDocuments(this.context);
         loadPage(SEARCH_SUGGEST_SOURCE_CLASS);
+        loadPage(SEARCH_SUGGEST_MACROS);
         loadPage(SEARCH_SUGGEST_CONFIG_SHEET);
 
         this.testString = "$doc.getDocumentReference().getName(){{/html}}{{noscript /}}";
@@ -137,25 +151,45 @@ class SearchSuggestConfigSheetPageTest extends PageTest
         when(this.oldcore.getMockDocumentAuthorizationManager()
             .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE, TEST_PAGE)).thenReturn(false);
 
+        // Add a second source using an icon-theme icon, next to the legacy one created in setUp(), so both the
+        // legacy and the icon-theme rendering paths are checked in the same render.
+        BaseObject iconThemeSource = this.testPageDocument.newXObject(SEARCH_SUGGEST_SOURCE_CLASS, this.context);
+        iconThemeSource.setStringValue("name", this.testString);
+        iconThemeSource.setStringValue("icon", "icon:user");
+        iconThemeSource.setStringValue("resultsNumber", this.testString);
+        iconThemeSource.setStringValue("engine", this.testString);
+        this.xwiki.saveDocument(this.testPageDocument, this.context);
+        String iconHTML = "<span class=\"fa fa-user\"></span>";
+        IconManager iconManager = this.componentManager.getInstance(IconManager.class);
+        when(iconManager.renderHTML("user")).thenReturn(iconHTML);
+
         this.context.setDoc(this.testPageDocument);
         Document result = renderHTMLPage(this.searchSuggestConfigSheetDocument);
 
-        verify(this.oldcore.getMockDocumentAuthorizationManager()).hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
-            AUTHOR_REFERENCE, TEST_PAGE);
+        verify(this.oldcore.getMockDocumentAuthorizationManager(), times(2)).hasAccess(Right.SCRIPT,
+            EntityType.DOCUMENT, AUTHOR_REFERENCE, TEST_PAGE);
         verify(this.velocityEngine, never()).evaluate(any(), any(), any(), eq(this.testString));
 
         Element presentationLink =
             result.getElementsByAttributeValue("role", "presentation").get(0).getElementsByTag("a").get(0);
-        // Escaping tests only.
+        // Escaping tests only. Both sources share the same engine, so there is still a single tab.
         assertEquals("#" + this.testString + "SearchSuggestSources", presentationLink.attr("href"));
         assertEquals(this.testString, presentationLink.text());
         assertEquals(this.testString + "SearchSuggestSources", presentationLink.attr("aria-controls"));
         assertEquals(this.testString + "SearchSuggestSources", result.getElementsByClass("tab-pane").get(0).attr("id"));
-        assertEquals(this.testString, result.getElementsByClass("limit").text());
+        for (Element limitElement : result.getElementsByClass("limit")) {
+            assertEquals(this.testString, limitElement.text());
+        }
+        for (Element nameElement : result.getElementsByClass("name")) {
+            assertEquals(this.testString, nameElement.text());
+        }
 
-        // These should not be evaluated.
+        // The legacy icon value (not prefixed with "icon:") is not evaluated.
+        assertEquals(1, result.getElementsByClass("icon").size());
         assertEquals(this.testString, result.getElementsByClass("icon").get(0).attr("src"));
-        assertEquals(this.testString, result.getElementsByClass("name").text());
+
+        // The icon-theme icon is rendered as expected.
+        assertEquals(1, result.getElementsByClass("fa-user").size());
     }
 
     @Test

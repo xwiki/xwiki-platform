@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.converter.OfficeConverter;
@@ -126,8 +125,7 @@ public class OfficeExporter extends PdfExportImpl
                 // Embedded files are placed in the same folder as the HTML input file during office conversion.
                 inputStreams.put(file.getName(), new FileInputStream(file));
             } catch (Exception e) {
-                LOGGER.warn("Failed to embed [{}] in the office export. Root cause is [{}]", file.getName(),
-                    ExceptionUtils.getRootCauseMessage(e));
+                LOGGER.warn("Failed to embed [{}] in the office export", file.getName(), e);
             }
         }
     }

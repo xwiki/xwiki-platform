@@ -199,6 +199,10 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
      */
     protected int intFromBoolean(Boolean value)
     {
-        return value == null ? -1 : (value.booleanValue() ? 1 : 0);
+        if (value == null) {
+            return -1;
+        }
+
+        return value.booleanValue() ? 1 : 0;
     }
 }

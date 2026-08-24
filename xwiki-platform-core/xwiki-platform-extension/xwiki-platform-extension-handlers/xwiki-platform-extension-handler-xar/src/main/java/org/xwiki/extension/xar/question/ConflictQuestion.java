@@ -170,9 +170,9 @@ public class ConflictQuestion
     private Map<Conflict<?>, ConflictDecision<?>> conflictDecisions;
 
     /**
-     * @deprecated since 9.2RC1, use
+     * @deprecated use
      */
-    @Deprecated
+    @Deprecated(since = "9.2RC1")
     public ConflictQuestion(XWikiDocument currentDocument, XWikiDocument previousDocument, XWikiDocument nextDocument,
         XWikiDocument mergedDocument)
     {
@@ -305,9 +305,9 @@ public class ConflictQuestion
     {
         Conflict conflict = this.findConflictFromReference(conflictReference);
 
-        ConflictDecision.DecisionType type = ConflictDecision.DecisionType.valueOf(decisionType.toUpperCase());
+        ConflictDecision.DecisionType newType = ConflictDecision.DecisionType.valueOf(decisionType.toUpperCase());
         ConflictDecision decision = new DefaultConflictDecision<>(conflict);
-        decision.setType(type);
+        decision.setType(newType);
         if (!StringUtils.isEmpty(customValue)) {
             decision.setCustom(Collections.singletonList(customValue));
         }

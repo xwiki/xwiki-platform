@@ -53,14 +53,14 @@ public class EditForm extends XWikiForm
      * {@code XWiki.XWikiRights_0_member}).
      */
     private static final Pattern XPROPERTY_REFERENCE_PATTERN =
-        Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)_(.+)$");
+        Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_(\\d+)_(.+)$");
 
     /**
      * Format for passing xobjects references in URLs. General format:
      * {@code &lt;space&gt;.&lt;pageClass&gt;_<number>} (e.g.
      * {@code XWiki.XWikiRights_0}).
      */
-    private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)$");
+    private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_(\\d+)$");
 
     // ---- Form fields -------------------------------------------------
     private String content;
@@ -144,19 +144,19 @@ public class EditForm extends XWikiForm
             this.tags = null;
             return;
         }
-        StringBuilder tags = new StringBuilder();
+        StringBuilder tagsBuilder = new StringBuilder();
         boolean first = true;
         for (int i = 0; i < parameter.length; ++i) {
             if (!"".equals(parameter[i])) {
                 if (first) {
                     first = false;
                 } else {
-                    tags.append("|");
+                    tagsBuilder.append("|");
                 }
-                tags.append(parameter[i]);
+                tagsBuilder.append(parameter[i]);
             }
         }
-        this.tags = tags.toString();
+        this.tags = tagsBuilder.toString();
     }
 
     public String getTags()
@@ -216,9 +216,9 @@ public class EditForm extends XWikiForm
         Map<String, String[]> allParameters = getRequest().getParameterMap();
         Map<String, String[]> result = new HashMap<>();
         for (Map.Entry<String, String[]> entry : allParameters.entrySet()) {
-            String name = entry.getKey();
-            if (name.startsWith(prefix + "_")) {
-                String newname = name.substring(prefix.length() + 1);
+            String parameterName = entry.getKey();
+            if (parameterName.startsWith(prefix + "_")) {
+                String newname = parameterName.substring(prefix.length() + 1);
                 result.put(newname, entry.getValue());
             }
         }
@@ -514,19 +514,12 @@ public class EditForm extends XWikiForm
                         parameter.getKey());
                     continue;
                 }
-                SortedMap<Integer, Map<String, String[]>> objectMap = this.updateOrCreateMap.get(className);
-                if (objectMap == null) {
-                    objectMap = new TreeMap<>();
-                    this.updateOrCreateMap.put(className, objectMap);
-                }
+                SortedMap<Integer, Map<String, String[]>> objectMap =
+                    this.updateOrCreateMap.computeIfAbsent(className, key -> new TreeMap<>());
                 // Get the property from the right object #objectNumber of type 'objectName';
                 // create it if they don't exist
-                Map<String, String[]> object = objectMap.get(classNumber);
-                if (object == null) {
-                    object = new HashMap<>();
-                    objectMap.put(classNumber, object);
-                }
-                object.put(classPropertyName, parameter.getValue());
+                objectMap.computeIfAbsent(classNumber, number -> new HashMap<>())
+                    .put(classPropertyName, parameter.getValue());
             }
         } else {
             this.updateOrCreateMap = Collections.emptyMap();

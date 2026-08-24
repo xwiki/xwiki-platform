@@ -57,6 +57,8 @@ import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
+import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
@@ -252,7 +254,7 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
         if (errors.isEmpty()) {
             Statements statements = validation.getParsedStatements();
 
-            Statement statement = statements.get(0);
+            Statement statement = statements.getStatements().get(0);
             if (statement instanceof Select select && isSelectSafe(select)) {
                 return Optional.of(true);
             }
@@ -263,8 +265,9 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
 
     private boolean isSelectSafe(Select select)
     {
-        // Only plain SELECTs are supported: anything else (a set operation, a piped query, etc.) is refused.
-        if (select instanceof PlainSelect plainSelect) {
+        SelectBody selectBody = select.getSelectBody();
+
+        if (selectBody instanceof PlainSelect plainSelect) {
             return isNodeSafe(plainSelect.getASTNode());
         }
 
@@ -276,8 +279,8 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
         Map<String, String> tables = getTables(plainSelect);
 
         // Make sure only allowed columns are used in SELECT
-        for (SelectItem<?> selectItem : plainSelect.getSelectItems()) {
-            if (!isSelectExpressionAllowed(selectItem.getExpression(), tables)) {
+        for (SelectItem selectItem : plainSelect.getSelectItems()) {
+            if (!isSelectItemAllowed(selectItem, tables)) {
                 return false;
             }
         }
@@ -342,21 +345,37 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
         }
     }
 
-    private boolean isAllowedAllTableColumns(ExpressionList<?> parameters, Map<String, String> tables)
+    /**
+     * @param selectItem the {@link SelectItem} to check
+     * @return true if the passed {@link SelectItem} is allowed
+     */
+    private boolean isSelectItemAllowed(SelectItem selectItem, Map<String, String> tables)
     {
-        return parameters.get(0) instanceof AllTableColumns allTableColumns
+        if (selectItem instanceof SelectExpressionItem selectExpressionItem) {
+            return isSelectExpressionAllowed(selectExpressionItem.getExpression(), tables);
+        }
+
+        // TODO: we could support more select items
+
+        return false;
+    }
+
+    private boolean isAllowedAllTableColumns(ExpressionList parameters, Map<String, String> tables)
+    {
+        Expression expression = parameters.getExpressions().get(0);
+        return expression instanceof AllTableColumns allTableColumns
             && isTableAllowed(getTableName(allTableColumns.getTable(), tables));
     }
 
-    private boolean isAllowedAllColumns(ExpressionList<?> parameters, Map<String, String> tables)
+    private boolean isAllowedAllColumns(ExpressionList parameters, Map<String, String> tables)
     {
-        return parameters.get(0) instanceof AllColumns && tables.size() == 1
+        return parameters.getExpressions().get(0) instanceof AllColumns && tables.size() == 1
             && isTableAllowed(tables.values().iterator().next());
     }
 
-    private boolean isAllowedCountFunction(Function function, ExpressionList<?> parameters, Map<String, String> tables)
+    private boolean isAllowedCountFunction(Function function, ExpressionList parameters, Map<String, String> tables)
     {
-        return parameters.size() == 1 && function.getName().equalsIgnoreCase(FUNCTION_COUNT)
+        return parameters.getExpressions().size() == 1 && function.getName().equalsIgnoreCase(FUNCTION_COUNT)
             && (isAllowedAllColumns(parameters, tables) || isAllowedAllTableColumns(parameters, tables));
     }
 
@@ -379,13 +398,7 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
 
     private boolean isSelectFunctionSafe(Function function, Map<String, String> tables)
     {
-        ExpressionList<?> parameters = function.getParameters();
-
-        if (parameters == null) {
-            // A function called without any parameter cannot expose a forbidden field
-            return true;
-        }
-
+        ExpressionList parameters = function.getParameters();
         if (isAllowedCountFunction(function, parameters, tables)) {
             // count(*)
             // count(table.*)
@@ -393,7 +406,7 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
             return true;
         } else {
             // Validate that allowed expressions are used as function parameters
-            for (Expression parameter : parameters) {
+            for (Expression parameter : parameters.getExpressions()) {
                 if (!isSelectExpressionAllowed(parameter, tables)) {
                     return false;
                 }

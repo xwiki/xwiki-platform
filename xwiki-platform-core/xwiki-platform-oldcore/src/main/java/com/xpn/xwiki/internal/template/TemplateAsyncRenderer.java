@@ -130,13 +130,13 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         }
 
         if (this.content.getSourceSyntax() != null) {
-            return renderWiki(async, cached);
+            return renderWiki(async);
         } else {
-            return renderVelocity(async, cached);
+            return renderVelocity(cached);
         }
     }
 
-    private BlockAsyncRendererResult renderWiki(boolean async, boolean cached) throws RenderingException
+    private BlockAsyncRendererResult renderWiki(boolean async) throws RenderingException
     {
         // Parsing and execution
 
@@ -164,7 +164,7 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         return new BlockAsyncRendererResult(resultString, xdom);
     }
 
-    private BlockAsyncRendererResult renderVelocity(boolean async, boolean cached) throws RenderingException
+    private BlockAsyncRendererResult renderVelocity(boolean cached) throws RenderingException
     {
         // Velocity
 

@@ -73,7 +73,7 @@ class PrefilteringLiveNotificationEmailSenderTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Test
-    void testSendMail() throws Exception
+    void testSendMail()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
 

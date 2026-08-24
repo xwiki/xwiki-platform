@@ -150,12 +150,10 @@ widgets.ModalPopup = Class.create({
       } else {
         widgets.ModalPopup.active = true;
       }
+    } else if (this.active) {
+      return;
     } else {
-      if (this.active) {
-        return;
-      } else {
-        this.active = true;
-      }
+      this.active = true;
     }
     if (!this.dialog) {
       // The dialog wasn't loaded, create it.

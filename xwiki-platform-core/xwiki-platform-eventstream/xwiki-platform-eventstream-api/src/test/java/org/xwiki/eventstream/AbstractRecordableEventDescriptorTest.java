@@ -70,13 +70,13 @@ class AbstractRecordableEventDescriptorTest
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    void getApplicationIcon() throws Exception
+    void getApplicationIcon()
     {
         assertEquals("applicationIcon :)", fakeRecordableEventDescriptor.getApplicationIcon());
     }
 
     @Test
-    void getEventType() throws Exception
+    void getEventType()
     {
         assertEquals("fake", fakeRecordableEventDescriptor.getEventType());
     }
@@ -95,11 +95,6 @@ class AbstractRecordableEventDescriptorTest
         when(contextualLocalizationManager.getTranslationPlain("applicationKey"))
                 .thenReturn("My nice application name");
 
-//        // On main wiki
-//        assertEquals("My nice description",
-//                fakeRecordableEventDescriptor.getDescription());
-//        assertEquals("My nice application name",
-//                fakeRecordableEventDescriptor.getApplicationName());
 
         // On sub wiki
         when(((NamespacedComponentManager) componentManager).getNamespace())
@@ -138,13 +133,13 @@ class AbstractRecordableEventDescriptorTest
                 fakeRecordableEventDescriptor.getDescription());
         assertEquals(1, this.logCapture.size());
         assertEquals("Failed to render the translation key [descriptionKey] in the namespace [wiki:subwiki] "
-                + "for the event descriptor of [fake]. Root cause is [Exception: some error]",
+                + "for the event descriptor of [fake]",
             this.logCapture.getMessage(0));
         assertEquals("My nice application name",
                 fakeRecordableEventDescriptor.getApplicationName());
         assertEquals(2, this.logCapture.size());
         assertEquals("Failed to render the translation key [applicationKey] in the namespace [wiki:subwiki] "
-                + "for the event descriptor of [fake]. Root cause is [Exception: some error]",
+                + "for the event descriptor of [fake]",
             this.logCapture.getMessage(1));
     }
 

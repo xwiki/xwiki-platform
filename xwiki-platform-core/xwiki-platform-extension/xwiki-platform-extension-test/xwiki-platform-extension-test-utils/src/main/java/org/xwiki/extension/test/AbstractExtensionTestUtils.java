@@ -131,15 +131,32 @@ public abstract class AbstractExtensionTestUtils
     }
 
     /**
-     * Installs the specified extension.
-     * 
+     * Installs the specified extension on the main wiki.
+     *
      * @param extensionId the id of the extension to install
      */
     public void install(ExtensionId extensionId) throws Exception
     {
+        install(extensionId, null);
+    }
+
+    /**
+     * Installs the specified extension on the passed namespace.
+     *
+     * @param extensionId the id of the extension to install
+     * @param namespace the namespace on which to install the extension, {@code null} to install it on the main wiki
+     *     and {@link Namespace#ROOT} to install it on the root namespace
+     * @since 18.7.0RC1
+     */
+    public void install(ExtensionId extensionId, Namespace namespace) throws Exception
+    {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("extensionId", extensionId.getId());
         parameters.put("extensionVersion", extensionId.getVersion().getValue());
+        if (namespace != null) {
+            String namespaceString = namespace.serialize();
+            parameters.put("extensionNamespace", namespaceString != null ? namespaceString : "");
+        }
 
         doAction("install", parameters);
     }

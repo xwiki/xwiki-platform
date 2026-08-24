@@ -77,7 +77,7 @@ class TempResourceActionTest
     private TempResourceAction action;
 
     @BeforeEach
-    void beforeEach() throws Exception
+    void beforeEach()
     {
         when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
     }
@@ -136,7 +136,7 @@ class TempResourceActionTest
      * Tests {@link TempResourceAction#getTemporaryFile(String, XWikiContext)} when the file is missing.
      */
     @Test
-    void testGetTemporaryFileMissing() throws Exception
+    void testGetTemporaryFileMissing()
     {
         assertFalse(new File(this.temporaryDirectory, "temp/module/xwiki/Space/Page/file.txt").exists());
         assertNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/module/file.txt", oldcore.getXWikiContext()));
@@ -204,7 +204,8 @@ class TempResourceActionTest
         oldcore.getXWikiContext().setResponse(response);
         when(request.getRequestURI()).thenReturn("/xwiki/bin/temp/Space/Page/module/file.txt");
         when(request.getParameter("force-download")).thenReturn("1");
-        when(response.getOutputStream()).thenReturn(mock(ServletOutputStream.class));
+        ServletOutputStream servletOutputStreamMock = mock();
+        when(response.getOutputStream()).thenReturn(servletOutputStreamMock);
         oldcore.getXWikiContext().setWikiId("wiki");
         createEmptyFile("temp/module/wiki/Space/Page/file.txt");
         action.render(oldcore.getXWikiContext());

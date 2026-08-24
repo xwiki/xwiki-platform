@@ -39,7 +39,6 @@ import jakarta.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.mime.MimeTypes;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -66,12 +65,12 @@ import com.xpn.xwiki.util.Util;
  *
  * @version $Id$
  * @since 2.4M1
- * @deprecated Use the "tmp" resource reference handler instead since 8.3
+ * @deprecated Use the "tmp" resource reference handler instead
  */
 @Component
 @Named("temp")
 @Singleton
-@Deprecated
+@Deprecated(since = "8.3")
 public class TempResourceAction extends XWikiAction
 {
     /**
@@ -120,8 +119,8 @@ public class TempResourceAction extends XWikiAction
         try {
             contentType = TikaUtils.detect(tempFile);
         } catch (IOException ex) {
-            this.logger.warn("Unable to determine mime type for temporary resource [{}]. Root cause is [{}]",
-                tempFile.getAbsolutePath(), ExceptionUtils.getRootCauseMessage(ex));
+            this.logger.warn("Unable to determine mime type for temporary resource [{}]",
+                tempFile.getAbsolutePath(), ex);
         }
         response.setContentType(contentType);
         if ("1".equals(request.getParameter("force-download"))) {

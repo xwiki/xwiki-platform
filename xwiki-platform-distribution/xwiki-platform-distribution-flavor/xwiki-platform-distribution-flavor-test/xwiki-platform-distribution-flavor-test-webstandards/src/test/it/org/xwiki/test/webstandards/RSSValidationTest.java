@@ -26,19 +26,18 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.List;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.test.webstandards.framework.AbstractValidationTest;
+import org.xwiki.test.webstandards.framework.Target;
 import org.xwiki.validator.ValidationError;
 import org.xwiki.validator.Validator;
 
-import org.xwiki.test.webstandards.framework.Target;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Verifies that all pages in the default wiki are valid XHTML documents.

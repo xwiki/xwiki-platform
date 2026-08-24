@@ -80,9 +80,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
      * </p>
      *
-     * @deprecated since 2.2M2 use {@link #getDocumentReference()}
+     * @deprecated use {@link #getDocumentReference()}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     @Override
     public String getName()
     {
@@ -95,9 +95,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * Note: BaseElement.setName() does not support setting reference anymore since 2.4M2.
      * </p>
      *
-     * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
+     * @deprecated use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     @Override
     public void setName(String name)
     {

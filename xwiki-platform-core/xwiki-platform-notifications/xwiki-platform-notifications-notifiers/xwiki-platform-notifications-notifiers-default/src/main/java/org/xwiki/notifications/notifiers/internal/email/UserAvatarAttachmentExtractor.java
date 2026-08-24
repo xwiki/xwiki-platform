@@ -30,7 +30,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
@@ -114,8 +113,7 @@ public class UserAvatarAttachmentExtractor
                     return attachment.getContentInputStream(context);
                 }
             } catch (Exception e) {
-                logger.warn("Failed to get the avatar of [{}]. Fallback to default one. Root cause is [{}]",
-                    userReference, ExceptionUtils.getRootCauseMessage(e));
+                logger.warn("Failed to get the avatar of [{}]. Fallback to default one", userReference, e);
             }
         }
 

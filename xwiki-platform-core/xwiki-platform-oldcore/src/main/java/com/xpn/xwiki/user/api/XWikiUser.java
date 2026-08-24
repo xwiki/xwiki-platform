@@ -120,9 +120,9 @@ public class XWikiUser
      * Create a XWikiUser for the given user.
      * 
      * @param user the full name of the user on the form {@code XWiki.Foo}.
-     * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference)}.
+     * @deprecated use {@link #XWikiUser(DocumentReference)}.
      */
-    @Deprecated
+    @Deprecated(since = "11.6RC1")
     public XWikiUser(String user)
     {
         this(user, false);
@@ -133,9 +133,9 @@ public class XWikiUser
      * 
      * @param user the full name of the user on the form {@code XWiki.Foo}.
      * @param main true if the user is global (i.e. registered in the main wiki)
-     * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference, boolean)}.
+     * @deprecated use {@link #XWikiUser(DocumentReference, boolean)}.
      */
-    @Deprecated
+    @Deprecated(since = "11.6RC1")
     public XWikiUser(String user, boolean main)
     {
         setUser(user);
@@ -171,9 +171,9 @@ public class XWikiUser
 
     /**
      * @return user fullname
-     * @deprecated since 11.6RC1 use {@link #getFullName()}.
+     * @deprecated use {@link #getFullName()}.
      */
-    @Deprecated
+    @Deprecated(since = "11.6RC1")
     public String getUser()
     {
         return getFullName();
@@ -359,15 +359,16 @@ public class XWikiUser
 
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     ACTIVE_PROPERTY, activeFlag);
-                UserReference userReference =
+                UserReference authorReference =
                     getDocumentReferenceUserReferenceResolver().resolve(context.getUserReference());
                 // If there's no current user (ie if it's guest), then make the save as the new user for consistency
                 // since the user creation and other changes made to the user profile are currently done under the
                 // name of the new user.
-                if (GuestUserReference.INSTANCE.equals(userReference)) {
-                    userReference = getDocumentReferenceUserReferenceResolver().resolve(userdoc.getDocumentReference());
+                if (GuestUserReference.INSTANCE.equals(authorReference)) {
+                    authorReference = getDocumentReferenceUserReferenceResolver()
+                        .resolve(userdoc.getDocumentReference());
                 }
-                userdoc.getAuthors().setOriginalMetadataAuthor(userReference);
+                userdoc.getAuthors().setOriginalMetadataAuthor(authorReference);
                 context.getWiki().saveDocument(userdoc,
                     localizePlainOrKey("core.users." + (disable ? "disable" : "enable") + ".saveComment"), context);
             } catch (XWikiException e) {

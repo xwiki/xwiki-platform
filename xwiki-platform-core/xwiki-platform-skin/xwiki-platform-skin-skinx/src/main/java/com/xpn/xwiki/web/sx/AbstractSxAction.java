@@ -20,6 +20,8 @@
 package com.xpn.xwiki.web.sx;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
@@ -60,7 +62,7 @@ public abstract class AbstractSxAction extends XWikiAction
     private static final String CACHE_EXPIRES_HEADER = "Expires";
 
     /** The response will be sent to the browser as a byte array in this character set. */
-    private static final String RESPONSE_CHARACTER_SET = "UTF-8";
+    private static final Charset RESPONSE_CHARACTER_SET = StandardCharsets.UTF_8;
 
     /** If the user passes this parameter in the URL, we will look for the script in the jar files. */
     private static final String JAR_RESOURCE_REQUEST_PARAMETER = "resource";

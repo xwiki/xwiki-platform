@@ -25,7 +25,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -34,9 +33,9 @@ import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
 import org.xwiki.platform.wiki.creationjob.WikiCreator;
-import org.xwiki.platform.wiki.creationjob.WikiCreationException;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -105,7 +104,7 @@ public class WikiCreationJobScriptServices implements ScriptService
             
         } catch (WikiCreationException e) {
             setLastError(e);
-            logger.warn("Failed to create a new wiki. Root cause is [{}]", ExceptionUtils.getRootCauseMessage(e));
+            logger.error("Failed to create a new wiki.", e);
         } catch (AccessDeniedException e) {
             setLastError(e);
         }

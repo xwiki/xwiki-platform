@@ -22,8 +22,6 @@ package com.xpn.xwiki;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
-import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
-
 import org.xwiki.test.annotation.AllComponents;
 
 import com.xpn.xwiki.api.Document;
@@ -32,6 +30,7 @@ import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiRightService;
 

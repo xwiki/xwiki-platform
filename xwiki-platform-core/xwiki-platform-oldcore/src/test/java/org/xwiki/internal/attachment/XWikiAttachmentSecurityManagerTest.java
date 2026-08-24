@@ -26,6 +26,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -39,16 +42,12 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.DownloadAction;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -97,7 +96,7 @@ class XWikiAttachmentSecurityManagerTest
     }
 
     @Test
-    void downloadWhenForce() throws XWikiException, IOException
+    void downloadWhenForce() throws IOException
     {
         XWikiAttachment attachment = createAttachment();
         when(this.request.getParameter("force-download")).thenReturn("1");

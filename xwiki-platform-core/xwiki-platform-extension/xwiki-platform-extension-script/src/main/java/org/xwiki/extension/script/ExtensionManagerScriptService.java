@@ -95,25 +95,25 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     /**
      * The prefix put behind all job ids.
      * 
-     * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_PREFIX} instead
+     * @deprecated use {@link ExtensionRequest#JOBID_PREFIX} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.2RC1")
     public static final String EXTENSION_JOBID_PREFIX = ExtensionRequest.JOBID_PREFIX;
 
     /**
      * The prefix put behind all job ids which are actual actions.
      * 
-     * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_ACTION_PREFIX} instead
+     * @deprecated use {@link ExtensionRequest#JOBID_ACTION_PREFIX} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.2RC1")
     public static final String EXTENSIONACTION_JOBID_PREFIX = ExtensionRequest.JOBID_ACTION_PREFIX;
 
     /**
      * The prefix put behind all job ids which are information gathering.
      * 
-     * @deprecated since 8.2RC1, use {@link ExtensionRequest#JOBID_PLAN_PREFIX} instead
+     * @deprecated use {@link ExtensionRequest#JOBID_PLAN_PREFIX} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.2RC1")
     public static final String EXTENSIONPLAN_JOBID_PREFIX = ExtensionRequest.JOBID_PLAN_PREFIX;
 
     /**
@@ -266,9 +266,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension couldn't
      *         be resolved, in which case {@link #getLastError()} contains the failure reason
      * @since 3.4M1
-     * @deprecated since 5.3M1, use {@link #resolve(ExtensionDependency, String)} instead
+     * @deprecated use {@link #resolve(ExtensionDependency, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.3M1")
     public Extension resolve(ExtensionDependency extensionDependency)
     {
         setError(null);
@@ -1023,9 +1023,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * 
      * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
      *         installed
-     * @deprecated since 5.3M1, use {@link InstalledExtensionScriptService#getInstalledExtensions()} instead
+     * @deprecated use {@link InstalledExtensionScriptService#getInstalledExtensions()} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.3M1")
     public Collection<InstalledExtension> getInstalledExtensions()
     {
         return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getInstalledExtensions();
@@ -1040,9 +1040,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param namespace the target namespace for which to retrieve the list of installed extensions
      * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
      *         installed in the target namespace
-     * @deprecated since 5.3M1, use {@link InstalledExtensionScriptService#getInstalledExtensions(String)} instead
+     * @deprecated use {@link InstalledExtensionScriptService#getInstalledExtensions(String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.3M1")
     public Collection<InstalledExtension> getInstalledExtensions(String namespace)
     {
         return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID)
@@ -1060,10 +1060,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param namespace the optional namespace where the extension should be installed
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
      *         installed in the target namespace
-     * @deprecated since 5.3M1, use {@link InstalledExtensionScriptService#getInstalledExtension(String, String)}
+     * @deprecated use {@link InstalledExtensionScriptService#getInstalledExtension(String, String)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "5.3M1")
     public InstalledExtension getInstalledExtension(String feature, String namespace)
     {
         return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID)
@@ -1078,9 +1078,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param version the specific version to check
      * @return a map namespace -&gt; list of dependent extensions, or {@code null} if any error occurs while computing
      *         the result, in which case {@link #getLastError()} contains the failure reason
-     * @deprecated since 5.3M1, use {@link InstalledExtensionScriptService#getBackwardDependencies(String)} instead
+     * @deprecated use {@link InstalledExtensionScriptService#getBackwardDependencies(String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.3M1")
     public Map<String, Collection<InstalledExtension>> getBackwardDependencies(String feature, String version)
     {
         return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID)
@@ -1091,9 +1091,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * Get a list of core extensions provided by the current version of the platform.
      * 
      * @return a list of read-only handlers corresponding to the core extensions
-     * @deprecated since 5.3M1, use {@link CoreExtensionScriptService#getCoreExtensions()} instead
+     * @deprecated use {@link CoreExtensionScriptService#getCoreExtensions()} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.3M1")
     public Collection<CoreExtension> getCoreExtensions()
     {
         return this.<CoreExtensionScriptService>get(CoreExtensionScriptService.ID).getCoreExtensions();
@@ -1106,9 +1106,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
      *         provided by the platform
-     * @deprecated since 5.3M1, use {@link CoreExtensionScriptService#getCoreExtension(String)} instead
+     * @deprecated use {@link CoreExtensionScriptService#getCoreExtension(String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "5.3M1")
     public CoreExtension getCoreExtension(String feature)
     {
         return this.<CoreExtensionScriptService>get(CoreExtensionScriptService.ID).getCoreExtension(feature);
@@ -1120,9 +1120,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * 
      * @return a list of read-only handlers corresponding to the local extensions, an empty list if nothing is available
      *         in the local repository
-     * @deprecated since 5.3M1, use {@link LocalExtensionScriptService#getLocalExtensions()}
+     * @deprecated use {@link LocalExtensionScriptService#getLocalExtensions()}
      */
-    @Deprecated
+    @Deprecated(since = "5.3M1")
     public Collection<LocalExtension> getLocalExtensions()
     {
         return this.<LocalExtensionScriptService>get(LocalExtensionScriptService.ID).getLocalExtensions();

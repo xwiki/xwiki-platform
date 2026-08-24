@@ -227,9 +227,9 @@ public class DBListClass extends ListClass
      *
      * @param context The current {@link XWikiContext context}.
      * @return The HQL query corresponding to this property.
-     * @deprecated since 9.8RC1, use the {@code QueryBuilder<DBListClass>} component instead
+     * @deprecated use the {@code QueryBuilder<DBListClass>} component instead
      */
-    @Deprecated
+    @Deprecated(since = "9.8RC1")
     public String getQuery(XWikiContext context)
     {
         // First, get the hql query entered by the user.
@@ -427,7 +427,8 @@ public class DBListClass extends ListClass
     // return first or second column from user query
     public String returnCol(String hqlQuery, boolean first)
     {
-        String firstCol = "-", secondCol = "-";
+        String firstCol = "-";
+        String secondCol = "-";
         if (StringUtils.isEmpty(hqlQuery)) {
             return firstCol;
         }
@@ -547,7 +548,8 @@ public class DBListClass extends ListClass
                 String classname = this.getObject().getName();
                 String fieldname = this.getName();
                 String hibquery = this.getSql();
-                String secondCol = "-", firstCol = "-";
+                String secondCol = "-";
+                String firstCol = "-";
 
                 if (hibquery != null && !hibquery.isEmpty()) {
                     firstCol = returnCol(hibquery, true);

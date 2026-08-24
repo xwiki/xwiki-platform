@@ -67,7 +67,7 @@ class LegacyModelScriptServiceTest
     }
 
     @Test
-    void getEntityReferenceValueWithNullType() throws Exception
+    void getEntityReferenceValueWithNullType()
     {
         assertNull(this.service.getEntityReferenceValue(null));
     }

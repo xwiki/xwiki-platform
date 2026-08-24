@@ -19,9 +19,9 @@
  */
 package org.xwiki.filter.xar.internal;
 
-import org.xwiki.filter.event.model.WikiFarmFilter;
 import org.xwiki.filter.event.model.WikiClassFilter;
 import org.xwiki.filter.event.model.WikiClassPropertyFilter;
+import org.xwiki.filter.event.model.WikiFarmFilter;
 import org.xwiki.filter.event.model.WikiFilter;
 import org.xwiki.filter.event.model.WikiObjectFilter;
 import org.xwiki.filter.event.model.WikiObjectPropertyFilter;

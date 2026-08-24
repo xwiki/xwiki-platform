@@ -37,6 +37,8 @@ import net.sf.jsqlparser.expression.operators.relational.LikeExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
 
 /**
  * Wraps a {@link Query} to perform modifications on it in order to modify the parameters and statements to change
@@ -140,34 +142,33 @@ public class EscapeLikeParametersQuery extends WrappingQuery
     private String modifyStatement(String statementString) throws JSQLParserException
     {
         Statement statement = CCJSqlParserUtil.parse(statementString);
-        if (statement instanceof PlainSelect plainSelect) {
-            Expression where = plainSelect.getWhere();
-            where.accept(new XWikiExpressionVisitor());
+        if (statement instanceof Select select) {
+            SelectBody selectBody = select.getSelectBody();
+            if (selectBody instanceof PlainSelect plainSelect) {
+                Expression where = plainSelect.getWhere();
+                where.accept(new XWikiExpressionVisitor());
+            }
         }
 
         return statement.toString();
     }
 
-    private final class XWikiExpressionVisitor extends ExpressionVisitorAdapter<Void>
+    private final class XWikiExpressionVisitor extends ExpressionVisitorAdapter
     {
         @Override
-        public <S> Void visit(LikeExpression expr, S context)
+        public void visit(LikeExpression expr)
         {
             if (expr.getEscape() == null) {
                 expr.setEscape(new StringValue("!"));
             }
-            // Visit the LIKE expression again with a visitor collecting the parameters it uses. Since that visitor does
-            // not override the LikeExpression handling, the default one is applied and the children are visited.
-            expr.accept(new XWikiLikeExpressionVisitor(), context);
-
-            return null;
+            expr.accept(new XWikiLikeExpressionVisitor());
         }
     }
 
-    private final class XWikiLikeExpressionVisitor extends ExpressionVisitorAdapter<Void>
+    private final class XWikiLikeExpressionVisitor extends ExpressionVisitorAdapter
     {
         @Override
-        public <S> Void visit(JdbcParameter parameter, S context)
+        public void visit(JdbcParameter parameter)
         {
             if (modifiedPositionalParameters == null) {
                 modifiedPositionalParameters = new ArrayList<>();
@@ -182,19 +183,15 @@ public class EscapeLikeParametersQuery extends WrappingQuery
                 // but HQL positional parameters start a 0.
                 modifiedPositionalParameters.add(index - 1);
             }
-
-            return null;
         }
 
         @Override
-        public <S> Void visit(JdbcNamedParameter parameter, S context)
+        public void visit(JdbcNamedParameter parameter)
         {
             if (modifiedNamedParameters == null) {
                 modifiedNamedParameters = new ArrayList<>();
             }
             modifiedNamedParameters.add(parameter.getName());
-
-            return null;
         }
     }
 }

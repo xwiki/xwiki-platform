@@ -29,7 +29,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -158,8 +157,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
 
                 return parseTitle(title);
             } catch (Exception e) {
-                logger.warn("Failed to interpret title of document [{}]. Root cause is [{}]",
-                    document.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
+                logger.warn("Failed to interpret title of document [{}]", document.getDocumentReference(), e);
             }
         }
 
@@ -171,8 +169,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                     return title;
                 }
             } catch (Exception e) {
-                logger.warn("Failed to extract title from content of document [{}]. Root cause is [{}]",
-                    document.getDocumentReference(), ExceptionUtils.getRootCauseMessage(e));
+                logger.warn("Failed to extract title from content of document [{}]",
+                    document.getDocumentReference(), e);
             }
         }
 
@@ -270,9 +268,9 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      * @param document the document to extract the title from
      * @param parameters display parameters
      * @return the title XDOM
-     * @deprecated since 7.0M1
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "7.0M1")
     protected abstract XDOM extractTitleFromContent(DocumentModelBridge document,
         DocumentDisplayerParameters parameters);
 

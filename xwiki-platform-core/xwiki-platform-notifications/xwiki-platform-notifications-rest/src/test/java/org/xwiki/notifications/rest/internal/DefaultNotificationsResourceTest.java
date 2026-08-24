@@ -126,7 +126,7 @@ class DefaultNotificationsResourceTest
 
     @ParameterizedTest
     @ValueSource(ints = { -1, 1001 })
-    void getgetNotificationsRSSLimitErrors(int limit) throws Exception
+    void getgetNotificationsRSSLimitErrors(int limit)
     {
         String userId = "XWiki.Admin";
         DocumentReference userIdDocReference = mock("userIdDocReference");
@@ -142,7 +142,7 @@ class DefaultNotificationsResourceTest
 
     @ParameterizedTest
     @ValueSource(ints = { -1, 1001 })
-    void getNotificationsLimitErrors(int limit) throws Exception
+    void getNotificationsLimitErrors(int limit)
     {
         String userId = "XWiki.Admin";
         DocumentReference userIdDocReference = mock("userIdDocReference");
@@ -166,16 +166,16 @@ class DefaultNotificationsResourceTest
         when(this.context.getUserReference()).thenReturn(wikiUserRef);
         DocumentReference userIdDocReference = mock("userIdDocReference");
         when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
-        Response response = this.notificationsResource.getNotifications(
+        Response actualResponse = this.notificationsResource.getNotifications(
                 null, userId, null, true, null, null, null, null, null, "10", null,
                 null, null, null, null, null, null, null, null, null
         );
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, actualResponse.getStatus());
     }
 
     @ParameterizedTest
     @ValueSource(ints = { -1, 1001 })
-    void getNotificationsCountLimitErrors(int limit) throws Exception
+    void getNotificationsCountLimitErrors(int limit)
     {
         String userId = "XWiki.Admin";
         DocumentReference userIdDocReference = mock("userIdDocReference");
@@ -199,7 +199,8 @@ class DefaultNotificationsResourceTest
         DocumentReference userIdDocReference = mock(DocumentReference.class);
         when(this.documentReferenceResolver.resolve(userId)).thenReturn(userIdDocReference);
 
-        when(this.context.getUserReference()).thenReturn(mock(DocumentReference.class));
+        DocumentReference documentReferenceMock = mock();
+        when(this.context.getUserReference()).thenReturn(documentReferenceMock);
         assertNull(this.notificationsResource.getNotificationsRSS(null, userId, null, null, null, null, null, null,
             null, null, null, null, null, null, null, null));
         verify(this.response).sendError(HttpServletResponse.SC_UNAUTHORIZED);

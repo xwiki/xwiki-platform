@@ -434,9 +434,9 @@ public class XWiki extends Api
      * @param index - {@link XWikiDocument#getId()}
      * @return the specified document from the recycle bin
      * @throws XWikiException if any error
-     * @deprecated since 9.4RC1. Use {@link #getDeletedDocument(String)} instead.
+     * @deprecated Use {@link #getDeletedDocument(String)} instead.
      */
-    @Deprecated
+    @Deprecated(since = "9.4RC1")
     public DeletedDocument getDeletedDocument(String fullname, String locale, String index) throws XWikiException
     {
         return getDeletedDocument(index);
@@ -485,8 +485,7 @@ public class XWiki extends Api
             }
             return result;
         } catch (Exception ex) {
-            LOGGER.warn("Failed to retrieve the deleted attachments of document [{}]. Root cause is [{}]", docName,
-                ExceptionUtils.getRootCauseMessage(ex));
+            LOGGER.warn("Failed to retrieve the deleted attachments of document [{}]", docName, ex);
         }
         return Collections.emptyList();
     }
@@ -517,8 +516,8 @@ public class XWiki extends Api
             }
             return result;
         } catch (Exception ex) {
-            LOGGER.warn("Failed to retrieve the deleted attachments named [{}] of document [{}]. Root cause is [{}]",
-                filename, docName, ExceptionUtils.getRootCauseMessage(ex));
+            LOGGER.warn("Failed to retrieve the deleted attachments named [{}] of document [{}]",
+                filename, docName, ex);
         }
         return Collections.emptyList();
     }
@@ -537,8 +536,7 @@ public class XWiki extends Api
                 return new DeletedAttachment(attachment, this.context);
             }
         } catch (Exception ex) {
-            LOGGER.warn("Failed to retrieve the deleted attachment with id [{}]. Root cause is [{}]", id,
-                ExceptionUtils.getRootCauseMessage(ex));
+            LOGGER.warn("Failed to retrieve the deleted attachment with id [{}]", id, ex);
         }
         return null;
     }
@@ -1017,9 +1015,9 @@ public class XWiki extends Api
      *
      * @param content
      * @return evaluated content if the content contains velocity scripts
-     * @deprecated Since 7.2M1. Use specific rendering/parsing options for the content type you want to parse/render.
+     * @deprecated Use specific rendering/parsing options for the content type you want to parse/render.
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     public String parseContent(String content)
     {
         return this.xwiki.parseContent(content, getXWikiContext());
@@ -1354,9 +1352,9 @@ public class XWiki extends Api
      * Same as {@link #getLocalePreference()} but as a String.
      *
      * @return the locale to use
-     * @deprecated since 8.0M1, use {@link #getLocalePreference()} instead
+     * @deprecated use {@link #getLocalePreference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getLanguagePreference()
     {
         return this.xwiki.getLanguagePreference(getXWikiContext());
@@ -1381,9 +1379,9 @@ public class XWiki extends Api
      * Same as {@link #getInterfaceLocalePreference()} but as a String.
      *
      * @return the document locale preference for the request
-     * @deprecated since 8.0M1, use {@link #getInterfaceLocalePreference()} instead
+     * @deprecated use {@link #getInterfaceLocalePreference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getInterfaceLanguagePreference()
     {
         return this.xwiki.getInterfaceLanguagePreference(getXWikiContext());
@@ -1578,15 +1576,15 @@ public class XWiki extends Api
      * @param xwikiname user to send the email to
      * @param password password to put in the mail
      * @param email email to send to
-     * @param add_message Additional message to send to the user
+     * @param addMessage Additional message to send to the user
      * @param contentfield Preference field to use as a mail template
      * @throws XWikiException if the mail was not send successfully
      */
-    public void sendConfirmationMail(String xwikiname, String password, String email, String add_message,
+    public void sendConfirmationMail(String xwikiname, String password, String email, String addMessage,
         String contentfield) throws XWikiException
     {
         if (hasProgrammingRights()) {
-            this.xwiki.sendConfirmationEmail(xwikiname, password, email, add_message, contentfield, getXWikiContext());
+            this.xwiki.sendConfirmationEmail(xwikiname, password, email, addMessage, contentfield, getXWikiContext());
         }
     }
 
@@ -2405,8 +2403,7 @@ public class XWiki extends Api
         try {
             return this.xwiki.getURLContent(surl, username, password, this.context);
         } catch (Exception e) {
-            LOGGER.warn("Failed to retrieve content from [{}]. Root cause is [{}]", surl,
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to retrieve content from [{}]", surl, e);
             return "";
         }
     }
@@ -2428,8 +2425,7 @@ public class XWiki extends Api
         try {
             return this.xwiki.getURLContent(surl, this.context);
         } catch (Exception e) {
-            LOGGER.warn("Failed to retrieve content from [{}]. Root cause is [{}]", surl,
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to retrieve content from [{}]", surl, e);
             return "";
         }
     }

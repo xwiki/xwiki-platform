@@ -38,9 +38,9 @@ import javax.xml.transform.sax.SAXSource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -174,8 +174,7 @@ public class PdfExportImpl implements PdfExport
                 FileUtils.deleteDirectory(tempdir);
             } catch (IOException ex) {
                 // Should not happen, but it's nothing serious, just that temporary files are left on the disk.
-                LOGGER.warn("Failed to cleanup temporary files after a PDF export. Root cause is [{}]",
-                    ExceptionUtils.getRootCauseMessage(ex));
+                LOGGER.warn("Failed to cleanup temporary files after a PDF export", ex);
             }
         }
     }
@@ -230,7 +229,7 @@ public class PdfExportImpl implements PdfExport
         // Debug output
         LOGGER.debug("Final XSL-FO source:\n[{}]", xmlfo);
 
-        renderXSLFO(xmlfo, out, type, context);
+        renderXSLFO(xmlfo, out, type);
     }
 
     /**
@@ -268,10 +267,9 @@ public class PdfExportImpl implements PdfExport
      * @param xmlfo the source FO to render
      * @param out where to write the resulting document
      * @param type the type of the output: PDF or RTF
-     * @param context the XWiki Context used by the custom URI Resolver we use to locate image attachment data
      * @throws XWikiException if the conversion fails for any reason
      */
-    private void renderXSLFO(String xmlfo, OutputStream out, ExportType type, final XWikiContext context)
+    private void renderXSLFO(String xmlfo, OutputStream out, ExportType type)
         throws XWikiException
     {
         try {
@@ -378,8 +376,7 @@ public class PdfExportImpl implements PdfExport
             LOGGER.debug("HTML with CSS applied [{}]", result);
             return result;
         } catch (Exception e) {
-            LOGGER.warn("Failed to apply CSS [{}] to HTML [{}]. Root cause is [{}]", css, html,
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to apply CSS [{}] to HTML [{}]", css, html, e);
             return html;
         }
     }

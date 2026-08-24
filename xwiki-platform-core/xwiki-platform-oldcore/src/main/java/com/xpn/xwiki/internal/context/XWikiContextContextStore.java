@@ -378,7 +378,7 @@ public class XWikiContextContextStore extends AbstractContextStore
                     // TODO: add support for request input stream
 
                     default:
-                        saveRequestAll(contextStore, key, request);
+                        saveRequestAll(contextStore, request);
                 }
             }, prefix, entries);
         }
@@ -445,7 +445,7 @@ public class XWikiContextContextStore extends AbstractContextStore
         contextStore.put(PROP_REQUEST_SESSION, new SerializableHttpSessionWrapper(request.getSession()));
     }
 
-    private void saveRequestAll(Map<String, Serializable> contextStore, String key, XWikiRequest request)
+    private void saveRequestAll(Map<String, Serializable> contextStore, XWikiRequest request)
     {
         saveRequestURL(contextStore, request);
         saveRequestParameters(contextStore, request);
@@ -602,8 +602,7 @@ public class XWikiContextContextStore extends AbstractContextStore
                     restoreDocument(wikiDescriptor.getMainPageReference(), xcontext);
                 }
             } catch (WikiManagerException e) {
-                this.logger.warn("Can't access the descriptor of the restored context wiki [{}]. Root cause is [{}]",
-                    storedWikiId, ExceptionUtils.getRootCauseMessage(e));
+                this.logger.warn("Can't access the descriptor of the restored context wiki [{}]", storedWikiId, e);
             }
         }
     }

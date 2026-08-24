@@ -19,8 +19,6 @@
  */
 package org.xwiki.test.docker.internal.junit5.browser;
 
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
-
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -36,6 +34,8 @@ import org.xwiki.test.docker.internal.junit5.BrowserTestUtils;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.browser.Browser;
+
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
 
 /**
  * Create and execute the browser docker container for driving the tests.

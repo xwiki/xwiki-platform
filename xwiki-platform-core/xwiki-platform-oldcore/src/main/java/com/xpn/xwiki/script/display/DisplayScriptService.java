@@ -28,7 +28,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -180,8 +179,8 @@ public class DisplayScriptService implements ScriptService
         try {
             content = document.getTranslatedContent();
         } catch (XWikiException e) {
-            this.logger.warn("Failed to get the translated content of document [{}]. Root cause is [{}]",
-                document.getPrefixedFullName(), ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to get the translated content of document [{}]",
+                document.getPrefixedFullName(), e);
             return null;
         }
         String renderedContent =

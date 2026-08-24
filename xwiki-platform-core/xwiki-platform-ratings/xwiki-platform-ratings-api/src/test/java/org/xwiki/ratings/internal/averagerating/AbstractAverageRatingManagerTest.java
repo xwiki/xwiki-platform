@@ -203,10 +203,10 @@ class AbstractAverageRatingManagerTest
         UpdatedAverageRatingEvent expectedEvent2 =
             new UpdatedAverageRatingEvent(expectedAverageRating, oldAverageVote, oldTotalVotes);
 
-        AverageRating averageRating =
+        AverageRating actualAverageRating =
             this.averageRatingsManager.resetAverageRating(this.entityReference, newAverageVote, newTotalVotes);
-        expectedAverageRating.setUpdatedAt(averageRating.getUpdatedAt());
-        assertEquals(expectedAverageRating, averageRating);
+        expectedAverageRating.setUpdatedAt(actualAverageRating.getUpdatedAt());
+        assertEquals(expectedAverageRating, actualAverageRating);
         assertTrue(this.averageRatingsManager.isSaved);
         verify(this.observationManager).notify(expectedEvent1, managerId,
             Collections.singletonList(expectedAverageRating));

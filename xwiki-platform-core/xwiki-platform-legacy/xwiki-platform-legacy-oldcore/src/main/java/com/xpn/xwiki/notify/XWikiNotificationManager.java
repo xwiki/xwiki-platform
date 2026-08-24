@@ -40,6 +40,7 @@ public class XWikiNotificationManager
 
     public XWikiNotificationManager()
     {
+        // Nothing to do, the rules are registered after construction.
     }
 
     /**
@@ -80,12 +81,7 @@ public class XWikiNotificationManager
     public void addNamedRule(String name, XWikiNotificationRule rule)
     {
         synchronized (namedrules) {
-            Vector<XWikiNotificationRule> vnamedrules = namedrules.get(name);
-            if (vnamedrules == null) {
-                vnamedrules = new Vector<>();
-                namedrules.put(name, vnamedrules);
-            }
-            vnamedrules.add(rule);
+            namedrules.computeIfAbsent(name, key -> new Vector<>()).add(rule);
         }
     }
 

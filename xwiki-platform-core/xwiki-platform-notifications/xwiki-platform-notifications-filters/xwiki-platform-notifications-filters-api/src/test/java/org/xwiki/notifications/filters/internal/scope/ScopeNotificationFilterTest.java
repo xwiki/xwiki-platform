@@ -122,7 +122,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void matchPreferenceWithCorrectPreference() throws Exception
+    void matchPreferenceWithCorrectPreference()
     {
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.DEFAULT);
@@ -133,7 +133,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void matchPreferenceWithIncorrectPreference() throws Exception
+    void matchPreferenceWithIncorrectPreference()
     {
         NotificationPreference preference = mock(NotificationPreference.class);
         when(preference.getCategory()).thenReturn(NotificationPreferenceCategory.SYSTEM);
@@ -142,13 +142,13 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void getName() throws Exception
+    void getName()
     {
         assertEquals(ScopeNotificationFilter.FILTER_NAME, this.scopeNotificationFilter.getName());
     }
 
     @Test
-    void complexCase1() throws Exception
+    void complexCase1()
     {
         // Preferences:
         //
@@ -168,25 +168,26 @@ class ScopeNotificationFilterTest
 
         // Mock β
         WikiReference wikiReference = new WikiReference("wikiA");
-        NotificationFilterPreference prefβ = mockNotificationFilterPreference("wikiA",
+        NotificationFilterPreference prefBeta = mockNotificationFilterPreference("wikiA",
             wikiReference, NotificationFilterType.EXCLUSIVE, null);
 
         // Mock γ
         SpaceReference spaceReferenceB = new SpaceReference("SpaceB", wikiReference);
-        NotificationFilterPreference prefγ = mockNotificationFilterPreference("wikiA:SpaceB",
+        NotificationFilterPreference prefGamma = mockNotificationFilterPreference("wikiA:SpaceB",
             spaceReferenceB, NotificationFilterType.INCLUSIVE, "update");
 
         // Mock δ
         SpaceReference spaceReferenceC = new SpaceReference("SpaceC", spaceReferenceB);
-        NotificationFilterPreference prefδ = mockNotificationFilterPreference("wikiA:SpaceB.SpaceC",
+        NotificationFilterPreference prefDelta = mockNotificationFilterPreference("wikiA:SpaceB.SpaceC",
             spaceReferenceC, NotificationFilterType.EXCLUSIVE, null);
 
         // Mock ε
         SpaceReference spaceReferenceD = new SpaceReference("SpaceD", spaceReferenceC);
-        NotificationFilterPreference prefε = mockNotificationFilterPreference("wikiA:SpaceB.SpaceC.SpaceD",
+        NotificationFilterPreference prefEpsilon = mockNotificationFilterPreference("wikiA:SpaceB.SpaceC.SpaceD",
             spaceReferenceD, NotificationFilterType.INCLUSIVE, null);
 
-        Collection<NotificationFilterPreference> filterPreferences = new LinkedHashSet<>(List.of(prefβ, prefγ, prefδ, prefε));
+        Collection<NotificationFilterPreference> filterPreferences =
+            new LinkedHashSet<>(List.of(prefBeta, prefGamma, prefDelta, prefEpsilon));
 
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
@@ -240,7 +241,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void withTopLevelInclusiveFilters() throws Exception
+    void withTopLevelInclusiveFilters()
     {
         // Preferences:
         //
@@ -259,16 +260,16 @@ class ScopeNotificationFilterTest
         // Mock γ
         WikiReference wikiReference = new WikiReference("wikiA");
         SpaceReference spaceReferenceB = new SpaceReference("SpaceB", new WikiReference(wikiReference));
-        NotificationFilterPreference prefγ = mockNotificationFilterPreference("wikiA:SpaceB",
+        NotificationFilterPreference prefGamma = mockNotificationFilterPreference("wikiA:SpaceB",
             spaceReferenceB, NotificationFilterType.INCLUSIVE, null);
 
         // Mock ζ
         DocumentReference documentReference = new DocumentReference("wikiA", "SpaceM", "DocumentN");
-        NotificationFilterPreference prefζ = mockNotificationFilterPreference("wikiA:SpaceM.DocumentN",
+        NotificationFilterPreference prefZeta = mockNotificationFilterPreference("wikiA:SpaceM.DocumentN",
             documentReference, NotificationFilterType.INCLUSIVE, null);
-        when(prefζ.getStartingDate()).thenReturn(new Date(99000));
+        when(prefZeta.getStartingDate()).thenReturn(new Date(99000));
 
-        Collection<NotificationFilterPreference> filterPreferences = new LinkedHashSet<>(List.of(prefγ, prefζ));
+        Collection<NotificationFilterPreference> filterPreferences = new LinkedHashSet<>(List.of(prefGamma, prefZeta));
 
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
@@ -321,7 +322,7 @@ class ScopeNotificationFilterTest
     }
 
     @Test
-    void filterExpressionWithSubQuery() throws Exception
+    void filterExpressionWithSubQuery()
     {
         NotificationPreference pref1 = mock(NotificationPreference.class);
         NotificationPreference pref2 = mock(NotificationPreference.class);
@@ -339,12 +340,12 @@ class ScopeNotificationFilterTest
         List<NotificationPreference> notificationFilterPreferences = List.of(pref1, pref2);
 
         DocumentReference pageRef = new DocumentReference("wikiA", "SpaceB", "PageC");
-        NotificationFilterPreference prefγ = mockNotificationFilterPreference("wikiA:SpaceB:PageC",
+        NotificationFilterPreference prefGamma = mockNotificationFilterPreference("wikiA:SpaceB:PageC",
             pageRef, NotificationFilterType.INCLUSIVE, null);
         NotificationFilterPreference prefz = mockNotificationFilterPreference("wikiA:SpaceB:PageD",
             pageRef, NotificationFilterType.EXCLUSIVE, null);
 
-        Collection<NotificationFilterPreference> filterPreferences = new LinkedHashSet<>(List.of(prefγ));
+        Collection<NotificationFilterPreference> filterPreferences = new LinkedHashSet<>(List.of(prefGamma));
 
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 
@@ -366,7 +367,7 @@ class ScopeNotificationFilterTest
             NotificationFilterType.EXCLUSIVE, NotificationFormat.ALERT, notificationFilterPreferences));
 
         // Test 3
-        filterPreferences = new LinkedHashSet<>(List.of(prefγ, prefz));
+        filterPreferences = new LinkedHashSet<>(List.of(prefGamma, prefz));
         assertEquals(
             "NOT (CONCAT(CONCAT(WIKI, \":\"), PAGE) IN (SELECT nfp.pageOnly "
                 + "FROM DefaultNotificationFilterPreference nfp "
@@ -398,15 +399,15 @@ class ScopeNotificationFilterTest
         // Mock γ
         WikiReference wikiReference = new WikiReference("wikiA");
         SpaceReference spaceReferenceB = new SpaceReference("SpaceB", new WikiReference(wikiReference));
-        NotificationFilterPreference prefγ = mockNotificationFilterPreference("wikiA:SpaceB",
+        NotificationFilterPreference prefGamma = mockNotificationFilterPreference("wikiA:SpaceB",
             spaceReferenceB, NotificationFilterType.INCLUSIVE, null);
 
         // Mock ζ
         DocumentReference documentReference = new DocumentReference("wikiA", "SpaceM", "DocumentN");
-        NotificationFilterPreference prefζ = mockNotificationFilterPreference("wikiA:SpaceM.DocumentN",
+        NotificationFilterPreference prefZeta = mockNotificationFilterPreference("wikiA:SpaceM.DocumentN",
             documentReference, NotificationFilterType.EXCLUSIVE, null);
 
-        Collection<NotificationFilterPreference> filterPreferences = new LinkedHashSet<>(List.of(prefγ, prefζ));
+        Collection<NotificationFilterPreference> filterPreferences = new LinkedHashSet<>(List.of(prefGamma, prefZeta));
 
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
 

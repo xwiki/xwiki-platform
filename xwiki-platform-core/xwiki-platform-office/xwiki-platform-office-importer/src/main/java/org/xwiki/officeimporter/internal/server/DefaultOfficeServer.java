@@ -27,7 +27,6 @@ import java.util.Date;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jodconverter.core.document.JsonDocumentFormatRegistry;
 import org.jodconverter.core.office.OfficeManager;
 import org.jodconverter.local.LocalConverter;
@@ -159,8 +158,8 @@ public class DefaultOfficeServer implements OfficeServer
                     DOCUMENT_FORMATS_PATH);
             }
         } catch (Exception e) {
-            this.logger.warn("Failed to parse [{}]. The default document format registry will be used instead. "
-                + "Root cause is [{}]", DOCUMENT_FORMATS_PATH, ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to parse [{}]. The default document format registry will be used instead",
+                DOCUMENT_FORMATS_PATH, e);
         }
 
         if (this.jodConverter == null) {

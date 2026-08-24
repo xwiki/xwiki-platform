@@ -17,14 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.filter.xar.internal;
+package org.xwiki.repository.internal;
 
-import org.xwiki.xar.internal.model.XarObjectPropertyModel;
+import org.xwiki.observation.event.EndFoldEvent;
 
 /**
+ * Event triggered when finished to import a project.
+ * 
  * @version $Id$
- * @since 6.2M1
+ * @since 18.7.0RC1
+ * @since 18.4.4
  */
-public class XARObjectPropertyModel extends XarObjectPropertyModel
+public class ProjectImportFinishedEvent implements EndFoldEvent
 {
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        return otherEvent instanceof ExtensionImportStartingEvent;
+    }
 }

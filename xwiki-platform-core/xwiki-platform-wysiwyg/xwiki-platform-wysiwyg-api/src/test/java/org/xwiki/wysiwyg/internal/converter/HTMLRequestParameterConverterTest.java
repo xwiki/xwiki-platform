@@ -28,6 +28,7 @@ import java.util.Optional;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -78,7 +79,8 @@ class HTMLRequestParameterConverterTest
         HttpServletRequest servletRequest = mock();
         String domain = "domain";
         when(servletRequest.getServerName()).thenReturn(domain);
-        when(servletRequest.getSession()).thenReturn(mock());
+        HttpSession httpSessionMock = mock();
+        when(servletRequest.getSession()).thenReturn(httpSessionMock);
         HttpServletResponse servletResponse = mock();
 
         String parameterName = "test";

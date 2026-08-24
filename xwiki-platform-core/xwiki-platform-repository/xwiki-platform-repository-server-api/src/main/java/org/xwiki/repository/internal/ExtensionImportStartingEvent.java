@@ -17,27 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.filter.xar.internal;
+package org.xwiki.repository.internal;
 
-import java.util.Map;
-
-import org.xwiki.filter.event.model.WikiObjectFilter;
-import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
-import org.xwiki.xar.internal.model.XarObjectModel;
+import org.xwiki.observation.event.BeginFoldEvent;
 
 /**
+ * Event triggered when starting to import an extension.
+ * 
  * @version $Id$
- * @since 6.2M1
+ * @since 18.7.0RC1
+ * @since 18.4.4
+ * @since 17.10.12
  */
-public class XARObjectModel extends XarObjectModel
+public class ExtensionImportStartingEvent implements BeginFoldEvent
 {
-    /**
-     * The list of parameters to be used when reading an object.
-     */
-    public static final Map<String, EventParameter> OBJECT_PARAMETERS = Map.of(
-        ELEMENT_NAME, new EventParameter(WikiObjectFilter.PARAMETER_NAME),
-        ELEMENT_CLASSNAME, new EventParameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE),
-        ELEMENT_GUID, new EventParameter(WikiObjectFilter.PARAMETER_GUID),
-        ELEMENT_NUMBER, new EventParameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class)
-    );
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        return otherEvent instanceof ExtensionImportStartingEvent;
+    }
 }

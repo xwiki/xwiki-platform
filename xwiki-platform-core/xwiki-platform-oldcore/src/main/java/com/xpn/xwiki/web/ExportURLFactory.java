@@ -90,17 +90,17 @@ public class ExportURLFactory extends XWikiServletURLFactory
     /**
      * Pages for which to convert URL to local.
      *
-     * @deprecated since 6.2RC1, use {link #getExportURLFactoryContext} instead
+     * @deprecated use {link #getExportURLFactoryContext} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     protected Set<String> exportedPages = new HashSet<>();
 
     /**
      * Directory where to export attachment.
      *
-     * @deprecated since 6.2RC1, use {link #getExportURLFactoryContext} instead
+     * @deprecated use {link #getExportURLFactoryContext} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     protected File exportDir;
 
     private boolean checkAccess;
@@ -135,9 +135,9 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     /**
      * @return the list skins names used.
-     * @deprecated since 6.2RC1, use {@link #getFilesystemExportContext()}
+     * @deprecated use {@link #getFilesystemExportContext()}
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     public Collection<String> getNeededSkins()
     {
         return getFilesystemExportContext().getNeededSkins();
@@ -145,9 +145,9 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     /**
      * @return the list of custom skin files.
-     * @deprecated since 6.2RC1, use {@link #getFilesystemExportContext()}
+     * @deprecated use {@link #getFilesystemExportContext()}
      */
-    @Deprecated
+    @Deprecated(since = "6.2RC1")
     public Collection<String> getExportedSkinFiles()
     {
         return getFilesystemExportContext().getExportedSkinFiles();

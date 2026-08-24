@@ -46,9 +46,10 @@ import org.xwiki.rest.resources.tags.TagsResource;
 import org.xwiki.rest.test.framework.AbstractHttpIT;
 import org.xwiki.rest.test.framework.TestConstants;
 import org.xwiki.test.ui.TestUtils;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @version $Id$

@@ -22,7 +22,7 @@ package org.xwiki.rendering.signature.internal;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -112,11 +112,6 @@ public class MacroBlockDumper implements BlockDumper
 
     private static byte[] toBytes(String s)
     {
-        try {
-            return s.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException ignored) {
-            // Should never happen since UTF-8 is a requirement for any JVM.
-        }
-        return s.getBytes();
+        return s.getBytes(StandardCharsets.UTF_8);
     }
 }

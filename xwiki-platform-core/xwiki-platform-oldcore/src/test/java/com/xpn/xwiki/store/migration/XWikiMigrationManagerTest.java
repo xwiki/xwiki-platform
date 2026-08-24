@@ -96,6 +96,7 @@ class XWikiMigrationManagerTest
                 @Override
                 public void migrate()
                 {
+                    // Nothing to do, this test migration does not change anything.
                 }
             };
         }
@@ -117,6 +118,7 @@ class XWikiMigrationManagerTest
         @Override
         protected void initializeEmptyDB()
         {
+            // Nothing to do, this test migration does not change anything.
         }
 
         @Override
@@ -128,6 +130,7 @@ class XWikiMigrationManagerTest
         @Override
         protected void updateSchema(Collection<XWikiMigration> migrations)
         {
+            // Nothing to do, this test migration does not change anything.
         }
     }
 
@@ -212,6 +215,7 @@ class XWikiMigrationManagerTest
         @Override
         public void migrate()
         {
+            // Nothing to do, this test migration does not change anything.
         }
     }
 

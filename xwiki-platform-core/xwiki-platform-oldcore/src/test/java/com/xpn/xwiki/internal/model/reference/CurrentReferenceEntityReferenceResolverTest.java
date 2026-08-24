@@ -102,7 +102,7 @@ class CurrentReferenceEntityReferenceResolverTest
     private CurrentReferenceEntityReferenceResolver resolver;
 
     @BeforeEach
-    void beforeEach() throws Exception
+    void beforeEach()
     {
         when(this.currentProvider.getDefaultReference(EntityType.WIKI)).thenReturn(CURRENT_WIKI_REFERENCE);
         when(this.currentProvider.getDefaultReference(EntityType.SPACE)).thenReturn(CURRENT_SPACE_REFERENCE);

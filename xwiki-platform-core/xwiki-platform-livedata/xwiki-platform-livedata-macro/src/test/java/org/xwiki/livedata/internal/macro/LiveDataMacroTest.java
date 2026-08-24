@@ -283,7 +283,7 @@ class LiveDataMacroTest
     }
 
     @BeforeEach
-    void before() throws Exception
+    void before()
     {
         when(this.macroTransformationContext.getTransformationContext()).thenReturn(this.transformationContext);
     }

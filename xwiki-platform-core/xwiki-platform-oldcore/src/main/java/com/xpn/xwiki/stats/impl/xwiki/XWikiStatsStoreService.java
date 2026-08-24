@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.context.ExecutionContext;
@@ -111,8 +110,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
             this.thread.join();
             this.thread = null;
         } catch (InterruptedException e) {
-            LOGGER.warn("Thread join has been interrupted. Root cause is [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Thread join has been interrupted", e);
         }
     }
 
@@ -124,11 +122,10 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
                 register();
             }
         } catch (InterruptedException e) {
-            LOGGER.warn("Statistics storing thread has been interrupted. Root cause is [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Statistics storing thread has been interrupted.", e);
             throw e;
         } catch (StopStatsStoreException e) {
-            LOGGER.info("Statistics storing thread received stop order.");
+            LOGGER.warn("Statistics storing thread received stop order.", e);
         }
     }
 

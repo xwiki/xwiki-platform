@@ -21,9 +21,10 @@ package com.xpn.xwiki.cache.api.internal;
 
 import java.util.Properties;
 
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 
 import com.xpn.xwiki.XWiki;
@@ -47,6 +48,7 @@ public class XWikiCacheServiceStub implements XWikiCacheService
     @Override
     public void init(XWiki context)
     {
+        // Nothing to do, the cache factories are provided at construction time.
     }
 
     @Override
@@ -70,7 +72,7 @@ public class XWikiCacheServiceStub implements XWikiCacheService
         configuration.setConfigurationId(cacheName);
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
         lru.setMaxEntries(capacity);
-        configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+        configuration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
 
         try {
             return new XWikiCacheStub(this.cacheFactory.newCache(configuration));
@@ -109,7 +111,7 @@ public class XWikiCacheServiceStub implements XWikiCacheService
         CacheConfiguration configuration = new CacheConfiguration();
         LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
         lru.setMaxEntries(capacity);
-        configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+        configuration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
 
         try {
             return new XWikiCacheStub(this.localCacheFactory.newCache(configuration));

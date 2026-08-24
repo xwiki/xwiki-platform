@@ -55,7 +55,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -242,12 +241,8 @@ class LiveTableLiveDataEntryStoreTest
 
         when(this.resultsRenderer.getLiveTableResultsFromPage("XWiki.LiveTableResults", null)).thenReturn("no JSON");
 
-        try {
-            this.entryStore.get(new LiveDataQuery());
-            fail();
-        } catch (LiveDataException e) {
-            assertEquals("Failed to execute the live data query.", e.getMessage());
-        }
+        LiveDataException e = assertThrows(LiveDataException.class, () -> this.entryStore.get(new LiveDataQuery()));
+        assertEquals("Failed to execute the live data query.", e.getMessage());
     }
 
     @Test

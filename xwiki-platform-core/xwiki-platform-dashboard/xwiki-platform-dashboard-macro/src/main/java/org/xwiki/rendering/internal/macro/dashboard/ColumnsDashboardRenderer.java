@@ -72,13 +72,10 @@ public class ColumnsDashboardRenderer implements DashboardRenderer
     {
         // transform the passed gagdets in a list of column gadgets
         List<ColumnGadget> columnGadgets = new ArrayList<>();
-        List<Gadget> invalidGadgets = new ArrayList<>();
         for (Gadget gadget : gadgets) {
             ColumnGadget cGadget = new ColumnGadget(gadget);
             if (cGadget.getColumn() != null && cGadget.getIndex() != null) {
                 columnGadgets.add(cGadget);
-            } else {
-                invalidGadgets.add(gadget);
             }
         }
 

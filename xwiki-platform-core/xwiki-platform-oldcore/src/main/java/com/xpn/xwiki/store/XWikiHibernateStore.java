@@ -90,7 +90,6 @@ import org.xwiki.store.UnexpectedException;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -215,44 +214,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private Optional<Set<EntityReference>> optimizedObjectClasses;
 
     /**
-     * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
-     * in the WEB-INF directory.
-     *
-     * @param xwiki
-     * @param context
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateStore(XWiki xwiki, XWikiContext context)
-    {
-        super(xwiki, context);
-        initValidColumTypes();
-    }
-
-    /**
-     * Initialize the storage engine with a specific path. This is used for tests.
-     *
-     * @param hibpath
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateStore(String hibpath)
-    {
-        super(hibpath);
-        initValidColumTypes();
-    }
-
-    /**
-     * @see #XWikiHibernateStore(XWiki, XWikiContext)
-     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
-     */
-    @Deprecated
-    public XWikiHibernateStore(XWikiContext context)
-    {
-        this(context.getWiki(), context);
-    }
-
-    /**
      * Empty constructor needed for component manager.
      */
     public XWikiHibernateStore()
@@ -275,18 +236,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     private void initValidColumTypes()
     {
-        String[] string_types = {"string", "text", "clob"};
-        String[] number_types =
+        String[] stringTypes = {"string", "text", "clob"};
+        String[] numberTypes =
             {"integer", "long", "float", "double", "big_decimal", "big_integer", "yes_no", "true_false"};
-        String[] date_types = {"date", "time", "timestamp"};
-        String[] boolean_types = {"boolean", "yes_no", "true_false", "integer"};
+        String[] dateTypes = {"date", "time", "timestamp"};
+        String[] booleanTypes = {"boolean", "yes_no", "true_false", "integer"};
         this.validTypesMap = new HashMap<>();
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.StringClass", string_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.TextAreaClass", string_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.PasswordClass", string_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.NumberClass", number_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.DateClass", date_types);
-        this.validTypesMap.put("com.xpn.xwiki.objects.classes.BooleanClass", boolean_types);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.StringClass", stringTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.TextAreaClass", stringTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.PasswordClass", stringTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.NumberClass", numberTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.DateClass", dateTypes);
+        this.validTypesMap.put("com.xpn.xwiki.objects.classes.BooleanClass", booleanTypes);
     }
 
     @Override
@@ -1119,7 +1080,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                     // Loading the attachment list
                     if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
-                        loadAttachmentList(doc, context, false);
+                        loadAttachmentList(doc, context);
                     }
 
                     // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
@@ -1459,10 +1420,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         session.update("com.xpn.xwiki.objects.BaseObject", object);
                     }
                 }
-                /*
-                 * if (stats) session.saveOrUpdate(object); else
-                 * session.saveOrUpdate((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
-                 */
                 BaseClass bclass = object.getXClass(context);
                 List<String> handledProps = new ArrayList<>();
                 if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
@@ -1477,8 +1434,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     } else {
                         session.update(bclass.getName(), objmap);
                     }
-
-                    // dynamicSession.saveOrUpdate((String) bclass.getName(), objmap);
                 }
 
                 if (object.getXClassReference() != null) {
@@ -1648,7 +1603,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             property = (BaseProperty) Class.forName(classType).newInstance();
                             property.setObject(object);
                             property.setName(name);
-                            loadXWikiProperty(property, context, false);
+                            loadXWikiProperty(property, context);
                         } catch (Exception e) {
                             // WORKAROUND IN CASE OF MIXMATCH BETWEEN STRING AND LARGESTRING
                             try {
@@ -1656,7 +1611,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     LargeStringProperty property2 = new LargeStringProperty();
                                     property2.setObject(object);
                                     property2.setName(name);
-                                    loadXWikiProperty(property2, context, false);
+                                    loadXWikiProperty(property2, context);
                                     property.setValue(property2.getValue());
 
                                     if (bclass != null && bclass.get(name) instanceof TextAreaClass) {
@@ -1667,7 +1622,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     StringProperty property2 = new StringProperty();
                                     property2.setObject(object);
                                     property2.setName(name);
-                                    loadXWikiProperty(property2, context, false);
+                                    loadXWikiProperty(property2, context);
                                     property.setValue(property2.getValue());
 
                                     if (bclass != null && bclass.get(name) instanceof StringClass) {
@@ -1803,7 +1758,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private void loadXWikiProperty(PropertyInterface property, XWikiContext context, boolean bTransaction)
+    private void loadXWikiProperty(PropertyInterface property, XWikiContext context)
         throws XWikiException
     {
         executeRead(context, session -> {
@@ -1912,7 +1867,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private void loadAttachmentList(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
+    private void loadAttachmentList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         executeRead(context, session -> {
             try {
@@ -2282,9 +2237,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
+     * @deprecated use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     @Override
     public List<String> loadBacklinks(String fullName, XWikiContext inputxcontext, boolean bTransaction)
         throws XWikiException
@@ -2357,7 +2312,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         // Save the links
         executeWrite(context, session -> {
             // We delete the existing links before saving the newly analyzed ones. Unless non exists yet.
-            if (countLinks(doc.getId(), context, false) > 0) {
+            if (countLinks(doc.getId(), context) > 0) {
                 deleteLinks(doc.getId(), context, false);
             }
 
@@ -2549,7 +2504,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         XWikiContext context) throws XWikiException
     {
         String sql = createSQLQuery(SELECT_DISTINCT_DOC_FULLNAME, wheresql);
-        return searchDocumentReferencesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
+        return searchDocumentReferencesInternal(sql, nb, start, Collections.emptyList(), context);
     }
 
     @Override
@@ -2557,7 +2512,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         XWikiContext context) throws XWikiException
     {
         String sql = createSQLQuery(SELECT_DISTINCT_DOC_FULLNAME, wheresql);
-        return searchDocumentsNamesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
+        return searchDocumentsNamesInternal(sql, nb, start, Collections.emptyList(), context);
     }
 
     @Override
@@ -2715,9 +2670,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     /**
-     * @deprecated since 2.2M1 used {@link #searchDocumentReferencesInternal(String, int, int, List, XWikiContext)}
+     * @deprecated used {@link #searchDocumentReferencesInternal(String, int, int, List, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     private List<String> searchDocumentsNamesInternal(String sql, int nb, int start, List parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -3335,7 +3290,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return this.store.getLimitSize(entityType, propertyName);
     }
 
-    private long countLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
+    private long countLinks(long docId, XWikiContext inputxcontext) throws XWikiException
     {
         return executeRead(inputxcontext, session -> {
             try {

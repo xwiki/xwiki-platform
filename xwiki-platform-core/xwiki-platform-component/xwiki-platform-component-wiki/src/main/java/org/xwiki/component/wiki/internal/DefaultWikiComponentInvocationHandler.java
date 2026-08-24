@@ -141,7 +141,6 @@ public class DefaultWikiComponentInvocationHandler implements InvocationHandler
         // We look for the method in the XObjects.
         if (!this.wikiComponent.getHandledMethods().containsKey(method.getName())) {
             if (method.getDeclaringClass() == Object.class || method.getDeclaringClass() == WikiComponent.class) {
-                // return ObjectMethodsProxy.invoke(proxy, method, args);
                 return method.invoke(wikiComponent, args);
             } else {
                 // Note: We throw a runtime exception so that our exception doesn't get wrapped by a generic

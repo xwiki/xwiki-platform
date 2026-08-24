@@ -150,8 +150,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
             }
             return documentReferences;
         } catch (QueryException e) {
-            this.logger.warn("Failed to query sheet bindings. Root cause is [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn("Failed to query sheet bindings", e);
             return Collections.emptyList();
         }
     }

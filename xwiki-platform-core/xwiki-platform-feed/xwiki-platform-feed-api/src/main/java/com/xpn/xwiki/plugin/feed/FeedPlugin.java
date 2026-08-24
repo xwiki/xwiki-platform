@@ -43,6 +43,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.rendering.converter.ConversionException;
 import org.xwiki.rendering.converter.Converter;
@@ -201,7 +202,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(iCapacity);
             lru.setMaxIdle(this.refreshPeriod);
-            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+            configuration.put(EntryEvictionConfiguration.CONFIGURATIONID, lru);
 
             CacheManager cacheManager = Utils.getComponent(CacheManager.class);
             this.feedCache = cacheManager.createNewLocalCache(configuration);
@@ -637,9 +638,9 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
      * @param context the XWiki context
      * @return the definition of the {@code AggregatorURLClass}
      * @throws XWikiException if loading the class definition fails
-     * @deprecated since 11.10RC1
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "11.10RC1")
     public BaseClass getAggregatorURLClass(XWikiContext context) throws XWikiException
     {
         return context.getWiki().getDocument(AggregatorURLClassDocumentInitializer.REFERENCE, context).getXClass();
@@ -652,9 +653,9 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
      * @param context the XWiki context
      * @return the definition of the {@code FeedEntryClass}
      * @throws XWikiException if loading the class definition fails
-     * @deprecated since 11.10RC1
+     * @deprecated
      */
-    @Deprecated
+    @Deprecated(since = "11.10RC1")
     public BaseClass getFeedEntryClass(XWikiContext context) throws XWikiException
     {
         return context.getWiki().getDocument(FeedEntryClassDocumentInitializer.REFERENCE, context).getXClass();

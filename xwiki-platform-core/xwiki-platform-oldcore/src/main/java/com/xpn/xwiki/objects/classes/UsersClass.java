@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.dom4j.Element;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.EntityReference;
@@ -113,8 +112,7 @@ public class UsersClass extends ListClass
             return (List<String>) context.getWiki().getGroupService(context)
                 .getAllMatchedUsers(null, false, 0, 0, null, context);
         } catch (XWikiException e) {
-            LOGGER.warn("Failed to retrieve the list of users. Root cause is [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to retrieve the list of users", e);
             return Collections.emptyList();
         }
     }
@@ -142,9 +140,9 @@ public class UsersClass extends ListClass
     /**
      * @return {@code true} if the list box that is used to select the users should be filled with all the available
      *         users, {@code false} otherwise
-     * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
+     * @deprecated this meta property is not used anymore because we changed the default displayer
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public boolean isUsesList()
     {
         return getIntValue(META_PROPERTY_USES_LIST) == 1;
@@ -156,9 +154,9 @@ public class UsersClass extends ListClass
      *
      * @param usesList {@code true} to fill the list box that is used to select the users with all the available users,
      *            {@code false} otherwise
-     * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
+     * @deprecated this meta property is not used anymore because we changed the default displayer
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public void setUsesList(boolean usesList)
     {
         setIntValue(META_PROPERTY_USES_LIST, usesList ? 1 : 0);

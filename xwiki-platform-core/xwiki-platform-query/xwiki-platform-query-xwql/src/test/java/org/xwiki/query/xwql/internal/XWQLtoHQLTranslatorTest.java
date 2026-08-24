@@ -59,7 +59,7 @@ class XWQLtoHQLTranslatorTest
         when(this.dab.getPropertyType(any(), eq("category"))).thenReturn("DBStringListProperty");
         when(this.dab.getPropertyType(any(), eq("stringlist"))).thenReturn("StringListProperty");
         when(this.dab.isPropertyCustomMapped(any(), any())).thenReturn(false);
-        when(this.dab.isPropertyCustomMapped(eq("Custom.Mapping"), eq("cmprop"))).thenReturn(true);
+        when(this.dab.isPropertyCustomMapped("Custom.Mapping", "cmprop")).thenReturn(true);
     }
 
     private void assertTranslate(String input, String expectedOutput) throws Exception

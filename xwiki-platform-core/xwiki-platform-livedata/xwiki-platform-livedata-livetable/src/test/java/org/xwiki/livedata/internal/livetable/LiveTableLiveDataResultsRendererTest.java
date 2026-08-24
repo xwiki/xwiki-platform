@@ -138,12 +138,12 @@ class LiveTableLiveDataResultsRendererTest
         when(this.xcontext.getWiki()).thenReturn(this.wiki);
         when(this.xcontext.getWikiReference()).thenReturn(new WikiReference("currentwiki"));
 
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(this.wiki.getDocument(documentReference, this.xcontext)).thenReturn(document);
-        when(document.isNew()).thenReturn(false);
+        XWikiDocument documentMock = mock(XWikiDocument.class);
+        when(this.wiki.getDocument(documentReference, this.xcontext)).thenReturn(documentMock);
+        when(documentMock.isNew()).thenReturn(false);
 
         String json = "{}";
-        when(document.getRenderedContent(Syntax.PLAIN_1_0, this.xcontext)).thenReturn(json);
+        when(documentMock.getRenderedContent(Syntax.PLAIN_1_0, this.xcontext)).thenReturn(json);
         assertEquals(json, this.resultsRenderer.getLiveTableResultsFromPage("subwiki:XWiki.Page", new LiveDataQuery()));
         verify(this.templateManager).render("xwikivars.vm");
         verify(this.xcontext).setWikiReference(new WikiReference("subwiki"));
@@ -192,7 +192,8 @@ class LiveTableLiveDataResultsRendererTest
     {
         String templateName = "template.vm";
         String json = "{}";
-        when(this.templateManager.getTemplate(templateName)).thenReturn(mock(Template.class));
+        Template templateMock = mock();
+        when(this.templateManager.getTemplate(templateName)).thenReturn(templateMock);
         when(this.templateManager.render(templateName)).thenReturn(json);
         assertEquals(json, this.resultsRenderer.getLiveTableResultsFromTemplate(templateName, new LiveDataQuery()));
     }

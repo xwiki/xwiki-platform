@@ -35,7 +35,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import com.xpn.xwiki.XWiki;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -53,6 +52,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -162,7 +162,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
         return new DocumentReference(getCurrentWiki(), DEFAULT_SPACE.getName(), id);
     }
 
-    private XWikiDocument getGroupDocument(String id, FilterEventParameters parameters) throws XWikiException
+    private XWikiDocument getGroupDocument(String id) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -349,7 +349,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
 
         XWikiDocument groupDocument;
         try {
-            groupDocument = getGroupDocument(name, parameters);
+            groupDocument = getGroupDocument(name);
         } catch (XWikiException e) {
             throw new FilterException("Failed to get an XWikiDocument for group name [" + name + "]", e);
         }

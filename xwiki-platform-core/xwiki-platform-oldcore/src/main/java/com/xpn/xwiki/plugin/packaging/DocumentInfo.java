@@ -28,9 +28,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
- * @deprecated since 5.2, use Filter framework instead
+ * @deprecated use Filter framework instead
  */
-@Deprecated
+@Deprecated(since = "5.2")
 public class DocumentInfo
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentInfo.class);
@@ -78,12 +78,12 @@ public class DocumentInfo
         return this.doc.isNew();
     }
 
-    public void changeSpace(String Space)
+    public void changeSpace(String space)
     {
         if (this.doc.getSpace().compareTo("XWiki") != 0) {
             return;
         }
-        this.doc.setSpace(Space);
+        this.doc.setSpace(space);
         this.installable = INSTALL_IMPOSSIBLE;
     }
 

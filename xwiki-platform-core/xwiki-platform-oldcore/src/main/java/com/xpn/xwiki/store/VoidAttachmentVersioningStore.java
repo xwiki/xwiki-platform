@@ -47,21 +47,11 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
 {
     /**
-     * Constructor used by {@link com.xpn.xwiki.XWiki} during storage initialization.
-     *
-     * @param context The current context.
-     * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentVersioningStore.class) instead.
-     */
-    @Deprecated
-    public VoidAttachmentVersioningStore(XWikiContext context)
-    {
-    }
-
-    /**
      * Empty constructor needed for component manager.
      */
     public VoidAttachmentVersioningStore()
     {
+        // Nothing to do, this empty constructor is only needed by the component manager.
     }
 
     @Override

@@ -196,6 +196,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public XWikiContext()
     {
+        // Nothing to do, the context is populated through its setters.
     }
 
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()

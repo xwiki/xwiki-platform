@@ -60,6 +60,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
      */
     public XWikiHibernateAttachmentStore()
     {
+        // Nothing to do, this empty constructor is only needed by the component manager.
     }
 
     @Override

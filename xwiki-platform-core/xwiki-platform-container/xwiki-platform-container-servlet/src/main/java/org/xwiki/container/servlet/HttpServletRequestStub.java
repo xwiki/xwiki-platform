@@ -91,6 +91,7 @@ public class HttpServletRequestStub implements HttpServletRequest
          */
         public Builder()
         {
+            // Nothing to do, the builder starts from an empty request stub.
         }
 
         /**
@@ -569,7 +570,7 @@ public class HttpServletRequestStub implements HttpServletRequest
     @Override
     public void setCharacterEncoding(String s) throws UnsupportedEncodingException
     {
-
+        // Nothing to do, this stub does not implement this part of the servlet API.
     }
 
     @Override
@@ -679,13 +680,13 @@ public class HttpServletRequestStub implements HttpServletRequest
     @Override
     public void setAttribute(String s, Object o)
     {
-
+        // Nothing to do, this stub does not implement this part of the servlet API.
     }
 
     @Override
     public void removeAttribute(String s)
     {
-
+        // Nothing to do, this stub does not implement this part of the servlet API.
     }
 
     @Override
@@ -755,12 +756,13 @@ public class HttpServletRequestStub implements HttpServletRequest
     @Override
     public void login(String s, String s1) throws ServletException
     {
+        // Nothing to do, this stub does not implement this part of the servlet API.
     }
 
     @Override
     public void logout() throws ServletException
     {
-
+        // Nothing to do, this stub does not implement this part of the servlet API.
     }
 
     @Override

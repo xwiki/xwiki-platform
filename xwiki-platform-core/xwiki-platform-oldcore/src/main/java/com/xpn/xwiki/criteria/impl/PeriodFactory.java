@@ -49,6 +49,7 @@ public class PeriodFactory
 
     public PeriodFactory()
     {
+        // Nothing to do, this public constructor is only needed to instantiate the factory from Velocity.
     }
 
     /**

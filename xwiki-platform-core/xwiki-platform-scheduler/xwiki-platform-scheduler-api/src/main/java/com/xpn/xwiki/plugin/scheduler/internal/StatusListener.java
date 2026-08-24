@@ -57,16 +57,19 @@ public class StatusListener implements SchedulerListener, JobListener
     @Override
     public void triggerFinalized(Trigger trigger)
     {
+        // Nothing to do, this event is not logged.
     }
 
     @Override
     public void triggerPaused(TriggerKey triggerKey)
     {
+        // Nothing to do, this event is not logged.
     }
 
     @Override
     public void triggerResumed(TriggerKey triggerKey)
     {
+        // Nothing to do, this event is not logged.
     }
 
     @Override
@@ -108,6 +111,7 @@ public class StatusListener implements SchedulerListener, JobListener
     @Override
     public void jobExecutionVetoed(JobExecutionContext context)
     {
+        // Nothing to do, this event is not logged.
     }
 
     @Override

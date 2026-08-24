@@ -202,6 +202,7 @@ public class XWikiAttachment implements Cloneable
 
     public void setDocId(long id)
     {
+        // Nothing to do, the document identifier is derived from the document itself.
     }
 
     public long getDocId()
@@ -211,6 +212,7 @@ public class XWikiAttachment implements Cloneable
 
     public void setId(long id)
     {
+        // Nothing to do, the identifier is computed from the document and the file name.
     }
 
     @Override

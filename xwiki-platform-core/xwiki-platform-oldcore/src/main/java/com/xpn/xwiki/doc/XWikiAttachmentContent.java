@@ -399,6 +399,7 @@ public class XWikiAttachmentContent implements Cloneable
     @Deprecated(since = "18.0.0RC1,17.10.3")
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
+        // Nothing to do, this deprecated method does not perform any action anymore.
     }
 
     /**

@@ -184,6 +184,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
      */
     public XWikiHibernateRecycleBinStore()
     {
+        // Nothing to do, this empty constructor is only needed by the component manager.
     }
 
     private XWikiRecycleBinContentStoreInterface getDefaultXWikiRecycleBinContentStore() throws XWikiException

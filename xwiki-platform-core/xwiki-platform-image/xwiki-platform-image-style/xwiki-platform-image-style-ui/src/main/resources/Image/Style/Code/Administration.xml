@@ -234,7 +234,8 @@
       <code>define('image-style-administration-messages', {
   prefix: 'image.style.administation.',
   keys: [
-    'newImageStyle.normalizedTitle'
+    'newImageStyle.normalizedTitle',
+    'newImageStyle.validationFailed'
   ]
 });
 
@@ -253,15 +254,38 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!image-style-administration-messages
   const submitButton = $('#newImageStyleForm input.button');
   var lastValue = undefined;
   var debounced = debounce((name) =&gt; {
-    Promise.resolve($.get(url, {
-      'xpage': 'entitynamevalidation_json',
-      'outputSyntax': 'plain',
-      'name': name,
-      'form_token': xm.form_token
+    if (name === '') {
+      // An empty name can never produce a document name, so there is nothing to check.
+      targetTitleActual.val('');
+      submitButton.prop('disabled', true);
+      $('#targetTitleActualMessage').text('');
+      return;
+    }
+    // Whether the name could actually be checked, so that the message below does not report a normalization
+    // that never happened.
+    let validated = true;
+    Promise.resolve($.get({
+      'url': url,
+      // Bound the request so that a validation page which does not answer ends up in the error handler below,
+      // instead of leaving the creation form disabled with no way to recover.
+      'timeout': 5000,
+      'data': {
+        'xpage': 'entitynamevalidation_json',
+        'outputSyntax': 'plain',
+        'name': name,
+        'form_token': xm.form_token
+      }
     })).then((data) =&gt; {
+      if (typeof data.transformedName !== 'string') {
+        throw new Error('Unexpected entity name validation response: ' + JSON.stringify(data));
+      }
       targetTitleActual.val(data.transformedName);
     }).catch((error) =&gt; {
-      console.log(error);
+      console.error(error);
+      // Fall back to the entered name when the validation request fails, so that the creation form does not stay
+      // unusable. The name is validated again server-side when the image style is created.
+      validated = false;
+      targetTitleActual.val(name);
     }).finally(() =&gt; {
       if (targetTitleActual.val() !== '') {
         submitButton.prop('disabled', false);
@@ -269,7 +293,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!image-style-administration-messages
       var message = '';
       // The result message is only displayed if some content was entered in the name field.
       if (targetTitle.val() !== '') {
-        message = l10n.get('newImageStyle.normalizedTitle', targetTitleActual.val());
+        message = validated
+          ? l10n.get('newImageStyle.normalizedTitle', targetTitleActual.val())
+          : l10n.get('newImageStyle.validationFailed', targetTitleActual.val());
       }
       $('#targetTitleActualMessage').text(message);
     });

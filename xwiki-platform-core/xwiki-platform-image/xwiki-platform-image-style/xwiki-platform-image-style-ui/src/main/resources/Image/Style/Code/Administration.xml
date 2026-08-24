@@ -252,8 +252,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!image-style-administration-messages
   const targetTitleActual = $('#targetTitleActual');
   const url = XWiki.currentDocument.getURL("get");
   const submitButton = $('#newImageStyleForm input.button');
-  var lastValue = undefined;
-  var debounced = debounce((name) =&gt; {
+  let lastValue;
+  const debounced = debounce((name) =&gt; {
     if (name === '') {
       // An empty name can never produce a document name, so there is nothing to check.
       targetTitleActual.val('');
@@ -290,7 +290,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!image-style-administration-messages
       if (targetTitleActual.val() !== '') {
         submitButton.prop('disabled', false);
       }
-      var message = '';
+      let message = '';
       // The result message is only displayed if some content was entered in the name field.
       if (targetTitle.val() !== '') {
         message = validated

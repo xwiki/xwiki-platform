@@ -50,7 +50,7 @@
   &lt;dl&gt;
     &lt;dt&gt;
       &lt;label for="targetTitle"&gt;$services.localization.render('image.style.administation.newImageStyle.label')&lt;/label&gt;
-      &lt;span class="xHint"&gt;$services.localization.render('image.style.administation.newImageStyle.label')&lt;/span&gt;
+      &lt;span class="xHint"&gt;$services.localization.render('image.style.administation.newImageStyle.hint')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
       &lt;input id="targetTitle" placeholder="$services.localization.render('image.style.administation.newImageStyle.placeHolder')" type="text" value=""&gt;

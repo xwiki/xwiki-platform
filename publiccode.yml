@@ -1,63 +1,98 @@
-publiccodeYmlVersion: 0.5.0
+# Metadata about XWiki, following the publiccode.yml standard: https://yml.publiccode.tools/
+# Deliberately minimal: fields that would rot quickly (usedBy, screenshots, videos, softwareVersion,
+# releaseDate) are omitted -- they are all optional in the standard. Exhaustive information lives on
+# xwiki.org and is reached through the `documentation` / `apiDocumentation` / `roadmap` links.
+
+publiccodeYmlVersion: "0.7.0"
+
 name: XWiki
-applicationSuite: XWiki
-url: https://github.com/xwiki
+url: https://github.com/xwiki/xwiki-platform
 landingURL: https://www.xwiki.org/
-isBasedOn: https://www.xwiki.com/
-softwareVersion: 18.1.0
-releaseDate: 2026-02-23
-logo: https://github.com/xwiki/xwiki-platform/blob/master/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-resources/src/main/resources/flamingo/logo.svg
+logo: https://www.xwiki.org/xwiki/bin/download/Main/Logo/XWiki-logo-color.svg
+roadmap: https://www.xwiki.org/xwiki/bin/view/Roadmaps/
+
 platforms:
   - web
+
 categories:
   - knowledge-management
-  - blog
   - collaboration
-  - enterprise-project-management
-  - online-community
-  - project-collaboration
   - web-collaboration
-  - other
-organisation:
-  uri: https://xwiki.com
-usedBy:
-  - Schleswik-Holstein
-  - 
-roadmap: https://www.xwiki.org/xwiki/bin/view/Roadmaps/
+  - content-management
+  - document-management
+  - online-community
+  - blog
+
 developmentStatus: stable
 softwareType: standalone/web
+
 description:
   en:
     localisedName: XWiki
-    shortDescription: "XWiki is a second-generation wiki. This means it's not only a traditional wiki, but also a powerful application development platform in its own right. XWiki can be used both as a classic wiki and as an application platform. An application in XWiki is a set of Pages that adds new functionality to the wiki, such as a blog or a task manager. You can also build your own applications, for instance, you could create a FAQ or an application to manage product sheets, without requiring programming skills. "
-    longDescription: "XWiki is a second-generation wiki. This means it's not only a traditional wiki, but also a powerful application development platform in its own right. While first-generation wikis focus on content collaboration (creating and editing pages together), second-generation wikis take this concept further by enabling users to build structured, collaborative web applications directly from within the wiki. XWiki can be used both as a classic wiki and as an application platform. An application in XWiki is a set of Pages that adds new functionality to the wiki, such as a blog or a task manager. You can also build your own applications, for instance, you could create a FAQ or an application to manage product sheets, without requiring programming skills. 
-    This allows XWiki to be used for a variety of use cases, such as Projects Powered by XWiki."
-    documentation: https://www.xwiki.org/xwiki/bin/view/Documentation/
-    apiDocumentation: https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/API/
+    shortDescription: "A second-generation wiki: a collaborative platform on which structured web applications can be built without coding."
+    longDescription: >
+      XWiki is a second-generation wiki. Beyond the traditional wiki features -- collaborative page
+      creation and editing, versioning, permissions, search -- it is an application development
+      platform in its own right. Where first-generation wikis focus on content collaboration,
+      second-generation wikis let users build structured, collaborative web applications directly
+      from within the wiki, without programming skills.
+
+      An application in XWiki is a set of pages that adds new functionality to the wiki, such as a
+      blog, a task manager, an FAQ or a product-sheet register. Applications can be built through
+      the browser with the App Within Minutes wizard, extended with scripting, or packaged and
+      shared through the XWiki Extension Repository, which hosts hundreds of ready-to-install
+      extensions.
+
+      XWiki is written in Java, runs on any servlet container and relational database, and is
+      designed to be extended: nearly every part of the platform is a replaceable component. It is
+      used by public administrations, companies and communities as an intranet, a knowledge base, a
+      documentation portal and a low-code application platform.
+
+      The full and up-to-date feature list is maintained at
+      https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/ and public references
+      are listed at https://www.xwiki.org/xwiki/bin/view/References/
     features:
-      - Wiki
-      - Structured Wiki
-      - Input Forms
-    screenshots:
-      - https://xwiki.com/en/features/
-    videos:
-      - https://www.youtube.com/watch?v=8DePx30dh2g
+      - Collaborative page creation and editing (WYSIWYG and wiki syntax)
+      - Page history, versioning, comparison and rollback
+      - Fine-grained rights management at wiki, space and page level
+      - "Structured data: custom page classes, forms and queries"
+      - Building web applications without coding (App Within Minutes)
+      - Full-text search and faceted navigation
+      - Multi-wiki (multi-tenant) hosting from a single installation
+      - Extensible through an extension repository with hundreds of extensions
+      - Import and export (Office documents, PDF, XAR, Markdown)
+      - REST API and scripting APIs for integration
+      - Multilingual content and interface
+      - Notifications, watchlists and activity streams
+      - See https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/ for the complete list
+    documentation: https://www.xwiki.org/xwiki/bin/view/documentation/
+    apiDocumentation: https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/API/
+
 legal:
-  license: LGPL-2.1
+  license: LGPL-2.1-or-later
+
 maintenance:
   type: community
+  # The standard requires real, individually reachable people here -- not mailing lists or
+  # organisations. Affiliation links the contact to the entity they represent.
   contacts:
-    - name: XWiki SAS
-      email: contact@xwiki.com
+    - name: Vincent Massol
+      email: vincent@xwiki.com
       affiliation: XWiki SAS
+
+fundedBy:
+  - name: XWiki SAS
+    uri: https://www.xwiki.com/
+
 localisation:
   localisationReady: true
+  # Kept in sync with https://dev.xwiki.org/xwiki/bin/view/Community/L10N/SupportedLocales/WebHome
   availableLanguages:
     - en
     - de
     - fr
     - es
-    - zh
+    - it
     - pt
     - nl
     - pl
@@ -66,15 +101,16 @@ localisation:
     - sl
     - hr
     - bs
+    - sr
     - hu
     - ru
     - uk
     - fi
-    - el
-    - it
-    - ja
-    - no
-    - ro
-    - sr
     - sv
+    - no
+    - da
+    - el
+    - ro
     - tr
+    - ja
+    - zh

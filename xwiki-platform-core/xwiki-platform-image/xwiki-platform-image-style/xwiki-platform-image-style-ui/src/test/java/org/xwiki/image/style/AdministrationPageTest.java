@@ -90,6 +90,12 @@ class AdministrationPageTest extends PageTest
         assertEquals("1", createImageStyleForm.getElementsByAttributeValue("name", "sheet").val());
         assertEquals("Image.Style.Code.ImageStyles",
             createImageStyleForm.getElementsByAttributeValue("name", "spaceName").val());
+        // The hint of the identifier field describes the field instead of repeating its label.
+        Element identifierTerm = createImageStyleForm.getElementsByTag("dt").first();
+        assertEquals("image.style.administation.newImageStyle.label",
+            identifierTerm.getElementsByTag("label").text());
+        assertEquals("image.style.administation.newImageStyle.hint",
+            identifierTerm.getElementsByClass("xHint").text());
         // The script reports the normalized identifier through this identifier.
         assertNotNull(createImageStyleForm.getElementById("targetTitleActualMessage"));
         // Form 1;

@@ -42,6 +42,13 @@ public class ImageStyleAdministrationPage extends ViewPage
     private static final String DEFAULT_IMAGE_STYLE_FIELD_NAME = "Image.Style.Code.ConfigurationClass_0_defaultStyle";
 
     /**
+     * Timeout, in seconds, granted to the identifier validation round-trip that enables the creation button. It is
+     * larger than the default timeout because that round-trip is a debounced asynchronous request, and the first one
+     * hitting the validation page is slow on a loaded machine.
+     */
+    private static final int VALIDATION_TIMEOUT_SECONDS = 30;
+
+    /**
      * @param wikiReference the reference of the wiki containing the admin to access
      * @return the page object for the administration of the image styles
      */
@@ -63,10 +70,17 @@ public class ImageStyleAdministrationPage extends ViewPage
     public ImageStyleConfigurationForm submitNewImageStyleForm(String identifier)
     {
         XWikiWebDriver driver = getDriver();
-        driver.findElementWithoutWaiting(By.id("targetTitle")).sendKeys(identifier);
-        WebElement submitButton =
-            driver.findElementWithoutWaiting(By.cssSelector("#newImageStyleForm input[type='submit']"));
-        driver.waitUntilElementIsEnabled(submitButton);
+        driver.findElement(By.id("targetTitle")).sendKeys(identifier);
+        WebElement submitButton = driver.findElement(By.cssSelector("#newImageStyleForm input[type='submit']"));
+        // The button is rendered disabled and is only enabled once the identifier has been normalized by a debounced
+        // request to the entity name validation page, so wait for that request to complete before clicking.
+        int currentTimeout = driver.getTimeout();
+        try {
+            driver.setTimeout(VALIDATION_TIMEOUT_SECONDS);
+            driver.waitUntilElementIsEnabled(submitButton);
+        } finally {
+            driver.setTimeout(currentTimeout);
+        }
         submitButton.click();
         return new ImageStyleConfigurationForm();
     }

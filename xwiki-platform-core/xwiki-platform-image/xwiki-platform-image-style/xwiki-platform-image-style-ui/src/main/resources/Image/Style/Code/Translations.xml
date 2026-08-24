@@ -53,6 +53,7 @@ image.style.administation.newImageStyle.label=New Image Style
 image.style.administation.newImageStyle.hint=Identifier of the new image style.
 image.style.administation.newImageStyle.placeHolder=Identifier
 image.style.administation.newImageStyle.normalizedTitle=The new image style, following the naming conventions is [{0}].
+image.style.administation.newImageStyle.invalidIdentifier=The identifier entered does not follow the naming conventions. The new image style will be created as [{0}].
 image.style.administation.newImageStyle.validationFailed=The naming conventions could not be checked. The new image style will be created as [{0}].
 Image.Style.Code.ImageStyleClass_adjustableAlignment=Adjustable Alignment
 Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=When checked, the user is allowed to customize the aligment of the image.

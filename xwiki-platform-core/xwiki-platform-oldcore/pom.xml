@@ -793,7 +793,6 @@
                 **/monitor/api/MonitorPlugin.java,
                 **/monitor/api/MonitorTimer.java,
                 **/monitor/api/MonitorTimerSummary.java,
-                **/objects/BaseCollection.java,
                 **/objects/BaseElement.java,
                 **/objects/BaseProperty.java,
                 **/objects/BaseStringProperty.java,

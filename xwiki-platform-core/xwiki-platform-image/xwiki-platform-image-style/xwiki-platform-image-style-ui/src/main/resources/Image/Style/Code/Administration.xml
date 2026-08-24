@@ -236,6 +236,7 @@
   keys: [
     'newImageStyle.normalizedTitle',
     'newImageStyle.invalidIdentifier',
+    'newImageStyle.tokenExpired',
     'newImageStyle.validationFailed'
   ]
 });
@@ -262,8 +263,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!image-style-administration-messages
       $('#targetTitleActualMessage').text('');
       return;
     }
-    // Which of the three outcomes of the check the hint has to report: the name follows the conventions, it does
-    // not and has been rewritten, or it could not be checked at all.
+    // Which outcome of the check the hint has to report: the name follows the conventions, it does not and has
+    // been rewritten, the page has expired, or the check could not be made at all.
     let messageKey = 'newImageStyle.normalizedTitle';
     Promise.resolve($.get({
       'url': url,
@@ -288,10 +289,17 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!image-style-administration-messages
       targetTitleActual.val(data.transformedName);
     }).catch((error) =&gt; {
       console.error(error);
-      // Fall back to the entered name when the validation request fails, so that the creation form does not stay
-      // unusable. The name is validated again server-side when the image style is created.
-      messageKey = 'newImageStyle.validationFailed';
-      targetTitleActual.val(name);
+      if (error.status === 401) {
+        // The validation page answers 401 when the CSRF token is no longer valid, which also makes the creation
+        // itself fail: the page has to be reloaded, so there is nothing worth falling back to.
+        messageKey = 'newImageStyle.tokenExpired';
+        targetTitleActual.val('');
+      } else {
+        // Fall back to the entered name when the validation request fails, so that the creation form does not stay
+        // unusable. The name is validated again server-side when the image style is created.
+        messageKey = 'newImageStyle.validationFailed';
+        targetTitleActual.val(name);
+      }
     }).finally(() =&gt; {
       if (targetTitleActual.val() !== '') {
         submitButton.prop('disabled', false);

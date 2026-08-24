@@ -55,7 +55,7 @@
     &lt;dd&gt;
       &lt;input id="targetTitle" placeholder="$services.localization.render('image.style.administation.newImageStyle.placeHolder')" type="text" value=""&gt;
       &lt;input id="targetTitleActual" type="hidden" name="docName" value=""/&gt;
-      &lt;span id="targetTitleActualMessage " class="xHint"&gt;&lt;/span&gt;
+      &lt;span id="targetTitleActualMessage" class="xHint"&gt;&lt;/span&gt;
     &lt;/dd&gt;
   &lt;/dl&gt;
   &lt;p&gt;

@@ -38,6 +38,7 @@ import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.velocity.VelocityManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 /**
@@ -88,6 +89,8 @@ class AdministrationPageTest extends PageTest
         assertEquals("1", createImageStyleForm.getElementsByAttributeValue("name", "sheet").val());
         assertEquals("Image.Style.Code.ImageStyles",
             createImageStyleForm.getElementsByAttributeValue("name", "spaceName").val());
+        // The script reports the normalized identifier through this identifier.
+        assertNotNull(createImageStyleForm.getElementById("targetTitleActualMessage"));
         // Form 1;
         Element updateConfigurationForm = forms.get(1);
         assertEquals("/xwiki/bin/saveandcontinue/Image/Style/Code/Configuration",

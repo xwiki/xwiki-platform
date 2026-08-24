@@ -56,6 +56,7 @@ public class PackagePlugin extends XWikiDefaultPlugin implements XWikiPluginInte
     @Override
     public void flushCache()
     {
+        // Nothing to do, this plugin does not use any cache.
     }
 
     @Override

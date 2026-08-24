@@ -88,6 +88,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      */
     public XWikiHibernateBaseStore()
     {
+        // Nothing to do, this empty constructor is only needed by the component manager.
     }
 
     public String getHint()

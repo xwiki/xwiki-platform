@@ -465,7 +465,7 @@ public class XWikiException extends Exception
     @Deprecated(since = "5.2M2")
     public void setMessage(String message)
     {
-
+        // Nothing to do, this deprecated setter is kept for backward compatibility only.
     }
 
     public String getFullMessage()

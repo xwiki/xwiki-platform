@@ -40,6 +40,7 @@ public class XWikiNotificationManager
 
     public XWikiNotificationManager()
     {
+        // Nothing to do, the rules are registered after construction.
     }
 
     /**

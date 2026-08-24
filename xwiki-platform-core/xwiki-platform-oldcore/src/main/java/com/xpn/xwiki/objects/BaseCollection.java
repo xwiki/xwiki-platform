@@ -34,7 +34,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +67,8 @@ import com.xpn.xwiki.web.Utils;
  */
 // We cannot change the class name as it's an API and it's also very difficult to fix the ClassFanOutComplexity for
 // the same reason.
-@SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:AbstractClassName"})
+// FIXME: an hashcode method should be provided but it might be too dangerous for a LTS change.
+@SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:AbstractClassName", "checkstyle:EqualsHashCode"})
 public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R>
     implements ObjectInterface, Cloneable
 {
@@ -767,16 +767,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
 
         return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return new HashCodeBuilder(17, 15)
-            .appendSuper(super.hashCode())
-            .append(fields)
-            .append(xClassReference)
-            .toHashCode();
     }
 
     @Override

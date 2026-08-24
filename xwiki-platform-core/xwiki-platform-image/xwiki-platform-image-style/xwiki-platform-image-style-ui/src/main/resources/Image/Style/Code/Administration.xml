@@ -235,6 +235,7 @@
   prefix: 'image.style.administation.',
   keys: [
     'newImageStyle.normalizedTitle',
+    'newImageStyle.invalidIdentifier',
     'newImageStyle.validationFailed'
   ]
 });
@@ -261,9 +262,9 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!image-style-administration-messages
       $('#targetTitleActualMessage').text('');
       return;
     }
-    // Whether the name could actually be checked, so that the message below does not report a normalization
-    // that never happened.
-    let validated = true;
+    // Which of the three outcomes of the check the hint has to report: the name follows the conventions, it does
+    // not and has been rewritten, or it could not be checked at all.
+    let messageKey = 'newImageStyle.normalizedTitle';
     Promise.resolve($.get({
       'url': url,
       // Bound the request so that a validation page which does not answer ends up in the error handler below,
@@ -279,12 +280,17 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!image-style-administration-messages
       if (typeof data.transformedName !== 'string') {
         throw new Error('Unexpected entity name validation response: ' + JSON.stringify(data));
       }
+      // The validation page reports whether the entered name is acceptable as is, which is only enforced when the
+      // wiki is configured to validate names.
+      if (data.useValidation &amp;&amp; data.isOriginalValid === false) {
+        messageKey = 'newImageStyle.invalidIdentifier';
+      }
       targetTitleActual.val(data.transformedName);
     }).catch((error) =&gt; {
       console.error(error);
       // Fall back to the entered name when the validation request fails, so that the creation form does not stay
       // unusable. The name is validated again server-side when the image style is created.
-      validated = false;
+      messageKey = 'newImageStyle.validationFailed';
       targetTitleActual.val(name);
     }).finally(() =&gt; {
       if (targetTitleActual.val() !== '') {
@@ -293,9 +299,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-l10n!image-style-administration-messages
       let message = '';
       // The result message is only displayed if some content was entered in the name field.
       if (targetTitle.val() !== '') {
-        message = validated
-          ? l10n.get('newImageStyle.normalizedTitle', targetTitleActual.val())
-          : l10n.get('newImageStyle.validationFailed', targetTitleActual.val());
+        message = l10n.get(messageKey, targetTitleActual.val());
       }
       $('#targetTitleActualMessage').text(message);
     });

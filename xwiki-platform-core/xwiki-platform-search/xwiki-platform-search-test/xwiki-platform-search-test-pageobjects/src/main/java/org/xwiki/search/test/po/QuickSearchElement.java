@@ -22,6 +22,7 @@ package org.xwiki.search.test.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
@@ -59,5 +60,28 @@ public class QuickSearchElement extends BaseElement
         getDriver().waitUntilElementIsVisible(sourceContainerSelector);
         return getDriver().findElement(sourceContainerSelector).findElements(By.cssSelector(".suggestList .xitem"))
             .stream().map(QuickSearchResult::new).toList();
+    }
+
+    /**
+     * @return {@code true} if the "Go to search page..." row is the last suggestion item
+     * @since 18.8.0RC1
+     */
+    public boolean isShowAllResultsLast()
+    {
+        List<WebElement> suggestItems =
+            getDriver().findElementsWithoutWaiting(By.cssSelector(".searchSuggest .suggestItem"));
+        return !suggestItems.isEmpty()
+            && suggestItems.get(suggestItems.size() - 1).getAttribute("class").contains("showAllResults");
+    }
+
+    /**
+     * Closes the suggestions panel by pressing the Escape key.
+     *
+     * @since 18.8.0RC1
+     */
+    public void closeSuggestions()
+    {
+        this.searchInput.sendKeys(Keys.ESCAPE);
+        getDriver().waitUntilElementDisappears(By.cssSelector(".searchSuggest"));
     }
 }

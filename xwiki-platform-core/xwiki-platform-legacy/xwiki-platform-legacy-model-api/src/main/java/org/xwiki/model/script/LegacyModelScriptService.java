@@ -75,9 +75,9 @@ public class LegacyModelScriptService extends ModelScriptService
      *            entity, like {@code 'SPACE'}
      * @return the current value for the requested entity type
      * @since 4.3M1
-     * @deprecated since 7.4.1/8.0M1, use {@link #getEntityReference(EntityType)}
+     * @deprecated use {@link #getEntityReference(EntityType)}
      */
-    @Deprecated
+    @Deprecated(since = "7.4.1,8.0M1")
     public String getEntityReferenceValue(EntityType type)
     {
         return getEntityReferenceValue(type, DEFAULT_RESOLVER_HINT);

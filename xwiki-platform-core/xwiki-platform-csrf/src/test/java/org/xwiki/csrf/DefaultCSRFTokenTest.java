@@ -72,16 +72,24 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DefaultCSRFTokenTest
 {
-    /** Characters that might break the layout and must thus not appear in a token. */
+    /**
+     * Characters that might break the layout and must thus not appear in a token.
+     */
     private static final Pattern BAD_CHARACTERS = Pattern.compile(".*[&?*_/#^,.({\\[\\]})~!=+-].*");
 
-    /** URL of the current document. */
+    /**
+     * URL of the current document.
+     */
     private static final String mockDocumentUrl = "http://host/xwiki/bin/save/Main/Test";
 
-    /** Resubmission URL. */
+    /**
+     * Resubmission URL.
+     */
     private static final String resubmitUrl = mockDocumentUrl;
 
-    /** Tested CSRF token component. */
+    /**
+     * Tested CSRF token component.
+     */
     @InjectMockComponents
     private DefaultCSRFToken csrf;
 

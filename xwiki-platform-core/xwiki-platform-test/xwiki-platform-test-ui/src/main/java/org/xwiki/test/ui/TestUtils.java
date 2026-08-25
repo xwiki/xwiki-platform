@@ -2417,7 +2417,7 @@ public class TestUtils
      * Sets the value of existing properties of XWiki.XWikiPreferences.
      *
      * @param properties a map of the name and value for the properties to set.
-     * @since 18.1.0
+     * @since 18.8.0RC1
      */
     public void setWikiPreferences(Map<String, String> properties) throws Exception
     {

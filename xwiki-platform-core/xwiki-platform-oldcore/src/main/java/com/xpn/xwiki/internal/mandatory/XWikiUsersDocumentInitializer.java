@@ -102,14 +102,14 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
     /**
      * The name of the field containing the user type.
      *
-     * @since 18.7.0RC1
+     * @since 18.8.0RC1
      */
     public static final String USERTYPE_FIELD = "usertype";
 
     /**
      * The default value of the {@link #USERTYPE_FIELD} field.
      *
-     * @since 18.7.0RC1
+     * @since 18.8.0RC1
      */
     public static final String USERTYPE_DEFAULT_VALUE = "Simple";
 

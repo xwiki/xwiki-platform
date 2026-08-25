@@ -55,7 +55,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * doesn't have it set yet.
  *
  * @version $Id$
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  */
 @Component
 @Named("R180700000XWIKI16742")

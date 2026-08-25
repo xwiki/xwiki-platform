@@ -19,14 +19,7 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.xwiki.localization.ContextualLocalizationManager;
-import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -36,17 +29,13 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link NumberClass} class.
- *
+ * 
  * @version $Id$
  */
 @OldcoreTest
@@ -55,9 +44,6 @@ class NumberClassTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
-
-    @MockComponent
-    private ContextualLocalizationManager contextualLocalizationManager;
 
     /** Test the fromString method. */
     @Test
@@ -69,29 +55,15 @@ class NumberClassTest
         bc.setName("Some.Class");
         nc.setObject(bc);
 
-        when(this.contextualLocalizationManager.getTranslationPlain(
-            "core.model.xclass.classProperty.error.invalidNumberFormat", "asd", "long"))
-                .thenReturn("The value \"asd\" is not a valid number of type \"long\".");
-        when(this.contextualLocalizationManager.getTranslationPlain(
-            "core.model.xclass.classProperty.error.invalidNumberFormat", "1111111111111111111111111111111111",
-            "long")).thenReturn("The value \"1111111111111111111111111111111111\" is not a valid number of type "
-                + "\"long\".");
-
-        // A String value containing non-numeric characters can not be represented as a numeric value, so this
-        // should throw an exception
+        // A String value containing non-numeric characters can not be represented as a numeric value, so this sould
+        // throw an exception
         XWikiException xWikiException = assertThrows(XWikiException.class, () -> nc.fromString("asd"));
-        assertEquals(XWikiException.MODULE_XWIKI_CLASSES, xWikiException.getModule());
-        assertEquals(XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID, xWikiException.getCode());
-        verify(this.contextualLocalizationManager)
-            .getTranslationPlain("core.model.xclass.classProperty.error.invalidNumberFormat", "asd", "long");
+        assertEquals("Error number 0 in 0: Error when parsing [asd] to type [long]",  xWikiException.getMessage());
 
         // A much too long number cannot be represented as a long value, so this should throw an exception
         xWikiException = assertThrows(XWikiException.class, () -> nc.fromString("1111111111111111111111111111111111"));
-        assertEquals(XWikiException.MODULE_XWIKI_CLASSES, xWikiException.getModule());
-        assertEquals(XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID, xWikiException.getCode());
-        verify(this.contextualLocalizationManager).getTranslationPlain(
-            "core.model.xclass.classProperty.error.invalidNumberFormat", "1111111111111111111111111111111111",
-            "long");
+        assertEquals("Error number 0 in 0: Error when parsing [1111111111111111111111111111111111] to type [long]",
+            xWikiException.getMessage());
 
         BaseProperty p;
 
@@ -109,61 +81,5 @@ class NumberClassTest
         p = nc.fromString("4");
         assertNotNull(p);
         assertEquals(4, Integer.parseInt(p.getValue().toString()));
-    }
-
-    /**
-     * Arguments for {@link #displayEdit(String, String, String, String)}: number type, expected {@code step}, and
-     * expected {@code min}/{@code max} ({@code null} for the types that don't get a range).
-     */
-    private static Stream<Arguments> numberTypes()
-    {
-        long safeIntegerLimit = 1L << 53;
-        return Stream.of(
-            Arguments.of(NumberClass.TYPE_INTEGER, "1", String.valueOf(Integer.MIN_VALUE),
-                String.valueOf(Integer.MAX_VALUE)),
-            Arguments.of(NumberClass.TYPE_LONG, "1", String.valueOf(-safeIntegerLimit),
-                String.valueOf(safeIntegerLimit)),
-            Arguments.of(NumberClass.TYPE_FLOAT, "any", null, null),
-            Arguments.of(NumberClass.TYPE_DOUBLE, "any", null, null));
-    }
-
-    /** Test that displayEdit() sets the HTML5 validation attributes matching the number type. */
-    @ParameterizedTest
-    @MethodSource("numberTypes")
-    void displayEdit(String numberType, String expectedStep, String expectedMin, String expectedMax)
-    {
-        NumberClass nc = new NumberClass();
-        BaseClass bc = new BaseClass();
-        bc.setName("Some.Class");
-        nc.setObject(bc);
-        nc.setName("number1");
-        nc.setNumberType(numberType);
-
-        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidformat"))
-            .thenReturn("Please enter a valid number.");
-        if (expectedMin != null) {
-            when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.outofrange",
-                expectedMin, expectedMax)).thenReturn("Out of range.");
-        }
-
-        StringBuffer buffer = new StringBuffer();
-        nc.displayEdit(buffer, "number1", "prefix_", bc, this.oldcore.getXWikiContext());
-        String html = buffer.toString();
-
-        assertTrue(html.contains("type='number'"), html);
-        assertTrue(html.contains("step='" + expectedStep + "'"), html);
-        assertTrue(html.contains("data-validation-bad-input='Please enter a valid number.'"), html);
-        assertTrue(html.contains("data-validation-step-mismatch='Please enter a valid number.'"), html);
-        if (expectedMin != null) {
-            assertTrue(html.contains("min='" + expectedMin + "'"), html);
-            assertTrue(html.contains("max='" + expectedMax + "'"), html);
-            assertTrue(html.contains("data-validation-range-overflow='Out of range.'"), html);
-            assertTrue(html.contains("data-validation-range-underflow='Out of range.'"), html);
-        } else {
-            assertFalse(html.contains("min="), html);
-            assertFalse(html.contains("max="), html);
-            assertFalse(html.contains("data-validation-range-overflow"), html);
-            assertFalse(html.contains("data-validation-range-underflow"), html);
-        }
     }
 }

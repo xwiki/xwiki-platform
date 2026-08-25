@@ -192,19 +192,4 @@ public class InlinePage extends ViewPage
             new FormContainerElement(getFormLocator()).setCheckBox(By.xpath(xpath), true);
         }
     }
-
-    /**
-     * Checks whether the specified form field currently satisfies its HTML5 constraint validation (e.g. its type,
-     * pattern, min, max or step).
-     *
-     * @param fieldName the name of a form field
-     * @return {@code true} if the field's value is currently valid, {@code false} otherwise
-     * @since 18.8.0RC1
-     */
-    public boolean isFieldValid(String fieldName)
-    {
-        String xpath = String.format(FIELD_XPATH_FORMAT, fieldName.length(), fieldName);
-        WebElement field = getForm().findElement(By.xpath(xpath));
-        return (Boolean) getDriver().executeJavascript("return arguments[0].checkValidity();", field);
-    }
 }

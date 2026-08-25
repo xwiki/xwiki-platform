@@ -87,11 +87,6 @@ public class AllIT
     }
 
     @Nested
-    class NestedNumberClassFieldIT extends NumberClassFieldIT
-    {
-    }
-
-    @Nested
     class NestedDBListClassFieldIT extends DBListClassFieldIT
     {
     }

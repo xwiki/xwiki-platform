@@ -188,7 +188,7 @@ public class AttachmentsPane extends BaseElement
      * @param fileName the name of the attachment
      * @param expectedSize the expected localized size displayed in the upload notification (e.g. {@code "27B"}), or
      *     {@code null} to not check the size
-     * @since 18.7.0RC1
+     * @since 18.8.0RC1
      */
     public void waitForUploadToFinish(String fileName, String expectedSize)
     {

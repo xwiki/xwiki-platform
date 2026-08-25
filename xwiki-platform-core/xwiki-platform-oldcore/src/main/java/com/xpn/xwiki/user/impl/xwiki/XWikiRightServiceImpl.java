@@ -459,7 +459,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     return true;
                 }
             } catch (XWikiRightNotFoundException e) {
-                // TODO: change the logic so this case is not signalled by an exception.
                 // No right found for this group, continue with the next one.
             } catch (Exception e) {
                 LOGGER.error("Failed to check right [{}] for group [{}] on document [{}]", accessLevel, group,
@@ -616,7 +615,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                             return false;
                         }
                     } catch (XWikiRightNotFoundException e1) {
-                        // TODO: change the logic so this case is not signalled by an exception.
                         // No right found at this level, continue with the next check.
                     }
                 }
@@ -649,7 +647,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         return false;
                     }
                 } catch (XWikiRightNotFoundException e) {
-                    // TODO: change the logic so this case is not signalled by an exception.
                     // No right found at this level, continue with the next check.
                 }
             }
@@ -664,7 +661,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     return true;
                 }
             } catch (XWikiRightNotFoundException e) {
-                // TODO: change the logic so this case is not signalled by an exception.
                 // No right found at this level, continue with the next check.
             }
 
@@ -690,7 +686,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                                 return false;
                             }
                         } catch (XWikiRightNotFoundException e) {
-                            // TODO: change the logic so this case is not signalled by an exception.
                             // No right found at this level, continue with the next check.
                         }
                     }
@@ -707,7 +702,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                                 return true;
                             }
                         } catch (XWikiRightNotFoundException e) {
-                            // TODO: change the logic so this case is not signalled by an exception.
                             // No right found at this level, continue with the next check.
                         }
                     }
@@ -736,7 +730,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         return false;
                     }
                 } catch (XWikiRightNotFoundException e) {
-                    // TODO: change the logic so this case is not signalled by an exception.
                     // No right found at this level, continue with the next check.
                 }
             }
@@ -753,7 +746,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         return true;
                     }
                 } catch (XWikiRightNotFoundException e) {
-                    // TODO: change the logic so this case is not signalled by an exception.
                     // No right found at this level, continue with the next check.
                 }
             }
@@ -842,7 +834,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     return true;
                 }
             } catch (XWikiRightNotFoundException e) {
-                // TODO: change the logic so this case is not signalled by an exception.
                 // No right found at this level, continue with the next check.
             }
 
@@ -865,7 +856,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         return false;
                     }
                 } catch (XWikiRightNotFoundException e) {
-                    // TODO: change the logic so this case is not signalled by an exception.
                     // No right found at this level, continue with the next check.
                 }
 
@@ -895,7 +885,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 return true;
             }
         } catch (XWikiRightNotFoundException e) {
-            // TODO: change the logic so this case is not signalled by an exception.
             // No right found at this level, continue with the next check.
         }
 
@@ -920,7 +909,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         return true;
                     }
                 } catch (XWikiRightNotFoundException e) {
-                    // TODO: change the logic so this case is not signalled by an exception.
                     // No right found at this level, continue with the next check.
                 }
 

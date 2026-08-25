@@ -859,7 +859,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     ctor = sesc.getConstructor(Map.class);
                     return ctor.newInstance(params);
                 } catch (Throwable t) {
-                    // TODO: change the logic so this case is not signalled by an exception.
+                    // TODO: log a warning instead of ignoring this exception: catching Throwable here also
+                    // hides a failure of the constructor that was found.
                     // The default constructor is used below.
                 }
             }

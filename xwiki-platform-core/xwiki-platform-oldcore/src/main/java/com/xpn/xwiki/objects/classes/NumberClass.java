@@ -91,6 +91,11 @@ public class NumberClass extends PropertyClass
     private static final String STEP_INTEGER = "1";
     private static final String MIN = "min";
     private static final String MAX = "max";
+
+    // Above this magnitude a double can no longer represent every integer exactly, which would make the browser's
+    // step-mismatch arithmetic on the min/max attributes unreliable. It's used as a stand-in for the long type's
+    // real range, which is far too large for that arithmetic to stay precise.
+    private static final long SAFE_INTEGER_LIMIT = 1L << 53;
     private static final String DATA_VALIDATION_BAD_INPUT = "data-validation-bad-input";
     private static final String DATA_VALIDATION_STEP_MISMATCH = "data-validation-step-mismatch";
     private static final String DATA_VALIDATION_RANGE_OVERFLOW = "data-validation-range-overflow";
@@ -224,10 +229,10 @@ public class NumberClass extends PropertyClass
         input.setType(INPUT_TYPE_NUMBER);
         input.setName(prefix + name);
         input.setID(prefix + name);
+        // The "size" attribute is ignored by browsers on type="number" inputs, but it's kept for API
+        // compatibility; Flamingo already styles input[type="number"] the same as input[type="text"], so no
+        // replacement width needs to be set here.
         input.setSize(getSize());
-        // The "size" attribute is ignored by browsers on type="number" inputs, so we approximate the same width
-        // with an inline style instead.
-        input.addAttribute("style", "width: " + getSize() + "ch;");
         input.setDisabled(isDisabled());
 
         String ntype = getNumberType();
@@ -245,8 +250,8 @@ public class NumberClass extends PropertyClass
                 min = String.valueOf(Integer.MIN_VALUE);
                 max = String.valueOf(Integer.MAX_VALUE);
             } else {
-                min = String.valueOf(Long.MIN_VALUE);
-                max = String.valueOf(Long.MAX_VALUE);
+                min = String.valueOf(-SAFE_INTEGER_LIMIT);
+                max = String.valueOf(SAFE_INTEGER_LIMIT);
             }
             input.addAttribute(MIN, min);
             input.addAttribute(MAX, max);

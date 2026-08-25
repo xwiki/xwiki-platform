@@ -31,6 +31,7 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -114,20 +115,20 @@ class NumberClassTest
         bc.setName("Some.Class");
         nc.setObject(bc);
         nc.setName("number1");
-        nc.setNumberType(NumberClass.TYPE_LONG);
+        nc.setNumberType(NumberClass.TYPE_INTEGER);
 
         when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidformat"))
             .thenReturn("Please enter a valid number.");
         when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.outofrange",
-            String.valueOf(Long.MIN_VALUE), String.valueOf(Long.MAX_VALUE))).thenReturn("Out of range.");
+            String.valueOf(Integer.MIN_VALUE), String.valueOf(Integer.MAX_VALUE))).thenReturn("Out of range.");
 
         StringBuffer buffer = new StringBuffer();
         nc.displayEdit(buffer, "number1", "prefix_", bc, this.oldcore.getXWikiContext());
         String html = buffer.toString();
 
         assertTrue(html.contains("step='1'"), html);
-        assertTrue(html.contains("min='" + Long.MIN_VALUE + "'"), html);
-        assertTrue(html.contains("max='" + Long.MAX_VALUE + "'"), html);
+        assertTrue(html.contains("min='" + Integer.MIN_VALUE + "'"), html);
+        assertTrue(html.contains("max='" + Integer.MAX_VALUE + "'"), html);
         assertTrue(html.contains("data-validation-bad-input='Please enter a valid number.'"), html);
         assertTrue(html.contains("data-validation-step-mismatch='Please enter a valid number.'"), html);
         assertTrue(html.contains("data-validation-range-overflow='Out of range.'"), html);
@@ -135,6 +136,38 @@ class NumberClassTest
 
         verify(this.contextualLocalizationManager).getTranslationPlain("core.validation.number.message.invalidformat");
         verify(this.contextualLocalizationManager).getTranslationPlain("core.validation.number.message.outofrange",
-            String.valueOf(Long.MIN_VALUE), String.valueOf(Long.MAX_VALUE));
+            String.valueOf(Integer.MIN_VALUE), String.valueOf(Integer.MAX_VALUE));
+    }
+
+    /**
+     * Test that displayEdit() clamps the long type's min/max to the safe integer range instead of the real
+     * {@code long} bounds, since the browser's step-mismatch arithmetic on min/max loses precision above it.
+     */
+    @Test
+    void displayEditLongHasSafeIntegerRange()
+    {
+        NumberClass nc = new NumberClass();
+        BaseClass bc = new BaseClass();
+        bc.setName("Some.Class");
+        nc.setObject(bc);
+        nc.setName("number1");
+        nc.setNumberType(NumberClass.TYPE_LONG);
+
+        long safeIntegerLimit = 1L << 53;
+
+        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidformat"))
+            .thenReturn("Please enter a valid number.");
+        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.outofrange",
+            String.valueOf(-safeIntegerLimit), String.valueOf(safeIntegerLimit))).thenReturn("Out of range.");
+
+        StringBuffer buffer = new StringBuffer();
+        nc.displayEdit(buffer, "number1", "prefix_", bc, this.oldcore.getXWikiContext());
+        String html = buffer.toString();
+
+        assertTrue(html.contains("step='1'"), html);
+        assertTrue(html.contains("min='" + (-safeIntegerLimit) + "'"), html);
+        assertTrue(html.contains("max='" + safeIntegerLimit + "'"), html);
+        assertFalse(html.contains("min='" + Long.MIN_VALUE + "'"), html);
+        assertFalse(html.contains("max='" + Long.MAX_VALUE + "'"), html);
     }
 }

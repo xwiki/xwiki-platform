@@ -155,6 +155,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin
                 mdata.setWikiPage(page);
             }
         } catch (Throwable e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // Monitoring must never break the request being monitored.
         }
     }
 

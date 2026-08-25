@@ -1340,6 +1340,8 @@ public class Document extends Api
                 }
             }
         } catch (Exception e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // The objects that could be retrieved so far are returned.
         }
         return result;
     }

@@ -1384,6 +1384,8 @@ public class Package
                     domdoc = reader.read(new FileInputStream(file));
                     validWikiDoc = XWikiDocument.containsXMLWikiDocument(domdoc);
                 } catch (DocumentException e1) {
+                    // TODO: log a warning instead of ignoring this exception.
+                    // A file that cannot be parsed is not a valid wiki document.
                 }
 
                 if (validWikiDoc) {

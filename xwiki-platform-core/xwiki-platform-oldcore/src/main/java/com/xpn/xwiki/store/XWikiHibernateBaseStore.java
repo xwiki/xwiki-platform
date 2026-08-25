@@ -413,6 +413,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                     endTransaction(context, true);
                 }
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // A failure to close the transaction must not hide the original error.
             }
 
             restoreExecutionXContext();
@@ -613,6 +615,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                 this.store.endTransaction(false);
             }
         } catch (HibernateException e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // Cleaning up the session at shutdown time is only a best effort.
         }
     }
 

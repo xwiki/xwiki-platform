@@ -84,9 +84,10 @@ public class MonitorTimer
         str.append(" End Date: ");
         str.append(this.endDate);
         str.append(" Duration: ");
-        try {
-            str.append(this.endDate.getTime() - this.startDate.getTime());
-        } catch (Exception e) {
+        // The duration is only known once the timer has ended: a timer that is still running has no end
+        // date, and printing it must not fail.
+        if (this.startDate != null && this.endDate != null) {
+            str.append(getDuration());
         }
         return str.toString();
     }

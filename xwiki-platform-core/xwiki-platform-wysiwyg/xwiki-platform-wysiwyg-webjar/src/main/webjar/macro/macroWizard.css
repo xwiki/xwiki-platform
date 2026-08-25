@@ -174,3 +174,8 @@ ul.macro-list .macro-extension {
 .macro-tabs {
   margin-bottom: 0.5em;
 }
+
+/* Ensure that a Tom Select field is not resized after setting a value. */
+.macro-parameter-field .ts-wrapper.full {
+  float: none;
+}

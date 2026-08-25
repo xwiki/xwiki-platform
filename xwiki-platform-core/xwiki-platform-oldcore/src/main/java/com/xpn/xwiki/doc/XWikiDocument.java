@@ -3706,7 +3706,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         try {
             type = (String) context.get("display");
         } catch (Exception e) {
-            // Ignore: the "view" display type is then used below.
+            // TODO: log a warning instead of ignoring this exception.
+            // The "view" display type is then used below.
         }
 
         if (type == null) {
@@ -7406,7 +7407,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 try {
                     is.close();
                 } catch (IOException ex) {
-                    // Ignore: a failure to close the stream must not hide the result of the operation.
+                    // TODO: log a warning instead of ignoring this exception.
+                    // A failure to close the stream must not hide the result of the operation.
                 }
             }
         }

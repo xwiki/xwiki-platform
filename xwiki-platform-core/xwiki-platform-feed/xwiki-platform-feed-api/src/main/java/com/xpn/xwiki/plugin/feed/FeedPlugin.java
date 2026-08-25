@@ -189,7 +189,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 iCapacity = Integer.parseInt(capacity);
             }
         } catch (Exception e) {
-            // Ignore: the default capacity is then used.
+            // TODO: log a warning instead of ignoring this exception.
+            // The default capacity is then used.
         }
 
         initCache(iCapacity, context);
@@ -220,7 +221,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 initCache(context);
             }
         } catch (XWikiException e) {
-            // Ignore: the cache initialization is retried the next time the cache is needed.
+            // TODO: log a warning instead of ignoring this exception.
+            // The cache initialization is retried the next time the cache is needed.
         }
     }
 
@@ -857,7 +859,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     ctor = sesc.getConstructor(Map.class);
                     return ctor.newInstance(params);
                 } catch (Throwable t) {
-                    // Ignore: fall back to the default constructor below.
+                    // TODO: change the logic so this case is not signalled by an exception.
+                    // The default constructor is used below.
                 }
             }
             ctor = sesc.getConstructor();

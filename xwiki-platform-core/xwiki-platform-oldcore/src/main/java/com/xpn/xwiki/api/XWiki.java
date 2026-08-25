@@ -1003,7 +1003,8 @@ public class XWiki extends Api
                         }
                     }
                 } catch (XWikiException ex) {
-                    // Ignore: a document that cannot be wrapped is simply not added to the result.
+                    // TODO: log a warning instead of ignoring this exception.
+                    // A document that cannot be wrapped is simply not added to the result.
                 }
             }
         }

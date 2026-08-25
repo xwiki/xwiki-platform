@@ -343,14 +343,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     statement.close();
                 }
             } catch (Exception e) {
-                // Ignore: a failure to close the statement must not hide the original error.
+                // TODO: log a warning instead of ignoring this exception.
+                // A failure to close the statement must not hide the original error.
             }
             try {
                 if (bTransaction) {
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
-                // Ignore: a failure to close the transaction must not hide the original error.
+                // TODO: log a warning instead of ignoring this exception.
+                // A failure to close the transaction must not hide the original error.
             }
         }
     }
@@ -420,14 +422,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     statement.close();
                 }
             } catch (Exception e) {
-                // Ignore: a failure to close the statement must not hide the original error.
+                // TODO: log a warning instead of ignoring this exception.
+                // A failure to close the statement must not hide the original error.
             }
             try {
                 if (bTransaction) {
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
-                // Ignore: a failure to close the transaction must not hide the original error.
+                // TODO: log a warning instead of ignoring this exception.
+                // A failure to close the transaction must not hide the original error.
             }
         }
     }
@@ -764,7 +768,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         try {
                             endTransaction(context, false);
                         } catch (Exception e) {
-                            // Ignore: a failure to close the transaction must not hide the original error.
+                            // TODO: log a warning instead of ignoring this exception.
+                            // A failure to close the transaction must not hide the original error.
                         }
                     }
                 }
@@ -1203,7 +1208,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         try {
                             endTransaction(context, false);
                         } catch (Exception e) {
-                            // Ignore: a failure to close the transaction must not hide the original error.
+                            // TODO: log a warning instead of ignoring this exception.
+                            // A failure to close the transaction must not hide the original error.
                         }
                     }
                 }
@@ -1307,7 +1313,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         try {
                             endTransaction(context, false);
                         } catch (Exception e) {
-                            // Ignore: a failure to close the transaction must not hide the original error.
+                            // TODO: log a warning instead of ignoring this exception.
+                            // A failure to close the transaction must not hide the original error.
                         }
                     }
                 }
@@ -1498,7 +1505,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     try {
                         endTransaction(context, true);
                     } catch (Exception e) {
-                        // Ignore: a failure to close the transaction must not hide the original error.
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }
@@ -1663,7 +1671,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
-                        // Ignore: a failure to close the transaction must not hide the original error.
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }
@@ -1754,7 +1763,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
-                        // Ignore: a failure to close the transaction must not hide the original error.
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }
@@ -2819,7 +2829,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
-                        // Ignore: a failure to close the transaction must not hide the original error.
+                        // TODO: log a warning instead of ignoring this exception.
+                        // A failure to close the transaction must not hide the original error.
                     }
                 }
             }

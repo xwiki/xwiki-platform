@@ -1744,7 +1744,8 @@ public class XWiki implements EventListener
                     return IOUtils.toByteArray(is);
                 }
             } catch (Exception e) {
-                // Ignore: fall back to reading the resource from the file system below.
+                // TODO: log a warning instead of ignoring this exception.
+                // The resource is then read from the file system below.
             }
         }
         return FileUtils.readFileToByteArray(new File(name));
@@ -1758,7 +1759,8 @@ public class XWiki implements EventListener
                     return true;
                 }
             } catch (IOException e) {
-                // Ignore: fall back to looking for the resource on the file system below.
+                // TODO: log a warning instead of ignoring this exception.
+                // The resource is then looked for on the file system below.
             }
         }
         try {
@@ -3193,7 +3195,8 @@ public class XWiki implements EventListener
                 }
             }
         } catch (Exception e) {
-            // Ignore: fall back to the next way of getting the locale below.
+            // TODO: log a warning instead of ignoring this exception.
+            // The next way of getting the locale is used below.
         }
 
         // As no language parameter was passed in the request, try to get the language to use from a cookie.
@@ -3207,7 +3210,8 @@ public class XWiki implements EventListener
                 }
             }
         } catch (Exception e) {
-            // Ignore: fall back to the next way of getting the locale below.
+            // TODO: log a warning instead of ignoring this exception.
+            // The next way of getting the locale is used below.
         }
 
         // If the default language is preferred, and since the user didn't explicitly ask for a
@@ -3400,7 +3404,8 @@ public class XWiki implements EventListener
         try {
             requestLanguage = Util.normalizeLanguage(context.getRequest().getParameter(LANGUAGE));
         } catch (Exception ex) {
-            // Ignore: this language source is then simply not taken into account.
+            // TODO: log a warning instead of ignoring this exception.
+            // This language source is then simply not taken into account.
         }
 
         // Get user preference
@@ -3412,7 +3417,8 @@ public class XWiki implements EventListener
                     userdoc.getStringValue(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING, DEFAULT_LANGUAGE);
             }
         } catch (XWikiException e) {
-            // Ignore: this language source is then simply not taken into account.
+            // TODO: log a warning instead of ignoring this exception.
+            // This language source is then simply not taken into account.
         }
 
         // Get navigator language setting
@@ -3431,7 +3437,8 @@ public class XWiki implements EventListener
         try {
             cookieLanguage = Util.normalizeLanguage(getUserPreferenceFromCookie(LANGUAGE, context));
         } catch (Exception e) {
-            // Ignore: this language source is then simply not taken into account.
+            // TODO: log a warning instead of ignoring this exception.
+            // This language source is then simply not taken into account.
         }
 
         // Determine which language to use
@@ -3500,7 +3507,8 @@ public class XWiki implements EventListener
         try {
             requestLanguage = Util.normalizeLanguage(context.getRequest().getParameter(INTERFACE_LANGUAGE));
         } catch (Exception ex) {
-            // Ignore: this language source is then simply not taken into account.
+            // TODO: log a warning instead of ignoring this exception.
+            // This language source is then simply not taken into account.
         }
 
         // Get context language
@@ -3516,7 +3524,8 @@ public class XWiki implements EventListener
                     "default_interface_language");
             }
         } catch (XWikiException e) {
-            // Ignore: this language source is then simply not taken into account.
+            // TODO: log a warning instead of ignoring this exception.
+            // This language source is then simply not taken into account.
         }
 
         // Get navigator language setting
@@ -3535,7 +3544,8 @@ public class XWiki implements EventListener
         try {
             cookieLanguage = Util.normalizeLanguage(getUserPreferenceFromCookie(INTERFACE_LANGUAGE, context));
         } catch (Exception e) {
-            // Ignore: this language source is then simply not taken into account.
+            // TODO: log a warning instead of ignoring this exception.
+            // This language source is then simply not taken into account.
         }
 
         // Determine which language to use
@@ -3664,11 +3674,13 @@ public class XWiki implements EventListener
                 try {
                     getClass(className, context).flushCache();
                 } catch (Exception e) {
-                    // Ignore: a class that cannot be flushed must not prevent the other classes from being flushed.
+                    // TODO: log a warning instead of ignoring this exception.
+                    // A class that cannot be flushed must not prevent the other classes from being flushed.
                 }
             }
         } catch (Exception e) {
-            // Ignore: failing to get the list of classes only means that no class cache is flushed.
+            // TODO: log a warning instead of ignoring this exception.
+            // Failing to get the list of classes only means that no class cache is flushed.
         }
 
     }
@@ -4511,7 +4523,8 @@ public class XWiki implements EventListener
                     }
                     includedDocs.add(prefixedTopic);
                 } catch (Exception e) {
-                    // Ignore: failing to update the list of included documents only disables the recursion check.
+                    // TODO: log a warning instead of ignoring this exception.
+                    // Failing to update the list of included documents only disables the recursion check.
                 }
 
                 // Get document to include
@@ -4561,7 +4574,8 @@ public class XWiki implements EventListener
                     includedDocs.remove(prefixedTopic);
                 }
             } catch (Exception e) {
-                // Ignore: failing to update the list of included documents only disables the recursion check.
+                // TODO: log a warning instead of ignoring this exception.
+                // Failing to update the list of included documents only disables the recursion check.
             }
             return result;
         } finally {
@@ -6275,7 +6289,8 @@ public class XWiki implements EventListener
                 }
             }
         } catch (Exception e) {
-            // Ignore: fall back to computing the referer text from the URL below.
+            // TODO: log a warning instead of ignoring this exception.
+            // The referer text is then computed from the URL below.
         }
 
         String result = referer.substring(referer.indexOf("://") + 3);
@@ -6555,7 +6570,8 @@ public class XWiki implements EventListener
             try {
                 sdf.setTimeZone(TimeZone.getTimeZone(getUserTimeZone(context)));
             } catch (Exception e) {
-                // Ignore: the date is then formatted with the default time zone.
+                // TODO: log a warning instead of ignoring this exception.
+                // The date is then formatted with the default time zone.
             }
 
             return sdf.format(date);
@@ -7174,7 +7190,8 @@ public class XWiki implements EventListener
         try {
             macrosmapping = getResourceContent(MACROS_FILE);
         } catch (IOException e) {
-            // Ignore: the mapping is then only made of the macros defined in the wiki preferences.
+            // TODO: log a warning instead of ignoring this exception.
+            // The mapping is then only made of the macros defined in the wiki preferences.
         }
 
         macrosmapping += "\r\n" + xwiki.getXWikiPreference("macros_mapping", "", context);

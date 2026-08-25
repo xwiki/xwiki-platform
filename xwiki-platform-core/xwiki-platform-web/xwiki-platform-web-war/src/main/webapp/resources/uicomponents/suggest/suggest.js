@@ -86,9 +86,11 @@ var XWiki = (function(XWiki){
       positions: [ "top" ],
       text: "$escapetool.javascript($services.localization.render('core.widgets.suggest.hide'))"
     },
-    // A node to insert before the suggestions
+    // A node to insert before the suggestions. Only supported in multi-source mode, i.e. when the "sources" option
+    // is set, even to a single-element array.
     insertBeforeSuggestions: null,
-    // A node to insert after the suggestions
+    // A node to insert after the suggestions. Only supported in multi-source mode, i.e. when the "sources" option
+    // is set, even to a single-element array.
     insertAfterSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,

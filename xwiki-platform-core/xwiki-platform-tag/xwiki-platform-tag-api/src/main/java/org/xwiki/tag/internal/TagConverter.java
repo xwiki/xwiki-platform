@@ -31,7 +31,7 @@ import org.xwiki.tag.Tag;
  * Converter that converts a value into a {@link Tag} object.
  *
  * @version $Id$
- * @since 18.7RC1
+ * @since 18.8.0RC1
  */
 @Component
 @Singleton

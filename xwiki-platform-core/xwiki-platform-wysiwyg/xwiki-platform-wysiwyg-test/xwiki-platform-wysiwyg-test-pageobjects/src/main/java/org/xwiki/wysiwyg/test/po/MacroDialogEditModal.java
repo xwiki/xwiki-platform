@@ -119,7 +119,7 @@ public class MacroDialogEditModal extends BaseElement
      *
      * @param name the macro parameter name
      * @return the picker used to edit the specified macro parameter
-     * @since 18.7.0RC1
+     * @since 18.8.0RC1
      */
     public SuggestInputElement getMacroParameterPicker(String name)
     {
@@ -129,7 +129,7 @@ public class MacroDialogEditModal extends BaseElement
     /**
      * @param name the macro parameter name
      * @return the select element behind the picker used to edit the specified macro parameter
-     * @since 18.7.0RC1
+     * @since 18.8.0RC1
      */
     public WebElement getMacroParameterSelect(String name)
     {

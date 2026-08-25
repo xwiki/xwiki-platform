@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * Represents a document tag, identified by its name.
  *
  * @version $Id$
- * @since 18.7RC1
+ * @since 18.8.0RC1
  */
 @Unstable
 public class Tag implements Serializable

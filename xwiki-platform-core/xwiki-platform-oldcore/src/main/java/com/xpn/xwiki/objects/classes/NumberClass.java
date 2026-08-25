@@ -92,9 +92,8 @@ public class NumberClass extends PropertyClass
     private static final String MIN = "min";
     private static final String MAX = "max";
 
-    // Above this magnitude a double can no longer represent every integer exactly, which would make the browser's
-    // step-mismatch arithmetic on the min/max attributes unreliable. It's used as a stand-in for the long type's
-    // real range, which is far too large for that arithmetic to stay precise.
+    // The largest magnitude a double can still represent every integer of, used as a safe stand-in for the long
+    // type's real range in the min/max attributes.
     private static final long SAFE_INTEGER_LIMIT = 1L << 53;
     private static final String DATA_VALIDATION_BAD_INPUT = "data-validation-bad-input";
     private static final String DATA_VALIDATION_STEP_MISMATCH = "data-validation-step-mismatch";
@@ -229,9 +228,7 @@ public class NumberClass extends PropertyClass
         input.setType(INPUT_TYPE_NUMBER);
         input.setName(prefix + name);
         input.setID(prefix + name);
-        // The "size" attribute is ignored by browsers on type="number" inputs, but it's kept for API
-        // compatibility; Flamingo already styles input[type="number"] the same as input[type="text"], so no
-        // replacement width needs to be set here.
+        // The "size" attribute is ignored on type="number" inputs, kept here only for API compatibility.
         input.setSize(getSize());
         input.setDisabled(isDisabled());
 

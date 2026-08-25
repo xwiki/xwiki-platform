@@ -25,6 +25,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * An exception made up of a group of exceptions.
@@ -45,6 +46,11 @@ public class TransactionException extends Exception
      * A tab character which will be used to tab in the messages from nested exceptions.
      */
     private static final String TAB = "\t";
+
+    /**
+     * The platform dependent newline string, compiled as a pattern.
+     */
+    private static final Pattern NEWLINE_PATTERN = Pattern.compile(NEWLINE);
 
     /**
      * The list of exceptions which caused this to be thrown.
@@ -211,7 +217,7 @@ public class TransactionException extends Exception
 
                 writeTo.println(cause.getClass().getName());
                 writeTo.print(TAB);
-                writeTo.print(("" + cause.getMessage()).replaceAll(NEWLINE, NEWLINE + TAB));
+                writeTo.print(NEWLINE_PATTERN.matcher("" + cause.getMessage()).replaceAll(NEWLINE + TAB));
                 writeTo.print(NEWLINE);
 
                 if (includeStackTrace) {
@@ -220,7 +226,7 @@ public class TransactionException extends Exception
                     final Writer stw = new StringWriter();
                     final PrintWriter stpw = new PrintWriter(stw);
                     cause.printStackTrace(stpw);
-                    writeTo.print(stw.toString().replaceAll(NEWLINE, NEWLINE + TAB));
+                    writeTo.print(NEWLINE_PATTERN.matcher(stw.toString()).replaceAll(NEWLINE + TAB));
                 }
             }
         }

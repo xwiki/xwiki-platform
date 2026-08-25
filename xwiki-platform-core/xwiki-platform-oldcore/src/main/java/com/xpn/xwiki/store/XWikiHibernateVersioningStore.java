@@ -61,6 +61,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
      */
     public XWikiHibernateVersioningStore()
     {
+        // Nothing to do, this empty constructor is only needed by the component manager.
     }
 
     @Override

@@ -1080,7 +1080,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                     // Loading the attachment list
                     if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
-                        loadAttachmentList(doc, context, false);
+                        loadAttachmentList(doc, context);
                     }
 
                     // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
@@ -1603,7 +1603,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             property = (BaseProperty) Class.forName(classType).newInstance();
                             property.setObject(object);
                             property.setName(name);
-                            loadXWikiProperty(property, context, false);
+                            loadXWikiProperty(property, context);
                         } catch (Exception e) {
                             // WORKAROUND IN CASE OF MIXMATCH BETWEEN STRING AND LARGESTRING
                             try {
@@ -1611,7 +1611,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     LargeStringProperty property2 = new LargeStringProperty();
                                     property2.setObject(object);
                                     property2.setName(name);
-                                    loadXWikiProperty(property2, context, false);
+                                    loadXWikiProperty(property2, context);
                                     property.setValue(property2.getValue());
 
                                     if (bclass != null && bclass.get(name) instanceof TextAreaClass) {
@@ -1622,7 +1622,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     StringProperty property2 = new StringProperty();
                                     property2.setObject(object);
                                     property2.setName(name);
-                                    loadXWikiProperty(property2, context, false);
+                                    loadXWikiProperty(property2, context);
                                     property.setValue(property2.getValue());
 
                                     if (bclass != null && bclass.get(name) instanceof StringClass) {
@@ -1758,7 +1758,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private void loadXWikiProperty(PropertyInterface property, XWikiContext context, boolean bTransaction)
+    private void loadXWikiProperty(PropertyInterface property, XWikiContext context)
         throws XWikiException
     {
         executeRead(context, session -> {
@@ -1867,7 +1867,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private void loadAttachmentList(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
+    private void loadAttachmentList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         executeRead(context, session -> {
             try {
@@ -2237,9 +2237,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     /**
-     * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
+     * @deprecated use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     @Override
     public List<String> loadBacklinks(String fullName, XWikiContext inputxcontext, boolean bTransaction)
         throws XWikiException
@@ -2312,7 +2312,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         // Save the links
         executeWrite(context, session -> {
             // We delete the existing links before saving the newly analyzed ones. Unless non exists yet.
-            if (countLinks(doc.getId(), context, false) > 0) {
+            if (countLinks(doc.getId(), context) > 0) {
                 deleteLinks(doc.getId(), context, false);
             }
 
@@ -2670,9 +2670,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     /**
-     * @deprecated since 2.2M1 used {@link #searchDocumentReferencesInternal(String, int, int, List, XWikiContext)}
+     * @deprecated used {@link #searchDocumentReferencesInternal(String, int, int, List, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     private List<String> searchDocumentsNamesInternal(String sql, int nb, int start, List parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -3290,7 +3290,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return this.store.getLimitSize(entityType, propertyName);
     }
 
-    private long countLinks(long docId, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
+    private long countLinks(long docId, XWikiContext inputxcontext) throws XWikiException
     {
         return executeRead(inputxcontext, session -> {
             try {

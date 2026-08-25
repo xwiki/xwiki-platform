@@ -80,9 +80,9 @@ public interface DocumentAccessBridge
      * @return the document object matching the passed document name
      * @throws Exception when the storage cannot be accessed
      * @since 2.2M1
-     * @deprecated deprecated since 10.2RC1, use {@link #getTranslatedDocumentInstance(DocumentReference)} instead
+     * @deprecated use {@link #getTranslatedDocumentInstance(DocumentReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "10.2RC1")
     DocumentModelBridge getDocument(DocumentReference documentReference) throws Exception;
 
     /**
@@ -188,10 +188,10 @@ public interface DocumentAccessBridge
      * 
      * @param documentReference The reference of the document to check.
      * @return <code>true</code> if the document already exists, <code>false</code> otherwise.
-     * @deprecated replaced by {@link #exists(DocumentReference)} since 2.2.1
+     * @deprecated replaced by {@link #exists(DocumentReference)}
      * @throws Exception when failing to check document existence
      */
-    @Deprecated
+    @Deprecated(since = "2.2.1")
     boolean exists(String documentReference) throws Exception;
 
     /**
@@ -217,9 +217,9 @@ public interface DocumentAccessBridge
      * @param editComment Comment describing this particular change.
      * @param isMinorEdit Flag indicating if this change is a minor one.
      * @throws Exception if the storage cannot be accessed.
-     * @deprecated replaced by {@link #setDocumentContent(DocumentReference, String, String, boolean)} since 2.2.1
+     * @deprecated replaced by {@link #setDocumentContent(DocumentReference, String, String, boolean)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2.1")
     void setDocumentContent(String documentReference, String content, String editComment, boolean isMinorEdit)
         throws Exception;
 
@@ -230,9 +230,8 @@ public interface DocumentAccessBridge
      * @return The document's content.
      * @throws Exception If the document cannot be accessed.
      * @deprecated replaced by {@link #getDocument(DocumentReference)} and {@link DocumentModelBridge#getContent()}
-     *             since 2.2.1
      */
-    @Deprecated
+    @Deprecated(since = "2.2.1")
     String getDocumentContent(String documentReference) throws Exception;
 
     /**
@@ -243,9 +242,8 @@ public interface DocumentAccessBridge
      * @return the syntax id.
      * @throws Exception If the storage cannot be accessed.
      * @deprecated replaced by {@link #getDocument(DocumentReference)} and {@link DocumentModelBridge#getSyntaxId()}
-     *             since 2.2.1
      */
-    @Deprecated
+    @Deprecated(since = "2.2.1")
     String getDocumentSyntaxId(String documentReference) throws Exception;
 
     /**
@@ -266,9 +264,9 @@ public interface DocumentAccessBridge
      * @param documentReference the reference of the target document
      * @param syntaxId New syntax Id.
      * @throws Exception If the storage cannot be accessed.
-     * @deprecated replaced by {@link #setDocumentSyntaxId(DocumentReference, String)} since 2.2.1
+     * @deprecated replaced by {@link #setDocumentSyntaxId(DocumentReference, String)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2.1")
     void setDocumentSyntaxId(String documentReference, String syntaxId) throws Exception;
 
     /**
@@ -314,9 +312,9 @@ public interface DocumentAccessBridge
      * @param documentReference the reference of the document to access
      * @return The document's content.
      * @throws Exception If the document cannot be accessed.
-     * @deprecated replaced by {@link #getDocumentContentForDefaultLanguage(DocumentReference)} since 2.2.1
+     * @deprecated replaced by {@link #getDocumentContentForDefaultLanguage(DocumentReference)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2.1")
     String getDocumentContentForDefaultLanguage(String documentReference) throws Exception;
 
     /**
@@ -337,9 +335,9 @@ public interface DocumentAccessBridge
      * @param language The desired translation of the document.
      * @return The document's content.
      * @throws Exception If the document cannot be accessed.
-     * @deprecated replaced by {@link #getDocumentContent(DocumentReference, String)} since 2.2.1
+     * @deprecated replaced by {@link #getDocumentContent(DocumentReference, String)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2.1")
     String getDocumentContent(String documentReference, String language) throws Exception;
 
     /**
@@ -374,9 +372,9 @@ public interface DocumentAccessBridge
      * @param propertyName The name of the property to retrieve.
      * @return the property value or null if it doesn't exist or an error occurred while looking for the property (the
      *         document doesn't exist for example)
-     * @deprecated since 2.2M1 use {@link #getProperty(DocumentReference, DocumentReference, String)} instead
+     * @deprecated use {@link #getProperty(DocumentReference, DocumentReference, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     Object getProperty(String documentReference, String className, String propertyName);
 
     /**
@@ -561,9 +559,9 @@ public interface DocumentAccessBridge
      * @param attachmentFilename the name of the attachment
      * @param attachmentData Attachment content.
      * @throws Exception If the storage cannot be accessed.
-     * @deprecated replaced by {@link #setAttachmentContent(AttachmentReference, byte[])} since 2.2.1
+     * @deprecated replaced by {@link #setAttachmentContent(AttachmentReference, byte[])}
      */
-    @Deprecated
+    @Deprecated(since = "2.2.1")
     void setAttachmentContent(String documentReference, String attachmentFilename, byte[] attachmentData)
         throws Exception;
 
@@ -665,9 +663,9 @@ public interface DocumentAccessBridge
      * @param anchor An optional URL fragment to append to the URL, use <code>null</code> or an empty string to skip.
      * @return A <code>String</code> representation of the URL, starting with the path segment of the URL (without
      *         protocol, host and port), for example <code>/xwiki/bin/save/Main/WebHome?content=abc</code>.
-     * @deprecated replaced by {@link #getDocumentURL(DocumentReference, String, String, String)} since 2.2.1
+     * @deprecated replaced by {@link #getDocumentURL(DocumentReference, String, String, String)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2.1")
     String getURL(String documentReference, String action, String queryString, String anchor);
 
     /**
@@ -731,11 +729,11 @@ public interface DocumentAccessBridge
      * @param documentReference the reference of the document to access
      * @return true if current user can view provided document.
      * @since 2.2.1
-     * @deprecated since 6.1, use
+     * @deprecated use
      *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#checkAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.EntityReference)}
      *             with {@link org.xwiki.security.authorization.Right#VIEW} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1")
     boolean isDocumentViewable(DocumentReference documentReference);
 
     /**
@@ -758,20 +756,20 @@ public interface DocumentAccessBridge
      * @param documentReference the name of the document to be edited.
      * @return True if current user has 'edit' access on the target document.
      * @since 2.2M1
-     * @deprecated since 6.1, use
+     * @deprecated use
      *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#checkAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.EntityReference)}
      *             with {@link org.xwiki.security.authorization.Right#EDIT} instead
      */
-    @Deprecated
+    @Deprecated(since = "6.1")
     boolean isDocumentEditable(DocumentReference documentReference);
 
     /**
      * Utility method to retrieve the current user.
      * 
      * @return the current user full reference.
-     * @deprecated replaced by {@link org.xwiki.bridge.DocumentAccessBridge#getCurrentUserReference()} since 4.0RC1
+     * @deprecated replaced by {@link org.xwiki.bridge.DocumentAccessBridge#getCurrentUserReference()}
      */
-    @Deprecated
+    @Deprecated(since = "4.0RC1")
     String getCurrentUser();
 
     /**
@@ -861,9 +859,9 @@ public interface DocumentAccessBridge
 
     /**
      * @return the current wiki
-     * @deprecated replaced by {@link org.xwiki.model.ModelContext#getCurrentEntityReference()} since 2.2M1
+     * @deprecated replaced by {@link org.xwiki.model.ModelContext#getCurrentEntityReference()}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     String getCurrentWiki();
 
     /**

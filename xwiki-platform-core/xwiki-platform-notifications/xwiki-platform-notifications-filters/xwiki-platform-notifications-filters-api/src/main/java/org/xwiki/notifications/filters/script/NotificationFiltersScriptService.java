@@ -82,10 +82,10 @@ public class NotificationFiltersScriptService implements ScriptService
      *         return the document reference contains in the DocumentUserReference.
      * @throws NotificationException if the user reference is not an instance of DocumentUserReference and not the
      *                               CurrentUserReference.
-     * @deprecated Since 13.2RC1: the various API using DocumentReference for users should be refactored
+     * @deprecated The various API using DocumentReference for users should be refactored
      *              to use UserReference directly.
      */
-    @Deprecated
+    @Deprecated(since = "13.2RC1")
     private DocumentReference convertReference(UserReference userReference) throws NotificationException
     {
         DocumentReference result;

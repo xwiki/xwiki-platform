@@ -83,6 +83,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
      */
     public HibernateAttachmentRecycleBinStore()
     {
+        // Nothing to do, this empty constructor is only needed by the component manager.
     }
 
     @Override

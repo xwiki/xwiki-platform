@@ -76,9 +76,9 @@ public interface DocumentModelBridge
     /**
      * @return the Syntax id representing the syntax used for the current document. For example "xwiki/1.0" represents
      *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
-     * @deprecated since 3.0M1 use {@link #getSyntax()} instead
+     * @deprecated use {@link #getSyntax()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.0M1")
     String getSyntaxId();
 
     /**
@@ -90,9 +90,9 @@ public interface DocumentModelBridge
 
     /**
      * @return the page to which the document belongs to (eg "WebHome")
-     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     String getPageName();
     
     /**
@@ -100,18 +100,18 @@ public interface DocumentModelBridge
      * <code>space1</code> will return <code>space1.space11</code>.
      * 
      * @return the space to which the document belongs to (eg "Main")
-     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     String getSpaceName();
 
     /**
      * Retrieve the name of the virtual wiki this document belongs to.
      *
      * @return A <code>String</code> representation of the document's wiki name.
-     * @deprecated since 2.2M1 use {@link #getDocumentReference()}  instead
+     * @deprecated use {@link #getDocumentReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "2.2M1")
     String getWikiName();
 
     /**
@@ -166,9 +166,9 @@ public interface DocumentModelBridge
     /**
      * @return the document's content author user reference
      * @since 7.2M1
-     * @deprecated since 14.0RC1 rely on {@link #getAuthors()}.
+     * @deprecated rely on {@link #getAuthors()}.
      */
-    @Deprecated
+    @Deprecated(since = "14.0RC1")
     DocumentReference getContentAuthorReference();
 
     /**

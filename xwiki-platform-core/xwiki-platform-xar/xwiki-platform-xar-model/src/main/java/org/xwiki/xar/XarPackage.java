@@ -307,9 +307,9 @@ public class XarPackage
 
     /**
      * @param preserveVersion true if the history should be preserved by default
-     * @deprecated since 7.2M1, use {@link #setPackagePreserveVersion(boolean)} instead
+     * @deprecated use {@link #setPackagePreserveVersion(boolean)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     public void setPreserveVersion(boolean preserveVersion)
     {
         this.packagePreserveVersion = preserveVersion;
@@ -443,9 +443,9 @@ public class XarPackage
      * Add a new entry to the package.
      * 
      * @param reference the entry reference
-     * @deprecated since 7.2M1, use {@link #addPackageFile(LocalDocumentReference, int)} instead
+     * @deprecated use {@link #addPackageFile(LocalDocumentReference, int)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     public void addEntry(LocalDocumentReference reference)
     {
         addEntry(reference, null);

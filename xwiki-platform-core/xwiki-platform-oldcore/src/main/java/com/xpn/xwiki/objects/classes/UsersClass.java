@@ -140,9 +140,9 @@ public class UsersClass extends ListClass
     /**
      * @return {@code true} if the list box that is used to select the users should be filled with all the available
      *         users, {@code false} otherwise
-     * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
+     * @deprecated this meta property is not used anymore because we changed the default displayer
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public boolean isUsesList()
     {
         return getIntValue(META_PROPERTY_USES_LIST) == 1;
@@ -154,9 +154,9 @@ public class UsersClass extends ListClass
      *
      * @param usesList {@code true} to fill the list box that is used to select the users with all the available users,
      *            {@code false} otherwise
-     * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
+     * @deprecated this meta property is not used anymore because we changed the default displayer
      */
-    @Deprecated
+    @Deprecated(since = "4.3M2")
     public void setUsesList(boolean usesList)
     {
         setIntValue(META_PROPERTY_USES_LIST, usesList ? 1 : 0);

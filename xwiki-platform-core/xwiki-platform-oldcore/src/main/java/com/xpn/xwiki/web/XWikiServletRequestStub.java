@@ -74,6 +74,7 @@ public class XWikiServletRequestStub extends HttpServletRequestWrapper
          */
         public Builder()
         {
+            // Nothing to do, the builder starts from an empty request stub.
         }
 
         /**

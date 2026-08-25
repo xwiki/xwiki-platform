@@ -180,7 +180,7 @@ public class BooleanClass extends PropertyClass
         Integer iValue = (Integer) prop.getValue();
         if (iValue != null) {
             int value = iValue.intValue();
-            buffer.append(getDisplayValue(context, value));
+            buffer.append(getDisplayValue(value));
         }
     }
 
@@ -229,8 +229,8 @@ public class BooleanClass extends PropertyClass
         select.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
             getTranslatedPrettyName(context)));
 
-        String string0 = getDisplayValue(context, 0);
-        String string1 = getDisplayValue(context, 1);
+        String string0 = getDisplayValue(0);
+        String string1 = getDisplayValue(1);
         int nb1 = 1;
         int nb2 = 2;
 
@@ -269,9 +269,9 @@ public class BooleanClass extends PropertyClass
     public void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        String stringNone = getDisplayValue(context, 2);
-        String stringTrue = getDisplayValue(context, 1);
-        String stringFalse = getDisplayValue(context, 0);
+        String stringNone = getDisplayValue(2);
+        String stringTrue = getDisplayValue(1);
+        String stringFalse = getDisplayValue(0);
         div[] inputs;
 
         input radioNone = new input(input.radio, prefix + name, "");
@@ -356,11 +356,10 @@ public class BooleanClass extends PropertyClass
      * <li>else return V if V is 0 or 1, or --- if V is 2 (undecided)</li>
      * </ol>
      *
-     * @param context The request context.
      * @param value The internal value.
      * @return The text that should be displayed, representing a human-understandable name for the internal value.
      */
-    private String getDisplayValue(XWikiContext context, int value)
+    private String getDisplayValue(int value)
     {
         try {
             // <classname>_<property>_<value>

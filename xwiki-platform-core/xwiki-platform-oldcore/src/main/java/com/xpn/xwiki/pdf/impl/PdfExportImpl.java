@@ -229,7 +229,7 @@ public class PdfExportImpl implements PdfExport
         // Debug output
         LOGGER.debug("Final XSL-FO source:\n[{}]", xmlfo);
 
-        renderXSLFO(xmlfo, out, type, context);
+        renderXSLFO(xmlfo, out, type);
     }
 
     /**
@@ -267,10 +267,9 @@ public class PdfExportImpl implements PdfExport
      * @param xmlfo the source FO to render
      * @param out where to write the resulting document
      * @param type the type of the output: PDF or RTF
-     * @param context the XWiki Context used by the custom URI Resolver we use to locate image attachment data
      * @throws XWikiException if the conversion fails for any reason
      */
-    private void renderXSLFO(String xmlfo, OutputStream out, ExportType type, final XWikiContext context)
+    private void renderXSLFO(String xmlfo, OutputStream out, ExportType type)
         throws XWikiException
     {
         try {

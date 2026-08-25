@@ -101,18 +101,18 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 7.3M1, use {@link ModelFactory#toRestWiki(URI, String)} instead
+     * @deprecated use {@link ModelFactory#toRestWiki(URI, String)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.3M1")
     public static Wiki createWiki(ObjectFactory objectFactory, URI baseUri, String wikiName)
     {
         return getModelFactory().toRestWiki(baseUri, wikiName);
     }
 
     /**
-     * @deprecated since 7.3M1, use {@link ModelFactory#toRestSpace(URI, String, List, Document)} instead
+     * @deprecated use {@link ModelFactory#toRestSpace(URI, String, List, Document)} instead
      */
-    @Deprecated
+    @Deprecated(since = "7.3M1")
     public static Space createSpace(ObjectFactory objectFactory, URI baseUri, String wikiName, List<String> spaces,
         Document home)
     {
@@ -120,9 +120,9 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 7.3M1, use {@link ModelFactory#toRestTranslations(URI, Document)}
+     * @deprecated use {@link ModelFactory#toRestTranslations(URI, Document)}
      */
-    @Deprecated
+    @Deprecated(since = "7.3M1")
     public static Translations createTranslations(ObjectFactory objectFactory, URI baseUri, Document doc)
         throws XWikiException
     {
@@ -130,9 +130,9 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 7.3M1, use {@link ModelFactory#toRestPageSummary(URI, Document, XWiki, Boolean)}
+     * @deprecated use {@link ModelFactory#toRestPageSummary(URI, Document, XWiki, Boolean)}
      */
-    @Deprecated
+    @Deprecated(since = "7.3M1")
     public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc, XWiki xwikiApi,
         Boolean withPrettyNames) throws XWikiException
     {
@@ -140,9 +140,9 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 7.3M1, use {@link ModelFactory#toRestPage(URI, URI, Document, boolean, XWiki, Boolean)}
+     * @deprecated use {@link ModelFactory#toRestPage(URI, URI, Document, boolean, XWiki, Boolean)}
      */
-    @Deprecated
+    @Deprecated(since = "7.3M1")
     public static Page createPage(ObjectFactory objectFactory, URI baseUri, URI self, Document doc, boolean useVersion,
         XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
@@ -195,11 +195,11 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 7.3M1, use
+     * @deprecated use
      *             {@link ModelFactory#toRestAttachment(URI, com.xpn.xwiki.api.Attachment, String, String, XWiki, Boolean, boolean)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "7.3M1")
     public static Attachment createAttachment(ObjectFactory objectFactory, URI baseUri,
         com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi,
         Boolean withPrettyNames)
@@ -209,11 +209,11 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 7.3M1, use
+     * @deprecated use
      *             {@link ModelFactory#toRestAttachment(URI, com.xpn.xwiki.api.Attachment, String, String, XWiki, Boolean, boolean)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "7.3M1")
     public static Attachment createAttachmentAtVersion(ObjectFactory objectFactory, URI baseUri,
         com.xpn.xwiki.api.Attachment xwikiAttachment, String xwikiRelativeUrl, String xwikiAbsoluteUrl, XWiki xwikiApi,
         Boolean withPrettyNames)
@@ -269,11 +269,11 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 7.3M1, use
+     * @deprecated use
      *             {@link ModelFactory#toRestObjectSummary(ObjectFactory, URI, XWikiContext, Document, BaseObject, boolean, XWiki, Boolean)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "7.3M1")
     public static ObjectSummary createObjectSummary(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext,
         Document doc, BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames)
         throws XWikiException
@@ -282,11 +282,11 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 7.3M1, use
+     * @deprecated use
      *             {@link ModelFactory#toRestObject(URI, XWikiContext, Document, BaseObject, boolean, XWiki, Boolean, Boolean)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "7.3M1")
     public static Object createObject(ObjectFactory objectFactory, URI baseUri, XWikiContext xwikiContext, Document doc,
         BaseObject xwikiObject, boolean useVersion, XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
@@ -294,11 +294,11 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 9.1RC1, use
+     * @deprecated use
      *             {@link ModelFactory#toRestJobStatus(org.xwiki.job.event.status.JobStatus, boolean, boolean, boolean)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "9.1RC1")
     public static JobStatus createJobStatus(ObjectFactory objectFactory, URI self,
         org.xwiki.job.event.status.JobStatus jobStatus) throws XWikiRestException
     {
@@ -306,10 +306,10 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 9.1RC1, use {@link ModelFactory#toRestJobProgress(org.xwiki.job.event.status.JobProgress)}
+     * @deprecated use {@link ModelFactory#toRestJobProgress(org.xwiki.job.event.status.JobProgress)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "9.1RC1")
     public static JobProgress createJobProgress(ObjectFactory objectFactory,
         org.xwiki.job.event.status.JobProgress jobProgress)
     {
@@ -317,11 +317,11 @@ public final class DomainObjectFactory
     }
 
     /**
-     * @deprecated since 9.1RC1, use
+     * @deprecated use
      *             {@link ModelFactory#toRestJobStatus(org.xwiki.job.event.status.JobStatus, boolean, boolean, boolean)}
      *             instead
      */
-    @Deprecated
+    @Deprecated(since = "9.1RC1")
     public static JobLog createLog(ObjectFactory objectFactory, URI self, Collection<LogEvent> logs)
     {
         return getModelFactory().toRestJobLog(logs, self);

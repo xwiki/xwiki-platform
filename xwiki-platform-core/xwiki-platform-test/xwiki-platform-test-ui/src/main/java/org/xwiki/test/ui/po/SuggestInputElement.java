@@ -346,7 +346,7 @@ public class SuggestInputElement extends BaseElement
      * suggestion to be displayed, so it can be used when the search is expected to return no results.
      *
      * @return the current suggest input element
-     * @since 18.7.0RC1
+     * @since 18.8.0RC1
      */
     public SuggestInputElement waitForSuggestionsLoaded()
     {
@@ -361,7 +361,7 @@ public class SuggestInputElement extends BaseElement
      * @param remote whether the suggestions are loaded from a remote source or not, which can be used to adjust the
      *            waiting
      * @return the current suggest input element
-     * @since 18.7.0RC1
+     * @since 18.8.0RC1
      */
     public SuggestInputElement waitForSuggestionsLoaded(boolean remote)
     {

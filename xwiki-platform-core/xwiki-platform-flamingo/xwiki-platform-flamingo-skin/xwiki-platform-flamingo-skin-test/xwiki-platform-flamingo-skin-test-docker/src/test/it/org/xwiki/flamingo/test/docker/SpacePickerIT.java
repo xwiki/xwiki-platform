@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Functional tests for the Space Picker.
  *
  * @version $Id$
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  */
 @UITest
 class SpacePickerIT

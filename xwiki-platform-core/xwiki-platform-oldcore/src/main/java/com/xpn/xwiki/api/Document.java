@@ -1340,6 +1340,7 @@ public class Document extends Api
                 }
             }
         } catch (Exception e) {
+            // Ignore: return the objects that could be retrieved so far.
         }
         return result;
     }

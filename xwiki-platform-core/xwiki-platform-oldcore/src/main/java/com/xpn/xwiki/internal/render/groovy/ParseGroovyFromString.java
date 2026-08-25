@@ -69,6 +69,7 @@ public class ParseGroovyFromString
                 classCacheSize = Integer.parseInt(capacity);
             }
         } catch (Exception e) {
+            // Ignore: the default cache capacity is then used.
         }
 
         initCache(classCacheSize);
@@ -93,6 +94,7 @@ public class ParseGroovyFromString
                 initCache(context);
             }
         } catch (Exception e) {
+            // Ignore: the cache initialization is retried the next time the cache is needed.
         }
     }
 

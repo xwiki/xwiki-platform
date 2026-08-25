@@ -413,6 +413,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                     endTransaction(context, true);
                 }
             } catch (Exception e) {
+                // Ignore: a failure to close the transaction must not hide the original error.
             }
 
             restoreExecutionXContext();
@@ -613,6 +614,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                 this.store.endTransaction(false);
             }
         } catch (HibernateException e) {
+            // Ignore: cleaning up the session at shutdown time is only a best effort.
         }
     }
 

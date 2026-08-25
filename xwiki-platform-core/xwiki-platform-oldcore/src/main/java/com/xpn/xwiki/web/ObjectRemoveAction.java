@@ -129,6 +129,7 @@ public class ObjectRemoveAction extends XWikiAction
                 response.getWriter().write("failed");
                 response.setContentLength(6);
             } catch (IOException e) {
+                // Ignore: there is nothing else we can do if the response cannot be written.
             }
             return null;
         } else {

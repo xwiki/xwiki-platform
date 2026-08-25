@@ -136,6 +136,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                         try {
                             endTransaction(context, false);
                         } catch (Exception e) {
+                            // Ignore: a failure to close the transaction must not hide the original error.
                         }
                     }
                 }
@@ -185,6 +186,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
+                        // Ignore: a failure to close the transaction must not hide the original error.
                     }
                 }
             }
@@ -352,6 +354,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     try {
                         endTransaction(context, false);
                     } catch (Exception e) {
+                        // Ignore: a failure to close the transaction must not hide the original error.
                     }
                 }
             }

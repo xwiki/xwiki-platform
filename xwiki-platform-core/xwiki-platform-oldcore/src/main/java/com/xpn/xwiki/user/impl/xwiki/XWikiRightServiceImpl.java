@@ -295,22 +295,26 @@ public class XWikiRightServiceImpl implements XWikiRightService
             needsAuth =
                 "yes".equalsIgnoreCase(context.getWiki().getXWikiPreference(AUTHENTICATE_PREFIX + right, "", context));
         } catch (Exception e) {
+            // Ignore: a preference that cannot be read doesn't contribute to the result.
         }
 
         try {
             needsAuth |= (context.getWiki().getXWikiPreferenceAsInt(AUTHENTICATE_PREFIX + right, 0, context) == 1);
         } catch (Exception e) {
+            // Ignore: a preference that cannot be read doesn't contribute to the result.
         }
 
         try {
             needsAuth |=
                 "yes".equalsIgnoreCase(context.getWiki().getSpacePreference(AUTHENTICATE_PREFIX + right, "", context));
         } catch (Exception e) {
+            // Ignore: a preference that cannot be read doesn't contribute to the result.
         }
 
         try {
             needsAuth |= (context.getWiki().getSpacePreferenceAsInt(AUTHENTICATE_PREFIX + right, 0, context) == 1);
         } catch (Exception e) {
+            // Ignore: a preference that cannot be read doesn't contribute to the result.
         }
 
         return needsAuth;
@@ -451,6 +455,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     return true;
                 }
             } catch (XWikiRightNotFoundException e) {
+                // No right found for this group, continue with the next one.
             } catch (Exception e) {
                 LOGGER.error("Failed to check right [{}] for group [{}] on document [{}]", accessLevel, group,
                     doc.getPrefixedFullName(), e);
@@ -606,6 +611,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                             return false;
                         }
                     } catch (XWikiRightNotFoundException e1) {
+                        // No right found at this level, continue with the next check.
                     }
                 }
 
@@ -637,6 +643,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         return false;
                     }
                 } catch (XWikiRightNotFoundException e) {
+                    // No right found at this level, continue with the next check.
                 }
             }
 
@@ -650,6 +657,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     return true;
                 }
             } catch (XWikiRightNotFoundException e) {
+                // No right found at this level, continue with the next check.
             }
 
             // Check if this document is denied/allowed
@@ -674,6 +682,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                                 return false;
                             }
                         } catch (XWikiRightNotFoundException e) {
+                            // No right found at this level, continue with the next check.
                         }
                     }
 
@@ -689,6 +698,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                                 return true;
                             }
                         } catch (XWikiRightNotFoundException e) {
+                            // No right found at this level, continue with the next check.
                         }
                     }
 
@@ -716,6 +726,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         return false;
                     }
                 } catch (XWikiRightNotFoundException e) {
+                    // No right found at this level, continue with the next check.
                 }
             }
 
@@ -731,6 +742,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         return true;
                     }
                 } catch (XWikiRightNotFoundException e) {
+                    // No right found at this level, continue with the next check.
                 }
             }
 
@@ -818,6 +830,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     return true;
                 }
             } catch (XWikiRightNotFoundException e) {
+                // No right found at this level, continue with the next check.
             }
 
             // Verify XWiki programming right
@@ -839,6 +852,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         return false;
                     }
                 } catch (XWikiRightNotFoundException e) {
+                    // No right found at this level, continue with the next check.
                 }
 
                 logDeny(name, resourceKey, accessLevel, "programming level (no right found)");
@@ -867,6 +881,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 return true;
             }
         } catch (XWikiRightNotFoundException e) {
+            // No right found at this level, continue with the next check.
         }
 
         XWikiDocument documentName = new XWikiDocument();
@@ -890,6 +905,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         return true;
                     }
                 } catch (XWikiRightNotFoundException e) {
+                    // No right found at this level, continue with the next check.
                 }
 
                 // find the parent web to check rights on it

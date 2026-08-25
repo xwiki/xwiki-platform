@@ -42,12 +42,14 @@ public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl
         try {
             param = context.getWiki().getXWikiPreference(name, context);
         } catch (Exception e) {
+            // Ignore: the value is then looked up in the configuration below.
         }
         if (param == null || "".equals(param)) {
             try {
                 param =
                     context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "groovy_", "groovy."));
             } catch (Exception e) {
+                // Ignore: the parameter is then left empty.
             }
         }
         if (param == null) {

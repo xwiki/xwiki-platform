@@ -87,6 +87,7 @@ public class MonitorTimer
         try {
             str.append(this.endDate.getTime() - this.startDate.getTime());
         } catch (Exception e) {
+            // Ignore: the duration is not appended when one of the dates is missing.
         }
         return str.toString();
     }

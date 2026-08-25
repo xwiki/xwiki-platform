@@ -631,7 +631,8 @@ var XWiki = (function(XWiki){
       this.resultContainer.down("ul").remove();
     }
 
-    if (this.options.insertAfterSuggestions && !this.options.insertAfterSuggestions.parentNode) {
+    if (this.options.insertAfterSuggestions
+        && this.options.insertAfterSuggestions.parentNode !== this.resultContainer) {
       this.resultContainer.insert(this.options.insertAfterSuggestions);
     }
 

@@ -26,14 +26,14 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage.goToEditor;
 
 /**
  * Special class editor tests that address only the Number class field type.
  *
  * @version $Id$
- * @since 18.6.0RC1
+ * @since 18.8.0RC1
  */
 @UITest(properties = {
     // Exclude the AppWithinMinutes.ClassEditSheet and AppWithinMinutes.DynamicMessageTool from the PR checker since
@@ -57,7 +57,8 @@ class NumberClassFieldIT
 
         entryEditPage.setValue(FIELD_NAME, "aaa");
 
-        assertTrue(!"aaa".equals(entryEditPage.getValue(FIELD_NAME)) || !entryEditPage.isFieldValid(FIELD_NAME));
+        assertFalse("aaa".equals(entryEditPage.getValue(FIELD_NAME)) && entryEditPage.isFieldValid(FIELD_NAME),
+            "The invalid value was kept and accepted as valid");
     }
 
     /**
@@ -71,7 +72,7 @@ class NumberClassFieldIT
 
         entryEditPage.setValue(FIELD_NAME, "99999999999999999999");
 
-        assertTrue(!entryEditPage.isFieldValid(FIELD_NAME));
+        assertFalse(entryEditPage.isFieldValid(FIELD_NAME), "The out-of-range value was accepted as valid");
     }
 
     private EntryEditPage addNumberFieldAndGoToEntry(TestReference testReference)

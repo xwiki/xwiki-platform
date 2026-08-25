@@ -19,7 +19,12 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -106,68 +111,59 @@ class NumberClassTest
         assertEquals(4, Integer.parseInt(p.getValue().toString()));
     }
 
-    /** Test that displayEdit() sets the HTML5 validation attributes matching the number type. */
-    @Test
-    void displayEdit()
+    /**
+     * Arguments for {@link #displayEdit(String, String, String, String)}: number type, expected {@code step}, and
+     * expected {@code min}/{@code max} ({@code null} for the types that don't get a range).
+     */
+    private static Stream<Arguments> numberTypes()
     {
-        NumberClass nc = new NumberClass();
-        BaseClass bc = new BaseClass();
-        bc.setName("Some.Class");
-        nc.setObject(bc);
-        nc.setName("number1");
-        nc.setNumberType(NumberClass.TYPE_INTEGER);
-
-        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidformat"))
-            .thenReturn("Please enter a valid number.");
-        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.outofrange",
-            String.valueOf(Integer.MIN_VALUE), String.valueOf(Integer.MAX_VALUE))).thenReturn("Out of range.");
-
-        StringBuffer buffer = new StringBuffer();
-        nc.displayEdit(buffer, "number1", "prefix_", bc, this.oldcore.getXWikiContext());
-        String html = buffer.toString();
-
-        assertTrue(html.contains("step='1'"), html);
-        assertTrue(html.contains("min='" + Integer.MIN_VALUE + "'"), html);
-        assertTrue(html.contains("max='" + Integer.MAX_VALUE + "'"), html);
-        assertTrue(html.contains("data-validation-bad-input='Please enter a valid number.'"), html);
-        assertTrue(html.contains("data-validation-step-mismatch='Please enter a valid number.'"), html);
-        assertTrue(html.contains("data-validation-range-overflow='Out of range.'"), html);
-        assertTrue(html.contains("data-validation-range-underflow='Out of range.'"), html);
-
-        verify(this.contextualLocalizationManager).getTranslationPlain("core.validation.number.message.invalidformat");
-        verify(this.contextualLocalizationManager).getTranslationPlain("core.validation.number.message.outofrange",
-            String.valueOf(Integer.MIN_VALUE), String.valueOf(Integer.MAX_VALUE));
+        long safeIntegerLimit = 1L << 53;
+        return Stream.of(
+            Arguments.of(NumberClass.TYPE_INTEGER, "1", String.valueOf(Integer.MIN_VALUE),
+                String.valueOf(Integer.MAX_VALUE)),
+            Arguments.of(NumberClass.TYPE_LONG, "1", String.valueOf(-safeIntegerLimit),
+                String.valueOf(safeIntegerLimit)),
+            Arguments.of(NumberClass.TYPE_FLOAT, "any", null, null),
+            Arguments.of(NumberClass.TYPE_DOUBLE, "any", null, null));
     }
 
-    /**
-     * Test that displayEdit() clamps the long type's min/max to the safe integer range instead of the real
-     * {@code long} bounds, since the browser's step-mismatch arithmetic on min/max loses precision above it.
-     */
-    @Test
-    void displayEditLongHasSafeIntegerRange()
+    /** Test that displayEdit() sets the HTML5 validation attributes matching the number type. */
+    @ParameterizedTest
+    @MethodSource("numberTypes")
+    void displayEdit(String numberType, String expectedStep, String expectedMin, String expectedMax)
     {
         NumberClass nc = new NumberClass();
         BaseClass bc = new BaseClass();
         bc.setName("Some.Class");
         nc.setObject(bc);
         nc.setName("number1");
-        nc.setNumberType(NumberClass.TYPE_LONG);
-
-        long safeIntegerLimit = 1L << 53;
+        nc.setNumberType(numberType);
 
         when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidformat"))
             .thenReturn("Please enter a valid number.");
-        when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.outofrange",
-            String.valueOf(-safeIntegerLimit), String.valueOf(safeIntegerLimit))).thenReturn("Out of range.");
+        if (expectedMin != null) {
+            when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.outofrange",
+                expectedMin, expectedMax)).thenReturn("Out of range.");
+        }
 
         StringBuffer buffer = new StringBuffer();
         nc.displayEdit(buffer, "number1", "prefix_", bc, this.oldcore.getXWikiContext());
         String html = buffer.toString();
 
-        assertTrue(html.contains("step='1'"), html);
-        assertTrue(html.contains("min='" + (-safeIntegerLimit) + "'"), html);
-        assertTrue(html.contains("max='" + safeIntegerLimit + "'"), html);
-        assertFalse(html.contains("min='" + Long.MIN_VALUE + "'"), html);
-        assertFalse(html.contains("max='" + Long.MAX_VALUE + "'"), html);
+        assertTrue(html.contains("type='number'"), html);
+        assertTrue(html.contains("step='" + expectedStep + "'"), html);
+        assertTrue(html.contains("data-validation-bad-input='Please enter a valid number.'"), html);
+        assertTrue(html.contains("data-validation-step-mismatch='Please enter a valid number.'"), html);
+        if (expectedMin != null) {
+            assertTrue(html.contains("min='" + expectedMin + "'"), html);
+            assertTrue(html.contains("max='" + expectedMax + "'"), html);
+            assertTrue(html.contains("data-validation-range-overflow='Out of range.'"), html);
+            assertTrue(html.contains("data-validation-range-underflow='Out of range.'"), html);
+        } else {
+            assertFalse(html.contains("min="), html);
+            assertFalse(html.contains("max="), html);
+            assertFalse(html.contains("data-validation-range-overflow"), html);
+            assertFalse(html.contains("data-validation-range-underflow"), html);
+        }
     }
 }

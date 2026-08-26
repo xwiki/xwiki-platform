@@ -65,11 +65,15 @@ class NumberClassFieldIT
 
     /**
      * A decimal value like "3.5" is a valid HTML5 number but mismatches the {@code step="1"} constraint of the
-     * default {@code long} type, so the browser must mark the field invalid. Both signs are checked because the
-     * field has no {@code min} attribute, so the step check is evaluated relative to a base of 0.
+     * default {@code long} type, so the browser must mark the field invalid. Both signs are checked since the
+     * field has no {@code min} attribute, so the step check is evaluated relative to a base of 0. A value like
+     * "99999999999999999999" is a valid HTML5 number that overflows the default {@code long} type. The browser
+     * can't be asked to catch it, since no {@code min}/{@code max} can express the {@code long} range without
+     * disabling the step check, so it reaches the server and must be reported with a friendly message rather
+     * than a generic error.
      */
     @Test
-    void browserRejectsDecimalInput(TestReference testReference)
+    void browserRejectsDecimalAndServerRejectsOutOfRangeValue(TestReference testReference)
     {
         EntryEditPage entryEditPage = addNumberFieldAndGoToEntry(testReference);
 
@@ -80,18 +84,6 @@ class NumberClassFieldIT
         entryEditPage.setValue(FIELD_NAME, "-3.5");
 
         assertFalse(entryEditPage.isFieldValid(FIELD_NAME), "The negative decimal value was accepted as valid");
-    }
-
-    /**
-     * A value like "99999999999999999999" is a valid HTML5 number that overflows the default {@code long} type.
-     * The browser can't be asked to catch it, since no {@code min}/{@code max} can express the {@code long} range
-     * without disabling the step check, so it reaches the server and must be reported with a friendly message
-     * rather than a generic error.
-     */
-    @Test
-    void saveShowsFriendlyErrorForOutOfRangeValue(TestReference testReference)
-    {
-        EntryEditPage entryEditPage = addNumberFieldAndGoToEntry(testReference);
 
         entryEditPage.setValue(FIELD_NAME, "42");
         entryEditPage.clickSaveAndContinue();

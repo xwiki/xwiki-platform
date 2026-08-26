@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.internal.filter.output;
 
+import java.text.ParseException;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
@@ -31,10 +33,12 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiObjectPropertyFilter;
 import org.xwiki.internal.objects.ObjectPropertyParser;
+import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 import com.xpn.xwiki.objects.classes.StringClass;
 
@@ -81,7 +85,7 @@ public class BasePropertyOutputFilterStream extends AbstractElementOutputFilterS
             if (propertyclass != null) {
                 // Bulletproofing using PropertyClassInterface#fromString when a String is passed (in case it's not
                 // really a String property)
-                property = value instanceof String valueString ? propertyclass.fromString(valueString)
+                property = value instanceof String valueString ? readStringPropertyValue(propertyclass, valueString)
                     : propertyclass.fromValue(value);
             } else {
                 property = computeMissingProperty(value, parameters);
@@ -95,6 +99,20 @@ public class BasePropertyOutputFilterStream extends AbstractElementOutputFilterS
                 this.entity = property;
             } else {
                 this.entity.apply(property, true);
+            }
+        }
+    }
+
+    private BaseProperty readStringPropertyValue(PropertyClassInterface propertyClass, String value)
+        throws XWikiException
+    {
+        try {
+            return propertyClass.fromString(value);
+        } catch (XWikiException e) {
+            if (propertyClass instanceof DateClass && e.getCause() instanceof ParseException) {
+                return propertyClass.fromValue(DateXarObjectPropertySerializer.parseDate(value));
+            } else {
+                throw e;
             }
         }
     }

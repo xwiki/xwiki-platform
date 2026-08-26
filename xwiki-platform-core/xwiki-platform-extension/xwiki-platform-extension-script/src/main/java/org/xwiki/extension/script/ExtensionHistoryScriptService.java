@@ -81,9 +81,9 @@ public class ExtensionHistoryScriptService extends AbstractExtensionScriptServic
             this.constraints.add(new Predicate<ExtensionJobHistoryRecord>()
             {
                 @Override
-                public boolean evaluate(ExtensionJobHistoryRecord record)
+                public boolean evaluate(ExtensionJobHistoryRecord historyRecord)
                 {
-                    return jobTypes.contains(record.getJobType());
+                    return jobTypes.contains(historyRecord.getJobType());
                 }
             });
             return this;
@@ -100,10 +100,10 @@ public class ExtensionHistoryScriptService extends AbstractExtensionScriptServic
             this.constraints.add(new Predicate<ExtensionJobHistoryRecord>()
             {
                 @Override
-                public boolean evaluate(ExtensionJobHistoryRecord record)
+                public boolean evaluate(ExtensionJobHistoryRecord historyRecord)
                 {
-                    return !record.getRequest().hasNamespaces()
-                        || record.getRequest().getNamespaces().contains(currentWikiNamespace);
+                    return !historyRecord.getRequest().hasNamespaces()
+                        || historyRecord.getRequest().getNamespaces().contains(currentWikiNamespace);
                 }
             });
             return this;
@@ -145,15 +145,15 @@ public class ExtensionHistoryScriptService extends AbstractExtensionScriptServic
     /**
      * Serializes a history record.
      * 
-     * @param record the history record to serialize
+     * @param historyRecord the history record to serialize
      * @return the string serialization of the given history record
      */
-    public String serialize(ExtensionJobHistoryRecord record)
+    public String serialize(ExtensionJobHistoryRecord historyRecord)
     {
         setError(null);
 
         try {
-            return this.serializer.serialize(record);
+            return this.serializer.serialize(historyRecord);
         } catch (Exception e) {
             setError(e);
             return null;
@@ -254,12 +254,12 @@ public class ExtensionHistoryScriptService extends AbstractExtensionScriptServic
     private List<ExtensionJobHistoryRecord> createReplayPlanInternal(List<ExtensionJobHistoryRecord> records,
         boolean preserveUsers, Collection<String> namespaces)
     {
-        for (ExtensionJobHistoryRecord record : records) {
+        for (ExtensionJobHistoryRecord historyRecord : records) {
             if (!preserveUsers) {
-                setRightsProperties((AbstractRequest) record.getRequest());
+                setRightsProperties((AbstractRequest) historyRecord.getRequest());
             }
-            if (record.getRequest().hasNamespaces() && namespaces != null && !namespaces.isEmpty()) {
-                ((AbstractRequest) record.getRequest()).setProperty("namespaces", namespaces);
+            if (historyRecord.getRequest().hasNamespaces() && namespaces != null && !namespaces.isEmpty()) {
+                ((AbstractRequest) historyRecord.getRequest()).setProperty("namespaces", namespaces);
             }
         }
         return records;

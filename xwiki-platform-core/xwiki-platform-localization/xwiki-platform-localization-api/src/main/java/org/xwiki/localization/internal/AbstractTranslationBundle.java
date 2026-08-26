@@ -75,7 +75,7 @@ public abstract class AbstractTranslationBundle implements TranslationBundle
     /**
      * @param id the identifier if the bundle
      */
-    public AbstractTranslationBundle(String id)
+    protected AbstractTranslationBundle(String id)
     {
         this.id = id;
     }
@@ -84,7 +84,7 @@ public abstract class AbstractTranslationBundle implements TranslationBundle
      * @param id the identifier of the bundle
      * @param priority the priority of the bundle
      */
-    public AbstractTranslationBundle(String id, int priority)
+    protected AbstractTranslationBundle(String id, int priority)
     {
         this.id = id;
         this.priority = priority;

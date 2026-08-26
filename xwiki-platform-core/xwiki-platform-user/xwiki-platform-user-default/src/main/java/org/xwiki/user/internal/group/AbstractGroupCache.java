@@ -136,7 +136,7 @@ public abstract class AbstractGroupCache extends AbstractCacheEntryListener<Grou
     /**
      * @param id the id of the cache
      */
-    public AbstractGroupCache(String id)
+    protected AbstractGroupCache(String id)
     {
         this.id = id;
     }

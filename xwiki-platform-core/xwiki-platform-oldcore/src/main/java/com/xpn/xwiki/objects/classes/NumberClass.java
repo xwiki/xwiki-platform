@@ -91,9 +91,8 @@ public class NumberClass extends PropertyClass
     private static final String MIN = "min";
     private static final String MAX = "max";
 
-    // The largest magnitude a double can still represent every integer of, used as a safe stand-in for the long
-    // type's real range in the min/max attributes.
-    private static final long SAFE_INTEGER_LIMIT = 1L << 53;
+    // A safe stand-in for the long type's real range, kept below 2^53 so Blink's step-mismatch check still runs.
+    private static final long SAFE_INTEGER_LIMIT = 1L << 52;
     private static final String DATA_VALIDATION_BAD_INPUT = "data-validation-bad-input";
     private static final String DATA_VALIDATION_STEP_MISMATCH = "data-validation-step-mismatch";
     private static final String DATA_VALIDATION_RANGE_OVERFLOW = "data-validation-range-overflow";
@@ -227,8 +226,6 @@ public class NumberClass extends PropertyClass
         input.setType(INPUT_TYPE_NUMBER);
         input.setName(prefix + name);
         input.setID(prefix + name);
-        // The "size" attribute is ignored on type="number" inputs, kept here only for API compatibility.
-        input.setSize(getSize());
         input.setDisabled(isDisabled());
 
         String ntype = getNumberType();

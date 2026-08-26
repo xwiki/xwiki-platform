@@ -117,7 +117,7 @@ class NumberClassTest
      */
     private static Stream<Arguments> numberTypes()
     {
-        long safeIntegerLimit = 1L << 53;
+        long safeIntegerLimit = 1L << 52;
         return Stream.of(
             Arguments.of(NumberClass.TYPE_INTEGER, "1", String.valueOf(Integer.MIN_VALUE),
                 String.valueOf(Integer.MAX_VALUE)),

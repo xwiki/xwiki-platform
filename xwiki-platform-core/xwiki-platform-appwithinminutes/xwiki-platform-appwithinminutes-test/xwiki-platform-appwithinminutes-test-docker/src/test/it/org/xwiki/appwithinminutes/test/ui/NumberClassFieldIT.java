@@ -63,16 +63,22 @@ class NumberClassFieldIT
 
     /**
      * A value like "99999999999999999999" is a valid HTML5 number but overflows the default {@code long} type, so
-     * the {@code max} constraint set on the input must reject it before the entry can be saved.
+     * the {@code max} constraint set on the input must reject it before the entry can be saved. A decimal value
+     * like "3.5" is also a valid HTML5 number but mismatches the {@code step="1"} constraint of the default
+     * {@code long} type, so it must be rejected too, regardless of the sign of the {@code min} attribute.
      */
     @Test
-    void browserRejectsOutOfRangeInput(TestReference testReference)
+    void browserRejectsOutOfRangeAndDecimalInput(TestReference testReference)
     {
         EntryEditPage entryEditPage = addNumberFieldAndGoToEntry(testReference);
 
         entryEditPage.setValue(FIELD_NAME, "99999999999999999999");
 
         assertFalse(entryEditPage.isFieldValid(FIELD_NAME), "The out-of-range value was accepted as valid");
+
+        entryEditPage.setValue(FIELD_NAME, "3.5");
+
+        assertFalse(entryEditPage.isFieldValid(FIELD_NAME), "The decimal value was accepted as valid");
     }
 
     private EntryEditPage addNumberFieldAndGoToEntry(TestReference testReference)

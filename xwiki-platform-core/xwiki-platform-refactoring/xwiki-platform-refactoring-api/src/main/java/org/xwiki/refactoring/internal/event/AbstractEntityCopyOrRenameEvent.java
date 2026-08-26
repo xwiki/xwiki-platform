@@ -51,7 +51,7 @@ public abstract class AbstractEntityCopyOrRenameEvent<T extends EntityReference>
     /**
      * Default constructor, used by listeners.
      */
-    public AbstractEntityCopyOrRenameEvent()
+    protected AbstractEntityCopyOrRenameEvent()
     {
         this(null, null);
     }
@@ -62,7 +62,7 @@ public abstract class AbstractEntityCopyOrRenameEvent<T extends EntityReference>
      * @param sourceReference the reference of the source entity
      * @param targetReference the reference of the target entity
      */
-    public AbstractEntityCopyOrRenameEvent(T sourceReference, T targetReference)
+    protected AbstractEntityCopyOrRenameEvent(T sourceReference, T targetReference)
     {
         this.sourceReference = sourceReference;
         this.targetReference = targetReference;

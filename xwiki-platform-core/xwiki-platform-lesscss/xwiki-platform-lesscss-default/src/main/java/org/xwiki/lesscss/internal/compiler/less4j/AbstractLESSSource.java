@@ -45,7 +45,7 @@ public abstract class AbstractLESSSource extends LessSource
      * @param skin the skin holding the templates
      * @param folder the folder in which the template is located
      */
-    public AbstractLESSSource(TemplateManager templateManager, Skin skin, String folder)
+    protected AbstractLESSSource(TemplateManager templateManager, Skin skin, String folder)
     {
         this.templateManager = templateManager;
         this.skin = skin;

@@ -41,7 +41,7 @@ public abstract class AbstractMandatoryDocumentInitializer extends AbstractManda
      * @param reference the reference of the document to update. Can be either local or absolute depending if the
      *            document is associated to a specific wiki or not
      */
-    public AbstractMandatoryDocumentInitializer(EntityReference reference)
+    protected AbstractMandatoryDocumentInitializer(EntityReference reference)
     {
         super(reference);
     }
@@ -50,7 +50,7 @@ public abstract class AbstractMandatoryDocumentInitializer extends AbstractManda
      * @param spaceName the space name of the document
      * @param documentName the document name of the document
      */
-    public AbstractMandatoryDocumentInitializer(String spaceName, String documentName)
+    protected AbstractMandatoryDocumentInitializer(String spaceName, String documentName)
     {
         this(new EntityReference(documentName, EntityType.DOCUMENT, new EntityReference(spaceName, EntityType.SPACE)));
     }

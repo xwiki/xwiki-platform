@@ -8,9 +8,9 @@
 }
 
 .slash-menu-item {
-  background-color: white;
-  border-radius: 2px;
-  box-shadow: 0 0 4px #dddddd;
+  background-color: var(--cr-color-neutral-50);
+  border-radius: var(--cr-border-radius-small);
+  box-shadow: 0 0 4px var(--cr-color-neutral-300);
 
   cursor: pointer;
 
@@ -18,12 +18,12 @@
   display: flex;
   flex-direction: row;
 
-  padding: 0.5rem;
+  padding: var(--cr-spacing-medium);
 }
 
 .slash-menu-item:hover,
 .slash-menu-item.selected {
-  background-color: rgb(215, 214, 214);
+  background-color: var(--cr-color-neutral-300);
 }
 
 .slash-menu-item img {
@@ -32,5 +32,5 @@
 }
 
 .slash-menu-item span {
-  padding-left: 1rem;
+  padding-left: var(--cr-spacing-large);
 }

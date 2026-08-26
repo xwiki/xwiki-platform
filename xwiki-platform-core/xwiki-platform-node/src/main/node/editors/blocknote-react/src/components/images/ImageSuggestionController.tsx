@@ -131,6 +131,7 @@ async function fetchImageSuggestions(
 
     return {
       title: link.label,
+      // NOTE: this is not actually used as a subtext but as a reference, see `ImageSuggestionMenu`
       subtext: link.url,
       onItemClick() {
         insertOrUpdateBlockForSlashMenu(editor, {

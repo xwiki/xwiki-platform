@@ -50,6 +50,7 @@ public class QuickSearchElement extends BaseElement
      * search a second time, since clicking the button again submits the form.
      *
      * @param terms text to search
+     * @since 18.4.5
      * @since 18.8.0RC1
      */
     public void typeSearch(String terms)
@@ -76,6 +77,7 @@ public class QuickSearchElement extends BaseElement
 
     /**
      * @return {@code true} if the "Go to search page..." row is the last suggestion item
+     * @since 18.4.5
      * @since 18.8.0RC1
      */
     public boolean isShowAllResultsLast()
@@ -90,6 +92,7 @@ public class QuickSearchElement extends BaseElement
     /**
      * Closes the suggestions panel by pressing the Escape key.
      *
+     * @since 18.4.5
      * @since 18.8.0RC1
      */
     public void closeSuggestions()

@@ -86,7 +86,7 @@ export function ImageSuggestionController({
   const searchImages = useCallback(
     async (query: string) => {
       const suggestions = await fetchImageSuggestions(
-        query || "a",
+        query,
         linkSuggestService,
         modelReferenceParser,
         editor,

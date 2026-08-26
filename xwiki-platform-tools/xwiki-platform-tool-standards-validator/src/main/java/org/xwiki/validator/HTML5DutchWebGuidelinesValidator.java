@@ -50,10 +50,12 @@ import org.xwiki.validator.framework.AbstractHTML5Validator;
 public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
 {
     /**
-     * Pattern an email address must match.
+     * Pattern an email address must match. The domain labels are matched by an atomic group because they are
+     * fully determined by the dot that ends each of them, so allowing the group to be re-entered on backtracking
+     * would only grow the stack.
      */
     private static final Pattern EMAIL =
-        Pattern.compile("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-zA-Z]{2,4}$");
+        Pattern.compile("^[\\w-][.\\w]+\\w@(?>[\\w-]+\\.)+[a-zA-Z]{2,4}$");
 
     /**
      * String used to identify the charset in the content-type meta.

@@ -75,7 +75,7 @@ class DefaultCSRFTokenTest
     /**
      * Characters that might break the layout and must thus not appear in a token.
      */
-    private static final Pattern BAD_CHARACTERS = Pattern.compile(".*[&?*_/#^,.({\\[\\]})~!=+-].*");
+    private static final Pattern BAD_CHARACTERS = Pattern.compile("[&?*_/#^,.({\\[\\]})~!=+-]");
 
     /**
      * URL of the current document.
@@ -349,7 +349,7 @@ class DefaultCSRFTokenTest
         for (int i = 0; i < 30; ++i) {
             this.csrf.clearToken();
             String token = this.csrf.getToken();
-            assertFalse(BAD_CHARACTERS.matcher(token).matches(),
+            assertFalse(BAD_CHARACTERS.matcher(token).find(),
                 "The token \"" + token + "\" contains a character that might break the layout");
         }
     }

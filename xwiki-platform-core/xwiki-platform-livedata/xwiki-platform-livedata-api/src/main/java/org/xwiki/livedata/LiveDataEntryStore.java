@@ -19,6 +19,7 @@
  */
 package org.xwiki.livedata;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,6 +40,20 @@ public interface LiveDataEntryStore
      * @throws LiveDataException if retrieving the specified entry fails
      */
     Optional<Map<String, Object>> get(Object entryId) throws LiveDataException;
+
+    /**
+     * Returns an entry that includes the specified properties.
+     *
+     * @param entryId identifies the entry to return
+     * @param properties the properties the returned entry must include
+     * @return the specified entry
+     * @throws LiveDataException if retrieving the specified entry fails
+     * @since 18.8.0RC1
+     */
+    default Optional<Map<String, Object>> get(Object entryId, List<String> properties) throws LiveDataException
+    {
+        return get(entryId);
+    }
 
     /**
      * @param entryId identifies the entry whose property value to return

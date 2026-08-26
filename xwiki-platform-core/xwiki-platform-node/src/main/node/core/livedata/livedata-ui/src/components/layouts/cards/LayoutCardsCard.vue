@@ -42,6 +42,8 @@
       <h2 v-if="!!titlePropertyId && logic.isPropertyVisible(titlePropertyId)">
         <LivedataDisplayer :property-id="titlePropertyId" :entry="entry" />
       </h2>
+      <!-- Footnote for frozen entries. -->
+      <sup v-if="isEntryFrozen">2</sup>
     </div>
 
     <!--
@@ -162,6 +164,15 @@ export default {
 
     isEntrySelectable() {
       return this.logic.isSelectionEnabled({ entry: this.entry });
+    },
+
+    // The entries are frozen when the live data is in edit mode.
+    isEntryFrozen() {
+      const frozen = this.logic.isViewFrozen() && !this.entry._new;
+      if (frozen) {
+        this.logic.footnotes.put("2", "livedata.footnotes.frozenEntries");
+      }
+      return frozen;
     },
   },
 

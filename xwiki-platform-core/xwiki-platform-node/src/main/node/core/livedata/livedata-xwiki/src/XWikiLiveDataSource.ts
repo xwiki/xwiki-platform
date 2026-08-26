@@ -87,6 +87,21 @@ export class XWikiLiveDataSource implements LiveDataSource {
     }
   }
 
+  getEntry(
+    source: Source,
+    entryId: string,
+    properties: string[],
+  ): Promise<Values | undefined> {
+    // The entry URL already holds parameters (e.g. the namespace), so the properties are appended to it.
+    const entryURL = `${this.getEntryURL(source, entryId)}&${this.$.param(
+      { properties },
+      true,
+    )}`;
+    return Promise.resolve(this.$.getJSON(entryURL)).then(
+      (entry) => entry?.values,
+    );
+  }
+
   updateEntry(source: Source, entryId: string, values: unknown): Promise<void> {
     return Promise.resolve(
       this.$.ajax({
@@ -114,15 +129,16 @@ export class XWikiLiveDataSource implements LiveDataSource {
     );
   }
 
-  addEntry(source: Source, values: unknown): Promise<void> {
+  addEntry(source: Source, values: unknown): Promise<Values | undefined> {
     return Promise.resolve(
       this.$.ajax({
         type: "POST",
         url: this.getEntriesURL(source),
         contentType: "application/json",
+        dataType: "json",
         data: JSON.stringify({ values }),
       }),
-    );
+    ).then((newEntry) => newEntry?.values);
   }
 
   private getEntriesURL(source: Source) {

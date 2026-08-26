@@ -294,6 +294,21 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>
+                Fetching a live data entry might require an optional list of properties to fetch, which was missing.
+                The REST API shouldn't be called directly from Java but through HTTP requests. Adding a new query string
+                parameter to an existing REST resource doesn't break existing code that calls this resource through HTTP.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <code>java.method.numberOfParametersChanged</code>
+                  <old>method org.xwiki.livedata.rest.model.jaxb.Entry org.xwiki.livedata.rest.LiveDataEntryResource::getEntry(java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</old>
+                  <new>method org.xwiki.livedata.rest.model.jaxb.Entry org.xwiki.livedata.rest.LiveDataEntryResource::getEntry(java.lang.String, java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;) throws java.lang.Exception</new>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

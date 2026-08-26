@@ -20,12 +20,14 @@ export function initTranslationsBuilder(resolver: Resolver): (local: string, i18
 export class XWikiLiveDataSource implements LiveDataSource {
     constructor($: JQueryStatic);
     // (undocumented)
-    addEntry(source: Source, values: unknown): Promise<void>;
+    addEntry(source: Source, values: unknown): Promise<Values | undefined>;
     // (undocumented)
     getEntries(liveDataQuery: Query): Promise<{
         count: number;
         entries: Values[];
     }>;
+    // (undocumented)
+    getEntry(source: Source, entryId: string, properties: string[]): Promise<Values | undefined>;
     // (undocumented)
     updateEntry(source: Source, entryId: string, values: unknown): Promise<void>;
     // (undocumented)

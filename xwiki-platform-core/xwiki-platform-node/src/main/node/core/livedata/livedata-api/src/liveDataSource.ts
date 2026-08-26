@@ -20,6 +20,7 @@
 import type { Data } from "./data";
 import type { Query } from "./query";
 import type { Source } from "./source";
+import type { Values } from "./values";
 
 /**
  * The component that provides the live data entries and their metadata.
@@ -34,6 +35,20 @@ interface LiveDataSource {
    * @returns a promise with the fetched data
    */
   getEntries(query: Query): Promise<Data>;
+
+  /**
+   * Fetch a single entry from its id.
+   * @param source - the source description
+   * @param entryId - the id of the entry to fetch
+   * @param properties - the properties to include in the fetched entry
+   * @returns a promise with the values of the entry, or undefined if the source returns none
+   * @since 18.8.0RC1
+   */
+  getEntry(
+    source: Source,
+    entryId: string,
+    properties: string[],
+  ): Promise<Values | undefined>;
 
   /**
    * Update a single property of an entry
@@ -63,10 +78,10 @@ interface LiveDataSource {
    * Create a new entry from the given values.
    * @param source - the source description
    * @param values - the values of the new entry
-   * @returns a promise that completes when the entry is created
-   * @since 18.7.0RC1
+   * @returns a promise with the values of the newly created entry, or undefined if the source trturns none
+   * @since 18.8.0RC1
    */
-  addEntry(source: Source, values: unknown): Promise<void>;
+  addEntry(source: Source, values: unknown): Promise<Values | undefined>;
 }
 
 export type { LiveDataSource };

@@ -90,9 +90,6 @@ public class NumberClass extends PropertyClass
     private static final String STEP_INTEGER = "1";
     private static final String MIN = "min";
     private static final String MAX = "max";
-
-    // A safe stand-in for the long type's real range, kept below 2^53 so Blink's step-mismatch check still runs.
-    private static final long SAFE_INTEGER_LIMIT = 1L << 52;
     private static final String DATA_VALIDATION_BAD_INPUT = "data-validation-bad-input";
     private static final String DATA_VALIDATION_STEP_MISMATCH = "data-validation-step-mismatch";
     private static final String DATA_VALIDATION_RANGE_OVERFLOW = "data-validation-range-overflow";
@@ -237,20 +234,18 @@ public class NumberClass extends PropertyClass
             input.addAttribute(STEP, STEP_ANY);
         } else {
             input.addAttribute(STEP, STEP_INTEGER);
-            String min;
-            String max;
+            // Only the integer type gets a range. Browsers evaluate min and max in double arithmetic, so a min set at
+            // the magnitude of the long range makes them skip the step check altogether, letting decimals through on
+            // the default number type. Values outside the long range are reported by fromString instead.
             if (TYPE_INTEGER.equals(ntype)) {
-                min = String.valueOf(Integer.MIN_VALUE);
-                max = String.valueOf(Integer.MAX_VALUE);
-            } else {
-                min = String.valueOf(-SAFE_INTEGER_LIMIT);
-                max = String.valueOf(SAFE_INTEGER_LIMIT);
+                String min = String.valueOf(Integer.MIN_VALUE);
+                String max = String.valueOf(Integer.MAX_VALUE);
+                input.addAttribute(MIN, min);
+                input.addAttribute(MAX, max);
+                String outOfRangeMessage = localizePlainOrKey("core.validation.number.message.outofrange", min, max);
+                input.addAttribute(DATA_VALIDATION_RANGE_OVERFLOW, outOfRangeMessage);
+                input.addAttribute(DATA_VALIDATION_RANGE_UNDERFLOW, outOfRangeMessage);
             }
-            input.addAttribute(MIN, min);
-            input.addAttribute(MAX, max);
-            String outOfRangeMessage = localizePlainOrKey("core.validation.number.message.outofrange", min, max);
-            input.addAttribute(DATA_VALIDATION_RANGE_OVERFLOW, outOfRangeMessage);
-            input.addAttribute(DATA_VALIDATION_RANGE_UNDERFLOW, outOfRangeMessage);
         }
 
         buffer.append(input.toString());

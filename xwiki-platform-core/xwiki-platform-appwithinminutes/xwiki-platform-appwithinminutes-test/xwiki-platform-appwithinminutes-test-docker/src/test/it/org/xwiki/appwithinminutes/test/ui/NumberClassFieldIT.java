@@ -46,6 +46,8 @@ class NumberClassFieldIT
 {
     private static final String FIELD_NAME = "number1";
 
+    private static final String INVALID_FORMAT_MESSAGE = "is not a valid number of type \"long\"";
+
     /**
      * The Number field is rendered as an HTML5 number input, so the browser rejects non-numeric input, either by
      * refusing to insert it or by marking the field invalid, before the entry can be saved.
@@ -62,23 +64,42 @@ class NumberClassFieldIT
     }
 
     /**
-     * A value like "99999999999999999999" is a valid HTML5 number but overflows the default {@code long} type, so
-     * the {@code max} constraint set on the input must reject it before the entry can be saved. A decimal value
-     * like "3.5" is also a valid HTML5 number but mismatches the {@code step="1"} constraint of the default
-     * {@code long} type, so it must be rejected too, regardless of the sign of the {@code min} attribute.
+     * A decimal value like "3.5" is a valid HTML5 number but mismatches the {@code step="1"} constraint of the
+     * default {@code long} type, so the browser must mark the field invalid. Both signs are checked because the
+     * step check is evaluated relative to the {@code min} attribute, which makes it sensitive to the sign.
      */
     @Test
-    void browserRejectsOutOfRangeAndDecimalInput(TestReference testReference)
+    void browserRejectsDecimalInput(TestReference testReference)
     {
         EntryEditPage entryEditPage = addNumberFieldAndGoToEntry(testReference);
 
-        entryEditPage.setValue(FIELD_NAME, "99999999999999999999");
-
-        assertFalse(entryEditPage.isFieldValid(FIELD_NAME), "The out-of-range value was accepted as valid");
-
         entryEditPage.setValue(FIELD_NAME, "3.5");
 
-        assertFalse(entryEditPage.isFieldValid(FIELD_NAME), "The decimal value was accepted as valid");
+        assertFalse(entryEditPage.isFieldValid(FIELD_NAME), "The positive decimal value was accepted as valid");
+
+        entryEditPage.setValue(FIELD_NAME, "-3.5");
+
+        assertFalse(entryEditPage.isFieldValid(FIELD_NAME), "The negative decimal value was accepted as valid");
+    }
+
+    /**
+     * A value like "99999999999999999999" is a valid HTML5 number that overflows the default {@code long} type.
+     * The browser can't be asked to catch it, since no {@code min}/{@code max} can express the {@code long} range
+     * without disabling the step check, so it reaches the server and must be reported with a friendly message
+     * rather than a generic error.
+     */
+    @Test
+    void saveShowsFriendlyErrorForOutOfRangeValue(TestReference testReference)
+    {
+        EntryEditPage entryEditPage = addNumberFieldAndGoToEntry(testReference);
+
+        entryEditPage.setValue(FIELD_NAME, "42");
+        entryEditPage.clickSaveAndContinue();
+
+        entryEditPage.setValue(FIELD_NAME, "99999999999999999999");
+        entryEditPage.clickSaveAndContinue(false);
+
+        entryEditPage.waitForNotificationErrorMessage(INVALID_FORMAT_MESSAGE);
     }
 
     private EntryEditPage addNumberFieldAndGoToEntry(TestReference testReference)

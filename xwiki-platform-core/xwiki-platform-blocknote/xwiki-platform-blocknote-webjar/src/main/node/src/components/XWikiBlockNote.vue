@@ -368,8 +368,6 @@ onUnmounted(() => {
 // xwikiMacroBlock / xwikiInlineMacro blocks: the wizard operates on macro invocations, and the editor stores the
 // resulting invocation in the block. The list of client-rendered macros is left empty (they are not used here).
 const macros: BlockNoteViewWrapperProps["macros"] = {
-  list: [],
-
   ctx: {
     openParamsEditor: async (invocation, update) => {
       try {

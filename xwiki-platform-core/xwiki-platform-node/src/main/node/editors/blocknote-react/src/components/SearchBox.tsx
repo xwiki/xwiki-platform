@@ -30,10 +30,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { RiLink } from "react-icons/ri";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
-import type {
-  ResourceReference,
-  ResourceReferenceParser,
-} from "@xwiki/platform-rendering-api";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { ReactElement } from "react";
 
 /**
@@ -135,9 +132,6 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
     .get()!;
 
-  // const resourceReferenceParser = depsContainer.get<ResourceReferenceParser>(
-  //   "ResourceReferenceParser",
-  // );
   const resourceReferenceParser = new DefaultResourceReferenceParser();
 
   const combobox = useCombobox({

@@ -66,7 +66,7 @@ class NumberClassFieldIT
     /**
      * A decimal value like "3.5" is a valid HTML5 number but mismatches the {@code step="1"} constraint of the
      * default {@code long} type, so the browser must mark the field invalid. Both signs are checked because the
-     * step check is evaluated relative to the {@code min} attribute, which makes it sensitive to the sign.
+     * field has no {@code min} attribute, so the step check is evaluated relative to a base of 0.
      */
     @Test
     void browserRejectsDecimalInput(TestReference testReference)

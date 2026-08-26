@@ -21,6 +21,7 @@ package org.xwiki.filter.xar;
 
 import org.xwiki.filter.test.integration.junit5.FilterTest;
 import org.xwiki.filter.test.integration.junit5.FilterTest.Scope;
+import org.xwiki.filter.xar.internal.input.CurrentXClassLoader;
 import org.xwiki.test.annotation.AllComponents;
 
 /**
@@ -33,4 +34,9 @@ import org.xwiki.test.annotation.AllComponents;
 @Scope(value = "document"/*, pattern = "new1.test"*/)
 class DocumentIntegrationTests extends FilterTest
 {
+    @Override
+    protected void beforeTests() throws Exception
+    {
+        getComponentManager().registerMockComponent(CurrentXClassLoader.class);
+    }
 }

@@ -19,27 +19,26 @@
  */
 package org.xwiki.filter.xar.internal.input;
 
-import javax.inject.Singleton;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.filter.FilterException;
-import org.xwiki.filter.xar.input.XARInputProperties;
+import org.xwiki.component.annotation.Role;
 
 /**
+ * Internal component for reading current xclass information as fallback for reading object properties.
+ *
  * @version $Id$
- * @since 9.0RC1
+ * @since 18.8.0RC1
+ * @since 18.4.5
+ * @since 17.10.13
  */
-@Component
-@Singleton
-public class WikiObjectPropertyReader extends AbstractWikiObjectPropertyReader
-    implements XARXMLReader<AbstractWikiObjectPropertyReader.WikiObjectProperty>
+@Role
+public interface CurrentXClassLoader
 {
-    @Override
-    public WikiObjectProperty read(XMLStreamReader xmlReader, XARInputProperties properties)
-        throws XMLStreamException, FilterException
-    {
-        return readObjectProperty(xmlReader, properties, null, null);
-    }
+    /**
+     * Read the class identified by the given reference and search for the type of the parameter identified by the
+     * given name.
+     *
+     * @param xclassReference the reference of the class to read.
+     * @param propertyName the name of the property for which to read the type.
+     * @return the property type or {@code null}.
+     */
+    String getXClassPropertyType(String xclassReference, String propertyName);
 }

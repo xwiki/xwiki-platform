@@ -23,11 +23,14 @@ import java.sql.DatabaseMetaData;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.SequencedMap;
 import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
@@ -91,6 +94,10 @@ import static org.mockito.Mockito.when;
 })
 class PingSenderIT
 {
+    private static final String EXTENSION_ID1 = "extensionId1";
+
+    private static final String EXTENSION_ID2 = "extensionId2";
+
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
@@ -133,6 +140,12 @@ class PingSenderIT
     @InjectElasticSearchContainer
     private ElasticsearchContainer container;
 
+    private String activeInstanceId;
+
+    private InstalledExtension extension1;
+
+    private InstalledExtension extension2;
+
     @BeforeComponent
     void beforeComponentInitialize()
     {
@@ -142,15 +155,15 @@ class PingSenderIT
             String.format("http://%s", this.container.getHttpHostAddress()));
     }
 
-    @Test
-    void sendPingData() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
         // Configure the Ping Sender to perform the ES setup since the ES instance is virgin at this stage.
         this.pingSetup.setup();
 
         // Distribution Ping Data Provider setup
-        String activeInstanceId = UUID.randomUUID().toString();
-        when(this.instanceIdManager.getInstanceId()).thenReturn(new InstanceId(activeInstanceId));
+        this.activeInstanceId = UUID.randomUUID().toString();
+        when(this.instanceIdManager.getInstanceId()).thenReturn(new InstanceId(this.activeInstanceId));
 
         // Servlet Container Ping Data Provider setup
         ServletContext servletContext = mock(ServletContext.class);
@@ -181,13 +194,15 @@ class PingSenderIT
         ec.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
 
         // Extension Ping Data Provider setup
-        InstalledExtension extension1 = mock(InstalledExtension.class);
-        when(extension1.getId()).thenReturn(new ExtensionId("extensionId1", "extensionVersion1"));
-        when(extension1.getExtensionFeatures()).thenReturn(List.of(new ExtensionId("featureId1", "featureVersion1")));
-        InstalledExtension extension2 = mock(InstalledExtension.class);
-        when(extension2.getId()).thenReturn(new ExtensionId("extensionId2", "extensionVersion2"));
-        when(extension2.getExtensionFeatures()).thenReturn(List.of(new ExtensionId("featureId2", "featureVersion2")));
-        Collection<InstalledExtension> installedExtensions = List.of(extension1, extension2);
+        this.extension1 = mock(InstalledExtension.class);
+        when(this.extension1.getId()).thenReturn(new ExtensionId(EXTENSION_ID1, "extensionVersion1"));
+        when(this.extension1.getExtensionFeatures())
+            .thenReturn(List.of(new ExtensionId("featureId1", "featureVersion1")));
+        this.extension2 = mock(InstalledExtension.class);
+        when(this.extension2.getId()).thenReturn(new ExtensionId(EXTENSION_ID2, "extensionVersion2"));
+        when(this.extension2.getExtensionFeatures())
+            .thenReturn(List.of(new ExtensionId("featureId2", "featureVersion2")));
+        Collection<InstalledExtension> installedExtensions = List.of(this.extension1, this.extension2);
         when(this.installedExtensionRepository.getInstalledExtensions()).thenReturn(installedExtensions);
 
         // Users Ping Data Provider setup (and Wikis Ping Data Provider)
@@ -217,7 +232,11 @@ class PingSenderIT
             .thenReturn(List.of(10000L))
             // For wiki2
             .thenReturn(List.of(100000L));
+    }
 
+    @Test
+    void sendPingData() throws Exception
+    {
         // Send a ping
         this.pingSender.sendPing();
 
@@ -240,7 +259,7 @@ class PingSenderIT
         assertEquals(2, this.dataManager.countInstalls(null));
 
         // Verify that a count query works with an non-empty json
-        String jsonString = "{ \"term\" : { \"distribution.instanceId\" : \"" + activeInstanceId + "\" } }";
+        String jsonString = "{ \"term\" : { \"distribution.instanceId\" : \"" + this.activeInstanceId + "\" } }";
         assertEquals(2, this.dataManager.countInstalls(jsonString));
 
         // Verify that a search query works with an empty json
@@ -250,6 +269,8 @@ class PingSenderIT
         // Verify that a search query works with an non-empty json
         pings = this.dataManager.searchInstalls(jsonString);
         assertEquals(2, pings.size());
+
+        assertDistinctInstallCountsForASingleInstance(jsonString);
 
         Ping ping = pings.get(0);
 
@@ -280,7 +301,7 @@ class PingSenderIT
         assertEquals(0, ping.getDate().getSince());
 
         // Distribution Ping Data Provider tests
-        assertEquals(activeInstanceId, ping.getDistribution().getInstanceId());
+        assertEquals(this.activeInstanceId, ping.getDistribution().getInstanceId());
         assertEquals("distributionId", ping.getDistribution().getExtension().getId());
         assertEquals("distributionVersion", ping.getDistribution().getExtension().getVersion());
         assertEquals(1, ping.getDistribution().getExtension().getFeatures().size());
@@ -320,5 +341,52 @@ class PingSenderIT
         assertEquals(2, ping.getDocuments().getWikis().size());
         assertEquals(1000, ping.getDocuments().getWikis().get(0));
         assertEquals(100000, ping.getDocuments().getWikis().get(1));
+
+        assertDistinctInstallCountsForASecondInstance();
+    }
+
+    private void assertDistinctInstallCountsForASecondInstance() throws Exception
+    {
+        // Send a third ping, from a second instance having only the second extension installed. The two extensions
+        // then differ both in the number of pings holding them (2 for the first one, 3 for the second) and in the
+        // number of instances having them installed (1 and 2), which is what the assertions below need. This
+        // invalidates the single-instance fixture the phases above rely on, so it comes last.
+        when(this.instanceIdManager.getInstanceId()).thenReturn(new InstanceId(UUID.randomUUID().toString()));
+        when(this.installedExtensionRepository.getInstalledExtensions()).thenReturn(List.of(this.extension2));
+        this.pingSender.sendPing();
+        this.clientManager.getClient().indices().refresh();
+
+        // Verify that the second instance is counted as a separate install, and that this is precisely what
+        // countInstalls() fails to report since it counts pings.
+        assertEquals(3, this.dataManager.countInstalls(null));
+        assertEquals(2, this.dataManager.countDistinctInstalls(null));
+
+        // Verify that only the instances having an extension installed are counted for it, and that the entries come
+        // back ordered by descending number of matching pings rather than in a hash order. Note that this is not the
+        // order of the counts: the two would differ if the first extension had been installed on more instances that
+        // ping less often.
+        SequencedMap<String, Long> countsByExtension = this.dataManager.countDistinctInstallsByExtension(null);
+        assertEquals(Map.of(EXTENSION_ID1, 1L, EXTENSION_ID2, 2L), countsByExtension);
+        assertEquals(List.of(EXTENSION_ID2, EXTENSION_ID1), List.copyOf(countsByExtension.sequencedKeySet()));
+    }
+
+    private void assertDistinctInstallCountsForASingleInstance(String jsonString) throws Exception
+    {
+        // Verify that the 2 pings sent so far are counted as a single install since they come from the same instance,
+        // with and without a query.
+        assertEquals(1, this.dataManager.countDistinctInstalls(null));
+        assertEquals(1, this.dataManager.countDistinctInstalls(jsonString));
+
+        // Verify that the distinct installs are also counted per extension, and that an extension is not counted
+        // twice when the same instance pings several times.
+        assertEquals(Map.of(EXTENSION_ID1, 1L, EXTENSION_ID2, 1L),
+            this.dataManager.countDistinctInstallsByExtension(null));
+        assertEquals(Map.of(EXTENSION_ID1, 1L, EXTENSION_ID2, 1L),
+            this.dataManager.countDistinctInstallsByExtension(jsonString));
+
+        // Verify that a query not matching any ping leads to no count at all.
+        String noMatchJsonString = "{ \"term\" : { \"distribution.instanceId\" : \"nomatch\" } }";
+        assertEquals(0, this.dataManager.countDistinctInstalls(noMatchJsonString));
+        assertEquals(Map.of(), this.dataManager.countDistinctInstallsByExtension(noMatchJsonString));
     }
 }

@@ -33,7 +33,7 @@
   <description>API to send XWiki instance ping data and query it</description>
   <properties>
     <!-- See the overridden value in the integration-tests profile -->
-    <xwiki.jacoco.instructionRatio>0.07</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.10</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Active Installs 2 API</xwiki.extension.name>
     <!-- We want only a single ActiveInstalls extension on the root namespace (only a single ping thread per XWiki
@@ -99,7 +99,7 @@
         <!-- Functional tests are allowed to output content to the console -->
         <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
         <!-- Overridden to include coverage from IT tests -->
-        <xwiki.jacoco.instructionRatio>0.90</xwiki.jacoco.instructionRatio>
+        <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
       </properties>
       <build>
         <plugins>

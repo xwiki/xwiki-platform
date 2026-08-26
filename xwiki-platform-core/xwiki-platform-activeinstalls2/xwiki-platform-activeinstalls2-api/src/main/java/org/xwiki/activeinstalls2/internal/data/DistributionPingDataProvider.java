@@ -49,9 +49,23 @@ import co.elastic.clients.elasticsearch._types.mapping.Property;
 @Singleton
 public class DistributionPingDataProvider extends AbstractPingDataProvider
 {
-    static final String PROPERTY_INSTANCE_ID = "instanceId";
+    /**
+     * The name of the mapping property holding the distribution data, and thus the first segment of the paths of the
+     * fields nested under it.
+     */
+    public static final String PROPERTY_DISTRIBUTION = "distribution";
 
-    static final String PROPERTY_DISTRIBUTION = "distribution";
+    /**
+     * The name of the mapping property holding the id uniquely identifying an XWiki instance across its pings.
+     */
+    public static final String PROPERTY_INSTANCE_ID = "instanceId";
+
+    /**
+     * The path of the field holding the id uniquely identifying an XWiki instance across its pings, to be used when
+     * querying the index. Assembled from the mapping property names above so that it cannot drift from the mapping
+     * declared in {@link #provideMapping()}.
+     */
+    public static final String FIELD_INSTANCE_ID = PROPERTY_DISTRIBUTION + "." + PROPERTY_INSTANCE_ID;
 
     private static final String PROPERTY_DISTRIBUTION_VERSION = "version";
 

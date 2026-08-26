@@ -29,7 +29,7 @@ import {
 import "@blocknote/core/fonts/inter.css";
 import { adaptMacroForBlockNote } from "../blocknote/utils";
 import { DepsContainerContext, MacrosContext } from "../contexts";
-import { blocksToYXmlFragment } from "@blocknote/core/yjs";
+import { blocksToYXmlFragment, withCollaboration } from "@blocknote/core/yjs";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import {
@@ -61,6 +61,7 @@ import type { ImageEditionOverrideFn } from "./images/CustomImageToolbar";
 import type { LinkEditionHandler } from "./links/linkEdition";
 import type { LinkEditionHooks } from "./links/linkEditionHooks";
 import type { BlockNoteEditorOptions } from "@blocknote/core";
+import type { CollaborationOptions } from "@blocknote/core/yjs";
 import type { Collaboration } from "@xwiki/platform-collaboration-api";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
 import type {
@@ -92,9 +93,7 @@ type BlockNoteViewWrapperProps = {
   /**
    * Options to forward to the BlockNote editor
    */
-  blockNoteOptions?: Partial<
-    Omit<DefaultBlockNoteEditorOptions, "schema" | "collaboration">
-  >;
+  blockNoteOptions?: Partial<Omit<DefaultBlockNoteEditorOptions, "schema">>;
 
   /**
    * The name of the editor instance, usually the name of the form field it is attached to. When realtime collaboration
@@ -268,9 +267,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   // the initial content at all and let it initialize the content with whatever makes sense (e.g. an empty paragraph).
   const initialContent = collaboration || !content.length ? undefined : content;
 
-  const getCollaborationOptions = ():
-    | BlockNoteEditorOptions<never, never, never>["collaboration"]
-    | undefined => {
+  const getCollaborationOptions = (): CollaborationOptions | undefined => {
     if (!collaboration) {
       return undefined;
     }
@@ -287,11 +284,9 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
     };
   };
 
-  // Create the BlockNote editor instance.
-  const editor = useCreateBlockNote({
+  const editorOptions = {
     ...blockNoteOptions,
     initialContent,
-    collaboration: getCollaborationOptions(),
     // Editor's schema, with custom blocks definition
     schema,
     // Use the provided language for the dictionary
@@ -306,7 +301,20 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
         "aria-label": label,
       },
     },
-  });
+  };
+
+  const collaborationOptions = getCollaborationOptions();
+
+  // Create the BlockNote editor instance. Yjs based collaboration is opt-in: wrapping the options registers the Yjs
+  // extensions the editor needs, so it is only applied when a collaboration session is available.
+  const editor = useCreateBlockNote(
+    collaborationOptions
+      ? withCollaboration({
+          ...editorOptions,
+          collaboration: collaborationOptions,
+        })
+      : editorOptions,
+  );
 
   // Allow the parent component to access the editor instance.
   useEffect(() => {

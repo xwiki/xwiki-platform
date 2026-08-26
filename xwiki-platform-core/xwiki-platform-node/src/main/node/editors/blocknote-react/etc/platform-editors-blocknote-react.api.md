@@ -41,7 +41,7 @@ import { SyntaxConfig } from '@xwiki/platform-syntaxes-config';
 
 // @beta
 export type BlockNoteViewWrapperProps = {
-    blockNoteOptions?: Partial<Omit<DefaultBlockNoteEditorOptions, "schema" | "collaboration">>;
+    blockNoteOptions?: Partial<Omit<DefaultBlockNoteEditorOptions, "schema">>;
     name?: string;
     theme?: "light" | "dark";
     lang: EditorLanguage;

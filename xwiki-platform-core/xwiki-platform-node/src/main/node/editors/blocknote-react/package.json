@@ -70,7 +70,10 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-i18next": "catalog:",
-    "react-icons": "catalog:"
+    "react-icons": "catalog:",
+    "y-prosemirror": "catalog:",
+    "y-protocols": "catalog:",
+    "yjs": "catalog:"
   },
   "peerDependencies": {
     "inversify": "8.x"

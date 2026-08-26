@@ -22,6 +22,7 @@ package org.xwiki.index.test.ui.docker;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class DocumentTreeMacroIT
 {
+    /**
+     * The HTML attributes that hold a tree node identifier.
+     */
+    private static final List<String> ID_ATTRIBUTE_NAMES = List.of("id", "aria-activedescendant", "aria-labelledby");
+
+    private static final Pattern WHITE_SPACE = Pattern.compile("\\s");
+
     @Test
     @Order(1)
     void sortDocumentsBy(TestUtils setup, TestReference testReference) throws Exception
@@ -475,6 +483,55 @@ class DocumentTreeMacroIT
         assertFalse(tree.hasNode(getNodeId(childrenSubEve2)));
         assertFalse(tree.hasNode(getNodeId(alice)));
         assertFalse(tree.hasNode(getNodeId(subAlice)));
+    }
+
+    /**
+     * Verify that the node identifiers rendered by the tree don't contain characters that are forbidden in an HTML
+     * identifier, and that the tree still resolves them back to the right entity reference when it talks to the server.
+     */
+    @Test
+    @Order(7)
+    void escapeNodeIds(TestUtils setup, TestReference testReference)
+    {
+        SpaceReference testSpaceReference = testReference.getLastSpaceReference();
+        DocumentReference parent = new DocumentReference("WebHome", new SpaceReference("A B", testSpaceReference));
+        DocumentReference child =
+            new DocumentReference("WebHome", new SpaceReference("C D", parent.getLastSpaceReference()));
+
+        setup.loginAsSuperAdmin();
+        // Clean up.
+        setup.deletePage(testReference, true);
+        createPage(setup, parent, "", "");
+        createPage(setup, child, "", "");
+
+        TreeElement tree = getDocumentTree(setup, testReference, true, Map.of("openTo", getNodeId(child)));
+
+        // The tree opened to the specified node, which means it was able to send the escaped node identifiers back to
+        // the server, unescaped, both to compute the path and to load the child nodes.
+        assertTrue(tree.hasNode(getNodeId(child)));
+        assertNodeLabels(tree.getNode(getNodeId(parent)).getChildren(), "C D");
+        assertEquals(List.of(getNodeId(child)), tree.getSelectedNodeIDs());
+
+        // None of the identifiers rendered by the tree contains white space, which is forbidden in an HTML identifier.
+        List<String> renderedIds = getRenderedIds(setup, testSpaceReference.getName());
+        assertTrue(renderedIds.contains(TreeElement.escapeNodeId(getNodeId(child))),
+            "The node with white space in its reference was not rendered: " + renderedIds);
+        renderedIds.forEach(renderedId -> assertFalse(WHITE_SPACE.matcher(renderedId).find(),
+            "The rendered identifier [" + renderedId + "] contains white space."));
+    }
+
+    /**
+     * @return the values of the attributes that hold a node identifier, collected from the tree with the given HTML
+     *         identifier and from all its descendants
+     */
+    @SuppressWarnings("unchecked")
+    private List<String> getRenderedIds(TestUtils setup, String treeId)
+    {
+        return (List<String>) setup.getDriver().executeScript("const attributeNames = arguments[0];"
+            + "const tree = document.getElementById(arguments[1]);"
+            + "return [tree, ...tree.querySelectorAll('*')]"
+            + "  .flatMap(element => attributeNames.map(name => element.getAttribute(name)))"
+            + "  .filter(value => value !== null);", ID_ATTRIBUTE_NAMES, treeId);
     }
 
     private ViewPage createPage(TestUtils setup, DocumentReference documentReference, String title, String content)

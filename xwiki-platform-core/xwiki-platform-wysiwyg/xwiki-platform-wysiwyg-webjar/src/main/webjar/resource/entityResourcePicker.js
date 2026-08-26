@@ -98,16 +98,17 @@ define('xwiki-wysiwyg-entity-resource-picker', [
         }).on('xtree.runJob', function (event, promise, action, node, params) {
           if (action === 'create') {
             promise.then(function (promiseData) {
-              // The parent node id is already escaped (it comes from the tree's own model), but params.id was
-              // unescaped by #execute() before being sent to the server, so we use the parent node id instead in
-              // order to match what #refresh_node.jstree reads later from data.node.id.
+              // We index the created nodes by the id of their parent node, as it appears in the tree model, because
+              // that's what #refresh_node.jstree reads later from data.node.id. Note that params.id can't be used
+              // because #execute() unescaped it before sending it to the server.
               if (createdNodes[node.id] === undefined) {
                 createdNodes[node.id] = {};
               }
               if (promiseData instanceof Array) {
-                // The job response carries the raw, unescaped, id of the newly created node, so we need to escape it
-                // before it can be inserted into the tree.
-                let newNode = $.fn.xtree.escapeNodeId(promiseData[0]);
+                // The job response carries the unescaped id of the newly created node, so we need to escape it before
+                // the node can be inserted into the tree.
+                let newNode = promiseData[0];
+                newNode.id = $.fn.xtree.escapeNodeId(newNode.id);
                 createdNodes[node.id][newNode.id] = newNode;
               }
             });

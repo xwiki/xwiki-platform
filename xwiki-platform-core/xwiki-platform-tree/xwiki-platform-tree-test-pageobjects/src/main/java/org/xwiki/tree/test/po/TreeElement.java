@@ -19,6 +19,8 @@
  */
 package org.xwiki.tree.test.po;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +39,12 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class TreeElement extends BaseElement
 {
+    /**
+     * The characters that {@code encodeURIComponent()} leaves unchanged.
+     */
+    private static final String UNRESERVED_CHARACTERS =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.!~*'()";
+
     /**
      * The element that represents the tree.
      */
@@ -58,7 +66,7 @@ public class TreeElement extends BaseElement
      */
     public TreeNodeElement getNode(String nodeId)
     {
-        return new TreeNodeElement(this.element, By.id(nodeId));
+        return new TreeNodeElement(this.element, By.id(escapeNodeId(nodeId)));
     }
 
     /**
@@ -67,12 +75,10 @@ public class TreeElement extends BaseElement
      */
     public boolean hasNode(String nodeId)
     {
-        // We cannot use By.id(nodeId) because findElements returns 0 elements if the id contains special characters
-        // such as backslash (which is used to escape special characters in an entity reference which the node id can
-        // be). Such an element id is technically invalid but the browsers are handling it fine.
-        // See https://code.google.com/p/selenium/issues/detail?id=8173
+        // We cannot use By.id() because findElements returns 0 elements if the id contains special characters that
+        // Selenium doesn't escape properly. See https://code.google.com/p/selenium/issues/detail?id=8173
         return !getDriver().findElementsWithoutWaiting(this.element,
-            By.xpath(".//*[@id = '" + nodeId + "']")).isEmpty();
+            By.xpath(".//*[@id = '" + escapeNodeId(nodeId) + "']")).isEmpty();
     }
 
     /**
@@ -133,7 +139,7 @@ public class TreeElement extends BaseElement
     public TreeElement waitForNodeSelected(String nodeId)
     {
         String selectedNodeXPath =
-            String.format(".//*[@id = '%s_anchor' and contains(@class, 'jstree-clicked')]", nodeId);
+            String.format(".//*[@id = '%s_anchor' and contains(@class, 'jstree-clicked')]", escapeNodeId(nodeId));
         getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));
         return this;
     }
@@ -149,8 +155,9 @@ public class TreeElement extends BaseElement
     @SuppressWarnings("unchecked")
     public List<String> getSelectedNodeIDs()
     {
-        return (List<String>) getDriver()
+        List<String> selectedNodeIds = (List<String>) getDriver()
             .executeScript("return jQuery.jstree.reference(jQuery(arguments[0])).get_selected()", this.element);
+        return selectedNodeIds.stream().map(TreeElement::unescapeNodeId).toList();
     }
 
     /**
@@ -163,7 +170,48 @@ public class TreeElement extends BaseElement
                 + "{flat:true, no_data:true, no_state:true})" + ".map(function(element) {return element.id});",
             this.element);
 
-        return Arrays.asList(selectedNodeIDs);
+        return Arrays.stream(selectedNodeIDs).map(TreeElement::unescapeNodeId).toList();
+    }
+
+    /**
+     * Percent-encodes the given node identifier the same way the tree widget does, so that it matches the {@code id}
+     * attribute of the corresponding HTML element. Page objects that locate a tree node by its identifier need this
+     * because entity references can contain characters that are forbidden in an HTML identifier, such as white space.
+     *
+     * @param nodeId the node identifier, holding the entity reference as is
+     * @return the escaped node identifier
+     * @since 18.8.0RC1
+     */
+    public static String escapeNodeId(String nodeId)
+    {
+        if (nodeId == null) {
+            return null;
+        }
+        StringBuilder result = new StringBuilder();
+        for (byte nodeIdByte : nodeId.getBytes(StandardCharsets.UTF_8)) {
+            char character = (char) (nodeIdByte & 0xFF);
+            if (UNRESERVED_CHARACTERS.indexOf(character) >= 0) {
+                result.append(character);
+            } else {
+                result.append(String.format("%%%02X", nodeIdByte & 0xFF));
+            }
+        }
+        // The colon and the at sign separate the components of a node identifier and are both valid in an HTML
+        // identifier, so the tree widget leaves them as is, in order to keep the escaped node identifiers readable.
+        return result.toString().replace("%3A", ":").replace("%40", "@");
+    }
+
+    /**
+     * Reverts {@link #escapeNodeId(String)}, turning a node identifier read from the tree back into the entity
+     * reference it holds.
+     *
+     * @param nodeId the escaped node identifier
+     * @return the node identifier holding the entity reference as is
+     * @since 18.8.0RC1
+     */
+    public static String unescapeNodeId(String nodeId)
+    {
+        return nodeId == null ? null : URLDecoder.decode(nodeId, StandardCharsets.UTF_8);
     }
 
     /**

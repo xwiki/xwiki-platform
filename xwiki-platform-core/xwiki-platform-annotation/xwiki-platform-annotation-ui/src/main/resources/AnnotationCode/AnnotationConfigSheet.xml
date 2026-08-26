@@ -289,21 +289,22 @@ $annotationsConfigDoc.display('annotationClass', 'edit')
             // Once the node is loaded, check it, if possible.
             // If the node did not load (lack of permissions, hidden document, etc.), nothing happens.
             tree.check_node(idToCheck);
-          }.bind(this, savedId));
+          }.bind(this, $.fn.xtree.escapeNodeId(savedId)));
         }
       });
 
       // Listen to tree nodes being checked/unchecked and save the changes in the DOM to be saved on submit.
       treeElement.on('changed.jstree', function(event, data) {
-        var node = data.node;
+        // The savedIds list holds the node ids as they are serialized in the form field, i.e. unescaped.
+        var nodeId = $.fn.xtree.unescapeNodeId(data.node.id);
         var initialNrOfNodes = savedIds.length;
 
         // Update the savedIds list.
-        var savedIdIndex = savedIds.indexOf(node.id);
+        var savedIdIndex = savedIds.indexOf(nodeId);
         if (data.action == 'select_node') {
           // If it's not in the list, add it.
           if (savedIdIndex == -1) {
-            savedIds.push(node.id);
+            savedIds.push(nodeId);
           }
         } else if (data.action == 'deselect_node') {
           // If it's in the list, remove it.

@@ -316,6 +316,7 @@ require([
   'xwiki-l10n!xwiki-panels-navigation-config-messages',
   'xwiki-meta',
   'jquery-ui',
+  'xwiki-tree',
   'xwiki-events-bridge'
 ], function($, l10n, xwikiMeta) {
   var getLocalDocumentReference = function(absoluteDocumentReference) {
@@ -366,7 +367,7 @@ require([
   var getNodeData = function(exclusion) {
     var documentReference = exclusion.data('reference');
     return {
-      id: 'document:' + documentReference,
+      id: $.fn.xtree.escapeNodeId('document:' + documentReference),
       text: exclusion.text(),
       children: exclusion.data('children') !== false,
       data: {
@@ -410,7 +411,7 @@ require([
   };
 
   var showOrCreateNode = function(tree, page) {
-    var node = tree.get_node('document:' + page.data('reference'));
+    var node = tree.get_node($.fn.xtree.escapeNodeId('document:' + page.data('reference')));
     if (node) {
       tree.show_node(node.id);
     } else {
@@ -477,7 +478,7 @@ require([
 
   var excludePagesFromDynamicFilter = function(pages, tree) {
     tree &amp;&amp; pages.find('.page').not('.included').each(function() {
-      tree.hide_node('document:' + $(this).data('reference'));
+      tree.hide_node($.fn.xtree.escapeNodeId('document:' + $(this).data('reference')));
     });
   };
 

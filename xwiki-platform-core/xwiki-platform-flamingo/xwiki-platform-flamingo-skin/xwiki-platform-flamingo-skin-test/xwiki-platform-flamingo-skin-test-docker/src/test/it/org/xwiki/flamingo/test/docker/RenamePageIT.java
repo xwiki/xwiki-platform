@@ -36,6 +36,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
+import org.xwiki.index.tree.test.po.DocumentPickerModal;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -935,6 +936,44 @@ class RenamePageIT
         setup.gotoPage(sourcePage, "edit", "editor=object");
         List<ObjectEditPane> rightObjects = new ObjectEditPage().getObjectsOfClass(XWIKI_RIGHTS_CLASS, true);
         assertEquals(1, rightObjects.size(), "The refused move must have left the source page's right in place.");
+    }
+
+    /**
+     * Move a page to a parent whose name contains white space, using the tree picker. The tree escapes the identifier
+     * of its nodes so that they can be used as HTML identifiers, so this checks that it unescapes them back before
+     * sending them to the server. See XWIKI-22151 and XWIKI-22154.
+     */
+    @Order(14)
+    @Test
+    void renamePageToParentWithWhiteSpaceUsingTreePicker(TestUtils setup) throws Exception
+    {
+        String targetSpaceName = "Rename Space";
+        DocumentReference targetParent = new DocumentReference("xwiki", targetSpaceName, "WebHome");
+        DocumentReference source =
+            new DocumentReference("xwiki", Arrays.asList("RenamePageIT", "MoveToSpaceWithWhiteSpace"), "WebHome");
+        DocumentReference target =
+            new DocumentReference("xwiki", Arrays.asList(targetSpaceName, "MoveToSpaceWithWhiteSpace"), "WebHome");
+
+        setup.rest().delete(targetParent);
+        setup.rest().delete(source);
+        setup.rest().delete(target);
+
+        setup.createPage(targetParent, "", targetSpaceName);
+        setup.createPage(source, "", "MoveToSpaceWithWhiteSpace");
+
+        new SolrTestUtils(setup).waitEmptyQueue();
+
+        RenamePage renamePage = setup.gotoPage(source).rename();
+        renamePage.getDocumentPicker().browseDocuments();
+        new DocumentPickerModal().selectDocument(targetSpaceName, "WebHome");
+        renamePage.clickRenameButton().waitUntilFinished();
+
+        // The page landed in the space that was selected in the tree, not in a space named after its escaped
+        // identifier (e.g. "Rename%20Space").
+        assertTrue(setup.pageExists(Arrays.asList(targetSpaceName, "MoveToSpaceWithWhiteSpace"), "WebHome"),
+            "The page was not moved to the [" + targetSpaceName + "] space.");
+        assertFalse(setup.pageExists(Arrays.asList("RenamePageIT", "MoveToSpaceWithWhiteSpace"), "WebHome"),
+            "The page is still in its original location.");
     }
 
     private static List<String> newSpaces(List<String> parentSpaces, String lastSpace)

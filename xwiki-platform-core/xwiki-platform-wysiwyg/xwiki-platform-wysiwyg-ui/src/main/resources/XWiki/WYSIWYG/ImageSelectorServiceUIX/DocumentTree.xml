@@ -127,7 +127,8 @@
     <property>
       <code>require(['jquery', 'xwiki-wysiwyg-image-selector'], function ($, imageSelector) {
   function getSelected(instance) {
-    return instance.get_selected(false)[0];
+    var selected = instance.get_selected(false)[0];
+    return selected &amp;&amp; $.fn.xtree.unescapeNodeId(selected);
   }
 
   function validateSelection(instance) {

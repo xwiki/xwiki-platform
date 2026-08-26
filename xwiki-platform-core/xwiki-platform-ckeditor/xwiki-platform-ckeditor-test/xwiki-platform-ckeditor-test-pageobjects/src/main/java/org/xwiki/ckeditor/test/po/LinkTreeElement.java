@@ -87,7 +87,7 @@ public class LinkTreeElement extends DocumentTreeElement
      */
     public void createNode(DocumentReference origin, String name)
     {
-        String createDocumentNodeId = getCreateDocumentNodeId(origin);
+        String createDocumentNodeId = escapeNodeId(getCreateDocumentNodeId(origin));
         WebElement originNode = getDriver().findElement(By.id(createDocumentNodeId));
         originNode.findElement(By.tagName("a")).click();
         // We cannot reuse the element
@@ -97,7 +97,7 @@ public class LinkTreeElement extends DocumentTreeElement
         SpaceReference targetSpace = new SpaceReference(name, origin.getLastSpaceReference());
         DocumentReference target = new DocumentReference("WebHome", targetSpace);
         getDriver().waitUntilCondition(
-            ExpectedConditions.presenceOfElementLocated(By.id(getNodeId(target)))
+            ExpectedConditions.presenceOfElementLocated(By.id(escapeNodeId(getNodeId(target))))
         );
         openTo(getNodeId(target));
     }

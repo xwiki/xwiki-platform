@@ -42,22 +42,24 @@ public class QuickSearchElement extends BaseElement
     public void search(String terms)
     {
         this.searchButton.click();
-        typeSearch(terms);
+        this.searchInput.clear();
+        this.searchInput.sendKeys(terms);
+        waitForSuggestions();
     }
 
     /**
-     * Enter text in the quick search box, which must already be open. Use this rather than {@link #search(String)} to
-     * search a second time, since clicking the button again submits the form.
+     * Reopens the suggestions panel for the terms already in the quick search box, by retyping their last character.
+     * Note that neither clicking the search button nor clearing the input can be used here, since the former submits
+     * the form and the latter takes the focus away from the input, which collapses the search box.
      *
-     * @param terms text to search
+     * @param terms the terms currently in the quick search box
      * @since 18.4.5
      * @since 18.8.0RC1
      */
-    public void typeSearch(String terms)
+    public void reopenSuggestions(String terms)
     {
-        this.searchInput.clear();
-        this.searchInput.sendKeys(terms);
-        getDriver().waitUntilElementIsVisible(By.cssSelector(".searchSuggest li.showAllResults.loading"));
+        this.searchInput.sendKeys(Keys.BACK_SPACE, terms.substring(terms.length() - 1));
+        waitForSuggestions();
     }
 
     /**
@@ -99,5 +101,10 @@ public class QuickSearchElement extends BaseElement
     {
         this.searchInput.sendKeys(Keys.ESCAPE);
         getDriver().waitUntilElementDisappears(By.cssSelector(".searchSuggest"));
+    }
+
+    private void waitForSuggestions()
+    {
+        getDriver().waitUntilElementIsVisible(By.cssSelector(".searchSuggest li.showAllResults.loading"));
     }
 }

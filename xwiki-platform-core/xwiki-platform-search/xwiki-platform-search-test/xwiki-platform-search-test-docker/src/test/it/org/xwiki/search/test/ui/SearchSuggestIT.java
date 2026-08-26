@@ -79,7 +79,7 @@ class SearchSuggestIT
 
         // Verify that closing and reopening the suggestions panel doesn't leave "Go to search page..." behind.
         quickSearchElement.closeSuggestions();
-        quickSearchElement.typeSearch(testDocumentTitle);
+        quickSearchElement.reopenSuggestions(testDocumentTitle);
         assertEquals(testDocumentTitle, quickSearchElement.getResults("Page titles").get(0).getTitle());
         assertTrue(quickSearchElement.isShowAllResultsLast());
     }

@@ -42,6 +42,18 @@ public class QuickSearchElement extends BaseElement
     public void search(String terms)
     {
         this.searchButton.click();
+        typeSearch(terms);
+    }
+
+    /**
+     * Enter text in the quick search box, which must already be open. Use this rather than {@link #search(String)} to
+     * search a second time, since clicking the button again submits the form.
+     *
+     * @param terms text to search
+     * @since 18.8.0RC1
+     */
+    public void typeSearch(String terms)
+    {
         this.searchInput.clear();
         this.searchInput.sendKeys(terms);
         getDriver().waitUntilElementIsVisible(By.cssSelector(".searchSuggest li.showAllResults.loading"));
@@ -68,8 +80,9 @@ public class QuickSearchElement extends BaseElement
      */
     public boolean isShowAllResultsLast()
     {
+        // The showAllResults class is on the list item, not on its suggestItem container child.
         List<WebElement> suggestItems =
-            getDriver().findElementsWithoutWaiting(By.cssSelector(".searchSuggest .suggestItem"));
+            getDriver().findElementsWithoutWaiting(By.cssSelector(".searchSuggest li.xitem"));
         return !suggestItems.isEmpty()
             && suggestItems.get(suggestItems.size() - 1).getAttribute("class").contains("showAllResults");
     }

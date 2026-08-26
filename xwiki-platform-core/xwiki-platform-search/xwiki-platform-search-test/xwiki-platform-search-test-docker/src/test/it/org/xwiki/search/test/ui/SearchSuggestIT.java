@@ -74,12 +74,13 @@ class SearchSuggestIT
         quickSearchElement.search(testDocumentTitle);
         assertEquals(testDocumentTitle, quickSearchElement.getResults("Page titles").get(0).getTitle());
 
-        // Verify that "Go to search page..." is displayed last (XWIKI-24324).
+        // Verify that "Go to search page..." is displayed last.
         assertTrue(quickSearchElement.isShowAllResultsLast());
 
         // Verify that closing and reopening the suggestions panel doesn't leave "Go to search page..." behind.
         quickSearchElement.closeSuggestions();
-        quickSearchElement.search(testDocumentTitle);
+        quickSearchElement.typeSearch(testDocumentTitle);
+        assertEquals(testDocumentTitle, quickSearchElement.getResults("Page titles").get(0).getTitle());
         assertTrue(quickSearchElement.isShowAllResultsLast());
     }
 

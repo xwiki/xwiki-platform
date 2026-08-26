@@ -20,9 +20,9 @@
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.security.Principal;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
@@ -50,6 +51,11 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
      * The XWiki config property for storing the superadmin password.
      */
     private static final String SUPERADMIN_PASSWORD_CONFIG = "xwiki.superadminpassword";
+
+    private static final Pattern SUPERADMIN_PASSWORD_PATTERN = Pattern.compile(
+        String.format("^\\{(%s)}.*$",
+        String.join("|", PasswordClass.SUPPORTED_ALGORITHMS)
+    ));
 
     /**
      * @param username the username to check for superadmin access. Examples: "xwiki:XWiki.superadmin",
@@ -102,9 +108,9 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
 
     private static boolean validateSuperAdminPassword(String password, String superadminpassword)
     {
-        if (superadminpassword.startsWith("$2") && superadminpassword.length() == 60) {
-            // The superadmin password is a BCrypt hash.
-            return OpenBSDBCrypt.checkPassword(superadminpassword, password.toCharArray());
+        if (SUPERADMIN_PASSWORD_PATTERN.matcher(superadminpassword).matches()) {
+            PasswordClass passwordClass = new PasswordClass();
+            return passwordClass.arePasswordsMatching(password, superadminpassword);
         }
         return superadminpassword.equals(password);
     }

@@ -137,7 +137,7 @@ class XWikiAuthServiceImplTest
     {
         // The password is "pass"
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.superadminpassword",
-            "$2y$08$2Mel30blRQ7E.XievLW00.AltivcBuU1HEl2mPG2qRGrd7FmWIwB6");
+            "{bcrypt}$2y$08$2Mel30blRQ7E.XievLW00.AltivcBuU1HEl2mPG2qRGrd7FmWIwB6");
 
         Principal principal = this.authService.authenticate(XWikiRightService.SUPERADMIN_USER, "pass",
             this.oldcore.getXWikiContext());

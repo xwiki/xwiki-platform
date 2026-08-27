@@ -25,17 +25,34 @@ import type {
 /**
  * Initializes a translator that resolves translation keys by sending request to a XWiki REST endpoint.
  *
+ * Resolved translations are cached per locale, so that the same key requested in two locales leads to two requests
+ * and two cache entries.
+ *
  * @param target - the url of the rest endpoint to use to resolve translation
  * @since 18.3.0RC1
  * @beta
  */
 export function translatorFactory(target: string): Translator {
-  const cache = {};
+  const caches = new Map<string, Translations>();
   const inflightRequests = new Map<string, Promise<Translations>>();
   return {
     // eslint-disable-next-line max-statements
     async resolve(query): Promise<Translations> {
-      const queryKey = JSON.stringify(query);
+      const isArrayQuery = Array.isArray(query);
+      const prefix = isArrayQuery ? "" : (query.prefix ?? "");
+      const keys = isArrayQuery ? query : query.keys;
+      const locale =
+        (isArrayQuery ? undefined : query.locale) ??
+        document.documentElement.getAttribute("lang") ??
+        "en";
+
+      const cache = caches.get(locale) ?? {};
+      caches.set(locale, cache);
+      const fullKey = (key: string) => prefix + key;
+
+      // The locale is part of the identity of a request: the same keys asked in two locales are two distinct
+      // requests.
+      const queryKey = JSON.stringify({ locale, prefix, keys });
       if (inflightRequests.has(queryKey)) {
         return inflightRequests.get(queryKey)!;
       }
@@ -49,35 +66,13 @@ export function translatorFactory(target: string): Translator {
       inflightRequests.set(queryKey, promise);
 
       const urlSearchParams = new URLSearchParams();
-
-      const cacheKeys = Object.keys(cache);
-      const defaultLocale = () =>
-        document.documentElement.getAttribute("lang") ?? "en";
-      if (Array.isArray(query)) {
-        const cleanedQuery = query.filter((key) => !cacheKeys.includes(key));
-
-        for (const arg of cleanedQuery) {
-          urlSearchParams.append("key", arg);
-        }
-
-        urlSearchParams.append("locale", defaultLocale());
-      } else {
-        const filteredKeys = query.keys.filter(
-          (key) => !cacheKeys.includes((query.prefix ?? "") + key),
-        );
-
-        if (query.prefix) {
-          urlSearchParams.append("prefix", query.prefix);
-        }
-        for (const arg of filteredKeys) {
-          urlSearchParams.append("key", arg);
-        }
-        if (query.locale) {
-          urlSearchParams.append("locale", query.locale);
-        } else {
-          urlSearchParams.append("locale", defaultLocale());
-        }
+      if (prefix) {
+        urlSearchParams.append("prefix", prefix);
       }
+      for (const key of keys.filter((key) => !(fullKey(key) in cache))) {
+        urlSearchParams.append("key", key);
+      }
+      urlSearchParams.append("locale", locale);
 
       // If there is no keys, it means that everything is already in the cache
       if (urlSearchParams.has("key")) {
@@ -102,7 +97,7 @@ export function translatorFactory(target: string): Translator {
           const translations: { key: string; rawSource: string }[] =
             promise.translations ?? {};
 
-          // Save newly resolved keys to the cache
+          // Save newly resolved keys to the cache of the requested locale
           Object.assign(
             cache,
             translations.reduce<{
@@ -125,7 +120,14 @@ export function translatorFactory(target: string): Translator {
         }
       }
 
-      _resolve(cache);
+      // Only the translations of the query, so that the caller does not receive the shared mutable cache, holding
+      // keys it never asked for.
+      const resolved: Translations = {};
+      for (const key of keys.filter((key) => fullKey(key) in cache)) {
+        resolved[fullKey(key)] = cache[fullKey(key)];
+      }
+
+      _resolve(resolved);
       inflightRequests.delete(queryKey);
 
       return promise;

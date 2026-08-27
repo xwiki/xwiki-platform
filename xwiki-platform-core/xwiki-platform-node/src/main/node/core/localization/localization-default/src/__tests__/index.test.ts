@@ -19,15 +19,18 @@
  */
 import { initialize } from "../index";
 import { describe, expect, it, vi } from "vitest";
-import type { Translator } from "@xwiki/platform-localization-api";
+import type { Query, Translator } from "@xwiki/platform-localization-api";
 
 function makeTranslator(resolved: Record<string, string>): Translator {
   return {
-    resolve: vi.fn(async (keys: string[]) =>
-      Object.fromEntries(
+    resolve: vi.fn(async (query: Query) => {
+      const keys = Array.isArray(query)
+        ? query
+        : query.keys.map((k) => (query.prefix ?? "") + k);
+      return Object.fromEntries(
         keys.filter((k) => k in resolved).map((k) => [k, resolved[k]]),
-      ),
-    ),
+      );
+    }),
   };
 }
 
@@ -116,5 +119,48 @@ describe("initialize", () => {
 
     expect(result.translations).toEqual({});
     expect(result.missed).toEqual(["a.key"]);
+  });
+});
+
+describe("initialize, locales", () => {
+  it("forwards the locale of the query to the translators", async () => {
+    const translator = makeTranslator({ "ns.hello": "Salut" });
+    const resolver = initialize(translator);
+
+    await resolver.resolve({
+      prefix: "ns.",
+      keys: ["hello"],
+      locale: "fr",
+    });
+
+    expect(translator.resolve).toHaveBeenCalledWith({
+      keys: ["ns.hello"],
+      locale: "fr",
+    });
+  });
+
+  it("forwards an undefined locale for an array query", async () => {
+    const translator = makeTranslator({ "a.key": "Hello" });
+    const resolver = initialize(translator);
+
+    await resolver.resolve(["a.key"]);
+
+    expect(translator.resolve).toHaveBeenCalledWith({
+      keys: ["a.key"],
+      locale: undefined,
+    });
+  });
+
+  it("keeps forwarding the locale to the next translator of the chain", async () => {
+    const t1 = makeTranslator({ "a.key": "From T1" });
+    const t2 = makeTranslator({ "b.key": "From T2" });
+    const resolver = initialize(t1, t2);
+
+    await resolver.resolve({ keys: ["a.key", "b.key"], locale: "fr" });
+
+    expect(t2.resolve).toHaveBeenCalledWith({
+      keys: ["b.key"],
+      locale: "fr",
+    });
   });
 });

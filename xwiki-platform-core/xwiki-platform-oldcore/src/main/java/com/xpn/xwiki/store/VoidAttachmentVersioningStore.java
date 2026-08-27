@@ -51,6 +51,7 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
      */
     public VoidAttachmentVersioningStore()
     {
+        // Nothing to do, this empty constructor is only needed by the component manager.
     }
 
     @Override

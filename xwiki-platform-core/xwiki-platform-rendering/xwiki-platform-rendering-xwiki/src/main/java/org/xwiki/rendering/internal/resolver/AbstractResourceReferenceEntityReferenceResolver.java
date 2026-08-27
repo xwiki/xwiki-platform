@@ -72,14 +72,14 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     /**
      * Default constructor with an unset resourceType.
      */
-    public AbstractResourceReferenceEntityReferenceResolver()
+    protected AbstractResourceReferenceEntityReferenceResolver()
     {
     }
 
     /**
      * @param type the resource type that this resolver will support
      */
-    public AbstractResourceReferenceEntityReferenceResolver(ResourceType type)
+    protected AbstractResourceReferenceEntityReferenceResolver(ResourceType type)
     {
         this.resourceType = type;
     }

@@ -157,6 +157,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     @Deprecated(since = "18.2.0RC1")
     public void setClassType(String type)
     {
+        // Nothing to do, the class type is derived from the property class itself.
     }
 
     @Override
@@ -197,6 +198,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     protected void cloneInternal(BaseProperty clone)
     {
+        // Nothing to do by default, meant to be overridden by subclasses.
     }
 
     @Override
@@ -214,6 +216,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
 
     public void setValue(Object value)
     {
+        // Nothing to do by default, meant to be overridden by subclasses.
     }
 
     /**

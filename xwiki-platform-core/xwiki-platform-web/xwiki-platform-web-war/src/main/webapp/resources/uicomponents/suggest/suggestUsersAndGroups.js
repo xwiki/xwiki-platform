@@ -25,7 +25,7 @@ define('xwiki-selectize-utils', ['jquery'], function($) {
   var maybeLoadMoreSuggestions = function(source, params) {
     return function(suggestions) {
       if (suggestions.length < params.limit) {
-        return source.call(null, params).then(function(response) {
+        return source(params).then(function(response) {
           // Success.
           if (Array.isArray(response)) {
             suggestions.push.apply(suggestions, response.slice(0, params.limit - suggestions.length));

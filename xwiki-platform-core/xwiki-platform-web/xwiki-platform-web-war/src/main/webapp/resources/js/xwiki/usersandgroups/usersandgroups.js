@@ -436,7 +436,6 @@ function displayMembers(row, i, table, form_token)
   */
 function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
 {
-  var userurl = row.userurl;
   var uorg = table.json.uorg;
   // Rights are case insensitive in XWiki security module, and the reference rights defined in rightsUI.vm
   // are lowercase, hence we make sure to convert all applying rights to lowercase before comparing them with the
@@ -617,22 +616,20 @@ function setGuestExtendedRights(self)
             pivot.alt = "no";
         }});
       }
+    } else if (self.id.indexOf('view') > 0) {
+      new Ajax.Request(url, {
+        method: 'post',
+        parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "1"},
+        onSuccess: function() {
+          pivot.alt = "yes";
+      }});
     } else {
-      if (self.id.indexOf('view') > 0) {
-        new Ajax.Request(url, {
-          method: 'post',
-          parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "1"},
-          onSuccess: function() {
-            pivot.alt = "yes";
-        }});
-      } else {
-        new Ajax.Request(url, {
-          method: 'post',
-          parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "1"},
-          onSuccess: function() {
-            pivot.alt = "yes";
-        }});
-      }
+      new Ajax.Request(url, {
+        method: 'post',
+        parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "1"},
+        onSuccess: function() {
+          pivot.alt = "yes";
+      }});
     }
   }
 }

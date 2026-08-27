@@ -136,7 +136,7 @@ public class TagNotificationFilterPreference implements NotificationFilterPrefer
     @Override
     public void setEnabled(boolean enabled)
     {
-
+        // Nothing to do, a tag notification filter preference is always enabled.
     }
 
     @Override

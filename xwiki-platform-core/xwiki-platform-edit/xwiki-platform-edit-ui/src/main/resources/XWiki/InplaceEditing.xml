@@ -48,16 +48,10 @@
     #set ($discard = $response.setStatus(423))
     #jsonResponse($editConfirmation)
   #else
-    ## Lock the document for editing.
-    #set ($lockParams = {
-      'ajax': 1,
-      'action': $request.lockAction,
-      'language': $tdoc.realLocale
-    })
-    #if ($request.force == 'true')
-      #set ($lockParams.force = 1)
-    #end
-    #set ($discard = $response.sendRedirect($tdoc.getURL('lock', $escapetool.url($lockParams))))
+    ## The edit action, which serves this sheet, has already locked the document translation that is going to be
+    ## edited, so there's nothing left for us to do. We still write an empty JSON object because the caller asks for
+    ## JSON and can't parse an empty response.
+    #jsonResponse({})
   #end
 #end
 {{/velocity}}</content>
@@ -158,7 +152,11 @@ require.config({
   paths: paths.js
 });
 
-define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
+define('xwiki-document-api', [
+  'jquery',
+  'xwiki-meta',
+  'xwiki-document-lock'
+], function($, xcontext, DocumentLock) {
   function getOldAPI(xwikiDocument) {
     return (xwikiDocument.documentReference &amp;&amp; new XWiki.Document(xwikiDocument.documentReference)) ||
       XWiki.currentDocument;
@@ -346,18 +344,29 @@ define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
      */
     lock(action, force) {
       action = action || 'edit';
-      return Promise.resolve($.getJSON(this.getURL('get'), {
+      // We go through the edit action because it resolves the document translation that is going to be edited, which
+      // is not always the one from the context (e.g. when the translation doesn't exist yet, because it's about to be
+      // created), and it locks that translation, which is what the edit confirmation checkers look at. We don't want
+      // the output of the edit action though, so we ask for the output of this sheet instead.
+      return Promise.resolve($.getJSON(this.getURL('edit'), {
+        xpage: 'get',
         sheet: 'XWiki.InplaceEditing',
         action: 'lock',
-        lockAction: action,
-        force: force,
+        // The edit action expects 1 in order to force the lock. We must not send any value when we're not forcing,
+        // because #getEditConfirmation() considers the edit forced as soon as this parameter is not empty.
+        force: force ? 1 : '',
         language: this.getRealLocale(),
         force_token: xcontext.form_token,
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
       })).then(() =&gt; {
-        // Lock succeeded.
-        this.locked = action;
+        // Lock succeeded. Remember the locale we locked, because the locale of this document can change while we edit
+        // it (e.g. when the edited translation doesn't exist and we fall back on the default translation), and the lock
+        // is taken on a specific document translation.
+        this.locked = {action, locale: this.getRealLocale()};
+        // We don't use DocumentLock to acquire the lock, because we need to handle the lock confirmation, but we let it
+        // know that we hold the lock, so that it removes it when the page is unloaded.
+        DocumentLock.getOrCreate(getOldAPI(this), this.locked.locale).setLocked(true, {action});
         return this;
       }).catch(response =&gt; {
         // Lock failed.
@@ -373,23 +382,13 @@ define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
     }
 
     /**
-     * Unlock this document for the specified action, by sending a beacon, if the browser supports it, or by making a
-     * synchronous HTTP request, because this function can be called just before the window is unloaded.
+     * Unlock this document, so that other users can edit it.
      */
-    unlock(action) {
-      action = action || 'edit';
-      this.locked = false;
-      var url = this.getURL('cancel', $.param({
-        ajax: 1,
-        action: action,
-        language: this.getRealLocale()
-      }));
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(url);
-      } else {
-        // Make a synchronous request otherwise, because the page can unload before the unlock request is sent.
-        // See https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Synchronous_and_Asynchronous_Requests
-        $.ajax({type: 'GET', url: url, async: false});
+    unlock() {
+      const locked = this.locked;
+      delete this.locked;
+      if (locked) {
+        DocumentLock.get(getOldAPI(this), locked.locale)?.unlock();
       }
     }
 
@@ -697,11 +696,6 @@ define('editInPlace', [
     }
     return xwikiDocument;
   };
-
-  // Make sure we unlock the document when the user navigates to another page.
-  $(window).on('unload pagehide', () =&gt; {
-    unlock(getCurrentXWikiDocument());
-  });
 
   var shouldReload = function(xwikiDocument) {
     var reloadEventFired = false;

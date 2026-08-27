@@ -51,7 +51,7 @@ define('xwiki-selectize', [
     var output = $(optionTemplate);
     var value = (option && typeof option === 'object') ? option.value : option;
     output.attr('data-value', value);
-    var icon = option && option.icon;
+    var icon = option?.icon;
     if (typeof icon === 'object') {
       // Set the icon set type in case it was missing.
       if (!icon.iconSetType && icon.url) {
@@ -71,7 +71,7 @@ define('xwiki-selectize', [
     } else {
       output.find('.xwiki-selectize-option-icon').remove();
     }
-    var url = option && option.url;
+    var url = option?.url;
     if (typeof url === 'string') {
       var anchor = $('<a class="xwiki-selectize-option-label"></a>').attr('href', url);
       output.find('.xwiki-selectize-option-label').replaceWith(anchor);
@@ -89,7 +89,7 @@ define('xwiki-selectize', [
     // the suggestions are displayed on separate lines in the drop down list. We don't need to center the icon for the
     // selected suggestions because they are displayed in-line so the labels don't have to be aligned.
     output.find('.xwiki-selectize-option-icon').wrap('<span class="xwiki-selectize-option-icon-wrapper"></span>');
-    var hint = option && option.hint;
+    var hint = option?.hint;
     if (typeof hint === 'string' && hint !== '') {
       output.append($('<div class="xwiki-selectize-option-hint"></div>').text(hint));
     }
@@ -98,7 +98,7 @@ define('xwiki-selectize', [
 
   var renderItem = function(option) {
     var output = renderCommon(option);
-    var hint = option && option.hint;
+    var hint = option?.hint;
     if (typeof hint === 'string' && hint !== '') {
       output.attr('title', hint);
     }
@@ -390,7 +390,7 @@ require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {
   $.fn.xwikiSelectize.initialized = true;
 
   var init = function(event, data) {
-    var container = $((data && data.elements) || document);
+    var container = $(data?.elements || document);
     container.find('.xwiki-selectize').xwikiSelectize();
   };
 

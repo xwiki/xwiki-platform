@@ -250,7 +250,7 @@ public class CreateAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
 
-        String parent = getParent(request, doc, isSpace, context);
+        String parent = getParent(request, doc, context);
 
         // get the title of the page to create, as specified in the parameters
         String title = getTitle(request, newDocument, isSpace);
@@ -377,11 +377,10 @@ public class CreateAction extends XWikiAction
     /**
      * @param request the current request for which this action is executed
      * @param doc the current document
-     * @param isSpace {@code true} if the request is to create a space, {@code false} if a page should be created
      * @param context the XWiki context
      * @return the serialized reference of the parent to create the document for
      */
-    private String getParent(XWikiRequest request, XWikiDocument doc, boolean isSpace, XWikiContext context)
+    private String getParent(XWikiRequest request, XWikiDocument doc, XWikiContext context)
     {
         // This template can be passed a parent document reference in parameter (using the "parent" parameter).
         // If a parent parameter is passed, use it to set the parent when creating the new Page or Space.

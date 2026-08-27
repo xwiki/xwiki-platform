@@ -48,14 +48,12 @@ require(['jquery', 'xwiki-l10n!link-protection-translations', 'xwiki-events-brid
     let checkURLPolicy = (configuration === null) ? 'COMMENTS' : configuration.frontendUrlCheckPolicy;
     if (!doesAnchorPositionRequireConfirmation(anchor, checkURLPolicy)) {
       return true;
+    } else if (configuration == null && !isAnchorCurrentDomain(anchor)) {
+      return confirm(customizedMessage);
+    } else if (!isAnchorTrustedOomain(anchor, configuration.trustedDomains, configuration.allowedUrls)) {
+      return confirm(customizedMessage);
     } else {
-      if (configuration == null && !isAnchorCurrentDomain(anchor)) {
-        return confirm(customizedMessage);
-      } else if (!isAnchorTrustedOomain(anchor, configuration.trustedDomains, configuration.allowedUrls)) {
-        return confirm(customizedMessage);
-      } else {
-        return true;
-      }
+      return true;
     }
   }
 

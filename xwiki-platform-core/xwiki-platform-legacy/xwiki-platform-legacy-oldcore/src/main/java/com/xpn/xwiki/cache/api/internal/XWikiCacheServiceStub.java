@@ -48,6 +48,7 @@ public class XWikiCacheServiceStub implements XWikiCacheService
     @Override
     public void init(XWiki context)
     {
+        // Nothing to do, the cache factories are provided at construction time.
     }
 
     @Override

@@ -48,19 +48,16 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
             documentReference = new XWiki.EntityReference('WebHome', XWiki.EntityType.DOCUMENT, parent);
           }
         }
+      } else if ($('.modal-popup').length > 0) {
+        // We are in the 'create page' popup
+        var spaceReference = XWiki.Model.resolve($('#spaceReference').val(), XWiki.EntityType.SPACE);
+        documentReference = new XWiki.EntityReference($('#name').val(), XWiki.EntityType.DOCUMENT, spaceReference);
+      } else if (terminalCheckbox.prop('checked')) {
+        // We are in the create page action, with a page name already filled, and the page is terminal
+        documentReference = xm.documentReference.parent;
       } else {
-        if ($('.modal-popup').length > 0) {
-          // We are in the 'create page' popup
-          var spaceReference = XWiki.Model.resolve($('#spaceReference').val(), XWiki.EntityType.SPACE);
-          documentReference = new XWiki.EntityReference($('#name').val(), XWiki.EntityType.DOCUMENT, spaceReference);
-        } else {
-          // We are in the create page action, but with a page name already filled
-          if (terminalCheckbox.prop('checked')) {
-            documentReference = xm.documentReference.parent;
-          } else {
-            documentReference = xm.documentReference;
-          }
-        }
+        // We are in the create page action, with a page name already filled, and the page is not terminal
+        documentReference = xm.documentReference;
       }
 
       return XWiki.Model.serialize(documentReference.relativeTo(new XWiki.WikiReference(xm.wiki)));

@@ -809,7 +809,7 @@ public class LegacyTestWiki extends AbstractTestWiki
                 .thenAnswer(invocation -> new Vector<>(memberObjects.values()));
         }
 
-        private BaseObject mockGroupBaseObject(String user)
+        private BaseObject mockGroupBaseObject()
         {
             ++objectNumber;
             return mock(BaseObject.class, getName() + objectNumber);
@@ -849,7 +849,7 @@ public class LegacyTestWiki extends AbstractTestWiki
 
             testWiki.groups.get(getName()).add(uname);
 
-            this.memberObjects.put(uname, mockGroupBaseObject(uname));
+            this.memberObjects.put(uname, mockGroupBaseObject());
         }
 
         public void removeUser(String userName)

@@ -47,11 +47,11 @@ public class ListProperty extends BaseProperty implements Cloneable
     protected transient List<String> list;
 
     /**
-     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
+     * @deprecated This was never used, since it is not the right place to handle separators. They are
      *             defined in {@link ListClass} and that is where they are now handled through
      *             {@link ListClass#toFormString(BaseProperty)}.
      */
-    @Deprecated
+    @Deprecated(since = "7.0M2")
     private String formStringSeparator = ListClass.DEFAULT_SEPARATOR;
 
     /**
@@ -68,22 +68,22 @@ public class ListProperty extends BaseProperty implements Cloneable
     }
 
     /**
-     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
+     * @deprecated This was never used, since it is not the right place to handle separators. They are
      *             defined in {@link ListClass} and that is where they are now handled through
      *             {@link ListClass#toFormString(BaseProperty)}.
      */
-    @Deprecated
+    @Deprecated(since = "7.0M2")
     public String getFormStringSeparator()
     {
         return this.formStringSeparator;
     }
 
     /**
-     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
+     * @deprecated This was never used, since it is not the right place to handle separators. They are
      *             defined in {@link ListClass} and that is where they are now handled through
      *             {@link ListClass#toFormString(BaseProperty)}.
      */
-    @Deprecated
+    @Deprecated(since = "7.0M2")
     public void setFormStringSeparator(String formStringSeparator)
     {
         this.formStringSeparator = formStringSeparator;
@@ -120,10 +120,10 @@ public class ListProperty extends BaseProperty implements Cloneable
     }
 
     /**
-     * @deprecated Since 7.0M2. This method is here for a long time but it does not seem to have ever been used and it
+     * @deprecated This method is here for a long time but it does not seem to have ever been used and it
      *             does not bring any value compared to the existing {@link #toFormString()} method.
      */
-    @Deprecated
+    @Deprecated(since = "7.0M2")
     public String toSingleFormString()
     {
         return super.toFormString();

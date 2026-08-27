@@ -176,9 +176,9 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param html the HTML fragment to be rendered
      * @param syntaxId the storage syntax identifier
      * @return the XHTML result of rendering the given HTML fragment
-     * @deprecated since 11.9RC1, use {@link #parseAndRender(String, Syntax, EntityReference)} instead
+     * @deprecated use {@link #parseAndRender(String, Syntax, EntityReference)} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.9RC1")
     public String parseAndRender(String html, String syntaxId)
     {
         return parseAndRender(html, getSyntax(syntaxId), null);
@@ -296,9 +296,9 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param source the text to be converted
      * @param syntaxId the syntax identifier
      * @return the annotated XHTML result of the conversion
-     * @deprecated since 11.9RC1 use
+     * @deprecated use
      */
-    @Deprecated
+    @Deprecated(since = "11.9RC1")
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
         XWikiDocument currentDocument = this.xcontextProvider.get().getDoc();

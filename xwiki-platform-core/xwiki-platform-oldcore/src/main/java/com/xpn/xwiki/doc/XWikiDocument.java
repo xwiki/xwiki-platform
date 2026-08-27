@@ -2161,9 +2161,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @deprecated since 3.0M3 use {@link #getAuthorReference()} instead
+     * @deprecated use {@link #getAuthorReference()} instead
      */
-    @Deprecated
+    @Deprecated(since = "3.0M3")
     public String getAuthor()
     {
         return userReferenceToString(getAuthorReference());
@@ -3706,6 +3706,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         try {
             type = (String) context.get("display");
         } catch (Exception e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // The "view" display type is then used below.
         }
 
         if (type == null) {
@@ -5426,6 +5428,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     break;
                 default:
                     if (character < 0x20) {
+                        // Control characters are not allowed in XML and are simply dropped.
                     } else if (character > 0x7F) {
                         result.append("&#x");
                         result.append(Integer.toHexString(character).toUpperCase());
@@ -7404,7 +7407,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                 try {
                     is.close();
                 } catch (IOException ex) {
-
+                    // TODO: log a warning instead of ignoring this exception.
+                    // A failure to close the stream must not hide the result of the operation.
                 }
             }
         }
@@ -7515,10 +7519,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     public void removeLock(XWikiContext context) throws XWikiException
     {
-        XWikiLock lock = getStore(context).loadLock(getId(), context, true);
-        if (lock != null) {
-            getStore(context).deleteLock(lock, context, true);
-        }
+        // Only the document id matters when removing the lock, and removing a lock that doesn't exist is a no-op, so
+        // there's no need to load the lock first.
+        getStore(context).deleteLock(new XWikiLock(getId(), context.getUser()), context, true);
     }
 
     public void insertText(String text, String marker, XWikiContext context) throws XWikiException

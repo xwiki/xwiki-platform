@@ -40,7 +40,7 @@ XWiki.FlavorOrDefaultUIStep = Class.create({
    * Reacts to the actions taken on the extensions displayed on the default UI step.
    */
   _onExtensionStatusChanged : function(event) {
-    var stepButtons = $('stepButtons') && $('stepButtons').select('button');
+    var stepButtons = $('stepButtons')?.select('button');
     if (!stepButtons) return;
     var extension = event.memo.extension;
     var status = extension.getStatus();
@@ -101,13 +101,13 @@ var AbstractExtensionListStep = Class.create({
     if (this.container.down('.extension-item.extension-item-loading') || this.container.down('.job-log-item-loading')) {
       // Disable all step buttons.
       stepButtons.invoke('disable');
-      this._disable && this._disable();
+      this._disable?.();
     } else {
       // Enable all step buttons.
       stepButtons.invoke('enable');
-      this._enable && this._enable();
+      this._enable?.();
       // Show the Continue button if the step is completed.
-      if (this._isCompleted && this._isCompleted()) {
+      if (this._isCompleted?.()) {
         // Show the Continue button.
         stepButtons[0].up().removeClassName('hidden');
         stepButtons[1].up().addClassName('hidden');
@@ -128,12 +128,12 @@ var AbstractExtensionListStep = Class.create({
 XWiki.OutdatedExtensionsStep = Class.create(AbstractExtensionListStep, {
   _enable : function() {
     var checkForUpdatesLink = this.container.down('.checkForUpdates');
-    checkForUpdatesLink && checkForUpdatesLink.up('.xHint').show();
+    checkForUpdatesLink?.up('.xHint').show();
   },
 
   _disable: function() {
     var checkForUpdatesLink = this.container.down('.checkForUpdates');
-    checkForUpdatesLink && checkForUpdatesLink.up('.xHint').hide();
+    checkForUpdatesLink?.up('.xHint').hide();
   },
 
   _isCompleted : function() {
@@ -246,9 +246,9 @@ var PreviousUIForm = Class.create({
   },
 
   _hidePreviousUIForm : function(event) {
-    event && event.stop();
+    event?.stop();
     this.form.hide();
-    this.upgradeQuestion && this.upgradeQuestion.hide();
+    this.upgradeQuestion?.hide();
     this.recommendedUI.show();
   },
 
@@ -266,7 +266,7 @@ var PreviousUIForm = Class.create({
         this.form.disable();
         // Remove the message corresponding to a failed search.
         var message = this.form.down('.buttons').next();
-        message && message.remove();
+        message?.remove();
       }.bind(this),
       onSuccess: function(response) {
         var container = new Element('div').update(response.responseText);
@@ -324,14 +324,14 @@ var PreviousUIForm = Class.create({
     var status = extension.getStatus();
     // The previous UI can have the status 'installed-invalid' if one of its dependencies are not met anymore.
     if (this.previousUIExtensionId && extension.getId() == this.previousUIExtensionId.id
-        && extension.getVersion() == this.previousUIExtensionId.version && status && status.startsWith('installed')) {
+        && extension.getVersion() == this.previousUIExtensionId.version && status?.startsWith('installed')) {
       // Remove the previous UI extension display.
       this.form.next().remove();
       // Display the default UI extension.
       for (var next = this.form.next(); next; next = next.show().next()) {};
       // Refresh the display of the recommended UI extension so that we get the upgrade button.
       var recommendedUIExtension = this.recommendedUI.down('.extension-item');
-      recommendedUIExtension && recommendedUIExtension._extensionBehaviour.refresh({hideExtensionDetails: true});
+      recommendedUIExtension?._extensionBehaviour.refresh({hideExtensionDetails: true});
     }
   }
 });
@@ -339,7 +339,7 @@ var PreviousUIForm = Class.create({
 function init() {
   // Make sure the users don't cancel the wizard by mistake.
   var cancelButton = $('body').down('#stepButtons button[value=CANCEL]');
-  cancelButton && cancelButton.observe('click', function(event) {
+  cancelButton?.observe('click', function(event) {
     if (!window.confirm("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.cancelConfirmation'))")) {
       event.stop();
     }

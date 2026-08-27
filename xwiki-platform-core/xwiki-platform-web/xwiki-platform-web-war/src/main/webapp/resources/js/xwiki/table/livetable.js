@@ -277,7 +277,7 @@ XWiki.widgets.LiveTable = Class.create({
   {
     var object = this.displayNode;
     while (object.hasChildNodes()) {
-      object.removeChild(object.firstChild);
+      object.firstChild.remove();
     }
   },
 
@@ -607,7 +607,7 @@ XWiki.widgets.LiveTable = Class.create({
       fragment += "&sort=" + column;
       var direction = this.getSortDirection();
       if( direction != null ) {
-        return fragment += "&dir=" + direction;
+        return fragment + "&dir=" + direction;
       }
     }
     return fragment;
@@ -831,7 +831,7 @@ var LiveTableHash = Class.create({
    */
   serializeParams: function(newParams)
   {
-    var params = $H((newParams) ? newParams : this.params);
+    var params = $H(newParams || this.params);
     params = params.inject({}, function(params, pair) {
       params[pair.key] = encodeURIComponent(pair.value);
       return params;

@@ -139,10 +139,10 @@ public class CreateActionRequestHandler
     /**
      * The property name for the spaces in the template provider object.
      *
-     * @deprecated since 8.3M2. Use {@link #TP_CREATION_RESTRICTIONS_PROPERTY} or
+     * @deprecated Use {@link #TP_CREATION_RESTRICTIONS_PROPERTY} or
      *             {@value #TP_VISIBILITY_RESTRICTIONS_PROPERTY} instead for the explicit restriction you need to add.
      */
-    @Deprecated
+    @Deprecated(since = "8.3M2")
     private static final String SPACES_PROPERTY = "spaces";
 
     /**
@@ -815,9 +815,9 @@ public class CreateActionRequestHandler
 
     /**
      * @return the {@link VelocityContext} for the context we are handling
-     * @deprecated since 8.3M1, use {@link #getCurrentScriptContext()} instead
+     * @deprecated use {@link #getCurrentScriptContext()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.3M1")
     public VelocityContext getVelocityContext()
     {
         return Utils.getComponent(VelocityManager.class).getVelocityContext();

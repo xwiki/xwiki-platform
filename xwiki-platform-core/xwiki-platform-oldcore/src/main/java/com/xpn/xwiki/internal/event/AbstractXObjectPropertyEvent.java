@@ -32,14 +32,14 @@ public abstract class AbstractXObjectPropertyEvent extends AbstractXObjectEvent 
     /**
      * Default constructor. Matches any {@link XObjectPropertyEvent}.
      */
-    public AbstractXObjectPropertyEvent()
+    protected AbstractXObjectPropertyEvent()
     {
     }
 
     /**
      * @param reference the object property reference
      */
-    public AbstractXObjectPropertyEvent(EntityReference reference)
+    protected AbstractXObjectPropertyEvent(EntityReference reference)
     {
         super(reference);
     }

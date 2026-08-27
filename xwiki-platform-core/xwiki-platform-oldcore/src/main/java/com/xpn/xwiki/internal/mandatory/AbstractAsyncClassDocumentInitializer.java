@@ -70,7 +70,7 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
      * @param reference the reference of the document to update. Can be either local or absolute depending if the
      *            document is associated to a specific wiki or not
      */
-    public AbstractAsyncClassDocumentInitializer(EntityReference reference)
+    protected AbstractAsyncClassDocumentInitializer(EntityReference reference)
     {
         super(reference);
     }

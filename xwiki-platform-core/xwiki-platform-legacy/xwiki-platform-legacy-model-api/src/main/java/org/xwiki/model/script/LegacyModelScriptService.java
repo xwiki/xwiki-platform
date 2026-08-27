@@ -49,9 +49,9 @@ public class LegacyModelScriptService extends ModelScriptService
      * @return the configured value for the requested entity type, for example "Main" for the default space or "WebHome"
      *         for the default space homepage
      * @since 4.3M1
-     * @deprecated since 7.2M1, use {@link #getEntityReference(EntityType, String)}
+     * @deprecated use {@link #getEntityReference(EntityType, String)}
      */
-    @Deprecated
+    @Deprecated(since = "7.2M1")
     public String getEntityReferenceValue(EntityType type, String hint)
     {
         if (type == null) {
@@ -75,9 +75,9 @@ public class LegacyModelScriptService extends ModelScriptService
      *            entity, like {@code 'SPACE'}
      * @return the current value for the requested entity type
      * @since 4.3M1
-     * @deprecated since 7.4.1/8.0M1, use {@link #getEntityReference(EntityType)}
+     * @deprecated use {@link #getEntityReference(EntityType)}
      */
-    @Deprecated
+    @Deprecated(since = "7.4.1,8.0M1")
     public String getEntityReferenceValue(EntityType type)
     {
         return getEntityReferenceValue(type, DEFAULT_RESOLVER_HINT);

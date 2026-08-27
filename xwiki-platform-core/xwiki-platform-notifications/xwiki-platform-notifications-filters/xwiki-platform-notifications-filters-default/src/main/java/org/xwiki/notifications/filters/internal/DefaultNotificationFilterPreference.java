@@ -179,6 +179,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     @Deprecated(since = "16.5.0RC1")
     public void setActive(boolean active)
     {
+        // Nothing to do, this deprecated setter is kept for backward compatibility only.
     }
 
     /**

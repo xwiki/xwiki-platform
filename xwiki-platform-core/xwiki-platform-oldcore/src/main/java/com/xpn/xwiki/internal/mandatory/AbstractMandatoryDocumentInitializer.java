@@ -32,16 +32,16 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
  *
  * @version $Id$
  * @since 4.3M1
- * @deprecated since 9.0RC1, use {@link com.xpn.xwiki.doc.AbstractMandatoryDocumentInitializer} instead
+ * @deprecated use {@link com.xpn.xwiki.doc.AbstractMandatoryDocumentInitializer} instead
  */
-@Deprecated
+@Deprecated(since = "9.0RC1")
 public abstract class AbstractMandatoryDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * @param reference the reference of the document to update. Can be either local or absolute depending if the
      *            document is associated to a specific wiki or not
      */
-    public AbstractMandatoryDocumentInitializer(EntityReference reference)
+    protected AbstractMandatoryDocumentInitializer(EntityReference reference)
     {
         super(reference);
     }
@@ -50,7 +50,7 @@ public abstract class AbstractMandatoryDocumentInitializer extends AbstractManda
      * @param spaceName the space name of the document
      * @param documentName the document name of the document
      */
-    public AbstractMandatoryDocumentInitializer(String spaceName, String documentName)
+    protected AbstractMandatoryDocumentInitializer(String spaceName, String documentName)
     {
         this(new EntityReference(documentName, EntityType.DOCUMENT, new EntityReference(spaceName, EntityType.SPACE)));
     }

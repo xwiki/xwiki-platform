@@ -40,7 +40,7 @@ public class XWikiInitializedWikiCacheStub implements XWikiCache
     @Override
     public void cancelUpdate(String key)
     {
-
+        // Nothing to do, this stub delegates everything to the wrapped cache.
     }
 
     @Override
@@ -88,6 +88,6 @@ public class XWikiInitializedWikiCacheStub implements XWikiCache
     @Override
     public void setCapacity(int capacity)
     {
-
+        // Nothing to do, this stub delegates everything to the wrapped cache.
     }
 }

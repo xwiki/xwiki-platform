@@ -616,10 +616,8 @@ XWiki.Dashboard = Class.create( {
                 onComplete();
               }
             });
-          } else {
-            if (onComplete) {
-              onComplete();
-            }
+          } else if (onComplete) {
+            onComplete();
           }
         }.bind(this),
         onFailure: function(response) {

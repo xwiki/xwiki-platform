@@ -182,7 +182,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
                 DocumentReference wikiMacroDocumentReference =
                     new DocumentReference((String) wikiMacroDocumentData[1], spaceReference);
 
-                registerMacro(wikiMacroDocumentReference, (String) wikiMacroDocumentData[2], xcontext);
+                registerMacro(wikiMacroDocumentReference, xcontext);
             }
         } catch (Exception ex) {
             this.logger.warn("Failed to register macros for wiki [{}]: [{}]", wikiName,
@@ -209,10 +209,9 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
      * Register a wiki macro in the component manager, if the macro author has the required rights.
      * 
      * @param wikiMacroDocumentReference the document holding the macro definition
-     * @param wikiMacroDocumentAuthor the author of the macro document
      * @param xcontext the current request context
      */
-    private void registerMacro(DocumentReference wikiMacroDocumentReference, String wikiMacroDocumentAuthor,
+    private void registerMacro(DocumentReference wikiMacroDocumentReference,
         XWikiContext xcontext)
     {
         this.logger.debug("Registering macro in document [{}]...", wikiMacroDocumentReference);

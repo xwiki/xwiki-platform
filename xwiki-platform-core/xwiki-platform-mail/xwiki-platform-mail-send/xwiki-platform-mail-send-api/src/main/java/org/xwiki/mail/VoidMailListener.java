@@ -32,49 +32,49 @@ public class VoidMailListener implements MailListener
     @Override
     public void onPrepareBegin(String batchId, Map<String, Object> parameters)
     {
-
+        // Nothing to do, this listener voluntarily ignores all mail events.
     }
 
     @Override
     public void onPrepareMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
     {
-
+        // Nothing to do, this listener voluntarily ignores all mail events.
     }
 
     @Override
     public void onPrepareMessageError(ExtendedMimeMessage message, Exception e, Map<String, Object> parameters)
     {
-
+        // Nothing to do, this listener voluntarily ignores all mail events.
     }
 
     @Override
     public void onPrepareFatalError(Exception exception, Map<String, Object> parameters)
     {
-
+        // Nothing to do, this listener voluntarily ignores all mail events.
     }
 
     @Override
     public void onPrepareEnd(Map<String, Object> parameters)
     {
-
+        // Nothing to do, this listener voluntarily ignores all mail events.
     }
 
     @Override
     public void onSendMessageSuccess(ExtendedMimeMessage message, Map<String, Object> parameters)
     {
-
+        // Nothing to do, this listener voluntarily ignores all mail events.
     }
 
     @Override
     public void onSendMessageError(ExtendedMimeMessage message, Exception exception, Map<String, Object> parameters)
     {
-
+        // Nothing to do, this listener voluntarily ignores all mail events.
     }
 
     @Override
     public void onSendMessageFatalError(String uniqueMessageId, Exception exception, Map<String, Object> parameters)
     {
-
+        // Nothing to do, this listener voluntarily ignores all mail events.
     }
 
     @Override

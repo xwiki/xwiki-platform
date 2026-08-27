@@ -76,21 +76,25 @@ class XWikiNotificationManagerTest
             @Override
             public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
             {
+                // Nothing to do, this test rule does not need to react to notifications.
             }
 
             @Override
             public void preverify(XWikiDocument doc, String action, XWikiContext context)
             {
+                // Nothing to do, this test rule does not need to react to notifications.
             }
 
             @Override
             public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
             {
+                // Nothing to do, this test rule does not need to react to notifications.
             }
 
             @Override
             public void verify(XWikiDocument doc, String action, XWikiContext context)
             {
+                // Nothing to do, this test rule does not need to react to notifications.
             }
         };
     }

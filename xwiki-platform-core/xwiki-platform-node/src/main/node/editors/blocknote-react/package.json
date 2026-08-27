@@ -65,12 +65,14 @@
     "@xwiki/platform-uniast-api": "workspace:*",
     "@xwiki/platform-uniast-markdown": "workspace:*",
     "i18next": "catalog:",
-    "inversify": "catalog:",
     "lodash-es": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-i18next": "catalog:",
-    "react-icons": "catalog:"
+    "react-icons": "catalog:",
+    "y-prosemirror": "catalog:",
+    "y-protocols": "catalog:",
+    "yjs": "catalog:"
   },
   "peerDependencies": {
     "inversify": "8.x"
@@ -88,6 +90,7 @@
     "@xwiki/platform-tool-viteconfig": "workspace:*",
     "cross-env": "catalog:",
     "eslint": "catalog:",
+    "inversify": "catalog:",
     "jsdom": "catalog:",
     "postcss": "catalog:",
     "postcss-preset-mantine": "catalog:",

@@ -80,17 +80,23 @@ public class Property extends Element
     }
 
     /**
-     * Returns the {@link BaseProperty#getObfuscatedValue()} or {@link BaseProperty#getValue()} if the content author
-     * has programming rights.
+     * Returns the {@link BaseProperty#getValue()} when the property is not sensitive or when the content author has
+     * programming rights, and the {@link BaseProperty#getObfuscatedValue()} otherwise. Prefer
+     * {@link #getObfuscatedValue()} when the value is only meant to be displayed, so that a sensitive property is
+     * never exposed by a page that happens to have the programming right.
+     *
      * @return the actual value of the property, as a String, Number or List.
      */
     public java.lang.Object getValue()
     {
-        if (getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext())) {
-            return getProperty().getValue();
-        } else {
-            return getBaseProperty().getObfuscatedValue();
+        // The programming right is only relevant for a sensitive property: for any other one both branches below
+        // return the same value. Testing the sensitivity first (a lookup in the already loaded XClass) thus spares a
+        // full authorization evaluation to almost every property read, without changing the result.
+        if (isSensitive() && !hasProgrammingRights()) {
+            return getObfuscatedValue();
         }
+
+        return getBaseProperty().getValue();
     }
 
     /**

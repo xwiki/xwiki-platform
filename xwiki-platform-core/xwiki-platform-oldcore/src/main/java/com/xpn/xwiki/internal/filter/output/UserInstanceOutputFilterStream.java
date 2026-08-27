@@ -162,7 +162,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
         return new DocumentReference(getCurrentWiki(), DEFAULT_SPACE.getName(), id);
     }
 
-    private XWikiDocument getGroupDocument(String id, FilterEventParameters parameters) throws XWikiException
+    private XWikiDocument getGroupDocument(String id) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -349,7 +349,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
 
         XWikiDocument groupDocument;
         try {
-            groupDocument = getGroupDocument(name, parameters);
+            groupDocument = getGroupDocument(name);
         } catch (XWikiException e) {
             throw new FilterException("Failed to get an XWikiDocument for group name [" + name + "]", e);
         }

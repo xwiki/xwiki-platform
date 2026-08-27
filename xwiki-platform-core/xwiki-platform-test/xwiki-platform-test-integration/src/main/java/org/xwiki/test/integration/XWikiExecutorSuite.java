@@ -26,6 +26,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.junit.extensions.cpsuite.ClasspathSuite;
 import org.junit.runner.Description;
@@ -52,6 +53,8 @@ import org.slf4j.LoggerFactory;
 public class XWikiExecutorSuite extends ClasspathSuite
 {
     public static final String PATTERN = String.format(".*(%s)", System.getProperty("pattern", ""));
+
+    private static final Pattern COMPILED_PATTERN = Pattern.compile(PATTERN);
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutorSuite.class);
 
@@ -101,7 +104,7 @@ public class XWikiExecutorSuite extends ClasspathSuite
             Description description = runner.getDescription();
             String runnerName = description.getClassName();
 
-            if (runnerName.matches(PATTERN)) {
+            if (COMPILED_PATTERN.matcher(runnerName).matches()) {
                 // If the entire test class matches, add it.
                 runners.add(runner);
             } else {

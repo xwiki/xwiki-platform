@@ -27,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -45,7 +44,7 @@ public class XWikiRESTContextInitializationFilter extends XWikiContextInitializa
     private WikiDescriptorManager wikis;
 
     private WikiDescriptorManager getWikiDescriptorManager(ServletContext context)
-        throws WikiManagerException, ComponentLookupException
+        throws ComponentLookupException
     {
         if (this.wikis == null) {
             ComponentManager componentManager =

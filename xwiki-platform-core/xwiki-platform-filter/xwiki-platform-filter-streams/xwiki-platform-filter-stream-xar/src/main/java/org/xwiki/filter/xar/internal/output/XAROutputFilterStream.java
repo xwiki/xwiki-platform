@@ -187,11 +187,13 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     @Override
     public void beginWikiFarm(FilterEventParameters parameters) throws FilterException
     {
+        // Nothing to do, the XAR format has no notion of wiki farm.
     }
 
     @Override
     public void endWikiFarm(FilterEventParameters parameters) throws FilterException
     {
+        // Nothing to do, the XAR format has no notion of wiki farm.
     }
 
     @Override

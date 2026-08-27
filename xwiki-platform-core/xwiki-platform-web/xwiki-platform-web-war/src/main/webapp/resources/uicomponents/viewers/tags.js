@@ -141,7 +141,7 @@ viewers.Tags = Class.create({
               while (wrapper.childNodes.length > 0) {
                 form.up('.tag-add').insert({before : wrapper.firstChild});
                 form.up('.tag-add').insert({before : ' '});
-                wrapper.removeChild(wrapper.firstChild);
+                wrapper.firstChild.remove();
               }
               form.reset();
             }.bind(this),

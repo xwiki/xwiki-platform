@@ -202,7 +202,10 @@ describe("translatorFactory, object queries", () => {
   });
 
   it("handles object query with a locale", async () => {
-    vi.stubGlobal("fetch", mockFetch([{ key: "hello", rawSource: "Hi" }]));
+    vi.stubGlobal(
+      "fetch",
+      mockFetch([{ key: "hello.world", rawSource: "Salut" }]),
+    );
 
     const translator = translatorFactory(TARGET);
     const result = await translator.resolve({
@@ -215,6 +218,94 @@ describe("translatorFactory, object queries", () => {
       "https://example.com/translations?prefix=hello.&key=world&locale=fr",
       expect.anything(),
     );
-    expect(result).toMatchObject({ hello: "Hi" });
+    expect(result).toEqual({ "hello.world": "Salut" });
+  });
+
+  it("only returns the translations of the query", async () => {
+    vi.stubGlobal(
+      "fetch",
+      mockFetch([
+        { key: "a.key", rawSource: "Hello" },
+        { key: "b.key", rawSource: "World" },
+      ]),
+    );
+
+    const translator = translatorFactory(TARGET);
+    await translator.resolve(["a.key", "b.key"]);
+    const result = await translator.resolve(["a.key"]);
+
+    expect(result).toEqual({ "a.key": "Hello" });
+  });
+});
+
+describe("translatorFactory, locales", () => {
+  it("caches per locale and requests each locale separately", async () => {
+    const fetchMock = mockFetch([{ key: "a.key", rawSource: "Bonjour" }]);
+    vi.stubGlobal("fetch", fetchMock);
+
+    const translator = translatorFactory(TARGET);
+    const fr = await translator.resolve({ keys: ["a.key"], locale: "fr" });
+
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () => ({ translations: [{ key: "a.key", rawSource: "Hello" }] }),
+    });
+
+    const en = await translator.resolve({ keys: ["a.key"], locale: "en" });
+
+    expect(fr).toEqual({ "a.key": "Bonjour" });
+    expect(en).toEqual({ "a.key": "Hello" });
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      `${TARGET}?key=a.key&locale=fr`,
+      expect.anything(),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      `${TARGET}?key=a.key&locale=en`,
+      expect.anything(),
+    );
+  });
+
+  it("serves a second query of the same locale from the cache", async () => {
+    vi.stubGlobal("fetch", mockFetch([{ key: "a.key", rawSource: "Bonjour" }]));
+
+    const translator = translatorFactory(TARGET);
+    await translator.resolve({ keys: ["a.key"], locale: "fr" });
+    const result = await translator.resolve({ keys: ["a.key"], locale: "fr" });
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ "a.key": "Bonjour" });
+  });
+
+  it("does not let a cached locale hide the default locale of the page", async () => {
+    const fetchMock = mockFetch([{ key: "a.key", rawSource: "Bonjour" }]);
+    vi.stubGlobal("fetch", fetchMock);
+
+    const translator = translatorFactory(TARGET);
+    await translator.resolve({ keys: ["a.key"], locale: "fr" });
+
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () => ({ translations: [{ key: "a.key", rawSource: "Hello" }] }),
+    });
+
+    // No locale, so the locale of the page is used, which is not the cached one.
+    const result = await translator.resolve(["a.key"]);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result).toEqual({ "a.key": "Hello" });
+  });
+
+  it("does not deduplicate inflight requests of two locales", async () => {
+    vi.stubGlobal("fetch", mockFetch([{ key: "a.key", rawSource: "Hello" }]));
+
+    const translator = translatorFactory(TARGET);
+    await Promise.all([
+      translator.resolve({ keys: ["a.key"], locale: "fr" }),
+      translator.resolve({ keys: ["a.key"], locale: "en" }),
+    ]);
+
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 });

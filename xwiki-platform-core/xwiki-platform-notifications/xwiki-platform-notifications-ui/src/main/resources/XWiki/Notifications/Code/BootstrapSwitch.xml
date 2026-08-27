@@ -172,7 +172,7 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
     // The handle and label spans only duplicate the state already carried by the underlying (still focusable)
     // checkbox/radio input, so screen readers shouldn't announce them as separate interactive elements.
     this.each(function() {
-      $(this).parent().find(
+      $(this).closest('.bootstrap-switch').find(
         '.bootstrap-switch-handle-on, .bootstrap-switch-handle-off, .bootstrap-switch-label'
       ).attr('aria-hidden', 'true');
     });

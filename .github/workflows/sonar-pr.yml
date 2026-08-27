@@ -138,10 +138,10 @@ jobs:
             ## parent declares. Every ancestor is selected along with the module because sonar:sonar
             ## rebuilds the project tree out of the reactor and fails the analysis with "<module> is
             ## orphan" when a selected module's parent is missing from it. A module only a profile
-            ## activates -- a legacy module, a functional test module, the distribution -- is not in
-            ## the reactor this workflow builds, so -pl would reject its path; a whole reactor build
-            ## does not analyze it either, so leaving it out changes nothing. The same check discards
-            ## the pom.xml an archetype ships as a resource, which is not a module at all.
+            ## activates -- a legacy module, a functional test module, a distribution module -- is
+            ## not in the reactor this workflow builds, so -pl would reject its path; a whole reactor
+            ## build does not analyze it either, so leaving it out changes nothing. The same check
+            ## discards the pom.xml an archetype ships as a resource, which is not a module at all.
             CHAIN=""
             REACHABLE=true
             while [ "$dir" != . ]; do
@@ -175,9 +175,9 @@ jobs:
 
       ## Compile only. The analysis needs the bytecode, not the test results, and no coverage as long
       ## as the quality gate keeps its condition on the coverage of new code disabled. The snapshot
-      ## profile is what supplies the XWiki repositories the parent pom, the xwiki-commons and
-      ## xwiki-rendering snapshots and the modules left out of the selection are downloaded from, a
-      ## runner having no settings.xml declaring them.
+      ## profile is what supplies the XWiki repositories the parent pom, the snapshots of the other
+      ## XWiki repositories and the modules left out of the selection are downloaded from, a runner
+      ## having no settings.xml declaring them.
       - name: Build
         env:
           MODULES: ${{ steps.modules.outputs.list }}

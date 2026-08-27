@@ -7519,10 +7519,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     public void removeLock(XWikiContext context) throws XWikiException
     {
-        XWikiLock lock = getStore(context).loadLock(getId(), context, true);
-        if (lock != null) {
-            getStore(context).deleteLock(lock, context, true);
-        }
+        // Only the document id matters when removing the lock, and removing a lock that doesn't exist is a no-op, so
+        // there's no need to load the lock first.
+        getStore(context).deleteLock(new XWikiLock(getId(), context.getUser()), context, true);
     }
 
     public void insertText(String text, String marker, XWikiContext context) throws XWikiException

@@ -41,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.context.Execution;
@@ -68,6 +69,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.BaseObject;
@@ -85,6 +87,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -103,6 +106,8 @@ class XWikiHibernateStoreTest
     private static final String WIKI_NAME = "wiki";
 
     private static final WikiReference WIKI_REFERENCE = new WikiReference(WIKI_NAME);
+
+    private static final String DELETE_LOCK_QUERY = "delete from XWikiLock as lock where lock.docId = :docId";
 
     /**
      * A special component manager that mocks automatically all the dependencies of the component under test.
@@ -273,6 +278,44 @@ class XWikiHibernateStoreTest
         verify(query).setParameter("userName", "XWiki.LoggerOutter");
         verify(query).executeUpdate();
         verify(this.hibernateStore).beginTransaction();
+        verify(this.hibernateStore).endTransaction(true);
+    }
+
+    @Test
+    void deleteLock() throws Exception
+    {
+        Query query = mock(Query.class);
+        when(this.session.createQuery(DELETE_LOCK_QUERY)).thenReturn(query);
+        when(this.hibernateStore.beginTransaction()).thenReturn(true);
+
+        this.store.deleteLock(new XWikiLock(13L, "XWiki.Alice"), this.xcontext, true);
+
+        // A bulk delete is used, rather than deleting the entity, so that removing a lock that has been removed in the
+        // mean time is a no-op.
+        verify(this.session, never()).delete(any());
+        verify(query).setParameter("docId", 13L);
+        verify(query).executeUpdate();
+        verify(this.hibernateStore).endTransaction(true);
+    }
+
+    @Test
+    void saveLock() throws Exception
+    {
+        Query query = mock(Query.class);
+        when(this.session.createQuery(DELETE_LOCK_QUERY)).thenReturn(query);
+        when(this.hibernateStore.beginTransaction()).thenReturn(true);
+
+        XWikiLock lock = new XWikiLock(13L, "XWiki.Alice");
+        this.store.saveLock(lock, this.xcontext, true);
+
+        // The previous lock, if any, is removed before the new one is saved, because updating it in place would fail if
+        // it has been removed in the mean time.
+        InOrder inOrder = inOrder(query, this.session);
+        inOrder.verify(query).executeUpdate();
+        inOrder.verify(this.session).save(lock);
+
+        verify(query).setParameter("docId", 13L);
+        verify(this.session, never()).update(any());
         verify(this.hibernateStore).endTransaction(true);
     }
 

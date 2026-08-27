@@ -1,0 +1,207 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Analyze each pull request with SonarCloud and fail when the pull request's quality gate fails, so
+## that a change introducing SonarQube issues is caught before it is merged instead of turning the
+## master quality gate red afterwards. This is not a duplicate of the ci.xwiki.org "quality" build:
+## that one analyzes master after the merge, with the tests and the coverage, whereas this one only
+## needs the bytecode of the changed code.
+name: SonarCloud PR analysis
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+## One analysis per pull request: a new commit makes the running one obsolete.
+concurrency:
+  group: sonar-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  analysis:
+    name: Analyze
+    ## A pull_request run from a fork gets no repository secrets, so the analysis has no token to
+    ## authenticate with. Skip those rather than fail them.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ## SonarCloud derives the lines the pull request changed from the git history, and the module
+          ## selection below diffs against the base branch.
+          fetch-depth: 0
+
+      ## The JDK to build with is the one the branch targets, which is the xwiki.java.version property
+      ## of the effective root pom. It is read with Maven rather than searched for in the pom text
+      ## because the property is not necessarily declared in the repository being built: xwiki-rendering
+      ## and xwiki-platform inherit it from the xwiki-commons parent, which Maven has to download to
+      ## know it. -N keeps the evaluation to the root pom, and -Psnapshot supplies the XWiki
+      ## repositories that parent is downloaded from, since a runner has no settings.xml declaring
+      ## them. The JDK preinstalled on the runner is enough to run this: the goal builds the pom model,
+      ## it compiles nothing.
+      - name: Read the Java version of the branch
+        id: java
+        run: |
+          VERSION=$(mvn -N -B -ntp -q -DforceStdout -Psnapshot help:evaluate \
+            -Dexpression=xwiki.java.version)
+          ## An undefined property makes help:evaluate print a message and still succeed, which would
+          ## otherwise surface as an obscure setup-java failure.
+          if [[ ! "$VERSION" =~ ^[0-9]+$ ]]; then
+            echo "::error::Failed to read xwiki.java.version from the root pom, got [$VERSION]"
+            exit 1
+          fi
+          echo "Building with Java $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: ${{ steps.java.outputs.version }}
+          cache: maven
+
+      ## A pull request analysis only ever reports on the pull request's own new code, and every
+      ## condition of the XWiki quality gate is on a new code metric, so a module the pull request does
+      ## not change can neither contribute an issue nor fail the gate. Building and scanning the whole
+      ## reactor to analyze the few modules a pull request touches is therefore wasted work: the
+      ## modules owning the changed files are selected instead, and the rest of the reactor is resolved
+      ## from the snapshots the CI publishes rather than rebuilt. An empty selection means the whole
+      ## reactor, which is the fallback whenever the change cannot be narrowed down.
+      - name: Select the modules the pull request changes
+        id: modules
+        ## A branch name is chosen by whoever opens the pull request and ${{ }} is substituted into the
+        ## script before the shell runs it, so the base branch goes through the environment instead.
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          if ! git rev-parse --verify --quiet "origin/$PR_BASE" > /dev/null; then
+            echo "Base branch [$PR_BASE] is not in the clone, building the whole reactor"
+            echo "list=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          BASE=$(git merge-base "origin/$PR_BASE" HEAD)
+
+          ## Prints the modules a pom declares outside of any profile, which are the ones held by the
+          ## reactor of a build activating no profile other than snapshot.
+          declared_modules() {
+            sed '/<profiles>/,/<\/profiles>/d' "$1/pom.xml" | sed -n 's|.*<module>\(.*\)</module>.*|\1|p'
+          }
+
+          SELECTED=""
+          FULL=""
+          while IFS= read -r file; do
+            [ -n "$file" ] || continue
+
+            if [ "$(basename "$file")" = pom.xml ]; then
+              ## The root pom drives every module and an aggregator pom drives every module below it.
+              ## Which of them a change to either actually affects cannot be told from the diff.
+              if [ "$file" = pom.xml ]; then
+                FULL="the root pom changed"
+                break
+              fi
+              ## The pull request may have deleted the pom, in which case it is read from the base.
+              POM=$(git show "HEAD:$file" 2>/dev/null || git show "$BASE:$file" 2>/dev/null || true)
+              case "$POM" in
+                *"<packaging>pom</packaging>"*)
+                  FULL="the aggregator pom [$file] changed"
+                  break
+                  ;;
+              esac
+            fi
+
+            ## Walk up from the changed file to the module owning it.
+            dir=$(dirname "$file")
+            while [ "$dir" != . ] && [ ! -f "$dir/pom.xml" ]; do
+              dir=$(dirname "$dir")
+            done
+            ## A file outside any module (.github, README...) holds nothing to compile or analyze.
+            [ "$dir" != . ] || continue
+
+            ## Collect the module and its ancestors, checking on the way up that each is a module its
+            ## parent declares. Every ancestor is selected along with the module because sonar:sonar
+            ## rebuilds the project tree out of the reactor and fails the analysis with "<module> is
+            ## orphan" when a selected module's parent is missing from it. A module only a profile
+            ## activates -- a legacy module, a functional test module, the distribution -- is not in
+            ## the reactor this workflow builds, so -pl would reject its path; a whole reactor build
+            ## does not analyze it either, so leaving it out changes nothing. The same check discards
+            ## the pom.xml an archetype ships as a resource, which is not a module at all.
+            CHAIN=""
+            REACHABLE=true
+            while [ "$dir" != . ]; do
+              CHAIN=$(printf '%s\n%s' "$CHAIN" "$dir")
+              parent=$(dirname "$dir")
+              if [ ! -f "$parent/pom.xml" ] || ! declared_modules "$parent" | grep -qFx "$(basename "$dir")"; then
+                REACHABLE=false
+                break
+              fi
+              dir="$parent"
+            done
+            if [ "$REACHABLE" = true ]; then
+              SELECTED="$SELECTED$CHAIN"
+            else
+              echo "Ignoring [$file]: no module of the reactor this workflow builds owns it"
+            fi
+          done <<< "$(git diff --name-only "$BASE" HEAD)"
+
+          if [ -n "$FULL" ]; then
+            echo "Building the whole reactor because $FULL"
+            echo "list=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          ## The root is always selected: sonar:sonar is an aggregator goal, so it runs on the top
+          ## level project of the reactor and fails with "Maven session does not declare a top level
+          ## project" without one. It is also where the analyzed sonar.projectKey comes from.
+          LIST=$(printf '.\n%s' "$SELECTED" | grep . | sort -u | paste -sd, -)
+          echo "Building $(tr ',' '\n' <<< "$LIST" | wc -l | tr -d ' ') of the reactor's modules:"
+          tr ',' '\n' <<< "$LIST" | sed 's/^/  /'
+          echo "list=$LIST" >> "$GITHUB_OUTPUT"
+
+      ## Compile only. The analysis needs the bytecode, not the test results, and no coverage as long
+      ## as the quality gate keeps its condition on the coverage of new code disabled. The snapshot
+      ## profile is what supplies the XWiki repositories the parent pom, the xwiki-commons and
+      ## xwiki-rendering snapshots and the modules left out of the selection are downloaded from, a
+      ## runner having no settings.xml declaring them.
+      - name: Build
+        env:
+          MODULES: ${{ steps.modules.outputs.list }}
+        run: >
+          mvn -B -ntp -T 1C install -DskipTests -Psnapshot ${MODULES:+-pl "$MODULES"}
+          -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true
+          -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true
+
+      ## sonar.qualitygate.wait makes the goal wait for the server to process the report and fail the
+      ## job when the quality gate fails. Without it the job would pass whatever the analysis found.
+      ## The pull request properties go through the environment rather than being interpolated into the
+      ## command: a branch name is chosen by whoever opens the pull request, and ${{ }} is substituted
+      ## into the script before the shell runs it, so interpolating one lets a crafted branch name run
+      ## commands on the runner, where the token is.
+      - name: Analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          PR_KEY: ${{ github.event.pull_request.number }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+          MODULES: ${{ steps.modules.outputs.list }}
+        run: >
+          mvn -B -ntp sonar:sonar -Psnapshot ${MODULES:+-pl "$MODULES"}
+          -Dsonar.qualitygate.wait=true
+          -Dsonar.pullrequest.key="$PR_KEY"
+          -Dsonar.pullrequest.branch="$PR_BRANCH"
+          -Dsonar.pullrequest.base="$PR_BASE"

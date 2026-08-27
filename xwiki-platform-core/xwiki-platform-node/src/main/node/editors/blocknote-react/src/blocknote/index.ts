@@ -183,8 +183,8 @@ function querySuggestionsMenuItems({
 
   // A single generic "Link" entry that opens the link wizard.
   // Only enabled if the syntax supports it
-  const genericLinkItem: DefaultReactSuggestionItem[] = syntax.features
-    .inlineContents.links.basicLinks
+  const genericLinkItem: DefaultReactSuggestionItem[] = inlineSupport.links
+    .basicLinks
     ? [
         {
           title: t("blocknote.slashMenu.link.title"),

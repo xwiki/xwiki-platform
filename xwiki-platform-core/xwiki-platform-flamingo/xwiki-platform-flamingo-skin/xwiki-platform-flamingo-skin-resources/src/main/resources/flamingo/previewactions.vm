@@ -60,7 +60,10 @@
     #editActionButton("$!{escapetool.xml($backToEditAction)}", 'backtoedit', 'btn-default')
     <div class="btn-group">
       #editActionButton('save', 'saveandview', 'btn-primary')
-      #editActionButton('saveandcontinue', 'save', 'btn-default')
+      ## The btn-group-last class is needed on the last visible button of the group because the hidden field added by
+      ## editActionButton is ignored by the css selectors, preventing the button from having rounded corners on its
+      ## right side.
+      #editActionButton('saveandcontinue', 'save', 'btn-default btn-group-last')
     </div>
     #editActionButton('cancel', 'cancel', 'btn-default')
   </div>

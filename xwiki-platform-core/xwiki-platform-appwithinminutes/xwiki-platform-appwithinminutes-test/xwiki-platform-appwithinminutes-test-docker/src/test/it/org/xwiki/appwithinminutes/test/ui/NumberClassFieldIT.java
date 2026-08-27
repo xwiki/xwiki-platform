@@ -49,33 +49,25 @@ class NumberClassFieldIT
     private static final String INVALID_FORMAT_MESSAGE = "is not a valid number of type \"long\"";
 
     /**
-     * The Number field is rendered as an HTML5 number input, so the browser rejects non-numeric input, either by
-     * refusing to insert it or by marking the field invalid, before the entry can be saved.
+     * Checks the successive validation layers of a Number field of the default {@code long} type, on a single
+     * fixture. Non-numeric input is rejected by the browser, which renders the field as an HTML5 number input and
+     * either refuses to insert the value or marks the field invalid. A decimal value like "3.5" is a valid HTML5
+     * number but mismatches the {@code step="1"} constraint, so the browser must mark the field invalid; both
+     * signs are checked since the field has no {@code min} attribute, so the step check is evaluated relative to a
+     * base of 0. A value like "99999999999999999999" is a valid HTML5 number that overflows the {@code long} type.
+     * The browser can't be asked to catch it, since no {@code min}/{@code max} can express the {@code long} range
+     * without disabling the step check, so it reaches the server and must be reported with a friendly message
+     * rather than a generic error.
      */
     @Test
-    void browserRejectsInvalidInput(TestReference testReference)
+    void numberFieldValidation(TestReference testReference)
     {
         EntryEditPage entryEditPage = addNumberFieldAndGoToEntry(testReference);
 
         entryEditPage.setValue(FIELD_NAME, "aaa");
 
         assertFalse("aaa".equals(entryEditPage.getValue(FIELD_NAME)) && entryEditPage.isFieldValid(FIELD_NAME),
-            "The invalid value was kept and accepted as valid");
-    }
-
-    /**
-     * A decimal value like "3.5" is a valid HTML5 number but mismatches the {@code step="1"} constraint of the
-     * default {@code long} type, so the browser must mark the field invalid. Both signs are checked since the
-     * field has no {@code min} attribute, so the step check is evaluated relative to a base of 0. A value like
-     * "99999999999999999999" is a valid HTML5 number that overflows the default {@code long} type. The browser
-     * can't be asked to catch it, since no {@code min}/{@code max} can express the {@code long} range without
-     * disabling the step check, so it reaches the server and must be reported with a friendly message rather
-     * than a generic error.
-     */
-    @Test
-    void browserRejectsDecimalAndServerRejectsOutOfRangeValue(TestReference testReference)
-    {
-        EntryEditPage entryEditPage = addNumberFieldAndGoToEntry(testReference);
+            "The non-numeric value was kept and accepted as valid");
 
         entryEditPage.setValue(FIELD_NAME, "3.5");
 
@@ -85,6 +77,7 @@ class NumberClassFieldIT
 
         assertFalse(entryEditPage.isFieldValid(FIELD_NAME), "The negative decimal value was accepted as valid");
 
+        // A value inside the long range still saves, now that the range is no longer expressed as min and max.
         entryEditPage.setValue(FIELD_NAME, "42");
         entryEditPage.clickSaveAndContinue();
 

@@ -240,11 +240,10 @@ public class DefaultNotificationPreferenceModelBridge implements NotificationPre
      * @param xWikiDocument the document to search in
      * @param notificationPreference the notification preference
      * @return the corresponding NotificationPreferences XObject
-     * @throws NotificationException if the base object could not be found
      * @since 9.7RC1
      */
     private BaseObject findNotificationPreference(XWikiDocument xWikiDocument,
-            NotificationPreference notificationPreference) throws NotificationException
+            NotificationPreference notificationPreference)
     {
         List<BaseObject> objects = xWikiDocument.getXObjects(NOTIFICATION_PREFERENCE_CLASS);
 

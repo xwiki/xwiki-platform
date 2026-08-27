@@ -89,11 +89,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      * @param storeType - the way to store the document
      * @param deleter - user which delete document
      * @param deleteDate - date of delete action
-     * @throws XWikiException if any error
      * @since 9.0RC1
      */
     private XWikiDeletedDocument(String fullName, Locale locale, String storeType, String deleter, Date deleteDate)
-        throws XWikiException
     {
         this.fullName = fullName;
         this.locale = locale;

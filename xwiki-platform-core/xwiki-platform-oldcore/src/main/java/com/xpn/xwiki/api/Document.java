@@ -889,7 +889,7 @@ public class Document extends Api
      * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @return the given text rendered in the context of this document using the passed Syntax
      */
-    private String getRenderedContent(String text, String syntaxId, boolean restricted) throws XWikiException
+    private String getRenderedContent(String text, String syntaxId, boolean restricted)
     {
         // Make sure we keep using current author as passed content author
         return this.doc.getRenderedContent(text, syntaxId, restricted, getCallerDocument(getXWikiContext()),

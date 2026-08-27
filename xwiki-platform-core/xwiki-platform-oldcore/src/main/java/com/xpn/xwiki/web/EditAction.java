@@ -186,9 +186,8 @@ public class EditAction extends XWikiAction
      * @param editForm the form inputs
      * @param context the XWiki context
      * @return the edited document translation based on the language specified on the request
-     * @throws XWikiException if something goes wrong
      */
-    private XWikiDocument getEditedDocument(EditForm editForm, XWikiContext context) throws XWikiException
+    private XWikiDocument getEditedDocument(EditForm editForm, XWikiContext context)
     {
         XWikiDocument doc = context.getDoc();  
         boolean hasTranslation = doc != context.get("tdoc");

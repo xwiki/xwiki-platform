@@ -253,10 +253,6 @@ jobs:
 
               selected = set()
               for path in changed:
-                  ## The root pom drives every module of the reactor, and which of them a change to
-                  ## it actually affects cannot be told from the diff.
-                  if path == 'pom.xml':
-                      return whole_reactor('the root pom changed')
                   directory = owning_project(path)
                   ## A file no project holds has nothing to compile or analyze.
                   if directory is None:
@@ -276,16 +272,12 @@ jobs:
                       log('Ignoring [%s]: no module of the reactor this workflow builds owns it'
                           % path)
                       continue
-                  ## An aggregator drives every module below it, the same way the root pom does.
-                  ## This is tested only once the module is known to be in the reactor: an
-                  ## aggregator that is not, such as the pom of a functional test module, drives
-                  ## nothing this build would analyze.
-                  if path == pom_path(directory):
-                      pom = read_pom(path)
-                      packaging = 'pom' if pom is None else (pom.findtext(NS + 'packaging')
-                                                             or 'jar').strip()
-                      if packaging == 'pom':
-                          return whole_reactor('the aggregator pom [%s] changed' % path)
+                  ## A changed pom selects its own module and nothing more, the root pom and an
+                  ## aggregator included, even though those drive the modules below them. Every
+                  ## condition of the quality gate is on a new code metric, and the new code a pom
+                  ## change brings is that pom's own lines, which are analyzed with the module
+                  ## holding them: a module the pull request does not change owns no new line, so
+                  ## building its subtree produces nothing the gate can read.
                   ## Every ancestor is selected along with the module because sonar:sonar rebuilds
                   ## the project tree out of the reactor and fails the analysis with "<module> is
                   ## orphan" when a selected module's parent is missing from it.

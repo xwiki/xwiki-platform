@@ -41,8 +41,10 @@ export function translatorFactory(target: string): Translator {
       }
 
       let _resolve!: (translation: Translations) => void;
-      const promise = new Promise<Translations>((resolve) => {
+      let _reject!: (reason: unknown) => void;
+      const promise = new Promise<Translations>((resolve, reject) => {
         _resolve = resolve;
+        _reject = reject;
       });
       inflightRequests.set(queryKey, promise);
 
@@ -90,6 +92,12 @@ export function translatorFactory(target: string): Translator {
             },
           );
 
+          if (!response.ok) {
+            throw new Error(
+              `Unexpected response status [${response.status}] from [${target}]`,
+            );
+          }
+
           const promise = await response.json();
           const translations: { key: string; rawSource: string }[] =
             promise.translations ?? {};
@@ -105,10 +113,15 @@ export function translatorFactory(target: string): Translator {
             }, {}),
           );
         } catch (e) {
-          console.log(
-            `Failed to retrieve the translations for query [${query}]`,
+          console.error(
+            `Failed to retrieve the translations for query [${JSON.stringify(query)}]`,
             e,
           );
+          // Let the caller know the translations could not be retrieved, instead of silently returning the keys
+          // resolved so far. Dropping the inflight entry allows a later identical query to be retried.
+          inflightRequests.delete(queryKey);
+          _reject(e);
+          return promise;
         }
       }
 

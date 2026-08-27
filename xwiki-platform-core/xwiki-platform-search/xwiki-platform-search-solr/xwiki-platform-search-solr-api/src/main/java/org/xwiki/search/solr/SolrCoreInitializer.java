@@ -45,6 +45,8 @@ public interface SolrCoreInitializer
      * @deprecated use {@link #initialize(XWikiSolrCore)} instead
      */
     @Deprecated(since = "16.1.0RC1")
+    // Intentional bridge with #initialize(XWikiSolrCore): every implementation overrides at least one of the two.
+    @SuppressWarnings("javabugs:S2190")
     default void initialize(SolrClient client) throws SolrException
     {
         initialize(new DefaultXWikiSolrCore(getCoreName(), getCoreName(), client, -1));

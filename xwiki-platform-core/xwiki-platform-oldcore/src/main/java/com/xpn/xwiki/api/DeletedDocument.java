@@ -81,9 +81,9 @@ public class DeletedDocument extends Api
 
     /**
      * @return locale of document
-     * @deprecated since 8.0M1, use {@link #getLocale()} instead
+     * @deprecated use {@link #getLocale()} instead
      */
-    @Deprecated
+    @Deprecated(since = "8.0M1")
     public String getLanguage()
     {
         return this.deletedDoc.getLanguage();

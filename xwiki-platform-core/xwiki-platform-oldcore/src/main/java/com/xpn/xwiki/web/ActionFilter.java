@@ -85,6 +85,7 @@ public class ActionFilter implements Filter
     @Override
     public void init(FilterConfig filterConfig) throws ServletException
     {
+        // Nothing to do, this filter has no configuration to read.
     }
 
     @Override

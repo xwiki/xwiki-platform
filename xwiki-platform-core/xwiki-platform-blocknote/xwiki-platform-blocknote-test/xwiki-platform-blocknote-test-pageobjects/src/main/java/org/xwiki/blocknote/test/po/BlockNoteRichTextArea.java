@@ -365,10 +365,47 @@ public class BlockNoteRichTextArea extends BaseElement
      */
     public BlockNoteRichTextArea select(int offset, int length)
     {
-        sendKeys(Keys.HOME, Keys.ARROW_RIGHT.toString().repeat(offset));
+        moveCaretTo(offset);
         if (length > 0) {
             sendKeys(Keys.chord(Keys.SHIFT, Keys.ARROW_RIGHT.toString().repeat(length)));
         }
         return this;
+    }
+
+    /**
+     * Moves the caret with the keyboard at the specified offset from the start of the current line.
+     *
+     * @param offset how far from the start of the current line to move the caret
+     * @return this rich text area instance
+     * @since 18.8.0RC1
+     */
+    public BlockNoteRichTextArea moveCaretTo(int offset)
+    {
+        // The browser moves the caret on its own for the keys the editor doesn't handle, and the editor only learns
+        // about it when the asynchronous selectionchange event fires. Keys sent in the same batch are processed before
+        // that, against an outdated selection, which makes the editor swallow them (e.g. it discards an arrow key
+        // because it still believes the caret is at the end of the line). So send HOME on its own and wait for the
+        // editor to see the caret at the start of the line, before asking it to move further.
+        sendKeys(Keys.HOME);
+        waitUntilCaretIsAt(0);
+        if (offset > 0) {
+            sendKeys(Keys.ARROW_RIGHT.toString().repeat(offset));
+            waitUntilCaretIsAt(offset);
+        }
+        return this;
+    }
+
+    /**
+     * Waits until the editor sees the caret at the specified offset from the start of the line it is on.
+     *
+     * @param offset the expected offset of the caret from the start of its line
+     */
+    private void waitUntilCaretIsAt(int offset)
+    {
+        // Read the offset from the editor rather than from the DOM selection: the editor is the one lagging behind,
+        // and thus the one we need to be in sync. Tiptap exposes its editor on the root editable element.
+        String script = "return arguments[0].editor.view.state.selection.$from.parentOffset";
+        getDriver().waitUntilCondition(
+            driver -> ((Number) getDriver().executeScript(script, this.container)).intValue() == offset);
     }
 }

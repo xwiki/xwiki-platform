@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>18.7.0-SNAPSHOT</version>
+    <version>18.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -756,7 +756,6 @@
                 **/monitor/api/MonitorPlugin.java,
                 **/monitor/api/MonitorTimer.java,
                 **/monitor/api/MonitorTimerSummary.java,
-                **/objects/BaseCollection.java,
                 **/objects/BaseElement.java,
                 **/objects/BaseProperty.java,
                 **/objects/BaseStringProperty.java,

@@ -33,6 +33,7 @@
     -->
     <select
       class="operator-select"
+      :aria-label="$t('livedata.panel.filter.operator.hint', [propertyName])"
       @change="
         logic.filter(propertyId, filterIndex, { operator: $event.target.value })
       "
@@ -93,6 +94,12 @@ export default {
       return this.logic.getQueryFilterGroup(this.propertyId).constraints[
         this.filterIndex
       ];
+    },
+
+    // The display name of the property being filtered, used to give the
+    // operator select an accessible name.
+    propertyName() {
+      return this.logic.getPropertyDescriptor(this.propertyId)?.name;
     },
   },
 };

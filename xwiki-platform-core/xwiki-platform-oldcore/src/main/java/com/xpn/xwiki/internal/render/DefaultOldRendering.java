@@ -115,7 +115,7 @@ public class DefaultOldRendering implements OldRendering
      * @since 2.2M1
      */
     private void refactorDocumentLinks(XWikiDocument document, DocumentReference oldDocumentReference,
-        DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
+        DocumentReference newDocumentReference, XWikiContext context)
     {
         this.referenceRenamer.renameReferences(document.getXDOM(), document.getDocumentReference(),
             oldDocumentReference, newDocumentReference, false,

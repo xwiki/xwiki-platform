@@ -55,6 +55,7 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
      */
     public HibernateAttachmentVersioningStore()
     {
+        // Nothing to do, this empty constructor is only needed by the component manager.
     }
 
     @Override

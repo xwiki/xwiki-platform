@@ -44,9 +44,9 @@ import com.xpn.xwiki.XWikiContext;
  *
  * @since 5.3M2
  * @version $Id$
- * @deprecated since 7.0M2
+ * @deprecated
  */
-@Deprecated
+@Deprecated(since = "7.0M2")
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named(TemplateWikiProvisioningJob.JOBTYPE)

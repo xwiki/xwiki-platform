@@ -193,9 +193,9 @@
        */
       xObjectAlreadyExist(xclassName, objectNumber) {
         return (this.editorStatus.savedXObjects[xclassName] !== undefined
-          && this.editorStatus.savedXObjects[xclassName].indexOf(objectNumber) !== -1)
+          && this.editorStatus.savedXObjects[xclassName].includes(objectNumber))
           || (this.editorStatus.addedXObjects[xclassName] !== undefined
-            && this.editorStatus.addedXObjects[xclassName].indexOf(objectNumber) !== -1);
+            && this.editorStatus.addedXObjects[xclassName].includes(objectNumber));
       }
 
       /**
@@ -215,7 +215,7 @@
        * Helper to remove an element from an array if and only if it was already in the array.
        */
       removeElementFromArray(array, element) {
-        if (array.indexOf(element) !== -1) {
+        if (array.includes(element)) {
           array.splice(array.indexOf(element), 1);
         }
       }
@@ -239,7 +239,7 @@
 
         // if an object with this number was already deleted, we remove the info from deleted objects.
         let deletedArray = this.editorStatus.deletedXObjects[xclassName];
-        if (deletedArray !== undefined && deletedArray.indexOf(objectNumberVal) !== -1) {
+        if (deletedArray !== undefined && deletedArray.includes(objectNumberVal)) {
           this.getDeletedXObject(xclassName, objectNumberVal).remove();
           this.removeElementFromArray(deletedArray, objectNumberVal);
           if (deletedArray.length === 0) {
@@ -381,7 +381,7 @@
                       if (self.editorStatus.deletedXObjects[xclassName] !== undefined) {
                         let deletionArray = self.editorStatus.deletedXObjects[xclassName];
                         // be sure to remove the requested object number from the array first.
-                        if (deletionArray.indexOf(objectNumberVal) !== -1) {
+                        if (deletionArray.includes(objectNumberVal)) {
                           self.removeElementFromArray(deletionArray, objectNumberVal);
                           self.getDeletedXObject(xclassName, objectNumberVal).remove();
                         }
@@ -446,7 +446,7 @@
                 let addedObjects = self.editorStatus.addedXObjects[xclassName];
 
                 // if the object was already saved, then we need to add the right form information to delete it on server
-                if (addedObjects === undefined || addedObjects.indexOf(xObjectNumber) === -1) {
+                if (addedObjects === undefined || !addedObjects.includes(xObjectNumber)) {
                   if (self.editorStatus.deletedXObjects[xclassName] === undefined) {
                     self.editorStatus.deletedXObjects[xclassName] = [];
                   }
@@ -725,7 +725,7 @@
             let item = $(this);
             item.find("input").each(function () {
               let input = $(this);
-              if (input.attr('id') && input.attr('id').endsWith("_number")) {
+              if (input.attr('id')?.endsWith("_number")) {
                 item.data('numberProperty', input);
                 input.parent().hide();
                 if (input.parent().prev('dt')) {

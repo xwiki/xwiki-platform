@@ -409,8 +409,7 @@ XWiki.ExtensionBehaviour = Class.create({
   /**
    * Schedule a new refresh if the extension has a job running.
    */
-  _maybeScheduleRefresh : function(timeout) {
-    timeout = timeout || 1;
+  _maybeScheduleRefresh : function(timeout = 1) {
     this.container.hasClassName('extension-item-loading') && !this.container.down('button[value="continue"]') && this._refresh.bind(this).delay(timeout);
   },
 
@@ -573,11 +572,11 @@ XWiki.ExtensionBehaviour = Class.create({
 
         // Update the summary
         this.container.select('#summary-' + diffItemBlock.id).each(function(diffSummaryLi) {
-          diffSummaryLi.parentNode.removeChild(diffSummaryLi);
+          diffSummaryLi.remove();
         });
 
         // Remove the document from the details
-        diffItemBlock.parentNode.removeChild(diffItemBlock);
+        diffItemBlock.remove();
       }.bind(this),
       onFailure : function(response) {
         // Stop loading

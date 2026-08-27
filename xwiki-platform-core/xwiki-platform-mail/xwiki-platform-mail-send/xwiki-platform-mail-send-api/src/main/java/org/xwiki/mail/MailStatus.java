@@ -41,42 +41,42 @@ public class MailStatus
      */
     private String uniqueMessageId;
 
-    /*
+    /**
      * @see #getState()
      */
     private String state;
 
-    /*
+    /**
      * @see #getBatchID()
      */
     private String batchId;
 
-    /*
+    /**
      * @see #getDate()
      */
     private Date date;
 
-    /*
+    /**
      * @see #getRecipients()
      */
     private String recipients;
 
-    /*
+    /**
      * @see #getType()
      */
     private String type;
 
-    /*
+    /**
      * @see #getErrorSummary()
      */
     private String errorSummary;
 
-    /*
+    /**
      * @see #getErrorDescription()
      */
     private String errorDescription;
 
-    /*
+    /**
      * @see #getWiki()
      */
     private String wiki;

@@ -48,7 +48,6 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.index.IndexException;
 import org.xwiki.job.JobException;
@@ -718,10 +717,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      *         the reference type is not supported.
      * @throws SolrIndexerException if problems occur.
      * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
-     * @throws ExecutionContextException
      */
     private XWikiSolrInputDocument getSolrDocument(EntityReference reference)
-        throws SolrIndexerException, IllegalArgumentException, ExecutionContextException
+        throws SolrIndexerException, IllegalArgumentException
     {
         SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
 
@@ -756,7 +754,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         try {
             result = this.componentManager.getInstance(SolrMetadataExtractor.class, entityType.name().toLowerCase());
         } catch (ComponentLookupException e) {
-            this.logger.warn("Unsupported entity type: [{}]", entityType.toString(), e);
+            this.logger.warn("Unsupported entity type: [{}]", entityType, e);
         }
 
         return result;

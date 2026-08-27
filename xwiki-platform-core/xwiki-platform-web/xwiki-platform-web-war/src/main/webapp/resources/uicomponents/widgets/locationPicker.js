@@ -131,7 +131,6 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
 require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-async'], function($, xm) {
   $('.location-picker').each(function() {
     var picker = $(this);
-    var form = picker.closest('form');
 
     var titleInput = picker.find('input.location-title-field');
     // The wiki field can be either a select (drop down) or an input (text or hidden).
@@ -233,7 +232,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge', 'xwiki-form-validation-a
 
     var updateLocationFromTitleOrNameInput = function() {
       var title = titleInput.val();
-      updateLocationLastElement(title ? title : nameInput.val());
+      updateLocationLastElement(title || nameInput.val());
     };
 
     /**

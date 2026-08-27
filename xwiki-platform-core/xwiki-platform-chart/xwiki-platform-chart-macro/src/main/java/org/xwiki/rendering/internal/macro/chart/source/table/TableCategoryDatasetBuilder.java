@@ -123,6 +123,7 @@ public class TableCategoryDatasetBuilder implements TableDatasetBuilder
     @Override
     public void setParameters(Map<String, String> parameters)
     {
+        // Nothing to do, this dataset builder needs no extra parameter.
     }
 
     @Override
@@ -140,5 +141,6 @@ public class TableCategoryDatasetBuilder implements TableDatasetBuilder
     @Override
     public void setLocaleConfiguration(LocaleConfiguration localeConfiguration)
     {
+        // Nothing to do, this dataset builder is not locale dependent.
     }
 }

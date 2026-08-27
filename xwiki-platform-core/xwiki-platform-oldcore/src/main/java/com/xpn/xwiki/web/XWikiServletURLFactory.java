@@ -260,6 +260,15 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * Get the url of the server EG: http://www.xwiki.org/ This function sometimes will return a URL with a trailing /
      * and other times not. This is because the xwiki.home param is recommended to have a trailing / but this.serverURL
      * never does.
+     * <p>
+     * When the requested wiki matches the wiki currently being displayed, this method primarily returns the base URL
+     * of the current request (see {@link #getDefaultURL(String, XWikiContext)}), only falling back on the trusted,
+     * server-side configured URL (see {@link com.xpn.xwiki.XWiki#getServerURL(String, XWikiContext)}) when no
+     * request-derived URL is available. This makes the result of this method suitable for building links meant to be
+     * followed by the same client that issued the current request (e.g., in-page navigation), but <strong>unsafe to
+     * use for URLs handed to a different party</strong> (e.g., emailed, or fetched server-side), since the request
+     * data it may rely on (the {@code Host} or {@code X-Forwarded-Host} headers) is client-controlled. See
+     * {@link XWikiURLFactory#getServerURL(XWikiContext)} for details.
      *
      * @param wikiId the identifier of the wiki, if null it is assumed to be the same as the wiki which we are currently
      *            displaying.

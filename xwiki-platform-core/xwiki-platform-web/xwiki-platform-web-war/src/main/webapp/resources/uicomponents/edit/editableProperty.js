@@ -201,12 +201,14 @@ define('editableProperty', ['jquery', 'xwiki-meta', 'xwiki-edit-confirmation'], 
     // Notify the others that we're about to save so that they have the chance to update the submit data.
     editor.trigger('xwiki:actions:beforeSave');
     var data = editor.find(':input').serializeArray();
-    data.push({name: 'language', value: xcontext.locale});
-    data.push({name: 'comment', value: 'Update property ' + editableProperty.data('property')});
-    data.push({name: 'minorEdit', value: true});
-    data.push({name: 'form_token', value: xcontext.form_token});
-    data.push({name: 'ajax', value: true});
-    data.push({name: 'objectPolicy', value: editableProperty.data('objectPolicy')});
+    data.push(
+      {name: 'language', value: xcontext.locale},
+      {name: 'comment', value: 'Update property ' + editableProperty.data('property')},
+      {name: 'minorEdit', value: true},
+      {name: 'form_token', value: xcontext.form_token},
+      {name: 'ajax', value: true},
+      {name: 'objectPolicy', value: editableProperty.data('objectPolicy')}
+    );
     // Make the request to save the property.
     return Promise.resolve($.post(XWiki.currentDocument.getURL('save'), data)).then(() => {
       editor.trigger('xwiki:document:saved');

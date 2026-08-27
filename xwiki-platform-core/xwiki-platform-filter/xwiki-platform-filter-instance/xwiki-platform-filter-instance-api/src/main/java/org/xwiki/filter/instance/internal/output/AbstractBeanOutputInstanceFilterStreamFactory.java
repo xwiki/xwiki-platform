@@ -36,7 +36,7 @@ public abstract class AbstractBeanOutputInstanceFilterStreamFactory<P, F> extend
     /**
      * @param id the id of the {@link OutputInstanceFilterStreamFactory}
      */
-    public AbstractBeanOutputInstanceFilterStreamFactory(String id)
+    protected AbstractBeanOutputInstanceFilterStreamFactory(String id)
     {
         super(new FilterStreamType(FilterStreamType.XWIKI_INSTANCE.getType(),
             FilterStreamType.XWIKI_INSTANCE.getDataFormat() + "+" + id));

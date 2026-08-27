@@ -147,6 +147,7 @@ public class PropertyMetaClass extends BaseClass implements PropertyMetaClassInt
     @Override
     public void setObject(BaseCollection object)
     {
+        // Nothing to do, a property meta class is not attached to an object.
     }
 
     @Override

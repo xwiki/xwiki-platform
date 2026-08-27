@@ -167,7 +167,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
                 xdom = this.documentDisplayer.display(document, parameters);
             } catch (Exception e) {
                 throw new MacroExecutionException(String.format("Error getting Chart table from document [%s]",
-                    this.documentReference, e));
+                    this.documentReference), e);
             }
         }
         return xdom;

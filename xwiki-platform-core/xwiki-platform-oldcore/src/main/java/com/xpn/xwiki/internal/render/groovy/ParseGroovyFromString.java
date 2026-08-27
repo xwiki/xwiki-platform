@@ -69,12 +69,14 @@ public class ParseGroovyFromString
                 classCacheSize = Integer.parseInt(capacity);
             }
         } catch (Exception e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // The default cache capacity is then used.
         }
 
-        initCache(classCacheSize, xcontext);
+        initCache(classCacheSize);
     }
 
-    private void initCache(int iClassCapacity, XWikiContext context) throws XWikiException
+    private void initCache(int iClassCapacity) throws XWikiException
     {
         try {
             CacheConfiguration configuration = new LRUCacheConfiguration("xwiki.groovy.class", iClassCapacity);
@@ -93,6 +95,8 @@ public class ParseGroovyFromString
                 initCache(context);
             }
         } catch (Exception e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // The cache initialization is retried the next time the cache is needed.
         }
     }
 

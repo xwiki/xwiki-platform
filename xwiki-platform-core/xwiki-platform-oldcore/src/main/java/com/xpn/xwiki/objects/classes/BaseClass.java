@@ -136,9 +136,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
      * </p>
      *
-     * @deprecated since 2.2M2 use {@link #getDocumentReference()}
+     * @deprecated use {@link #getDocumentReference()}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     @Override
     public String getName()
     {
@@ -152,9 +152,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * replaced by this overridden method. See XWIKI-5285
      * </p>
      *
-     * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
+     * @deprecated use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     @Override
     public void setName(String name)
     {
@@ -382,9 +382,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @deprecated since 2.2.3 use {@link com.xpn.xwiki.doc.XWikiDocument#newXObject}
+     * @deprecated use {@link com.xpn.xwiki.doc.XWikiDocument#newXObject}
      */
-    @Deprecated
+    @Deprecated(since = "2.2.3")
     public BaseCollection newObject(XWikiContext context) throws XWikiException
     {
         BaseObject bobj = newCustomClassInstance(context);
@@ -395,9 +395,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @deprecated since 2.2.3 use {@link #fromMap(java.util.Map, com.xpn.xwiki.objects.BaseCollection)}
+     * @deprecated use {@link #fromMap(java.util.Map, com.xpn.xwiki.objects.BaseCollection)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2.3")
     public BaseCollection fromMap(Map<String, ?> map, XWikiContext context) throws XWikiException
     {
         BaseCollection object = newObject(context);
@@ -1348,9 +1348,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     /**
-     * @deprecated since 2.2.3 use {@link #newCustomClassInstance(DocumentReference, XWikiContext)}
+     * @deprecated use {@link #newCustomClassInstance(DocumentReference, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2.3")
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = context.getWiki().getClass(className, context);

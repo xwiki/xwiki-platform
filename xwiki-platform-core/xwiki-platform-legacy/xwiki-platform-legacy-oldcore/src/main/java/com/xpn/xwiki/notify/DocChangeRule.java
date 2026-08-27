@@ -97,11 +97,13 @@ public class DocChangeRule implements XWikiNotificationRule
     @Override
     public void verify(XWikiDocument doc, String action, XWikiContext context)
     {
+        // Nothing to do, this rule only reacts to document changes.
     }
 
     @Override
     public void preverify(XWikiDocument doc, String action, XWikiContext context)
     {
+        // Nothing to do, this rule only reacts to document changes.
     }
 
     public boolean isPostverify()

@@ -21,8 +21,8 @@ package com.xpn.xwiki.cache.api.internal;
 
 import java.util.Properties;
 
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
@@ -48,6 +48,7 @@ public class XWikiCacheServiceStub implements XWikiCacheService
     @Override
     public void init(XWiki context)
     {
+        // Nothing to do, the cache factories are provided at construction time.
     }
 
     @Override

@@ -227,9 +227,9 @@ public class DBListClass extends ListClass
      *
      * @param context The current {@link XWikiContext context}.
      * @return The HQL query corresponding to this property.
-     * @deprecated since 9.8RC1, use the {@code QueryBuilder<DBListClass>} component instead
+     * @deprecated use the {@code QueryBuilder<DBListClass>} component instead
      */
-    @Deprecated
+    @Deprecated(since = "9.8RC1")
     public String getQuery(XWikiContext context)
     {
         // First, get the hql query entered by the user.

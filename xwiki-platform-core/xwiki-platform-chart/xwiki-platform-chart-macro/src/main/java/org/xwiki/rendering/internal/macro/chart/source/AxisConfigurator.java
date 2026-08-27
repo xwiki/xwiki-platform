@@ -189,9 +189,8 @@ public class AxisConfigurator extends AbstractConfigurator
      *
      * @param index The index.
      * @param dateFormatString the date format.
-     * @throws MacroExecutionException if the date format string is invalid.
      */
-    private void setAxisDateFormat(int index, String dateFormatString) throws MacroExecutionException
+    private void setAxisDateFormat(int index, String dateFormatString)
     {
         axisDateFormat[index] = dateFormatString;
     }

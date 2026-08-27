@@ -172,7 +172,7 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
         }
 
         // Unknown namespace
-        checkNamespaceRight(namespace, Right.PROGRAM, request);
+        checkNamespaceRight(Right.PROGRAM, request);
     }
 
     protected void checkInstallInternal(Extension extension, String namespace, Request request) throws InstallException
@@ -215,7 +215,7 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
         }
     }
 
-    private void checkNamespaceRight(Namespace namespace, Right program, Request request) throws AccessDeniedException
+    private void checkNamespaceRight(Right program, Request request) throws AccessDeniedException
     {
         // Check programming right by default
         checkAccess(null, Right.PROGRAM, request);

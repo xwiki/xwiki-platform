@@ -215,6 +215,7 @@ public class DOMXMLWriter extends XMLWriter
     @Override
     public void writeDocumentStart(Document doc) throws IOException
     {
+        // Nothing to do, the default action is voluntarily skipped.
     }
 
     /**

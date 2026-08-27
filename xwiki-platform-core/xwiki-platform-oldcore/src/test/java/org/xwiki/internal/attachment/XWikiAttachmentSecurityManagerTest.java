@@ -26,6 +26,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -45,9 +48,6 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.DownloadAction;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;

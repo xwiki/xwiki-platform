@@ -73,9 +73,9 @@ ignoredBuiltDependencies:
 onlyBuiltDependencies:
   - nx
 catalog:
-  "@blocknote/core": 0.51.4
-  "@blocknote/mantine": 0.51.4
-  "@blocknote/react": 0.51.4
+  "@blocknote/core": 0.54.0
+  "@blocknote/mantine": 0.54.0
+  "@blocknote/react": 0.54.0
   "@eslint/config-helpers": 0.6.0
   "@eslint/js": 10.0.1
   "@jridgewell/remapping": 2.3.5
@@ -86,7 +86,7 @@ catalog:
   "@playwright/experimental-ct-react": 1.61.1
   "@playwright/experimental-ct-vue": 1.61.1
   "@playwright/test": 1.61.1
-  "@tsconfig/node24": 24.0.4
+  "@tsconfig/node24": 24.0.5
   "@types/jquery": 4.0.1
   "@types/jsdom": 28.0.3
   "@types/lodash-es": 4.17.12
@@ -104,10 +104,10 @@ catalog:
   "@vue/eslint-config-typescript": 14.9.0
   "@vue/test-utils": 2.4.11
   "@vue/tsconfig": 0.9.1
-  axe-core: 4.12.1
+  axe-core: 4.13.0
   bootstrap-icons: 1.13.1
   cross-env: 7.0.3
-  dompurify: 3.4.11
+  dompurify: 3.4.13
   eslint: 10.7.0
   eslint-import-resolver-typescript: 4.4.5
   eslint-plugin-headers: 1.3.4
@@ -141,7 +141,7 @@ catalog:
   postcss: 8.5.24
   postcss-preset-mantine: 1.18.0
   postcss-simple-vars: 7.0.1
-  publint: 0.3.21
+  publint: 0.3.24
   qunit: 2.26.0
   react: 19.2.8
   react-dom: 19.2.8
@@ -170,8 +170,10 @@ catalog:
   vue-tsc: 3.3.7
   vue3-touch-events: 5.0.15
   vuedraggable: 4.1.0
-  y-websocket: 3.0.0
-  yjs: 13.6.31
+  y-prosemirror: 1.3.7
+  y-protocols: 1.0.7
+  y-websocket: 3.1.0
+  yjs: 13.6.32
 allowBuilds:
   esbuild: true
   nx: true

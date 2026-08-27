@@ -265,7 +265,7 @@ public class UserIterator<T> implements Iterator<T>
             }
         }
 
-        cleanStackIfNeeded(currentIterator);
+        cleanStackIfNeeded();
         return currentValue;
     }
 
@@ -314,7 +314,7 @@ public class UserIterator<T> implements Iterator<T>
         return value;
     }
 
-    private void cleanStackIfNeeded(Iterator<DocumentReference> currentIterator)
+    private void cleanStackIfNeeded()
     {
         // If there is no more reference to handle in the current iterator, pop the stack!
         while (!this.userAndGroupIteratorStack.isEmpty() && !this.userAndGroupIteratorStack.peek().hasNext()) {

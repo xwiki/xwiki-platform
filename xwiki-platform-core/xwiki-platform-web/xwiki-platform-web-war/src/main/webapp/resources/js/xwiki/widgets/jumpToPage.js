@@ -59,7 +59,7 @@ window.XWiki = window.XWiki || {};
 var widgets = XWiki.widgets = XWiki.widgets || {};
 // Make sure the ModalPopup class exist.
 if (!XWiki.widgets.ModalPopup) {
-  if (console && console.warn) {
+  if (console?.warn) {
     console.warn("[JumpToPage widget] Required class missing: XWiki.widgets.ModalPopup");
   }
 } else {

@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import org.xwiki.model.reference.EntityReference;
-
 import java.util.Objects;
+
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Base class for all entity {@link org.xwiki.observation.event.Event events}.
@@ -39,14 +39,14 @@ public abstract class AbstractEntityEvent implements EntityEvent
     /**
      * Default constructor. Matches any {@link EntityEvent}.
      */
-    public AbstractEntityEvent()
+    protected AbstractEntityEvent()
     {
     }
 
     /**
      * @param reference the reference
      */
-    public AbstractEntityEvent(EntityReference reference)
+    protected AbstractEntityEvent(EntityReference reference)
     {
         this.reference = reference;
     }

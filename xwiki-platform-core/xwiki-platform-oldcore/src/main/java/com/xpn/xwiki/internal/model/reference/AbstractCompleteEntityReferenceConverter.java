@@ -55,7 +55,7 @@ public abstract class AbstractCompleteEntityReferenceConverter<R extends EntityR
     /**
      * @param type the type of reference
      */
-    public AbstractCompleteEntityReferenceConverter(EntityType type)
+    protected AbstractCompleteEntityReferenceConverter(EntityType type)
     {
         this.type = type;
     }

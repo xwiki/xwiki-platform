@@ -34,8 +34,8 @@ import org.xwiki.job.Request;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.resources.job.JobsResource;
-import org.xwiki.test.docker.junit5.XWikiInstances;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.XWikiInstances;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;

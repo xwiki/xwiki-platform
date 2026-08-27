@@ -748,7 +748,7 @@ public class MockitoOldcore
                     reference = reference.setWikiReference(xcontext.getWikiReference());
                 }
 
-                saveDocument(reference, document, xcontext);
+                saveDocument(document, xcontext);
 
                 return null;
             }
@@ -930,7 +930,7 @@ public class MockitoOldcore
                         document.setOriginalDocument(originalDocument);
                     }
 
-                    saveDocument(document.getDocumentReferenceWithLocale(), document, xcontext);
+                    saveDocument(document, xcontext);
 
                     XWikiDocument newOriginal = document.getOriginalDocument();
 
@@ -1243,7 +1243,7 @@ public class MockitoOldcore
         }
     }
 
-    private void saveDocument(DocumentReference reference, XWikiDocument document, XWikiContext xcontext)
+    private void saveDocument(XWikiDocument document, XWikiContext xcontext)
         throws XWikiException
     {
         boolean supportRevisionStore = this.componentManager.hasComponent(XWikiDocumentFilterUtils.class);

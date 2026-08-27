@@ -34,14 +34,14 @@ public abstract class AbstractXObjectEvent extends AbstractEntityEvent implement
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
      * other attachment event (add, update, delete).
      */
-    public AbstractXObjectEvent()
+    protected AbstractXObjectEvent()
     {
     }
 
     /**
      * @param reference the reference of the object
      */
-    public AbstractXObjectEvent(EntityReference reference)
+    protected AbstractXObjectEvent(EntityReference reference)
     {
         super(reference);
     }

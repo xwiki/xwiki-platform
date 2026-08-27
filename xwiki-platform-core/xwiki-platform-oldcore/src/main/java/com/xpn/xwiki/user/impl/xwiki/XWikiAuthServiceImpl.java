@@ -214,7 +214,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 return null;
             }
 
-            final String userName = getContextUserName(wrappedRequest.getUserPrincipal(), context);
+            final String userName = getContextUserName(wrappedRequest.getUserPrincipal());
             if (LOGGER.isInfoEnabled() && userName != null) {
                 LOGGER.info(USER_AUTHENTIFIED_MESSAGE, userName);
             }
@@ -270,7 +270,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 return null;
             }
 
-            return new XWikiUser(getContextUserName(principal, context));
+            return new XWikiUser(getContextUserName(principal));
         } catch (Exception e) {
             LOGGER.error("Failed to authenticate", e);
 
@@ -278,7 +278,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
     }
 
-    private String getContextUserName(Principal principal, XWikiContext context)
+    private String getContextUserName(Principal principal)
     {
         String contextUserName;
 
@@ -472,12 +472,16 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         try {
             param = context.getWiki().getXWikiPreference(name, context);
         } catch (Exception e) {
+            // TODO: log a warning instead of ignoring this exception.
+            // The value is then looked up in the configuration below.
         }
 
         if (param == null || "".equals(param)) {
             try {
                 param = context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "auth_", ""));
             } catch (Exception e) {
+                // TODO: log a warning instead of ignoring this exception.
+                // The parameter is then left empty.
             }
         }
 

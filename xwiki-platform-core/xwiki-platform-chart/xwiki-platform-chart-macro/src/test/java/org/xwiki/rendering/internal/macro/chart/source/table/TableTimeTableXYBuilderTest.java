@@ -19,17 +19,17 @@
  */
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import org.jfree.data.time.TimeTableXYDataset;
-import org.jfree.chart.axis.ValueAxis;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.data.time.TimeTableXYDataset;
 import org.junit.jupiter.api.Test;
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.test.junit5.mockito.ComponentTest;
-
-import java.util.Date;
-import java.util.Locale;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

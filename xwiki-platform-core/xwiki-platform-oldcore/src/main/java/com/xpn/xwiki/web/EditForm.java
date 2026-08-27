@@ -515,7 +515,7 @@ public class EditForm extends XWikiForm
                     continue;
                 }
                 SortedMap<Integer, Map<String, String[]>> objectMap =
-                    this.updateOrCreateMap.computeIfAbsent(className, name -> new TreeMap<>());
+                    this.updateOrCreateMap.computeIfAbsent(className, key -> new TreeMap<>());
                 // Get the property from the right object #objectNumber of type 'objectName';
                 // create it if they don't exist
                 objectMap.computeIfAbsent(classNumber, number -> new HashMap<>())

@@ -24,9 +24,9 @@ package org.xwiki.notifications.notifiers.email;
  *
  * @version $Id$
  * @since 9.5RC1
- * @deprecated since 12.6, use {@link org.xwiki.notifications.preferences.NotificationEmailInterval} instead
+ * @deprecated use {@link org.xwiki.notifications.preferences.NotificationEmailInterval} instead
  */
-@Deprecated
+@Deprecated(since = "12.6")
 public enum NotificationEmailInterval
 {
     /**

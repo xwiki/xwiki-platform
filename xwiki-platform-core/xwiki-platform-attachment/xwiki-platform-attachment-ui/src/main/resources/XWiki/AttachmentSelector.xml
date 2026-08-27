@@ -212,7 +212,9 @@ $xwiki.jsx.use($attachmentPickerDocName)
     (% class="gallery_actions" %)(((
       #foreach ($action in $actions)
         #set( $actionname = $services.localization.render("${translationPrefix}.actions.${action.name}") )
-        [[${actionname}&gt;&gt;path:${action.url}||class="tool ${action.name}" title="${actionname}" #if($action.rel) rel="${action.rel}"#end]]##
+        ## Escape the URL so that it cannot break out of the link syntax, whatever its origin.
+        #set ($actionURL = $services.rendering.escape($action.url, 'xwiki/2.1'))
+        [[${actionname}&gt;&gt;path:${actionURL}||class="tool ${action.name}" title="${actionname}" #if($action.rel) rel="${action.rel}"#end]]##
       #end
       $!additionalContent
     )))## actions
@@ -303,7 +305,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #attachmentPicker_displayStartFrame({'cssClass' : "gallery_emptyChoice $!{dcssClass}", 'text' : $services.localization.render("${translationPrefix}.default"), 'value' : "${options.defaultValue}"} $currentValue)
   #attachmentPicker_displayAttachmentDetails($defaultAttachment $options)
   #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
-  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=&amp;form_token=$!{services.csrf.getToken()}"))
+  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, $escapetool.url({
+    "${options.get('classname')}_${options.get('object')}_${options.get('property')}": '',
+    'form_token': $!{services.csrf.getToken()}
+  })))
   #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}])
 #end
 {{/velocity}}

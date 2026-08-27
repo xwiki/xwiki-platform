@@ -42,25 +42,35 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    ## The profiles every Maven command of this job uses, the module selection included, so that the
+    ## reactor the selection reasons about cannot drift from the reactor Maven builds. They have to
+    ## cover every module the ci.xwiki.org "quality" build analyzes master with, because a module
+    ## missing from this build is a module whose new code no pull request gate ever sees: the -legacy
+    ## modules are analyzed there and legacy is what puts them in the reactor. The profiles adding
+    ## the modules that exist to run the functional tests, integration-tests and docker and
+    ## distribution, are deliberately left out: master is not analyzed with them either. And
+    ## snapshot supplies the XWiki repositories that a runner, having no settings.xml, cannot
+    ## declare.
+    env:
+      MAVEN_PROFILES: snapshot,legacy
     steps:
       - uses: actions/checkout@v7
         with:
-          ## SonarCloud derives the lines the pull request changed from the git history, and the module
-          ## selection below diffs against the base branch.
+          ## SonarCloud derives the lines the pull request changed from the git history, and the
+          ## module selection below diffs against the base branch.
           fetch-depth: 0
 
       ## The JDK to build with is the one the branch targets, which is the xwiki.java.version property
       ## of the effective root pom. It is read with Maven rather than searched for in the pom text
       ## because the property is not necessarily declared in the repository being built: xwiki-rendering
       ## and xwiki-platform inherit it from the xwiki-commons parent, which Maven has to download to
-      ## know it. -N keeps the evaluation to the root pom, and -Psnapshot supplies the XWiki
-      ## repositories that parent is downloaded from, since a runner has no settings.xml declaring
-      ## them. The JDK preinstalled on the runner is enough to run this: the goal builds the pom model,
-      ## it compiles nothing.
+      ## know it. -N keeps the evaluation to the root pom, and the profiles supply the XWiki
+      ## repositories that parent is downloaded from. The JDK preinstalled on the runner is enough to
+      ## run this: the goal builds the pom model, it compiles nothing.
       - name: Read the Java version of the branch
         id: java
         run: |
-          VERSION=$(mvn -N -B -ntp -q -DforceStdout -Psnapshot help:evaluate \
+          VERSION=$(mvn -N -B -ntp -q -DforceStdout -P"$MAVEN_PROFILES" help:evaluate \
             -Dexpression=xwiki.java.version)
           ## An undefined property makes help:evaluate print a message and still succeed, which would
           ## otherwise surface as an obscure setup-java failure.
@@ -96,93 +106,220 @@ jobs:
             echo "list=" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          BASE=$(git merge-base "origin/$PR_BASE" HEAD)
 
-          ## Prints the modules a pom declares outside of any profile, which are the ones held by the
-          ## reactor of a build activating no profile other than snapshot.
-          declared_modules() {
-            sed '/<profiles>/,/<\/profiles>/d' "$1/pom.xml" | sed -n 's|.*<module>\(.*\)</module>.*|\1|p'
-          }
+          ## The reactor is derived from the poms rather than from a Maven pass over the modules,
+          ## which costs minutes for what amounts to reading the <module> elements. It is read as XML
+          ## and not as text because a pom holds <profiles> and <module> elements inside comments,
+          ## which a text scan takes for real ones, and because a construct this cannot model has to
+          ## be recognized to fall back on the whole reactor instead of silently leaving a module out.
+          LIST=$(python3 - "$(git merge-base "origin/$PR_BASE" HEAD)" <<'PYTHON'
+          import os
+          import subprocess
+          import sys
+          import xml.etree.ElementTree as ET
 
-          SELECTED=""
-          FULL=""
-          while IFS= read -r file; do
-            [ -n "$file" ] || continue
+          ## Maven's own namespace: an element outside of it is not the element it looks like.
+          NS = '{http://maven.apache.org/POM/4.0.0}'
+          BASE = sys.argv[1]
+          PROFILES = {profile for profile in os.environ['MAVEN_PROFILES'].split(',') if profile}
 
-            if [ "$(basename "$file")" = pom.xml ]; then
-              ## The root pom drives every module and an aggregator pom drives every module below it.
-              ## Which of them a change to either actually affects cannot be told from the diff.
-              if [ "$file" = pom.xml ]; then
-                FULL="the root pom changed"
-                break
-              fi
-              ## The pull request may have deleted the pom, in which case it is read from the base.
-              POM=$(git show "HEAD:$file" 2>/dev/null || git show "$BASE:$file" 2>/dev/null || true)
-              case "$POM" in
-                *"<packaging>pom</packaging>"*)
-                  FULL="the aggregator pom [$file] changed"
-                  break
-                  ;;
-              esac
-            fi
 
-            ## Walk up from the changed file to the module owning it.
-            dir=$(dirname "$file")
-            while [ "$dir" != . ] && [ ! -f "$dir/pom.xml" ]; do
-              dir=$(dirname "$dir")
-            done
-            ## A file outside any module (.github, README...) holds nothing to compile or analyze.
-            [ "$dir" != . ] || continue
+          class Unmodelled(Exception):
+              """A pom uses a construct this selection does not model, so no reactor can be derived
+              from it."""
 
-            ## Collect the module and its ancestors, checking on the way up that each is a module its
-            ## parent declares. Every ancestor is selected along with the module because sonar:sonar
-            ## rebuilds the project tree out of the reactor and fails the analysis with "<module> is
-            ## orphan" when a selected module's parent is missing from it. A module only a profile
-            ## activates -- a legacy module, a functional test module, a distribution module -- is
-            ## not in the reactor this workflow builds, so -pl would reject its path; a whole reactor
-            ## build does not analyze it either, so leaving it out changes nothing. The same check
-            ## discards the pom.xml an archetype ships as a resource, which is not a module at all.
-            CHAIN=""
-            REACHABLE=true
-            while [ "$dir" != . ]; do
-              CHAIN=$(printf '%s\n%s' "$CHAIN" "$dir")
-              parent=$(dirname "$dir")
-              if [ ! -f "$parent/pom.xml" ] || ! declared_modules "$parent" | grep -qFx "$(basename "$dir")"; then
-                REACHABLE=false
-                break
-              fi
-              dir="$parent"
-            done
-            if [ "$REACHABLE" = true ]; then
-              SELECTED="$SELECTED$CHAIN"
-            else
-              echo "Ignoring [$file]: no module of the reactor this workflow builds owns it"
-            fi
-          done <<< "$(git diff --name-only "$BASE" HEAD)"
 
-          if [ -n "$FULL" ]; then
-            echo "Building the whole reactor because $FULL"
-            echo "list=" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          ## The root is always selected: sonar:sonar is an aggregator goal, so it runs on the top
-          ## level project of the reactor and fails with "Maven session does not declare a top level
-          ## project" without one. It is also where the analyzed sonar.projectKey comes from.
-          LIST=$(printf '.\n%s' "$SELECTED" | grep . | sort -u | paste -sd, -)
-          echo "Building $(tr ',' '\n' <<< "$LIST" | wc -l | tr -d ' ') of the reactor's modules:"
-          tr ',' '\n' <<< "$LIST" | sed 's/^/  /'
+          def log(message):
+              print(message, file=sys.stderr)
+
+
+          def git(*arguments):
+              result = subprocess.run(('git',) + arguments, stdout=subprocess.PIPE,
+                                      stderr=subprocess.DEVNULL)
+              if result.returncode != 0:
+                  raise OSError(' '.join(arguments))
+              return result.stdout
+
+
+          def pom_path(directory):
+              return 'pom.xml' if directory == '.' else directory + '/pom.xml'
+
+
+          def read_pom(path):
+              """The pom as XML, from the working tree, or from git when the pull request deleted
+              it. None when no version of it can be parsed."""
+              readers = (lambda: open(path, 'rb').read(), lambda: git('show', 'HEAD:' + path),
+                         lambda: git('show', BASE + ':' + path))
+              for read in readers:
+                  try:
+                      pom = ET.fromstring(read())
+                  except (OSError, ET.ParseError):
+                      continue
+                  if pom.tag != NS + 'project':
+                      raise Unmodelled('[%s] is not in the Maven 4.0.0 namespace' % path)
+                  return pom
+              return None
+
+
+          def listed_modules(element):
+              modules = element.find(NS + 'modules')
+              if modules is None:
+                  return []
+              return [module.text.strip() for module in modules.findall(NS + 'module')
+                      if module.text and module.text.strip()]
+
+
+          def declared_modules(pom):
+              """The modules a pom contributes to the reactor of a build activating PROFILES, and
+              the ones it may contribute. Certain are the modules declared outside of any profile
+              and the ones declared by a profile named on the command line. Undecided are the
+              modules of a profile carrying an <activation>, which Maven turns on by itself on a
+              property, the operating system, the presence of a file or by default: they are kept
+              out of the reactor, the way a build setting none of that leaves them out, and reported
+              so that a change actually touching one of them can be widened to the whole reactor."""
+              certain = listed_modules(pom)
+              undecided = []
+              profiles = pom.find(NS + 'profiles')
+              for profile in [] if profiles is None else profiles.findall(NS + 'profile'):
+                  declared = listed_modules(profile)
+                  if not declared:
+                      continue
+                  if (profile.findtext(NS + 'id') or '').strip() in PROFILES:
+                      certain += declared
+                  elif profile.find(NS + 'activation') is not None:
+                      undecided += declared
+              return certain, undecided
+
+
+          def build_reactor():
+              """Every module directory of the reactor, mapped to the directory of the module that
+              declares it, along with the directories a profile Maven decides on by itself may add
+              to it. A <module> is resolved as a path the way Maven resolves it, so a module
+              declared as a nested or a relative path is followed as well."""
+              parents = {'.': None}
+              undecided = set()
+              pending = ['.']
+              while pending:
+                  directory = pending.pop()
+                  pom = read_pom(pom_path(directory))
+                  if pom is None:
+                      raise Unmodelled('[%s] cannot be read' % pom_path(directory))
+                  certain, maybe = declared_modules(pom)
+                  for module in certain:
+                      child = os.path.normpath(os.path.join(directory, module))
+                      if child not in parents:
+                          parents[child] = directory
+                          pending.append(child)
+                  undecided.update(os.path.normpath(os.path.join(directory, module))
+                                   for module in maybe)
+              return parents, undecided
+
+
+          def ancestors(directory):
+              """The directory and every directory holding it, up to the repository root."""
+              while directory and directory != '.':
+                  yield directory
+                  directory = os.path.dirname(directory)
+
+
+          def owning_project(path):
+              """The directory of the Maven project a file belongs to, which is its closest ancestor
+              holding a pom.xml, the way Maven decides it."""
+              directory = os.path.dirname(path)
+              while True:
+                  if os.path.isfile(pom_path(directory or '.')):
+                      return directory or '.'
+                  if not directory:
+                      return None
+                  directory = os.path.dirname(directory)
+
+
+          def whole_reactor(reason):
+              log('Building the whole reactor because %s' % reason)
+              print('')
+              return 0
+
+
+          def main():
+              ## -z keeps git from quoting a path holding a character it considers unusual, and a
+              ## quoted path is a path no walk up the directories can resolve.
+              changed = git('diff', '-z', '--name-only', BASE, 'HEAD')
+              changed = [path for path in changed.decode('utf-8', 'surrogateescape').split('\0')
+                         if path]
+              try:
+                  reactor, undecided = build_reactor()
+              except Unmodelled as reason:
+                  return whole_reactor('the reactor cannot be derived: %s' % reason)
+
+              selected = set()
+              for path in changed:
+                  ## The root pom drives every module of the reactor, and which of them a change to
+                  ## it actually affects cannot be told from the diff.
+                  if path == 'pom.xml':
+                      return whole_reactor('the root pom changed')
+                  directory = owning_project(path)
+                  ## A file no project holds has nothing to compile or analyze.
+                  if directory is None:
+                      continue
+                  ## A module that only a profile this build leaves out activates -- a functional
+                  ## test module, a distribution module -- is not in the reactor, so -pl would
+                  ## reject its path, and the master analysis does not cover it either, so leaving
+                  ## it out changes nothing. The same goes for the pom.xml a module ships as a test
+                  ## resource, which is not a module at all.
+                  if directory not in reactor:
+                      ## Unless a profile Maven decides on by itself declares the module, in which
+                      ## case whether the reactor holds it is exactly what is not known.
+                      held = next((d for d in ancestors(directory) if d in undecided), None)
+                      if held is not None:
+                          return whole_reactor('[%s] belongs to [%s], which a profile Maven decides '
+                                               'on by itself declares' % (path, held))
+                      log('Ignoring [%s]: no module of the reactor this workflow builds owns it'
+                          % path)
+                      continue
+                  ## An aggregator drives every module below it, the same way the root pom does.
+                  ## This is tested only once the module is known to be in the reactor: an
+                  ## aggregator that is not, such as the pom of a functional test module, drives
+                  ## nothing this build would analyze.
+                  if path == pom_path(directory):
+                      pom = read_pom(path)
+                      packaging = 'pom' if pom is None else (pom.findtext(NS + 'packaging')
+                                                             or 'jar').strip()
+                      if packaging == 'pom':
+                          return whole_reactor('the aggregator pom [%s] changed' % path)
+                  ## Every ancestor is selected along with the module because sonar:sonar rebuilds
+                  ## the project tree out of the reactor and fails the analysis with "<module> is
+                  ## orphan" when a selected module's parent is missing from it.
+                  while directory != '.':
+                      selected.add(directory)
+                      directory = reactor[directory]
+
+              ## The root is always selected: sonar:sonar is an aggregator goal, so it runs on the
+              ## top level project of the reactor and fails with "Maven session does not declare a
+              ## top level project" without one. It is also where the analyzed sonar.projectKey
+              ## comes from.
+              listing = ['.'] + sorted(selected)
+              log("Building %d of the reactor's %d modules:" % (len(listing), len(reactor)))
+              for directory in listing:
+                  log('  ' + directory)
+              print(','.join(listing))
+              return 0
+
+
+          sys.exit(main())
+          PYTHON
+          )
           echo "list=$LIST" >> "$GITHUB_OUTPUT"
 
       ## Compile only. The analysis needs the bytecode, not the test results, and no coverage as long
-      ## as the quality gate keeps its condition on the coverage of new code disabled. The snapshot
-      ## profile is what supplies the XWiki repositories the parent pom, the snapshots of the other
-      ## XWiki repositories and the modules left out of the selection are downloaded from, a runner
-      ## having no settings.xml declaring them.
+      ## as the quality gate keeps its condition on the coverage of new code disabled. The profiles
+      ## are what supplies the XWiki repositories the parent pom, the snapshots of the other XWiki
+      ## repositories and the modules left out of the selection are downloaded from, a runner having
+      ## no settings.xml declaring them.
       - name: Build
         env:
           MODULES: ${{ steps.modules.outputs.list }}
         run: >
-          mvn -B -ntp -T 1C install -DskipTests -Psnapshot ${MODULES:+-pl "$MODULES"}
+          mvn -B -ntp -T 1C install -DskipTests -P"$MAVEN_PROFILES" ${MODULES:+-pl "$MODULES"}
           -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true
           -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true
 
@@ -200,7 +337,7 @@ jobs:
           PR_BASE: ${{ github.event.pull_request.base.ref }}
           MODULES: ${{ steps.modules.outputs.list }}
         run: >
-          mvn -B -ntp sonar:sonar -Psnapshot ${MODULES:+-pl "$MODULES"}
+          mvn -B -ntp sonar:sonar -P"$MAVEN_PROFILES" ${MODULES:+-pl "$MODULES"}
           -Dsonar.qualitygate.wait=true
           -Dsonar.pullrequest.key="$PR_KEY"
           -Dsonar.pullrequest.branch="$PR_BRANCH"

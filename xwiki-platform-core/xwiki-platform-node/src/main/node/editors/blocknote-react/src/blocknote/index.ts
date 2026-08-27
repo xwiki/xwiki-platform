@@ -182,6 +182,7 @@ function querySuggestionsMenuItems({
     syntax.features;
 
   // A single generic "Link" entry that opens the link wizard.
+  // Only enabled if the syntax supports it
   const genericLinkItem: DefaultReactSuggestionItem[] = syntax.features
     .inlineContents.links.basicLinks
     ? [

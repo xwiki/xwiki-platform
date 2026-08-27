@@ -90,7 +90,6 @@ onMounted(() => {
     v-bind="{ 'data-test': 'linkDisplayText' }"
     :label="t('link-modal.config.display-text')"
     v-model="linkData.displayText"
-    autofocus
     required
   />
 

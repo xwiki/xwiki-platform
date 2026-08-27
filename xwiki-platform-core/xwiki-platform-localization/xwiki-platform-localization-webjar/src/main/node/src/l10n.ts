@@ -22,6 +22,7 @@ import { resolver } from "./index";
 import { transformTranslation } from "./internal/transformTranslation";
 import type {
   Query,
+  Translations,
   TranslationsWithMissed,
 } from "@xwiki/platform-localization-api";
 
@@ -45,35 +46,60 @@ define("xwiki-l10n", (() => {
         const resolvedKeys: string[] = Array.isArray(query)
           ? query
           : query.keys.map((k) => queryPrefix + k);
+        /**
+         * Build the module returned to the dependent modules.
+         * @param translations - the resolved translations, keyed by full translation key
+         */
+        function buildModule(translations: Translations) {
+          // Remove the prefix when returning the translations for the current query.
+          const normalizedTranslations = Object.entries(translations).reduce<{
+            [key: string]: string;
+          }>((acc, [k, v]) => {
+            // We only return the keys from the query.
+            if (resolvedKeys.includes(k)) {
+              acc[k.substring(queryPrefix.length)] = v;
+            }
+            return acc;
+          }, {});
+          return {
+            ...normalizedTranslations,
+            get(key: string, ...args: string[]): string | null {
+              return transformTranslation(
+                normalizedTranslations[key] ?? null,
+                ...args,
+              );
+            },
+          };
+        }
+
         resolver
           .resolve(query)
-          .then((resolvedTranslations: TranslationsWithMissed) => {
-            const translations = resolvedTranslations.translations;
-            // Remove the prefix when returning the translations for the current query.
-            const normalizedTranslations = Object.entries(translations).reduce<{
-              [key: string]: string;
-            }>((acc, [k, v]) => {
-              // We only return the keys from the query.
-              if (resolvedKeys.includes(k)) {
-                acc[k.substring(queryPrefix.length)] = v;
-              }
-              return acc;
-            }, {});
-            onLoad({
-              ...normalizedTranslations,
-              get(key: string, ...args: string[]): string | null {
-                return transformTranslation(
-                  normalizedTranslations[key] ?? null,
-                  ...args,
-                );
-              },
-            });
-
-            return normalizedTranslations;
-          })
+          .then(
+            (resolvedTranslations: TranslationsWithMissed) =>
+              buildModule(resolvedTranslations.translations),
+            (err: unknown) => {
+              console.error(
+                `An issue occurred during the resolution of localization query ${JSON.stringify(query)}`,
+                err,
+              );
+              // Degrade to the untranslated keys so that the dependent modules still initialize and merely display
+              // the keys instead of their translations.
+              return buildModule(
+                Object.fromEntries(
+                  resolvedKeys.map((key) => [
+                    key,
+                    key.substring(queryPrefix.length),
+                  ]),
+                ),
+              );
+            },
+          )
+          // onLoad is called outside of the handlers above so that an error thrown by a dependent module is not
+          // reported as a translation resolution failure.
+          .then(onLoad)
           .catch((err: unknown) => {
             console.error(
-              `An issue occurred during the resolution of localization query ${query}`,
+              `An issue occurred while initializing a module depending on the localization query ${JSON.stringify(query)}`,
               err,
             );
           });

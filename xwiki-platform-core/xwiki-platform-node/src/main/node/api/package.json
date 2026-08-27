@@ -39,8 +39,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/platform-authentication-api": "workspace:*",
-    "@xwiki/platform-configuration-api": "workspace:*",
-    "vue-router": "catalog:"
+    "@xwiki/platform-configuration-api": "workspace:*"
   },
   "peerDependencies": {
     "inversify": "8.x",

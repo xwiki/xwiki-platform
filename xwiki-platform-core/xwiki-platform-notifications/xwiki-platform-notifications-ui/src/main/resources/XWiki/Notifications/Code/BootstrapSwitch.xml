@@ -336,6 +336,9 @@ define('xwiki-bootstrap-switch', ['jquery', 'bootstrap', 'bootstrap-switch'], fu
   Use the theme's primary color instead, scoped to the switch only. */
 .bootstrap-switch.bootstrap-switch-focused {
   border-color: var(--brand-primary);
+  /* Bootstrap Switch draws the focus glow with a hardcoded light blue that doesn't follow the color theme and no
+    longer matches the border color set above. */
+  box-shadow: 0 0 8px var(--brand-primary);
 }</code>
     </property>
     <property>

@@ -1729,7 +1729,7 @@ importers:
         version: 4.17.12
       '@vue/test-utils':
         specifier: 'catalog:'
-        version: 2.4.11(@vue/compiler-dom@3.5.38)(@vue/server-renderer@3.5.38(vue@3.5.38(typescript@5.9.3)))(vue@3.5.38(typescript@5.9.3))
+        version: 2.4.11(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3))
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config

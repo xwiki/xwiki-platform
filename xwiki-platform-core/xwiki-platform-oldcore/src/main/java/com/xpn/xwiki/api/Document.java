@@ -166,7 +166,7 @@ public class Document extends Api
         return this.currentMixedDocumentReferenceResolver;
     }
 
-    private EntityReferenceSerializer<String> getDefaultEntityReferenceSerializer()
+    private EntityReferenceSerializer<String> getDefaultReferenceSerializer()
     {
         if (this.defaultEntityReferenceSerializer == null) {
             this.defaultEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
@@ -374,7 +374,7 @@ public class Document extends Api
      */
     public String getPrefixedFullName()
     {
-        return getDefaultEntityReferenceSerializer().serialize(this.doc.getDocumentReference());
+        return getDefaultReferenceSerializer().serialize(this.doc.getDocumentReference());
     }
 
     /**
@@ -2766,7 +2766,7 @@ public class Document extends Api
                 saveAsAuthor(comment, minorEdit);
             }
         } else {
-            java.lang.Object[] args = {getDefaultEntityReferenceSerializer().serialize(getDocumentReference())};
+            java.lang.Object[] args = {getDefaultReferenceSerializer().serialize(getDocumentReference())};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
         }
@@ -2797,7 +2797,7 @@ public class Document extends Api
                     saveDocument(comment, minorEdit, false);
                 } else {
                     java.lang.Object[] args =
-                        { getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), getWiki() };
+                        { getDefaultReferenceSerializer().serialize(getDocumentReference()), getWiki() };
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                         XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                         "Access denied in edit mode on document [{0}]. The wiki [{1}] is in read only mode.", null,

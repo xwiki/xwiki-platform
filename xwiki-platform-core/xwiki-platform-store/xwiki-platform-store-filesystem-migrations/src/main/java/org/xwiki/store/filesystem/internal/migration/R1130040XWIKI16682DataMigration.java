@@ -103,7 +103,7 @@ public class R1130040XWIKI16682DataMigration extends AbstractStoreTypeDataMigrat
 
         if (!attachments.isEmpty()) {
             try {
-                setStore(attachments, session);
+                setAttachmentsStore(attachments, session);
             } catch (IOException e) {
                 throw new HibernateException("Failed to fix missed attachment", e);
             }
@@ -120,7 +120,7 @@ public class R1130040XWIKI16682DataMigration extends AbstractStoreTypeDataMigrat
         }
     }
 
-    private void setStore(List<Object[]> attachments, Session session) throws IOException
+    private void setAttachmentsStore(List<Object[]> attachments, Session session) throws IOException
     {
         WikiReference wikiReference = getXWikiContext().getWikiReference();
 

@@ -213,7 +213,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         setupCookie(rememberCookie, sessionCookie, secureCookie, cookieDomain, response);
 
         if (PROTECTION_ALL.equals(this.protection) || PROTECTION_VALIDATION.equals(this.protection)) {
-            String validationHash = getValidationHash(protectedUsername, protectedPassword, getClientIP(request));
+            String validationHash = computeValidationHash(protectedUsername, protectedPassword, getClientIP(request));
             if (validationHash != null) {
                 // Validation
                 Cookie validationCookie = new Cookie(getCookiePrefix() + COOKIE_VALIDATION, validationHash);
@@ -287,7 +287,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @param clientIP The client IP of the request.
      * @return Validation hash.
      */
-    private String getValidationHash(String username, String password, String clientIP)
+    private String computeValidationHash(String username, String password, String clientIP)
     {
         if (this.validationKey == null) {
             LOGGER.error("No validation key specified. The [xwiki.authentication.validationKey] property is "
@@ -373,10 +373,10 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public void forgetLogin(HttpServletRequest request, HttpServletResponse response)
     {
         ((SecurityRequestWrapper) request).setUserPrincipal(null);
-        removeCookie(request, response, getCookiePrefix() + COOKIE_USERNAME);
-        removeCookie(request, response, getCookiePrefix() + COOKIE_PASSWORD);
-        removeCookie(request, response, getCookiePrefix() + COOKIE_REMEMBERME);
-        removeCookie(request, response, getCookiePrefix() + COOKIE_VALIDATION);
+        expireCookie(request, response, getCookiePrefix() + COOKIE_USERNAME);
+        expireCookie(request, response, getCookiePrefix() + COOKIE_PASSWORD);
+        expireCookie(request, response, getCookiePrefix() + COOKIE_REMEMBERME);
+        expireCookie(request, response, getCookiePrefix() + COOKIE_VALIDATION);
     }
 
     /**
@@ -406,7 +406,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @param response The servlet response.
      * @param cookieName The name of the cookie that must be removed.
      */
-    private void removeCookie(HttpServletRequest request, HttpServletResponse response, String cookieName)
+    private void expireCookie(HttpServletRequest request, HttpServletResponse response, String cookieName)
     {
         Cookie cookie = getCookie(request.getCookies(), cookieName);
         if (cookie != null) {
@@ -470,7 +470,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
             String cookieHash =
                 getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_VALIDATION, DEFAULT_VALUE);
-            String calculatedHash = getValidationHash(username, password, getClientIP(request));
+            String calculatedHash = computeValidationHash(username, password, getClientIP(request));
             if (cookieHash.equals(calculatedHash)) {
                 return true;
             } else {

@@ -48,16 +48,10 @@
     #set ($discard = $response.setStatus(423))
     #jsonResponse($editConfirmation)
   #else
-    ## Lock the document for editing.
-    #set ($lockParams = {
-      'ajax': 1,
-      'action': $request.lockAction,
-      'language': $tdoc.realLocale
-    })
-    #if ($request.force == 'true')
-      #set ($lockParams.force = 1)
-    #end
-    #set ($discard = $response.sendRedirect($tdoc.getURL('lock', $escapetool.url($lockParams))))
+    ## The edit action, which serves this sheet, has already locked the document translation that is going to be
+    ## edited, so there's nothing left for us to do. We still write an empty JSON object because the caller asks for
+    ## JSON and can't parse an empty response.
+    #jsonResponse({})
   #end
 #end
 {{/velocity}}</content>
@@ -350,11 +344,17 @@ define('xwiki-document-api', [
      */
     lock(action, force) {
       action = action || 'edit';
-      return Promise.resolve($.getJSON(this.getURL('get'), {
+      // We go through the edit action because it resolves the document translation that is going to be edited, which
+      // is not always the one from the context (e.g. when the translation doesn't exist yet, because it's about to be
+      // created), and it locks that translation, which is what the edit confirmation checkers look at. We don't want
+      // the output of the edit action though, so we ask for the output of this sheet instead.
+      return Promise.resolve($.getJSON(this.getURL('edit'), {
+        xpage: 'get',
         sheet: 'XWiki.InplaceEditing',
         action: 'lock',
-        lockAction: action,
-        force: force,
+        // The edit action expects 1 in order to force the lock. We must not send any value when we're not forcing,
+        // because #getEditConfirmation() considers the edit forced as soon as this parameter is not empty.
+        force: force ? 1 : '',
         language: this.getRealLocale(),
         force_token: xcontext.form_token,
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).

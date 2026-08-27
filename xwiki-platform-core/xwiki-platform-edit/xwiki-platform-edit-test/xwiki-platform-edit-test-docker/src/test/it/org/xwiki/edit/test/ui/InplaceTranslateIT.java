@@ -25,13 +25,16 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -48,9 +51,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 12.10.6
  * @since 13.2RC1
  */
-@UITest
+@UITest(servletEngineNetworkAliases = InplaceTranslateIT.XWIKI_ALIAS)
 class InplaceTranslateIT
 {
+    /**
+     * Used to authenticate a second user, in a second browser tab, in order to check which document translation is
+     * locked while the first user is editing.
+     */
+    public static final String XWIKI_ALIAS = "xwiki-alias";
+
     @BeforeEach
     void setup(TestUtils setup, TestReference testReference) throws Exception
     {
@@ -66,6 +75,17 @@ class InplaceTranslateIT
         setup.createPage(originalTranslationReference, "content EN", "title EN");
     }
 
+    @AfterEach
+    void closeBrowserTabs(TestUtils setup, MultiUserTestUtils multiUserSetup)
+    {
+        // Leave the edit mode on each tab, otherwise closing them can trigger the unsaved changes confirmation.
+        setup.getDriver().getWindowHandles().forEach(handle -> {
+            multiUserSetup.switchToBrowserTab(handle);
+            setup.maybeLeaveEditMode();
+        });
+        multiUserSetup.closeTabs();
+    }
+
     @AfterAll
     void tearDown(TestUtils setup) throws Exception
     {
@@ -75,6 +95,7 @@ class InplaceTranslateIT
     }
 
     @Test
+    @Order(1)
     void translateInplace(TestUtils setup, TestReference testReference) throws Exception
     {
         // The hints displayed when creating a translation with the Translate button are in the language of the user
@@ -226,9 +247,44 @@ class InplaceTranslateIT
     }
 
     /**
+     * The in-place editor has to lock the translation that is being created, and release the lock of the original
+     * translation, no matter how the creation of the new translation was started.
+     */
+    @Test
+    @Order(2)
+    void lockTranslationToCreate(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+    {
+        // Alice is logged in on the first tab (see #setup). Log in Bob on a second tab, so that we can check which
+        // translation is locked while Alice is creating a new one.
+        String bobTab = multiUserSetup.openNewBrowserTab(XWIKI_ALIAS);
+        setup.createUserAndLogin("bob", "pa$$word", "editor", "Wysiwyg");
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+
+        // Use case 1: create the translation directly from the Translate button, from view mode.
+        setup.gotoPage(testReference, "view", "language=fr");
+        InplaceEditablePage alicePage = new InplaceEditablePage();
+        assertTrue(alicePage.hasTranslateButton());
+        alicePage.translateInplace().waitForEditedLocale("fr");
+
+        assertOnlyTranslationToCreateIsLocked(setup, testReference, multiUserSetup, bobTab);
+
+        // Release the lock on the French translation before testing the second use case.
+        multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        alicePage.cancel();
+
+        // Use case 2: start editing the original translation and then switch to creating the new translation.
+        setup.gotoPage(testReference, "view", "language=fr");
+        alicePage = new InplaceEditablePage().editInplace().waitForEditedLocale("");
+        alicePage.translateInplace().waitForEditedLocale("fr");
+
+        assertOnlyTranslationToCreateIsLocked(setup, testReference, multiUserSetup, bobTab);
+    }
+
+    /**
      * The creation of a translation from the Information tab works the same for a terminal page.
      */
     @Test
+    @Order(3)
     void translateTerminalPageFromInformationTab(TestUtils setup, TestReference testReference)
     {
         DocumentReference terminalPageReference =
@@ -284,4 +340,23 @@ class InplaceTranslateIT
         return newFrenchPage;
     }
 
+    /**
+     * Checks, as Bob, that the translation Alice is creating is locked while the original translation is not.
+     */
+    private void assertOnlyTranslationToCreateIsLocked(TestUtils setup, TestReference testReference,
+        MultiUserTestUtils multiUserSetup, String bobTab)
+    {
+        multiUserSetup.switchToBrowserTab(bobTab);
+
+        // The translation being created is locked, so Bob is asked to confirm before taking over the lock.
+        setup.gotoPage(testReference, "view", "language=fr");
+        InplaceEditablePage bobPage = new InplaceEditablePage();
+        bobPage.clickTranslate();
+        assertTrue(bobPage.waitForEditLockConfirmation().contains("alice"),
+            "Expected the French translation to be locked by alice.");
+
+        // The original translation is not locked, so Bob can edit it without being asked to confirm.
+        setup.gotoPage(testReference, "view", "language=en");
+        new InplaceEditablePage().editInplace().cancel();
+    }
 }

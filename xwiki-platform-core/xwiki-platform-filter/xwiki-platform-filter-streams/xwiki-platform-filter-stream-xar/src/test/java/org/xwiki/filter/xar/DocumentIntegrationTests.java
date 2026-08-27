@@ -24,6 +24,8 @@ import org.xwiki.filter.test.integration.junit5.FilterTest.Scope;
 import org.xwiki.filter.xar.internal.input.CurrentXClassLoader;
 import org.xwiki.test.annotation.AllComponents;
 
+import static org.mockito.Mockito.when;
+
 /**
  * Run all tests found in the classpath. These {@code *.test} files must follow the conventions described in
  * {@link org.xwiki.filter.test.integration.TestDataParser}.
@@ -37,6 +39,10 @@ class DocumentIntegrationTests extends FilterTest
     @Override
     protected void beforeTests() throws Exception
     {
-        getComponentManager().registerMockComponent(CurrentXClassLoader.class);
+        CurrentXClassLoader loader = getComponentManager().registerMockComponent(CurrentXClassLoader.class);
+        when(loader.getXClassPropertyType("space.classOldStyleTest", "property2")).thenReturn("StaticList");
+        when(loader.getXClassPropertyType("space.classOldStyleTest", "property1")).thenReturn("String");
+        when(loader.getXClassPropertyType("space.classOldStyleTest", "mypass")).thenReturn("Password");
+        when(loader.getXClassPropertyType("space.classOldStyleTest", "mydate")).thenReturn("Date");
     }
 }

@@ -98,12 +98,12 @@ public abstract class AbstractWikiObjectPropertyReader extends AbstractReader
             type = properties.getObjectPropertyType();
         }
         boolean useTypeAttribute = false;
-        if (type == null && !StringUtils.isEmpty(typeAttribute)) {
+        if (type == null && StringUtils.isNotEmpty(typeAttribute)) {
             type = typeAttribute;
             useTypeAttribute = true;
         }
         // last fallback: try to load the type from current xclass
-        if (type == null && !StringUtils.isEmpty(classReference)) {
+        if (type == null && StringUtils.isNotEmpty(classReference)) {
             type = this.currentXClassLoaderProvider.get().getXClassPropertyType(classReference, property.name);
         }
 
@@ -123,6 +123,4 @@ public abstract class AbstractWikiObjectPropertyReader extends AbstractReader
 
         return property;
     }
-
-
 }

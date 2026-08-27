@@ -20,6 +20,7 @@
 package org.xwiki.internal.filter;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
@@ -54,6 +55,7 @@ public class DefaultCurrentXClassLoader implements CurrentXClassLoader
     private Provider<XWikiContext> contextProvider;
 
     @Inject
+    @Named("current")
     private DocumentReferenceResolver<String> stringDocumentReferenceResolver;
 
     @Override

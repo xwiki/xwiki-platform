@@ -182,25 +182,28 @@ function querySuggestionsMenuItems({
     syntax.features;
 
   // A single generic "Link" entry that opens the link wizard.
-  const genericLinkItem: DefaultReactSuggestionItem[] = [
-    {
-      title: t("blocknote.slashMenu.link.title"),
-      subtext: t("blocknote.slashMenu.link.subtext"),
-      aliases: ["link"],
-      group: "Links",
-      icon: createElement(RiLink),
-      onItemClick() {
-        linkEditionHandler({
-          mode: "createNew",
-          current: { title: "", url: "" },
-          onSubmit({ title, url }) {
-            editor.createLink(url, title);
-            editor.focus();
+  const genericLinkItem: DefaultReactSuggestionItem[] = syntax.features
+    .inlineContents.links.basicLinks
+    ? [
+        {
+          title: t("blocknote.slashMenu.link.title"),
+          subtext: t("blocknote.slashMenu.link.subtext"),
+          aliases: ["link"],
+          group: "Links",
+          icon: createElement(RiLink),
+          onItemClick() {
+            linkEditionHandler({
+              mode: "createNew",
+              current: { title: "", url: "" },
+              onSubmit({ title, url }) {
+                editor.createLink(url, title);
+                editor.focus();
+              },
+            });
           },
-        });
-      },
-    },
-  ];
+        },
+      ]
+    : [];
 
   // A single generic "Macro" entry that opens the macro wizard. It is used to insert the server-rendered
   // xwikiMacroBlock / xwikiInlineMacro (the per-macro entries below only exist for client-rendered macros).

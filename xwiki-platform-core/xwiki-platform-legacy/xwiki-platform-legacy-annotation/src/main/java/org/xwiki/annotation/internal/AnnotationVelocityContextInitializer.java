@@ -82,4 +82,17 @@ public class AnnotationVelocityContextInitializer implements VelocityContextInit
                 ExceptionUtils.getRootCauseMessage(e));
         }
     }
+
+    /**
+     * TEMPORARY: comparing a value with itself is reported by SonarQube as a bug (java:S1764). It is here only to
+     * check that the pull request analysis reports on a legacy module and that its quality gate then fails. To be
+     * reverted, this pull request is not meant to be merged.
+     *
+     * @param value any value
+     * @return whether the value equals itself
+     */
+    private boolean isSelfEqual(int value)
+    {
+        return value == value;
+    }
 }

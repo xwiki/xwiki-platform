@@ -315,6 +315,8 @@
   </build>
   <modules>
     <!-- Sorted Alphabetically -->
+    <!-- TEMPORARY: this comment exists only to make the SonarCloud pull request analysis see a change
+         to this aggregator pom. To be reverted, this pull request is not meant to be merged. -->
     <module>xwiki-platform-activeinstalls2</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-alerts</module>

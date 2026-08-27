@@ -100,7 +100,10 @@ public class WikiObjectReader extends AbstractWikiObjectPropertyReader
             if (elementName.equals(XARClassModel.ELEMENT_CLASS)) {
                 wikiObject.wikiClass = this.classReader.read(xmlReader, properties);
             } else if (elementName.equals(XARObjectPropertyModel.ELEMENT_PROPERTY)) {
-                wikiObject.properties.add(readObjectProperty(xmlReader, properties, wikiObject.wikiClass));
+                String classReference =
+                    (String) wikiObject.parameters.get(WikiObjectFilter.PARAMETER_CLASS_REFERENCE);
+                wikiObject.properties.add(readObjectProperty(xmlReader, properties, wikiObject.wikiClass,
+                    classReference));
             } else {
                 EventParameter parameter = XARObjectModel.OBJECT_PARAMETERS.get(elementName);
 

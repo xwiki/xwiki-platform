@@ -81,18 +81,8 @@ public class AnnotationVelocityContextInitializer implements VelocityContextInit
                     + "annotations service will not be accessible in velocity context. Root cause is [{}].",
                 ExceptionUtils.getRootCauseMessage(e));
         }
-    }
-
-    /**
-     * TEMPORARY: comparing a value with itself is reported by SonarQube as a bug (java:S1764). It is here only to
-     * check that the pull request analysis reports on a legacy module and that its quality gate then fails. To be
-     * reverted, this pull request is not meant to be merged.
-     *
-     * @param value any value
-     * @return whether the value equals itself
-     */
-    private boolean isSelfEqual(int value)
-    {
-        return value == value;
+        // TEMPORARY: this comment keeps this legacy module among the ones the pull request changes, now that the
+        // bug checking that the quality gate fails on one has been taken out. To be reverted, this pull request is
+        // not meant to be merged.
     }
 }

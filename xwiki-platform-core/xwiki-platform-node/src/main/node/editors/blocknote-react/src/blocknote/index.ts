@@ -190,7 +190,7 @@ function querySuggestionsMenuItems({
           title: t("blocknote.slashMenu.link.title"),
           subtext: t("blocknote.slashMenu.link.subtext"),
           aliases: ["link"],
-          group: "Links",
+          group: t("blocknote.slashMenu.link.group"),
           icon: createElement(RiLink),
           onItemClick() {
             linkEditionHandler({
@@ -215,7 +215,7 @@ function querySuggestionsMenuItems({
             title: t("blocknote.slashMenu.macro.title"),
             subtext: t("blocknote.slashMenu.macro.subtext"),
             aliases: ["macro"],
-            group: "Macros",
+            group: t("blocknote.slashMenu.macro.group"),
             icon: createElement(RiFileList3Fill),
             onItemClick: () =>
               openMacroInsertionEditor(

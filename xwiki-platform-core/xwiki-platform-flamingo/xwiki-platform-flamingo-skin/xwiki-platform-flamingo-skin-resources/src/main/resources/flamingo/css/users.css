@@ -84,5 +84,4 @@ li.group {
 .user .user-alias,
 .group .group-alias {
   color: var(--text-muted);
-  margin-left: .3em;
 }

@@ -226,14 +226,17 @@ public class NumberClass extends PropertyClass
         input.setDisabled(isDisabled());
 
         String ntype = getNumberType();
-        String invalidFormatMessage = localizePlainOrKey("core.validation.number.message.invalidformat");
-        input.addAttribute(DATA_VALIDATION_BAD_INPUT, invalidFormatMessage);
-        input.addAttribute(DATA_VALIDATION_STEP_MISMATCH, invalidFormatMessage);
+        input.addAttribute(DATA_VALIDATION_BAD_INPUT,
+            localizePlainOrKey("core.validation.number.message.invalidformat"));
         if (TYPE_FLOAT.equals(ntype) || TYPE_DOUBLE.equals(ntype)) {
             // Without an explicit step, the HTML5 default (step=1) makes any decimal value a stepMismatch.
             input.addAttribute(STEP, STEP_ANY);
         } else {
             input.addAttribute(STEP, STEP_INTEGER);
+            // A step mismatch can only be a decimal value here, which is a valid number, so the message asks for a
+            // whole number rather than reporting an invalid one.
+            input.addAttribute(DATA_VALIDATION_STEP_MISMATCH,
+                localizePlainOrKey("core.validation.number.message.wholenumberrequired"));
             // Only the integer type gets a range. Browsers evaluate min and max in double arithmetic, so a min set at
             // the magnitude of the long range makes them skip the step check altogether, letting decimals through on
             // the default number type. Values outside the long range are reported by fromString instead.

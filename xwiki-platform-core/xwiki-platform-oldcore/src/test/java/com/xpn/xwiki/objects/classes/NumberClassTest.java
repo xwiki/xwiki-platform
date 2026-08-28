@@ -139,6 +139,9 @@ class NumberClassTest
 
         when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.invalidformat"))
             .thenReturn("Please enter a valid number.");
+        when(this.contextualLocalizationManager
+            .getTranslationPlain("core.validation.number.message.wholenumberrequired"))
+            .thenReturn("Please enter a whole number.");
         if (expectedMin != null) {
             when(this.contextualLocalizationManager.getTranslationPlain("core.validation.number.message.outofrange",
                 expectedMin, expectedMax)).thenReturn("Out of range.");
@@ -151,7 +154,11 @@ class NumberClassTest
         assertTrue(html.contains("type='number'"), html);
         assertTrue(html.contains("step='" + expectedStep + "'"), html);
         assertTrue(html.contains("data-validation-bad-input='Please enter a valid number.'"), html);
-        assertTrue(html.contains("data-validation-step-mismatch='Please enter a valid number.'"), html);
+        if ("1".equals(expectedStep)) {
+            assertTrue(html.contains("data-validation-step-mismatch='Please enter a whole number.'"), html);
+        } else {
+            assertFalse(html.contains("data-validation-step-mismatch"), html);
+        }
         if (expectedMin != null) {
             assertTrue(html.contains("min='" + expectedMin + "'"), html);
             assertTrue(html.contains("max='" + expectedMax + "'"), html);

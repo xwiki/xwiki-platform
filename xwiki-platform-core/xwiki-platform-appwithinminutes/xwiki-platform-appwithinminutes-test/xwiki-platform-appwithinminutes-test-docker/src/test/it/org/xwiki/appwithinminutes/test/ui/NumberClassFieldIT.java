@@ -19,11 +19,13 @@
  */
 package org.xwiki.appwithinminutes.test.ui;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.appwithinminutes.test.po.ApplicationClassEditPage;
 import org.xwiki.appwithinminutes.test.po.EntryEditPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.xclass.test.po.ClassSheetPage;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -47,6 +49,13 @@ class NumberClassFieldIT
     private static final String FIELD_NAME = "number1";
 
     private static final String INVALID_FORMAT_MESSAGE = "is not a valid number of type \"long\"";
+
+    @BeforeEach
+    void setUp(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.deleteSpace(testReference.getLastSpaceReference());
+    }
 
     /**
      * Checks the successive validation layers of a Number field of the default {@code long} type, on a single
@@ -89,7 +98,7 @@ class NumberClassFieldIT
 
     private EntryEditPage addNumberFieldAndGoToEntry(TestReference testReference)
     {
-        ApplicationClassEditPage editor = goToEditor(testReference);
+        ApplicationClassEditPage editor = goToEditor(testReference.getLastSpaceReference());
         editor.addField("Number");
         editor.clickSaveAndView();
         new ClassSheetPage().clickTemplateLink().edit();

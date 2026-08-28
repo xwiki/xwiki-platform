@@ -141,7 +141,7 @@
           // Fix the tab-key navigation.
           var resourceTypeDropDownToggle = this.getElement().findOne('.dropdown-toggle');
           var resourceTypeButton = this.getElement().findOne('button.resourceType');
-          var resourceReferenceInput = this.getElement().findOne('.ts-control > input');
+          var resourceReferenceInput = this.getResourceReferenceInput();
           var tabIndex = this.tabIndex;
           [resourceTypeDropDownToggle, resourceTypeButton, resourceReferenceInput].forEach(function(field) {
             var dialog = this;
@@ -156,13 +156,8 @@
               dialog._.currentFocusIndex = this._focusable.focusIndex;
             });
           }, this.getDialog());
-          // Fix the binding between the label and the input.
-          let id = resourceReferenceInput.getAttribute('id');
-          if (!id) {
-            id = CKEDITOR.tools.getNextId();
-            resourceReferenceInput.setAttribute('id', id);
-          }
-          this.getElement().findOne('label').setAttribute('for', id);
+          this.resourceReferenceFocusable = resourceReferenceInput._focusable;
+          this.updateResourceReferenceInput();
         },
         validate: function() {
           var resourceReference = this.getValue();
@@ -255,6 +250,39 @@
         getResourcePickerInput: function() {
           return this.getElement().findOne('input');
         },
+        /**
+         * @return the input the resource reference is typed in, which is the input created by the suggestion widget
+         *   when the selected resource type has a suggester, and the resource reference input otherwise
+         */
+        getResourceReferenceInput: function() {
+          return this.getElement().findOne('.ts-control > input') ||
+            this.getElement().findOne('input.resourceReference');
+        },
+        /**
+         * Makes the focusable and the label of the resource reference target the input that is currently displayed.
+         * The suggestion widget is destroyed and recreated whenever the resource type changes, so the input it had
+         * created is removed from the page.
+         */
+        updateResourceReferenceInput: function() {
+          const dialog = this.getDialog();
+          const focusable = this.resourceReferenceFocusable;
+          const input = this.getResourceReferenceInput();
+          focusable.element = input;
+          // isFocusable() is bound to the input that was passed when the focusable was created.
+          focusable.isFocusable = function() {
+            return !input.getAttribute('disabled') && input.isVisible();
+          };
+          input.on('focus', function() {
+            dialog._.currentFocusIndex = focusable.focusIndex;
+          });
+          // Fix the binding between the label and the input.
+          let id = input.getAttribute('id');
+          if (!id) {
+            id = CKEDITOR.tools.getNextId();
+            input.setAttribute('id', id);
+          }
+          this.getElement().findOne('label').setAttribute('for', id);
+        },
         getLabelElement: function() {
           return this.getElement().findOne('.cke_dialog_ui_labeled_label');
         },
@@ -262,6 +290,10 @@
           // Update the label.
           var resourceTypeConfig = $resource.types[data.newValue] || {label: data.newValue};
           this.getLabelElement().setText(resourceTypeConfig.label);
+          // This event is also fired while the resource picker is being created, before the focusable exists.
+          if (this.resourceReferenceFocusable) {
+            this.updateResourceReferenceInput();
+          }
         },
         onSelectResource: function(event, resource) {
           this.selectedResource = resource;

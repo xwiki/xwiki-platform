@@ -86,11 +86,3 @@ li.group {
   color: var(--text-muted);
   margin-left: .3em;
 }
-.user .user-alias:before,
-.group .group-alias:before {
-  content: '(';
-}
-.user .user-alias:after,
-.group .group-alias:after {
-  content: ')';
-}

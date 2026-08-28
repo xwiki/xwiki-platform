@@ -154,7 +154,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
       // To avoid having several requests in the same time (which could lead to error 500), we disable all the triggers during the save process
       var toggles = $('.bootstrap-switch input');
       // Disabling a focused input blurs it and drops it from the tab order, so remember it to restore focus later.
-      var focusedToggle = toggles.filter(':focus');
+      const focusedToggle = toggles.filter(':focus');
       toggles.bootstrapSwitch('disabled', true);
       var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
       var data = [];
@@ -197,7 +197,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
         // Enable again the triggers
         toggles.bootstrapSwitch('disabled', false);
         // Restore focus to the toggle the user was interacting with, since disabling it moved focus away, but only
-        // if focus is still where the disabling left it (on the body) -- don't steal it back if the user has since
+        // if focus is still on the body where the disabling left it. Don't steal it back if the user has since
         // moved focus elsewhere while the save request was in flight.
         if (document.activeElement === document.body) {
           focusedToggle.focus();

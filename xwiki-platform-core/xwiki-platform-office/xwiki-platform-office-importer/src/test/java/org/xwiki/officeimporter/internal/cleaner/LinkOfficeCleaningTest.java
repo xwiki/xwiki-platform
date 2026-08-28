@@ -53,7 +53,7 @@ class LinkOfficeCleaningTest extends AbstractHTMLCleaningTest
      * {@code <a name="table1"/>
      * <h1>
      *   <a name="table1">Sheet 1: <em>Hello</em></a>
-     * </h1>
+     * </h1>}
      * </pre>
      * <p>
      * this is because of the close-before-copy-inside behavior of default HTML cleaner. Thus the additional

@@ -21,6 +21,10 @@
 ## breaks one, so that it is caught before the merge instead of turning the master quality build red
 ## afterwards. Everything but the trigger lives in the shared workflow, which every XWiki repository
 ## calls, so that a change to what is checked is made once. See https://github.com/xwiki/.github
+##
+## This is the half of the trigger that "pull_request" can serve on its own. Its companion,
+## quality-pr-sonar.yml, takes the pull requests this one cannot check in full: those from a fork,
+## which a pull_request run is handed no repository secrets for, and so no SonarQube token.
 name: Pull request quality checks
 
 on:
@@ -35,13 +39,19 @@ concurrency:
 jobs:
   analysis:
     ## A reusable workflow names its check "<this job> / <the called job>", so this reads
-    ## "Quality / Analyze".
+    ## "Quality / Analyze". quality-pr-sonar.yml names its own job identically on purpose: exactly
+    ## one of the two ever runs for a given pull request, so the check to require is called the same
+    ## whichever one it was.
     name: Quality
-    ## A pull_request run from a fork gets no repository secrets, so the analysis has no token to
-    ## authenticate with. Skip those rather than fail them. The guard has to be here rather than in
-    ## the shared workflow, because a job that is skipped is a job whose secrets are never resolved,
-    ## and SONAR_TOKEN is required there.
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    ## The pull requests this workflow answers for, which are the ones quality-pr-sonar.yml leaves to
+    ## it: a branch pushed into this repository, which a pull_request run does hand SONAR_TOKEN to,
+    ## and a fork whose author GitHub does not report as one of ours, which gets the Checkstyle
+    ## verdict alone. This condition is the exact negation of that workflow's, so that a pull request
+    ## is built once and not twice; changing one of the two means changing the other.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository
+      || !contains(fromJSON('["OWNER", "MEMBER"]'),
+                   github.event.pull_request.author_association)
     ## For a reusable workflow the GITHUB_TOKEN permissions are the caller's. The analysis only
     ## reads the sources.
     permissions:
@@ -51,5 +61,10 @@ jobs:
     ## indirection removes. What pinning protects against, a third party repointing the ref under
     ## us, does not apply to a repository the XWiki committers own themselves.
     uses: xwiki/.github/.github/workflows/quality-pr.yml@master
+    with:
+      ## A pull_request run from a fork is given no repository secrets, so there is no token to
+      ## analyze with and Checkstyle is the whole verdict. SonarCloud sees such a change after the
+      ## merge, in the master analysis, as it did before this workflow existed.
+      sonar: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

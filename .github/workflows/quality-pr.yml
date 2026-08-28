@@ -17,20 +17,21 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-## Analyze each pull request with SonarCloud and fail when a line the pull request writes carries a
-## SonarQube issue, so that a change introducing one is caught before it is merged instead of turning
-## the master quality gate red afterwards. This is not a duplicate of the ci.xwiki.org "quality"
-## build: that one analyzes master after the merge, with the tests and the coverage, whereas this one
-## only needs the bytecode of the changed code.
-name: SonarCloud PR analysis
+## Hold each pull request to the quality rules the code base is held to, and fail it when the change
+## breaks one, so that it is caught before the merge instead of turning the master quality build red
+## afterwards. Two rules are checked: the change compiles without a Checkstyle violation, and no line
+## the pull request writes carries a SonarQube issue. This is not a duplicate of the ci.xwiki.org
+## "quality" build: that one checks master after the merge, with the tests and the coverage, whereas
+## this one only needs the sources and the bytecode of the changed modules.
+name: Pull request quality checks
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-## One analysis per pull request: a new commit makes the running one obsolete.
+## One run per pull request: a new commit makes the running one obsolete.
 concurrency:
-  group: sonar-pr-${{ github.event.pull_request.number }}
+  group: quality-pr-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
@@ -307,13 +308,18 @@ jobs:
       ## are what supplies the XWiki repositories the parent pom, the snapshots of the other XWiki
       ## repositories and the modules left out of the selection are downloaded from, a runner having
       ## no settings.xml declaring them.
+      ## Checkstyle is the one verification left running, and it is a verdict on the pull request in
+      ## itself. It needs none of the line filtering the SonarQube issues below are put through: a
+      ## violation fails the build, so the code base carries none, so a violation the selected
+      ## modules report is one the pull request wrote. The verifications that are skipped are the
+      ## ones this build cannot give an answer to in reasonable time or without the rest of the
+      ## reactor.
       - name: Build
         env:
           MODULES: ${{ steps.modules.outputs.list }}
         run: >
           mvn -B -ntp -T 1C install -DskipTests -P"$MAVEN_PROFILES" ${MODULES:+-pl "$MODULES"}
-          -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true
-          -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true
+          -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true
 
       ## This publishes the analysis and nothing more: sonar.qualitygate.wait is deliberately not
       ## asked for, because it would make the job's verdict the project's quality gate, which is the

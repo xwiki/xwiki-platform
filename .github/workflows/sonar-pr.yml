@@ -17,11 +17,11 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-## Analyze each pull request with SonarCloud and fail when the pull request's quality gate fails, so
-## that a change introducing SonarQube issues is caught before it is merged instead of turning the
-## master quality gate red afterwards. This is not a duplicate of the ci.xwiki.org "quality" build:
-## that one analyzes master after the merge, with the tests and the coverage, whereas this one only
-## needs the bytecode of the changed code.
+## Analyze each pull request with SonarCloud and fail when a line the pull request writes carries a
+## SonarQube issue, so that a change introducing one is caught before it is merged instead of turning
+## the master quality gate red afterwards. This is not a duplicate of the ci.xwiki.org "quality"
+## build: that one analyzes master after the merge, with the tests and the coverage, whereas this one
+## only needs the bytecode of the changed code.
 name: SonarCloud PR analysis
 
 on:
@@ -302,8 +302,8 @@ jobs:
           )
           echo "list=$LIST" >> "$GITHUB_OUTPUT"
 
-      ## Compile only. The analysis needs the bytecode, not the test results, and no coverage as long
-      ## as the quality gate keeps its condition on the coverage of new code disabled. The profiles
+      ## Compile only. The analysis needs the bytecode, not the test results, and no coverage: the
+      ## verdict is on the issues the pull request's own lines carry. The profiles
       ## are what supplies the XWiki repositories the parent pom, the snapshots of the other XWiki
       ## repositories and the modules left out of the selection are downloaded from, a runner having
       ## no settings.xml declaring them.
@@ -315,8 +315,9 @@ jobs:
           -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true
           -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true
 
-      ## sonar.qualitygate.wait makes the goal wait for the server to process the report and fail the
-      ## job when the quality gate fails. Without it the job would pass whatever the analysis found.
+      ## This publishes the analysis and nothing more: sonar.qualitygate.wait is deliberately not
+      ## asked for, because it would make the job's verdict the project's quality gate, which is the
+      ## wrong verdict for a pull request. What the job fails on is decided by the step below.
       ## The pull request properties go through the environment rather than being interpolated into the
       ## command: a branch name is chosen by whoever opens the pull request, and ${{ }} is substituted
       ## into the script before the shell runs it, so interpolating one lets a crafted branch name run
@@ -330,7 +331,169 @@ jobs:
           MODULES: ${{ steps.modules.outputs.list }}
         run: >
           mvn -B -ntp sonar:sonar -P"$MAVEN_PROFILES" ${MODULES:+-pl "$MODULES"}
-          -Dsonar.qualitygate.wait=true
           -Dsonar.pullrequest.key="$PR_KEY"
           -Dsonar.pullrequest.branch="$PR_BRANCH"
           -Dsonar.pullrequest.base="$PR_BASE"
+
+      ## The verdict, which the project's quality gate cannot give. On a pull request SonarCloud
+      ## counts every issue it reports in a changed file towards the new code metrics the gate is
+      ## made of, whatever line the issue sits on, so a pull request editing one line of a file
+      ## inherits the issues that file already had and fails a gate none of its own lines made red.
+      ## The pull request is judged on the lines it writes instead: every issue the analysis reports
+      ## is kept only when it points at one of them, and any issue that passes that filter fails the
+      ## job, whatever its severity, since a pull request has no reason to write a line SonarQube
+      ## has something to say about. The conditions of the gate that are not about issues are lost
+      ## with it, and deliberately: the coverage is not measured by this build at all, and the
+      ## duplication of new code is a ratio that a handful of changed lines is enough to blow past.
+      ## Security hotspots are not part of the verdict either: they ask for a human review, which
+      ## cannot happen between the analysis and the merge.
+      - name: Fail on the issues the pull request introduces
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          PR_KEY: ${{ github.event.pull_request.number }}
+        run: |
+          python3 - <<'PYTHON'
+          import json
+          import os
+          import sys
+          import time
+          import urllib.parse
+          import urllib.request
+
+
+          def read_report_task():
+              """Where the scanner published and what it published. It is read rather than declared
+              because this workflow is the same file in every XWiki repository, so it cannot name a
+              server or a project key of its own."""
+              properties = {}
+              with open('target/sonar/report-task.txt', encoding='utf-8') as report:
+                  for line in report:
+                      key, separator, value = line.strip().partition('=')
+                      if separator:
+                          properties[key] = value
+              return properties
+
+
+          TASK = read_report_task()
+          SERVER = TASK['serverUrl'].rstrip('/')
+          PROJECT = TASK['projectKey']
+          PULL_REQUEST = os.environ['PR_KEY']
+
+
+          def api(path, parameters):
+              """The answer of a SonarCloud web API call, parsed. The parameters are passed as a
+              mapping and not as keyword arguments because one of them is named "from"."""
+              url = '%s%s?%s' % (SERVER, path, urllib.parse.urlencode(parameters))
+              request = urllib.request.Request(url,
+                  headers={'Authorization': 'Bearer %s' % os.environ['SONAR_TOKEN']})
+              with urllib.request.urlopen(request, timeout=120) as answer:
+                  return json.load(answer)
+
+
+          def wait_for_the_report():
+              """The scanner submits its report and returns, the server queues it, and nothing the
+              analysis found can be read back before that queued task is done."""
+              deadline = time.monotonic() + 30 * 60
+              while True:
+                  status = api('/api/ce/task', {'id': TASK['ceTaskId']})['task']['status']
+                  if status == 'SUCCESS':
+                      return
+                  if status in ('FAILED', 'CANCELED'):
+                      sys.exit('::error::SonarCloud could not process the analysis report [%s]'
+                               % status)
+                  if time.monotonic() > deadline:
+                      sys.exit('::error::SonarCloud is still processing the analysis report')
+                  time.sleep(10)
+
+
+          def reported_issues():
+              """Every unresolved issue the analysis reports on the pull request, and the path of
+              each file holding one. That is every issue of the files the pull request changed, the
+              ones its own lines carry and the ones those files already had alike."""
+              issues = []
+              paths = {}
+              page = 1
+              while True:
+                  answer = api('/api/issues/search',
+                               {'componentKeys': PROJECT, 'pullRequest': PULL_REQUEST,
+                                'resolved': 'false', 'ps': 500, 'p': page})
+                  issues += answer['issues']
+                  paths.update({component['key']: component['path']
+                                for component in answer.get('components', [])
+                                if 'path' in component})
+                  paging = answer['paging']
+                  if not answer['issues'] or page * paging['pageSize'] >= paging['total']:
+                      return issues, paths
+                  page += 1
+
+
+          def written_lines(component, lines):
+              """Which of the given lines of a file the pull request wrote. This is SonarCloud's own
+              isNew flag, which it derives from the SCM data, so the verdict cannot drift from the
+              diff the analysis itself reasoned about."""
+              written = set()
+              remaining = sorted(lines)
+              while remaining:
+                  ## The endpoint returns a thousand lines at most, so a file whose issues are far
+                  ## apart takes several calls.
+                  first, last = remaining[0], remaining[0] + 999
+                  answer = api('/api/sources/lines',
+                               {'key': component, 'pullRequest': PULL_REQUEST,
+                                'from': first, 'to': last})
+                  written.update(line['line'] for line in answer['sources'] if line.get('isNew'))
+                  remaining = [line for line in remaining if line > last]
+              return written
+
+
+          def describe(issue, paths):
+              return '%s:%s [%s] %s' % (paths.get(issue['component'], issue['component']),
+                                        issue.get('line', '-'), issue['rule'], issue['message'])
+
+
+          def main():
+              wait_for_the_report()
+              issues, paths = reported_issues()
+
+              ## The lines are asked for one file at a time rather than one issue at a time.
+              lines_of = {}
+              for issue in issues:
+                  if issue.get('line'):
+                      lines_of.setdefault(issue['component'], set()).add(issue['line'])
+              written_of = {component: written_lines(component, lines)
+                            for component, lines in lines_of.items()}
+
+              introduced = []
+              inherited = []
+              for issue in issues:
+                  ## An issue on no line at all is an issue on the file as a whole, which no line of
+                  ## the pull request can be held responsible for.
+                  line = issue.get('line')
+                  if line and line in written_of[issue['component']]:
+                      introduced.append(issue)
+                  else:
+                      inherited.append(issue)
+
+              if inherited:
+                  print('::group::%d issue(s) of the changed files that this pull request did not '
+                        'write' % len(inherited))
+                  for issue in inherited:
+                      print(describe(issue, paths))
+                  print('::endgroup::')
+
+              for issue in introduced:
+                  ## A workflow command, so that the issue is annotated on its own line in the Files
+                  ## changed tab instead of being buried in this log.
+                  print('::error file=%s,line=%s,title=%s::%s'
+                        % (paths.get(issue['component'], ''), issue['line'], issue['rule'],
+                           issue['message']))
+
+              if introduced:
+                  print('::error::This pull request introduces %d SonarQube issue(s), listed above. '
+                        '%s' % (len(introduced), TASK.get('dashboardUrl', SERVER)))
+                  return 1
+              print('No line this pull request writes carries a SonarQube issue.')
+              return 0
+
+
+          sys.exit(main())
+          PYTHON

@@ -78,7 +78,7 @@ interface LiveDataSource {
    * Create a new entry from the given values.
    * @param source - the source description
    * @param values - the values of the new entry
-   * @returns a promise with the values of the newly created entry, or undefined if the source trturns none
+   * @returns a promise with the values of the newly created entry, or undefined if the source returns none
    * @since 18.8.0RC1
    */
   addEntry(source: Source, values: unknown): Promise<Values | undefined>;

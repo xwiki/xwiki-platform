@@ -87,7 +87,7 @@ export class XWikiLiveDataSource implements LiveDataSource {
     }
   }
 
-  getEntry(
+  async getEntry(
     source: Source,
     entryId: string,
     properties: string[],
@@ -97,9 +97,7 @@ export class XWikiLiveDataSource implements LiveDataSource {
       { properties },
       true,
     )}`;
-    return Promise.resolve(this.$.getJSON(entryURL)).then(
-      (entry) => entry?.values,
-    );
+    return (await this.$.getJSON(entryURL))?.values;
   }
 
   updateEntry(source: Source, entryId: string, values: unknown): Promise<void> {

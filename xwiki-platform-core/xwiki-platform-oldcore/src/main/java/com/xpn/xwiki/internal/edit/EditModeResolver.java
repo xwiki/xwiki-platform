@@ -17,10 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.realtime.internal;
-
-import java.util.List;
-import java.util.Locale;
+package com.xpn.xwiki.internal.edit;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -29,42 +26,52 @@ import jakarta.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.netflux.EntityChannelStore;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
-import org.xwiki.script.service.ScriptService;
 import org.xwiki.sheet.SheetManager;
-import org.xwiki.wysiwyg.script.WysiwygEditorScriptService;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Determines the currently selected editor based on XWiki and Script contexts. Determines wether a realtime session is
- * active for a given editor using the Netflux Channel Store.
- * 
+ * Determines the edit mode that is going to be used to edit the current document, based on the request, the XWiki
+ * context and the script context.
+ *
  * @version $Id$
- * @since 16.10.6
- * @since 17.3.0RC1
+ * @since 18.8.0RC1
  */
-@Component
+@Component(roles = EditModeResolver.class)
 @Singleton
-public class DefaultRealtimeSessionManager implements RealtimeSessionManager
+public class EditModeResolver
 {
+    /**
+     * The edit mode that uses a WYSIWYG editor to edit the document content in a standalone page.
+     */
+    public static final String WYSIWYG = "wysiwyg";
+
+    /**
+     * The edit mode that uses a WYSIWYG editor to edit the document content in place, from the view page.
+     */
+    public static final String INPLACE = "inplace";
+
+    /**
+     * The edit mode that edits the document content as wiki syntax.
+     */
+    public static final String WIKI = "wiki";
+
+    /**
+     * The edit mode that displays a form with the document fields, based on a sheet.
+     */
+    public static final String INLINE = "inline";
+
     private static final String EDITOR_KEY = "editor";
-
-    private static final String WYSIWYG = "wysiwyg";
-
-    private static final String WIKI = "wiki";
-
-    private static final String INLINE = "inline";
 
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
-
-    @Inject
-    private EntityChannelStore entityChannelStore;
 
     @Inject
     private SheetManager sheetManager;
@@ -73,45 +80,22 @@ public class DefaultRealtimeSessionManager implements RealtimeSessionManager
     private ScriptContextManager scriptContextManager;
 
     @Inject
-    @Named(WYSIWYG)
-    private ScriptService wysiwygEditorScriptService;
-
-    @Inject
     private Container container;
 
-    @Override
-    public boolean canJoinSession(DocumentReference documentReference, Locale locale)
-    {
-        String editMode = getEditMode().toLowerCase();
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
-        if (List.of(WYSIWYG, "inplace", WIKI).contains(editMode)) {
-            // For the standalone WYSIWYG, inplace WYSIWYG and Wiki edit modes we check if there is an active realtime
-            // editing session where the same editor is used to edit the document content.
-            String contentEditor = WIKI.equals(editMode) ? WIKI : WYSIWYG;
-            // We use Locale.toString() instead of Locale.toLanguageTag() in order to match the output of the Page REST
-            // API (see ModelFactory#toRestPage()), which is used by the JavaScript code to determine the locale of the
-            // edited document and create the associated Netflux channel.
-            List<String> contentChannelPath =
-                List.of("translations", locale.toString(), "fields", "content", "editors", contentEditor);
-            return this.entityChannelStore.getChannel(documentReference, contentChannelPath)
-                .map(contentChannel -> contentChannel.getUserCount() > 0).orElse(false);
-        } else if (INLINE.equals(editMode)) {
-            // The Inline Form edit mode doesn't support realtime editing yet. When this is implemented, we'll have to
-            // return true here (always join) if there is an active session and force the preferred editor for the
-            // edited fields to the editor already used in the realtime session (e.g. if a user starts a realtime
-            // session and their preferred editor for the text area fields is WYSIWYG then the next user joining the
-            // session shold be forced to use also the WYSIWYG editor for the text area fields).
-        }
-
-        return false;
-    }
-
-    String getEditMode()
+    /**
+     * @return the edit mode that is going to be used to edit the current document, in lower case; one of
+     *         {@link #WYSIWYG}, {@link #INPLACE}, {@link #WIKI} or {@link #INLINE}
+     */
+    public String getEditMode()
     {
         // Check if the edit mode is specified as a request parameter.
         String requestEditor = (String) this.container.getRequest().getParameter(EDITOR_KEY);
         if (!StringUtils.isEmpty(requestEditor)) {
-            return requestEditor;
+            return requestEditor.toLowerCase();
         }
 
         // The Inplace edit mode comes with a custom InplaceEditing sheet that handles the locking confirmation.
@@ -119,7 +103,7 @@ public class DefaultRealtimeSessionManager implements RealtimeSessionManager
         // editor through the editor variable in the ScriptContext.
         String scontextEditor = (String) this.scriptContextManager.getCurrentScriptContext().getAttribute(EDITOR_KEY);
         if (!StringUtils.isEmpty(scontextEditor)) {
-            return scontextEditor;
+            return scontextEditor.toLowerCase();
         }
 
         // Otherwise, we fallback to the default editor. This part is taken from the getDefaultDocumentEditor macro
@@ -135,11 +119,37 @@ public class DefaultRealtimeSessionManager implements RealtimeSessionManager
 
         // If the default editor is set to WYSIWYG, it will be used if possible.
         String xwikiEditorPreference = context.getWiki().getEditorPreference(context);
-        if (WYSIWYG.equals(xwikiEditorPreference) && ((WysiwygEditorScriptService) wysiwygEditorScriptService)
-            .isSyntaxSupported(document.getSyntax().toIdString())) {
+        if (WYSIWYG.equals(xwikiEditorPreference) && isSyntaxWYSIWYGEditable(document.getSyntax().toIdString())) {
             return xwikiEditorPreference;
         }
 
         return WIKI;
+    }
+
+    /**
+     * Check if content using the specified syntax can be edited with a WYSIWYG editor. This is generally true for
+     * syntaxes that provide a parser and a renderer:
+     * <ul>
+     * <li>the parser is needed to go from content syntax -> XDOM -> WYSIWYG editor syntax</li>
+     * <li>the renderer is needed to go from WYSIWYG editor syntax -> XDOM -> content syntax</li>
+     * </ul>
+     * This method should be called before attempting to load a WYSIWYG editor.
+     *
+     * @param syntaxId the syntax identifier, like {@code xwiki/2.1}
+     * @return {@code true} if content using the specified syntax can be edited with a WYSIWYG editor, {@code false}
+     *         otherwise
+     */
+    public boolean isSyntaxWYSIWYGEditable(String syntaxId)
+    {
+        // Special handling for XHTML since the XHTML renderer doesn't produce valid XHTML. Thus if, for example, you
+        // use the WYSIWYG editor and add 2 paragraphs, it'll generate {@code <p>a</p><p>b</p>} which is invalid XHTML
+        // and the page will fail to render.
+        if (Syntax.XHTML_1_0.toIdString().equals(syntaxId)) {
+            return false;
+        }
+
+        ComponentManager componentManager = this.componentManagerProvider.get();
+        return componentManager.hasComponent(Parser.class, syntaxId)
+            && componentManager.hasComponent(PrintRendererFactory.class, syntaxId);
     }
 }

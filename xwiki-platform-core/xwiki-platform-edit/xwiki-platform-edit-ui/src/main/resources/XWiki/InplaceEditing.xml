@@ -356,6 +356,9 @@ define('xwiki-document-api', [
         // because #getEditConfirmation() considers the edit forced as soon as this parameter is not empty.
         force: force ? 1 : '',
         language: this.getRealLocale(),
+        // Let the server know which WYSIWYG editor is going to be used, because the edit confirmation checkers may
+        // behave differently depending on it (e.g. when deciding whether the edit lock can be taken over silently).
+        'SyntaxContent.wysiwyg.editor': config.wysiwygEditor,
         force_token: xcontext.form_token,
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
@@ -1640,6 +1643,7 @@ $url#if ($url.contains('?'))&amp;#else?#end$escapetool.url($params)
       'contentType': 'org.xwiki.rendering.syntax.SyntaxContent',
       'editMode': $defaultEditMode,
       'contentEditor': "xwiki-${services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id}-inline",
+      'wysiwygEditor': $services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id,
       'editButtonSelector': '#tmEdit &gt; a',
       'translateButtonSelector': '#tmTranslate &gt; a',
       'paths': {

@@ -32,7 +32,7 @@
   <name>XWiki Platform - BlockNote Integration - API</name>
   <description>Integrates BlockNote as a WYSIWYG editor in XWiki. The integration is in early stages of development so please use with care.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.14</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>BlockNote Integration (Experimental)</xwiki.extension.name>
   </properties>
@@ -72,7 +72,12 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-yjs-websocket</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
+    </dependency>
+    <!-- Used to skip the edit lock confirmation. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
@@ -80,6 +85,12 @@
       <version>${rendering.version}</version>
     </dependency>
     <!-- Test dependencies -->
+    <!-- Needed in order to be able to mock the room manager, whose API uses the WebSocket session. -->
+    <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-api</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>

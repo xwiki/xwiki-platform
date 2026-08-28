@@ -254,12 +254,10 @@ public class BooleanClass extends PropertyClass
         }
 
         int value = getValue(name, object);
-        if (value == 1) {
-            options[nb1].setSelected(true);
-        } else if (value == 0) {
-            options[nb2].setSelected(true);
-        } else {
-            options[0].setSelected(true);
+        switch (value) {
+            case 1 -> options[nb1].setSelected(true);
+            case 0 -> options[nb2].setSelected(true);
+            default -> options[0].setSelected(true);
         }
 
         select.addElement(options);
@@ -315,12 +313,10 @@ public class BooleanClass extends PropertyClass
         }
 
         int value = getValue(name, object);
-        if (value == 1) {
-            radioTrue.setChecked(true);
-        } else if (value == 0) {
-            radioFalse.setChecked(true);
-        } else {
-            radioNone.setChecked(true);
+        switch (value) {
+            case 1 -> radioTrue.setChecked(true);
+            case 0 -> radioFalse.setChecked(true);
+            default -> radioNone.setChecked(true);
         }
 
         for (div input : inputs) {

@@ -86,7 +86,8 @@ class NumberClassFieldIT
 
         assertFalse(entryEditPage.isFieldValid(FIELD_NAME), "The negative decimal value was accepted as valid");
 
-        // A value inside the long range still saves, now that the range is no longer expressed as min and max.
+        // Save a valid value first so that the overflowing value below is submitted while editing an existing
+        // entry, which is the case this issue is about.
         entryEditPage.setValue(FIELD_NAME, "42");
         entryEditPage.clickSaveAndContinue();
 

@@ -111,6 +111,7 @@ public class DataMojo extends AbstractOldCoreMojo
         } catch (ComponentLookupException e) {
             throw new MojoExecutionException("Failed to get task manager.", e);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new MojoExecutionException("Error while waiting for the task manager to finish.", e);
         }
     }

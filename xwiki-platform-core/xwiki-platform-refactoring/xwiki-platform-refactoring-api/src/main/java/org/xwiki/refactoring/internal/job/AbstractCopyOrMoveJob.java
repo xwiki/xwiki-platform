@@ -418,6 +418,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
                 }
                 return question.isOverwrite();
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 this.logger.warn("Overwrite question has been interrupted.");
                 return false;
             }

@@ -301,6 +301,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 queueEntry = resolveQueue.take();
                 DefaultSolrIndexer.this.resolveQueueRemovalCounter.incrementAndGet();
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 logger.warn("The SOLR resolve thread has been interrupted", e);
                 queueEntry = RESOLVE_QUEUE_ENTRY_STOP;
             }
@@ -521,6 +522,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
             try {
                 queueEntry = this.indexQueue.take();
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 this.logger.warn("The SOLR index thread has been interrupted", e);
 
                 queueEntry = INDEX_QUEUE_ENTRY_STOP;
@@ -790,6 +792,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 this.resolveQueue.put(
                     new ResolveQueueEntry(this.entityReferenceFactory.getReference(reference), recurse, operation));
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 this.pendingResolveItems.decrementAndGet();
                 this.logger.error("Failed to add reference [{}] to Solr indexing queue", reference, e);
             }

@@ -17,24 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
- {
-  // We want all suggestions right away
-  "prHourlyLimit" : 0,
-  "prConcurrentLimit" : 0,
-
-  // Create different pull request for each major upgrade
-  "separateMajorMinor": true,
-  "separateMultipleMajor": true,
-
-  // Skip Eclipse M2E special setup "dependency"
-  "ignoreDeps": ["org.eclipse.m2e:lifecycle-mapping"],
-
-   // Set a "dependencies" label on all pull requests created by Renovate
-  "labels": ["dependencies"],
+{
+  // The settings the XWiki repositories share. See https://github.com/xwiki/.github
+  "extends": ["github>xwiki/.github//renovate/default.json5"],
 
   // See https://docs.renovatebot.com/configuration-options/#pnpmdedupe
   "postUpdateOptions": ["pnpmDedupe"],
 
+  // Added to the rules of the preset, which already disables the commons dependencies.
   "packageRules": [
     // Add the URL to the XWiki Nexus public proxy for non-Central Maven dependencies
     {
@@ -42,9 +32,9 @@
       "registryUrls": ["https://repo1.maven.org/maven2/", "https://nexus.xwiki.org/nexus/content/repositories/public/"]
     },
 
-    // There is no point trying to find updates for commons, rendering and platform dependencies
+    // There is no point trying to find updates for rendering, platform and enterprise dependencies
     {
-      "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:", "org.xwiki.platform:", "org.xwiki.enterprise:"],
+      "matchPackagePrefixes": ["org.xwiki.rendering:", "org.xwiki.platform:", "org.xwiki.enterprise:"],
       "enabled": false
     },
 

@@ -483,9 +483,9 @@ function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
       // Set a data-title attribute for the responsive livetable (since Flamingo).
       td.setAttribute("data-title", rightsNames[index]);
       var r = 0;
-      if (denys.indexOf(right)>=0) {
+      if (denys.includes(right)) {
         r = 2;
-      } else if (allows.indexOf(right)>=0) {
+      } else if (allows.includes(right)) {
         r = 1;
       }
       new MSCheckbox(td, right, saveUrl, r, table, i);

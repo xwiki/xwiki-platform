@@ -257,7 +257,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     @Override
     public int compareTo(Macro<?> macro)
     {
-        return getPriority() - macro.getPriority();
+        return Integer.compare(getPriority(), macro.getPriority());
     }
 
     @Override

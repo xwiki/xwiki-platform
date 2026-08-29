@@ -531,7 +531,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     @Override
     public int compareTo(Right other)
     {
-        return this.ordinal() - other.ordinal();
+        return Integer.compare(this.ordinal(), other.ordinal());
     }
 
     /**

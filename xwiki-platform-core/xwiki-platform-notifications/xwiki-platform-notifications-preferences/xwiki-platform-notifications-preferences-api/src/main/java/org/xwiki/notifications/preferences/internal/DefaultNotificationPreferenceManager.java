@@ -82,7 +82,7 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
             // notificationPreferences is a set, only the first occurrence of a preference is stored.
             Collections.sort(providers, (o1, o2) ->
                 // The comparison is inverted so the higher priorities are sorted first
-                o2.getProviderPriority() - o1.getProviderPriority()
+                Integer.compare(o2.getProviderPriority(), o1.getProviderPriority())
             );
 
             return providers;

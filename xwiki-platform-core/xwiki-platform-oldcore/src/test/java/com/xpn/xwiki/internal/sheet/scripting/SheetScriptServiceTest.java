@@ -24,9 +24,7 @@ import java.util.Arrays;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -107,14 +105,9 @@ class SheetScriptServiceTest
         final DocumentReference sheetReference =
             new DocumentReference("MySheet", classReference.getLastSpaceReference());
 
-        when(this.mockClassSheetBinder.bind(argThat(new ArgumentMatcher<DocumentModelBridge>()
-        {
-            @Override
-            public boolean matches(DocumentModelBridge argument)
-            {
-                return classDocument.equals(argument) && classDocument != argument;
-            }
-        }), same(sheetReference))).thenReturn(true);
+        when(this.mockClassSheetBinder.bind(
+            argThat(argument -> classDocument.equals(argument) && classDocument != argument),
+            same(sheetReference))).thenReturn(true);
 
         assertTrue(this.sheetScriptService.bindClassSheet(classDocumentApi, sheetReference));
     }

@@ -178,6 +178,12 @@
       <artifactId>xwiki-platform-wiki-creationjob</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Used to reuse the wiki descriptor class and field names when updating the wiki descriptor during tests -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Since the minimal dependency list doesn't include the Flamingo resources JAR (see the comment in it for
      more explanations), we need to add a dependency to it since we need to unpack it -->
     <dependency>

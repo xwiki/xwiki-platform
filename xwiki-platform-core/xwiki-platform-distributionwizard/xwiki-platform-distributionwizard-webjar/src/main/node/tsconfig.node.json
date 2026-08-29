@@ -1,0 +1,8 @@
+{
+  "extends": "@xwiki/platform-tool-tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "isolatedDeclarations": false
+  },
+  "include": ["vite.config.ts", "vite.minified.config.ts"]
+}

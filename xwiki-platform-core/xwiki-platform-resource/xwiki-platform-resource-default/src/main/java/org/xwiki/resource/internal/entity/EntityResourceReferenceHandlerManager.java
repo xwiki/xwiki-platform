@@ -40,7 +40,7 @@ import org.xwiki.resource.internal.AbstractResourceReferenceHandlerManager;
 public class EntityResourceReferenceHandlerManager extends AbstractResourceReferenceHandlerManager<EntityResourceAction>
 {
     @Override
-    protected boolean matches(ResourceReferenceHandler handler, EntityResourceAction action)
+    protected boolean matches(ResourceReferenceHandler<?> handler, EntityResourceAction action)
     {
         return handler.getSupportedResourceReferences().contains(action);
     }

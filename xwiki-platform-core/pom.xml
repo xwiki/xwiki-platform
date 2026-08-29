@@ -151,6 +151,36 @@
             -->
             <revapi.differences>
               <justification>
+                ResourceReferenceHandler was declared as Comparable over the raw ResourceReferenceHandler type. It is
+                now Comparable over ResourceReferenceHandler&lt;?&gt;, which removes the raw type without changing the
+                erasure: the compiled compareTo() descriptor and the Comparable bridge method are identical, so
+                existing compiled Handlers keep working, and Handlers declaring the former raw parameter still
+                override it (with an unchecked warning).
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.superTypeTypeParametersChanged</code>
+                  <old>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</old>
+                  <new>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.noLongerImplementsInterface</code>
+                  <old>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</old>
+                  <new>interface org.xwiki.resource.ResourceReferenceHandler&lt;T&gt;</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>java\.class\.noLongerImplementsInterface</code>
+                  <interface>java\.lang\.Comparable&lt;org\.xwiki\.resource\.ResourceReferenceHandler&gt;</interface>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
                 These utility classes (only static members) had their implicit public constructor made private to
                 follow SonarQube rule java:S1118 (utility classes should not be instantiable). Instantiating them was
                 never useful, but this is technically a real breakage since existing code calling the constructor will

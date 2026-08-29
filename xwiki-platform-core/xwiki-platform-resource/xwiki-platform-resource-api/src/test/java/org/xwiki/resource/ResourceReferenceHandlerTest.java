@@ -57,11 +57,11 @@ class ResourceReferenceHandlerTest
     @Test
     void priority()
     {
-        ResourceReferenceHandler handler1 = new TestableResourceReferenceHandler(500);
+        ResourceReferenceHandler<ResourceType> handler1 = new TestableResourceReferenceHandler(500);
         assertEquals(500, handler1.getPriority());
         assertTrue(handler1.getSupportedResourceReferences().contains(new ResourceType("test")));
 
-        ResourceReferenceHandler handler2 = new TestableResourceReferenceHandler(200);
+        ResourceReferenceHandler<ResourceType> handler2 = new TestableResourceReferenceHandler(200);
         assertTrue(handler1.compareTo(handler2) > 0);
     }
 }

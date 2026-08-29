@@ -38,7 +38,7 @@ import org.xwiki.resource.ResourceType;
 public class MainResourceReferenceHandlerManager extends AbstractResourceReferenceHandlerManager<ResourceType>
 {
     @Override
-    protected boolean matches(ResourceReferenceHandler handler, ResourceType resourceType)
+    protected boolean matches(ResourceReferenceHandler<?> handler, ResourceType resourceType)
     {
         return handler.getSupportedResourceReferences().contains(resourceType);
     }

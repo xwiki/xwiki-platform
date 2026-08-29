@@ -133,7 +133,7 @@ public abstract class AbstractTranslationBundle implements TranslationBundle
     public int compareTo(TranslationBundle otherBundle)
     {
         if (getPriority() != otherBundle.getPriority()) {
-            return getPriority() - otherBundle.getPriority();
+            return Integer.compare(getPriority(), otherBundle.getPriority());
         }
 
         int result;

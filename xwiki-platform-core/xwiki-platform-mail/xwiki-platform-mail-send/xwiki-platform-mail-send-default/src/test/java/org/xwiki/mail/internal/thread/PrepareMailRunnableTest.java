@@ -213,36 +213,29 @@ class PrepareMailRunnableTest
 
         MemoryMailListener listener1 = this.componentManager.getInstance(MailListener.class, "memory");
         PrepareMailQueueItem item1 =
-            new PrepareMailQueueItem(new Iterable<MimeMessage>()
+            new PrepareMailQueueItem(() -> new Iterator<MimeMessage>()
                 {
+                    int index = 0;
+
                     @Override
-                    public Iterator<MimeMessage> iterator()
+                    public boolean hasNext()
                     {
-                        return new Iterator<MimeMessage>()
-                        {
-                            int index = 0;
+                        return true;
+                    }
 
-                            @Override
-                            public boolean hasNext()
-                            {
-                                return true;
-                            }
+                    @Override
+                    public MimeMessage next()
+                    {
+                        if (index++ == 0) {
+                            return message1;
+                        }
+                        throw new RuntimeException("Iterator failure");
+                    }
 
-                            @Override
-                            public MimeMessage next()
-                            {
-                                if (index++ == 0) {
-                                    return message1;
-                                }
-                                throw new RuntimeException("Iterator failure");
-                            }
+                    @Override
+                    public void remove()
+                    {
 
-                            @Override
-                            public void remove()
-                            {
-
-                            }
-                        };
                     }
                 }, session, listener1, batchId1, context1);
         MemoryMailListener listener2 = this.componentManager.getInstance(MailListener.class, "memory");

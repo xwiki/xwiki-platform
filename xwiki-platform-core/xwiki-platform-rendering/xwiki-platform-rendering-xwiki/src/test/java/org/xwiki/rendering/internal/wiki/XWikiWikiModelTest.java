@@ -26,7 +26,6 @@ import java.util.Map;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.SkinAccessBridge;
@@ -334,13 +333,9 @@ class XWikiWikiModelTest
             new AttachmentReference("image", new DocumentReference("wiki", "space", "page"));
         when(configuration.isImageDimensionsIncludedInImageURL())
             .thenReturn(expectedIsImageDimensionsIncludedInImageURL);
-        when(this.referenceResolver.resolve(argThat(new ArgumentMatcher<ResourceReference>()
-        {
-            public boolean matches(ResourceReference argument)
-            {
-                return argument.getReference().equals(imageReference.getReference());
-            }
-        }), same(EntityType.ATTACHMENT))).thenReturn(attachmentReference);
+        when(this.referenceResolver.resolve(
+            argThat(argument -> argument.getReference().equals(imageReference.getReference())),
+            same(EntityType.ATTACHMENT))).thenReturn(attachmentReference);
         when(this.documentAccessBridge.getAttachmentURL(attachmentReference, expectedQueryString, false))
             .thenReturn("?" + expectedQueryString);
 

@@ -25,6 +25,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.FormContainerElement;
 
@@ -92,6 +93,8 @@ public class ClassEditPage extends EditPage
     {
         getForm().setFieldValue(this.propertyNameField, propertyName);
         getForm().setFieldValue(this.propertyTypeField, propertyType);
+        // The button is only enabled once the class editor JavaScript has bound the handler that adds the property.
+        getDriver().waitUntilCondition(ExpectedConditions.elementToBeClickable(this.propertySubmit));
         this.propertySubmit.click();
     }
 

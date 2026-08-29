@@ -51,6 +51,6 @@ public abstract class AbstractResourceReferenceHandler<T> implements ResourceRef
     @Override
     public int compareTo(ResourceReferenceHandler handler)
     {
-        return getPriority() - handler.getPriority();
+        return Integer.compare(getPriority(), handler.getPriority());
     }
 }

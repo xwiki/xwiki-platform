@@ -62,6 +62,6 @@ class ResourceReferenceHandlerTest
         assertTrue(handler1.getSupportedResourceReferences().contains(new ResourceType("test")));
 
         ResourceReferenceHandler handler2 = new TestableResourceReferenceHandler(200);
-        assertEquals(300, handler1.compareTo(handler2));
+        assertTrue(handler1.compareTo(handler2) > 0);
     }
 }

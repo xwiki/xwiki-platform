@@ -496,7 +496,7 @@ class EntityReferenceResolver {
         }
         name.reverse();
       } else {
-        name = defaultValueProvider && defaultValueProvider[type];
+        name = defaultValueProvider?.[type];
       }
     } else if (typeof defaultValueProvider === 'function') {
       name = defaultValueProvider(type);

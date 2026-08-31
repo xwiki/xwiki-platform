@@ -53,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -188,6 +189,18 @@ class EditModeResolverTest
     void getEditModeDefaultOther()
     {
         assertEquals(EditModeResolver.WIKI, this.editModeResolver.getEditMode());
+    }
+
+    @Test
+    void getEditModeWithoutDocument()
+    {
+        wysiwygSyntaxSupported(true);
+        when(this.wiki.getEditorPreference(this.xwikiContext)).thenReturn(EditModeResolver.WYSIWYG);
+        when(this.xwikiContext.get("tdoc")).thenReturn(null);
+
+        assertEquals(EditModeResolver.WIKI, this.editModeResolver.getEditMode());
+
+        verifyNoInteractions(this.sheetManager);
     }
 
     @Test

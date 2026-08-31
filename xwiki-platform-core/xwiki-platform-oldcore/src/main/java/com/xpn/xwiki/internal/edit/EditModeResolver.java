@@ -109,18 +109,23 @@ public class EditModeResolver
         // Otherwise, we fallback to the default editor. This part is taken from the getDefaultDocumentEditor macro
         // defined in macros.vm from xwiki-platform-web-templates.
 
-        // If a sheet matches the edit action for this document and no specific editor was specified,
-        // the Inline Form edit mode will be used.
+        // There is no document to edit when the edit mode is resolved outside of a request that targets a document,
+        // in which case we can neither look for sheets nor check the document syntax.
         XWikiContext context = this.xwikiContextProvider.get();
         XWikiDocument document = (XWikiDocument) context.get("tdoc");
-        if (!this.sheetManager.getSheets(document, context.getAction()).isEmpty()) {
-            return INLINE;
-        }
+        if (document != null) {
+            // If a sheet matches the edit action for this document and no specific editor was specified,
+            // the Inline Form edit mode will be used.
+            if (!this.sheetManager.getSheets(document, context.getAction()).isEmpty()) {
+                return INLINE;
+            }
 
-        // If the default editor is set to WYSIWYG, it will be used if possible.
-        String xwikiEditorPreference = context.getWiki().getEditorPreference(context);
-        if (WYSIWYG.equals(xwikiEditorPreference) && isSyntaxWYSIWYGEditable(document.getSyntax().toIdString())) {
-            return xwikiEditorPreference;
+            // If the default editor is set to WYSIWYG, it will be used if possible.
+            String xwikiEditorPreference = context.getWiki().getEditorPreference(context);
+            if (WYSIWYG.equals(xwikiEditorPreference)
+                && isSyntaxWYSIWYGEditable(document.getSyntax().toIdString())) {
+                return xwikiEditorPreference;
+            }
         }
 
         return WIKI;

@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>18.7.0</version>
+  <version>18.7.1-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -129,11 +129,11 @@
     <xwiki.npm.release.registry>https://registry.npmjs.org</xwiki.npm.release.registry>
 
     <!-- Enable reproducible builds -->
-    <project.build.outputTimestamp>2026-08-31T09:06:18Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-08-31T09:06:30Z</project.build.outputTimestamp>
   </properties>
   <scm>
     <url>https://github.com/${xwiki.github.owner}/${xwiki.github.repository}/tree/master/</url>
-    <tag>xwiki-platform-18.7.0</tag>
+    <tag>stable-18.7.x</tag>
   </scm>
   <issueManagement>
     <system>jira</system>

@@ -1883,7 +1883,7 @@ public class XWiki implements EventListener
      * 
      * @param userReference the user responsible for the changes
      * @param document the document to save
-     * @param comment the comment to associated to the new version of the saved document
+     * @param comment the comment to associate to the new version of the saved document
      * @param isMinorEdit true if the new version is a minor version
      * @param context see {@link XWikiContext}
      * @since 10.11.10
@@ -1899,34 +1899,42 @@ public class XWiki implements EventListener
             context.setWikiId(document.getDocumentReference().getWikiReference().getName());
 
             // Make sure the document is ready to be saved
-            XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
-
-            ObservationManager om = getObservationManager();
+            prepareDocumentForSave(document, comment, isMinorEdit, context);
 
             // Notify listeners about the document about to be created or updated
-
-            // Note that for the moment the event being send is a bridge event, as we are still passing around
-            // an XWikiDocument as source and an XWikiContext as data.
-
-            if (om != null) {
-                CancelableEvent documentEvent;
-                if (originalDocument.isNew()) {
-                    documentEvent = new UserCreatingDocumentEvent(userReference, document.getDocumentReference());
-                } else {
-                    documentEvent = new UserUpdatingDocumentEvent(userReference, document.getDocumentReference());
-                }
-                om.notify(documentEvent, document, context);
-
-                // If the action has been canceled by the user then don't perform any save and throw an exception
-                if (documentEvent.isCanceled()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                        String.format("User [%s] has been denied the right to save the document [%s]. Reason: [%s]",
-                            userReference, document.getDocumentReference(), documentEvent.getReason()));
-                }
-            }
+            notifyUserDocumentEvent(userReference, document, context);
         } finally {
             context.setWikiId(currentWiki);
+        }
+    }
+
+    /**
+     * Check if the user is allowed to save the document.
+     * 
+     * @param userReference the user responsible for the changes
+     * @param document the document to save
+     * @param context see {@link XWikiContext}
+     */
+    private void notifyUserDocumentEvent(DocumentReference userReference, XWikiDocument document,
+        XWikiContext context) throws XWikiException
+    {
+        ObservationManager om = getObservationManager();
+
+        if (om != null) {
+            CancelableEvent documentEvent;
+            if (document.getOriginalDocument().isNew()) {
+                documentEvent = new UserCreatingDocumentEvent(userReference, document.getDocumentReference());
+            } else {
+                documentEvent = new UserUpdatingDocumentEvent(userReference, document.getDocumentReference());
+            }
+            om.notify(documentEvent, document, context);
+
+            // If the action has been canceled by the user then don't perform any save and throw an exception
+            if (documentEvent.isCanceled()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    String.format("User [%s] has been denied the right to save the document [%s]. Reason: [%s]",
+                        userReference, document.getDocumentReference(), documentEvent.getReason()));
+            }
         }
     }
 
@@ -2047,6 +2055,29 @@ public class XWiki implements EventListener
     public void saveDocument(XWikiDocument document, String comment, boolean isMinorEdit, XWikiContext context)
         throws XWikiException
     {
+        saveDocument(document, comment, isMinorEdit, false, context);
+    }
+
+    /**
+     * Save the passed document in the store.
+     * <p>
+     * If document is not new and metadata and content dirty flags are false, the version/history won't be incremented
+     * (only the current state will be updated).
+     * <p>
+     * If document#isNew() return true, any pre existing document will be backuped in the deleted documents store
+     * automatically and completely replaced.
+     * 
+     * @param document the document to save
+     * @param comment the comment to associated to the new version of the saved document
+     * @param isMinorEdit true if the new version is a minor version
+     * @param modifiedByContextUser true if the document is potentially modified by a user, in which case some
+     *            protection must be applied, false if it's done by the system (for example when saving mandatory
+     *            documents)
+     * @param context see {@link XWikiContext}
+     */
+    public void saveDocument(XWikiDocument document, String comment, boolean isMinorEdit, boolean modifiedByContextUser,
+        XWikiContext context) throws XWikiException
+    {
         String currentWiki = context.getWikiId();
 
         try {
@@ -2059,6 +2090,11 @@ public class XWiki implements EventListener
 
             // Make sure the document is ready to be saved
             XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
+
+            // Notify listeners about the change made by the context user and give them a chance to cancel it
+            if (modifiedByContextUser) {
+                notifyUserDocumentEvent(context.getUserReference(), document, context);
+            }
 
             // Notify listeners about the document about to be created or updated
 
@@ -4888,6 +4924,21 @@ public class XWiki implements EventListener
         List<DocumentReference> childDocumentReferences, XWikiContext context)
         throws XWikiException
     {
+        return renameDocument(sourceDocumentReference, targetDocumentReference, overwrite, backlinkDocumentReferences,
+            childDocumentReferences, false, context);
+    }
+    
+
+    /**
+    * @since 18.8.0RC1
+    * @since 18.4.5
+    * @since 17.10.13
+     */
+    public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
+        List<DocumentReference> childDocumentReferences, boolean modifiedByContextUser, XWikiContext context)
+        throws XWikiException
+    {
         boolean result = false;
 
         // if source and destination are same, no need to perform the rename.
@@ -4911,7 +4962,7 @@ public class XWiki implements EventListener
 
                 try {
                     // rename main document
-                    this.atomicRenameDocument(sourceDocument, targetDocumentReference, context);
+                    atomicRenameDocument(sourceDocument, targetDocumentReference, modifiedByContextUser, context);
 
                     // handle translations
                     List<Locale> translationLocales = sourceDocument.getTranslationLocales(context);
@@ -4921,7 +4972,7 @@ public class XWiki implements EventListener
                         DocumentReference translatedTargetReference =
                             new DocumentReference(targetDocumentReference, translationLocale);
                         XWikiDocument translatedSourceDoc = this.getDocument(translatedSourceReference, context);
-                        this.atomicRenameDocument(translatedSourceDoc, translatedTargetReference, context);
+                        atomicRenameDocument(translatedSourceDoc, translatedTargetReference, modifiedByContextUser, context);
                     }
                 } finally {
                     context.setWikiReference(wikiReference);
@@ -4942,17 +4993,22 @@ public class XWiki implements EventListener
     }
 
     private void atomicRenameDocument(XWikiDocument sourceDocument, DocumentReference targetDocumentReference,
-        XWikiContext context) throws XWikiException
+        boolean modifiedByContextUser, XWikiContext context) throws XWikiException
     {
         // Step 1: Simulate creating a document and deleting a document from listeners point of view
         // FIXME: currently modifications made by listeners won't be applied
         XWikiDocument futureTargetDocument = sourceDocument.cloneRename(targetDocumentReference, context);
         futureTargetDocument.setOriginalDocument(new XWikiDocument(targetDocumentReference));
+        // Notify listeners about the change made by the context user, and give them a chance to cancel it
+        if (modifiedByContextUser) {
+            notifyUserDocumentEvent(context.getUserReference(), futureTargetDocument, context);
+        }
+        // Notify listeners about the document about to be created/updated/deleted, mainly to given them a cancel it
         beforeSave(futureTargetDocument, context);
         XWikiDocument deletedDocument = beforeDelete(sourceDocument, context);
 
         // Step 2: Perform atomic rename in DB
-        this.getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
+        getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
 
         // Step 3: Simulate a created document and a deleted document from listeners point of view
         afterDelete(deletedDocument, context);
@@ -5107,8 +5163,8 @@ public class XWiki implements EventListener
         return copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale, reset, force, false, context);
     }
 
-    private boolean copyDocument(XWikiDocument sourceDocument, DocumentReference targetDocumentReference, boolean reset,
-        boolean force, boolean resetCreationData, XWikiContext context) throws XWikiException
+    private boolean copyXWikiDocument(XWikiDocument sourceDocument, DocumentReference targetDocumentReference, boolean reset,
+        boolean force, boolean resetCreationData, boolean checkSaving, XWikiContext context) throws XWikiException
     {
         if (!force) {
             XWikiDocument currentTargetDocument = getDocument(targetDocumentReference, context);
@@ -5141,7 +5197,8 @@ public class XWiki implements EventListener
             targetDocument.setContentDirty(false);
         }
 
-        saveDocument(targetDocument, "Copied from " + sourceDocument.getDocumentReference(), context);
+        // Save the target document
+        saveDocument(targetDocument, "Copied from " + sourceDocument.getDocumentReference(), false, checkSaving, context);
 
         return true;
     }
@@ -5153,6 +5210,19 @@ public class XWiki implements EventListener
         String wikilocale, boolean reset, boolean force, boolean resetCreationData, XWikiContext context)
         throws XWikiException
     {
+        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale, reset, force,
+            resetCreationData, false, context);
+    }
+
+    /**
+    * @since 18.8.0RC1
+    * @since 18.4.5
+    * @since 17.10.13
+     */
+    public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        String wikilocale, boolean reset, boolean force, boolean resetCreationData, boolean checkSaving, XWikiContext context)
+        throws XWikiException
+    {
         // Get the document to copy
         XWikiDocument sourceDocument = getDocument(sourceDocumentReference, context);
 
@@ -5160,7 +5230,8 @@ public class XWiki implements EventListener
         if (!sourceDocument.isNew()) {
             if (wikilocale == null) {
                 // Copy default document
-                if (!copyDocument(sourceDocument, targetDocumentReference, reset, force, resetCreationData, context)) {
+                if (!copyXWikiDocument(sourceDocument, targetDocumentReference, reset, force, resetCreationData, checkSaving,
+                    context)) {
                     return false;
                 }
 
@@ -5169,8 +5240,8 @@ public class XWiki implements EventListener
                 for (Locale locale : locales) {
                     XWikiDocument translationDocument = sourceDocument.getTranslatedDocument(locale, context);
 
-                    copyDocument(translationDocument, targetDocumentReference, reset, force, resetCreationData,
-                        context);
+                    copyXWikiDocument(translationDocument, targetDocumentReference, reset, force, resetCreationData,
+                        checkSaving, context);
                 }
 
                 return true;
@@ -5178,8 +5249,8 @@ public class XWiki implements EventListener
                 // Copy the translation
                 XWikiDocument trandlationDocument = sourceDocument.getTranslatedDocument(wikilocale, context);
 
-                return copyDocument(trandlationDocument, targetDocumentReference, reset, force, resetCreationData,
-                    context);
+                return copyXWikiDocument(trandlationDocument, targetDocumentReference, reset, force, resetCreationData,
+                    checkSaving, context);
             }
         }
 
@@ -7660,10 +7731,6 @@ public class XWiki implements EventListener
             message = localizePlainOrKey("core.comment.rollback", rev);
         }
 
-        if (triggeredByUser) {
-            checkSavingDocument(xcontext.getUserReference(), document, message, false, xcontext);
-        }
-
         ObservationManager om = getObservationManager();
         if (om != null) {
             // Notify listeners about the document that is going to be rolled back.
@@ -7674,7 +7741,7 @@ public class XWiki implements EventListener
 
         XWikiDocument originalDocument = document.getOriginalDocument();
 
-        saveDocument(document, message, xcontext);
+        saveDocument(document, message, false, triggeredByUser, xcontext);
 
         // Since XWiki#saveDocument resets the original document, we need to temporarily put it back to send
         // notifications.

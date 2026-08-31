@@ -1498,19 +1498,12 @@ public class XWiki implements EventListener
 
     public XWikiHibernateStore getHibernateStore()
     {
-        XWikiStoreInterface resolvedStore = getStore();
-        if (resolvedStore instanceof XWikiHibernateStore hibernateStore) {
-            return hibernateStore;
-        } else if (resolvedStore instanceof XWikiCacheStoreInterface cacheStore) {
-            resolvedStore = cacheStore.getStore();
-            if (resolvedStore instanceof XWikiHibernateStore hibernateStore) {
-                return hibernateStore;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
+        return switch (getStore()) {
+            case XWikiHibernateStore hibernateStore -> hibernateStore;
+            case XWikiCacheStoreInterface cacheStore ->
+                cacheStore.getStore() instanceof XWikiHibernateStore hibernateStore ? hibernateStore : null;
+            case null, default -> null;
+        };
     }
 
     /**
@@ -7924,26 +7917,25 @@ public class XWiki implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (event instanceof JobFinishedEvent jobFinishedEvent) {
+        switch (event) {
             // An extension just been initialized (after an install or upgrade for example)
-            onJobFinished(jobFinishedEvent);
-        } else if (event instanceof WikiDeletedEvent wikiDeletedEvent) {
+            case JobFinishedEvent jobFinishedEvent -> onJobFinished(jobFinishedEvent);
             // A wiki has been deleted
-            onWikiDeletedEvent(wikiDeletedEvent);
-        } else if (event instanceof ComponentDescriptorAddedEvent componentDescriptorAddedEvent) {
+            case WikiDeletedEvent wikiDeletedEvent -> onWikiDeletedEvent(wikiDeletedEvent);
             // A new mandatory document initializer has been installed
-            onMandatoryDocumentInitializerAdded(componentDescriptorAddedEvent, (ComponentManager) source);
-        } else {
+            case ComponentDescriptorAddedEvent componentDescriptorAddedEvent ->
+                onMandatoryDocumentInitializerAdded(componentDescriptorAddedEvent, (ComponentManager) source);
             // Document modifications
+            case null, default -> {
+                XWikiDocument doc = (XWikiDocument) source;
 
-            XWikiDocument doc = (XWikiDocument) source;
-
-            if (event instanceof XObjectPropertyEvent xObjectPropertyEvent) {
-                EntityReference reference = xObjectPropertyEvent.getReference();
-                String modifiedProperty = reference.getName();
-                if (BACKLINKS.equals(modifiedProperty)) {
-                    this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent()).getIntValue(BACKLINKS,
-                        getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
+                if (event instanceof XObjectPropertyEvent xObjectPropertyEvent) {
+                    EntityReference reference = xObjectPropertyEvent.getReference();
+                    String modifiedProperty = reference.getName();
+                    if (BACKLINKS.equals(modifiedProperty)) {
+                        this.hasBacklinks = doc.getXObject((ObjectReference) reference.getParent())
+                            .getIntValue(BACKLINKS, getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
+                    }
                 }
             }
         }

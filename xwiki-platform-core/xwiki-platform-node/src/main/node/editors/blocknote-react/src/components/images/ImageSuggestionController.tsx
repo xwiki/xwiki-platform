@@ -88,7 +88,7 @@ export function ImageSuggestionController({
 
   return (
     <SuggestionMenuController
-      triggerCharacter={":"} /* TODO: "img::" */
+      triggerCharacter={"img::"}
       getItems={searchImages}
       suggestionMenuComponent={ImageSuggestionMenu}
     />

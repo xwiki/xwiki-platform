@@ -23,7 +23,7 @@
 // to a separate file would mean more code scatter.
 
 /**
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 type SearchLinkSuggestion<T, U> = {
@@ -34,7 +34,7 @@ type SearchLinkSuggestion<T, U> = {
 };
 
 /**
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 type SearchLinkSuggestor<T, U> = (

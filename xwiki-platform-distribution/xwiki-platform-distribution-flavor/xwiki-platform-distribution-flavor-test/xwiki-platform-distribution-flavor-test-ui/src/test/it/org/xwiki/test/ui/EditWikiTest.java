@@ -95,7 +95,7 @@ public class EditWikiTest extends AbstractTest
     }
 
     /**
-     * @see XWIKI-6934: Preview action doesn't displays the page's title
+     * @see "XWIKI-6934: Preview action doesn't displays the page's title"
      */
     @Test
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146")

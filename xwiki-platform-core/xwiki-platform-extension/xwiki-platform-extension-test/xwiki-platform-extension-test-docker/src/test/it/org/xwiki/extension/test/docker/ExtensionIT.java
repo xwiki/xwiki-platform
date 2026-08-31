@@ -47,7 +47,6 @@ import org.xwiki.extension.DefaultExtensionSupporter;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
-import org.xwiki.extension.test.RepositoryUtils;
 import org.xwiki.extension.test.po.AdvancedSearchPane;
 import org.xwiki.extension.test.po.DependencyPane;
 import org.xwiki.extension.test.po.ExtensionAdministrationPage;

@@ -2070,6 +2070,9 @@ public class XWiki implements EventListener
      *            protection must be applied, false if it's done by the system (for example when saving mandatory
      *            documents)
      * @param context see {@link XWikiContext}
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.8.0-rc-1
      */
     public void saveDocument(XWikiDocument document, String comment, boolean isMinorEdit, boolean modifiedByContextUser,
         XWikiContext context) throws XWikiException

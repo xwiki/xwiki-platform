@@ -423,36 +423,45 @@ public class TestUtils
      */
     public void loginAndGotoPage(String username, String password, String pageURL, boolean checkLoginSuccess)
     {
-        // Get rid of the currently displayed page before switching the user, see unloadCurrentPage().
-        unloadCurrentPage();
-
-        // ensure to be on a wiki page before performing check on the username.
-        getDriver().get(getURL("XWiki", "Register", "register", "_=" + new Date().getTime()));
+        // Check on the currently displayed page whether the requested user is already logged in, so that the common
+        // case of a fixture defensively logging in as a user that is already logged in costs no page load at all.
+        // A page showing the requested user as logged in is a definitive answer, since only a page that the server
+        // rendered for that user can show them as logged in. The opposite is not definitive, because the displayed
+        // page may not be a wiki page (or not be skinned) and thus not show any login state at all, so it only means
+        // that we have to load a wiki page and ask again, which is what the block below does.
         if (!username.equals(getLoggedInUserName())) {
-            // The Register page loaded above is now the page we're leaving behind, so unload it in turn before
-            // actually switching the user.
+            // Get rid of the currently displayed page before switching the user, see unloadCurrentPage().
             unloadCurrentPage();
 
-            // Log in and direct to the Register page again, so that we can check below that the login succeeded and
-            // re-cache the CSRF token without any extra page load.
-            String destUrl = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
-            getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
+            // ensure to be on a wiki page before performing check on the username.
+            getDriver().get(getURL("XWiki", "Register", "register", "_=" + new Date().getTime()));
+            if (!username.equals(getLoggedInUserName())) {
+                // The Register page loaded above is now the page we're leaving behind, so unload it in turn before
+                // actually switching the user.
+                unloadCurrentPage();
 
-            if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
-                throw new RuntimeException(
-                    String.format("Login failed with credentials: [%s] / [%s]. Was expecting to be on URL [%s] but "
-                        + "was on [%s]. Page source is [%s]", username, password, destUrl,
-                        getDriver().getCurrentUrl(), getDriver().getPageSource()));
+                // Log in and direct to the Register page again, so that we can check below that the login succeeded
+                // and re-cache the CSRF token without any extra page load.
+                String destUrl = getURL("XWiki", "Register", "register", "_=" + new Date().getTime());
+                getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
 
+                if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
+                    throw new RuntimeException(
+                        String.format("Login failed with credentials: [%s] / [%s]. Was expecting to be on URL [%s] but "
+                            + "was on [%s]. Page source is [%s]", username, password, destUrl,
+                            getDriver().getCurrentUrl(), getDriver().getPageSource()));
+
+                }
             }
         }
 
-        // Whether we logged in or not, a Register page is displayed (the one loaded above or the one the login
+        // Whether we logged in or not, a fully skinned wiki page is displayed (the page that was already displayed
+        // when the requested user was already logged in, otherwise the Register page loaded above or the one the login
         // redirected to), so re-cache the CSRF token for the current user without any extra page load. Doing this also
         // when no login was performed is important because the cached token may belong to a different user, in which
         // case the server rejects it: e.g. createUserAndLogin() caches the token of the user it creates, so a
         // subsequent login as the user that was logged in before it would otherwise keep using that token.
-        recacheSecretTokenWhenOnRegisterPage();
+        recacheSecretTokenFromDisplayedPage();
 
         if (pageURL != null) {
             // Go to the page asked, whether a login was needed or not: callers of this method expect to end up on that
@@ -460,8 +469,9 @@ public class TestUtils
             getDriver().get(pageURL);
         }
 
-        // When no page is asked we stay on the Register page: it's already loaded, it's cheap and, being fully skinned,
-        // it shows the login state on screenshots and screen recordings, unlike a blank xpage=plain page.
+        // When no page is asked we stay on the page that is already displayed: either the one the caller was on when
+        // the requested user turned out to be already logged in, or the Register page. Both are fully skinned, so they
+        // show the login state on screenshots and screen recordings, unlike a blank xpage=plain page.
 
         // Always synchronize the REST client credentials with the requested user, even when the browser was already
         // logged in as that user and thus skipped the browser login above. The browser session and the REST client
@@ -668,7 +678,7 @@ public class TestUtils
 
         // We're on the Register page: re-cache the CSRF token for the new user's session (the token cached for the
         // previous user is no longer valid) before it's used e.g. by updateObject below.
-        recacheSecretTokenWhenOnRegisterPage();
+        recacheSecretTokenFromDisplayedPage();
 
         if (properties.length > 0) {
             updateObject("XWiki", username, USER_CLASS_NAME, 0, properties);
@@ -1655,12 +1665,12 @@ public class TestUtils
         String previousURL = getDriver().getCurrentUrl();
         // Go to the registration page because the registration form uses secret token.
         gotoPage(getCurrentWiki(), "Register", "register");
-        recacheSecretTokenWhenOnRegisterPage();
+        recacheSecretTokenFromDisplayedPage();
         // Return to the previous page.
         getDriver().get(previousURL);
     }
 
-    private void recacheSecretTokenWhenOnRegisterPage()
+    private void recacheSecretTokenFromDisplayedPage()
     {
         try {
             WebElement htmlElement = getDriver().findElement(By.tagName("html"));

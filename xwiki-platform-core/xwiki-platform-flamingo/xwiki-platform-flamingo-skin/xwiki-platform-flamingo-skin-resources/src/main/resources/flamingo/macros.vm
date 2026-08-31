@@ -427,10 +427,11 @@
   #if ($name == '')
     #set ($name = $services.localization.render("$!{options.translationPrefix}${item.id}"))
   #end
+  #set ($escapedName = $escapetool.xml($name))
   #set ($escapedId = $services.rendering.escape(${item.id}, $options.syntax))
   #set ($escapedUrl = $escapetool.xml(${item.url}))
   #set ($escapedClass = $services.rendering.escape($class, $options.syntax))
-  $level (% id="vertical-menu-${escapedId}" class="${escapedClass}" %){{html}}<a #if ("$!{item.url}" != '')href="$escapedUrl"#{end}>#if($item.glyphicon)$services.icon.renderHTML($item.glyphicon) #end$name</a>{{/html}}
+  $level (% id="vertical-menu-${escapedId}" class="${escapedClass}" %){{html}}<a #if ("$!{item.url}" != '')href="$escapedUrl"#{end}>#if($item.glyphicon)$services.icon.renderHTML($item.glyphicon) #end$escapedName</a>{{/html}}
   #if ($hasChildren)
     #set ($children = [])
     #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)

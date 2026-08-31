@@ -22,7 +22,9 @@ package com.xpn.xwiki.plugin.scheduler;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.inject.Provider;
@@ -65,6 +67,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobClassDocumentInitializer;
@@ -925,7 +929,48 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
                     LOGGER.warn("Failed to register job in document [{}]: [{}]", document.getDocumentReference(),
                         ExceptionUtils.getRootCauseMessage(e));
                 }
+            } else if (isJobDefinitionModified(originalJobObj, jobObj)) {
+                // Modified job. The scheduler holds the job xobject that was passed to it when the job was registered,
+                // so the new definition is only taken into account once the job has been registered again.
+                try {
+                    // Leave alone a job the scheduler doesn't know about: it gets registered with its new definition
+                    // when it's scheduled.
+                    JobState state = getCurrentJobState(jobObj);
+                    if (state != null && !JobState.STATE_NONE.equals(state.getValue())) {
+                        // We get the document from the store as we don't want to corrupt the document instance
+                        // associated with the event
+                        BaseObject jobObject = getModifiableObject(document.getDocumentReference(), xcontext);
+
+                        reloadJob(jobObject, xcontext);
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("Failed to reload job in document [{}]: [{}]", document.getDocumentReference(),
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
             }
         }
+    }
+
+    /**
+     * @param previousJobObject the job xobject as it was before the modification
+     * @param jobObject the job xobject as it is after the modification
+     * @return {@code true} when the modification affects the definition of the job, i.e. anything but its status,
+     *         which the scheduler itself saves whenever it registers or unregisters a job
+     */
+    private boolean isJobDefinitionModified(BaseObject previousJobObject, BaseObject jobObject)
+    {
+        Set<String> properties = new HashSet<>(previousJobObject.getPropertyList());
+        properties.addAll(jobObject.getPropertyList());
+        properties.remove(STATUS);
+
+        return properties.stream().anyMatch(property -> !Objects.equals(getPropertyValue(previousJobObject, property),
+            getPropertyValue(jobObject, property)));
+    }
+
+    private Object getPropertyValue(BaseObject object, String property)
+    {
+        PropertyInterface value = object.safeget(property);
+
+        return value instanceof BaseProperty<?> baseProperty ? baseProperty.getValue() : null;
     }
 }

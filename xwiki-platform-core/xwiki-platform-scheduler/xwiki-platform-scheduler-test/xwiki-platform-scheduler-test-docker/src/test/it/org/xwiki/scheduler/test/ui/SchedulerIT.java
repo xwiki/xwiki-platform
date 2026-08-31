@@ -22,7 +22,9 @@ package org.xwiki.scheduler.test.ui;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.scheduler.test.po.SchedulerHomePage;
+import org.xwiki.scheduler.test.po.SchedulerJobOutputPage;
 import org.xwiki.scheduler.test.po.SchedulerPage;
 import org.xwiki.scheduler.test.po.editor.SchedulerEditPage;
 import org.xwiki.test.docker.junit5.UITest;
@@ -39,8 +41,10 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 @UITest(
     properties = {
-        // The scheduler UI need programming right
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=xwiki:Scheduler\\.WebHome",
+        // The scheduler UI need programming right, and so does the job page holding the Groovy script executed by
+        // verifyJobScriptModificationIsUsed()
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern="
+            + "xwiki:Scheduler\\.(WebHome|SchedulerScriptTestJob)",
 
         // Override in order to add the Scheduler Plugin
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
@@ -61,6 +65,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 })
 class SchedulerIT
 {
+    private static final String OUTPUT_PAGE = "SchedulerScriptTestOutput";
+
+    private static final LocalDocumentReference OUTPUT_REFERENCE =
+        new LocalDocumentReference("Scheduler", OUTPUT_PAGE);
+
     @Test
     @Order(1)
     void verifyScheduler(TestUtils setup)
@@ -161,5 +170,61 @@ class SchedulerIT
         SchedulerPage schedulerPage = schedulerEdit.clickSaveAndView();
 
         assertEquals("{{/code}}", schedulerPage.getScript());
+    }
+
+    @Test
+    @Order(3)
+    void verifyJobScriptModificationIsUsed(TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+
+        setup.deletePage("Scheduler", "SchedulerScriptTestJob");
+        // Create the output page up front, so that waiting for the content written by a job is waiting for that
+        // content to replace a known one, rather than for the page itself to come into existence.
+        setup.createPage(OUTPUT_REFERENCE, "no job executed yet");
+
+        // Create a job that writes a known content in the output page. Its cron expression is set far in the future
+        // so that the job only runs when it's explicitly triggered.
+        SchedulerHomePage schedulerHomePage = SchedulerHomePage.gotoPage();
+        schedulerHomePage.setJobName("SchedulerScriptTestJob");
+        SchedulerEditPage schedulerEdit = schedulerHomePage.clickAdd();
+        String jobName = "Script modification job";
+        schedulerEdit.setJobName(jobName);
+        schedulerEdit.setJobDescription(jobName);
+        schedulerEdit.setCron("0 0 0 1 1 ? 2100");
+        schedulerEdit.setScript(getOutputScript("first"));
+        schedulerHomePage = schedulerEdit.clickSaveAndView().backToHome();
+
+        schedulerHomePage.clickJobActionSchedule(jobName);
+        if (schedulerHomePage.hasError()) {
+            fail("Failed to schedule job. Error [" + schedulerHomePage.getErrorMessage() + "]");
+        }
+
+        schedulerHomePage.clickJobActionTrigger(jobName);
+        if (schedulerHomePage.hasError()) {
+            fail("Failed to trigger job. Error [" + schedulerHomePage.getErrorMessage() + "]");
+        }
+        SchedulerJobOutputPage.gotoPage(OUTPUT_REFERENCE).waitUntilContentIs("first");
+
+        // Modify the script of the scheduled job. The new script must be used without having to unschedule and
+        // schedule the job again.
+        schedulerHomePage = SchedulerHomePage.gotoPage();
+        schedulerEdit = schedulerHomePage.clickJobActionEdit(jobName);
+        schedulerEdit.setScript(getOutputScript("second"));
+        schedulerHomePage = schedulerEdit.clickSaveAndView().backToHome();
+
+        schedulerHomePage.clickJobActionTrigger(jobName);
+        if (schedulerHomePage.hasError()) {
+            fail("Failed to trigger job. Error [" + schedulerHomePage.getErrorMessage() + "]");
+        }
+        SchedulerJobOutputPage.gotoPage(OUTPUT_REFERENCE).waitUntilContentIs("second");
+
+        SchedulerHomePage.gotoPage().clickJobActionUnschedule(jobName);
+    }
+
+    private String getOutputScript(String content)
+    {
+        return String.format("def output = xwiki.getDocument('Scheduler.%s')\noutput.setContent('%s')\n"
+            + "output.save()", OUTPUT_PAGE, content);
     }
 }

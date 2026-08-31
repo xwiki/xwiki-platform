@@ -170,13 +170,13 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public boolean copy(DocumentReference source, DocumentReference destination)
+    public boolean copy(DocumentReference source, DocumentReference destination, boolean modifiedByContextUser)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             String language = source.getLocale() != null ? source.getLocale().toString() : null;
-            boolean result =
-                xcontext.getWiki().copyDocument(source, destination, language, false, true, true, xcontext);
+            boolean result = xcontext.getWiki().copyDocument(source, destination, language, false, true, true,
+                modifiedByContextUser, xcontext);
             if (result) {
                 this.logger.info("Document [{}] has been copied to [{}].", source, destination);
             } else {
@@ -721,13 +721,12 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public boolean rename(DocumentReference source, DocumentReference destination)
+    public boolean rename(DocumentReference source, DocumentReference destination, boolean modifiedByContextUser)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
-            return xcontext.getWiki()
-                .renameDocument(source, destination, true,
-                    Collections.emptyList(), Collections.emptyList(), xcontext);
+            return xcontext.getWiki().renameDocument(source, destination, true, Collections.emptyList(),
+                Collections.emptyList(), modifiedByContextUser, xcontext);
         } catch (Exception e) {
             this.logger.error("Failed to rename [{}] to [{}].", source, destination, e);
         }

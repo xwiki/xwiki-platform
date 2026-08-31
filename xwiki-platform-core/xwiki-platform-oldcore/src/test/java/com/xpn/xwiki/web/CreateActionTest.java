@@ -1651,6 +1651,6 @@ class CreateActionTest
         verify(document).setTitle("Yippee");
         verify(document).setCreatorReference(userReference);
         verify(document).setAuthorReference(userReference);
-        verify(this.context.getWiki()).saveDocument(document, this.context);
+        verify(this.context.getWiki()).saveDocument(document, "", false, true, this.context);
     }
 }

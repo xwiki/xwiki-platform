@@ -21,8 +21,12 @@ package org.xwiki.internal.document;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.internal.DefaultObservationManager;
+import org.xwiki.refactoring.event.DocumentCopyingEvent;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -34,6 +38,8 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DocumentOverrideListener}.
@@ -51,6 +57,9 @@ class DocumentOverrideListenerTest
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @MockComponent
+    private ObservationContext observationContext;
 
     @Test
     void savingNewDocument() throws Exception
@@ -81,5 +90,31 @@ class DocumentOverrideListenerTest
         assertEquals("Error number 9001 in 9: User [wiki:XWiki.user] has been denied the right to save the "
             + "document [wiki:space.page]. Reason: [The document already exists but the document to be saved is marked "
             + "as new.]", exception.getMessage());
+    }
+
+    @Test
+    void savingOverridingExistingDocumentDuringRename() throws Exception
+    {
+        when(this.observationContext.isIn(any(DocumentRenamingEvent.class))).thenReturn(true);
+
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
+        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
+        XWikiDocument newDocument = new XWikiDocument(DOCUMENT_REFERENCE);
+
+        // A rename handles the override on its own, so the save must not be cancelled.
+        this.oldcore.getSpyXWiki().checkSavingDocument(USER_REFERENCE, newDocument, this.oldcore.getXWikiContext());
+    }
+
+    @Test
+    void savingOverridingExistingDocumentDuringCopy() throws Exception
+    {
+        when(this.observationContext.isIn(any(DocumentCopyingEvent.class))).thenReturn(true);
+
+        XWikiDocument document = new XWikiDocument(DOCUMENT_REFERENCE);
+        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
+        XWikiDocument newDocument = new XWikiDocument(DOCUMENT_REFERENCE);
+
+        // A copy handles the override on its own, so the save must not be cancelled.
+        this.oldcore.getSpyXWiki().checkSavingDocument(USER_REFERENCE, newDocument, this.oldcore.getXWikiContext());
     }
 }

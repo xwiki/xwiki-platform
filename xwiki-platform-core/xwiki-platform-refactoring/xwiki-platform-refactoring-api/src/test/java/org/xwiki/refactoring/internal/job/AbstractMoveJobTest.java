@@ -21,11 +21,13 @@ package org.xwiki.refactoring.internal.job;
 
 import java.util.List;
 
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.MoveRequest;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 /**
  * Base class for writing unit tests for jobs extending {@link MoveJob}.
@@ -44,7 +46,7 @@ public abstract class AbstractMoveJobTest extends AbstractEntityJobTest
 
     protected void verifyNoMove() throws Exception
     {
-        verify(this.modelBridge, never()).delete(any(DocumentReference.class));
-        verify(this.modelBridge, never()).copy(any(DocumentReference.class), any(DocumentReference.class));
+        verify(this.modelBridge, never()).delete(any());
+        verify(this.modelBridge, never()).copy(any(), any(), anyBoolean());
     }
 }

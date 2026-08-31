@@ -20,6 +20,7 @@
 package org.xwiki.flamingo.test.docker;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +56,8 @@ import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
@@ -66,6 +69,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class RenamePageIT
 {
+    private static final String RIGHTS_USER = "RenameRightsUser";
+
+    private static final String XWIKI_RIGHTS_CLASS = "XWiki.XWikiRights";
+
+    private static final String MOVED_PAGE_CONTENT = "This page carries a right its mover cannot grant";
+
     @BeforeAll
     public void setup(TestUtils setup)
     {
@@ -864,5 +873,70 @@ class RenamePageIT
         String breadcrumb = childVP.getBreadcrumbContent();
         assertTrue(breadcrumb.endsWith("/4/child"),
             "Expected breadcrumb to end with /4/child but was [" + breadcrumb + "]");
+    }
+
+    /**
+     * Verify that a user moving a page cannot bring along a right that this user is not allowed to grant at the target
+     * location. The source page grants {@code admin} to the user through an {@code XWiki.XWikiRights} object and the
+     * user is not administrator of the target space, so the move must be refused: otherwise the user would gain
+     * administration rights simply by moving a page. Unlike a copy, where the offending rights are filtered out, a
+     * rename cannot modify the document on the fly, so the whole operation is cancelled.
+     */
+    @Order(13)
+    @Test
+    void renameIsRefusedWhenItWouldMoveRightsTheUserCannotGrant(TestUtils setup, TestReference testReference)
+        throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        SpaceReference testSpace = testReference.getLastSpaceReference();
+        SpaceReference sourceSpace = new SpaceReference("Source", testSpace);
+        SpaceReference targetSpace = new SpaceReference("Target", testSpace);
+        DocumentReference sourcePage = new DocumentReference("Page", sourceSpace);
+        DocumentReference targetPage = new DocumentReference("Page", targetSpace);
+
+        setup.rest().delete(sourcePage);
+        setup.rest().delete(targetPage);
+
+        setup.createUser(RIGHTS_USER, RIGHTS_USER, null, "usertype", "Advanced");
+        String userFullName = "XWiki." + RIGHTS_USER;
+
+        // The user may delete in the source space and create in the target space, so it is allowed to perform the move
+        // itself, but it is administrator of neither space.
+        setup.setRightsOnSpace(sourceSpace, "", userFullName, "view,edit,delete", true);
+        setup.setRightsOnSpace(targetSpace, "", userFullName, "view,edit", true);
+
+        // The source page carries a right granting admin to the user. It has been set by an administrator, so it is
+        // legitimate at this location.
+        setup.rest().savePage(sourcePage, MOVED_PAGE_CONTENT, "Source Page");
+        setup.addObject(sourcePage, XWIKI_RIGHTS_CLASS, "levels", "admin", "users", userFullName, "allow", 1);
+
+        // Move the page as the restricted user.
+        setup.login(RIGHTS_USER, RIGHTS_USER);
+        RenamePage renamePage = setup.gotoPage(sourcePage).rename();
+        renamePage.getDocumentPicker().setParent(setup.serializeReference(targetSpace)).setName("Page");
+        renamePage.clickRenameButton().waitUntilFinished();
+
+        setup.loginAsSuperAdmin();
+
+        // The move must have been refused: the target must not have been created and the source must be untouched,
+        // still carrying its right.
+        List<String> classAndMethodSpaces = List.of(testSpace.getParent().getName(), testSpace.getName());
+        assertFalse(setup.pageExists(newSpaces(classAndMethodSpaces, "Target"), "Page"),
+            "The page must not have been moved to a location where the user moving it is not allowed to grant the "
+                + "[admin] right it carries.");
+        assertTrue(setup.pageExists(newSpaces(classAndMethodSpaces, "Source"), "Page"),
+            "The source page must still exist since the move was refused.");
+
+        setup.gotoPage(sourcePage, "edit", "editor=object");
+        List<ObjectEditPane> rightObjects = new ObjectEditPage().getObjectsOfClass(XWIKI_RIGHTS_CLASS, true);
+        assertEquals(1, rightObjects.size(), "The refused move must have left the source page's right in place.");
+    }
+
+    private static List<String> newSpaces(List<String> parentSpaces, String lastSpace)
+    {
+        List<String> spaces = new ArrayList<>(parentSpaces);
+        spaces.add(lastSpace);
+        return spaces;
     }
 }

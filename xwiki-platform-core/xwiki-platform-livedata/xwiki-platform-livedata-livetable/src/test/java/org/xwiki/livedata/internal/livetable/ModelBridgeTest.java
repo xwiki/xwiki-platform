@@ -175,7 +175,7 @@ class ModelBridgeTest
         assertEquals("updatedValue", update.get());
         
         verify(this.baseClass).fromMap(Collections.singletonMap("propertyName", "value"), this.baseObject);
-        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, this.xcontext);
+        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, true, this.xcontext);
     }
 
     @Test
@@ -208,7 +208,7 @@ class ModelBridgeTest
         assertTrue(properties.containsKey(property));
         assertArrayEquals(new String[] { "a", "b" }, (String[]) properties.get(property));
 
-        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, this.xcontext);
+        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, true, this.xcontext);
     }
 
     @Test
@@ -267,7 +267,7 @@ class ModelBridgeTest
         Optional<Object> update = this.modelBridge.update(property, value, documentReference, null);
         assertEquals("oldContent", update.get());
         verify(this.document).setContent("newContent");
-        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, this.xcontext);
+        verify(this.xwiki).saveDocument(this.document, "LiveData update.", true, true, this.xcontext);
     }
 
     @Test

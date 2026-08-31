@@ -164,7 +164,7 @@ public class CreateJob extends AbstractEntityJob<CreateRequest, EntityJobStatus<
             // Should generally not happen, but you never know.
             this.logger.error("Template document [{}] does not exist.", templateDocumentReference);
         } else {
-            this.modelBridge.copy(templateDocumentReference, newDocumentReference);
+            this.modelBridge.copy(templateDocumentReference, newDocumentReference, this.request.isCheckRights());
         }
     }
 }

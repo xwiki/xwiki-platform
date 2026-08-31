@@ -31,8 +31,10 @@ import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -67,11 +69,16 @@ public class RightsFilterListener extends AbstractEventListener
      */
     public static final String NAME = "org.xwiki.security.authorization.internal.RightsFilterListener";
 
+    private static final DocumentRenamingEvent DOCUMENT_RENAMING_EVENT = new DocumentRenamingEvent();
+
     @Inject
     private AuthorizationManager authorization;
 
     @Inject
     private DocumentRequiredRightsReader documentRequiredRightsReader;
+
+    @Inject
+    private ObservationContext observationContext;
 
     /**
      * The default constructor.
@@ -90,7 +97,7 @@ public class RightsFilterListener extends AbstractEventListener
 
         // Check local rights
         checkModifiedRights(userEvent.getUserReference(), document, XWikiRightsDocumentInitializer.CLASS_REFERENCE,
-            null);
+            (CancelableEvent) event);
 
         // Check global rights
         checkModifiedRights(userEvent.getUserReference(), document,
@@ -100,8 +107,7 @@ public class RightsFilterListener extends AbstractEventListener
         checkModifiedRequiredRights(userEvent.getUserReference(), document, (CancelableEvent) event);
     }
 
-    private void checkModifiedRequiredRights(DocumentReference user, XWikiDocument document,
-        CancelableEvent event)
+    private void checkModifiedRequiredRights(DocumentReference user, XWikiDocument document, CancelableEvent event)
     {
         XWikiDocument originalDocument = document.getOriginalDocument();
         DocumentRequiredRights originalRequiredRights =
@@ -141,8 +147,14 @@ public class RightsFilterListener extends AbstractEventListener
                 // Cancel the delete because it might have an impact on other documents
                 event.cancel("Deleting the document have an impact on rights the author does not have");
             } else {
-                // Cancel all the right modifications
-                cancel(document, originalRights, rights);
+                if (this.observationContext.isIn(DOCUMENT_RENAMING_EVENT)) {
+                    // Cancel the rename to not loose information (there is also a limitation that rename does
+                    // not allow to modify the document)
+                    event.cancel("The user is not allowed to modify the rights impacted by the rename operation");
+                } else {
+                    // Cancel all the right modifications
+                    cancel(document, originalRights, rights);
+                }
             }
         }
     }

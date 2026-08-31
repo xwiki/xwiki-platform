@@ -226,10 +226,10 @@ class DefaultModelBridgeTest
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
         DocumentReference copyReference = new DocumentReference("wiki", "Space", "Copy");
 
-        when(this.xcontext.getWiki().copyDocument(sourceReference, copyReference, "fr", false, true, true,
+        when(this.xcontext.getWiki().copyDocument(sourceReference, copyReference, "fr", false, true, true, false,
             this.xcontext)).thenReturn(true);
 
-        assertTrue(this.modelBridge.copy(sourceReference, copyReference));
+        assertTrue(this.modelBridge.copy(sourceReference, copyReference, false));
         assertLog(Level.INFO, "Document [{}] has been copied to [{}].", sourceReference, copyReference);
     }
 
@@ -961,10 +961,10 @@ class DefaultModelBridgeTest
         DocumentReference source = new DocumentReference("wiki", "space", "sourcePage");
         DocumentReference target = new DocumentReference("wiki", "space", "targetPage");
 
-        when(this.xwiki.renameDocument(source, target, true, List.of(), List.of(), this.xcontext)).thenReturn(true);
-        assertTrue(this.modelBridge.rename(source, target));
+        when(this.xwiki.renameDocument(source, target, true, List.of(), List.of(), false, this.xcontext)).thenReturn(true);
+        assertTrue(this.modelBridge.rename(source, target, false));
 
-        verify(this.xwiki).renameDocument(source, target, true, List.of(), List.of(), this.xcontext);
+        verify(this.xwiki).renameDocument(source, target, true, List.of(), List.of(), false, this.xcontext);
     }
 
     @Test

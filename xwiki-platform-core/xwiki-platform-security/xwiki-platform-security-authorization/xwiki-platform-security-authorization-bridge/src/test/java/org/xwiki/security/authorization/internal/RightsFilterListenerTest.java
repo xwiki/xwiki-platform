@@ -29,6 +29,8 @@ import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationContext;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -73,6 +75,9 @@ class RightsFilterListenerTest
 
     @MockComponent
     private DocumentRequiredRightsReader requiredRightsReader;
+
+    @MockComponent
+    private ObservationContext observationContext;
 
     @InjectMockComponents
     private RightsFilterListener listener;
@@ -162,6 +167,32 @@ class RightsFilterListenerTest
 
         assertNotEquals(before, document);
         assertEquals(document.getOriginalDocument(), document);
+    }
+
+    @Test
+    void newDeniedRightObjectDuringRename() throws XWikiException, AccessDeniedException
+    {
+        when(this.observationContext.isIn(any(DocumentRenamingEvent.class))).thenReturn(true);
+
+        XWikiDocument document = createTestDocument();
+        BaseObject rightObject =
+            document.newXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, oldcore.getXWikiContext());
+        document.setOriginalDocument(document.clone());
+        document.getOriginalDocument().removeXObjects(XWikiRightsDocumentInitializer.CLASS_REFERENCE);
+        rightObject.setStringValue("levels", "view");
+
+        doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.VIEW, null,
+            document.getDocumentReference());
+
+        XWikiDocument before = document.clone();
+
+        UserUpdatingDocumentEvent event = new UserUpdatingDocumentEvent();
+        this.listener.onEvent(event, document, null);
+
+        // A rename cannot filter the rights out of the document, so the whole operation must be cancelled and the
+        // document left untouched.
+        assertTrue(event.isCanceled());
+        assertEquals(before, document);
     }
 
     @Test

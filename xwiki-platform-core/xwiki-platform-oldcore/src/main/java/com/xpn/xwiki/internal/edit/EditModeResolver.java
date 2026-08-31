@@ -109,10 +109,15 @@ public class EditModeResolver
         // Otherwise, we fallback to the default editor. This part is taken from the getDefaultDocumentEditor macro
         // defined in macros.vm from xwiki-platform-web-templates.
 
+        XWikiContext context = this.xwikiContextProvider.get();
+        // We access the document to get its syntax and to determine if it has a sheet. Technically, each document
+        // translation has its own syntax field, but it doesn't make sense for a translation to have a different syntax
+        // than the default translation. The sheet is determined using the objects attached to the document. Even though
+        // all document translations share the objects, they can be accessed only from the default translation. For this
+        // reasons we retrieve only the default document translation.
+        XWikiDocument document = (XWikiDocument) context.get("doc");
         // There is no document to edit when the edit mode is resolved outside of a request that targets a document,
         // in which case we can neither look for sheets nor check the document syntax.
-        XWikiContext context = this.xwikiContextProvider.get();
-        XWikiDocument document = (XWikiDocument) context.get("tdoc");
         if (document != null) {
             // If a sheet matches the edit action for this document and no specific editor was specified,
             // the Inline Form edit mode will be used.

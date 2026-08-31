@@ -123,7 +123,7 @@ class EditModeResolverTest
         when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
         // The current document is open in edit mode.
-        when(this.xwikiContext.get("tdoc")).thenReturn(this.document);
+        when(this.xwikiContext.get("doc")).thenReturn(this.document);
         when(this.xwikiContext.getAction()).thenReturn(EDIT);
         when(this.xwikiContext.getWiki()).thenReturn(this.wiki);
         when(this.xwikiContextProvider.get()).thenReturn(this.xwikiContext);
@@ -196,7 +196,7 @@ class EditModeResolverTest
     {
         wysiwygSyntaxSupported(true);
         when(this.wiki.getEditorPreference(this.xwikiContext)).thenReturn(EditModeResolver.WYSIWYG);
-        when(this.xwikiContext.get("tdoc")).thenReturn(null);
+        when(this.xwikiContext.get("doc")).thenReturn(null);
 
         assertEquals(EditModeResolver.WIKI, this.editModeResolver.getEditMode());
 

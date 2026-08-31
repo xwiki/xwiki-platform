@@ -2330,6 +2330,9 @@ public class TestUtils
 
     /**
      * Add and set a property into XWiki.XWikiPreferences. Create XWiki.XWikiPreferences if it does not exist.
+     * <p>
+     * The property is set over REST, and thus with the REST credentials rather than as the user currently logged in
+     * the browser, and the page displayed in the browser is left untouched.
      *
      * @param propertyName name of the property to set
      * @param propertyType the type of the property to add
@@ -2338,13 +2341,14 @@ public class TestUtils
      */
     public void setPropertyInXWikiPreferences(String propertyName, String propertyType, Object value)
     {
+        // The property may not be defined in the XWiki.XWikiPreferences class (e.g. "core.hierarchyMode"), in which
+        // case it must be added to the class before it can be set on the object.
         addClassProperty("XWiki", "XWikiPreferences", propertyName, propertyType);
-        gotoPage("XWiki", "XWikiPreferences", "edit", "editor", "object");
-        ObjectEditPage objectEditPage = new ObjectEditPage();
-        if (objectEditPage.hasObject("XWiki.XWikiPreferences")) {
-            updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0, propertyName, value);
-        } else {
-            addObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", propertyName, value);
+        try {
+            setWikiPreference(propertyName, Objects.toString(value, null));
+        } catch (Exception e) {
+            throw new RuntimeException(
+                String.format("Failed to set property [%s] in [XWiki.XWikiPreferences]", propertyName), e);
         }
     }
 

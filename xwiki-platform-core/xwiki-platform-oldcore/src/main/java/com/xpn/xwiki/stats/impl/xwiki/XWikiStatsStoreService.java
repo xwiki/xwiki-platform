@@ -110,6 +110,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
             this.thread.join();
             this.thread = null;
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             LOGGER.warn("Thread join has been interrupted", e);
         }
     }
@@ -182,6 +183,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
         try {
             this.queue.put(statsRegisterItem);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             LOGGER.error("Statistics storage thread has been interrupted", e);
         }
     }

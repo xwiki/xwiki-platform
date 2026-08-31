@@ -154,6 +154,7 @@ public class XClassDeletingListener extends AbstractEventListener
                     }
                 }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 this.logger.warn("Confirm question has been interrupted.");
                 cancelableEvent.cancel("Question has been interrupted.");
             }

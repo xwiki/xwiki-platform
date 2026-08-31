@@ -1113,6 +1113,7 @@ public class XWiki implements EventListener
             try {
                 wikiJob.join();
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_INIT_FAILED,
                     "Wiki [" + wikiId + "] initialization was interrupted unexpectedly", e);
             }

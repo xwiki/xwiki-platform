@@ -136,6 +136,7 @@ public class DocumentsDeletingListener extends AbstractEventListener
                     cancelableEvent.cancel(message);
                 }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 this.logger.warn("Confirm question has been interrupted.");
                 cancelableEvent.cancel("Question has been interrupted.");
             }

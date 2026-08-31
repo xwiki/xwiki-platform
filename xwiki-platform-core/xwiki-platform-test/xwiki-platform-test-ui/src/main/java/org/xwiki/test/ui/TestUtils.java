@@ -2331,8 +2331,9 @@ public class TestUtils
     /**
      * Add and set a property into XWiki.XWikiPreferences. Create XWiki.XWikiPreferences if it does not exist.
      * <p>
-     * The property is set over REST, and thus with the REST credentials rather than as the user currently logged in
-     * the browser, and the page displayed in the browser is left untouched.
+     * The property value is set over REST, and thus with the REST credentials rather than as the user currently logged
+     * in the browser. Adding the property to the class still goes through the browser, which is therefore left on
+     * another page: a page chosen to load fast, since no caller has any use for it.
      *
      * @param propertyName name of the property to set
      * @param propertyType the type of the property to add
@@ -2343,7 +2344,13 @@ public class TestUtils
     {
         // The property may not be defined in the XWiki.XWikiPreferences class (e.g. "core.hierarchyMode"), in which
         // case it must be added to the class before it can be set on the object.
-        addClassProperty("XWiki", "XWikiPreferences", propertyName, propertyType);
+        //
+        // The "propadd" action redirects to the class editor of the document it modified, and loading that editor for
+        // XWiki.XWikiPreferences (a class with dozens of properties) is by far the most expensive part of setting a
+        // preference: more than 3 seconds, against about 200 ms for everything else this method does. No caller has
+        // any use for that editor, so send the browser to a page that loads fast instead.
+        gotoPage("XWiki", "XWikiPreferences", "propadd", "propname", propertyName, "proptype", propertyType,
+            "xredirect", getURLToNonExistentPage());
         try {
             setWikiPreference(propertyName, Objects.toString(value, null));
         } catch (Exception e) {

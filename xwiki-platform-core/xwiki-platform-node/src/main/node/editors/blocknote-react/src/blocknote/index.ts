@@ -163,9 +163,7 @@ type SuggestionMenuItemsParams = {
 /**
  * Suggests a set of suggestion from the menu items.
  *
- * @param editor - the editor type
- * @param query - the query to filter the suggestions by
- * @param macros - the available macros
+ * @param params - see {@link SuggestionMenuItemsParams}
  */
 // eslint-disable-next-line max-statements
 function querySuggestionsMenuItems({

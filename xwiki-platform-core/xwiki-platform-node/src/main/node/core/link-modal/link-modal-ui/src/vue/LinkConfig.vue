@@ -25,7 +25,6 @@ import type {
   LinkData,
   LinkTargetTypeExtension,
 } from "@xwiki/platform-link-type-api";
-import type { Ref } from "vue";
 
 const props = defineProps<{ linkData: LinkData }>();
 
@@ -39,20 +38,20 @@ const { t, locale } = useI18n({ messages: translations });
 
 // Provided by `LinkModal.vue`: the list of registered, enabled link target types, already resolved from the
 // shared component manager — see `@xwiki/platform-link-type-api`'s `LinkTargetTypeExtension`.
-const extensions = inject<Ref<LinkTargetTypeExtension[]>>(
+const extensions = inject<LinkTargetTypeExtension[]>(
   "linkTargetTypeExtensions",
 )!;
 
 const linkData = ref(props.linkData);
 
 const linkTargetTypeSelect = ref(
-  extensions.value
+  extensions
     .find((extension) => extension.type === linkData.value.target.type)
     ?.getLabel(locale.value) ?? "",
 );
 
 watch(linkTargetTypeSelect, (label) => {
-  const extension = extensions.value.find(
+  const extension = extensions.find(
     (extension) => extension.getLabel(locale.value) === label,
   );
 

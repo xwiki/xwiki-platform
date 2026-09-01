@@ -278,10 +278,7 @@ type MacroInsertionEditorPrefillData = {
 /**
  * Information about a macro block invocation
  *
- * Reuses the `kind` / `id` / `params` envelope from `@xwiki/platform-uniast-api`'s
- * `MacroBlockInvocation`, but keeps its own `body`: this one carries a live BlockNote editor
- * fragment (`InlineContentType`, editable in place), whereas UniAst's `body` carries UniAst's own
- * (non-editable, portable) `InlineContent`.
+ * Identical to `MacroBlockInvocation` except for `body` which is a BlockNote AST piece here
  *
  * @since 18.5.0RC1
  * @beta
@@ -298,8 +295,7 @@ type MacroBlockInvocation = Omit<UniAstMacroBlockInvocation, "body"> & {
 /**
  * Information about an inline macro invocation
  *
- * Reuses the `kind` / `id` / `params` envelope from `@xwiki/platform-uniast-api`'s
- * `InlineMacroInvocation`, but keeps its own `body` for the same reason as
+ * Identical to `InlineMacroInvocation` except for `body` which is a BlockNote AST piece here
  * {@link MacroBlockInvocation}.
  *
  * @since 18.5.0RC1

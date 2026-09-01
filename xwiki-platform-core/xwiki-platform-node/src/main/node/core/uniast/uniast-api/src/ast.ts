@@ -294,9 +294,7 @@ type LinkTarget =
       rawReference: string;
 
       /**
-       * Will be `null` if the raw reference is invalid and can't be parsed. Code producing a
-       * `LinkTarget` without access to entity-reference parsing (e.g. a macro's `render()`) must
-       * pass `null` here explicitly.
+       * Will be `null` if the raw reference is invalid and can't be parsed.
        *
        * @since 18.0.0RC1
        * @beta

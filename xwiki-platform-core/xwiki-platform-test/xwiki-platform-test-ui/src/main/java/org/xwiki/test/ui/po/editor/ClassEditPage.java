@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po.editor;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -139,11 +140,193 @@ public class ClassEditPage extends EditPage
      */
     public void movePropertyBefore(String propertyToMove, String propertyBefore)
     {
-        WebElement moveToolSource = getDriver()
-            .findElementWithoutWaiting(By.id("xproperty_" + propertyToMove))
-            .findElement(By.cssSelector(".tool.move"));
         WebElement target = getDriver().findElementWithoutWaiting(By.id("xproperty_" + propertyBefore));
-        new Actions(getDriver().getWrappedDriver()).dragAndDrop(moveToolSource, target).perform();
+        new Actions(getDriver().getWrappedDriver()).dragAndDrop(getPropertyDragSource(propertyToMove), target)
+            .perform();
+    }
+
+    /**
+     * Clicks the move up button of the given property. The property keeps its position when it is already the first
+     * one.
+     *
+     * @param propertyToMove the property to move one position up
+     * @since 18.8.0RC1
+     */
+    public void movePropertyUp(String propertyToMove)
+    {
+        getMovePropertyUpButton(propertyToMove).click();
+    }
+
+    /**
+     * Clicks the move down button of the given property. The property keeps its position when it is already the last
+     * one.
+     *
+     * @param propertyToMove the property to move one position down
+     * @since 18.8.0RC1
+     */
+    public void movePropertyDown(String propertyToMove)
+    {
+        getMovePropertyDownButton(propertyToMove).click();
+    }
+
+    /**
+     * Presses the up arrow key on the move buttons of the given property, which both answer it. The property keeps its
+     * position when it is already the first one.
+     *
+     * @param propertyToMove the property to move one position up
+     * @since 18.8.0RC1
+     */
+    public void movePropertyUpWithKeyboard(String propertyToMove)
+    {
+        getMovePropertyUpButton(propertyToMove).sendKeys(Keys.ARROW_UP);
+    }
+
+    /**
+     * Presses the down arrow key on the move buttons of the given property, which both answer it. The property keeps
+     * its position when it is already the last one.
+     *
+     * @param propertyToMove the property to move one position down
+     * @since 18.8.0RC1
+     */
+    public void movePropertyDownWithKeyboard(String propertyToMove)
+    {
+        getMovePropertyDownButton(propertyToMove).sendKeys(Keys.ARROW_DOWN);
+    }
+
+    /**
+     * @param propertyName the name of a property of this class
+     * @return the button moving the given property one position up
+     * @since 18.8.0RC1
+     */
+    public WebElement getMovePropertyUpButton(String propertyName)
+    {
+        return getPropertyContainer(propertyName).findElement(By.cssSelector(".reorder-control-up"));
+    }
+
+    /**
+     * @param propertyName the name of a property of this class
+     * @return the button moving the given property one position down
+     * @since 18.8.0RC1
+     */
+    public WebElement getMovePropertyDownButton(String propertyName)
+    {
+        return getPropertyContainer(propertyName).findElement(By.cssSelector(".reorder-control-down"));
+    }
+
+    /**
+     * @param propertyName the name of a property of this class
+     * @return whether the button moving the given property up currently holds the focus
+     * @since 18.8.0RC1
+     */
+    public boolean isMovePropertyUpButtonFocused(String propertyName)
+    {
+        return getMovePropertyUpButton(propertyName).equals(getDriver().switchTo().activeElement());
+    }
+
+    /**
+     * @param propertyName the name of a property of this class
+     * @return the accessible name of the button moving the given property up, which is displayed to screen readers
+     *     only
+     * @since 18.8.0RC1
+     */
+    public String getMovePropertyUpButtonName(String propertyName)
+    {
+        return getButtonName(getMovePropertyUpButton(propertyName));
+    }
+
+    /**
+     * @param propertyName the name of a property of this class
+     * @return the accessible name of the button moving the given property down, which is displayed to screen readers
+     *     only
+     * @since 18.8.0RC1
+     */
+    public String getMovePropertyDownButtonName(String propertyName)
+    {
+        return getButtonName(getMovePropertyDownButton(propertyName));
+    }
+
+    /**
+     * @param propertyName the name of a property of this class
+     * @return the tooltip of the button moving the given property up
+     * @since 18.8.0RC1
+     */
+    public String getMovePropertyUpButtonTooltip(String propertyName)
+    {
+        return getMovePropertyUpButton(propertyName).getDomAttribute("title");
+    }
+
+    /**
+     * @param propertyName the name of a property of this class
+     * @return the tooltip of the button moving the given property down
+     * @since 18.8.0RC1
+     */
+    public String getMovePropertyDownButtonTooltip(String propertyName)
+    {
+        return getMovePropertyDownButton(propertyName).getDomAttribute("title");
+    }
+
+    /**
+     * @param propertyName the name of a property of this class
+     * @return the number of move buttons displayed for the given property, which stays at two however many times
+     *     properties are added to the editor
+     * @since 18.8.0RC1
+     */
+    public int getMovePropertyButtonCount(String propertyName)
+    {
+        return getPropertyContainer(propertyName).findElements(By.cssSelector(".reorder-control")).size();
+    }
+
+    /**
+     * @param button one of the move buttons
+     * @return the accessible name of the given button
+     */
+    private String getButtonName(WebElement button)
+    {
+        return button.findElement(By.className("sr-only")).getDomProperty("textContent");
+    }
+
+    /**
+     * Waits until the move buttons have announced the given text to the screen readers.
+     *
+     * @param announcement the expected announcement
+     * @since 18.8.0RC1
+     */
+    public void waitForReorderAnnouncement(String announcement)
+    {
+        getDriver().waitUntilCondition(driver -> announcement.equals(getReorderAnnouncement()));
+    }
+
+    /**
+     * Reads the announcement without waiting for it. The live region is emptied as soon as a move is performed and
+     * filled again shortly after, so this returns an empty string when it is called right after a move. Prefer
+     * {@link #waitForReorderAnnouncement(String)}, which waits for the announcement to be set.
+     *
+     * @return the text currently held by the live region the move buttons announce their moves in
+     * @since 18.8.0RC1
+     */
+    public String getReorderAnnouncement()
+    {
+        return getDriver().findElementWithoutWaiting(By.id("reorder-controls-live-region"))
+            .getDomProperty("textContent");
+    }
+
+    /**
+     * @param propertyName the name of a property of this class
+     * @return the part of the property title a drag has to start from, the move buttons being operated by a click
+     *     rather than by a drag
+     */
+    private WebElement getPropertyDragSource(String propertyName)
+    {
+        return getPropertyContainer(propertyName).findElement(By.cssSelector(".xproperty-title h2"));
+    }
+
+    /**
+     * @param propertyName the name of a property of this class
+     * @return the element holding the title and the content of the given property
+     */
+    private WebElement getPropertyContainer(String propertyName)
+    {
+        return getDriver().findElementWithoutWaiting(By.id("xproperty_" + propertyName));
     }
 
     private FormContainerElement getForm()

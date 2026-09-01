@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($icons = {'reposition': $services.icon.renderHTML('reposition')})
+#set ($icons = {'up': $services.icon.renderHTML('up'), 'down': $services.icon.renderHTML('down')})
 #[[*/
 // Start JavaScript-only code.
 
@@ -44,11 +44,18 @@
       'object.loadObject.inProgress',
       'object.loadObject.done',
       'object.loadObject.failed',
-      'class.moveProperty.handle.label',
+      'class.moveProperty.up.text',
+      'class.moveProperty.up.tooltip',
+      'class.moveProperty.up.boundary',
+      'class.moveProperty.down.text',
+      'class.moveProperty.down.tooltip',
+      'class.moveProperty.down.boundary',
+      'class.moveProperty.moved',
       'class.switchClass.confirm'
     ]
   });
-  require(['jquery','xwiki-meta','xwiki-l10n!dataeditors-translations','xwiki-events-bridge','jquery-ui'], function ($, xm, l10n) {
+  require(['jquery','xwiki-meta','xwiki-l10n!dataeditors-translations','xwiki-reorder-controls',
+    'xwiki-events-bridge','jquery-ui'], function ($, xm, l10n, reorderControls) {
     class XDataEditors {
       constructor() {
         let self = this;
@@ -720,7 +727,7 @@
       /* Class editor: xproperty ordering */
       makeSortable(element) {
         if (element.length > 0) {
-          // Hide the property number, as ordering can be done by drag and drop
+          // Hide the property number, as ordering can be done by drag and drop or with the move buttons
           element.find('.xproperty-content').each(function () {
             let item = $(this);
             item.find("input").each(function () {
@@ -734,33 +741,52 @@
               }
             });
           });
-          // Create and insert move button
-          element.find('.xproperty-title .tools').each(function () {
-            let item = $(this);
-            let movebutton = $('<span>', {
-              'class': 'tool move',
-              title: l10n['class.moveProperty.handle.label']
-            }).html(icons['reposition']);
-            item.css('position', 'relative');
-            item.append(movebutton);
-            movebutton.on('click', function (event) {
-              event.stopPropagation();
-            });
-          });
           let self = this;
+          // Create and insert the move up and move down buttons, which reorder the properties both with a single
+          // click and with the arrow keys.
+          reorderControls(element, {
+            item: '.xproperty',
+            buttonContainer: '.xproperty-title .tools',
+            buttonClass: 'tool move',
+            icons: {
+              up: icons['up'],
+              down: icons['down']
+            },
+            labels: function (item, direction) {
+              let propertyName = item.attr('id').substring('xproperty_'.length);
+              return {
+                text: l10n['class.moveProperty.' + direction + '.text'],
+                title: l10n.get('class.moveProperty.' + direction + '.tooltip', propertyName)
+              };
+            },
+            onMove: function () {
+              self.updateOrder($('#xclassContent'));
+            },
+            announce: function (item, newIndex, itemCount) {
+              return l10n.get('class.moveProperty.moved', newIndex + 1, itemCount);
+            },
+            announceBoundary: function (item, direction) {
+              return l10n['class.moveProperty.' + direction + '.boundary'];
+            }
+          });
+          // The cancel option is left to its default value on purpose: that value excludes buttons, which is what
+          // keeps a drag from ever starting on a move button. A click or a tap that drifts by a pixel has to stay
+          // a click, otherwise the buttons stop being an alternative to dragging.
           $('#xclassContent').sortable({
             cursor: 'move',
             items: '.xproperty',
             start: self.startDrag,
             stop: self.endDrag,
-            update: self.updateOrder
+            update: function () {
+              self.updateOrder(this);
+            }
           });
         }
       }
 
-      updateOrder() {
+      updateOrder(container) {
         let i = 1;
-        $(this).find(".xproperty-content").each(function () {
+        $(container).find(".xproperty-content").each(function () {
           let item = $(this);
           // the numberProperty data is actually a reference to an input.
           item.data('numberProperty').val(i++);

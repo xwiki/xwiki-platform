@@ -2061,7 +2061,7 @@ public class XWiki implements EventListener
      * @param context see {@link XWikiContext}
      * @since 17.10.13
      * @since 18.4.5
-     * @since 18.8.0-rc-1
+     * @since 18.8.0RC1
      */
     public void saveDocument(XWikiDocument document, String comment, boolean isMinorEdit, boolean modifiedByContextUser,
         XWikiContext context) throws XWikiException

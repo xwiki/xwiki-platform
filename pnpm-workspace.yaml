@@ -136,7 +136,7 @@ catalog:
   npm-package-json-lint: 10.5.1
   npm-run-all: 4.1.5
   npm-run-all2: 9.0.3
-  nx: 23.1.1
+  nx: 23.1.2
   pinia: 4.0.3
   postcss: 8.5.26
   postcss-preset-mantine: 1.18.0

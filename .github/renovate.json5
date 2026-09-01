@@ -75,6 +75,16 @@
       "matchDatasources": ["npm"],
       "groupName": "blocknote",
       "matchDepPatterns": "@blocknote/.+"
+    },
+    {
+      "matchDatasources": ["npm"],
+      "groupName": "playwright",
+      "matchDepPatterns": "@playwright/.+"
+    },
+    {
+      "matchDatasources": ["npm"],
+      "groupName": "mantine",
+      "matchDepPatterns": "@mantine/.+"
     }
   ]
 }

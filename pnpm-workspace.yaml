@@ -79,8 +79,8 @@ catalog:
   "@eslint/config-helpers": 0.7.0
   "@eslint/js": 10.0.1
   "@jridgewell/remapping": 2.3.5
-  "@mantine/core": 9.4.1
-  "@mantine/hooks": 9.4.1
+  "@mantine/core": 9.5.2
+  "@mantine/hooks": 9.5.2
   "@microsoft/api-extractor": 7.59.0
   "@oxc-project/runtime": 0.139.0
   "@playwright/experimental-ct-react": 1.61.1

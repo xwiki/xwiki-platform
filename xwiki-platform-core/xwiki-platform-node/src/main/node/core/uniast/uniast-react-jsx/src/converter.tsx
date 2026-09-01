@@ -26,7 +26,12 @@ import type {
   RemoteURLParser,
   RemoteURLSerializer,
 } from "@xwiki/platform-model-remote-url-api";
-import type { Block, BlockStyles, InlineContent, LinkTarget } from "@xwiki/platform-uniast-api";
+import type {
+  Block,
+  BlockStyles,
+  InlineContent,
+  LinkTarget,
+} from "@xwiki/platform-uniast-api";
 import type {
   CSSProperties,
   HTMLAttributes,
@@ -154,7 +159,6 @@ export class UniAstToReactJsxConverter {
     });
   }
 
-  // eslint-disable-next-line max-statements
   private convertBlock(
     block: Block,
     editableZoneRef: MacroEditableZoneRef,
@@ -190,7 +194,7 @@ export class UniAstToReactJsxConverter {
               const childKey = `${key}.${i}`;
 
               return (
-                <li key={childKey} value={item.number}>
+                <li key={childKey}>
                   {item.checked !== undefined && (
                     <input type="checkbox" checked={item.checked} readOnly />
                   )}

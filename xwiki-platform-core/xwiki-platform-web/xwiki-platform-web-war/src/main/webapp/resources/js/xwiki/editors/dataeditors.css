@@ -223,8 +223,10 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
   font-weight: 900;
 }
 
+/* The right padding leaves room for the focus indicator of the last tool, which the hidden overflow would cut off. */
 .xproperty-title .tools {
   align-self: center;
+  padding-right: 3px;
 }
 
 .xproperty-title .tools .tool {
@@ -235,8 +237,14 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
 }
 
 .xproperty-title .tools .move {
-  cursor: move;
   color: $theme.linkColor;
+}
+
+/* The move tools are buttons, so their default border and padding have to be removed to align them with the other
+tools. The background is already reset by the rule above. */
+.xproperty-title .tools button.tool {
+  border: none;
+  padding: 0;
 }
 
 .xproperty-title .tools .delete {

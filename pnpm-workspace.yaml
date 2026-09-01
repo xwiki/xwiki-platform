@@ -102,7 +102,7 @@ catalog:
   "@vue/compiler-dom": 3.5.41
   "@vue/eslint-config-prettier": 10.2.0
   "@vue/eslint-config-typescript": 14.9.0
-  "@vue/test-utils": 2.4.11
+  "@vue/test-utils": 2.5.0
   "@vue/tsconfig": 0.9.1
   axe-core: 4.13.0
   bootstrap-icons: 1.13.1

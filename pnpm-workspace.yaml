@@ -160,7 +160,7 @@ catalog:
   vite: 8.2.2
   vite-plugin-css-injected-by-js: 5.0.2
   vite-plugin-dts: 4.5.4
-  vitest: 4.1.6
+  vitest: 4.1.11
   vitest-mock-extended: 5.1.1
   vue: 3.5.42
   vue-eslint-parser: 10.4.1

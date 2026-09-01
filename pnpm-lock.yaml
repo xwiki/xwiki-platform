@@ -268,8 +268,8 @@ catalogs:
       specifier: 4.5.4
       version: 4.5.4
     vitest:
-      specifier: 4.1.6
-      version: 4.1.6
+      specifier: 4.1.11
+      version: 4.1.11
     vitest-mock-extended:
       specifier: 5.1.1
       version: 5.1.1
@@ -455,7 +455,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -580,7 +580,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -658,7 +658,7 @@ importers:
         version: 6.0.8(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))(vue@3.5.42(typescript@5.9.3))
       '@vitest/eslint-plugin':
         specifier: 'catalog:'
-        version: 1.6.23(@typescript-eslint/eslint-plugin@8.68.0(@typescript-eslint/parser@8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3))(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3))(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
+        version: 1.6.23(@typescript-eslint/eslint-plugin@8.68.0(@typescript-eslint/parser@8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3))(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3))(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
       '@vue/eslint-config-prettier':
         specifier: 'catalog:'
         version: 10.2.0(eslint@10.9.1(jiti@2.7.0))(prettier@3.6.2)
@@ -703,7 +703,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -755,7 +755,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node:
     devDependencies:
@@ -782,7 +782,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/api:
     dependencies:
@@ -828,7 +828,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -877,7 +877,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -944,10 +944,10 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -983,7 +983,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/backends/backend-api:
     dependencies:
@@ -1026,7 +1026,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/collaboration/collaboration-api:
     dependencies:
@@ -1087,7 +1087,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -1157,7 +1157,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -1200,7 +1200,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/component/component-annotation/component-annotation-inversify:
     dependencies:
@@ -1240,7 +1240,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-api:
     devDependencies:
@@ -1273,7 +1273,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-default:
     dependencies:
@@ -1316,7 +1316,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/component/component-manager/component-manager-inversify:
     dependencies:
@@ -1359,7 +1359,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/configuration/configuration-api:
     dependencies:
@@ -1393,7 +1393,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/document/document-api:
     dependencies:
@@ -1439,7 +1439,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -1485,7 +1485,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -1524,7 +1524,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/hierarchy/hierarchy-api:
     dependencies:
@@ -1564,7 +1564,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/hierarchy/hierarchy-xwiki:
     dependencies:
@@ -1628,7 +1628,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/icons:
     dependencies:
@@ -1674,7 +1674,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -1762,10 +1762,10 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -1814,7 +1814,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-suggest/link-suggest-xwiki:
     dependencies:
@@ -1869,7 +1869,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/livedata/livedata-api:
     devDependencies:
@@ -1902,7 +1902,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -1944,7 +1944,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -2035,7 +2035,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -2096,7 +2096,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue-i18n:
         specifier: 'catalog:'
         version: 11.4.10(vue@3.5.42(typescript@5.9.3))
@@ -2139,10 +2139,10 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -2178,7 +2178,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-default:
     dependencies:
@@ -2218,10 +2218,10 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-resolvers/localization-resolver-xwiki-rest:
     dependencies:
@@ -2261,10 +2261,10 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-api:
     devDependencies:
@@ -2300,7 +2300,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx:
     dependencies:
@@ -2355,10 +2355,10 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-service:
     dependencies:
@@ -2401,10 +2401,10 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-api:
     devDependencies:
@@ -2440,7 +2440,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api:
     dependencies:
@@ -2489,7 +2489,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api:
     dependencies:
@@ -2538,7 +2538,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api:
     dependencies:
@@ -2578,7 +2578,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/rendering/rendering-api:
     devDependencies:
@@ -2620,7 +2620,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/markdown:
     dependencies:
@@ -2660,7 +2660,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/minimal:
     dependencies:
@@ -2700,7 +2700,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/syntaxes-config:
     dependencies:
@@ -2734,7 +2734,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/syntaxes/xwiki:
     dependencies:
@@ -2774,7 +2774,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/test/accessibility:
     dependencies:
@@ -2786,7 +2786,7 @@ importers:
         version: 4.13.0
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -2848,7 +2848,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown:
     dependencies:
@@ -2936,10 +2936,10 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown-xwiki:
     dependencies:
@@ -2979,7 +2979,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-utils:
     dependencies:
@@ -3016,7 +3016,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/dev/config:
     devDependencies:
@@ -3034,7 +3034,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-headless:
     dependencies:
@@ -3128,10 +3128,10 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -3288,10 +3288,10 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)))
       vue-tsc:
         specifier: 'catalog:'
         version: 3.3.11(typescript@5.9.3)
@@ -3433,7 +3433,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vue:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
@@ -4727,11 +4727,11 @@ packages:
       vitest:
         optional: true
 
-  '@vitest/expect@4.1.6':
-    resolution: {integrity: sha512-7EHDquPthALSV0jhhjgEW8FXaviMx7rSqu8W6oqCoAuOhKov814P99QDV1pxMA3QPv21YudvJngIhjrNI4opLg==}
+  '@vitest/expect@4.1.11':
+    resolution: {integrity: sha512-VX2x5vNJXET47KAFzwERI+KRMtTTCSWTfSMKsW7JsUsXV4psq++e3DvZpuTDOpHcxytiDs6p2nhVb2tVDiiUYw==}
 
-  '@vitest/mocker@4.1.6':
-    resolution: {integrity: sha512-MCFc63czMjEInOlcY2cpQCvCN+KgbAn+60xu9cMgP4sKaLC5JNAKw7JH8QdAnoAC88hW1IiSNZ+GgVXlN1UcMQ==}
+  '@vitest/mocker@4.1.11':
+    resolution: {integrity: sha512-2XJVD55d1o5AZous5CCGKS74g/riOj9odEt2bQpCVZeblHyHdnMeFl4jl0XjU21stf4mbjUkew2eXQZt65g5CQ==}
     peerDependencies:
       msw: ^2.4.9
       vite: ^6.0.0 || ^7.0.0 || ^8.0.0
@@ -4741,20 +4741,20 @@ packages:
       vite:
         optional: true
 
-  '@vitest/pretty-format@4.1.6':
-    resolution: {integrity: sha512-h5SxD/IzNhZYnrSZRsUZQIC+vD0GY8cUvq0iwsmkFKixRCKLLWqCXa/FIQ4S1R+sI+PGoojkHsdNrbZiM9Qpgw==}
+  '@vitest/pretty-format@4.1.11':
+    resolution: {integrity: sha512-yiZzPbGTS9Sr/JpFl8zHrcIkAofNbFV6k21vIgQN/cY/oxZeXhJv5sc/MBJ5jFKWmWs+oJHw0UXLZjmf931+Vw==}
 
-  '@vitest/runner@4.1.6':
-    resolution: {integrity: sha512-nOPCmn2+yD0ZNmKdsXGv/UxMMWbMuKeD6GyYncNwdkYDxpQvrPSKYj2rWuDjC2Y4b6w6hjip5dBKFzEUuZe3vA==}
+  '@vitest/runner@4.1.11':
+    resolution: {integrity: sha512-LztvUgdwMNJMIkj3hQnnxiC2Xy1zNxq928W/xhjCLaNCzqTZOudjwbQf6v9IntZGPw132i2Lq2rgTRZHD3JHNw==}
 
-  '@vitest/snapshot@4.1.6':
-    resolution: {integrity: sha512-YhsdE6xAVfTDmzjxL2ZDUvjj+ZsgyOKe+TdQzqkD72wIOmHka8NuGQ6NpTNZv9D2Z63fbwWKJPeVpEw4EQgYxw==}
+  '@vitest/snapshot@4.1.11':
+    resolution: {integrity: sha512-pN7ikn1ON7h8ee4gIAp4AzyK+zBtJPzVbqOgu5LCEh4VaJVbPQcgYQYJIMGQPXVeJJq1fnfazis7a5pFNPahog==}
 
-  '@vitest/spy@4.1.6':
-    resolution: {integrity: sha512-JFKxMx6udhwKh/Ldo270e17QX710vgunMkuPAvXjHSvC6oqLWAHhVhjg/I71q0u0CBSErIODV1Kjv0FQNSWjdg==}
+  '@vitest/spy@4.1.11':
+    resolution: {integrity: sha512-apNa/prQy2qCeywhnixOHPRCgGNhvg7T4Dapfl1GahLp/R+uhBm5cPyFoNVyqsNd2h1nJxL6BqqdIjiABL60YA==}
 
-  '@vitest/utils@4.1.6':
-    resolution: {integrity: sha512-FxIY+U81R3LGKCxaHHFRQ5+g6/iRgGLmeHWdp2Amj4ljQRrEIWHmZyDfDYBRZlpyqA7qKxtS9DD1dhk8RnRIVQ==}
+  '@vitest/utils@4.1.11':
+    resolution: {integrity: sha512-zTCVGpyFsGWBhllOyKlTw/vnr6D9qxsfSDyfbyZmTyjHw5N/VuvzHpHoQjm2ZJzn4RJgx5w4r7V0er69CmLgPQ==}
 
   '@volar/language-core@2.4.28':
     resolution: {integrity: sha512-w4qhIJ8ZSitgLAkVay6AbcnC7gP3glYM3fYwKV3srj8m494E3xtrCv6E+bWviiK/8hs6e6t1ij1s2Endql7vzQ==}
@@ -7512,20 +7512,20 @@ packages:
       typescript: 3.x || 4.x || 5.x || 6.x || 7.x
       vitest: '>=4.0.0'
 
-  vitest@4.1.6:
-    resolution: {integrity: sha512-6lvjbS3p9b4CrdCmguzbh2/4uoXhGE2q71R4OX5sqF9R1bo9Xd6fGrMAfvp5wnCzlBnFVdCOp6onuTQVbo8iUQ==}
+  vitest@4.1.11:
+    resolution: {integrity: sha512-fhACrNXUidIbGSBr5FlbuBkO7VWC1ZyLl0DO4CU2DrQoAPxX84Ysxs+HeGQpii5lZWV1Q4gBZTTu49mF+A6Edw==}
     engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@opentelemetry/api': ^1.9.0
       '@types/node': ^20.0.0 || ^22.0.0 || >=24.0.0
-      '@vitest/browser-playwright': 4.1.6
-      '@vitest/browser-preview': 4.1.6
-      '@vitest/browser-webdriverio': 4.1.6
-      '@vitest/coverage-istanbul': 4.1.6
-      '@vitest/coverage-v8': 4.1.6
-      '@vitest/ui': 4.1.6
+      '@vitest/browser-playwright': 4.1.11
+      '@vitest/browser-preview': 4.1.11
+      '@vitest/browser-webdriverio': 4.1.11
+      '@vitest/coverage-istanbul': 4.1.11
+      '@vitest/coverage-v8': 4.1.11
+      '@vitest/ui': 4.1.11
       happy-dom: '*'
       jsdom: '*'
       vite: ^6.0.0 || ^7.0.0 || ^8.0.0
@@ -8990,7 +8990,7 @@ snapshots:
       vite: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vue: 3.5.42(typescript@5.9.3)
 
-  '@vitest/eslint-plugin@1.6.23(@typescript-eslint/eslint-plugin@8.68.0(@typescript-eslint/parser@8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3))(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3))(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))':
+  '@vitest/eslint-plugin@1.6.23(@typescript-eslint/eslint-plugin@8.68.0(@typescript-eslint/parser@8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3))(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3))(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))':
     dependencies:
       '@typescript-eslint/scope-manager': 8.68.0
       '@typescript-eslint/utils': 8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
@@ -8998,56 +8998,56 @@ snapshots:
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 8.68.0(@typescript-eslint/parser@8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3))(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
       typescript: 5.9.3
-      vitest: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+      vitest: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/expect@4.1.6':
+  '@vitest/expect@4.1.11':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@types/chai': 5.2.3
-      '@vitest/spy': 4.1.6
-      '@vitest/utils': 4.1.6
+      '@vitest/spy': 4.1.11
+      '@vitest/utils': 4.1.11
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.6(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))':
+  '@vitest/mocker@4.1.11(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))':
     dependencies:
-      '@vitest/spy': 4.1.6
+      '@vitest/spy': 4.1.11
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
       vite: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)
 
-  '@vitest/mocker@4.1.6(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))':
+  '@vitest/mocker@4.1.11(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))':
     dependencies:
-      '@vitest/spy': 4.1.6
+      '@vitest/spy': 4.1.11
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
       vite: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
 
-  '@vitest/pretty-format@4.1.6':
+  '@vitest/pretty-format@4.1.11':
     dependencies:
       tinyrainbow: 3.1.0
 
-  '@vitest/runner@4.1.6':
+  '@vitest/runner@4.1.11':
     dependencies:
-      '@vitest/utils': 4.1.6
+      '@vitest/utils': 4.1.11
       pathe: 2.0.3
 
-  '@vitest/snapshot@4.1.6':
+  '@vitest/snapshot@4.1.11':
     dependencies:
-      '@vitest/pretty-format': 4.1.6
-      '@vitest/utils': 4.1.6
+      '@vitest/pretty-format': 4.1.11
+      '@vitest/utils': 4.1.11
       magic-string: 0.30.21
       pathe: 2.0.3
 
-  '@vitest/spy@4.1.6': {}
+  '@vitest/spy@4.1.11': {}
 
-  '@vitest/utils@4.1.6':
+  '@vitest/utils@4.1.11':
     dependencies:
-      '@vitest/pretty-format': 4.1.6
+      '@vitest/pretty-format': 4.1.11
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
@@ -12230,27 +12230,27 @@ snapshots:
       sugarss: 5.0.1(postcss@8.5.26)
       yaml: 2.9.0
 
-  vitest-mock-extended@5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))):
+  vitest-mock-extended@5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))):
     dependencies:
       ts-essentials: 10.2.1(typescript@5.9.3)
       typescript: 5.9.3
-      vitest: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))
+      vitest: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))
 
-  vitest-mock-extended@5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))):
+  vitest-mock-extended@5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))):
     dependencies:
       ts-essentials: 10.2.1(typescript@5.9.3)
       typescript: 5.9.3
-      vitest: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+      vitest: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
 
-  vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)):
+  vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0)):
     dependencies:
-      '@vitest/expect': 4.1.6
-      '@vitest/mocker': 4.1.6(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))
-      '@vitest/pretty-format': 4.1.6
-      '@vitest/runner': 4.1.6
-      '@vitest/snapshot': 4.1.6
-      '@vitest/spy': 4.1.6
-      '@vitest/utils': 4.1.6
+      '@vitest/expect': 4.1.11
+      '@vitest/mocker': 4.1.11(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.24))(yaml@2.9.0))
+      '@vitest/pretty-format': 4.1.11
+      '@vitest/runner': 4.1.11
+      '@vitest/snapshot': 4.1.11
+      '@vitest/spy': 4.1.11
+      '@vitest/utils': 4.1.11
       es-module-lexer: 2.1.0
       expect-type: 1.3.0
       magic-string: 0.30.21
@@ -12271,15 +12271,15 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-  vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)):
+  vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)):
     dependencies:
-      '@vitest/expect': 4.1.6
-      '@vitest/mocker': 4.1.6(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
-      '@vitest/pretty-format': 4.1.6
-      '@vitest/runner': 4.1.6
-      '@vitest/snapshot': 4.1.6
-      '@vitest/spy': 4.1.6
-      '@vitest/utils': 4.1.6
+      '@vitest/expect': 4.1.11
+      '@vitest/mocker': 4.1.11(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+      '@vitest/pretty-format': 4.1.11
+      '@vitest/runner': 4.1.11
+      '@vitest/snapshot': 4.1.11
+      '@vitest/spy': 4.1.11
+      '@vitest/utils': 4.1.11
       es-module-lexer: 2.1.0
       expect-type: 1.3.0
       magic-string: 0.30.21

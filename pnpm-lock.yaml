@@ -85,8 +85,8 @@ catalogs:
       specifier: 1.6.23
       version: 1.6.23
     '@vue/compiler-dom':
-      specifier: 3.5.41
-      version: 3.5.41
+      specifier: 3.5.42
+      version: 3.5.42
     '@vue/eslint-config-prettier':
       specifier: 10.2.0
       version: 10.2.0
@@ -425,7 +425,7 @@ importers:
         version: 6.0.8(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))(vue@3.5.42(typescript@5.9.3))
       '@vue/test-utils':
         specifier: 'catalog:'
-        version: 2.5.0(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
+        version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
       '@vue/tsconfig':
         specifier: 'catalog:'
         version: 0.9.1(typescript@5.9.3)(vue@3.5.42(typescript@5.9.3))
@@ -550,7 +550,7 @@ importers:
         version: 2.1.37
       '@vue/test-utils':
         specifier: 'catalog:'
-        version: 2.5.0(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
+        version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../../../xwiki-platform-node/src/main/node/dev/config
@@ -667,7 +667,7 @@ importers:
         version: 14.9.0(eslint-plugin-vue@10.10.0(@typescript-eslint/parser@8.68.0(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3))(eslint@10.9.1(jiti@2.7.0))(vue-eslint-parser@10.4.1(eslint@10.9.1(jiti@2.7.0))))(eslint@10.9.1(jiti@2.7.0))(typescript@5.9.3)
       '@vue/test-utils':
         specifier: 'catalog:'
-        version: 2.5.0(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
+        version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
       '@vue/tsconfig':
         specifier: 'catalog:'
         version: 0.9.1(typescript@5.9.3)(vue@3.5.42(typescript@5.9.3))
@@ -1644,7 +1644,7 @@ importers:
         version: 7.59.0(@types/node@24.13.3)
       '@vue/test-utils':
         specifier: 'catalog:'
-        version: 2.5.0(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
+        version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -1914,7 +1914,7 @@ importers:
         version: 7.59.0(@types/node@24.13.3)
       '@vue/test-utils':
         specifier: 'catalog:'
-        version: 2.5.0(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
+        version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1987,7 +1987,7 @@ importers:
         version: 4.0.1
       '@vue/test-utils':
         specifier: 'catalog:'
-        version: 2.5.0(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
+        version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2112,7 +2112,7 @@ importers:
         version: 7.59.0(@types/node@24.13.3)
       '@vue/test-utils':
         specifier: 'catalog:'
-        version: 2.5.0(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
+        version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../../dev/config
@@ -2780,7 +2780,7 @@ importers:
     dependencies:
       '@vue/test-utils':
         specifier: 'catalog:'
-        version: 2.5.0(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
+        version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
       axe-core:
         specifier: 'catalog:'
         version: 4.13.0
@@ -3089,7 +3089,7 @@ importers:
         version: 4.17.12
       '@vue/compiler-dom':
         specifier: 'catalog:'
-        version: 3.5.41
+        version: 3.5.42
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -3403,7 +3403,7 @@ importers:
         version: 6.0.8(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))(vue@3.5.42(typescript@5.9.3))
       '@vue/test-utils':
         specifier: 'catalog:'
-        version: 2.5.0(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
+        version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))
       '@vue/tsconfig':
         specifier: 'catalog:'
         version: 0.9.1(typescript@5.9.3)(vue@3.5.42(typescript@5.9.3))
@@ -9178,9 +9178,9 @@ snapshots:
   '@vue/language-core@2.2.0(typescript@5.9.3)':
     dependencies:
       '@volar/language-core': 2.4.28
-      '@vue/compiler-dom': 3.5.41
+      '@vue/compiler-dom': 3.5.42
       '@vue/compiler-vue2': 2.7.16
-      '@vue/shared': 3.5.41
+      '@vue/shared': 3.5.42
       alien-signals: 0.4.14
       minimatch: 9.0.5
       muggle-string: 0.4.1
@@ -9191,8 +9191,8 @@ snapshots:
   '@vue/language-core@3.3.11':
     dependencies:
       '@volar/language-core': 2.4.28
-      '@vue/compiler-dom': 3.5.41
-      '@vue/shared': 3.5.41
+      '@vue/compiler-dom': 3.5.42
+      '@vue/shared': 3.5.42
       alien-signals: 3.2.1
       muggle-string: 0.4.1
       path-browserify: 1.0.1
@@ -9224,9 +9224,9 @@ snapshots:
 
   '@vue/shared@3.5.42': {}
 
-  '@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))':
+  '@vue/test-utils@2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@5.9.3))':
     dependencies:
-      '@vue/compiler-dom': 3.5.41
+      '@vue/compiler-dom': 3.5.42
       js-beautify: 2.0.3
       vue: 3.5.42(typescript@5.9.3)
       vue-component-type-helpers: 3.2.8

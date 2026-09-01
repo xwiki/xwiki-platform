@@ -52,7 +52,7 @@ public class ObjectAddAction extends XWikiAction
      * A pattern that matches the {@code xobjectNumber} request parameter which is used to pass the number of the added
      * object to the redirect URL.
      */
-    private static final Pattern XOBJECT_NUMBER_PARAMETER = Pattern.compile("(\\?|&)xobjectNumber=?(&|#|$)");
+    private static final Pattern XOBJECT_NUMBER_PARAMETER = Pattern.compile("([?&])xobjectNumber=?(&|#|$)");
 
     /**
      * Used to resolve XClass references.

@@ -233,9 +233,7 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.velocity.VelocityEvaluator;
 import com.xpn.xwiki.job.JobRequestContext;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
@@ -3465,7 +3463,7 @@ public class XWiki implements EventListener
             String accept = context.getRequest().getHeader("Accept-Language");
             if ((accept != null) && (!accept.isEmpty())) {
                 String[] alist = StringUtils.split(accept, ",;-");
-                if ((alist != null) && !(alist.length == 0)) {
+                if ((alist != null) && (alist.length != 0)) {
                     context.setLanguage(alist[0]);
                     navigatorLanguage = alist[0];
                 }
@@ -3572,7 +3570,7 @@ public class XWiki implements EventListener
             String accept = context.getRequest().getHeader("Accept-Language");
             if ((accept != null) && (!accept.isEmpty())) {
                 String[] alist = StringUtils.split(accept, ",;-");
-                if ((alist != null) && !(alist.length == 0)) {
+                if ((alist != null) && (alist.length != 0)) {
                     context.setLanguage(alist[0]);
                     navigatorLanguage = alist[0];
                 }

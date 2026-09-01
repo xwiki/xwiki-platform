@@ -39,7 +39,6 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-default
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/localization/localization-resolvers/localization-resolver-xwiki-rest
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-api
-  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-service
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
@@ -54,6 +53,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown-xwiki
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-react-jsx
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-utils
   - xwiki-platform-core/xwiki-platform-node/src/main/node/dev/config
   - xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-headless

@@ -114,6 +114,14 @@ export class DefaultUniAstToMarkdownConverter
 
       case "macroBlock":
         return this.convertMacro(block.call);
+
+      case "rawHtml":
+        throw new Error("Raw HTML is not representable in Markdown");
+
+      case "macroBlockEditableArea":
+        throw new Error(
+          "Macro editable-area blocks are not representable in Markdown",
+        );
     }
   }
 
@@ -202,6 +210,12 @@ export class DefaultUniAstToMarkdownConverter
         return this.convertLink(inlineContent);
       case "inlineMacro":
         return this.convertMacro(inlineContent.call);
+      case "rawHtml":
+        throw new Error("Raw HTML is not representable in Markdown");
+      case "inlineMacroEditableArea":
+        throw new Error(
+          "Macro editable-area inline content is not representable in Markdown",
+        );
     }
   }
 

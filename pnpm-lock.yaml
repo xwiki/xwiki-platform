@@ -34,8 +34,8 @@ catalogs:
       specifier: 7.59.0
       version: 7.59.0
     '@oxc-project/runtime':
-      specifier: 0.139.0
-      version: 0.139.0
+      specifier: 0.147.0
+      version: 0.147.0
     '@playwright/experimental-ct-react':
       specifier: 1.62.1
       version: 1.62.1
@@ -507,7 +507,7 @@ importers:
     devDependencies:
       '@oxc-project/runtime':
         specifier: 'catalog:'
-        version: 0.139.0
+        version: 0.147.0
       '@xwiki/platform-tool-eslintconfig':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/tools/tool-eslintconfig
@@ -4024,8 +4024,8 @@ packages:
   '@one-ini/wasm@0.1.1':
     resolution: {integrity: sha512-XuySG1E38YScSJoMlqovLru4KTUNSjgVTIjyh7qMX6aNN5HY5Ct5LhRJdxO79JtTzKfzV/bnWpz+zquYrISsvw==}
 
-  '@oxc-project/runtime@0.139.0':
-    resolution: {integrity: sha512-WnuGdceWtRdqD7f3alOIDXN6bnGuGtFjtQf/dHjzgn2im7eKaYRJTEl2T1kFEWPhBWCDk+UDYgsTLUE5L6jc0w==}
+  '@oxc-project/runtime@0.147.0':
+    resolution: {integrity: sha512-vAYDOvumvPwsx0GSoHj+h1qCarq2f9RmfGk3deWBJTtRUDSqvvja5x+q5bUbs7a7CgVPiQDEIx+a5fBtVIQNdA==}
     engines: {node: ^20.19.0 || >=22.12.0}
 
   '@oxc-project/types@0.139.0':
@@ -8443,7 +8443,7 @@ snapshots:
 
   '@one-ini/wasm@0.1.1': {}
 
-  '@oxc-project/runtime@0.139.0': {}
+  '@oxc-project/runtime@0.147.0': {}
 
   '@oxc-project/types@0.139.0': {}
 

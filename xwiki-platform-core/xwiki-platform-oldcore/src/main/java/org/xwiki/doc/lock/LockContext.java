@@ -77,7 +77,8 @@ public interface LockContext
     Locale getRealLocale();
 
     /**
-     * @return the edit mode that is going to be used to edit the specified document translation
+     * @return the edit mode that is going to be used to edit the specified document translation, or {@code null} if
+     *         that edit mode is not one of the {@link EditMode} values (e.g. the object editor)
      */
     EditMode getEditMode();
 

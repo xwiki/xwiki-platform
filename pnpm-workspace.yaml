@@ -84,7 +84,7 @@ catalog:
   "@microsoft/api-extractor": 7.59.0
   "@oxc-project/runtime": 0.139.0
   "@playwright/experimental-ct-react": 1.61.1
-  "@playwright/experimental-ct-vue": 1.61.1
+  "@playwright/experimental-ct-vue": 1.62.1
   "@playwright/test": 1.61.1
   "@tsconfig/node24": 24.0.5
   "@types/jquery": 4.0.1

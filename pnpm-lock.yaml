@@ -2285,45 +2285,6 @@ importers:
         version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-api:
-<<<<<<< HEAD
-    devDependencies:
-      '@microsoft/api-extractor':
-        specifier: 'catalog:'
-        version: 7.59.0(@types/node@24.13.3)
-      '@xwiki/platform-dev-config':
-        specifier: workspace:*
-        version: link:../../../dev/config
-      '@xwiki/platform-tool-apiextractorconfig':
-        specifier: workspace:*
-        version: link:../../../tools/tool-apiextractorconfig
-      '@xwiki/platform-tool-tsconfig':
-        specifier: workspace:*
-        version: link:../../../tools/tool-tsconfig
-      '@xwiki/platform-tool-tsdocconfig':
-        specifier: workspace:*
-        version: link:../../../tools/tool-tsdocconfig
-      '@xwiki/platform-tool-viteconfig':
-        specifier: workspace:*
-        version: link:../../../tools/tool-viteconfig
-      eslint:
-        specifier: 'catalog:'
-        version: 10.9.1(jiti@2.7.0)
-      jsdom:
-        specifier: 'catalog:'
-        version: 29.1.1
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-      vite:
-        specifier: 'catalog:'
-        version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
-      vitest:
-        specifier: 'catalog:'
-        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
-
-  xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx:
-=======
->>>>>>> a3c0a00bf6d (XWIKI-24402: Remove macros AST from BlockNote)
     dependencies:
       '@xwiki/platform-uniast-api':
         specifier: workspace:*
@@ -2332,12 +2293,6 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.59.0(@types/node@24.13.3)
-<<<<<<< HEAD
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.18
-=======
->>>>>>> a3c0a00bf6d (XWIKI-24402: Remove macros AST from BlockNote)
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2367,14 +2322,7 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-<<<<<<< HEAD
         version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
-      vitest-mock-extended:
-        specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
-=======
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
->>>>>>> a3c0a00bf6d (XWIKI-24402: Remove macros AST from BlockNote)
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-service:
     dependencies:
@@ -3050,7 +2998,7 @@ importers:
         version: 7.59.0(@types/node@24.13.3)
       '@types/react':
         specifier: 'catalog:'
-        version: 19.2.17
+        version: 19.2.18
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -3086,10 +3034,10 @@ importers:
         version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)
       vitest:
         specifier: 'catalog:'
-        version: 4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
+        version: 4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0))
       vitest-mock-extended:
         specifier: 'catalog:'
-        version: 5.1.1(typescript@5.9.3)(vitest@4.1.6(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
+        version: 5.1.1(typescript@5.9.3)(vitest@4.1.11(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@29.1.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(yaml@2.9.0)))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-utils:
     dependencies:
@@ -4893,26 +4841,14 @@ packages:
       vue:
         optional: true
 
-  '@vue/compiler-core@3.5.41':
-    resolution: {integrity: sha512-q0Xtv/F9w2YO/7htQhtiL+Ev2WCJbe5N2hc+XfgyKkEKqWpSxknmT8QOuGdEKNdjPq0c3F7rNpFkTo3Kfrm7pg==}
-
   '@vue/compiler-core@3.5.42':
     resolution: {integrity: sha512-2Ye1ilMtKXxl8qZUrQ5j0CdgenFp/HFQmta6rfRyfEsTG69L6Wk+tWuNoHYHMx9E8tF2Slvdg1FuwDvAXdy1LQ==}
-
-  '@vue/compiler-dom@3.5.41':
-    resolution: {integrity: sha512-oKacVfNglLvGjnS6BXOlGL7EyG2h8X03pqXCjzotRZUaXGjbrTJUnVAQjrCqUnS+lyu31nwQjZY/d817GmCnfw==}
 
   '@vue/compiler-dom@3.5.42':
     resolution: {integrity: sha512-qbhQZEFmycr+ni/qyuccS4sucNN7VAbDfbkvNxWOX2VfgFm90MNs3/UhRNKoPMEIVn0F8gdlYjLPvqxHwHeQOA==}
 
-  '@vue/compiler-sfc@3.5.41':
-    resolution: {integrity: sha512-XJhip7R2wy6vX3knCxdZN4KracFaZUef58s1KYewqluedHIJaPIVfXoYT7MF1F8nCvv6k8bWWxDC8opMkg1VTQ==}
-
   '@vue/compiler-sfc@3.5.42':
     resolution: {integrity: sha512-fkCAFB4okcAANGMThboWnScp/gzWjU0ZSkVnjTIiplmMDq2uq0tIB3j+xVu4rhv5rvOgBySCysudmbMd6xRRqw==}
-
-  '@vue/compiler-ssr@3.5.41':
-    resolution: {integrity: sha512-U3v5OejKEGqOI0Wy0+Sz7hGuIFZHA4LSXzrNM3IMIeDyJEBBfTpX26n3SDgToRpP2bLc9FfI2j/kSgcJ8Emq5A==}
 
   '@vue/compiler-ssr@3.5.42':
     resolution: {integrity: sha512-xmLk3wLkbizPAiLyomjgFFosf2ys9b5Ghb+oh/k2tnvipNz8OFrQOiTcWCzyK7MpBp9KkyGtfvgfLUivbmuGYA==}
@@ -4972,9 +4908,6 @@ packages:
 
   '@vue/server-renderer@3.5.42':
     resolution: {integrity: sha512-2++5dUyYS4gvo7xQXSECUDhB7TS0aOl5SeVfC5qSq1Jgfhjvegw1zqhwTIR3imZ+QYPJQw9gfcFvXGAjGZ7ajQ==}
-
-  '@vue/shared@3.5.41':
-    resolution: {integrity: sha512-IOnwSCma8j+9xJT6b8H0dEYidC80NsYmNMlZxRsukYcSoGaDBohog5hDxzeUXdFeGWFA++vWvxqOmrr96VlqMA==}
 
   '@vue/shared@3.5.42':
     resolution: {integrity: sha512-2rPxex1jQf4jvl9MOHl6YaXCPcrNqz/FstMOEh3QWY+/OME9nQTvl9WYeCwhW7AFjaR0SnngZGlp/wkR6rkI6g==}
@@ -5165,10 +5098,6 @@ packages:
 
   brace-expansion@2.0.2:
     resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
-
-  brace-expansion@5.0.8:
-    resolution: {integrity: sha512-JZyDyq3D4AUifKTPOB7DELf6XsB3WdPuNxCtob1vFXPsSXhdAiHBWJ/tJ8HAc9aH84BK+5JFZLNkJKx3G9kzQg==}
-    engines: {node: 20 || >=22}
 
   brace-expansion@5.0.9:
     resolution: {integrity: sha512-ScQ4IuvIEF1TMlP7Zt+vjJ//9zlPb2SDcxWxM3bk8s6t6GGdJ7KO1dCcTidOPJKePW30LE/2cT7wCyPho9/Wxg==}
@@ -9147,21 +9076,13 @@ snapshots:
 
   '@vue-macros/common@3.1.4(vue@3.5.42(typescript@5.9.3))':
     dependencies:
-      '@vue/compiler-sfc': 3.5.41
+      '@vue/compiler-sfc': 3.5.42
       ast-kit: 2.2.0
       local-pkg: 1.2.1
       magic-string-ast: 1.0.3
       unplugin-utils: 0.3.2
     optionalDependencies:
       vue: 3.5.42(typescript@5.9.3)
-
-  '@vue/compiler-core@3.5.41':
-    dependencies:
-      '@babel/parser': 7.29.8
-      '@vue/shared': 3.5.41
-      entities: 7.0.1
-      estree-walker: 2.0.2
-      source-map-js: 1.2.1
 
   '@vue/compiler-core@3.5.42':
     dependencies:
@@ -9171,27 +9092,10 @@ snapshots:
       estree-walker: 2.0.2
       source-map-js: 1.2.1
 
-  '@vue/compiler-dom@3.5.41':
-    dependencies:
-      '@vue/compiler-core': 3.5.41
-      '@vue/shared': 3.5.41
-
   '@vue/compiler-dom@3.5.42':
     dependencies:
       '@vue/compiler-core': 3.5.42
       '@vue/shared': 3.5.42
-
-  '@vue/compiler-sfc@3.5.41':
-    dependencies:
-      '@babel/parser': 7.29.8
-      '@vue/compiler-core': 3.5.41
-      '@vue/compiler-dom': 3.5.41
-      '@vue/compiler-ssr': 3.5.41
-      '@vue/shared': 3.5.41
-      estree-walker: 2.0.2
-      magic-string: 0.30.21
-      postcss: 8.5.26
-      source-map-js: 1.2.1
 
   '@vue/compiler-sfc@3.5.42':
     dependencies:
@@ -9204,11 +9108,6 @@ snapshots:
       magic-string: 0.30.21
       postcss: 8.5.26
       source-map-js: 1.2.1
-
-  '@vue/compiler-ssr@3.5.41':
-    dependencies:
-      '@vue/compiler-dom': 3.5.41
-      '@vue/shared': 3.5.41
 
   '@vue/compiler-ssr@3.5.42':
     dependencies:
@@ -9301,8 +9200,6 @@ snapshots:
       '@vue/compiler-ssr': 3.5.42
       '@vue/runtime-dom': 3.5.42
       '@vue/shared': 3.5.42
-
-  '@vue/shared@3.5.41': {}
 
   '@vue/shared@3.5.42': {}
 
@@ -9479,10 +9376,6 @@ snapshots:
   brace-expansion@2.0.2:
     dependencies:
       balanced-match: 1.0.2
-
-  brace-expansion@5.0.8:
-    dependencies:
-      balanced-match: 4.0.4
 
   brace-expansion@5.0.9:
     dependencies:
@@ -10929,15 +10822,15 @@ snapshots:
 
   minimatch@10.2.3:
     dependencies:
-      brace-expansion: 5.0.8
+      brace-expansion: 5.0.9
 
   minimatch@10.2.5:
     dependencies:
-      brace-expansion: 5.0.8
+      brace-expansion: 5.0.9
 
   minimatch@10.2.6:
     dependencies:
-      brace-expansion: 5.0.8
+      brace-expansion: 5.0.9
 
   minimatch@3.1.5:
     dependencies:

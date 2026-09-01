@@ -609,9 +609,10 @@ public final class RightsManager
      * @param bobj the object containing rights preferences.
      * @param levelsToMatch the levels names to check ("view", "edit", etc.).
      * @param direct if true fill the {@link LevelTree#direct} field, otherwise fill the {@link LevelTree#inherited}.
+     * @param context the XWiki context.
      */
     private void fillLevelTreeMap(Map<String, LevelTree> rightsMap, List<String> levelInherited, BaseObject bobj,
-        List<String> levelsToMatch, boolean direct)
+        List<String> levelsToMatch, boolean direct, XWikiContext context)
     {
         List<String> users =
             ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_USERS), RIGHTSLISTFIELD_SEP, false);
@@ -720,7 +721,7 @@ public final class RightsManager
             List<BaseObject> rightObjects = preferences.getXObjects(rightClassReference);
             if (rightObjects != null) {
                 for (BaseObject bobj : rightObjects) {
-                    fillLevelTreeMap(rightsMap, levelInherited, bobj, levelsToMatch, direct);
+                    fillLevelTreeMap(rightsMap, levelInherited, bobj, levelsToMatch, direct, context);
                 }
             }
         }

@@ -342,7 +342,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
             // Find images used with src="cid:" in the email HTML part
             Pattern cidPattern =
-                Pattern.compile("src=('|\")cid:([^'\"]*)('|\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+                Pattern.compile("src=(['\"])cid:([^'\"]*)(['\"])", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
             Matcher matcher = cidPattern.matcher(mail.getHtmlPart());
             List<String> foundEmbeddedImages = new ArrayList<>();
             while (matcher.find()) {

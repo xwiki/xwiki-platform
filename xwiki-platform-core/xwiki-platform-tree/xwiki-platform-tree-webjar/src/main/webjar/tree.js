@@ -89,34 +89,35 @@ define([
 
   // Prefix each node's rendered anchor id with the tree's own container id, to avoid duplicate DOM ids when the same
   // entity is shown by more than one tree on the same page.
+  let treeCounter = 0;
 
-  var getTreePrefix = function(tree) {
-    var prefix = tree.element.attr('id');
-    if (!prefix) {
-      prefix = 'xtree-' + (treeCounter++);
-      tree.element.attr('id', prefix);
+  function getOrGenerateTreeId(tree) {
+    let id = tree.element.attr('id');
+    if (!id) {
+      id = 'xtree-' + (treeCounter++);
+      tree.element.attr('id', id);
     }
-    return prefix;
-  };
+    return id;
+  }
 
-  var prefixAnchorAttributes = function(node, tree) {
+  function prefixAnchorIdAttribute(node, tree) {
     if (node && typeof node.id !== 'undefined') {
-      var prefix = getTreePrefix(tree);
-      node.a_attr = $.extend({}, node.a_attr, {id: prefix + '-' + node.id + '_anchor'});
+      const treeId = getOrGenerateTreeId(tree);
+      node.a_attr = $.extend({}, node.a_attr, {id: treeId + '-' + node.id + '_anchor'});
     }
     return node;
-  };
+  }
 
   var getChildren = function(node, callback, parameters) {
     // 'this' is the tree instance.
-    var tree = this;
-    var boundCallback = callback.bind(this);
+    const tree = this;
+    const boundCallback = callback.bind(this);
     // Wrap the callback from jsTree so that every fetched child's anchor gets a page-wide unique rendered id.
-    callback = function(children) {
+    callback = function(children, ...args) {
       (children || []).forEach(function(child) {
-        prefixAnchorAttributes(child, tree);
+        prefixAnchorIdAttribute(child, tree);
       });
-      boundCallback(children);
+      return boundCallback(children, ...args);
     };
     if (node.id === $.jstree.root && !node.data) {
       // Take the root node data from the tree container element.

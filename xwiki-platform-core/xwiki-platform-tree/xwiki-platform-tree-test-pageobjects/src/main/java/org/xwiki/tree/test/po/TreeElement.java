@@ -38,11 +38,6 @@ import org.xwiki.test.ui.po.BaseElement;
 public class TreeElement extends BaseElement
 {
     /**
-     * The id HTML attribute.
-     */
-    private static final String ID = "id";
-
-    /**
      * The element that represents the tree.
      */
     private WebElement element;
@@ -65,7 +60,7 @@ public class TreeElement extends BaseElement
      */
     private String getRenderedAnchorId(String nodeId)
     {
-        String prefix = this.element.getAttribute(ID);
+        String prefix = this.element.getAttribute(ATTRIBUTE_ID);
         String anchorId = nodeId + "_anchor";
         return (prefix == null || prefix.isEmpty()) ? anchorId : (prefix + "-" + anchorId);
     }
@@ -208,6 +203,16 @@ public class TreeElement extends BaseElement
     }
 
     /**
+     * @return the DOM ids of the labels of the loaded nodes, in document order
+     * @since 18.8.0RC1
+     */
+    public List<String> getNodeLabelIds()
+    {
+        return getDriver().findElementsWithoutWaiting(this.element, By.cssSelector(".jstree-anchor")).stream()
+            .map(label -> label.getAttribute(ATTRIBUTE_ID)).toList();
+    }
+
+    /**
      * @return the list of top level nodes
      */
     public List<TreeNodeElement> getTopLevelNodes()
@@ -215,7 +220,7 @@ public class TreeElement extends BaseElement
         return getDriver()
             .findElementsWithoutWaiting(this.element,
                 By.cssSelector(".jstree-container-ul > .jstree-node:not(.jstree-hidden)"))
-            .stream().map(nodeElement -> By.id(nodeElement.getAttribute(ID)))
+            .stream().map(nodeElement -> By.id(nodeElement.getAttribute(ATTRIBUTE_ID)))
             .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).toList();
     }
 }

@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { BlockNoteWithLinkEditionHooks } from "./LinkEdition.story";
+import { pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-react";
 import type { BlockType } from "../../blocknote";
 import type { Locator, Page } from "@playwright/test";
@@ -103,12 +104,25 @@ test("beforeUpdate can rewrite the url written into the content", async ({
 });
 
 /**
- * Hovers the link to trigger the link toolbar, then opens the link editor.
+ * Moves the caret inside the link to trigger the link toolbar, then opens the link editor. The toolbar also opens
+ * when the link is hovered, but not with a single synthetic mouse move: the editor only records the hovered link
+ * when the pointer enters it, and the toolbar starts listening for pointer events on the link on the render that
+ * follows, so it never sees that move.
  */
 async function editLink(editorEl: Locator, page: Page): Promise<void> {
   const linkEl = editorEl.locator(`a[href="${LINK_URL}"]`);
   await linkEl.waitFor({ state: "attached" });
-  await linkEl.hover();
+
+  // Click on "First", away from the link, because clicking the link itself would make the browser follow it, then
+  // move the caret inside the link ("second" spans offsets 6 to 12). Each key press is awaited until it is painted
+  // (see pressKeySettled) so that sending them in quick succession doesn't outrun the editor's selection update.
+  await editorEl
+    .locator("p.bn-inline-content")
+    .click({ position: { x: 5, y: 5 } });
+  await pressKeySettled(page, "Home");
+  for (let i = 0; i < 8; i++) {
+    await pressKeySettled(page, "ArrowRight");
+  }
 
   const editLinkButtonEl = page.locator('button[data-test="editLink"]');
   await editLinkButtonEl.waitFor({ state: "attached" });

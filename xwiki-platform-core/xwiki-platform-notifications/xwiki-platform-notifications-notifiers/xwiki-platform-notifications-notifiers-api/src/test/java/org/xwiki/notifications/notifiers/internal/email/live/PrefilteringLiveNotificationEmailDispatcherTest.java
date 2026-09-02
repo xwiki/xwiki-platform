@@ -19,19 +19,22 @@
  */
 package org.xwiki.notifications.notifiers.internal.email.live;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Named;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.internal.DefaultEvent;
@@ -42,14 +45,15 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link PrefilteringLiveNotificationEmailDispatcher}.
- * 
+ *
  * @version $Id$
  */
 @ComponentTest
@@ -68,20 +72,35 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
     @Named("context")
     private ComponentManager componentManager;
 
+    private final List<Runnable> scheduledTasks = new ArrayList<>();
+
     @BeforeComponent
     void beforeComponent() throws ComponentLookupException
     {
         ExecutionContextManager executionContextManager = mock(ExecutionContextManager.class);
         when(this.componentManager.getInstance(ExecutionContextManager.class)).thenReturn(executionContextManager);
+        // The dispatch tasks are run by the test thread, so the execution context they set up and tear down must be
+        // available there too.
+        Execution execution = mock(Execution.class);
+        when(this.componentManager.getInstance(Execution.class)).thenReturn(execution);
+    }
+
+    @BeforeEach
+    void beforeEach() throws IllegalAccessException
+    {
+        // Replace the asynchronous scheduler with one which only records the dispatch tasks, so that the test decides
+        // when they run instead of racing them.
+        ScheduledExecutorService scheduler = mock(ScheduledExecutorService.class);
+        when(scheduler.schedule(any(Runnable.class), anyLong(), any(TimeUnit.class))).thenAnswer(invocation -> {
+            this.scheduledTasks.add(invocation.getArgument(0));
+            return null;
+        });
+        FieldUtils.writeField(this.dispatcher, "processingService", scheduler, true);
     }
 
     @Test
     void addEvent()
-        throws IllegalAccessException, ComponentLifecycleException, InitializationException
     {
-        // Force a very short grace period so that the test does not take 1 minute
-        FieldUtils.writeField(this.dispatcher, "grace", 100, true);
-
         //////
         // One event
 
@@ -128,26 +147,22 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
         this.dispatcher.addEvent(similarevent, userReference);
         this.dispatcher.addEvent(otherevent, userReference);
 
-        // Wait until the sendMails() method is called with the right parameters or until it times out.
-        // We need the wait because there's the grace period and processing the event can also take some time.
         events = new HashMap<>();
         events.put(userReference, List.of(event, similarevent, otherevent));
         verifySendMailsCalled(events);
     }
 
-    private void resetDispatcher() throws ComponentLifecycleException, InitializationException, IllegalAccessException
+    private void verifySendMailsCalled(Map<DocumentReference, List<Event>> events)
     {
-        this.dispatcher.dispose();
-        this.dispatcher.initialize();
-        FieldUtils.writeField(this.dispatcher, "grace", 100, true);
+        runScheduledTasks();
+
+        verify(this.sender).sendMails(events);
     }
 
-    private void verifySendMailsCalled(Map<DocumentReference, List<Event>> events)
-        throws ComponentLifecycleException, InitializationException, IllegalAccessException
+    private void runScheduledTasks()
     {
-        // Wait until the sendMails() method is called with the right parameters or until it times out.
-        // We need the wait because there's the grace period and processing the event can also take some time.
-        verify(this.sender, timeout(5000).times(1)).sendMails(events);
-        resetDispatcher();
+        List<Runnable> tasks = new ArrayList<>(this.scheduledTasks);
+        this.scheduledTasks.clear();
+        tasks.forEach(Runnable::run);
     }
 }

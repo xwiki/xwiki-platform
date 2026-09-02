@@ -19,6 +19,8 @@
  */
 package org.xwiki.livedata.rest;
 
+import java.util.List;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -42,11 +44,12 @@ public interface LiveDataEntryResource
 {
     /**
      * Fetches an entry from the specified live data source.
-     * 
+     *
      * @param sourceId indicates the {@link LiveDataSource} component implementation
      * @param namespace the component manager name-space where to look for {@link LiveDataSource} implementations; if
      *            not specified then the context / current name-space is used
      * @param entryId identifies the entry to retrieve
+     * @param properties (since 18.8.0RC1) the list of properties to include in the returned live data entry
      * @return the specified entry
      * @throws Exception if retrieving the entry fails
      */
@@ -54,7 +57,8 @@ public interface LiveDataEntryResource
     Entry getEntry(
         @PathParam("sourceId") String sourceId,
         @QueryParam("namespace") @DefaultValue("") String namespace,
-        @PathParam("entryId") String entryId
+        @PathParam("entryId") String entryId,
+        @QueryParam("properties") List<String> properties
     ) throws Exception;
 
     /**

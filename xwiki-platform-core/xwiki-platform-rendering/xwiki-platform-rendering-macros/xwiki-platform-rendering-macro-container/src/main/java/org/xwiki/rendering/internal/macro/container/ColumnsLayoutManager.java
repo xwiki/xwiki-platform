@@ -129,5 +129,6 @@ public class ColumnsLayoutManager implements LayoutManager
     @Override
     public void setParameter(String parameterName, Object parameterValue)
     {
+        // Nothing to do: this layout manager has no parameter, see getParameter(String).
     }
 }

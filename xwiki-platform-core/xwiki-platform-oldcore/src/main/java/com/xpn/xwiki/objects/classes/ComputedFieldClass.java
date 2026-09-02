@@ -170,5 +170,6 @@ public class ComputedFieldClass extends PropertyClass
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
+        // Nothing to display: a computed field has no stored value to submit back in a hidden input.
     }
 }

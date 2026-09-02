@@ -38,6 +38,7 @@ import org.xwiki.wysiwyg.test.po.MacroDialogEditModal;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests how rendering macros are integrated in CKEditor.
@@ -208,5 +209,28 @@ class MacroIT extends AbstractCKEditorIT
             {{/info}}
 
             after""");
+    }
+
+    @Test
+    @Order(5)
+    void macroNameNextToTheMoveHandle(TestUtils setup, TestReference testReference)
+    {
+        edit(setup, testReference, true);
+        setSource("""
+            {{info}}
+            one
+            {{/info}}
+
+            {{warning}}
+            two
+            {{/warning}}""");
+
+        // The macro name is displayed only when the macro is hovered.
+        assertNull(this.textArea.getMacroNameNextToMoveHandle(0));
+        assertNull(this.textArea.getMacroNameNextToMoveHandle(1));
+
+        this.textArea.hoverMacro(1);
+        assertEquals("warning", this.textArea.getMacroNameNextToMoveHandle(1));
+        assertNull(this.textArea.getMacroNameNextToMoveHandle(0));
     }
 }

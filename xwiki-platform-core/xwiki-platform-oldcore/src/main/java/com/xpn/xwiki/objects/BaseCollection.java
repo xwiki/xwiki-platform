@@ -883,16 +883,16 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         // FIXME: this whole code should be refactored and factorized: some parts are also duplicated in BaseObject.
         ArrayList<ObjectDiff> difflist = new ArrayList<>();
-        BaseCollection oldCollection = (BaseCollection) oldObject;
+        BaseCollection<?> oldCollection = (BaseCollection<?>) oldObject;
 
         // Iterate over the new properties first, to handle changed and added objects
-        for (Object key : this.getFields().keySet()) {
-            addOrChangePropertyDiff((String) key, oldCollection, context, difflist);
+        for (String key : this.getFields().keySet()) {
+            addOrChangePropertyDiff(key, oldCollection, context, difflist);
         }
 
         // Iterate over the old properties, in case there are some removed properties
-        for (Object key : oldCollection.getFields().keySet()) {
-            removedPropertyDiff((String) key, oldCollection, context, difflist);
+        for (String key : oldCollection.getFields().keySet()) {
+            removedPropertyDiff(key, oldCollection, context, difflist);
         }
 
         return difflist;

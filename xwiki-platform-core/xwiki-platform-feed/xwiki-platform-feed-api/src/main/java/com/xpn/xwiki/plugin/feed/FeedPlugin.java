@@ -117,7 +117,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 return -1;
             }
 
-            return (-entry1.getPublishedDate().compareTo(entry2.getPublishedDate()));
+            return entry2.getPublishedDate().compareTo(entry1.getPublishedDate());
         }
     }
 
@@ -139,7 +139,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 return -1;
             }
 
-            return (-bobj1.getDateValue("date").compareTo(bobj2.getDateValue("date")));
+            return bobj2.getDateValue("date").compareTo(bobj1.getDateValue("date"));
         }
     }
 

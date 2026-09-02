@@ -215,7 +215,7 @@
                 broad, checking read access makes sense but others are out of scope.
                 It is now replaced by UserManager#hasReadAccess().
               </justification>
-              <criticality>highlight</criticality>
+              <criticality>documented</criticality>
               <differences>
                 <item>
                   <ignore>true</ignore>

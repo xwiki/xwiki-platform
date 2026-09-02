@@ -46,7 +46,8 @@
     "@xwiki/platform-api": "workspace:*",
     "@xwiki/platform-component-annotation-default": "workspace:*",
     "@xwiki/platform-component-manager-default": "workspace:*",
-    "@xwiki/platform-dsapi": "workspace:*"
+    "@xwiki/platform-dsapi": "workspace:*",
+    "@xwiki/platform-xwiki-utils": "workspace:*"
   },
   "peerDependencies": {
     "jquery": "4.x",
@@ -56,10 +57,10 @@
     "@microsoft/api-extractor": "catalog:",
     "@types/jquery": "catalog:",
     "@types/node": "catalog:",
-    "@types/requirejs": "catalog:",
     "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-test-accessibility": "workspace:*",
+    "@xwiki/platform-test-requirejs": "workspace:*",
     "@xwiki/platform-tool-eslintconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-viteconfig": "workspace:*",

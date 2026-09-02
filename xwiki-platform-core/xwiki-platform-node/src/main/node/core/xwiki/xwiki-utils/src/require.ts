@@ -17,19 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { mockRequireJS } from "@xwiki/platform-test-requirejs";
-import { vi } from "vitest";
-import { useI18n } from "vue-i18n";
 
-// Install the fake RequireJS globals used to load the legacy wizards. Tests register the modules they need through
-// the global define, or through the returned mock.
-const requireJS = mockRequireJS();
+import { getRequire } from "./requirejs";
 
-function mockI18n() {
-  vi.mock("vue-i18n");
-  useI18n.mockReturnValue({
-    t: (tKey) => tKey,
+/**
+ * Load RequireJS modules using a promise instead of a callback.
+ *
+ * @typeParam T - the type of the loaded module, or of the array of loaded modules
+ * @param ids - the identifiers of the modules to load
+ * @returns the loaded module when a single identifier is given, the array of loaded modules otherwise
+ * @since 18.8.0RC1
+ * @public
+ */
+function loadById<T = unknown>(...ids: string[]): Promise<T> {
+  return new Promise((resolve, reject) => {
+    getRequire()(
+      ids,
+      (...modules) => resolve((ids.length === 1 ? modules[0] : modules) as T),
+      reject,
+    );
   });
 }
 
-export { mockI18n, requireJS };
+export { loadById };

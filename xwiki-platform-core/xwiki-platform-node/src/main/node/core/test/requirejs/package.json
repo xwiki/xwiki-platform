@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-xwiki-utils",
+  "name": "@xwiki/platform-test-requirejs",
   "version": "18.8.0-SNAPSHOT",
   "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-utils",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/test/requirejs",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -37,13 +37,9 @@
     "typecheck": "tsc"
   },
   "types": "./dist/index.d.ts",
-  "dependencies": {
-    "@xwiki/platform-api": "workspace:*"
-  },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
-    "@xwiki/platform-test-requirejs": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",

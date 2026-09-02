@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-// Simply re-export the globally defined require function. This is mainly useful to isolate it is a
-// es-module. Allowing, for instance, to mock its result.
-export const require = window.require;
+
+import { generateConfig } from "@xwiki/platform-tool-viteconfig";
+
+export default generateConfig(import.meta.url);

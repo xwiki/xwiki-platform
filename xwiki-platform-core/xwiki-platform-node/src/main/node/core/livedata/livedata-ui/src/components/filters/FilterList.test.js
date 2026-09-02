@@ -19,22 +19,21 @@
  */
 import FilterList from "./FilterList.vue";
 import { mount } from "@vue/test-utils";
+import { mockRequireJS } from "@xwiki/platform-test-requirejs";
 import flushPromises from "flush-promises";
 import $ from "jquery";
 import _ from "lodash-es";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { reactive } from "vue";
 
-vi.mock("../../services/require.js", () => {
-  return {
-    loadById() {
-      return {
-        require(ids, callback) {
-          callback();
-        },
-      };
-    },
-  };
+let requireJS;
+
+beforeEach(() => {
+  requireJS = mockRequireJS({ "xwiki-selectize": {} });
+});
+
+afterEach(() => {
+  requireJS.restore();
 });
 
 /**

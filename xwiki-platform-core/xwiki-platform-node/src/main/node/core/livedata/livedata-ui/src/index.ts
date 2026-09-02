@@ -26,8 +26,15 @@ import displayerMixin from "./components/displayers/displayerMixin";
 import { populateStore } from "./components/populateStore.js";
 // @ts-expect-error this is a JavaScript Vue component, it is expected to not have types.
 import XWikiIcon from "./components/utilities/XWikiIcon.vue";
-// @ts-expect-error this is a JavaScript file, it is expected to not have types.
-import { loadById } from "./services/require.js";
+import { loadById as loadByIdFromUtils } from "@xwiki/platform-xwiki-utils";
+
+/**
+ * Load RequireJS modules using a promise instead of a callback.
+ *
+ * @deprecated since 18.8.0RC1, use `loadById` from `@xwiki/platform-xwiki-utils` instead
+ * @public
+ */
+const loadById: typeof loadByIdFromUtils = loadByIdFromUtils;
 
 export {
   BaseDisplayer,

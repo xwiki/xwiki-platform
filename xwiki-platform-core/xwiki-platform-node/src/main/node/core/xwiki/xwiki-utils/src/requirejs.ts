@@ -18,26 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { require } from "./requirejs.js";
+type Require = (
+  ids: string[],
+  onLoad: (...modules: unknown[]) => void,
+  onError?: (error: unknown) => void,
+) => void;
 
 /**
- * Load requirejs modules using an asynchronous call instead of a callback.
+ * Access the RequireJS `require` function defined on the global object. Going through a dedicated
+ * module makes it possible to mock it, and reading the global on each call means that importing this
+ * package doesn't require a RequireJS environment.
  *
- * @param ids - an array of ids to load using require js
- * @returns return the array of resolved requested modules
- * @since 17.4.0RC1
+ * @returns the global RequireJS `require` function
  */
-export function loadById(...ids) {
-  let resolveP;
-  const promise = new Promise((resolve) => {
-    resolveP = resolve;
-  });
-  require([...ids], function (...response) {
-    if (ids.length === 1 && response.length > 0) {
-      resolveP(response[0]);
-    } else {
-      resolveP(response);
-    }
-  });
-  return promise;
+function getRequire(): Require {
+  return (globalThis as unknown as { require: Require }).require;
 }
+
+export { getRequire };

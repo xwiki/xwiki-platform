@@ -22,7 +22,7 @@ import { XWikiLiveDataSource } from "./XWikiLiveDataSource";
 // eslint-disable-next-line import-x/no-named-as-default
 import $ from "jquery";
 import { stub } from "sinon";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const getJSONStub = stub($, "getJSON");
 // @ts-expect-error leftover from initial javascript implementation
@@ -32,16 +32,6 @@ global.XWiki = { contextPath: "http://localhost/" };
 global.$ = $;
 
 describe("liveDataSource.js", () => {
-  vi.mock("@xwiki/platform-livedata-ui", () => {
-    return {
-      loadById(id) {
-        if (id === "jquery") {
-          return $;
-        }
-      },
-    };
-  });
-
   describe("getEntries", () => {
     it("is tested", async () => {
       // spyOn($, 'getJSON').and.callFake((entriesURL, params) => {

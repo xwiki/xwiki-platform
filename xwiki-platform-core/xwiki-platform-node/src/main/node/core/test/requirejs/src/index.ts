@@ -17,19 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { mockRequireJS } from "@xwiki/platform-test-requirejs";
-import { vi } from "vitest";
-import { useI18n } from "vue-i18n";
 
-// Install the fake RequireJS globals used to load the legacy wizards. Tests register the modules they need through
-// the global define, or through the returned mock.
-const requireJS = mockRequireJS();
+import { mockRequireJS } from "./mock-requirejs";
+import type { RequireJSMock } from "./mock-requirejs";
 
-function mockI18n() {
-  vi.mock("vue-i18n");
-  useI18n.mockReturnValue({
-    t: (tKey) => tKey,
-  });
-}
-
-export { mockI18n, requireJS };
+export { mockRequireJS };
+export type { RequireJSMock };

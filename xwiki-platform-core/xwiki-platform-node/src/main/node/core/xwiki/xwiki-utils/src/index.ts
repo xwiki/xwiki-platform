@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { loadById } from "./require";
 import type { WikiConfig } from "@xwiki/platform-api";
 
 /**
@@ -29,7 +30,7 @@ import type { WikiConfig } from "@xwiki/platform-api";
  * @since 18.5.0RC1
  * @beta
  */
-export function getRestSpacesApiUrl(
+function getRestSpacesApiUrl(
   wikiConfig: WikiConfig,
   documentId: string,
 ): string {
@@ -47,3 +48,5 @@ export function getRestSpacesApiUrl(
     .replace(/\.(?=.*\.)/g, "/spaces/") // Transform separators to spaces endpoints
     .replace(/\./, "/pages/")}`; // Transform last separator to pages endpoint
 }
+
+export { getRestSpacesApiUrl, loadById };

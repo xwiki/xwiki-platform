@@ -22,6 +22,7 @@ import { generateWebjarNodeConfig } from "@xwiki/platform-tool-viteconfig";
 
 export default generateWebjarNodeConfig(import.meta.url, [
   "@xwiki/platform-livedata-ui",
+  "@xwiki/platform-xwiki-utils",
   "dompurify",
   "eventemitter3",
   "lz-string",

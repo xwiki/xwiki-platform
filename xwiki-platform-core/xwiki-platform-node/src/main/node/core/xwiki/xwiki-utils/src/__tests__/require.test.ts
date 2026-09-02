@@ -18,54 +18,39 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import DisplayerDate from "./DisplayerDate.vue";
-import { initWrapper } from "./displayerTestsHelper";
+import { loadById } from "..";
 import { mockRequireJS } from "@xwiki/platform-test-requirejs";
-import flushPromises from "flush-promises";
-import { restore } from "sinon";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import type { RequireJSMock } from "@xwiki/platform-test-requirejs";
 
-describe("DisplayerDate.vue", () => {
-  let requireJS;
+describe("loadById", () => {
+  let requireJS: RequireJSMock;
 
   beforeEach(() => {
     requireJS = mockRequireJS({
-      moment: () => ({
-        format() {
-          return "formatted date";
-        },
-      }),
-      daterangepicker: {},
+      jquery: "jQuery module",
+      moment: "moment module",
     });
   });
 
-  afterEach(function () {
+  afterEach(() => {
     requireJS.restore();
-    // completely restore all fakes created through the sandbox
-    restore();
   });
 
-  it("Renders an entry in view mode", async () => {
-    const wrapper = initWrapper(DisplayerDate, {
-      logic: {
-        isEditMode: () => false,
-      },
-    });
-    await flushPromises();
-    expect(wrapper.text()).toMatch("formatted date");
+  it("resolves with the module when a single identifier is given", async () => {
+    await expect(loadById("jquery")).resolves.toBe("jQuery module");
   });
 
-  it("Switch to edit mode", async () => {
-    const wrapper = initWrapper(DisplayerDate, {
-      logic: {
-        isEditMode: () => false,
-      },
-    });
-    await flushPromises();
-    await wrapper.setProps({ isView: false });
+  it("resolves with the array of modules when several identifiers are given", async () => {
+    await expect(loadById("jquery", "moment")).resolves.toStrictEqual([
+      "jQuery module",
+      "moment module",
+    ]);
+  });
 
-    const input = wrapper.find(".editor-date");
-    expect(input.attributes("value")).toBe("formatted date");
-    expect(input.element).toBe(document.activeElement);
+  it("rejects when a module fails to load", async () => {
+    await expect(loadById("missing")).rejects.toThrow(
+      "No RequireJS module registered with identifier [missing].",
+    );
   });
 });

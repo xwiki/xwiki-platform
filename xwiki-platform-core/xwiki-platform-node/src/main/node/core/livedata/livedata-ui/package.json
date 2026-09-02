@@ -45,6 +45,7 @@
   "dependencies": {
     "@xwiki/platform-livedata-api": "workspace:*",
     "@xwiki/platform-localization-api": "workspace:*",
+    "@xwiki/platform-xwiki-utils": "workspace:*",
     "dompurify": "catalog:",
     "eventemitter3": "catalog:",
     "lz-string": "catalog:",
@@ -66,6 +67,7 @@
     "@xwiki/platform-dev-config": "workspace:*",
     "@xwiki/platform-livedata-componentstore": "workspace:*",
     "@xwiki/platform-test-accessibility": "workspace:*",
+    "@xwiki/platform-test-requirejs": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",

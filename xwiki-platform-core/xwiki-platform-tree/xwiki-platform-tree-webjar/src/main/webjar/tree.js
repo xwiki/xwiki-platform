@@ -414,7 +414,8 @@ define([
         // the rest of the siblings (i.e. all the next pages) until we find the node that corresponds to the given path
         // element, so we simply add the node to the parent. Don't worry, the node won't be duplicated when the
         // pagination is triggered.
-        this.create_node(parent, nodeSpec, siblings.length - 1, resolve);
+        // This node doesn't go through the children callback, so its anchor id is prefixed here instead.
+        this.create_node(parent, prefixAnchorIdAttribute(nodeSpec, this), siblings.length - 1, resolve);
       } else {
         // The specified node can't be created.
         reject();

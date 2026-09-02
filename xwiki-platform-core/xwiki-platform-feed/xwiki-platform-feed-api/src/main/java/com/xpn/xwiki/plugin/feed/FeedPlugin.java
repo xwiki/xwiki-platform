@@ -102,44 +102,45 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     private static final String FULL_CONTENT = "fullContent";
 
+    private static final String DATE = "date";
+
+    /**
+     * Orders feed entries by published date, most recent first, entries without a date coming last.
+     */
     public static class SyndEntryComparator implements Comparator<SyndEntry>
     {
+        private static final Comparator<SyndEntry> ORDER =
+            Comparator.comparing(SyndEntry::getPublishedDate, Comparator.nullsLast(Comparator.reverseOrder()));
+
         @Override
         public int compare(SyndEntry entry1, SyndEntry entry2)
         {
-            if ((entry1.getPublishedDate() == null) && (entry2.getPublishedDate() == null)) {
-                return 0;
-            }
-            if (entry1.getPublishedDate() == null) {
-                return 1;
-            }
-            if (entry2.getPublishedDate() == null) {
-                return -1;
-            }
-
-            return entry2.getPublishedDate().compareTo(entry1.getPublishedDate());
+            return ORDER.compare(entry1, entry2);
         }
     }
 
+    /**
+     * Orders {@code XWiki.FeedEntryClass} objects by their {@code date} property, most recent first, entries without
+     * a date coming last.
+     */
     public static class EntriesComparator implements Comparator<com.xpn.xwiki.api.Object>
     {
+        private static final Comparator<com.xpn.xwiki.api.Object> ORDER =
+            Comparator.comparing(EntriesComparator::getDate, Comparator.nullsLast(Comparator.reverseOrder()));
+
         @Override
         public int compare(com.xpn.xwiki.api.Object entry1, com.xpn.xwiki.api.Object entry2)
         {
-            BaseObject bobj1 = entry1.getXWikiObject();
-            BaseObject bobj2 = entry1.getXWikiObject();
+            return ORDER.compare(entry1, entry2);
+        }
 
-            if ((bobj1.getDateValue("date") == null) && (bobj2.getDateValue("date") == null)) {
-                return 0;
-            }
-            if (bobj1.getDateValue("date") == null) {
-                return 1;
-            }
-            if (bobj2.getDateValue("date") == null) {
-                return -1;
-            }
+        private static Date getDate(com.xpn.xwiki.api.Object entry)
+        {
+            // Read the property through the API object instead of through getXWikiObject(), which returns null
+            // whenever the caller doesn't have programming rights and would thus fail the whole comparison.
+            java.lang.Object value = entry.getValue(DATE);
 
-            return bobj2.getDateValue("date").compareTo(bobj1.getDateValue("date"));
+            return value instanceof Date date ? date : null;
         }
     }
 
@@ -388,7 +389,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     context.remove(FEEDIMGURL);
                 }
                 obj.set("nb", nb, context);
-                obj.set("date", new Date(), context);
+                obj.set(DATE, new Date(), context);
 
                 // Update original document
                 context.getWiki().saveDocument(doc, context);
@@ -731,7 +732,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             edate = new Date();
         }
 
-        obj.setDateValue("date", edate);
+        obj.setDateValue(DATE, edate);
         obj.setStringValue("url", entry.getLink());
         obj.setStringValue(AUTHOR, entry.getAuthor());
         obj.setStringValue("feedurl", feedurl);

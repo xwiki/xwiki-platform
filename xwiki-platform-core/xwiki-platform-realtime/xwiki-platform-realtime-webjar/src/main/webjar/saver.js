@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-realtime-saver', [
-  'jquery',
   'chainpad',
   'chainpad-netflux',
   'json.sortify',
@@ -27,7 +26,7 @@ define('xwiki-realtime-saver', [
   'xwiki-l10n!xwiki-realtime-messages'
 ], function(
   /* jshint maxparams:false */
-  $, ChainPad, ChainPadNetflux, jsonSortify, Crypto, xwikiDocument, Messages
+  ChainPad, ChainPadNetflux, jsonSortify, Crypto, xwikiDocument, Messages
 ) {
   'use strict';
 
@@ -41,6 +40,21 @@ define('xwiki-realtime-saver', [
 
   function log(level, ...args) {
     console[level]('[Saver] ', ...args);
+  }
+
+  /**
+   * Load RequireJS modules asynchronously.
+   *
+   * @param {...String} ids the identifiers of the modules to load
+   * @returns {Promise} a promise that resolves with the loaded module, or with the array of loaded modules when
+   *   multiple identifiers are given
+   */
+  function loadById(...ids) {
+    return new Promise((resolve, reject) => {
+      require(ids, (...modules) => {
+        resolve(ids.length === 1 ? modules[0] : modules);
+      }, reject);
+    });
   }
 
   // The interval between two consecutive saves (when the content is modified). Using a slightly different value for
@@ -342,8 +356,10 @@ define('xwiki-realtime-saver', [
      * Called when the transport is ready, to install the listeners used to detect and intercept the save requests
      * (e.g. when the user clicks on the save button). This has to wait for the transport because a save accepted
      * before the states of the other clients are known would elect no client and thus save nothing.
+     *
+     * @returns {Promise} a promise that resolves when the target is ready to intercept the save requests
      */
-    initialize() {
+    async initialize() {
       // Must be implemented by subclasses.
     }
 
@@ -397,10 +413,14 @@ define('xwiki-realtime-saver', [
       this._revertList = [];
     }
 
-    initialize() {
+    async initialize() {
+      // jQuery is needed only by this save target, so it's loaded on demand rather than being a dependency of the
+      // entire module.
+      this._$ = await loadById('jquery');
+
       // There's a very small chance that the preview button might cause problems, so let's just get rid of it.
       const form = document.getElementById(this._config.formId);
-      const $previewButton = $(form).find('input[name="action_preview"]');
+      const $previewButton = this._$(form).find('input[name="action_preview"]');
       if ($previewButton.is(':visible')) {
         $previewButton.hide();
         this._revertList.push(() => {
@@ -418,9 +438,9 @@ define('xwiki-realtime-saver', [
           this._saver.save({button: event.target}).catch(() => {});
         }
       };
-      $(form).on('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
+      this._$(form).on('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
       this._revertList.push(() => {
-        $(form).off('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
+        this._$(form).off('xwiki:actions:beforeSave.realtime-saver', beforeSaveHandler);
       });
 
       this._notifyInitialVersion();
@@ -450,7 +470,12 @@ define('xwiki-realtime-saver', [
 
     _overwriteAjaxSaveAndContinue(form) {
       const saver = this._saver;
-      const originalAjaxSaveAndContinue = $.extend({}, XWiki.actionButtons.AjaxSaveAndContinue.prototype);
+      const prototype = XWiki.actionButtons.AjaxSaveAndContinue.prototype;
+      // Keep a reference to the methods we override, in order to call and later restore them.
+      const originalAjaxSaveAndContinue = {
+        reloadEditor: prototype.reloadEditor,
+        maybeRedirect: prototype.maybeRedirect
+      };
       const newAjaxSaveAndContinue = {
         // Prevent the save buttons from reloading the page. Instead, reset the editor's content.
         // FIXME: The in-place editor is also overriding reloadEditor, before this code is executed, so here we're
@@ -459,7 +484,7 @@ define('xwiki-realtime-saver', [
           xwikiDocument.reload();
           // HACK: Replicate the behavior from the in-place editor.
           setTimeout(() => {
-            $(form).trigger('xwiki:actions:reload');
+            this._$(form).trigger('xwiki:actions:reload');
           }, 0);
         },
         // Redirect only after we have confirmation that the saver state has been propagated to all clients.
@@ -474,12 +499,12 @@ define('xwiki-realtime-saver', [
           }
         }
       };
-      $.extend(XWiki.actionButtons.AjaxSaveAndContinue.prototype, newAjaxSaveAndContinue);
+      Object.assign(prototype, newAjaxSaveAndContinue);
       this._revertList.push(() => {
         // Revert only if the method has not been overridden by another script.
         for(const [methodName, method] of Object.entries(newAjaxSaveAndContinue)) {
-          if (XWiki.actionButtons.AjaxSaveAndContinue.prototype[methodName] === method) {
-            XWiki.actionButtons.AjaxSaveAndContinue.prototype[methodName] = originalAjaxSaveAndContinue[methodName];
+          if (prototype[methodName] === method) {
+            prototype[methodName] = originalAjaxSaveAndContinue[methodName];
           }
         }
       });
@@ -537,13 +562,13 @@ define('xwiki-realtime-saver', [
     async submit({button}) {
       // The merge conflict modal is already displayed (from a previous save attempt). Clicking the save button again
       // would reopen the same modal and reset the fields the user did not submit yet. We don't want that.
-      if ($('#previewDiffModal').is(':visible')) {
+      if (this._$('#previewDiffModal').is(':visible')) {
         throw new Error('Merge conflict prevents save.');
       }
 
       const isAutoSave = !button;
       button = button || this.getSaveButton(true);
-      if (!$(button).is(':enabled')) {
+      if (!button?.matches(':enabled')) {
         throw new Error('The save button is disabled or missing.');
       }
 
@@ -552,13 +577,13 @@ define('xwiki-realtime-saver', [
       const submitResultPromise = this._getSubmitResult(form, removeListeners, SUBMIT_TIMEOUT);
 
       let savePrevented = true;
-      $(button).on('xwiki:actions:save.realtime-saver', event => {
+      this._$(button).on('xwiki:actions:save.realtime-saver', event => {
         savePrevented = event.isDefaultPrevented();
       });
 
       const restoreVersionSummary = this._maybeSetAutoSaveVersionSummary(form, isAutoSave);
-      $(button).click();
-      $(button).off('xwiki:actions:save.realtime-saver');
+      button.click();
+      this._$(button).off('xwiki:actions:save.realtime-saver');
       restoreVersionSummary?.();
 
       if (savePrevented) {
@@ -638,7 +663,7 @@ define('xwiki-realtime-saver', [
         });
         // ... or for the merge conflict modal to be closed without resolving the conflict.
         this._once(document, removeListeners, 'hide.bs.modal.realtime-saver', '#previewDiffModal', () => {
-          if ($('#previewDiffModal').data('action') === 'cancel') {
+          if (this._$('#previewDiffModal').data('action') === 'cancel') {
             reject(new Error('Save canceled.'));
           } else {
             // The modal was closed but not canceled so we still need to wait for a save (successful or not) or reload
@@ -669,8 +694,8 @@ define('xwiki-realtime-saver', [
         }
         return result;
       };
-      $(target).one(...args);
-      removeListeners.push(() => $(target).off(...args));
+      this._$(target).one(...args);
+      removeListeners.push(() => this._$(target).off(...args));
     }
 
     _afterSave({newVersion}) {
@@ -733,7 +758,7 @@ define('xwiki-realtime-saver', [
      */
     async toBeReady() {
       await this._transport.toBeReady();
-      this._target.initialize();
+      await this._target.initialize();
       this._notifyStatusChange();
     }
 

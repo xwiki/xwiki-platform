@@ -566,16 +566,16 @@ public final class XWikiRepositoryModel
     public static ExtensionRepositoryDescriptor toRepositoryDescriptor(String repository, ExtensionFactory factory)
         throws URISyntaxException
     {
-        int index;
-
         // Id
-        String id = repository.substring(0, index = repository.indexOf(':'));
+        int idIndex = repository.indexOf(':');
+        String id = repository.substring(0, idIndex);
 
         // Type
-        String type = repository.substring(index + 1, index = repository.indexOf(':', index + 1));
+        int typeIndex = repository.indexOf(':', idIndex + 1);
+        String type = repository.substring(idIndex + 1, typeIndex);
 
         // URI
-        URI uri = new URI(repository.substring(index + 1, repository.length()));
+        URI uri = new URI(repository.substring(typeIndex + 1, repository.length()));
 
         return factory.getExtensionRepositoryDescriptor(id, type, uri, null);
     }

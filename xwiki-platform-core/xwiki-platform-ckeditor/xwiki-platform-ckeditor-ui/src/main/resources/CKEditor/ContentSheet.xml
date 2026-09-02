@@ -250,6 +250,36 @@ a[data-linktype="create"]::after {
   display: block;
 }
 
+/* Display the macro name next to the move handle, in order to be able to identify the macros that are nested or that
+  don't have a visible output. */
+.cke_widget_drag_handler_container[data-macro-name]::after {
+  /* The move handle is hidden by collapsing its container, which doesn't hide the overflowing macro name, so we have
+    to hide the macro name ourselves. */
+  display: none;
+  content: attr(data-macro-name);
+}
+.cke_widget_wrapper:hover &gt; .cke_widget_drag_handler_container[data-macro-name]::after {
+  background-color: #dcdcdc;
+  color: #333;
+  display: block;
+  font-family: monospace;
+  font-size: 12px;
+  /* The height of the move handle. */
+  height: 15px;
+  line-height: 15px;
+  max-width: 20em;
+  overflow: hidden;
+  padding: 0 .3em;
+  /* Don't steal the mouse events from the content displayed above the macro. */
+  pointer-events: none;
+  /* Place the macro name right after the move handle, whose container is absolutely positioned. */
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Inline widgets (macros) have display:inline-block and thus don't inherit the text-decoration styles. We fix this by
   applying the styles directly for the text-decoration values that are commonly used.
   See CKEDITOR-282: Strikethrough not displayed for macros */

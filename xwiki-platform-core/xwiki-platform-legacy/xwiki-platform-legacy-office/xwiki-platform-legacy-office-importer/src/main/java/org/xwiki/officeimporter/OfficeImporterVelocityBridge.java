@@ -20,7 +20,6 @@
 package org.xwiki.officeimporter;
 
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +43,7 @@ public class OfficeImporterVelocityBridge
     /**
      * File extensions corresponding to slide presentations.
      */
-    public static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "pptx", "odp");
+    public static final List<String> PRESENTATION_FORMAT_EXTENSIONS = List.of("ppt", "pptx", "odp");
 
     /**
      * The key used to place any error messages while importing office documents.

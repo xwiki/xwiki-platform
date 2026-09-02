@@ -5057,7 +5057,7 @@ public class XWiki implements EventListener
         boolean modifiedByContextUser, XWikiContext context) throws XWikiException
     {
         // Step 1: Simulate creating a document and deleting a document from listeners point of view
-        // FIXME: currently modifications made by listeners won't be applied
+        // FIXME: modifications made by listeners won't be applied, see https://jira.xwiki.org/browse/XWIKI-24780
         XWikiDocument futureTargetDocument = sourceDocument.cloneRename(targetDocumentReference, context);
         futureTargetDocument.setOriginalDocument(new XWikiDocument(targetDocumentReference));
         // Notify listeners about the change made by the context user, and give them a chance to cancel it

@@ -19,12 +19,15 @@
  */
 package org.xwiki.image.style.test.po;
 
+import java.net.URI;
 import java.util.Map;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.ViewPage;
@@ -47,6 +50,61 @@ public class ImageStyleAdministrationPage extends ViewPage
      * hitting the validation page is slow on a loaded machine.
      */
     private static final int VALIDATION_TIMEOUT_SECONDS = 30;
+
+    /**
+     * Waits for the section to be displayed and checks that it carries the fields of the configuration object.
+     * <p>
+     * The wait matters because this page object is also built right after clicking a link, i.e. possibly before the
+     * browser left the previous page. The check turns a section rendered without those fields into an explicit
+     * failure, instead of letting a later interaction report an opaque "element not found" on one of them. The section
+     * renders that way when {@code Image.Style.Code.ConfigurationClass} is not visible to the server, which leaves the
+     * property labels as unevaluated Velocity and both fields empty.
+     *
+     * @since 18.8.0RC1
+     */
+    public ImageStyleAdministrationPage()
+    {
+        XWikiWebDriver driver = getDriver();
+        driver.waitUntilElementIsVisible(By.id(DEFAULT_IMAGE_STYLE_FORM_ID));
+        if (!driver.hasElementWithoutWaiting(By.name(DEFAULT_IMAGE_STYLE_FIELD_NAME))) {
+            throw new AssertionError("The image style administration section was rendered without the fields of the "
+                + "[Image.Style.Code.ConfigurationClass] object, which means that object or its class was not visible "
+                + "to the server while rendering the section.\n"
+                + "Section rendered by the server:\n" + getDefaultImageStyleFormMarkup() + '\n'
+                + "Configuration document as served by REST:\n" + getConfigurationDocumentFromRest());
+        }
+    }
+
+    /**
+     * @return the markup of the default image style form, as the server rendered it, so that a failure shows which of
+     *     the fields and labels of the configuration object are missing
+     */
+    private String getDefaultImageStyleFormMarkup()
+    {
+        try {
+            return getDriver().findElementWithoutWaiting(By.id(DEFAULT_IMAGE_STYLE_FORM_ID))
+                .getAttribute("outerHTML");
+        } catch (Exception e) {
+            return String.format("could not be read: %s", ExceptionUtils.getRootCauseMessage(e));
+        }
+    }
+
+    /**
+     * @return the REST representation of the configuration document, objects included. REST does not read the document
+     *     through the same code path as the rendering of the section, so comparing the two tells whether the object is
+     *     missing from the database or only invisible to the request that rendered the section
+     */
+    private String getConfigurationDocumentFromRest()
+    {
+        TestUtils testUtils = getUtil();
+        String uri = String.format("%s/wikis/%s/spaces/Image/spaces/Style/spaces/Code/pages/Configuration/objects",
+            testUtils.rest().getBaseURL(), testUtils.getCurrentWiki());
+        try {
+            return testUtils.rest().executeGet(URI.create(uri)).getResponseBodyAsString();
+        } catch (Exception e) {
+            return String.format("[%s] could not be read: %s", uri, ExceptionUtils.getRootCauseMessage(e));
+        }
+    }
 
     /**
      * @param wikiReference the reference of the wiki containing the admin to access

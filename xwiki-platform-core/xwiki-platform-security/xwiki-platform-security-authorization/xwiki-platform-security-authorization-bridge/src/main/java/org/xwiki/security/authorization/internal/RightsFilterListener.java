@@ -149,7 +149,7 @@ public class RightsFilterListener extends AbstractEventListener
             } else {
                 if (this.observationContext.isIn(DOCUMENT_RENAMING_EVENT)) {
                     // Cancel the rename to not loose information (there is also a limitation that rename does
-                    // not allow to modify the document)
+                    // not allow modifying the document through events, see https://jira.xwiki.org/browse/XWIKI-24780)
                     event.cancel("The user is not allowed to modify the rights impacted by the rename operation");
                 } else {
                     // Cancel all the right modifications

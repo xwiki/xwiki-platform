@@ -62,6 +62,7 @@ public interface UserManager
      * @param user the user whose access right is being checked
      * @param target the user whose data is being accessed
      * @return {@code true} if {@code user} can read {@code target}'s data, {@code false} otherwise
+     * @since 18.4.5
      * @since 18.8.0RC1
      */
     @Unstable

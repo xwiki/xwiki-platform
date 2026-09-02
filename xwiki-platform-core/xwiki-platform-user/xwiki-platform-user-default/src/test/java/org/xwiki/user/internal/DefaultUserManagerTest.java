@@ -129,27 +129,27 @@ class DefaultUserManagerTest
     }
 
     @Test
-    void hasReadAccess() throws Exception
+    void hasViewAccess() throws Exception
     {
         UserManager customUserManager = mock(UserManager.class);
-        when(customUserManager.hasReadAccess(any(TestUserReference.class), any(TestUserReference.class)))
+        when(customUserManager.hasViewAccess(any(TestUserReference.class), any(TestUserReference.class)))
             .thenReturn(true);
 
         when(this.contextComponentManager.getInstance(UserManager.class, TestUserReference.class.getName()))
             .thenReturn(customUserManager);
 
-        assertTrue(this.userManager.hasReadAccess(new TestUserReference(), new TestUserReference()));
+        assertTrue(this.userManager.hasViewAccess(new TestUserReference(), new TestUserReference()));
     }
 
     @Test
-    void hasReadAccessWhenNonResourceTarget()
+    void hasViewAccessWhenNonResourceTarget()
     {
-        assertTrue(this.userManager.hasReadAccess(mock(UserReference.class), SuperAdminUserReference.INSTANCE));
-        assertTrue(this.userManager.hasReadAccess(mock(UserReference.class), GuestUserReference.INSTANCE));
+        assertTrue(this.userManager.hasViewAccess(mock(UserReference.class), SuperAdminUserReference.INSTANCE));
+        assertTrue(this.userManager.hasViewAccess(mock(UserReference.class), GuestUserReference.INSTANCE));
     }
 
     @Test
-    void hasReadAccessWhenNoUserManager() throws Exception
+    void hasViewAccessWhenNoUserManager() throws Exception
     {
         when(this.contextComponentManager.getInstance(UserManager.class, TestUserReference.class.getName()))
             .thenThrow(new ComponentLookupException("error"));
@@ -157,7 +157,7 @@ class DefaultUserManagerTest
         TestUserReference userReference1 = new TestUserReference();
         TestUserReference userReference2 = new TestUserReference();
         Throwable exception = assertThrows(RuntimeException.class,
-            () -> this.userManager.hasReadAccess(userReference1, userReference2));
+            () -> this.userManager.hasViewAccess(userReference1, userReference2));
         assertEquals("Failed to find user manager for role [org.xwiki.user.UserManager] and hint "
             + "[org.xwiki.user.internal.DefaultUserManagerTest$TestUserReference]", exception.getMessage());
         assertEquals("ComponentLookupException: error", ExceptionUtils.getRootCauseMessage(exception));

@@ -66,5 +66,5 @@ public interface UserManager
      * @since 18.8.0RC1
      */
     @Unstable
-    boolean hasReadAccess(UserReference user, UserReference target);
+    boolean hasViewAccess(UserReference user, UserReference target);
 }

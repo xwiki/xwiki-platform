@@ -85,7 +85,7 @@ public class CurrentUserManager implements UserManager
     }
 
     @Override
-    public boolean hasReadAccess(UserReference user, UserReference target)
+    public boolean hasViewAccess(UserReference user, UserReference target)
     {
         boolean hasAccess;
 
@@ -109,7 +109,7 @@ public class CurrentUserManager implements UserManager
             // The target is not an actual resource, its metadata is always readable.
             hasAccess = true;
         } else {
-            hasAccess = this.documentUserManager.hasReadAccess(resolvedUserReference, resolvedTargetReference);
+            hasAccess = this.documentUserManager.hasViewAccess(resolvedUserReference, resolvedTargetReference);
         }
 
         return hasAccess;

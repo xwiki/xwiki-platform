@@ -80,7 +80,7 @@ public class UserResourceImpl extends XWikiResource implements UserResource
             UserReference userReference = this.userReferenceResolver.resolve(userId,
                 this.getXWikiContext().getWikiReference());
 
-            if (!this.userManager.hasReadAccess(CurrentUserReference.INSTANCE, userReference)) {
+            if (!this.userManager.hasViewAccess(CurrentUserReference.INSTANCE, userReference)) {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 

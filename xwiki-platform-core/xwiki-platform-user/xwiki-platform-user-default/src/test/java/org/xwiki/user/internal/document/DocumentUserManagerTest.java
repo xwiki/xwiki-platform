@@ -243,7 +243,7 @@ class DocumentUserManagerTest
     }
 
     @Test
-    void hasReadAccess()
+    void hasViewAccess()
     {
         when(this.documentUserReferenceSerializer.serialize(this.documentUserReferenceCaptor.capture()))
             .then((Answer<DocumentReference>)
@@ -253,11 +253,11 @@ class DocumentUserManagerTest
         DocumentReference targetReference = new DocumentReference("xwiki", "XWiki", "user2");
 
         when(this.authorizationManager.hasAccess(Right.VIEW, userReference, targetReference)).thenReturn(false);
-        assertFalse(this.userManager.hasReadAccess(new DocumentUserReference(userReference, true),
+        assertFalse(this.userManager.hasViewAccess(new DocumentUserReference(userReference, true),
             new DocumentUserReference(targetReference, true)));
 
         when(this.authorizationManager.hasAccess(Right.VIEW, userReference, targetReference)).thenReturn(true);
-        assertTrue(this.userManager.hasReadAccess(new DocumentUserReference(userReference, true),
+        assertTrue(this.userManager.hasViewAccess(new DocumentUserReference(userReference, true),
             new DocumentUserReference(targetReference, true)));
     }
 }

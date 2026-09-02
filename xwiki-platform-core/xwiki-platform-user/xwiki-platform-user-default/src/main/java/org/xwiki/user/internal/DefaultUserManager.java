@@ -94,7 +94,7 @@ public class DefaultUserManager implements UserManager
     }
 
     @Override
-    public boolean hasReadAccess(UserReference user, UserReference target)
+    public boolean hasViewAccess(UserReference user, UserReference target)
     {
         boolean hasAccess;
 
@@ -115,10 +115,10 @@ public class DefaultUserManager implements UserManager
             || normalizedTargetReference == CurrentUserReference.INSTANCE)
         {
             hasAccess = resolveUserManager(CurrentUserReference.INSTANCE)
-                .hasReadAccess(normalizedUserReference, normalizedTargetReference);
+                .hasViewAccess(normalizedUserReference, normalizedTargetReference);
         } else {
             // We know that "target" is an actual user resource, so we use it to resolve the manager.
-            hasAccess = resolveUserManager(target).hasReadAccess(normalizedUserReference, target);
+            hasAccess = resolveUserManager(target).hasViewAccess(normalizedUserReference, target);
         }
         return hasAccess;
     }

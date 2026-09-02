@@ -119,7 +119,7 @@ class CurrentUserManagerTest
     }
 
     @Test
-    void hasReadAccessWhenCurrentUser()
+    void hasViewAccessWhenCurrentUser()
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "User");
@@ -130,13 +130,13 @@ class CurrentUserManagerTest
         when(this.userReferenceResolver.resolve(documentReference)).thenReturn(documentUserReference);
 
         DocumentUserReference targetUserReference = mock(DocumentUserReference.class);
-        this.manager.hasReadAccess(CurrentUserReference.INSTANCE, targetUserReference);
+        this.manager.hasViewAccess(CurrentUserReference.INSTANCE, targetUserReference);
 
-        verify(this.documentUserManager).hasReadAccess(documentUserReference, targetUserReference);
+        verify(this.documentUserManager).hasViewAccess(documentUserReference, targetUserReference);
     }
 
     @Test
-    void hasReadAccessWhenNoCurrentUser()
+    void hasViewAccessWhenNoCurrentUser()
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getUserReference()).thenReturn(null);
@@ -144,13 +144,13 @@ class CurrentUserManagerTest
         when(this.userReferenceResolver.resolve(null)).thenReturn(GuestUserReference.INSTANCE);
 
         DocumentUserReference targetUserReference = mock(DocumentUserReference.class);
-        this.manager.hasReadAccess(CurrentUserReference.INSTANCE, targetUserReference);
+        this.manager.hasViewAccess(CurrentUserReference.INSTANCE, targetUserReference);
 
-        verify(this.documentUserManager).hasReadAccess(GuestUserReference.INSTANCE, targetUserReference);
+        verify(this.documentUserManager).hasViewAccess(GuestUserReference.INSTANCE, targetUserReference);
     }
 
     @Test
-    void hasReadAccessWhenCurrentTarget()
+    void hasViewAccessWhenCurrentTarget()
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "User");
@@ -161,13 +161,13 @@ class CurrentUserManagerTest
         when(this.userReferenceResolver.resolve(documentReference)).thenReturn(documentUserReference);
 
         DocumentUserReference userUserReference = mock(DocumentUserReference.class);
-        this.manager.hasReadAccess(userUserReference, CurrentUserReference.INSTANCE);
+        this.manager.hasViewAccess(userUserReference, CurrentUserReference.INSTANCE);
 
-        verify(this.documentUserManager).hasReadAccess(userUserReference, documentUserReference);
+        verify(this.documentUserManager).hasViewAccess(userUserReference, documentUserReference);
     }
 
     @Test
-    void hasReadAccessWhenNoCurrentTarget()
+    void hasViewAccessWhenNoCurrentTarget()
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getUserReference()).thenReturn(null);
@@ -175,6 +175,6 @@ class CurrentUserManagerTest
         when(this.userReferenceResolver.resolve(null)).thenReturn(GuestUserReference.INSTANCE);
 
         DocumentUserReference userUserReference = mock(DocumentUserReference.class);
-        assertTrue(this.manager.hasReadAccess(userUserReference, CurrentUserReference.INSTANCE));
+        assertTrue(this.manager.hasViewAccess(userUserReference, CurrentUserReference.INSTANCE));
     }
 }

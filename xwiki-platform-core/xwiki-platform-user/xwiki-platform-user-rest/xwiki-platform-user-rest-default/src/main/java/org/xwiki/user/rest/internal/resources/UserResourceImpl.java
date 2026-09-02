@@ -33,7 +33,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
@@ -81,7 +80,7 @@ public class UserResourceImpl extends XWikiResource implements UserResource
             UserReference userReference = this.userReferenceResolver.resolve(userId,
                 this.getXWikiContext().getWikiReference());
 
-            if (!this.userManager.hasAccess(Right.VIEW, CurrentUserReference.INSTANCE, userReference)) {
+            if (!this.userManager.hasReadAccess(CurrentUserReference.INSTANCE, userReference)) {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 

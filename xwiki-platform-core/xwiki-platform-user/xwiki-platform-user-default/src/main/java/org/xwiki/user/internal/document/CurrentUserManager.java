@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
@@ -86,7 +85,7 @@ public class CurrentUserManager implements UserManager
     }
 
     @Override
-    public boolean hasAccess(Right right, UserReference user, UserReference target)
+    public boolean hasReadAccess(UserReference user, UserReference target)
     {
         boolean hasAccess;
 
@@ -107,10 +106,10 @@ public class CurrentUserManager implements UserManager
         if (resolvedTargetReference == GuestUserReference.INSTANCE
             || resolvedTargetReference == SuperAdminUserReference.INSTANCE)
         {
-            // The target is not an actual resource, its metadata can only be read.
-            hasAccess = right == Right.VIEW;
+            // The target is not an actual resource, its metadata is always readable.
+            hasAccess = true;
         } else {
-            hasAccess = this.documentUserManager.hasAccess(right, resolvedUserReference, resolvedTargetReference);
+            hasAccess = this.documentUserManager.hasReadAccess(resolvedUserReference, resolvedTargetReference);
         }
 
         return hasAccess;

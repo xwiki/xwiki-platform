@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
@@ -95,7 +94,7 @@ public class DefaultUserManager implements UserManager
     }
 
     @Override
-    public boolean hasAccess(Right right, UserReference user, UserReference target)
+    public boolean hasReadAccess(UserReference user, UserReference target)
     {
         boolean hasAccess;
 
@@ -110,16 +109,16 @@ public class DefaultUserManager implements UserManager
         }
 
         if (target == GuestUserReference.INSTANCE || target == SuperAdminUserReference.INSTANCE) {
-            // The target is not an actual resource, its metadata can only be read.
-            hasAccess = right == Right.VIEW;
+            // The target is not an actual resource, its metadata is always readable.
+            hasAccess = true;
         } else if (normalizedUserReference == CurrentUserReference.INSTANCE
             || normalizedTargetReference == CurrentUserReference.INSTANCE)
         {
             hasAccess = resolveUserManager(CurrentUserReference.INSTANCE)
-                .hasAccess(right, normalizedUserReference, normalizedTargetReference);
+                .hasReadAccess(normalizedUserReference, normalizedTargetReference);
         } else {
             // We know that "target" is an actual user resource, so we use it to resolve the manager.
-            hasAccess = resolveUserManager(target).hasAccess(right, normalizedUserReference, target);
+            hasAccess = resolveUserManager(target).hasReadAccess(normalizedUserReference, target);
         }
         return hasAccess;
     }

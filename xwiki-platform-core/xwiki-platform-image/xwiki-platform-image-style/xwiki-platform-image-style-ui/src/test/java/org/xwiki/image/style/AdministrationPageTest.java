@@ -27,9 +27,12 @@ import org.jsoup.select.Elements;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryBuilder;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.HTML50ComponentList;
@@ -37,8 +40,12 @@ import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.velocity.VelocityManager;
 
+import com.xpn.xwiki.objects.classes.DBListClass;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -57,6 +64,9 @@ class AdministrationPageTest extends PageTest
     @Mock
     private CSRFTokenScriptService csrfScriptService;
 
+    @Mock
+    private Query query;
+
     private VelocityManager velocityManager;
 
     @BeforeEach
@@ -65,6 +75,10 @@ class AdministrationPageTest extends PageTest
         this.componentManager.registerComponent(ScriptService.class, "csrf", this.csrfScriptService);
         when(this.csrfScriptService.getToken()).thenReturn("csrf_token0", "csrf_token1");
         this.velocityManager = this.oldcore.getMocker().getInstance(VelocityManager.class);
+        // Mock the database access, the values of the default style list are not needed.
+        QueryBuilder<DBListClass> queryBuilder = this.componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, QueryBuilder.class, DBListClass.class));
+        when(queryBuilder.build(any())).thenReturn(this.query);
     }
 
     @Test
@@ -108,5 +122,33 @@ class AdministrationPageTest extends PageTest
             updateConfigurationForm.getElementsByAttributeValue("name", "xredirect").val());
         assertEquals("Image.Style.Code.Configuration",
             updateConfigurationForm.getElementsByAttributeValue("name", "classname").val());
+    }
+
+    @Test
+    void defaultStyleFormProperties() throws Exception
+    {
+        // A current doc is expected to be in the context when rendering the page in the administration.
+        this.velocityManager.getVelocityContext()
+            .put("currentDoc", this.xwiki.getDocument(new DocumentReference("wiki", "Space", "Page"), this.context));
+        // The configuration class and its object are needed for the default style properties to be displayed.
+        loadPage(new DocumentReference("xwiki", List.of("Image", "Style", "Code"), "ConfigurationClass"));
+        loadPage(new DocumentReference("xwiki", List.of("Image", "Style", "Code"), "Configuration"));
+
+        Document document =
+            renderHTMLPage(new DocumentReference("xwiki", List.of("Image", "Style", "Code"), "Administration"));
+
+        Element updateConfigurationForm = document.getElementsByTag("form").get(1);
+        Elements terms = updateConfigurationForm.getElementsByTag("dt");
+        assertEquals(2, terms.size());
+        for (Element term : terms) {
+            // The properties are stored on Image.Style.Code.Configuration, which the in-place property editor cannot
+            // target since it always requests the current document.
+            assertFalse(term.hasClass("editableProperty"));
+            assertFalse(term.hasAttr("data-property"));
+            assertFalse(term.hasAttr("data-property-type"));
+            // The label references the field displayed right after it.
+            Element label = term.getElementsByTag("label").first();
+            assertNotNull(term.nextElementSibling().getElementById(label.attr("for")));
+        }
     }
 }

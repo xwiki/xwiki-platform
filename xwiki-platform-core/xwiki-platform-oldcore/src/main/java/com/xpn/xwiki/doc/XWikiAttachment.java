@@ -1344,10 +1344,10 @@ public class XWikiAttachment implements Cloneable
         try {
             // Note: If the attachment from which to copy data from has a null content, don't copy the content.
             if (isContentDifferentButNotNull(attachment)) {
-				try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
-					setContent(attachmentIs);
-					modified = true;
-				}
+                try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
+                    setContent(attachmentIs);
+                    modified = true;
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Failed to set content of attachment [{}] onto [{}]", this, attachment, e);
@@ -1360,20 +1360,19 @@ public class XWikiAttachment implements Cloneable
     {
         boolean isDifferent = false;
 
-		try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
-			if (attachmentIs != null) {
-				if (this.content == null) {
-					isDifferent = true;
-				} else {
-					try (InputStream is = getContentInputStream(null)) {
-						if (is != null && !IOUtils.contentEquals(is, attachmentIs)) {
-							isDifferent = true;
-						}
-					}
-				}
-
-			}
-		}
+        try (InputStream attachmentIs = attachment.getContentInputStream(null)) {
+            if (attachmentIs != null) {
+                if (this.content == null) {
+                    isDifferent = true;
+                } else {
+                    try (InputStream is = getContentInputStream(null)) {
+                        if (is != null && !IOUtils.contentEquals(is, attachmentIs)) {
+                            isDifferent = true;
+                        }
+                    }
+                }
+            }
+        }
 
         return isDifferent;
     }

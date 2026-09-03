@@ -85,7 +85,7 @@
       #foreach ($tab in $tabs)
         <li id="xwiki$tab['tabName']"#if($view == $tab['tabName']) class="active"#end>
           <a href="$doc.getURL('view',"viewer=children&view=$tab['tabName']&$!param")">
-            $services.localization.render($tab['title'])
+            $escapetool.xml($services.localization.render($tab['title']))
           </a>
         </li>
       #end

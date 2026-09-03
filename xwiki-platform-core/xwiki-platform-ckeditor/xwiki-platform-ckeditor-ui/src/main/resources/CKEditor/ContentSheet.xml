@@ -260,7 +260,8 @@ a[data-linktype="create"]::after {
 }
 .cke_widget_wrapper:hover &gt; .cke_widget_drag_handler_container[data-macro-name]::after {
   background-color: #dcdcdc;
-  color: #333;
+  /* The move handle container is painted with an opacity of 0.75, so the text has to be darker than usual. */
+  color: #000;
   display: block;
   font-family: monospace;
   font-size: 12px;

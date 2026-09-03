@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconManager;
+import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetManager;
 import org.xwiki.icon.rest.model.jaxb.Icon;
@@ -40,6 +42,7 @@ import org.xwiki.icon.rest.model.jaxb.ObjectFactory;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.skinx.RequiredSkinExtensionsRecorder;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -85,6 +88,12 @@ class DefaultIconThemesResourceTest
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @MockComponent
+    private RequiredSkinExtensionsRecorder skinExtensionsRecorder;
+
+    @MockComponent
+    private IconRenderer iconRenderer;
+
     @BeforeEach
     void setUp() throws Exception
     {
@@ -108,25 +117,30 @@ class DefaultIconThemesResourceTest
     @Test
     void getIconsByThemeNoNames() throws Exception
     {
-        when(this.iconSetManager.getIconSet("testTheme")).thenReturn(new IconSet("testTheme"));
+        IconSet iconSet = new IconSet("testTheme");
+        when(this.iconSetManager.getIconSet("testTheme")).thenReturn(iconSet);
 
-        Icons response = this.iconThemesResource.getIconsByTheme("wikiTest", "testTheme", singletonList(null));
+        Response response = this.iconThemesResource.getIconsByTheme("wikiTest", "testTheme", singletonList(null));
 
         Icons expected = new ObjectFactory().createIcons();
-        assertEquals(marshal(expected), marshal(response));
+        assertEquals(marshal(expected), marshal(response.getEntity()));
         verify(this.modelContext).setCurrentEntityReference(new WikiReference("wikiTest"));
         verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
+        verify(this.iconRenderer).use(iconSet);
     }
 
     @Test
     void getIconCurrentTheme() throws Exception
     {
-        when(this.iconSetManager.getDefaultIconSet()).thenReturn(new IconSet("testTheme"));
+        IconSet iconSet = new IconSet("testTheme");
+        when(this.iconSetManager.getDefaultIconSet()).thenReturn(iconSet);
         when(this.iconManager.hasIcon("testTheme", "plus")).thenReturn(true);
         Map<String, Object> metadata = new HashMap<>();
         metadata.put(META_DATA_ICON_SET_TYPE, "icon");
         when(this.iconManager.getMetaData("plus", "testTheme")).thenReturn(metadata);
-        Icons response = this.iconThemesResource.getIcons("wikiTest", singletonList("plus"));
+        String skinExtensions = "my skin extensions";
+        when(this.skinExtensionsRecorder.stop()).thenReturn(skinExtensions);
+        Response response = this.iconThemesResource.getIcons("wikiTest", singletonList("plus"));
 
         ObjectFactory objectFactory = new ObjectFactory();
         Icons expected = objectFactory.createIcons();
@@ -135,9 +149,13 @@ class DefaultIconThemesResourceTest
         icon.setIconSetType("icon");
         icon.setIconSetName("testTheme");
         expected.getIcons().add(icon);
-        assertEquals(marshal(expected), marshal(response));
+        assertEquals(marshal(expected), marshal(response.getEntity()));
+        assertEquals(skinExtensions,
+            response.getHeaderString(RequiredSkinExtensionsRecorder.XWIKI_SKIN_EXTENSIONS_DEFAULT_HEADER));
         verify(this.modelContext).setCurrentEntityReference(new WikiReference("wikiTest"));
         verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
+        verify(this.iconRenderer).use(iconSet);
+        verify(this.skinExtensionsRecorder).start();
     }
 
     @Test
@@ -154,13 +172,16 @@ class DefaultIconThemesResourceTest
         iconBMetaData.put("url", "http://test/url");
         iconBMetaData.put("cssClass", "");
 
-        when(this.iconSetManager.getIconSet("testTheme")).thenReturn(new IconSet("testTheme"));
+        IconSet iconSet = new IconSet("testTheme");
+        when(this.iconSetManager.getIconSet("testTheme")).thenReturn(iconSet);
         when(this.iconManager.hasIcon("testTheme","iconA")).thenReturn(true);
         when(this.iconManager.hasIcon("testTheme", "iconB")).thenReturn(true);
         when(this.iconManager.getMetaData("iconA", "testTheme")).thenReturn(iconAMetaData);
         when(this.iconManager.getMetaData("iconB", "testTheme")).thenReturn(iconBMetaData);
+        String skinExtensions = "my skin extensions";
+        when(this.skinExtensionsRecorder.stop()).thenReturn(skinExtensions);
 
-        Icons response = this.iconThemesResource
+        Response response = this.iconThemesResource
             .getIconsByTheme("wikiTest", "testTheme", asList("iconA", "unknownIcon", "iconB"));
 
         ObjectFactory objectFactory = new ObjectFactory();
@@ -178,9 +199,13 @@ class DefaultIconThemesResourceTest
         iconB.setUrl("http://test/url");
         expected.getIcons().add(iconB);
         expected.getMissingIcons().add("unknownIcon");
-        assertEquals(marshal(expected), marshal(response));
+        assertEquals(marshal(expected), marshal(response.getEntity()));
+        assertEquals(skinExtensions,
+            response.getHeaderString(RequiredSkinExtensionsRecorder.XWIKI_SKIN_EXTENSIONS_DEFAULT_HEADER));
         verify(this.modelContext).setCurrentEntityReference(new WikiReference("wikiTest"));
         verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
+        verify(this.iconRenderer).use(iconSet);
+        verify(this.skinExtensionsRecorder).start();
     }
 
     @Test
@@ -197,13 +222,17 @@ class DefaultIconThemesResourceTest
         iconBMetaData.put("url", "http://test/url");
         iconBMetaData.put("cssClass", "");
 
-        when(this.iconSetManager.getCurrentIconSet()).thenReturn(new IconSet("testTheme"));
+        IconSet iconSet = new IconSet("testTheme");
+        when(this.iconSetManager.getCurrentIconSet()).thenReturn(iconSet);
         when(this.iconManager.hasIcon("testTheme", "iconA")).thenReturn(true);
         when(this.iconManager.hasIcon("testTheme", "iconB")).thenReturn(true);
         when(this.iconManager.getMetaData("iconA", "testTheme")).thenReturn(iconAMetaData);
         when(this.iconManager.getMetaData("iconB", "testTheme")).thenReturn(iconBMetaData);
 
-        Icons response = this.iconThemesResource.getIcons("wikiTest", asList("iconA", "unknownIcon", "iconB"));
+        String skinExtensions = "my skin extensions";
+        when(this.skinExtensionsRecorder.stop()).thenReturn(skinExtensions);
+
+        Response response = this.iconThemesResource.getIcons("wikiTest", asList("iconA", "unknownIcon", "iconB"));
 
         ObjectFactory objectFactory = new ObjectFactory();
         Icons expected = objectFactory.createIcons();
@@ -220,10 +249,14 @@ class DefaultIconThemesResourceTest
         iconB.setUrl("http://test/url");
         expected.getIcons().add(iconB);
         expected.getMissingIcons().add("unknownIcon");
-        assertEquals(marshal(expected), marshal(response));
+        assertEquals(marshal(expected), marshal(response.getEntity()));
+        assertEquals(skinExtensions,
+            response.getHeaderString(RequiredSkinExtensionsRecorder.XWIKI_SKIN_EXTENSIONS_DEFAULT_HEADER));
         verify(this.modelContext).setCurrentEntityReference(new WikiReference("wikiTest"));
         verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
         verify(this.iconSetManager, never()).getDefaultIconSet();
+        verify(this.iconRenderer).use(iconSet);
+        verify(this.skinExtensionsRecorder).start();
     }
 
     @Test
@@ -266,7 +299,7 @@ class DefaultIconThemesResourceTest
         assertEquals(WikiManagerException.class, webApplicationException.getCause().getClass());
     }
 
-    private String marshal(Icons icons) throws JAXBException
+    private String marshal(Object icons) throws JAXBException
     {
         // We need to marshal because jaxb generated objects does not have equalily operations.
         JAXBContext jaxbContext = JAXBContext.newInstance(Icons.class);

@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconManager;
+import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetManager;
 import org.xwiki.icon.rest.IconThemesResource;
@@ -42,6 +43,7 @@ import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiRestComponent;
+import org.xwiki.skinx.RequiredSkinExtensionsRecorder;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -72,19 +74,25 @@ public class DefaultIconThemesResource implements IconThemesResource, XWikiRestC
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @Inject
+    private RequiredSkinExtensionsRecorder skinExtensionsRecorder;
+
+    @Inject
+    private IconRenderer iconRenderer;
+
     @Override
-    public Icons getIconsByTheme(String wikiId, String iconTheme, List<String> names)
+    public Response getIconsByTheme(String wikiId, String iconTheme, List<String> names)
     {
         return iconsByTheme(wikiId, iconTheme, names);
     }
 
     @Override
-    public Icons getIcons(String wikiName, List<String> names)
+    public Response getIcons(String wikiName, List<String> names)
     {
         return iconsByTheme(wikiName, null, names);
     }
 
-    private Icons iconsByTheme(String wikiId, String iconTheme, List<String> iconNames)
+    private Response iconsByTheme(String wikiId, String iconTheme, List<String> iconNames)
     {
         wikiExists(wikiId);
 
@@ -93,11 +101,12 @@ public class DefaultIconThemesResource implements IconThemesResource, XWikiRestC
         try {
             // Set the requested wiki.
             this.modelContext.setCurrentEntityReference(new WikiReference(wikiId));
-
+            this.skinExtensionsRecorder.start();
             IconSet iconSet = getIconSet(iconTheme);
             if (iconSet == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
+            this.iconRenderer.use(iconSet);
             String iconSetName = iconSet.getName();
             ObjectFactory objectFactory = new ObjectFactory();
             Icons icons = objectFactory.createIcons();
@@ -111,8 +120,10 @@ public class DefaultIconThemesResource implements IconThemesResource, XWikiRestC
                     icons.getMissingIcons().add(iconName);
                 }
             }
-
-            return icons;
+            String skinExtensions = this.skinExtensionsRecorder.stop();
+            return Response.ok(icons)
+                .header(RequiredSkinExtensionsRecorder.XWIKI_SKIN_EXTENSIONS_DEFAULT_HEADER, skinExtensions)
+                .build();
         } catch (IconException e) {
             throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
         } finally {

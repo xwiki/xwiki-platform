@@ -254,11 +254,14 @@ a[data-linktype="create"]::after {
   don't have a visible output. The move handle is hidden by collapsing its container, which doesn't hide the
   overflowing macro name, so the macro name is displayed only while the macro is hovered. */
 .cke_widget_drag_handler_container &gt; .macro-name {
+  /* Match the grey CKEditor hard-codes for the move handle, rather than a color theme value that would drift away
+    from it. The handle container is painted with an opacity of 0.75, applied after the text is drawn, so the text has
+    to be black to stay readable through it. */
   background-color: #dcdcdc;
-  /* The move handle container is painted with an opacity of 0.75, so the text has to be darker than usual. */
   color: #000;
   display: none;
   font-family: monospace;
+  /* Fit the text in the 15px band of the move handle, whose size CKEditor hard-codes as well. */
   font-size: 12px;
   line-height: 15px;
   padding: 0 .3em;

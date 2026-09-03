@@ -1386,7 +1386,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             getProgress().startStep(getDocumentReference(), "document.progress.render.translatedcontent",
                 "Get translated content");
 
-            XWikiContext xcontext = getXWikiContext();
+            // There's nothing to display without a context: the translated content, the rendering cache and
+            // the display itself below are all resolved through it.
+            XWikiContext xcontext = Objects.requireNonNull(getXWikiContext());
 
             XWikiDocument tdoc = translate ? getTranslatedDocument(xcontext) : this;
             String translatedContent = tdoc.getContent();
@@ -9004,6 +9006,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         // Restore the Execution Context. This will also restore the previous Velocity and Script Context.
         Execution execution = Utils.getComponent(Execution.class);
         execution.popContext();
+
+        // The Execution Context is popped first so that backupContext()'s push is undone whatever happens next.
+        // Everything restored below is written to the XWiki Context, which backupContext() also requires.
+        Objects.requireNonNull(context);
 
         // Restore the current document on the XWiki Context.
         context.setDoc((XWikiDocument) backup.get("doc"));

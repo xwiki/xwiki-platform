@@ -42,7 +42,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.web.Utils;
 
@@ -580,32 +579,6 @@ public class DBListClass extends ListClass
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
             hidden.setAttributeFilter(new XMLAttributeValueFilter());
             buffer.append(hidden);
-        }
-    }
-
-    @Override
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
-        XWikiContext context)
-    {
-        List<String> selectlist;
-        String separator = getSeparator();
-        BaseProperty prop = (BaseProperty) object.safeget(name);
-        Map<String, ListItem> map = getMap(context);
-
-        // Skip unset values.
-        if (prop == null) {
-            return;
-        }
-
-        if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
-            List<String> newlist = new ArrayList<>();
-            for (String entry : selectlist) {
-                newlist.add(getDisplayValue(entry, name, map, context));
-            }
-            buffer.append(StringUtils.join(newlist, separator));
-        } else {
-            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
         }
     }
 }

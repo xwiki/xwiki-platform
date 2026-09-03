@@ -136,10 +136,12 @@ describe('XWiki Macro Plugin for CKEditor', function() {
     editor.setData('<!--startmacro:info|-||-|info--><div class="box infomessage">info</div><!--stopmacro-->', {
       callback: function() {
         var infoMacro = getWikiMacroWidgets(editor)[0];
-        expect(infoMacro.dragHandlerContainer.getAttribute('data-macro-name')).toBe('info');
+        var macroName = infoMacro.dragHandlerContainer.findOne('.macro-name');
+        expect(macroName.getText()).toBe('info');
+        expect(macroName.getAttribute('aria-hidden')).toBe('true');
 
         infoMacro.setData('name', 'warning');
-        expect(infoMacro.dragHandlerContainer.getAttribute('data-macro-name')).toBe('warning');
+        expect(infoMacro.dragHandlerContainer.findOne('.macro-name').getText()).toBe('warning');
 
         done();
       }

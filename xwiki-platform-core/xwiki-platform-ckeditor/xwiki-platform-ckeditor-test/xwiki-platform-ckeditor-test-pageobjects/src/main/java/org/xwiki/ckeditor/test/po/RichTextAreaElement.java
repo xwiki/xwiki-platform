@@ -786,15 +786,10 @@ public class RichTextAreaElement extends BaseElement
     public String getMacroNameNextToMoveHandle(int macroIndex)
     {
         return getFromEditedContent(() -> {
-            WebElement dragHandlerContainer = this.content.getMacros().get(macroIndex).findElement(By.xpath(
-                "./ancestor::*[@data-cke-widget-wrapper][1]/*[contains(@class, 'cke_widget_drag_handler_container')]"));
-            // The macro name is displayed using the content of a pseudo element, which is not part of the DOM, so we
-            // can't read its text. We read instead the attribute the pseudo element takes its content from, after
-            // checking that the pseudo element is displayed.
-            return (String) getDriver().executeScript("""
-                const dragHandlerContainer = arguments[0];
-                return getComputedStyle(dragHandlerContainer, '::after').display === 'none' ? null
-                    : dragHandlerContainer.getAttribute('data-macro-name');""", dragHandlerContainer);
+            WebElement macroName = this.content.getMacros().get(macroIndex).findElement(By.xpath(
+                "./ancestor::*[@data-cke-widget-wrapper][1]"
+                    + "/*[contains(@class, 'cke_widget_drag_handler_container')]/*[@class = 'macro-name']"));
+            return macroName.isDisplayed() ? macroName.getText() : null;
         });
     }
 }

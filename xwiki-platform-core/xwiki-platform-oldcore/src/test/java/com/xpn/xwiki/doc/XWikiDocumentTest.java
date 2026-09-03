@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -76,6 +77,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -972,5 +974,142 @@ public class XWikiDocumentTest
 
         assertNotSame(userReference, this.document.getAuthors().getContentAuthor());
         assertNotSame(userReference, this.document.getAuthors().getCreator());
+    }
+
+    @Test
+    void applyWithoutModification() throws Exception
+    {
+        XWikiDocument document = createDocumentToApply();
+        XWikiDocument otherDocument = createDocumentToApply();
+
+        assertFalse(document.apply(otherDocument));
+
+        assertEquals(createDocumentToApply(), document);
+    }
+
+    @Test
+    void applyContent() throws Exception
+    {
+        XWikiDocument document = createDocumentToApply();
+        XWikiDocument otherDocument = createDocumentToApply();
+        otherDocument.setContent("other content");
+
+        assertTrue(document.apply(otherDocument));
+
+        assertEquals("other content", document.getContent());
+    }
+
+    @Test
+    void applyHidden() throws Exception
+    {
+        XWikiDocument document = createDocumentToApply();
+        XWikiDocument otherDocument = createDocumentToApply();
+        otherDocument.setHidden(true);
+
+        assertTrue(document.apply(otherDocument));
+
+        assertTrue(document.isHidden());
+    }
+
+    @Test
+    void applyAddedXObject() throws Exception
+    {
+        XWikiDocument document = createDocumentToApply();
+        XWikiDocument otherDocument = createDocumentToApply();
+        otherDocument.newXObject(CLASS_REFERENCE, this.oldcore.getXWikiContext()).setStringValue("string", "other");
+
+        assertTrue(document.apply(otherDocument));
+
+        assertEquals("other", document.getXObject(CLASS_REFERENCE, 1).getStringValue("string"));
+    }
+
+    @Test
+    void applyRemovedXObject() throws Exception
+    {
+        XWikiDocument document = createDocumentToApply();
+        XWikiDocument otherDocument = createDocumentToApply();
+        otherDocument.removeXObjects(CLASS_REFERENCE);
+
+        assertTrue(document.apply(otherDocument));
+
+        assertNull(document.getXObject(CLASS_REFERENCE, 0));
+    }
+
+    @Test
+    void applyRemovedXObjectWithoutClean() throws Exception
+    {
+        XWikiDocument document = createDocumentToApply();
+        XWikiDocument otherDocument = createDocumentToApply();
+        otherDocument.removeXObjects(CLASS_REFERENCE);
+
+        assertFalse(document.apply(otherDocument, false));
+
+        assertNotNull(document.getXObject(CLASS_REFERENCE, 0));
+    }
+
+    @Test
+    void applyAddedAttachment() throws Exception
+    {
+        XWikiDocument document = createDocumentToApply();
+        XWikiDocument otherDocument = createDocumentToApply();
+        otherDocument.setAttachment("other.txt", new ByteArrayInputStream("other".getBytes()),
+            this.oldcore.getXWikiContext());
+
+        assertTrue(document.apply(otherDocument));
+
+        assertNotNull(document.getAttachment("other.txt"));
+    }
+
+    @Test
+    void applyRemovedAttachment() throws Exception
+    {
+        XWikiDocument document = createDocumentToApply();
+        XWikiDocument otherDocument = createDocumentToApply();
+        otherDocument.removeAttachment(otherDocument.getAttachment("file.txt"));
+
+        assertTrue(document.apply(otherDocument));
+
+        assertNull(document.getAttachment("file.txt"));
+    }
+
+    @Test
+    void applyRemovedAttachmentWithoutClean() throws Exception
+    {
+        XWikiDocument document = createDocumentToApply();
+        XWikiDocument otherDocument = createDocumentToApply();
+        otherDocument.removeAttachment(otherDocument.getAttachment("file.txt"));
+
+        assertFalse(document.apply(otherDocument, false));
+
+        assertNotNull(document.getAttachment("file.txt"));
+    }
+
+    @Test
+    void applyModifiedAttachment() throws Exception
+    {
+        XWikiDocument document = createDocumentToApply();
+        XWikiDocument otherDocument = createDocumentToApply();
+        otherDocument.getAttachment("file.txt").setMimeType("text/html");
+
+        assertTrue(document.apply(otherDocument));
+
+        assertEquals("text/html", document.getAttachment("file.txt").getMimeType());
+    }
+
+    /**
+     * @return a document with the various kinds of data {@link XWikiDocument#apply(XWikiDocument)} deals with
+     */
+    private XWikiDocument createDocumentToApply() throws Exception
+    {
+        XWikiDocument documentToApply = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, "ApplyPage"));
+        documentToApply.setSyntax(Syntax.XWIKI_2_1);
+        documentToApply.setTitle("title");
+        documentToApply.setContent("content");
+        documentToApply.newXObject(CLASS_REFERENCE, this.oldcore.getXWikiContext()).setStringValue("string", "string");
+        documentToApply.setAttachment("file.txt", new ByteArrayInputStream("content".getBytes()),
+            this.oldcore.getXWikiContext());
+        documentToApply.getAttachment("file.txt").setMimeType("text/plain");
+
+        return documentToApply;
     }
 }

@@ -493,7 +493,7 @@
     <h2>$services.localization.render('extension.history.replayStatus.title')</h2>
     <div class="box infomessage">
       $services.icon.renderHTML('info')
-      $services.localization.render('extension.history.replayStatus.notFound', [$replayJobId])
+      $escapetool.xml($services.localization.render('extension.history.replayStatus.notFound', [$replayJobId]))
     </div>
   #end
 #end

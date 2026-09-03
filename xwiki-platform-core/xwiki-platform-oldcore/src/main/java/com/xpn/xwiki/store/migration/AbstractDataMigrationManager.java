@@ -281,7 +281,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     /**
      * Unified constructor for all subclasses.
      */
-    public AbstractDataMigrationManager()
+    protected AbstractDataMigrationManager()
     {
     }
 

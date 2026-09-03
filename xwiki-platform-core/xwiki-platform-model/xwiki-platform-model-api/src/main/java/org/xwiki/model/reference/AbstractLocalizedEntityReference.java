@@ -45,7 +45,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
      * @param name name for the newly created entity reference, could not be null.
      * @param type type for the newly created entity reference, could not be null.
      */
-    public AbstractLocalizedEntityReference(String name, EntityType type)
+    protected AbstractLocalizedEntityReference(String name, EntityType type)
     {
         super(name, type);
     }
@@ -57,7 +57,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
      * @param type type for the newly created entity reference, could not be null.
      * @param locale the {@link Locale} of the entity.
      */
-    public AbstractLocalizedEntityReference(String name, EntityType type, Locale locale)
+    protected AbstractLocalizedEntityReference(String name, EntityType type, Locale locale)
     {
         this(name, type);
 
@@ -71,7 +71,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
      * @param type type for the newly created entity reference, could not be null.
      * @param parent parent reference for the newly created entity reference, may be null.
      */
-    public AbstractLocalizedEntityReference(String name, EntityType type, EntityReference parent)
+    protected AbstractLocalizedEntityReference(String name, EntityType type, EntityReference parent)
     {
         super(name, type, parent);
     }
@@ -84,7 +84,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
      * @param parent parent reference for the newly created entity reference, may be null.
      * @param parameters parameters for this reference, may be null
      */
-    public AbstractLocalizedEntityReference(String name, EntityType type, EntityReference parent,
+    protected AbstractLocalizedEntityReference(String name, EntityType type, EntityReference parent,
         Map<String, Serializable> parameters)
     {
         super(name, type, parent, parameters);
@@ -96,7 +96,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
      * @param parent parent reference for the newly created entity reference, may be null.
      * @param locale the {@link Locale} of the entity.
      */
-    public AbstractLocalizedEntityReference(String name, EntityType type, EntityReference parent, Locale locale)
+    protected AbstractLocalizedEntityReference(String name, EntityType type, EntityReference parent, Locale locale)
     {
         super(name, type, parent);
 
@@ -108,7 +108,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
      *
      * @param reference the reference to clone
      */
-    public AbstractLocalizedEntityReference(EntityReference reference)
+    protected AbstractLocalizedEntityReference(EntityReference reference)
     {
         super(reference);
     }
@@ -119,7 +119,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
      * @param reference the reference to clone
      * @param locale the {@link Locale} of the new reference
      */
-    public AbstractLocalizedEntityReference(EntityReference reference, Locale locale)
+    protected AbstractLocalizedEntityReference(EntityReference reference, Locale locale)
     {
         super(reference);
 
@@ -146,7 +146,7 @@ public abstract class AbstractLocalizedEntityReference extends EntityReference
      * @param parent the new parent to use
      * @since 10.8RC1
      */
-    public AbstractLocalizedEntityReference(EntityReference reference, EntityReference parent)
+    protected AbstractLocalizedEntityReference(EntityReference reference, EntityReference parent)
     {
         super(reference, parent);
     }

@@ -58,9 +58,9 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * @since 18.8.0RC1
  */
 @Component
-@Named("R180700000XWIKI16742")
+@Named("R180800000XWIKI16742")
 @Singleton
-public class R180700000XWIKI16742DataMigration extends AbstractHibernateDataMigration
+public class R180800000XWIKI16742DataMigration extends AbstractHibernateDataMigration
 {
     @Inject
     @Named("current")
@@ -78,7 +78,7 @@ public class R180700000XWIKI16742DataMigration extends AbstractHibernateDataMigr
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(180700000);
+        return new XWikiDBVersion(180800000);
     }
 
     @Override
@@ -121,10 +121,11 @@ public class R180700000XWIKI16742DataMigration extends AbstractHibernateDataMigr
     private List<String> getUsersWithoutUserType(Session session) throws HibernateException, XWikiException
     {
         Query<String> query = session.createQuery("select obj.name from BaseObject obj"
-            + " where obj.className = '" + XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING + "'"
-            + " and obj.id not in (select prop.id.id from StringProperty prop where prop.id.name='"
-            + XWikiUsersDocumentInitializer.USERTYPE_FIELD + "')",
+            + " where obj.className = :className"
+            + " and obj.id not in (select prop.id.id from StringProperty prop where prop.id.name = :propertyName)",
             String.class);
+        query.setParameter("className", XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING);
+        query.setParameter("propertyName", XWikiUsersDocumentInitializer.USERTYPE_FIELD);
 
         return query.list();
     }

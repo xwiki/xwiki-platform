@@ -108,10 +108,8 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
 
     /**
      * The default value of the {@link #USERTYPE_FIELD} field.
-     *
-     * @since 18.8.0RC1
      */
-    public static final String USERTYPE_DEFAULT_VALUE = "Simple";
+    private static final String USERTYPE_DEFAULT_VALUE = "Simple";
 
     /**
      * Used to bind a class to a document sheet.

@@ -179,6 +179,27 @@
                   </item>
                 </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>
+                No real breakage: the API return type changed, but it's the REST API and the actual return type
+                didn't change, we only encapsulate it in a Response to also allow setting a header.
+              </justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method org.xwiki.icon.rest.model.jaxb.Icons org.xwiki.icon.rest.IconThemesResource::getIcons(java.lang.String, java.util.List&lt;java.lang.String&gt;)</old>
+                  <new>method javax.ws.rs.core.Response org.xwiki.icon.rest.IconThemesResource::getIcons(java.lang.String, java.util.List&lt;java.lang.String&gt;)</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method org.xwiki.icon.rest.model.jaxb.Icons org.xwiki.icon.rest.IconThemesResource::getIconsByTheme(java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;)</old>
+                  <new>method javax.ws.rs.core.Response org.xwiki.icon.rest.IconThemesResource::getIconsByTheme(java.lang.String, java.lang.String, java.util.List&lt;java.lang.String&gt;)</new>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

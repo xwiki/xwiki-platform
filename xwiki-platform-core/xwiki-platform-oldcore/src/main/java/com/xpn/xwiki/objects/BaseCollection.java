@@ -874,16 +874,24 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             oldPropertyValue = getPropertyDisplayValue(oldProperty, pclass, oldCollection, propertyName, context);
         } else {
             // Cannot get property definition, so use the plain value
-            newPropertyValue = newProperty.toText();
+            newPropertyValue = (newProperty == null) ? "" : newProperty.toText();
             oldPropertyValue = oldProperty.toText();
         }
         difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
             propertyName, propertyType, oldPropertyValue, newPropertyValue));
     }
 
+    /**
+     * @return the value of the property as it would be displayed in the interface, or the empty string when the
+     *         property is not set in the collection, matching how addOrChangePropertyDiff() compares the two sides
+     */
     private String getPropertyDisplayValue(BaseProperty property, PropertyClass pclass, BaseCollection collection,
         String propertyName, XWikiContext context)
     {
+        if (property == null) {
+            return "";
+        }
+
         return (property.getValue() instanceof String) ? property.toText()
             : pclass.displayView(propertyName, collection, context);
     }

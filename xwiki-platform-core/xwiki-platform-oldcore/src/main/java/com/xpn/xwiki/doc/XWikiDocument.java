@@ -9578,7 +9578,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             modified = true;
         }
 
-        if (isHidden() != document.isHidden()) {
+        if (!Objects.equals(isHidden(), document.isHidden())) {
             setHidden(document.isHidden());
             modified = true;
         }
@@ -9642,6 +9642,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             for (XWikiAttachment attachment : new ArrayList<XWikiAttachment>(getAttachmentList())) {
                 if (document.getAttachment(attachment.getFilename()) == null) {
                     removeAttachment(attachment);
+                    modified = true;
                 }
             }
         }
@@ -9650,8 +9651,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             XWikiAttachment originalAttachment = getAttachment(attachment.getFilename());
             if (originalAttachment == null) {
                 addAttachment(attachment);
+                modified = true;
             } else {
-                originalAttachment.apply(attachment);
+                modified |= originalAttachment.apply(attachment);
             }
         }
 

@@ -19,6 +19,8 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -70,6 +72,51 @@ public class LinkDialog extends CKEditorDialog
     public SuggestInputElement getResourceSuggestInput()
     {
         return new SuggestInputElement(getResourceReferenceInput());
+    }
+
+    /**
+     * @return the input the resource reference is typed in, which is the input created by the suggestion widget when
+     *         the selected resource type has a suggester, and the resource reference input otherwise
+     */
+    private WebElement getDisplayedResourceReferenceInput()
+    {
+        List<WebElement> suggesterInputs = getResourcePicker().findElements(cssSelector(".ts-control > input"));
+        return suggesterInputs.isEmpty() ? getResourceReferenceInput() : suggesterInputs.get(0);
+    }
+
+    /**
+     * @return the first input displayed above the resource picker, which is the link display text
+     */
+    private WebElement getDisplayTextInput()
+    {
+        return getContainer().findElements(cssSelector(".cke_dialog_page_contents input.cke_dialog_ui_input_text"))
+            .stream().filter(WebElement::isDisplayed).findFirst().orElseThrow();
+    }
+
+    /**
+     * Moves the keyboard focus to the display text field, then presses the tab key once.
+     *
+     * @return {@code true} if the focus landed on the input the resource reference is typed in
+     * @since 18.8.0RC1
+     */
+    public boolean isResourceReferenceInputNextInTabOrder()
+    {
+        WebElement displayTextInput = getDisplayTextInput();
+        displayTextInput.click();
+        displayTextInput.sendKeys(Keys.TAB);
+        return getDriver().switchTo().activeElement().equals(getDisplayedResourceReferenceInput());
+    }
+
+    /**
+     * @return {@code true} if the field label is bound to the input the resource reference is typed in
+     * @since 18.8.0RC1
+     */
+    public boolean isLabelBoundToResourceReferenceInput()
+    {
+        String labelTarget =
+            getResourcePicker().findElement(xpath("preceding-sibling::label")).getDomAttribute("for");
+        return labelTarget != null
+            && labelTarget.equals(getDisplayedResourceReferenceInput().getDomAttribute("id"));
     }
 
     /**

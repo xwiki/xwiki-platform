@@ -35,6 +35,8 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Test of the CKEditor Link Plugin.
  *
@@ -99,6 +101,12 @@ class LinkIT extends AbstractCKEditorIT
         editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER);
 
         linkDialog = editor.getToolBar().insertOrEditLink().setResourceType("attach");
+
+        // Changing the resource type destroys and recreates the suggestion widget, so make sure the input it creates
+        // is still reachable with the tab key and still bound to the field label.
+        assertTrue(linkDialog.isResourceReferenceInputNextInTabOrder());
+        assertTrue(linkDialog.isLabelBoundToResourceReferenceInput());
+
         linkDialog.getResourceSuggestInput().sendKeys("text").waitForSuggestions().selectByVisibleText(attachmentName);
         linkDialog.submit();
 

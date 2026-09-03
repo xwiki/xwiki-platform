@@ -40,7 +40,7 @@ public abstract class AbstractXarEntryType implements XarEntryType
     /**
      * @param name the name of the type
      */
-    public AbstractXarEntryType(String name)
+    protected AbstractXarEntryType(String name)
     {
         this.name = name;
     }

@@ -34,7 +34,7 @@ public abstract class AbstractTemplateEvent implements TemplateEvent
     /**
      * Matches any {@link TemplateEvent}s.
      */
-    public AbstractTemplateEvent()
+    protected AbstractTemplateEvent()
     {
 
     }
@@ -42,7 +42,7 @@ public abstract class AbstractTemplateEvent implements TemplateEvent
     /**
      * @param id the id of the template
      */
-    public AbstractTemplateEvent(String id)
+    protected AbstractTemplateEvent(String id)
     {
         this.id = id;
     }

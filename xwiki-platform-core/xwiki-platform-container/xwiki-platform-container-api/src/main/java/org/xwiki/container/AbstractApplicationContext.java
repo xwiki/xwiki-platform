@@ -61,7 +61,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext
      *            {@link ConfigurationSource} because it depends on {@link ApplicationContext} to actually get the
      *            configuration
      */
-    public AbstractApplicationContext(ComponentManager componentManager)
+    protected AbstractApplicationContext(ComponentManager componentManager)
     {
         this.componentManager = componentManager;
     }

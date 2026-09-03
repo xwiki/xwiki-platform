@@ -108,7 +108,7 @@ public abstract class ListClass extends PropertyClass
 
     private static final String XCLASSNAME = "list";
 
-    public ListClass(String name, String prettyname, PropertyMetaClass wclass)
+    protected ListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
         super(name, prettyname, wclass);
         setRelationalStorage(false);
@@ -119,12 +119,12 @@ public abstract class ListClass extends PropertyClass
         setCache(false);
     }
 
-    public ListClass(PropertyMetaClass wclass)
+    protected ListClass(PropertyMetaClass wclass)
     {
         this(XCLASSNAME, "List", wclass);
     }
 
-    public ListClass()
+    protected ListClass()
     {
         this(null);
     }

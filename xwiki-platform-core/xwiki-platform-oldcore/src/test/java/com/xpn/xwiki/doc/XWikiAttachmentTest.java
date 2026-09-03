@@ -284,6 +284,32 @@ class XWikiAttachmentTest
     }
 
     @Test
+    void applyMimeType() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+        attachment.setMimeType("text/plain");
+        XWikiAttachment newAttachment = new XWikiAttachment();
+        newAttachment.setMimeType("text/html");
+
+        assertTrue(attachment.apply(newAttachment));
+
+        assertEquals("text/html", attachment.getMimeType());
+    }
+
+    @Test
+    void applyIdenticalAttachment() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+        attachment.setMimeType("text/plain");
+        attachment.setContent(new ByteArrayInputStream("content".getBytes()));
+        XWikiAttachment newAttachment = new XWikiAttachment();
+        newAttachment.setMimeType("text/plain");
+        newAttachment.setContent(new ByteArrayInputStream("content".getBytes()));
+
+        assertFalse(attachment.apply(newAttachment));
+    }
+
+    @Test
     void resetMimeType()
     {
         XWikiAttachment attachment = new XWikiAttachment();

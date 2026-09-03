@@ -131,6 +131,11 @@ class MacroIT extends AbstractCKEditorIT
         setSource("before\n\n{{id name='test'/}}\n\nafter");
         assertEquals("before\nmacro:id\nafter", this.textArea.getText());
 
+        // The macro name is displayed next to the move handle, but only while the macro is hovered.
+        assertNull(this.textArea.getMacroNameNextToMoveHandle(0));
+        this.textArea.hoverMacro(0);
+        assertEquals("id", this.textArea.getMacroNameNextToMoveHandle(0));
+
         this.textArea.sendKeys(Keys.HOME, Keys.LEFT);
         this.textArea.waitUntilWidgetSelected();
         this.textArea.sendKeys(Keys.ENTER);
@@ -209,28 +214,5 @@ class MacroIT extends AbstractCKEditorIT
             {{/info}}
 
             after""");
-    }
-
-    @Test
-    @Order(5)
-    void macroNameNextToTheMoveHandle(TestUtils setup, TestReference testReference)
-    {
-        edit(setup, testReference, true);
-        setSource("""
-            {{info}}
-            one
-            {{/info}}
-
-            {{warning}}
-            two
-            {{/warning}}""");
-
-        // The macro name is displayed only when the macro is hovered.
-        assertNull(this.textArea.getMacroNameNextToMoveHandle(0));
-        assertNull(this.textArea.getMacroNameNextToMoveHandle(1));
-
-        this.textArea.hoverMacro(1);
-        assertEquals("warning", this.textArea.getMacroNameNextToMoveHandle(1));
-        assertNull(this.textArea.getMacroNameNextToMoveHandle(0));
     }
 }

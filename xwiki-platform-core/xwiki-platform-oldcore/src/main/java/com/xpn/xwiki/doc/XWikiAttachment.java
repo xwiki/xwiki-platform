@@ -1305,7 +1305,7 @@ public class XWikiAttachment implements Cloneable
             modified = true;
         }
 
-        if (Strings.CS.equals(getMimeType(), attachment.getMimeType())) {
+        if (!Strings.CS.equals(getMimeType(), attachment.getMimeType())) {
             setMimeType(attachment.getMimeType());
             modified = true;
         }

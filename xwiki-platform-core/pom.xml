@@ -209,6 +209,26 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>
+                UserManager#hasAccess() is an unstable API. Checking any right on a user through the user API was too
+                broad, checking view access makes sense but others are out of scope.
+                It is now replaced by UserManager#hasViewAccess().
+              </justification>
+              <criticality>documented</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method boolean org.xwiki.user.UserManager::hasAccess(org.xwiki.security.authorization.Right, org.xwiki.user.UserReference, org.xwiki.user.UserReference)</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.addedToInterface</code>
+                  <new>method boolean org.xwiki.user.UserManager::hasViewAccess(org.xwiki.user.UserReference, org.xwiki.user.UserReference)</new>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

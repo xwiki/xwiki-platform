@@ -485,7 +485,7 @@
     #displayExtensionHistoryReplayStatus($replayJobStatus)
   #else
     <h2>$services.localization.render('extension.history.replayStatus.title')</h2>
-    #info($services.localization.render('extension.history.replayStatus.notFound', [$replayJobId]))
+    #info($escapetool.xml($services.localization.render('extension.history.replayStatus.notFound', [$replayJobId])))
   #end
 #end
 

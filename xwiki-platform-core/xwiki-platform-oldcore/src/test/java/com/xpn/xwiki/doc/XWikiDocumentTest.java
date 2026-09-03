@@ -39,6 +39,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -82,6 +83,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -860,7 +862,23 @@ public class XWikiDocumentTest
     }
 
     @Test
-    public void getIntValue()
+    void restoreContextWithoutXWikiContext() throws Exception
+    {
+        Execution execution = this.oldcore.getMocker().getInstance(Execution.class);
+        ExecutionContext initialContext = execution.getContext();
+
+        Map<String, Object> backup = new HashMap<>();
+        XWikiDocument.backupContext(backup, this.oldcore.getXWikiContext());
+        assertNotSame(initialContext, execution.getContext());
+
+        // Everything restored on the XWiki Context needs one, so a missing context is reported rather than failing
+        // further down. The Execution Context that backupContext() pushed is popped all the same.
+        assertThrows(NullPointerException.class, () -> XWikiDocument.restoreContext(backup, null));
+        assertSame(initialContext, execution.getContext());
+    }
+
+    @Test
+    void getIntValue()
     {
         assertEquals(42, this.document.getIntValue(CLASS_REFERENCE, "int", 99));
         assertEquals(42, this.document.getIntValue(CLASS_REFERENCE, "int"));

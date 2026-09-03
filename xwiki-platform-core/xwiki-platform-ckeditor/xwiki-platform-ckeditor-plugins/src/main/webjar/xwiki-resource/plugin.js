@@ -157,7 +157,7 @@
             });
           }, this.getDialog());
           this.resourceReferenceFocusable = resourceReferenceInput._focusable;
-          this.updateResourceReferenceInput();
+          this.initResourceReferenceInput();
         },
         validate: function() {
           var resourceReference = this.getValue();
@@ -259,11 +259,11 @@
             this.getElement().findOne('input.resourceReference');
         },
         /**
-         * Makes the focusable and the label of the resource reference target the input that is currently displayed.
-         * The suggestion widget is destroyed and recreated whenever the resource type changes, so the input it had
-         * created is removed from the page.
+         * Initializes the focusable and the label of the resource reference to target the input that is currently
+         * displayed. The suggestion widget is destroyed and recreated whenever the resource type changes, so the
+         * input it had created is removed from the page.
          */
-        updateResourceReferenceInput: function() {
+        initResourceReferenceInput: function() {
           const dialog = this.getDialog();
           const focusable = this.resourceReferenceFocusable;
           const input = this.getResourceReferenceInput();
@@ -292,7 +292,7 @@
           this.getLabelElement().setText(resourceTypeConfig.label);
           // This event is also fired while the resource picker is being created, before the focusable exists.
           if (this.resourceReferenceFocusable) {
-            this.updateResourceReferenceInput();
+            this.initResourceReferenceInput();
           }
         },
         onSelectResource: function(event, resource) {

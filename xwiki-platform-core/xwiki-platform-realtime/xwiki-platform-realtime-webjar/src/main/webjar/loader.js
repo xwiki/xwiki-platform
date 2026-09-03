@@ -69,11 +69,11 @@ define('xwiki-realtime-loader', [
     async updateChannels() {
       const channels = await doc.getChannels({
         path: [
-          `translations/${doc.language}/saver`,
-          `translations/${doc.language}/userData`,
-          `translations/${doc.language}/fields/${this.info.field}/editors/${this.info.type}`,
+          `translations/${doc.realLocale}/saver`,
+          `translations/${doc.realLocale}/userData`,
+          `translations/${doc.realLocale}/fields/${this.info.field}/editors/${this.info.type}`,
           // Check also if the field is edited in real-time with other editors at the same time.
-          `translations/${doc.language}/fields/${this.info.field}/editors/`,
+          `translations/${doc.realLocale}/fields/${this.info.field}/editors/`,
         ],
         create: true
       });
@@ -83,9 +83,9 @@ define('xwiki-realtime-loader', [
 
     _parseChannels(channels) {
       let keys = {};
-      const saverChannel = channels.getByPath(['translations', doc.language, 'saver']);
-      const userDataChannel = channels.getByPath(['translations', doc.language, 'userData']);
-      const editorChannel = channels.getByPath(['translations', doc.language, 'fields', this.info.field, 'editors',
+      const saverChannel = channels.getByPath(['translations', doc.realLocale, 'saver']);
+      const userDataChannel = channels.getByPath(['translations', doc.realLocale, 'userData']);
+      const editorChannel = channels.getByPath(['translations', doc.realLocale, 'fields', this.info.field, 'editors',
         this.info.type]);
       if (!saverChannel || !userDataChannel || !editorChannel) {
         console.error('Missing document channels.');
@@ -100,7 +100,7 @@ define('xwiki-realtime-loader', [
         // Collect the other active real-time editing session (for the specified document field) that are using a
         // different editor (e.g. the WYSIWYG editor).
         channels.getByPathPrefix([
-          'translations', doc.language, 'fields', this.info.field, 'editors'
+          'translations', doc.realLocale, 'fields', this.info.field, 'editors'
         ]).forEach(channel => {
           if (channel.userCount > 0 && JSON.stringify(channel.path) !== JSON.stringify(editorChannel.path)) {
             keys.active[channel.path.slice(5).join('/')] = channel;
@@ -482,7 +482,7 @@ define('xwiki-realtime-loader', [
 
   getAllUsersChannel = async function() {
     const channels = await doc.getChannels({
-      path: `translations/${doc.language}/loader`,
+      path: `translations/${doc.realLocale}/loader`,
       create: true
     });
     if (channels.length) {

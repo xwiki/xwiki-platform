@@ -540,10 +540,11 @@ ul.realtime-versions &gt; li.divider:last-child {
 {{html clean="false"}}
 #getUserAvatarURL($xcontext.userReference $avatarURL 120)
 ## Note that we have to pass some document information that is missing from the meta:
-## * meta includes only the raw document locale value which is the same for documents with translations (e.g. having
-##   English as default locale) and for technical documents that don't have translations (e.g. having ROOT as default
-##   locale)
-## * meta includes the document version but not its timestamp which is needed to be able to properly merge on save.
+## * 'realLocale' because meta includes only the raw document locale value which is the same for documents with
+##   translations (e.g. having English as default locale) and for technical documents that don't have translations
+##   (e.g. having ROOT as default locale)
+## * 'modified' because meta includes the document version but not its timestamp which is needed to be able to
+##   properly merge on save.
 #set ($config = {
   'webSocketURL': $services.websocket.url('netflux'),
   'user': {
@@ -551,7 +552,7 @@ ul.realtime-versions &gt; li.divider:last-child {
     'avatarURL': $avatarURL.url
   },
   'document': {
-    'language': $tdoc.realLocale,
+    'realLocale': $tdoc.realLocale,
     'modified': $tdoc.date.time
   },
   'dateFormat': $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm')

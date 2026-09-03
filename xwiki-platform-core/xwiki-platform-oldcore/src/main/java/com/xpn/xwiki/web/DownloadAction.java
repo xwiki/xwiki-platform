@@ -421,6 +421,12 @@ public class DownloadAction extends XWikiAction
 
     private XWikiAttachment getAttachment(XWikiRequest request, XWikiDocument document, String filename)
     {
+        // The document comes from the context and is null when the URL didn't resolve to one. There's then no
+        // attachment to look for here and the caller falls back on re-parsing the URL.
+        if (document == null) {
+            return null;
+        }
+
         XWikiAttachment attachment = null;
 
         String idStr = request.getParameter("id");

@@ -22,6 +22,7 @@ package org.xwiki.edit.test.ui;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -36,6 +37,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InformationPane;
 
+import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -60,9 +62,11 @@ class InplaceTranslateIT
     void setup(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
-        setup.setWikiPreference("multilingual", "true");
-        setup.setWikiPreference("languages", "de,en,fr,it");
-        setup.setWikiPreference("default_language", "en");
+        setup.setWikiPreferences(Map.ofEntries(
+            entry("multilingual", "true"), 
+            entry("languages", "de,en,fr,it"),
+            entry("default_language", "en")
+        ));
 
         setup.createUserAndLogin("alice", "pa$$word", "editor", "Wysiwyg");
         // Make sure we create the page with English as default locale.
@@ -86,8 +90,7 @@ class InplaceTranslateIT
     void tearDown(TestUtils setup) throws Exception
     {
         setup.loginAsSuperAdmin();
-        setup.setWikiPreference("multilingual", "false");
-        setup.setWikiPreference("languages", "en");
+        setup.setWikiPreferences(Map.ofEntries(entry("multilingual", "false"), entry("languages", "en")));
     }
 
     @Test

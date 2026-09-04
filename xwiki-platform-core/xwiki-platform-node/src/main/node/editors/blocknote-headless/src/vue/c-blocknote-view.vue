@@ -72,7 +72,7 @@ type Props = {
   macros:
     | {
         /** Optional list of client-rendered macros; omit it when only the server-rendered macros are used. */
-        list?: MacroWithUnknownParamsType[];
+        list: MacroWithUnknownParamsType[];
         ctx: ContextForMacros;
       }
     | false;

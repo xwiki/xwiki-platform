@@ -19,11 +19,11 @@
  */
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
-var getDocument = function(document) {
+const getDocument = function(document) {
   if (!document) {
     return XWiki.currentDocument;
   } else if (typeof document == 'string') {
-    var reference = XWiki.Model.resolve(document, XWiki.EntityType.DOCUMENT);
+    const reference = XWiki.Model.resolve(document, XWiki.EntityType.DOCUMENT);
     return new XWiki.Document(reference);
   }
   return document;
@@ -176,7 +176,7 @@ XWiki.DocumentLock.getOrCreate = function(document, locale) {
   return XWiki.DocumentLock.get(document, locale) || new XWiki.DocumentLock(document, locale);
 };
 
-var init = function() {
+const init = function() {
   // Edit lock for the current document.
   XWiki.EditLock = XWiki.DocumentLock.getOrCreate();
 

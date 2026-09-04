@@ -238,8 +238,6 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   refs: { setEditor } = {},
   // eslint-disable-next-line max-statements
 }: BlockNoteViewWrapperProps) => {
-  console.debug(`BlockNote is now using syntax "${syntax.id}"`, syntax);
-
   const builtMacros: BlockNoteConcreteMacro[] = [];
 
   if (macros) {

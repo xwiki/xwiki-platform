@@ -94,7 +94,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   margin: 0;
 }
 
-.xobject-title:hover, .xclass-title:hover, .xproperty-title:hover {
+.xobject-title:hover, .xclass-title:hover {
   cursor: default;
 }
 
@@ -123,9 +123,13 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   padding: 1em 0 1em 1em;
 }
 
+/* The title is the part of a property that is visible whether the property is expanded or collapsed, so it is the area
+users are expected to grab to drag the property. The grab cursor is what tells them the property can be dragged at all,
+now that there is no drag handle. The vertical padding widens that band, so that the drag is comfortable to start even
+though the title is a single line of text. */
 .xproperty-title {
-  cursor: default;
-  padding: 0px;
+  cursor: grab;
+  padding: 4px 0;
   overflow: hidden;
 }
 
@@ -229,7 +233,10 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
   padding-right: 3px;
 }
 
+/* The tools sit in the title but are clicked rather than dragged, so they keep the pointer cursor. Buttons need it
+spelled out, since they do not get it from the browser like links do. */
 .xproperty-title .tools .tool {
+  cursor: pointer;
   width: 16px;
   height: 16px;
   float: left;

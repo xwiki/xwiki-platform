@@ -19,18 +19,28 @@
  */
 package org.xwiki.panels.test.ui.docker;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xwiki.appwithinminutes.test.po.AppWithinMinutesHomePage;
 import org.xwiki.appwithinminutes.test.po.ApplicationCreatePage;
 import org.xwiki.appwithinminutes.test.po.ApplicationHomePage;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.panels.test.po.NavigationPanel;
 import org.xwiki.panels.test.po.NavigationPanelAdministrationPage;
+import org.xwiki.panels.test.po.NavigationTreeElement;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
@@ -98,5 +108,39 @@ class NavigationPanelIT
         ApplicationCreatePage appCreatePage = AppWithinMinutesHomePage.gotoPage().clickCreateApplication();
         appCreatePage.setApplicationName(appName);
         return appCreatePage.clickNextStep().clickNextStep().clickNextStep().clickFinish();
+    }
+
+    /**
+     * Show the Navigation Panel in both columns so the same document nodes end up rendered by two independent trees.
+     */
+    @Test
+    void noDuplicateAnchorIds(TestUtils setup, TestReference testReference)
+        throws Exception
+    {
+        setup.setWikiPreference("showLeftPanels", "1");
+        setup.setWikiPreference("leftPanels", "Panels.Navigation");
+
+        setup.createPage(testReference, "Some content");
+        String[] documentPath = Stream
+            .concat(testReference.getSpaceReferences().stream().map(EntityReference::getName),
+                Stream.of(testReference.getName()))
+            .toArray(String[]::new);
+
+        // The created page is the current one, so both trees open to it and thus render the same nodes twice.
+        List<String> labelIds = new ArrayList<>();
+        for (boolean leftColumn : List.of(true, false)) {
+            NavigationTreeElement tree = new NavigationPanel(leftColumn).getNavigationTree();
+            tree.waitForDocumentSelected(documentPath);
+            labelIds.addAll(tree.getNodeLabelIds());
+        }
+
+        assertEquals(List.of(), getDuplicates(labelIds), "Found duplicate node label ids on the page");
+    }
+
+    private List<String> getDuplicates(List<String> values)
+    {
+        Map<String, Long> counts =
+            values.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        return counts.entrySet().stream().filter(entry -> entry.getValue() > 1).map(Map.Entry::getKey).toList();
     }
 }

@@ -127,6 +127,13 @@ export default {
           await loadById("xwiki-bootstrap-switch");
 
           const jQuery = this.jQuery;
+          // The switch otherwise has no accessible name: the visible content is a decorative icon and the
+          // handle/label spans are hidden from assistive technology since XWIKI-22198. Only set it when a name is
+          // actually known, because an empty aria-label is treated by some screen readers as an explicit
+          // "unlabelled", which is worse than omitting the attribute.
+          if (this.propertyDescriptor?.name) {
+            this.$refs.input.setAttribute("aria-label", this.propertyDescriptor.name);
+          }
           jQuery(this.$refs.input).bootstrapSwitch({
             size: "mini",
             state: component.innerChecked,

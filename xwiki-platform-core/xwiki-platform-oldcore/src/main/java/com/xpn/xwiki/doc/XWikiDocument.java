@@ -72,6 +72,7 @@ import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.io.DocumentResult;
 import org.dom4j.io.OutputFormat;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.Diff;
@@ -947,13 +948,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         return this.oldRenderingProvider.get();
     }
 
-    private JobProgressManager getProgress()
+    private @NonNull JobProgressManager getProgress()
     {
         if (this.progress == null) {
             this.progress = Utils.getComponent(JobProgressManager.class);
         }
 
-        return this.progress;
+        return Objects.requireNonNull(this.progress);
     }
 
     private VelocityContextFactory getVelocityContextFactory()

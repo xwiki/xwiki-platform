@@ -23,7 +23,7 @@
  *#
 #macro(exportModal)
   #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
-  <div class="modal fade text-left" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel"
+  <dialog class="modal fade text-left" id="exportModal" aria-labelledby="exportModalLabel"
       aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -46,8 +46,8 @@
         </div>
       </div>
     </div>
-  </div>
-  #if ($doc.documentReference.name == 'WebHome' && $xwiki.exists('XWiki.ExportDocumentTree'))
+  </dialog>
+  #if ($doc.documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name && $xwiki.exists('XWiki.ExportDocumentTree'))
     #exportTreeModal()
   #end
 #end
@@ -107,7 +107,7 @@
     'name': $doc.fullName,
     'pages': [$services.model.serialize($doc.documentReference, 'default')]
   })
-  #if ($doc.documentReference.name == 'WebHome')
+  #if ($doc.documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
     ## When nested page also export WebPreferences which contain among other things the right of this entity
     #set ($preferencesReference = $services.model.createDocumentReference('WebPreferences',
       $doc.documentReference.lastSpaceReference))
@@ -204,7 +204,7 @@
 #end
 ##
 #macro(exportTreeModal)
-  <div class="modal fade text-left" id="exportTreeModal" tabindex="-1" role="dialog"
+  <dialog class="modal fade text-left" id="exportTreeModal"
       aria-labelledby="exportTreeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -238,5 +238,5 @@
         </div>
       </div>
     </div>
-  </div>
+  </dialog>
 #end

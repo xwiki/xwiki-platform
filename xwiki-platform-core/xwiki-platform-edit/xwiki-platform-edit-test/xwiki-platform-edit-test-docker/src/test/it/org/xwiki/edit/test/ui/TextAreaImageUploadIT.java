@@ -19,6 +19,7 @@
  */
 package org.xwiki.edit.test.ui;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -88,6 +89,23 @@ class TextAreaImageUploadIT
         // Velocity script.
         testUtils.setGlobalRights("", "XWiki." + USER_NAME, "script", true);
         testUtils.createUserAndLogin(USER_NAME, "pa$$word", "editor", "Wysiwyg");
+    }
+
+    @AfterEach
+    void discardUnsavedChanges(TestUtils testUtils)
+    {
+        // A test failing in the middle of an edit leaves the page with unsaved changes, so the next navigation shows
+        // the leave confirmation. All the tests of AllIT share a single browser session, so that dialog blocks every
+        // test that comes after, in this class and in the other nested ones. Discarding the changes here keeps a
+        // failure contained to the test that caused it.
+
+        // The comment, the annotation and the in-place property are edited on a view page, where there is no edit
+        // mode to leave: the leave confirmation comes from the CKEditor instances themselves being dirty.
+        CKEditor.discardUnsavedChanges();
+
+        // The object editor asks for confirmation based on its own form state, which only leaving the edit mode
+        // resets. Done after the editors are marked clean, so that leaving doesn't trigger the dialog itself.
+        testUtils.maybeLeaveEditMode();
     }
 
     /**

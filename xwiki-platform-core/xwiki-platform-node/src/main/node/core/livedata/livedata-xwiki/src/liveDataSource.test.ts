@@ -23,6 +23,7 @@ import { XWikiLiveDataSource } from "./XWikiLiveDataSource";
 import $ from "jquery";
 import { stub } from "sinon";
 import { describe, expect, it } from "vitest";
+import type { QueryConstraint } from "@xwiki/platform-livedata-api";
 
 const getJSONStub = stub($, "getJSON");
 // @ts-expect-error leftover from initial javascript implementation
@@ -57,6 +58,30 @@ describe("liveDataSource.js", () => {
       });
 
       expect(res).toEqual({ count: 0, entries: [] });
+    });
+
+    it("sends the constraints without operator with an empty operator, without modifying them", async () => {
+      global.XWiki = {};
+
+      const liveDataSource = new XWikiLiveDataSource($);
+      const constraint = { value: "help" } as unknown as QueryConstraint;
+
+      await liveDataSource.getEntries({
+        source: { id: "test" },
+        properties: ["doc.location"],
+        offset: 0,
+        limit: 15,
+        filters: [{ property: "doc.location", constraints: [constraint] }],
+        sort: [],
+        descending: [],
+      });
+
+      expect(getJSONStub.lastCall.args[1]).toContain(
+        "filters.doc.location=%3Ahelp",
+      );
+      // The constraint is part of the Live Data query, which is also encoded to persist the Live Data state, and that
+      // encoding only accepts a known operator.
+      expect(constraint).toEqual({ value: "help" });
     });
   });
 });

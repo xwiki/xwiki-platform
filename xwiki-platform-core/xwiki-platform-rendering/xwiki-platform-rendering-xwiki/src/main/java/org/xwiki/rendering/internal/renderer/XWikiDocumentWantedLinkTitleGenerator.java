@@ -24,10 +24,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.reference.link.WantedLinkTitleGenerator;
 
@@ -36,7 +36,7 @@ import org.xwiki.rendering.renderer.reference.link.WantedLinkTitleGenerator;
  * This implementation uses translations to generate localized titles.
  *
  * @version $Id$
- * @since 16.3.0RC1
+ * @since 18.8.0RC1
  */
 @Component(hints = {"doc", "page"})
 @Singleton
@@ -62,7 +62,7 @@ public class XWikiDocumentWantedLinkTitleGenerator implements WantedLinkTitleGen
     @Override
     public String generateWantedLinkTitle(ResourceReference reference)
     {
-        String documentTitleTranslationKey = "rendering.xwiki.wantedLink.document.label";
+        String documentTitleTranslationKey = "rendering.xwiki.wantedLink.page.label";
         String documentName;
         if (reference.isTyped() && reference.getType() == ResourceType.DOCUMENT) {
             documentName = this.currentDocumentReferenceResolver.resolve(reference.getReference()).getName();

@@ -22,6 +22,10 @@
 // Given the types defined here are only relevant to this specific component, extracting
 // to a separate file would mean more code scatter.
 
+/**
+ * @since 18.8.0RC1
+ * @beta
+ */
 type SearchLinkSuggestion<T, U> = {
   value: T;
   renderingData: U;
@@ -29,6 +33,10 @@ type SearchLinkSuggestion<T, U> = {
   equivalentQuery: string;
 };
 
+/**
+ * @since 18.8.0RC1
+ * @beta
+ */
 type SearchLinkSuggestor<T, U> = (
   query: string,
 ) => Promise<SearchLinkSuggestion<T, U>[] | false>;

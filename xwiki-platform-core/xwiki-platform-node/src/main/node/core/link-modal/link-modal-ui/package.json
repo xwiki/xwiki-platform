@@ -6,7 +6,7 @@
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/link-modal/link-modal-ui",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/link-modal/link-modal-ui",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -42,8 +42,8 @@
     "@xwiki/platform-attachments-api": "workspace:*",
     "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-dsapi": "workspace:*",
-    "@xwiki/platform-icons": "workspace:*",
     "@xwiki/platform-link-suggest-api": "workspace:*",
+    "@xwiki/platform-link-type-api": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-reference-api": "workspace:*",
     "@xwiki/platform-model-remote-url-api": "workspace:*",
@@ -59,8 +59,8 @@
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@types/lodash-es": "catalog:",
+    "@vue/test-utils": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
-    "@xwiki/platform-fn-utils": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",

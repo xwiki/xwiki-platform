@@ -18,10 +18,11 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { translations } from "../../translations";
-import LinkConfig from "../LinkConfig.vue";
+import { translations } from "../translations";
+import { LinkConfig } from "@xwiki/platform-link-modal-ui";
 import { useI18n } from "vue-i18n";
-import type { LinkData, LinkEmailConfig } from "../../data/linkType";
+import type { LinkEmailConfig } from "../data/linkType";
+import type { LinkData } from "@xwiki/platform-link-type-api";
 
 defineProps<{ linkData: LinkData }>();
 
@@ -37,7 +38,7 @@ const { t } = useI18n({ messages: translations });
     <template #config>
       <x-text-field
         v-bind="{ 'data-test': 'linkEmailAddress' }"
-        :label="t('link-modal.target-types.email.address')"
+        :label="t('link-type.target-types.email.address')"
         type="email"
         v-model="model.address"
         required
@@ -47,13 +48,13 @@ const { t } = useI18n({ messages: translations });
     <template #options>
       <x-text-field
         v-bind="{ 'data-test': 'linkEmailSubject' }"
-        :label="t('link-modal.target-types.email.subject')"
+        :label="t('link-type.target-types.email.subject')"
         v-model="model.messageSubject"
       />
 
       <x-text-field
         v-bind="{ 'data-test': 'linkEmailBody' }"
-        :label="t('link-modal.target-types.email.body')"
+        :label="t('link-type.target-types.email.body')"
         v-model="model.messageBody"
       />
     </template>

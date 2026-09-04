@@ -18,16 +18,13 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import AttachmentConfig from "./linkTypes/AttachmentConfig.vue";
-import EmailConfig from "./linkTypes/EmailConfig.vue";
-import PageConfig from "./linkTypes/PageConfig.vue";
-import UrlConfig from "./linkTypes/UrlConfig.vue";
 import { createLinkEditionContext } from "../linkSuggest.js";
 import { translations } from "../translations";
 import { typedRef } from "../utils";
-import { provide } from "vue";
+import { listLinkTargetTypeExtensions } from "@xwiki/platform-link-type-api";
+import { computed, markRaw, provide } from "vue";
 import { useI18n } from "vue-i18n";
-import type { LinkData } from "../data/linkType";
+import type { LinkData } from "@xwiki/platform-link-type-api";
 import type { Container } from "inversify";
 
 const props = defineProps<{
@@ -41,31 +38,30 @@ provide("linkEditionCtx", createLinkEditionContext(props.depsContainer));
 
 const linkData = typedRef(props.current);
 
+const linkExtensions = listLinkTargetTypeExtensions(props.depsContainer);
+
+provide("linkTargetTypeExtensions", linkExtensions);
+
+// The configuration component for the currently selected link target type. `markRaw()` excludes it from Vue's
+// reactivity tracking (mirrors `LivedataDisplayer.vue`'s own use of `markRaw()` for the same reason, for a
+// dynamically registered component).
+const activeConfigComponent = computed(() => {
+  const extension = linkExtensions.find(
+    (e) => e.type === linkData.value.target.type,
+  );
+
+  // The extension providing this type is not (or no longer) registered/enabled: nothing to render.
+  return extension ? markRaw(extension.component()) : null;
+});
+
 defineEmits<{ submit: [LinkData]; cancel: [] }>();
 </script>
 
 <template>
   <div :class="$style.container">
-    <url-config
-      v-if="linkData.target.type === 'url'"
-      v-model="linkData.target.config"
-      :link-data="linkData"
-    />
-
-    <page-config
-      v-if="linkData.target.type === 'page'"
-      v-model="linkData.target.config"
-      :link-data="linkData"
-    />
-
-    <attachment-config
-      v-if="linkData.target.type === 'attachment'"
-      v-model="linkData.target.config"
-      :link-data="linkData"
-    />
-
-    <email-config
-      v-if="linkData.target.type === 'email'"
+    <component
+      v-if="activeConfigComponent"
+      :is="activeConfigComponent"
       v-model="linkData.target.config"
       :link-data="linkData"
     />

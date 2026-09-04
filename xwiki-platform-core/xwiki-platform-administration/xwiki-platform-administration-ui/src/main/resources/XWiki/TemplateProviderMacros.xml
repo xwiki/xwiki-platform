@@ -214,7 +214,8 @@
     $('.location-picker.modal').prop('modalTrigger', $(this)).modal();
   });
 
-  var getLocalSpaceReference = function(nodeId) {
+  var getLocalSpaceReference = function(escapedNodeId) {
+    var nodeId = $.fn.xtree.unescapeNodeId(escapedNodeId);
     var separatorIndex = nodeId.indexOf(':');
     var nodeType = nodeId.substr(0, separatorIndex);
     var nodeStringReference = nodeId.substr(separatorIndex + 1);

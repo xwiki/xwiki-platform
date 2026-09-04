@@ -1260,7 +1260,7 @@ require(['jquery', 'xwiki-meta'], function($, meta) {
   var updateDocTrees = function(xwikiDocument) {
     var plainTitle = xwikiDocument.getPlainTitle();
     $('.jstree-xwiki').each(function() {
-      $(this).jstree?.(true)?.set_text?.('document:' + xwikiDocument.id, plainTitle);
+      $(this).jstree?.(true)?.set_text?.($.fn.xtree.escapeNodeId('document:' + xwikiDocument.id), plainTitle);
     });
   };
 

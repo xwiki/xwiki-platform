@@ -567,7 +567,8 @@ require(['jquery'], function ($) {
     if (config.excludeNestedPagesByDefault) {
       return new Promise((resolve, reject) => {
         const tree = exportTreeModal.find('.export-tree').jstree(true);
-        const currentPageNodeId = 'document:' + XWiki.Model.serialize(XWiki.currentDocument.documentReference);
+        const currentPageNodeId = $.fn.xtree.escapeNodeId(
+          'document:' + XWiki.Model.serialize(XWiki.currentDocument.documentReference));
         tree.open_node(currentPageNodeId, () => {
           tree.select_node(currentPageNodeId);
           tree.deselectChildNodes(currentPageNodeId);

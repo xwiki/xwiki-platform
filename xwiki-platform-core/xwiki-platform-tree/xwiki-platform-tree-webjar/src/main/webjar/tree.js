@@ -48,6 +48,48 @@ define([
     };
   }
 
+  // jsTree node identifiers are used, without any escaping, both as the HTML id attribute of the rendered nodes and as
+  // the value sent back to the server (e.g. to look up children, to move or copy a node to a new parent, etc.). Entity
+  // references can contain characters that are forbidden in an HTML id, such as white space, so the tree escapes every
+  // node id that enters its model and unescapes it back on the way out, i.e. when the id is sent to the server.
+  //
+  // The escaped form is the percent-encoding of the node id, except for the colon and the at sign, which separate the
+  // components of a node id (e.g. "document:xwiki:Some Space.Some Page") and are both valid in an HTML id, so they are
+  // left as is in order to keep the escaped id readable. Leaving them as is doesn't break the round trip because their
+  // encoded form is produced only for these two characters, so both forms mean the same thing to decodeURIComponent().
+  const escapeNodeId = function(nodeId) {
+    return convertNodeId(nodeId, id => encodeURIComponent(id).replaceAll('%3A', ':').replaceAll('%40', '@'));
+  };
+
+  // Turns a node id read from the tree's model (e.g. through get_selected()) back into the original entity reference.
+  // Scripts that need to resolve a node id into an entity reference, rather than pass it back to the tree, must
+  // unescape it first.
+  const unescapeNodeId = function(nodeId) {
+    return convertNodeId(nodeId, decodeURIComponent);
+  };
+
+  const convertNodeId = function(nodeId, convert) {
+    // The root node id is a jsTree internal that is neither rendered nor sent to the server.
+    return typeof nodeId === 'string' && nodeId !== $.jstree.root ? convert(nodeId) : nodeId;
+  };
+
+  // Escapes the id and the parent id of the given node definition, and of all its nested children, in case the node
+  // was received with its children already inlined.
+  const escapeNode = function(node) {
+    if (node && typeof node === 'object') {
+      if (typeof node.id === 'string') {
+        node.id = escapeNodeId(node.id);
+      }
+      if (typeof node.parent === 'string') {
+        node.parent = escapeNodeId(node.parent);
+      }
+      if (Array.isArray(node.children)) {
+        node.children.forEach(escapeNode);
+      }
+    }
+    return node;
+  };
+
   var formToken = $('meta[name=form_token]').attr('content');
 
   var getNodeTypes = function(nodes) {
@@ -116,11 +158,11 @@ define([
       childrenURL = this.element.attr('data-url');
       parameters = $.extend({
         data: 'children',
-        id: node.id
+        id: unescapeNodeId(node.id)
       }, parameters);
     }
     if (childrenURL) {
-      post(childrenURL, parameters).then(callback, () => callback([]));
+      post(childrenURL, parameters).then(children => children.map(escapeNode)).then(callback, () => callback([]));
     } else {
       callback([]);
     }
@@ -363,7 +405,8 @@ define([
       // We need to retrieve the node path from the server.
       var url = this.element.attr('data-url');
       if (url) {
-        return Promise.resolve(post(url, {data: 'path', 'id': nodeId}));
+        return Promise.resolve(
+          post(url, {data: 'path', 'id': unescapeNodeId(nodeId)}).then(nodes => nodes.map(escapeNode)));
       } else {
         return Promise.reject();
       }
@@ -486,7 +529,9 @@ define([
     if (element.attr('data-url')) {
       defaultParams.core.data = getChildren;
     } else if (element.attr('data-json')) {
-      defaultParams.core.data = element.data('json');
+      // The tree data is specified inline, using the entity references as node ids, so it needs to be escaped.
+      const json = element.data('json');
+      defaultParams.core.data = Array.isArray(json) ? json.map(escapeNode) : escapeNode(json);
     }
     return $.extend(true, defaultParams, element.data('config'));
   };
@@ -497,6 +542,9 @@ define([
       if (!isArray) {
         nodeIds = [nodeIds];
       }
+      // The node ids are specified by the caller, using the entity reference, so they need to be escaped before they
+      // can be matched against the ids from the tree model.
+      nodeIds = nodeIds.map(escapeNodeId);
       // Select the nodes if no callback is provided.
       callback = callback || this.select_node.bind(this);
       // The tree is often expanded to show a specific node when the page loads (i.e. right after the tree is ready) and
@@ -519,7 +567,11 @@ define([
       if (!url) {
         url = this.element.attr('data-url');
         params.action = action;
-        params.id = node.id;
+        params.id = unescapeNodeId(node.id);
+      }
+      if (params.parent) {
+        // The parent is specified, as a node id, when moving or copying a node to a new parent.
+        params.parent = unescapeNodeId(params.parent);
       }
       params.form_token = formToken;
       var promise = this.jobRunner.run(url, params);
@@ -732,7 +784,7 @@ define([
     }).on('changed.jstree', function(event, data) {
       if (data.instance.settings.xwiki && typeof data.instance.settings.xwiki.fieldName !== 'undefined') {
         var fieldName = data.instance.settings.xwiki.fieldName;
-        var fieldValue = data.selected.join('|');
+        var fieldValue = data.selected.map(unescapeNodeId).join('|');
         $('input[type="hidden"]').filter(function() {
           return $(this).attr('name') === fieldName;
         }).val(fieldValue);
@@ -758,6 +810,11 @@ define([
       $.extend($.jstree.reference(this), customTreeAPI, {jobRunner: createJobRunner(this)});
     });
   };
+
+  // The bridge between the entity reference based node ids used by the tree data source and the escaped node ids used
+  // by the tree model and by the rendered HTML id attributes.
+  $.fn.xtree.escapeNodeId = escapeNodeId;
+  $.fn.xtree.unescapeNodeId = unescapeNodeId;
 
   return $;
 });

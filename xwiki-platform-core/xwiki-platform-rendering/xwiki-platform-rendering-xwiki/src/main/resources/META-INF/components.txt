@@ -1,6 +1,10 @@
 500:org.xwiki.rendering.internal.renderer.XWikiAttachmentURILabelGenerator
 500:org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator
 500:org.xwiki.rendering.internal.renderer.XWikiPageAttachmentURILabelGenerator
+480:org.xwiki.rendering.internal.renderer.XWikiDefaultWantedLinkTitleGenerator
+500:org.xwiki.rendering.internal.renderer.XWikiDocumentWantedLinkTitleGenerator
+500:org.xwiki.rendering.internal.renderer.XWikiSpaceWantedLinkTitleGenerator
+500:org.xwiki.rendering.internal.renderer.XWikiAttachmentWantedLinkTitleGenerator
 500:org.xwiki.rendering.internal.util.XWikiIconProvider
 500:org.xwiki.rendering.internal.util.XWikiErrorBlockGenerator
 500:org.xwiki.rendering.internal.wiki.XWikiWikiModel

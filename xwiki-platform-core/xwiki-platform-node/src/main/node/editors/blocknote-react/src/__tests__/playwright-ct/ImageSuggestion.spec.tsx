@@ -36,7 +36,7 @@ test("Triggering the image suggestions shows the upload button, then the matchin
 
   const editorEl = component.locator(".bn-editor");
   await editorEl.click();
-  await page.keyboard.type(":");
+  await page.keyboard.type("img::");
 
   const menuEl = page.locator(".slash-menu");
   await menuEl.waitFor({ state: "attached" });
@@ -75,7 +75,7 @@ test("Only the first 5 image suggestions are shown, in addition to the upload bu
 
   const editorEl = component.locator(".bn-editor");
   await editorEl.click();
-  await page.keyboard.type(":");
+  await page.keyboard.type("img::");
 
   const menuEl = page.locator(".slash-menu");
   await menuEl.waitFor({ state: "attached" });
@@ -96,7 +96,7 @@ test("Clicking an image suggestion inserts an image block with its URL", async (
 
   const editorEl = component.locator(".bn-editor");
   await editorEl.click();
-  await page.keyboard.type(":");
+  await page.keyboard.type("img::");
 
   const menuEl = page.locator(".slash-menu");
   await menuEl.waitFor({ state: "attached" });
@@ -124,7 +124,7 @@ test("Keyboard navigation can select an image suggestion", async ({
 
   const editorEl = component.locator(".bn-editor");
   await editorEl.click();
-  await page.keyboard.type(":");
+  await page.keyboard.type("img::");
 
   const menuEl = page.locator(".slash-menu");
   await menuEl.waitFor({ state: "attached" });
@@ -153,7 +153,7 @@ test("Falls back to an explanatory message when the backend doesn't support sear
 
   const editorEl = component.locator(".bn-editor");
   await editorEl.click();
-  await page.keyboard.type(":");
+  await page.keyboard.type("img::");
 
   const menuEl = page.locator(".slash-menu");
   await menuEl.waitFor({ state: "attached" });

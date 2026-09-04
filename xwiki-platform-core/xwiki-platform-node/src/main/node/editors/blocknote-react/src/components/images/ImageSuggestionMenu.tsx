@@ -29,16 +29,18 @@ import type {
 
 import "./ImageSuggestionMenu.css";
 
-// HACK: the first item is actually a placeholder for the upload button, in order to make it selectable with the keyboard
+// HACK: the first two items are actually placeholders for the "browse" and upload buttons, in
+// order to make them selectable with the keyboard
+const IMAGE_SELECTOR_BTN_TITLE_PLACEHOLDER = "#imageSelectorHack";
 const IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER = "#imageSuggestionHack";
 
 // This component renders the image suggestions menu
 //
-// The first item is a placeholder for the upload button ; it needs to be
-// provided by the suggestions function as BlockNote will use it for keyboard
+// The first two items are placeholders for the "browse" and upload buttons (in that order) ; they
+// need to be provided by the suggestions function as BlockNote will use them for keyboard
 // navigation.
-// The first item *must* use the IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER
-// constant for its `subtext` property.
+// The first item *must* use the IMAGE_SELECTOR_BTN_TITLE_PLACEHOLDER constant, and the second the
+// IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER constant, for their `title` property.
 //
 // In order to access all items' URL to render them, they *must* be provided
 // through the items' `subtext` property. Items with no `subtext` (e.g. a "search
@@ -67,13 +69,19 @@ function ImageSuggestionMenu(
     return null;
   }
 
-  if (props.items[0].title !== IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER) {
+  if (props.items[0].title !== IMAGE_SELECTOR_BTN_TITLE_PLACEHOLDER) {
     throw new Error(
-      "Expected first item to be the placeholder for upload button",
+      "Expected first item to be the placeholder for the browse button",
     );
   }
 
-  const [uploadItem, ...suggestionItems] = props.items;
+  if (props.items[1]?.title !== IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER) {
+    throw new Error(
+      "Expected second item to be the placeholder for the upload button",
+    );
+  }
+
+  const [selectorItem, uploadItem, ...suggestionItems] = props.items;
 
   if (
     suggestionItems.find(
@@ -90,6 +98,14 @@ function ImageSuggestionMenu(
       <div
         className={`slash-menu-item ${props.selectedIndex === 0 ? "selected" : ""}`}
       >
+        <Button variant="default" onClick={() => selectorItem.onItemClick()}>
+          {t("blocknote.imageSelector.browseButton")}
+        </Button>
+      </div>
+
+      <div
+        className={`slash-menu-item ${props.selectedIndex === 1 ? "selected" : ""}`}
+      >
         <Button variant="default" onClick={() => uploadItem.onItemClick()}>
           {t("blocknote.imageSelector.uploadButton")}
         </Button>
@@ -99,7 +115,7 @@ function ImageSuggestionMenu(
         <div
           key={item.title}
           className={`slash-menu-item ${
-            props.selectedIndex === index + 1 ? "selected" : ""
+            props.selectedIndex === index + 2 ? "selected" : ""
           }`}
           onClick={() => {
             if (item.subtext) {
@@ -115,4 +131,8 @@ function ImageSuggestionMenu(
   );
 }
 
-export { IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER, ImageSuggestionMenu };
+export {
+  IMAGE_SELECTOR_BTN_TITLE_PLACEHOLDER,
+  IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER,
+  ImageSuggestionMenu,
+};

@@ -17,7 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { ImageSelector } from "./ImageSelector";
 import {
+  IMAGE_SELECTOR_BTN_TITLE_PLACEHOLDER,
   IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER,
   ImageSuggestionMenu,
 } from "./ImageSuggestionMenu";
@@ -25,9 +27,15 @@ import { DepsContainerContext } from "../../contexts";
 import { useEditor } from "../../hooks";
 import { useImageUploader } from "../../misc/fileUpload";
 import { insertOrUpdateBlockForSlashMenu } from "@blocknote/core";
-import { SuggestionMenuController } from "@blocknote/react";
+import { SuggestionMenu as SuggestionMenuExtension } from "@blocknote/core/extensions";
+import {
+  PositionPopover,
+  SuggestionMenuController,
+  useExtension,
+} from "@blocknote/react";
+import { Paper } from "@mantine/core";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { EditorType } from "../../blocknote";
 import type { DefaultReactSuggestionItem } from "@blocknote/react";
@@ -45,6 +53,7 @@ export type ImageSuggestionControllerProps = {
   maxSuggestions?: number;
 };
 
+// eslint-disable-next-line max-statements
 export function ImageSuggestionController({
   maxSuggestions,
 }: ImageSuggestionControllerProps) {
@@ -60,8 +69,24 @@ export function ImageSuggestionController({
 
   const editor = useEditor();
   const uploadImage = useImageUploader(editor, depsContainer);
+  const suggestionMenu = useExtension(SuggestionMenuExtension);
 
   const { t } = useTranslation();
+
+  const [selectorPosition, setSelectorPosition] = useState<{
+    from: number;
+    to: number;
+  }>();
+
+  // Closes/clears the "img::" suggestion menu (same as the built-in keyboard-selection path
+  // already does, see `SuggestionMenuWrapper`'s `onItemClickCloseMenu`) and opens the full image
+  // selector popover where the suggestion menu was.
+  const openImageSelector = useCallback(() => {
+    suggestionMenu.closeMenu();
+    suggestionMenu.clearQuery();
+    const pos = editor.transact((tr) => tr.selection.from);
+    setSelectorPosition({ from: pos, to: pos });
+  }, [editor, suggestionMenu]);
 
   const searchImages = useCallback(
     async (query: string) => {
@@ -73,25 +98,66 @@ export function ImageSuggestionController({
         t,
       );
 
-      // HACK: placeholder for the upload button (see the `ImageSuggestionMenu` component for more info.)
-      suggestions.unshift({
-        title: IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER,
-        onItemClick: uploadImage,
-      });
+      // HACK: placeholders for the browse and upload buttons (see the `ImageSuggestionMenu`
+      // component for more info.)
+      suggestions.unshift(
+        {
+          title: IMAGE_SELECTOR_BTN_TITLE_PLACEHOLDER,
+          onItemClick: openImageSelector,
+        },
+        {
+          title: IMAGE_SUGGESTION_UPLOAD_BTN_TITLE_PLACEHOLDER,
+          onItemClick: uploadImage,
+        },
+      );
 
       return maxSuggestions
-        ? suggestions.slice(0, maxSuggestions + 1) // account for the placeholder item
+        ? suggestions.slice(0, maxSuggestions + 2) // account for the two placeholder items
         : suggestions;
     },
-    [t, linkSuggestService, modelReferenceParser, maxSuggestions],
+    [
+      t,
+      linkSuggestService,
+      modelReferenceParser,
+      maxSuggestions,
+      openImageSelector,
+      uploadImage,
+    ],
   );
 
   return (
-    <SuggestionMenuController
-      triggerCharacter={"img::"}
-      getItems={searchImages}
-      suggestionMenuComponent={ImageSuggestionMenu}
-    />
+    <>
+      <SuggestionMenuController
+        triggerCharacter={"img::"}
+        getItems={searchImages}
+        suggestionMenuComponent={ImageSuggestionMenu}
+      />
+
+      <PositionPopover
+        position={selectorPosition}
+        useFloatingOptions={{
+          open: selectorPosition !== undefined,
+          onOpenChange: (open) => {
+            if (!open) {
+              setSelectorPosition(undefined);
+            }
+          },
+          placement: "bottom-start",
+        }}
+      >
+        <Paper shadow="md" p="sm">
+          <ImageSelector
+            onSelected={(url) => {
+              insertOrUpdateBlockForSlashMenu(editor, {
+                type: "image",
+                props: { url },
+              });
+              setSelectorPosition(undefined);
+            }}
+          />
+        </Paper>
+      </PositionPopover>
+    </>
   );
 }
 

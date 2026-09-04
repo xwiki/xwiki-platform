@@ -17,6 +17,7 @@
   "blocknote.toolbar.subscript": "Subscript",
   "blocknote.toolbar.superscript": "Superscript",
   "blocknote.imageSelector.uploadButton": "Upload",
+  "blocknote.imageSelector.browseButton": "Browse images...",
   "blocknote.imageSelector.placeholder": "Query or image URL...",
   "blocknote.linkEditor.submit": "Submit",
   "blocknote.linkEditor.placeholder": "Query or URL...",

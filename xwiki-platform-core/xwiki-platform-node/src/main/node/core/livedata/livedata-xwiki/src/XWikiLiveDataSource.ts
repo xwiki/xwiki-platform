@@ -57,13 +57,12 @@ export class XWikiLiveDataSource implements LiveDataSource {
       }
       parameters["filters." + filter.property] = filter.constraints
         .filter((constraint) => constraint.value !== undefined)
-        .map((constraint) => {
-          if (constraint.operator === undefined) {
-            constraint.operator = "";
-          }
-          return constraint;
-        })
-        .map((constraint) => constraint.operator + ":" + constraint.value);
+        // The operator can be missing, in which case the backend applies the default one. The constraints themselves
+        // are left untouched: they are part of the Live Data query, which is also encoded to persist the Live Data
+        // state, and that encoding only accepts a known operator.
+        .map(
+          (constraint) => (constraint.operator || "") + ":" + constraint.value,
+        );
     });
     // Add sort.
     parameters.sort = liveDataQuery.sort.map((sort) => sort.property);

@@ -35,7 +35,7 @@ const LinkModal = _LinkModal;
  * link type selector, and the "Options" section. Re-exported so that link target type extensions defined in
  * other packages (e.g., `@xwiki/platform-link-type-default`) can wrap their own configuration component with it.
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 const LinkConfig = _LinkConfig;
@@ -44,7 +44,7 @@ const LinkConfig = _LinkConfig;
  * Generic search/typeahead input, used by link target types backed by a suggestion service (e.g., the built-in
  * "page" and "attachment" types). Re-exported so that other link target type extensions can reuse it.
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 const SearchBox = _SearchBox;

@@ -32,7 +32,7 @@ import type { Component } from "vue";
  * registered with the lowest priority (highest {@link order} value) among all registered link target types, so
  * that every other, more specific type gets a chance to match first.
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 @injectable()

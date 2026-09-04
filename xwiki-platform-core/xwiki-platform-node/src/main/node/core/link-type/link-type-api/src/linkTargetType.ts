@@ -37,7 +37,7 @@ import type { Component } from "vue";
  * (see `@xwiki/platform-syntaxes-config`): an unconstrained (no `.whenNamed()`/`.whenDefault()`) multi-binding,
  * disambiguated by a plain `type` field on each resolved object rather than by an Inversify name/tag.
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
@@ -47,7 +47,7 @@ const linkTargetTypeExtensionRole = "LinkTargetTypeExtension";
  * Passed explicitly at call time, rather than through constructor injection, so that implementations stay
  * decoupled from exactly which services the caller happens to have on hand.
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 type LinkTargetUrlContext = {
@@ -62,7 +62,7 @@ type LinkTargetUrlContext = {
  * round-tripping) needing different services, so that implementations/callers only depend on the
  * subset of services their supported operations actually need.
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 type LinkTargetReferenceContext = {
@@ -77,7 +77,7 @@ type LinkTargetReferenceContext = {
  *
  * @typeParam TConfig - the shape of this link target type's configuration
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 interface LinkTargetTypeExtension<TConfig = unknown> {

@@ -79,7 +79,7 @@ type LinkSuggestor = (params: {
  * extensions defined in other packages (e.g., `@xwiki/platform-link-type-default`) can access these services
  * from their own configuration component via `inject("linkEditionCtx")`.
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 type LinkEditionContext = {

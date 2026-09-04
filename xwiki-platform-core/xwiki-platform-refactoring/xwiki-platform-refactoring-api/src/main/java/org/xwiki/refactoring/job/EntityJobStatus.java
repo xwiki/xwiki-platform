@@ -40,9 +40,10 @@ public class EntityJobStatus<T extends EntityRequest> extends DefaultJobStatus<T
      * @param observationManager the observation manager
      * @param loggerManager the logger manager
      * @param parentJobStatus the status of the parent job, or {@code null} if this job doesn't have a parent
-     * @deprecated since 9.2RC1, use
+     * @deprecated use
      *             {@link #EntityJobStatus(String, EntityRequest, ObservationManager, LoggerManager, JobStatus)} instead
      */
+    @Deprecated(since = "9.2RC1")
     public EntityJobStatus(T request, ObservationManager observationManager, LoggerManager loggerManager,
         JobStatus parentJobStatus)
     {

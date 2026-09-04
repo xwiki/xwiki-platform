@@ -47,7 +47,11 @@ import type {
   ReactInlineContentImplementation,
 } from "@blocknote/react";
 import type { MacroWithUnknownParamsType } from "@xwiki/platform-macros-api";
-import type { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
+import type {
+  InlineMacroInvocation as UniAstInlineMacroInvocation,
+  MacroBlockInvocation as UniAstMacroBlockInvocation,
+} from "@xwiki/platform-uniast-api";
+import type { UniAstToReactJsxConverter } from "@xwiki/platform-uniast-react-jsx";
 import type { JSX, ReactNode } from "react";
 
 /**
@@ -274,13 +278,12 @@ type MacroInsertionEditorPrefillData = {
 /**
  * Information about a macro block invocation
  *
+ * Identical to `MacroBlockInvocation` except for `body` which is a BlockNote AST piece here
+ *
  * @since 18.5.0RC1
  * @beta
  */
-type MacroBlockInvocation = {
-  kind: "block";
-  id: string;
-  params: MacroCallParams;
+type MacroBlockInvocation = Omit<UniAstMacroBlockInvocation, "body"> & {
   // NOTE: 'InlineContentType[]' should become 'BlockType[]' once BlockNote supports nesting
   // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
   body:
@@ -292,13 +295,13 @@ type MacroBlockInvocation = {
 /**
  * Information about an inline macro invocation
  *
+ * Identical to `InlineMacroInvocation` except for `body` which is a BlockNote AST piece here
+ * {@link MacroBlockInvocation}.
+ *
  * @since 18.5.0RC1
  * @beta
  */
-type InlineMacroInvocation = {
-  kind: "inline";
-  id: string;
-  params: MacroCallParams;
+type InlineMacroInvocation = Omit<UniAstInlineMacroInvocation, "body"> & {
   // NOTE: 'InlineContentType' should become 'InlineContentType[]' once BlockNote supports nesting
   // Tracking issue: https://github.com/TypeCellOS/BlockNote/issues/1540
   body:
@@ -312,7 +315,7 @@ type InlineMacroInvocation = {
  *
  * @param macro - The macro to adapt
  * @param ctx - The context used to handle the macro inside BlockNote
- * @param jsxConverter - A converter that transforms macro ASTs to React JSX
+ * @param jsxConverter - A converter that transforms a macro's rendered UniAst content to React JSX
  *
  * @returns - The BlockNote-compatible macro
  *
@@ -323,7 +326,7 @@ type InlineMacroInvocation = {
 function adaptMacroForBlockNote(
   macro: MacroWithUnknownParamsType,
   ctx: ContextForMacros,
-  jsxConverter: MacrosAstToReactJsxConverter,
+  jsxConverter: UniAstToReactJsxConverter,
 ): BlockNoteConcreteMacro {
   const { id, name, params, defaultParameters } = macro.infos;
 

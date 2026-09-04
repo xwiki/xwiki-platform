@@ -41,7 +41,7 @@ import {
   useCreateBlockNote,
 } from "@blocknote/react";
 import { filterMap } from "@xwiki/platform-fn-utils";
-import { MacrosAstToReactJsxConverter } from "@xwiki/platform-macros-ast-react-jsx";
+import { UniAstToReactJsxConverter } from "@xwiki/platform-uniast-react-jsx";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type {
@@ -243,7 +243,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
   const builtMacros: BlockNoteConcreteMacro[] = [];
 
   if (macros) {
-    const macroAstToReactJsxConverter = new MacrosAstToReactJsxConverter(
+    const uniAstToReactJsxConverter = new UniAstToReactJsxConverter(
       depsContainer
         .get<RemoteURLParserProvider>("RemoteURLParserProvider")
         .get()!,
@@ -255,7 +255,7 @@ const BlockNoteViewWrapper: React.FC<BlockNoteViewWrapperProps> = ({
 
     for (const macro of macros.list ?? []) {
       builtMacros.push(
-        adaptMacroForBlockNote(macro, macros.ctx, macroAstToReactJsxConverter),
+        adaptMacroForBlockNote(macro, macros.ctx, uniAstToReactJsxConverter),
       );
     }
   }

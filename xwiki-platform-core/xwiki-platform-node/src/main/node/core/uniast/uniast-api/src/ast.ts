@@ -67,6 +67,37 @@ type Block =
        * @beta
        */
       call: MacroBlockInvocation;
+    }
+  | {
+      /**
+       * @since 18.8.0RC1
+       * @beta
+       */
+      type: "rawHtml";
+
+      /**
+       * @since 18.8.0RC1
+       * @beta
+       */
+      html: string;
+    }
+  | {
+      /**
+       * A WYSIWYG-editable slot inside a macro's own rendered block output.
+       *
+       * Unlike `macroBlock` (an invocation placeholder waiting to be rendered), this marks where a
+       * macro's user-editable body should be mounted inside the macro's *own* render() output.
+       *
+       * @since 18.8.0RC1
+       * @beta
+       */
+      type: "macroBlockEditableArea";
+
+      /**
+       * @since 18.8.0RC1
+       * @beta
+       */
+      styles: BlockStyles;
     };
 
 /**
@@ -77,6 +108,12 @@ type BlockStyles = {
   textColor?: string;
   backgroundColor?: string;
   textAlignment?: Alignment;
+
+  /**
+   * @since 18.8.0RC1
+   * @beta
+   */
+  cssClasses?: string[];
 };
 
 /**
@@ -191,6 +228,31 @@ type InlineContent =
        * @beta
        */
       call: InlineMacroInvocation;
+    }
+  | {
+      /**
+       * @since 18.8.0RC1
+       * @beta
+       */
+      type: "rawHtml";
+
+      /**
+       * @since 18.8.0RC1
+       * @beta
+       */
+      html: string;
+    }
+  | {
+      /**
+       * A WYSIWYG-editable slot inside a macro's own rendered inline content output.
+       *
+       * Unlike `inlineMacro` (an invocation placeholder waiting to be rendered), this marks where a
+       * macro's user-editable body should be mounted inside the macro's *own* render() output.
+       *
+       * @since 18.8.0RC1
+       * @beta
+       */
+      type: "inlineMacroEditableArea";
     };
 
 /**
@@ -232,7 +294,7 @@ type LinkTarget =
       rawReference: string;
 
       /**
-       * Will be `null` if the raw reference is invalid and can't be parsed
+       * Will be `null` if the raw reference is invalid and can't be parsed.
        *
        * @since 18.0.0RC1
        * @beta

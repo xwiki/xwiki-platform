@@ -21,9 +21,11 @@ import { InlineContent } from '@blocknote/core';
 import { InlineContentSchema } from '@blocknote/core';
 import { InlineContentSchemaFromSpecs } from '@blocknote/core';
 import { InlineContentSpec } from '@blocknote/core';
+import { InlineMacroInvocation as InlineMacroInvocation_2 } from '@xwiki/platform-uniast-api';
 import { Link } from '@blocknote/core';
 import * as locales from '@blocknote/core/locales';
 import { LooseBlockSpec } from '@blocknote/core';
+import { MacroBlockInvocation as MacroBlockInvocation_2 } from '@xwiki/platform-uniast-api';
 import { MacroWithUnknownParamsType } from '@xwiki/platform-macros-api';
 import { PartialBlockFromConfig } from '@blocknote/core';
 import { PartialInlineContent } from '@blocknote/core';
@@ -131,10 +133,7 @@ export type ImageUpdateResult = {
 export type InlineContentType = InlineContent<EditorInlineContentSchema, EditorStyleSchema>;
 
 // @beta
-export type InlineMacroInvocation = {
-    kind: "inline";
-    id: string;
-    params: MacroCallParams;
+export type InlineMacroInvocation = Omit<InlineMacroInvocation_2, "body"> & {
     body: {
         type: "inlineContent";
         content: InlineContentType;
@@ -173,10 +172,7 @@ export type LinkEditionHooks = {
 export const MACRO_NAME_PREFIX = "Macro_";
 
 // @beta
-export type MacroBlockInvocation = {
-    kind: "block";
-    id: string;
-    params: MacroCallParams;
+export type MacroBlockInvocation = Omit<MacroBlockInvocation_2, "body"> & {
     body: {
         type: "inlineContents";
         content: InlineContentType[];

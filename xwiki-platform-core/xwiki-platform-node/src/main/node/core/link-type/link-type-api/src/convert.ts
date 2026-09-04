@@ -31,7 +31,7 @@ import type { Container } from "inversify";
  * @param container - the `depsContainer` to look up registered {@link LinkTargetTypeExtension}s from
  * @returns every registered link target type extension, sorted by ascending {@link LinkTargetTypeExtension.order}
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 function listLinkTargetTypeExtensions(
@@ -58,7 +58,7 @@ function listLinkTargetTypeExtensions(
  * @throws {@link Error} when no registered extension matches the URL (should not happen as long as a
  *   permissive catch-all extension, such as the built-in `"url"` type, is registered)
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 function parseLinkTarget(
@@ -93,7 +93,7 @@ function parseLinkTarget(
  *
  * @throws {@link Error} when no registered extension matches `target.type`
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 function serializeLinkTarget(
@@ -126,7 +126,7 @@ function serializeLinkTarget(
  * @returns the matching link target, or `undefined` when no registered extension claims this resource
  *   type, so that the caller can fall back on {@link parseLinkTarget}
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 function resourceReferenceToLinkTarget(
@@ -161,7 +161,7 @@ function resourceReferenceToLinkTarget(
  *   {@link LinkTargetTypeExtension.configToReference}, or when it does but the configuration doesn't
  *   designate a resource yet (e.g. no page selected, empty URL)
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 function linkTargetToResourceReference(

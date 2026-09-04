@@ -26,7 +26,7 @@
  * `@xwiki/platform-link-type-default`, contribute `"page"`, `"attachment"`, `"url"` and `"email"`), rather than
  * being a fixed, closed set of types.
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 type LinkTarget = {
@@ -37,7 +37,7 @@ type LinkTarget = {
 /**
  * Parameters for a link
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 type LinkData = {

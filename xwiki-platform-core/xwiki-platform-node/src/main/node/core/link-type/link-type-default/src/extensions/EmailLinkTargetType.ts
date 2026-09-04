@@ -31,7 +31,7 @@ import type { Component } from "vue";
 /**
  * Built-in link target type for `mailto:` links.
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 @injectable()

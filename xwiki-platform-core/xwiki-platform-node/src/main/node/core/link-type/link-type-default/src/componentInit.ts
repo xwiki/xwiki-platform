@@ -33,7 +33,7 @@ import type { Container } from "inversify";
  * A consumer that does not want one (or several) of the built-in link target types (e.g. to offer a reduced set)
  * should simply not instantiate this class, and instead register only the extensions it wants, the same way.
  *
- * @since 18.7.0RC1
+ * @since 18.8.0RC1
  * @beta
  */
 class ComponentInit {

@@ -28,6 +28,8 @@ import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
+import jakarta.inject.Provider;
+
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.IconException;
@@ -74,8 +76,9 @@ public class DefaultIconThemesResource implements IconThemesResource, XWikiRestC
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
+    // We have to rely on a provider as we want to get a different instance per request.
     @Inject
-    private RequiredSkinExtensionsRecorder skinExtensionsRecorder;
+    private Provider<RequiredSkinExtensionsRecorder> skinExtensionsRecorderProvider;
 
     @Inject
     private IconRenderer iconRenderer;
@@ -101,7 +104,8 @@ public class DefaultIconThemesResource implements IconThemesResource, XWikiRestC
         try {
             // Set the requested wiki.
             this.modelContext.setCurrentEntityReference(new WikiReference(wikiId));
-            this.skinExtensionsRecorder.start();
+            RequiredSkinExtensionsRecorder skinExtensionsRecorder = this.skinExtensionsRecorderProvider.get();
+            skinExtensionsRecorder.start();
             IconSet iconSet = getIconSet(iconTheme);
             if (iconSet == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -120,7 +124,7 @@ public class DefaultIconThemesResource implements IconThemesResource, XWikiRestC
                     icons.getMissingIcons().add(iconName);
                 }
             }
-            String skinExtensions = this.skinExtensionsRecorder.stop();
+            String skinExtensions = skinExtensionsRecorder.stop();
             return Response.ok(icons)
                 .header(RequiredSkinExtensionsRecorder.XWIKI_SKIN_EXTENSIONS_DEFAULT_HEADER, skinExtensions)
                 .build();

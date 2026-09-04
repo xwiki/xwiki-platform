@@ -773,7 +773,7 @@
           // keeps a drag from ever starting on a move button. A click or a tap that drifts by a pixel has to stay
           // a click, otherwise the buttons stop being an alternative to dragging.
           $('#xclassContent').sortable({
-            cursor: 'move',
+            cursor: 'grabbing',
             items: '.xproperty',
             start: self.startDrag,
             stop: self.endDrag,

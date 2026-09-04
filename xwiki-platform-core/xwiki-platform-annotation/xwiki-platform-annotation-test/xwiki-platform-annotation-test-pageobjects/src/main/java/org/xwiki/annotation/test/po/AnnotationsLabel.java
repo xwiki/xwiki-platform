@@ -40,20 +40,24 @@ public class AnnotationsLabel extends BaseElement
     @FindBy(xpath = "annotationDate")
     private WebElement annotationDate;
 
-    private void hoverOnAnnotationByText(String searchText)
+    private void openAnnotationViewByText(String searchText)
     {
-        hoverOnAnnotationById(getAnnotationIdByText(searchText));
+        openAnnotationViewById(getAnnotationIdByText(searchText));
     }
 
-    private void hoverOnAnnotationById(String annotationId)
+    private void openAnnotationViewById(String annotationId)
     {
-        getDriver().findElement(By.className(annotationId)).click();
+        // The toggle button (id="ID<n>") is hidden via .sr-only's clip:rect(0,0,0,0). WebDriver's own visibility
+        // check detects that and refuses to click it (ElementNotInteractableException), so the test calls
+        // .click() directly through JavaScript instead, which has no such check and still works despite the
+        // lack of clickable area.
+        getDriver().executeJavascript("arguments[0].click();", getDriver().findElement(By.id(annotationId)));
         getDriver().waitUntilElementIsVisible(By.className("annotation-box-view"));
     }
 
     private void showAnnotationById(String idText)
     {
-        hoverOnAnnotationById(idText);
+        openAnnotationViewById(idText);
     }
 
     /**
@@ -66,7 +70,7 @@ public class AnnotationsLabel extends BaseElement
      */
     public void showAnnotationByText(String text)
     {
-        hoverOnAnnotationByText(text);
+        openAnnotationViewByText(text);
     }
 
     public void deleteAnnotationByText(String searchText)
@@ -77,16 +81,17 @@ public class AnnotationsLabel extends BaseElement
     public void deleteAnnotationById(String idText)
     {
         this.showAnnotationById(idText);
-        // The id format is "ID<index>".
-        String index = idText.substring(2);
-        getDriver().findElement(By.cssSelector("#annotation_view_" + index + " a.delete")).click();
-        getDriver().waitUntilElementIsVisible(By.xpath("//input[@value='Yes']"));
-        getDriver().findElement(By.xpath("//input[@value='Yes']")).click();
+        // The Comments annotation class renders Delete as a form button, other annotation classes as a plain
+        // link - match both.
+        getDriver().findElement(By.cssSelector(".annotation-bubble .delete")).click();
+        // Delete asks for confirmation via XWiki.widgets.ConfirmedAjaxRequest, a JS-generated dialog (not a native
+        // browser confirm).
+        confirmAction();
     }
 
     public String getAnnotationsAuthorByText(String searchText)
     {
-        this.hoverOnAnnotationByText(searchText);
+        this.openAnnotationViewByText(searchText);
         return this.annotationAuthor.getText();
     }
 
@@ -109,16 +114,13 @@ public class AnnotationsLabel extends BaseElement
 
     public String getAnnotationContentByText(String searchText)
     {
-        hoverOnAnnotationByText(searchText);
+        openAnnotationViewByText(searchText);
         getDriver().waitUntilElementIsVisible(By.xpath("//div[@class='annotationText']/p"));
         String annotationContent = getDriver()
             .findElement(By.xpath("//*[contains(@class, 'annotation-bubble')]//div[@class='annotationText']/p"))
             .getText();
         WebElement body = getDriver().findElement(By.id("body"));
 
-        // It seems that hovering over the small yellow icon sends 2 requests, and one ESC is not enough to make the
-        // window disappear
-        body.sendKeys(Keys.ESCAPE);
         body.sendKeys(Keys.ESCAPE);
         getDriver().waitUntilElementDisappears(By.className("annotation-box-view"));
         return annotationContent;

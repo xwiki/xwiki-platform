@@ -63,6 +63,15 @@ public class RichTextAreaElement extends BaseElement
 
             return getRootEditableElement(false).findElements(By.tagName("img"));
         }
+
+        /**
+         * @return the list of macros included in the rich text area
+         * @since 18.8.0RC1
+         */
+        public List<WebElement> getMacros()
+        {
+            return getRootEditableElement(false).findElements(By.className("macro"));
+        }
     }
 
     /**
@@ -753,6 +762,34 @@ public class RichTextAreaElement extends BaseElement
                 .moveToElement(targetImage)
                 // We have to drag the image using the dedicated drag handle.
                 .dragAndDropBy(dragHandle, xOffset, yOffset).perform();
+        });
+    }
+
+    /**
+     * Hovers the specified macro, in order to display its move handle.
+     *
+     * @param macroIndex the index of the macro to hover (0-based)
+     * @since 18.8.0RC1
+     */
+    public void hoverMacro(int macroIndex)
+    {
+        verifyContent(editedContent -> getDriver().createActions()
+            .moveToElement(editedContent.getMacros().get(macroIndex)).perform());
+    }
+
+    /**
+     * @param macroIndex the index of the macro to look at (0-based)
+     * @return the macro name displayed next to the move handle of the specified macro, or {@code null} if the macro
+     *         name is not displayed
+     * @since 18.8.0RC1
+     */
+    public String getMacroNameNextToMoveHandle(int macroIndex)
+    {
+        return getFromEditedContent(() -> {
+            WebElement macroName = this.content.getMacros().get(macroIndex).findElement(By.xpath(
+                "./ancestor::*[@data-cke-widget-wrapper][1]"
+                    + "/*[contains(@class, 'cke_widget_drag_handler_container')]/*[@class = 'macro-name']"));
+            return macroName.isDisplayed() ? macroName.getText() : null;
         });
     }
 }

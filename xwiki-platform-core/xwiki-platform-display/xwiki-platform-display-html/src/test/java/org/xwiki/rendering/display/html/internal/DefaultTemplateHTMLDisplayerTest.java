@@ -20,6 +20,7 @@
 package org.xwiki.rendering.display.html.internal;
 
 import java.io.StringWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,10 +124,35 @@ class DefaultTemplateHTMLDisplayerTest
     {
         this.defaultTemplateHTMLDisplayer.display(new DefaultParameterizedType(null, List.class, Block.class), null);
         verify(this.templateManager)
+            .getTemplate("html_displayer/list(block)/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/list(block).vm");
+        verify(this.templateManager)
             .getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block)/view.vm");
-        verify(this.templateManager).getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block).vm");
+        verify(this.templateManager)
+            .getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block).vm");
         verify(this.templateManager).getTemplate("html_displayer/view.vm");
         verify(this.templateManager).getTemplate("html_displayer/default.vm");
+        this.defaultTemplateHTMLDisplayer.display(new Type()
+        {
+            @Override
+            public String getTypeName()
+            {
+                return "unknownType";
+            }
+        }, null);
+        verify(this.templateManager).getTemplate("html_displayer/unknowntype.vm");
+    }
+
+    @Test
+    void getTemplateWithNestedParameterizedTypeTest() throws Exception
+    {
+        // A type argument that isn't a plain Class (here, List<Block> nested inside another List) must not be cast
+        // directly to Class, but fall back to serializing its type name.
+        this.defaultTemplateHTMLDisplayer.display(
+            new DefaultParameterizedType(null, List.class, new DefaultParameterizedType(null, List.class,
+                Block.class)), null);
+        verify(this.templateManager).getTemplate("html_displayer/list(java.util.list(org.xwiki.rendering.block."
+            + "block))/view.vm");
     }
 
     @Test

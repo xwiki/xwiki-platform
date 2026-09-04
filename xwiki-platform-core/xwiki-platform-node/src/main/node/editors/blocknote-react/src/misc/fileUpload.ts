@@ -77,7 +77,7 @@ async function uploadSelectedFile(
 function triggerUserFileUpload(
   depsContainer: Container,
 ): Promise<{ url: string }> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     // Creates a hidden file input element and temporarily adds it to the DOM,
     // so we can open the system file picker by clicking it. See
     // https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications#using_hidden_file_input_elements_using_the_click_method
@@ -93,7 +93,7 @@ function triggerUserFileUpload(
         return;
       }
 
-      resolve(await uploadSelectedFile(file, depsContainer));
+      uploadSelectedFile(file, depsContainer).then(resolve).catch(reject);
     });
 
     // Removes the input from the DOM again if the user closes the file

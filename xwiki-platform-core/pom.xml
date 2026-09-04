@@ -250,6 +250,27 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>No retro compatibility impact, only makes the macro parameter mandatory in the macro
+                parameter descriptor.</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setAttachment(java.lang.String)</old>
+                  <new>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setAttachment(java.lang.String)</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.annotation.added</code>
+                  <old>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setReference(org.xwiki.rendering.listener.reference.ResourceReference)</old>
+                  <new>method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setReference(org.xwiki.rendering.listener.reference.ResourceReference)</new>
+                  <annotation>@org.xwiki.properties.annotation.PropertyFeature(value = "reference", mandatory = true)</annotation>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

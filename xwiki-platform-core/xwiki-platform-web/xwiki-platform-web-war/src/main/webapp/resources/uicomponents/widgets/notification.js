@@ -19,7 +19,7 @@
  */
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
-var widgets = XWiki.widgets = XWiki.widgets || {};
+const widgets = XWiki.widgets = XWiki.widgets || {};
 /**
  * A general purpose notification class, displaying a simple message for the user, at the bottom of the screen.
  * Features:

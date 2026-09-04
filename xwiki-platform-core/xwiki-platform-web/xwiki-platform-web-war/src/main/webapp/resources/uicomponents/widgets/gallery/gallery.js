@@ -93,10 +93,9 @@ XWiki.Gallery = Class.create({
     this.show(0);
   },
   _collectImages : function(container) {
-    var images = [];
-    var imageElements = container.select('img');
-    for(var i = 0; i < imageElements.length; i++) {
-      var imageElement = imageElements[i];
+    const images = [];
+    const imageElements = container.select('img');
+    for (const imageElement of imageElements) {
       images.push({url: imageElement.getAttribute('src'), title: imageElement.title, alt: imageElement.alt});
       imageElement.removeAttribute('src');
     }
@@ -117,7 +116,7 @@ XWiki.Gallery = Class.create({
   _onAbortImage: function() {
   },
   _onKeyDown : function(event) {
-    var stop = true;
+    let stop = true;
     switch(event.keyCode) {
       case Event.KEY_LEFT:
         this._onPreviousImage();
@@ -186,9 +185,9 @@ XWiki.Gallery = Class.create({
 });
 
 function init(event) {
-  var elements = event?.memo.elements || [$('body')];
+  const elements = event?.memo.elements || [$('body')];
   elements.forEach(function(element) {
-    var galleries = element.hasClassName('gallery') ? [element] : element.select('.gallery');
+    const galleries = element.hasClassName('gallery') ? [element] : element.select('.gallery');
     galleries.forEach(function (gallery) {
       new XWiki.Gallery(gallery);
     });

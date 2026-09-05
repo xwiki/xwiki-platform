@@ -17,12 +17,10 @@ ul.log li:hover {
   border-right: 7px solid $theme.pageContentBackgroundColor;
   padding: 0.3em 0 0.3em 20px;
   position: relative;
+  background-position: left .3em;
 }
 .log-item > div {
   line-height: 1.4em;
-}
-.log-item {
-  background-position: left .3em;
 }
 .log-item-trace {
   background-image: url("$xwiki.getSkinFile('icons/silk/bug.png')");

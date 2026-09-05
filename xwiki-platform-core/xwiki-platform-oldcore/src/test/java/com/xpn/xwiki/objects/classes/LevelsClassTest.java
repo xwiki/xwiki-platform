@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -32,9 +34,17 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -47,6 +57,7 @@ import static org.mockito.Mockito.when;
  * @since 13.3RC1
  * @since 12.10.7
  */
+@OldcoreTest
 class LevelsClassTest
 {
     private static final List<String> DEFAULT_LIST = Arrays.asList(
@@ -59,20 +70,26 @@ class LevelsClassTest
         "delete"
     );
 
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
+    @MockComponent
+    private ContextualLocalizationManager contextualLocalizationManager;
+
     private XWikiContext context;
     private XWikiRequest xWikiRequest;
 
     @BeforeEach
     void setup() throws XWikiException
     {
-        this.context = mock(XWikiContext.class);
+        this.context = this.oldcore.getXWikiContext();
         XWiki xWiki = mock(XWiki.class);
-        when(this.context.getWiki()).thenReturn(xWiki);
+        this.context.setWiki(xWiki);
         XWikiRightService xWikiRightService = mock(XWikiRightService.class);
         when(xWiki.getRightService()).thenReturn(xWikiRightService);
         when(xWikiRightService.listAllLevels(context)).thenReturn(DEFAULT_LIST);
         this.xWikiRequest = mock(XWikiRequest.class);
-        when(this.context.getRequest()).thenReturn(this.xWikiRequest);
+        this.context.setRequest(this.xWikiRequest);
     }
 
     @Test
@@ -91,8 +108,21 @@ class LevelsClassTest
 
         // View and edit should be selected even despite the weird case in edit right
         // Comment should not be selected since there's a space before it
-        String expectedString = "<select id='authorizationrights' name='authorizationrights' size='6'>"
-            + "<option value='admin' label='admin'>admin</option>"
+        String actual = stringBuffer.toString();
+        int selectOpeningTagEnd = actual.indexOf('>') + 1;
+
+        // org.apache.ecs.xhtml.select stores its attributes in a java.util.Hashtable, whose iteration order shifts
+        // whenever an attribute is added or removed. Assert the opening tag's attributes are present rather than
+        // relying on a specific order, so the next attribute added here doesn't break this test again.
+        assertThat(actual.substring(0, selectOpeningTagEnd), allOf(
+            startsWith("<select "),
+            endsWith(">"),
+            containsString(" size='6' "),
+            containsString(" id='authorizationrights' "),
+            containsString(" aria-label='Levels List' "),
+            containsString(" name='authorizationrights'")));
+
+        String expectedRest = "<option value='admin' label='admin'>admin</option>"
             + "<option value='programming' label='programming'>programming</option>"
             + "<option selected='selected' value='edit' label='edit'>edit</option>"
             + "<option selected='selected' value='view' label='view'>view</option>"
@@ -100,7 +130,7 @@ class LevelsClassTest
             + "<option value='script' label='script'>script</option>"
             + "<option value='delete' label='delete'>delete</option>"
             + "</select><input name='authorizationrights' type='hidden'/>";
-        assertEquals(expectedString, stringBuffer.toString());
+        assertEquals(expectedRest, actual.substring(selectOpeningTagEnd));
     }
 
     @Test

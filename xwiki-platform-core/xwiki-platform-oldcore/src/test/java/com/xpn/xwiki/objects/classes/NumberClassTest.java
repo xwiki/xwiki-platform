@@ -29,12 +29,15 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -58,6 +61,19 @@ class NumberClassTest
 
     @MockComponent
     private ContextualLocalizationManager contextualLocalizationManager;
+
+    @Test
+    void displayEditSetsAriaLabel()
+    {
+        NumberClass nc = new NumberClass();
+        nc.setPrettyName("Quantity");
+        BaseObject object = new BaseObject();
+        StringBuffer buffer = new StringBuffer();
+
+        nc.displayEdit(buffer, "quantity", "prefix_", object, null);
+
+        assertThat(buffer.toString(), containsString("aria-label='Quantity'"));
+    }
 
     /** Test the fromString method. */
     @Test

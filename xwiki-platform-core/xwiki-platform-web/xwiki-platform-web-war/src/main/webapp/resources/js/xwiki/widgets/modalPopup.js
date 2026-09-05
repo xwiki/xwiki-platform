@@ -72,8 +72,9 @@ widgets.ModalPopup = Class.create({
     this.dialogBox.update(this.dialogBox._x_contentPlug);
     this.dialogBox._x_contentPlug.update(this.content);
     // Add the dialog title
+    var title;
     if (this.options.title) {
-      var title = new Element('div', {'class': 'xdialog-title'}).update(this.options.title);
+      title = new Element('div', {'class': 'xdialog-title'}).update(this.options.title);
       title.setStyle({"color" : this.options.titleColor});
       this.dialogBox.insertBefore(title, this.dialogBox.firstChild);
     }
@@ -211,8 +212,8 @@ widgets.ModalPopup = Class.create({
     var shortcuts = this.shortcuts[action].keys;
     var method = this.shortcuts[action].method.bindAsEventListener(this, action);
     var options = this.shortcuts[action].options;
-    for (var i = 0; i < shortcuts.length; ++i) {
-      shortcut.add(shortcuts[i], method, options);
+    for (const shortcutKey of shortcuts) {
+      shortcut.add(shortcutKey, method, options);
     }
   },
   /**
@@ -221,8 +222,8 @@ widgets.ModalPopup = Class.create({
    * @param {String} action The action to unregister {@see #shortcuts}
    */
   unregisterShortcuts : function(action) {
-    for (var i = 0; i < this.shortcuts[action].keys.length; ++i) {
-      shortcut.remove(this.shortcuts[action].keys[i]);
+    for (const shortcutKey of this.shortcuts[action].keys) {
+      shortcut.remove(shortcutKey);
     }
   },
   createButton : function(type, text, title, id, extraClass) {

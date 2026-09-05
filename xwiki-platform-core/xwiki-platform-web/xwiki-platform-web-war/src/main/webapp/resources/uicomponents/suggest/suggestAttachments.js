@@ -130,8 +130,7 @@ define('xwiki-attachments-filter', ['jquery'], function($) {
   };
 
   var isAttachmentAllowed = function(attachment, allowedFileTypes) {
-    for (var i = 0; i < allowedFileTypes.length; i++) {
-      var type = allowedFileTypes[i];
+    for (const type of allowedFileTypes) {
       if (type.substring(0, 1) === '.') {
         // Verify if the file name matches the allowed file name extension.
         if (attachment.name.substring(attachment.name.length - type.length) === type) {

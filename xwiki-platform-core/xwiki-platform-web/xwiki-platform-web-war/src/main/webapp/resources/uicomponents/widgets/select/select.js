@@ -256,12 +256,12 @@ require(['jquery'], function($) {
       // For each category.
       var categories = self.selectWidget.find('.xwiki-select-category');
       for (const categoryElement of categories) {
-        var category = $(categoryElement);
+        const category = $(categoryElement);
         // For each option of that category.
         var options = category.find('.xwiki-select-option');
         var matchingOptionsCount = 0;
         for (const optionElement of options) {
-          var option = $(optionElement);
+          const option = $(optionElement);
           // We look both in the label and in the hint of the option
           var label = option.find('label').text().toLowerCase();
           var hint  = option.find('.xHint').text().toLowerCase();
@@ -269,7 +269,7 @@ require(['jquery'], function($) {
           // We look if the label match all the values of the filter.
           var optionShouldBeVisible = true;
           for (const rawFilterValue of filterValues) {
-            var filterValue = rawFilterValue.toLowerCase();
+            const filterValue = rawFilterValue.toLowerCase();
             // If one of the filter values is missing from the label of this option, we must hide it.
             if (!optionText.includes(filterValue)) {
               optionShouldBeVisible = false;

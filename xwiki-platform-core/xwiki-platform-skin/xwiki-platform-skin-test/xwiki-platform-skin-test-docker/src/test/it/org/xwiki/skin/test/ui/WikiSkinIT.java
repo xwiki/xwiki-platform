@@ -42,7 +42,9 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.skin.test.po.SkinInlinePage;
 import org.xwiki.skin.test.po.SkinTemplateElement;
 import org.xwiki.skin.test.po.SkinViewPage;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -143,7 +145,7 @@ class WikiSkinIT
      */
     @Test
     @Order(2)
-    void overrideFaviconWithSkinAttachment(TestUtils setup) throws Exception
+    void overrideFaviconWithSkinAttachment(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
         setup.loginAsSuperAdmin();
 
@@ -166,9 +168,9 @@ class WikiSkinIT
 
             setup.gotoPage("Main", "WebHome");
 
-            assertFavicon(setup, SVG_LINK, FAVICON_SVG, svg);
-            assertFavicon(setup, PNG_LINK, FAVICON_PNG, png);
-            assertFavicon(setup, APPLE_TOUCH_LINK, FAVICON_APPLE_TOUCH, appleTouch);
+            assertFavicon(setup, testConfiguration, SVG_LINK, FAVICON_SVG, svg);
+            assertFavicon(setup, testConfiguration, PNG_LINK, FAVICON_PNG, png);
+            assertFavicon(setup, testConfiguration, APPLE_TOUCH_LINK, FAVICON_APPLE_TOUCH, appleTouch);
         } finally {
             // Restore the state of the skin and of the wiki so that this test doesn't affect the other tests.
             setup.rest().deleteAttachement(getAttachmentReference(FAVICON_SVG));
@@ -178,20 +180,25 @@ class WikiSkinIT
         }
     }
 
-    private void assertFavicon(TestUtils setup, String linkSelector, String attachmentName, byte[] expectedContent)
-        throws Exception
+    private void assertFavicon(TestUtils setup, TestConfiguration testConfiguration, String linkSelector,
+        String attachmentName, byte[] expectedContent) throws Exception
     {
-        // URL of the skin action serving the attachment, e.g.
-        // "http://localhost:8080/xwiki/bin/skin/XWiki/DefaultSkin/icons.xwiki.favicon.svg".
+        // URL of the skin action serving the attachment, as seen from the browser, e.g.
+        // "http://host.testcontainers.internal:8080/xwiki/bin/skin/XWiki/DefaultSkin/icons.xwiki.favicon.svg".
         String url = stripQueryString(setup.getURL(getAttachmentReference(attachmentName), "skin", null));
 
         // The <link> element points to that URL, instead of to the resource shipped in the WAR.
         assertEquals(url, stripQueryString(getFaviconURL(setup, linkSelector)));
 
-        // And the skin action serves there the image that was attached. Note that getInputStream() already asserts
-        // that the resource is served with a 200 status code, and that it expects a path relative to the base URL.
+        // And the skin action serves there the image that was attached. The base URL of TestUtils is the one the
+        // browser uses to reach XWiki and it's only resolvable inside the browser container, so the request is sent
+        // to the address at which the servlet engine is reachable from the test JVM instead. Note that
+        // getInputStream() already asserts that the resource is served with a 200 status code.
         String path = url.substring(setup.getBaseURL().length());
-        assertArrayEquals(expectedContent, IOUtils.toByteArray(setup.getInputStream(path, null)),
+        ServletEngine servletEngine = testConfiguration.getServletEngine();
+        String servletEngineBaseURL =
+            String.format("http://%s:%s/xwiki/", servletEngine.getIP(), servletEngine.getPort());
+        assertArrayEquals(expectedContent, IOUtils.toByteArray(setup.getInputStream(servletEngineBaseURL, path, null)),
             String.format("Wrong content served for the [%s] skin resource", attachmentName));
     }
 

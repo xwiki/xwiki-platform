@@ -82,6 +82,13 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- WikiManagerRestIT#checkTableRowFormat() reads the store APIs from a Groovy script -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>

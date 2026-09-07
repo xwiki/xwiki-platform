@@ -18,10 +18,11 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { translations } from "../../translations";
-import LinkConfig from "../LinkConfig.vue";
+import { translations } from "../translations";
+import { LinkConfig } from "@xwiki/platform-link-modal-ui";
 import { useI18n } from "vue-i18n";
-import type { LinkData, LinkUrlConfig } from "../../data/linkType";
+import type { LinkUrlConfig } from "../data/linkType";
+import type { LinkData } from "@xwiki/platform-link-type-api";
 
 defineProps<{ linkData: LinkData }>();
 
@@ -37,7 +38,7 @@ const { t } = useI18n({ messages: translations });
     <template #config>
       <x-text-field
         v-bind="{ 'data-test': 'linkUrl' }"
-        :label="t('link-modal.target-types.url.url')"
+        :label="t('link-type.target-types.url.url')"
         type="url"
         v-model="model.url"
         required

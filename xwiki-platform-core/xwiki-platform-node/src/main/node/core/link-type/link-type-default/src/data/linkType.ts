@@ -23,34 +23,9 @@ import type {
 } from "@xwiki/platform-model-api";
 
 /**
- * Parameters for a link
- *
- * @since 18.5.0RC1
- * @beta
- */
-type LinkData = {
-  displayText: string;
-  newTab?: boolean;
-  target: LinkTarget;
-};
-
-/**
- * Target of a link
- *
- * @since 18.4.0RC-1
- * @beta
- */
-// TODO: allow arbitrary link targets using extensions - https://jira.xwiki.org/browse/XWIKI-23927
-type LinkTarget =
-  | { type: "page"; config: LinkPageConfig }
-  | { type: "attachment"; config: LinkAttachmentConfig }
-  | { type: "url"; config: LinkUrlConfig }
-  | { type: "email"; config: LinkEmailConfig };
-
-/**
  * Configuration for a page link
  *
- * @since 18.4.0RC-1
+ * @since 18.8.0RC1
  * @beta
  */
 type LinkPageConfig = {
@@ -62,7 +37,7 @@ type LinkPageConfig = {
 /**
  * Configuration for an attachment link
  *
- * @since 18.4.0RC-1
+ * @since 18.8.0RC1
  * @beta
  */
 type LinkAttachmentConfig = {
@@ -73,7 +48,7 @@ type LinkAttachmentConfig = {
 /**
  * Configuration for an URL link
  *
- * @since 18.4.0RC-1
+ * @since 18.8.0RC1
  * @beta
  */
 type LinkUrlConfig = {
@@ -83,7 +58,7 @@ type LinkUrlConfig = {
 /**
  * Configuration for an e-mail link
  *
- * @since 18.4.0RC-1
+ * @since 18.8.0RC1
  * @beta
  */
 type LinkEmailConfig = {
@@ -94,9 +69,7 @@ type LinkEmailConfig = {
 
 export type {
   LinkAttachmentConfig,
-  LinkData,
   LinkEmailConfig,
   LinkPageConfig,
-  LinkTarget,
   LinkUrlConfig,
 };

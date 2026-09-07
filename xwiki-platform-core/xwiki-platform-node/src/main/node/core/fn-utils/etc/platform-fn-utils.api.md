@@ -11,6 +11,9 @@ export function assertInArray<T, U extends T>(value: T, array: U[], message: str
 export function assertUnreachable(value: never): never;
 
 // @beta
+export function debounceAsync<Args extends unknown[], R>(fn: (...args: Args) => Promise<R> | R, delay?: number): (...args: Args) => Promise<R>;
+
+// @beta
 export function escapeHtml(str: string): string;
 
 // @beta

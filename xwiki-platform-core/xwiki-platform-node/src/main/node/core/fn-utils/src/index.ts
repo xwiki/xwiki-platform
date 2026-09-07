@@ -265,6 +265,50 @@ function escapeHtml(str: string): string {
 }
 
 /**
+ * Debounce async function call
+ *
+ * Returned promise will be rejected if a new one starts in the meantime
+ *
+ * @param fn - Function to call (returns a promise)
+ * @param delay - Delay in milliseconds
+ * @returns A debounced promise
+ *
+ * @since 18.8.0RC1
+ * @beta
+ */
+function debounceAsync<Args extends unknown[], R>(
+  fn: (...args: Args) => Promise<R> | R,
+  delay = 100,
+): (...args: Args) => Promise<R> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  let pendingReject: ((reason?: unknown) => void) | undefined;
+
+  return (...args: Args): Promise<R> => {
+    // Cancel any pending call
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+      pendingReject?.(new Error("Debounced: call cancelled by a newer call"));
+    }
+
+    return new Promise<R>((resolve, reject) => {
+      pendingReject = reject;
+
+      timeoutId = setTimeout(async () => {
+        try {
+          const result = await fn(...args);
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        } finally {
+          timeoutId = undefined;
+          pendingReject = undefined;
+        }
+      }, delay);
+    });
+  };
+}
+
+/**
  * Generic tree structure type.
  * @since 18.0.0RC1
  * @beta
@@ -276,6 +320,7 @@ type TreeNode<T> = T & {
 export {
   assertInArray,
   assertUnreachable,
+  debounceAsync,
   escapeHtml,
   filterMap,
   objectEntries,

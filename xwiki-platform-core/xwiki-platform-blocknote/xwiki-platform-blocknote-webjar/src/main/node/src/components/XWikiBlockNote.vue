@@ -402,6 +402,8 @@ const macros: BlockNoteViewWrapperProps["macros"] = {
       }
     },
   },
+
+  list: [],
 };
 
 //

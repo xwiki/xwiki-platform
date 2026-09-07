@@ -20,17 +20,17 @@
 import { DepsContainerContext } from "../contexts";
 import { LinkType } from "../misc/linkEditionCtx";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
-import { ResourceType } from "@xwiki/platform-rendering-api";
+import { debounceAsync } from "@xwiki/platform-fn-utils";
+import {
+  DefaultResourceReferenceParser,
+  ResourceType,
+} from "@xwiki/platform-rendering-api";
 import { t } from "i18next";
-import { debounce } from "lodash-es";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { RiLink } from "react-icons/ri";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
 import type { RemoteURLSerializerProvider } from "@xwiki/platform-model-remote-url-api";
-import type {
-  ResourceReference,
-  ResourceReferenceParser,
-} from "@xwiki/platform-rendering-api";
+import type { ResourceReference } from "@xwiki/platform-rendering-api";
 import type { ReactElement } from "react";
 
 /**
@@ -132,9 +132,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
     .get()!;
 
-  const resourceReferenceParser = depsContainer.get<ResourceReferenceParser>(
-    "ResourceReferenceParser",
-  );
+  const resourceReferenceParser = new DefaultResourceReferenceParser();
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -155,8 +153,8 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   const isUrl = (value: string) =>
     value.startsWith("http://") || value.startsWith("https://");
 
-  const performSearch = useCallback(
-    debounce((search: string) => {
+  const runSearch = useCallback(
+    (search: string) => {
       if (isUrl(search)) {
         setSuggestions({ status: "resolved", suggestions: [] });
         return;
@@ -173,9 +171,11 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
             : { status: "backendSearchUnsupported" },
         );
       });
-    }),
+    },
     [setSuggestions, getSuggestions],
   );
+
+  const performSearch = useCallback(debounceAsync(runSearch), [runSearch]);
 
   const submitRawValue = useCallback(
     // eslint-disable-next-line max-statements
@@ -224,10 +224,15 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   );
 
   // Automatically perform a search when the query changes
-  useEffect(() => performSearch(query), [query, performSearch]);
+  useEffect(() => {
+    performSearch(query);
+  }, [query, performSearch]);
 
-  // Perform a search at the opening
-  useEffect(() => performSearch(""), []);
+  // Perform a search at the opening, immediately: there's no rapid typing to debounce yet, and the
+  // suggestions should be available as soon as possible (e.g. to be keyboard-navigable right away).
+  useEffect(() => {
+    runSearch("");
+  }, [runSearch]);
 
   return (
     <Combobox

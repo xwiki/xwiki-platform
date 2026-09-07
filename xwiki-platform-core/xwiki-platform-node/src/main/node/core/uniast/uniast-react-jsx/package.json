@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-macros-ast-react-jsx",
+  "name": "@xwiki/platform-uniast-react-jsx",
   "version": "18.8.0-SNAPSHOT",
   "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-ast-react-jsx",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-react-jsx",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {
@@ -39,8 +39,8 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/platform-fn-utils": "workspace:*",
-    "@xwiki/platform-macros-api": "workspace:*",
-    "@xwiki/platform-model-remote-url-api": "workspace:*"
+    "@xwiki/platform-model-remote-url-api": "workspace:*",
+    "@xwiki/platform-uniast-api": "workspace:*"
   },
   "peerDependencies": {
     "inversify": "8.x"

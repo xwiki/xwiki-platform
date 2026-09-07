@@ -37,6 +37,9 @@
     "typecheck": "tsc"
   },
   "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@xwiki/platform-uniast-api": "workspace:*"
+  },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",

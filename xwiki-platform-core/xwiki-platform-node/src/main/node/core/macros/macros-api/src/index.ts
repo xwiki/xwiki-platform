@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { MacroBlock, MacroInlineContent } from "./ast";
+import type { Block, InlineContent } from "@xwiki/platform-uniast-api";
 
 /**
  * Information about a macro.
@@ -91,7 +91,7 @@ interface BlockMacro<Parameters extends Record<string, MacroParameterType>> {
   render(
     params: GetConcreteMacroParametersType<Parameters>,
     rawBody: string | null,
-  ): MacroBlock[];
+  ): Block[];
 }
 
 /**
@@ -118,7 +118,7 @@ interface InlineMacro<Parameters extends Record<string, MacroParameterType>> {
   render(
     params: GetConcreteMacroParametersType<Parameters>,
     rawBody: string | null,
-  ): MacroInlineContent[];
+  ): InlineContent[];
 }
 
 /**
@@ -263,18 +263,3 @@ export type {
   UndefinableToOptional,
   UnknownMacroParamsType,
 };
-
-export type {
-  MacroAlignment,
-  MacroBlock,
-  MacroBlockStyles,
-  MacroImage,
-  MacroInlineContent,
-  MacroLink,
-  MacroLinkTarget,
-  MacroListItem,
-  MacroTableCell,
-  MacroTableColumn,
-  MacroText,
-  MacroTextStyles,
-} from "./ast";

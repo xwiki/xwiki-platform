@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Add support for implementing User Interface extensions from a wiki page.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

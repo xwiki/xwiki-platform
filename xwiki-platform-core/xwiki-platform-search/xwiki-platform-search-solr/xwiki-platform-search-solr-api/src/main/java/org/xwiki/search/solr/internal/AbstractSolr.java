@@ -74,6 +74,9 @@ public abstract class AbstractSolr implements Solr, Disposable
         }
     }
 
+    /**
+     * @deprecated use {@link #getCore(String)} instead
+     */
     @Override
     @Deprecated
     public SolrClient getClient(String name) throws SolrException

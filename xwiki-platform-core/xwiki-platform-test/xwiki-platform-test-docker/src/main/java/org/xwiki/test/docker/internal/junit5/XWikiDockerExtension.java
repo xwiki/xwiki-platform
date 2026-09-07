@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
+import org.opentest4j.TestAbortedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
@@ -340,6 +341,12 @@ public class XWikiDockerExtension extends AbstractExecutionConditionExtension
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
+        // An aborted test (e.g. a failed assumption) is not a failure and thus there's nothing to debug. Don't save
+        // any screenshot or video for it, exactly as for a passing test.
+        if (throwable instanceof TestAbortedException) {
+            throw throwable;
+        }
+
         try {
             saveScreenshotAndVideo(extensionContext);
         } catch (Exception e) {

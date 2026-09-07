@@ -34,6 +34,7 @@ import {
   useExtension,
 } from "@blocknote/react";
 import { Paper } from "@mantine/core";
+import { debounceAsync } from "@xwiki/platform-fn-utils";
 import { LinkType } from "@xwiki/platform-link-suggest-api";
 import { useCallback, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -89,7 +90,7 @@ export function ImageSuggestionController({
   }, [editor, suggestionMenu]);
 
   const searchImages = useCallback(
-    async (query: string) => {
+    debounceAsync(async (query: string) => {
       const suggestions = await fetchImageSuggestions(
         query,
         linkSuggestService,
@@ -114,7 +115,7 @@ export function ImageSuggestionController({
       return maxSuggestions
         ? suggestions.slice(0, maxSuggestions + 2) // account for the two placeholder items
         : suggestions;
-    },
+    }),
     [
       t,
       linkSuggestService,

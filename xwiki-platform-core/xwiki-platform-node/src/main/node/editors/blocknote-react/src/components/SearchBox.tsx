@@ -20,12 +20,12 @@
 import { DepsContainerContext } from "../contexts";
 import { LinkType } from "../misc/linkEditionCtx";
 import { Combobox, InputBase, Paper, useCombobox } from "@mantine/core";
+import { debounceAsync } from "@xwiki/platform-fn-utils";
 import {
   DefaultResourceReferenceParser,
   ResourceType,
 } from "@xwiki/platform-rendering-api";
 import { t } from "i18next";
-import { debounce } from "lodash-es";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { RiLink } from "react-icons/ri";
 import type { ModelReferenceParserProvider } from "@xwiki/platform-model-reference-api";
@@ -154,7 +154,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     value.startsWith("http://") || value.startsWith("https://");
 
   const performSearch = useCallback(
-    debounce((search: string) => {
+    debounceAsync((search: string) => {
       if (isUrl(search)) {
         setSuggestions({ status: "resolved", suggestions: [] });
         return;
@@ -222,10 +222,14 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   );
 
   // Automatically perform a search when the query changes
-  useEffect(() => performSearch(query), [query, performSearch]);
+  useEffect(() => {
+    performSearch(query);
+  }, [query, performSearch]);
 
   // Perform a search at the opening
-  useEffect(() => performSearch(""), []);
+  useEffect(() => {
+    performSearch("");
+  }, []);
 
   return (
     <Combobox

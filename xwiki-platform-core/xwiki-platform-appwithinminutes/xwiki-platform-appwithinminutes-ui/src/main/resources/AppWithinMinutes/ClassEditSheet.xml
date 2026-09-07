@@ -256,8 +256,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set ($class = 'wikicreatelink')
     #set ($action = 'create')
     #set ($discard = $params.put('parent', $doc.fullName))
-    #set ($title = $escapetool.xml($services.localization.render('rendering.xwiki.wantedLink.page.label',
-      [$reference.name])))
+    #set ($title = $escapetool.xml($services.localization.render(
+      'platform.appwithinminutes.classEditorCreatePageTitle', [$reference.name])))
   #end
   &lt;span class="$class"&gt;&lt;a
     href="$escapetool.xml($xwiki.getURL($reference, $action, $escapetool.url($params)))"

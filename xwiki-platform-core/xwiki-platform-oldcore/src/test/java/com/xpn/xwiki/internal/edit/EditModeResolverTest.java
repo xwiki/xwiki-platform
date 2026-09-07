@@ -31,14 +31,11 @@ import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
-import org.xwiki.edit.Editor;
-import org.xwiki.edit.EditorDescriptor;
 import org.xwiki.edit.EditorManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxContent;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.sheet.SheetManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -136,16 +133,6 @@ class EditModeResolverTest
     {
         when(this.contextComponentManager.hasComponent(Parser.class, XWIKI_2_1)).thenReturn(supported);
         when(this.contextComponentManager.hasComponent(PrintRendererFactory.class, XWIKI_2_1)).thenReturn(supported);
-    }
-
-    private void wysiwygEditor(String editorId)
-    {
-        Editor<SyntaxContent> editor = mock(Editor.class);
-        EditorDescriptor descriptor = mock(EditorDescriptor.class);
-        when(editor.getDescriptor()).thenReturn(descriptor);
-        when(descriptor.getId()).thenReturn(editorId);
-        when(this.editorManager.<SyntaxContent>getDefaultEditor(SyntaxContent.class, EditModeResolver.WYSIWYG))
-            .thenReturn(editor);
     }
 
     @Test

@@ -121,7 +121,7 @@ public class R180800000XWIKI24357DataMigration extends AbstractHibernateDataMigr
     {
         if (value.startsWith("hash:")) {
             String newValue = encoder.reencodePassword(value);
-            int result = hibernateStore.executeWrite(getXWikiContext(), (session) ->
+            int result = hibernateStore.executeWrite(getXWikiContext(), session ->
                 session.createQuery("update PasswordProperty set value = :value where id.id = :id and id.name "
                     + "= "
                     + ":name")

@@ -3451,7 +3451,7 @@ public class XWiki implements EventListener
             String accept = context.getRequest().getHeader("Accept-Language");
             if ((accept != null) && (!accept.isEmpty())) {
                 String[] alist = StringUtils.split(accept, ",;-");
-                if ((alist != null) && !(alist.length == 0)) {
+                if ((alist != null) && (alist.length != 0)) {
                     context.setLanguage(alist[0]);
                     navigatorLanguage = alist[0];
                 }
@@ -3558,7 +3558,7 @@ public class XWiki implements EventListener
             String accept = context.getRequest().getHeader("Accept-Language");
             if ((accept != null) && (!accept.isEmpty())) {
                 String[] alist = StringUtils.split(accept, ",;-");
-                if ((alist != null) && !(alist.length == 0)) {
+                if ((alist != null) && (alist.length != 0)) {
                     context.setLanguage(alist[0]);
                     navigatorLanguage = alist[0];
                 }

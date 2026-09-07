@@ -25,7 +25,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
@@ -59,19 +62,44 @@ public class XWikiDocumentWantedLinkTitleGenerator implements WantedLinkTitleGen
     @Named("current")
     private PageReferenceResolver<String> currentPageReferenceResolver;
 
+    /**
+     * Used to know which document name marks the default document of a space.
+     */
+    @Inject
+    private EntityReferenceProvider defaultEntityReferenceProvider;
+
     @Override
     public String generateWantedLinkTitle(ResourceReference reference)
     {
-        String documentTitleTranslationKey = "rendering.xwiki.wantedLink.page.label";
         String documentName;
-        if (reference.isTyped() && reference.getType() == ResourceType.DOCUMENT) {
-            documentName = this.currentDocumentReferenceResolver.resolve(reference.getReference()).getName();
-        } else if (reference.isTyped() && reference.getType() == ResourceType.PAGE) {
+        if (reference.getType() == ResourceType.PAGE) {
             documentName = this.currentPageReferenceResolver.resolve(reference.getReference()).getName();
         } else {
-            documentName = reference.getReference();
+            documentName =
+                getNestedPageName(this.currentDocumentReferenceResolver.resolve(reference.getReference()));
         }
-        return this.contextLocalization.getTranslationPlain(documentTitleTranslationKey,
-            documentName);
+        return this.contextLocalization.getTranslationPlain("rendering.xwiki.wantedLink.page.label", documentName);
+    }
+
+    /**
+     * Names a document the way the default link label format does, so that the title and the label of a link agree
+     * on how they call the missing page.
+     *
+     * @param documentReference the reference of the document the wanted link points to
+     * @return the name of the document, or the name of its last space when the document is the default document of
+     *         that space, since naming a nested page after its default document would show {@code WebHome} instead
+     *         of the name the user typed
+     */
+    private String getNestedPageName(DocumentReference documentReference)
+    {
+        String name;
+        if (this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName()
+            .equals(documentReference.getName()))
+        {
+            name = documentReference.getLastSpaceReference().getName();
+        } else {
+            name = documentReference.getName();
+        }
+        return name;
     }
 }

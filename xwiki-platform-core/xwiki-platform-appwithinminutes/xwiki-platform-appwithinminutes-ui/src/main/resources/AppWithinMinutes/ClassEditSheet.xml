@@ -259,8 +259,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #set ($title = $escapetool.xml($services.localization.render('rendering.xwiki.wantedLink.page.label',
       [$reference.name])))
   #end
-  &lt;span class="$class"#if (!$exists) title="$title"#end&gt;&lt;a
+  &lt;span class="$class"&gt;&lt;a
     href="$escapetool.xml($xwiki.getURL($reference, $action, $escapetool.url($params)))"
+    #if (!$exists) title="$title"#end
     &gt;$escapetool.xml($reference.name)&lt;/a&gt;&lt;/span&gt;##
 #end
 

@@ -295,7 +295,7 @@ type MacroBlockInvocation = Omit<UniAstMacroBlockInvocation, "body"> & {
 /**
  * Information about an inline macro invocation
  *
- * Identical to `InlineMacroInvocation` except for `body` which is a BlockNote AST piece here
+ * Identical to `UniAstInlineMacroInvocation` except for `body` which is a BlockNote AST piece here
  * {@link MacroBlockInvocation}.
  *
  * @since 18.5.0RC1

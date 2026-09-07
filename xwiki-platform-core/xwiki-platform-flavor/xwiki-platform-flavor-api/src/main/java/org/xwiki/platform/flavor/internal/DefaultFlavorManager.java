@@ -78,6 +78,9 @@ public class DefaultFlavorManager implements FlavorManager
     @Inject
     private Logger logger;
 
+    /**
+     * @deprecated use {@link #searchFlavors(FlavorQuery)} instead
+     */
     @Override
     @Deprecated
     public IterableResult<Extension> getFlavors(FlavorQuery query) throws SearchException

@@ -229,6 +229,9 @@ public class DefaultTemplateManager implements TemplateManager
         return this.templateManager.getTemplate(templateName);
     }
 
+    /**
+     * @deprecated use {@link #createStringTemplate(String, DocumentReference, DocumentReference)} instead
+     */
     @Override
     @Deprecated
     public Template createStringTemplate(String content, DocumentReference author) throws Exception
@@ -236,6 +239,9 @@ public class DefaultTemplateManager implements TemplateManager
         return createStringTemplate(content, author, null);
     }
 
+    /**
+     * @deprecated use {@link #createStringTemplate(String, String, DocumentReference, DocumentReference)} instead
+     */
     @Override
     @Deprecated(since = "15.9RC1")
     public Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)

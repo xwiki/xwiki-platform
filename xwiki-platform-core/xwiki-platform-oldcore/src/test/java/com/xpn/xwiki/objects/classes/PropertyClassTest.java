@@ -46,6 +46,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.objects.meta.TextAreaMetaClass;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -270,5 +271,24 @@ public class PropertyClassTest
         newClass.setOwnerDocument(new XWikiDocument(newClassReference));
         propertyClass.setObject(newClass);
         assertEquals(new ClassPropertyReference("users", newClass.getReference()), propertyClass.getReference());
+    }
+
+    @Test
+    void displayViewEscapesValue()
+    {
+        // The base displayer is used by the property classes that don't override it (NumberClass, DateClass), whose
+        // values can't hold markup. Escape anyway so that it stays correct for any other subclass.
+        PropertyClass propertyClass = new PropertyClass();
+        propertyClass.setName("prop");
+
+        StringProperty property = new StringProperty();
+        property.setValue("value & <b>{{macro}}");
+        BaseObject object = new BaseObject();
+        object.safeput("prop", property);
+
+        StringBuffer buffer = new StringBuffer();
+        propertyClass.displayView(buffer, "prop", "", object, this.oldCore.getXWikiContext());
+
+        assertEquals("value &#38; &#60;b>&#123;&#123;macro}}", buffer.toString());
     }
 }

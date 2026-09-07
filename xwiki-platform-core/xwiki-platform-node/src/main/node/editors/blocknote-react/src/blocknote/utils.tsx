@@ -278,7 +278,7 @@ type MacroInsertionEditorPrefillData = {
 /**
  * Information about a macro block invocation
  *
- * Identical to `MacroBlockInvocation` except for `body` which is a BlockNote AST piece here
+ * Identical to `UniAstMacroBlockInvocation` except for `body` which is a BlockNote AST piece here
  *
  * @since 18.5.0RC1
  * @beta

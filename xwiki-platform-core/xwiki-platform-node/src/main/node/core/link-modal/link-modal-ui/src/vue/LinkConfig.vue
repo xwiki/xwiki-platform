@@ -44,6 +44,10 @@ const extensions = inject<LinkTargetTypeExtension[]>(
 
 const linkData = ref(props.linkData);
 
+// Here we depend on the label as there's no other choice: the selection happens with the <x-select>,
+// which doesn't allow specifying a value that differs from the label.
+//
+// So we rely on the label selected by the user to choose the extension.
 const linkTargetTypeSelect = ref(
   extensions
     .find((extension) => extension.type === linkData.value.target.type)

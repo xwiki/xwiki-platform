@@ -50,10 +50,10 @@ platform.userdirectory.customizeNotAllowed=Vous n'êtes pas autorisé à personn
 platform.userdirectory.configTitle=Configuration de l'annuaire utilisateur
 platform.userdirectory.configSheetTitle=Fiche de configuration de l'annuaire utilisateur
 platform.userdirectory.configSheetApplyOnConfiguration=Cette sheet doit être appliquée sur le document de configuration de l'annuaire utilisateur.
-### Missing: platform.userdirectory.isCustomizedWarning=You are viewing a customized user directory. You can reset it to default or customize it further.
-### Missing: platform.userdirectory.canCustomizeInfo=The user directory can be customized to display the columns you wish to see.
-### Missing: platform.userdirectory.canCustomizeInfoGuest=The user directory can be customized to display the columns you wish to see, but you need to log in first.
+platform.userdirectory.isCustomizedWarning=Vous visualisez actuellement un annuaire utilisateurs personnalisé. Vous pouvez soit le personnaliser d'avantage, soit ré-initialiser l'affichage.
+platform.userdirectory.canCustomizeInfo=L'annuaire utilisateurs peut être personnalisé afin d'afficher les colonnes souhaitées.
+platform.userdirectory.canCustomizeInfoGuest=Vous devez être connecté pour personnaliser l'affichage de l'annuaire utilisateurs.
 platform.userdirectory.customizeButton=Personnaliser
-### Missing: platform.userdirectory.resetButton=Reset
+platform.userdirectory.resetButton=Réinitialiser
 </content>
 </xwikidoc>

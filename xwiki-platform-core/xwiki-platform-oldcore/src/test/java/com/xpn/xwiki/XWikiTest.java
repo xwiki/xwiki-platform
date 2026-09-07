@@ -1126,8 +1126,8 @@ class XWikiTest
         when(listener.getName()).thenReturn("removeattachmentlistener");
         when(listener.getEvents()).thenReturn(Arrays.asList(new DocumentCreatingEvent(targetReference)));
         doAnswer(invocationOnMock -> {
-            XWikiDocument document = invocationOnMock.getArgument(1);
-            document.removeAttachment(document.getAttachment("file.txt"));
+            XWikiDocument targetDocument = invocationOnMock.getArgument(1);
+            targetDocument.removeAttachment(targetDocument.getAttachment("file.txt"));
 
             return null;
         }).when(listener).onEvent(any(), any(), any());
@@ -1251,11 +1251,11 @@ class XWikiTest
 
     private void saveDocument(DocumentReference reference, Locale locale, String content) throws XWikiException
     {
-        XWikiDocument document = new XWikiDocument(reference, locale);
-        document.setSyntax(Syntax.PLAIN_1_0);
-        document.setContent(content);
+        XWikiDocument newDocument = new XWikiDocument(reference, locale);
+        newDocument.setSyntax(Syntax.PLAIN_1_0);
+        newDocument.setContent(content);
 
-        this.xwiki.saveDocument(document, this.oldcore.getXWikiContext());
+        this.xwiki.saveDocument(newDocument, this.oldcore.getXWikiContext());
     }
 
     /**
@@ -1287,9 +1287,9 @@ class XWikiTest
         when(listener.getName()).thenReturn("modifyinglistener");
         when(listener.getEvents()).thenReturn(Arrays.asList(new DocumentCreatingEvent(targetReference)));
         doAnswer(invocationOnMock -> {
-            XWikiDocument document = invocationOnMock.getArgument(1);
-            document.setContent("modified by listener");
-            document.removeXObjects(new LocalDocumentReference("Some", "Class"));
+            XWikiDocument targetDocument = invocationOnMock.getArgument(1);
+            targetDocument.setContent("modified by listener");
+            targetDocument.removeXObjects(new LocalDocumentReference("Some", "Class"));
 
             return null;
         }).when(listener).onEvent(any(), any(), any());

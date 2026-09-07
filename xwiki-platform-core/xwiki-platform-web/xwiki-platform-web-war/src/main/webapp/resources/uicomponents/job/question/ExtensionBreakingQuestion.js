@@ -41,8 +41,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-tree'], function($, xm) {
         var selectedNodes = deleteTree.jstree().get_selected(true);
 
         answerProperties.selectAllFreePages = false;
-        for (var i = 0; i < selectedNodes.length; ++i) {
-          var node = selectedNodes[i];
+        for (const node of selectedNodes) {
           if (node.data.type == 'extension') {
             answerProperties.selectedExtensions.push(node.id);
           } else if (node.data.type == 'page') {

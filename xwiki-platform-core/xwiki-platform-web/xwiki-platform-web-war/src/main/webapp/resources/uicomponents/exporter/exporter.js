@@ -211,8 +211,8 @@ define('xwiki-export-tree', ['jquery', 'xwiki-tree', 'xwiki-entityReference'], f
         no_li_attr: true
       });
       // Check if there are any unselected nodes.
-      for (var i = 0; i < nodes.length; i++) {
-        var nodeId = nodes[i].id;
+      for (const node of nodes) {
+        var nodeId = node.id;
         if (!this.is_selected(nodeId) && !this.is_undetermined(nodeId)) {
           return false;
         }

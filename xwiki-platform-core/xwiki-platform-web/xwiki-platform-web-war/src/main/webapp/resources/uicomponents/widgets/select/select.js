@@ -255,21 +255,21 @@ require(['jquery'], function($) {
       var matchingCategoriesCount = 0;
       // For each category.
       var categories = self.selectWidget.find('.xwiki-select-category');
-      for (var i = 0; i < categories.length; ++i) {
-        var category = $(categories[i]);
+      for (const categoryElement of categories) {
+        const category = $(categoryElement);
         // For each option of that category.
         var options = category.find('.xwiki-select-option');
         var matchingOptionsCount = 0;
-        for (var j = 0; j < options.length; ++j) {
-          var option = $(options[j]);
+        for (const optionElement of options) {
+          const option = $(optionElement);
           // We look both in the label and in the hint of the option
           var label = option.find('label').text().toLowerCase();
           var hint  = option.find('.xHint').text().toLowerCase();
           var optionText = label + ' ' + hint;
           // We look if the label match all the values of the filter.
           var optionShouldBeVisible = true;
-          for (var k = 0; k < filterValues.length; ++k) {
-            var filterValue = filterValues[k].toLowerCase();
+          for (const rawFilterValue of filterValues) {
+            const filterValue = rawFilterValue.toLowerCase();
             // If one of the filter values is missing from the label of this option, we must hide it.
             if (!optionText.includes(filterValue)) {
               optionShouldBeVisible = false;
@@ -352,7 +352,7 @@ require(['jquery'], function($) {
     //--------------------
     if (!action || action == 'init') {
       // Handle each object separately
-      for (var i = 0; i < this.length; ++i) {
+      for (let i = 0; i < this.length; ++i) {
         var domElement = this[i];
         // This widget might have already been created
         if ($(domElement).data('xwikiSelectWidget')) {
@@ -364,7 +364,7 @@ require(['jquery'], function($) {
       }
     } else if (action == 'clearSelection') {
       // Handle each object separately
-      for (var i = 0; i < this.length; ++i) {
+      for (let i = 0; i < this.length; ++i) {
         $(this[i]).data('xwikiSelectWidget').clearSelection();
       }
     } else if (action == 'getValue') {

@@ -38,6 +38,7 @@ import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -271,7 +272,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     {
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
-            buffer.append(prop.toText());
+            buffer.append(XMLUtils.escapeElementText(prop.toText()));
         }
     }
 

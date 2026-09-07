@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.stability.Unstable;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
@@ -252,7 +253,7 @@ public class DBTreeListClass extends DBListClass
             List<ListItem> items = resList.get(i);
             for (int j = 0; j < items.size(); j++) {
                 ListItem item = items.get(j);
-                buff.append(item.getValue());
+                buff.append(XMLUtils.escapeElementText(item.getValue()));
                 if (j < items.size() - 1) {
                     buff.append(" &gt; ");
                 }
@@ -330,7 +331,8 @@ public class DBTreeListClass extends DBListClass
             for (ListItem item : list) {
                 String display = level + getDisplayValue(item.getId(), "", map, context);
                 option option = new option(display, item.getId());
-                option.addElement(display);
+                option.setAttributeFilter(new XMLAttributeValueFilter());
+                option.addElement(XMLUtils.escape(display));
                 if (selectlist.contains(item.getId())) {
                     option.setSelected(true);
                 }

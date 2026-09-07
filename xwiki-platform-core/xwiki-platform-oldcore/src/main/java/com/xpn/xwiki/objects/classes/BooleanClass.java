@@ -151,7 +151,7 @@ public class BooleanClass extends PropertyClass
         Integer iValue = (Integer) prop.getValue();
         if (iValue != null) {
             int value = iValue.intValue();
-            buffer.append(getDisplayValue(context, value));
+            buffer.append(XMLUtils.escapeElementText(getDisplayValue(context, value)));
         }
     }
 
@@ -251,19 +251,25 @@ public class BooleanClass extends PropertyClass
         radioTrue.setDisabled(isDisabled());
         radioFalse.setDisabled(isDisabled());
         label labelNone = new label();
+        labelNone.setAttributeFilter(new XMLAttributeValueFilter());
         label labelTrue = new label();
+        labelTrue.setAttributeFilter(new XMLAttributeValueFilter());
         label labelFalse = new label();
+        labelFalse.setAttributeFilter(new XMLAttributeValueFilter());
         div divNone = new div();
+        divNone.setAttributeFilter(new XMLAttributeValueFilter());
         div divTrue = new div();
+        divTrue.setAttributeFilter(new XMLAttributeValueFilter());
         div divFalse = new div();
+        divFalse.setAttributeFilter(new XMLAttributeValueFilter());
         labelNone.addElement(radioNone);
-        labelNone.addElement(StringNone);
+        labelNone.addElement(XMLUtils.escape(StringNone));
         divNone.addElement(labelNone);
         labelTrue.addElement(radioTrue);
-        labelTrue.addElement(StringTrue);
+        labelTrue.addElement(XMLUtils.escape(StringTrue));
         divTrue.addElement(labelTrue);
         labelFalse.addElement(radioFalse);
-        labelFalse.addElement(StringFalse);
+        labelFalse.addElement(XMLUtils.escape(StringFalse));
         divFalse.addElement(labelFalse);
 
         radioNone.setID(prefix + name + "_none");

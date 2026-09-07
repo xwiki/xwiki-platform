@@ -23,6 +23,7 @@ import javax.script.ScriptContext;
 
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.stability.Unstable;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -156,7 +157,7 @@ public class ComputedFieldClass extends PropertyClass
             buffer.append(getComputedValue(name, prefix, object, context));
         } catch (Exception e) {
             // TODO: append a rendering style complete error instead
-            buffer.append(e.getMessage());
+            buffer.append(XMLUtils.escapeElementText(e.getMessage()));
         }
     }
 

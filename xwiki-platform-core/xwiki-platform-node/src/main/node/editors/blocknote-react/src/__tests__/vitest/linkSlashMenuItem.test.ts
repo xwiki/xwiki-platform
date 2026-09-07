@@ -67,7 +67,7 @@ describe("querySuggestionsMenuItems (Link quick action)", () => {
     expect(linkItem).toBeDefined();
     expect(linkItem!.subtext).toBe("blocknote.slashMenu.link.subtext");
     expect(linkItem!.aliases).toEqual(["link"]);
-    expect(linkItem!.group).toBe("Links");
+    expect(linkItem!.group).toBe("blocknote.slashMenu.link.group");
   });
 
   test("the Link entry survives a query matching its alias", () => {

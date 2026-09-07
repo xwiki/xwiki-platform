@@ -10,15 +10,18 @@ import { ComponentCustomProps } from 'vue';
 import { ComponentOptionsBase } from 'vue';
 import { ComponentOptionsMixin } from 'vue';
 import { ComponentProvideOptions } from 'vue';
+import { ComputedOptions } from 'vue';
 import { Container } from 'inversify';
 import { CreateComponentPublicInstanceWithMixins } from 'vue';
 import { DefineComponent } from 'vue';
 import { DocumentService } from '@xwiki/platform-document-api';
 import { GlobalComponents } from 'vue';
 import { GlobalDirectives } from 'vue';
+import { InputHTMLAttributes } from 'vue';
 import { LinkData } from '@xwiki/platform-link-type-api';
 import { LinkSuggestService } from '@xwiki/platform-link-suggest-api';
 import { LinkType } from '@xwiki/platform-link-suggest-api';
+import { MethodOptions } from 'vue';
 import { ModelReferenceHandler } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceParser } from '@xwiki/platform-model-reference-api';
 import { ModelReferenceSerializer } from '@xwiki/platform-model-reference-api';
@@ -26,6 +29,7 @@ import { PublicProps } from 'vue';
 import { RemoteURLParser } from '@xwiki/platform-model-remote-url-api';
 import { RemoteURLSerializer } from '@xwiki/platform-model-remote-url-api';
 import { ShallowUnwrapRef } from 'vue';
+import { TextFieldProps } from '@xwiki/platform-dsapi';
 import { VNode } from 'vue';
 import { VNodeProps } from 'vue';
 
@@ -36,7 +40,22 @@ export function createLinkSuggestor(input: LinkEditionContext): LinkSuggestor | 
 export const LinkConfig: {
     new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<{
     linkData: LinkData;
-    }> & Readonly<{}>, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, PublicProps, {}, false, {}, {}, GlobalComponents, GlobalDirectives, string, {}, any, ComponentProvideOptions, {
+    }> & Readonly<{}>, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, PublicProps, {}, false, {}, {}, GlobalComponents, GlobalDirectives, string, {
+    displayTextField: CreateComponentPublicInstanceWithMixins<Readonly<TextFieldProps & InputHTMLAttributes>, {}, {}, ComputedOptions, MethodOptions, ComponentOptionsMixin, ComponentOptionsMixin, {}, PublicProps, {
+    value?: any;
+    inlist?: any;
+    }, true, {}, {}, GlobalComponents, GlobalDirectives, string, {}, any, ComponentProvideOptions, {
+    P: {};
+    B: {};
+    D: {};
+    C: {};
+    M: {};
+    Defaults: {};
+    }, Readonly<TextFieldProps & InputHTMLAttributes>, {}, {}, ComputedOptions, MethodOptions, {
+    value?: any;
+    inlist?: any;
+    }> | null;
+    }, any, ComponentProvideOptions, {
     P: {};
     B: {};
     D: {};

@@ -786,6 +786,7 @@ public class RichTextAreaElement extends BaseElement
     public String getMacroNameNextToMoveHandle(int macroIndex)
     {
         return getFromEditedContent(() -> {
+            // A nested macro has one widget wrapper per ancestor macro, so take the closest one.
             WebElement macroName = this.content.getMacros().get(macroIndex).findElement(By.xpath(
                 "./ancestor::*[@data-cke-widget-wrapper][1]"
                     + "/*[contains(@class, 'cke_widget_drag_handler_container')]/*[@class = 'macro-name']"));

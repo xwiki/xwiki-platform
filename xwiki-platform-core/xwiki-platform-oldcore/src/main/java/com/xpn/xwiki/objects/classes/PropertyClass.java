@@ -25,6 +25,7 @@ import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.ecs.xhtml.div;
 import org.apache.ecs.xhtml.input;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
@@ -88,6 +89,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     private static final String PARAGRAPH_START = "<p>";
 
     private static final String PARAGRAPH_END = "</p>";
+
+    private static final String ARIA_LABEL = "aria-label";
 
     private static final String NAME = "name";
     private static final String VALUE = "value";
@@ -299,6 +302,33 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     }
 
     /**
+     * Wraps a set of related controls, such as the radio buttons or the checkboxes of a list property, in a group
+     * named after the property. Assistive technologies then announce what the controls have in common before announcing
+     * the controls themselves, instead of presenting a flat run of unrelated controls. This is the ARIA equivalent of a
+     * {@code fieldset} element labelled by a {@code legend} element. The ARIA form is used because a property is always
+     * displayed inside a caption structure provided by the surrounding sheet, so a {@code legend} would duplicate that
+     * caption and every sheet wrapping a property display would have to be adapted.
+     *
+     * @param content the markup of the controls to group, already escaped
+     * @param context the XWiki context
+     * @return the markup of the group wrapping the given content
+     * @since 18.8.0RC1
+     */
+    protected String displayControlGroup(String content, XWikiContext context)
+    {
+        div group = new div();
+        group.setAttributeFilter(new XMLAttributeValueFilter());
+        group.addAttribute("role", "group");
+        // The group is named after the property so that its name matches the caption the surrounding sheet displays,
+        // the way a legend repeats the heading of the controls it groups. No sheet labels the group itself, so this
+        // name is what Assistive Techs announce when entering the group.
+        group.addAttribute(ARIA_LABEL, getTranslatedPrettyName(context));
+        group.addElement(content);
+
+        return group.toString();
+    }
+
+    /**
      * Display a hidden input for the given property of the given object and returns it in a string.
      * @param name the name of the property to display
      * @param prefix the prefix to use for the name of the field
@@ -422,7 +452,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
             scontext.setAttribute("type", type, ScriptContext.ENGINE_SCOPE);
             // This is a text alternative fallback to explain what the input is about. 
             // If the input has already been labelled in another way, this fallback will be ignored by Assistive Techs.
-            scontext.setAttribute("aria-label",
+            scontext.setAttribute(ARIA_LABEL,
                 localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
                     this.getTranslatedPrettyName(context)), ScriptContext.ENGINE_SCOPE);
 

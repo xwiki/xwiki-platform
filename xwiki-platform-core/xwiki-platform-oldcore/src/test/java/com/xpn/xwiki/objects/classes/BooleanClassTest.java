@@ -34,6 +34,7 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -153,5 +154,37 @@ class BooleanClassTest
         prop.setValue(2);
         metaProperty.displayView(out, "prop", "", obj, this.oldcore.getXWikiContext());
         assertEquals("Dunno", out.toString());
+    }
+
+    /**
+     * The radio buttons of a boolean property are related controls, so they must be exposed as a group named after the
+     * property.
+     */
+    @Test
+    void displayEditRadioWrapsTheControlsInAGroupNamedAfterTheProperty()
+    {
+        DocumentReference classReference =
+            new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "Some", "Class");
+        when(this.entityReferenceSerializer.serialize(classReference)).thenReturn("Some.Class");
+        when(this.contextualLocalizationManager.getTranslationPlain("Some.Class_prop")).thenReturn("Is active");
+
+        BooleanClass metaProperty = new BooleanClass();
+        metaProperty.setDisplayFormType(BooleanClass.DISPLAY_RADIO);
+        metaProperty.setName("prop");
+        BaseClass cls = new BaseClass();
+        cls.setDocumentReference(classReference);
+        metaProperty.setObject(cls);
+
+        BaseObject object = new BaseObject();
+        IntegerProperty property = new IntegerProperty();
+        property.setValue(1);
+        object.safeput("prop", property);
+
+        StringBuffer out = new StringBuffer();
+        metaProperty.displayEdit(out, "prop", "", object, this.oldcore.getXWikiContext());
+
+        assertTrue(out.toString().startsWith("<div role='group' aria-label='Is active'>"),
+            "The controls are not wrapped in a group named after the property: " + out);
+        assertTrue(out.toString().endsWith("</div>"), "The group is not closed: " + out);
     }
 }

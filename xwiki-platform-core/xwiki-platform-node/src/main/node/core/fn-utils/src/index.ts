@@ -272,6 +272,9 @@ function escapeHtml(str: string): string {
  * @param fn - Function to call (returns a promise)
  * @param delay - Delay in milliseconds
  * @returns A debounced promise
+ *
+ * @since 18.8.0RC1
+ * @beta
  */
 function debounceAsync<Args extends unknown[], R>(
   fn: (...args: Args) => Promise<R> | R,

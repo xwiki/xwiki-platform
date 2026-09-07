@@ -317,7 +317,7 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
     <script src="${services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar',
       'searchSuggest' + $jsExtension)}" defer="defer"></script>##
     $xwiki.linkx.use(
-      $services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.css', {'evaluate': true}),
+      $services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.css'),
       {'type': 'text/css', 'rel': 'stylesheet'})##
   #end
 #end

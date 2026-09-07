@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -52,6 +53,7 @@ import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -131,6 +133,38 @@ class ClassEditSheetPageTest extends PageTest
         Document document = renderHTMLPage(xwikiDocument);
 
         assertEquals("<strong>TITLE</strong>", document.selectFirst(".category").text());
+    }
+
+    @Test
+    void pageLinkPutsTheCreateTitleOnTheAnchor() throws Exception
+    {
+        loadPage(new DocumentReference("xwiki", "AppWithinMinutes", "VelocityMacros"));
+        loadPage(new DocumentReference("xwiki", "AppWithinMinutes", "ClassEditSheet"));
+
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(any())).thenReturn(true);
+
+        XWikiDocument xwikiDocument =
+            this.xwiki.getDocument(new DocumentReference("xwiki", "Space", "Page"), this.context);
+        xwikiDocument.setContent("""
+            {{include reference="AppWithinMinutes.ClassEditSheet" /}}
+
+            {{velocity}}
+            #pageLink($services.model.resolveDocument('Space.MissingPage'))
+            {{/velocity}}
+            """);
+        xwikiDocument.setSyntax(Syntax.XWIKI_2_1);
+        this.xwiki.saveDocument(xwikiDocument, this.context);
+
+        Document document = renderHTMLPage(xwikiDocument);
+
+        // The title has to sit on the anchor and not on the wrapping span, because the accessible description of a
+        // link is only computed from the link element itself.
+        Element span = document.selectFirst("span.wikicreatelink");
+        assertFalse(span.hasAttr("title"));
+        // The localization is not resolved in a page test, so the key itself is rendered. That is what tells us the
+        // sheet uses its own key and not one of another extension.
+        assertTrue(span.selectFirst("a").attr("title")
+            .startsWith("platform.appwithinminutes.classEditorCreatePageTitle"));
     }
 
     @Test

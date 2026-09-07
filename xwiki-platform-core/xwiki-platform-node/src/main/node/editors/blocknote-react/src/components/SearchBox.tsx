@@ -153,8 +153,8 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   const isUrl = (value: string) =>
     value.startsWith("http://") || value.startsWith("https://");
 
-  const performSearch = useCallback(
-    debounceAsync((search: string) => {
+  const runSearch = useCallback(
+    (search: string) => {
       if (isUrl(search)) {
         setSuggestions({ status: "resolved", suggestions: [] });
         return;
@@ -171,9 +171,11 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
             : { status: "backendSearchUnsupported" },
         );
       });
-    }),
+    },
     [setSuggestions, getSuggestions],
   );
+
+  const performSearch = useCallback(debounceAsync(runSearch), [runSearch]);
 
   const submitRawValue = useCallback(
     // eslint-disable-next-line max-statements
@@ -226,10 +228,11 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
     performSearch(query);
   }, [query, performSearch]);
 
-  // Perform a search at the opening
+  // Perform a search at the opening, immediately: there's no rapid typing to debounce yet, and the
+  // suggestions should be available as soon as possible (e.g. to be keyboard-navigable right away).
   useEffect(() => {
-    performSearch("");
-  }, []);
+    runSearch("");
+  }, [runSearch]);
 
   return (
     <Combobox

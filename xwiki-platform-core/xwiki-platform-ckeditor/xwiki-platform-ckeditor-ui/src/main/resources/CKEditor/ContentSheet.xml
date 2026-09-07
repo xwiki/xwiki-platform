@@ -253,6 +253,12 @@ a[data-linktype="create"]::after {
 /* Display the macro name next to the move handle, in order to be able to identify the macros that are nested or that
   don't have a visible output. The move handle is hidden by collapsing its container, which doesn't hide the
   overflowing macro name, so the macro name is displayed only while the macro is hovered. */
+.cke_widget_xwiki-macro &gt; .cke_widget_drag_handler_container {
+  /* CKEditor paints the move handle as a background image and sizes the container after it, so the image must not be
+    tiled over the macro name and the container has to grow with it. */
+  background-repeat: no-repeat;
+  width: auto;
+}
 .cke_widget_drag_handler_container &gt; .macro-name {
   /* Match the grey CKEditor hard-codes for the move handle, rather than a color theme value that would drift away
     from it. The handle container is painted with an opacity of 0.75, applied after the text is drawn, so the text has
@@ -264,17 +270,23 @@ a[data-linktype="create"]::after {
   /* Fit the text in the 15px band of the move handle, whose size CKEditor hard-codes as well. */
   font-size: 12px;
   line-height: 15px;
+  /* Leave the move handle visible on the left of the macro name. */
+  margin-inline-start: 15px;
   padding: 0 .3em;
-  /* Don't steal the mouse events from the content displayed above the macro. */
+  /* Let the move handle stretched above the macro name receive the mouse events. */
   pointer-events: none;
-  /* Place the macro name right after the move handle, whose container is absolutely positioned. */
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline-start: 100%;
   white-space: nowrap;
 }
 .cke_widget_wrapper:hover &gt; .cke_widget_drag_handler_container &gt; .macro-name {
   display: block;
+}
+.cke_widget_xwiki-macro:hover &gt; .cke_widget_drag_handler_container &gt; img.cke_widget_drag_handler {
+  /* Stretch the move handle over the macro name, so that the macro can be dragged from the whole band. CKEditor
+    listens for the drag on this image only. */
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
 }
 
 /* Inline widgets (macros) have display:inline-block and thus don't inherit the text-decoration styles. We fix this by

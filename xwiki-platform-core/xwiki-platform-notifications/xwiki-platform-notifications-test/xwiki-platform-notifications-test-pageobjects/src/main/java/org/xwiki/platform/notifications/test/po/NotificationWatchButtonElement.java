@@ -20,6 +20,7 @@
 
 package org.xwiki.platform.notifications.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
@@ -49,6 +50,8 @@ public class NotificationWatchButtonElement extends BaseElement
     public NotificationsWatchModal openModal()
     {
         this.watchButton.click();
+        // The modal is fetched from the server when the button is clicked, so it's not part of the DOM before that.
+        getDriver().waitUntilElementIsVisible(By.id("watchModal"));
         return new NotificationsWatchModal();
     }
 

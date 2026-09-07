@@ -1,0 +1,226 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsWatchModal" locale="">
+  <web>XWiki.Notifications.Code</web>
+  <name>NotificationsWatchModal</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>NotificationsWatchModal</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#if ("$!request.getParameter('documentReference')" == '')
+  #set ($discard = $response.setStatus(400))
+#else
+#set ($watchedDocumentReference = $services.model.resolveDocument($request.getParameter('documentReference')))
+## Only a logged in user has watch settings, and only for a location they are allowed to view.
+#if ($isGuest || !$services.security.authorization.hasAccess('view', $watchedDocumentReference))
+  #set ($discard = $response.setStatus(403))
+#else
+#set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($watchedDocumentReference))
+## If the watched status informs that the filter is about children it means it's a filter for the space,
+## so we should look for ancestor of the space.
+#set ($refForAncestorFirstFilter = $watchedDocumentReference)
+#if ($watchedStatus == 'WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS' || $watchedStatus == 'BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS')
+  #set ($refForAncestorFirstFilter = $watchedDocumentReference.parent)
+#end
+#set ($ancestorFirstFilter = $services.notification.watch.getFirstFilteredAncestor($refForAncestorFirstFilter))
+#if ($ancestorFirstFilter)
+  #set ($ancestorRef = $ancestorFirstFilter.left)
+  #set ($ancestorWatchStatus = $ancestorFirstFilter.right)
+#end
+## FIXME: the different icons should use the icon service
+#set ($iconWhenWatched = 'fa-bell')
+#set ($iconWhenNotSet = 'fa-bell-o')
+#set ($iconWhenBlocked = 'fa-bell-slash')
+#set ($iconWhenCustom = 'fa-bullhorn')
+#if ($watchedStatus == 'NOT_SET')
+  #set ($watchIcon = $iconWhenNotSet)
+#elseif ($watchedStatus.isWatched())
+  #set ($watchIcon = $iconWhenWatched)
+#elseif ($watchedStatus.isBlocked())
+  #set ($watchIcon = $iconWhenBlocked)
+#else
+  #set ($watchIcon = $iconWhenCustom)
+#end
+## TODO: better way for that?
+#set ($isTerminal = ($watchedDocumentReference.name != 'WebHome'))
+#macro (_displayOption $attributeName $optionValue $translationSuffix $iconName $panelClass)
+  &lt;div class="panel panel-default $panelClass"&gt;
+    &lt;div class="panel-radio"&gt;
+      &lt;input type="radio" name="watch-option" id="option-$attributeName" value="$optionValue" /&gt;
+    &lt;/div&gt;
+    &lt;div class="panel-heading" role="tab" id="heading-$attributeName"&gt;
+        &lt;div class="panel-title" id="title-$attributeName"&gt;
+          $services.icon.renderHTML("$iconName") 
+          &lt;label for="option-$attributeName"&gt;$services.localization.render("notifications.watch.modal.option.${translationSuffix}.title", 'html/5.0', [])&lt;/label&gt;
+          &lt;a role="button" data-toggle="collapse" data-parent="#watch-options-accordion" 
+            href="#xhint-$attributeName" aria-controls="xhint-$attributeName" 
+            title="$escapetool.xml($services.localization.render('notifications.watch.modal.option.hint.toggle'))"&gt;
+            &lt;span class="help-icon"&gt;$services.icon.renderHTML('question')&lt;/span&gt;
+            &lt;span class="sr-only"&gt;$escapetool.xml($services.localization.render('notifications.watch.modal.option.hint.toggle'))&lt;/span&gt;
+          &lt;/a&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;&lt;!-- end panel heading --&gt;
+    &lt;div id="xhint-$attributeName" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-$attributeName"&gt;
+      &lt;div class="panel-body xHint"&gt;
+        $services.localization.render("notifications.watch.modal.option.${translationSuffix}.hint", 'html/5.0', [])
+      &lt;/div&gt;
+    &lt;/div&gt;&lt;!-- end collapsed xhint --&gt;
+  &lt;/div&gt;&lt;!-- end panel --&gt;
+#end
+#set ($watchPageOption = "#_displayOption('watch-page','watchPage','watchpage','page','')")
+#set ($watchSpaceOption = "#_displayOption('watch-space','watchSpace','watchspace','chart-organisation','')")
+#set ($unwatchPageAndWatchSpaceOption = "#_displayOption('unwatch-page-watch-space','unwatchPageWatchSpace','watchspace','chart-organisation','')")
+#set ($watchWikiOption = "#_displayOption('watch-wiki','watchWiki','watchwiki','world','wiki-option')")
+#set ($blockPageOption = "#_displayOption('block-page','blockPage','blockpage','page','')")
+#set ($unblockPageAndBlockSpaceOption = "#_displayOption('unblock-page-block-space','unblockPageBlockSpace','blockspace','chart-organisation','')")
+#set ($blockSpaceOption = "#_displayOption('block-space','blockSpace','blockspace','chart-organisation','')")
+#set ($unwatchPageOption = "#_displayOption('unwatch-page','unwatchPage','unwatchpage','page','')")
+#set ($unwatchSpaceOption = "#_displayOption('unwatch-space','unwatchSpace','unwatchspace','chart-organisation','')")
+#set ($unwatchWikiOption = "#_displayOption('unwatch-wiki','unwatchWiki','unwatchwiki','world','wiki-option')")
+#set ($unblockPageOption = "#_displayOption('unblock-page','unblockPage','unblockpage','page','')")
+#set ($unblockSpaceOption = "#_displayOption('unblock-space','unblockSpace','unblockspace','chart-organisation','')")
+#set ($unblockWikiOption = "#_displayOption('unblock-wiki','unblockWiki','unblockwiki','world','wiki-option')")
+{{html clean='false'}}
+  &lt;div class="modal" tabindex="-1" role="dialog" id="watchModal"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close close-modal" data-dismiss="modal" aria-label="$escapetool.xml($services.localization.render('notifications.watch.modal.close'))"&gt;
+            &lt;span aria-hidden="true"&gt;
+              $services.icon.renderHTML('cross')
+            &lt;/span&gt;&lt;/button&gt;
+          &lt;div class="modal-title"&gt;
+            &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $services.localization.render("notifications.watch.modal.title.$watchedStatus", 'html/5.0', [])
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          &lt;div class="watch-status-container"&gt;
+            $services.localization.render("notifications.watch.modal.description.$watchedStatus", 'html/5.0', [])
+            &lt;hr /&gt;
+            #if (($watchedStatus == 'WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS' || $watchedStatus == 'BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS') &amp;&amp; $ancestorRef.type == 'SPACE' &amp;&amp; $services.security.authorization.hasAccess('view', $ancestorRef))
+              #set ($ancestorDoc = $xwiki.getDocument($ancestorRef))
+              #set ($ancestorDocUrl = $ancestorDoc.getURL())
+              #set ($ancestorDocTitle = $ancestorDoc.displayTitle)
+              #set ($ancestorLink = "&lt;a href=""$ancestorDocUrl""&gt;$ancestorDocTitle&lt;/a&gt;")
+              $services.localization.render('notifications.watch.modal.description.ancestoroption', [$ancestorLink])
+            #end
+          &lt;/div&gt;
+          &lt;div class="watch-options-container panel-group" id="watch-options-accordion" role="tablist" aria-multiselectable="false"&gt;
+          #set ($blockedByAncestor = ("$!ancestorWatchStatus" == '' || $ancestorWatchStatus.isBlocked()))
+          #set ($watchedByAncestor = ($ancestorWatchStatus.isWatched()))
+          #if ($watchedStatus == 'NOT_SET')
+            $watchPageOption
+            #if (!$isTerminal)
+            $watchSpaceOption
+            #end
+            $watchWikiOption
+          #elseif ($watchedStatus == 'WATCHED_FOR_ALL_EVENTS_AND_FORMATS')
+            #if ($blockedByAncestor)
+            $unwatchPageOption
+            #else
+            $blockPageOption
+            #end
+            #if (!$isTerminal &amp;&amp; $blockedByAncestor)
+            $unwatchPageAndWatchSpaceOption
+            #elseif (!$isTerminal &amp;&amp; !$blockedByAncestor)
+            $blockSpaceOption
+            #end
+          #elseif ($watchedStatus == 'WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS')
+            #if ($blockedByAncestor)
+            $unwatchSpaceOption
+            #else
+            $blockPageOption
+            $blockSpaceOption
+            #end
+          #elseif ($watchedStatus == 'WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS')
+            $blockPageOption
+            #if (!$isTerminal)
+            $blockSpaceOption
+            #end
+            #if ($ancestorRef.type == 'WIKI')
+            $unwatchWikiOption
+            #end
+          #elseif ($watchedStatus == 'BLOCKED_FOR_ALL_EVENTS_AND_FORMATS')
+            #if ($watchedByAncestor)
+            $unblockPageOption
+            #else
+            $watchPageOption
+            #end
+            #if (!$isTerminal &amp;&amp; $watchedByAncestor)
+            $unblockPageAndBlockSpaceOption
+            #elseif (!$isTerminal &amp;&amp; !$watchedByAncestor)
+            $watchSpaceOption
+            #end
+          #elseif ($watchedStatus == 'BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS')
+            #if ($watchedByAncestor)
+            $unblockSpaceOption
+            #else
+            $watchPageOption
+            $watchSpaceOption
+            #end
+          #elseif ($watchedStatus == 'BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS')
+            $watchPageOption
+            #if (!$isTerminal)
+            $watchSpaceOption
+            #end
+            #if ($ancestorRef.type == 'WIKI')
+            $unblockWikiOption
+            #end
+          #end
+          &lt;/div&gt;&lt;!-- end panel group --&gt;
+          &lt;div class="modal-body-footer"&gt;
+            #set ($userDoc = $xwiki.getDocument($xcontext.userReference))
+            #set ($settingsLink = "$userDoc.getURL('view','category=notifications')#Hnotifications.settings.filters.preferences.custom.title")
+            &lt;a href="$settingsLink" class="goto-settings"&gt;
+              $services.localization.render('notifications.watch.modal.gotosettings', 'html/5.0', []) $services.icon.renderHTML('move')
+            &lt;/a&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;&lt;!-- end modal body --&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default close-modal" data-dismiss="modal"&gt;
+            $services.localization.render('notifications.watch.modal.close', 'html/5.0', [])
+          &lt;/button&gt;
+          #if ($watchedStatus != 'CUSTOM')
+          &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;
+            $services.localization.render('notifications.watch.modal.savechanges', 'html/5.0', [])
+          &lt;/button&gt;
+          #end
+        &lt;/div&gt;
+      &lt;/div&gt;&lt;!-- /.modal-content --&gt;
+    &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
+  &lt;/div&gt;&lt;!-- /.modal --&gt;
+{{/html}}
+#end
+#end
+{{/velocity}}</content>
+</xwikidoc>

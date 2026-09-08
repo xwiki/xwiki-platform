@@ -61,7 +61,7 @@
     #set ($discard = $tabs.add({
       'tabName': $extension.getParameters().get('tabName'),
       'title': $extension.getParameters().get('title'),
-      'content': $services.rendering.render($extension.execute(), 'html/5.0')
+      'content': $services.uix.render($extension, 'html/5.0')
     }))
   #end
 #end

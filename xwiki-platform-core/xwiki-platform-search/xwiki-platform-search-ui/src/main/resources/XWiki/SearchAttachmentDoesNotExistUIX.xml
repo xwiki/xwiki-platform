@@ -113,7 +113,8 @@
 ## Display the first extension only, ordered by priority (lowest first).
 #set ($extensions = $services.uix.getExtensions('org.xwiki.platform.search.ui.attachmentdoesnotexist', {'sortByParameter' : 'order'}))
 #if ($extensions.size() &gt; 0)
-  {{html clean='false'}}$services.rendering.render($extensions[0].execute(), 'html/5.0'){{/html}}
+
+{{uiextension id="$services.rendering.escape($extensions[0].id, 'xwiki/2.1')"/}}
 #end
 {{/velocity}}
 </content>

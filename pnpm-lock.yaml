@@ -187,8 +187,8 @@ catalogs:
       specifier: 2.1.0
       version: 2.1.0
     npm-package-json-lint:
-      specifier: 10.5.1
-      version: 10.5.1
+      specifier: 11.0.0
+      version: 11.0.0
     npm-run-all:
       specifier: 4.1.5
       version: 4.1.5
@@ -782,7 +782,7 @@ importers:
         version: 17.11.0
       npm-package-json-lint:
         specifier: 'catalog:'
-        version: 10.5.1
+        version: 11.0.0
       publint:
         specifier: 'catalog:'
         version: 0.3.24
@@ -6471,8 +6471,8 @@ packages:
     resolution: {integrity: sha512-tdt4aFn9QamlhdN3HV2D2ccpBwO5/fyjjbXUxYA6uBjyekMZcZvDq0aSj9t5Jo+tih6AYFnt/cuIRn9013e0Uw==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
 
-  npm-package-json-lint@10.5.1:
-    resolution: {integrity: sha512-KvphpY9PVN8Le6spIXH9LXdSPPiaeG6HBk/PRCmtOn8vY/gsnUpXCfFBZBRUpPMVjv7dsfCU2jOPao4ao3Z2Hg==}
+  npm-package-json-lint@11.0.0:
+    resolution: {integrity: sha512-XOFaxHM+TB9tK51Uj609kA1iA87cJe/VNCv/5INLCDbM///KpZpIai+t9LRRyOzvkd62j0JEWKSJeDUlzOSG6Q==}
     engines: {node: '>=22.0.0', npm: '>=10.0.0'}
     hasBin: true
 
@@ -10892,7 +10892,7 @@ snapshots:
 
   npm-normalize-package-bin@6.0.0: {}
 
-  npm-package-json-lint@10.5.1:
+  npm-package-json-lint@11.0.0:
     dependencies:
       chalk: 4.1.2
       cosmiconfig: 10.0.0

@@ -336,6 +336,7 @@
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-ratings</module>
     <module>xwiki-platform-realtime</module>
+    <module>xwiki-platform-records</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>

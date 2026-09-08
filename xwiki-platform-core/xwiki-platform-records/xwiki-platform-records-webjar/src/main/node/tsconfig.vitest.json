@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.vitest.tsbuildinfo",
+    "isolatedDeclarations": false,
+    "types": ["requirejs", "jquery", "node", "jsdom"]
+  },
+  "include": ["src/**/__tests__/*"],
+  "exclude": []
+}

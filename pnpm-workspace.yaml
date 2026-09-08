@@ -65,6 +65,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-tsdocconfig
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig
   - xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node/
+  - xwiki-platform-core/xwiki-platform-records/xwiki-platform-records-webjar/src/main/node/
 
 catalogMode: strict
 cleanupUnusedCatalogs: true

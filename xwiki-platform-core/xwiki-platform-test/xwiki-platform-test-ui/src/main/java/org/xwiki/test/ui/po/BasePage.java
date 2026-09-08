@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -57,6 +58,20 @@ public class BasePage extends BaseElement
     private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
 
     private static final By EDIT_BUTTON_LOCATOR = By.xpath("//li[@id='tmEdit']/a[contains(@class, 'btn')]");
+
+    /**
+     * Number of times the axe-core accessibility analysis is attempted before giving up, to work around the
+     * axe-injection race (see {@link #analyzeWithAxeReadyRetry}).
+     */
+    private static final int WCAG_ANALYZE_ATTEMPTS = 3;
+
+    /**
+     * Message fragments identifying a JavaScript error raised because axe-core was not present in the frame when the
+     * analysis probed it. Browsers word it differently: Chrome reports the failing property read on the axe object
+     * ({@code runPartial} is the axe entry point the analysis calls), while Firefox reports the missing binding itself.
+     */
+    private static final List<String> AXE_NOT_READY_ERRORS =
+        List.of("runPartial", "window.axe", "axe is not defined", "axe is undefined");
 
     /**
      * Used for sending keyboard shortcuts to.
@@ -716,7 +731,7 @@ public class BasePage extends BaseElement
             if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
                 XWikiWebDriver driver = this.getDriver();
                 AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
-                Results axeResult = axeBuilder.analyze(driver);
+                Results axeResult = analyzeWithAxeReadyRetry(axeBuilder, driver);
                 wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
                 long stopTime = System.currentTimeMillis();
                 long deltaTime = stopTime - startTime;
@@ -735,6 +750,33 @@ public class BasePage extends BaseElement
                 LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
             }
         }
+    }
+
+    private Results analyzeWithAxeReadyRetry(AxeBuilder axeBuilder, XWikiWebDriver driver)
+    {
+        // The axe-core library injects its script and then immediately probes window.axe. On a page that changes
+        // underneath the analysis (e.g. the refactoring job status page refreshing while the job runs), the page can
+        // navigate between the injection and the probe, leaving window.axe undefined and making analyze() fail. Waiting
+        // for the page to settle and re-running the analysis avoids this race.
+        JavascriptException lastError = null;
+        for (int attempt = 0; attempt < WCAG_ANALYZE_ATTEMPTS; attempt++) {
+            try {
+                return axeBuilder.analyze(driver);
+            } catch (JavascriptException e) {
+                if (!isAxeNotReadyError(e)) {
+                    throw e;
+                }
+                lastError = e;
+                waitUntilPageIsReady();
+            }
+        }
+        throw lastError;
+    }
+
+    static boolean isAxeNotReadyError(JavascriptException error)
+    {
+        String message = error.getMessage();
+        return message != null && AXE_NOT_READY_ERRORS.stream().anyMatch(message::contains);
     }
 
     /**

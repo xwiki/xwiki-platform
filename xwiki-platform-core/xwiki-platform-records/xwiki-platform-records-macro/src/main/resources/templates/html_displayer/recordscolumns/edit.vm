@@ -1,0 +1,50 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Displays the field picker used for the columns of a Records table.
+##
+## The candidates depend on the value of the sibling class parameter, which no displayer can be told about: the macro
+## editor renders each parameter from its own type, default value and attributes alone. The picker therefore reads
+## that input from the browser when the author opens the dropdown, which is why the logic lives in JavaScript rather
+## than here. See the xwiki-platform-records-webjar module.
+##
+## This template only has to produce an input the suggest widget can enhance and the macro editor can read back. The
+## editor collects parameter values by serializing the inputs of the modal and matching their names against
+## parameter ids, so the name attribute it hands over is passed through untouched.
+#set ($parameters = {})
+#set ($discard = $parameters.putAll($displayer.parameters))
+## Note the absence of the xwiki-selectize class. xwiki.selectize.js auto-enhances every element carrying it on
+## xwiki:dom:updated, with default settings and therefore without the load callback this picker is built on, and
+## $.fn.xwikiSelectize skips an element that is already enhanced. Owning the enhancement means keeping that class
+## off and marking the element with our own instead.
+#set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-records-fields"))
+#set ($discard = $parameters.put('multiple', 'multiple'))
+#if ("$!displayer.value" != '')
+  #set ($discard = $parameters.put('value', "$displayer.value"))
+#end
+#set ($discard = $parameters.putIfAbsent('placeholder',
+  $services.localization.render('rendering.macro.records.parameter.properties.placeholder')))
+## Loads the picker. This is deliberately a classic script rather than a module one: the macro editor injects this
+## template with jQuery, which refuses to fetch a type="module" script by src and evaluates every other script as a
+## classic one, so a module script here would never run. The bundle is built free of imports and exports for that
+## reason, and it declares jquery and xwiki-selectize as RequireJS dependencies so that it shares the page's
+## instances rather than bundling its own.
+<script src="$escapetool.xml($services.webjars.url(
+  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
+#suggestInput($parameters)

@@ -254,9 +254,13 @@ a[data-linktype="create"]::after {
   don't have a visible output. The move handle is hidden by collapsing its container, which doesn't hide the
   overflowing macro name, so the macro name is displayed only while the macro is hovered. */
 .cke_widget_xwiki-macro &gt; .cke_widget_drag_handler_container {
-  /* CKEditor paints the move handle as a background image and sizes the container after it, so the image must not be
-    tiled over the macro name and the container has to grow with it. */
-  background-repeat: no-repeat;
+  /* CKEditor paints the move handle as a background image and sizes the container after it, so the container has to
+    grow with the macro name. The image comes from a background shorthand set in a style attribute, which resets the
+    repetition and wins over a plain declaration, hence the important one needed to keep the handle from being tiled
+    over the whole width. */
+  background-repeat: no-repeat !important;
+  /* Keep the room of the move handle even when the macro name is missing. */
+  min-width: 15px;
   width: auto;
 }
 .cke_widget_drag_handler_container &gt; .macro-name {
@@ -288,9 +292,10 @@ a[data-linktype="create"]::after {
   transition: none;
   visibility: visible;
 }
-.cke_widget_xwiki-macro:hover &gt; .cke_widget_drag_handler_container &gt; img.cke_widget_drag_handler {
+.cke_widget_xwiki-macro &gt; .cke_widget_drag_handler_container &gt; img.cke_widget_drag_handler {
   /* Stretch the move handle over the macro name, so that the macro can be dragged from the whole band. CKEditor
-    listens for the drag on this image only. */
+    listens for the drag on this image only. The stretch applies whether the macro is hovered or not, so that the
+    macro name keeps its place in the band while it is being hidden. */
   height: 100%;
   inset: 0;
   position: absolute;

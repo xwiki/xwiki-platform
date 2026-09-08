@@ -86,7 +86,7 @@ catalog:
   "@oxc-project/runtime": 0.148.0
   "@playwright/experimental-ct-react": 1.62.1
   "@playwright/experimental-ct-vue": 1.62.1
-  "@playwright/test": 1.62.1
+  "@playwright/test": 1.63.0
   "@tsconfig/node24": 24.0.5
   "@types/jquery": 4.0.1
   "@types/jsdom": 30.0.0

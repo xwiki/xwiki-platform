@@ -265,7 +265,7 @@ a[data-linktype="create"]::after {
     to be black to stay readable through it. */
   background-color: #dcdcdc;
   color: #000;
-  display: none;
+  display: block;
   font-family: monospace;
   /* Fit the text in the 15px band of the move handle, whose size CKEditor hard-codes as well. */
   font-size: 12px;
@@ -275,10 +275,18 @@ a[data-linktype="create"]::after {
   padding: 0 .3em;
   /* Let the move handle stretched above the macro name receive the mouse events. */
   pointer-events: none;
+  /* CKEditor delays the collapsing of the move handle container by 0.2s, so hide the macro name with the same delay
+    and let the two disappear together. Hovering the macro drops the delay, so both appear at once. The duration is
+    left to its default of zero rather than written down, the stylesheet minifier turning an explicit 0s into a
+    unitless 0 that invalidates the whole declaration. */
+  transition-delay: .2s;
+  transition-property: visibility;
+  visibility: hidden;
   white-space: nowrap;
 }
 .cke_widget_wrapper:hover &gt; .cke_widget_drag_handler_container &gt; .macro-name {
-  display: block;
+  transition: none;
+  visibility: visible;
 }
 .cke_widget_xwiki-macro:hover &gt; .cke_widget_drag_handler_container &gt; img.cke_widget_drag_handler {
   /* Stretch the move handle over the macro name, so that the macro can be dragged from the whole band. CKEditor

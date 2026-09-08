@@ -72,7 +72,7 @@
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
     <solr.minimum.java.version>11</solr.minimum.java.version>
-    <jersey.version>2.48</jersey.version>
+    <jersey.version>3.1.12</jersey.version>
     <hk2.version>2.6.1</hk2.version>
     <zookeeper.version>3.9.5</zookeeper.version>
     <rssreader.version>3.12.0</rssreader.version>

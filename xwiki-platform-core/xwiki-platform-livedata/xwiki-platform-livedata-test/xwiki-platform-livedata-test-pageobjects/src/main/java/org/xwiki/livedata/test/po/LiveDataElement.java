@@ -132,30 +132,23 @@ public class LiveDataElement extends BaseElement
     /**
      * Check if the livedata supports edit mode.
      *
-     * @return {@code true} if the "Edit mode" toggle is available in the dropdown menu, {@code false} otherwise
+     * @return {@code true} if the edit mode button is available in the top bar, {@code false} otherwise
      * @since 18.7.0RC1
      */
     public boolean hasEditModeAction()
     {
-        WebElement dropdownMenu = openDropDownMenu();
-        boolean present = dropdownMenu.findElements(By.cssSelector(".livedata-action-edit-mode"))
+        return getRootElement().findElements(By.cssSelector(".livedata-edit-button"))
             .stream().anyMatch(WebElement::isDisplayed);
-        // Close the dropdown menu back so it doesn't overlap the layout.
-        dropdownMenu.click();
-        return present;
     }
 
     /**
      * Toggle edit mode.
-     * 
+     *
      * @since 18.7.0RC1
      */
     public void toggleEditMode()
     {
-        WebElement dropdownMenu = openDropDownMenu();
-        dropdownMenu.findElement(By.cssSelector(".livedata-action-edit-mode input[type='checkbox']")).click();
-        // Close the dropdown menu back so it doesn't overlap the layout.
-        dropdownMenu.click();
+        getRootElement().findElement(By.cssSelector(".livedata-edit-button")).click();
     }
 
     /**

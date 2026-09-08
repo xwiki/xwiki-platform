@@ -38,6 +38,7 @@ import {
   inject,
   nextTick,
   onMounted,
+  onUnmounted,
   provide,
   ref,
   useTemplateRef,
@@ -74,6 +75,17 @@ const translationsLoaded = ref(false);
 
 const dataId = computed(() => logic.data?.id);
 const layoutId = computed(() => logic.currentLayoutId?.value);
+const maximized = computed(() => logic.isMaximized());
+
+function onKeydown(event: KeyboardEvent) {
+  // Escape should allow to exit maximized mode.
+  if (event.key === "Escape" && logic.isMaximized()) {
+    logic.toggleMaximized();
+  }
+}
+
+onMounted(() => document.addEventListener("keydown", onKeydown));
+onUnmounted(() => document.removeEventListener("keydown", onKeydown));
 
 // eslint-disable-next-line max-statements
 onMounted(async () => {
@@ -144,7 +156,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="xwiki-livedata" ref="rootElement">
+  <div
+    class="xwiki-livedata"
+    :class="{ 'livedata-maximized': maximized }"
+    ref="rootElement"
+  >
     <!-- Import the Livedata advanced configuration panels -->
     <LivedataAdvancedPanels />
 
@@ -161,3 +177,14 @@ onMounted(async () => {
     <div v-if="!layoutLoaded" class="loading"></div>
   </div>
 </template>
+
+<style>
+.xwiki-livedata.livedata-maximized {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: auto;
+  padding: 0 var(--padding-large-horizontal, 1rem);
+  background-color: var(--body-bg, #fff);
+}
+</style>

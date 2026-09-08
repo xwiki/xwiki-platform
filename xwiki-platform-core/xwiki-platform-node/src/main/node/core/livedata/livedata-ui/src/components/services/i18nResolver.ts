@@ -58,6 +58,8 @@ export async function i18nResolver(
       "action.columnName.sortable.hint",
       "action.columnName.default.hint",
       "action.editMode",
+      "action.maximize",
+      "action.minimize",
       "action.resizeColumn.hint",
       "table.entrySelector.hint",
       "panel.heading.actions.collapse.hint",

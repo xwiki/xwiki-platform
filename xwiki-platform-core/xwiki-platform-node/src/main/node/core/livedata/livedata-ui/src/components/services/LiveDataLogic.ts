@@ -67,6 +67,8 @@ export class LiveDataLogic implements Logic {
 
   private editMode: Ref<boolean> = ref(false);
 
+  private maximized: Ref<boolean> = ref(false);
+
   constructor(
     private readonly liveDataSource: LiveDataSource,
     data: string,
@@ -1550,6 +1552,20 @@ export class LiveDataLogic implements Logic {
 
   hasEditMode(): boolean {
     return this.data.query.source.hasEditMode === "true";
+  }
+
+  /**
+   * @returns whether the Live Data should be maximized, covering the rest of the page
+   */
+  isMaximized(): boolean {
+    return this.maximized.value;
+  }
+
+  /**
+   * Switches between the maximized view and the normal one
+   */
+  toggleMaximized(): void {
+    this.maximized.value = !this.maximized.value;
   }
 
   // eslint-disable-next-line max-statements

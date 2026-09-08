@@ -60,15 +60,24 @@
               {{ $t("livedata.action.refresh") }}
             </a>
           </li>
-          <!-- Edit mode toggle. -->
-          <li class="livedata-action-edit-mode" v-show="logic.hasEditMode()">
-            <a href="#" @click.stop.prevent="toggleEditMode">
-              <input
-                type="checkbox"
-                :checked="isEditMode"
-                @click.stop="toggleEditMode"
+          <!-- Maximized view, which displays the Live Data on its own, over the rest of the
+          page. -->
+          <li>
+            <a
+              href="#"
+              @click.prevent="logic.toggleMaximized()"
+              class="livedata-action-maximize"
+            >
+              <XWikiIcon
+                :icon-descriptor="{
+                  name: isMaximized ? 'arrow_in' : 'arrow_out',
+                }"
               />
-              {{ $t("livedata.action.editMode") }}
+              {{
+                isMaximized
+                  ? $t("livedata.action.minimize")
+                  : $t("livedata.action.maximize")
+              }}
             </a>
           </li>
         </ul>
@@ -131,20 +140,12 @@ export default {
 
   inject: ["logic"],
 
-  data() {
-    return {
-      isEditMode: false,
-    };
-  },
-
-  async beforeUnmount() {
-    this.logic.disableEditMode();
-    await this.logic.updateEntries();
-  },
-
   computed: {
     data() {
       return this.logic.data;
+    },
+    isMaximized() {
+      return this.logic.isMaximized();
     },
   },
 
@@ -156,20 +157,6 @@ export default {
       if (!this.isCurrentLayout(layoutId)) {
         this.logic.changeLayout(layoutId);
       }
-    },
-    toggleEditMode() {
-      this.isEditMode = !this.isEditMode;
-    },
-  },
-
-  watch: {
-    async isEditMode(value) {
-      if (value) {
-        this.logic.enableEditMode();
-      } else {
-        this.logic.disableEditMode();
-      }
-      await this.logic.updateEntries();
     },
   },
 };
@@ -224,15 +211,6 @@ export default {
 
   li:has(> ul):has(+ li > ul) {
     margin-bottom: calc(0.5lh - 1px);
-  }
-}
-
-#xwikicontent ul li.livedata-action-edit-mode {
-  a {
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
   }
 }
 </style>

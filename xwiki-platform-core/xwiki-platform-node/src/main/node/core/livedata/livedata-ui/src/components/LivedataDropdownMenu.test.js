@@ -48,7 +48,7 @@ function initWrapper() {
             },
           },
           changeLayout: changeLayout,
-          hasEditMode: () => false,
+          isMaximized: () => false,
         },
       },
       mocks: {

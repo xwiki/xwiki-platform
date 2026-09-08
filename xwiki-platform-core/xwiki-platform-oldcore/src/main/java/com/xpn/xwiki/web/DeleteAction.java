@@ -200,6 +200,7 @@ public class DeleteAction extends XWikiAction
             try {
                 job.join();
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw new XWikiException("Failed to delete all from the recycle bin", e);
             }
 
@@ -303,6 +304,7 @@ public class DeleteAction extends XWikiAction
         try {
             deleteJob.join();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new XWikiException(String.format("Failed to delete [%s]", entityReference), e);
         }
 

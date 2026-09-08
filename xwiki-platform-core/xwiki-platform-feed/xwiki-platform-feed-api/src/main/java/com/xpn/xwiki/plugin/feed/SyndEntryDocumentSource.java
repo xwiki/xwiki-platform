@@ -763,14 +763,12 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      */
     protected Document castDocument(Object obj, XWikiContext context) throws XWikiException
     {
-        if (obj instanceof Document document) {
-            return document;
-        } else if (obj instanceof XWikiDocument xwikiDocument) {
-            return xwikiDocument.newDocument(context);
-        } else if (obj instanceof String string) {
-            return context.getWiki().getDocument(string, context).newDocument(context);
-        } else {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, "");
-        }
+        return switch (obj) {
+            case Document document -> document;
+            case XWikiDocument xwikiDocument -> xwikiDocument.newDocument(context);
+            case String string -> context.getWiki().getDocument(string, context).newDocument(context);
+            case null, default -> throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
+                XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, "");
+        };
     }
 }

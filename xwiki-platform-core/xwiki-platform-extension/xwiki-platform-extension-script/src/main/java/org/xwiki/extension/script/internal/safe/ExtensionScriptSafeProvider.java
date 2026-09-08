@@ -59,24 +59,21 @@ public class ExtensionScriptSafeProvider implements ScriptSafeProvider<Extension
     @Override
     public <S> S get(Extension unsafe)
     {
-        Extension safe;
-
-        if (unsafe instanceof CoreExtension coreExtension) {
-            safe = new SafeCoreExtension<CoreExtension>(coreExtension, this.defaultSafeProvider);
-        } else if (unsafe instanceof InstalledExtension installedExtension) {
-            safe = new SafeInstalledExtension<InstalledExtension>(installedExtension, this.defaultSafeProvider,
-                this.documentReferenceResolver);
-        } else if (unsafe instanceof LocalExtension localExtension) {
-            safe = new SafeLocalExtension<LocalExtension>(localExtension, this.defaultSafeProvider);
-        } else if (unsafe instanceof IndexedExtension indexedExtension) {
-            safe = new SafeIndexedExtension<IndexedExtension>(indexedExtension, this.defaultSafeProvider);
-        } else if (unsafe instanceof RatingExtension ratingExtension) {
-            safe = new SafeRatingExtension<RatingExtension>(ratingExtension, this.defaultSafeProvider);
-        } else if (unsafe instanceof RemoteExtension remoteExtension) {
-            safe = new SafeRemoteExtension<RemoteExtension>(remoteExtension, this.defaultSafeProvider);
-        } else {
-            safe = new SafeExtension<Extension>(unsafe, this.defaultSafeProvider);
-        }
+        Extension safe = switch (unsafe) {
+            case CoreExtension coreExtension ->
+                new SafeCoreExtension<CoreExtension>(coreExtension, this.defaultSafeProvider);
+            case InstalledExtension installedExtension -> new SafeInstalledExtension<InstalledExtension>(
+                installedExtension, this.defaultSafeProvider, this.documentReferenceResolver);
+            case LocalExtension localExtension ->
+                new SafeLocalExtension<LocalExtension>(localExtension, this.defaultSafeProvider);
+            case IndexedExtension indexedExtension ->
+                new SafeIndexedExtension<IndexedExtension>(indexedExtension, this.defaultSafeProvider);
+            case RatingExtension ratingExtension ->
+                new SafeRatingExtension<RatingExtension>(ratingExtension, this.defaultSafeProvider);
+            case RemoteExtension remoteExtension ->
+                new SafeRemoteExtension<RemoteExtension>(remoteExtension, this.defaultSafeProvider);
+            case null, default -> new SafeExtension<Extension>(unsafe, this.defaultSafeProvider);
+        };
 
         return (S) safe;
     }

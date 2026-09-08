@@ -57,12 +57,10 @@ public class MacroBlockDumper implements BlockDumper
     @Override
     public void dump(OutputStream out, Block block) throws IOException
     {
-        if (block instanceof MacroBlock b) {
-            dump(out, b.getId(), b.getParameters(), b.getContent());
-        } else if (block instanceof MacroMarkerBlock b) {
-            dump(out, b.getId(), b.getParameters(), b.getContent());
-        } else {
-            throw new IllegalArgumentException("Unsupported block [" + block.getClass().getName() + "].");
+        switch (block) {
+            case MacroBlock b -> dump(out, b.getId(), b.getParameters(), b.getContent());
+            case MacroMarkerBlock b -> dump(out, b.getId(), b.getParameters(), b.getContent());
+            default -> throw new IllegalArgumentException("Unsupported block [" + block.getClass().getName() + "].");
         }
 
         String source = getSourceReference(block);

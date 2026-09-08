@@ -94,7 +94,7 @@ catalog:
   "@types/mdast": 4.0.4
   "@types/node": 24.13.3
   "@types/react": 19.2.18
-  "@types/react-dom": 19.2.5
+  "@types/react-dom": 19.2.7
   "@types/requirejs": 2.1.37
   "@types/sinon": 22.0.0
   "@vitejs/plugin-react": 6.1.1

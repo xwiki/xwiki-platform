@@ -83,7 +83,7 @@ catalog:
   "@mantine/core": 9.5.2
   "@mantine/hooks": 9.5.2
   "@microsoft/api-extractor": 7.59.0
-  "@oxc-project/runtime": 0.147.0
+  "@oxc-project/runtime": 0.148.0
   "@playwright/experimental-ct-react": 1.62.1
   "@playwright/experimental-ct-vue": 1.62.1
   "@playwright/test": 1.62.1

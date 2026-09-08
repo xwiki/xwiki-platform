@@ -84,6 +84,7 @@ public class ObjectPropertyReference extends EntityReference
      * @param page the document where the parent object of this property is
      * @param objectName the name of the parent object of this property
      * @param propertyName the name of the property to refer to
+     * @deprecated use {@link #ObjectPropertyReference(String, ObjectReference)} instead
      */
     @Deprecated
     public ObjectPropertyReference(String wiki, String space, String page, String objectName, String propertyName)

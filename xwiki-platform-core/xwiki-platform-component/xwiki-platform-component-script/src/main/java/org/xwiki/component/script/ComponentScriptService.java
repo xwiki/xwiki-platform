@@ -60,6 +60,10 @@ public class ComponentScriptService implements ScriptService
     @Named("context")
     private Provider<ComponentManager> contextComponentManagerProvider;
 
+    /**
+     * @deprecated only used by the deprecated {@link #getComponentManager()}, use
+     *             {@link #contextComponentManagerProvider} instead
+     */
     @Inject
     @Named("context/root")
     @Deprecated

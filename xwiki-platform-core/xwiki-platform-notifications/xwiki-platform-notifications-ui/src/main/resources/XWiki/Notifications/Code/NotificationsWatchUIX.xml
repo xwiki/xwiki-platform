@@ -219,40 +219,41 @@
     $('#watchModal .close-modal').on('click', removeAnySelection);
   };
   
-  var modalPromise;
+  let modalPromise;
+  
+  const loadWatchModal = async (url) =&gt; {
+    // The options offered by the modal depend on the watch settings currently stored for the user, so the
+    // browser must not serve an outdated copy of it.
+    const html = await $.ajax({url: url, cache: false});
+    const modal = $('&lt;div&gt;&lt;/div&gt;').html(html).find('#watchModal').appendTo(document.body);
+    initWatchModal();
+    return modal;
+  };
   
   // The modal is only needed by the few page views where the user actually wants to change the watch settings, so
   // it is fetched from the server on the first click on the button rather than sent along with every page.
-  const getWatchModal = function (url) {
-    if (!modalPromise) {
-      // The options offered by the modal depend on the watch settings currently stored for the user, so the
-      // browser must not serve an outdated copy of it.
-      modalPromise = $.ajax({url: url, cache: false}).then(function (html) {
-        const modal = $('&lt;div&gt;&lt;/div&gt;').html(html).find('#watchModal').appendTo(document.body);
-        initWatchModal();
-        return modal;
-      });
-    }
+  const getWatchModal = (url) =&gt; {
+    modalPromise ??= loadWatchModal(url);
     return modalPromise;
   };
   
-  const init = function () {
-    $('#watchButton button').on('click', function () {
-      var button = $(this);
-      button.prop('disabled', true);
-      getWatchModal(button.attr('data-url')).done(function (modal) {
-        modal.modal('show');
-      }).fail(function (data) {
-        // Forget the failed request so that the next click tries to load the modal again.
-        modalPromise = undefined;
-        console.error("Error when loading the watch settings modal: " + data);
-      }).always(function () {
-        button.prop('disabled', false);
-      });
-    });
-  };
-  
-  (XWiki.isInitialized &amp;&amp; init()) || document.on('xwiki:dom:loaded', init);
+  // The listener is registered on the document so that it also covers a button inserted after this script ran, for
+  // instance when the content menu is refreshed asynchronously.
+  $(document).on('click', '#watchButton button', async (event) =&gt; {
+    const button = $(event.currentTarget);
+    button.prop('disabled', true);
+    try {
+      const modal = await getWatchModal(button.attr('data-url'));
+      modal.modal('show');
+    } catch (error) {
+      // Forget the failed request so that the next click tries to load the modal again.
+      modalPromise = undefined;
+      new XWiki.widgets.Notification(button.attr('data-error-message'), 'error');
+      console.error('Error when loading the watch settings modal:', error);
+    } finally {
+      button.prop('disabled', false);
+    }
+  });
 });</code>
     </property>
     <property>
@@ -561,7 +562,8 @@
 {{html clean='false'}}
 &lt;li class="btn-group" id="watchButton"&gt;
   &lt;button type="button" title="$escapetool.xml($buttonTitle)" class="btn btn-default"
-    data-url="$escapetool.xml($watchModalURL)"&gt;
+    data-url="$escapetool.xml($watchModalURL)"
+    data-error-message="$escapetool.xml($services.localization.render('notifications.watch.button.loading.error'))"&gt;
     &lt;span class="fa $watchIcon"&gt;&lt;/span&gt; $watchText
   &lt;/button&gt;
 &lt;/li&gt;

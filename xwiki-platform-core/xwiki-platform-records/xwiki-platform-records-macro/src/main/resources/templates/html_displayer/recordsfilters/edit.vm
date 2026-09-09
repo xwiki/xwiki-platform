@@ -1,0 +1,42 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Displays the filter picker of a Records table: one item per field=value constraint.
+##
+## Everything this template does mirrors the columns picker, and for the same reasons: the candidates depend on the
+## sibling class parameter, which no displayer can be told about, so they are loaded by the browser; the element is
+## marked with a class of ours rather than xwiki-selectize, so that this module owns the enhancement; and the
+## bundle is loaded as a classic script, since the macro editor injects this template with jQuery. See
+## templates/html_displayer/recordscolumns/edit.vm for the long form of each.
+##
+## Unlike the other two pickers, this one separates its items with & rather than with a comma, since that is how
+## the parameter separates its constraints. The widget is told so in JavaScript, along with everything else that
+## is behaviour rather than markup.
+#set ($parameters = {})
+#set ($discard = $parameters.putAll($displayer.parameters))
+#set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-records-filters"))
+#set ($discard = $parameters.put('multiple', 'multiple'))
+#if ("$!displayer.value" != '')
+  #set ($discard = $parameters.put('value', "$displayer.value"))
+#end
+#set ($discard = $parameters.putIfAbsent('placeholder',
+  $services.localization.render('rendering.macro.records.parameter.filters.placeholder')))
+<script src="$escapetool.xml($services.webjars.url(
+  'org.xwiki.platform:xwiki-platform-records-webjar', 'index.es.js'))"></script>
+#suggestInput($parameters)

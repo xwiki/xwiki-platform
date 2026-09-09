@@ -692,8 +692,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 // The property exist in the new object, but not in the old one
                 if ((newProperty != null) && (!newProperty.toText().equals(""))) {
                     if (pclass != null) {
-                        String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
-                            : pclass.displayView(propertyName, this, context);
+                        String newPropertyValue =
+                            getPropertyDisplayValue(newProperty, pclass, this, propertyName, context);
                         difflist.add(new ObjectDiff(getXClassReference(), getNumber(), "",
                             ObjectDiff.ACTION_PROPERTYADDED, propertyName, propertyType, "", newPropertyValue));
                     }
@@ -702,10 +702,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 // The property exists in both objects and is different
                 if (pclass != null) {
                     // Put the values as they would be displayed in the interface
-                    String newPropertyValue = (newProperty.getValue() instanceof String) ? newProperty.toText()
-                        : pclass.displayView(propertyName, this, context);
-                    String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                        : pclass.displayView(propertyName, oldCollection, context);
+                    String newPropertyValue =
+                        getPropertyDisplayValue(newProperty, pclass, this, propertyName, context);
+                    String oldPropertyValue =
+                        getPropertyDisplayValue(oldProperty, pclass, oldCollection, propertyName, context);
                     difflist
                         .add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
                             propertyName, propertyType, oldPropertyValue, newPropertyValue));
@@ -713,7 +713,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     // Cannot get property definition, so use the plain value
                     difflist
                         .add(new ObjectDiff(getXClassReference(), getNumber(), "", ObjectDiff.ACTION_PROPERTYCHANGED,
-                            propertyName, propertyType, oldProperty.toText(), newProperty.toText()));
+                            propertyName, propertyType, oldProperty.toText(),
+                            (newProperty == null) ? "" : newProperty.toText()));
                 }
             }
         }
@@ -732,8 +733,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
-                        String oldPropertyValue = (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                            : pclass.displayView(propertyName, oldCollection, context);
+                        String oldPropertyValue =
+                            getPropertyDisplayValue(oldProperty, pclass, oldCollection, propertyName, context);
                         difflist.add(new ObjectDiff(oldCollection.getXClassReference(), oldCollection.getNumber(), "",
                             ObjectDiff.ACTION_PROPERTYREMOVED, propertyName, propertyType, oldPropertyValue, ""));
                     } else {
@@ -746,6 +747,21 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
 
         return difflist;
+    }
+
+    /**
+     * @return the value of the property as it would be displayed in the interface, or the empty string when the
+     *         property is not set in the collection, matching how getDiff() compares the two sides
+     */
+    private String getPropertyDisplayValue(BaseProperty property, PropertyClass pclass, BaseCollection collection,
+        String propertyName, XWikiContext context)
+    {
+        if (property == null) {
+            return "";
+        }
+
+        return (property.getValue() instanceof String) ? property.toText()
+            : pclass.displayView(propertyName, collection, context);
     }
 
     public List getFieldsToRemove()

@@ -102,15 +102,24 @@ interface PickerSettings {
   hidePlaceholder: boolean;
   delimiter?: string;
   onItemAdd?: (this: Suggester, value: string) => void;
+  onItemRemove?: (this: Suggester, value: string) => void;
 }
 
 /**
  * The part of the suggest widget's API this module drives.
  */
 interface Suggester {
+  /**
+   * The values currently selected.
+   */
+  items: string[];
   removeItem: (value: string, silent?: boolean) => void;
   setTextboxValue: (value: string) => void;
   refreshOptions: (triggerDropdown?: boolean) => void;
+  /**
+   * Drops every option that is not backing a selected item, and clears the search cache with them.
+   */
+  clearOptions: () => void;
 }
 
 /**
@@ -135,19 +144,29 @@ function createSettings(
 ): PickerSettings {
   // A failure to reach the properties resource must not break the keystroke handler: the dropdown simply has
   // nothing to offer, which is the same state as "no data type picked yet".
-  const guard =
-    (produce: (query: string) => Promise<FieldOption[]>) =>
-    (query: string, callback: (options: FieldOption[]) => void) => {
+  const guard = (
+    produce: (query: string, selected: string[]) => Promise<FieldOption[]>,
+  ) =>
+    // Not an arrow function: the widget calls this with itself as `this`, which is how a picker knows what is
+    // already selected.
+    function (
+      this: Suggester | undefined,
+      query: string,
+      callback: (options: FieldOption[]) => void,
+    ) {
+      const selected = this?.items ?? [];
       void (async () => {
         try {
-          callback(await produce(query));
+          callback(await produce(query, selected));
         } catch {
           callback([]);
         }
       })();
     };
   return {
-    load: guard((query) => offer.load(element, query, fetchJson)),
+    load: guard((query, selected) =>
+      offer.load(element, query, fetchJson, selected),
+    ),
     loadSelected: guard((value) => offer.resolve(element, value, fetchJson)),
     optgroups: [
       { value: "fields", label: "Fields" },
@@ -180,6 +199,7 @@ interface Offer {
     element: Element,
     query: string,
     fetchJson: JsonFetcher,
+    selected: string[],
   ) => Promise<FieldOption[]>;
   resolve: (
     element: Element,
@@ -203,14 +223,16 @@ const columnsOffer: Offer = {
 };
 
 /**
- * The sort picker: two options per field, one per direction, and a stored criterion is resolved exactly rather
- * than searched, for the reason given on {@link resolveSortOption}.
+ * The sort picker: two options per field, one per direction, minus the fields already sorted on, since sorting a
+ * field twice adds nothing. A stored criterion is resolved exactly rather than searched, for the reason given on
+ * {@link resolveSortOption}.
  */
 const sortOffer: Offer = {
-  load: async (element, query, fetchJson) =>
+  load: async (element, query, fetchJson, selected) =>
     toSortOptions(
       await loadDescriptors(element, XWiki.contextPath, fetchJson),
       query,
+      selected,
     ),
   resolve: async (element, value, fetchJson) => [
     resolveSortOption(
@@ -218,6 +240,17 @@ const sortOffer: Offer = {
       value,
     ),
   ],
+  settings: {
+    // A field that has just been used, or has just been freed, changes what should be offered. The widget caches
+    // what it has loaded per query and keeps the options it has already seen, so both are dropped here: what
+    // survives is the options backing the selected criteria, and the next dropdown loads the rest afresh.
+    onItemAdd() {
+      this.clearOptions();
+    },
+    onItemRemove() {
+      this.clearOptions();
+    },
+  },
 };
 
 /**

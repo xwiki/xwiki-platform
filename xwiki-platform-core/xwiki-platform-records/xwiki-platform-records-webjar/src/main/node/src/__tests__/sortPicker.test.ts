@@ -70,6 +70,20 @@ describe("toSortOptions", () => {
   it("offers nothing when the data type has no field", () => {
     expect(toSortOptions([])).toEqual([]);
   });
+
+  it("stops offering a field that is already sorted on", () => {
+    // Both directions go, not just the one picked: sorting a field twice says nothing the first criterion did not
+    // already say.
+    expect(
+      toSortOptions(DESCRIPTORS, "", ["budget:asc"]).map((o) => o.value),
+    ).toEqual(["doc.title:asc", "doc.title:desc"]);
+  });
+
+  it("recognises a used field whose criterion names no direction", () => {
+    expect(
+      toSortOptions(DESCRIPTORS, "", ["budget"]).map((o) => o.value),
+    ).toEqual(["doc.title:asc", "doc.title:desc"]);
+  });
 });
 
 describe("resolveSortOption", () => {

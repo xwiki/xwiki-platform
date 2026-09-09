@@ -24,8 +24,9 @@ import {
   resetDerivedParameters,
   setTabsVisible,
 } from "./dialog";
-import { loadOptions } from "./fieldPicker";
-import type { FieldOption } from "./fieldPicker";
+import { loadDescriptors, loadOptions } from "./fieldPicker";
+import { resolveSortOption, toSortOptions } from "./sortPicker";
+import type { FieldOption, JsonFetcher } from "./fieldPicker";
 
 /**
  * Wires the Records macro dialog: the field picker, and the two behaviours that depend on the data type.
@@ -42,9 +43,14 @@ import type { FieldOption } from "./fieldPicker";
  */
 
 /**
- * The CSS class the displayer template marks its field inputs with.
+ * The CSS class the columns displayer template marks its input with.
  */
 const PICKER_SELECTOR = ".suggest-records-fields";
+
+/**
+ * The CSS class the sort displayer template marks its input with.
+ */
+const SORT_SELECTOR = ".suggest-records-sort";
 
 /**
  * Marks a dialog as already wired, since `xwiki:dom:updated` fires more than once per dialog.
@@ -82,7 +88,7 @@ interface PickerSettings {
 }
 
 /**
- * Builds the suggest widget settings for one field input.
+ * Builds the suggest widget settings for one picker input.
  *
  * `persist` is off and the options are cleared whenever the data type changes, because the widget would otherwise
  * keep offering the previous data type's columns: the suggest widget caches what it has loaded, and the author
@@ -98,26 +104,25 @@ interface PickerSettings {
  */
 function createSettings(
   element: Element,
-  fetchJson: (url: string) => Promise<unknown>,
+  fetchJson: JsonFetcher,
+  offer: Offer = columnsOffer,
 ): PickerSettings {
-  const load = (query: string, callback: (options: FieldOption[]) => void) => {
-    // A failure to reach the properties resource must not break the keystroke handler: the dropdown simply has
-    // nothing to offer, which is the same state as "no data type picked yet".
-    void (async () => {
-      try {
-        callback(
-          await loadOptions(element, query, XWiki.contextPath, fetchJson),
-        );
-      } catch {
-        callback([]);
-      }
-    })();
-  };
+  // A failure to reach the properties resource must not break the keystroke handler: the dropdown simply has
+  // nothing to offer, which is the same state as "no data type picked yet".
+  const guard =
+    (produce: (query: string) => Promise<FieldOption[]>) =>
+    (query: string, callback: (options: FieldOption[]) => void) => {
+      void (async () => {
+        try {
+          callback(await produce(query));
+        } catch {
+          callback([]);
+        }
+      })();
+    };
   return {
-    load,
-    // The saved value is a list of identifiers, and an identifier is all the picker needs to show it back, so the
-    // selected values resolve through the same request as the suggestions.
-    loadSelected: (value, callback) => load(value, callback),
+    load: guard((query) => offer.load(element, query, fetchJson)),
+    loadSelected: guard((value) => offer.resolve(element, value, fetchJson)),
     optgroups: [
       { value: "fields", label: "Fields" },
       { value: "metadata", label: "Entry metadata" },
@@ -126,7 +131,8 @@ function createSettings(
     labelField: "label",
     valueField: "value",
     searchField: ["label", "value"],
-    // Column order is authored, so the selected items must be reorderable.
+    // Both the column order and the order of the sort criteria are authored, so the selected items must be
+    // reorderable.
     plugins: ["drag_drop", "remove_button"],
     persist: false,
     // A column the data type does not have would render an empty column, so free text is refused.
@@ -138,6 +144,50 @@ function createSettings(
     hidePlaceholder: true,
   };
 }
+
+/**
+ * What one picker offers: the options for a query, and the option that shows a stored value back.
+ */
+interface Offer {
+  load: (
+    element: Element,
+    query: string,
+    fetchJson: JsonFetcher,
+  ) => Promise<FieldOption[]>;
+  resolve: (
+    element: Element,
+    value: string,
+    fetchJson: JsonFetcher,
+  ) => Promise<FieldOption[]>;
+}
+
+/**
+ * The columns picker: one option per field, and a stored value is an identifier the same request resolves.
+ */
+const columnsOffer: Offer = {
+  load: (element, query, fetchJson) =>
+    loadOptions(element, query, XWiki.contextPath, fetchJson),
+  resolve: (element, value, fetchJson) =>
+    loadOptions(element, value, XWiki.contextPath, fetchJson),
+};
+
+/**
+ * The sort picker: two options per field, one per direction, and a stored criterion is resolved exactly rather
+ * than searched, for the reason given on {@link resolveSortOption}.
+ */
+const sortOffer: Offer = {
+  load: async (element, query, fetchJson) =>
+    toSortOptions(
+      await loadDescriptors(element, XWiki.contextPath, fetchJson),
+      query,
+    ),
+  resolve: async (element, value, fetchJson) => [
+    resolveSortOption(
+      await loadDescriptors(element, XWiki.contextPath, fetchJson),
+      value,
+    ),
+  ],
+};
 
 /**
  * Fetches and parses a JSON document.
@@ -158,8 +208,11 @@ async function fetchJson(url: string): Promise<unknown> {
 /**
  * Wires one Records dialog.
  *
+ * The columns picker is what identifies the dialog as a Records one, and it is also where the data type is
+ * watched from, so that the warning and the reset happen once per dialog rather than once per picker.
+ *
  * @param $ - the page's jQuery instance
- * @param picker - the field picker element, which identifies the dialog as a Records one
+ * @param picker - the columns picker element
  */
 function wire($: JQueryStatic, picker: Element): void {
   const $picker = $(picker);
@@ -167,6 +220,9 @@ function wire($: JQueryStatic, picker: Element): void {
   const dataTypeInput = findDataTypeInput(scope);
 
   $picker.xwikiSelectize(createSettings(picker, fetchJson));
+  scope.querySelectorAll(SORT_SELECTOR).forEach((sort) => {
+    $(sort).xwikiSelectize(createSettings(sort, fetchJson, sortOffer));
+  });
 
   // The tabs are all derived from the data type, so there is nothing to show until one is picked.
   setTabsVisible(scope, dataTypeInput !== null && dataTypeInput.value !== "");

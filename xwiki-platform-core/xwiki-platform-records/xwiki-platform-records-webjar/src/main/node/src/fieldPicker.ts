@@ -163,28 +163,15 @@ function toOptions(
   descriptors: PropertyDescriptor[],
   query = "",
 ): FieldOption[] {
-  const normalizedQuery = query.trim().toLowerCase();
   return descriptors
-    .filter(
-      (descriptor) =>
-        typeof descriptor?.id === "string" &&
-        descriptor.id !== "" &&
-        !descriptor.id.startsWith(INTERNAL_PREFIX),
-    )
+    .filter(isCandidate)
     .map((descriptor) => ({
       value: descriptor.id,
       label: descriptor.name ?? descriptor.id,
       hint: descriptor.type,
-      optgroup: descriptor.id.startsWith(METADATA_PREFIX)
-        ? METADATA_GROUP
-        : FIELDS_GROUP,
+      optgroup: groupOf(descriptor),
     }))
-    .filter(
-      (option) =>
-        normalizedQuery === "" ||
-        option.label.toLowerCase().includes(normalizedQuery) ||
-        option.value.toLowerCase().includes(normalizedQuery),
-    );
+    .filter((option) => matches(option, query));
 }
 
 /**
@@ -210,12 +197,75 @@ async function loadOptions(
   contextPath: string,
   fetchJson: JsonFetcher,
 ): Promise<FieldOption[]> {
+  return toOptions(
+    await loadDescriptors(element, contextPath, fetchJson),
+    query,
+  );
+}
+
+/**
+ * Loads the property descriptors of the data type currently selected.
+ *
+ * This is the step every picker of this dialog shares: which data type is selected is read from the sibling
+ * parameter, and the answer is the same list of descriptors whether the picker turns them into columns, into sort
+ * criteria or into filter constraints.
+ *
+ * @param element - the picker element
+ * @param contextPath - the wiki context path
+ * @param fetchJson - fetches and parses the properties resource
+ * @returns the descriptors of the selected data type, empty when no data type is selected
+ */
+async function loadDescriptors(
+  element: Element,
+  contextPath: string,
+  fetchJson: JsonFetcher,
+): Promise<PropertyDescriptor[]> {
   const dataType = findDataType(element);
   if (dataType === null) {
     return [];
   }
-  const payload = await fetchJson(propertiesUrl(contextPath, dataType));
-  return toOptions(asDescriptors(payload), query);
+  return asDescriptors(await fetchJson(propertiesUrl(contextPath, dataType)));
+}
+
+/**
+ * Whether a property descriptor names something an author can pick.
+ *
+ * @param descriptor - the descriptor to check
+ * @returns false for the Live Data pseudo-columns and for anything without an identifier
+ */
+function isCandidate(descriptor: PropertyDescriptor): boolean {
+  return (
+    typeof descriptor?.id === "string" &&
+    descriptor.id !== "" &&
+    !descriptor.id.startsWith(INTERNAL_PREFIX)
+  );
+}
+
+/**
+ * @param descriptor - a property descriptor
+ * @returns the group it is listed under
+ */
+function groupOf(descriptor: PropertyDescriptor): string {
+  return descriptor.id.startsWith(METADATA_PREFIX)
+    ? METADATA_GROUP
+    : FIELDS_GROUP;
+}
+
+/**
+ * @param option - an option to test
+ * @param query - the text the author typed
+ * @returns whether the option matches, on either what is shown or what is stored
+ */
+function matches(
+  option: { label: string; value: string },
+  query: string,
+): boolean {
+  const normalized = query.trim().toLowerCase();
+  return (
+    normalized === "" ||
+    option.label.toLowerCase().includes(normalized) ||
+    option.value.toLowerCase().includes(normalized)
+  );
 }
 
 /**
@@ -255,7 +305,11 @@ export {
   METADATA_PREFIX,
   asDescriptors,
   findDataType,
+  groupOf,
+  isCandidate,
+  loadDescriptors,
   loadOptions,
+  matches,
   propertiesUrl,
   toOptions,
 };

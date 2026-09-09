@@ -64,9 +64,10 @@ import org.xwiki.stability.Unstable;
  * authored by someone without script right and get the link displayers sanitized away.
  * <p>
  * The display types are what select the parameter widgets. {@link RecordsDataType} names the XClass picker of the
- * object and class editors, {@link RecordsColumns} names this module's own field picker and {@link RecordsLayouts}
- * names its layout radio group; all three resolve to a template under {@code templates/html_displayer}. Everything
- * else relies on the displayer the Java type already has: a {@link String} renders a text input.
+ * object and class editors, {@link RecordsColumns} names this module's own field picker, {@link RecordsSort} its
+ * sort picker and {@link RecordsLayouts} its layout radio group; all four resolve to a template under
+ * {@code templates/html_displayer}. Everything else relies on the displayer the Java type already has: a
+ * {@link String} renders a text input.
  *
  * @version $Id$
  * @since 18.8.0RC1
@@ -165,9 +166,9 @@ public class RecordsMacroParameters
     /**
      * @param sort the columns the table is sorted on when the page opens
      */
+    @PropertyDisplayType(RecordsSort.class)
     @PropertyName("Sort")
-    @PropertyDescription("The columns the table is sorted on when the page opens, separated by commas. Each name may "
-        + "be followed by :asc or :desc.")
+    @PropertyDescription("The columns the table is sorted on when the page opens, in the order they apply.")
     @PropertyGroup("filterSort")
     @PropertyOrder(4)
     public void setSort(String sort)

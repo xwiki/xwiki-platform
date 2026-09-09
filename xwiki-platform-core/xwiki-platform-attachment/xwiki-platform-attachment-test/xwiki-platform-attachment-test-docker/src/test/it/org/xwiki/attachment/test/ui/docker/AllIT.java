@@ -43,4 +43,14 @@ public class AllIT
     class NestedAttachmentCommentIT extends AttachmentCommentIT
     {
     }
+
+    @Nested
+    class NestedDownloadAttachmentRevisionIT extends DownloadAttachmentRevisionIT
+    {
+    }
+
+    @Nested
+    class NestedViewAttachmentRevisionIT extends ViewAttachmentRevisionIT
+    {
+    }
 }

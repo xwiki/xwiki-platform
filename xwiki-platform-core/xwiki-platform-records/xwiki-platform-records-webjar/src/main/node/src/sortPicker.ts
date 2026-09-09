@@ -28,7 +28,9 @@
  * suggester with the drag-and-drop plugin already gives.
  *
  * Each candidate field therefore yields two options rather than one, so that picking a criterion is a single
- * choice and the direction never has to be typed.
+ * choice and the direction never has to be typed. A field already used is then dropped from what is offered:
+ * sorting on the same field twice says nothing the first criterion did not already say, and offering both
+ * directions of a field that is already sorted invites reading the pair as a choice when it is not one.
  */
 
 import { groupOf, isCandidate, matches } from "./fieldPicker";
@@ -56,18 +58,31 @@ const DIRECTIONS: readonly { value: string; label: string }[] = [
 const DEFAULT_DIRECTION_LABEL = "default order";
 
 /**
+ * @param criterion - one criterion, with or without a direction
+ * @returns the field it sorts on
+ */
+function fieldOf(criterion: string): string {
+  const separator = criterion.indexOf(DIRECTION_SEPARATOR);
+  return separator === -1 ? criterion : criterion.slice(0, separator);
+}
+
+/**
  * Builds the sort criteria offered for a data type.
  *
  * @param descriptors - the property descriptors of the data type
  * @param query - the text the author typed, matched against both the label and the stored value
- * @returns two options per candidate field, ascending first
+ * @param selected - the criteria already picked, whose fields are not offered again
+ * @returns two options per candidate field still available, ascending first
  */
 function toSortOptions(
   descriptors: PropertyDescriptor[],
   query = "",
+  selected: readonly string[] = [],
 ): FieldOption[] {
+  const used = new Set(selected.map(fieldOf));
   return descriptors
     .filter(isCandidate)
+    .filter((descriptor) => !used.has(descriptor.id))
     .flatMap((descriptor) =>
       DIRECTIONS.map((direction) => ({
         value: `${descriptor.id}${DIRECTION_SEPARATOR}${direction.value}`,
@@ -96,7 +111,7 @@ function resolveSortOption(
   value: string,
 ): FieldOption {
   const separator = value.indexOf(DIRECTION_SEPARATOR);
-  const field = separator === -1 ? value : value.slice(0, separator);
+  const field = fieldOf(value);
   const direction = separator === -1 ? "" : value.slice(separator + 1);
   const descriptor = descriptors
     .filter(isCandidate)
@@ -119,6 +134,7 @@ function resolveSortOption(
 export {
   DEFAULT_DIRECTION_LABEL,
   DIRECTIONS,
+  fieldOf,
   resolveSortOption,
   toSortOptions,
 };

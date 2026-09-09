@@ -50,6 +50,12 @@ export class Logic {
 
     // Reactive properties must be initialized before Vue is instantiated.
     this.firstEntriesLoading = ref(true);
+    // Settled once the first entries are displayed, whatever the outcome. It is created before the application is
+    // mounted because the root component waits for it in order to know when the Live Data is fully displayed.
+    let resolveFirstEntriesLoaded;
+    this.firstEntriesLoaded = new Promise(resolve => {
+      resolveFirstEntriesLoaded = resolve;
+    });
     this.currentLayoutId = ref("");
     this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = reactive({
@@ -100,9 +106,13 @@ export class Logic {
       this.updateEntries()
         // Mark the loader as finished, even if it fails as the loader should stop and a message be
         // displayed to the user in this case.
-        .finally(() => this.firstEntriesLoading.value = false);
+        .finally(() => {
+          this.firstEntriesLoading.value = false;
+          resolveFirstEntriesLoaded();
+        });
     } else {
       this.firstEntriesLoading.value = false;
+      resolveFirstEntriesLoaded();
     }
 
     // TODO: define and import editBus
@@ -421,8 +431,10 @@ export class Logic {
 
   updateEntries() {
     return this.fetchEntries()
-      .then(data => {
+      .then(async data => {
         this.data.data = data;
+        // Remove the outdated footnotes, they will be recomputed by the new entries.
+        this.footnotes.reset();
         // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated first.
         // It turns out this is not enough when components are resolved asynchronously.
         // Therefore, we preemptively resolve the components that are going to be displayed here. Since they are cached,
@@ -434,12 +446,9 @@ export class Logic {
         const preloadDisplayer = this.getPropertyDescriptors()
             .filter(it => this.isPropertyVisible(it.id))
             .map(it => componentStore.load('displayer', this.getDisplayerDescriptor(it.id).id));
-        Promise.all(preloadDisplayer)
-            .then(() => {
-              this.vueInstance.$nextTick(() => this.triggerEvent("entriesUpdated", {}));
-            })
-        // Remove the outdated footnotes, they will be recomputed by the new entries.
-        this.footnotes.reset();
+        await Promise.all(preloadDisplayer);
+        await this.vueInstance.$nextTick();
+        this.triggerEvent("entriesUpdated", {});
       })
       .catch(err => {
         // Prevent undesired notifications of the end user for non business related errors (for

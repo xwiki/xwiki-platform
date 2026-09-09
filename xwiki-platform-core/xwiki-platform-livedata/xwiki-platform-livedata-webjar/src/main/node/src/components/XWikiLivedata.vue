@@ -80,14 +80,53 @@ export default {
     };
   },
 
-  mounted() {
-    // Waits for the layout to be (lazily) loaded before hiding the loader.
-    this.logic.onEvent("layoutLoaded", () => {
-      this.layoutLoaded = true;
+  async mounted() {
+    // Waits for the layout to be (lazily) loaded before hiding the loader. The promise is rejected when no layout
+    // can be loaded at all, so that we never wait for one indefinitely.
+    const layoutReady = new Promise((resolve, reject) => {
+      this.logic.onEvent("layoutLoaded", event => {
+        const { error } = event.detail;
+        if (error) {
+          reject(error);
+        } else {
+          // Hide the loader and show the footnotes only when a layout was actually loaded. When none could be
+          // loaded the loader keeps running: there is nothing to display in its place yet, and it is also what
+          // tells the functional tests that the live data is not usable.
+          // TODO: XWIKI-24835: The Live Data displays an endless loading animation instead of an error when no
+          // layout can be loaded
+          this.layoutLoaded = true;
+          resolve();
+        }
+      });
     });
-    this.logic.translationsLoaded().finally(() => {
-      this.translationsLoaded = true;
-    });
+    // We await this promise only at the end, after the translations and the entries, so we register the rejection
+    // handler right away to keep the failure from being reported as unhandled meanwhile.
+    layoutReady.catch(() => {});
+
+    let error;
+    try {
+      try {
+        await this.logic.translationsLoaded();
+      } finally {
+        this.translationsLoaded = true;
+      }
+
+      // The first entries are fetched by the Live Data logic, right after this component is mounted.
+      await this.logic.firstEntriesLoaded;
+
+      // The layout is loaded in parallel with the entries so we have to wait for it too, and for
+      // the tick that renders it, before the live data can be considered fully displayed.
+      await layoutReady;
+      await this.$nextTick();
+    } catch (e) {
+      error = e;
+    } finally {
+      // Notify that the live data is fully loaded and displayed, or that it failed, because there are
+      // listeners that can't wait indefinitely, such as the page ready detection used by the PDF
+      // export. The "error" event data tells the two cases apart: it is undefined on success, and the
+      // live data instance is always available as the "livedata" event data.
+      this.logic.triggerEvent("instanceReady", { error });
+    }
   },
 
 };

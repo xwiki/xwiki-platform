@@ -100,7 +100,11 @@ export default {
 
   // On mounted and when the `layoutId` prop change,
   // try to load the layout corresponding to the layoutId
-  // or the default one as fallback
+  // or the default one as fallback.
+  //
+  // Either way the "layoutLoaded" event is triggered on the logic, with {layoutId, previousLayoutId} plus:
+  // * "component", the loaded layout component, when a layout could be displayed
+  // * "error", the error that prevented it, when no layout could be displayed at all
   watch: {
     layoutId: {
       immediate: true,
@@ -116,12 +120,23 @@ export default {
             });
           })
           .catch(err => {
-            // If the layout was not the default one, try to load default layout
-            if (this.layoutId && this.layoutId !== this.data.meta.defaultLayout) {
+            const defaultLayout = this.data.meta.defaultLayout;
+            // Fall back on the default layout, unless it's the one that just failed or it isn't declared, in which
+            // case changing the layout would be a no-op.
+            const canFallBack = this.layoutId && this.layoutId !== defaultLayout
+              && this.logic.getLayoutDescriptor(defaultLayout);
+            if (canFallBack) {
               console.warn(err);
-              this.logic.changeLayout(this.data.meta.defaultLayout);
+              this.logic.changeLayout(defaultLayout);
             } else {
               console.error(err);
+              // There's no layout left to try, so report the failure to the listeners waiting for a layout,
+              // instead of making them wait indefinitely.
+              this.logic.triggerEvent("layoutLoaded", {
+                layoutId,
+                previousLayoutId,
+                error: err,
+              });
             }
           });
       },

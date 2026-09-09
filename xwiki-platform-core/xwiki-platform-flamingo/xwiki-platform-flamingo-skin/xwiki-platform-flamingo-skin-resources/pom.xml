@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin</artifactId>
-    <version>17.10.13</version>
+    <version>17.10.14-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Resources</name>
@@ -315,6 +315,6 @@
   </build>
 
   <scm>
-    <tag>xwiki-platform-17.10.13</tag>
+    <tag>stable-17.10.x</tag>
   </scm>
 </project>

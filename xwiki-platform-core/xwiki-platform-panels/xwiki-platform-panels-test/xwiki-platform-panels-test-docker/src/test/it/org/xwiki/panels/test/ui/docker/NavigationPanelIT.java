@@ -134,6 +134,10 @@ class NavigationPanelIT
             labelIds.addAll(tree.getNodeLabelIds());
         }
 
+        // A node label without an id would otherwise be reported below as a duplicate of the other missing ids,
+        // which is not the problem this test is about.
+        assertFalse(labelIds.stream().anyMatch(id -> id == null || id.isEmpty()),
+            "Found a node label without an id in " + labelIds);
         assertEquals(List.of(), getDuplicates(labelIds), "Found duplicate node label ids on the page");
     }
 

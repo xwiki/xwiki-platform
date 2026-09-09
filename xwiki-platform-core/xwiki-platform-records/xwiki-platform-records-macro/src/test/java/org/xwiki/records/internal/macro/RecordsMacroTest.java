@@ -139,8 +139,7 @@ class RecordsMacroTest
         parameters.setProperties("doc.title,status,budget");
         parameters.setFilters("status=Active&client=Acme");
         parameters.setSort("budget:desc");
-        parameters.setLayouts("table,cards");
-        parameters.setLimit(25);
+        parameters.setLayouts("cards");
         parameters.setDescription("Acme projects, most recent first");
         parameters.setId("projects");
 
@@ -150,8 +149,7 @@ class RecordsMacroTest
         assertEquals("doc.title,status,budget", liveDataParameters.getProperties());
         assertEquals("status=Active&client=Acme", liveDataParameters.getFilters());
         assertEquals("budget:desc", liveDataParameters.getSort());
-        assertEquals("table,cards", liveDataParameters.getLayouts());
-        assertEquals(25, liveDataParameters.getLimit());
+        assertEquals("cards", liveDataParameters.getLayouts());
         assertEquals("Acme projects, most recent first", liveDataParameters.getDescription());
         assertEquals("projects", liveDataParameters.getId());
     }
@@ -325,6 +323,8 @@ class RecordsMacroTest
         assertNull(liveDataParameters.getSort());
         assertNull(liveDataParameters.getDescription());
         assertNull(liveDataParameters.getOffset());
+        // The page size is deliberately not a macro parameter, so it stays Live Data's own default.
+        assertNull(liveDataParameters.getLimit());
     }
 
     @Test
@@ -333,7 +333,6 @@ class RecordsMacroTest
         LiveDataRendererParameters liveDataParameters = execute(newParameters());
 
         assertEquals("table", liveDataParameters.getLayouts());
-        assertEquals(15, liveDataParameters.getLimit());
     }
 
     @Test

@@ -51,9 +51,12 @@ import org.xwiki.stability.Unstable;
  * {@code Columns}. Leaving it childless is the only way to get the intended order. A mandatory parameter never
  * reaches that branch, which is why {@code class} is exempt.
  * <p>
- * Two parameters the design calls for are deliberately absent from this first increment. {@code location}, which
- * scopes the table to one part of the page tree, needs an exact prefix predicate that the {@code liveTable} source
- * cannot express, so it waits on the results page this module will ship. {@code editable} cannot be honoured
+ * Three parameters the design calls for are deliberately absent from this first increment. {@code limit}, which
+ * decides how many entries a page holds, is left out until there is a reason to override Live Data's own default of
+ * fifteen: the reader can already change the page size from the pagination controls, so the parameter would only
+ * pick the starting point. {@code location}, which scopes the table to one part of the page tree, needs an exact
+ * prefix predicate that the {@code liveTable} source cannot express, so it waits on the results page this module
+ * will ship. {@code editable} cannot be honoured
  * without harm: it maps onto the per-property {@code editable} flag of the Live Data <em>configuration</em> rather
  * than onto a macro parameter, and {@code LiveDataRenderer} treats a configuration as trusted only when it is blank
  * or the author holds script right. Since the {@code liveTable} property types already allow editing, suppressing
@@ -61,9 +64,9 @@ import org.xwiki.stability.Unstable;
  * authored by someone without script right and get the link displayers sanitized away.
  * <p>
  * The display types are what select the parameter widgets. {@link RecordsDataType} names the XClass picker of the
- * object and class editors, and {@link RecordsColumns} names this module's own field picker; both resolve to a
- * template under {@code templates/html_displayer}. Everything else relies on the displayer the Java type already
- * has: {@code int} and {@link String} render text inputs.
+ * object and class editors, {@link RecordsColumns} names this module's own field picker and {@link RecordsLayouts}
+ * names its layout radio group; all three resolve to a template under {@code templates/html_displayer}. Everything
+ * else relies on the displayer the Java type already has: a {@link String} renders a text input.
  *
  * @version $Id$
  * @since 18.8.0RC1
@@ -80,8 +83,6 @@ public class RecordsMacroParameters
     private String sort;
 
     private String layouts = "table";
-
-    private int limit = 15;
 
     private String description;
 
@@ -175,7 +176,7 @@ public class RecordsMacroParameters
     }
 
     /**
-     * @return the layouts readers can switch between
+     * @return the layout the entries are displayed in
      */
     public String getLayouts()
     {
@@ -183,35 +184,16 @@ public class RecordsMacroParameters
     }
 
     /**
-     * @param layouts the layouts readers can switch between
+     * @param layouts the layout the entries are displayed in
      */
-    @PropertyName("Layouts")
-    @PropertyDescription("The layouts readers can switch between, separated by commas. The first one is shown first.")
+    @PropertyDisplayType(RecordsLayouts.class)
+    @PropertyName("Layout")
+    @PropertyDescription("How the entries are laid out.")
     @PropertyGroup("display")
     @PropertyOrder(5)
     public void setLayouts(String layouts)
     {
         this.layouts = layouts;
-    }
-
-    /**
-     * @return how many entries are shown before paging
-     */
-    public int getLimit()
-    {
-        return this.limit;
-    }
-
-    /**
-     * @param limit how many entries are shown before paging
-     */
-    @PropertyName("Entries per page")
-    @PropertyDescription("How many entries are shown before paging.")
-    @PropertyGroup("display")
-    @PropertyOrder(6)
-    public void setLimit(int limit)
-    {
-        this.limit = limit;
     }
 
     /**
@@ -229,7 +211,7 @@ public class RecordsMacroParameters
     @PropertyDescription("Describes what the table lists. Shown above the table, and used as its accessible "
         + "description.")
     @PropertyGroup("display")
-    @PropertyOrder(7)
+    @PropertyOrder(6)
     public void setDescription(String description)
     {
         this.description = description;
@@ -250,7 +232,7 @@ public class RecordsMacroParameters
     @PropertyDescription("Identifier for this table, needed only when one page holds more than one.")
     @PropertyGroup("advanced")
     @PropertyAdvanced
-    @PropertyOrder(8)
+    @PropertyOrder(7)
     public void setId(String id)
     {
         this.id = id;

@@ -423,8 +423,10 @@ export class LiveDataLogic implements Logic {
     return (
       this.fetchEntries()
         // eslint-disable-next-line promise/always-return
-        .then((data) => {
+        .then(async (data) => {
           this.data.data = data;
+          // Remove the outdated footnotes, they will be recomputed by the new entries.
+          this.footnotes.reset();
           // Before triggering 'entriesUpdated', we wait for the next tick to be sure to have the DOM updated
           // first.
           // It turns out this is not enough when components are resolved asynchronously.
@@ -441,12 +443,9 @@ export class LiveDataLogic implements Logic {
                 (this.getDisplayerDescriptor(it!.id) as { id: string }).id,
               ),
             );
-          // eslint-disable-next-line promise/catch-or-return,promise/always-return,promise/no-nesting
-          Promise.all(preloadDisplayer).then(() => {
-            nextTick(() => this.triggerEvent("entriesUpdated", {}));
-          });
-          // Remove the outdated footnotes, they will be recomputed by the new entries.
-          this.footnotes.reset();
+          await Promise.all(preloadDisplayer);
+          await nextTick();
+          this.triggerEvent("entriesUpdated", {});
         })
         .catch((err) => {
           // Prevent undesired notifications of the end user for non business related errors (for

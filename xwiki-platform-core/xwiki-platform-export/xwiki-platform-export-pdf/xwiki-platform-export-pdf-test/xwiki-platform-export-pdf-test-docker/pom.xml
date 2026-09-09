@@ -76,6 +76,20 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Provides the Live Data macro used to test how the Live Data is exported to PDF. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Provides the Live Data source used by the page that tests the PDF export of the Live Data. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-livetable</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!--Test only dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -86,6 +100,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-export-pdf-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used to drive the Live Data before exporting it to PDF. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-livedata-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

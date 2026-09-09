@@ -140,7 +140,10 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
       </select>
     </div>
     <span class="buttonwrapper">
-      <input type="submit" class="button" value="$services.localization.render('core.editors.class.addProperty.submit')" name="action_propadd"/>
+      ## The button is disabled by default because adding a property is only supported through JavaScript: submitting
+      ## the form without it would leave the class editor. It is enabled again by the class editor JavaScript, once the
+      ## click handler performing the actual addition has been bound.
+      <input type="submit" class="button" value="$services.localization.render('core.editors.class.addProperty.submit')" name="action_propadd" disabled="disabled"/>
     </span>
   </div>
 #end

@@ -78,6 +78,7 @@ interface PickerSettings {
   plugins: string[];
   persist: boolean;
   create: boolean;
+  hidePlaceholder: boolean;
 }
 
 /**
@@ -86,6 +87,10 @@ interface PickerSettings {
  * `persist` is off and the options are cleared whenever the data type changes, because the widget would otherwise
  * keep offering the previous data type's columns: the suggest widget caches what it has loaded, and the author
  * changing their mind about the data type is exactly the case that must not silently keep stale fields.
+ *
+ * `hidePlaceholder` is set for the reason given below: it is not the widget's default for a multiple-value field,
+ * and every such field in the platform has carried the placeholder alongside its items since Tom Select replaced
+ * Selectize.
  *
  * @param element - the field input being enhanced
  * @param fetchJson - fetches and parses the Live Data properties resource
@@ -126,6 +131,11 @@ function createSettings(
     persist: false,
     // A column the data type does not have would render an empty column, so free text is refused.
     create: false,
+    // The suggest widget is backed by Tom Select, whose `hidePlaceholder` defaults to `mode !==
+    // 'multi'`, so a multiple-value field keeps its placeholder next to the selected items. Here that
+    // placeholder names the default column list, so leaving it visible would tell the author the table
+    // shows the title and every field while they are looking at the columns they just picked.
+    hidePlaceholder: true,
   };
 }
 

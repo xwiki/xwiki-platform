@@ -215,7 +215,7 @@ public class RecordsMacroParameters
     }
 
     /**
-     * @return the description announced to assistive technology
+     * @return the description shown above the table
      */
     public String getDescription()
     {
@@ -223,10 +223,11 @@ public class RecordsMacroParameters
     }
 
     /**
-     * @param description the description announced to assistive technology
+     * @param description the description shown above the table, which is also its accessible description
      */
     @PropertyName("Description")
-    @PropertyDescription("Describes what the table lists. Announced to assistive technology.")
+    @PropertyDescription("Describes what the table lists. Shown above the table, and used as its accessible "
+        + "description.")
     @PropertyGroup("display")
     @PropertyOrder(7)
     public void setDescription(String description)

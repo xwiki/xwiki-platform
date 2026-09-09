@@ -107,8 +107,7 @@ public class WCAGContext
             entry("image-alt", true),
             entry("input-button-name", true),
             entry("input-image-alt", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("label", false),
+            entry("label", true),
             entry("link-in-text-block", true),
             entry("link-name", true),
             entry("list", true),

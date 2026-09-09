@@ -203,7 +203,6 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         liveDataParameters.setProperties(getProperties(parameters));
         liveDataParameters.setFilters(parameters.getFilters());
         liveDataParameters.setSort(parameters.getSort());
-        liveDataParameters.setLimit(parameters.getLimit());
         liveDataParameters.setLayouts(parameters.getLayouts());
         liveDataParameters.setDescription(parameters.getDescription());
         return liveDataParameters;

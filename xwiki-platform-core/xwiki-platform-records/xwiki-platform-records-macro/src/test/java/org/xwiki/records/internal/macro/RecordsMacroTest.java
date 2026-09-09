@@ -174,25 +174,41 @@ class RecordsMacroTest
     }
 
     @Test
-    void executeDisplaysEveryFieldOfTheDataTypeWhenNoColumnIsGiven() throws Exception
+    void executeDisplaysTheTitleAndEveryFieldWhenNoColumnIsGiven() throws Exception
     {
         // The liveTable source needs an explicit column list: an absent one yields a table with no columns rather
         // than one with every column, which is the opposite of the parameter's documented default.
         LiveDataRendererParameters liveDataParameters = execute(newParameters());
 
-        assertEquals("first_name,last_name,email", liveDataParameters.getProperties());
+        assertEquals("doc.title,first_name,last_name,email", liveDataParameters.getProperties());
     }
 
     @Test
-    void executeLeavesTheEntryMetadataOutOfTheDefaultColumns() throws Exception
+    void executeOpensTheDefaultColumnsWithTheEntryTitle() throws Exception
     {
-        // doc.* columns are offered to the author but are not part of "every field of this data type", and the
+        // Without it a reader cannot tell one entry from another, nor reach the page an entry lives in.
+        assertTrue(execute(newParameters()).getProperties().startsWith("doc.title,"));
+    }
+
+    @Test
+    void executeLeavesTheOtherMetadataAndThePseudoColumnsOutOfTheDefault() throws Exception
+    {
+        // The title is the only piece of entry metadata the default wants; the rest is the author's to add. The
         // pseudo-columns are affordances rather than data.
         String properties = execute(newParameters()).getProperties();
 
-        assertFalse(properties.contains("doc."));
+        assertFalse(properties.contains("doc.location"));
         assertFalse(properties.contains("_actions"));
         assertFalse(properties.contains("_avatar"));
+    }
+
+    @Test
+    void executeStillIdentifiesTheEntriesOfADataTypeWithoutFields() throws Exception
+    {
+        // A data type with no field of its own still gets a table a reader can use, rather than no columns at all.
+        when(this.propertyStore.get()).thenReturn(List.of(descriptor("doc.title"), descriptor("_actions")));
+
+        assertEquals("doc.title", execute(newParameters()).getProperties());
     }
 
     @Test

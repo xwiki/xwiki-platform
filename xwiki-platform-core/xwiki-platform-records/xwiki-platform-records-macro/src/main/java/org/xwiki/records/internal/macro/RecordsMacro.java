@@ -46,6 +46,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * Lists the entries of a data type as a table readers can sort and filter.
@@ -114,6 +115,12 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      */
     private static final String TITLE_PROPERTY = "doc.title";
 
+    /**
+     * The prefix of a generated table identifier. Has to be alphabetical: {@link IdGenerator} builds HTML ids, which
+     * may not start with a digit.
+     */
+    private static final String ID_PREFIX = ID;
+
     private static final String DESCRIPTION =
         "Displays a collection of entries of the same data type, as a table readers can sort and filter.";
 
@@ -154,7 +161,8 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         try {
             boolean restricted = context.getTransformationContext().isRestricted();
             // The advanced configuration is left blank on purpose, see the class javadoc.
-            return List.of(this.liveDataRenderer.execute(toLiveDataParameters(parameters), (String) null, restricted));
+            return List.of(
+                this.liveDataRenderer.execute(toLiveDataParameters(parameters, context), (String) null, restricted));
         } catch (LiveDataException e) {
             throw new MacroExecutionException("Failed to render the Records macro.", e);
         }
@@ -182,13 +190,14 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * a {@code liveData} macro.
      *
      * @param parameters the macro parameters
+     * @param context the transformation context, which carries the document's identifier generator
      * @return the equivalent Live Data renderer parameters
      */
-    private LiveDataRendererParameters toLiveDataParameters(RecordsMacroParameters parameters)
-        throws MacroExecutionException
+    private LiveDataRendererParameters toLiveDataParameters(RecordsMacroParameters parameters,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         LiveDataRendererParameters liveDataParameters = new LiveDataRendererParameters();
-        liveDataParameters.setId(parameters.getId());
+        liveDataParameters.setId(getId(parameters, context));
         liveDataParameters.setSource(SOURCE);
         liveDataParameters.setSourceParameters(getSourceParameters(parameters));
         liveDataParameters.setProperties(getProperties(parameters));
@@ -198,6 +207,42 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         liveDataParameters.setLayouts(parameters.getLayouts());
         liveDataParameters.setDescription(parameters.getDescription());
         return liveDataParameters;
+    }
+
+    /**
+     * Returns the identifier of this table, which is always set.
+     *
+     * Live Data needs one whether or not the author supplied it. Its layout builds the element id of the table's
+     * description as {@code <id>-description} and points at it with {@code aria-describedby}, so a table without an
+     * id gets the literal id {@code undefined-description}: harmless alone, but two such tables on one page share
+     * that element id and the second is then described by the first one's text.
+     *
+     * The document's {@link IdGenerator} is used rather than a counter of our own, so a Records table takes its
+     * place among the ids the rest of the page generates — headings included — and cannot collide with them. It
+     * appends {@code -1}, {@code -2} and so on, which is what makes two tables on a page distinct whether the author
+     * named them the same thing or named neither.
+     *
+     * @param parameters the macro parameters
+     * @param context the transformation context, which carries the generator
+     * @return the authored identifier, made unique, or a generated one when the author supplied none
+     */
+    private String getId(RecordsMacroParameters parameters, MacroTransformationContext context)
+    {
+        IdGenerator idGenerator = context.getXDOM() == null ? null : context.getXDOM().getIdGenerator();
+        String authored = parameters.getId();
+        if (idGenerator == null) {
+            // Nothing to be unique against, which happens when the macro is executed outside a document.
+            return StringUtils.defaultIfBlank(authored, ID_PREFIX);
+        }
+        if (StringUtils.isBlank(authored)) {
+            return idGenerator.generateUniqueId(ID_PREFIX, "");
+        }
+        if (Character.isLetter(authored.charAt(0))) {
+            return idGenerator.adaptId(authored);
+        }
+        // adaptId takes the first character of the id as the prefix and rejects one that is not a letter, so an
+        // identifier the author started with anything else is prefixed rather than refused.
+        return idGenerator.generateUniqueId(ID_PREFIX, authored);
     }
 
     /**

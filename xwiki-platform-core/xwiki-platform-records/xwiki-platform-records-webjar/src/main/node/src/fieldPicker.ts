@@ -56,6 +56,16 @@ interface PropertyDescriptor {
    * way.
    */
   type?: string;
+  /**
+   * How the property is filtered, when the source says so.
+   */
+  filter?: {
+    /**
+     * The URL suggesting the property's values, with an `{encodedQuery}` placeholder. Reported for the properties
+     * whose values are enumerable, and used by the filter picker exactly as the Live Data filter row uses it.
+     */
+    searchURL?: string;
+  };
 }
 
 /**

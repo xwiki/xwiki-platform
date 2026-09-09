@@ -25,6 +25,16 @@ import {
   setTabsVisible,
 } from "./dialog";
 import { loadDescriptors, loadOptions } from "./fieldPicker";
+import {
+  FILTER_SEPARATOR,
+  asValues,
+  isIncomplete,
+  resolveFilterOption,
+  splitConstraint,
+  toFieldOptions,
+  toValueOptions,
+  valuesUrl,
+} from "./filterPicker";
 import { resolveSortOption, toSortOptions } from "./sortPicker";
 import type { FieldOption, JsonFetcher } from "./fieldPicker";
 
@@ -51,6 +61,11 @@ const PICKER_SELECTOR = ".suggest-records-fields";
  * The CSS class the sort displayer template marks its input with.
  */
 const SORT_SELECTOR = ".suggest-records-sort";
+
+/**
+ * The CSS class the filters displayer template marks its input with.
+ */
+const FILTERS_SELECTOR = ".suggest-records-filters";
 
 /**
  * Marks a dialog as already wired, since `xwiki:dom:updated` fires more than once per dialog.
@@ -85,6 +100,17 @@ interface PickerSettings {
   persist: boolean;
   create: boolean;
   hidePlaceholder: boolean;
+  delimiter?: string;
+  onItemAdd?: (this: Suggester, value: string) => void;
+}
+
+/**
+ * The part of the suggest widget's API this module drives.
+ */
+interface Suggester {
+  removeItem: (value: string, silent?: boolean) => void;
+  setTextboxValue: (value: string) => void;
+  refreshOptions: (triggerDropdown?: boolean) => void;
 }
 
 /**
@@ -142,6 +168,7 @@ function createSettings(
     // placeholder names the default column list, so leaving it visible would tell the author the table
     // shows the title and every field while they are looking at the columns they just picked.
     hidePlaceholder: true,
+    ...offer.settings,
   };
 }
 
@@ -159,6 +186,10 @@ interface Offer {
     value: string,
     fetchJson: JsonFetcher,
   ) => Promise<FieldOption[]>;
+  /**
+   * What this picker needs on top of the settings every picker shares.
+   */
+  settings?: Partial<PickerSettings>;
 }
 
 /**
@@ -190,6 +221,65 @@ const sortOffer: Offer = {
 };
 
 /**
+ * The filters picker: one item per `field=value` constraint.
+ *
+ * The suggestions come in two steps, because a constraint has two halves and only the author knows the first one.
+ * Until a value separator is typed the dropdown offers the fields; once one is typed, it offers that field's
+ * values when the source reports a way to suggest them, and otherwise stays out of the way so the author can type
+ * a value freely. That is also why this is the one picker accepting free text.
+ */
+const filtersOffer: Offer = {
+  load: async (element, query, fetchJson) => {
+    const descriptors = await loadDescriptors(
+      element,
+      XWiki.contextPath,
+      fetchJson,
+    );
+    const constraint = splitConstraint(query);
+    if (constraint === null) {
+      return toFieldOptions(descriptors, query);
+    }
+    const descriptor = descriptors.find(
+      (candidate) => candidate.id === constraint.field,
+    );
+    const searchURL = descriptor?.filter?.searchURL;
+    if (descriptor === undefined || searchURL === undefined) {
+      return [];
+    }
+    const values = asValues(
+      await fetchJson(
+        valuesUrl(searchURL, constraint.value, window.location.href),
+      ),
+    );
+    return toValueOptions(values, descriptor, constraint.value);
+  },
+  resolve: async (element, value, fetchJson) => [
+    resolveFilterOption(
+      await loadDescriptors(element, XWiki.contextPath, fetchJson),
+      value,
+    ),
+  ],
+  settings: {
+    // One item is one constraint, and the parameter separates them the way a query string does.
+    delimiter: FILTER_SEPARATOR,
+    // Most properties have no value suggester, so a value has to be typeable.
+    create: true,
+    // Filters apply together, so unlike columns and sort criteria their order carries no meaning.
+    plugins: ["remove_button"],
+    // Picking a field is picking half a constraint. Rather than leaving `status=` behind as an item that filters
+    // on the empty value, put it back in the text box: the author carries on with the value, and typing the
+    // separator is what brings up that field's values.
+    onItemAdd(value) {
+      if (isIncomplete(value)) {
+        this.removeItem(value, true);
+        this.setTextboxValue(value);
+        this.refreshOptions(true);
+      }
+    },
+  },
+};
+
+/**
  * Fetches and parses a JSON document.
  *
  * @param url - the URL to fetch
@@ -206,6 +296,33 @@ async function fetchJson(url: string): Promise<unknown> {
 }
 
 /**
+ * Enhances the three pickers of one dialog.
+ *
+ * They differ only in what they offer, which is what {@link Offer} carries: the settings they share — the widget,
+ * the failure handling, the placeholder behaviour — are built once in {@link createSettings}.
+ *
+ * @param $ - the page's jQuery instance
+ * @param picker - the columns picker element
+ * @param scope - the dialog's form
+ */
+function enhancePickers(
+  $: JQueryStatic,
+  picker: Element,
+  scope: ParentNode,
+): void {
+  $(picker).xwikiSelectize(createSettings(picker, fetchJson));
+  const others: [string, Offer][] = [
+    [SORT_SELECTOR, sortOffer],
+    [FILTERS_SELECTOR, filtersOffer],
+  ];
+  others.forEach(([selector, offer]) => {
+    scope.querySelectorAll(selector).forEach((element) => {
+      $(element).xwikiSelectize(createSettings(element, fetchJson, offer));
+    });
+  });
+}
+
+/**
  * Wires one Records dialog.
  *
  * The columns picker is what identifies the dialog as a Records one, and it is also where the data type is
@@ -215,14 +332,10 @@ async function fetchJson(url: string): Promise<unknown> {
  * @param picker - the columns picker element
  */
 function wire($: JQueryStatic, picker: Element): void {
-  const $picker = $(picker);
   const scope = findScope(picker);
   const dataTypeInput = findDataTypeInput(scope);
 
-  $picker.xwikiSelectize(createSettings(picker, fetchJson));
-  scope.querySelectorAll(SORT_SELECTOR).forEach((sort) => {
-    $(sort).xwikiSelectize(createSettings(sort, fetchJson, sortOffer));
-  });
+  enhancePickers($, picker, scope);
 
   // The tabs are all derived from the data type, so there is nothing to show until one is picked.
   setTabsVisible(scope, dataTypeInput !== null && dataTypeInput.value !== "");

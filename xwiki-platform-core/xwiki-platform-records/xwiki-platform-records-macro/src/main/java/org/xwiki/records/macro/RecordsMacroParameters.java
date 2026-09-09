@@ -64,10 +64,10 @@ import org.xwiki.stability.Unstable;
  * authored by someone without script right and get the link displayers sanitized away.
  * <p>
  * The display types are what select the parameter widgets. {@link RecordsDataType} names the XClass picker of the
- * object and class editors, {@link RecordsColumns} names this module's own field picker, {@link RecordsSort} its
- * sort picker and {@link RecordsLayouts} its layout radio group; all four resolve to a template under
- * {@code templates/html_displayer}. Everything else relies on the displayer the Java type already has: a
- * {@link String} renders a text input.
+ * object and class editors, {@link RecordsColumns} names this module's own field picker, {@link RecordsFilters}
+ * its filter picker, {@link RecordsSort} its sort picker and {@link RecordsLayouts} its layout radio group; all
+ * five resolve to a template under {@code templates/html_displayer}. Everything else relies on the displayer the
+ * Java type already has: a {@link String} renders a text input.
  *
  * @version $Id$
  * @since 18.8.0RC1
@@ -145,9 +145,10 @@ public class RecordsMacroParameters
     /**
      * @param filters the filters applied before readers see the table
      */
+    @PropertyDisplayType(RecordsFilters.class)
     @PropertyName("Filters")
-    @PropertyDescription("Filters applied before readers see the table, as a query string, for example "
-        + "status=Active&client=Acme. The operator is the one the field's type defines.")
+    @PropertyDescription("Filters applied before readers see the table. The operator is the one the field's type "
+        + "defines.")
     @PropertyGroup("filterSort")
     @PropertyOrder(3)
     public void setFilters(String filters)

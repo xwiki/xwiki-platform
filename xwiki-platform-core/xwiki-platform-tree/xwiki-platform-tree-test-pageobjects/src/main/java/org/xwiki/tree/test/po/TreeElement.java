@@ -53,6 +53,19 @@ public class TreeElement extends BaseElement
     }
 
     /**
+     * Reconstructs an anchor's rendered id from its node id.
+     *
+     * @param nodeId the node identifier
+     * @return the corresponding anchor DOM id
+     */
+    private String getRenderedAnchorId(String nodeId)
+    {
+        String prefix = this.element.getAttribute(ATTRIBUTE_ID);
+        String anchorId = nodeId + "_anchor";
+        return (prefix == null || prefix.isEmpty()) ? anchorId : (prefix + "-" + anchorId);
+    }
+
+    /**
      * @param nodeId the node identifier
      * @return the node with the specified identifier
      */
@@ -133,7 +146,7 @@ public class TreeElement extends BaseElement
     public TreeElement waitForNodeSelected(String nodeId)
     {
         String selectedNodeXPath =
-            String.format(".//*[@id = '%s_anchor' and contains(@class, 'jstree-clicked')]", nodeId);
+            String.format(".//*[@id = '%s' and contains(@class, 'jstree-clicked')]", getRenderedAnchorId(nodeId));
         getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));
         return this;
     }
@@ -190,6 +203,16 @@ public class TreeElement extends BaseElement
     }
 
     /**
+     * @return the DOM ids of the labels of the loaded nodes, in document order
+     * @since 18.8.0RC1
+     */
+    public List<String> getNodeLabelIds()
+    {
+        return getDriver().findElementsWithoutWaiting(this.element, By.cssSelector(".jstree-anchor")).stream()
+            .map(label -> label.getAttribute(ATTRIBUTE_ID)).toList();
+    }
+
+    /**
      * @return the list of top level nodes
      */
     public List<TreeNodeElement> getTopLevelNodes()
@@ -197,7 +220,7 @@ public class TreeElement extends BaseElement
         return getDriver()
             .findElementsWithoutWaiting(this.element,
                 By.cssSelector(".jstree-container-ul > .jstree-node:not(.jstree-hidden)"))
-            .stream().map(nodeElement -> By.id(nodeElement.getAttribute("id")))
+            .stream().map(nodeElement -> By.id(nodeElement.getAttribute(ATTRIBUTE_ID)))
             .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).toList();
     }
 }

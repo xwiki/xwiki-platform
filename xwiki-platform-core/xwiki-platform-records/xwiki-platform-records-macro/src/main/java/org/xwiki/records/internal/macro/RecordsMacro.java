@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -107,6 +108,11 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
      * The identifier prefix of the Live Data pseudo-columns, which are rendering affordances rather than data.
      */
     private static final String INTERNAL_PREFIX = "_";
+
+    /**
+     * The column identifying the entry, which the default column list opens with.
+     */
+    private static final String TITLE_PROPERTY = "doc.title";
 
     private static final String DESCRIPTION =
         "Displays a collection of entries of the same data type, as a table readers can sort and filter.";
@@ -197,13 +203,17 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
     /**
      * Returns the columns to display.
      *
-     * An author who has not chosen any expects to see the data type's own fields, which is what the parameter's
-     * default says. That default has to be resolved here rather than left to Live Data: the {@code liveTable}
-     * source needs an explicit column list, and an absent one yields a table with no columns at all rather than
-     * one with every column. The {@code documents} macro assembles its list for the same reason.
+     * The default has to be resolved here rather than left to Live Data: the {@code liveTable} source needs an
+     * explicit column list, and an absent one yields a table with no columns at all rather than one with every
+     * column. The {@code documents} macro assembles its list for the same reason.
+     *
+     * It opens with the entry's title. A table of nothing but field values gives a reader no way to tell one entry
+     * from another, and no way to reach the page an entry lives in; the title column is what makes the rest of the
+     * row mean something. An author who wants the fields alone can say so, since naming any column replaces this
+     * list entirely.
      *
      * @param parameters the macro parameters
-     * @return the columns the author chose, or every field of the data type when they chose none
+     * @return the columns the author chose, or the entry title followed by every field of the data type
      * @throws MacroExecutionException when the data type's fields cannot be read
      */
     private String getProperties(RecordsMacroParameters parameters) throws MacroExecutionException
@@ -211,16 +221,17 @@ public class RecordsMacro extends AbstractMacro<RecordsMacroParameters>
         if (StringUtils.isNotBlank(parameters.getProperties())) {
             return parameters.getProperties();
         }
-        return getFields(this.entityReferenceSerializer.serialize(parameters.getDataType())).stream()
+        String dataType = this.entityReferenceSerializer.serialize(parameters.getDataType());
+        return Stream.concat(Stream.of(TITLE_PROPERTY), getFields(dataType).stream())
             .collect(Collectors.joining(","));
     }
 
     /**
      * Reads the field identifiers of a data type, in the order the data type declares them.
      *
-     * The entry metadata is left out: the property store reports it alongside the fields, but a default built from
-     * the data type is about the data type, and the author can add any {@code doc.*} column themselves. The Live
-     * Data pseudo-columns are left out because they are affordances rather than data.
+     * The entry metadata is left out here: the property store reports it alongside the fields, and the only piece
+     * of it the default wants is the title, which {@link #getProperties} adds itself. The Live Data pseudo-columns
+     * are left out because they are affordances rather than data.
      *
      * @param dataType the serialized reference of the data type
      * @return its field identifiers

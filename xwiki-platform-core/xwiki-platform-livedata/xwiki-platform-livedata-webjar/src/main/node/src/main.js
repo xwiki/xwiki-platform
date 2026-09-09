@@ -23,15 +23,25 @@
 // fetched by the module loader of the web browser. The entries are fetched asynchronously as well. We thus have to
 // delay the page ready ourselves until the Live Data is displayed, otherwise the page can be marked as ready too
 // early (e.g. the PDF export would print an empty Live Data).
-require(["jquery", "xwiki-page-ready"], ($, pageReady) => {
+// The RequireJS require function is read from the global object rather than used as a free variable, so that this
+// module can be loaded outside of a RequireJS environment (e.g. by the unit tests).
+globalThis.require(["jquery", "xwiki-page-ready"], ($, pageReady) => {
   $.fn.liveData = function(config) {
     return this.each(function() {
-      if (!$(this).data("liveData")) {
-        const instanceConfig = $.extend($(this).data("config"), config);
-        pageReady.delayPageReady(import("./services/init.js").then(({init}) => {
+      const elementConfig = $(this).data("config");
+      // An element that carries no configuration is a live data that is already displayed: displaying it consumes the
+      // configuration. The editor puts such an element back in the page when it moves the content it edits into its
+      // editable area, and displaying it a second time would replace the table by an empty element.
+      if (!$(this).data("liveData") && (elementConfig || config)) {
+        const instanceConfig = $.extend({}, elementConfig, config);
+        const displayed = import("./services/init.js").then(({init}) => {
           $(this).attr("data-config", JSON.stringify(instanceConfig));
           return init(this, $);
-        }), "livedata:display");
+        });
+        // Mark the element as displayed synchronously, before the asynchronous initialization completes: this method
+        // is called again for every xwiki:dom:updated event and displaying the same element twice destroys it.
+        $(this).data("liveData", displayed);
+        pageReady.delayPageReady(displayed, "livedata:display");
       }
     });
   };

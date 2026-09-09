@@ -41,9 +41,11 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.records.macro.RecordsMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -57,6 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -105,6 +108,8 @@ class RecordsMacroTest
     void beforeEach() throws Exception
     {
         this.context = new MacroTransformationContext(new TransformationContext());
+        // The document's generator: shared by every id the page builds, headings included.
+        this.context.setXDOM(new XDOM(List.of(), new IdGenerator()));
         when(this.entityReferenceSerializer.serialize(DATA_TYPE)).thenReturn(SERIALIZED_DATA_TYPE);
         when(this.liveDataSourceManager.get(any(Source.class))).thenReturn(Optional.of(this.liveDataSource));
         when(this.liveDataSource.getProperties()).thenReturn(this.propertyStore);
@@ -244,15 +249,80 @@ class RecordsMacroTest
     }
 
     @Test
+    void executeGeneratesAnIdentifierWhenTheAuthorSuppliedNone() throws Exception
+    {
+        // Live Data builds the table description's element id from it, so an absent one is not an option.
+        assertEquals("records", execute(newParameters()).getId());
+    }
+
+    @Test
+    void executeSuffixesTheGeneratedIdentifierOfEveryFurtherTableOnThePage() throws Exception
+    {
+        assertEquals("records", executeOn(this.context, newParameters()).getId());
+        assertEquals("records-1", executeOn(this.context, newParameters()).getId());
+        assertEquals("records-2", executeOn(this.context, newParameters()).getId());
+    }
+
+    @Test
+    void executeKeepsAnAuthoredIdentifierThatIsAlreadyUnique() throws Exception
+    {
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setId("projects");
+
+        assertEquals("projects", execute(parameters).getId());
+    }
+
+    @Test
+    void executeSuffixesAnAuthoredIdentifierAnotherTableAlreadyUses() throws Exception
+    {
+        RecordsMacroParameters first = newParameters();
+        first.setId("projects");
+        RecordsMacroParameters second = newParameters();
+        second.setId("projects");
+
+        assertEquals("projects", executeOn(this.context, first).getId());
+        assertEquals("projects-1", executeOn(this.context, second).getId());
+    }
+
+    @Test
+    void executeIsNotConfusedByAnIdentifierStartingWithADigit() throws Exception
+    {
+        // The generator takes the first character of an id as its prefix and rejects a non-letter, so this would
+        // otherwise fail rather than render.
+        RecordsMacroParameters parameters = newParameters();
+        parameters.setId("2026projects");
+
+        assertEquals("records2026projects", execute(parameters).getId());
+    }
+
+    @Test
+    void executeDoesNotCollideWithAnIdentifierThePageAlreadyUsed() throws Exception
+    {
+        // A heading rendered before the macro takes its id from the same generator.
+        this.context.getXDOM().getIdGenerator().generateUniqueId("records", "");
+
+        assertEquals("records-1", execute(newParameters()).getId());
+    }
+
+    @Test
+    void executeCopesWithNoDocumentToBeUniqueAgainst() throws Exception
+    {
+        // A macro executed outside a document has no XDOM, and must still hand Live Data an id.
+        MacroTransformationContext bare = new MacroTransformationContext(new TransformationContext());
+
+        assertEquals("records", executeOn(bare, newParameters()).getId());
+    }
+
+    @Test
     void executeLeavesTheParametersLiveDataDefaultsAlone() throws Exception
     {
         // The macro must not invent values for what the author left empty, otherwise a Records table and a liveData
-        // macro with the same parameters would not behave the same way.
+        // macro with the same parameters would not behave the same way. The identifier is the exception, and has
+        // its own tests: Live Data needs one whether the author supplied it or not.
         LiveDataRendererParameters liveDataParameters = execute(newParameters());
 
         assertNull(liveDataParameters.getFilters());
         assertNull(liveDataParameters.getSort());
-        assertNull(liveDataParameters.getId());
         assertNull(liveDataParameters.getDescription());
         assertNull(liveDataParameters.getOffset());
     }
@@ -282,7 +352,9 @@ class RecordsMacroTest
         TransformationContext transformationContext = new TransformationContext();
         transformationContext.setRestricted(true);
 
-        this.macro.execute(newParameters(), null, new MacroTransformationContext(transformationContext));
+        MacroTransformationContext restrictedContext = new MacroTransformationContext(transformationContext);
+        restrictedContext.setXDOM(new XDOM(List.of(), new IdGenerator()));
+        this.macro.execute(newParameters(), null, restrictedContext);
 
         verify(this.liveDataRenderer).execute(any(LiveDataRendererParameters.class), eq((String) null), eq(true));
     }
@@ -349,11 +421,27 @@ class RecordsMacroTest
      */
     private LiveDataRendererParameters execute(RecordsMacroParameters parameters) throws Exception
     {
-        this.macro.execute(parameters, null, this.context);
+        return executeOn(this.context, parameters);
+    }
+
+    /**
+     * Executes the macro in a given context and captures what it handed to the renderer.
+     *
+     * Several tests execute the macro more than once in the same context, to exercise what a page holding more than
+     * one table produces, so the captured value is the last one.
+     *
+     * @param context the transformation context to execute in
+     * @param parameters the macro parameters
+     * @return the Live Data parameters the macro built
+     */
+    private LiveDataRendererParameters executeOn(MacroTransformationContext context,
+        RecordsMacroParameters parameters) throws Exception
+    {
+        this.macro.execute(parameters, null, context);
 
         ArgumentCaptor<LiveDataRendererParameters> captor =
             ArgumentCaptor.forClass(LiveDataRendererParameters.class);
-        verify(this.liveDataRenderer).execute(captor.capture(), eq((String) null), anyBoolean());
+        verify(this.liveDataRenderer, atLeastOnce()).execute(captor.capture(), eq((String) null), anyBoolean());
         return captor.getValue();
     }
 }

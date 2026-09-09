@@ -176,7 +176,7 @@ class UIExtensionRendererTest
     }
 
     @Test
-    void renderRestoresThePreviousTargetSyntaxWhenRenderingFails() throws Exception
+    void renderRestoresThePreviousTargetSyntaxWhenRenderingFails()
     {
         pushTargetSyntax(Syntax.HTML_5_0);
 
@@ -210,7 +210,7 @@ class UIExtensionRendererTest
     }
 
     @Test
-    void renderWhenNoRendererForTheOutputSyntax() throws Exception
+    void renderWhenNoRendererForTheOutputSyntax()
     {
         RenderingException exception = assertThrows(RenderingException.class,
             () -> this.renderer.render(List.of(), Syntax.ANNOTATED_HTML_5_0, false));

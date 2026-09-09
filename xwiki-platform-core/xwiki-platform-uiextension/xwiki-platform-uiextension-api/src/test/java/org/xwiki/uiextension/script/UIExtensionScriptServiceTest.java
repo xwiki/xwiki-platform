@@ -142,7 +142,7 @@ class UIExtensionScriptServiceTest
     }
 
     @Test
-    void renderWhenNullExtension() throws Exception
+    void renderWhenNullExtension()
     {
         assertNull(this.uiExtensionScriptService.render(null, Syntax.HTML_5_0));
 
@@ -151,7 +151,7 @@ class UIExtensionScriptServiceTest
     }
 
     @Test
-    void renderWhenNullOutputSyntax() throws Exception
+    void renderWhenNullOutputSyntax()
     {
         assertNull(this.uiExtensionScriptService.render(mock(UIExtension.class), null));
 
@@ -199,7 +199,7 @@ class UIExtensionScriptServiceTest
     }
 
     @Test
-    void renderExtensionsWhenNullOutputSyntax() throws Exception
+    void renderExtensionsWhenNullOutputSyntax()
     {
         assertNull(this.uiExtensionScriptService.renderExtensions("epId", null));
 

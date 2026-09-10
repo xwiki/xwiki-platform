@@ -386,7 +386,7 @@ public class Utils
                 InputStream fileis = null;
                 try {
                     fileis = item.getInputStream();
-                    fileis.read(data);
+                    IOUtils.readFully(fileis, data);
                 } catch (IOException e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                         XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION,

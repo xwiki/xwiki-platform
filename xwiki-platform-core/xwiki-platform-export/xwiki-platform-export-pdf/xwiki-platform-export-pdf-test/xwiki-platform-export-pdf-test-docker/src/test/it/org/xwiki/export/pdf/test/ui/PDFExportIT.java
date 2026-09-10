@@ -44,7 +44,10 @@ import org.xwiki.export.pdf.test.po.PDFExportOptionsModal;
 import org.xwiki.export.pdf.test.po.PDFImage;
 import org.xwiki.export.pdf.test.po.PDFTemplateEditPage;
 import org.xwiki.flamingo.skin.test.po.ExportTreeModal;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
@@ -771,7 +774,7 @@ class PDFExportIT
         // Change the state of the Live Table in order to verify that the PDF export preserves it.
         LiveTableElement liveTable = new LiveTableElement("docs");
         liveTable.sortDescending("Date");
-        liveTable.filterColumn("xwiki-livetable-docs-filter-2", "live");
+        liveTable.filterColumn("xwiki-livetable-docs-filter-2", "livetable");
 
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
 
@@ -784,7 +787,7 @@ class PDFExportIT
             assertTrue(content.contains("""
                 Results 1 - 2 out of 2 per page of 15
                 Page Location Date Last Author Actions
-                live
+                livetable
                 """), "Unexpected content: " + content);
             // Verify the results and the order.
             // Depending on the screen width the text from the live table cells might be wrapped on multiple lines,
@@ -1736,6 +1739,70 @@ class PDFExportIT
             // Make sure we're actually testing a table of contents that is split between print pages.
             assertTrue(tocPageCount > 1, "The table of contents is not split between print pages.");
             assertEquals(expectedAnchors, actualAnchors);
+        }
+    }
+
+    @Test
+    @Order(37)
+    void liveData(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // The page name is used both as the page title and as the value of the Location filter below, so that the live
+        // data lists only the pages created by this test.
+        String pageName = testReference.getLastSpaceReference().getName();
+        setup.createPage(testReference, """
+            {{liveData
+              id="docs"
+              properties="doc.title,doc.location,doc.date,doc.author"
+              source="liveTable"
+              sourceParameters="translationPrefix=platform.index."
+              pageSizes="1,15,25"
+            /}}""", pageName);
+        // Create a child page after the parent because we want to verify that the PDF export preserves the live data
+        // state (we sort by last modification date and show a single entry per page, so only the child page should be
+        // exported).
+        DocumentReference childReference = new DocumentReference("Child", testReference.getLastSpaceReference());
+        setup.createPage(childReference, "", "Child");
+
+        ViewPage viewPage = setup.gotoPage(testReference);
+
+        // Change the state of the live data in order to verify that the PDF export preserves it.
+        LiveDataElement liveData = new LiveDataElement("docs");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilReady();
+        // Keep only the pages from the space used by this test.
+        tableLayout.filterColumn("Location", pageName);
+        tableLayout.waitUntilRowCountEqualsTo(2);
+        // Sort by date, descending, so that the child page comes first. The first click sorts ascending, replacing the
+        // default sort (by title, ascending), while the second click reverses the order.
+        tableLayout.sortBy("Date");
+        tableLayout.sortBy("Date");
+        // Show a single entry per page.
+        liveData.setPagination(1);
+        tableLayout.waitUntilRowCountEqualsTo(1);
+        assertEquals("Child", tableLayout.getCell("Title", 1).getText());
+
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+
+        try (PDFDocument pdf = export(exportOptions)) {
+            // We should have 2 pages: cover page and content page.
+            assertEquals(2, pdf.getNumberOfPages());
+
+            String content = pdf.getTextFromPage(1);
+            // Depending on the screen width the text from the live data cells might be wrapped on multiple lines,
+            // which translates to new lines in the PDF text as well. For this reason we need to do the lookup ignoring
+            // line endings. Moreover, we normally get a space character between the text from two adjacent cells, but
+            // even this is not always consistent, so we need to ignore spaces also.
+            String contentWithoutWhitespace = content.replaceAll("\\s+", "");
+            // Verify the column headers.
+            assertTrue(contentWithoutWhitespace.contains("TitleLocationDateLastAuthor"),
+                "Unexpected content: " + content);
+            // Verify that the entries were actually fetched (2 pages match the filter) and that the page size was
+            // preserved (a single entry is displayed).
+            assertTrue(contentWithoutWhitespace.contains("Entries1-1outof2"), "Unexpected content: " + content);
+            // The displayed entry should be the child page, because we sorted by date descending.
+            String childLocation = setup.serializeLocalReference(childReference).replace(".", "");
+            assertTrue(contentWithoutWhitespace.contains(/* Title */ "Child" + /* Location */ childLocation),
+                "Unexpected content: " + content);
         }
     }
 

@@ -86,6 +86,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AbstractLocalizedEntityReference;
 import org.xwiki.model.reference.AttachmentReference;
@@ -3087,7 +3088,7 @@ public class TestUtils
         public void savePageAs(UsernamePasswordCredentials credentials, EntityReference reference, String content,
             String syntaxId, String title, String parentFullPageName, boolean isHidden) throws Exception
         {
-            runAs(credentials.getUserName(), credentials.getPassword(),
+            runAs(new XWikiCredentials(credentials.getUserName(), credentials.getPassword()),
                 rest -> rest.savePage(reference, content, syntaxId, title, parentFullPageName, isHidden));
         }
 
@@ -3096,19 +3097,18 @@ public class TestUtils
          * afterward. Only the credentials of the REST client are changed: the user the browser is logged in as, if
          * any, is left untouched.
          *
-         * @param username the login of the user to perform the actions as
-         * @param password the password of the user to perform the actions as
+         * @param credentials the credentials of the user to perform the actions as
          * @param actions the actions to perform
          * @throws Exception if an error occurs while performing the actions
          * @since 18.8.0RC1
          */
-        public void runAs(String username, String password, RestActions actions) throws Exception
+        public void runAs(XWikiCredentials credentials, RestActions actions) throws Exception
         {
             // Remember the current credentials
             UsernamePasswordCredentials currentCredentials = this.testUtils.getDefaultCredentials();
 
             try {
-                this.testUtils.setDefaultCredentials(username, password);
+                this.testUtils.setDefaultCredentials(credentials.getUserName(), credentials.getPassword());
 
                 actions.run(this);
             } finally {

@@ -369,7 +369,10 @@
       setup: function(data) {
         let resourceReference = data.resourceReference;
         if (!resourceReference) {
-          // We're probably creating a new link so there's no resource to preselect.
+          // We're creating a new link so there's no resource to preselect yet: preselect the page that would be
+          // created from the default link label, so that we don't create a link with an empty target when the dialog
+          // is validated without touching this field.
+          this.preselectNewResource(this.getDefaultLinkLabel());
           return;
         } else if (resourceReference.type === 'space' && this.resourceTypes.indexOf('space') < 0 &&
             this.resourceTypes.indexOf('doc') >= 0) {
@@ -424,6 +427,14 @@
         });
         dialog.getContentElement('info', 'optionsToggle').sync();
         dialog.layout();
+      },
+      /**
+       * @return the text selected in the rich text area, which is used as the default link label, with the white space
+       *   normalized, or an empty string when there's no text selection (e.g. when an image is selected)
+       */
+      getDefaultLinkLabel: function() {
+        const linkLabel = this.getDialog().getParentEditor().getSelection().getSelectedText() || '';
+        return linkLabel.trim().replace(/\s+/g, ' ');
       }
     });
   };

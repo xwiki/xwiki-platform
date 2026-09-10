@@ -23,6 +23,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.LinkDialog;
@@ -35,6 +36,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -138,7 +140,7 @@ class LinkIT extends AbstractCKEditorIT
     @Order(3)
     void createLinkForNotExistingPage(TestUtils setup, TestReference testReference)
     {
-        setup.createPage(testReference, "", "createLinkForNotExistingPage");
+        setup.createPage(testReference, "", "");
         edit(setup, testReference, false);
         editor.getToolBar()
             .insertOrEditLink()
@@ -183,7 +185,7 @@ class LinkIT extends AbstractCKEditorIT
         SpaceReference targetSpaceReference = new SpaceReference("My Test Page", testReference.getLastSpaceReference());
         DocumentReference targetReference = new DocumentReference("WebHome", targetSpaceReference);
         setup.createPage(targetReference, "", "My Test Page");
-        setup.createPage(testReference, "", "createLinkToExistingPageUsingItsFullReference");
+        setup.createPage(testReference, "", "");
         // The link suggester relies on Solr, so wait for the target page to be indexed.
         waitForSolrIndexing(setup);
 
@@ -195,5 +197,121 @@ class LinkIT extends AbstractCKEditorIT
 
         // Verify that the content matches what we did using CKEditor.
         assertSourceEquals("[[My Test Page>>doc:.My Test Page.WebHome]]");
+    }
+
+    @Test
+    @Order(5)
+    void createLinkToNewPageFromSelectedText(TestUtils setup, TestReference testReference)
+    {
+        setup.createPage(testReference, "", "");
+        edit(setup, testReference, false);
+
+        // The dot is important: the selected text must be used as a page name and not as a page reference, although
+        // the test user is an advanced user, that also gets the "Create with exact reference..." suggestion.
+        this.textArea.sendKeys("Version 1.2", Keys.chord(Keys.SHIFT, Keys.HOME));
+        assertEquals("Version 1.2", this.textArea.getSelectedText());
+
+        LinkDialog linkDialog = this.editor.getToolBar().insertOrEditLink();
+        // The page that would be created from the selected text is preselected, so that validating the dialog without
+        // touching the link target doesn't create a link with an empty target.
+        linkDialog.waitForSelectedResource("doc:.Version 1\\.2.WebHome");
+        // Preselecting the link target must not overwrite the link label.
+        assertEquals("Version 1.2", linkDialog.getDisplayText());
+        linkDialog.submit();
+
+        assertSourceEquals("[[Version 1.2>>doc:.Version 1\\.2.WebHome]]");
+    }
+
+    @Test
+    @Order(6)
+    void updateLinkTargetingCurrentPage(TestUtils setup, TestReference testReference)
+    {
+        // A link with an empty target points to the current page. Such a link can be written in wiki syntax, so it
+        // must remain editable from the link dialog, without having to select a link target.
+        setup.createPage(testReference, "[[label>>]]", "");
+        edit(setup, testReference, false);
+
+        // Put the caret inside the link, in order to edit it.
+        this.textArea.click(By.cssSelector("a"));
+        LinkDialog linkDialog = this.editor.getToolBar().insertOrEditLink();
+        // The current page is preselected for a link with an empty target.
+        linkDialog.waitForSelectedResource("doc:");
+        linkDialog.submit();
+
+        // The link target is normalized, but it stays empty.
+        assertSourceEquals("[[label>>doc:]]");
+    }
+
+    @Test
+    @Order(7)
+    void rejectLinkWithoutTarget(TestUtils setup, TestReference testReference)
+    {
+        setup.createPage(testReference, "", "");
+        edit(setup, testReference, false);
+
+        // There's no text selected in the rich text area, so there's no link label to compute the link target from.
+        // The dialog must not be validated with an empty link target that was not explicitly selected, otherwise the
+        // user ends up with a link to the current page without noticing.
+        LinkDialog linkDialog = this.editor.getToolBar().insertOrEditLink();
+        assertEquals("Please select a value for the link location.", linkDialog.submitExpectingValidationFailure());
+
+        // Closing the dialog asks for confirmation because the link label was filled in automatically while the
+        // dialog was being validated.
+        setup.getDriver().makeConfirmDialogSilent(true);
+        linkDialog.cancel();
+
+        assertSourceEquals("");
+    }
+
+    @Test
+    @Order(8)
+    void createLinkWithoutTargetButWithParameters(TestUtils setup, TestReference testReference)
+    {
+        setup.createPage(testReference, "", "");
+        edit(setup, testReference, false);
+
+        // There's no text selected, so the link target is left empty, which means the current page. This is accepted
+        // because the link has an anchor.
+        LinkDialog linkDialog = this.editor.getToolBar().insertOrEditLink();
+        linkDialog.setDisplayText("Anchor link").expandOptions().setAnchor("Section");
+        linkDialog.submit();
+
+        this.editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER);
+
+        // Same with a query string instead of an anchor. Note that the link options keep their value from the
+        // previous link, because the link dialog is reused, so the anchor has to be cleared explicitly.
+        linkDialog = this.editor.getToolBar().insertOrEditLink();
+        linkDialog.setDisplayText("Query string link").expandOptions().setAnchor("").setQueryString("a=b");
+        linkDialog.submit();
+
+        assertSourceEquals("""
+            [[Anchor link>>||anchor="Section"]]
+
+            [[Query string link>>||queryString="a=b"]]""");
+    }
+
+    @Test
+    @Order(9)
+    void createLinkAfterChangingResourceType(TestUtils setup, TestReference testReference)
+    {
+        setup.createPage(testReference, "", "");
+        edit(setup, testReference, false);
+
+        // Select a resource type without selecting a resource. The link dialog is reused, so it keeps the selected
+        // resource type the next time it is opened.
+        LinkDialog linkDialog = this.editor.getToolBar().insertOrEditLink();
+        linkDialog.setResourceType("url");
+        linkDialog.cancel();
+
+        this.textArea.sendKeys("Foo", Keys.chord(Keys.SHIFT, Keys.HOME));
+        assertEquals("Foo", this.textArea.getSelectedText());
+
+        // Creating a new link targets the page that would be created from the selected text, so the resource type
+        // goes back to the first type supported by the link dialog, which is the document resource type.
+        linkDialog = this.editor.getToolBar().insertOrEditLink();
+        linkDialog.waitForSelectedResource("doc:.Foo.WebHome");
+        linkDialog.submit();
+
+        assertSourceEquals("[[Foo>>doc:.Foo.WebHome]]");
     }
 }

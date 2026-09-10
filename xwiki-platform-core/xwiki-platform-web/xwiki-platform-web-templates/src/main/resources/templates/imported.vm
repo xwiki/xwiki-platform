@@ -27,7 +27,7 @@
 #end
 #macro(_showFileList $contextKey $text)
   #_getImportedDocuments($contextKey)
-  #if($importedDocuments.size()>0)
+  #if($importedDocuments.size() > 0)
     <h4 class="legend">
       $escapetool.xml($services.localization.render("import_listof${text}files"))
     </h4>

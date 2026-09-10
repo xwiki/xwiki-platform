@@ -3152,6 +3152,33 @@ public class TestUtils
         }
 
         /**
+         * Add a new object to an existing or new page using the provided credentials and restore the previous
+         * credentials afterward.
+         *
+         * @param credentials the credentials to use to add the object
+         * @param documentReference the document where to add the object
+         * @param className the class name of the object to add
+         * @param properties the properties of the object to add (name1, value1, name2, value2, ...)
+         * @throws Exception if an error occurs while adding the object
+         * @since 18.8.0RC1
+         */
+        public void addObjectAs(UsernamePasswordCredentials credentials, EntityReference documentReference,
+            String className, Object... properties) throws Exception
+        {
+            // Remember the current credentials
+            UsernamePasswordCredentials currentCredentials = this.testUtils.getDefaultCredentials();
+
+            try {
+                this.testUtils.setDefaultCredentials(credentials);
+
+                addObject(documentReference, className, properties);
+            } finally {
+                // Restore initial credentials
+                this.testUtils.setDefaultCredentials(currentCredentials);
+            }
+        }
+
+        /**
          * Fail if the object does not exist.
          */
         public void update(org.xwiki.rest.model.jaxb.Object obj) throws Exception

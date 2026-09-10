@@ -19,13 +19,13 @@
  */
 package org.xwiki.mentions.test.ui;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.xwiki.mentions.test.po.MentionNotificationPage;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -53,7 +53,7 @@ import static org.xwiki.platform.notifications.test.po.NotificationsTrayPage.wai
         // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
         // manually. See https://jira.xwiki.org/browse/XWIKI-21594
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
-        // Required to ensure that the notifications rest endpoints are registered before XWikiJaxRsApplication is 
+        // Required to ensure that the notifications rest endpoints are registered before XWikiJaxRsApplication is
         // initialized.
         "org.xwiki.platform:xwiki-platform-notifications-rest"
     },
@@ -67,25 +67,42 @@ class MentionsIT
 
     private static final String U3_USERNAME = "U3";
 
+    private static final String U4_USERNAME = "U4";
+
     private static final String USERS_PWD = "password";
 
-    /**
-     * A duplicate of {@link Runnable} which allows to throw checked {@link Exception}.
-     * @see  Runnable
-     * @see <a href="https://www.baeldung.com/java-lambda-exceptions">Baeldung's Exceptions in Java 8 Lambda Expressions</a>.
-     */
-    @FunctionalInterface
-    private interface RunnableErr
+    private static final UsernamePasswordCredentials U1_CREDENTIALS =
+        new UsernamePasswordCredentials(U1_USERNAME, USERS_PWD);
+
+    private static final UsernamePasswordCredentials U3_CREDENTIALS =
+        new UsernamePasswordCredentials(U3_USERNAME, USERS_PWD);
+
+    private static final String MENTION_NOTIFICATION_CONTENT = "You have received one mention.";
+
+    @BeforeAll
+    static void beforeAll(TestUtils setup) throws Exception
     {
-        void run() throws Exception;
+        // Each test mentions a user of its own, so that the notifications received by one test can't be seen by
+        // another one and the tests don't have to clear them.
+        for (String username : new String[] { U1_USERNAME, U2_USERNAME, U3_USERNAME, U4_USERNAME }) {
+            createUser(setup, username);
+        }
     }
 
     /**
-     *
+     * Create a user over REST, as superadmin, without going through the browser.
+     */
+    private static void createUser(TestUtils setup, String username) throws Exception
+    {
+        // The password is hashed by the class' password property when it is set, so the user can log in with it.
+        setup.rest().addObject(new LocalDocumentReference("XWiki", username), "XWiki.XWikiUsers",
+            "password", USERS_PWD, "active", "1");
+    }
+
+    /**
      * <ul>
-     *     <li>Superadmin creates U1 and U2.</li>
-     *     <li>U1 adds a mention to U2.</li>
-     *     <li>U2 verify that she has received a notification.</li>
+     *     <li>U1 mentions U2 in the content of a page.</li>
+     *     <li>U2 verifies that she has received a notification.</li>
      * </ul>
      *
      * @param setup The test setup.
@@ -97,50 +114,30 @@ class MentionsIT
     void documentBody(TestUtils setup, TestReference reference) throws Exception
     {
         String pageName = "Mention Test Page";
-        runAsSuperAdmin(setup, () -> {
-            // create the users.
-            setup.createUser(U1_USERNAME, USERS_PWD, null);
-            setup.createUser(U2_USERNAME, USERS_PWD, null);
-        });
+        setup.rest().delete(reference);
+        setup.rest().savePageAs(U1_CREDENTIALS, reference,
+            "<strong>Quote</strong> "
+                + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-1\" /}}",
+            pageName);
 
-        runAsUser(setup, U1_USERNAME, USERS_PWD, () -> {
-            setup.deletePage(reference);
-            setup.createPage(reference,
-                "<strong>Quote</strong> "
-                    + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-1\" /}}",
-                pageName);
-        });
-
-        runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
-            setup.gotoPage("Main", "WebHome");
-            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
-            // check that a notif is well received
-            NotificationsTrayPage tray = new NotificationsTrayPage();
-            tray.showNotificationTray();
-            assertEquals(1, tray.getNotificationsCount());
-            assertEquals(1, tray.getUnreadNotificationsCount());
-            assertEquals("mentions.mention", tray.getNotificationType(0));
-            String notificationContent = tray.getNotificationContent(0);
-            String expected = "You have received one mention.";
-            assertTrue(notificationContent.contains(expected),
-                String.format("Notification content should contain [%s] but is [%s].", expected, notificationContent));
-            final WebElement rootElement = tray.getNotificationsButton();
-            MentionNotificationPage mentionNotificationPage = new MentionNotificationPage(rootElement);
-            mentionNotificationPage.openGroup(0);
-            assertEquals("mentioned you on page Mention Test Page", mentionNotificationPage.getText(0, 0));
-            assertEquals("U1", mentionNotificationPage.getEmitter(0, 0));
-            assertTrue(mentionNotificationPage.hasSummary(0, 0));
-            assertEquals("<strong>Quote</strong> @U2", mentionNotificationPage.getSummary(0, 0));
-            tray.clearAllNotifications();
-        });
+        setup.login(U2_USERNAME, USERS_PWD);
+        setup.gotoPage("Main", "WebHome");
+        waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
+        // check that a notif is well received
+        NotificationsTrayPage tray = assertMentionNotification();
+        final WebElement rootElement = tray.getNotificationsButton();
+        MentionNotificationPage mentionNotificationPage = new MentionNotificationPage(rootElement);
+        mentionNotificationPage.openGroup(0);
+        assertEquals("mentioned you on page Mention Test Page", mentionNotificationPage.getText(0, 0));
+        assertEquals("U1", mentionNotificationPage.getEmitter(0, 0));
+        assertTrue(mentionNotificationPage.hasSummary(0, 0));
+        assertEquals("<strong>Quote</strong> @U2", mentionNotificationPage.getSummary(0, 0));
     }
 
     /**
-     *
      * <ul>
-     *     <li>Superadmin creates U1 and U2.</li>
-     *     <li>U1 adds a mention to U2.</li>
-     *     <li>U2 verify that she has received a notification.</li>
+     *     <li>U3 mentions U4 in a comment of a page created by U1.</li>
+     *     <li>U4 verifies that she has received a notification.</li>
      * </ul>
      *
      * @param setup The test setup.
@@ -152,83 +149,52 @@ class MentionsIT
     void comment(TestUtils setup, TestReference reference) throws Exception
     {
         String pageName = "Mention Comment Test Page";
-        runAsSuperAdmin(setup, () -> {
-            // create the users.
-            setup.createUser(U1_USERNAME, USERS_PWD, null);
-            setup.createUser(U2_USERNAME, USERS_PWD, null);
-            setup.createUser(U3_USERNAME, USERS_PWD, null);
-        });
+        setup.rest().delete(reference);
+        setup.rest().savePageAs(U1_CREDENTIALS, reference, "", pageName);
 
-        runAsUser(setup, U1_USERNAME, USERS_PWD, () -> {
-            setup.deletePage(reference);
-            setup.createPage(reference, "", pageName);
-        });
+        // We comment with a user distinct from the one who created the page (U1) to make sure that the emitter of
+        // the mention is correct. The author property of the comment is deliberately set to U1 to make sure that the
+        // emitter is the user who actually added the comment and not the one declared in the comment.
+        setup.rest().addObjectAs(U3_CREDENTIALS, reference, "XWiki.XWikiComments",
+            "author", "xwiki:XWiki.U1",
+            "date", "17/08/2020 14:55:18",
+            "comment", "AAAAA\n\n"
+                + "<strong>Quote</strong> "
+                + "{{mention reference=\"xwiki:XWiki.U4\" style=\"LOGIN\" anchor=\"test-mention-2\" "
+                + "type=\"user\" /}} XYZ\n\nBBBBB");
 
-        // We comment with a user distinct from the one who created the page (U1) to make sure that the emitter of 
-        // the mention is correct.
-        runAsUser(setup, U3_USERNAME, USERS_PWD, () -> {
-            Map<String, Object> properties = new HashMap<>();
-            properties.put("author", "xwiki:XWiki.U1");
-            properties.put("date", "17/08/2020 14:55:18");
-            properties
-                .put("comment",
-                    "AAAAA\n\n"
-                        + "<strong>Quote</strong> "
-                        + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-2\" "
-                        + "type=\"user\" /}} XYZ\n\nBBBBB");
-            setup.addObject(reference, "XWiki.XWikiComments", properties);
-        });
-
-        runAsUser(setup, U2_USERNAME, USERS_PWD, () -> {
-            setup.gotoPage("Main", "WebHome");
-            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
-            // check that a notif is well received
-            NotificationsTrayPage tray = new NotificationsTrayPage();
-            tray.showNotificationTray();
-            assertEquals(1, tray.getNotificationsCount());
-            assertEquals(1, tray.getUnreadNotificationsCount());
-            assertEquals("mentions.mention", tray.getNotificationType(0));
-            String notificationContent = tray.getNotificationContent(0);
-            String expected = "You have received one mention.";
-            assertTrue(notificationContent.contains(expected),
-                String.format("Notification content should contain [%s] but is [%s].", expected, notificationContent));
-            final WebElement rootElement = tray.getNotificationsButton();
-            MentionNotificationPage mentionNotificationPage = new MentionNotificationPage(rootElement);
-            mentionNotificationPage.openGroup(0);
-            assertEquals("mentioned you on a comment on page Mention Comment Test Page",
-                mentionNotificationPage.getText(0, 0));
-            assertEquals("U3", mentionNotificationPage.getEmitter(0, 0));
-            assertTrue(mentionNotificationPage.hasSummary(0, 0));
-            assertEquals("<strong>Quote</strong> @U2 XYZ", mentionNotificationPage.getSummary(0, 0));
-            tray.clearAllNotifications();
-        });
+        setup.login(U4_USERNAME, USERS_PWD);
+        setup.gotoPage("Main", "WebHome");
+        waitOnNotificationCount("xwiki:XWiki.U4", "xwiki", 1);
+        // check that a notif is well received
+        NotificationsTrayPage tray = assertMentionNotification();
+        final WebElement rootElement = tray.getNotificationsButton();
+        MentionNotificationPage mentionNotificationPage = new MentionNotificationPage(rootElement);
+        mentionNotificationPage.openGroup(0);
+        assertEquals("mentioned you on a comment on page Mention Comment Test Page",
+            mentionNotificationPage.getText(0, 0));
+        assertEquals("U3", mentionNotificationPage.getEmitter(0, 0));
+        assertTrue(mentionNotificationPage.hasSummary(0, 0));
+        assertEquals("<strong>Quote</strong> @U4 XYZ", mentionNotificationPage.getSummary(0, 0));
     }
 
     /**
-     * Login as some user and perform some actions, then logout.
+     * Assert that the notification tray of the currently logged in user holds exactly one unread mention
+     * notification.
      *
-     * @param setup The test setup.
-     * @param username The user's login.
-     * @param password The user's password.
-     * @param actions The actions to be performed.
-     * @throws Exception In case of errors.
+     * @return the notification tray, with its notifications displayed
      */
-    private void runAsUser(TestUtils setup, String username, String password, RunnableErr actions) throws Exception
+    private NotificationsTrayPage assertMentionNotification()
     {
-        setup.login(username, password);
-        actions.run();
-    }
-
-    /**
-     * Login as supermadmin, perform some actions, then logout.
-     *
-     * @param setup The test setup.
-     * @param actions Some actions.
-     * @throws Exception In case of error.
-     */
-    private void runAsSuperAdmin(TestUtils setup, RunnableErr actions) throws Exception
-    {
-        setup.loginAsSuperAdmin();
-        actions.run();
+        NotificationsTrayPage tray = new NotificationsTrayPage();
+        tray.showNotificationTray();
+        assertEquals(1, tray.getNotificationsCount());
+        assertEquals(1, tray.getUnreadNotificationsCount());
+        assertEquals("mentions.mention", tray.getNotificationType(0));
+        String notificationContent = tray.getNotificationContent(0);
+        assertTrue(notificationContent.contains(MENTION_NOTIFICATION_CONTENT),
+            String.format("Notification content should contain [%s] but is [%s].", MENTION_NOTIFICATION_CONTENT,
+                notificationContent));
+        return tray;
     }
 }

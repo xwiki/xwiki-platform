@@ -3087,8 +3087,8 @@ public class TestUtils
         public void savePageAs(UsernamePasswordCredentials credentials, EntityReference reference, String content,
             String syntaxId, String title, String parentFullPageName, boolean isHidden) throws Exception
         {
-            runAs(credentials, rest -> rest.savePage(reference, content, syntaxId, title, parentFullPageName,
-                isHidden));
+            runAs(credentials.getUserName(), credentials.getPassword(),
+                rest -> rest.savePage(reference, content, syntaxId, title, parentFullPageName, isHidden));
         }
 
         /**
@@ -3096,18 +3096,19 @@ public class TestUtils
          * afterward. Only the credentials of the REST client are changed: the user the browser is logged in as, if
          * any, is left untouched.
          *
-         * @param credentials the credentials to use to perform the actions
+         * @param username the login of the user to perform the actions as
+         * @param password the password of the user to perform the actions as
          * @param actions the actions to perform
          * @throws Exception if an error occurs while performing the actions
          * @since 18.8.0RC1
          */
-        public void runAs(UsernamePasswordCredentials credentials, RestActions actions) throws Exception
+        public void runAs(String username, String password, RestActions actions) throws Exception
         {
             // Remember the current credentials
             UsernamePasswordCredentials currentCredentials = this.testUtils.getDefaultCredentials();
 
             try {
-                this.testUtils.setDefaultCredentials(credentials);
+                this.testUtils.setDefaultCredentials(username, password);
 
                 actions.run(this);
             } finally {
@@ -3180,6 +3181,26 @@ public class TestUtils
 
             // Add the object
             add(jaxbObject);
+        }
+
+        /**
+         * Create a user, without going through the browser as {@link TestUtils#createUser(String, String, String,
+         * Object...)} does. The user is created active, and its password is hashed by the class' password property
+         * when it is set, so that the user can log in with it.
+         * <p>
+         * The user must not exist yet: this adds a new user object, it does not update an existing one.
+         *
+         * @param username the name of the user to create, in the {@code XWiki} space
+         * @param password the password of the user to create
+         * @param properties the extra properties of the user to create (name1, value1, name2, value2, ...), which
+         *            take precedence over the properties set by this method
+         * @throws Exception if an error occurs while creating the user
+         * @since 18.8.0RC1
+         */
+        public void createUser(String username, String password, Object... properties) throws Exception
+        {
+            addObject(new LocalDocumentReference("XWiki", username), USER_CLASS_NAME,
+                ArrayUtils.addAll(new Object[] {"password", password, "active", "1"}, properties));
         }
 
         /**

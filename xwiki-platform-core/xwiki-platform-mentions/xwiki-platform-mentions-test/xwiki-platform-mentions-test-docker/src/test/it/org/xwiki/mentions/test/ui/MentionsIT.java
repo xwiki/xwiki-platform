@@ -19,13 +19,11 @@
  */
 package org.xwiki.mentions.test.ui;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebElement;
 import org.xwiki.mentions.test.po.MentionNotificationPage;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -71,12 +69,6 @@ class MentionsIT
 
     private static final String USERS_PWD = "password";
 
-    private static final UsernamePasswordCredentials U1_CREDENTIALS =
-        new UsernamePasswordCredentials(U1_USERNAME, USERS_PWD);
-
-    private static final UsernamePasswordCredentials U3_CREDENTIALS =
-        new UsernamePasswordCredentials(U3_USERNAME, USERS_PWD);
-
     private static final String MENTION_NOTIFICATION_CONTENT = "You have received one mention.";
 
     @BeforeAll
@@ -85,18 +77,8 @@ class MentionsIT
         // Each test mentions a user of its own, so that the notifications received by one test can't be seen by
         // another one and the tests don't have to clear them.
         for (String username : new String[] { U1_USERNAME, U2_USERNAME, U3_USERNAME, U4_USERNAME }) {
-            createUser(setup, username);
+            setup.rest().createUser(username, USERS_PWD);
         }
-    }
-
-    /**
-     * Create a user over REST, as superadmin, without going through the browser.
-     */
-    private static void createUser(TestUtils setup, String username) throws Exception
-    {
-        // The password is hashed by the class' password property when it is set, so the user can log in with it.
-        setup.rest().addObject(new LocalDocumentReference("XWiki", username), "XWiki.XWikiUsers",
-            "password", USERS_PWD, "active", "1");
     }
 
     /**
@@ -115,7 +97,7 @@ class MentionsIT
     {
         String pageName = "Mention Test Page";
         setup.rest().delete(reference);
-        setup.rest().runAs(U1_CREDENTIALS, rest -> rest.savePage(reference,
+        setup.rest().runAs(U1_USERNAME, USERS_PWD, rest -> rest.savePage(reference,
             "<strong>Quote</strong> "
                 + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-1\" /}}",
             pageName));
@@ -150,12 +132,12 @@ class MentionsIT
     {
         String pageName = "Mention Comment Test Page";
         setup.rest().delete(reference);
-        setup.rest().runAs(U1_CREDENTIALS, rest -> rest.savePage(reference, "", pageName));
+        setup.rest().runAs(U1_USERNAME, USERS_PWD, rest -> rest.savePage(reference, "", pageName));
 
         // We comment with a user distinct from the one who created the page (U1) to make sure that the emitter of
         // the mention is correct. The author property of the comment is deliberately set to U1 to make sure that the
         // emitter is the user who actually added the comment and not the one declared in the comment.
-        setup.rest().runAs(U3_CREDENTIALS, rest -> rest.addObject(reference, "XWiki.XWikiComments",
+        setup.rest().runAs(U3_USERNAME, USERS_PWD, rest -> rest.addObject(reference, "XWiki.XWikiComments",
             "author", "xwiki:XWiki.U1",
             "date", "17/08/2020 14:55:18",
             "comment", "AAAAA\n\n"

@@ -17,37 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.attachment.test.ui.docker;
-
-import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.UITest;
+package org.xwiki.test.docker.junit5;
 
 /**
- * All UI tests for the Attachment feature.
+ * What host/port is the default (and so, used to generate external URL in background threads) in the wiki descriptor.
  *
  * @version $Id$
- * @since 14.0RC1
+ * @since 18.8.0RC1
  */
-@UITest
-public class AllIT
+public enum WikiDescriptorTarget
 {
-    @Nested
-    class NestedMoveAttachmentIT extends MoveAttachmentIT
-    {
-    }
+    /**
+     * Use the host/port through which the browser accesses XWiki (default).
+     */
+    BROWSER,
 
-    @Nested
-    class NestedAttachmentCommentIT extends AttachmentCommentIT
-    {
-    }
-
-    @Nested
-    class NestedDownloadAttachmentRevisionIT extends DownloadAttachmentRevisionIT
-    {
-    }
-
-    @Nested
-    class NestedViewAttachmentRevisionIT extends ViewAttachmentRevisionIT
-    {
-    }
+    /**
+     * Use the host/port through which the HTTP client running on the host, that is outside of Docker, accesses XWiki.
+     */
+    HTTP_CLIENT
 }

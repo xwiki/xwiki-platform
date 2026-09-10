@@ -19,7 +19,6 @@
  */
 package org.xwiki.security.authentication.test.ui;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -39,6 +38,8 @@ import org.xwiki.administration.test.po.ResetPasswordCompletePage;
 import org.xwiki.administration.test.po.ResetPasswordPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.UseWikiDescriptorTarget;
+import org.xwiki.test.docker.junit5.WikiDescriptorTarget;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LoginPage;
@@ -84,13 +85,6 @@ public class ResetPasswordIT
         this.mail.start();
 
         configureEmail(setup, testConfiguration);
-
-        // Configure the server alias to match the host the browser uses to reach XWiki so that the reset link generated
-        // from the  configuration is valid.
-        // TODO: can be removed on XWIKI-24639 is done.
-        URI baseURI = URI.create(setup.getCurrentExecutor().getBrowserBaseURL());
-        setup.updateObject("XWiki", "XWikiServerXwiki", "XWiki.XWikiServerClass", 0,
-            "server", baseURI.getHost(), "port", String.valueOf(baseURI.getPort()));
     }
 
     @AfterEach
@@ -104,6 +98,9 @@ public class ResetPasswordIT
         logCaptureConfiguration.registerExcludes("Secret CSRF token verification failed");
     }
 
+    // The reset link sent by mail is built from the server URL configured in the wiki descriptor, and the test opens
+    // it with the browser: the descriptor must thus target the browser, whatever the default is.
+    @UseWikiDescriptorTarget(WikiDescriptorTarget.BROWSER)
     @Test
     public void resetForgottenPassword(TestUtils setup) throws Exception
     {

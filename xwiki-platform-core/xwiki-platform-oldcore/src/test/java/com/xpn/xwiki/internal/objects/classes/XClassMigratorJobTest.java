@@ -23,6 +23,15 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.concurrent.ContextStoreManager;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobContext;
+import org.xwiki.job.JobExecutor;
+import org.xwiki.job.JobStatusStore;
+import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.logging.LoggerManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.query.Query;
@@ -46,18 +55,19 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Validate {@link XClassMigratorListener}.
+ * Validate {@link XClassMigratorJob}.
  * 
  * @version $Id$
  */
 @OldcoreTest
-@ComponentList({ DefaultObservationManager.class, PropertyConverter.class, XClassPropertyEventGeneratorListener.class })
+@ComponentList({ DefaultObservationManager.class, PropertyConverter.class, XClassPropertyEventGeneratorListener.class, XClassMigratorJob.class })
 @ReferenceComponentList
-class XClassMigratorListenerTest
+class XClassMigratorJobTest
 {
     @MockComponent
     private QueryManager mockQueryManager;
@@ -68,12 +78,30 @@ class XClassMigratorListenerTest
     @InjectMockComponents
     private XClassMigratorListener listener;
 
+    @MockComponent
+    private JobExecutor mockJobExecutor;
+
+    @MockComponent
+    private JobContext jobContext;
+
+    @MockComponent
+    private LoggerManager loggerManager;
+
+    @MockComponent
+    private ContextStoreManager contextStoreManager;
+
+    @MockComponent
+    private JobStatusStore jobStatusStore;
+
+    @MockComponent
+    private JobProgressManager jobProgressManager;
+
     private XWikiDocument xobjectDocument;
 
     private XWikiDocument xclassDocument;
 
     @BeforeEach
-    void beforeEach() throws Exception
+    void beforeEach(ComponentManager componentManager) throws Exception
     {
         this.xclassDocument = new XWikiDocument(new DocumentReference("wiki", "Space", "Class"));
         this.xclassDocument.setSyntax(Syntax.PLAIN_1_0);
@@ -89,6 +117,12 @@ class XClassMigratorListenerTest
             .createQuery("select distinct obj.name from BaseObject as obj where obj.className = :className", Query.HQL))
                 .thenReturn(query);
         when(query.<String>execute()).thenReturn(Arrays.asList("Space.Page"));
+        when(this.mockJobExecutor.execute(eq(XClassMigratorJob.JOB_TYPE), ArgumentCaptor.forClass(XClassMigratorRequest.class).capture())).thenAnswer(a -> {
+            XClassMigratorJob job = componentManager.getInstance(Job.class, XClassMigratorJob.JOB_TYPE);
+            job.initialize(a.getArgument(1));
+            job.runInternal();
+            return job;
+        });
 
         // We need document modification notifications
         this.oldcore.notifyDocumentUpdatedEvent(true);

@@ -66,6 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openqa.selenium.Keys.BACK_SPACE;
 import static org.openqa.selenium.Keys.CONTROL;
+import static org.openqa.selenium.Keys.ENTER;
 import static org.openqa.selenium.Keys.chord;
 import static org.xwiki.livedata.test.po.TableLayoutElement.FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS;
 
@@ -298,7 +299,10 @@ class LiveDataIT
         suggestInputElement.waitForNonTypedSuggestions();
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
-        suggestionElements.get(0).select();
+        // Select the suggestion with the keyboard, in this test method, because clicking on it moves the mouse
+        // pointer over a table cell (the suggestions are displayed over the first rows) and hovering an editable cell
+        // displays the cell actions popover above it, with a high z-index, which then covers the suggestions.
+        suggestInputElement.sendKeys(ENTER);
         liveDataElement.waitUntilReady();
         tableLayout.waitUntilRowCountEqualsTo(1);
         assertEquals(1, tableLayout.countRows());
@@ -320,7 +324,7 @@ class LiveDataIT
         suggestInputElement.waitForNonTypedSuggestions();
         suggestionElements = suggestInputElement.getSuggestions();
         assertEquals(1, suggestionElements.size());
-        suggestionElements.get(0).select();
+        suggestInputElement.sendKeys(ENTER);
         liveDataElement.waitUntilReady();
         tableLayout.waitUntilRowCountEqualsTo(1);
         assertEquals(1, tableLayout.countRows());

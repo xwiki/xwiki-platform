@@ -684,11 +684,10 @@ class DefaultAuthorizationSettlerTest extends AbstractAdditionalRightsTestCase
     }
 
 
-    // We cannot unregister the right anymore because AuthorizationManager#unregister has been disabled
-    // and we cannot call Right#unregister because we are not in the proper package. So in order to avoid breaking the
-    // whole test suite we just disable this test
     @Test
-    @Disabled
+    @Disabled("We cannot unregister the right anymore because AuthorizationManager#unregister has been disabled and "
+        + "we cannot call Right#unregister because we are not in the proper package. So in order to avoid breaking "
+        + "the whole test suite we just disable this test")
     void testSettleNewRightJustAdded() throws Exception
     {
         Right newRight = getNewTestRight("RightAddedLater",DENY,DENY,true);

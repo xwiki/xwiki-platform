@@ -48,6 +48,9 @@
 .supported-by h3,
 .supported-by h4{
   color: var(--text-muted);
+  /*TODO: Change font-size to use CSS variables in future work.
+  For XWIKI-24855, the 0.9em values was used since it's used in other places of this CSS file,
+  making it 'locally' consistent. But they too should be updated to font variables */
   font-size: .9em;
 }
 

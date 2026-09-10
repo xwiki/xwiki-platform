@@ -22,17 +22,12 @@ package org.xwiki.rest.test;
 import java.io.InputStream;
 import java.util.Collections;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -66,13 +61,13 @@ class WikisIT
 
         // Execute a REST request with the right credentials
         setup.setDefaultCredentials(user, password);
-        GetMethod get = setup.rest().executeGet(WikiResource.class, wiki.getName());
+        CloseableHttpResponse get = setup.rest().executeGet(WikiResource.class, wiki.getName());
 
         try {
             // Make sure the REST request was executed with the right user
-            assertEquals(wiki.getName() + ":XWiki." + user, get.getResponseHeader("XWiki-User").getValue());
+            assertEquals(wiki.getName() + ":XWiki." + user, get.getHeader("XWiki-User").getValue());
         } finally {
-            get.releaseConnection();
+            get.close();
         }
     }
 
@@ -83,11 +78,11 @@ class WikisIT
         setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
 
         try (InputStream is = this.getClass().getResourceAsStream("/Main.Foo.xar")) {
-            PostMethod post = setup.rest().executePost(WikiResource.class, is, "xwiki");
+            CloseableHttpResponse post = setup.rest().executePost(WikiResource.class, is, "xwiki");
             try {
-                assertEquals(HttpStatus.SC_OK, post.getStatusCode());
+                assertEquals(HttpStatus.SC_OK, post.getCode());
             } finally {
-                post.releaseConnection();
+                post.close();
             }
         }
 
@@ -95,11 +90,11 @@ class WikisIT
         setup.setDefaultCredentials(null);
 
         try (InputStream is = this.getClass().getResourceAsStream("/Main.Foo.xar")) {
-            PostMethod post = setup.rest().executePost(WikiResource.class, is, "xwiki");
+            CloseableHttpResponse post = setup.rest().executePost(WikiResource.class, is, "xwiki");
             try {
-                assertEquals(HttpStatus.SC_UNAUTHORIZED, post.getStatusCode());
+                assertEquals(HttpStatus.SC_UNAUTHORIZED, post.getCode());
             } finally {
-                post.releaseConnection();
+                post.close();
             }
         }
 
@@ -129,12 +124,12 @@ class WikisIT
 
         // A multipart/form-data POST is a "simple" cross-origin request, so a valid CSRF form token is required.
         String formToken;
-        GetMethod tokenGet = setup.rest().executeGet(WikisResource.class);
+        CloseableHttpResponse tokenGet = setup.rest().executeGet(WikisResource.class);
         try {
-            assertEquals(HttpStatus.SC_OK, tokenGet.getStatusCode());
-            formToken = tokenGet.getResponseHeader("XWiki-Form-Token").getValue();
+            assertEquals(HttpStatus.SC_OK, tokenGet.getCode());
+            formToken = tokenGet.getHeader("XWiki-Form-Token").getValue();
         } finally {
-            tokenGet.releaseConnection();
+            tokenGet.close();
         }
 
         byte[] xar;
@@ -145,20 +140,15 @@ class WikisIT
         String uri =
             setup.rest().createUri(WikiResource.class, Collections.<String, Object[]>emptyMap(), "xwiki").toString();
 
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(
-            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword()));
-        httpClient.getParams().setAuthenticationPreemptive(true);
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+        entityBuilder.addBinaryBody("file", xar, ContentType.DEFAULT_BINARY, "Main.Foo.xar");
 
-        PostMethod post = new PostMethod(uri);
-        Part[] parts = {new FilePart("file", new ByteArrayPartSource("Main.Foo.xar", xar))};
-        post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
-        post.setRequestHeader("XWiki-Form-Token", formToken);
-        try {
-            httpClient.executeMethod(post);
-            assertEquals(HttpStatus.SC_OK, post.getStatusCode());
-        } finally {
-            post.releaseConnection();
+        HttpPost post = new HttpPost(uri);
+        post.setEntity(entityBuilder.build());
+        post.addHeader("XWiki-Form-Token", formToken);
+
+        try (CloseableHttpResponse response = setup.execute(post)) {
+            assertEquals(HttpStatus.SC_OK, response.getCode());
         }
 
         // The multipart body was restored and its file part extracted, so the XAR was actually imported.

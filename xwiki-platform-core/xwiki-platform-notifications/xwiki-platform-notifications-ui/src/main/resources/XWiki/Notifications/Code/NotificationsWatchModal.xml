@@ -37,14 +37,25 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ("$!request.getParameter('documentReference')" == '')
-  #set ($discard = $response.setStatus(400))
-#else
-#set ($watchedDocumentReference = $services.model.resolveDocument($request.getParameter('documentReference')))
+#macro (_failWith $statusCode $message)
+  #set ($discard = $response.setStatus($statusCode))
+  #set ($discard = $response.setContentType('text/plain'))
+  ## The message is written directly to the response because marking the context as finished, just below, prevents
+  ## XWiki from writing any more content.
+  #set ($discard = $response.writer.print($message))
+  #set ($discard = $xcontext.setFinished(true))
+#end
+#set ($documentReferenceParameter = "$!request.getParameter('documentReference')")
+#if ($documentReferenceParameter == '')
+  #_failWith(400 'The [documentReference] request parameter is mandatory.')
+  #stop
+#end
+#set ($watchedDocumentReference = $services.model.resolveDocument($documentReferenceParameter))
 ## Only a logged in user has watch settings, and only for a location they are allowed to view.
 #if ($isGuest || !$services.security.authorization.hasAccess('view', $watchedDocumentReference))
-  #set ($discard = $response.setStatus(403))
-#else
+  #_failWith(403 "You are not allowed to view the watch settings of [$documentReferenceParameter].")
+  #stop
+#end
 #set ($watchedStatus = $services.notification.watch.getLocationWatchedStatus($watchedDocumentReference))
 ## If the watched status informs that the filter is about children it means it's a filter for the space,
 ## so we should look for ancestor of the space.
@@ -220,7 +231,5 @@
     &lt;/div&gt;&lt;!-- /.modal-dialog --&gt;
   &lt;/div&gt;&lt;!-- /.modal --&gt;
 {{/html}}
-#end
-#end
 {{/velocity}}</content>
 </xwikidoc>

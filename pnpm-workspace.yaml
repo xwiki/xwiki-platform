@@ -144,8 +144,8 @@ catalog:
   postcss-simple-vars: 7.0.1
   publint: 0.3.24
   qunit: 2.26.0
-  react: 19.2.8
-  react-dom: 19.2.8
+  react: 19.3.0
+  react-dom: 19.3.0
   react-i18next: 17.0.13
   react-icons: 5.7.0
   reflect-metadata: 0.2.2

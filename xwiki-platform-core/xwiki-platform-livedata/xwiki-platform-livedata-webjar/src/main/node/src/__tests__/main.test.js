@@ -19,6 +19,7 @@
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import $ from "jquery";
+import { flushPromises } from "@vue/test-utils";
 
 const init = vi.fn();
 const delayPageReady = vi.fn((promise) => promise);
@@ -34,15 +35,6 @@ await import("../main.js");
 const liveDataMarkup = '<div class="liveData" data-config=\'{"id":"test"}\'></div>';
 
 /**
- * Let the pending dynamic imports, promise callbacks and jQuery ready callbacks run.
- */
-async function settle() {
-  for (let i = 0; i < 5; i++) {
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  }
-}
-
-/**
  * @returns the number of live data displays that were started, each display delaying the page ready
  */
 function startedDisplays() {
@@ -53,7 +45,7 @@ describe("$.fn.liveData", () => {
   beforeEach(async () => {
     // The plugin displays the live data elements found on the page as soon as the document is ready. Let that first
     // pass run before clearing the counters, so that the tests below start from a known state.
-    await settle();
+    await flushPromises();
     init.mockReset();
     init.mockResolvedValue({});
     delayPageReady.mockClear();
@@ -65,7 +57,7 @@ describe("$.fn.liveData", () => {
     const element = document.querySelector(".liveData");
 
     $(element).liveData();
-    await settle();
+    await flushPromises();
 
     expect(startedDisplays()).toBe(1);
     expect(init).toHaveBeenCalledTimes(1);
@@ -79,7 +71,7 @@ describe("$.fn.liveData", () => {
 
     $(element).liveData();
     $(element).liveData();
-    await settle();
+    await flushPromises();
 
     expect(startedDisplays()).toBe(1);
   });
@@ -88,11 +80,11 @@ describe("$.fn.liveData", () => {
     document.body.innerHTML = liveDataMarkup;
 
     $(document).trigger("xwiki:dom:updated");
-    await settle();
+    await flushPromises();
     expect(startedDisplays()).toBe(1);
 
     $(document).trigger("xwiki:dom:updated");
-    await settle();
+    await flushPromises();
     expect(startedDisplays()).toBe(1);
   });
 
@@ -103,7 +95,7 @@ describe("$.fn.liveData", () => {
     const element = document.querySelector(".liveData");
 
     $(document).trigger("xwiki:dom:updated");
-    await settle();
+    await flushPromises();
 
     expect(startedDisplays()).toBe(0);
     expect(init).not.toHaveBeenCalled();
@@ -116,7 +108,7 @@ describe("$.fn.liveData", () => {
     const element = document.querySelector(".liveData");
 
     $(element).liveData({ id: "passed" });
-    await settle();
+    await flushPromises();
 
     expect(startedDisplays()).toBe(1);
     expect(element.dataset.config).toBe('{"id":"passed"}');
@@ -126,14 +118,14 @@ describe("$.fn.liveData", () => {
     document.body.innerHTML = liveDataMarkup;
 
     $(document).trigger("xwiki:dom:updated");
-    await settle();
+    await flushPromises();
     expect(startedDisplays()).toBe(1);
 
     // The editor re-inserts the content it edited as HTML, so the live data element is a new, freshly rendered node
     // that has to be displayed again.
     document.body.innerHTML = liveDataMarkup;
     $(document).trigger("xwiki:dom:updated");
-    await settle();
+    await flushPromises();
 
     expect(startedDisplays()).toBe(2);
     expect(init.mock.calls[1][0]).toBe(document.querySelector(".liveData"));

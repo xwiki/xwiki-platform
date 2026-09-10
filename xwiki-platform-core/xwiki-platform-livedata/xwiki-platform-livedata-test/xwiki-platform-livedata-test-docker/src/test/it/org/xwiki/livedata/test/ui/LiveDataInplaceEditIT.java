@@ -30,8 +30,6 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
-import static java.util.Collections.singletonMap;
-
 /**
  * Tests of the Live Data macro in the in-place WYSIWYG editor.
  *
@@ -70,19 +68,22 @@ class LiveDataInplaceEditIT
     void liveDataIsStillDisplayedAfterSourceRoundTrip(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
-        setup.deletePage(testReference, true);
 
         // In-place editing is used only when the default editor is the WYSIWYG one.
         setup.setWikiPreference("editor", "Wysiwyg");
 
+        DocumentReference classReference = new DocumentReference("EntryClass", testReference.getLastSpaceReference());
+        DocumentReference entryReference = new DocumentReference("Entry", testReference.getLastSpaceReference());
+        setup.rest().delete(testReference);
+        setup.rest().delete(classReference);
+        setup.rest().delete(entryReference);
+
         // Define the XClass of the Live Data entries and create the single entry, before the page holding the macro:
-        // the Live Data has to be displayable as soon as that page is created, since creating it displays it.
-        DocumentReference classReference =
-            new DocumentReference("EntryClass", testReference.getLastSpaceReference());
+        // the Live Data has to be displayable as soon as that page is created, since creating it displays it. Adding
+        // a class property has no REST API, so it goes through the browser.
         setup.addClassProperty(classReference, NAME_COLUMN, "String");
         String className = setup.serializeReference(classReference.getLocalDocumentReference());
-        setup.addObject(new DocumentReference("Entry", testReference.getLastSpaceReference()), className,
-            singletonMap(NAME_COLUMN, NAME_LYNDA));
+        setup.rest().addObject(entryReference, className, NAME_COLUMN, NAME_LYNDA);
 
         // The text around the macro gives the editor a place to put the caret that is not the Live Data itself.
         String content = """

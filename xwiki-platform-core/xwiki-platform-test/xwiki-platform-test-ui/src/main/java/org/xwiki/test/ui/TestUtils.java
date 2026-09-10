@@ -3239,17 +3239,17 @@ public class TestUtils
          * <p>
          * The user must not exist yet: this adds a new user object, it does not update an existing one.
          *
-         * @param username the name of the user to create, in the {@code XWiki} space
-         * @param password the password of the user to create
+         * @param credentials the login, taken as the name of the user in the {@code XWiki} space, and the password of
+         *            the user to create
          * @param properties the extra properties of the user to create (name1, value1, name2, value2, ...), which
          *            take precedence over the properties set by this method
          * @throws Exception if an error occurs while creating the user
          * @since 18.8.0RC1
          */
-        public void createUser(String username, String password, Object... properties) throws Exception
+        public void createUser(XWikiCredentials credentials, Object... properties) throws Exception
         {
-            addObject(new LocalDocumentReference("XWiki", username), USER_CLASS_NAME,
-                ArrayUtils.addAll(new Object[] {"password", password, "active", "1"}, properties));
+            addObject(new LocalDocumentReference("XWiki", credentials.getUserName()), USER_CLASS_NAME,
+                ArrayUtils.addAll(new Object[] {"password", credentials.getPassword(), "active", "1"}, properties));
         }
 
         /**

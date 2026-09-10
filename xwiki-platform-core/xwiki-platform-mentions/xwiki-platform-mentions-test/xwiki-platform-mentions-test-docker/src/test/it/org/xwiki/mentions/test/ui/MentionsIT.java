@@ -115,10 +115,10 @@ class MentionsIT
     {
         String pageName = "Mention Test Page";
         setup.rest().delete(reference);
-        setup.rest().savePageAs(U1_CREDENTIALS, reference,
+        setup.rest().runAs(U1_CREDENTIALS, rest -> rest.savePage(reference,
             "<strong>Quote</strong> "
                 + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-1\" /}}",
-            pageName);
+            pageName));
 
         setup.login(U2_USERNAME, USERS_PWD);
         setup.gotoPage("Main", "WebHome");
@@ -150,18 +150,18 @@ class MentionsIT
     {
         String pageName = "Mention Comment Test Page";
         setup.rest().delete(reference);
-        setup.rest().savePageAs(U1_CREDENTIALS, reference, "", pageName);
+        setup.rest().runAs(U1_CREDENTIALS, rest -> rest.savePage(reference, "", pageName));
 
         // We comment with a user distinct from the one who created the page (U1) to make sure that the emitter of
         // the mention is correct. The author property of the comment is deliberately set to U1 to make sure that the
         // emitter is the user who actually added the comment and not the one declared in the comment.
-        setup.rest().addObjectAs(U3_CREDENTIALS, reference, "XWiki.XWikiComments",
+        setup.rest().runAs(U3_CREDENTIALS, rest -> rest.addObject(reference, "XWiki.XWikiComments",
             "author", "xwiki:XWiki.U1",
             "date", "17/08/2020 14:55:18",
             "comment", "AAAAA\n\n"
                 + "<strong>Quote</strong> "
                 + "{{mention reference=\"xwiki:XWiki.U4\" style=\"LOGIN\" anchor=\"test-mention-2\" "
-                + "type=\"user\" /}} XYZ\n\nBBBBB");
+                + "type=\"user\" /}} XYZ\n\nBBBBB"));
 
         setup.login(U4_USERNAME, USERS_PWD);
         setup.gotoPage("Main", "WebHome");

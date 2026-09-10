@@ -2702,6 +2702,21 @@ public class TestUtils
         }
 
         /**
+         * Some actions to perform on the REST API, which can throw a checked {@link Exception}.
+         *
+         * @since 18.8.0RC1
+         */
+        @FunctionalInterface
+        public interface RestActions
+        {
+            /**
+             * @param rest the REST API to perform the actions on
+             * @throws Exception in case of error while performing the actions
+             */
+            void run(RestTestUtils rest) throws Exception;
+        }
+
+        /**
          * Used to match number part of the object reference name.
          */
         private static final Pattern OBJECT_NAME_PATTERN = Pattern.compile("(\\\\*)\\[(\\d*)\\]$");
@@ -3072,13 +3087,29 @@ public class TestUtils
         public void savePageAs(UsernamePasswordCredentials credentials, EntityReference reference, String content,
             String syntaxId, String title, String parentFullPageName, boolean isHidden) throws Exception
         {
+            runAs(credentials, rest -> rest.savePage(reference, content, syntaxId, title, parentFullPageName,
+                isHidden));
+        }
+
+        /**
+         * Perform some actions on the REST API using the provided credentials and restore the previous credentials
+         * afterward. Only the credentials of the REST client are changed: the user the browser is logged in as, if
+         * any, is left untouched.
+         *
+         * @param credentials the credentials to use to perform the actions
+         * @param actions the actions to perform
+         * @throws Exception if an error occurs while performing the actions
+         * @since 18.8.0RC1
+         */
+        public void runAs(UsernamePasswordCredentials credentials, RestActions actions) throws Exception
+        {
             // Remember the current credentials
             UsernamePasswordCredentials currentCredentials = this.testUtils.getDefaultCredentials();
 
             try {
                 this.testUtils.setDefaultCredentials(credentials);
 
-                savePage(reference, content, syntaxId, title, parentFullPageName, isHidden);
+                actions.run(this);
             } finally {
                 // Restore initial credentials
                 this.testUtils.setDefaultCredentials(currentCredentials);
@@ -3149,33 +3180,6 @@ public class TestUtils
 
             // Add the object
             add(jaxbObject);
-        }
-
-        /**
-         * Add a new object to an existing or new page using the provided credentials and restore the previous
-         * credentials afterward.
-         *
-         * @param credentials the credentials to use to add the object
-         * @param documentReference the document where to add the object
-         * @param className the class name of the object to add
-         * @param properties the properties of the object to add (name1, value1, name2, value2, ...)
-         * @throws Exception if an error occurs while adding the object
-         * @since 18.8.0RC1
-         */
-        public void addObjectAs(UsernamePasswordCredentials credentials, EntityReference documentReference,
-            String className, Object... properties) throws Exception
-        {
-            // Remember the current credentials
-            UsernamePasswordCredentials currentCredentials = this.testUtils.getDefaultCredentials();
-
-            try {
-                this.testUtils.setDefaultCredentials(credentials);
-
-                addObject(documentReference, className, properties);
-            } finally {
-                // Restore initial credentials
-                this.testUtils.setDefaultCredentials(currentCredentials);
-            }
         }
 
         /**

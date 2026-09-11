@@ -38,9 +38,11 @@ import {
   inject,
   nextTick,
   onMounted,
+  onUnmounted,
   provide,
   ref,
   useTemplateRef,
+  watch,
 } from "vue";
 import type { LiveDataSource, Logic } from "@xwiki/platform-livedata-api";
 import type { Query, Translations } from "@xwiki/platform-localization-api";
@@ -74,6 +76,26 @@ const translationsLoaded = ref(false);
 
 const dataId = computed(() => logic.data?.id);
 const layoutId = computed(() => logic.currentLayoutId?.value);
+const maximized = computed(() => logic.isMaximized());
+
+// Escape should allow to exit maximized mode,
+// unless it's already handled by another component (e.g., editor).
+function onEscape(event: KeyboardEvent) {
+  if (event.key === "Escape" && maximized.value) {
+    logic.toggleMaximized();
+  }
+}
+
+// We only set the escape listener when we're actually in maximized mode.
+watch(maximized, (isMaximized) => {
+  if (isMaximized) {
+    document.addEventListener("keydown", onEscape);
+  } else {
+    document.removeEventListener("keydown", onEscape);
+  }
+});
+
+onUnmounted(() => document.removeEventListener("keydown", onEscape));
 
 // eslint-disable-next-line max-statements
 onMounted(async () => {
@@ -177,7 +199,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="xwiki-livedata" ref="rootElement">
+  <div
+    class="xwiki-livedata"
+    :class="{ 'livedata-maximized': maximized }"
+    ref="rootElement"
+  >
     <!-- Import the Livedata advanced configuration panels -->
     <LivedataAdvancedPanels />
 
@@ -194,3 +220,17 @@ onMounted(async () => {
     <div v-if="!layoutLoaded" class="loading"></div>
   </div>
 </template>
+
+<style>
+.xwiki-livedata.livedata-maximized {
+  position: fixed;
+  inset: 0;
+  /*
+   * We use the same z-index as the gallery application, which maximizes the same way.
+   */
+  z-index: 1001;
+  overflow: auto;
+  padding: 0 var(--grid-gutter-width);
+  background-color: var(--body-bg);
+}
+</style>

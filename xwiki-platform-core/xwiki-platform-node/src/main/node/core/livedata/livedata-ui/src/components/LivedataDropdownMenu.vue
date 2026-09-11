@@ -60,15 +60,24 @@
               {{ $t("livedata.action.refresh") }}
             </a>
           </li>
-          <!-- Edit mode toggle. -->
-          <li class="livedata-action-edit-mode" v-show="logic.hasEditMode()">
-            <a href="#" @click.stop.prevent="toggleEditMode">
-              <input
-                type="checkbox"
-                :checked="isEditMode"
-                @click.stop="toggleEditMode"
+          <!-- Maximized view, which displays the Live Data on its own, over the rest of the
+          page. -->
+          <li>
+            <a
+              href="#"
+              @click.prevent="logic.toggleMaximized()"
+              class="livedata-action-maximize"
+            >
+              <XWikiIcon
+                :icon-descriptor="{
+                  name: isMaximized ? 'compress' : 'expand',
+                }"
               />
-              {{ $t("livedata.action.editMode") }}
+              {{
+                isMaximized
+                  ? $t("livedata.action.minimize")
+                  : $t("livedata.action.maximize")
+              }}
             </a>
           </li>
         </ul>
@@ -131,20 +140,12 @@ export default {
 
   inject: ["logic"],
 
-  data() {
-    return {
-      isEditMode: false,
-    };
-  },
-
-  async beforeUnmount() {
-    this.logic.disableEditMode();
-    await this.logic.updateEntries();
-  },
-
   computed: {
     data() {
       return this.logic.data;
+    },
+    isMaximized() {
+      return this.logic.isMaximized();
     },
   },
 
@@ -157,52 +158,17 @@ export default {
         this.logic.changeLayout(layoutId);
       }
     },
-    toggleEditMode() {
-      this.isEditMode = !this.isEditMode;
-    },
-  },
-
-  watch: {
-    async isEditMode(value) {
-      if (value) {
-        this.logic.enableEditMode();
-      } else {
-        this.logic.disableEditMode();
-      }
-      await this.logic.updateEntries();
-    },
   },
 };
 </script>
 
 <style>
 .livedata-dropdown-menu {
-  /* Similar to .flat-buttons() */
-  .btn-default {
-    background-color: var(--breadcrumb-bg);
-    background-image: none;
-    border-color: var(--dropdown-divider-bg);
-    box-shadow: none;
-    color: var(--dropdown-link-color);
-    text-shadow: none;
-  }
-
-  .btn-default:hover,
-  .btn-default:active,
-  .btn-default:focus,
-  .open .dropdown-toggle {
-    border-color: hsl(from var(--dropdown-divider-bg) h s calc(l - 0.1));
-  }
-
   /* Style each section of the dropdown */
   ul.dropdown-menu > li > ul {
     list-style: none;
     padding-left: 0;
   }
-}
-
-.livedata-dropdown-menu .btn-default span {
-  vertical-align: middle;
 }
 
 /*
@@ -224,15 +190,6 @@ export default {
 
   li:has(> ul):has(+ li > ul) {
     margin-bottom: calc(0.5lh - 1px);
-  }
-}
-
-#xwikicontent ul li.livedata-action-edit-mode {
-  a {
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
   }
 }
 </style>

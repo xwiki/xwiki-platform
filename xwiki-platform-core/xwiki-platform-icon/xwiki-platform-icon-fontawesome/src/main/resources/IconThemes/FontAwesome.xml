@@ -210,6 +210,10 @@ sort-descending = sort-amount-desc
 ## Since 18.0.0RC1
 note = sticky-note
 
+## Since 18.8.0RC1
+expand = expand
+compress = compress
+
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check
 anchor = anchor

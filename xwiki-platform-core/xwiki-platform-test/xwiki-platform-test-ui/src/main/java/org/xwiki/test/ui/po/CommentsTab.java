@@ -22,10 +22,13 @@ package org.xwiki.test.ui.po;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
@@ -37,6 +40,8 @@ import org.xwiki.test.ui.XWikiWebDriver;
 public class CommentsTab extends BaseElement
 {
     private static final String COMMENT_FORM_ID = "openCommentForm";
+
+    private static final String COMMENT_CLASS_NAME = "XWiki.XWikiComments";
 
     @FindBy(css = "fieldset#commentform > label > span")
     private WebElement commentAuthor;
@@ -124,6 +129,26 @@ public class CommentsTab extends BaseElement
         addCommentForm.clickSubmit(wait);
         return this.getCommentID(content);
     }
+
+    /**
+     * Post a comment on a page over the REST API, as the current REST user, without using the browser. To be used when
+     * a test needs a comment to exist but does not assert anything about the comment form itself.
+     *
+     * @param rest the REST API to perform the actions on
+     * @param pageReference the reference of the page to comment on
+     * @param content the content of the comment
+     * @param properties the extra properties of the comment (name1, value1, name2, value2, ...), for instance an
+     *     {@code author} or a {@code date} differing from the ones the server would set
+     * @throws Exception in case of error while calling the REST API
+     * @since 18.8.0RC1
+     */
+    public static void restPostComment(TestUtils.RestTestUtils rest, EntityReference pageReference, String content,
+        Object... properties) throws Exception
+    {
+        rest.addObject(pageReference, COMMENT_CLASS_NAME,
+            ArrayUtils.addAll(new Object[] {"comment", content}, properties));
+    }
+
     /**
      * Toggle the comment thread for a comment if available
      *

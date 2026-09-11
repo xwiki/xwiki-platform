@@ -29,6 +29,7 @@ import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.CommentsTab;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -142,13 +143,13 @@ class MentionsIT
         // We comment with a user distinct from the one who created the page (U1) to make sure that the emitter of
         // the mention is correct. The author property of the comment is deliberately set to U1 to make sure that the
         // emitter is the user who actually added the comment and not the one declared in the comment.
-        setup.rest().runAs(U3_CREDENTIALS, rest -> rest.addObject(reference, "XWiki.XWikiComments",
-            "author", "xwiki:XWiki.U1",
-            "date", "17/08/2020 14:55:18",
-            "comment", "AAAAA\n\n"
-                + "<strong>Quote</strong> "
-                + "{{mention reference=\"xwiki:XWiki.U4\" style=\"LOGIN\" anchor=\"test-mention-2\" "
-                + "type=\"user\" /}} XYZ\n\nBBBBB"));
+        setup.rest().runAs(U3_CREDENTIALS, rest -> {
+            CommentsTab.restPostComment(rest, reference, "AAAAA\n\n"
+                    + "<strong>Quote</strong> "
+                    + "{{mention reference=\"xwiki:XWiki.U4\" style=\"LOGIN\" anchor=\"test-mention-2\" "
+                    + "type=\"user\" /}} XYZ\n\nBBBBB",
+                "author", "xwiki:XWiki.U1", "date", "17/08/2020 14:55:18");
+        });
 
         setup.login(U4_USERNAME, USERS_PWD);
         setup.gotoPage("Main", "WebHome");

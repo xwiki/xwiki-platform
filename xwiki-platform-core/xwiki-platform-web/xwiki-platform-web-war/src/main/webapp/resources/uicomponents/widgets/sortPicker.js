@@ -53,8 +53,8 @@ require(['jquery'], function($) {
     });
   };
 
-  var init = function(event, data) {
-    var container = $(data?.elements || document);
+  const init = function(event, data) {
+    const container = $(data?.elements || document);
     container.find('.sortPicker').sortPicker();
   };
 

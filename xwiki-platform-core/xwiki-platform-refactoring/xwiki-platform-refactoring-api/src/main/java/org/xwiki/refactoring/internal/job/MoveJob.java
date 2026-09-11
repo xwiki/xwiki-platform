@@ -114,6 +114,6 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     @Override
     protected boolean atomicOperation(DocumentReference source, DocumentReference target)
     {
-        return this.modelBridge.rename(source, target);
+        return this.modelBridge.rename(source, target, this.request.isCheckRights());
     }
 }

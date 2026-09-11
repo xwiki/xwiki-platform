@@ -19,20 +19,20 @@
  */
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
-var getDocument = function(document) {
+const getDocument = function(document) {
   if (!document) {
     return XWiki.currentDocument;
   } else if (typeof document == 'string') {
-    var reference = XWiki.Model.resolve(document, XWiki.EntityType.DOCUMENT);
+    const reference = XWiki.Model.resolve(document, XWiki.EntityType.DOCUMENT);
     return new XWiki.Document(reference);
   }
   return document;
 };
 
-// The real locale of the current document translation. This must match the real locale computed by the document API
-// used by the in-place editor, otherwise the same lock would be represented by two different lock instances.
-const getDefaultLocale = () => new URLSearchParams(XWiki.docvariant || '').get('language') ||
-  document.documentElement.lang;
+// The locale of the current document translation, which is empty for a technical document (one without a default
+// locale). We read it from the meta information, like the document API used by the in-place editor does, otherwise
+// the same lock would be represented by two different lock instances.
+const getRealLocale = () => document.documentElement.dataset.xwikiRealLocale ?? '';
 
 // Use the same format as LocalizedStringEntityReferenceSerializer, for consistency with the server side. Note that
 // this format doesn't escape the parenthesis, so a page named "Page(en)" gets the same key as the "en" translation of
@@ -48,7 +48,7 @@ XWiki.DocumentLock = Class.create({
    */
   initialize: function(document, locale) {
     this._document = getDocument(document);
-    this._locale = locale ?? getDefaultLocale();
+    this._locale = locale ?? getRealLocale();
     this._options = {};
     // The functions to call in order to revert what we do below, see #destroy().
     this._cleanupCallbacks = [];
@@ -163,7 +163,7 @@ XWiki.DocumentLock._instances = {};
  * @return the lock instance associated with the given document translation, if any
  */
 XWiki.DocumentLock.get = function(document, locale) {
-  return XWiki.DocumentLock._instances[getKey(getDocument(document), locale ?? getDefaultLocale())];
+  return XWiki.DocumentLock._instances[getKey(getDocument(document), locale ?? getRealLocale())];
 };
 
 /**
@@ -176,7 +176,7 @@ XWiki.DocumentLock.getOrCreate = function(document, locale) {
   return XWiki.DocumentLock.get(document, locale) || new XWiki.DocumentLock(document, locale);
 };
 
-var init = function() {
+const init = function() {
   // Edit lock for the current document.
   XWiki.EditLock = XWiki.DocumentLock.getOrCreate();
 

@@ -81,7 +81,7 @@ public class OldCoreHelper implements AutoCloseable
      */
     public OldCoreHelper()
     {
-
+        // Empty on purpose: initialization is done by create(String, File).
     }
 
     /**

@@ -2,6 +2,11 @@
 .ts-wrapper.full {
   width: unset;
 }
+/* The previous rule breaks the usage of the Tom Select widget in an input-group, so we need to revert it for this use
+  case. */
+.input-group .ts-wrapper.full.form-control {
+  width: 100%;
+}
 
 .ts-control {
   border: 1px solid var(--input-border);

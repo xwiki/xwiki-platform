@@ -50,6 +50,7 @@ public class TestSolrCoreInitializer extends AbstractSolrCoreInitializer
     @Override
     protected void migrateSchema(long cversion)
     {
+        // Nothing to migrate: this test core only ever has a single schema version.
     }
 
     @Override

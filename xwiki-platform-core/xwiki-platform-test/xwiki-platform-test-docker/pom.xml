@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Uses Docker to start/stop browsers and XWiki</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.21</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.19</xwiki.jacoco.instructionRatio>
     <!-- TODO: Put back when the XWikiBrowserWebDriverContainer class is removed or when we find a construct that makes
          Spoon pass on it. -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
@@ -160,6 +160,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rest-jersey</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-http</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>

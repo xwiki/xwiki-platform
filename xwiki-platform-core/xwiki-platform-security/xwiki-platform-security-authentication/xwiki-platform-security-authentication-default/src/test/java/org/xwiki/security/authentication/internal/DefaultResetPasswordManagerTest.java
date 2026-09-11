@@ -309,15 +309,8 @@ class DefaultResetPasswordManagerTest
         when(this.userDocument
             .getXObject(ResetPasswordRequestClassDocumentInitializer.REFERENCE))
             .thenReturn(xObject);
-        String encodedVerificationCode = "encodedVerificationCode";
-        when(xObject.getStringValue(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD))
-            .thenReturn(encodedVerificationCode);
-        BaseClass baseClass = mock(BaseClass.class);
-        when(xObject.getXClass(context)).thenReturn(baseClass);
-        PasswordClass passwordClass = mock(PasswordClass.class);
-        when(baseClass.get(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD)).thenReturn(passwordClass);
-        when(passwordClass.getEquivalentPassword(encodedVerificationCode, verificationCode))
-            .thenReturn(encodedVerificationCode);
+        when(xObject.isPasswordValueMatching(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD,
+            verificationCode)).thenReturn(true);
         DefaultResetPasswordRequestResponse expected =
             new DefaultResetPasswordRequestResponse(this.userReference, verificationCode);
 
@@ -336,15 +329,8 @@ class DefaultResetPasswordManagerTest
         when(this.userDocument
             .getXObject(ResetPasswordRequestClassDocumentInitializer.REFERENCE))
             .thenReturn(xObject);
-        String encodedVerificationCode = "encodedVerificationCode";
-        when(xObject.getStringValue(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD))
-            .thenReturn(encodedVerificationCode);
-        BaseClass baseClass = mock(BaseClass.class);
-        when(xObject.getXClass(context)).thenReturn(baseClass);
-        PasswordClass passwordClass = mock(PasswordClass.class);
-        when(baseClass.get(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD)).thenReturn(passwordClass);
-        when(passwordClass.getEquivalentPassword(encodedVerificationCode, verificationCode))
-            .thenReturn(encodedVerificationCode);
+        when(xObject.isPasswordValueMatching(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD,
+            verificationCode)).thenReturn(true);
         when(this.configurationSource.getProperty(DefaultResetPasswordManager.TOKEN_LIFETIME, 60)).thenReturn(15);
         when(xObject.getDateValue(ResetPasswordRequestClassDocumentInitializer.REQUEST_DATE_FIELD))
             .thenReturn(Date.from(Instant.now().minus(14, ChronoUnit.MINUTES)));

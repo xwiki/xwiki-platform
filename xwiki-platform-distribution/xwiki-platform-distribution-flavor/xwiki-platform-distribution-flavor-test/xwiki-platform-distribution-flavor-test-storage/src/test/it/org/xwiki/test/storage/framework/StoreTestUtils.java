@@ -20,19 +20,21 @@
 package org.xwiki.test.storage.framework;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.xwiki.http.internal.XWikiCredentials;
+import org.xwiki.http.internal.XWikiHTTPClient;
 
 /**
  * Test saving and downloading of attachments.
@@ -42,71 +44,65 @@ import org.apache.commons.httpclient.methods.multipart.Part;
  */
 public final class StoreTestUtils
 {
+    /**
+     * The status code and the body of a response, both read before the connection is released, so that tests can
+     * assert on them without having to manage the connection themselves.
+     *
+     * @param code the status code of the response
+     * @param body the body of the response
+     */
+    public record Response(int code, byte[] body)
+    {
+        /**
+         * @return the body of the response as an UTF-8 string
+         */
+        public String bodyAsString()
+        {
+            return new String(this.body, StandardCharsets.UTF_8);
+        }
+    }
+
     public static String getPageAsString(final String address) throws IOException
     {
-        final HttpMethod ret = doPost(address, null, null);
-        return new String(ret.getResponseBody(), "UTF-8");
+        return doPost(address, null, null).bodyAsString();
     }
 
     /** Method to easily do a post request to the site. */
-    public static HttpMethod doPost(final String address, final UsernamePasswordCredentials userNameAndPassword,
+    public static Response doPost(final String address, final XWikiCredentials userNameAndPassword,
         final Map<String, String> parameters) throws IOException
     {
-        final HttpClient client = new HttpClient();
-        final PostMethod method = new PostMethod(address);
-
-        if (userNameAndPassword != null) {
-            client.getState().setCredentials(AuthScope.ANY, userNameAndPassword);
-            client.getParams().setAuthenticationPreemptive(true);
-        }
+        final HttpPost method = new HttpPost(address);
 
         if (parameters != null) {
+            List<NameValuePair> formParameters = new ArrayList<>(parameters.size());
             for (Map.Entry<String, String> e : parameters.entrySet()) {
-                method.addParameter(e.getKey(), e.getValue());
+                formParameters.add(new BasicNameValuePair(e.getKey(), e.getValue()));
             }
+            method.setEntity(new UrlEncodedFormEntity(formParameters, StandardCharsets.UTF_8));
         }
-        client.executeMethod(method);
-        return method;
+
+        return execute(method, userNameAndPassword);
     }
 
-    public static HttpMethod doUpload(final String address, final UsernamePasswordCredentials userNameAndPassword,
+    public static Response doUpload(final String address, final XWikiCredentials userNameAndPassword,
         final Map<String, byte[]> uploads) throws IOException
     {
-        final HttpClient client = new HttpClient();
-        final PostMethod method = new PostMethod(address);
+        final HttpPost method = new HttpPost(address);
 
-        if (userNameAndPassword != null) {
-            client.getState().setCredentials(AuthScope.ANY, userNameAndPassword);
-            client.getParams().setAuthenticationPreemptive(true);
-        }
-
-        Part[] parts = new Part[uploads.size()];
-        int i = 0;
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
         for (Map.Entry<String, byte[]> e : uploads.entrySet()) {
-            parts[i++] = new FilePart("filepath", new ByteArrayPartSource(e.getKey(), e.getValue()));
+            entityBuilder.addBinaryBody("filepath", e.getValue(), ContentType.DEFAULT_BINARY, e.getKey());
         }
-        MultipartRequestEntity entity = new MultipartRequestEntity(parts, method.getParams());
-        method.setRequestEntity(entity);
+        method.setEntity(entityBuilder.build());
 
-        client.executeMethod(method);
-        return method;
+        return execute(method, userNameAndPassword);
     }
 
-    /**
-     * Encodes a given string so that it may be used as a URL component. Compatible with javascript decodeURIComponent,
-     * though more strict than encodeURIComponent: all characters except [a-zA-Z0-9], '.', '-', '*', '_' are converted
-     * to hexadecimal, and spaces are substituted by '+'.
-     * 
-     * @param s
-     * @since 3.2M1
-     */
-    public static String escapeURL(String s)
+    private static Response execute(ClassicHttpRequest request, XWikiCredentials credentials) throws IOException
     {
-        try {
-            return URLEncoder.encode(s, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // should not happen
-            throw new RuntimeException(e);
+        try (XWikiHTTPClient client = new XWikiHTTPClient()) {
+            return client.execute(request, credentials, (response, context) -> new Response(response.getCode(),
+                response.getEntity() != null ? EntityUtils.toByteArray(response.getEntity()) : new byte[0]));
         }
     }
 }

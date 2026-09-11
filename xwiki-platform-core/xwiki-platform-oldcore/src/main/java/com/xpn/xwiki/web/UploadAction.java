@@ -231,12 +231,9 @@ public class UploadAction extends XWikiAction
             documentComment = localizePlainOrReturnKey("core.comment.uploadAttachmentComment", params.toArray());
         }
 
-        // Make sure the user is allowed to make this modification
-        context.getWiki().checkSavingDocument(context.getUserReference(), doc, documentComment, true, context);
-
         // Save the document.
         try {
-            context.getWiki().saveDocument(doc, documentComment, context);
+            context.getWiki().saveDocument(doc, documentComment, false, true, context);
         } catch (XWikiException e) {
             // check Exception is ERROR_XWIKI_APP_JAVA_HEAP_SPACE when saving Attachment
             if (e.getCode() == XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE) {

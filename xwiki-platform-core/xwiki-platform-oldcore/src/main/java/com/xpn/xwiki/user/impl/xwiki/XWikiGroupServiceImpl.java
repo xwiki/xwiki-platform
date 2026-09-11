@@ -121,14 +121,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
     private static final String NAME = "groupservice";
 
-    private static final List<Event> EVENTS = new ArrayList<Event>()
-    {
-        {
-            add(new DocumentCreatedEvent());
-            add(new DocumentUpdatedEvent());
-            add(new DocumentDeletedEvent());
-        }
-    };
+    private static final List<Event> EVENTS = new ArrayList<>(List.of(new DocumentCreatedEvent(),
+        new DocumentUpdatedEvent(), new DocumentDeletedEvent()));
 
     /**
      * Used to convert a string into a proper Document Reference.

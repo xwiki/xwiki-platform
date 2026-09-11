@@ -122,8 +122,7 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
 
                 // We must initialize all the fields to an empty value in order to correctly create the object
                 BaseClass xwikiClass = xwiki.getClass(xwikiObject.getClassName(), xcontext);
-                for (Object propertyNameObject : xwikiClass.getPropertyNames()) {
-                    String propertyName = (String) propertyNameObject;
+                for (String propertyName : xwikiClass.getPropertyNames()) {
                     xwikiObject.set(propertyName, "", xcontext);
                 }
             }

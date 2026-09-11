@@ -21,14 +21,16 @@
 import DisplayerToggle from "../DisplayerToggle.vue";
 import { flushPromises, mount } from "@vue/test-utils";
 import * as liveDataUI from "@xwiki/platform-livedata-ui";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { mockRequireJS } from "@xwiki/platform-test-requirejs";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { RequireJSMock } from "@xwiki/platform-test-requirejs";
 
 // --- Mocks ---
 const bootstrapSwitchMock = vi.fn();
 const jQueryMock = vi.fn(() => ({ bootstrapSwitch: bootstrapSwitchMock }));
 
 // Mock the elements provided by @xwiki/platform-livedata-ui to provide simplified vue component instead of relying on
-// shallow mount, making it easier to inspect their internal state in tests. require (from Requirejs) is mocked.
+// shallow mount, making it easier to inspect their internal state in tests.
 vi.mock("@xwiki/platform-livedata-ui", async (importOriginal) => {
   const actual: typeof liveDataUI = await importOriginal();
   return {
@@ -42,7 +44,6 @@ vi.mock("@xwiki/platform-livedata-ui", async (importOriginal) => {
       emits: ["ready"],
       props: ["iconDescriptor"],
     },
-    loadById: vi.fn(),
   };
 });
 
@@ -67,7 +68,15 @@ function initWrapper(props = {}) {
 // --- Tests ---
 // eslint-disable-next-line max-statements
 describe("DisplayerToggle", () => {
-  beforeEach(() => vi.clearAllMocks());
+  let requireJS: RequireJSMock;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // The Bootstrap switch widget is loaded as a RequireJS module by the component.
+    requireJS = mockRequireJS({ "xwiki-bootstrap-switch": {} });
+  });
+
+  afterEach(() => requireJS.restore());
 
   it("reads checked state from entry", () => {
     const wrapper = initWrapper();

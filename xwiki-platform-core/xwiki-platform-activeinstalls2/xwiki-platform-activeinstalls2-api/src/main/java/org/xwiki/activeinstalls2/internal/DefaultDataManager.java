@@ -97,6 +97,14 @@ public class DefaultDataManager implements DataManager
         return count.count();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns at most 10 pings, which is the number of hits Elasticsearch returns for a search request that doesn't
+     * ask for a size. No size is asked for since the pings are only meant to be sampled here: retrieving more of
+     * them, let alone all of them, would mean holding an unbounded number of extension lists in memory, which the
+     * counting methods avoid by aggregating server-side instead.
+     */
     @Override
     public List<Ping> searchInstalls(String jsonQuery) throws Exception
     {

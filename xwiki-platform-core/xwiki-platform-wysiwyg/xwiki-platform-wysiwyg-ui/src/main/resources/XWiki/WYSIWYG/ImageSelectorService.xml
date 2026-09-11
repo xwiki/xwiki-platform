@@ -71,7 +71,7 @@
       &lt;div role="tabpanel" 
         class="$escapetool.xml(${uix.parameters.id}) tab-pane#if($foreach.index == 0) active#end" 
         id="$escapetool.xml($tabId)"&gt;
-      $services.rendering.render($uix.execute(), 'xhtml/1.0')
+      $services.uix.render($uix, 'html/5.0')
       &lt;/div&gt;
     #end
   &lt;/div&gt;

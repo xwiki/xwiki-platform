@@ -1,0 +1,88 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Hold each pull request to the quality rules the code base is held to, and fail it when the change
+## breaks one, so that it is caught before the merge instead of turning the master quality build red
+## afterwards. Everything but the trigger lives in the shared workflow, which every XWiki repository
+## calls, so that a change to what is checked is made once. See https://github.com/xwiki/.github
+##
+## This is the half of the trigger that "pull_request" cannot serve. A pull request from a fork is
+## given no repository secrets, so quality-pr.yml can only run Checkstyle on it, and the SonarQube
+## half needs SONAR_TOKEN; "pull_request_target" is the trigger that releases the secrets to a fork.
+## Who they are released to is the whole question: this run builds the pull request's own code, and
+## Maven executes what that code's poms tell it to -- a build extension, a plugin resolved from a
+## repository the pom adds -- so the token is exactly as safe as the author is trusted. The guard
+## below therefore limits this workflow to authors GitHub reports as members of the organization
+## owning this repository, the people on https://github.com/orgs/xwiki/people, for whom building
+## their code with the token grants nothing they could not already reach. Every other fork keeps the
+## Checkstyle-only verdict quality-pr.yml gives it.
+##
+## Two consequences of pull_request_target are worth knowing. It runs the copy of this file held by
+## the base branch and not the one in the pull request, so a change to this file cannot be tried out
+## in a pull request and takes effect only once merged -- and a pull request targeting a branch that
+## does not carry this file gets no run at all. And what to check out has to be said explicitly, the
+## default being the base branch, which holds none of the change.
+name: Pull request quality checks (fork)
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+## One run per pull request: a new commit makes the running one obsolete.
+concurrency:
+  group: quality-pr-sonar-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  analysis:
+    ## Named as in quality-pr.yml, and for the same reason: a reusable workflow names its check
+    ## "<this job> / <the called job>", exactly one of the two workflows runs for a given pull
+    ## request, and the check to require should be called the same whichever one it was.
+    name: Quality
+    ## A fork whose author GitHub reports as a member of the organization owning this repository.
+    ## author_association is computed by GitHub and is no part of what the pull request's author
+    ## sends, so it cannot be claimed by crafting anything; it is also the only way to ask this
+    ## question here, a workflow's GITHUB_TOKEN being unable to read organization membership and a
+    ## token that could being one more secret to hold. It covers members whose membership is private,
+    ## which this organization has. COLLABORATOR, someone granted access to this repository alone, is
+    ## deliberately left out: that access can be read-only, and read-only is not the "could have
+    ## pushed this branch themselves" that this guard stands in for.
+    ## This condition is the exact negation of quality-pr.yml's, so that a pull request is built once
+    ## and not twice; changing one of the two means changing the other.
+    if: >-
+      github.event.pull_request.head.repo.full_name != github.repository
+      && contains(fromJSON('["OWNER", "MEMBER"]'),
+                  github.event.pull_request.author_association)
+    ## For a reusable workflow the GITHUB_TOKEN permissions are the caller's. The analysis only reads
+    ## the sources, and narrowing them here is also what keeps this pull_request_target run from
+    ## carrying the writable token it would otherwise be handed.
+    permissions:
+      contents: read
+    ## Referenced by branch and not by commit hash, on purpose: pinning would mean a pull request in
+    ## every repository for every change to the shared workflow, which is the duplication this
+    ## indirection removes. What pinning protects against, a third party repointing the ref under
+    ## us, does not apply to a repository the XWiki committers own themselves.
+    uses: xwiki/.github/.github/workflows/quality-pr.yml@master
+    with:
+      ## refs/pull/<number>/head is a ref of this repository that GitHub maintains itself, so the
+      ## fork's commit is reached without configuring a remote of the fork or fetching from it.
+      ref: refs/pull/${{ github.event.pull_request.number }}/head
+      sonar: true
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

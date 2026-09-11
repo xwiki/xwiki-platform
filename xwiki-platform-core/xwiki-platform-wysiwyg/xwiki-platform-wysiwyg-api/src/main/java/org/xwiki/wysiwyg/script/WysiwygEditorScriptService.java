@@ -43,8 +43,6 @@ import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorExecutor;
@@ -63,6 +61,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.edit.EditModeResolver;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -96,6 +95,9 @@ public class WysiwygEditorScriptService implements ScriptService
 
     @Inject
     private ContextualAuthorizationManager authorization;
+
+    @Inject
+    private EditModeResolver editModeResolver;
 
     /**
      * The component used to convert HTML to wiki syntax.
@@ -142,20 +144,7 @@ public class WysiwygEditorScriptService implements ScriptService
      */
     public boolean isSyntaxSupported(String syntaxId)
     {
-        // Special handling for XHTML since right the XHTML renderer doesn't produce valid XHTML. Thus if, for example,
-        // you the WYSIWYG editor and add 2 paragraphs, it'll generate {@code <p>a</p><p>b</p>} which is invalid XHTML
-        // and the page will fail to render.
-        if (syntaxId.equals(Syntax.XHTML_1_0.toIdString())) {
-            return false;
-        }
-
-        try {
-            this.contextComponentManager.getInstance(Parser.class, syntaxId);
-            this.contextComponentManager.getInstance(PrintRendererFactory.class, syntaxId);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return this.editModeResolver.isSyntaxWYSIWYGEditable(syntaxId);
     }
 
     /**

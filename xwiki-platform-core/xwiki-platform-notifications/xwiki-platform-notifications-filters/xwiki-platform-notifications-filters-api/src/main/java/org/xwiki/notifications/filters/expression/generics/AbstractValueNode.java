@@ -51,7 +51,7 @@ public abstract class AbstractValueNode<T> extends AbstractNode
      *
      * @param content the node content
      */
-    public AbstractValueNode(T content)
+    protected AbstractValueNode(T content)
     {
         if (content == null) {
             throw new NullPointerException("A value node should have its content defined.");

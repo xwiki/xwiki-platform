@@ -61,13 +61,13 @@
     <pdfbox.version>3.0.8</pdfbox.version>
     <poi.version>5.5.1</poi.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.1.12</jetty.server.version>
+    <jetty.server.version>12.1.13</jetty.server.version>
     <jetty.client.version>10.0.26</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.2.17.Final</netty.version>
+    <netty.version>4.2.18.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <!-- Used for CVSS score calculation -->
-    <metaeffekt.version>0.156.6</metaeffekt.version>
+    <metaeffekt.version>0.157.0</metaeffekt.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
@@ -313,7 +313,7 @@
       <dependency>
         <groupId>com.github.junrar</groupId>
         <artifactId>junrar</artifactId>
-        <version>8.1.0</version>
+        <version>8.1.1</version>
       </dependency>
 
       <dependency>
@@ -539,7 +539,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.23.1</version>
+        <version>1.23.2</version>
       </dependency>
 
       <!-- PDF -->
@@ -659,7 +659,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.3.0</version>
+        <version>2.3.1</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -669,7 +669,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.2</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -715,7 +715,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail-junit5</artifactId>
-        <version>2.1.12</version>
+        <version>2.1.13</version>
         <exclusions>
           <!--  -->
           <exclusion>
@@ -1190,7 +1190,7 @@
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>vue</artifactId>
-        <version>3.5.41</version>
+        <version>3.5.42</version>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
@@ -1201,6 +1201,13 @@
         <groupId>org.webjars</groupId>
         <artifactId>font-awesome</artifactId>
         <version>7.3.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-bom</artifactId>
+        <version>7.1.1</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

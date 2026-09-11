@@ -110,6 +110,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
      */
     public DefaultAuthenticationFailureManager()
     {
+        // Nothing to initialize here: see initialize(), called by the component manager.
     }
 
     @Override

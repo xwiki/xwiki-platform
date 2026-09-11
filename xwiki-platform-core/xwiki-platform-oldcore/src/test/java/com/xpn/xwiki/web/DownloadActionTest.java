@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
@@ -219,18 +218,13 @@ class DownloadActionTest
 
     private void verifyOutputExpectations(final int start, final int end) throws IOException
     {
-        verify(this.out).write(argThat(new ArgumentMatcher<byte[]>()
-        {
-            @Override
-            public boolean matches(byte[] argument)
-            {
-                for (int i = start; i < end; ++i) {
-                    if (argument[i - start] != DownloadActionTest.this.fileContent[i]) {
-                        return false;
-                    }
+        verify(this.out).write(argThat(argument -> {
+            for (int i = start; i < end; ++i) {
+                if (argument[i - start] != this.fileContent[i]) {
+                    return false;
                 }
-                return true;
             }
+            return true;
         }), eq(0), eq(end - start));
     }
 

@@ -9,6 +9,9 @@ import { WikiConfig } from '@xwiki/platform-api';
 // @beta
 export function getRestSpacesApiUrl(wikiConfig: WikiConfig, documentId: string): string;
 
+// @public
+export function loadById<T = unknown>(...ids: string[]): Promise<T>;
+
 // (No @packageDocumentation comment for this package)
 
 ```

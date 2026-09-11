@@ -85,11 +85,11 @@ public class PasswordMetaClass extends StringMetaClass
         storageTypeClass.setSize(1);
         safeput(storageTypeClass.getName(), storageTypeClass);
 
-        StringClass encryptAlgorithmClass = new StringClass(this);
-        encryptAlgorithmClass.setName(ALGORITHM_KEY);
-        encryptAlgorithmClass.setPrettyName("Encryption/hash algorithm");
-        encryptAlgorithmClass.setSize(20);
-        safeput(encryptAlgorithmClass.getName(), encryptAlgorithmClass);
+        StringClass hashAlgorithmClass = new StringClass(this);
+        hashAlgorithmClass.setName(ALGORITHM_KEY);
+        hashAlgorithmClass.setPrettyName("Hash algorithm");
+        hashAlgorithmClass.setSize(20);
+        safeput(hashAlgorithmClass.getName(), hashAlgorithmClass);
     }
 
     @Override

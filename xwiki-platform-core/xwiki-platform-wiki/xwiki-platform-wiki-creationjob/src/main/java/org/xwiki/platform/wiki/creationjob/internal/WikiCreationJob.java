@@ -79,7 +79,7 @@ public class WikiCreationJob extends AbstractJob<WikiCreationRequest, DefaultJob
             List<WikiCreationStep> wikiCreationStepList = componentManager.getInstanceList(WikiCreationStep.class);
             // Some extra steps needs to be executed AFTER some others, so we have introduce a getOrder() method in the
             // interface. We use this method to sort the list of extra steps by this order.
-            Collections.sort(wikiCreationStepList, (o1, o2) -> o1.getOrder() - o2.getOrder());
+            Collections.sort(wikiCreationStepList, (o1, o2) -> Integer.compare(o1.getOrder(), o2.getOrder()));
             // Now we can execute these extra steps
             this.progressManager.pushLevelProgress(wikiCreationStepList.size(), this);
 

@@ -26,7 +26,7 @@ import com.xpn.xwiki.objects.PropertyInterface;
 
 public abstract class Collection extends Element
 {
-    public Collection(BaseCollection collection, XWikiContext context)
+    protected Collection(BaseCollection collection, XWikiContext context)
     {
         super(collection, context);
     }

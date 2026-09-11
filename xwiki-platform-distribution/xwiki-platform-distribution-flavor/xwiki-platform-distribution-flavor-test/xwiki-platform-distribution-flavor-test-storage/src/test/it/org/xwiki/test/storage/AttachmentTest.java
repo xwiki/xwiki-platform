@@ -22,7 +22,6 @@ package org.xwiki.test.storage;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 
-import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -80,16 +79,16 @@ public class AttachmentTest extends AbstractTest
                 put("content", test);
             }});
 
-        HttpMethod ret = null;
+        StoreTestUtils.Response ret = null;
 
         // Test getAttachment()
         ret = doPostAsAdmin("Test", "Attachment", null, "view", "xpage=plain", null);
-        Assert.assertEquals("<p>" + ATTACHMENT_CONTENT + "</p>", ret.getResponseBodyAsString());
+        Assert.assertEquals("<p>" + ATTACHMENT_CONTENT + "</p>", ret.bodyAsString());
 
         // Test downloadAction.
         ret = doPostAsAdmin("Test", "Attachment", FILENAME, "download", null, null);
-        Assert.assertEquals(ATTACHMENT_CONTENT, new String(ret.getResponseBody(), "UTF-8"));
-        Assert.assertEquals(200, ret.getStatusCode());
+        Assert.assertEquals(ATTACHMENT_CONTENT, ret.bodyAsString());
+        Assert.assertEquals(200, ret.code());
 
         // Make sure there is exactly 1 version of this attachment.
         ret = doPostAsAdmin("Test", "Attachment", null, "preview", "xpage=plain",
@@ -97,7 +96,7 @@ public class AttachmentTest extends AbstractTest
                 put("content", "{{velocity}}$doc.getAttachment('"
                     + FILENAME + "').getVersions().size(){{/velocity}}");
             }});
-        Assert.assertEquals("<p>1</p>", ret.getResponseBodyAsString());
+        Assert.assertEquals("<p>1</p>", ret.bodyAsString());
 
         // Make sure that version contains the correct content.
         ret = doPostAsAdmin("Test", "Attachment", null, "preview", "xpage=plain",
@@ -105,7 +104,7 @@ public class AttachmentTest extends AbstractTest
                 put("content", "{{velocity}}$doc.getAttachment('" + FILENAME
                     + "').getAttachmentRevision('1.1').getContentAsString(){{/velocity}}");
             }});
-        Assert.assertEquals("<p>" + ATTACHMENT_CONTENT + "</p>", ret.getResponseBodyAsString());
+        Assert.assertEquals("<p>" + ATTACHMENT_CONTENT + "</p>", ret.bodyAsString());
     }
 
     /**
@@ -193,7 +192,7 @@ public class AttachmentTest extends AbstractTest
         // Create a document.
         doPostAsAdmin(spaceName, pageName, null, "save", null, null);
 
-        HttpMethod ret;
+        StoreTestUtils.Response ret;
 
         // Upload the attachment
         ret = doUploadAsAdmin(spaceName, pageName,
@@ -209,8 +208,8 @@ public class AttachmentTest extends AbstractTest
 
         // Make sure it's nolonger there.
         ret = doPostAsAdmin(spaceName, pageName, FILENAME, "download", null, null);
-        Assert.assertFalse(ATTACHMENT_CONTENT.equals(new String(ret.getResponseBody(), "UTF-8")));
-        Assert.assertEquals(404, ret.getStatusCode());
+        Assert.assertFalse(ATTACHMENT_CONTENT.equals(ret.bodyAsString()));
+        Assert.assertEquals(404, ret.code());
     }
 
     @Test
@@ -277,7 +276,7 @@ public class AttachmentTest extends AbstractTest
         // Create a document. v1.1
         doPostAsAdmin(spaceName, pageName, null, "save", null, null);
 
-        HttpMethod ret;
+        StoreTestUtils.Response ret;
 
         // Upload the attachment v2.1
         ret = doUploadAsAdmin(spaceName, pageName,
@@ -308,7 +307,7 @@ public class AttachmentTest extends AbstractTest
             new HashMap<String, String>() {{
                 put("content", "{{velocity}}$doc.getVersion(){{/velocity}}");
             }});
-        Assert.assertEquals("<p>5.1</p>", new String(ret.getResponseBody(), "UTF-8"));
+        Assert.assertEquals("<p>5.1</p>", ret.bodyAsString());
 
         // Make sure it is version1
         Assert.assertEquals(ATTACHMENT_CONTENT, StoreTestUtils.getPageAsString(attachURL));
@@ -324,7 +323,7 @@ public class AttachmentTest extends AbstractTest
             new HashMap<String, String>() {{
                 put("content", "{{velocity}}$doc.getVersion(){{/velocity}}");
             }});
-        Assert.assertEquals("<p>6.1</p>", new String(ret.getResponseBody(), "UTF-8"));
+        Assert.assertEquals("<p>6.1</p>", ret.bodyAsString());
     }
 
     /**

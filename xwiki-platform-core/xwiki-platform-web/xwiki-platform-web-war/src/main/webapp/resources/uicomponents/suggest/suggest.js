@@ -86,7 +86,14 @@ var XWiki = (function(XWiki){
       positions: [ "top" ],
       text: "$escapetool.javascript($services.localization.render('core.widgets.suggest.hide'))"
     },
+    // A node to insert before the suggestions. Only supported in multi-source mode, i.e. when the "sources" option
+    // is set, even to a single-element array. In mono-source mode the list reset searches the whole result container,
+    // so it removes this node's own <ul> instead of the suggestion list when this node contains one.
     insertBeforeSuggestions: null,
+    // A node to insert after the suggestions. Only supported in multi-source mode, i.e. when the "sources" option
+    // is set, even to a single-element array. In mono-source mode the suggestion list is appended to the result
+    // container after this node, so this node ends up above the suggestions rather than below them.
+    insertAfterSuggestions: null,
     // Should value be displayed as a hint
     displayValue: false,
     // Display value prefix text
@@ -626,11 +633,15 @@ var XWiki = (function(XWiki){
       this.resultContainer.down("ul").remove();
     }
 
-    var withEnableButton = typeof this.options.hideButton !== "undefined"
+    if (this.options.insertAfterSuggestions
+        && this.options.insertAfterSuggestions.parentNode !== this.resultContainer) {
+      this.resultContainer.insert(this.options.insertAfterSuggestions);
+    }
+
+    const withEnableButton = this.options.hideButton
                         && typeof this.options.hideButton.positions === "object"
                         && this.options.hideButton.positions.length > 0;
     if (withEnableButton && !this.container.down('.hide-button')) {
-      // TODO: replace the label "hide suggestions" to an icon (see XWIKI-24324).
       var positions = this.options.hideButton.positions;
       for (var i=0; i< positions.length; i++) {
         var hideButton = new Element('button', {'class' : 'hide-button', 'type' : 'button'})

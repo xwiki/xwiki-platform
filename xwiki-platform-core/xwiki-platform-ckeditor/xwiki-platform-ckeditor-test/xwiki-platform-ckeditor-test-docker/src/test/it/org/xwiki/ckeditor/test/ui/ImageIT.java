@@ -439,13 +439,16 @@ class ImageIT extends AbstractCKEditorIT
         editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
 
         LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
-        // The reference (suggest) input is focused when the link dialog is opened so the dropdown is opened.
-        linkDialog.getResourceSuggestInput().waitForSuggestions().hideSuggestions();
+        // The reference (suggest) input is focused when the link dialog is opened so the dropdown is opened. We
+        // currently have to select a link target. See XWIKI-24860: Preselect the image resource reference as link
+        // target when creating a link from an image selection
+        linkDialog.getResourceSuggestInput().waitForSuggestions()
+            .sendKeys(testReference.getLastSpaceReference().getName()).waitForSuggestions().selectByIndex(0);
         linkDialog.submit();
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
-        assertEquals("[[~[~[image:image.gif~]~]>>]]", savedPage.editWiki().getContent());
+        assertEquals("[[~[~[image:image.gif~]~]>>doc:]]", savedPage.editWiki().getContent());
     }
 
     @Test

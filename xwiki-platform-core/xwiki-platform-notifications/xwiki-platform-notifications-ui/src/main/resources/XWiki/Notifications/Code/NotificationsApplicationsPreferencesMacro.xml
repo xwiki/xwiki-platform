@@ -153,6 +153,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
     var save = function() {
       // To avoid having several requests in the same time (which could lead to error 500), we disable all the triggers during the save process
       var toggles = $('.bootstrap-switch input');
+      // Disabling a focused input blurs it and drops it from the tab order, so remember it to restore focus later.
+      const focusedToggle = toggles.filter(':focus');
       toggles.bootstrapSwitch('disabled', true);
       var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
       var data = [];
@@ -194,6 +196,12 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
       }).finally(function() {
         // Enable again the triggers
         toggles.bootstrapSwitch('disabled', false);
+        // Restore focus to the toggle the user was interacting with, since disabling it moved focus away, but only
+        // if focus is still on the body where the disabling left it. Don't steal it back if the user has since
+        // moved focus elsewhere while the save request was in flight.
+        if (document.activeElement === document.body) {
+          focusedToggle.focus();
+        }
       });
     };
 
@@ -1042,12 +1050,14 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
       &lt;/th&gt;
       ## Alert switch
       &lt;td class="notificationAppCell loading" data-format="alert"&gt;
-        &lt;input type="checkbox" class="notificationAppCheckbox hidden"/&gt;
+        &lt;input type="checkbox" class="notificationAppCheckbox hidden"
+          aria-label="$escapetool.xml($services.localization.render('notifications.settings.applications.table.toggle.app.label', [$services.localization.render('notifications.format.alert'), $type.applicationName]))"/&gt;
       &lt;/td&gt;
       ## Email switch
       #if ($services.notification.areEmailsEnabled())
         &lt;td class="notificationAppCell loading" data-format="email"&gt;
-          &lt;input type="checkbox" class="notificationAppCheckbox hidden"/&gt;
+          &lt;input type="checkbox" class="notificationAppCheckbox hidden"
+            aria-label="$escapetool.xml($services.localization.render('notifications.settings.applications.table.toggle.app.label', [$services.localization.render('notifications.format.email'), $type.applicationName]))"/&gt;
         &lt;/td&gt;
       #end
       ## Collapse button
@@ -1093,7 +1103,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 
   #end
   &lt;td class="notificationTypeCell loading" data-eventtype="$!escapetool.xml($type.eventType)" data-format="$format" data-filter="${type.filter}"&gt;
     &lt;div class="hidden"&gt;
-      &lt;input type="checkbox" class="notificationTypeCheckbox" $checked/&gt;
+      &lt;input type="checkbox" class="notificationTypeCheckbox" $checked
+        aria-label="$escapetool.xml($services.localization.render('notifications.settings.applications.table.toggle.eventType.label', [$services.localization.render("notifications.format.${format}"), $type.description]))"/&gt;
     &lt;/div&gt;
   &lt;/td&gt;
 #end

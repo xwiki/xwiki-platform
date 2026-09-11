@@ -87,38 +87,26 @@ define([
     return $.post(new URL('?', url), $.param($.extend(urlParams, data), true));
   };
 
-  // Prefix each node's rendered anchor id with the tree's own container id, to avoid duplicate DOM ids when the same
-  // entity is shown by more than one tree on the same page.
+  // Used to generate an id for the tree containers that don't have one.
   let treeCounter = 0;
 
-  function getOrGenerateTreeId(tree) {
-    let id = tree.element.attr('id');
+  // The tree container id is used to prefix the rendered id of the node anchors, so the tree must have an id.
+  function getOrGenerateTreeId(element) {
+    let id = element.attr('id');
     if (!id) {
       id = 'xtree-' + (treeCounter++);
-      tree.element.attr('id', id);
+      element.attr('id', id);
     }
     return id;
   }
 
-  function prefixAnchorIdAttribute(node, tree) {
-    if (node && typeof node.id !== 'undefined') {
-      const treeId = getOrGenerateTreeId(tree);
-      node.a_attr = $.extend({}, node.a_attr, {id: treeId + '-' + node.id + '_anchor'});
-    }
-    return node;
+  function getNodeAnchorId(tree, nodeId) {
+    return getOrGenerateTreeId(tree.element) + '-' + nodeId + '_anchor';
   }
 
   var getChildren = function(node, callback, parameters) {
     // 'this' is the tree instance.
-    const tree = this;
-    const boundCallback = callback.bind(this);
-    // Wrap the callback from jsTree so that every fetched child's anchor gets a page-wide unique rendered id.
-    callback = function(children, ...args) {
-      (children || []).forEach(function(child) {
-        prefixAnchorIdAttribute(child, tree);
-      });
-      return boundCallback(children, ...args);
-    };
+    callback = callback.bind(this);
     if (node.id === $.jstree.root && !node.data) {
       // Take the root node data from the tree container element.
       node.data = this.get_container().data('root') || {};
@@ -414,8 +402,7 @@ define([
         // the rest of the siblings (i.e. all the next pages) until we find the node that corresponds to the given path
         // element, so we simply add the node to the parent. Don't worry, the node won't be duplicated when the
         // pagination is triggered.
-        // This node doesn't go through the children callback, so its anchor id is prefixed here instead.
-        this.create_node(parent, prefixAnchorIdAttribute(nodeSpec, this), siblings.length - 1, resolve);
+        this.create_node(parent, nodeSpec, siblings.length - 1, resolve);
       } else {
         // The specified node can't be created.
         reject();
@@ -522,6 +509,9 @@ define([
   };
 
   var customTreeAPI = {
+    getNodeAnchorId: function(nodeId) {
+      return getNodeAnchorId(this, nodeId);
+    },
     openTo: function(nodeIds, callback) {
       var isArray = Array.isArray(nodeIds);
       if (!isArray) {
@@ -556,6 +546,23 @@ define([
       this.element.trigger('xtree.runJob', [promise, action, node, params]);
       return promise;
     }
+  };
+
+  $.jstree.plugins.xtree = function(options, parent) {
+    // The node id alone is not unique on the page, when the same entity is displayed by more than one tree, so we
+    // prefix the rendered anchor id with the tree id. The tree owns this id, rather than leaving it to the code that
+    // specifies the nodes, so that the nodes created by extensions get it too. We do this on redraw because it's the
+    // single place where jsTree computes the anchor id, whatever the node comes from (the data source, #create_node(),
+    // #move_node(), #copy_node() or a redraw that follows #set_id()).
+    this.redraw_node = function(node, ...args) {
+      const nodeModel = this.get_node(node);
+      if (nodeModel) {
+        // Modify the existing object because the code that specifies the nodes may keep a reference to it.
+        nodeModel.a_attr = nodeModel.a_attr || {};
+        nodeModel.a_attr.id = getNodeAnchorId(this, nodeModel.id);
+      }
+      return parent.redraw_node.call(this, node, ...args);
+    };
   };
 
   $.fn.xtree = function(params) {
@@ -772,7 +779,7 @@ define([
     // Un-wrap the links generated from wiki syntax so that they are taken into account by jsTree.
     //
 
-    }).find('li > span[class^="wiki"] > a').unwrap().addBack()
+    }).find('li > span[class^="wiki"] > a').unwrap().end()
 
     //
     // Create the tree and extend its API.
@@ -784,7 +791,16 @@ define([
       pageReady.delayPageReady(new Promise((resolve, reject) => {
         $(this).one('ready.jstree', resolve);
       }), 'tree:ready');
-      $(this).jstree($.extend(true, getDefaultParams($(this)), params || {}));
+      // The rendered id of the node anchors is derived from the tree id, and the nodes can be drawn synchronously
+      // (when the tree data comes from the HTML inside the tree element), so the tree needs an id before it is created.
+      getOrGenerateTreeId($(this));
+      var treeParams = $.extend(true, getDefaultParams($(this)), params || {});
+      // Add our plugin after the merge because $.extend() merges the arrays by index, so a plugin list passed by the
+      // caller could otherwise overwrite it.
+      if (!treeParams.plugins.includes('xtree')) {
+        treeParams.plugins.push('xtree');
+      }
+      $(this).jstree(treeParams);
       $.extend($.jstree.reference(this), customTreeAPI, {jobRunner: createJobRunner(this)});
     });
   };

@@ -70,7 +70,7 @@
             >
               <XWikiIcon
                 :icon-descriptor="{
-                  name: isMaximized ? 'compress' : 'expand',
+                  name: isMaximized ? 'minimize' : 'maximize',
                 }"
               />
               {{

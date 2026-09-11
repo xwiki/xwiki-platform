@@ -53,16 +53,13 @@ public class TreeElement extends BaseElement
     }
 
     /**
-     * Reconstructs an anchor's rendered id from its node id.
-     *
-     * @param nodeId the node identifier
-     * @return the corresponding anchor DOM id
+     * @return the trees displayed in the content of the currently viewed page, in document order
+     * @since 18.8.0RC1
      */
-    private String getRenderedAnchorId(String nodeId)
+    public static List<TreeElement> getTreesInPageContent()
     {
-        String prefix = this.element.getAttribute(ATTRIBUTE_ID);
-        String anchorId = nodeId + "_anchor";
-        return (prefix == null || prefix.isEmpty()) ? anchorId : (prefix + "-" + anchorId);
+        return getUtil().getDriver().findElementsWithoutWaiting(By.cssSelector("#xwikicontent .jstree")).stream()
+            .map(TreeElement::new).toList();
     }
 
     /**
@@ -145,8 +142,10 @@ public class TreeElement extends BaseElement
      */
     public TreeElement waitForNodeSelected(String nodeId)
     {
+        // We cannot match the anchor by its id because it is prefixed with the tree id (to be unique on the page), so
+        // we look for it relative to its node (the node id is used as is for the id of the list item element).
         String selectedNodeXPath =
-            String.format(".//*[@id = '%s' and contains(@class, 'jstree-clicked')]", getRenderedAnchorId(nodeId));
+            String.format(".//*[@id = '%s']/a[contains(@class, 'jstree-clicked')]", nodeId);
         getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));
         return this;
     }

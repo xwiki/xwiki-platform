@@ -121,24 +121,31 @@ class NavigationPanelIT
         setup.setWikiPreference("leftPanels", "Panels.Navigation");
 
         setup.createPage(testReference, "Some content");
-        String[] documentPath = Stream
-            .concat(testReference.getSpaceReferences().stream().map(EntityReference::getName),
-                Stream.of(testReference.getName()))
-            .toArray(String[]::new);
+        try {
+            String[] documentPath = Stream
+                .concat(testReference.getSpaceReferences().stream().map(EntityReference::getName),
+                    Stream.of(testReference.getName()))
+                .toArray(String[]::new);
 
-        // The created page is the current one, so both trees open to it and thus render the same nodes twice.
-        List<String> labelIds = new ArrayList<>();
-        for (boolean leftColumn : List.of(true, false)) {
-            NavigationTreeElement tree = new NavigationPanel(leftColumn).getNavigationTree();
-            tree.waitForDocumentSelected(documentPath);
-            labelIds.addAll(tree.getNodeLabelIds());
+            // The created page is the current one, so both trees open to it and thus render the same nodes twice.
+            List<String> labelIds = new ArrayList<>();
+            for (boolean leftColumn : List.of(true, false)) {
+                NavigationTreeElement tree = new NavigationPanel(leftColumn).getNavigationTree();
+                tree.waitForDocumentSelected(documentPath);
+                labelIds.addAll(tree.getNodeLabelIds());
+            }
+
+            // A node label without an id would otherwise be reported below as a duplicate of the other missing ids,
+            // which is not the problem this test is about.
+            assertFalse(labelIds.stream().anyMatch(id -> id == null || id.isEmpty()),
+                "Found a node label without an id in " + labelIds);
+            assertEquals(List.of(), getDuplicates(labelIds), "Found duplicate node label ids on the page");
+        } finally {
+            // Clean up the page created by this test because its top level page interferes with the navigation
+            // panel administration test (which asserts the exact list of top level pages). The deletion is done
+            // through REST so that the browser stays on the current page.
+            setup.rest().delete(testReference);
         }
-
-        // A node label without an id would otherwise be reported below as a duplicate of the other missing ids,
-        // which is not the problem this test is about.
-        assertFalse(labelIds.stream().anyMatch(id -> id == null || id.isEmpty()),
-            "Found a node label without an id in " + labelIds);
-        assertEquals(List.of(), getDuplicates(labelIds), "Found duplicate node label ids on the page");
     }
 
     private List<String> getDuplicates(List<String> values)

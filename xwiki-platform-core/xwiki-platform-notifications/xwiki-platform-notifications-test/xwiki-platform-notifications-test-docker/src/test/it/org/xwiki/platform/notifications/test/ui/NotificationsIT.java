@@ -28,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -82,6 +83,12 @@ class NotificationsIT
 
     private static final String SECOND_USER_PASSWORD = "notificationsUser2";
 
+    private static final XWikiCredentials FIRST_USER_CREDENTIALS =
+        new XWikiCredentials(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+
+    private static final XWikiCredentials SECOND_USER_CREDENTIALS =
+        new XWikiCredentials(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+
     // Number of pages that have to be created in order for the notifications badge to show «X+»
     private static final int PAGES_TOP_CREATION_COUNT = 21;
 
@@ -108,8 +115,8 @@ class NotificationsIT
         // log in as superadmin.
         setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
         // Create the two users we will be using
-        setup.rest().createUser(FIRST_USER_NAME, FIRST_USER_PASSWORD);
-        setup.rest().createUser(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        setup.rest().createUser(FIRST_USER_CREDENTIALS);
+        setup.rest().createUser(SECOND_USER_CREDENTIALS);
 
         NotificationsUserProfilePage p;
 
@@ -152,7 +159,7 @@ class NotificationsIT
         // the pages of the user 1 are created over REST, since the subject of this test is the notification tray of
         // the user 2, not the page creation itself.
         String space = testReference.getLastSpaceReference().getName();
-        setup.rest().runAs(FIRST_USER_NAME, FIRST_USER_PASSWORD,
+        setup.rest().runAs(FIRST_USER_CREDENTIALS,
             rest -> rest.savePage(new LocalDocumentReference(space, "WebHome"),
                 "Content from " + FIRST_USER_NAME, "Page title"));
 
@@ -178,7 +185,7 @@ class NotificationsIT
         notificationsWatchModal.selectOptionAndSave(NotificationsWatchModal.WatchOptions.WATCH_WIKI);
 
         // We create a lot of pages in order to test the notification badge
-        setup.rest().runAs(FIRST_USER_NAME, FIRST_USER_PASSWORD, rest -> {
+        setup.rest().runAs(FIRST_USER_CREDENTIALS, rest -> {
             for (int i = 1; i < PAGES_TOP_CREATION_COUNT; i++) {
                 LocalDocumentReference page = new LocalDocumentReference(space, "Page" + i);
                 // Make sure the page is created, and not updated, so that a "create" event is sent.
@@ -230,7 +237,7 @@ class NotificationsIT
         p.setEventTypeState(SYSTEM, DELETE, ALERT_FORMAT, BootstrapSwitch.State.ON);
 
         // Delete the "Deletion test page" and test the notification
-        setup.rest().runAs(FIRST_USER_NAME, FIRST_USER_PASSWORD,
+        setup.rest().runAs(FIRST_USER_CREDENTIALS,
             rest -> rest.delete(new LocalDocumentReference(space, "DTP")));
 
         setup.gotoPage(space, "WebHome");
@@ -284,7 +291,7 @@ class NotificationsIT
         // Create a page, edit it several times, and finally add a comment. What this test is about is how the
         // resulting events are grouped in the tray of the user 2, so the user 1 produces them over REST rather than
         // through the editor.
-        setup.rest().runAs(FIRST_USER_NAME, FIRST_USER_PASSWORD, rest -> {
+        setup.rest().runAs(FIRST_USER_CREDENTIALS, rest -> {
             StringBuilder content = new StringBuilder("Linux is a part of GNU/Linux - it's the kernel");
             rest.savePage(testReference, content.toString(), "Linux as a title");
 
@@ -388,7 +395,7 @@ class NotificationsIT
 
             // Modify ARandomPageThatShouldBeModified as the second user over REST, so that the browser stays
             // logged in as the first user, whose notification tray is the subject of this test.
-            setup.rest().runAs(SECOND_USER_NAME, SECOND_USER_PASSWORD,
+            setup.rest().runAs(SECOND_USER_CREDENTIALS,
                 rest -> rest.savePage(modifiedPage, "Something", "Test page"));
 
             // Ensure that the notification is displayed with a custom template

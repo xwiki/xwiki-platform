@@ -99,14 +99,14 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 }
 
 .xobject-action {
-    display: block;
-    position: absolute;
-    top: -5px;
-    padding: 7px;
+   display: block;
+   position: absolute;
+   top: -5px;
+   padding: 7px;
 }
 
 .xobject-action.delete {
-    right: 0px;
+   right: 0px;
 }
 
 .xobject-title .delete {
@@ -119,7 +119,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 }
 
 .xobject-row {
-    min-height: 24px;
+   min-height: 24px;
 }
 
 /* XProperty definition */
@@ -237,14 +237,14 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
 }
 
 .xproperty-title .tools .tool {
-    width: 16px;
-    height: 16px;
-    padding: 4px;
-    box-sizing: content-box;
-    background-clip: content-box;
-    float: left;
-    background: transparent none center no-repeat;
-    margin-top: -4px;
+   width: 16px;
+   height: 16px;
+   padding: 4px;
+   box-sizing: content-box;
+   background-clip: content-box;
+   float: left;
+   background: transparent none center no-repeat;
+   margin-top: -4px;
 }
 
 .xproperty-title .tools .move {

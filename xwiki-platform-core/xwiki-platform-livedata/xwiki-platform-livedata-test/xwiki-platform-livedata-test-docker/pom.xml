@@ -49,6 +49,19 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Required to test the Live Data in the in-place WYSIWYG editor. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Runtime dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -74,6 +87,21 @@
       <artifactId>xwiki-platform-localization-rest-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- The in-place WYSIWYG editor the Live Data is tested in. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-edit-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

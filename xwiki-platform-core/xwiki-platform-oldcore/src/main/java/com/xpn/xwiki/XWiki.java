@@ -233,9 +233,7 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.velocity.VelocityEvaluator;
 import com.xpn.xwiki.job.JobRequestContext;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
@@ -1914,7 +1912,7 @@ public class XWiki implements EventListener
      * 
      * @param userReference the user responsible for the changes
      * @param document the document to save
-     * @param comment the comment to associated to the new version of the saved document
+     * @param comment the comment to associate to the new version of the saved document
      * @param isMinorEdit true if the new version is a minor version
      * @param context see {@link XWikiContext}
      * @since 10.11.10
@@ -1930,34 +1928,42 @@ public class XWiki implements EventListener
             context.setWikiId(document.getDocumentReference().getWikiReference().getName());
 
             // Make sure the document is ready to be saved
-            XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
-
-            ObservationManager om = getObservationManager();
+            prepareDocumentForSave(document, comment, isMinorEdit, context);
 
             // Notify listeners about the document about to be created or updated
-
-            // Note that for the moment the event being send is a bridge event, as we are still passing around
-            // an XWikiDocument as source and an XWikiContext as data.
-
-            if (om != null) {
-                CancelableEvent documentEvent;
-                if (originalDocument.isNew()) {
-                    documentEvent = new UserCreatingDocumentEvent(userReference, document.getDocumentReference());
-                } else {
-                    documentEvent = new UserUpdatingDocumentEvent(userReference, document.getDocumentReference());
-                }
-                om.notify(documentEvent, document, context);
-
-                // If the action has been canceled by the user then don't perform any save and throw an exception
-                if (documentEvent.isCanceled()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                        String.format("User [%s] has been denied the right to save the document [%s]. Reason: [%s]",
-                            userReference, document.getDocumentReference(), documentEvent.getReason()));
-                }
-            }
+            notifyUserDocumentEvent(userReference, document, context);
         } finally {
             context.setWikiId(currentWiki);
+        }
+    }
+
+    /**
+     * Check if the user is allowed to save the document.
+     * 
+     * @param userReference the user responsible for the changes
+     * @param document the document to save
+     * @param context see {@link XWikiContext}
+     */
+    private void notifyUserDocumentEvent(DocumentReference userReference, XWikiDocument document,
+        XWikiContext context) throws XWikiException
+    {
+        ObservationManager om = getObservationManager();
+
+        if (om != null) {
+            CancelableEvent documentEvent;
+            if (document.getOriginalDocument().isNew()) {
+                documentEvent = new UserCreatingDocumentEvent(userReference, document.getDocumentReference());
+            } else {
+                documentEvent = new UserUpdatingDocumentEvent(userReference, document.getDocumentReference());
+            }
+            om.notify(documentEvent, document, context);
+
+            // If the action has been canceled by the user then don't perform any save and throw an exception
+            if (documentEvent.isCanceled()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    String.format("User [%s] has been denied the right to save the document [%s]. Reason: [%s]",
+                        userReference, document.getDocumentReference(), documentEvent.getReason()));
+            }
         }
     }
 
@@ -2078,6 +2084,32 @@ public class XWiki implements EventListener
     public void saveDocument(XWikiDocument document, String comment, boolean isMinorEdit, XWikiContext context)
         throws XWikiException
     {
+        saveDocument(document, comment, isMinorEdit, false, context);
+    }
+
+    /**
+     * Save the passed document in the store.
+     * <p>
+     * If document is not new and metadata and content dirty flags are false, the version/history won't be incremented
+     * (only the current state will be updated).
+     * <p>
+     * If document#isNew() return true, any pre existing document will be backuped in the deleted documents store
+     * automatically and completely replaced.
+     * 
+     * @param document the document to save
+     * @param comment the comment to associated to the new version of the saved document
+     * @param isMinorEdit true if the new version is a minor version
+     * @param modifiedByContextUser true if the document is potentially modified by a user, in which case some
+     *            protection must be applied, false if it's done by the system (for example when saving mandatory
+     *            documents)
+     * @param context see {@link XWikiContext}
+     * @since 17.10.13
+     * @since 18.4.5
+     * @since 18.8.0RC1
+     */
+    public void saveDocument(XWikiDocument document, String comment, boolean isMinorEdit, boolean modifiedByContextUser,
+        XWikiContext context) throws XWikiException
+    {
         String currentWiki = context.getWikiId();
 
         try {
@@ -2090,6 +2122,11 @@ public class XWiki implements EventListener
 
             // Make sure the document is ready to be saved
             XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
+
+            // Notify listeners about the change made by the context user and give them a chance to cancel it
+            if (modifiedByContextUser) {
+                notifyUserDocumentEvent(context.getUserReference(), document, context);
+            }
 
             // Notify listeners about the document about to be created or updated
 
@@ -2105,19 +2142,7 @@ public class XWiki implements EventListener
                     deleteDocument(originalDocument, true, false, context);
                 }
             } else {
-                // Put attachments to remove in recycle bin
-                if (hasAttachmentRecycleBin(context)) {
-                    for (XWikiAttachmentToRemove attachment : document.getAttachmentsToRemove()) {
-                        if (attachment.isToRecycleBin()
-                            // Only store the attachment to the trash bin if it's not broken
-                            && attachment.getAttachment().contentExists(context)) {
-                            // Make sure the attachment will be stored with its history
-                            attachment.getAttachment().loadArchive(context);
-                            getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(),
-                                context.getUser(), new Date(), context, true);
-                        }
-                    }
-                }
+                saveRemovedAttachmentsToRecycleBin(document, context);
             }
 
             // Restore dirty flags #saveDocument was called with metadata dirty flag to false
@@ -3931,20 +3956,14 @@ public class XWiki implements EventListener
             userDocument = userDocument.clone();
 
             // Get the stored validation key
-            BaseObject userObject = userDocument.getObject(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING, 0);
-            String storedKey = userObject.getStringValue(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
+            BaseObject userObject =
+                userDocument.getXObject(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE, 0);
 
             // Get the validation key from the URL
             String validationKey = request.getParameter(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
-            PropertyInterface validationKeyClass =
-                getClass(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING, context)
-                    .get(XWikiUsersDocumentInitializer.VALIDKEY_FIELD);
-            if (validationKeyClass instanceof PasswordClass passwordClass) {
-                validationKey = passwordClass.getEquivalentPassword(storedKey, validationKey);
-            }
 
             // Compare the two keys
-            if ((!"".equals(storedKey) && (storedKey.equals(validationKey)))) {
+            if (userObject.isPasswordValueMatching(XWikiUsersDocumentInitializer.VALIDKEY_FIELD, validationKey)) {
                 // Ensure to remove the validation key value, so it cannot be used afterwards to enable back
                 // a disabled user.
                 userObject.setStringValue(XWikiUsersDocumentInitializer.VALIDKEY_FIELD, "");
@@ -4657,10 +4676,8 @@ public class XWiki implements EventListener
         return blankDoc;
     }
 
-    private XWikiDocument beforeDelete(XWikiDocument doc, XWikiContext context) throws XWikiException
+    private void beforeDelete(XWikiDocument doc, XWikiDocument blankDoc, XWikiContext context) throws XWikiException
     {
-        XWikiDocument blankDoc = prepareDocumentDelete(doc, context);
-
         ObservationManager om = getObservationManager();
 
         // Inform notification mechanisms that a document is about to be deleted
@@ -4678,8 +4695,6 @@ public class XWiki implements EventListener
                         doc.getDocumentReference(), documentEvent.getReason()));
             }
         }
-
-        return blankDoc;
     }
 
     private void afterDelete(XWikiDocument blankDoc, XWikiContext context)
@@ -4706,7 +4721,8 @@ public class XWiki implements EventListener
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
             if (notify) {
-                blankDoc = beforeDelete(doc, context);
+                blankDoc = prepareDocumentDelete(doc, context);
+                beforeDelete(doc, blankDoc, context);
             }
 
             if (hasRecycleBin(context) && totrash) {
@@ -4756,26 +4772,28 @@ public class XWiki implements EventListener
 
             XWikiDocument blankDoc = prepareDocumentDelete(document, context);
 
-            ObservationManager om = getObservationManager();
-
-            // Inform notification mechanisms that a document is about to be deleted
-            // Note that for the moment the event being send is a bridge event, as we are still passing around
-            // an XWikiDocument as source and an XWikiContext as data.
-            if (om != null) {
-                CancelableEvent documentEvent =
-                    new UserDeletingDocumentEvent(userReference, document.getDocumentReference());
-                om.notify(documentEvent, blankDoc, context);
-
-                // If the action has been canceled by the user then don't perform any deletion and throw an exception
-                if (documentEvent.isCanceled()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                        String.format("User [%s] has been denied the right to delete the document [%s]. Reason: [%s]",
-                            userReference, document.getDocumentReference(), documentEvent.getReason()));
-                }
-            }
+            notifyUserDeletingDocumentEvent(userReference, document, blankDoc, context);
         } finally {
             context.setWikiId(currentWiki);
+        }
+    }
+
+    private void notifyUserDeletingDocumentEvent(DocumentReference userReference, XWikiDocument document,
+        XWikiDocument blankDoc, XWikiContext context) throws XWikiException
+    {
+        ObservationManager om = getObservationManager();
+
+        if (om != null) {
+            CancelableEvent documentEvent =
+                new UserDeletingDocumentEvent(userReference, document.getDocumentReference());
+            om.notify(documentEvent, blankDoc, context);
+
+            // If the action has been canceled by the user then don't perform any deletion and throw an exception
+            if (documentEvent.isCanceled()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    String.format("User [%s] has been denied the right to delete the document [%s]. Reason: [%s]",
+                        userReference, document.getDocumentReference(), documentEvent.getReason()));
+            }
         }
     }
 
@@ -4952,6 +4970,21 @@ public class XWiki implements EventListener
         List<DocumentReference> childDocumentReferences, XWikiContext context)
         throws XWikiException
     {
+        return renameDocument(sourceDocumentReference, targetDocumentReference, overwrite, backlinkDocumentReferences,
+            childDocumentReferences, false, context);
+    }
+    
+
+    /**
+    * @since 18.8.0RC1
+    * @since 18.4.5
+    * @since 17.10.13
+     */
+    public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
+        List<DocumentReference> childDocumentReferences, boolean modifiedByContextUser, XWikiContext context)
+        throws XWikiException
+    {
         boolean result = false;
 
         // if source and destination are same, no need to perform the rename.
@@ -4962,20 +4995,13 @@ public class XWiki implements EventListener
             // Proceed on the rename only if the source document exists and if either the targetDoc does not exist or
             // the overwritten is accepted.
             if (!sourceDocument.isNew() && (overwrite || targetDocument.isNew())) {
-                if (!targetDocument.isNew()) {
-                    // If there is a document at the target location we need to delete it first.
-                    // But we don't want to notify about this delete since from outside world point of view it's an
-                    // update and not a delete+create
-                    deleteDocument(targetDocument, true, false, context);
-                }
-
                 // Ensure that the current context contains the wiki reference of the source document.
                 WikiReference wikiReference = context.getWikiReference();
                 context.setWikiReference(sourceDocumentReference.getWikiReference());
 
                 try {
                     // rename main document
-                    this.atomicRenameDocument(sourceDocument, targetDocumentReference, context);
+                    atomicRenameDocument(sourceDocument, targetDocumentReference, modifiedByContextUser, context);
 
                     // handle translations
                     List<Locale> translationLocales = sourceDocument.getTranslationLocales(context);
@@ -4985,7 +5011,8 @@ public class XWiki implements EventListener
                         DocumentReference translatedTargetReference =
                             new DocumentReference(targetDocumentReference, translationLocale);
                         XWikiDocument translatedSourceDoc = this.getDocument(translatedSourceReference, context);
-                        this.atomicRenameDocument(translatedSourceDoc, translatedTargetReference, context);
+                        atomicRenameDocument(translatedSourceDoc, translatedTargetReference, modifiedByContextUser,
+                            context);
                     }
                 } finally {
                     context.setWikiReference(wikiReference);
@@ -5006,21 +5033,148 @@ public class XWiki implements EventListener
     }
 
     private void atomicRenameDocument(XWikiDocument sourceDocument, DocumentReference targetDocumentReference,
-        XWikiContext context) throws XWikiException
+        boolean modifiedByContextUser, XWikiContext context) throws XWikiException
     {
         // Step 1: Simulate creating a document and deleting a document from listeners point of view
-        // FIXME: currently modifications made by listeners won't be applied
+        // The document currently located where the renamed document is going is what it's replacing, so it's the
+        // previous version of the future target document
+        XWikiDocument previousTargetDocument = getDocument(targetDocumentReference, context);
         XWikiDocument futureTargetDocument = sourceDocument.cloneRename(targetDocumentReference, context);
-        futureTargetDocument.setOriginalDocument(new XWikiDocument(targetDocumentReference));
-        beforeSave(futureTargetDocument, context);
-        XWikiDocument deletedDocument = beforeDelete(sourceDocument, context);
+        futureTargetDocument.setOriginalDocument(previousTargetDocument);
+        XWikiDocument futureTargetDocumentFiltered = futureTargetDocument.clone();
+        XWikiDocument deletedSourceDocument = prepareDocumentDelete(sourceDocument, context);
+        // Notify listeners about the changes, it also give them a chance to cancel the rename and apply
+        // modifications(that are applied to the document before it's moved)
+        if (modifiedByContextUser) {
+            notifyUserDocumentEvent(context.getUserReference(), futureTargetDocumentFiltered, context);
+            notifyUserDeletingDocumentEvent(context.getUserReference(), sourceDocument, deletedSourceDocument, context);
+        }
+        beforeSave(futureTargetDocumentFiltered, context);
+        beforeDelete(sourceDocument, deletedSourceDocument, context);
 
-        // Step 2: Perform atomic rename in DB
-        this.getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
+        // Step 2: Apply the modifications made by the listeners to the document about to be moved, so that it's
+        // already in the expected state when it reaches its new location. The save is done without event and without
+        // adding a new version to the history, so that the modifications appear as being part of the rename as much as
+        // possible.
+        XWikiDocument modifiedSourceDocument =
+            applyListenersModifications(sourceDocument, futureTargetDocument, futureTargetDocumentFiltered, context);
 
-        // Step 3: Simulate a created document and a deleted document from listeners point of view
-        afterDelete(deletedDocument, context);
-        afterSave(futureTargetDocument, context);
+        // Step 3: Perform atomic rename in the store
+        try {
+            // The document located where the renamed document is going is replaced by it. No event is sent for this
+            // delete since from outside world point of view the target document is updated, and not deleted and
+            // created again.
+            if (!previousTargetDocument.isNew()) {
+                deleteDocument(previousTargetDocument, true, false, context);
+            }
+
+            getStore().renameXWikiDoc(modifiedSourceDocument != null ? modifiedSourceDocument : sourceDocument,
+                targetDocumentReference, context);
+        } catch (Exception e) {
+            // The document did not move, so the modifications made by the listeners don't apply to it since they were
+            // meant for the new location
+            if (modifiedSourceDocument != null) {
+                revertListenersModifications(modifiedSourceDocument, sourceDocument, context);
+            }
+
+            throw e;
+        }
+
+        // Step 4: Produce events related to update/created and deleted documents, so that listeners can react to these
+        // changes
+        afterDelete(deletedSourceDocument, context);
+        afterSave(futureTargetDocumentFiltered, context);
+    }
+
+    /**
+     * Apply to the document about to be renamed the modifications the listeners made to the future target document.
+     * <p>
+     * Those modifications are part of the rename and not a change of their own, so they are stored in the current
+     * version of the document and no event is sent for them.
+     * <p>
+     * FIXME: only the modifications {@link XWikiDocument#apply(XWikiDocument)} supports are taken into account, and
+     * nothing is kept in the history about what the listeners changed.
+     *
+     * @param sourceDocument the document to rename, left untouched so that it can be used to revert the modifications
+     * @param futureTargetDocument the future target document as it was given to the listeners
+     * @param futureTargetDocumentFiltered the future target document as the listeners left it
+     * @return the document to rename with the modifications made by the listeners applied to it, or null when the
+     *         listeners did not modify anything
+     */
+    private XWikiDocument applyListenersModifications(XWikiDocument sourceDocument,
+        XWikiDocument futureTargetDocument, XWikiDocument futureTargetDocumentFiltered, XWikiContext context)
+        throws XWikiException
+    {
+        if (futureTargetDocumentFiltered.equals(futureTargetDocument)) {
+            return null;
+        }
+
+        XWikiDocument modifiedSourceDocument = sourceDocument.clone();
+
+        // Nothing modified the document to rename since the future target document was cloned from it, so applying
+        // the filtered document is enough to only get the modifications made by the listeners
+        if (!modifiedSourceDocument.apply(futureTargetDocumentFiltered)) {
+            return null;
+        }
+
+        saveCurrentVersion(modifiedSourceDocument, context);
+
+        return modifiedSourceDocument;
+    }
+
+    /**
+     * Put back the document as it was before the modifications made by the listeners.
+     *
+     * @param modifiedSourceDocument the document containing the modifications made by the listeners
+     * @param sourceDocument the document as it was before those modifications
+     */
+    private void revertListenersModifications(XWikiDocument modifiedSourceDocument, XWikiDocument sourceDocument,
+        XWikiContext context)
+    {
+        try {
+            // Apply the whole initial document to also get rid of what the listeners added
+            modifiedSourceDocument.apply(sourceDocument);
+
+            saveCurrentVersion(modifiedSourceDocument, context);
+        } catch (Exception e) {
+            LOGGER.error("Failed to revert the modifications made by the listeners on the document [{}]",
+                sourceDocument.getDocumentReference(), e);
+        }
+    }
+
+    /**
+     * Update in the store the current version of the passed document, without adding anything to its history and
+     * without sending any event.
+     */
+    private void saveCurrentVersion(XWikiDocument document, XWikiContext context) throws XWikiException
+    {
+        saveRemovedAttachmentsToRecycleBin(document, context);
+
+        // The store only creates a new version when the document is dirty
+        document.setContentDirty(false);
+        document.setMetaDataDirty(false);
+
+        getStore().saveXWikiDoc(document, context);
+    }
+
+    /**
+     * Put in the recycle bin the attachments removed from the passed document, since the store only deletes them.
+     */
+    private void saveRemovedAttachmentsToRecycleBin(XWikiDocument document, XWikiContext context)
+        throws XWikiException
+    {
+        if (hasAttachmentRecycleBin(context)) {
+            for (XWikiAttachmentToRemove attachment : document.getAttachmentsToRemove()) {
+                if (attachment.isToRecycleBin()
+                    // Only store the attachment to the trash bin if it's not broken
+                    && attachment.getAttachment().contentExists(context)) {
+                    // Make sure the attachment will be stored with its history
+                    attachment.getAttachment().loadArchive(context);
+                    getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(), context.getUser(),
+                        new Date(), context, true);
+                }
+            }
+        }
     }
 
     private void updateLinksForRename(XWikiDocument sourceDoc, DocumentReference newDocumentReference,
@@ -5151,8 +5305,8 @@ public class XWiki implements EventListener
         return copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale, reset, force, false, context);
     }
 
-    private boolean copyDocument(XWikiDocument sourceDocument, DocumentReference targetDocumentReference, boolean reset,
-        boolean force, boolean resetCreationData, XWikiContext context) throws XWikiException
+    private boolean copyXWikiDocument(XWikiDocument sourceDocument, DocumentReference targetDocumentReference, boolean reset,
+        boolean force, boolean resetCreationData, boolean checkSaving, XWikiContext context) throws XWikiException
     {
         if (!force) {
             XWikiDocument currentTargetDocument = getDocument(targetDocumentReference, context);
@@ -5185,7 +5339,8 @@ public class XWiki implements EventListener
             targetDocument.setContentDirty(false);
         }
 
-        saveDocument(targetDocument, "Copied from " + sourceDocument.getDocumentReference(), context);
+        // Save the target document
+        saveDocument(targetDocument, "Copied from " + sourceDocument.getDocumentReference(), false, checkSaving, context);
 
         return true;
     }
@@ -5197,6 +5352,19 @@ public class XWiki implements EventListener
         String wikilocale, boolean reset, boolean force, boolean resetCreationData, XWikiContext context)
         throws XWikiException
     {
+        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilocale, reset, force,
+            resetCreationData, false, context);
+    }
+
+    /**
+    * @since 18.8.0RC1
+    * @since 18.4.5
+    * @since 17.10.13
+     */
+    public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        String wikilocale, boolean reset, boolean force, boolean resetCreationData, boolean checkSaving, XWikiContext context)
+        throws XWikiException
+    {
         // Get the document to copy
         XWikiDocument sourceDocument = getDocument(sourceDocumentReference, context);
 
@@ -5204,7 +5372,8 @@ public class XWiki implements EventListener
         if (!sourceDocument.isNew()) {
             if (wikilocale == null) {
                 // Copy default document
-                if (!copyDocument(sourceDocument, targetDocumentReference, reset, force, resetCreationData, context)) {
+                if (!copyXWikiDocument(sourceDocument, targetDocumentReference, reset, force, resetCreationData, checkSaving,
+                    context)) {
                     return false;
                 }
 
@@ -5213,8 +5382,8 @@ public class XWiki implements EventListener
                 for (Locale locale : locales) {
                     XWikiDocument translationDocument = sourceDocument.getTranslatedDocument(locale, context);
 
-                    copyDocument(translationDocument, targetDocumentReference, reset, force, resetCreationData,
-                        context);
+                    copyXWikiDocument(translationDocument, targetDocumentReference, reset, force, resetCreationData,
+                        checkSaving, context);
                 }
 
                 return true;
@@ -5222,8 +5391,8 @@ public class XWiki implements EventListener
                 // Copy the translation
                 XWikiDocument trandlationDocument = sourceDocument.getTranslatedDocument(wikilocale, context);
 
-                return copyDocument(trandlationDocument, targetDocumentReference, reset, force, resetCreationData,
-                    context);
+                return copyXWikiDocument(trandlationDocument, targetDocumentReference, reset, force, resetCreationData,
+                    checkSaving, context);
             }
         }
 
@@ -7684,10 +7853,6 @@ public class XWiki implements EventListener
             message = localizePlainOrKey("core.comment.rollback", rev);
         }
 
-        if (triggeredByUser) {
-            checkSavingDocument(xcontext.getUserReference(), document, message, false, xcontext);
-        }
-
         ObservationManager om = getObservationManager();
         if (om != null) {
             // Notify listeners about the document that is going to be rolled back.
@@ -7698,7 +7863,7 @@ public class XWiki implements EventListener
 
         XWikiDocument originalDocument = document.getOriginalDocument();
 
-        saveDocument(document, message, xcontext);
+        saveDocument(document, message, false, triggeredByUser, xcontext);
 
         // Since XWiki#saveDocument resets the original document, we need to temporarily put it back to send
         // notifications.

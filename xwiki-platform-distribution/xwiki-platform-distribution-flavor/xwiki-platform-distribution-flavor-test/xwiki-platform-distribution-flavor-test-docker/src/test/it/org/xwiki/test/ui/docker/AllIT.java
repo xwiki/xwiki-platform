@@ -35,4 +35,9 @@ public class AllIT
     class NestedNameStrategiesDefaultConfigurationIT extends NameStrategiesDefaultConfigurationIT
     {
     }
+
+    @Nested
+    class NestedSyntaxHighlightingIT extends SyntaxHighlightingIT
+    {
+    }
 }

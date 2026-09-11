@@ -19,8 +19,9 @@
  */
 package org.xwiki.flamingo.test.docker;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
@@ -68,7 +69,13 @@ class CommentsIT
 
     private static final String COMMENT_REPLACED_CONTENT = "Some replaced content";
 
-    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    /**
+     * The dates sent to the server are parsed by the server in its own timezone, and the dates asserted below are
+     * expressed in UTC (the test sets the wiki timezone to UTC). Thus the dates must be formatted in UTC and not in
+     * the timezone of the machine running the test, otherwise the assertions are off by that timezone's offset.
+     */
+    private static final DateTimeFormatter DEFAULT_DATE_FORMAT =
+        DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withZone(ZoneOffset.UTC);
 
     @BeforeEach
     void beforeEach(TestUtils setup)
@@ -191,7 +198,7 @@ class CommentsIT
 
     private String getDateString(int seconds)
     {
-        return DEFAULT_DATE_FORMAT.format(new Date(seconds * 1000L));
+        return DEFAULT_DATE_FORMAT.format(Instant.ofEpochSecond(seconds));
     }
 
     @ParameterizedTest

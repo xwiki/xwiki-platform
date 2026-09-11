@@ -63,9 +63,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 
 /**
  * Default implementation of the {@link ResetPasswordManager}.
@@ -313,24 +310,15 @@ public class DefaultResetPasswordManager implements ResetPasswordManager
                     throw new ResetPasswordException(exceptionMessage);
                 }
 
-                String storedVerificationCode =
-                    xObject.getStringValue(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD);
-                BaseClass xClass = xObject.getXClass(context);
-                PropertyInterface verification =
-                    xClass.get(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD);
-                // FIXME: shouldn't we be able to get rid of this check?
-                if (!(verification instanceof PasswordClass)) {
-                    throw new ResetPasswordException("Bad definition of ResetPassword XClass.");
-                }
-                PasswordClass passwordClass = (PasswordClass) verification;
-                String equivalentPassword =
-                    passwordClass.getEquivalentPassword(storedVerificationCode, verificationCode);
+                boolean matchingVerificationCode =
+                    xObject.isPasswordValueMatching(ResetPasswordRequestClassDocumentInitializer.VERIFICATION_FIELD,
+                        verificationCode);
 
                 // If the token is expired we remove it right away to avoid any attack.
                 if (this.isTokenExpired(xObject)) {
                     resetVerificationCode(userDocument, "security.authentication.resetPassword.tokenExpired");
                     throw new ResetPasswordException(exceptionMessage);
-                } else if (!storedVerificationCode.equals(equivalentPassword)) {
+                } else if (!matchingVerificationCode) {
                     // If the token is not correct and there's no lifetime duration set, we immediately get rid of it
                     // so any bruteforce is compromised.
                     if (getTokenLifeTime() <= 0) {

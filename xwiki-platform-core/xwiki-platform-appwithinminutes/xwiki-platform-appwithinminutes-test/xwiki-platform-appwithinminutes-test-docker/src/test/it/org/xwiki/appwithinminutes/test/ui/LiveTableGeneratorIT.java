@@ -109,7 +109,7 @@ class LiveTableGeneratorIT
     }
 
     /**
-     * @see "XWIKI-8728: AWM home page does not list entries when \"Title\" column is set to be the first one"
+     * @see "XWIKI-8728: AWM home page does not list entries when the Title column is set to be the first one"
      */
     @Test
     @Order(2)

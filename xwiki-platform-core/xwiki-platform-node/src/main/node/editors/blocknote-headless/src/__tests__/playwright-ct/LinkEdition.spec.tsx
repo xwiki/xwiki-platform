@@ -19,6 +19,7 @@
  */
 import { mountBlockNoteHeadless } from "./BlockNote.story";
 import { FULL_SYNTAX } from "./syntax.mock";
+import { pressKeySettled } from "./utils";
 import { expect, test } from "@playwright/experimental-ct-vue";
 import type { BlockType } from "@xwiki/platform-editors-blocknote-react";
 
@@ -39,8 +40,19 @@ test("Editing the title of a link keeps the rest of the line intact", async ({
   const linkEl = editorEl.locator('a[href="https://xwiki.org"]');
   await linkEl.waitFor({ state: "attached" });
 
-  // Hover the link to trigger the link toolbar.
-  await linkEl.hover();
+  // Move the caret inside the link, with the keyboard, to trigger the link toolbar. The toolbar also opens when the
+  // link is hovered, but not with a single synthetic mouse move: the editor only records the hovered link when the
+  // pointer enters it, and the toolbar starts listening for pointer events on the link on the render that follows,
+  // so it never sees that move. Click on "First", away from the link, because clicking the link itself would make
+  // the browser follow it. Each key press is awaited until it is painted (see pressKeySettled) so that sending them
+  // in quick succession doesn't outrun the editor's selection update.
+  await editorEl
+    .locator("p.bn-inline-content")
+    .click({ position: { x: 5, y: 5 } });
+  await pressKeySettled(page, "Home");
+  for (let i = 0; i < 8; i++) {
+    await pressKeySettled(page, "ArrowRight");
+  }
 
   const editLinkButtonEl = page.locator('button[data-test="editLink"]');
   await editLinkButtonEl.waitFor({ state: "attached" });

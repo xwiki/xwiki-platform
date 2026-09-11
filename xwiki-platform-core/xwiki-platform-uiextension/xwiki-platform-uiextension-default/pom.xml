@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Add support for implementing User Interface extensions from a wiki page.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -72,6 +72,30 @@
       <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Used to verify, on a rendered page, that the UI extensions are executed with the requested output
+        syntax. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-page</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Provides the component list for RenderingScriptService. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-xwiki</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Provides the component list for the default rendering configuration. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-configuration-default</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

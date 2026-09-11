@@ -18,17 +18,18 @@
   02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { loadById } from "@xwiki/platform-xwiki-utils";
 import { onMounted, ref, useTemplateRef, watchEffect } from "vue";
 import type { DialogProps } from "@xwiki/platform-dsapi";
 import type { Ref } from "vue";
 
 const { width, title } = defineProps<DialogProps>();
 
-const jQuery: Promise<JQueryStatic> = new Promise((resolve) => {
-  // requiring bootstrap is needed to be able to access the modal method once the component is mounted.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require(["jquery", "bootstrap"], ($: JQueryStatic) => resolve($));
-});
+// requiring bootstrap is needed to be able to access the modal method once the component is mounted.
+const jQuery: Promise<JQueryStatic> = loadById<[JQueryStatic, unknown]>(
+  "jquery",
+  "bootstrap",
+).then(([$]) => $);
 
 defineSlots<{ default(): void; activator(): void }>();
 const root = useTemplateRef("root");

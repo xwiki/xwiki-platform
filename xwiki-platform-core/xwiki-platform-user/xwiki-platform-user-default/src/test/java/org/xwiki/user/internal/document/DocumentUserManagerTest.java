@@ -243,22 +243,21 @@ class DocumentUserManagerTest
     }
 
     @Test
-    void hasAccess()
+    void hasViewAccess()
     {
         when(this.documentUserReferenceSerializer.serialize(this.documentUserReferenceCaptor.capture()))
             .then((Answer<DocumentReference>)
                 invocationOnMock -> this.documentUserReferenceCaptor.getValue().getReference());
 
-        Right mockRight = mock(Right.class);
         DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "user1");
         DocumentReference targetReference = new DocumentReference("xwiki", "XWiki", "user2");
 
-        when(this.authorizationManager.hasAccess(mockRight, userReference, targetReference)).thenReturn(false);
-        assertFalse(this.userManager.hasAccess(mockRight, new DocumentUserReference(userReference, true),
+        when(this.authorizationManager.hasAccess(Right.VIEW, userReference, targetReference)).thenReturn(false);
+        assertFalse(this.userManager.hasViewAccess(new DocumentUserReference(userReference, true),
             new DocumentUserReference(targetReference, true)));
 
-        when(this.authorizationManager.hasAccess(mockRight, userReference, targetReference)).thenReturn(true);
-        assertTrue(this.userManager.hasAccess(mockRight, new DocumentUserReference(userReference, true),
+        when(this.authorizationManager.hasAccess(Right.VIEW, userReference, targetReference)).thenReturn(true);
+        assertTrue(this.userManager.hasViewAccess(new DocumentUserReference(userReference, true),
             new DocumentUserReference(targetReference, true)));
     }
 }

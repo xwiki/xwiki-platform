@@ -24,17 +24,10 @@ import org.jsoup.select.Elements;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.wiki.internal.DefaultWikiComponentManager;
-import org.xwiki.component.wiki.internal.DefaultWikiComponentManagerContext;
-import org.xwiki.component.wiki.internal.WikiComponentManagerEventListenerHelper;
-import org.xwiki.component.wiki.internal.bridge.DefaultContentParser;
-import org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponentManagerEventListener;
-import org.xwiki.component.wiki.internal.bridge.WikiObjectComponentManagerEventListenerProxy;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
-import org.xwiki.rendering.async.internal.block.DefaultBlockAsyncRenderer;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.Right;
@@ -43,10 +36,7 @@ import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
-import org.xwiki.uiextension.internal.DefaultUIExtensionManager;
-import org.xwiki.uiextension.internal.WikiUIExtension;
-import org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder;
-import org.xwiki.uiextension.script.UIExtensionScriptService;
+import org.xwiki.uiextension.script.UIExtensionScriptServiceComponentList;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -66,18 +56,8 @@ import static org.xwiki.component.wiki.internal.bridge.DefaultWikiObjectComponen
 @HTML50ComponentList
 @RenderingScriptServiceComponentList
 @DefaultRenderingConfigurationComponentList
+@UIExtensionScriptServiceComponentList
 @ComponentList({
-    UIExtensionScriptService.class,
-    DefaultUIExtensionManager.class,
-    DefaultWikiObjectComponentManagerEventListener.class,
-    WikiObjectComponentManagerEventListenerProxy.class,
-    WikiComponentManagerEventListenerHelper.class,
-    DefaultWikiComponentManager.class,
-    DefaultWikiComponentManagerContext.class,
-    WikiUIExtensionComponentBuilder.class,
-    WikiUIExtension.class,
-    DefaultContentParser.class,
-    DefaultBlockAsyncRenderer.class,
     TestNoScriptMacro.class
 })
 class IncludedPagesDocumentInformationPageTest extends PageTest

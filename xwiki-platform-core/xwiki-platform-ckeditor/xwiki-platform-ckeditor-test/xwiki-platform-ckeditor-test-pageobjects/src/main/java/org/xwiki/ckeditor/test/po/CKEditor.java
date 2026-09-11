@@ -170,4 +170,18 @@ public class CKEditor extends BaseElement
             }
         }
     }
+
+    /**
+     * Marks every CKEditor instance on the current page as clean, so that leaving the page doesn't ask the user to
+     * confirm that they want to discard their changes. Meant to be called when cleaning up after a test that may have
+     * been interrupted in the middle of an edit: the confirmation dialog would otherwise block the next navigation,
+     * including the navigation done by the tests that come after in the same browser session.
+     *
+     * @since 18.8.0RC1
+     */
+    public static void discardUnsavedChanges()
+    {
+        getUtil().getDriver()
+            .executeScript("Object.values(window.CKEDITOR?.instances ?? {}).forEach(editor => editor.resetDirty());");
+    }
 }

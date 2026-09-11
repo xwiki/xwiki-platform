@@ -64,8 +64,8 @@ import {
   BaseDisplayer,
   XWikiIcon,
   displayerMixin,
-  loadById,
 } from "@xwiki/platform-livedata-ui";
+import { loadById } from "@xwiki/platform-xwiki-utils";
 
 export default {
   name: "displayer-toggle",

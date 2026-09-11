@@ -40,6 +40,7 @@ import ch.qos.logback.classic.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
@@ -82,7 +83,7 @@ class CopyJobTest extends AbstractEntityJobTest
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);
 
         DocumentReference copyReference = new DocumentReference("wiki", "Copy", "Page");
-        when(this.modelBridge.copy(sourceReference, copyReference)).thenReturn(true);
+        when(this.modelBridge.copy(sourceReference, copyReference, true)).thenReturn(true);
 
         CopyRequest request = this.createRequest(sourceReference, copyReference);
         run(request);
@@ -98,7 +99,7 @@ class CopyJobTest extends AbstractEntityJobTest
 
         SpaceReference copyReference = new SpaceReference("wiki", "Copy", "Page");
         DocumentReference copyDestination = new DocumentReference("Foo", copyReference);
-        when(this.modelBridge.copy(sourceReference, copyDestination)).thenReturn(true);
+        when(this.modelBridge.copy(sourceReference, copyDestination, false)).thenReturn(true);
 
         CopyRequest request = this.createRequest(sourceReference, copyReference);
         Map<String, String> parameters = Map.of("foo", "bar");
@@ -109,7 +110,7 @@ class CopyJobTest extends AbstractEntityJobTest
         verify(this.observationManager).notify(new DocumentCopyingEvent(sourceReference, copyDestination), job,
             request);
 
-        verify(this.modelBridge).copy(sourceReference, copyDestination);
+        verify(this.modelBridge).copy(sourceReference, copyDestination, false);
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
         verify(this.observationManager).notify(new DocumentCopiedEvent(sourceReference, copyDestination), job, request);
         verify(this.observationManager).notify(any(EntitiesCopiedEvent.class), same(job), same(request));
@@ -136,7 +137,7 @@ class CopyJobTest extends AbstractEntityJobTest
         verify(this.observationManager, never()).notify(any(DocumentCopyingEvent.class), any(), any());
 
         verify(this.modelBridge, never()).delete(any());
-        verify(this.modelBridge, never()).copy(any(), any());
+        verify(this.modelBridge, never()).copy(any(), any(), anyBoolean());
 
         verify(this.observationManager, never()).notify(any(DocumentCopiedEvent.class), any(), any());
         verify(this.observationManager, never()).notify(any(EntitiesCopiedEvent.class), any(), any());
@@ -158,7 +159,7 @@ class CopyJobTest extends AbstractEntityJobTest
             new DocumentReference("Alice", new SpaceReference("Source", destinationReference));
         DocumentReference copyBobReference =
             new DocumentReference("Bob", new SpaceReference("Source", destinationReference));
-        when(this.modelBridge.copy(bobReference, copyBobReference)).thenReturn(true);
+        when(this.modelBridge.copy(bobReference, copyBobReference, false)).thenReturn(true);
 
         CopyRequest request = createRequest(sourceReference, destinationReference);
 
@@ -176,13 +177,13 @@ class CopyJobTest extends AbstractEntityJobTest
         // The copy of the first document is canceled.
         verify(this.observationManager).notify(new DocumentCopyingEvent(aliceReference, copyAliceReference), job,
             request);
-        verify(this.modelBridge, never()).copy(aliceReference, copyAliceReference);
+        verify(this.modelBridge, never()).copy(aliceReference, copyAliceReference, false);
         verify(this.observationManager, never()).notify(new DocumentCopiedEvent(aliceReference, copyAliceReference),
             job, request);
 
         // The second document is still copied.
         verify(this.observationManager).notify(new DocumentCopyingEvent(bobReference, copyBobReference), job, request);
-        verify(this.modelBridge).copy(bobReference, copyBobReference);
+        verify(this.modelBridge).copy(bobReference, copyBobReference, false);
         verify(this.observationManager).notify(new DocumentCopiedEvent(bobReference, copyBobReference), job, request);
 
         verify(this.observationManager).notify(any(EntitiesCopiedEvent.class), same(job), same(request));

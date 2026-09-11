@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { loadById } from "@xwiki/platform-xwiki-utils";
 import { Container, inject, injectable } from "inversify";
 import type {
   ImageWithReference,
@@ -125,21 +126,22 @@ export class DefaultImageWizard implements ImageWizard {
     callback: ImageWizardCallback,
     image?: ImageWithReference,
   ): void {
-    requirejs(["xwiki-wysiwyg-image-wizard"], (imageWizard) => {
-      (imageWizard as XWikiWYSIWYGImageWizard)({
-        captionAllowed: true,
-        currentDocument: XWiki.currentDocument.documentReference,
-        getImageResourceURL: this.getResourceURL.bind(this),
-        imageData: image ? this.getImageData(image) : {},
-        isHTML5: true,
-        isInsert: !image,
-        upload: this.upload.bind(this),
-      })
-        .then((imageData) =>
-          callback.submit(this.getImageProperties(imageData, image?.reference)),
-        )
-        .catch(callback.cancel);
-    });
+    loadById<XWikiWYSIWYGImageWizard>("xwiki-wysiwyg-image-wizard")
+      .then((imageWizard) =>
+        imageWizard({
+          captionAllowed: true,
+          currentDocument: XWiki.currentDocument.documentReference,
+          getImageResourceURL: this.getResourceURL.bind(this),
+          imageData: image ? this.getImageData(image) : {},
+          isHTML5: true,
+          isInsert: !image,
+          upload: this.upload.bind(this),
+        }),
+      )
+      .then((imageData) =>
+        callback.submit(this.getImageProperties(imageData, image?.reference)),
+      )
+      .catch(callback.cancel);
   }
 
   private getResourceURL(

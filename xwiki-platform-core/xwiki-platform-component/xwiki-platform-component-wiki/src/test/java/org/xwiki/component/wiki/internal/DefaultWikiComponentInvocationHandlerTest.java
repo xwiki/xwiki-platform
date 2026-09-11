@@ -57,7 +57,7 @@ class DefaultWikiComponentInvocationHandlerTest
     {
         public void foo()
         {
-
+            // Does nothing: this method only exists so that the tests have a method to invoke.
         }
     }
 

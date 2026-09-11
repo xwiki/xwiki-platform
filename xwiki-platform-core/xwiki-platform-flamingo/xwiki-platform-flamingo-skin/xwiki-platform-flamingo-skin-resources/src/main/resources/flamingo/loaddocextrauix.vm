@@ -22,7 +22,7 @@
   #if (!$docExtraExtensions.isEmpty())
     #template('display_macros.vm')
     #initRequiredSkinExtensions()
-    #set ($content = $services.rendering.render($docExtraExtensions.get(0).execute(), 'html/5.0'))
+    #set ($content = $services.uix.render($docExtraExtensions.get(0), 'html/5.0'))
     $content
     #sendRequiredSkinExtensions()
   #end

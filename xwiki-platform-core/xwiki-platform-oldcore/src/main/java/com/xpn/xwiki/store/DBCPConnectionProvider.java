@@ -33,7 +33,6 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.cfg.Environment;
 import org.hibernate.engine.jdbc.connections.internal.ConnectionProviderInitiator;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.service.UnknownUnwrapTypeException;

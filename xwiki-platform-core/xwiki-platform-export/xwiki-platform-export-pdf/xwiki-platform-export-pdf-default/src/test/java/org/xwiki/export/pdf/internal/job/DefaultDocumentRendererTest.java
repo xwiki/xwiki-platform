@@ -30,8 +30,6 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
@@ -134,25 +132,16 @@ class DefaultDocumentRendererTest
         XDOM titleXDOM = new XDOM(Arrays.asList(new WordBlock("title")));
         XDOM xdom = new XDOM(Arrays.asList(new WordBlock("content")));
         when(this.documentDisplayer.display(same(this.translatedDocument), any(DocumentDisplayerParameters.class)))
-            .then(new Answer<XDOM>()
-            {
-                @Override
-                public XDOM answer(InvocationOnMock invocation) throws Throwable
-                {
-                    DocumentDisplayerParameters params = (DocumentDisplayerParameters) invocation.getArgument(1);
-                    params.getIdGenerator().generateUniqueId("H", "heading");
-                    return params.isTitleDisplayed() ? titleXDOM : xdom;
-                }
+            .then(invocation -> {
+                DocumentDisplayerParameters params = (DocumentDisplayerParameters) invocation.getArgument(1);
+                params.getIdGenerator().generateUniqueId("H", "heading");
+                return params.isTitleDisplayed() ? titleXDOM : xdom;
             });
 
-        doAnswer(new Answer<Void>()
-        {
-            public Void answer(InvocationOnMock invocation)
-            {
-                WikiPrinter printer = (WikiPrinter) invocation.getArguments()[1];
-                printer.print("some content");
-                return null;
-            }
+        doAnswer(invocation -> {
+            WikiPrinter printer = (WikiPrinter) invocation.getArguments()[1];
+            printer.print("some content");
+            return null;
         }).when(this.html5Renderer).render(same(xdom), any(WikiPrinter.class));
 
         DocumentRendererParameters rendererParameters = new DocumentRendererParameters();

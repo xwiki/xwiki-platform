@@ -100,10 +100,7 @@ public class PropUpdateAction extends XWikiAction
 
         String comment = localizePlainOrKey("core.comment.updateClassProperty");
 
-        // Make sure the user is allowed to make this modification
-        context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
-
-        xwiki.saveDocument(doc, comment, true, context);
+        xwiki.saveDocument(doc, comment, true, true, context);
 
         // We need to load all documents that use this property and rename it
         if (fieldsToRename.size() > 0) {

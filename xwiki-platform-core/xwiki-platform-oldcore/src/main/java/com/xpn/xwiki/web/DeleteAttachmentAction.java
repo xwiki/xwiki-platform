@@ -137,10 +137,7 @@ public class DeleteAttachmentAction extends XWikiAction
         try {
             newdoc.removeAttachment(attachment);
 
-            // Make sure the user is allowed to make this modification
-            context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, context);
-
-            xwiki.saveDocument(newdoc, comment, context);
+            xwiki.saveDocument(newdoc, comment, false, true, context);
         } catch (Exception ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 

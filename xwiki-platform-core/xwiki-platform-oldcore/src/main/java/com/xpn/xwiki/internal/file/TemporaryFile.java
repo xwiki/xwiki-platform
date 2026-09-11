@@ -49,6 +49,9 @@ public class TemporaryFile extends File
         super(parent, child);
     }
 
+    // The finalizer is a deliberate last-resort safety net deleting the temporary file when a caller forgot to;
+    // super.finalize() is called for the same reason.
+    @SuppressWarnings({ "java:S1113", "java:S5738" })
     @Override
     protected void finalize() throws Throwable
     {

@@ -67,6 +67,11 @@ li.group {
   margin-right: .3em;
 }
 
+.user-avatar.icon-only,
+.group-avatar.icon-only {
+  margin-right: 0;
+}
+
 .user img.user-avatar,
 .group img.group-avatar {
   border-radius: var(--border-radius-small);
@@ -79,6 +84,47 @@ li.group {
 .medium-avatars img.group-avatar {
   max-height: 32px;
   max-width: 32px;
+}
+
+img.user-avatar.small-avatar,
+img.group-avatar.small-avatar {
+  max-height: 18px;
+  max-width: 18px;
+}
+
+img.user-avatar.medium-avatar,
+img.group-avatar.medium-avatar {
+  max-height: 32px;
+  max-width: 32px;
+}
+
+img.user-avatar.large-avatar,
+img.group-avatar.large-avatar {
+  max-height: 50px;
+  max-width: 50px;
+}
+
+img.user-avatar.circle-avatar,
+img.group-avatar.circle-avatar {
+  border-radius: 50%;
+}
+
+img.user-avatar.small-avatar.circle-avatar,
+img.group-avatar.small-avatar.circle-avatar {
+  height: 18px;
+  width: 18px;
+}
+
+img.user-avatar.medium-avatar.circle-avatar,
+img.group-avatar.medium-avatar.circle-avatar {
+  height: 32px;
+  width: 32px;
+}
+
+img.user-avatar.large-avatar.circle-avatar,
+img.group-avatar.large-avatar.circle-avatar {
+  height: 50px;
+  width: 50px;
 }
 
 .user .user-alias,

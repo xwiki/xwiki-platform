@@ -1835,6 +1835,10 @@ require(['jquery'], ($) => {
 });
 
 require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
+    // Used to give a unique id to each rendering error and to its description, so that they can reference each
+    // other.
+    let renderingErrorCounter = 0;
+
     function init(rootElement) {
         if (XWiki.docsyntax !== "xwiki/1.0" && XWiki.contextaction === "view" && XWiki.hasEdit) {
             $(rootElement).find('span.wikicreatelink:not(.skipCreatePagePopup) a').on('click', loadCreateModal);
@@ -1878,27 +1882,54 @@ require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
      * Otherwise make all the document's body errors expandable.
      */
     function makeRenderingErrorsExpandable(content) {
-        $(content || 'body').find('.xwikirenderingerror').each(function (index) {
-            let error = $(this);
-            let description = error.next(".xwikirenderingerrordescription");
-            if (description.innerHTML !== "" && description.hasClass("xwikirenderingerrordescription")) {
-                error.attr('id', 'xwikirenderingerror-' + index);
-                error.attr('role', 'button');
-                description.attr('id', 'xwikirenderingerrordescription-' + index);
-                error.attr('aria-controls', 'xwikirenderingerrordescription-' + index);
-                error.attr('aria-expanded', false);
-                let buttonDescription = "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))"
-                error.attr('title', buttonDescription);
-                error.on("click", function () {
-                    // Toggle both the description class and the aria-expanded attribute of the button.
-                    let error = $(this);
-                    let description = error.next('.xwikirenderingerrordescription');
-                    description.toggleClass("hidden");
-                    error.attr('aria-expanded', error.attr('aria-expanded') === 'true' ? 'false' : 'true')
-                });
+        const readTechnicalInformation =
+            "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))";
+        // Skip the errors that are already expandable, since this initialization is executed again whenever the DOM is
+        // updated, possibly on a part of the DOM that has already been initialized.
+        $(content || 'body').find('.xwikirenderingerror:not([aria-controls])').each(function () {
+            const error = $(this);
+            const description = error.next('.xwikirenderingerrordescription');
+            // Only the errors that come with a description can be expanded.
+            if (!description.html()) {
+                return;
             }
+            const descriptionId = 'xwikirenderingerrordescription-' + renderingErrorCounter;
+            description.attr('id', descriptionId);
+            error.attr({
+                'id': 'xwikirenderingerror-' + renderingErrorCounter,
+                'role': 'button',
+                // A div is not focusable on its own, unlike a real button.
+                'tabindex': 0,
+                'aria-controls': descriptionId,
+                'aria-expanded': false,
+                'title': readTechnicalInformation
+            });
+            renderingErrorCounter++;
+            error.on('click', function () {
+                // Toggle both the visibility of the description and the expanded state of the button.
+                description.toggleClass('hidden');
+                error.attr('aria-expanded', !description.hasClass('hidden'));
+            });
+            error.on('keydown', function (event) {
+                // A div with a button role is not activated by the keyboard on its own, unlike a real button.
+                if (event.key === 'Enter' || event.key === ' ') {
+                    // Prevent the page from scrolling down when the space key is pressed.
+                    event.preventDefault();
+                    error.trigger('click');
+                }
+            });
         });
     }
+
+    /**
+     * @deprecated since 18.8.0RC1, rendering errors are made expandable automatically, trigger the
+     *             xwiki:dom:updated event on the new content instead
+     */
+    XWiki.makeRenderingErrorsExpandable = (content) => {
+        console.warn('XWiki.makeRenderingErrorsExpandable() is deprecated since 18.8.0RC1, trigger the '
+            + 'xwiki:dom:updated event on the new content instead.');
+        makeRenderingErrorsExpandable(content);
+    };
 
     $(document).on('xwiki:dom:updated', (event, data) => {
         const containers = data?.elements || [document.documentElement];

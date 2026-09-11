@@ -895,31 +895,7 @@ class LiveDataIT
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
 
-        // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
-        String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
-        String newRowLocation = testUtils.serializeReference(testReference.getLocalDocumentReference().getParent());
-
-        // Create the Live Data page.
-        // The "uuid" row naming strategy generates a new page named after a random UUID in the "newRowLocation" space.
-        // "hasEditMode=true" exposes the edit mode toggle in the actions menu.
-        String sourceParameters = String.format(
-            "translationPrefix=&className=%s&hasEditMode=true&newRowNamingStrategy=uuid&newRowLocation=%s",
-            className, newRowLocation);
-        String content = """
-            {{liveData
-              id="test"
-              properties="%s"
-              source="liveTable"
-              sourceParameters="%s"
-            /}}
-            """.formatted(NAME_COLUMN, sourceParameters);
-        testUtils.createPage(testReference, content, "Add entry from layout");
-
-        // Define the XClass on the test page.
-        testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
-
-        DocumentReference initialEntry = new DocumentReference("InitialEntry", testReference.getLastSpaceReference());
-        testUtils.addObject(initialEntry, className, singletonMap(NAME_COLUMN, NAME_LYNDA));
+        createEditableLiveDataPage(testUtils, testReference);
 
         testUtils.createUser("creator", "creator", null);
         testUtils.setRightsOnSpace(testReference.getLastSpaceReference(), null, "XWiki.creator", "edit", true);
@@ -965,6 +941,125 @@ class LiveDataIT
         assertEquals(2, tableLayout.getTotalEntries());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
         tableLayout.assertRow(NAME_COLUMN, NAME_ESTHER);
+    }
+
+    @Test
+    @Order(12)
+    void toggleEditMode(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        createEditableLiveDataPage(testUtils, testReference);
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(1);
+
+        assertTrue(liveData.hasEditModeAction());
+        assertFalse(liveData.isEditMode());
+
+        // The button stays pressed while the user is in edit mode.
+        liveData.toggleEditMode();
+        tableLayout.waitUntilReady();
+        assertTrue(liveData.isEditMode());
+        assertTrue(tableLayout.hasEditModeActionsColumn());
+
+        liveData.toggleEditMode();
+        tableLayout.waitUntilReady();
+        assertFalse(liveData.isEditMode());
+        assertFalse(tableLayout.hasEditModeActionsColumn());
+    }
+
+    @Test
+    @Order(13)
+    void maximizeLiveData(TestUtils testUtils, TestReference testReference) throws Exception
+    {
+        testUtils.loginAsSuperAdmin();
+        testUtils.deletePage(testReference, true);
+
+        createEditableLiveDataPage(testUtils, testReference);
+
+        testUtils.gotoPage(testReference);
+        LiveDataElement liveData = new LiveDataElement("test");
+        TableLayoutElement tableLayout = liveData.getTableLayout();
+        tableLayout.waitUntilRowCountEqualsTo(1);
+
+        assertFalse(liveData.isMaximized());
+        assertEquals("Maximize", liveData.getMaximizedActionLabel());
+        // Both states use a different icon name, so each of them must be mapped by the icon theme.
+        assertTrue(liveData.hasMaximizedActionIcon());
+
+        // Maximize the Live Data: it is displayed over the rest of the page, and the action now offers to go back to
+        // the normal view.
+        liveData.toggleMaximized();
+        liveData.waitUntilMaximized(true);
+        assertEquals("Minimize", liveData.getMaximizedActionLabel());
+        assertTrue(liveData.hasMaximizedActionIcon());
+        // The entries are still displayed once maximized.
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        // Going back to the normal view from the same action.
+        liveData.toggleMaximized();
+        liveData.waitUntilMaximized(false);
+        assertEquals("Maximize", liveData.getMaximizedActionLabel());
+
+        // Escape exits the maximized view too.
+        liveData.toggleMaximized();
+        liveData.waitUntilMaximized(true);
+        liveData.pressEscape();
+        liveData.waitUntilMaximized(false);
+
+        // Escape does nothing when the Live Data is not maximized.
+        liveData.pressEscape();
+        assertFalse(liveData.isMaximized());
+
+        // Escape is first consumed by the cell editor, so it takes a second one to leave the maximized view.
+        liveData.toggleMaximized();
+        liveData.waitUntilMaximized(true);
+        // The editor is opened from the cell popover, which is only offered outside of edit mode.
+        tableLayout.clickEditCell(NAME_COLUMN, 1);
+        testUtils.getDriver().waitUntilCondition(
+            input -> tableLayout.isCellEditing(NAME_COLUMN, 1, NAME_COLUMN));
+
+        liveData.pressEscape();
+        testUtils.getDriver().waitUntilCondition(
+            input -> !tableLayout.isCellEditing(NAME_COLUMN, 1, NAME_COLUMN));
+        assertTrue(liveData.isMaximized());
+
+        liveData.pressEscape();
+        liveData.waitUntilMaximized(false);
+    }
+
+    /**
+     * Creates a Live Data page on an XClass holding a single entry, with a source supporting the edit mode.
+     */
+    private void createEditableLiveDataPage(TestUtils testUtils, DocumentReference testReference)
+    {
+        // testReference is used both as the XClass defining the entries and as the page holding the Live Data macro.
+        String className = testUtils.serializeReference(testReference.getLocalDocumentReference());
+        String newRowLocation = testUtils.serializeReference(testReference.getLocalDocumentReference().getParent());
+
+        // The "uuid" row naming strategy generates a new page named after a random UUID in the "newRowLocation" space.
+        // "hasEditMode=true" exposes the edit mode button in the top bar.
+        String sourceParameters = String.format(
+            "translationPrefix=&className=%s&hasEditMode=true&newRowNamingStrategy=uuid&newRowLocation=%s",
+            className, newRowLocation);
+        String content = """
+            {{liveData
+              id="test"
+              properties="%s"
+              source="liveTable"
+              sourceParameters="%s"
+            /}}
+            """.formatted(NAME_COLUMN, sourceParameters);
+        testUtils.createPage(testReference, content, "Live Data with an edit mode");
+
+        // Define the XClass on the test page, and add a single entry.
+        testUtils.addClassProperty(testReference, NAME_COLUMN, "String");
+        DocumentReference initialEntry = new DocumentReference("InitialEntry", testReference.getLastSpaceReference());
+        testUtils.addObject(initialEntry, className, singletonMap(NAME_COLUMN, NAME_LYNDA));
     }
 
     private void initLocalization(TestUtils testUtils, DocumentReference testReference) throws Exception

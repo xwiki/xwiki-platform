@@ -211,8 +211,8 @@ sort-descending = sort-amount-desc
 note = sticky-note
 
 ## Since 18.8.0RC1
-expand = expand
-compress = compress
+maximize = expand
+minimize = compress
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check

@@ -1875,7 +1875,8 @@ public class TestUtils
     }
 
     /**
-     * Forces the current user to be the Guest user by clearing all coookies.
+     * Forces the current user to be the Guest user by clearing all the cookies, both in the browser and in the HTTP
+     * client used for REST calls.
      */
     public void forceGuestUser()
     {

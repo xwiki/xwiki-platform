@@ -65,6 +65,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   border: none;
   cursor: default;
   background: transparent;
+  min-height: 24px;
 }
 
 .xobject:hover .xobject-title,
@@ -116,10 +117,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 
 .xobject-title .edit {
   right: 28px;
-}
-
-.xobject-row {
-  min-height: 24px;
 }
 
 /* XProperty definition */
@@ -241,7 +238,6 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
   height: 16px;
   padding: 4px;
   box-sizing: content-box;
-  background-clip: content-box;
   float: left;
   background: transparent none center no-repeat;
   margin-top: -4px;

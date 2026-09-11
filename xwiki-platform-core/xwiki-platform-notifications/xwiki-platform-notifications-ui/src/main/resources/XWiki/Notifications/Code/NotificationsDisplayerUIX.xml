@@ -281,7 +281,9 @@ Get the actual notifications.
     // Create the counter if it is not present
     if (counter.length == 0) {
       counter = $('&lt;span&gt;').addClass('notifications-count badge');
-      $('#tmNotifications &gt; button.dropdown-toggle').append(counter);
+      const stylingContainer = $('&lt;div&gt;').addClass("badge-count-container");
+      stylingContainer.append(counter);
+      $('#tmNotifications &gt; button.dropdown-toggle').prepend(stylingContainer);
     }
     // Update the counter
     counter.text(count);
@@ -589,14 +591,12 @@ Get the actual notifications.
   color: @btn-danger-color;
   background-color: @btn-danger-bg;
   position: absolute;
-  top: 0;
+  right: -1em;
+  top: -1em;
 }
 
-@media (min-width: 768px) {
-  .notifications-count {
-    top: 3px;
-    right: 3px;
-  }
+.badge-count-container {
+  position: relative;
 }
 
 .notifications-header-uix {

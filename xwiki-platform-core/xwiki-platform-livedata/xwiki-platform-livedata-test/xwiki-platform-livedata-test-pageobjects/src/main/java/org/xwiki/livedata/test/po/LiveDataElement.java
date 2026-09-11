@@ -155,8 +155,11 @@ public class LiveDataElement extends BaseElement
 
     /**
      * Check if edit mode is currently enabled. The edit mode button stays pressed as long as the user is in edit mode.
+     * Only a Live Data whose source supports the edit mode displays that button, so call {@link #hasEditModeAction()}
+     * first when the source is not known to support it.
      *
      * @return {@code true} if edit mode is enabled, {@code false} otherwise
+     * @throws NoSuchElementException if the Live Data does not offer the edit mode
      * @since 18.8.0RC1
      */
     public boolean isEditMode()
@@ -201,8 +204,9 @@ public class LiveDataElement extends BaseElement
     public boolean hasMaximizedActionIcon()
     {
         WebElement dropdownMenu = openDropDownMenu();
-        boolean resolved = dropdownMenu.findElements(
-            By.cssSelector(".livedata-action-maximize .icon-placeholder")).isEmpty();
+        // The placeholder is expected to be absent, so looking for it must not wait for it to appear.
+        boolean resolved = !getDriver().hasElementWithoutWaiting(dropdownMenu,
+            By.cssSelector(".livedata-action-maximize .icon-placeholder"));
         // Close the dropdown menu back so it doesn't overlap the layout.
         dropdownMenu.findElement(By.cssSelector(".dropdown-toggle")).click();
         return resolved;

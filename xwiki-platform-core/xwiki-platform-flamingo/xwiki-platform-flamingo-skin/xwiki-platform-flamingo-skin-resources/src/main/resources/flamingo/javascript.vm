@@ -104,6 +104,7 @@
     'xwiki-job-runner': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', ""jobRunner${jsExtension}""))",
     'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
     'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
+    'xwiki-reorder-controls': $xwiki.getSkinFile('uicomponents/widgets/reorderControls.js'),
     'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js'),
     'xwiki-suggestAttachments-bundle': $xwiki.getSkinFile('uicomponents/suggest/suggestAttachments.js'),
     'xwiki-tree-finder': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', ""finder${jsExtension}""))",

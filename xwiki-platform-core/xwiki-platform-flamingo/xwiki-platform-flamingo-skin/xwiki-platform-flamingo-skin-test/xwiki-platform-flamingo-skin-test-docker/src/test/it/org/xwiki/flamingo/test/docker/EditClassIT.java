@@ -212,6 +212,72 @@ class EditClassIT
         assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
     }
 
+    @Test
+    @Order(6)
+    void reorderPropertyWithoutDragging(TestUtils setup, TestReference reference) throws Exception
+    {
+        setup.rest().savePage(reference, "Some content", "");
+        ClassEditPage classEditPage = setup.editClass(reference);
+        classEditPage.addProperty("testA", "Number");
+        classEditPage.addProperty("testB", "Number");
+        classEditPage.addProperty("testC", "Number");
+
+        // A property added without reloading the editor gets its move buttons too, and they move it right away.
+        // The properties added before it keep exactly one pair of buttons, however many times the editor adds one.
+        assertEquals(List.of("testA", "testB", "testC"), classEditPage.getProperties());
+        assertEquals(2, classEditPage.getMovePropertyButtonCount("testA"));
+        assertEquals(2, classEditPage.getMovePropertyButtonCount("testC"));
+        classEditPage.movePropertyUp("testC");
+        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+        classEditPage.movePropertyDown("testC");
+        assertEquals(List.of("testA", "testB", "testC"), classEditPage.getProperties());
+
+        classEditPage.clickSaveAndView();
+
+        classEditPage = setup.editClass(reference);
+        assertEquals(List.of("testA", "testB", "testC"), classEditPage.getProperties());
+
+        // Both move controls are buttons, and each one has an accessible name and a tooltip naming the property it
+        // moves.
+        assertEquals("button", classEditPage.getMovePropertyUpButton("testC").getTagName());
+        assertEquals("move up", classEditPage.getMovePropertyUpButtonName("testC"));
+        assertEquals("Move property testC up", classEditPage.getMovePropertyUpButtonTooltip("testC"));
+        assertEquals("move down", classEditPage.getMovePropertyDownButtonName("testA"));
+        assertEquals("Move property testA down", classEditPage.getMovePropertyDownButtonTooltip("testA"));
+
+        // A single click moves the property, and the button keeps the focus so that several moves can be performed in
+        // a row.
+        classEditPage.movePropertyUp("testC");
+        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+        assertTrue(classEditPage.isMovePropertyUpButtonFocused("testC"));
+        classEditPage.waitForReorderAnnouncement("Property moved to position 2 out of 3");
+        classEditPage.movePropertyUp("testC");
+        assertEquals(List.of("testC", "testA", "testB"), classEditPage.getProperties());
+
+        // The first property cannot be moved further up, and says so rather than staying silent.
+        classEditPage.movePropertyUp("testC");
+        assertEquals(List.of("testC", "testA", "testB"), classEditPage.getProperties());
+        classEditPage.waitForReorderAnnouncement("Property already at the top of the list");
+
+        // The last property cannot be moved further down, and says so too.
+        classEditPage.movePropertyDown("testB");
+        assertEquals(List.of("testC", "testA", "testB"), classEditPage.getProperties());
+        classEditPage.waitForReorderAnnouncement("Property already at the bottom of the list");
+
+        // The arrow keys move the property too, and both buttons answer both keys.
+        classEditPage.movePropertyDownWithKeyboard("testC");
+        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+        classEditPage.movePropertyUpWithKeyboard("testC");
+        assertEquals(List.of("testC", "testA", "testB"), classEditPage.getProperties());
+        classEditPage.movePropertyDownWithKeyboard("testC");
+        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+
+        classEditPage.clickSaveAndView();
+
+        classEditPage = setup.editClass(reference);
+        assertEquals(List.of("testA", "testC", "testB"), classEditPage.getProperties());
+    }
+
     private DocumentReference getTestClassDocumentReference(TestReference reference)
     {
         return new DocumentReference("TestClass", reference.getLastSpaceReference());

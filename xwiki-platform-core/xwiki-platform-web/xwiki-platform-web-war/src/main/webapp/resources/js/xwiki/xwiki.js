@@ -1841,7 +1841,8 @@ require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
 
     function init(rootElement) {
         if (XWiki.docsyntax !== "xwiki/1.0" && XWiki.contextaction === "view" && XWiki.hasEdit) {
-            $(rootElement).find('span.wikicreatelink:not(.skipCreatePagePopup) a').on('click', loadCreateModal);
+            $(rootElement).find('span.wikicreatelink:not(.skipCreatePagePopup) a')
+                .off('click.xwikiCreateModal').on('click.xwikiCreateModal', loadCreateModal);
         }
         _makeRenderingErrorsExpandable(rootElement);
     }
@@ -1920,16 +1921,6 @@ require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
             });
         });
     }
-
-    /**
-     * @deprecated since 18.8.0RC1, rendering errors are made expandable by default, trigger the
-     *             xwiki:dom:updated event on the new content instead
-     */
-    XWiki.makeRenderingErrorsExpandable = (content) => {
-        console.warn('XWiki.makeRenderingErrorsExpandable() is deprecated since 18.8.0RC1, rendering errors are '
-            + 'made expandable by default, trigger the xwiki:dom:updated event on the new content instead.');
-        _makeRenderingErrorsExpandable(content);
-    };
 
     $(document).on('xwiki:dom:updated', (event, data) => {
         const containers = data?.elements || [document.documentElement];

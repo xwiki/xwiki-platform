@@ -945,7 +945,7 @@ class LiveDataIT
 
     @Test
     @Order(12)
-    void toggleEditMode(TestUtils testUtils, TestReference testReference) throws Exception
+    void editModeAndMaximizedView(TestUtils testUtils, TestReference testReference) throws Exception
     {
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
@@ -970,21 +970,6 @@ class LiveDataIT
         tableLayout.waitUntilReady();
         assertFalse(liveData.isEditMode());
         assertFalse(tableLayout.hasEditModeActionsColumn());
-    }
-
-    @Test
-    @Order(13)
-    void maximizeLiveData(TestUtils testUtils, TestReference testReference) throws Exception
-    {
-        testUtils.loginAsSuperAdmin();
-        testUtils.deletePage(testReference, true);
-
-        createEditableLiveDataPage(testUtils, testReference);
-
-        testUtils.gotoPage(testReference);
-        LiveDataElement liveData = new LiveDataElement("test");
-        TableLayoutElement tableLayout = liveData.getTableLayout();
-        tableLayout.waitUntilRowCountEqualsTo(1);
 
         assertFalse(liveData.isMaximized());
         assertEquals("Maximize", liveData.getMaximizedActionLabel());
@@ -1020,12 +1005,10 @@ class LiveDataIT
         liveData.waitUntilMaximized(true);
         // The editor is opened from the cell popover, which is only offered outside of edit mode.
         tableLayout.clickEditCell(NAME_COLUMN, 1);
-        testUtils.getDriver().waitUntilCondition(
-            input -> tableLayout.isCellEditing(NAME_COLUMN, 1, NAME_COLUMN));
+        tableLayout.waitUntilCellIsEditing(NAME_COLUMN, 1, NAME_COLUMN, true);
 
         liveData.pressEscape();
-        testUtils.getDriver().waitUntilCondition(
-            input -> !tableLayout.isCellEditing(NAME_COLUMN, 1, NAME_COLUMN));
+        tableLayout.waitUntilCellIsEditing(NAME_COLUMN, 1, NAME_COLUMN, false);
         assertTrue(liveData.isMaximized());
 
         liveData.pressEscape();

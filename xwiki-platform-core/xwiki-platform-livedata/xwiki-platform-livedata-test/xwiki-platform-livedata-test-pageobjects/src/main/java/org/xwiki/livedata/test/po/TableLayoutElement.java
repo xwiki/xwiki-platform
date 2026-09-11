@@ -969,7 +969,22 @@ public class TableLayoutElement extends BaseElement
     {
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
-        return !element.findElements(By.cssSelector(String.format("[name$='_%s']", fieldName))).isEmpty();
+        // This is called to observe the editor closing as well as opening, so it must not wait for the editor.
+        return getDriver().hasElementWithoutWaiting(element, By.cssSelector(String.format("[name$='_%s']", fieldName)));
+    }
+
+    /**
+     * Wait until the inline editor of the given XObject property cell is displayed, or until it is closed.
+     *
+     * @param columnLabel the label of the column
+     * @param rowNumber the number of the row (the first line is number 1)
+     * @param fieldName the name of the edited XClass property
+     * @param editing {@code true} to wait for the editor to be displayed, {@code false} to wait for it to be closed
+     * @since 18.8.0RC1
+     */
+    public void waitUntilCellIsEditing(String columnLabel, int rowNumber, String fieldName, boolean editing)
+    {
+        getDriver().waitUntilCondition(input -> isCellEditing(columnLabel, rowNumber, fieldName) == editing);
     }
 
     /**

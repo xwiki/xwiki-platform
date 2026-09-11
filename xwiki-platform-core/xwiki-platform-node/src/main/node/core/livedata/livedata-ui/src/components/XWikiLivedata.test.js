@@ -68,16 +68,20 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  // The tests mounting in the document leave their elements behind otherwise.
+  document.body.innerHTML = "";
 });
 
 /**
  * Vue component initializer for `XWikiLivedata` components. Calls `mount()` with preconfigured
  * values.
  *
+ * @param attachTo - an optional element to mount the component into, needed by the tests
+ *   looking at the elements surrounding the Live Data
  * @returns a map containing a wrapper for `XWikiLivedata` components and the logic instance it
  *   created
  */
-function initWrapper() {
+function initWrapper(attachTo) {
   global.XWiki = {
     contextPath: "",
   };
@@ -111,6 +115,7 @@ function initWrapper() {
   });
 
   const wrapper = mount(XWikiLivedata, {
+    attachTo,
     props: {
       liveDataSource: {},
       data: JSON.stringify(data),
@@ -143,6 +148,17 @@ function initWrapper() {
 async function pressKey(key) {
   document.dispatchEvent(new KeyboardEvent("keydown", { key }));
   await nextTick();
+}
+
+/**
+ * Mounts a Live Data in the document, next to an element standing for the rest of the page.
+ *
+ * @returns the result of `initWrapper()`, plus the element displayed next to the Live Data
+ */
+function initWrapperWithSibling() {
+  const sibling = document.createElement("div");
+  document.body.appendChild(sibling);
+  return { sibling, ...initWrapper(document.body) };
 }
 
 describe("XWikiLivedata.vue", () => {
@@ -217,6 +233,48 @@ describe("XWikiLivedata.vue", () => {
     await pressKey("Escape");
 
     expect(logic.isMaximized()).toBe(true);
+  });
+
+  it("Makes the rest of the page inert while maximized", async () => {
+    const { sibling, getLogic } = initWrapperWithSibling();
+    await flushPromises();
+
+    expect(sibling.hasAttribute("inert")).toBe(false);
+
+    getLogic().toggleMaximized();
+    await nextTick();
+    expect(sibling.hasAttribute("inert")).toBe(true);
+
+    getLogic().toggleMaximized();
+    await nextTick();
+    expect(sibling.hasAttribute("inert")).toBe(false);
+  });
+
+  it("Leaves the rest of the page inert as it found it", async () => {
+    const { sibling, getLogic } = initWrapperWithSibling();
+    sibling.setAttribute("inert", "");
+    await flushPromises();
+
+    getLogic().toggleMaximized();
+    await nextTick();
+    getLogic().toggleMaximized();
+    await nextTick();
+
+    // The element was inert before the Live Data was maximized, so it stays inert.
+    expect(sibling.hasAttribute("inert")).toBe(true);
+  });
+
+  it("Restores the rest of the page when unmounted while maximized", async () => {
+    const { wrapper, sibling, getLogic } = initWrapperWithSibling();
+    await flushPromises();
+
+    getLogic().toggleMaximized();
+    await nextTick();
+    expect(sibling.hasAttribute("inert")).toBe(true);
+
+    wrapper.unmount();
+
+    expect(sibling.hasAttribute("inert")).toBe(false);
   });
 
   it("Escape only exits the maximized Live Data when several are displayed", async () => {

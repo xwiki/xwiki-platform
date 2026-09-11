@@ -86,8 +86,38 @@ function onEscape(event: KeyboardEvent) {
   }
 }
 
+// The elements we made inert, so that only those are restored afterwards. An element already
+// inert before the Live Data was maximized must stay inert once the normal view is back.
+let inertElements: Element[] = [];
+
+// The maximized view is painted over the page, so the content it hides must not stay reachable
+// with the keyboard nor exposed to assistive technologies. Everything becomes inert except the
+// ancestors of the Live Data, which are the only path leading to it.
+function setPageInert(inert: boolean) {
+  if (inert) {
+    for (
+      let node = element.value as Element | null;
+      node && node !== document.body && node.parentElement;
+      node = node.parentElement
+    ) {
+      for (const sibling of Array.from(node.parentElement.children)) {
+        if (sibling !== node && !sibling.hasAttribute("inert")) {
+          sibling.setAttribute("inert", "");
+          inertElements.push(sibling);
+        }
+      }
+    }
+  } else {
+    for (const inertElement of inertElements) {
+      inertElement.removeAttribute("inert");
+    }
+    inertElements = [];
+  }
+}
+
 // We only set the escape listener when we're actually in maximized mode.
 watch(maximized, (isMaximized) => {
+  setPageInert(isMaximized);
   if (isMaximized) {
     document.addEventListener("keydown", onEscape);
   } else {
@@ -95,7 +125,12 @@ watch(maximized, (isMaximized) => {
   }
 });
 
-onUnmounted(() => document.removeEventListener("keydown", onEscape));
+// Unmounting while maximized removes the view without toggling it back, so the rest of the page
+// must be restored here too.
+onUnmounted(() => {
+  document.removeEventListener("keydown", onEscape);
+  setPageInert(false);
+});
 
 // eslint-disable-next-line max-statements
 onMounted(async () => {

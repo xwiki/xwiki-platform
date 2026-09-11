@@ -2715,6 +2715,31 @@ $string##
 #end
 
 #**
+* Pulls all the JavaScript and CSS resources needed by the space picker.
+*#
+#macro (spacePicker_import)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestSpaces.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
+#end
+
+#macro (spacePicker $parameters)
+  #spacePicker_import
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-spaces"))
+  #if ($parameters.get('multiple') == 'multiple')
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.spacePicker.multi.title')))
+  #else
+    #set ($discard = $parameters.putIfAbsent('title',
+      $services.localization.render('core.widgets.suggest.spacePicker.single.title')))
+  #end
+  #suggestInput($parameters)
+#end
+
+#**
 * Pulls all the JavaScript and CSS resources needed by the attachment picker.
 *#
 #macro (attachmentPicker_import)

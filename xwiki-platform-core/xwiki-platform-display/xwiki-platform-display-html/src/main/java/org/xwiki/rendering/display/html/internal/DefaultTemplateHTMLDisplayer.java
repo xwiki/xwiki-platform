@@ -21,12 +21,15 @@ package org.xwiki.rendering.display.html.internal;
 
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -127,7 +130,12 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
      * <li>html_displayer/[mode].vm
      * <li>html_displayer/default.vm
      * </ul>
-     * Please note that the following special characters: &gt;, &lt;, ? and spaces will be replaced by "." in the path.
+     * For a parameterized type, [type] is first the fully qualified type name and then a short name built from the
+     * simple names of the raw type and of its type arguments. For instance
+     * {@code java.util.List<org.xwiki.rendering.block.Block>} is looked up as
+     * {@code java.util.list(org.xwiki.rendering.block.block)} and then as {@code list(block)}.
+     * Please note that in those paths &lt; and &gt; are replaced by parentheses, ? is replaced by "_" and spaces are
+     * removed.
      *
      * @return the template name used to make the rendering
      */
@@ -183,6 +191,18 @@ public class DefaultTemplateHTMLDisplayer implements HTMLDisplayer<Object>
             if (aClass.isEnum()) {
                 typeNames.add("enum");
             }
+        } else if (type instanceof ParameterizedType ptype) {
+            // The fully qualified name is looked up first so that a template can always target one precise type, even
+            // when several types share the same short name.
+            typeNames.add(ReflectionUtils.serializeType(type).toLowerCase());
+            StringBuilder shortName = new StringBuilder();
+            shortName.append(((Class<?>) ptype.getRawType()).getSimpleName().toLowerCase());
+            shortName.append('(');
+            shortName.append(Arrays.stream(ptype.getActualTypeArguments())
+                .map(t -> t instanceof Class ? ((Class<?>) t).getSimpleName() : ReflectionUtils.serializeType(t))
+                .collect(Collectors.joining(",")).toLowerCase());
+            shortName.append(')');
+            typeNames.add(shortName.toString());
         } else if (type != null) {
             typeNames.add(ReflectionUtils.serializeType(type).toLowerCase());
         }

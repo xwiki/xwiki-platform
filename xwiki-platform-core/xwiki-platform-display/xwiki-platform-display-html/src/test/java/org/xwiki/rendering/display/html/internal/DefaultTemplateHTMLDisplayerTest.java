@@ -20,6 +20,7 @@
 package org.xwiki.rendering.display.html.internal;
 
 import java.io.StringWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import javax.script.ScriptContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.displayer.HTMLDisplayerException;
 import org.xwiki.model.EntityType;
@@ -44,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -122,11 +125,40 @@ class DefaultTemplateHTMLDisplayerTest
     void getTemplateWithNullValueAndSpecialTypeTest() throws Exception
     {
         this.defaultTemplateHTMLDisplayer.display(new DefaultParameterizedType(null, List.class, Block.class), null);
-        verify(this.templateManager)
+        // The fully qualified type name is looked up before the short one, so that a template targeting one precise
+        // type wins over a template sharing its short name.
+        InOrder inOrder = inOrder(this.templateManager);
+        inOrder.verify(this.templateManager)
             .getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block)/view.vm");
-        verify(this.templateManager).getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block).vm");
-        verify(this.templateManager).getTemplate("html_displayer/view.vm");
-        verify(this.templateManager).getTemplate("html_displayer/default.vm");
+        inOrder.verify(this.templateManager)
+            .getTemplate("html_displayer/java.util.list(org.xwiki.rendering.block.block).vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/list(block)/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/list(block).vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/view.vm");
+        inOrder.verify(this.templateManager).getTemplate("html_displayer/default.vm");
+        this.defaultTemplateHTMLDisplayer.display(new Type()
+        {
+            @Override
+            public String getTypeName()
+            {
+                return "unknownType";
+            }
+        }, null);
+        verify(this.templateManager).getTemplate("html_displayer/unknowntype.vm");
+    }
+
+    @Test
+    void getTemplateWithNestedParameterizedTypeTest() throws Exception
+    {
+        // A type argument that isn't a plain Class (here, List<Block> nested inside another List) must not be cast
+        // directly to Class, but fall back to serializing its type name.
+        this.defaultTemplateHTMLDisplayer.display(
+            new DefaultParameterizedType(null, List.class, new DefaultParameterizedType(null, List.class,
+                Block.class)), null);
+        verify(this.templateManager).getTemplate("html_displayer/java.util.list(java.util.list(org.xwiki.rendering."
+            + "block.block))/view.vm");
+        verify(this.templateManager).getTemplate("html_displayer/list(java.util.list(org.xwiki.rendering.block."
+            + "block))/view.vm");
     }
 
     @Test

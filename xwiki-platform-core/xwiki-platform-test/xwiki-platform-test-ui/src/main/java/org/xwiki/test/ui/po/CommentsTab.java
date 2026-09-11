@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebElement;
@@ -136,12 +137,16 @@ public class CommentsTab extends BaseElement
      * @param setup the test setup, used to reach the REST API
      * @param pageReference the reference of the page to comment on
      * @param content the content of the comment
+     * @param properties the extra properties of the comment (name1, value1, name2, value2, ...), for instance an
+     *            {@code author} or a {@code date} differing from the ones the server would set
      * @throws Exception in case of error while calling the REST API
      * @since 18.8.0RC1
      */
-    public static void restPostComment(TestUtils setup, EntityReference pageReference, String content) throws Exception
+    public static void restPostComment(TestUtils setup, EntityReference pageReference, String content,
+        Object... properties) throws Exception
     {
-        setup.rest().addObject(pageReference, COMMENT_CLASS_NAME, "comment", content);
+        setup.rest().addObject(pageReference, COMMENT_CLASS_NAME,
+            ArrayUtils.addAll(new Object[] {"comment", content}, properties));
     }
 
     /**

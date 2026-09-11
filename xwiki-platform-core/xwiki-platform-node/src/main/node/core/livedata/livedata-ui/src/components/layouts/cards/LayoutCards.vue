@@ -39,8 +39,7 @@
       <template #right>
         <LivedataPagination side="right" />
         <LivedataEntrySelectorAll v-if="isSelectionEnabled" />
-        <LivedataEditButton />
-        <LivedataDropdownMenu />
+        <LivedataActions />
       </template>
     </LivedataTopbar>
 
@@ -82,9 +81,8 @@
 <script>
 import LayoutCardsCard from "./LayoutCardsCard.vue";
 import LayoutCardsNewCard from "./LayoutCardsNewCard.vue";
+import LivedataActions from "../../LivedataActions.vue";
 import LivedataBottombar from "../../LivedataBottombar.vue";
-import LivedataDropdownMenu from "../../LivedataDropdownMenu.vue";
-import LivedataEditButton from "../../LivedataEditButton.vue";
 import LivedataEntrySelectorAll from "../../LivedataEntrySelectorAll.vue";
 import LivedataEntrySelectorInfoBar from "../../LivedataEntrySelectorInfoBar.vue";
 import LivedataPagination from "../../LivedataPagination.vue";
@@ -95,10 +93,9 @@ export default {
   name: "layout-cards",
 
   components: {
+    LivedataActions,
     LivedataBottombar,
     LivedataTopbar,
-    LivedataDropdownMenu,
-    LivedataEditButton,
     LivedataEntrySelectorAll,
     LivedataPagination,
     LivedataEntrySelectorInfoBar,

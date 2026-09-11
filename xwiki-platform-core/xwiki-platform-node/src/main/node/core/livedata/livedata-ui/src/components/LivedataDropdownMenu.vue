@@ -70,7 +70,7 @@
             >
               <XWikiIcon
                 :icon-descriptor="{
-                  name: isMaximized ? 'arrow_in' : 'arrow_out',
+                  name: isMaximized ? 'compress' : 'expand',
                 }"
               />
               {{
@@ -164,32 +164,11 @@ export default {
 
 <style>
 .livedata-dropdown-menu {
-  /* Similar to .flat-buttons() */
-  .btn-default {
-    background-color: var(--breadcrumb-bg);
-    background-image: none;
-    border-color: var(--dropdown-divider-bg);
-    box-shadow: none;
-    color: var(--dropdown-link-color);
-    text-shadow: none;
-  }
-
-  .btn-default:hover,
-  .btn-default:active,
-  .btn-default:focus,
-  .open .dropdown-toggle {
-    border-color: hsl(from var(--dropdown-divider-bg) h s calc(l - 0.1));
-  }
-
   /* Style each section of the dropdown */
   ul.dropdown-menu > li > ul {
     list-style: none;
     padding-left: 0;
   }
-}
-
-.livedata-dropdown-menu .btn-default span {
-  vertical-align: middle;
 }
 
 /*

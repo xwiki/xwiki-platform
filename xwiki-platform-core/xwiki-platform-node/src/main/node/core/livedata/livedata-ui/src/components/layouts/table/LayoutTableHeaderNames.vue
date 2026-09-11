@@ -101,7 +101,7 @@
           @keydown.left="keyboardResizeColumn($event, -10)"
           @keydown.right="keyboardResizeColumn($event, 10)"
           @dblclick="resetColumnSize"
-          @keydown.esc="resetColumnSize"
+          @keydown.esc.stop="resetColumnSize"
         ></button>
       </th>
     </template>

@@ -87,7 +87,7 @@
 
       <!-- The slot containing the displayer Editor widget -->
       <div
-        @keydown.esc.capture="cancelEdit"
+        @keydown.esc.capture.stop="cancelEdit"
         @focusin="editorFocused = true"
         v-if="!isView && !isLoading"
         ref="editBlock"

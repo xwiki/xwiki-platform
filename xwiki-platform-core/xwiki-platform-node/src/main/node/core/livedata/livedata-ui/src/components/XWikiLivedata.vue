@@ -42,6 +42,7 @@ import {
   provide,
   ref,
   useTemplateRef,
+  watch,
 } from "vue";
 import type { LiveDataSource, Logic } from "@xwiki/platform-livedata-api";
 import type { Query, Translations } from "@xwiki/platform-localization-api";
@@ -77,15 +78,24 @@ const dataId = computed(() => logic.data?.id);
 const layoutId = computed(() => logic.currentLayoutId?.value);
 const maximized = computed(() => logic.isMaximized());
 
-function onKeydown(event: KeyboardEvent) {
-  // Escape should allow to exit maximized mode.
-  if (event.key === "Escape" && logic.isMaximized()) {
+// Escape should allow to exit maximized mode,
+// unless it's already handled by another component (e.g., editor).
+function onEscape(event: KeyboardEvent) {
+  if (event.key === "Escape" && maximized.value) {
     logic.toggleMaximized();
   }
 }
 
-onMounted(() => document.addEventListener("keydown", onKeydown));
-onUnmounted(() => document.removeEventListener("keydown", onKeydown));
+// We only set the escape listener when we're actually in maximized mode.
+watch(maximized, (isMaximized) => {
+  if (isMaximized) {
+    document.addEventListener("keydown", onEscape);
+  } else {
+    document.removeEventListener("keydown", onEscape);
+  }
+});
+
+onUnmounted(() => document.removeEventListener("keydown", onEscape));
 
 // eslint-disable-next-line max-statements
 onMounted(async () => {
@@ -182,9 +192,12 @@ onMounted(async () => {
 .xwiki-livedata.livedata-maximized {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  /*
+   * We use the same z-index az the gallery application, which maximizes the same way.
+   */
+  z-index: 1001;
   overflow: auto;
-  padding: 0 var(--padding-large-horizontal, 1rem);
-  background-color: var(--body-bg, #fff);
+  padding: 0 var(--grid-gutter-width);
+  background-color: var(--body-bg);
 }
 </style>

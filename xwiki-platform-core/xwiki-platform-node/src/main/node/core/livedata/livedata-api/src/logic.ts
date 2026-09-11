@@ -228,4 +228,18 @@ export interface Logic {
    * @param panel - the panel to add
    */
   registerPanel(panel: Panel): void;
+
+  /**
+   * Indicates whether the view is currently maximized.
+   *
+   * @returns whether the Live Data is currently displayed maximized
+   * @since 18.8.0RC1
+   */
+  isMaximized(): boolean;
+
+  /**
+   * Switches between the maximized view and the normal view.
+   * @since 18.8.0RC1
+   */
+  toggleMaximized(): void;
 }

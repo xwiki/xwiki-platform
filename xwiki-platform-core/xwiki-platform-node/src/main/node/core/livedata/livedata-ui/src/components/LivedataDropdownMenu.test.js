@@ -28,15 +28,20 @@ import { ref } from "vue";
  * Vue component initializer for `LivedataDropdownMenu` components. Calls `mount()` with
  * preconfigured values.
  *
- * @returns a map containing a wrapper for `LivedataDropdownMenu` components and a mock of
- *   logic.changeLayout
+ * @param maximized - whether the Live Data starts maximized
+ * @returns a map containing a wrapper for `LivedataDropdownMenu` components and mocks of
+ *   logic.changeLayout and logic.toggleMaximized
  */
-function initWrapper() {
+function initWrapper({ maximized = false } = {}) {
   global.XWiki = {
     contextPath: "",
   };
 
   const changeLayout = spy();
+  const isMaximized = ref(maximized);
+  const toggleMaximized = spy(() => {
+    isMaximized.value = !isMaximized.value;
+  });
   const wrapper = mount(LivedataDropdownMenu, {
     global: {
       provide: {
@@ -48,7 +53,8 @@ function initWrapper() {
             },
           },
           changeLayout: changeLayout,
-          isMaximized: () => false,
+          isMaximized: () => isMaximized.value,
+          toggleMaximized: toggleMaximized,
         },
       },
       mocks: {
@@ -59,7 +65,7 @@ function initWrapper() {
       },
     },
   });
-  return { wrapper, changeLayout };
+  return { wrapper, changeLayout, toggleMaximized };
 }
 
 // Since the <li> elements does not have distinguishing attributes, we look for the layout items by
@@ -121,5 +127,30 @@ describe("LivedataDropdownMenu.vue", () => {
     expect(
       wrapper.find('[data-toggle="dropdown"]').attributes("aria-expanded"),
     ).toBe("false");
+  });
+
+  it("Offers to maximize the Live Data when it is not maximized", () => {
+    const { wrapper } = initWrapper();
+    expect(wrapper.find(".livedata-action-maximize").text()).toBe(
+      "livedata.action.maximize",
+    );
+  });
+
+  it("Offers to minimize the Live Data when it is maximized", () => {
+    const { wrapper } = initWrapper({ maximized: true });
+    expect(wrapper.find(".livedata-action-maximize").text()).toBe(
+      "livedata.action.minimize",
+    );
+  });
+
+  it("Clicking on the maximize action switches to the maximized view", async () => {
+    const { wrapper, toggleMaximized } = initWrapper();
+
+    await wrapper.find(".livedata-action-maximize").trigger("click");
+
+    expect(toggleMaximized.callCount).toBe(1);
+    expect(wrapper.find(".livedata-action-maximize").text()).toBe(
+      "livedata.action.minimize",
+    );
   });
 });

@@ -99,10 +99,10 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 }
 
 .xobject-action {
-   display: block;
-   position: absolute;
-   top: -5px;
-   padding: 7px;
+  display: block;
+  position: absolute;
+  top: -5px;
+  padding: 7px;
 }
 
 .xobject-action.delete {
@@ -119,7 +119,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 }
 
 .xobject-row {
-   min-height: 24px;
+  min-height: 24px;
 }
 
 /* XProperty definition */

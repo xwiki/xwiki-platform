@@ -73,6 +73,7 @@ export interface Logic {
     getEntryId(entry: Values): string | undefined;
     getPageCount(): number;
     isContentTrusted(): boolean;
+    isMaximized(): boolean;
     onEvent(event: string, callback: (e: Event) => void): void;
     onEventWhere(eventName: string, condition: object | ((p: unknown) => boolean), callback: (e: Event) => void): void;
     registerPanel(panel: Panel): void;
@@ -85,6 +86,7 @@ export interface Logic {
         values: unknown;
     }): Promise<unknown>;
     sort(property: string, level: number, descending?: boolean): Promise<void>;
+    toggleMaximized(): void;
     translationsLoaded(): Promise<boolean>;
     triggerEvent(eventName: string, eventData?: object): void;
     updateEntries(): Promise<void>;

@@ -19,12 +19,11 @@
 -->
 
 <!--
-  LivedataEditButton is used to toggle edit mode n and off, for the sources that support it.
-  It should be placed in the top bar, next to the dropdown menu.
+  LivedataEditButton is used to toggle edit mode on and off, for the sources that support it.
+  It should be placed in the actions area.
 -->
 <template>
   <button
-    v-if="logic.hasEditMode()"
     type="button"
     class="btn btn-default livedata-edit-button"
     :class="{ active: isEditMode }"
@@ -76,33 +75,12 @@ export default {
 </script>
 
 <style>
-.livedata-edit-button.btn-default {
-  /* The same flat look as the dropdown menu button. */
-  background-color: var(--breadcrumb-bg);
-  background-image: none;
-  border-color: var(--dropdown-divider-bg);
-  box-shadow: none;
-  color: var(--dropdown-link-color);
-  margin-left: 1rem;
-  text-shadow: none;
-}
-
-.livedata-edit-button.btn-default:hover,
-.livedata-edit-button.btn-default:active,
-.livedata-edit-button.btn-default:focus {
-  border-color: hsl(from var(--dropdown-divider-bg) h s calc(l - 0.1));
-}
-
 /*
  * The edit mode is a state the user stays in, so the button has to look pressed when it's on.
  */
 .livedata-edit-button.btn-default.active {
   background-color: var(--btn-primary-bg);
-  border-color: var(--btn-primary-border, var(--btn-primary-bg));
+  border-color: var(--btn-primary-bg);
   color: var(--btn-primary-color);
-}
-
-.livedata-edit-button span {
-  vertical-align: middle;
 }
 </style>

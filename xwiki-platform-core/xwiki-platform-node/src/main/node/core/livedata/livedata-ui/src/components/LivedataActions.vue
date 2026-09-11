@@ -19,47 +19,43 @@
 -->
 
 <!--
-  The LivedataTopbar component can be use to create consistent topbars
-  for the different layout implementations.
-  It usually contains the dropdown menu, the refresh button, the global search
-  and the pagination.
-
-  It contains two slots: `left` and `right`, that allows to quickly
-  organize its content to stick to the left or to the right
+  LivedataActions groups the actions of the Live Data at the end of its top bar. They are laid out
+  as a list of buttons sharing a flat look, the same way the skin displays the actions of a page.
 -->
 <template>
-  <div class="livedata-topbar">
-    <div class="livedata-topbar-left">
-      <slot name="left"></slot>
-    </div>
-
-    <div class="livedata-topbar-right">
-      <slot name="right"></slot>
-    </div>
-  </div>
+  <ul class="livedata-actions flat-buttons">
+    <li v-if="logic.hasEditMode()"><LivedataEditButton /></li>
+    <li><LivedataDropdownMenu /></li>
+  </ul>
 </template>
 
 <script>
+import LivedataDropdownMenu from "./LivedataDropdownMenu.vue";
+import LivedataEditButton from "./LivedataEditButton.vue";
+
 export default {
-  name: "LivedataTopbar",
+  name: "LivedataActions",
+
+  components: {
+    LivedataDropdownMenu,
+    LivedataEditButton,
+  },
+
+  inject: ["logic"],
 };
 </script>
 
 <style>
-.livedata-topbar {
+.livedata-actions {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: var(--padding-large-vertical);
-  margin-bottom: var(--padding-large-vertical);
+  gap: var(--button-spacing);
+  list-style: none;
+  margin-bottom: 0;
+  margin-left: var(--grid-gutter-width);
+  padding-left: 0;
 }
 
-.livedata-topbar-left,
-.livedata-topbar-right {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
+.livedata-actions .btn span {
+  vertical-align: middle;
 }
 </style>

@@ -299,7 +299,7 @@ class NotificationsIT
                 content.append(String.format("%nAdding some content iteration %s", i));
                 rest.savePage(testReference, content.toString(), "Linux as a title");
             }
-            CommentsTab.restPostComment(setup, testReference, "Linux is a great OS");
+            CommentsTab.restPostComment(rest, testReference, "Linux is a great OS");
         });
 
         // Check that events have been grouped together (see: https://jira.xwiki.org/browse/XWIKI-14114)

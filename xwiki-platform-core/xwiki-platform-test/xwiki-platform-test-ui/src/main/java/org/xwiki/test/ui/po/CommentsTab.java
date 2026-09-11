@@ -131,21 +131,21 @@ public class CommentsTab extends BaseElement
     }
 
     /**
-     * Post a comment on a page over the REST API, as the current REST user, without using the browser. To be used
-     * when a test needs a comment to exist but does not assert anything about the comment form itself.
+     * Post a comment on a page over the REST API, as the current REST user, without using the browser. To be used when
+     * a test needs a comment to exist but does not assert anything about the comment form itself.
      *
-     * @param setup the test setup, used to reach the REST API
+     * @param rest the REST API to perform the actions on
      * @param pageReference the reference of the page to comment on
      * @param content the content of the comment
      * @param properties the extra properties of the comment (name1, value1, name2, value2, ...), for instance an
-     *            {@code author} or a {@code date} differing from the ones the server would set
+     *     {@code author} or a {@code date} differing from the ones the server would set
      * @throws Exception in case of error while calling the REST API
      * @since 18.8.0RC1
      */
-    public static void restPostComment(TestUtils setup, EntityReference pageReference, String content,
+    public static void restPostComment(TestUtils.RestTestUtils rest, EntityReference pageReference, String content,
         Object... properties) throws Exception
     {
-        setup.rest().addObject(pageReference, COMMENT_CLASS_NAME,
+        rest.addObject(pageReference, COMMENT_CLASS_NAME,
             ArrayUtils.addAll(new Object[] {"comment", content}, properties));
     }
 

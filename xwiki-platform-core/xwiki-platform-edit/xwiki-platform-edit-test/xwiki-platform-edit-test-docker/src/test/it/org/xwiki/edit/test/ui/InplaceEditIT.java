@@ -531,8 +531,8 @@ class InplaceEditIT
         InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
         inplaceEditablePage.edit();
 
+        // Creating the page object waits until the modal is actually displayed.
         ForceEditLockModal forceEditLockModal = new ForceEditLockModal();
-        setup.getDriver().waitUntilCondition(driver -> forceEditLockModal.isDisplayed());
         assertEquals("Warning", forceEditLockModal.getTitle());
         assertThat(forceEditLockModal.getMessage(),
             containsString(

@@ -237,14 +237,14 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
 }
 
 .xproperty-title .tools .tool {
-   width: 16px;
-   height: 16px;
-   padding: 4px;
-   box-sizing: content-box;
-   background-clip: content-box;
-   float: left;
-   background: transparent none center no-repeat;
-   margin-top: -4px;
+  width: 16px;
+  height: 16px;
+  padding: 4px;
+  box-sizing: content-box;
+  background-clip: content-box;
+  float: left;
+  background: transparent none center no-repeat;
+  margin-top: -4px;
 }
 
 .xproperty-title .tools .move {

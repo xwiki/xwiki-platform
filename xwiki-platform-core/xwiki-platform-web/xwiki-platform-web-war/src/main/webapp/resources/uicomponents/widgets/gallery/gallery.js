@@ -30,9 +30,14 @@
 #foreach ($key in $l10nKeys)
   #set ($discard = $l10n.put($key, $services.localization.render($key)))
 #end
+#set ($iconNames = ['arrow-expand', 'arrow-compress'])
+#set ($icons = {})
+#foreach ($iconName in $iconNames)
+  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
+#end
 #[[*/
 // Start JavaScript-only code.
-(function(l10n) {
+(function(l10n, icons) {
   "use strict";
 globalThis.XWiki = (function (XWiki) {
 // Start XWiki augmentation.
@@ -42,6 +47,7 @@ XWiki.Gallery = Class.create({
     // Generate the different parts of the gallery
     let maximizeButton = new Element('button', {
       'class': 'maximize', 'title': l10n['core.widgets.gallery.maximize']});
+    maximizeButton.insert(icons['arrow-expand'] + icons['arrow-compress']);
     let previousButton = new Element('button', {
       'class': 'previous', 'title': l10n['core.widgets.gallery.previousImage']});
     previousButton.insert("&lt;");
@@ -208,4 +214,4 @@ if (XWiki.contextaction !== 'export') {
 return XWiki;
 }(XWiki || {}));
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$l10n]));
+}).apply(']]#', $jsontool.serialize([$l10n, $icons]));

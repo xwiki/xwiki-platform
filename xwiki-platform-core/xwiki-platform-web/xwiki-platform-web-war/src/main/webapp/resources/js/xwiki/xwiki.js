@@ -1843,7 +1843,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
         if (XWiki.docsyntax !== "xwiki/1.0" && XWiki.contextaction === "view" && XWiki.hasEdit) {
             $(rootElement).find('span.wikicreatelink:not(.skipCreatePagePopup) a').on('click', loadCreateModal);
         }
-        makeRenderingErrorsExpandable(rootElement);
+        _makeRenderingErrorsExpandable(rootElement);
     }
 
     function loadCreateModal(event) {
@@ -1881,7 +1881,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
      * If a content is passed, add click listener for errors reported in this content (useful for AJAX requests response)
      * Otherwise make all the document's body errors expandable.
      */
-    function makeRenderingErrorsExpandable(content) {
+    function _makeRenderingErrorsExpandable(content) {
         const readTechnicalInformation =
             "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))";
         // Skip the errors that are already expandable, since this initialization is executed again whenever the DOM is
@@ -1922,13 +1922,13 @@ require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
     }
 
     /**
-     * @deprecated since 18.8.0RC1, rendering errors are made expandable automatically, trigger the
+     * @deprecated since 18.8.0RC1, rendering errors are made expandable by default, trigger the
      *             xwiki:dom:updated event on the new content instead
      */
     XWiki.makeRenderingErrorsExpandable = (content) => {
-        console.warn('XWiki.makeRenderingErrorsExpandable() is deprecated since 18.8.0RC1, trigger the '
-            + 'xwiki:dom:updated event on the new content instead.');
-        makeRenderingErrorsExpandable(content);
+        console.warn('XWiki.makeRenderingErrorsExpandable() is deprecated since 18.8.0RC1, rendering errors are '
+            + 'made expandable by default, trigger the xwiki:dom:updated event on the new content instead.');
+        _makeRenderingErrorsExpandable(content);
     };
 
     $(document).on('xwiki:dom:updated', (event, data) => {

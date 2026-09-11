@@ -23,6 +23,7 @@ import java.net.URI;
 import java.util.Map;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.model.reference.DocumentReference;
@@ -100,7 +101,7 @@ public class ImageStyleAdministrationPage extends ViewPage
         String uri = String.format("%s/wikis/%s/spaces/Image/spaces/Style/spaces/Code/pages/Configuration/objects",
             testUtils.rest().getBaseURL(), testUtils.getCurrentWiki());
         try {
-            return testUtils.rest().executeGet(URI.create(uri)).getResponseBodyAsString();
+            return EntityUtils.toString(testUtils.rest().executeGet(URI.create(uri)).getEntity());
         } catch (Exception e) {
             return String.format("[%s] could not be read: %s", uri, ExceptionUtils.getRootCauseMessage(e));
         }

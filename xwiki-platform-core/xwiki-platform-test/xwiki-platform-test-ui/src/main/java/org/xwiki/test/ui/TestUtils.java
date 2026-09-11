@@ -2742,6 +2742,21 @@ public class TestUtils
         }
 
         /**
+         * Some actions to perform on the REST API, which can throw a checked {@link Exception}.
+         *
+         * @since 18.8.0RC1
+         */
+        @FunctionalInterface
+        public interface RestActions
+        {
+            /**
+             * @param rest the REST API to perform the actions on
+             * @throws Exception in case of error while performing the actions
+             */
+            void run(RestTestUtils rest) throws Exception;
+        }
+
+        /**
          * Used to match number part of the object reference name.
          */
         private static final Pattern OBJECT_NAME_PATTERN = Pattern.compile("(\\\\*)\\[(\\d*)\\]$");
@@ -3112,13 +3127,29 @@ public class TestUtils
         public void savePageAs(XWikiCredentials credentials, EntityReference reference, String content,
             String syntaxId, String title, String parentFullPageName, boolean isHidden) throws Exception
         {
+            runAs(credentials,
+                rest -> rest.savePage(reference, content, syntaxId, title, parentFullPageName, isHidden));
+        }
+
+        /**
+         * Perform some actions on the REST API using the provided credentials and restore the previous credentials
+         * afterward. Only the credentials of the REST client are changed: the user the browser is logged in as, if
+         * any, is left untouched.
+         *
+         * @param credentials the credentials of the user to perform the actions as
+         * @param actions the actions to perform
+         * @throws Exception if an error occurs while performing the actions
+         * @since 18.8.0RC1
+         */
+        public void runAs(XWikiCredentials credentials, RestActions actions) throws Exception
+        {
             // Remember the current credentials
             XWikiCredentials currentCredentials = this.testUtils.getDefaultCredentials();
 
             try {
                 this.testUtils.setDefaultCredentials(credentials);
 
-                savePage(reference, content, syntaxId, title, parentFullPageName, isHidden);
+                actions.run(this);
             } finally {
                 // Restore initial credentials
                 this.testUtils.setDefaultCredentials(currentCredentials);
@@ -3189,6 +3220,26 @@ public class TestUtils
 
             // Add the object
             add(jaxbObject);
+        }
+
+        /**
+         * Create a user, without going through the browser as {@link TestUtils#createUser(String, String, String,
+         * Object...)} does. The user is created active, and its password is hashed by the class' password property
+         * when it is set, so that the user can log in with it.
+         * <p>
+         * The user must not exist yet: this adds a new user object, it does not update an existing one.
+         *
+         * @param credentials the login, taken as the name of the user in the {@code XWiki} space, and the password of
+         *            the user to create
+         * @param properties the extra properties of the user to create (name1, value1, name2, value2, ...), which
+         *            take precedence over the properties set by this method
+         * @throws Exception if an error occurs while creating the user
+         * @since 18.8.0RC1
+         */
+        public void createUser(XWikiCredentials credentials, Object... properties) throws Exception
+        {
+            addObject(new LocalDocumentReference("XWiki", credentials.getUserName()), USER_CLASS_NAME,
+                ArrayUtils.addAll(new Object[] {"password", credentials.getPassword(), "active", "1"}, properties));
         }
 
         /**

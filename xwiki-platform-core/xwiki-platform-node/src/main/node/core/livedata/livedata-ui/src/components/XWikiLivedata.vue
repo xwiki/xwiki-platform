@@ -193,7 +193,7 @@ onMounted(async () => {
   position: fixed;
   inset: 0;
   /*
-   * We use the same z-index az the gallery application, which maximizes the same way.
+   * We use the same z-index as the gallery application, which maximizes the same way.
    */
   z-index: 1001;
   overflow: auto;

@@ -86,10 +86,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.xwiki.platform:xwiki-platform-scheduler-api"
     }
 )
-// The mail templates are evaluated in the thread of the request that sends the mail, and thus the URLs they generate
-// come from that request and not from the wiki descriptor. Make the descriptor target the HTTP client, that is a
-// host/port the browser doesn't use, so that the assertions on those URLs actually verify that.
-@UseWikiDescriptorTarget(WikiDescriptorTarget.HTTP_CLIENT)
 class MailIT
 {
     private GreenMail mail;
@@ -126,6 +122,8 @@ class MailIT
 
     @Test
     @Order(1)
+    // It's already the default, but we force it in case the default changes because the test relies on it
+    @UseWikiDescriptorTarget(WikiDescriptorTarget.BROWSER)
     void verifyMail(TestUtils setup, XWikiWebDriver webDriver, TestConfiguration testConfiguration)
         throws Exception
     {

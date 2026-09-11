@@ -1123,6 +1123,32 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
     </property>
     <property>
       <code>{{velocity}}
+## The wikis/spaces/pages/users/tags macro parameters are typed (to enable pickers in the macro editor UI), so
+## when they're set through a picker their value is a List of references/strings instead of the historical
+## comma-separated String. Normalize them back to a comma-separated String of serialized values so that the
+## rest of this macro (and the notification sources/RSS code it calls) keeps working the same way regardless of
+## whether the parameter was set through a picker or using the historical String syntax.
+#macro (notificationsMacroJoinParam $paramValue $kind $target $key)
+  #set ($notifMacroItems = [])
+  #if ("$!paramValue" != '')
+    #if ($paramValue.size())
+      #foreach ($notifMacroItem in $paramValue)
+        #if ($kind == 'reference')
+          #set ($discard = $notifMacroItems.add("$!services.model.serialize($notifMacroItem, 'default')"))
+        #elseif ($kind == 'user')
+          #set ($discard = $notifMacroItems.add("$!services.user.serialize($notifMacroItem)"))
+        #elseif ($kind == 'tag')
+          #set ($discard = $notifMacroItems.add("$!notifMacroItem.name"))
+        #else
+          #set ($discard = $notifMacroItems.add("$!notifMacroItem"))
+        #end
+      #end
+    #else
+      #set ($discard = $notifMacroItems.add("$paramValue"))
+    #end
+  #end
+  #set ($discard = $target.put($key, $stringtool.join($notifMacroItems, ',')))
+#end
 #set ($displayMacro = true)
 #set ($users = $xcontext.macro.params.users)
 #if ("$!xcontext.macro.params.displayWatchedUsersOnly" == 'true')
@@ -1143,6 +1169,13 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
 #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
 
+#set ($notifLocationParams = {})
+#notificationsMacroJoinParam($xcontext.macro.params.wikis 'plain' $notifLocationParams 'wikis')
+#notificationsMacroJoinParam($xcontext.macro.params.spaces 'reference' $notifLocationParams 'spaces')
+#notificationsMacroJoinParam($xcontext.macro.params.pages 'reference' $notifLocationParams 'pages')
+#notificationsMacroJoinParam($users 'user' $notifLocationParams 'users')
+#notificationsMacroJoinParam($xcontext.macro.params.tags 'tag' $notifLocationParams 'tags')
+
 #set ($parameters = {
   "userId": "$!services.model.serialize($xcontext.userReference, 'default')",
   "maxCount": "$!xcontext.macro.params.count",
@@ -1151,12 +1184,12 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
   "displayMinorEvents": "$!xcontext.macro.params.displayMinorEvents",
   "displaySystemEvents": "$!xcontext.macro.params.displaySystemEvents",
   "displayReadEvents": "$!xcontext.macro.params.displayReadEvents",
-  "wikis": "$!xcontext.macro.params.wikis",
-  "spaces": "$!xcontext.macro.params.spaces",
-  "pages": "$!xcontext.macro.params.pages",
-  "users": "$!users",
+  "wikis": "$!notifLocationParams.wikis",
+  "spaces": "$!notifLocationParams.spaces",
+  "pages": "$!notifLocationParams.pages",
+  "users": "$!notifLocationParams.users",
   "currentWiki": "$!services.wiki.currentWikiId",
-  "tags": "$!xcontext.macro.params.tags"
+  "tags": "$!notifLocationParams.tags"
 })
 #set ($dataParameters = [])
 #foreach($key in $parameters.keySet())
@@ -1177,12 +1210,12 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
   #set ($rssURL = "${rssURL}&amp;displayMinorEvents=$!escapetool.url($xcontext.macro.params.displayMinorEvents)")
   #set ($rssURL = "${rssURL}&amp;displaySystemEvents=$!escapetool.url($xcontext.macro.params.displaySystemEvents)")
   #set ($rssURL = "${rssURL}&amp;displayReadEvents=$!escapetool.url($xcontext.macro.params.displayReadEvents)")
-  #set ($rssURL = "${rssURL}&amp;wikis=$!escapetool.url($xcontext.macro.params.wikis)")
-  #set ($rssURL = "${rssURL}&amp;spaces=$!escapetool.url($xcontext.macro.params.spaces)")
-  #set ($rssURL = "${rssURL}&amp;pages=$!escapetool.url($xcontext.macro.params.pages)")
-  #set ($rssURL = "${rssURL}&amp;users=$!escapetool.url($xcontext.macro.params.users)")
+  #set ($rssURL = "${rssURL}&amp;wikis=$!escapetool.url($notifLocationParams.wikis)")
+  #set ($rssURL = "${rssURL}&amp;spaces=$!escapetool.url($notifLocationParams.spaces)")
+  #set ($rssURL = "${rssURL}&amp;pages=$!escapetool.url($notifLocationParams.pages)")
+  #set ($rssURL = "${rssURL}&amp;users=$!escapetool.url($notifLocationParams.users)")
   #set ($rssURL = "${rssURL}&amp;displayReadStatus=$!escapetool.url($xcontext.macro.params.displayReadStatus)")
-  #set ($rssURL = "${rssURL}&amp;tags=$!escapetool.url($xcontext.macro.params.tags)")
+  #set ($rssURL = "${rssURL}&amp;tags=$!escapetool.url($notifLocationParams.tags)")
   #set ($rssURL = "${rssURL}&amp;currentWiki=$!escapetool.url($services.wiki.currentWikiId)")
   &lt;p class="notifications-macro-rss-link"&gt;&lt;a href="$rssURL" rel="nofollow external"&gt;$services.icon.renderHTML('rss') $escapetool.xml($services.localization.render('notifications.rss.feedLink'))&lt;/a&gt;&lt;/p&gt;
 #end
@@ -1846,7 +1879,7 @@ $notifs
       <name>wikis</name>
     </property>
     <property>
-      <type/>
+      <type>java.util.List&lt;org.xwiki.model.reference.WikiReference&gt;</type>
     </property>
   </object>
   <object>
@@ -1924,7 +1957,7 @@ $notifs
       <name>spaces</name>
     </property>
     <property>
-      <type/>
+      <type>java.util.List&lt;org.xwiki.model.reference.SpaceReference&gt;</type>
     </property>
   </object>
   <object>
@@ -2002,7 +2035,7 @@ $notifs
       <name>pages</name>
     </property>
     <property>
-      <type/>
+      <type>java.util.List&lt;org.xwiki.model.reference.DocumentReference&gt;</type>
     </property>
   </object>
   <object>
@@ -2080,7 +2113,7 @@ $notifs
       <name>users</name>
     </property>
     <property>
-      <type/>
+      <type>java.util.List&lt;org.xwiki.user.UserReference&gt;</type>
     </property>
   </object>
   <object>
@@ -2314,7 +2347,7 @@ $notifs
       <name>tags</name>
     </property>
     <property>
-      <type/>
+      <type>java.util.List&lt;org.xwiki.tag.Tag&gt;</type>
     </property>
   </object>
 </xwikidoc>

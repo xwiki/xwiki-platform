@@ -45,6 +45,9 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.web.XWikiRequest;
 
+// The hiding is deliberate: this static gives level lists their own parsing defaults, and callers pick it
+// explicitly through LevelsClass. It is public API of oldcore, so it cannot be renamed either.
+@SuppressWarnings("java:S9149")
 public class LevelsClass extends ListClass
 {
     /**

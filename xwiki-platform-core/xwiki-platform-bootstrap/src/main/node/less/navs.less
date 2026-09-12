@@ -12,7 +12,6 @@
   padding-left: 0; // Override default ul/ol
   margin-bottom: 0;
   list-style: none;
-  &:extend(.clearfix all);
 
   > li {
     position: relative;
@@ -77,14 +76,16 @@
 // Give the tabs something to sit on
 .nav-tabs {
   border-bottom: 1px solid @nav-tabs-border-color;
+  display: flex;
+  gap: .2em;
+  flex-wrap: wrap;
   > li {
-    float: left;
     // Make the list-items overlay the bottom border
+    z-index: 2;
     margin-bottom: -1px;
 
     // Actual tabs (as links)
     > a {
-      margin-right: 2px;
       line-height: @line-height-base;
       border: 1px solid transparent;
       border-radius: @border-radius-base @border-radius-base 0 0;

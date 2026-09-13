@@ -43,6 +43,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-service
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/rendering/rendering-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api
@@ -65,6 +66,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-tsdocconfig
   - xwiki-platform-core/xwiki-platform-node/src/main/node/tools/tool-viteconfig
   - xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-webjar/src/main/node/
+  - xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-webjar/src/main/node
 
 catalogMode: strict
 cleanupUnusedCatalogs: true

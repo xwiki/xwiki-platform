@@ -119,7 +119,7 @@ public class DefaultLiveDataConfigurationProvider implements Provider<LiveDataCo
         if (property.getFilter() == null) {
             property.setFilter(new FilterDescriptor("list"));
         }
-        // TODO: Take into account the user scope. See suggestUsersAndGroups.js for an example.
+        // TODO: Take into account the user scope. See suggestValues.js for an example.
         property.getFilter().setParameter("searchURL", "?xpage=uorgsuggest&uorg=user&input={encodedQuery}&media=json");
     }
 }

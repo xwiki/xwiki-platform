@@ -17,26 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Container, inject, injectable } from "inversify";
-import type {
-  RemoteURLSerializer,
-  RemoteURLSerializerProvider,
-} from "@xwiki/platform-model-remote-url-api";
 
-@injectable("Singleton")
-export class DefaultRemoteURLSerializerProvider
-  implements RemoteURLSerializerProvider
-{
-  public static bind(container: Container): void {
-    container
-      .bind("RemoteURLSerializerProvider")
-      .to(DefaultRemoteURLSerializerProvider)
-      .inSingletonScope();
-  }
+import { generateConfig } from "@xwiki/platform-tool-viteconfig";
 
-  constructor(@inject("Container") private readonly container: Container) {}
-
-  public get(type?: string): RemoteURLSerializer | undefined {
-    return this.container.get("RemoteURLSerializer", { name: type || "XWiki" });
-  }
-}
+export default generateConfig(import.meta.url);

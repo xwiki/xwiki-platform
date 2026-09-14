@@ -17,28 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Container, inject, injectable } from "inversify";
+
+import { inject, injectable } from "inversify";
+import type { CristalApp } from "@xwiki/platform-api";
 import type {
   AuthenticationManager,
   AuthenticationManagerProvider,
 } from "@xwiki/platform-authentication-api";
 
-@injectable("Singleton")
-export class DefaultAuthenticationManagerProvider
+/**
+ * Resolves the authentication manager of the current backend.
+ *
+ * It lives here rather than in authentication-api because it needs the CristalApp, and platform-api already
+ * depends on authentication-api.
+ *
+ * @since 18.8.0RC1
+ * @beta
+ */
+@injectable()
+class DefaultAuthenticationManagerProvider
   implements AuthenticationManagerProvider
 {
-  public static bind(container: Container): void {
-    container
-      .bind("AuthenticationManagerProvider")
-      .to(DefaultAuthenticationManagerProvider)
-      .inSingletonScope();
-  }
-
-  constructor(@inject("Container") private readonly container: Container) {}
+  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
 
   get(type?: string): AuthenticationManager | undefined {
-    return this.container.get("AuthenticationManager", {
-      name: type || "XWiki",
-    });
+    const resolvedType = type || this.cristalApp.getWikiConfig().getType();
+    try {
+      return this.cristalApp
+        .getContainer()
+        .get("AuthenticationManager", { name: resolvedType });
+    } catch (e) {
+      this.cristalApp
+        .getLogger("authentication.default")
+        .warn(
+          `Couldn't resolve AuthenticationManager for type=[${resolvedType}]`,
+          e,
+        );
+      return undefined;
+    }
   }
 }
+
+export { DefaultAuthenticationManagerProvider };

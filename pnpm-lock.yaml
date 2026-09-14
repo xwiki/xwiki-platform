@@ -326,9 +326,9 @@ importers:
       '@xwiki/platform-attachments-default':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/attachments/attachments-default
-      '@xwiki/platform-authentication-api':
+      '@xwiki/platform-authentication-default':
         specifier: workspace:*
-        version: link:../../../../../xwiki-platform-node/src/main/node/core/authentication/authentication-api
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/authentication/authentication-default
       '@xwiki/platform-authentication-xwiki':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/authentication/authentication-xwiki
@@ -1014,6 +1014,52 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(happy-dom@20.9.0)(jsdom@30.0.1)(vite@8.3.0(@types/node@24.13.4)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
+
+  xwiki-platform-core/xwiki-platform-node/src/main/node/core/authentication/authentication-default:
+    dependencies:
+      '@xwiki/platform-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/platform-authentication-api':
+        specifier: workspace:*
+        version: link:../authentication-api
+    devDependencies:
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.59.0(@types/node@24.13.3)
+      '@xwiki/platform-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      '@xwiki/platform-tool-apiextractorconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-apiextractorconfig
+      '@xwiki/platform-tool-tsconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsconfig
+      '@xwiki/platform-tool-tsdocconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-tsdocconfig
+      '@xwiki/platform-tool-viteconfig':
+        specifier: workspace:*
+        version: link:../../../tools/tool-viteconfig
+      eslint:
+        specifier: 'catalog:'
+        version: 10.10.0(jiti@2.7.0)
+      inversify:
+        specifier: 'catalog:'
+        version: 8.2.3(reflect-metadata@0.2.2)
+      reflect-metadata:
+        specifier: 'catalog:'
+        version: 0.2.2
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.0(@types/node@24.13.3)(happy-dom@20.9.0)(jsdom@30.0.1)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.27.3)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(yaml@2.9.0))
 
   xwiki-platform-core/xwiki-platform-node/src/main/node/core/authentication/authentication-xwiki:
     dependencies:

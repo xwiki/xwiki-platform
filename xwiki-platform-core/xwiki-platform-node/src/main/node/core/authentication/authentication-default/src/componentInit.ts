@@ -17,28 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Container, inject, injectable } from "inversify";
-import type {
-  ModelReferenceHandler,
-  ModelReferenceHandlerProvider,
-} from "@xwiki/platform-model-reference-api";
 
-@injectable("Singleton")
-export class DefaultModelReferenceHandlerProvider
-  implements ModelReferenceHandlerProvider
-{
-  public static bind(container: Container): void {
+import { DefaultAuthenticationManagerProvider } from "./defaultAuthenticationManagerProvider";
+import type { AuthenticationManagerProvider } from "@xwiki/platform-authentication-api";
+import type { Container } from "inversify";
+
+/**
+ * @since 18.8.0RC1
+ * @beta
+ */
+class ComponentInit {
+  constructor(container: Container) {
     container
-      .bind("ModelReferenceHandlerProvider")
-      .to(DefaultModelReferenceHandlerProvider)
+      .bind<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+      .to(DefaultAuthenticationManagerProvider)
       .inSingletonScope();
   }
-
-  constructor(@inject("Container") private readonly container: Container) {}
-
-  get(type?: string): ModelReferenceHandler | undefined {
-    return this.container.get("ModelReferenceHandler", {
-      name: type || "XWiki",
-    });
-  }
 }
+
+export { ComponentInit };

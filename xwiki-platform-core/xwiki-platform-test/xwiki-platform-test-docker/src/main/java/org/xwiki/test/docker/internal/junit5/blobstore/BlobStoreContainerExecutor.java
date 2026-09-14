@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.MinIOContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.utility.DockerImageName;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
@@ -41,13 +42,27 @@ public class BlobStoreContainerExecutor extends AbstractContainerExecutor
 
     private static final String BUCKET_NAME = "xwiki";
 
-    private static final String NETWORK_ALIAS = "xwikiminio";
+    private static final String NETWORK_ALIAS = "xwikisilo";
 
     private static final String USERNAME = "minioadmin";
 
     private static final String PASSWORD = "miniopassword";
 
-    private static final String MINIO_CLIENT = "mc";
+    /**
+     * The name of the S3 client shipped inside the Silo image (the MinIO client, renamed by the fork).
+     */
+    private static final String S3_CLIENT = "mcli";
+
+    /**
+     * Silo is a maintained fork of the MinIO server, used since the {@code minio/minio} images are not published
+     * anymore.
+     */
+    private static final String SILO_IMAGE = "pgsty/silo";
+
+    /**
+     * The image the Testcontainers MinIO module expects, for which Silo is a drop-in replacement.
+     */
+    private static final String MINIO_IMAGE = "minio/minio";
 
     /**
      * @param testConfiguration the configuration to build (blob store, debug mode, etc)
@@ -66,7 +81,7 @@ public class BlobStoreContainerExecutor extends AbstractContainerExecutor
                 // No container needed for filesystem blob store
                 break;
             case S3:
-                startMinIOContainer(testConfiguration);
+                startSiloContainer(testConfiguration);
                 break;
             default:
                 throw new DockerTestException(String.format("Blob store [%s] is not yet supported!",
@@ -82,27 +97,30 @@ public class BlobStoreContainerExecutor extends AbstractContainerExecutor
         // Note that we don't need to stop the container as this is taken care of by TestContainers
     }
 
-    private void startMinIOContainer(TestConfiguration testConfiguration) throws Exception
+    private void startSiloContainer(TestConfiguration testConfiguration) throws Exception
     {
-        MinIOContainer minioContainer;
+        String siloImageFullName;
         if (StringUtils.isNotBlank(testConfiguration.getBlobStoreTag())) {
-            minioContainer = new MinIOContainer(String.format("minio/minio:%s", testConfiguration.getBlobStoreTag()));
+            siloImageFullName = String.format("%s:%s", SILO_IMAGE, testConfiguration.getBlobStoreTag());
         } else {
             // No tag specified, use "latest"
-            minioContainer = new MinIOContainer("minio/minio:latest");
+            siloImageFullName = String.format("%s:latest", SILO_IMAGE);
         }
+        // Silo keeps the MinIO ports, health check endpoint and MINIO_* environment variables, so it can be started
+        // with the MinIO Testcontainers module.
+        DockerImageName siloImage = DockerImageName.parse(siloImageFullName).asCompatibleSubstituteFor(MINIO_IMAGE);
 
-        minioContainer
+        MinIOContainer siloContainer = new MinIOContainer(siloImage)
             .withUserName(USERNAME)
             .withPassword(PASSWORD)
             .withNetwork(Network.SHARED)
             .withNetworkAliases(NETWORK_ALIAS);
 
-        start(minioContainer, testConfiguration);
+        start(siloContainer, testConfiguration);
 
         String endpoint;
         if (testConfiguration.getServletEngine().isOutsideDocker()) {
-            endpoint = minioContainer.getS3URL();
+            endpoint = siloContainer.getS3URL();
         } else {
             endpoint = String.format("http://%s:9000", NETWORK_ALIAS);
         }
@@ -110,17 +128,17 @@ public class BlobStoreContainerExecutor extends AbstractContainerExecutor
         testConfiguration.getBlobStore().setEndpoint(endpoint);
 
         // Create the bucket
-        createBucket(minioContainer);
+        createBucket(siloContainer);
     }
 
-    private void createBucket(MinIOContainer minioContainer) throws Exception
+    private void createBucket(MinIOContainer siloContainer) throws Exception
     {
-        // Execute the MinIO client command inside the container to create the bucket
+        // Execute the S3 client command inside the container to create the bucket
         LOGGER.info("Creating S3 bucket [{}]", BUCKET_NAME);
 
-        minioContainer.execInContainer(MINIO_CLIENT, "alias", "set", "local", "http://localhost:9000",
+        siloContainer.execInContainer(S3_CLIENT, "alias", "set", "local", "http://localhost:9000",
             USERNAME, PASSWORD);
-        minioContainer.execInContainer(MINIO_CLIENT, "mb", "local/" + BUCKET_NAME);
+        siloContainer.execInContainer(S3_CLIENT, "mb", "local/" + BUCKET_NAME);
 
         LOGGER.info("Successfully created S3 bucket [{}]", BUCKET_NAME);
     }

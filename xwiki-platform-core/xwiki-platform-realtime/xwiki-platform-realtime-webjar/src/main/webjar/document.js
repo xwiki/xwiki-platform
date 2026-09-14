@@ -202,7 +202,11 @@ define('xwiki-realtime-document', [
   // Adds the real-time channels API on top of the generic XWiki document API.
   class RealtimeXWikiDocument extends XWikiDocument {
     static currentDocument() {
-      const currentDocument = super.currentDocument();
+      // Don't call super.currentDocument() here: the Closure Compiler, which minifies this code, compiles a super
+      // call made from a static method into a plain call on the parent class (XWikiDocument.currentDocument()),
+      // dropping the "this" binding that the parent factory needs in order to instantiate this class rather than the
+      // parent one. The minified code would then return a document without the real-time channels API.
+      const currentDocument = XWikiDocument.currentDocument.call(this);
       const config = realtimeConfig.document || {};
       // The meta information doesn't expose the date of the last modification, which is needed to properly merge on
       // save. We keep it up to date on the edit form ourselves, see syncCurrentDocumentState().

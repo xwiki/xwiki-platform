@@ -918,8 +918,10 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage page = setup.createPage(testReference, "[[image:image.gif||data-widget='uploadimage']]");
         WYSIWYGEditPage wysiwygEditPage = page.editWYSIWYG();
         CKEditor editor = new CKEditor("content").waitToLoad();
-        // Make sure the image can be clicked as a proof that the editor did not crash.
-        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        // Make sure the editor did not crash.
+        editor.getRichTextArea().verifyContent(content -> assertTrue(
+            content.getImages().stream().anyMatch(image -> image.getDomAttribute("src").endsWith("/image.gif")),
+            "The image is missing from the edited content."));
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
         assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
     }

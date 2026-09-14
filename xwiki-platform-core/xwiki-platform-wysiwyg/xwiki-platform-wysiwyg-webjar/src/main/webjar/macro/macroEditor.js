@@ -217,6 +217,12 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
     </div>`,
 
   displayGroup = function (parametersMap, groupNode) {
+    let children = groupNode.children.map(nodeKey => parametersMap[nodeKey]);
+    let visibleChildren = children.filter(child => !child.hidden);
+    // A feature with a single visible member offers no choice, so there is nothing to put a titled box around.
+    if (groupNode.featureOnly && visibleChildren.length === 1 && visibleChildren[0].type === 'PARAMETER') {
+      return displaySingleGroupParameter(parametersMap, groupNode, children, visibleChildren[0]);
+    }
     let isFeature = groupNode.featureOnly;
     let name = (isFeature) ? groupNode.featureName : groupNode.name;
     let output = $(macroFeatureContainerTemplate);
@@ -234,6 +240,20 @@ define('xwiki-wysiwyg-macro-parameter-tree-displayer', [
         groupNode.children.map(nodeKey =>
             createGroupNodeValue(parametersMap, nodeKey, groupNode.id, useRadioButtons, groupNode.mandatory)
     ));
+    return output;
+  },
+
+  displaySingleGroupParameter = function (parametersMap, groupNode, children, visibleChild) {
+    let output = $();
+    // The hidden members are displayed too, hidden, since the macro call is built from the displayed parameters.
+    children.forEach(child => {
+      let childOutput = displayMacroParameterTreeNode(parametersMap, child, null);
+      if (child === visibleChild && groupNode.mandatory) {
+        childOutput.addClass('mandatory');
+        childOutput.find('.mandatory').first().text('(' + translations.get('required') + ')');
+      }
+      output = output.add(childOutput);
+    });
     return output;
   },
 

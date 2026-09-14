@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { AbstractStorage } from "@xwiki/platform-backend-api";
-import { Container, inject, injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import type {
   AttachmentsData,
   Logger,
@@ -27,16 +27,8 @@ import type {
 } from "@xwiki/platform-api";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 
-@injectable("Singleton")
-export class XWikiStorage extends AbstractStorage {
-  public static override bind(container: Container): void {
-    container
-      .bind("Storage")
-      .to(XWikiStorage)
-      .inSingletonScope()
-      .whenNamed("XWiki");
-  }
-
+@injectable()
+class XWikiStorage extends AbstractStorage {
   constructor(
     @inject("Logger") logger: Logger,
     @inject("XWikiMeta") private readonly xwikiMeta: XWikiMeta,
@@ -164,3 +156,5 @@ export class XWikiStorage extends AbstractStorage {
     throw new Error("Method not implemented.");
   }
 }
+
+export { XWikiStorage };

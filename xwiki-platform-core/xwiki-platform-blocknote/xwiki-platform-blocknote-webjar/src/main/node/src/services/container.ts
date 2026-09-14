@@ -34,9 +34,9 @@ import { DefaultRemoteURLParserProvider } from "./model/url/DefaultRemoteURLPars
 import { DefaultRemoteURLSerializerProvider } from "./model/url/DefaultRemoteURLSerializerProvider";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
-import { XWikiStorage } from "./storage/XWikiStorage";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
+import { ComponentInit as BackendXWikiComponentList } from "@xwiki/platform-backend-xwiki";
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
 import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
@@ -73,7 +73,7 @@ DefaultLinkSuggestServiceProvider.bind(container);
 DefaultSkinManager.bind(container);
 
 DefaultStorageProvider.bind(container);
-XWikiStorage.bind(container);
+new BackendXWikiComponentList(container);
 new DefaultAttachmentsComponentInit(container);
 
 new CollaborationComponentList(container);

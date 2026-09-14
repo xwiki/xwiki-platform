@@ -13,6 +13,7 @@
     "@xwiki/platform-attachments-default": "workspace:*",
     "@xwiki/platform-authentication-api": "workspace:*",
     "@xwiki/platform-backend-api": "workspace:*",
+    "@xwiki/platform-backend-xwiki": "workspace:*",
     "@xwiki/platform-collaboration-api": "workspace:*",
     "@xwiki/platform-collaboration-xwiki": "workspace:*",
     "@xwiki/platform-component-manager-api": "workspace:*",

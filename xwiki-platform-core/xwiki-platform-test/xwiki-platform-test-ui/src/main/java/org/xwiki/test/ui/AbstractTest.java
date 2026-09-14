@@ -92,13 +92,6 @@ public abstract class AbstractTest
         BaseElement.setContext(context);
         TestUtils.setContext(context);
 
-        // These tests run against the distribution as it is shipped, which leaves xwiki.superadminpassword commented
-        // out in xwiki.cfg and thus has no superadmin to authenticate as. Admin is the user with full rights here, so
-        // use it both as the privileged user of the test framework and as the user the REST calls are performed as
-        // until a test logs in as somebody else.
-        context.getUtil().setPrivilegedCredentials(TestUtils.ADMIN_CREDENTIALS);
-        context.getUtil().setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
-
         AbstractTest.componentManager = new EmbeddableComponentManager();
 
         // Only load the minimal number of components required for the test framework, for both performance reasons

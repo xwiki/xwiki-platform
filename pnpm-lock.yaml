@@ -3296,6 +3296,9 @@ importers:
       '@xwiki/platform-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/platform-link-type-default':
+        specifier: workspace:*
+        version: link:../../core/link-type/link-type-default
       '@xwiki/platform-syntaxes-config':
         specifier: workspace:*
         version: link:../../core/syntaxes/syntaxes-config

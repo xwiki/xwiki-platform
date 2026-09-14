@@ -154,6 +154,8 @@ public class UpgradeTest extends AbstractTest
         init(Arrays.asList(executor));
 
         // Use Admin credentials since superadmin is not enabled by default
+        getUtil().setPrivilegedCredentials(TestUtils.ADMIN_CREDENTIALS);
+        getUtil().setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
         extensionTestUtil = new ExtensionTestUtils(getUtil(), TestUtils.ADMIN_CREDENTIALS);
     }
 

@@ -821,17 +821,30 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
     <property>
       <code>(function(){
 
-  var isWikiNameSet = false;
-  var isAliasSet = false;
-  var lastWikiName;
+  let isWikiNameSet = false;
+  let isAliasSet = false;
+
+  // Validation state of each field that gates the "Next" button. A field is valid, invalid, or being validated on
+  // the server, in which case it is loading. The button is enabled only when every field is valid, so that no
+  // ordering of the user input and of the server answers can enable it for an incomplete or invalid form.
+  const VALID = 'valid';
+  const INVALID = 'invalid';
+  const LOADING = 'loading';
+  const fieldStates = {'prettyname': INVALID, 'wikiname': INVALID};
+
+  // The wiki name availability is checked on the server. The check is delayed so that it does not run on each
+  // keystroke, and its answer is applied only when it answers the last check that was requested.
+  const WIKI_NAME_VALIDATION_DELAY = 500;
+  let wikiNameValidationTimeout;
+  let wikiNameValidationRequest;
+  let wikiNameValidationCounter = 0;
 
   ## Error messages
   #set ($MSG_ERROR_WIKIALREADYEXISTS = "$services.localization.render('platform.wiki.create.error.wikiname.wikialreadyexists')")
   #set ($MSG_ERROR_DATABASEALREADYEXISTS = "$services.localization.render('platform.wiki.create.error.wikiname.databasealreadyexists')")
-  #set ($MSG_ERROR_WIKINAMEALREADYUSED = "$services.localization.render('platform.wiki.create.error.wikiname.wikialreadyexists')")
   #set ($MSG_ERROR_WIKINAMEEMPTY = "$services.localization.render('platform.wiki.create.error.wikiname.empty')")
+  #set ($MSG_ERROR_WIKINAMENOTCHECKED = "$services.localization.render('platform.wiki.create.error.wikiname.notchecked')")
   #set ($MSG_ERROR_WIKIPRETTYNAMEEMPTY = "$services.localization.render('platform.wiki.create.prettyname.empty')")
-  #set ($MSG_INFO_WIKINAMEVALID = "$services.localization.render('workspacemanager.wikiname.info.valid')")
   #set ($ISWIKINAMEAVAILABLE = $xwiki.getURL($services.model.createDocumentReference("", "WikiManager", "IsWikiOrDatabaseOrAvailableService")))
 
   /**
@@ -844,22 +857,24 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
       initStepUsers();
     }
   }
-  
+
   function initStepType() {
-    var prettyName = $('prettyname');
+    const prettyName = $('prettyname');
     prettyName.observe('change', prettyNameChanged);
     prettyName.observe('keyup', prettyNameChanged);
-    var wikiName   = $('wikiname');
+    const wikiName = $('wikiname');
     wikiName.observe('change', wikiNameChanged);
     wikiName.observe('keyup', wikiNameChanged);
-    var alias      = $('wikialias');
+    const alias = $('wikialias');
     if (alias) {
       alias.observe('change', aliasChanged);
       alias.observe('keyup', aliasChanged);
     }
-    if(prettyName.value.blank() || wikiName.value.blank()){
-      $('wizard-next').disabled = true;
-    }
+    // The fields can already hold a value, for instance when the form is re-displayed with the values of a
+    // previous attempt, so validate them right away. The "this field is empty" errors are not displayed at this
+    // point because the user has not filled the form yet.
+    validatePrettyName(false);
+    validateWikiName(false);
   }
 
   function initStepUsers() {
@@ -870,30 +885,61 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
   }
 
   /**
+   * Record the validation state of a field and refresh the "Next" button.
+   */
+  function setFieldState(fieldId, state) {
+    fieldStates[fieldId] = state;
+    updateNextButtonState();
+  }
+
+  /**
+   * Enable the "Next" button only when every validated field is valid.
+   */
+  function updateNextButtonState() {
+    $('wizard-next').disabled = !Object.values(fieldStates).every(function (state) {
+      return state === VALID;
+    });
+  }
+
+  /**
    * Pretty name changed
    */
   function prettyNameChanged(event){
-    var prettyName = $('prettyname');
-    if(prettyName.value.blank()){
-      $('wikiprettynamevalidation').innerHTML = "$MSG_ERROR_WIKIPRETTYNAMEEMPTY";
-      prettyName.addClassName('xErrorField');
-    }else{
-      $('wikiprettynamevalidation').innerHTML = '';
-      prettyName.removeClassName('xErrorField');
+    const prettyName = $('prettyname');
+    validatePrettyName(true);
+    if (!prettyName.value.blank()) {
+      const generatedName = prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
       // If the user has manually changed the wikiname, we don't generate it automatically anymore
-      if(!isWikiNameSet){
-        var wikiName = $('wikiname');
-        wikiName.value = prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
-        validateWikiName();
+      if (!isWikiNameSet) {
+        $('wikiname').value = generatedName;
+        validateWikiName(true);
       }
-      if(!isAliasSet){
-        var wikiAlias = $('wikialias');
+      if (!isAliasSet) {
+        const wikiAlias = $('wikialias');
         if (wikiAlias) {
-          var alias = filterWikiName(prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase());
-          alias += getAliasSuffix();
-          wikiAlias.value = alias;
+          wikiAlias.value = filterWikiName(generatedName) + getAliasSuffix();
         }
       }
+    }
+  }
+  /**
+   * Validate the wiki pretty name, which is only required to be non empty
+   */
+  function validatePrettyName(showEmptyError) {
+    const prettyName = $('prettyname');
+    if (prettyName.value.blank()) {
+      if (showEmptyError) {
+        $('wikiprettynamevalidation').innerHTML = "$MSG_ERROR_WIKIPRETTYNAMEEMPTY";
+        prettyName.addClassName('xErrorField');
+      } else {
+        $('wikiprettynamevalidation').innerHTML = '';
+        prettyName.removeClassName('xErrorField');
+      }
+      setFieldState('prettyname', INVALID);
+    } else {
+      $('wikiprettynamevalidation').innerHTML = '';
+      prettyName.removeClassName('xErrorField');
+      setFieldState('prettyname', VALID);
     }
   }
   /**
@@ -901,7 +947,7 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
    */
   function wikiNameChanged(event){
     isWikiNameSet = true;
-    validateWikiName();
+    validateWikiName(true);
   }
   /**
    * Alias changed
@@ -910,61 +956,88 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
     isAliasSet = true;
   }
   /**
-   * Validate the wiki name
+   * Validate the wiki name. The field stays in the loading state, which keeps the "Next" button disabled, until
+   * the server has answered whether the name is available.
    */
-  function validateWikiName(){
-    var wikiNameElement = $('wikiname');
-    var wikiname = wikiNameElement.value;
-    var filteredWikiName = filterWikiName(wikiname);
-    if (wikiname != filteredWikiName) {
-      wikiNameElement.value = filteredWikiName;
-      wikiname = filteredWikiName;
+  function validateWikiName(showEmptyError) {
+    const wikiNameElement = $('wikiname');
+    const wikiname = filterWikiName(wikiNameElement.value);
+    if (wikiNameElement.value !== wikiname) {
+      wikiNameElement.value = wikiname;
     }
-    if (lastWikiName == wikiname){
+    // Cancel the availability check that is scheduled or running for the previous value. Incrementing the counter
+    // is what makes its answer obsolete, aborting the request only saves a useless round trip.
+    clearTimeout(wikiNameValidationTimeout);
+    if (wikiNameValidationRequest) {
+      wikiNameValidationRequest.transport.abort();
+      wikiNameValidationRequest = undefined;
+    }
+    wikiNameValidationCounter++;
+    if (wikiname.blank()) {
+      if (showEmptyError) {
+        $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEEMPTY";
+        wikiNameElement.addClassName('xErrorField');
+      } else {
+        $('wikinamevalidation').innerHTML = '';
+        wikiNameElement.removeClassName('xErrorField');
+      }
+      setFieldState('wikiname', INVALID);
+    } else {
+      setFieldState('wikiname', LOADING);
+      const validationId = wikiNameValidationCounter;
+      wikiNameValidationTimeout = setTimeout(function () {
+        checkWikiNameAvailability(wikiname, validationId);
+      }, WIKI_NAME_VALIDATION_DELAY);
+    }
+  }
+  /**
+   * Ask the server whether the given wiki name is available
+   */
+  function checkWikiNameAvailability(wikiname, validationId) {
+    let url = "$ISWIKINAMEAVAILABLE" + "?xpage=plain&amp;outputSyntax=plain&amp;ajax=1";
+    url += "&amp;wikiname=" + encodeURIComponent(wikiname);
+    url += "&amp;form_token=$!{services.csrf.getToken()}";
+    wikiNameValidationRequest = new Ajax.Request(url, {
+      method: 'get',
+      onSuccess: function (transport) {
+        applyWikiNameValidationResult(validationId, transport.responseText.strip());
+      },
+      onFailure: function () {
+        applyWikiNameValidationResult(validationId, 'error');
+      }
+    });
+  }
+  /**
+   * Report the result of an availability check, unless the wiki name changed while the check was running
+   */
+  function applyWikiNameValidationResult(validationId, result) {
+    if (validationId !== wikiNameValidationCounter) {
+      // The wiki name changed while this check was running, so its result does not describe the current value.
       return;
     }
-    lastWikiName = wikiname;
-    if (wikiname &amp;&amp; !wikiname.blank()) {
-      var surl = "$ISWIKINAMEAVAILABLE" + "?xpage=plain&amp;outputSyntax=plain&amp;ajax=1&amp;wikiname=" + escape(wikiname);
-      surl += "&amp;form_token=$!{services.csrf.getToken()}";
-      new Ajax.Request(surl, {
-        method: 'get',
-        onSuccess: function(transport) {
-          if (transport.responseText == "true") {
-            $('wikinamevalidation').innerHTML = "";
-            wikiNameElement.removeClassName('xErrorField');
-              if (!$('prettyname').value.blank()) {
-                $('wizard-next').disabled = false;
-              }
-          }
-          else if (transport.responseText == "database"){
-            $('wikinamevalidation').innerHTML = "$MSG_ERROR_DATABASEALREADYEXISTS";
-            wikiNameElement.addClassName('xErrorField');
-            $('wizard-next').disabled = true;
-          }
-          else if (transport.responseText == "wiki"){
-            $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKIALREADYEXISTS";
-            wikiNameElement.addClassName('xErrorField');
-            $('wizard-next').disabled = true;
-          }
-          else{
-            $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEALREADYUSED";
-            wikiNameElement.addClassName('xErrorField');
-            $('wizard-next').disabled = true;
-          }
-        }
-      });
-    }
-    else{
-      $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEEMPTY";
-      $('wizard-next').disabled = true;
+    wikiNameValidationRequest = undefined;
+    const wikiNameElement = $('wikiname');
+    if (result === 'true') {
+      $('wikinamevalidation').innerHTML = '';
+      wikiNameElement.removeClassName('xErrorField');
+      setFieldState('wikiname', VALID);
+    } else {
+      if (result === 'database') {
+        $('wikinamevalidation').innerHTML = "$MSG_ERROR_DATABASEALREADYEXISTS";
+      } else if (result === 'wiki') {
+        $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKIALREADYEXISTS";
+      } else {
+        $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMENOTCHECKED";
+      }
+      wikiNameElement.addClassName('xErrorField');
+      setFieldState('wikiname', INVALID);
     }
   }
   /**
    * Filter wiki name
    */
   function filterWikiName(wikiName){
-    var result = noaccent(wikiName);
+    let result = noaccent(wikiName);
 
     // The server-side code strips '_' chars from the database name.
     result = result.replace(/[_]/g, "");
@@ -985,12 +1058,12 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
     return result;
   }
   function getAliasSuffix() {
-    var suffix = "${services.wiki.aliasSuffix}";
+    let suffix = "${services.wiki.aliasSuffix}";
     if (suffix != "") {
       suffix = "." + suffix;
     } else {
       // try to compute the suffix from the request URL
-      var hostname = window.location.hostname;
+      const hostname = window.location.hostname;
       if (hostname != "localhost" &amp;&amp; !hostname.match(/[0-9]{1,3}(?:\.[0-9]{1,3}){3}/g)) {
         suffix = hostname.substr(hostname.indexOf("."));
       }
@@ -999,7 +1072,7 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
 }
 
   function userScopeChanged(){
-    var value = $$('input:checked[type=radio][name=userScope]')[0].value
+    const value = $$('input:checked[type=radio][name=userScope]')[0].value
     if (value=='local_only') {
       // Disable membership type radio button
       $$('input[type=radio][name=membershipType]').each(function (item){

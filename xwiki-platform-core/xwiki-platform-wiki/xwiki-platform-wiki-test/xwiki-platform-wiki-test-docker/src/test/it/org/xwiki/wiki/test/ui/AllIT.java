@@ -44,4 +44,9 @@ public class AllIT
     class NestedSubWikiIT extends SubWikiIT
     {
     }
+
+    @Nested
+    class NestedCreateWikiIT extends CreateWikiIT
+    {
+    }
 }

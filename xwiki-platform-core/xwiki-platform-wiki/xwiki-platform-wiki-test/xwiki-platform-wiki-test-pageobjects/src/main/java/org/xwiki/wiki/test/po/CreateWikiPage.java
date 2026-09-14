@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -50,6 +51,95 @@ public class CreateWikiPage extends ExtendedViewPage
     {
         prettyNameField.clear();
         prettyNameField.sendKeys(prettyName);
+    }
+
+    /**
+     * @param wikiName the wiki identifier to type in the identifier field, which stops the identifier from being
+     *     computed from the pretty name
+     * @since 18.8.0RC1
+     */
+    public void setWikiName(String wikiName)
+    {
+        this.wikiNameField.clear();
+        this.wikiNameField.sendKeys(wikiName);
+    }
+
+    /**
+     * Empty the wiki pretty name field.
+     *
+     * @since 18.8.0RC1
+     */
+    public void clearPrettyName()
+    {
+        clearField(this.prettyNameField);
+    }
+
+    /**
+     * Empty the wiki identifier field.
+     *
+     * @since 18.8.0RC1
+     */
+    public void clearWikiName()
+    {
+        clearField(this.wikiNameField);
+    }
+
+    /**
+     * @return {@code true} if the button leading to the next step of the wizard is enabled
+     * @since 18.8.0RC1
+     */
+    public boolean isNextStepEnabled()
+    {
+        return this.nextStepButton.isEnabled();
+    }
+
+    /**
+     * Wait until the button leading to the next step of the wizard is enabled. The identifier is validated on the
+     * server, so the button can stay disabled for a while after the form has been filled.
+     *
+     * @since 18.8.0RC1
+     */
+    public void waitUntilNextStepIsEnabled()
+    {
+        getDriver().waitUntilElementIsEnabled(this.nextStepButton);
+    }
+
+    /**
+     * Wait until the button leading to the next step of the wizard is disabled.
+     *
+     * @since 18.8.0RC1
+     */
+    public void waitUntilNextStepIsDisabled()
+    {
+        getDriver().waitUntilElementIsDisabled(this.nextStepButton);
+    }
+
+    /**
+     * Wait until the identifier field reports the given validation message.
+     *
+     * @param message the expected validation message
+     * @since 18.8.0RC1
+     */
+    public void waitForWikiNameValidationMessage(String message)
+    {
+        getDriver().waitUntilElementHasTextContent(By.id("wikinamevalidation"), message);
+    }
+
+    /**
+     * @return the validation message currently displayed for the pretty name field
+     * @since 18.8.0RC1
+     */
+    public String getPrettyNameValidationMessage()
+    {
+        return getDriver().findElement(By.id("wikiprettynamevalidation")).getText();
+    }
+
+    private void clearField(WebElement field)
+    {
+        field.clear();
+        // clear() only fires a change event, so also send a keystroke to make sure the validation runs whatever the
+        // browser does with an already empty field.
+        field.sendKeys(Keys.BACK_SPACE);
     }
 
     public String getName()

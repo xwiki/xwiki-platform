@@ -17,32 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
 import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
 import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
 import { MinimalApp } from "./cristal/MinimalApp";
 import { DefaultImageWizard } from "./image/DefaultImageWizard";
-import { DefaultLinkSuggestServiceProvider } from "./link/DefaultLinkSuggestServiceProvider";
 import { DefaultMacroWizard } from "./macros/DefaultMacroWizard";
 import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
-import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
-import { DefaultModelReferenceParserProvider } from "./model/reference/DefaultModelReferenceParserProvider";
-import { DefaultModelReferenceSerializerProvider } from "./model/reference/DefaultModelReferenceSerializerProvider";
-import { DefaultRemoteURLParserProvider } from "./model/url/DefaultRemoteURLParserProvider";
-import { DefaultRemoteURLSerializerProvider } from "./model/url/DefaultRemoteURLSerializerProvider";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
-import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
+import { ComponentInit as AuthenticationComponentList } from "@xwiki/platform-authentication-default";
 import { ComponentInit as AuthenticationXWikiComponentList } from "@xwiki/platform-authentication-xwiki";
+import { ComponentInit as BackendComponentList } from "@xwiki/platform-backend-api";
 import { ComponentInit as BackendXWikiComponentList } from "@xwiki/platform-backend-xwiki";
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
 import { ComponentInit as DocumentXWikiComponentList } from "@xwiki/platform-document-xwiki";
+import { ComponentInit as LinkSuggestComponentList } from "@xwiki/platform-link-suggest-api";
 import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
 import { ComponentInit as MarkdownSyntaxConfig } from "@xwiki/platform-markdown-syntax-config";
 import { ComponentInit as MinimalSyntaxConfig } from "@xwiki/platform-minimal-syntax-config";
+import { ComponentInit as ModelReferenceComponentList } from "@xwiki/platform-model-reference-api";
 import { ComponentInit as ModelReferenceXWikiComponentList } from "@xwiki/platform-model-reference-xwiki";
+import { ComponentInit as ModelRemoteURLComponentList } from "@xwiki/platform-model-remote-url-api";
 import { ComponentInit as ModelRemoteURLXWikiComponentList } from "@xwiki/platform-model-remote-url-xwiki";
 import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
 import { ComponentInit as XWikiSyntaxConfig } from "@xwiki/platform-xwiki-syntax-config";
@@ -54,30 +51,26 @@ container.bind("Logger").to(DefaultLogger).inSingletonScope();
 
 new DocumentXWikiComponentList(container);
 
-DefaultModelReferenceParserProvider.bind(container);
-DefaultModelReferenceSerializerProvider.bind(container);
-DefaultModelReferenceHandlerProvider.bind(container);
+new ModelReferenceComponentList(container);
 new ModelReferenceXWikiComponentList(container);
 
 DefaultResourceReferenceParser.bind(container);
 
-DefaultRemoteURLParserProvider.bind(container);
-DefaultRemoteURLSerializerProvider.bind(container);
+new ModelRemoteURLComponentList(container);
 new ModelRemoteURLXWikiComponentList(container);
 
-DefaultAuthenticationManagerProvider.bind(container);
+new AuthenticationComponentList(container);
 new AuthenticationXWikiComponentList(container);
-
-DefaultLinkSuggestServiceProvider.bind(container);
 
 DefaultSkinManager.bind(container);
 
-DefaultStorageProvider.bind(container);
+new BackendComponentList(container);
 new BackendXWikiComponentList(container);
 new DefaultAttachmentsComponentInit(container);
 
 new CollaborationComponentList(container);
 new XWikiCollaborationComponentList(container);
+new LinkSuggestComponentList(container);
 new LinkSuggestXWikiComponentList(container);
 
 DefaultBlockNoteIterator.bind(container);

@@ -17,24 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Container, inject, injectable } from "inversify";
-import type {
-  RemoteURLParser,
-  RemoteURLParserProvider,
-} from "@xwiki/platform-model-remote-url-api";
 
-@injectable("Singleton")
-export class DefaultRemoteURLParserProvider implements RemoteURLParserProvider {
-  public static bind(container: Container): void {
-    container
-      .bind("RemoteURLParserProvider")
-      .to(DefaultRemoteURLParserProvider)
-      .inSingletonScope();
-  }
+import localConfig from "./vite.config";
+import { vitestVue as defaultConfig } from "@xwiki/platform-dev-config";
+import { mergeConfig } from "vitest/config";
 
-  constructor(@inject("Container") private readonly container: Container) {}
-
-  public get(type?: string): RemoteURLParser | undefined {
-    return this.container.get("RemoteURLParser", { name: type || "XWiki" });
-  }
-}
+export default mergeConfig(defaultConfig, localConfig);

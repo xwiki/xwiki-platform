@@ -79,18 +79,26 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
     }
 
     /**
-     * Convert bytes to human-readable size format.
+     * Convert bytes to a human-readable, localized size format.
      *
      * @param bytes the number of bytes to convert
-     * @return a string representing the size in bytes, kilobytes or megabytes, with 1 decimal precision
+     * @param isRate whether the value represents a data rate (appends a localized "per second" unit)
+     * @return a string representing the size (or rate) in bytes, kilobytes, megabytes or gigabytes, localized using
+     *         the page language, with 1 decimal precision
      */
-    static bytesToSize(bytes)
+    static bytesToSize(bytes, isRate = false)
     {
       if (bytes === 0) return 'N/A';
-      let sizes = ['B', 'KB', 'MB'];
-      let unitIndex = Number.parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-      return (bytes / Math.pow(1024, unitIndex)).toFixed(1) +
-          sizes[Math.min(unitIndex, sizes.length - 1)];
+      let units = ['byte', 'kilobyte', 'megabyte', 'gigabyte'];
+      let unitIndex = 0;
+      let value = bytes;
+      while (value >= 1000 && unitIndex < units.length - 1) {
+        value /= 1000;
+        unitIndex++;
+      }
+      let unit = units[unitIndex] + (isRate ? '-per-second' : '');
+      return new Intl.NumberFormat(document.documentElement.lang || undefined,
+          {style: 'unit', unit, unitDisplay: 'narrow', maximumFractionDigits: 1}).format(value);
     }
 
     /**
@@ -355,7 +363,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
       let crtBytesPerSecond = diff * this.progressData.updatesPerSecond;
 
       // update speed info
-      let speed = UploadUtils.bytesToSize(crtBytesPerSecond) + '/s';
+      let speed = UploadUtils.bytesToSize(crtBytesPerSecond, true);
       this.progressData.latestSpeed = speed;
       this.statusUI.PROGRESS_SPEED.update(`(${speed})`);
       this.statusUI.PROGRESS_REMAINING.update(UploadUtils.secondsToTime(secondsRemaining));
@@ -418,7 +426,7 @@ define('xwiki-upload', ['xwiki-l10n!upload-translations'], function(l10n) {
         this.statusUI.PROGRESS_REMAINING.update('00:00:00');
         this.statusUI.PROGRESS_TRANSFERED.update(UploadUtils.bytesToSize(this.file.size));
         if (this.progressData.latestSpeed === 0) {
-          this.statusUI.PROGRESS_SPEED.update('(' + UploadUtils.bytesToSize(this.file.size) + '/s)');
+          this.statusUI.PROGRESS_SPEED.update('(' + UploadUtils.bytesToSize(this.file.size, true) + ')');
         }
       }
       this.formData.input.fire('xwiki:html5upload:message', {

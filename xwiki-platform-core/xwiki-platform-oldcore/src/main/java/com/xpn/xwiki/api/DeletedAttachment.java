@@ -24,6 +24,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -121,16 +122,20 @@ public class DeletedAttachment extends Api
      */
     public Attachment getAttachment()
     {
-        try {
-            XWikiAttachment attachment = this.deletedAttachment.restoreAttachment();
+        if (hasAccess(Right.VIEW, this.deletedAttachment.getAttachmentReference().getDocumentReference())) {
+            try {
+                XWikiAttachment attachment = this.deletedAttachment.restoreAttachment();
 
-            if (attachment != null) {
-                Document doc = this.context.getWiki().getDocument(getDocName(), this.context).newDocument(this.context);
+                if (attachment != null) {
+                    Document doc =
+                        this.context.getWiki().getDocument(getDocName(), this.context).newDocument(this.context);
 
-                return new Attachment(doc, attachment, this.context);
+                    return new Attachment(doc, attachment, this.context);
+                }
+            } catch (XWikiException ex) {
+                LOGGER.warn("Failed to restore deleted attachment [{}] of document [{}]", getFilename(), getDocName(),
+                    ex);
             }
-        } catch (XWikiException ex) {
-            LOGGER.warn("Failed to restore deleted attachment [{}] of document [{}]", getFilename(), getDocName(), ex);
         }
 
         return null;

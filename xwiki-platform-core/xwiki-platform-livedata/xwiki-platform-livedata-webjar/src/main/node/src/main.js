@@ -18,27 +18,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-require(["jquery"], ($) => {
+// The Live Data user interface is loaded with dynamic imports, which the page ready detection is not able to see: it
+// watches the XMLHttpRequest and fetch calls, and the script elements added to the page head, while the modules are
+// fetched by the module loader of the web browser. The entries are fetched asynchronously as well. We thus have to
+// delay the page ready ourselves until the Live Data is displayed, otherwise the page can be marked as ready too
+// early (e.g. the PDF export would print an empty Live Data).
+require(["jquery", "xwiki-page-ready"], ($, pageReady) => {
   $.fn.liveData = function(config) {
     return this.each(function() {
       if (!$(this).data("liveData")) {
         const instanceConfig = $.extend($(this).data("config"), config);
-        import("./services/init.js").then(
-          ({init}) => {
-             $(this).attr("data-config", JSON.stringify(instanceConfig));
-            init(this, $);
-          });
+        pageReady.delayPageReady(import("./services/init.js").then(({init}) => {
+          $(this).attr("data-config", JSON.stringify(instanceConfig));
+          return init(this, $);
+        }), "livedata:display");
       }
     });
   };
 
   const init = function(event, data) {
-    import("@xwiki/platform-livedata-ui").then(({populateStore}) => {
+    pageReady.delayPageReady(import("@xwiki/platform-livedata-ui").then(({populateStore}) => {
       populateStore()
       const container = $((data && data.elements) || document);
       container.find(".liveData").liveData();
-    });
-
+    }), "livedata:load");
   };
   $(document).on("xwiki:dom:updated", init);
   $(init);

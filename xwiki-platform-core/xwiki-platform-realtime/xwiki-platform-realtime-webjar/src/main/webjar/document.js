@@ -87,12 +87,18 @@ define('xwiki-realtime-document', [
   class XWikiDocument {
     // The document currently displayed by the web page, with the fields exposed by the meta information.
     static currentDocument() {
-      return new this({
+      const currentDocument = new this({
         documentReference: meta.documentReference,
         language: meta.locale,
         version: meta.version,
         isNew: meta.isNew
       });
+      if (!currentDocument.language) {
+        // We know this is the original document translation, whose raw locale is empty, so we take its actual (real)
+        // locale from the meta information.
+        currentDocument.translations = {'default': meta.realLocale};
+      }
+      return currentDocument;
     }
 
     constructor(data) {
@@ -198,11 +204,6 @@ define('xwiki-realtime-document', [
     static currentDocument() {
       const currentDocument = super.currentDocument();
       const config = realtimeConfig.document || {};
-      if (!currentDocument.language) {
-        // We know this is the original document translation, but the meta information doesn't expose its actual
-        // (real) locale, so we take it from the real-time configuration.
-        currentDocument.translations = {'default': config.realLocale};
-      }
       // The meta information doesn't expose the date of the last modification, which is needed to properly merge on
       // save. We keep it up to date on the edit form ourselves, see syncCurrentDocumentState().
       currentDocument.modified = Number(getFieldValue('editingVersionDate')) || config.modified;

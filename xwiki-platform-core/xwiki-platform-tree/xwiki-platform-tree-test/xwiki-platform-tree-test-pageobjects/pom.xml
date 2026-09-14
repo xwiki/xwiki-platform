@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-tree</artifactId>
+    <artifactId>xwiki-platform-tree-test</artifactId>
     <version>18.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tree-test-pageobjects</artifactId>

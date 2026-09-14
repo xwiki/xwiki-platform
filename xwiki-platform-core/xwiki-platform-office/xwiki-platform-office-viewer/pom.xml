@@ -33,7 +33,7 @@
   <properties>
     <!-- Skipping revapi since xwiki-platform-legacy-office-viewer wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.79</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.88</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -69,6 +69,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

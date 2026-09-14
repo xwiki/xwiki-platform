@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -123,6 +124,11 @@ class XWikiDocumentTest
     private static final String CLASSNAME = DOCSPACE + "." + DOCNAME;
 
     private static final DocumentReference CLASS_REFERENCE = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
+
+    /**
+     * A fixed date, with no millisecond, used for the documents compared in the {@code apply*()} tests.
+     */
+    private static final long APPLY_DATE = 1234567890000L;
 
     private XWikiDocument document;
 
@@ -1256,6 +1262,12 @@ class XWikiDocumentTest
     private XWikiDocument createDocumentToApply() throws Exception
     {
         XWikiDocument documentToApply = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, "ApplyPage"));
+        // Force the dates, which a new document initializes to the current time truncated to the second. Since
+        // XWikiDocument#equals() compares them, two documents created on either side of a second boundary would
+        // otherwise not be equal.
+        documentToApply.setDate(new Date(APPLY_DATE));
+        documentToApply.setContentUpdateDate(new Date(APPLY_DATE));
+        documentToApply.setCreationDate(new Date(APPLY_DATE));
         documentToApply.setSyntax(Syntax.XWIKI_2_1);
         documentToApply.setTitle("title");
         documentToApply.setContent("content");

@@ -99,9 +99,8 @@ class LiveDataXObjectEditConfirmationIT
         // Trigger the inline edit of the XObject property. The edit confirmation check in display.vm returns a 423
         // (warning), so the ForceEditLockModal is shown instead of the editor.
         tableLayout.clickEditCell(NAME_COLUMN, 1);
+        // Creating the page object waits until the modal is actually displayed.
         ForceEditLockModal modal = new ForceEditLockModal();
-        // The fade animation takes a while to complete, so we wait until the modal is actually displayed.
-        setup.getDriver().waitUntilCondition(driver -> modal.isDisplayed());
 
         // Cancel: the editor must not open.
         modal.clickCancel();
@@ -111,7 +110,6 @@ class LiveDataXObjectEditConfirmationIT
         // reappears.
         tableLayout.clickEditCell(NAME_COLUMN, 1);
         ForceEditLockModal modal2 = new ForceEditLockModal();
-        setup.getDriver().waitUntilCondition(driver -> modal2.isDisplayed());
 
         // Confirm: the editor should open after the modal closes.
         modal2.clickOk();

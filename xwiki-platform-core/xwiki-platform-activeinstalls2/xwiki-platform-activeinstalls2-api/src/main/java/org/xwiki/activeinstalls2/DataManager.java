@@ -36,7 +36,12 @@ import org.xwiki.stability.Unstable;
 public interface DataManager
 {
     /**
-     * Executes a Search query for Active Installs.
+     * Executes a Search query for Active Installs. Note that this returns a bounded number of the matching pings and
+     * not all of them: a ping holds the whole extension list of an instance, and an instance sends a ping every day
+     * as well as every time it's restarted, so the matching pings are far too many and too big to be held in memory.
+     * Which pings of the matching ones are returned is not defined either, since they are not sorted. So this answers
+     * "what does a matching ping look like". It answers neither "how many instances match", which
+     * {@link #countDistinctInstalls(String)} does, nor "give me every matching ping", which is not supported.
      *
      * @param jsonQuery the Elastic Search JSON query used to search for installs. For example:
      *        <pre>{@code
@@ -44,8 +49,9 @@ public interface DataManager
      *                "term": { "distribution.extension.version" : "5.2" }
      *            }
      *        }</pre>
-     * @return the parsed JSON result coming from Elastic Search, as a list of {@link Ping} object. Passing an empty
-     *      or null json string results in returning all data found in the index (i.e no query constraint)
+     *      Passing an empty or null json string matches all the data found in the index (i.e no query constraint)
+     * @return the parsed JSON result coming from Elastic Search, as a list of {@link Ping} object. Implementations
+     *      are allowed to return only some of the matching pings, and document the number above which they do
      * @throws Exception when an error happens while retrieving the data
      * @since 14.4RC1
      */

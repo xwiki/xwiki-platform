@@ -28,8 +28,8 @@ import java.util.Set;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -137,9 +137,9 @@ public class NotificationsTrayPage extends ViewPage
             .queryParam("_", System.currentTimeMillis())
             .build();
         try {
-            GetMethod getMethod = testUtils.rest().executeGet(attemptURI);
-            if (Set.of(200, 202).contains(getMethod.getStatusCode())) {
-                String responseBody = IOUtils.toString(getMethod.getResponseBodyAsStream(), UTF_8);
+            CloseableHttpResponse response = testUtils.rest().executeGet(attemptURI);
+            if (Set.of(200, 202).contains(response.getCode())) {
+                String responseBody = IOUtils.toString(response.getEntity().getContent(), UTF_8);
                 Map<?, ?> map = new ObjectMapper().readValue(responseBody, Map.class);
                 return getOptionalLong(String.valueOf(map.get("unread")));
             } else {

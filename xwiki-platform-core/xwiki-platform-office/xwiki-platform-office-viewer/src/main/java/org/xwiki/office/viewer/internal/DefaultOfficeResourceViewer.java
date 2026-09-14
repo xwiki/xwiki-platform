@@ -77,6 +77,8 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLSecurityManager;
@@ -189,6 +191,12 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
     @Inject
     private URLSecurityManager urlSecurityManager;
+
+    /**
+     * Used to check that the current user is allowed to see the attachment to view.
+     */
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorization;
 
     /**
      * The logger to log.
@@ -388,6 +396,10 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     private OfficeDocumentView getView(ResourceReference reference, AttachmentReference attachmentReference,
         Map<String, ?> parameters) throws Exception
     {
+        // The view right on the attachment is checked first, before the cache is read and before the attachment
+        // itself is accessed, so that the check applies to every view this method returns.
+        this.contextualAuthorization.checkAccess(Right.VIEW, attachmentReference);
+
         // Search the cache.
         String cacheKey =
             getCacheKey(attachmentReference.getDocumentReference(), attachmentReference.getName(), parameters);

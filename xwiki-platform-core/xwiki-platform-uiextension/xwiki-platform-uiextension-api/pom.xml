@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Java API for the User Interface extensions</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.94</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.96</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -61,6 +61,13 @@
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-event</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Used to verify that the UI extensions are executed with the requested output syntax. -->
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-plain</artifactId>
       <version>${rendering.version}</version>
       <scope>test</scope>
     </dependency>

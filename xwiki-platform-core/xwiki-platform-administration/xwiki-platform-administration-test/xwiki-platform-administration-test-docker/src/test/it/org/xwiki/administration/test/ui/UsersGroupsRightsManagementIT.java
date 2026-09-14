@@ -139,6 +139,7 @@ class UsersGroupsRightsManagementIT
      * <li>Validate adding sub-groups</li>
      * <li>Validate removing user members.</li>
      * <li>Validate removing sub-groups.</li>
+     * <li>Validate that the alias of a member is displayed as text.</li>
      * </ul>
      */
     @Test
@@ -244,6 +245,23 @@ class UsersGroupsRightsManagementIT
         // Close the modal and check the updated member count.
         devsGroupModal.close();
         assertEquals("2", groupsPage.getMemberCount(devs));
+
+        //
+        // Check the display of the alias of a member.
+        //
+
+        // The alias is only displayed for a member whose display name differs from its page name, so this member
+        // needs a first and a last name.
+        String carol = String.format("%s_%s", testName, "Carol");
+        setup.rest().deletePage("XWiki", carol);
+        setup.createUser(carol, carol, "", "first_name", "Carol", "last_name", "Smith");
+
+        // Verify that the alias is part of the text of the member cell, separator space and parentheses included.
+        groupsPage = GroupsPage.gotoPage();
+        devsGroupModal = groupsPage.clickEditGroup(devs);
+        devsGroupModal.addUsers(carol);
+        devsGroupModal.getMembersTable().assertRow("Member", String.format("Carol Smith (%s)", carol));
+        devsGroupModal.close();
     }
 
     /**

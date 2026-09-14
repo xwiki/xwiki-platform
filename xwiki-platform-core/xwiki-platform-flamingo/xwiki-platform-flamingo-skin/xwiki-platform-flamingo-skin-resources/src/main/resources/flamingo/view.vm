@@ -51,9 +51,8 @@
       ## This is an aside element because it is related to the main
       ## content but not part of it.
       <aside id="xdocFooter" aria-label="$escapetool.xml($services.localization.render('contentfooter.label'))">
-        #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.contentFooter', {'sortByParameter': 'order'}))
-          $services.rendering.render($uix.execute(), 'xhtml/1.0')
-        #end
+        $services.uix.renderExtensions('org.xwiki.platform.template.contentFooter', 'html/5.0',
+          {'sortByParameter': 'order'})
       </aside>
     #end
     #if ($displayDocExtra)

@@ -182,6 +182,8 @@
         <configuration>
           <classpathDependencyExcludes>
             <classpathDependencyExcludes>org.xwiki.platform:xwiki-platform-oldcore:jar</classpathDependencyExcludes>
+            <classpathDependencyExcludes>org.xwiki.rendering:xwiki-rendering-api:jar</classpathDependencyExcludes>
+            <classpathDependencyExcludes>org.xwiki.commons:xwiki-commons-component-api:jar</classpathDependencyExcludes>
           </classpathDependencyExcludes>
         </configuration>
       </plugin>

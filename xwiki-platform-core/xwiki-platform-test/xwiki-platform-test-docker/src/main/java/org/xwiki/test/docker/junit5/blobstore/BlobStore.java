@@ -33,7 +33,7 @@ public enum BlobStore
     FILESYSTEM("filesystem"),
 
     /**
-     * Represents the S3 blob store using MinIO.
+     * Represents the S3 blob store using Silo, a MinIO fork.
      */
     S3("s3");
 

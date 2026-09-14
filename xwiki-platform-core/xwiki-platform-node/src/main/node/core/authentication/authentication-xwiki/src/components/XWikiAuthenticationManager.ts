@@ -17,24 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { Container, inject, injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import type {
   AuthenticationManager,
   UserDetails,
 } from "@xwiki/platform-authentication-api";
 import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 
-@injectable("Singleton")
-export class XWikiAuthenticationManager implements AuthenticationManager {
+@injectable()
+class XWikiAuthenticationManager implements AuthenticationManager {
   private userDetails?: Promise<UserDetails>;
-
-  public static bind(container: Container): void {
-    container
-      .bind("AuthenticationManager")
-      .to(XWikiAuthenticationManager)
-      .inSingletonScope()
-      .whenNamed("XWiki");
-  }
 
   constructor(@inject("XWikiMeta") private readonly xwikiMeta: XWikiMeta) {}
 
@@ -105,3 +97,5 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
       : undefined;
   }
 }
+
+export { XWikiAuthenticationManager };

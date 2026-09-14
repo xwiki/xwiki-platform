@@ -12,33 +12,35 @@ import { WikiConfig } from '@xwiki/platform-api';
 // @beta
 export function getRestSpacesApiUrl(wikiConfig: WikiConfig, documentId: string): string;
 
-// @public
-export function loadById<T = unknown>(...ids: string[]): Promise<T>;
-
 // @beta
-export interface XWikiAttachment {
+export interface LegacyXWikiAttachment {
     // (undocumented)
     getURL(): string;
 }
 
 // @beta
-export interface XWikiDocument {
+export interface LegacyXWikiDocument {
     // (undocumented)
-    getURL(action?: string, parameters?: URLSearchParams): string;
+    getRestURL(entity?: string, parameters?: URLSearchParams): string;
+    // (undocumented)
+    getURL(action?: string, parameters?: URLSearchParams, fragment?: string): string;
 }
+
+// @public
+export function loadById<T = unknown>(...ids: string[]): Promise<T>;
 
 // @beta
 export interface XWikiGlobal {
     // (undocumented)
-    Attachment: new (reference: EntityReference) => XWikiAttachment;
+    Attachment: new (reference: EntityReference) => LegacyXWikiAttachment;
     contextPath: string;
-    currentDocument: XWikiDocument & {
+    currentDocument: LegacyXWikiDocument & {
         documentReference: EntityReference;
     };
     currentWiki: string;
     docsyntax: string;
     // (undocumented)
-    Document: new (reference: EntityReference) => XWikiDocument;
+    Document: new (reference: EntityReference) => LegacyXWikiDocument;
     // (undocumented)
     EntityReference: new (name: string, type: number, parent?: EntityReference | null, locale?: string) => EntityReference;
     // (undocumented)
@@ -56,6 +58,7 @@ export type XWikiMeta = {
     userReference?: EntityReference | null;
     isNew: boolean;
     locale: string;
+    realLocale: string;
     action: string;
     setVersion: (version: string) => void;
     refreshVersion: (handle404: (response: Response) => void) => Promise<void>;

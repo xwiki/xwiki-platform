@@ -6,12 +6,15 @@
   "main": "src/entityReference.ts",
   "scripts": {
     "build": "run-s type-check build-only",
-    "build-only": "cross-env MINIFY=false vite build && cross-env MINIFY=true vite build",
+    "build-only": "run-s build-entityReference build-document",
+    "build-entityReference": "cross-env ENTRY=entityReference MINIFY=false vite build && cross-env ENTRY=entityReference MINIFY=true vite build",
+    "build-document": "cross-env ENTRY=document MINIFY=false vite build && cross-env ENTRY=document MINIFY=true vite build",
     "lint": "eslint .",
     "test:unit": "vitest --run --passWithNoTests",
     "type-check": "tsc --build"
   },
   "dependencies": {
+    "@xwiki/platform-document-xwiki": "workspace:*",
     "@xwiki/platform-xwiki-model-api": "workspace:*"
   },
   "devDependencies": {

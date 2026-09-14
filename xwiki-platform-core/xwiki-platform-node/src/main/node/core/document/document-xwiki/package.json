@@ -17,6 +17,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./src/index.ts"
+    },
+    "./document": {
+      "types": "./dist/XWikiDocument.d.ts",
+      "import": "./src/XWikiDocument.ts"
     }
   },
   "main": "./src/index.ts",
@@ -42,6 +46,7 @@
     "@xwiki/platform-document-api": "workspace:*",
     "@xwiki/platform-model-api": "workspace:*",
     "@xwiki/platform-model-xwiki": "workspace:*",
+    "@xwiki/platform-xwiki-model-api": "workspace:*",
     "@xwiki/platform-xwiki-utils": "workspace:*"
   },
   "peerDependencies": {
@@ -73,6 +78,16 @@
         },
         "require": {
           "types": "./dist/index.d.cts",
+          "default": "./dist/index.umd.js"
+        }
+      },
+      "./document": {
+        "import": {
+          "types": "./dist/XWikiDocument.d.ts",
+          "default": "./dist/index.es.js"
+        },
+        "require": {
+          "types": "./dist/XWikiDocument.d.ts",
           "default": "./dist/index.umd.js"
         }
       }

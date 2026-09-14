@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { XWikiDocument } from "../XWikiDocument";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { inject, injectable } from "inversify";
 import { ref } from "vue";
@@ -33,21 +34,32 @@ import type { Ref } from "vue";
 class XWikiDocumentService implements DocumentService {
   constructor(@inject("XWikiMeta") private readonly xwikiMeta: XWikiMeta) {}
 
+  /**
+   * @returns the document displayed by the current page. It is read again on each call, so that it stays accurate
+   *   when the page edits a different document in place, without being reloaded.
+   */
+  private getCurrentXWikiDocument(): XWikiDocument {
+    return XWikiDocument.currentDocument(this.xwikiMeta);
+  }
+
   public getCurrentDocument(): Ref<PageData | undefined> {
     // TODO
     throw new Error("Method not implemented.");
   }
 
   public getCurrentDocumentReference(): Ref<DocumentReference | undefined> {
+    const currentDocument = this.getCurrentXWikiDocument();
     const documentReference = toCristalEntityReference(
-      XWiki.currentDocument.documentReference,
+      currentDocument.documentReference,
     ) as DocumentReference;
-    documentReference.locale = this.xwikiMeta.locale;
+    documentReference.locale = currentDocument.language;
     return ref(documentReference);
   }
 
   public getCurrentDocumentReferenceString(): Ref<string | undefined> {
-    return ref(XWiki.Model.serialize(XWiki.currentDocument.documentReference));
+    return ref(
+      XWiki.Model.serialize(this.getCurrentXWikiDocument().documentReference),
+    );
   }
 
   public getCurrentDocumentRevision(): Ref<string | undefined> {

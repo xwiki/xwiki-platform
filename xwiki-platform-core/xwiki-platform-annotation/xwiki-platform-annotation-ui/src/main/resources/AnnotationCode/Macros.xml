@@ -263,15 +263,10 @@
  *#
 #macro(displayAnnotationToolboxFromReference $ann $mode $docRef)
   #if ($mode == 'view')
-  ## $hasAdmin/$hasEdit are normally bound by the calling template, xwikivars.vm - true when this macro is
-  ## reached from the Comments tab, but NOT when the annotation bubble fetches its own content via
-  ## AnnotationCode.DisplayForm, rendered through the lightweight "get" action, which never runs that template.
-  ## Compute the rights locally so the Edit/Delete actions are gated correctly regardless of which caller
-  ## reached this macro. Comment rights are computed the same way rather than through
-  ## $xwiki.hasAccessLevel('comment'), which checks $xcontext.doc and so isn't reliable either for the same
-  ## reason. The values are stored under macro-specific names: a #set in a macro body writes to the shared
-  ## Velocity context, so reusing $hasAdmin/$hasEdit would leave them overwritten with the rights on $docRef
-  ## for everything rendered after this macro.
+  ## xwikivars.vm binds $hasAdmin/$hasEdit for the Comments tab but not for the annotation bubble, which
+  ## fetches its content through the "get" action, so compute the rights here against $docRef instead of
+  ## relying on the caller or on $xcontext.doc. Keep the $ann prefix: a #set in a macro body writes to the
+  ## shared Velocity context and would otherwise clobber the calling template's values.
   #set($annHasAdmin = $services.security.authorization.hasAccess('admin', $docRef))
   #set($annHasEdit = $services.security.authorization.hasAccess('edit', $docRef))
   #set($annHasComment = $services.security.authorization.hasAccess('comment', $docRef))

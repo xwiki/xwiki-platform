@@ -24,19 +24,11 @@ import {
 } from "@xwiki/platform-model-api";
 import { AbstractModelReferenceHandler } from "@xwiki/platform-model-reference-api";
 import { absoluteCristalEntityReference } from "@xwiki/platform-model-xwiki";
-import { Container, injectable } from "inversify";
+import { injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
 
-@injectable("Singleton")
-export class XWikiModelReferenceHandler extends AbstractModelReferenceHandler {
-  public static bindComponents(container: Container): void {
-    container
-      .bind("ModelReferenceHandler")
-      .to(XWikiModelReferenceHandler)
-      .inSingletonScope()
-      .whenNamed("XWiki");
-  }
-
+@injectable()
+class XWikiModelReferenceHandler extends AbstractModelReferenceHandler {
   public createDocumentReference(
     name: string,
     space: SpaceReference,
@@ -69,3 +61,5 @@ export class XWikiModelReferenceHandler extends AbstractModelReferenceHandler {
     return "";
   }
 }
+
+export { XWikiModelReferenceHandler };

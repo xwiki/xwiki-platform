@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
-import { Container, injectable } from "inversify";
+import { injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type { RemoteURLParser } from "@xwiki/platform-model-remote-url-api";
 import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xwiki-model-api";
@@ -28,16 +28,8 @@ import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xw
 // "/wiki/subwiki/bin/download/Space/Page/file.png".
 const URL_PATH_REGEXP = /^(?:\/wiki\/([^/]+))?\/bin\/([^/]+)\/(.*)$/;
 
-@injectable("Singleton")
-export class XWikiRemoteURLParser implements RemoteURLParser {
-  public static bind(container: Container): void {
-    container
-      .bind("RemoteURLParser")
-      .to(XWikiRemoteURLParser)
-      .inSingletonScope()
-      .whenNamed("XWiki");
-  }
-
+@injectable()
+class XWikiRemoteURLParser implements RemoteURLParser {
   public parse(url: string): EntityReference | undefined {
     const path = this.getPathAfterContext(url);
     if (path === undefined) {
@@ -154,3 +146,5 @@ export class XWikiRemoteURLParser implements RemoteURLParser {
       .map(decodeURIComponent);
   }
 }
+
+export { XWikiRemoteURLParser };

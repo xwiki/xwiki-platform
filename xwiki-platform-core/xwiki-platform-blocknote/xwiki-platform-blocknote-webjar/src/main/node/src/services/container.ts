@@ -30,13 +30,8 @@ import { DefaultBlockNoteMacroWizard } from "./macros/MacroWizard";
 import { DefaultModelReferenceHandlerProvider } from "./model/reference/DefaultModelReferenceHandlerProvider";
 import { DefaultModelReferenceParserProvider } from "./model/reference/DefaultModelReferenceParserProvider";
 import { DefaultModelReferenceSerializerProvider } from "./model/reference/DefaultModelReferenceSerializerProvider";
-import { XWikiModelReferenceHandler } from "./model/reference/XWikiModelReferenceHandler";
-import { XWikiModelReferenceParser } from "./model/reference/XWikiModelReferenceParser";
-import { XWikiModelReferenceSerializer } from "./model/reference/XWikiModelReferenceSerializer";
 import { DefaultRemoteURLParserProvider } from "./model/url/DefaultRemoteURLParserProvider";
 import { DefaultRemoteURLSerializerProvider } from "./model/url/DefaultRemoteURLSerializerProvider";
-import { XWikiRemoteURLParser } from "./model/url/XWikiRemoteURLParser";
-import { XWikiRemoteURLSerializer } from "./model/url/XWikiRemoteURLSerializer";
 import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
 import { XWikiStorage } from "./storage/XWikiStorage";
@@ -47,6 +42,8 @@ import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platfor
 import { ComponentInit as LinkSuggestXWikiComponentList } from "@xwiki/platform-link-suggest-xwiki";
 import { ComponentInit as MarkdownSyntaxConfig } from "@xwiki/platform-markdown-syntax-config";
 import { ComponentInit as MinimalSyntaxConfig } from "@xwiki/platform-minimal-syntax-config";
+import { ComponentInit as ModelReferenceXWikiComponentList } from "@xwiki/platform-model-reference-xwiki";
+import { ComponentInit as ModelRemoteURLXWikiComponentList } from "@xwiki/platform-model-remote-url-xwiki";
 import { DefaultResourceReferenceParser } from "@xwiki/platform-rendering-api";
 import { ComponentInit as XWikiSyntaxConfig } from "@xwiki/platform-xwiki-syntax-config";
 import { Container } from "inversify";
@@ -58,20 +55,15 @@ container.bind("Logger").to(DefaultLogger).inSingletonScope();
 DefaultDocumentService.bind(container);
 
 DefaultModelReferenceParserProvider.bind(container);
-XWikiModelReferenceParser.bind(container);
-
 DefaultModelReferenceSerializerProvider.bind(container);
-XWikiModelReferenceSerializer.bind(container);
-
 DefaultModelReferenceHandlerProvider.bind(container);
-XWikiModelReferenceHandler.bindComponents(container);
+new ModelReferenceXWikiComponentList(container);
 
 DefaultResourceReferenceParser.bind(container);
 
 DefaultRemoteURLParserProvider.bind(container);
-XWikiRemoteURLParser.bind(container);
 DefaultRemoteURLSerializerProvider.bind(container);
-XWikiRemoteURLSerializer.bind(container);
+new ModelRemoteURLXWikiComponentList(container);
 
 DefaultAuthenticationManagerProvider.bind(container);
 XWikiAuthenticationManager.bind(container);

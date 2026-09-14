@@ -19,7 +19,7 @@
  */
 import { EntityType } from "@xwiki/platform-model-api";
 import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
-import { Container, inject, injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type {
   ModelReferenceParser,
@@ -30,16 +30,8 @@ import type {
   ResourceReferenceParser,
 } from "@xwiki/platform-rendering-api";
 
-@injectable("Singleton")
-export class XWikiModelReferenceParser implements ModelReferenceParser {
-  public static bind(container: Container): void {
-    container
-      .bind("ModelReferenceParser")
-      .to(XWikiModelReferenceParser)
-      .inSingletonScope()
-      .whenNamed("XWiki");
-  }
-
+@injectable()
+class XWikiModelReferenceParser implements ModelReferenceParser {
   constructor(
     @inject("ResourceReferenceParser")
     private readonly resourceReferenceParser: ResourceReferenceParser,
@@ -91,3 +83,5 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
     return toCristalEntityReference(XWiki.Model.resolve(reference, type))!;
   }
 }
+
+export { XWikiModelReferenceParser };

@@ -19,20 +19,12 @@
  */
 import { EntityType } from "@xwiki/platform-model-api";
 import { toXWikiEntityReference } from "@xwiki/platform-model-xwiki";
-import { Container, injectable } from "inversify";
+import { injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type { ModelReferenceSerializer } from "@xwiki/platform-model-reference-api";
 
-@injectable("Singleton")
-export class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
-  public static bind(container: Container): void {
-    container
-      .bind("ModelReferenceSerializer")
-      .to(XWikiModelReferenceSerializer)
-      .inSingletonScope()
-      .whenNamed("XWiki");
-  }
-
+@injectable()
+class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
   public serialize(reference?: EntityReference): string | undefined {
     if (!reference) {
       return undefined;
@@ -56,3 +48,5 @@ export class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
     }
   }
 }
+
+export { XWikiModelReferenceSerializer };

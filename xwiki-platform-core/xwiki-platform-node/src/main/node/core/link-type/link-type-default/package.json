@@ -39,6 +39,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@xwiki/platform-dsapi": "workspace:*",
+    "@xwiki/platform-fn-utils": "workspace:*",
     "@xwiki/platform-icons": "workspace:*",
     "@xwiki/platform-link-modal-ui": "workspace:*",
     "@xwiki/platform-link-suggest-api": "workspace:*",
@@ -57,7 +58,6 @@
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@xwiki/platform-dev-config": "workspace:*",
-    "@xwiki/platform-fn-utils": "workspace:*",
     "@xwiki/platform-tool-apiextractorconfig": "workspace:*",
     "@xwiki/platform-tool-tsconfig": "workspace:*",
     "@xwiki/platform-tool-tsdocconfig": "workspace:*",

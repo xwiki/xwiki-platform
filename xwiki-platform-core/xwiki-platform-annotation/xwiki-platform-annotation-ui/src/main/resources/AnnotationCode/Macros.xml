@@ -263,17 +263,20 @@
  *#
 #macro(displayAnnotationToolboxFromReference $ann $mode $docRef)
   #if ($mode == 'view')
-  ## $hasAdmin/$hasEdit are normally bound by the calling template (xwikivars.vm) - true when this macro is
+  ## $hasAdmin/$hasEdit are normally bound by the calling template, xwikivars.vm - true when this macro is
   ## reached from the Comments tab, but NOT when the annotation bubble fetches its own content via
-  ## AnnotationCode.DisplayForm (rendered through the lightweight "get" action, which never runs that template).
-  ## Compute them locally so the Edit/Delete actions are gated correctly regardless of which caller reached
-  ## this macro. $hasComment is computed the same way rather than through $xwiki.hasAccessLevel('comment'), which
-  ## checks $xcontext.doc and so isn't reliable either for the same reason.
-  #set($hasAdmin = $services.security.authorization.hasAccess('admin', $docRef))
-  #set($hasEdit = $services.security.authorization.hasAccess('edit', $docRef))
-  #set($hasComment = $services.security.authorization.hasAccess('comment', $docRef))
+  ## AnnotationCode.DisplayForm, rendered through the lightweight "get" action, which never runs that template.
+  ## Compute the rights locally so the Edit/Delete actions are gated correctly regardless of which caller
+  ## reached this macro. Comment rights are computed the same way rather than through
+  ## $xwiki.hasAccessLevel('comment'), which checks $xcontext.doc and so isn't reliable either for the same
+  ## reason. The values are stored under macro-specific names: a #set in a macro body writes to the shared
+  ## Velocity context, so reusing $hasAdmin/$hasEdit would leave them overwritten with the rights on $docRef
+  ## for everything rendered after this macro.
+  #set($annHasAdmin = $services.security.authorization.hasAccess('admin', $docRef))
+  #set($annHasEdit = $services.security.authorization.hasAccess('edit', $docRef))
+  #set($annHasComment = $services.security.authorization.hasAccess('comment', $docRef))
   #if ($annotationClassDocName == 'XWiki.XWikiComments')
-    ## Same reasoning as $hasAdmin/$hasEdit above: use $annoDoc rather than the calling template's $doc, since
+    ## Same reasoning as the rights above: use $annoDoc rather than the calling template's $doc, since
     ## it isn't guaranteed to point at the annotated document (or to be bound at all) for every caller.
     #set($annoDoc = $xwiki.getDocument($docRef))
     #set($repliesList = $annoDoc.getObjects($annotationClassDocName, 'replyto', $ann.id))
@@ -288,7 +291,7 @@
         $services.icon.renderHTML('comments') $!escapetool.xml($services.localization.render('core.viewers.comments.thread.view', [$threadCount]))
       &lt;/button&gt;##
     #end
-    #if($hasComment)
+    #if($annHasComment)
       &lt;a class="commentreply btn btn-default infomessage" rel="nofollow" href="$xredirect.replaceAll('&amp;?replyto=\d++', '')&amp;replyto=${ann.id}#xwikicomment_${ann.id}"#if("$!replyTo" == "${ann.id}") style="display: none;"#end&gt;##
       $services.icon.renderHTML('comment') $!escapetool.xml($services.localization.render('core.viewers.comments.reply'))
       &lt;/a&gt;##
@@ -297,7 +300,7 @@
       href="$annoDoc.getURL('view', 'viewer=comments')#xwikicomment_${ann.id}"&gt;##
       $services.icon.renderHTML('link') $!escapetool.xml($services.localization.render('core.viewers.comments.share'))
     &lt;/a&gt;##
-    #if($hasComment &amp;&amp; ($hasAdmin || $isUserComment))
+    #if($annHasComment &amp;&amp; ($annHasAdmin || $isUserComment))
       #set ($editQueryString = $escapetool.url({
         'viewer': 'comments',
         'number': $ann.id,
@@ -307,7 +310,7 @@
       $services.icon.renderHTML('pencil') $!escapetool.xml($services.localization.render('core.viewers.comments.edit'))
       &lt;/a&gt;##
     #end
-    #if ($hasAdmin || ($hasEdit &amp;&amp; $isUserComment))
+    #if ($annHasAdmin || ($annHasEdit &amp;&amp; $isUserComment))
       ## Delete mutates state, so it's a real POST form (not a link) - a link's href can be followed by a
       ## crawler, prefetched, opened in a new tab, or navigated to directly if JavaScript never attaches.
       #set ($deleteActionURL = $xwiki.getURL($annoDoc.fullName, 'objectremove'))
@@ -336,7 +339,7 @@
           $services.icon.renderHTML('check')
         &lt;/a&gt;##
       #end
-      #if ($hasAdmin || $isUserComment)
+      #if ($annHasAdmin || $isUserComment)
         &lt;a class="edit btn btn-default infomessage" href="${editURL}"
           title="$services.localization.render('annotations.action.edit.tooltip')"&gt;
           $services.icon.renderHTML('pencil')

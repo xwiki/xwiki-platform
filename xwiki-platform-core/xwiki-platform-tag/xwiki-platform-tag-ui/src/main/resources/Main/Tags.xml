@@ -59,11 +59,11 @@ $xwiki.ssx.use('Main.Tags')##
 ##
 #macro (displayTagAppTitle $urlEscapedTag $htmlEscapedTag $displayButtons)
   (% class="xapp" %)
-  = (% class="highlight tag" %)${wikiEscapedTag}##
-      #if ($xwiki.hasAdminRights() &amp;&amp; $displayButtons) ##
-        [[$services.localization.render('xe.tag.rename.link')&gt;&gt;||queryString="do=prepareRename&amp;tag=${urlEscapedTag}" class="button rename" rel="nofollow"]] [[$services.localization.render('xe.tag.delete.link')&gt;&gt;||queryString="do=prepareDelete&amp;tag=${urlEscapedTag}" class="button delete" rel="nofollow"]]##
-      #end
-    (%%) =
+  ((((% class="tag" %)
+  = $services.icon.render('tag') ${wikiEscapedTag} =
+  #if ($xwiki.hasAdminRights() &amp;&amp; $displayButtons)##
+    [[$services.icon.render('edit') $services.localization.render('xe.tag.rename.link')&gt;&gt;||queryString="do=prepareRename&amp;tag=${urlEscapedTag}" class="btn btn-default rename" rel="nofollow"]][[$services.icon.render('cross') $services.localization.render('xe.tag.delete.link')&gt;&gt;||queryString="do=prepareDelete&amp;tag=${urlEscapedTag}" class="btn btn-default delete" rel="nofollow"]]##
+  #end)))
 #end
 ##
 ## Switch between all possible actions:
@@ -268,54 +268,14 @@ $xwiki.ssx.use('Main.Tags')##
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
-
-h1.xapp {
-  border-bottom: 0 none;
-  margin: 0;
-}
-
-h1.xapp + form {
-  margin: 1.5em 0 1em;
-}
-
-h1.xapp * {
-  vertical-align: middle;
-}
-
-h1.xapp .highlight {
-  background: url("$xwiki.getSkinFile('icons/silk/tag_blue.png')") no-repeat 5px 50% $theme.backgroundSecondaryColor;
-  border: solid 1px $theme.borderColor;
-  border-radius: 10px;
-  display: inline-block;
-  font-weight: bold;
-  padding: 2px 8px 2px 25px;
-  white-space: nowrap;
-}
-
-h1.xapp .button {
-  background: no-repeat 3px 50% $theme.pageContentBackgroundColor;
-  border: solid 1px $theme.borderColor;
-  border-radius: 7px;
-  color: $theme.linkColor;
-  display : inline-block;
-  font-size: 50%;
-  font-weight: normal;
-  line-height: 1.5em;
-  padding: 2px 5px 2px 20px;
-}
-
-h1.xapp .delete {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
-}
-
-h1.xapp .rename {
-  background-image: url("$xwiki.getSkinFile('icons/silk/textfield_rename.png')");
-}
-
-h1.xapp .button:hover {
-  background-color: $theme.highlightColor;
-  text-decoration: none;
+      <code>.xapp:has(h1.tag), .xapp:has(h1.tag) &gt; p {
+  display: flex;
+  gap: .5em;
+  align-items: center;
+  
+  &amp; &gt;* {
+    margin: 0;
+  }
 }
 </code>
     </property>

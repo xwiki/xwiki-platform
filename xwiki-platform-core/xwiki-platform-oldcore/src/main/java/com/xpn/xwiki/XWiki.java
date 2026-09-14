@@ -5974,9 +5974,7 @@ public class XWiki implements EventListener
                 reference = getDefaultDocumentReference().setWikiReference(new WikiReference(context.getWikiId()));
             }
         } else if (context.getMode() == XWikiContext.MODE_XMLRPC) {
-            reference = new DocumentReference(context.getWikiId(),
-                context.getDoc().getDocumentReference().getLastSpaceReference().getName(),
-                context.getDoc().getDocumentReference().getName());
+            reference = getXMLRPCDocumentReference(context);
         } else {
             ResourceReference resourceReference = getResourceReferenceManager().getResourceReference();
             if (resourceReference instanceof EntityResourceReference entityResource) {
@@ -5996,6 +5994,22 @@ public class XWiki implements EventListener
         }
 
         return reference;
+    }
+
+    private DocumentReference getXMLRPCDocumentReference(XWikiContext context)
+    {
+        XWikiDocument document = context.getDoc();
+
+        if (document == null) {
+            // There's no current document yet (this method is precisely what's used to find out which document is
+            // requested), so point to this wiki's home page, as in portlet mode.
+            return getDefaultDocumentReference().setWikiReference(new WikiReference(context.getWikiId()));
+        }
+
+        DocumentReference documentReference = document.getDocumentReference();
+
+        return new DocumentReference(context.getWikiId(), documentReference.getLastSpaceReference().getName(),
+            documentReference.getName());
     }
 
     /**

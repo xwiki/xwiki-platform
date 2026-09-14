@@ -24,7 +24,7 @@
 // Imports ====================================================================
 @import "before-bootstrap"; // Fixes that must be included BEFORE bootstrap
 @import "bootstrap/bootstrap.less"; // Bootstrap
-@import "variables"; // Bootstrap variables overrided by flamingo
+@import "variables"; // Bootstrap variables overridden by flamingo and XWiki specific LESS variables.
 @import "accordion";
 @import "action-menus";
 @import "admin";

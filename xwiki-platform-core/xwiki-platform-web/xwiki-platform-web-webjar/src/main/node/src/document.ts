@@ -18,9 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { XWikiDocument } from "./XWikiDocument";
-import { ComponentInit } from "./components/componentsInit";
-import type { XWikiDocumentData, XWikiDocumentRevision } from "./XWikiDocument";
+import { XWikiDocument } from "@xwiki/platform-document-xwiki/document";
 
-export { ComponentInit, XWikiDocument };
-export type { XWikiDocumentData, XWikiDocumentRevision };
+// Register the generic client-side API for an XWiki document as a RequireJS module. Unlike the entity reference API,
+// this bundle is not loaded by every page: it is declared in the RequireJS paths configuration, so that the code that
+// needs it loads it on demand. Nothing is exposed on the global XWiki object, because this API is new.
+if (typeof define === "function" && define.amd) {
+  define("xwiki-document", [], () => ({ XWikiDocument }));
+}

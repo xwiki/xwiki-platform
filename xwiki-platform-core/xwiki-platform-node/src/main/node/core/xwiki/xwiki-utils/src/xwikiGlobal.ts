@@ -25,13 +25,32 @@ import type {
 } from "@xwiki/platform-xwiki-model-api";
 
 /**
- * A document from the global XWiki object, able to compute its own URLs.
+ * A document from the global XWiki object, able to compute its own URLs. It is the legacy counterpart of the
+ * `XWikiDocument` class from `@xwiki/platform-document-xwiki`, which forwards its URL computation to it.
  *
  * @since 18.8.0RC1
  * @beta
  */
-interface XWikiDocument {
-  getURL(action?: string, parameters?: URLSearchParams): string;
+interface LegacyXWikiDocument {
+  /**
+   * @param action - the action to perform on this document, e.g. `view` or `edit`
+   * @param parameters - the query string parameters to add to the URL
+   * @param fragment - the fragment identifier to add to the URL, without the leading `#`
+   * @returns the URL that performs the given action on this document
+   */
+  getURL(
+    action?: string,
+    parameters?: URLSearchParams,
+    fragment?: string,
+  ): string;
+
+  /**
+   * @param entity - the path of the sub-resource to target, relative to this document, e.g. `objects` or
+   *   `translations/fr`
+   * @param parameters - the query string parameters to add to the URL
+   * @returns the URL of this document, or of one of its sub-resources, in the XWiki REST API
+   */
+  getRestURL(entity?: string, parameters?: URLSearchParams): string;
 }
 
 /**
@@ -40,7 +59,7 @@ interface XWikiDocument {
  * @since 18.8.0RC1
  * @beta
  */
-interface XWikiAttachment {
+interface LegacyXWikiAttachment {
   getURL(): string;
 }
 
@@ -73,14 +92,14 @@ interface XWikiGlobal {
 
   Model: ModelApi;
 
-  Document: new (reference: EntityReference) => XWikiDocument;
+  Document: new (reference: EntityReference) => LegacyXWikiDocument;
 
-  Attachment: new (reference: EntityReference) => XWikiAttachment;
+  Attachment: new (reference: EntityReference) => LegacyXWikiAttachment;
 
   /**
    * The document being displayed by the current page.
    */
-  currentDocument: XWikiDocument & { documentReference: EntityReference };
+  currentDocument: LegacyXWikiDocument & { documentReference: EntityReference };
 
   /**
    * The name of the wiki the current page belongs to.
@@ -98,4 +117,4 @@ interface XWikiGlobal {
   docsyntax: string;
 }
 
-export type { XWikiAttachment, XWikiDocument, XWikiGlobal };
+export type { LegacyXWikiAttachment, LegacyXWikiDocument, XWikiGlobal };

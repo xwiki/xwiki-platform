@@ -30,7 +30,7 @@
   <packaging>webjar-node</packaging>
   <artifactId>xwiki-platform-web-webjar</artifactId>
   <name>XWiki Platform - Web - WebJar</name>
-  <description>JavaScript APIs that are loaded on every page of the XWiki web application.</description>
+  <description>Core JavaScript APIs of the XWiki web application.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Web WebJar</xwiki.extension.name>

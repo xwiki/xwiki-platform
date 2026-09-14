@@ -1632,6 +1632,9 @@ importers:
       '@xwiki/platform-model-xwiki':
         specifier: workspace:*
         version: link:../../model/model-xwiki
+      '@xwiki/platform-xwiki-model-api':
+        specifier: workspace:*
+        version: link:../../xwiki/xwiki-model-api
       '@xwiki/platform-xwiki-utils':
         specifier: workspace:*
         version: link:../../xwiki/xwiki-utils
@@ -3921,6 +3924,9 @@ importers:
 
   xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-webjar/src/main/node:
     dependencies:
+      '@xwiki/platform-document-xwiki':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/document/document-xwiki
       '@xwiki/platform-xwiki-model-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/xwiki/xwiki-model-api

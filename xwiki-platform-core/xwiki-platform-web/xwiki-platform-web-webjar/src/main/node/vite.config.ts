@@ -22,24 +22,27 @@ import { defineConfig } from "vite";
 
 const minify = process.env.MINIFY === "true";
 
+// The entry point to build. The "iife" format supports a single entry per build, so each of them is built by its own
+// Vite pass, selected through this environment variable.
+const entry = process.env.ENTRY ?? "entityReference";
+
 // Note that the shared generateWebjarNodeConfig() helper is deliberately not used here: it forces the "es" format,
-// while this bundle has to be a classic script, and it defines "define.amd" as false, which would remove the AMD
-// registration done by the entry point.
+// while these bundles have to be classic scripts, and it defines "define.amd" as false, which would remove the AMD
+// registration done by the entry points.
 export default defineConfig({
   build: {
     // The webjar-node packaging copies this directory to META-INF/resources/webjars/<artifactId>/<version>/.
     outDir: "../../../target/node-dist",
-    // Keep the minified and the non minified builds side by side.
+    // Keep the minified and the non minified builds of each entry point side by side.
     emptyOutDir: false,
     minify: minify ? "esbuild" : false,
     sourcemap: minify,
     lib: {
-      entry: "src/entityReference.ts",
-      // Unused, since the entry point exports nothing, but required by the "iife" format.
-      name: "xwikiEntityReference",
+      entry: `src/${entry}.ts`,
+      // Unused, since the entry points export nothing, but required by the "iife" format.
+      name: entry,
       formats: ["iife"],
-      fileName: () =>
-        minify ? "entityReference.min.js" : "entityReference.js",
+      fileName: () => (minify ? `${entry}.min.js` : `${entry}.js`),
     },
   },
 });

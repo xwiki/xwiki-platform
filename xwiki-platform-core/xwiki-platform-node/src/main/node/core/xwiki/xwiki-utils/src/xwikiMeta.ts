@@ -33,7 +33,20 @@ type XWikiMeta = {
   form_token: string;
   userReference?: EntityReference | null;
   isNew: boolean;
+
+  /**
+   * The raw locale of the document displayed by the current page. It is empty for the original translation, whose
+   * actual locale is given by {@link XWikiMeta.realLocale}.
+   */
   locale: string;
+
+  /**
+   * The actual locale of the document displayed by the current page. It differs from {@link XWikiMeta.locale} only
+   * for the original translation, whose raw locale is empty. Note that it is the empty string for a technical
+   * document, whose locale is the root locale.
+   */
+  realLocale: string;
+
   action: string;
 
   setVersion: (version: string) => void;

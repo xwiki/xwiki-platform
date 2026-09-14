@@ -422,13 +422,13 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     async _resetContent() {
-      const html = await $.get(xwikiDocument.getURL('get', {
+      const html = await $.get(xwikiDocument.getURL('get', new URLSearchParams({
         xpage:'get',
         outputSyntax:'annotatedhtml',
         outputSyntaxVersion:'5.0',
         transformations:'macro',
-        language: xwikiDocument.realLocale
-      }));
+        language: xwikiDocument.realLocale ?? ''
+      })));
       this._hideChangesFromSaver(this._patchedEditor.setHTML(html, true));
     }
 

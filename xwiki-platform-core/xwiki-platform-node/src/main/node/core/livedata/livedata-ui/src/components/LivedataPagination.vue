@@ -33,9 +33,8 @@
     :aria-label="
       this.data.id
         ? $t('livedata.pagination.label', [this.data.id])
-        : $t('livedata.pagination.label.empty')
-    "
-  >
+        : $t('livedata.pagination.label.empty')"
+       v-if="showPagination">
     <!--
       The actual pagination widget
       It displays the the available pages numbers, and change to them on click.
@@ -331,6 +330,9 @@ export default {
     showEntryRange() {
       return this.data.meta.pagination.showEntryRange;
     },
+    showPagination() {
+      return this.logic.getPageCount() > 1 || this.data.meta.pagination.showPaginationOnSinglePage;
+    }
   },
 
   methods: {

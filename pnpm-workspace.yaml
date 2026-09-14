@@ -13,6 +13,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/attachments/attachments-default
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/authentication/authentication-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/backends/backend-api
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/backends/backend-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/collaboration/collaboration-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/collaboration/collaboration-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/component/component-annotation/component-annotation-default

@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { DefaultAuthenticationManagerProvider } from "./authentication/DefaultAuthenticationManagerProvider";
-import { XWikiAuthenticationManager } from "./authentication/XWikiAuthenticationManager";
 import { DefaultBlockNoteIterator } from "./blocknote/DefaultBlockNoteIterator";
 import { XWikiBlockNoteProcessor } from "./blocknote/XWikiBlockNoteProcessor";
 import { MinimalApp } from "./cristal/MinimalApp";
@@ -36,6 +35,7 @@ import { DefaultSkinManager } from "./skin/DefaultSkinManager";
 import { DefaultStorageProvider } from "./storage/DefaultStorageProvider";
 import { DefaultLogger } from "@xwiki/platform-api";
 import { ComponentInit as DefaultAttachmentsComponentInit } from "@xwiki/platform-attachments-default";
+import { ComponentInit as AuthenticationXWikiComponentList } from "@xwiki/platform-authentication-xwiki";
 import { ComponentInit as BackendXWikiComponentList } from "@xwiki/platform-backend-xwiki";
 import { ComponentInit as CollaborationComponentList } from "@xwiki/platform-collaboration-api";
 import { ComponentInit as XWikiCollaborationComponentList } from "@xwiki/platform-collaboration-xwiki";
@@ -66,7 +66,7 @@ DefaultRemoteURLSerializerProvider.bind(container);
 new ModelRemoteURLXWikiComponentList(container);
 
 DefaultAuthenticationManagerProvider.bind(container);
-XWikiAuthenticationManager.bind(container);
+new AuthenticationXWikiComponentList(container);
 
 DefaultLinkSuggestServiceProvider.bind(container);
 

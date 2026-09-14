@@ -50,3 +50,9 @@ function getRestSpacesApiUrl(
 }
 
 export { getRestSpacesApiUrl, loadById };
+export type {
+  XWikiAttachment,
+  XWikiDocument,
+  XWikiGlobal,
+} from "./xwikiGlobal";
+export type { XWikiMeta } from "./xwikiMeta";

@@ -377,12 +377,18 @@ importers:
       '@xwiki/platform-model-remote-url-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
+      '@xwiki/platform-model-xwiki':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/model/model-xwiki
       '@xwiki/platform-rendering-api':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/rendering/rendering-api
       '@xwiki/platform-syntaxes-config':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/syntaxes/syntaxes-config
+      '@xwiki/platform-xwiki-model-api':
+        specifier: workspace:*
+        version: link:../../../../../xwiki-platform-node/src/main/node/core/xwiki/xwiki-model-api
       '@xwiki/platform-xwiki-syntax-config':
         specifier: workspace:*
         version: link:../../../../../xwiki-platform-node/src/main/node/core/syntaxes/xwiki
@@ -3116,6 +3122,9 @@ importers:
       '@xwiki/platform-api':
         specifier: workspace:*
         version: link:../../../api
+      '@xwiki/platform-xwiki-model-api':
+        specifier: workspace:*
+        version: link:../xwiki-model-api
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'

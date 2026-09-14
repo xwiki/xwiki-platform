@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { Container, inject, injectable } from "inversify";
-import type { XWikiMeta } from "../meta/XWikiMeta";
 import type {
   AuthenticationManager,
   UserDetails,
 } from "@xwiki/platform-authentication-api";
+import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 
 @injectable("Singleton")
 export class XWikiAuthenticationManager implements AuthenticationManager {

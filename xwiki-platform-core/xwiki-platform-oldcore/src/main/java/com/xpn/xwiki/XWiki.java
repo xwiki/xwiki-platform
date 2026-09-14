@@ -4757,13 +4757,18 @@ public class XWiki implements EventListener
      * @param userReference the user responsible for the delete
      * @param document the document to delete
      * @param context the XWiki context
-     * @throws XWikiException when failing to delete
+     * @throws XWikiException when failing to delete or when the passed document is {@code null}
      * @since 11.6
      * @since 10.11.10
      */
     public void checkDeletingDocument(DocumentReference userReference, XWikiDocument document, XWikiContext context)
         throws XWikiException
     {
+        if (document == null) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Cannot check the deletion of a null document");
+        }
+
         String currentWiki = null;
 
         currentWiki = context.getWikiId();

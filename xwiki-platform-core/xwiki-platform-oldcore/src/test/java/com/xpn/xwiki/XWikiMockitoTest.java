@@ -89,6 +89,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -308,6 +309,16 @@ class XWikiMockitoTest
             same(this.context));
 
         verifyNoMoreInteractions(observation);
+    }
+
+    @Test
+    void checkDeletingDocumentWithNullDocument()
+    {
+        XWikiException exception = assertThrows(XWikiException.class,
+            () -> this.xwiki.checkDeletingDocument(new DocumentReference("wiki", "XWiki", "User"), null,
+                this.context));
+
+        assertEquals("Error number 0 in 2: Cannot check the deletion of a null document", exception.getMessage());
     }
 
     @Test

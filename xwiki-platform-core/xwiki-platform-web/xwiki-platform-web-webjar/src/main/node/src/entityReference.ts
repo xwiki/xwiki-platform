@@ -30,7 +30,7 @@ import {
   Model,
   SpaceReference,
   WikiReference,
-} from "@xwiki/platform-model-reference-xwiki";
+} from "@xwiki/platform-xwiki-model-api";
 
 const api = {
   EntityType,

@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/platform-model-reference-xwiki",
+  "name": "@xwiki/platform-xwiki-model-api",
   "version": "18.8.0-SNAPSHOT",
   "license": "LGPL-2.1-or-later",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-xwiki",
+    "directory": "xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-model-api",
     "url": "git+https://github.com/xwiki/xwiki-platform.git"
   },
   "bugs": {

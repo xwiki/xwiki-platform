@@ -43,7 +43,6 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/macros/macros-service
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-api
-  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-reference/model-reference-xwiki
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/model/model-remote-url/model-remote-url-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/rendering/rendering-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/navigation-tree/navigation-tree-api
@@ -56,6 +55,7 @@ packages:
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/uniast/uniast-markdown-xwiki
+  - xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-model-api
   - xwiki-platform-core/xwiki-platform-node/src/main/node/core/xwiki/xwiki-utils
   - xwiki-platform-core/xwiki-platform-node/src/main/node/dev/config
   - xwiki-platform-core/xwiki-platform-node/src/main/node/editors/blocknote-headless

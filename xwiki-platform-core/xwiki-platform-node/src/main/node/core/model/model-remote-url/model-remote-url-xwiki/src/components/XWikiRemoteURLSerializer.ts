@@ -26,20 +26,12 @@ import {
   absoluteXWikiEntityReference,
   toXWikiEntityReference,
 } from "@xwiki/platform-model-xwiki";
-import { Container, injectable } from "inversify";
+import { injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
 
-@injectable("Singleton")
-export class XWikiRemoteURLSerializer implements RemoteURLSerializer {
-  public static bind(container: Container): void {
-    container
-      .bind("RemoteURLSerializer")
-      .to(XWikiRemoteURLSerializer)
-      .inSingletonScope()
-      .whenNamed("XWiki");
-  }
-
+@injectable()
+class XWikiRemoteURLSerializer implements RemoteURLSerializer {
   public serialize(reference?: EntityReference): string | undefined {
     if (!reference) {
       return undefined;
@@ -79,3 +71,5 @@ export class XWikiRemoteURLSerializer implements RemoteURLSerializer {
     ).getURL();
   }
 }
+
+export { XWikiRemoteURLSerializer };

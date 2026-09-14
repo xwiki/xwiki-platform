@@ -99,13 +99,9 @@
         }
       }
 
-      // Avatar styling
-      img.avatar {
-        border-radius: 50%;
-        height: 50px;
-        width: 50px;
-        // Overwrite the default for img and avoid squishing down the avatar when the account name is too large
-        max-width: unset;
+      // Avoid squishing down the avatar when the account name is too large
+      > .user {
+        flex-shrink: 0;
       }
 
       .brand-links {

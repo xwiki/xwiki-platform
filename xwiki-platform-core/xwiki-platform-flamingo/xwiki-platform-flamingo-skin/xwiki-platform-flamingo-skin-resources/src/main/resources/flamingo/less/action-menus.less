@@ -185,10 +185,10 @@ li:has(+ li #tmRegister) #tmLogin {
 // Navbar avatar ==========================================================
 
 .navbar-avatar {
-  > a {
+  a {
     max-height: @navbar-height;
 
-    > img {
+    img {
       @avatar-size: floor((ceil((@navbar-height / 2)) / 2)) * 2;
       border-radius: @thumbnail-border-radius;
       height: @avatar-size;
@@ -201,7 +201,8 @@ li:has(+ li #tmRegister) #tmLogin {
 
 // Icon in a navbar  ======================================================
 
-.icon-navbar {
+.icon-navbar,
+.navbar-avatar a {
   cursor: pointer;
 }
 

@@ -1921,29 +1921,30 @@ define('xwiki-text-offset-updater', ['jquery', 'node-module!fast-diff'], functio
   };
 });
 
-require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function($, offsetUpdater) {
+require(['jquery', 'xwiki-text-offset-updater', 'xwiki-annotate-popup', 'xwiki-events-bridge'], function($, offsetUpdater, AnnotatePopup) {
   $(function() {
     // Load the annotations only in view mode, if the document content is displayed
     // (the document content is not displayed when viewer=history for instance).
-    if (XWiki.contextaction != 'view' || !$('#xwikicontent')[0]) {
+    const wikiContent = $('#xwikicontent')[0];
+    if (XWiki.contextaction != 'view' || !wikiContent) {
       return;
     }
 
-    #if ($annotationHighlightByDefault &amp;&amp; $annotationHighlightByDefault != 0)
-      var displayHighlight = true;
-    #else
-      var displayHighlight = false;
-    #end
-    #if ($annotationsDisplayedByDefault &amp;&amp; $annotationsDisplayedByDefault != 0)
-      var displayed = true;
-    #else
-      var displayed = false;
-    #end
-    #if ($annotationsActivated &amp;&amp; $annotationsActivated != 0)
-      var activated = true;
-    #else
-      var activated = false;
-    #end
+  #if ($annotationHighlightByDefault &amp;&amp; $annotationHighlightByDefault != 0)
+    var displayHighlight = true;
+  #else
+    var displayHighlight = false;
+  #end
+  #if ($annotationsDisplayedByDefault &amp;&amp; $annotationsDisplayedByDefault != 0)
+    var displayed = true;
+  #else
+    var displayed = false;
+  #end
+  #if ($annotationsActivated &amp;&amp; $annotationsActivated != 0)
+    var activated = true;
+  #else
+    var activated = false;
+  #end
 
     $.extend(XWiki.Annotation.prototype, {
       /**
@@ -2012,8 +2013,8 @@ require(['jquery', 'xwiki-text-offset-updater', 'xwiki-events-bridge'], function
     var currentSpaceInExceptions = exceptions.indexOf(XWiki.currentSpace);
     // if the annotations are activated and the current space is not an exception or the annotations are not activated but the current space is an exception
     if ((activated &amp;&amp; currentSpaceInExceptions &lt; 0) || (!activated &amp;&amp; currentSpaceInExceptions &gt;= 0)) {
-      // initialize the annotations on the xwikicontent element which is the document content by default
-      new XWiki.Annotation(displayHighlight, $('#xwikicontent')[0], displayed);
+      const annotation = new XWiki.Annotation(displayHighlight, wikiContent, displayed);
+      new AnnotatePopup(wikiContent, annotation.onAddAnnotationShortcut.bind(annotation));
     }
   });
 });</code>

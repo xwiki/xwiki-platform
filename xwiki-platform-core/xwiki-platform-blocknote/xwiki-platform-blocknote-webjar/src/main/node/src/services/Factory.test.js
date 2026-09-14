@@ -20,29 +20,29 @@
 import { Factory } from "./Factory";
 import { describe, expect, it, vi } from "vitest";
 
+vi.mock("@xwiki/platform-component-manager-default", () => ({
+  resolverPromise: Promise.resolve({
+    getAsync() {},
+  }),
+}));
+
+vi.mock("./Logic", () => {
+  return {
+    Logic: class MockLogic {
+      constructor(host) {
+        this.host = host;
+        this.name = host.name;
+        this.ready = Promise.resolve(this);
+      }
+
+      destroy() {
+        // Do nothing.
+      }
+    },
+  };
+});
+
 describe("Factory", () => {
-  vi.mock("@xwiki/platform-component-manager-default", () => ({
-    resolverPromise: Promise.resolve({
-      getAsync() {},
-    }),
-  }));
-
-  vi.mock("./Logic", () => {
-    return {
-      Logic: class MockLogic {
-        constructor(host) {
-          this.host = host;
-          this.name = host.name;
-          this.ready = Promise.resolve(this);
-        }
-
-        destroy() {
-          // Do nothing.
-        }
-      },
-    };
-  });
-
   // eslint-disable-next-line max-statements
   it("should create a BlockNote instance", async () => {
     const factory = new Factory();

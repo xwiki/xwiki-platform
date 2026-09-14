@@ -144,7 +144,7 @@ class MentionsIT
         // the mention is correct. The author property of the comment is deliberately set to U1 to make sure that the
         // emitter is the user who actually added the comment and not the one declared in the comment.
         setup.rest().runAs(U3_CREDENTIALS, rest -> {
-            CommentsTab.restPostComment(rest, reference, "AAAAA\n\n"
+            CommentsTab.restPostComment(reference, "AAAAA\n\n"
                     + "<strong>Quote</strong> "
                     + "{{mention reference=\"xwiki:XWiki.U4\" style=\"LOGIN\" anchor=\"test-mention-2\" "
                     + "type=\"user\" /}} XYZ\n\nBBBBB",

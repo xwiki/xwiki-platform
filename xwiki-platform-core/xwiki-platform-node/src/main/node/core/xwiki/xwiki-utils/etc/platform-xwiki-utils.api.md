@@ -4,6 +4,9 @@
 
 ```ts
 
+import { EntityReference } from '@xwiki/platform-xwiki-model-api';
+import { EntityTypeApi } from '@xwiki/platform-xwiki-model-api';
+import { ModelApi } from '@xwiki/platform-xwiki-model-api';
 import { WikiConfig } from '@xwiki/platform-api';
 
 // @beta
@@ -11,6 +14,52 @@ export function getRestSpacesApiUrl(wikiConfig: WikiConfig, documentId: string):
 
 // @public
 export function loadById<T = unknown>(...ids: string[]): Promise<T>;
+
+// @beta
+export interface XWikiAttachment {
+    // (undocumented)
+    getURL(): string;
+}
+
+// @beta
+export interface XWikiDocument {
+    // (undocumented)
+    getURL(action?: string, parameters?: URLSearchParams): string;
+}
+
+// @beta
+export interface XWikiGlobal {
+    // (undocumented)
+    Attachment: new (reference: EntityReference) => XWikiAttachment;
+    contextPath: string;
+    currentDocument: XWikiDocument & {
+        documentReference: EntityReference;
+    };
+    currentWiki: string;
+    docsyntax: string;
+    // (undocumented)
+    Document: new (reference: EntityReference) => XWikiDocument;
+    // (undocumented)
+    EntityReference: new (name: string, type: number, parent?: EntityReference | null, locale?: string) => EntityReference;
+    // (undocumented)
+    EntityType: EntityTypeApi;
+    // (undocumented)
+    Model: ModelApi;
+}
+
+// @beta
+export type XWikiMeta = {
+    documentReference: EntityReference;
+    version: string;
+    restURL: string;
+    form_token: string;
+    userReference?: EntityReference | null;
+    isNew: boolean;
+    locale: string;
+    action: string;
+    setVersion: (version: string) => void;
+    refreshVersion: (handle404: (response: Response) => void) => Promise<void>;
+};
 
 // (No @packageDocumentation comment for this package)
 

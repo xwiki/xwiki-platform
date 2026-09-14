@@ -17,16 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { toCristalEntityReference } from "../model/reference/XWikiEntityReference";
+import { toCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { Container, inject, injectable } from "inversify";
 import { ref } from "vue";
-import type { XWikiMeta } from "../meta/XWikiMeta";
 import type { PageData } from "@xwiki/platform-api";
 import type {
   DocumentChange,
   DocumentService,
 } from "@xwiki/platform-document-api";
 import type { DocumentReference } from "@xwiki/platform-model-api";
+import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 import type { Ref } from "vue";
 
 @injectable("Singleton")

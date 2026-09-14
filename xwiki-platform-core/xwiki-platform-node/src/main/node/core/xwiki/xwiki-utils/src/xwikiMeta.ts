@@ -17,33 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import type { XWikiEntityReference } from "../model/reference/XWikiEntityReference";
+
+import type { EntityReference } from "@xwiki/platform-xwiki-model-api";
 
 /**
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
+ * The metadata of the document displayed by the current page, exposed by the `xwiki-meta` RequireJS module.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * @since 18.8.0RC1
+ * @beta
  */
-export type XWikiMeta = {
-  documentReference: XWikiEntityReference;
+type XWikiMeta = {
+  documentReference: EntityReference;
   version: string;
   restURL: string;
   form_token: string;
-  userReference?: XWikiEntityReference;
+  userReference?: EntityReference | null;
   isNew: boolean;
   locale: string;
   action: string;
@@ -58,3 +46,5 @@ export type XWikiMeta = {
    */
   refreshVersion: (handle404: (response: Response) => void) => Promise<void>;
 };
+
+export type { XWikiMeta };

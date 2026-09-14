@@ -19,13 +19,13 @@
  */
 import { AbstractStorage } from "@xwiki/platform-backend-api";
 import { Container, inject, injectable } from "inversify";
-import type { XWikiMeta } from "../meta/XWikiMeta";
 import type {
   AttachmentsData,
   Logger,
   PageAttachment,
   PageData,
 } from "@xwiki/platform-api";
+import type { XWikiMeta } from "@xwiki/platform-xwiki-utils";
 
 @injectable("Singleton")
 export class XWikiStorage extends AbstractStorage {
@@ -139,7 +139,8 @@ export class XWikiStorage extends AbstractStorage {
       XWiki.currentDocument.documentReference,
     );
     const language = document.documentElement.getAttribute("lang") || "";
-    return new XWiki.Document(documentReference).getURL(
+    // The page is a non empty reference string, so it always resolves.
+    return new XWiki.Document(documentReference!).getURL(
       "get",
       new URLSearchParams({
         sheet: "XWiki.WYSIWYG.FileUploader",

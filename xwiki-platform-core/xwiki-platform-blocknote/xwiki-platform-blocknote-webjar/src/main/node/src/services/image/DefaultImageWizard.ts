@@ -24,13 +24,13 @@ import type {
   ImageWizard,
   ImageWizardCallback,
 } from "./ImageWizard";
-import type { XWikiEntityReference } from "../model/reference/XWikiEntityReference";
 import type { StorageProvider } from "@xwiki/platform-backend-api";
 import type { BlockOfType } from "@xwiki/platform-editors-blocknote-react";
 import type {
   ResourceReference,
   ResourceReferenceParser,
 } from "@xwiki/platform-rendering-api";
+import type { EntityReference as XWikiEntityReference } from "@xwiki/platform-xwiki-model-api";
 
 // The image alignment options supported by the Image Wizard.
 type ImageAlignment = "none" | "start" | "center" | "end";
@@ -237,7 +237,8 @@ export class DefaultImageWizard implements ImageWizard {
         .saveAttachments(currentDocumentReference, [file]);
       if (result?.[0]) {
         callback.onSuccess(
-          XWiki.Model.resolve(result[0], XWiki.EntityType.ATTACHMENT),
+          // The upload result is a non empty attachment reference string, so it always resolves.
+          XWiki.Model.resolve(result[0], XWiki.EntityType.ATTACHMENT)!,
         );
       } else {
         callback.onAbort();

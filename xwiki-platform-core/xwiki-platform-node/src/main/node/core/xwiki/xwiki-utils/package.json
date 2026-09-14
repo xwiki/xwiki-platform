@@ -38,7 +38,8 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@xwiki/platform-api": "workspace:*"
+    "@xwiki/platform-api": "workspace:*",
+    "@xwiki/platform-xwiki-model-api": "workspace:*"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",

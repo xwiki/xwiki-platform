@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { absoluteCristalEntityReference } from "./XWikiEntityReference";
 import {
   DocumentReference,
   EntityType,
   SpaceReference,
 } from "@xwiki/platform-model-api";
 import { AbstractModelReferenceHandler } from "@xwiki/platform-model-reference-api";
+import { absoluteCristalEntityReference } from "@xwiki/platform-model-xwiki";
 import { Container, injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
 
@@ -46,7 +46,10 @@ export class XWikiModelReferenceHandler extends AbstractModelReferenceHandler {
   }
 
   public getTitle(reference: EntityReference): string {
-    const absoluteReference = absoluteCristalEntityReference(reference);
+    const absoluteReference = absoluteCristalEntityReference(
+      reference,
+      XWiki.currentDocument.documentReference,
+    );
     switch (absoluteReference?.type) {
       case EntityType.WIKI:
         return absoluteReference.name;

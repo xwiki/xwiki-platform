@@ -18,14 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import {
-  absoluteXWikiEntityReference,
-  toXWikiEntityReference,
-} from "../reference/XWikiEntityReference";
-import {
   DocumentReference,
   EntityType,
   SpaceReference,
 } from "@xwiki/platform-model-api";
+import {
+  absoluteXWikiEntityReference,
+  toXWikiEntityReference,
+} from "@xwiki/platform-model-xwiki";
 import { Container, injectable } from "inversify";
 import type { EntityReference } from "@xwiki/platform-model-api";
 import type { RemoteURLSerializer } from "@xwiki/platform-model-remote-url-api";
@@ -61,14 +61,21 @@ export class XWikiRemoteURLSerializer implements RemoteURLSerializer {
   }
 
   private getDocumentURL(reference: EntityReference): string {
+    // Resolving the serialized form of a complete reference always yields a reference back.
     return new XWiki.Document(
-      absoluteXWikiEntityReference(toXWikiEntityReference(reference)),
+      absoluteXWikiEntityReference(
+        toXWikiEntityReference(reference),
+        XWiki.currentDocument.documentReference,
+      )!,
     ).getURL();
   }
 
   private getAttachmentURL(reference: EntityReference): string {
     return new XWiki.Attachment(
-      absoluteXWikiEntityReference(toXWikiEntityReference(reference)),
+      absoluteXWikiEntityReference(
+        toXWikiEntityReference(reference),
+        XWiki.currentDocument.documentReference,
+      )!,
     ).getURL();
   }
 }

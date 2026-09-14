@@ -43,6 +43,10 @@ public class JobState
 
     private TriggerState state;
 
+    /**
+     * @param state the ordinal of the {@link TriggerState} of the job
+     * @deprecated use {@link #JobState(TriggerState)} instead
+     */
     @Deprecated
     public JobState(int state)
     {
@@ -54,6 +58,10 @@ public class JobState
         setQuartzState(state);
     }
 
+    /**
+     * @param state the ordinal of the {@link TriggerState} of the job
+     * @deprecated use {@link #setQuartzState(TriggerState)} instead
+     */
     @Deprecated
     public void setState(int state)
     {

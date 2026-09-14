@@ -96,6 +96,7 @@ public class AttachmentDiff
      * scripts that were exposed to the unsafe {@link com.xpn.xwiki.doc.AttachmentDiff}.
      * 
      * @return the original attachment version
+     * @deprecated use {@link #getOrigAttachment()} instead
      */
     @Deprecated
     public String getOrigVersion()
@@ -108,6 +109,7 @@ public class AttachmentDiff
      * scripts that were exposed to the unsafe {@link com.xpn.xwiki.doc.AttachmentDiff}.
      * 
      * @return the new attachment version
+     * @deprecated use {@link #getNewAttachment()} instead
      */
     @Deprecated
     public String getNewVersion()

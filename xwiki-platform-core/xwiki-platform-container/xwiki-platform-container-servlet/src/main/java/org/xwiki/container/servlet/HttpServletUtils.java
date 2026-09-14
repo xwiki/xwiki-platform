@@ -324,6 +324,7 @@ public final class HttpServletUtils
      * 
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
+     * @deprecated use {@link #getSourceURL(HttpServletRequest)} instead
      */
     @Deprecated(since = "17.0.0RC1")
     public static URL getSourceURL(javax.servlet.http.HttpServletRequest servletRequest)
@@ -345,6 +346,7 @@ public final class HttpServletUtils
      * 
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
+     * @deprecated use {@link #getSourceBaseURL(HttpServletRequest)} instead
      */
     @Deprecated(since = "17.0.0RC1")
     public static URL getSourceBaseURL(javax.servlet.http.HttpServletRequest servletRequest)
@@ -360,6 +362,7 @@ public final class HttpServletUtils
      * @param request the servlet request input
      * @return true if the request explicitly disable getting resources from the cache
      * @since 11.8RC1
+     * @deprecated use {@link #isCacheReadAllowed(HttpServletRequest)} instead
      */
     @Deprecated(since = "17.0.0RC1")
     public static boolean isCacheReadAllowed(javax.servlet.http.HttpServletRequest request)
